@@ -1,7 +1,14 @@
-.PHONY: all check site stubs-check en pl text-only watch-en watch-pl clean diagrams diagrams-clean \
+.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 \
+        text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames outcomes values translate shots debt
 
+# Two paper formats from one source. `standard` is the 17 x 24 cm trade format
+# shared with the companion volumes; `a4` is A4 at 12pt, which is what the book
+# is actually read in -- on a screen, or off an office printer. The format is
+# chosen by the main file, and the four main files differ in five lines.
 LANGS   := en pl
+FORMATS := standard a4
+
 MMD_SRC := $(wildcard figures/mermaid/en/*.mmd) $(wildcard figures/mermaid/pl/*.mmd)
 MMD_PDF := $(patsubst figures/mermaid/%.mmd,figures/diagrams/%.pdf,$(MMD_SRC))
 VAL_SRC := $(wildcard code/*.py)
@@ -13,6 +20,11 @@ BROWSER ?= $(shell command -v chromium 2>/dev/null || command -v chromium-browse
 
 all: numbers diagrams en pl check
 
+# Both editions on A4. Use `make all-formats` for all four PDFs.
+a4: numbers diagrams en-a4 pl-a4 check-a4
+
+all-formats: numbers diagrams en pl en-a4 pl-a4 check check-a4
+
 # The three gates. A build that only *looked* like it succeeded is the failure
 # mode this book cannot afford: -interaction=nonstopmode writes a PDF over the
 # top of an error, and with -file-line-error the error line does not begin with
@@ -23,6 +35,13 @@ check:
 	@python3 tools/parity.py | tail -n 3
 	@python3 tools/reflist.py 2>/dev/null || true
 
+# The A4 build is the same source, so parity and the stub manifest are already
+# covered by `check`. What is NOT covered is the log: a format change can push
+# a table past a page boundary and produce an overfull vbox in one format only,
+# which is exactly the class of defect the trade format's own log cannot see.
+check-a4:
+	@python3 tools/checklog.py main-en-a4.log main-pl-a4.log
+
 en: numbers
 	latexmk -pdf -interaction=nonstopmode -file-line-error main-en.tex
 	@python3 tools/checklog.py main-en.log
@@ -30,6 +49,14 @@ en: numbers
 pl: numbers
 	latexmk -pdf -interaction=nonstopmode -file-line-error main-pl.tex
 	@python3 tools/checklog.py main-pl.log
+
+en-a4: numbers
+	latexmk -pdf -interaction=nonstopmode -file-line-error main-en-a4.tex
+	@python3 tools/checklog.py main-en-a4.log
+
+pl-a4: numbers
+	latexmk -pdf -interaction=nonstopmode -file-line-error main-pl-a4.tex
+	@python3 tools/checklog.py main-pl-a4.log
 
 # Skip diagram rendering and value regeneration -- useful when iterating on
 # prose. Unrendered diagrams print their Mermaid source, so the build is still
@@ -40,13 +67,15 @@ text-only:
 
 # Assemble locally exactly what CI publishes to Pages, so a link or a layout
 # change can be checked before it is deployed rather than after.
-site: en pl
+site: en pl en-a4 pl-a4
 	@rm -rf _site && mkdir -p _site
 	@cp -r docs/. _site/
 	@cp main-en.pdf "_site/Mathematics-from-Zero-for-the-AI-Engineer.pdf"
 	@cp main-pl.pdf "_site/Matematyka-od-zera-dla-inzyniera-AI.pdf"
 	@cp main-en.pdf _site/book-en.pdf
 	@cp main-pl.pdf _site/book-pl.pdf
+	@cp main-en-a4.pdf _site/book-en-a4.pdf
+	@cp main-pl-a4.pdf _site/book-pl-a4.pdf
 	@echo "  _site/ assembled. Open _site/index.html."
 
 watch-en:
@@ -55,7 +84,7 @@ watch-pl:
 	latexmk -pvc -pdf -interaction=nonstopmode main-pl.tex
 
 clean:
-	latexmk -C main-en.tex; latexmk -C main-pl.tex
+	for j in main-en main-pl main-en-a4 main-pl-a4; do latexmk -C $$j.tex; done
 	rm -rf _site
 	rm -f *.dgm *.ilg *.ind *.idx programs/*/*.aux appendices/*/*.aux
 

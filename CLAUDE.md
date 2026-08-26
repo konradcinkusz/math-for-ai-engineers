@@ -10,16 +10,27 @@ Read this before touching a program.
 
 | | Done | Remaining |
 |---|---|---|
-| Structure | Both mains, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
+| Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
 | Programs | **F1 written, both editions.** F2–F13 and P1–P34 are stubs carrying their briefs | 46 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
-Both editions build clean: `latexmk -pdf main-en.tex` and `main-pl.tex` each
-return 0. **English 169 pages, Polish 171 pages, zero errors, zero warnings,
-zero overfull vboxes, four overfull hboxes of at most 4.1 pt.** Parity reports
-**0 failures and 0 warnings** across 56 file pairs; `reflist.py` confirms 66
-labels resolve to the same numbers in both editions.
+**Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
+the format the book is read in; 17 x 24 cm is the trade format shared with the
+companion volumes.
+
+| | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
+|---|---|---|---|---|---|
+| `main-en` (17x24) | 171 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-pl` (17x24) | 171 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en-a4` | 163 | 0 | 0 | 5, worst 6.3 pt | 0 |
+| `main-pl-a4` | 163 | 0 | 0 | 4, worst 4.4 pt | 0 |
+
+The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
+one format and one language because that is where the line falls. Well under
+the 15 pt budget. Parity reports **0 failures and 0 warnings** across 56 file
+pairs; `reflist.py` confirms 66 labels resolve to the same numbers in both
+editions.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
@@ -79,27 +90,57 @@ something. No marketing register. No *simply*, no *just*, no *powerful*.
 **Two to four figures per program**, each teaching something. Mermaid, ASCII
 source, per language, committed; rendered PDFs are build output.
 
-**Watch the margin.** 17 cm page. Anything over ~15 pt is a defect; the current
-worst is 4.1 pt. Count vboxes as well as hboxes — an overfull **vbox** means a
+**Watch the margin.** 17 cm page in the trade format, 21 cm on A4 — but both
+are set to about the same measure, so a line that overflows in one usually
+overflows in the other. Anything over ~15 pt is a defect; the current worst is
+6.3 pt. Count vboxes as well as hboxes — an overfull **vbox** means a
 boxed block grew past a page and could not break, and the fix is to split the
 table, not to shrink the text.
 
 ---
 
-## Two editions, one source
+## Two editions, two formats, one source
 
-`main-en.tex` and `main-pl.tex` differ in `\booklang` and in which language's
-directories they read. Everything structural is shared exactly once:
+Four main files: two languages times two paper formats. They differ in five
+lines each — the class's point size, `\booklang`, `\bookpaper` and the PDF
+title — and share everything else, **including the document body**:
 
 ```
-preamble.tex        all machinery, both editions
-lang/en.tex         every user-visible string + the notation contract
-lang/pl.tex         the same macro set, or CI fails
-structure.tex       THE part and program sequence. One list, both editions.
-figures/values/     computed numbers, committed, shared
-code/               the scripts that produce them
-programs/{en,pl}/   the only place prose is duplicated
+main-{en,pl}.tex      17 x 24 cm at 11pt, the trade format
+main-{en,pl}-a4.tex   A4 at 12pt, the format the book is read in
+body.tex              THE document body. One copy, read by all four.
+preamble.tex          all machinery, every format
+lang/en.tex           every user-visible string + the notation contract
+lang/pl.tex           the same macro set, or CI fails
+structure.tex         THE part and program sequence. One list, both editions.
+figures/values/       computed numbers, committed, shared
+code/                 the scripts that produce them
+programs/{en,pl}/     the only place prose is duplicated
 ```
+
+**`body.tex` is not tidiness, it is C15 made structural.** `main-en.tex` was
+once rewritten with the introduction dropped and every other check passed,
+because nothing that compares *programs* can see a difference that lives in the
+*wiring*. Adding a second format would have made that four copies of the wiring
+and four chances to make the same mistake. There is one copy, parameterised by
+`\booklang` exactly as `structure.tex` already parameterises the program
+sequence, so the defect is now impossible rather than merely detected. C15 was
+rewritten to guard the structure that makes it impossible: every main file
+reads the body, and the body still wires up a whole book.
+
+**Why A4 at all.** The trade format is right for a printed book and wrong for
+both things a reader actually does with this one — read it in a PDF viewer, or
+print it on an office printer, where a 17 x 24 cm page lands in the middle of an
+A4 sheet surrounded by white. Both formats are set to **about the same measure**:
+A4 spends its extra width on margin, not on a longer line. A 15.5 cm block at
+12pt would be some eighty-five characters, past the point where the eye loses
+the line return, and "it reads badly" would have been fixed into the wrong
+shape.
+
+A format change moves every page boundary, so **CI compiles all four**. A table
+that fits on one page in the trade format can overflow its vbox on A4 without
+the trade build noticing, and that is exactly the class of defect a
+single-format build ships.
 
 **There is exactly one list of programs**, so the two editions cannot contain
 different ones. Part titles live in `lang/*.tex`, not in `structure.tex`: the
@@ -233,6 +274,35 @@ patched for the same reason.
 system it should not be written), `rigourbox` (*what we are not proving*, and
 where the proof lives), `notationbox`, `verifybox`, `exercisebox`.
 
+**Two box treatments, and that is the whole visual grammar.** `mfa tinted` is a
+block the reader may read in passing: a tint and a thick left bar, no outline.
+`mfa outlined` is a block the reader must stop at: a full rule on white. Both
+styles live in one `\tcbset` so the eight boxes share one set of spacing
+numbers rather than eight copies that drift. A third treatment would mean the
+first two are not carrying their meaning.
+
+The numbers that matter are `before skip` and `after skip`, at 13 pt. tcolorbox
+defaults to a couple of points, which is not enough air to read as a separate
+block — and every box carrying its own value is how a page ends up looking
+arbitrary.
+
+**The frame boundary is a rule with the frame's number sitting on it**, like a
+tab on a card. The badge used to be the first thing in the *text flow* instead,
+which reads correctly only when a frame opens with a sentence — and about a
+third of them open with `\ans`, whose box starts a new vertical block, so the
+badge was left stranded alone on the line above with the box beneath it.
+`\mfaframeabove` (17 pt) and `\mfaframebelow` (10 pt) are the gutter, and they
+are the most load-bearing numbers in the layout: the frame is the unit the
+reader covers with a hand, and two frames a hairline apart are one block of
+text to the eye no matter what the rule says. Generous above, tighter below, so
+the white space reads as belonging to the frame that follows it.
+
+**A program opens between two rules** — a hairline above the PROGRAM Fn line, a
+heavy one under the title — and a part page gets the same treatment one level
+up. Programs are what the reader navigates by: every Summary back-reference,
+every Quiz route and every cross-reference in the book names a program and a
+frame. A coloured title alone does not survive being thumbed past.
+
 ---
 
 ## Build traps already hit and fixed
@@ -299,6 +369,18 @@ Each cost time; none is obvious from its error message.
 - **`babel` with a missing language is fatal, not a warning.** The preamble
   probes for `polish.ldf` and `british.ldf` before requesting either. Do not
   simplify this back to a bare `\usepackage`.
+
+- **A rule drawn after a badge draws straight through it.** The frame boundary
+  puts the frame number on the separating rule. Doing it the obvious way round
+  — badge first in an `\rlap`, then the rule — paints a hairline across the
+  digit, which at that size reads as a struck-out number rather than as a badge
+  on a line. The rule goes down first, inside the `\rlap`; the badge is painted
+  over it second. Nothing warns; it just looks wrong.
+
+- **Do not guess the badge's vertical shift.** It is centred on the rule with
+  `\sbox0` and `\dimexpr0.3pt-0.5\ht0+0.5\dp0`, measured rather than tuned by
+  eye, because the two formats set 11pt and 12pt from the same source and a
+  hard-coded shift is right in exactly one of them.
 
 ---
 
@@ -483,9 +565,12 @@ it; the pretesting literature is clear that a box saying "wrong" does nothing.
 ## Build
 
 ```bash
-make            # numbers, diagrams, then both editions, then the three gates
+make            # numbers, diagrams, both editions at 17 x 24 cm, then the gates
+make a4         # both editions on A4
+make all-formats  # all four PDFs
 make en         # English only, and check its log properly
 make pl         # Polish only
+make en-a4      # the same, on A4
 make numbers    # regenerate figures/values from code/
 make verify     # fail if any committed number has drifted from its script
 make debt       # every outstanding-work ledger
@@ -498,22 +583,27 @@ artefact or a tagged release, so the book was not readable without a TeX
 installation. `pages.yml` now builds both editions on every push to `main` and
 publishes them:
 
-- `https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf`
-- `https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf`
+- `.../book-en-a4.pdf` · `.../book-pl-a4.pdf` — A4, and what the site links to
+- `.../book-en.pdf` · `.../book-pl.pdf` — 17 x 24 cm
 
 It duplicates the compile steps from `build.yml` on purpose, and runs
 `checklog.py` against its own logs rather than trusting another workflow's:
 Pages must never publish a PDF that did not build.
 
 CI runs the numbers job first and gates everything on it, then parity as a hard
-gate, then the two editions in a matrix, then a cross-reference comparison out of
-the two `.aux` files. The ledgers are advisory and are published to the step
+gate, then **all four PDFs in a matrix** (two languages times two formats), then
+a cross-reference comparison out of the two `.aux` files. Only the trade format
+uploads its aux tree: labels resolve to program and frame numbers, which the
+paper format cannot change, so a second copy would give `reflist.py` two
+identical things to compare and collide on the artefact name. The ledgers are advisory and are published to the step
 summary on every build.
 
 **After each pass:**
 
-1. `make` — zero errors, zero warnings, zero unresolved references
-2. `python3 tools/checklog.py main-en.log main-pl.log` — **not** `grep '^!'`
+1. `make all-formats` — zero errors, zero warnings, zero unresolved references.
+   All four, not two: a format change moves every page boundary, and a table
+   that fits on one page in the trade format can overflow its vbox on A4.
+2. `python3 tools/checklog.py main-*.log` — **not** `grep '^!'`
 3. `python3 tools/parity.py` — zero failures before you commit
 4. `make debt` — confirm the ledgers moved the way you expected
 5. Update the Status table and the ledgers at the top of this file
