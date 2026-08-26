@@ -1,0 +1,33 @@
+%% P18 --- Rachunek macierzowy
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
+%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
+%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
+%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+
+\program{Rachunek macierzowy}
+\label{prog:P18}
+
+\programstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: differentiating with respect to a vector or a matrix is
+bookkeeping plus a layout convention, and most of the pain in the literature
+is the convention rather than the mathematics. Payoff: the identities the
+reader actually needs, derived once each: the gradient of \code{Wx} with
+respect to \code{W}; of a squared error; of a softmax; of a log-softmax; of
+layer normalisation. The headline: **the gradient of cross-entropy through a
+softmax is \code{p - y}**, the single most reused fact in applied machine
+learning, derived in full \dash{} and the reason the two operations are
+fused in every serious implementation. Also a versionbox on numerator versus
+denominator layout, because the reader will meet both in the same week.
+
+FORWARD REFERENCE, declared: the softmax--cross-entropy gradient is this
+program's most reused derivation, and cross-entropy is not defined until
+P30. Give it a definitional frame here -- cross-entropy as minus the sum of
+y log p, stated as a definition to be justified later -- and have P26 and
+P30 each carry a frame returning to it.
+
+\medskip
+\textbf{Planowana długość:} 60 ramek.
+}

@@ -1,0 +1,29 @@
+%% P16 --- Jakobian, reguła łańcuchowa i różniczkowanie automatyczne
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
+%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
+%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
+%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+
+\program{Jakobian, reguła łańcuchowa i różniczkowanie automatyczne}
+\label{prog:P16}
+
+\programstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: for vector-valued functions the chain rule multiplies Jacobians;
+nobody forms a Jacobian; forward mode computes a Jacobian--vector product
+and reverse mode a vector--Jacobian product, and which is cheaper depends
+only on the shape of the problem. Payoff: **what \code{loss.backward()}
+actually computes**, in full: why a scalar loss with many parameters makes
+reverse mode cheaper by a factor of the parameter count; why reverse mode
+must keep the activations, so memory scales with depth and batch; gradient
+checkpointing as an explicit trade of recomputation for memory, with the
+arithmetic done; why a numerical finite-difference gradient is a testing
+tool and not an implementation; the three places autodiff silently gives you
+something other than the derivative you meant (a non-differentiable point, a
+detached tensor, an in-place write).
+
+\medskip
+\textbf{Planowana długość:} 65 ramek.
+}

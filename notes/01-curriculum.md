@@ -1048,3 +1048,43 @@ Appendices:
    The current position is that this audience needs to read theorems and does
    not need to write them, and that position should be stated in the front
    matter rather than left implicit.
+
+
+---
+
+## 21. Addendum — changes forced by the adversarial review, August 2026
+
+This document was rejected as it stood, and five findings are now in
+`tools/programs.json` rather than here. Recorded so the design and the manifest
+do not disagree.
+
+1. **P7, *Tensors, shapes and index notation*, was missing** and is the largest
+   content gap in the book — and in every book in §1. Inserted between P6 and
+   the old P7; everything after it moved up one, so the book is now 47
+   programs and roughly 2,415 frames.
+2. **F13 was curriculum inertia.** Forty-five frames on the integral in a book
+   whose §13 excludes every integration technique by name. Cut to twenty and
+   retitled *Accumulation, area and expectation*.
+3. **P3 asked for a transformer parameter count** three parts before any
+   program had said what a matrix is. That count moved to P32.
+4. **Initialisation was missing entirely** — no variance propagation, no fan-in
+   argument, no He or Xavier — and a training run that diverges at step zero is
+   the commonest failure the audience meets. Added to P25.
+5. **§3's Part I contract was false.** *Assumes genuinely nothing* is
+   contradicted by every Foundation payoff sentence in this document. The two
+   floors are now separated in the front matter: no mathematics beyond school
+   arithmetic, but the vocabulary of the job assumed throughout.
+
+**And §16's 80/80 obligation was unmeasurable as written.** §14 puts the Quiz on
+Foundation programs only, so the standard could not be measured on 34 of the 47
+and was contaminated on the other 13, the same items serving as entry and exit
+test. The instrument is the scored Test exercises, which every program has.
+
+Three further findings are recorded and **not** acted on, because they are
+judgement calls for the author rather than defects:
+
+- whether P12 (combinatorics) should move next to the probability that consumes
+  it — §20 already had this open;
+- whether the book is one volume or two;
+- whether P14 (logic and proof) is enough of a fix for Stroud's rigour gap, or
+  whether a second, later program on writing a proof is wanted.

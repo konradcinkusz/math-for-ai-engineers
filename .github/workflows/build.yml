@@ -66,6 +66,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+      - name: The manifest and the tree agree
+        run: python3 tools/gen_stubs.py --check
+
       - name: Compare the two editions
         run: python3 tools/parity.py
 

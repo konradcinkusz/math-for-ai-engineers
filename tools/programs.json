@@ -38,66 +38,67 @@
     "P7",
     "P8",
     "P9",
-    "P10"
+    "P10",
+    "P11"
    ]
   },
   {
    "en": "Discrete structures and argument",
    "pl": "Struktury dyskretne i argumentacja",
    "ids": [
-    "P11",
     "P12",
-    "P13"
+    "P13",
+    "P14"
    ]
   },
   {
    "en": "Calculus and automatic differentiation",
    "pl": "Rachunek różniczkowy i różniczkowanie automatyczne",
    "ids": [
-    "P14",
     "P15",
     "P16",
-    "P17"
+    "P17",
+    "P18"
    ]
   },
   {
    "en": "Optimisation",
    "pl": "Optymalizacja",
    "ids": [
-    "P18",
     "P19",
     "P20",
-    "P21"
+    "P21",
+    "P22"
    ]
   },
   {
    "en": "Probability and statistics",
    "pl": "Prawdopodobieństwo i statystyka",
    "ids": [
-    "P22",
     "P23",
     "P24",
     "P25",
     "P26",
-    "P27"
+    "P27",
+    "P28"
    ]
   },
   {
    "en": "Information theory",
    "pl": "Teoria informacji",
    "ids": [
-    "P28",
     "P29",
-    "P30"
+    "P30",
+    "P31"
    ]
   },
   {
    "en": "Assembling it",
    "pl": "Złożenie",
    "ids": [
-    "P31",
     "P32",
-    "P33"
+    "P33",
+    "P34"
    ]
   }
  ],
@@ -212,11 +213,11 @@
   },
   {
    "id": "F13",
-   "en": "The integral: accumulation and area",
-   "pl": "Całka: sumowanie i pole",
-   "frames": 45,
-   "brief": "Argument: integration accumulates, and it undoes differentiation. Payoff: the probability of a continuous quantity is an area, an expectation is an integral, and the denominator that makes a density integrate to one is the \"normalising constant\" that will keep reappearing.",
-   "file": "F13-integral",
+   "en": "Accumulation, area and expectation",
+   "pl": "Sumowanie, pole i wartość oczekiwana",
+   "frames": 20,
+   "brief": "Argument: an integral accumulates, and it is the continuous twin of the sigma of Program~F4. Payoff: the probability of a continuous quantity is an area, an expectation is an integral, and the denominator that makes a density integrate to one is the normalising constant that keeps reappearing. NOT a course in integration technique: substitution, parts and partial fractions are excluded deliberately and by name, because nothing this book pays off needs them and a reader who wants them is better served elsewhere. Twenty frames rather than forty-five, and the difference is the point.",
+   "file": "F13-accumulation",
    "key": "F13"
   },
   {
@@ -242,7 +243,7 @@
    "en": "Orders of magnitude: O-notation, FLOPs and memory",
    "pl": "Rzędy wielkości: notacja O, FLOP-y i pamięć",
    "frames": 45,
-   "brief": "Argument: asymptotic notation is a statement about growth and says nothing about which of two implementations is faster today; both facts matter. Payoff: count the parameters of a transformer block by hand; count the activations; count the KV cache and watch it grow linearly in sequence length while attention grows quadratically --- **the reader derives why long context is expensive rather than accepting it**. Arithmetic intensity, and why a large matrix multiply is compute-bound while an elementwise operation is memory-bound, which is the whole justification for kernel fusion.",
+   "brief": "Argument: asymptotic notation is a statement about growth and says nothing about which of two implementations is faster today; both facts matter. Payoff: bytes, FLOPs as a rate, and arithmetic intensity as a ratio, which is the whole justification for kernel fusion; why a large matrix multiply is compute-bound and an elementwise operation is memory-bound. DEPENDENCY NOTE: an earlier brief had the reader count the parameters of a transformer block here, three parts before any program has said what a matrix is. That count moves to P32, where the shapes exist. What stays is magnitude and cost, which need only arithmetic and sigma notation.",
    "file": "P03-orders-of-magnitude",
    "key": "P03"
   },
@@ -275,246 +276,255 @@
   },
   {
    "id": "P7",
+   "key": "P07",
+   "file": "P07-tensors-shapes",
+   "en": "Tensors, shapes and index notation",
+   "pl": "Tensory, kształty i notacja wskaźnikowa",
+   "frames": 55,
+   "brief": "Argument: an operation on arrays is a statement about which axes line up, and index notation says it exactly where a picture cannot. Payoff: read an `einsum` string as the sum it denotes; state the broadcasting rules and say which axes align for a given pair of shapes; distinguish reshape from transpose from permute, and say which of them moves data; count the axes of an attention tensor (batch, head, query, key) and say what a matrix multiply over them actually contracts. This is the largest gap in every book in the field: the audience manipulates rank-4 arrays daily, has only ever been taught rank-2 notation, and the mismatch is where the shape errors come from."
+  },
+  {
+   "id": "P8",
    "en": "Rank, the four subspaces and least squares",
    "pl": "Rząd, podprzestrzenie i najmniejsze kwadraty",
    "frames": 60,
    "brief": "Argument: a matrix has a column space, a row space and two null spaces; rank is the dimension shared by the first two and it is the honest measure of how much a matrix does. Payoff: **LoRA is a rank constraint**, and this is the program that makes that sentence carry information --- a `d x d` update replaced by `B A` with inner dimension `r`, parameter count `2dr` against `d^2`, and the assumption being made about the update stated plainly. Solving `Ax = b` when there is no solution: least squares as a projection, which is linear regression's closed form. Rank collapse in deep attention stacks, described as the phenomenon it is.",
-   "file": "P07-rank-least-squares",
-   "key": "P07"
-  },
-  {
-   "id": "P8",
-   "en": "Determinant, inverse and change of basis",
-   "pl": "Wyznacznik, macierz odwrotna i zmiana bazy",
-   "frames": 45,
-   "brief": "Argument: the determinant is a signed volume scale factor and zero means information was destroyed; an inverse exists exactly when nothing was destroyed; a change of basis is the same vector described in another coordinate system. Payoff: why production code almost never calls `inv()` and solves a factorised system instead --- stated here, measured in P10; a rotation as an orthogonal change of basis, which is what rotary position embedding does; the log-determinant term in a normalising flow, named so the reader recognises it later without the book promising to teach flows.",
-   "file": "P08-determinant-inverse",
+   "file": "P08-rank-least-squares",
    "key": "P08"
   },
   {
    "id": "P9",
-   "en": "Eigenvalues, quadratic forms and positive definiteness",
-   "pl": "Wartości własne, formy kwadratowe i dodatnia określoność",
-   "frames": 65,
-   "brief": "Argument: an eigenvector is a direction the matrix only stretches; a symmetric matrix has a full orthogonal set of them (the spectral theorem, stated and used, not proved); a quadratic form is a bowl, a saddle or a ridge, and its eigenvalues say which. Payoff: a covariance matrix is symmetric and positive semi-definite, so PCA is an eigen-decomposition and not a black box; the spectral norm as the largest stretch, which is the Lipschitz constant that bounds how much a layer can amplify; **the Hessian's eigenvalues are the shape of the loss basin**, which is where \"ravine\", \"sharp minimum\" and \"the learning rate is too high\" all become one statement --- collected here and spent in P16 and P19.",
-   "file": "P09-eigenvalues",
+   "en": "Determinant, inverse and change of basis",
+   "pl": "Wyznacznik, macierz odwrotna i zmiana bazy",
+   "frames": 45,
+   "brief": "Argument: the determinant is a signed volume scale factor and zero means information was destroyed; an inverse exists exactly when nothing was destroyed; a change of basis is the same vector described in another coordinate system. Payoff: why production code almost never calls `inv()` and solves a factorised system instead --- stated here, measured in P10; a rotation as an orthogonal change of basis, which is what rotary position embedding does; the log-determinant term in a normalising flow, named so the reader recognises it later without the book promising to teach flows.",
+   "file": "P09-determinant-inverse",
    "key": "P09"
   },
   {
    "id": "P10",
-   "en": "SVD, low-rank approximation and conditioning",
-   "pl": "Rozkład SVD, aproksymacja niskiego rzędu i uwarunkowanie",
-   "frames": 60,
-   "brief": "Argument: every matrix, square or not, factors into rotate--stretch--rotate. Truncating the stretch gives the provably best approximation of a given rank (Eckart--Young, stated). The ratio of largest to smallest singular value is the condition number, and it is the amplification factor from input error to output error. Payoff: the singular-value spectrum of a real embedding matrix, plotted, showing how few directions carry the energy --- the empirical case for LoRA and for embedding compression, measured; the pseudoinverse as least squares done properly; **why the normal equations square the condition number and a QR solve does not**, which is the concrete form of \"do not invert\"; and the condition number as the number that predicts how many iterations an optimiser will need, handed forward to P19.",
-   "file": "P10-svd-conditioning",
+   "en": "Eigenvalues, quadratic forms and positive definiteness",
+   "pl": "Wartości własne, formy kwadratowe i dodatnia określoność",
+   "frames": 65,
+   "brief": "Argument: an eigenvector is a direction the matrix only stretches; a symmetric matrix has a full orthogonal set of them (the spectral theorem, stated and used, not proved); a quadratic form is a bowl, a saddle or a ridge, and its eigenvalues say which. Payoff: a covariance matrix is symmetric and positive semi-definite, so PCA is an eigen-decomposition and not a black box; the spectral norm as the largest stretch, which is the Lipschitz constant that bounds how much a layer can amplify; **the Hessian's eigenvalues are the shape of the loss basin**, which is where \"ravine\", \"sharp minimum\" and \"the learning rate is too high\" all become one statement --- collected here and spent in P16 and P19.\n\nFORWARD REFERENCE, declared: this program's payoff uses the covariance matrix, defined in P24. State the two facts it needs -- that a covariance matrix is symmetric and positive semi-definite -- in the Learning outcomes with the pointer, exactly as P21 does for its probability prerequisites.",
+   "file": "P10-eigenvalues",
    "key": "P10"
   },
   {
    "id": "P11",
-   "en": "Combinatorics and counting",
-   "pl": "Kombinatoryka i zliczanie",
-   "frames": 45,
-   "brief": "Argument: four counting rules --- product, permutation, combination, inclusion--exclusion --- plus the pigeonhole principle and simple recurrences. Payoff: the birthday calculation, so the reader can size a hash for dataset deduplication and say why 64 bits is not enough and 128 is; the size of a beam search's space and why beam width buys so little; **a Shapley value is an average over every ordering of the features**, so exact SHAP is exponential by construction and every implementation you have used is a sampling approximation --- which changes how much you should trust an attribution plot.",
-   "file": "P11-combinatorics",
+   "en": "SVD, low-rank approximation and conditioning",
+   "pl": "Rozkład SVD, aproksymacja niskiego rzędu i uwarunkowanie",
+   "frames": 60,
+   "brief": "Argument: every matrix, square or not, factors into rotate--stretch--rotate. Truncating the stretch gives the provably best approximation of a given rank (Eckart--Young, stated). The ratio of largest to smallest singular value is the condition number, and it is the amplification factor from input error to output error. Payoff: the singular-value spectrum of a real embedding matrix, plotted, showing how few directions carry the energy --- the empirical case for LoRA and for embedding compression, measured; the pseudoinverse as least squares done properly; **why the normal equations square the condition number and a QR solve does not**, which is the concrete form of \"do not invert\"; and the condition number as the number that predicts how many iterations an optimiser will need, handed forward to P19.\n\nFORWARD REFERENCE, declared: as P10. PCA is an eigen-decomposition of a covariance matrix, and covariance is defined in P24.",
+   "file": "P11-svd-conditioning",
    "key": "P11"
   },
   {
    "id": "P12",
-   "en": "Graphs, DAGs and random walks",
-   "pl": "Grafy, DAG-i i błądzenie losowe",
-   "frames": 50,
-   "brief": "Argument: a graph is a set plus a relation; adjacency matrix and adjacency list are two encodings with different costs; a DAG has a topological order and that order is what makes evaluation well defined. Payoff: the computation graph, defined properly, one program before autodiff needs it; **message passing in a graph neural network is a multiplication by the adjacency matrix**, which is where Part III and this part meet; PageRank as the stationary distribution of a random walk, which is the same eigenvector calculation as P9; an agent workflow, a build system and a neural network as the same object.",
-   "file": "P12-graphs-dags",
+   "en": "Combinatorics and counting",
+   "pl": "Kombinatoryka i zliczanie",
+   "frames": 45,
+   "brief": "Argument: four counting rules --- product, permutation, combination, inclusion--exclusion --- plus the pigeonhole principle and simple recurrences. Payoff: the birthday calculation, so the reader can size a hash for dataset deduplication and say why 64 bits is not enough and 128 is; the size of a beam search's space and why beam width buys so little; **a Shapley value is an average over every ordering of the features**, so exact SHAP is exponential by construction and every implementation you have used is a sampling approximation --- which changes how much you should trust an attribution plot.",
+   "file": "P12-combinatorics",
    "key": "P12"
   },
   {
    "id": "P13",
-   "en": "Logic, proof and reading theorems",
-   "pl": "Logika, dowód i czytanie twierdzeń",
-   "frames": 45,
-   "brief": "Argument: implication is not equivalence, a quantifier's order changes the claim, and a proof by induction or contradiction is a shape you can recognise. Payoff: **the reader can read a paper's theorem and separate its hypotheses from its conclusion.** Worked on real examples of the gap: a convergence result that assumes convexity being cited about a neural network; a bound that holds \"with high probability over the draw of the data\" quoted as if it held for the dataset in hand; \"universal approximation\" quoted as if it said anything about learnability. This program is the honest, bounded fix for Stroud's absent rigour: it does not train the reader to *write* proofs, and says so.",
-   "file": "P13-logic-proof",
+   "en": "Graphs, DAGs and random walks",
+   "pl": "Grafy, DAG-i i błądzenie losowe",
+   "frames": 50,
+   "brief": "Argument: a graph is a set plus a relation; adjacency matrix and adjacency list are two encodings with different costs; a DAG has a topological order and that order is what makes evaluation well defined. Payoff: the computation graph, defined properly, one program before autodiff needs it; **message passing in a graph neural network is a multiplication by the adjacency matrix**, which is where Part III and this part meet; PageRank as the stationary distribution of a random walk, which is the same eigenvector calculation as P9; an agent workflow, a build system and a neural network as the same object.",
+   "file": "P13-graphs-dags",
    "key": "P13"
   },
   {
    "id": "P14",
-   "en": "Functions of several variables and the gradient",
-   "pl": "Funkcje wielu zmiennych i gradient",
-   "frames": 55,
-   "brief": "Argument: a partial derivative holds everything else still; the gradient collects them; the directional derivative is a dot product with the gradient, so the gradient is the steepest direction and is perpendicular to the level set. Payoff: gradient descent's direction is derived rather than asserted; **the zig-zag in a narrow valley is explained by the gradient being perpendicular to the contour rather than pointing at the minimum**, which is the picture that makes momentum obvious two parts later.",
-   "file": "P14-gradient",
+   "en": "Logic, proof and reading theorems",
+   "pl": "Logika, dowód i czytanie twierdzeń",
+   "frames": 45,
+   "brief": "Argument: implication is not equivalence, a quantifier's order changes the claim, and a proof by induction or contradiction is a shape you can recognise. Payoff: **the reader can read a paper's theorem and separate its hypotheses from its conclusion.** Worked on real examples of the gap: a convergence result that assumes convexity being cited about a neural network; a bound that holds \"with high probability over the draw of the data\" quoted as if it held for the dataset in hand; \"universal approximation\" quoted as if it said anything about learnability. This program is the honest, bounded fix for Stroud's absent rigour: it does not train the reader to *write* proofs, and says so.",
+   "file": "P14-logic-proof",
    "key": "P14"
   },
   {
    "id": "P15",
-   "en": "Jacobians, the chain rule and automatic differentiation",
-   "pl": "Jakobian, reguła łańcuchowa i różniczkowanie automatyczne",
-   "frames": 65,
-   "brief": "Argument: for vector-valued functions the chain rule multiplies Jacobians; nobody forms a Jacobian; forward mode computes a Jacobian--vector product and reverse mode a vector--Jacobian product, and which is cheaper depends only on the shape of the problem. Payoff: **what `loss.backward()` actually computes**, in full: why a scalar loss with many parameters makes reverse mode cheaper by a factor of the parameter count; why reverse mode must keep the activations, so memory scales with depth and batch; gradient checkpointing as an explicit trade of recomputation for memory, with the arithmetic done; why a numerical finite-difference gradient is a testing tool and not an implementation; the three places autodiff silently gives you something other than the derivative you meant (a non-differentiable point, a detached tensor, an in-place write).",
-   "file": "P15-autodiff",
+   "en": "Functions of several variables and the gradient",
+   "pl": "Funkcje wielu zmiennych i gradient",
+   "frames": 55,
+   "brief": "Argument: a partial derivative holds everything else still; the gradient collects them; the directional derivative is a dot product with the gradient, so the gradient is the steepest direction and is perpendicular to the level set. Payoff: gradient descent's direction is derived rather than asserted; **the zig-zag in a narrow valley is explained by the gradient being perpendicular to the contour rather than pointing at the minimum**, which is the picture that makes momentum obvious two parts later.",
+   "file": "P15-gradient",
    "key": "P15"
   },
   {
    "id": "P16",
-   "en": "The Hessian, curvature and the Taylor expansion",
-   "pl": "Hesjan, krzywizna i rozwinięcie Taylora",
-   "frames": 50,
-   "brief": "Argument: the second-order Taylor expansion is the best local quadratic model, and its matrix is the Hessian. Payoff: **why the largest stable learning rate is bounded by the inverse of the curvature**, derived on a quadratic, which turns \"the loss exploded\" into an arithmetic statement; the condition number of the Hessian as the ratio of fastest to slowest direction, joining P9 and P10 to the optimiser; second-order methods explained and then dismissed on cost for this problem size; and an honest section on sharp-versus-flat minima --- what is measured, what is reparameterisation-dependent, and why the claim is contested.",
-   "file": "P16-hessian-taylor",
+   "en": "Jacobians, the chain rule and automatic differentiation",
+   "pl": "Jakobian, reguła łańcuchowa i różniczkowanie automatyczne",
+   "frames": 65,
+   "brief": "Argument: for vector-valued functions the chain rule multiplies Jacobians; nobody forms a Jacobian; forward mode computes a Jacobian--vector product and reverse mode a vector--Jacobian product, and which is cheaper depends only on the shape of the problem. Payoff: **what `loss.backward()` actually computes**, in full: why a scalar loss with many parameters makes reverse mode cheaper by a factor of the parameter count; why reverse mode must keep the activations, so memory scales with depth and batch; gradient checkpointing as an explicit trade of recomputation for memory, with the arithmetic done; why a numerical finite-difference gradient is a testing tool and not an implementation; the three places autodiff silently gives you something other than the derivative you meant (a non-differentiable point, a detached tensor, an in-place write).",
+   "file": "P16-autodiff",
    "key": "P16"
   },
   {
    "id": "P17",
-   "en": "Matrix calculus",
-   "pl": "Rachunek macierzowy",
-   "frames": 60,
-   "brief": "Argument: differentiating with respect to a vector or a matrix is bookkeeping plus a layout convention, and most of the pain in the literature is the convention rather than the mathematics. Payoff: the identities the reader actually needs, derived once each: the gradient of `Wx` with respect to `W`; of a squared error; of a softmax; of a log-softmax; of layer normalisation. The headline: **the gradient of cross-entropy through a softmax is `p - y`**, the single most reused fact in applied machine learning, derived in full --- and the reason the two operations are fused in every serious implementation. Also a versionbox on numerator versus denominator layout, because the reader will meet both in the same week.",
-   "file": "P17-matrix-calculus",
+   "en": "The Hessian, curvature and the Taylor expansion",
+   "pl": "Hesjan, krzywizna i rozwinięcie Taylora",
+   "frames": 50,
+   "brief": "Argument: the second-order Taylor expansion is the best local quadratic model, and its matrix is the Hessian. Payoff: **why the largest stable learning rate is bounded by the inverse of the curvature**, derived on a quadratic, which turns \"the loss exploded\" into an arithmetic statement; the condition number of the Hessian as the ratio of fastest to slowest direction, joining P9 and P10 to the optimiser; second-order methods explained and then dismissed on cost for this problem size; and an honest section on sharp-versus-flat minima --- what is measured, what is reparameterisation-dependent, and why the claim is contested.",
+   "file": "P17-hessian-taylor",
    "key": "P17"
   },
   {
    "id": "P18",
-   "en": "Convexity and Jensen's inequality",
-   "pl": "Wypukłość i nierówność Jensena",
-   "frames": 45,
-   "brief": "Argument: a convex function has one basin and every local minimum is global; that is a promise about the problem, not about the algorithm. Deep learning breaks the promise, and what survives anyway is worth naming precisely. Payoff: Jensen's inequality, and **why you cannot average perplexities** --- the mean of the exponentials is not the exponential of the mean, so a leaderboard that averages per-document perplexity is reporting a different quantity from one that exponentiates the mean loss; the same inequality is the ELBO in one line, named for recognition; and the honest statement that \"non-convex\" does not mean \"hopeless\", with the reasons.",
-   "file": "P18-convexity-jensen",
+   "en": "Matrix calculus",
+   "pl": "Rachunek macierzowy",
+   "frames": 60,
+   "brief": "Argument: differentiating with respect to a vector or a matrix is bookkeeping plus a layout convention, and most of the pain in the literature is the convention rather than the mathematics. Payoff: the identities the reader actually needs, derived once each: the gradient of `Wx` with respect to `W`; of a squared error; of a softmax; of a log-softmax; of layer normalisation. The headline: **the gradient of cross-entropy through a softmax is `p - y`**, the single most reused fact in applied machine learning, derived in full --- and the reason the two operations are fused in every serious implementation. Also a versionbox on numerator versus denominator layout, because the reader will meet both in the same week.\n\nFORWARD REFERENCE, declared: the softmax--cross-entropy gradient is this program's most reused derivation, and cross-entropy is not defined until P30. Give it a definitional frame here -- cross-entropy as minus the sum of y log p, stated as a definition to be justified later -- and have P26 and P30 each carry a frame returning to it.",
+   "file": "P18-matrix-calculus",
    "key": "P18"
   },
   {
    "id": "P19",
-   "en": "Gradient descent: from SGD to Adam",
-   "pl": "Metoda gradientu prostego: od SGD do Adama",
-   "frames": 65,
-   "brief": "Argument: every optimiser in common use is the same update with a different estimate of \"how far and in which direction\", and each addition fixes a specific named failure of the one before it. Payoff: the step-size bound from P16; momentum as the exponential moving average met in F4, fixing the zig-zag from P14; per-coordinate scaling fixing badly scaled features; **why Adam divides by the square root of the second moment --- it is a per-coordinate estimate of the gradient's scale, so the update becomes approximately unit-sized regardless of how large the gradient is**, which is also precisely why Adam is insensitive to loss scaling and why the epsilon must sit outside the square root; bias correction derived from the initialisation at zero; **weight decay is not L2 regularisation once you divide by a running scale**, which is the entire content of AdamW; warmup and cosine schedules described as what they do to the effective step rather than as ritual.",
-   "file": "P19-gradient-descent",
+   "en": "Convexity and Jensen's inequality",
+   "pl": "Wypukłość i nierówność Jensena",
+   "frames": 45,
+   "brief": "Argument: a convex function has one basin and every local minimum is global; that is a promise about the problem, not about the algorithm. Deep learning breaks the promise, and what survives anyway is worth naming precisely. Payoff: Jensen's inequality, and **why you cannot average perplexities** --- the mean of the exponentials is not the exponential of the mean, so a leaderboard that averages per-document perplexity is reporting a different quantity from one that exponentiates the mean loss; the same inequality is the ELBO in one line, named for recognition; and the honest statement that \"non-convex\" does not mean \"hopeless\", with the reasons.",
+   "file": "P19-convexity-jensen",
    "key": "P19"
   },
   {
    "id": "P20",
-   "en": "Stochastic optimisation and differentiating through randomness",
-   "pl": "Optymalizacja stochastyczna i różniczkowanie losowania",
-   "frames": 50,
-   "brief": "Argument: a minibatch gradient is an unbiased estimator with variance proportional to `1/B`, and the noise is a property of the algorithm rather than a defect in it. Payoff: why the loss curve is noisy and what a moving average of it hides; the linear scaling rule for batch size and learning rate, presented as **widely repeated folklore with a limited empirical basis**, not as a law; gradient clipping as a bound on the update rather than on the gradient; and the two ways to get a gradient through a sampling step --- the score-function estimator (REINFORCE, unbiased and high variance) and the reparameterisation trick (low variance, requires a differentiable path) --- which is the fork that separates policy-gradient RLHF from a VAE.",
-   "file": "P20-stochastic-optimisation",
+   "en": "Gradient descent: from SGD to Adam",
+   "pl": "Metoda gradientu prostego: od SGD do Adama",
+   "frames": 65,
+   "brief": "Argument: every optimiser in common use is the same update with a different estimate of \"how far and in which direction\", and each addition fixes a specific named failure of the one before it. Payoff: the step-size bound from P16; momentum as the exponential moving average met in F4, fixing the zig-zag from P14; per-coordinate scaling fixing badly scaled features; **why Adam divides by the square root of the second moment --- it is a per-coordinate estimate of the gradient's scale, so the update becomes approximately unit-sized regardless of how large the gradient is**, which is also precisely why Adam is insensitive to loss scaling and why the epsilon must sit outside the square root; bias correction derived from the initialisation at zero; **weight decay is not L2 regularisation once you divide by a running scale**, which is the entire content of AdamW; warmup and cosine schedules described as what they do to the effective step rather than as ritual.",
+   "file": "P20-gradient-descent",
    "key": "P20"
   },
   {
    "id": "P21",
-   "en": "Constrained optimisation and Lagrange multipliers",
-   "pl": "Optymalizacja z ograniczeniami i mnożniki Lagrange'a",
+   "en": "Stochastic optimisation and differentiating through randomness",
+   "pl": "Optymalizacja stochastyczna i różniczkowanie losowania",
    "frames": 50,
-   "brief": "Argument: at a constrained optimum the gradients of objective and constraint are parallel; the multiplier is the exchange rate between them. Payoff: **a Lagrange multiplier is a price** --- how much objective you buy per unit of constraint relaxed --- and that reading turns the `beta` in a KL-penalised objective from a tuning knob into a quantity with units; the equivalence between a hard KL constraint and a KL penalty, which is why PPO and DPO are talking about the same problem; projection onto a set as the other way to enforce a constraint; KKT conditions stated for recognition, with the inequality case sketched rather than developed.",
-   "file": "P21-constrained-optimisation",
+   "brief": "Argument: a minibatch gradient is an unbiased estimator with variance proportional to `1/B`, and the noise is a property of the algorithm rather than a defect in it. Payoff: why the loss curve is noisy and what a moving average of it hides; the linear scaling rule for batch size and learning rate, presented as **widely repeated folklore with a limited empirical basis**, not as a law; gradient clipping as a bound on the update rather than on the gradient; and the two ways to get a gradient through a sampling step --- the score-function estimator (REINFORCE, unbiased and high variance) and the reparameterisation trick (low variance, requires a differentiable path) --- which is the fork that separates policy-gradient RLHF from a VAE.",
+   "file": "P21-stochastic-optimisation",
    "key": "P21"
   },
   {
    "id": "P22",
-   "en": "Probability and Bayes' theorem",
-   "pl": "Prawdopodobieństwo i twierdzenie Bayesa",
-   "frames": 55,
-   "brief": "Argument: probability is a measure on a sample space obeying three rules; conditioning is restricting the space; Bayes' theorem is one line of algebra from the definition and is derived, never asserted. Payoff: **the base-rate calculation an engineer must be able to do in a meeting** --- a classifier with 99% accuracy on a fault that occurs once in a thousand requests, and what fraction of its alarms are real. Independence and conditional independence distinguished, because the naive Bayes assumption and most \"these two evals are independent signals\" claims live on the difference. Trap: the prosecutor's fallacy, elicited from the reader before it is named.",
-   "file": "P22-probability-bayes",
+   "en": "Constrained optimisation and Lagrange multipliers",
+   "pl": "Optymalizacja z ograniczeniami i mnożniki Lagrange'a",
+   "frames": 50,
+   "brief": "Argument: at a constrained optimum the gradients of objective and constraint are parallel; the multiplier is the exchange rate between them. Payoff: **a Lagrange multiplier is a price** --- how much objective you buy per unit of constraint relaxed --- and that reading turns the `beta` in a KL-penalised objective from a tuning knob into a quantity with units; the equivalence between a hard KL constraint and a KL penalty, which is why PPO and DPO are talking about the same problem; projection onto a set as the other way to enforce a constraint; KKT conditions stated for recognition, with the inequality case sketched rather than developed.",
+   "file": "P22-constrained-optimisation",
    "key": "P22"
   },
   {
    "id": "P23",
-   "en": "Random variables and distributions",
-   "pl": "Zmienne losowe i rozkłady",
-   "frames": 60,
-   "brief": "Argument: a random variable is a function on the sample space; expectation and variance are its first two summaries; six distributions cover almost everything in this field. Payoff: **sampling a token is a draw from a categorical distribution**, and temperature, top-k and top-p are three ways of editing that distribution before drawing --- described as distribution surgery, with what each destroys; the Gumbel-max trick, so the reader can see that `argmax(logits + gumbel)` is exact categorical sampling and not an approximation; the Gaussian introduced through its role rather than its formula; expectation as the linear operator that makes almost every derivation later in the book short.",
-   "file": "P23-distributions",
+   "en": "Probability and Bayes' theorem",
+   "pl": "Prawdopodobieństwo i twierdzenie Bayesa",
+   "frames": 55,
+   "brief": "Argument: probability is a measure on a sample space obeying three rules; conditioning is restricting the space; Bayes' theorem is one line of algebra from the definition and is derived, never asserted. Payoff: **the base-rate calculation an engineer must be able to do in a meeting** --- a classifier with 99% accuracy on a fault that occurs once in a thousand requests, and what fraction of its alarms are real. Independence and conditional independence distinguished, because the naive Bayes assumption and most \"these two evals are independent signals\" claims live on the difference. Trap: the prosecutor's fallacy, elicited from the reader before it is named.",
+   "file": "P23-probability-bayes",
    "key": "P23"
   },
   {
    "id": "P24",
-   "en": "Sums of random variables: the central limit theorem, concentration and Monte Carlo",
-   "pl": "Sumy zmiennych losowych: centralne twierdzenie graniczne i metoda Monte Carlo",
-   "frames": 55,
-   "brief": "Argument: variances of independent quantities add; averages concentrate; the error of an average falls as `1/sqrt(n)` and that single rate governs an astonishing amount of practice. Payoff: **the derivation of the `1/sqrt(d_k)` in attention.** A dot product of two `d_k`-dimensional vectors with independent unit-variance entries has variance `d_k`, so its standard deviation grows as `sqrt(d_k)`; feed that into a softmax and it saturates, and the gradient dies; divide by `sqrt(d_k)` and the logits have unit variance regardless of head size. The scaling is a variance correction and nothing else, and the reader derives it here and measures it in P31. Also: Monte Carlo error is the same `1/sqrt(n)`, so the number of samples needed to halve an error bar is four times as many --- the fact that prices every evaluation run in the book.",
-   "file": "P24-clt-monte-carlo",
+   "en": "Random variables and distributions",
+   "pl": "Zmienne losowe i rozkłady",
+   "frames": 60,
+   "brief": "Argument: a random variable is a function on the sample space; expectation and variance are its first two summaries; six distributions cover almost everything in this field. Payoff: **sampling a token is a draw from a categorical distribution**, and temperature, top-k and top-p are three ways of editing that distribution before drawing --- described as distribution surgery, with what each destroys; the Gumbel-max trick, so the reader can see that `argmax(logits + gumbel)` is exact categorical sampling and not an approximation; the Gaussian introduced through its role rather than its formula; expectation as the linear operator that makes almost every derivation later in the book short.",
+   "file": "P24-distributions",
    "key": "P24"
   },
   {
    "id": "P25",
-   "en": "Estimation and maximum likelihood",
-   "pl": "Estymacja i metoda największej wiarogodności",
+   "en": "Sums of random variables: the central limit theorem, concentration and Monte Carlo",
+   "pl": "Sumy zmiennych losowych: centralne twierdzenie graniczne i metoda Monte Carlo",
    "frames": 55,
-   "brief": "Argument: an estimator is a function of the sample; bias and variance are two different ways of being wrong; maximum likelihood picks the parameter that makes the observed data least surprising. Payoff: **training a language model is maximum likelihood**, and the cross-entropy loss is the negative log-likelihood of the observed tokens --- one derivation that reframes the entire training objective, and from which label smoothing, class weighting and the `n-1` in a sample variance all fall out. MAP as maximum likelihood with a prior, which is exactly weight decay with a Gaussian prior --- the cleanest available statement of what regularisation *is*.",
-   "file": "P25-maximum-likelihood",
+   "brief": "Argument: variances of independent quantities add; averages concentrate; the error of an average falls as `1/sqrt(n)` and that single rate governs an astonishing amount of practice. Payoff: **the derivation of the `1/sqrt(d_k)` in attention.** A dot product of two `d_k`-dimensional vectors with independent unit-variance entries has variance `d_k`, so its standard deviation grows as `sqrt(d_k)`; feed that into a softmax and it saturates, and the gradient dies; divide by `sqrt(d_k)` and the logits have unit variance regardless of head size. The scaling is a variance correction and nothing else, and the reader derives it here and measures it in P31. Also: Monte Carlo error is the same `1/sqrt(n)`, so the number of samples needed to halve an error bar is four times as many --- the fact that prices every evaluation run in the book.\n\nADDITION, from the review: nothing in the book explained why a training run diverges at initialisation. Extend this program with signal propagation -- the variance through a linear layer as fan-in times weight variance, the scale that holds it at one, and what a non-linearity does to it, which is where the factor of two in He initialisation comes from. It belongs here because it is a variance argument, and it is the single most common cause of a run that never starts.",
+   "file": "P25-clt-monte-carlo",
    "key": "P25"
   },
   {
    "id": "P26",
-   "en": "Statistical inference for the engineer",
-   "pl": "Wnioskowanie statystyczne dla inżyniera",
-   "frames": 60,
-   "brief": "Argument: a measured difference is a random quantity, and the question is whether it is larger than the noise in the measurement. Payoff: the program that carries this house's first rule into a mathematics book. **\"Model B scored 71.4 and model A scored 70.9 on 200 evaluation items\" --- is that real?** Worked end to end: the standard error of a proportion; a bootstrap confidence interval on an evaluation set; the paired comparison, because A and B saw the same prompts and a paired test has far more statistical power; what a p-value does and does not say, stated flatly; the multiple-comparisons problem, which is what a leaderboard with forty models is; and a power calculation answering how many evaluation items are needed to detect a one-point difference at all. The honest conclusion --- that most published leaderboard deltas of this size are not distinguishable from noise, and the reader can now check.",
-   "file": "P26-inference",
+   "en": "Estimation and maximum likelihood",
+   "pl": "Estymacja i metoda największej wiarogodności",
+   "frames": 55,
+   "brief": "Argument: an estimator is a function of the sample; bias and variance are two different ways of being wrong; maximum likelihood picks the parameter that makes the observed data least surprising. Payoff: **training a language model is maximum likelihood**, and the cross-entropy loss is the negative log-likelihood of the observed tokens --- one derivation that reframes the entire training objective, and from which label smoothing, class weighting and the `n-1` in a sample variance all fall out. MAP as maximum likelihood with a prior, which is exactly weight decay with a Gaussian prior --- the cleanest available statement of what regularisation *is*.",
+   "file": "P26-maximum-likelihood",
    "key": "P26"
   },
   {
    "id": "P27",
-   "en": "Bayesian inference",
-   "pl": "Wnioskowanie bayesowskie",
-   "frames": 50,
-   "brief": "Argument: put a distribution on the parameter, condition on the data, report the posterior. Conjugacy makes the arithmetic closed-form in the one case that matters most. Payoff: Beta--Binomial worked fully, which covers \"what is this model's success rate and how sure am I\"; a credible interval and a confidence interval contrasted, because they answer different questions and are routinely conflated; Bayesian A/B testing on evaluation results, giving \"the probability that B is better\" which is the quantity people wanted from a p-value; Thompson sampling as model routing under uncertainty; calibration of a judge model's stated probability, and what it costs downstream when the judge is confidently wrong.",
-   "file": "P27-bayesian-inference",
+   "en": "Statistical inference for the engineer",
+   "pl": "Wnioskowanie statystyczne dla inżyniera",
+   "frames": 60,
+   "brief": "Argument: a measured difference is a random quantity, and the question is whether it is larger than the noise in the measurement. Payoff: the program that carries this house's first rule into a mathematics book. **\"Model B scored 71.4 and model A scored 70.9 on 200 evaluation items\" --- is that real?** Worked end to end: the standard error of a proportion; a bootstrap confidence interval on an evaluation set; the paired comparison, because A and B saw the same prompts and a paired test has far more statistical power; what a p-value does and does not say, stated flatly; the multiple-comparisons problem, which is what a leaderboard with forty models is; and a power calculation answering how many evaluation items are needed to detect a one-point difference at all. The honest conclusion --- that most published leaderboard deltas of this size are not distinguishable from noise, and the reader can now check.",
+   "file": "P27-inference",
    "key": "P27"
   },
   {
    "id": "P28",
-   "en": "Entropy and the measure of surprise",
-   "pl": "Entropia i miara zaskoczenia",
-   "frames": 45,
-   "brief": "Argument: surprise is the negative log of a probability; entropy is average surprise; it is the shortest average code length, and that is why the units are bits. Payoff: **perplexity is the exponential of the cross-entropy, and it is the effective number of equally likely choices at each step** --- so a perplexity of 7 is a concrete statement about a model and not a leaderboard number; entropy of the next-token distribution as a usable runtime signal for when a model is guessing; the entropy of a tokeniser's output as a bound on how much a compression-style argument can claim.",
-   "file": "P28-entropy",
+   "en": "Bayesian inference",
+   "pl": "Wnioskowanie bayesowskie",
+   "frames": 50,
+   "brief": "Argument: put a distribution on the parameter, condition on the data, report the posterior. Conjugacy makes the arithmetic closed-form in the one case that matters most. Payoff: Beta--Binomial worked fully, which covers \"what is this model's success rate and how sure am I\"; a credible interval and a confidence interval contrasted, because they answer different questions and are routinely conflated; Bayesian A/B testing on evaluation results, giving \"the probability that B is better\" which is the quantity people wanted from a p-value; Thompson sampling as model routing under uncertainty; calibration of a judge model's stated probability, and what it costs downstream when the judge is confidently wrong.",
+   "file": "P28-bayesian-inference",
    "key": "P28"
   },
   {
    "id": "P29",
-   "en": "Cross-entropy and the Kullback--Leibler divergence",
-   "pl": "Entropia krzyżowa i dywergencja Kullbacka--Leiblera",
-   "frames": 55,
-   "brief": "Argument: cross-entropy is the cost of coding one distribution with another's code; KL is the excess; it is non-negative, zero only when the distributions agree, **and it is not symmetric**. Payoff: the question the brief asks for --- **what the asymmetry costs you when you pick a loss.** Forward KL is mode-covering: it pays an unbounded price for putting no mass where the target has some, so it spreads. Reverse KL is mode-seeking: it pays for putting mass where the target has none, so it collapses onto one mode. Distillation minimises one, a variational objective and a KL-regularised policy the other, and the difference is visible in the output. Measured on a bimodal target, not asserted. Also: \"KL distance\" is a misnomer and the triangle inequality fails; Jensen--Shannon as the symmetric alternative and what it costs; and the observation that minimising cross-entropy against a fixed dataset is minimising forward KL to the empirical distribution, which closes the loop with P25.",
-   "file": "P29-cross-entropy-kl",
+   "en": "Entropy and the measure of surprise",
+   "pl": "Entropia i miara zaskoczenia",
+   "frames": 45,
+   "brief": "Argument: surprise is the negative log of a probability; entropy is average surprise; it is the shortest average code length, and that is why the units are bits. Payoff: **perplexity is the exponential of the cross-entropy, and it is the effective number of equally likely choices at each step** --- so a perplexity of 7 is a concrete statement about a model and not a leaderboard number; entropy of the next-token distribution as a usable runtime signal for when a model is guessing; the entropy of a tokeniser's output as a bound on how much a compression-style argument can claim.",
+   "file": "P29-entropy",
    "key": "P29"
   },
   {
    "id": "P30",
-   "en": "Mutual information",
-   "pl": "Informacja wzajemna",
-   "frames": 50,
-   "brief": "Argument: mutual information is the reduction in uncertainty about one quantity given another; it is symmetric, non-negative, and zero exactly under independence. Payoff: the vocabulary behind a large class of claims the reader will meet --- \"layer 12 contains information about syntax\", \"this feature is informative about the label\" --- together with the reason to discount most of them: **mutual information in high dimension is extremely hard to estimate, and the common estimators are biased in the direction that flatters the claim.** The data-processing inequality, which says post-processing cannot create information, and is the clean argument against several popular interpretability claims. A folklore-puncturing program by design.",
-   "file": "P30-mutual-information",
+   "en": "Cross-entropy and the Kullback--Leibler divergence",
+   "pl": "Entropia krzyżowa i dywergencja Kullbacka--Leiblera",
+   "frames": 55,
+   "brief": "Argument: cross-entropy is the cost of coding one distribution with another's code; KL is the excess; it is non-negative, zero only when the distributions agree, **and it is not symmetric**. Payoff: the question the brief asks for --- **what the asymmetry costs you when you pick a loss.** Forward KL is mode-covering: it pays an unbounded price for putting no mass where the target has some, so it spreads. Reverse KL is mode-seeking: it pays for putting mass where the target has none, so it collapses onto one mode. Distillation minimises one, a variational objective and a KL-regularised policy the other, and the difference is visible in the output. Measured on a bimodal target, not asserted. Also: \"KL distance\" is a misnomer and the triangle inequality fails; Jensen--Shannon as the symmetric alternative and what it costs; and the observation that minimising cross-entropy against a fixed dataset is minimising forward KL to the empirical distribution, which closes the loop with P25.",
+   "file": "P30-cross-entropy-kl",
    "key": "P30"
   },
   {
    "id": "P31",
-   "en": "The transformer, derived",
-   "pl": "Transformer wyprowadzony od podstaw",
-   "frames": 70,
-   "brief": "The whole book spent on one architecture. Embeddings as vectors in a space [P4]; the query--key dot product as an inner product and its high-dimensional behaviour [P5]; **the `1/sqrt(d_k)` as a variance correction** [P24], with the measurement; softmax and its stable implementation [P2]; the value-weighted sum as a convex combination [P18]; multi-head as a reshape and a block-diagonal map [P6]; the residual stream as repeated addition and why that keeps gradients alive [P15]; layer normalisation and its gradient [P17]; positional information as rotation [F8, P8]; the parameter count, the FLOP count and the KV cache arithmetic [P3]; and attention's quadratic cost stated as the thing every long-context method is trying to avoid.",
-   "file": "P31-transformer-derived",
+   "en": "Mutual information",
+   "pl": "Informacja wzajemna",
+   "frames": 50,
+   "brief": "Argument: mutual information is the reduction in uncertainty about one quantity given another; it is symmetric, non-negative, and zero exactly under independence. Payoff: the vocabulary behind a large class of claims the reader will meet --- \"layer 12 contains information about syntax\", \"this feature is informative about the label\" --- together with the reason to discount most of them: **mutual information in high dimension is extremely hard to estimate, and the common estimators are biased in the direction that flatters the claim.** The data-processing inequality, which says post-processing cannot create information, and is the clean argument against several popular interpretability claims. A folklore-puncturing program by design.",
+   "file": "P31-mutual-information",
    "key": "P31"
   },
   {
    "id": "P32",
-   "en": "Anatomy of a training run",
-   "pl": "Anatomia treningu",
-   "frames": 60,
-   "brief": "The loss as maximum likelihood [P25]; its gradient as `p - y` [P17]; the optimiser and its bias correction [P19]; precision and loss scaling [P1]; the schedule and the curvature bound [P16]; gradient clipping and minibatch noise [P20]. Then the diagnostic half: **a loss curve read as evidence** --- what a plateau, a spike, a divergence and a suspiciously smooth descent each imply, and which of them are distinguishable from noise [P26]. Scaling laws presented as **an empirical power-law fit with reported uncertainty**, plotted on log-log axes [F3], with the fit's extrapolation error stated --- not as a law of nature.",
-   "file": "P32-training-run",
+   "en": "The transformer, derived",
+   "pl": "Transformer wyprowadzony od podstaw",
+   "frames": 70,
+   "brief": "The whole book spent on one architecture. Embeddings as vectors in a space [P4]; the query--key dot product as an inner product and its high-dimensional behaviour [P5]; **the `1/sqrt(d_k)` as a variance correction** [P24], with the measurement; softmax and its stable implementation [P2]; the value-weighted sum as a convex combination [P18]; multi-head as a reshape and a block-diagonal map [P6]; the residual stream as repeated addition and why that keeps gradients alive [P15]; layer normalisation and its gradient [P17]; positional information as rotation [F8, P8]; the parameter count, the FLOP count and the KV cache arithmetic [P3]; and attention's quadratic cost stated as the thing every long-context method is trying to avoid.",
+   "file": "P32-transformer-derived",
    "key": "P32"
   },
   {
    "id": "P33",
+   "en": "Anatomy of a training run",
+   "pl": "Anatomia treningu",
+   "frames": 60,
+   "brief": "The loss as maximum likelihood [P25]; its gradient as `p - y` [P17]; the optimiser and its bias correction [P19]; precision and loss scaling [P1]; the schedule and the curvature bound [P16]; gradient clipping and minibatch noise [P20]. Then the diagnostic half: **a loss curve read as evidence** --- what a plateau, a spike, a divergence and a suspiciously smooth descent each imply, and which of them are distinguishable from noise [P26]. Scaling laws presented as **an empirical power-law fit with reported uncertainty**, plotted on log-log axes [F3], with the fit's extrapolation error stated --- not as a law of nature.",
+   "file": "P33-training-run",
+   "key": "P33"
+  },
+  {
+   "id": "P34",
    "en": "Measuring a model honestly",
    "pl": "Uczciwy pomiar modelu",
    "frames": 55,
    "brief": "Evaluation design as an estimation problem [P25]; the confidence interval and the bootstrap [P26]; the paired comparison; the judge model as a miscalibrated instrument [P27]; the arithmetic of cost per token and per conversation [P3]; and information-theoretic evaluation measures and their limits [P28--P30]. Closes with the discipline both companion volumes are built on, now with the mathematics behind it: **a claim needs a method and a number, or it is labelled judgement.**",
-   "file": "P33-measuring-honestly",
-   "key": "P33"
+   "file": "P34-measuring-honestly",
+   "key": "P34"
   }
  ]
 }

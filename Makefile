@@ -1,4 +1,4 @@
-.PHONY: all check en pl text-only watch-en watch-pl clean diagrams diagrams-clean \
+.PHONY: all check stubs-check en pl text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames outcomes values translate shots debt
 
 LANGS   := en pl
@@ -18,6 +18,7 @@ all: numbers diagrams en pl check
 # top of an error, and with -file-line-error the error line does not begin with
 # a `!`, so the inherited `grep '^!' main.log` habit cannot see it.
 check:
+	@python3 tools/gen_stubs.py --check
 	@python3 tools/checklog.py main-en.log main-pl.log
 	@python3 tools/parity.py | tail -n 3
 	@python3 tools/reflist.py 2>/dev/null || true
@@ -102,6 +103,12 @@ diagrams-clean:
 # the other three are inherited from the companion volumes.
 # ---------------------------------------------------------------------------
 
+# 0. The manifest and the tree agree. tools/programs.json is the single source
+#    of the part and program sequence; this fails when a stub or structure.tex
+#    is stale against it.
+stubs-check:
+	@python3 tools/gen_stubs.py --check
+
 # 1. Programs not yet written.
 stubs:
 	@for L in $(LANGS); do \
@@ -147,7 +154,8 @@ shots:
 	@ls figures/mermaid/*/*.mmd 2>/dev/null | wc -l
 
 debt:
-	@echo "== Programs not yet written =="        ; $(MAKE) -s stubs
+	@echo "== Manifest and tree =="              ; $(MAKE) -s stubs-check || true
+	@echo; echo "== Programs not yet written ==" ; $(MAKE) -s stubs
 	@echo; echo "== Exercises with no answer =="  ; $(MAKE) -s answers
 	@echo; echo "== Frames =="                    ; $(MAKE) -s frames
 	@echo; echo "== Learning outcomes =="         ; $(MAKE) -s outcomes
@@ -158,3 +166,9 @@ debt:
 	@echo "== Reader validation =="
 	@echo "  80/80: NOT ESTABLISHED. The method is validated; this book is not."
 	@echo "  It may not claim 80/80 until it has been trialled on readers."
+	@echo
+	@echo "  The instrument is the scored Test exercises, NOT the Quiz. The Quiz"
+	@echo "  runs on the thirteen Foundation programs only, so a standard defined"
+	@echo "  against it would be unmeasurable on thirty-four of the forty-seven --"
+	@echo "  and contaminated on the other thirteen, because the same items are"
+	@echo "  used on entry and on exit. Every program has Test exercises."

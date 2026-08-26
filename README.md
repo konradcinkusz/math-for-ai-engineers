@@ -22,7 +22,7 @@ and the same numbers, so a correction applied to one cannot silently miss the
 other.
 
 > **Early draft.** The structure, the build, the bilingual tooling and
-> **Program F1 in both languages** are done. Forty-five of forty-six programs
+> **Program F1 in both languages** are done. Forty-six of forty-seven programs
 > are stubs carrying the brief they must satisfy. Every ledger below is printed
 > on every CI build, so the debt is visible rather than quietly carried.
 
@@ -30,7 +30,7 @@ other.
 
 ## What a program looks like
 
-Each of the forty-six programs is a stream of numbered **frames**. Nearly every
+Each of the forty-seven programs is a stream of numbered **frames**. Nearly every
 frame ends by asking you for something, and **the answer is at the top of the
 next frame** — so you commit before you check. Over one program that happens
 forty to seventy times.
@@ -56,13 +56,13 @@ are catalogued, each phrased in the reader's own voice.
 
 ## What is covered
 
-Nine parts, thirteen Foundation programs and thirty-three main programs.
+Nine parts, thirteen Foundation programs and thirty-four main programs.
 
 | Part | Programs |
 |---|---|
-| **I — Foundation** | Numbers · Algebra · Logarithms · Sums and sequences · Functions · Equations · Exponentials · Trigonometry · Vectors · Sets and counting · The derivative · The chain rule · The integral |
+| **I — Foundation** | Numbers · Algebra · Logarithms · Sums and sequences · Functions · Equations · Exponentials · Trigonometry · Vectors · Sets and counting · The derivative · The chain rule · Accumulation and expectation |
 | **II — Number, precision and cost** | Floating point · Numerical stability and log-space · O-notation, FLOPs and memory |
-| **III — Linear algebra** | Vector spaces · Inner products and norms · Matrices as maps · Rank and least squares · Determinants · Eigenvalues · SVD and conditioning |
+| **III — Linear algebra** | Vector spaces · Inner products and norms · Matrices as maps · **Tensors, shapes and index notation** · Rank and least squares · Determinants · Eigenvalues · SVD and conditioning |
 | **IV — Discrete structures** | Combinatorics · Graphs and DAGs · Logic and reading theorems |
 | **V — Calculus and autodiff** | The gradient · Jacobians and autodiff · The Hessian · Matrix calculus |
 | **VI — Optimisation** | Convexity · SGD to Adam · Stochastic optimisation · Lagrange multipliers |
@@ -95,10 +95,10 @@ Program F1 alone pulls in twenty-nine of them. A few, so you can see the shape:
 
 | | |
 |---|---|
-| `2^10` against `10^3` | 2.40% high |
-| `2^80` against `10^24` | **20.89% high** — the same error, compounded eight times |
+| `2^10` against `10^3` | 2.40% above |
+| `2^80` against `10^24` | **20.89% above** — the same error, compounded eight times |
 | 7 billion parameters at 2 bytes | 14 GB, and 13.04 GiB |
-| A gibibyte against a gigabyte | 7.4% more bytes |
+| A gibibyte against a gigabyte | 7.37% more bytes |
 | "Fifty per cent faster" on 200 ms | 100 ms or 133.3 ms, **33.3 ms apart** |
 
 Ten experiments are specified across the book and **none has been run**. Until

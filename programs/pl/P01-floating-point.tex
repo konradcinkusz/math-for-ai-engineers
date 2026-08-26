@@ -1,23 +1,22 @@
-%% P01 \dash{} Liczby zmiennoprzecinkowe: co maszyna naprawdę liczy
+%% P01 --- Liczby zmiennoprzecinkowe: co maszyna naprawdę liczy
 %%
-%% Zalążek. Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co
-%% ma dać czytelnikowi. Napisanie programu oznacza usunięcie bloku
-%% \programstub{} i zastąpienie go programem. Jeśli po przerobieniu materiału
-%% opis okaże się błędny, popraw go i odnotuj sprzeczność w CLAUDE.md w sekcji
-%% *Resolved questions*.
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
+%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
+%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
+%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
 
 \program{Liczby zmiennoprzecinkowe: co maszyna naprawdę liczy}
 \label{prog:P01}
 
 \programstub{%
-\textit{[Opis do przetłumaczenia \dash{} patrz wydanie angielskie.]}
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
 
 Argument: a float is a sign, an exponent and a fixed number of significant
 bits, so the gap between representable numbers grows with magnitude, and
 equality is not a question you should ask. Payoff: why \code{bf16} is the
-training format and \code{fp16} needs loss scaling \dash{} they have the same
-width and different exponent budgets, and the reader computes the overflow
-threshold rather than being told it; why a sum of gradients is not
+training format and \code{fp16} needs loss scaling \dash{} they have the
+same width and different exponent budgets, and the reader computes the
+overflow threshold rather than being told it; why a sum of gradients is not
 associative and two GPUs therefore disagree in the last bits; what machine
 epsilon is and why comparing two loss values that differ in the eighth
 decimal is measuring the hardware.

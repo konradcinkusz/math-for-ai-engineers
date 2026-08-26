@@ -30,7 +30,15 @@
 \usepackage[utf8]{inputenc}
 \IfFileExists{lmodern.sty}{\usepackage{lmodern}}{}
 \IfFileExists{newtxtext.sty}{\usepackage{newtxtext}}{}
-\IfFileExists{newtxmath.sty}{\usepackage{newtxmath}}{}
+% amsmath goes here, not down with the other packages, because newtxmath
+% patches amsmath's internals and must be loaded AFTER it. The wrong order does
+% not fail on a machine without newtxmath -- which is most CI images -- and
+% fails on the author's full TeX Live.
+%
+% amssymb only when newtxmath is absent: newtxmath supplies the AMS symbols
+% itself (its amssymbols option is on by default) and loading both clashes.
+\usepackage{amsmath}
+\IfFileExists{newtxmath.sty}{\usepackage{newtxmath}}{\usepackage{amssymb}}
 \IfFileExists{inconsolata.sty}{\usepackage[varqu,scaled=0.95]{inconsolata}}{}
 \IfFileExists{lmodern.sty}{\usepackage{microtype}}{\usepackage[expansion=false]{microtype}}
 
@@ -70,8 +78,6 @@
 \usepackage{longtable}
 \usepackage{array}
 \usepackage{enumitem}
-\usepackage{amsmath}
-\usepackage{amssymb}
 \IfFileExists{mathtools.sty}{\usepackage{mathtools}}{}
 \usepackage{listings}
 \usepackage[most]{tcolorbox}
@@ -215,7 +221,13 @@
 % The running head carries the *frame* number as well as the program, because
 % in a book of numbered frames "where am I" is a frame question, not a page
 % question, and the summary's back-references are frame numbers.
-\renewcommand{\chaptermark}[1]{\markboth{\lblProgram\ \thechapter.\ #1}{}}
+% \@chapapp, not \lblProgram. \appendix switches \@chapapp from \chaptername
+% to \appendixname, and babel supplies both in the right language; hard-coding
+% the word gives an appendix a running head reading "Program A. Answers" over a
+% page whose own chapter head reads "APPENDIX A".
+\makeatletter
+\renewcommand{\chaptermark}[1]{\markboth{\@chapapp\ \thechapter.\ #1}{}}
+\makeatother
 \renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
 
 % ============================================================
@@ -765,10 +777,37 @@
 
 \makeatletter
 \newcommand{\mfaval}[2]{\csgdef{mfaval@#1}{#2}\listxadd{\mfavalues}{#1}}
+% \num on a non-numeric body is a FATAL siunitx error -- "Invalid number" --
+% and under -halt-on-error that is the whole build. A script emitting a word
+% where the book expected a number is a plausible mistake.
+%
+% The check is NOT done here. Deciding in TeX whether a token list is a number
+% means parsing it character by character, which is fragile and was got wrong
+% once already. The generator knows the answer for free, so it emits \mfaval
+% for a number and \mfavaltext for a word, and this end only has to enforce
+% which macro reads which.
 \newcommand{\val}[1]{%
-  \ifcsdef{mfaval@#1}{\mfanum{\csuse{mfaval@#1}}}%
+  \ifcsdef{mfaval@#1}{%
+    \ifcsdef{mfavaltext@#1}{%
+      \PackageError{mfabook}{Value `#1' is not a number}%
+        {\string\val\space passes its body to siunitx, which refuses anything
+         that is not a number. Use \string\valtext{#1} instead, or fix the
+         script in code/ that emits this key.}%
+    }{}%
+    \mfanum{\csuse{mfaval@#1}}%
+  }{\textcolor{mred}{\textbf{[?\,#1]}}}%
+}
+% A value that is deliberately a word rather than a number -- a format name, a
+% verdict, a unit. Rare, and a visibly different macro so nobody reaches for
+% \val and gets an error they cannot place.
+\newcommand{\valtext}[1]{%
+  \ifcsdef{mfaval@#1}{\csuse{mfaval@#1}}%
     {\textcolor{mred}{\textbf{[?\,#1]}}}%
 }
+\newcommand{\mfavaltext}[2]{%
+  \csgdef{mfaval@#1}{#2}\csgdef{mfavaltext@#1}{}\listxadd{\mfavalues}{#1}%
+}
+
 % The raw stored string, for the cases where a number must appear exactly as
 % the machine printed it -- inside a console block, or where the digits
 % themselves are the point and grouping them would obscure the pattern.

@@ -12,18 +12,18 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Both mains, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1 written, both editions.** F2–F13 and P1–P33 are stubs carrying their briefs | 45 of 46 |
+| Programs | **F1 written, both editions.** F2–F13 and P1–P34 are stubs carrying their briefs | 46 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 Both editions build clean: `latexmk -pdf main-en.tex` and `main-pl.tex` each
-return 0. **English 167 pages, Polish 169 pages, zero errors, zero warnings,
+return 0. **English 169 pages, Polish 171 pages, zero errors, zero warnings,
 zero overfull vboxes, four overfull hboxes of at most 4.1 pt.** Parity reports
-**0 failures and 0 warnings** across 55 file pairs; `reflist.py` confirms 65
+**0 failures and 0 warnings** across 56 file pairs; `reflist.py` confirms 66
 labels resolve to the same numbers in both editions.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **45 of 46 programs are stubs**, in each language. This is the whole of the
+- **46 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
@@ -126,6 +126,18 @@ gates on it.
 | C14 macro histogram | A `\trapbox` or an `\index` dropped in translation |
 | **C15 main-file wiring** | A main file rewritten with a chapter of front matter dropped |
 | `reflist.py` | `\label{prog:F08}` resolving to F8 in one edition and F9 in the other. Both builds stay internally consistent and neither warns |
+
+`tools/gen_stubs.py` regenerates every stub and `structure.tex` from
+`tools/programs.json`, which is the single source of the part and program
+sequence. **It will not overwrite a program that has been written** — a file
+with no `\programstub{}` left in it is finished prose — and it refuses outright
+if a written program has been renumbered under it, because moving written work
+is a decision and not a side effect. `--check` fails when anything is stale.
+
+Use it. Inserting P7 by hand would have been forty-seven file renames and a
+renumbering done by eye, and the one-off patch that escaped the briefs' LaTeX
+the first time was silently undone by the next regeneration — which is exactly
+why the escaping now lives in the generator.
 
 C12 compares **strictly** — the Polish decimal comma is *not* normalised away.
 That was tried and it hid the defect it was meant to catch: a `$0.1$` / `$0{,}1$`
@@ -359,7 +371,7 @@ works.
 
 ## Structure
 
-Nine parts, thirteen Foundation programs and thirty-three main programs.
+Nine parts, thirteen Foundation programs and thirty-four main programs.
 The full reasoning, with each program's argument, its AI payoff, its frame
 estimate and the dependency graph, is `notes/01-curriculum.md`.
 
@@ -367,13 +379,13 @@ estimate and the dependency graph, is `notes/01-curriculum.md`.
 |---|---|
 | I — Foundation / Podstawy | F1–F13 · assumes nothing, triaged by Quiz |
 | II — Number, precision and cost | P1–P3 · before the linear algebra, deliberately |
-| III — Linear algebra | P4–P10 · the largest part |
-| IV — Discrete structures and argument | P11–P13 |
-| V — Calculus and automatic differentiation | P14–P17 |
-| VI — Optimisation | P18–P21 |
-| VII — Probability and statistics | P22–P27 · past the normal distribution, to inference and Bayes |
-| VIII — Information theory | P28–P30 |
-| IX — Assembling it | P31–P33 · no new mathematics |
+| III — Linear algebra | P4–P11 · the largest part |
+| IV — Discrete structures and argument | P12–P14 |
+| V — Calculus and automatic differentiation | P15–P18 |
+| VI — Optimisation | P19–P22 |
+| VII — Probability and statistics | P23–P28 · past the normal distribution, to inference and Bayes |
+| VIII — Information theory | P29–P31 |
+| IX — Assembling it | P32–P34 · no new mathematics |
 
 **Each program's brief lives in its own file**, inside the `\programstub{}`
 block: what it must argue and what it must buy the reader. That is deliberate —
@@ -382,11 +394,57 @@ stub for a program, and disappears the moment the program is written. Writing a
 program means deleting the stub. If the brief turns out to be wrong once the
 mathematics has been worked, change it and record the contradiction here.
 
-**One ordering conflict, resolved and recorded** so nobody "fixes" it: P20
-(stochastic optimisation) needs random variables and variance from P23–P24, two
-parts later. P20 states those prerequisites in its outcomes and points at them;
-P24 revisits minibatch noise once the machinery exists. It is the only forward
-prerequisite in the book.
+**Forward prerequisites, all declared rather than discovered.** An adversarial
+review of the curriculum found four, and the rule is now that each is stated in
+the owning program's Learning outcomes with a pointer:
+
+- **P21** (stochastic optimisation) needs random variables and variance from
+  **P24–P25**, two parts later. P25 revisits minibatch noise once the machinery
+  exists.
+- **P10** and **P11** use the covariance matrix, defined in **P24**. They need
+  two facts from it — symmetric, positive semi-definite — and say so.
+- **P18** (matrix calculus) carries the book's most reused derivation, the
+  softmax–cross-entropy gradient, and cross-entropy is not defined until
+  **P30**. P18 gives it a definitional frame; P26 and P30 each return to it.
+
+Anything else is a dependency error, not a forward reference.
+
+### Changes the curriculum review forced, August 2026
+
+An adversarial pass over `notes/01-curriculum.md` rejected it as it stood, and
+five of its findings are now in the manifest:
+
+1. **A program on tensors, shapes and index notation was missing** — the
+   largest content gap in the book, and in every book in its own competitive
+   survey. The audience manipulates rank-4 arrays daily and has only ever been
+   taught rank-2 notation, which is where the shape errors come from. It is now
+   **P7**, between *Matrices as linear maps* and *Rank*, and everything after it
+   moved up one.
+2. **F13 was curriculum inertia.** Forty-five frames on the integral, in a book
+   whose own scope statement excludes every integration technique. Cut to
+   twenty and retitled *Accumulation, area and expectation* — it exists to make
+   an expectation an integral and a density integrate to one, and for nothing
+   else.
+3. **P3 asked the reader to count the parameters of a transformer block** three
+   parts before any program had said what a matrix is. The count moved to P32;
+   P3 keeps magnitude and cost, which need only arithmetic and sigma notation.
+4. **Nothing explained why a training run diverges at initialisation.** No
+   variance propagation, no fan-in argument, no He or Xavier. Added to P25,
+   where it belongs, because it is a variance argument.
+5. **Part I's contract was false.** *Assumes genuinely nothing* is contradicted
+   by every Foundation payoff sentence, F1's included: it has the reader compute
+   what a seven-billion-parameter model weighs and does not stop to say what a
+   parameter is. Both introductions now separate the two floors — no mathematics
+   beyond school arithmetic, but the vocabulary of the job assumed throughout —
+   and say plainly that a reader who has never trained or served a model will
+   find the mathematics correct and the reasons for caring about it absent.
+
+**And the 80/80 standard was unmeasurable as defined.** The Quiz runs on the
+thirteen Foundation programs only, so a standard defined against it could not be
+measured on thirty-four of the forty-seven — and was contaminated on the other
+thirteen, because the same items serve as entry and exit test. The instrument is
+now the **scored Test exercises**, which every program has, with entry and exit
+items drawn from the same pool but not identical.
 
 **The trap catalogue** — 38 misconceptions AI engineers actually hold, each
 phrased in the reader's own voice with its correction and its owning program —
@@ -429,7 +487,7 @@ clone instead.
 
 ## What is left
 
-1. **Forty-five programs.** This is the work. F2–F13 first, because the
+1. **Forty-six programs.** This is the work. F2–F13 first, because the
    Foundation part is what makes the book's claim — *it assumes nothing* — true
    or false, and because F3 (logarithms) and F12 (the chain rule) are the two
    the rest of the book leans on hardest.
@@ -439,12 +497,15 @@ clone instead.
    argument into a demonstration.
 3. **Appendices C–F.** C (formula reference) is the one that fixes Stroud's
    fair criticism that a book of frames is a useless reference.
-4. **`odzera`, the companion library.** One stage per part, every gradient
+4. **Program P7 has no plan.** It was added by review rather than designed, so
+   its brief is a contract and not yet a frame-by-frame plan. Write that before
+   writing the program.
+5. **`odzera`, the companion library.** One stage per part, every gradient
    checked against finite differences in CI, no GPU, the whole suite under a
    minute. Specified in `notes/01-curriculum.md` §18; nothing built.
-5. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
+6. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
    ledger stays open and the book may not claim it.
 
 Two decisions still open, both recorded in `notes/01-curriculum.md` §20: whether
-this is one volume or two (≈2,385 frames is 460–540 pages), and whether P11
+this is one volume or two (≈2,415 frames is 470–550 pages), and whether P12
 (combinatorics) should move next to the probability that consumes it.

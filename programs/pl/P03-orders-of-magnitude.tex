@@ -1,25 +1,25 @@
-%% P03 \dash{} Rzędy wielkości: notacja O, FLOP-y i pamięć
+%% P03 --- Rzędy wielkości: notacja O, FLOP-y i pamięć
 %%
-%% Zalążek. Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co
-%% ma dać czytelnikowi. Napisanie programu oznacza usunięcie bloku
-%% \programstub{} i zastąpienie go programem. Jeśli po przerobieniu materiału
-%% opis okaże się błędny, popraw go i odnotuj sprzeczność w CLAUDE.md w sekcji
-%% *Resolved questions*.
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
+%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
+%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
+%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
 
 \program{Rzędy wielkości: notacja O, FLOP-y i pamięć}
 \label{prog:P03}
 
 \programstub{%
-\textit{[Opis do przetłumaczenia \dash{} patrz wydanie angielskie.]}
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
 
 Argument: asymptotic notation is a statement about growth and says nothing
 about which of two implementations is faster today; both facts matter.
-Payoff: count the parameters of a transformer block by hand; count the
-activations; count the KV cache and watch it grow linearly in sequence
-length while attention grows quadratically \dash{} the reader derives why long
-context is expensive rather than accepting it. Arithmetic intensity, and why
-a large matrix multiply is compute-bound while an elementwise operation is
-memory-bound, which is the whole justification for kernel fusion.
+Payoff: bytes, FLOPs as a rate, and arithmetic intensity as a ratio, which
+is the whole justification for kernel fusion; why a large matrix multiply is
+compute-bound and an elementwise operation is memory-bound. DEPENDENCY NOTE:
+an earlier brief had the reader count the parameters of a transformer block
+here, three parts before any program has said what a matrix is. That count
+moves to P32, where the shapes exist. What stays is magnitude and cost,
+which need only arithmetic and sigma notation.
 
 \medskip
 \textbf{Planowana długość:} 45 ramek.

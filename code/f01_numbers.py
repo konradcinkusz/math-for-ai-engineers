@@ -14,17 +14,29 @@ from __future__ import annotations
 import math
 from pathlib import Path
 
-VALUES: dict[str, str] = {}
+VALUES: dict[str, tuple[str, bool]] = {}
 
 
 def emit(key: str, value, digits: int | None = None) -> None:
-    """Record one value under the name the book will reference it by."""
+    """Record one value under the name the book will reference it by.
+
+    Also decides here whether the value is a number, because this end knows for
+    free and the LaTeX end does not. \val passes its body to siunitx, which
+    raises a fatal error on anything that is not a number; the book's \val
+    refuses a value emitted as text and names \valtext instead.
+    """
     if isinstance(value, float) and digits is not None:
-        VALUES[key] = f"{value:.{digits}f}"
+        body = f"{value:.{digits}f}"
     elif isinstance(value, float):
-        VALUES[key] = repr(value)
+        body = repr(value)
     else:
-        VALUES[key] = str(value)
+        body = str(value)
+    try:
+        float(body.replace("e", "E"))
+        numeric = True
+    except ValueError:
+        numeric = False
+    VALUES[key] = (body, numeric)
 
 
 # --------------------------------------------------------------------------
@@ -134,11 +146,14 @@ def main() -> None:
         "% away from the computation that justifies it.",
         "",
     ]
-    lines += [f"\\mfaval{{{k}}}{{{v}}}" for k, v in VALUES.items()]
+    lines += [
+        f"\\{'mfaval' if numeric else 'mfavaltext'}{{{k}}}{{{body}}}"
+        for k, (body, numeric) in VALUES.items()
+    ]
     OUT.write_text("\n".join(lines) + "\n", encoding="utf8")
     width = max(len(k) for k in VALUES)
-    for k, v in VALUES.items():
-        print(f"  {k:<{width}}  {v}")
+    for k, (body, numeric) in VALUES.items():
+        print(f"  {k:<{width}}  {body}{'' if numeric else '   (text)'}")
     print(f"\n  {len(VALUES)} values -> {OUT.relative_to(OUT.parents[2])}")
 
 
