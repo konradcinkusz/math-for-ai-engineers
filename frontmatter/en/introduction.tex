@@ -18,8 +18,8 @@ under-equipped, and aware of it.
 
 It assumes \textbf{nothing}. Not algebra, not trigonometry, not calculus. Part~I
 begins with arithmetic and means it. If you have a degree in a numerate
-subject, that is not a problem --- the Quizzes exist precisely so that you can
-skip what you already have --- but the floor is genuinely the floor, because a
+subject, that is not a problem \dash{} the Quizzes exist precisely so that you can
+skip what you already have \dash{} but the floor is genuinely the floor, because a
 book that claims to start from zero and then quietly assumes indices has
 started from one.
 
@@ -47,7 +47,7 @@ The machinery is simple. The book is a sequence of numbered \emph{frames}.
 Nearly every one demands a response, and the answer is at the top of the next
 frame, so you are asked to commit before you check. Over one program that
 happens forty to seventy times. The effect is that retrieval practice is not
-something you have to organise for yourself at the end of a chapter --- it is
+something you have to organise for yourself at the end of a chapter \dash{} it is
 the only way the pages can be turned.
 
 The design also grades its own support: worked example, then example with gaps,
@@ -62,41 +62,41 @@ gone, and one that has merely been avoided is waiting.
 
 Nine parts, forty-six programs.
 
-\textbf{Part~I --- Foundation} (F1--F13) assumes nothing and is triaged by
+\textbf{Part~I \dash{} Foundation} (F1--F13) assumes nothing and is triaged by
 Quiz. It is bent towards the payoff rather than towards a school syllabus:
 logarithms get a whole program because log-space arithmetic is load-bearing
 three parts later, and the chain rule gets the longest program in the part
 because backpropagation is the chain rule and nothing else.
 
-\textbf{Part~II --- Number, precision and cost} (P1--P3) comes before linear
+\textbf{Part~II \dash{} Number, precision and cost} (P1--P3) comes before linear
 algebra, which is a departure from every mathematics curriculum and is
 deliberate. Everything after it is arithmetic performed by a finite machine on
 a budget. A book that waits four hundred pages to admit that the machine cannot
 represent $\num{0.1}$ has spent four hundred pages teaching a fiction.
 
-\textbf{Part~III --- Linear algebra} (P4--P10) is the largest part, because it
+\textbf{Part~III \dash{} Linear algebra} (P4--P10) is the largest part, because it
 is the subject this audience uses daily and understands least.
 
-\textbf{Part~IV --- Discrete structures and argument} (P11--P13) covers
+\textbf{Part~IV \dash{} Discrete structures and argument} (P11--P13) covers
 counting, graphs, and how to read a theorem without believing more than it
 says. It sits before the calculus so that \emph{DAG} and \emph{for all
 $\varepsilon$} are defined the first time they are needed.
 
-\textbf{Part~V --- Calculus and automatic differentiation} (P14--P17) takes the
+\textbf{Part~V \dash{} Calculus and automatic differentiation} (P14--P17) takes the
 chain rule all the way to what \code{loss.backward()} does.
 
-\textbf{Part~VI --- Optimisation} (P18--P21) is absent from Stroud's first
+\textbf{Part~VI \dash{} Optimisation} (P18--P21) is absent from Stroud's first
 volume entirely.
 
-\textbf{Part~VII --- Probability and statistics} (P22--P27) goes past the
-normal distribution, where Stroud stops, to inference and Bayes --- because
+\textbf{Part~VII \dash{} Probability and statistics} (P22--P27) goes past the
+normal distribution, where Stroud stops, to inference and Bayes \dash{} because
 this audience's real statistical job is deciding whether a measured difference
 is real, and that is the part no engineering mathematics text covers.
 
-\textbf{Part~VIII --- Information theory} (P28--P30) is where the loss function
+\textbf{Part~VIII \dash{} Information theory} (P28--P30) is where the loss function
 comes from.
 
-\textbf{Part~IX --- Assembling it} (P31--P33) spends the whole book on one
+\textbf{Part~IX \dash{} Assembling it} (P31--P33) spends the whole book on one
 architecture, one training run and one evaluation, and introduces no new
 mathematics.
 
@@ -108,7 +108,7 @@ here is produced by a script in \code{code/} and pulled into the text
 mechanically. The book does not contain the digits; it contains a reference to
 them. A value the scripts stop producing prints a visible marker and fails the
 build. This exists because a wrong digit in a mathematics book is not a broken
-example --- it is something the reader will carry.
+example \dash{} it is something the reader will carry.
 \end{note}
 
 \begin{note}
@@ -126,8 +126,8 @@ their answers; only the prose differs. A check on every build proves that the
 two have the same programs, the same frame counts and the same numbers, so a
 correction applied to one edition cannot silently miss the other.
 
-Where Polish and English mathematical usage genuinely differ --- $\mathrm{tg}$ against
+Where Polish and English mathematical usage genuinely differ \dash{} $\mathrm{tg}$ against
 $\mathrm{tan}$, the decimal comma, the angle brackets Polish tradition uses for a
-closed interval, $D^2(X)$ against $\Var(X)$ --- the decision is recorded in
+closed interval, $D^2(X)$ against $\Var(X)$ \dash{} the decision is recorded in
 Appendix~B rather than left to a translator's memory, and it is executed by the
 typesetting rather than applied by hand.

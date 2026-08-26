@@ -1,4 +1,4 @@
-%% P19 --- Metoda gradientu prostego: od SGD do Adama
+%% P19 \dash{} Metoda gradientu prostego: od SGD do Adama
 %%
 %% Zalążek. Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co
 %% ma dać czytelnikowi. Napisanie programu oznacza usunięcie bloku
@@ -10,14 +10,14 @@
 \label{prog:P19}
 
 \programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\textit{[Opis do przetłumaczenia \dash{} patrz wydanie angielskie.]}
 
 Argument: every optimiser in common use is the same update with a different
 estimate of \enquote{how far and in which direction}, and each addition fixes a
 specific named failure of the one before it. Payoff: the step-size bound
 from P16; momentum as the exponential moving average met in F4, fixing the
 zig-zag from P14; per-coordinate scaling fixing badly scaled features; why
-Adam divides by the square root of the second moment --- it is a per-
+Adam divides by the square root of the second moment \dash{} it is a per-
 coordinate estimate of the gradient's scale, so the update becomes
 approximately unit-sized regardless of how large the gradient is, which is
 also precisely why Adam is insensitive to loss scaling and why the epsilon

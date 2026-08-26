@@ -1,20 +1,911 @@
 %% F01 --- Numbers, powers and roots
 %%
-%% Stub. The brief below is the contract for this program: what it must argue,
-%% and what it must buy the reader. Writing the program means deleting the
-%% \programstub{} block and replacing it with the program. If the brief turns
-%% out to be wrong once the mathematics has been worked, change it and record
-%% the contradiction in CLAUDE.md under *Resolved questions*.
+%% Every number in this program comes from code/f01_numbers.py and is pulled in
+%% with \val{}. Arithmetic the program is TEACHING (2^5 = 32) is written
+%% inline, because the reader is meant to do it; anything the reader cannot do
+%% in their head is computed.
 
 \program{Numbers, powers and roots}
 \label{prog:F01}
+\index{numbers!sets of}
+\index{measurement!orders of magnitude}
 
-\programstub{%
-Argument: arithmetic is a set of rules you can check, and scientific
-notation is how you hold quantities you cannot picture. Payoff: a 7-billion-
-parameter model in \code{fp16} is 14 GB, and the reader computes that rather
-than repeating it; orders of magnitude for tokens, FLOPs and dollars.
+\begin{outcomes}
+\outcome{1--7}{say which set a number belongs to, and why the answer changes
+  what a program can do with it}
+\outcome{8--15}{use the laws of indices, including the zero and negative
+  exponents, without stopping to think}
+\outcome{16--22}{read a fractional index as a root, and move between the two
+  forms in either direction}
+\outcome{23--28}{write any quantity in scientific notation, and multiply,
+  divide and compare quantities while they stay in it}
+\outcome{29--33}{estimate an order of magnitude in your head, and say how far
+  the estimate can be trusted}
+\outcome{34--37}{compute the memory a model's weights need from its parameter
+  count and its precision}
+\outcome{38--41}{tell a gigabyte from a gibibyte, and say which one a piece of
+  tooling is reporting}
+\outcome{42--45}{state a speed-up unambiguously, and spot the two readings of
+  \enquote{fifty per cent faster}}
+\end{outcomes}
 
-\medskip
-\textbf{Planned length:} 55 frames.
-}
+\begin{quiz}
+\item Which of $-4$, $\tfrac{7}{2}$, $\sqrt{9}$ and $\sqrt{7}$ are rational?
+  \teachesat{1--7}
+  \answerto{All except $\sqrt{7}$. Note $\sqrt{9}=3$, an integer \dash{} the
+  form a number is written in is not the same thing as the set it lives in.}
+\item Simplify $2^{6} \times 2^{-2}$. \teachesat{9--13}
+  \answerto{$2^{4} = 16$.}
+\item What is $5^{0}$, and why? \teachesatone{12}
+  \answerto{$1$. From $a^{m}/a^{m} = a^{m-m} = a^{0}$, and anything non-zero
+  divided by itself is $1$.}
+\item Write $81^{3/4}$ without an index. \teachesat{16--21}
+  \answerto{$27$. The fourth root of $81$ is $3$; cubed, $27$.}
+\item Is $\sqrt{9+16}$ equal to $\sqrt{9}+\sqrt{16}$? \teachesatone{22}
+  \answerto{No. $\sqrt{25}=5$, while $3+4=7$. A root does not distribute over
+  a sum.}
+\item Write $\num{0.00042}$ in scientific notation. \teachesat{23--24}
+  \answerto{$\num{4.2e-4}$.}
+\item Compute $(\num{3e8}) \times (\num{2e-3})$. \teachesat{25--26}
+  \answerto{$\num{6e5}$. Multiply the mantissas, add the exponents.}
+\item $2^{10}$ is often called \enquote{about a thousand}. By what percentage
+  is that wrong? \teachesat{30--31}
+  \answerto{$2^{10} = 1024$, so the approximation is low by
+  \val{f01.two.ten.err.pct}\%.}
+\item A model has \val{f01.params} parameters stored in a 2-byte format. How
+  many bytes are its weights? \teachesat{34--36}
+  \answerto{$\val{f01.weights.bytes}$ bytes, which is \val{f01.weights.gb}~GB.}
+\item Your arithmetic says 14~GB and your tooling reports \val{f01.weights.gib}~GiB. Which is
+  wrong? \teachesat{38--40}
+  \answerto{Neither. They are different units: a gibibyte is $2^{30}$ bytes and
+  a gigabyte is $10^{9}$, so a gibibyte is \val{f01.gib.over.si.pct}\% more
+  bytes.}
+\item A request took \val{f01.base.ms}~ms and is now \enquote{fifty per cent
+  faster}. How long does it take? \teachesat{42--43}
+  \answerto{Ambiguous, and that is the point: \val{f01.fifty.pct.less.ms}~ms
+  if half the time, \val{f01.fifty.pct.more.rate.ms}~ms if one and a half times
+  the rate.}
+\item Estimate the number of FLOPs to train a \val{f01.params}-parameter model
+  on \val{f01.tokens} tokens, given roughly 6 FLOPs per parameter per token.
+  \teachesat{29--33}
+  \answerto{$\val{f01.train.flops}$, or about $10^{\val{f01.train.flops.exp}}$.}
+\end{quiz}
+
+% ============================================================
+\section{Which numbers there are}
+\label{sec:F01-sets}
+\index{numbers!natural}
+\index{numbers!rational}
+
+\begin{fr}
+Counting is the oldest thing arithmetic does, and the numbers you count with
+are the \emph{natural numbers}: $0, 1, 2, 3, \dots$ and on without end. They
+are written $\N$.
+
+Whether $0$ belongs in $\N$ is a convention, and it is not settled: some
+countries teach that it does and some that it does not. This book takes
+$0 \in \N$ throughout, and says so here rather than letting you find out from
+an example.
+
+Now a question. You are asked to record a temperature of three degrees below
+zero. Can you do it with a natural number?
+\end{fr}
+
+\begin{fr}
+\ans{No. You need a sign as well as a magnitude.}
+Extend $\N$ with the negatives and you have the \emph{integers}, $\Z$:
+\[ \dots,\; -3,\; -2,\; -1,\; 0,\; 1,\; 2,\; 3,\; \dots \]
+Every natural number is an integer. The reverse is not true, which is what
+makes this an extension rather than a renaming.
+
+Next: you have three biscuits to divide between two people. Which set do you
+need?
+\end{fr}
+
+\begin{fr}
+\ans{Neither. You need a number between $1$ and $2$.}
+A \emph{rational} number is one that can be written as a ratio of two integers,
+$p/q$ with $q \ne 0$. The set is written $\Q$. It contains $\tfrac{3}{2}$, and
+it contains $-17$ (as $-17/1$), and it contains $\num{0.1}$ (as $1/10$).
+
+Write down the decimal expansion of $\tfrac{1}{3}$.
+\end{fr}
+
+\begin{fr}
+\ans{$\num{0.333}\dots$, repeating without end.}
+A rational number's decimal expansion either stops or repeats for ever. It
+never does anything more interesting than that. $\tfrac{1}{3}$ repeats;
+$\tfrac{1}{4} = \num{0.25}$ stops; $\tfrac{1}{7} = \num{0.142857142857}\dots$ repeats
+with a period of six.
+
+That $\tfrac{1}{3}$ cannot be written down exactly in decimal is not a fact
+about $\tfrac{1}{3}$. It is a fact about \emph{base ten}. In base three,
+$\tfrac{1}{3}$ is exactly $\num{0.1}$.
+
+Hold that thought. Now: is $\num{0.1}$ a simple number, or an awkward one?
+\end{fr}
+
+\begin{fr}
+\ans{Simple. It is $\tfrac{1}{10}$, one digit, exact.}
+That is the right answer in base ten and it is the wrong answer about your
+computer, and the gap between those two sentences is the subject of
+Program~\ref{prog:P01}.
+
+\begin{trapbox}
+Your machine does not work in base ten. It works in base two, and in base two
+$\tfrac{1}{10}$ behaves exactly the way $\tfrac{1}{3}$ behaves in base ten: it
+repeats for ever, and any finite machine has to stop writing it down somewhere.
+
+So the number your program holds when you type \code{0.1} is not $\num{0.1}$.
+It is the nearest number the machine can represent, and it is not the same. It
+is not a small inaccuracy in a big calculation; it is there in a single
+assignment, before any arithmetic has happened.
+
+Nothing in this program depends on that. Everything in
+Program~\ref{prog:P01} does.
+\end{trapbox}
+
+There are also numbers that are not rational at all. $\sqrt{2}$ is one, and
+$\pi$ is another: their decimal expansions neither stop nor repeat. Together
+with the rationals they make the \emph{real} numbers, $\R$.
+\end{fr}
+
+\mermaidfig{f01-number-sets}{%
+  The four sets, nested, and the one that is not nested with them. What a
+  machine stores is a finite subset of the rationals \dash{} so it holds
+  neither all of $\Q$ nor any irrational number exactly.}{%
+  Nested number sets, with the machine's floating-point set shown as a finite
+  subset of the rationals.}
+
+\begin{fr}
+Classify each of these. Write $\N$, $\Z$, $\Q$ or $\R$ for the \emph{smallest}
+set each one belongs to:
+\[ 7, \qquad -17, \qquad \tfrac{22}{7}, \qquad \sqrt{2}, \qquad \sqrt{9} \]
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$7 \in \N$. \quad $-17 \in \Z$. \quad $\tfrac{22}{7} \in \Q$. \quad
+$\sqrt{2} \in \R$ and nothing smaller. \quad $\sqrt{9} \in \N$, because
+$\sqrt{9} = 3$.
+
+The last one is the one worth pausing on. $\sqrt{9}$ \emph{looks} irrational
+and is not. The way a number is written is not the same thing as the set it
+lives in, and a good many mistakes in this book's later programs come from
+reading a form instead of a value.
+\end{ansblock}
+
+That is the whole of the vocabulary you need. On to the tool you will use
+every day.
+\end{fr}
+
+% ============================================================
+\section{Powers}
+\label{sec:F01-powers}
+\index{indices!laws of}
+\index{powers}
+
+\begin{fr}
+$a^{n}$, read \enquote{$a$ to the power $n$}, means $a$ multiplied by itself
+$n$ times. $a$ is the \emph{base}; $n$ is the \emph{index}, or the exponent.
+\[ 2^{5} = 2 \times 2 \times 2 \times 2 \times 2 \]
+Work it out.
+\end{fr}
+
+\begin{fr}
+\ans{$2^{5} = 32$}
+Now put two powers of the same base side by side:
+\[ 2^{3} \times 2^{4} = (2\times2\times2) \times (2\times2\times2\times2) \]
+Count the twos on the right. There are seven of them, so the product is
+$2^{7}$. Nothing was memorised; the exponents were counted.
+
+That is the first law of indices:
+\[ a^{m} \times a^{n} = a^{m+n} \]
+Use it: $10^{3} \times 10^{6} = \blank$
+\end{fr}
+
+\begin{fr}
+\ans{$10^{9}$}
+Division works the same way in reverse. In $2^{5} / 2^{3}$ there are five twos
+on top and three underneath; three cancel, two are left:
+\[ \frac{a^{m}}{a^{n}} = a^{m-n} \]
+And a power of a power multiplies:
+\[ (a^{m})^{n} = a^{mn} \]
+because $(2^{3})^{4}$ is four copies of three twos.
+
+Now a question that is not what it looks like. Is $2^{3} \times 3^{2}$ equal to
+$6^{5}$?
+\end{fr}
+
+\begin{fr}
+\ans{No. $2^{3} \times 3^{2} = 8 \times 9 = 72$, while $6^{5} = 7776$.}
+\begin{trapbox}
+\textbf{Every law of indices requires a common base.} $a^{m}\times a^{n} =
+a^{m+n}$ says nothing whatever about $a^{m} \times b^{n}$, and there is no rule
+that combines them. The temptation to add the exponents anyway is strong,
+because the pattern looks the same on the page, and it is the single most
+common error in this material.
+
+When the bases differ, you have two separate numbers. Compute them and
+multiply.
+\end{trapbox}
+Now the two cases that look like exceptions and are not. What is $5^{0}$?
+\end{fr}
+
+\begin{fr}
+\ans{$1$.}
+That is not a definition adopted for convenience. It follows:
+\[ 1 = \frac{5^{3}}{5^{3}} = 5^{3-3} = 5^{0} \]
+The division law forces it. Anything non-zero over itself is $1$, and the law
+says that quotient is $a^{0}$; so $a^{0}$ must be $1$ for every $a \ne 0$.
+
+Run the same argument one step further:
+\[ \frac{5^{3}}{5^{5}} = 5^{3-5} = 5^{-2} \quad\text{and also}\quad
+   \frac{5^{3}}{5^{5}} = \frac{1}{5^{2}} \]
+So what does a negative index mean?
+\end{fr}
+
+\begin{fr}
+\ans{A reciprocal: $a^{-n} = \dfrac{1}{a^{n}}$.}
+A negative index is not a negative number. $2^{-3} = \tfrac{1}{8}$, which is
+small and positive. The sign of the index says which way the division goes; it
+says nothing about the sign of the result.
+
+Simplify each of these, leaving no negative indices:
+\[ 3^{2} \times 3^{-5}, \qquad \frac{7^{-2}}{7^{-4}}, \qquad (2^{-1})^{-3} \]
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$3^{2} \times 3^{-5} = 3^{-3} = \tfrac{1}{27}$.
+
+$\dfrac{7^{-2}}{7^{-4}} = 7^{-2-(-4)} = 7^{2} = 49$. Subtracting a negative
+adds; this is where sign slips happen, so do it in two steps rather than one.
+
+$(2^{-1})^{-3} = 2^{3} = 8$.
+\end{ansblock}
+
+\yourturn
+Simplify $\dfrac{(x^{2})^{3} \times x^{-4}}{x^{-1}}$, giving one power of $x$.
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(x^{2})^{3} = x^{6}$; then $x^{6} \times x^{-4} = x^{2}$; then
+$x^{2}/x^{-1} = x^{2+1} = x^{3}$.
+\end{ansblock}
+
+\begin{aibox}
+This is not throat-clearing. A transformer's attention step costs on the order
+of $n^{2}d$ operations for a sequence of length $n$ and width $d$, and its
+memory for a cached key--value pair grows like $n d$. Every argument in this
+book about what long context costs is an argument about the exponent on $n$,
+and you cannot follow it without the fluency this section is building.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Roots}
+\label{sec:F01-roots}
+\index{roots}
+\index{indices!fractional}
+
+\begin{fr}
+A square root undoes a square. $\sqrt{64} = \blank$
+\end{fr}
+
+\begin{fr}
+\ans{$8$, because $8^{2} = 64$.}
+Roots and indices are the same machinery. Suppose $\sqrt{a} = a^{k}$ for some
+index $k$. Then
+\[ a^{k} \times a^{k} = a^{2k} \quad\text{must equal}\quad a^{1} \]
+so $2k = 1$. What is $k$?
+\end{fr}
+
+\begin{fr}
+\ans{$k = \tfrac{1}{2}$, so $\sqrt{a} = a^{1/2}$.}
+The same argument with an $n$th root gives $\sqrt[n]{a} = a^{1/n}$, and
+combining it with the power-of-a-power law gives the general form:
+\[ a^{m/n} = \left(\sqrt[n]{a}\right)^{m} = \sqrt[n]{a^{m}} \]
+Both orders give the same answer, and one of them is usually much easier
+arithmetic than the other.
+
+\textbf{Worked.} $81^{3/4}$. Take the root first: $\sqrt[4]{81} = 3$, then
+$3^{3} = 27$. Taking the power first would have meant finding the fourth root
+of $531441$, which is the same answer by a worse road.
+\end{fr}
+
+\begin{fr}
+\textbf{Worked, with gaps.} Evaluate $32^{2/5}$.
+
+The fifth root of $32$ is $\blank$, because $2^{5} = 32$.
+
+Raising that to the power $2$ gives $\blank$.
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\sqrt[5]{32} = 2$, and $2^{2} = 4$. So $32^{2/5} = 4$.
+\end{ansblock}
+
+A negative fractional index combines both rules and nothing new:
+\[ 16^{-3/4} = \frac{1}{16^{3/4}} = \frac{1}{(\sqrt[4]{16})^{3}}
+             = \frac{1}{2^{3}} = \frac{1}{8} \]
+
+\yourturn
+Evaluate $\left(\dfrac{27}{8}\right)^{-2/3}$.
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+The negative index inverts the fraction: $\left(\tfrac{8}{27}\right)^{2/3}$.
+The cube root of $\tfrac{8}{27}$ is $\tfrac{2}{3}$; squared, $\tfrac{4}{9}$.
+\end{ansblock}
+
+One more question before we leave roots, and it is a trap. Is
+$\sqrt{9 + 16}$ equal to $\sqrt{9} + \sqrt{16}$?
+\end{fr}
+
+\begin{fr}
+\ans{No. $\sqrt{25} = 5$, and $3 + 4 = 7$.}
+\begin{trapbox}
+\textbf{A root does not distribute over a sum.} Neither does a power:
+$(a+b)^{2} \ne a^{2} + b^{2}$, which Program~\ref{prog:F02} takes apart
+properly.
+
+Distribution over a \emph{product} is fine \dash{}
+$\sqrt{ab} = \sqrt{a}\sqrt{b}$ \dash{} and that is exactly what makes the
+error easy to make: one of the two looks like the other, and only one of them
+is true.
+
+You will meet this again in a form that costs real money. The norm of a sum of
+vectors is not the sum of the norms, and the assumption that it is turns up in
+plausible-looking arguments about embeddings. Program~\ref{prog:P05} deals with
+it there.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Scientific notation}
+\label{sec:F01-scientific}
+\index{scientific notation}
+\index{numbers!orders of magnitude}
+
+\begin{fr}
+Here is a number from the exercise you will do in a few frames:
+\[ \val{f01.weights.bytes} \]
+Count its digits. Now imagine comparing it, by eye, with $1400000000$ and
+saying which is bigger and by how much. The difficulty is not arithmetic; it
+is that a run of zeros carries no shape.
+
+\emph{Scientific notation} \dash{} also called standard form \dash{} writes
+every number as
+\[ m \times 10^{e}, \qquad 1 \le m < 10, \quad e \text{ an integer} \]
+$m$ is the mantissa and carries the precision; $e$ is the exponent and carries
+the size. Write $4\,500$ in that form.
+\end{fr}
+
+\begin{fr}
+\ans{$\num{4.5e3}$}
+The exponent is the number of places the point moves. Moving it left makes the
+exponent go up, because you are compensating for a smaller mantissa.
+
+Small numbers move the point the other way, so the exponent is negative:
+\[ \num{0.00042} = \num{4.2e-4} \]
+Convert $\num{0.0000031}$.
+\end{fr}
+
+\begin{fr}
+\ans{$\num{3.1e-6}$}
+Arithmetic in standard form is where it earns its keep. \textbf{Multiplication}
+multiplies the mantissas and adds the exponents:
+\[ (\num{3e8}) \times (\num{2e-3})
+   = (3 \times 2) \times 10^{8 + (-3)} = \num{6e5} \]
+\textbf{Division} divides and subtracts:
+\[ \frac{\num{8e12}}{\num{4e4}} = 2 \times 10^{12-4} = \num{2e8} \]
+Do one: $(\num{6e-2}) \times (\num{5e7}) = \blank$
+\end{fr}
+
+\begin{fr}
+\ans{$\num{3e6}$. The mantissas give $30$, which is renormalised to
+$3 \times 10^{1}$, and $10^{1} \times 10^{5} = 10^{6}$.}
+That renormalisation step is where the mistakes are: $30 \times 10^{5}$ is
+correct arithmetic and is not standard form, and if you leave it there you will
+mis-read your own exponent later.
+
+Now addition, which does \emph{not} work the same way. What is
+$(\num{3e8}) + (\num{2e7})$?
+\end{fr}
+
+\begin{fr}
+\ans{$\num{3.2e8}$}
+\begin{trapbox}
+\textbf{You cannot add exponents when you are adding numbers.} There is no
+short cut here at all: the two quantities must be brought to a common exponent
+first, and only then do the mantissas add.
+\[ \num{3e8} + \num{2e7} = \num{3e8} + \num{0.2e8} = \num{3.2e8} \]
+The reason this matters beyond arithmetic: it is the same reason a floating-
+point sum of numbers with very different exponents loses the small one
+entirely. Line up the exponents, and the small number's digits fall off the end
+of the mantissa. Program~\ref{prog:P02} measures exactly that.
+\end{trapbox}
+
+\yourturn
+Evaluate $(\num{7.2e5}) + (\num{4e4})$, then
+$\dfrac{\num{1.5e-3}}{\num{5e2}}$.
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\num{7.2e5} + \num{0.4e5} = \num{7.6e5}$.
+
+$\dfrac{\num{1.5}}{5} = \num{0.3}$ and $10^{-3-2} = 10^{-5}$, giving $\num{0.3} \times 10^{-5}$,
+which renormalises to $\num{3e-6}$.
+\end{ansblock}
+\end{fr}
+
+% ============================================================
+\section{Orders of magnitude}
+\label{sec:F01-magnitudes}
+\index{measurement!estimation}
+\index{orders of magnitude}
+
+\begin{fr}
+An \emph{order of magnitude} is the exponent alone. Two quantities are
+\enquote{the same order of magnitude} if their ratio is somewhere near one, and
+\enquote{three orders of magnitude apart} if the ratio is about a thousand.
+
+This is a coarse instrument on purpose. Most of the questions worth asking
+before you build something \dash{} will this fit in memory, will this finish
+this week, will this cost more than the project \dash{} are answered by an
+exponent, and answering them to three significant figures is work you did not
+need to do.
+
+Here is the estimator's basic move. In binary, sizes go up in powers of two,
+and $2^{10} = 1024$. What decimal power is that near?
+\end{fr}
+
+\begin{fr}
+\ans{$10^{3}$. So $2^{10} \approx 10^{3}$, and a factor of $1024$ can be read
+as a factor of a thousand.}
+The approximation is high by \val{f01.two.ten.err.pct}\%, which for a
+back-of-envelope answer is nothing.
+
+Now push it. $2^{80}$ is eight of those factors stacked up, so it should be
+about $10^{24}$. Is the error still nothing?
+\end{fr}
+
+\begin{fr}
+\ans{No. $2^{80} = \val{f01.two.eighty}$, which is
+\val{f01.two.eighty.err.pct}\% above $10^{24}$.}
+\begin{trapbox}
+\textbf{A small relative error compounds into a large one.} Each factor of
+$1024$ carries \val{f01.two.ten.err.pct}\% and the errors multiply rather than
+add, so eight of them is not eight times \val{f01.two.ten.err.pct}\% \dash{}
+it is \val{f01.two.eighty.err.pct}\%.
+
+The rule to carry away: an approximation is safe once, and a repeated
+approximation needs checking. It is the same arithmetic that makes compound
+interest surprising, and it is the same arithmetic that will make a per-layer
+error bound in Program~\ref{prog:P02} much worse than you expect after
+ninety-six layers.
+\end{trapbox}
+
+Estimating in standard form is now three steps: round each quantity to one
+significant figure, add or subtract the exponents, and renormalise.
+\end{fr}
+
+\mermaidfig{f01-magnitudes}{%
+  The quantities this book keeps returning to, on one ladder. Every step is
+  an exponent, and every question about cost is a subtraction along it.}{%
+  A logarithmic ladder from a single token to the FLOPs of a training run.}
+
+\begin{fr}
+\textbf{Worked.} A novel runs to about \val{f01.novel.words} words. A rule of
+thumb puts an English word at about three quarters of a token. Roughly how
+many tokens is the novel?
+
+\[ \frac{\num{1e5}}{\num{0.75}} \approx \num{1.3e5} \]
+
+So a little over $10^{5}$ tokens, and \val{f01.novel.tokens} on the nose. A
+context window of $10^{5}$ tokens holds about one novel, which is a far more
+useful thing to remember than the exact figure.
+
+\begin{note}
+The three-quarters figure is a rule of thumb, not a measurement, and it varies
+with the tokeniser, the language and the subject matter. It is quoted here as
+judgement. Polish, with its inflections, tokenises less efficiently than
+English in most tokenisers built primarily on English text, and this book has
+not measured by how much.
+\end{note}
+
+\yourturn
+A device performs about $\num{4e14}$ floating-point operations per second. How
+many seconds would $\num{8e22}$ operations take, at that rate?
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\dfrac{\num{8e22}}{\num{4e14}} = 2 \times 10^{22-14} = \num{2e8}$ seconds.
+
+And $\num{2e8}$ seconds is worth converting while you are here: a year is about
+$\num{3e7}$ seconds, so this is about six or seven years. On one device.
+\end{ansblock}
+
+That number is not hypothetical, and the rest of this program is where it comes
+from.
+\end{fr}
+
+% ============================================================
+\section{Sizing a model}
+\label{sec:F01-sizing}
+\index{measurement!model memory}
+\index{parameters!counting}
+
+\begin{fr}
+Everything so far has been arithmetic. This section is the reason it was worth
+doing.
+
+A model's weights are numbers. If you know how many numbers there are, and how
+many bytes each one takes, you know how much memory the weights need. That is
+the whole calculation:
+\[ \text{bytes} = \text{parameters} \times \text{bytes per parameter} \]
+A \enquote{7B} model has \val{f01.params} parameters. Stored in a two-byte
+format, how many bytes is that?
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f01.weights.bytes}$ bytes.}
+In standard form that is
+\[ (\num{7e9}) \times 2 = \num{1.4e10} \text{ bytes} \]
+and since $10^{9}$ bytes is a gigabyte, \val{f01.weights.gb}~GB.
+
+You have just derived, from two facts you already had, the number that gets
+quoted at you constantly. It is worth noticing how little was involved.
+
+Now: the same model in a four-byte format needs how much?
+\end{fr}
+
+\begin{fr}
+\ans{\val{f01.weights.fp32.gb}~GB. Double the bytes per parameter, double the
+memory.}
+\begin{aibox}
+This is why the choice of numeric format is a first-order engineering decision
+rather than a detail. Halving the bytes per parameter halves the weight memory
+exactly, and it is the cheapest lever available: no retraining, no architecture
+change, one flag.
+
+What it costs \dash{} what precision you give up, why \code{bf16} became the
+training format while \code{fp16} needs a scaling trick to work at all, and
+what \enquote{two bytes} actually buys you \dash{} is
+Program~\ref{prog:P01}, and it is the reason that program comes before the
+linear algebra rather than after it.
+\end{aibox}
+
+\begin{warning}
+\textbf{The weights are not the whole memory bill,} and a reader who leaves
+this section thinking they are will under-provision every machine they ever
+size. Training additionally holds optimiser state and activations; serving
+holds a growing cache of keys and values that scales with how much text is in
+flight. Both are counted properly in Program~\ref{prog:P03}.
+
+What you have here is a floor, and floors are useful: if the weights alone do
+not fit, nothing else matters.
+\end{warning}
+
+\yourturn
+A model has \val{f01.big.params} parameters and is stored two bytes to the
+parameter. How many gigabytes are its weights?
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(\num{7e10}) \times 2 = \num{1.4e11}$ bytes, which is \val{f01.big.gb}~GB.
+\end{ansblock}
+
+Worth a moment: \val{f01.big.gb}~GB is more memory than any single accelerator
+in common use carries today, which is why a model of that size has to be split
+across several devices before anybody can run it at all. That the split is
+necessary follows from the arithmetic; how it is done, and what it costs, does
+not, and this book does not cover it.
+\end{fr}
+
+% ============================================================
+\section{Gigabytes and gibibytes}
+\label{sec:F01-prefixes}
+\index{troubleshooting!GB versus GiB}
+\index{units!binary prefixes}
+
+\begin{fr}
+You computed \val{f01.weights.gb}~GB. You load the model, look at what your
+tooling reports, and it says \textbf{\val{f01.weights.gib}~GiB}.
+
+Which of the two is wrong?
+\end{fr}
+
+\begin{fr}
+\ans{Neither. They are different units, and they are both describing the same
+$\val{f01.weights.bytes}$ bytes.}
+\begin{trapbox}
+\textbf{A gigabyte is $10^{9}$ bytes. A gibibyte is $2^{30}$ bytes.} They are
+not the same size, and they are not approximately the same size once they are
+stacked:
+\[ 2^{30} = \val{f01.gib.bytes}, \qquad
+   \text{which is } \val{f01.gib.over.si.pct}\% \text{ more than } 10^{9} \]
+So $\val{f01.weights.bytes}$ bytes is \val{f01.weights.gb}~GB \emph{and}
+\val{f01.weights.gib}~GiB. Both statements are exact. Neither tool is lying.
+
+The habit that saves you: whenever a memory figure disagrees with your
+arithmetic by something in the region of seven per cent, this is why. It is the
+single most common false alarm in capacity planning, and it costs an afternoon
+the first time.
+\end{trapbox}
+\end{fr}
+
+\mermaidfig{f01-prefixes}{%
+  The two prefix ladders and the gap between them. The gap compounds: it is
+  \val{f01.kib.over.si.pct}\% at kilo and \val{f01.tib.over.si.pct}\% at tera,
+  which is the same compounding as $2^{80}$ against $10^{24}$.}{%
+  SI decimal prefixes against IEC binary prefixes, with the widening gap.}
+
+\begin{fr}
+The two ladders, side by side:
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}llrX@{}}
+\toprule
+\textbf{Decimal} & \textbf{Binary} & \textbf{Binary is larger by} &
+  \textbf{Where you meet it} \\
+\midrule
+kB $= 10^{3}$  & KiB $= 2^{10}$ & \val{f01.kib.over.si.pct}\% & File sizes \\
+MB $= 10^{6}$  & MiB $= 2^{20}$ & \val{f01.mib.over.si.pct}\% & Model shards \\
+GB $= 10^{9}$  & GiB $= 2^{30}$ & \val{f01.gib.over.si.pct}\% & Device memory \\
+TB $= 10^{12}$ & TiB $= 2^{40}$ & \val{f01.tib.over.si.pct}\% & Training corpora \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+As a rough division of the world: hardware vendors and storage sell in decimal,
+because it makes the number bigger; operating systems and accelerator tooling
+report in binary, because that is how the addresses work. The abbreviations are
+frequently written the same way even when the unit is not, so read the tool
+rather than the letters.
+
+\yourturn
+A device advertises 80~GB of memory. How many gibibytes is that, and will
+\val{f01.big.gb}~GB of weights fit on one?
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$80 \times 10^{9}$ bytes divided by $2^{30}$ is about $\num{74.5}$~GiB.
+
+And no: \val{f01.big.gb}~GB of weights does not fit in 80~GB, before anything
+else is loaded at all. The answer would have been \enquote{it is close} without
+the arithmetic, and it is not close.
+\end{ansblock}
+\end{fr}
+
+% ============================================================
+\section{Ratios, percentages and the word \enquote{faster}}
+\label{sec:F01-ratios}
+\index{measurement!reporting a speed-up}
+\index{percentages}
+
+\begin{fr}
+A request took \val{f01.base.ms}~ms. Someone reports it is now
+\enquote{fifty per cent faster}.
+
+How long does it take?
+\end{fr}
+
+\begin{fr}
+\ans{You cannot tell, and that is the point.}
+\begin{trapbox}
+\textbf{\enquote{Fifty per cent faster} has two readings, and they differ by
+\val{f01.speedup.discrepancy.ms}~ms.}
+
+\emph{Half the time}: $\val{f01.base.ms} \times \num{0.5} =
+\val{f01.fifty.pct.less.ms}$~ms.
+
+\emph{One and a half times the rate}: $\val{f01.base.ms} / \num{1.5} =
+\val{f01.fifty.pct.more.rate.ms}$~ms.
+
+Both are ordinary English and both are in common use. The discrepancy here is
+a third of the original, which is larger than most of the improvements anybody
+reports.
+
+\textbf{Say the number.} \enquote{Latency fell from \val{f01.base.ms}~ms to
+\val{f01.fifty.pct.less.ms}~ms} cannot be misread. A percentage improvement
+almost always can be, and a table of them is worse, because the reader has no
+way to recover the quantities.
+\end{trapbox}
+Two more that are worth being exact about. If a rate goes from 4\% to 6\%, has
+it risen by two per cent or by fifty per cent?
+\end{fr}
+
+\begin{fr}
+\ans{Two percentage \emph{points}, which is a fifty per cent relative
+increase.}
+Both descriptions are correct and they sound wildly different, which is why the
+distinction has its own vocabulary. When the quantity is itself a percentage,
+say \emph{percentage points} for the difference and \emph{per cent} for the
+ratio, and the sentence stops being ambiguous.
+
+Last one. Is \enquote{three times faster} the same as \enquote{three times the
+time}?
+\end{fr}
+
+\begin{fr}
+\ans{No \dash{} they are reciprocals of each other. Three times faster is a
+third of the time.}
+A speed-up is a ratio of rates; a duration is the reciprocal of a rate. Writing
+\enquote{$3\times$} beside a latency figure leaves the reader to guess which
+one you meant, and half of them will guess wrong.
+
+\begin{aibox}
+This is the last section of the program and it is the one that will come back
+most often. Almost every claim you will read about a model \dash{} faster,
+cheaper, better \dash{} is a ratio quoted without its two quantities.
+Program~\ref{prog:P33} is about reading those claims properly, and
+Program~\ref{prog:P26} is about deciding whether the difference in one is real
+at all. The habit starts here: recover the two numbers, or do not repeat the
+claim.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--5}{$\N \subset \Z \subset \Q \subset \R$. This book takes
+  $0 \in \N$. A rational's decimal expansion stops or repeats; nothing else
+  does. What repeats depends on the \emph{base}, which is why $\num{0.1}$ is
+  exact in base ten and is not exact in your machine.}
+\sumitem{9--11}{$a^{m}a^{n} = a^{m+n}$, \quad $a^{m}/a^{n} = a^{m-n}$, \quad
+  $(a^{m})^{n} = a^{mn}$. All three require a \emph{common base}.}
+\sumitem{12--13}{$a^{0} = 1$ and $a^{-n} = 1/a^{n}$, both forced by the
+  division law rather than defined for convenience.}
+\sumitem{17--18}{$a^{1/n} = \sqrt[n]{a}$ and $a^{m/n} =
+  (\sqrt[n]{a})^{m}$. Take the root first; the arithmetic is smaller.}
+\sumitem{22}{$\sqrt{a+b} \ne \sqrt{a} + \sqrt{b}$. Roots distribute over a
+  product, never over a sum.}
+\sumitem{23--24}{Scientific notation is $m \times 10^{e}$ with
+  $1 \le m < 10$.}
+\sumitem{25--26}{Multiplying adds the exponents; dividing subtracts them; then
+  renormalise the mantissa.}
+\sumitem{27}{Adding requires a \emph{common exponent} first. This is also why a
+  floating-point sum loses a small addend.}
+\sumitem{30--31}{$2^{10} \approx 10^{3}$, low by
+  \val{f01.two.ten.err.pct}\%. Repeated, that error compounds:
+  $2^{80}$ is \val{f01.two.eighty.err.pct}\% above $10^{24}$.}
+\sumitem{34--36}{Weight memory $=$ parameters $\times$ bytes per parameter.
+  \val{f01.params} parameters at two bytes is \val{f01.weights.gb}~GB.}
+\sumitem{36}{That is a \emph{floor}. Optimiser state, activations and the
+  key--value cache are counted in Program~\ref{prog:P03}.}
+\sumitem{38--39}{GB $= 10^{9}$; GiB $= 2^{30}$, larger by
+  \val{f01.gib.over.si.pct}\%. A seven per cent disagreement between your
+  arithmetic and your tooling is almost always this.}
+\sumitem{42--43}{\enquote{Fifty per cent faster} is ambiguous by
+  \val{f01.speedup.discrepancy.ms}~ms on a
+  \val{f01.base.ms}~ms baseline. Quote the two numbers instead.}
+\sumitem{44}{Percentage \emph{points} for a difference between percentages;
+  \emph{per cent} for the ratio.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Classify each of $-6$, $\sqrt{16}$, $\tfrac{5}{8}$, $\pi$ into the
+  smallest of $\N$, $\Z$, $\Q$, $\R$ it belongs to.
+  \answerto{$-6 \in \Z$; \quad $\sqrt{16} = 4 \in \N$; \quad
+  $\tfrac{5}{8} \in \Q$; \quad $\pi \in \R$.}
+\item Simplify $\dfrac{a^{5} \times a^{-2}}{a^{-4}}$.
+  \answerto{$a^{5-2+4} = a^{7}$.}
+\item Evaluate $4^{-3/2}$.
+  \answerto{$\dfrac{1}{4^{3/2}} = \dfrac{1}{(\sqrt{4})^{3}} = \dfrac{1}{8}$.}
+\item Evaluate $\left(\dfrac{16}{81}\right)^{3/4}$.
+  \answerto{$\left(\tfrac{2}{3}\right)^{3} = \tfrac{8}{27}$.}
+\item Write $\num{0.0000675}$ in scientific notation.
+  \answerto{$\num{6.75e-5}$.}
+\item Compute $(\num{2.5e-6}) \times (\num{4e11})$.
+  \answerto{$\num{1e6}$.}
+\item Compute $(\num{9.4e7}) + (\num{6e6})$.
+  \answerto{$\num{9.4e7} + \num{0.6e7} = \num{1e8}$.}
+\item A model has $\num{1.3e9}$ parameters stored two bytes to the parameter.
+  How many gigabytes are the weights, to one decimal place?
+  \answerto{$\num{2.6e9}$ bytes, so $\num{2.6}$~GB.}
+\item Express the answer to the previous exercise in gibibytes.
+  \answerto{$\num{2.6e9} / 2^{30} \approx \num{2.4}$~GiB.}
+\item A job took 90 minutes and now takes 60. State the improvement in the two
+  ways this program warns about, and say which you would put in a report.
+  \answerto{It is $\num{1.5}\times$ the rate, and it is a $\num{33.3}\%$ reduction in time.
+  Put neither in a report on its own: write \enquote{90 minutes to 60
+  minutes}, which cannot be misread.}
+\item $2^{40}$ is often read as \enquote{about $10^{12}$}. By what percentage
+  is that low?
+  \answerto{\val{f01.tib.over.si.pct}\%. Four compounded factors of
+  \val{f01.two.ten.err.pct}\%.}
+\item Estimate, to one significant figure, the FLOPs needed to generate one
+  token from a \val{f01.params}-parameter model, given roughly 2 FLOPs per
+  parameter per token.
+  \answerto{$2 \times \num{7e9} = \num{1.4e10}$, so about $10^{10}$.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Simplify $(2x^{3})^{4}$.
+  \answerto{$16x^{12}$. The index applies to the $2$ as well as to the $x$.}
+\item Simplify $\dfrac{(3a^{2}b)^{3}}{9a^{4}b^{2}}$.
+  \answerto{$\dfrac{27a^{6}b^{3}}{9a^{4}b^{2}} = 3a^{2}b$.}
+\item Evaluate $\left(\dfrac{1}{32}\right)^{-2/5}$.
+  \answerto{$32^{2/5} = 4$.}
+\item Show that $a^{1/2} \times a^{1/3} = a^{5/6}$.
+  \answerto{$\tfrac{1}{2} + \tfrac{1}{3} = \tfrac{3}{6} + \tfrac{2}{6} =
+  \tfrac{5}{6}$.}
+\item Is $\sqrt{a^{2} + b^{2}}$ ever equal to $a + b$ for positive $a$ and $b$?
+  \answerto{No. Squaring both sides gives $a^{2}+b^{2}$ against
+  $a^{2}+2ab+b^{2}$, and $2ab > 0$.}
+\item Write $\num{6.02e23}$ as an ordinary number, and say why you would not
+  want to.
+  \answerto{$602\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000$. Twenty-four digits carry
+  no shape, and only three of them are significant.}
+\item Compute $\dfrac{(\num{4.2e-3}) \times (\num{5e8})}{\num{7e2}}$.
+  \answerto{Numerator $\num{2.1e6}$; divided by $\num{7e2}$ gives
+  $\num{3e3}$.}
+\item Order these by size without evaluating them fully:
+  $2^{20}$, $10^{6}$, $3^{13}$.
+  \answerto{$10^{6} < 2^{20} < 3^{13}$. $2^{20} \approx \num{1.05e6}$ and
+  $3^{13} \approx \num{1.59e6}$.}
+\item A corpus holds \val{f01.tokens} tokens. At 4 bytes per stored token id,
+  how many terabytes is the tokenised corpus?
+  \answerto{$\num{8e12}$ bytes, which is $8$~TB \dash{} or about $\num{7.3}$~TiB.}
+\item Training is often estimated at 6 FLOPs per parameter per token. For
+  \val{f01.params} parameters and \val{f01.tokens} tokens, compute the total.
+  \answerto{$6 \times \num{7e9} \times \num{2e12} = \val{f01.train.flops}$.}
+\item A device sustains \val{f01.device.flops} FLOP/s but achieves only
+  \val{f01.device.util.pct}\% of that in practice. How many device-days is the
+  previous answer?
+  \answerto{About \val{f01.device.days} device-days, or roughly
+  \val{f01.device.years} years on one device.}
+\item How many such devices would finish that training run in thirty days?
+  \answerto{About \val{f01.devices.for.30.days}. Note this ignores every cost
+  of coordinating them, which is not a small assumption.}
+\item A card advertises 24~GB. Express it in gibibytes.
+  \answerto{$24 \times 10^{9} / 2^{30} \approx \num{22.4}$~GiB.}
+\item Which is larger, 1~TiB or $\num{1.1}$~TB?
+  \answerto{1~TiB, at $\num{1.0995e12}$ bytes against $\num{1.1e12}$ \dash{}
+  by a whisker, and this is exactly the margin where guessing fails.}
+\item A latency drops from 250~ms to 200~ms. Express the change as a
+  percentage reduction and as a speed-up factor.
+  \answerto{A $20\%$ reduction; a $\num{1.25}\times$ speed-up.}
+\item A model's accuracy goes from 82\% to 86\%. State the change in the two
+  ways this program distinguishes.
+  \answerto{Four percentage points; a $\num{4.9}\%$ relative increase. Whether either
+  is meaningful is Program~\ref{prog:P26}.}
+\item Two runs cost \$\num{0.004} and \$\num{0.0025} per request. State the saving as a
+  percentage and as a ratio, and say which you would put on a slide.
+  \answerto{A $\num{37.5}\%$ reduction, or $\num{1.6}\times$ cheaper. Put the two figures
+  on the slide; the reader can compute either.}
+\item Show that $10^{-3} < 2^{-10} < 10^{-2}$.
+  \answerto{$2^{-10} = 1/1024 \approx \num{9.77e-4}$, which lies between
+  $\num{1e-3}$ and $\num{1e-2}$.}
+\item Estimate how many novels of \val{f01.novel.words} words fit in a context
+  window of $\num{1e6}$ tokens.
+  \answerto{One novel is about \val{f01.novel.tokens} tokens, so about seven
+  and a half.}
+\item Without a calculator, estimate $\dfrac{\num{3.1e12} \times \num{7.9e-5}}
+  {\num{1.9e4}}$ to one significant figure.
+  \answerto{Round to $3 \times 8 / 2 = 12$, and $10^{12-5-4} = 10^{3}$, giving
+  $12 \times 10^{3} = \num{1.2e4}$. The exact value is $\num{1.289e4}$, so one
+  significant figure was enough to be within eight per cent.}
+\end{furtherproblems}

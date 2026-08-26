@@ -1,4 +1,4 @@
-%% P01 --- Liczby zmiennoprzecinkowe: co maszyna naprawdę liczy
+%% P01 \dash{} Liczby zmiennoprzecinkowe: co maszyna naprawdę liczy
 %%
 %% Zalążek. Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co
 %% ma dać czytelnikowi. Napisanie programu oznacza usunięcie bloku
@@ -10,12 +10,12 @@
 \label{prog:P01}
 
 \programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\textit{[Opis do przetłumaczenia \dash{} patrz wydanie angielskie.]}
 
 Argument: a float is a sign, an exponent and a fixed number of significant
 bits, so the gap between representable numbers grows with magnitude, and
 equality is not a question you should ask. Payoff: why \code{bf16} is the
-training format and \code{fp16} needs loss scaling --- they have the same
+training format and \code{fp16} needs loss scaling \dash{} they have the same
 width and different exponent budgets, and the reader computes the overflow
 threshold rather than being told it; why a sum of gradients is not
 associative and two GPUs therefore disagree in the last bits; what machine

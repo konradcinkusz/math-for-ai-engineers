@@ -132,4 +132,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except BrokenPipeError:
+        # `checklog.py ... | head` closes the pipe. Exiting quietly is the
+        # right behaviour; a traceback here reads as a failure of the check.
+        sys.exit(0)

@@ -119,13 +119,39 @@ def _balanced(src: str, i: int) -> tuple[str, int]:
     return src[i + 1:], len(src)
 
 
+# Prose inside a display: \text{and also} against \text{oraz}. The words are
+# translated on purpose and the maths around them must still be compared, so
+# the body of each is replaced by a marker rather than digested.
+PROSE_IN_MATH = re.compile(
+    r"\\(?:text|textrm|textit|textbf|mbox|hbox|intertext)\s*\{[^{}]*\}")
+
+
+VAL_IN_MATH = re.compile(r"\\(?:raw)?val\{([^{}]*)\}")
+
+
+def _harvest_vals(doc, body: str) -> None:
+    """Collect \\val{} keys out of a maths body.
+
+    A maths span is consumed and digested in one go, so any \\val inside it was
+    invisible to the value ledger: C7 reported values as unused while the book
+    was printing them. Both editions were wrong identically, so the parity
+    checks stayed green and only the ledger lied -- which is the failure mode
+    a ledger exists to prevent.
+    """
+    doc.vals.extend(VAL_IN_MATH.findall(body))
+
+
 def _norm_math(body: str) -> str:
     """Normalise a maths body so that only its mathematical content survives.
 
-    Whitespace and \\, spacing are noise. Nothing else is stripped: if the two
-    editions disagree about a sign or an exponent, that must show up.
+    Whitespace and \\, spacing are noise, and so is the wording inside a
+    \\text{} -- that is prose, it is translated, and a book that refused to let
+    a translator write "oraz" for "and also" inside a display would be
+    unusable. Nothing else is stripped: if the two editions disagree about a
+    sign or an exponent, that must show up.
     """
     b = COMMENT_RE.sub("", body)
+    b = PROSE_IN_MATH.sub("<prose>", b)
     b = re.sub(r"\\[,;:!> ]", "", b)
     b = re.sub(r"\s+", "", b)
     return hashlib.sha1(b.encode("utf8")).hexdigest()[:10]
@@ -167,6 +193,7 @@ def tokenise(path: Path) -> Doc:
                     break
                 j += 1
             body = src_nc[i + len(close):j]
+            _harvest_vals(doc, body)
             d = _norm_math(body)
             emit("MATH", d, i)
             doc.frame_math.setdefault(cur_frame, []).append(d)
@@ -176,6 +203,7 @@ def tokenise(path: Path) -> Doc:
         if src_nc.startswith("\\[", i):
             j = src_nc.find("\\]", i)
             j = n if j < 0 else j
+            _harvest_vals(doc, src_nc[i + 2:j])
             d = _norm_math(src_nc[i + 2:j])
             emit("MATH", d, i)
             doc.frame_math.setdefault(cur_frame, []).append(d)
@@ -202,6 +230,7 @@ def tokenise(path: Path) -> Doc:
                     endtok = "\\end{%s}" % body
                     j = src_nc.find(endtok, nxt)
                     j = n if j < 0 else j
+                    _harvest_vals(doc, src_nc[nxt:j])
                     d = _norm_math(src_nc[nxt:j])
                     emit("MATH", d, i)
                     doc.frame_math.setdefault(cur_frame, []).append(d)
@@ -502,14 +531,17 @@ def check_notation(rep: Report, path: Path) -> None:
 
     # A decimal point inside maths defeats the locale. Numbers belong in
     # \num{} or \val{} so that the Polish edition gets its comma for free.
+    #
+    # The wrapper spans are removed FIRST rather than looked for behind each
+    # decimal. Peeking a fixed number of characters backwards misreads
+    # \frac{\num{1e5}}{0.75}: the \num belongs to the numerator, the bare
+    # decimal is in the denominator, and the check passed a real defect.
+    wrapped = re.compile(r"\\(?:raw)?(?:num|val)\{[^{}]*\}")
     for m in MATH_SPAN.finditer(src):
         if in_listing(m.start()):
             continue
-        body = m.group(0)
+        body = wrapped.sub(lambda w: " " * len(w.group(0)), m.group(0))
         for d in re.finditer(r"(?<![\w.\\])\d+\.\d+", body):
-            seg = body[max(0, d.start() - 12):d.start()]
-            if "\\num" in seg or "\\val" in seg or "\\rawval" in seg:
-                continue
             rep.bad("C10-notation",
                     f"{rel}:{src.count(chr(10), 0, m.start())+1} "
                     f"bare decimal {d.group(0)!r} in maths -- wrap it in "

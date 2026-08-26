@@ -41,17 +41,16 @@ emit("f01.weights.gb", weights_bytes / 1e9, 0)            # decimal gigabytes
 emit("f01.weights.gib", weights_bytes / 2**30, 2)         # binary gibibytes
 emit("f01.weights.fp32.gb", PARAMS * BYTES_FP32 / 1e9, 0)
 
-# The kilo/kibi gap. This is not pedantry: a reader who computes 14 GB and then
-# reads 13.04 GiB from their GPU concludes something is wrong with one of them.
-gap = (1e9 * (weights_bytes / 1e9)) / 2**30 / (weights_bytes / 1e9)
-emit("f01.gib.per.gb", 1e9 / 2**30, 4)
-emit("f01.gib.gap.pct", (1 - 1e9 / 2**30) * 100, 1)
+# The kilo/kibi gap, expressed the way the book states it: a gibibyte is N per
+# cent MORE bytes than a gigabyte. The reciprocal form (a gigabyte is 6.9% of a
+# gibibyte less) is also true, reads as a different number, and is not used --
+# so it is not emitted. A value the book does not reference is a number carried
+# without justification, and `make debt` counts it.
 
 # --------------------------------------------------------------------------
 # 2^10 against 10^3. The approximation everyone uses, and the error it carries
 # when it is compounded -- which is where it stops being harmless.
 # --------------------------------------------------------------------------
-emit("f01.two.ten", 2**10)
 emit("f01.two.ten.err.pct", (2**10 / 10**3 - 1) * 100, 2)
 emit("f01.two.eighty", 2**80)
 emit("f01.two.eighty.err.pct", (2**80 / 10**24 - 1) * 100, 2)
@@ -79,8 +78,23 @@ emit("f01.device.days", device_seconds / 86400, 0)
 emit("f01.device.years", device_seconds / (86400 * 365), 1)
 emit("f01.devices.for.30.days", device_seconds / (86400 * 30), 0)
 
-# Inference, per generated token: about 2 FLOPs per parameter.
-emit("f01.infer.flops.per.token", 2 * PARAMS)
+# A larger model, for the exercise the reader does unaided.
+BIG_PARAMS = 70_000_000_000
+emit("f01.big.params", BIG_PARAMS)
+emit("f01.big.gb", BIG_PARAMS * BYTES_FP16 / 1e9, 0)
+
+# The binary prefixes, so the table in the program is generated rather than
+# typed. A table of powers is exactly the kind of thing that acquires a typo.
+for name, k in (("kib", 10), ("mib", 20), ("gib", 30), ("tib", 40)):
+    if name == "gib":                      # the only one the text spells out
+        emit(f"f01.{name}.bytes", 2**k)
+    emit(f"f01.{name}.over.si.pct", (2**k / 10 ** (3 * (k // 10)) - 1) * 100, 1)
+
+# Estimating: a novel of 100,000 words, at the rule of thumb that a token is
+# about three quarters of an English word.
+WORDS = 100_000
+emit("f01.novel.words", WORDS)
+emit("f01.novel.tokens", round(WORDS / 0.75))
 
 # --------------------------------------------------------------------------
 # Ratios and percentages. "50% faster" is ambiguous and the ambiguity is

@@ -1,0 +1,15 @@
+flowchart LR
+  classDef si fill:#F4F6F8,stroke:#1F4E79,color:#1a1a1a
+  classDef bin fill:#FFFFFF,stroke:#B26A00,color:#1a1a1a
+  classDef gap fill:#FFFFFF,stroke:#9B2C2C,color:#9B2C2C
+
+  s1["kB = 10^3"]:::si --> s2["MB = 10^6"]:::si --> s3["GB = 10^9"]:::si --> s4["TB = 10^12"]:::si
+  b1["KiB = 2^10"]:::bin --> b2["MiB = 2^20"]:::bin --> b3["GiB = 2^30"]:::bin --> b4["TiB = 2^40"]:::bin
+
+  s1 -.->|"+2.4%"| b1
+  s2 -.->|"+4.9%"| b2
+  s3 -.->|"+7.4%"| b3
+  s4 -.->|"+10.0%"| b4
+
+  d["The gap COMPOUNDS.<br/>Vendors quote GB. Tooling reports GiB.<br/>Neither is lying."]:::gap
+  b4 --> d

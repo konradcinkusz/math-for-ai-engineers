@@ -1,4 +1,4 @@
-%% P01 --- Floating point: what the machine actually computes
+%% P01 \dash{} Floating point: what the machine actually computes
 %%
 %% Stub. The brief below is the contract for this program: what it must argue,
 %% and what it must buy the reader. Writing the program means deleting the
@@ -13,7 +13,7 @@
 Argument: a float is a sign, an exponent and a fixed number of significant
 bits, so the gap between representable numbers grows with magnitude, and
 equality is not a question you should ask. Payoff: why \code{bf16} is the
-training format and \code{fp16} needs loss scaling --- they have the same
+training format and \code{fp16} needs loss scaling \dash{} they have the same
 width and different exponent budgets, and the reader computes the overflow
 threshold rather than being told it; why a sum of gradients is not
 associative and two GPUs therefore disagree in the last bits; what machine

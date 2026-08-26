@@ -1,4 +1,4 @@
-%% P03 --- Rzędy wielkości: notacja O, FLOP-y i pamięć
+%% P03 \dash{} Rzędy wielkości: notacja O, FLOP-y i pamięć
 %%
 %% Zalążek. Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co
 %% ma dać czytelnikowi. Napisanie programu oznacza usunięcie bloku
@@ -10,13 +10,13 @@
 \label{prog:P03}
 
 \programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\textit{[Opis do przetłumaczenia \dash{} patrz wydanie angielskie.]}
 
 Argument: asymptotic notation is a statement about growth and says nothing
 about which of two implementations is faster today; both facts matter.
 Payoff: count the parameters of a transformer block by hand; count the
 activations; count the KV cache and watch it grow linearly in sequence
-length while attention grows quadratically --- the reader derives why long
+length while attention grows quadratically \dash{} the reader derives why long
 context is expensive rather than accepting it. Arithmetic intensity, and why
 a large matrix multiply is compute-bound while an elementwise operation is
 memory-bound, which is the whole justification for kernel fusion.

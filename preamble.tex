@@ -202,7 +202,9 @@
 % is a frame number, and hunting for one by page is the single most annoying
 % thing about reading a programmed text. \theframeno at shipout is the last
 % frame begun on the page, which is what a reader flicking through wants.
-\fancyhead[RO]{\small\lblFrame~\theframeno}
+% Guarded: the front matter and the appendices have no frames, and a head
+% reading "Frame 0" over the introduction is worse than no head at all.
+\fancyhead[RO]{\ifnum\value{frameno}>0\relax\small\lblFrame~\theframeno\fi}
 \fancyfoot[LE,RO]{\small\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 
@@ -301,7 +303,11 @@
 % The row of dots. Stroud's signal that the reader is to supply a word, a
 % number or an expression. \blank is inline; \dotline occupies its own line,
 % which is what a longer derivation step wants.
-\newcommand{\blank}[1][4em]{\makebox[#1]{\dotfill}}
+% \penalty0 offers TeX a break opportunity immediately before the dots. Without
+% it the run of dots is glued to the last word of the question, and a long
+% question in the Polish edition -- where the words are longer and hyphenate
+% less freely -- runs into the margin.
+\newcommand{\blank}[1][4em]{\penalty0\makebox[#1]{\dotfill}}
 \newcommand{\dotline}{\par\vspace{2pt}\noindent\makebox[\linewidth]{\dotfill}\par\vspace{2pt}}
 
 % "Now one for you to do." The third rung of the scaffolding gradient, and the
@@ -420,8 +426,11 @@
 }
 \makeatother
 
-% The frames that teach the question just asked.
+% The frames that teach the question just asked. Two forms, because a Quiz
+% question that routes to a single frame reading "Frames 22" is the kind of
+% small wrongness a reader notices and an author never does.
 \newcommand{\teachesat}[1]{\hfill{\footnotesize\color{mgrey}(\lblFrames~#1)}}
+\newcommand{\teachesatone}[1]{\hfill{\footnotesize\color{mgrey}(\lblFrame~#1)}}
 
 % ---- Summary --------------------------------------------------------------
 % Every item carries the frame number it came from, in square brackets. That
@@ -803,18 +812,28 @@
 
 \newcommand{\mermaidfig}[3]{%
   \addcontentsline{dgm}{subsection}{\protect\numberline{}\texttt{#1.mmd} --- #3}%
-  \begin{figure}[htbp]
-  \centering
   \IfFileExists{figures/diagrams/\booklang/#1.pdf}{%
+    \begin{figure}[htbp]
+    \centering
     \includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/diagrams/\booklang/#1.pdf}%
+    \caption{#2}\label{fig:#1}
+    \end{figure}%
   }{%
+    % The unrendered case deliberately does NOT float. A Mermaid source
+    % typeset verbatim is often taller than a page, and a float cannot break,
+    % so wrapping it in `figure` produces an overfull box per diagram and a
+    % pile of tcolorbox warnings. In the flow it breaks like any other text.
+    \par\medskip
     \begin{tcolorbox}[
-      enhanced, breakable, width=0.98\linewidth, sharp corners,
+      enhanced, breakable, width=\linewidth, sharp corners,
       colback=white, colframe=mgrey, boxrule=0.8pt,
       left=8pt, right=8pt, top=8pt, bottom=8pt]
       {\bfseries\color{mgrey}\small \lblNotRendered}\\[4pt]
       {\ttfamily\scriptsize\color{mgrey} figures/mermaid/\booklang/#1.mmd}\\[6pt]
       \IfFileExists{figures/mermaid/\booklang/#1.mmd}{%
+        % ASCII only, like every other listing in this book: the fallback runs
+        % the Mermaid source through `listings`, which aborts on a multi-byte
+        % character it has no literate mapping for.
         \lstinputlisting[style=mfacode,numbers=none,basicstyle=\ttfamily\scriptsize,
                          backgroundcolor=\color{mlight},frame=none,
                          keywordstyle=\color{black}]{figures/mermaid/\booklang/#1.mmd}%
@@ -822,9 +841,9 @@
         {\small\color{mred} \lblSourceMissing: \texttt{figures/mermaid/\booklang/#1.mmd}}%
       }%
     \end{tcolorbox}%
+    \captionof{figure}{#2}\label{fig:#1}
+    \par\medskip
   }%
-  \caption{#2}\label{fig:#1}
-  \end{figure}%
 }
 
 % ============================================================

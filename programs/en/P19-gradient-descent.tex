@@ -1,4 +1,4 @@
-%% P19 --- Gradient descent: from SGD to Adam
+%% P19 \dash{} Gradient descent: from SGD to Adam
 %%
 %% Stub. The brief below is the contract for this program: what it must argue,
 %% and what it must buy the reader. Writing the program means deleting the
@@ -15,7 +15,7 @@ estimate of \enquote{how far and in which direction}, and each addition fixes a
 specific named failure of the one before it. Payoff: the step-size bound
 from P16; momentum as the exponential moving average met in F4, fixing the
 zig-zag from P14; per-coordinate scaling fixing badly scaled features; why
-Adam divides by the square root of the second moment --- it is a per-
+Adam divides by the square root of the second moment \dash{} it is a per-
 coordinate estimate of the gradient's scale, so the update becomes
 approximately unit-sized regardless of how large the gradient is, which is
 also precisely why Adam is insensitive to loss scaling and why the epsilon
