@@ -1,4 +1,4 @@
-.PHONY: all check stubs-check en pl text-only watch-en watch-pl clean diagrams diagrams-clean \
+.PHONY: all check site stubs-check en pl text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames outcomes values translate shots debt
 
 LANGS   := en pl
@@ -38,6 +38,17 @@ text-only:
 	latexmk -pdf -interaction=nonstopmode main-en.tex
 	latexmk -pdf -interaction=nonstopmode main-pl.tex
 
+# Assemble locally exactly what CI publishes to Pages, so a link or a layout
+# change can be checked before it is deployed rather than after.
+site: en pl
+	@rm -rf _site && mkdir -p _site
+	@cp -r docs/. _site/
+	@cp main-en.pdf "_site/Mathematics-from-Zero-for-the-AI-Engineer.pdf"
+	@cp main-pl.pdf "_site/Matematyka-od-zera-dla-inzyniera-AI.pdf"
+	@cp main-en.pdf _site/book-en.pdf
+	@cp main-pl.pdf _site/book-pl.pdf
+	@echo "  _site/ assembled. Open _site/index.html."
+
 watch-en:
 	latexmk -pvc -pdf -interaction=nonstopmode main-en.tex
 watch-pl:
@@ -45,6 +56,7 @@ watch-pl:
 
 clean:
 	latexmk -C main-en.tex; latexmk -C main-pl.tex
+	rm -rf _site
 	rm -f *.dgm *.ilg *.ind *.idx programs/*/*.aux appendices/*/*.aux
 
 # ---------------------------------------------------------------------------

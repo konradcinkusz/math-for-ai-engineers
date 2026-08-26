@@ -477,7 +477,20 @@ make numbers    # regenerate figures/values from code/
 make verify     # fail if any committed number has drifted from its script
 make debt       # every outstanding-work ledger
 make check      # checklog + parity + reflist, without rebuilding
+make site       # assemble locally exactly what CI publishes to Pages
 ```
+
+**The PDF has an address.** Before, the only way to get one was a 14-day CI
+artefact or a tagged release, so the book was not readable without a TeX
+installation. `pages.yml` now builds both editions on every push to `main` and
+publishes them:
+
+- `https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf`
+- `https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf`
+
+It duplicates the compile steps from `build.yml` on purpose, and runs
+`checklog.py` against its own logs rather than trusting another workflow's:
+Pages must never publish a PDF that did not build.
 
 CI runs the numbers job first and gates everything on it, then parity as a hard
 gate, then the two editions in a matrix, then a cross-reference comparison out of

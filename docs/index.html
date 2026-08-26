@@ -45,6 +45,15 @@
     display: inline-block; background: var(--light); border: 1px solid var(--border);
     border-radius: 999px; padding: .15rem .7rem; font-size: .82rem; color: var(--grey); margin-right: .4rem;
   }
+  .dl { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.5rem 0 .5rem; }
+  .dl a {
+    display: inline-block; text-decoration: none; border: 1px solid var(--blue);
+    border-radius: 6px; padding: .55rem 1rem; color: var(--blue); font-weight: 600;
+    background: var(--light);
+  }
+  .dl a:hover { background: var(--blue); color: var(--bg); }
+  .dl small { display: block; font-weight: 400; color: var(--grey); font-size: .78rem; }
+  .dl a:hover small { color: var(--bg); }
 </style>
 </head>
 <body>
@@ -58,6 +67,13 @@
   <span class="pill">Polish + English</span>
   <span class="pill">one repository</span>
 </p>
+
+<div class="dl">
+  <a href="book-en.pdf">Download the English edition
+    <small>PDF &middot; rebuilt on every push to main</small></a>
+  <a href="book-pl.pdf">Pobierz wydanie polskie
+    <small>PDF &middot; przebudowywane przy każdym pushu do main</small></a>
+</div>
 
 <div class="banner">
   <strong>Early draft.</strong> The structure, the build, the bilingual tooling
