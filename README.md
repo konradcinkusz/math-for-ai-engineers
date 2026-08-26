@@ -23,8 +23,14 @@ other.
 
 **Read it now — both editions, rebuilt on every push to `main`:**
 
-- **[English edition (PDF)](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf)**
-- **[Wydanie polskie (PDF)](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf)**
+- **[English edition (PDF, A4)](https://konradcinkusz.github.io/math-for-ai-engineers/book-en-a4.pdf)**
+- **[Wydanie polskie (PDF, A4)](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl-a4.pdf)**
+
+Also in the 17 × 24 cm trade format that matches the companion volumes —
+[English](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf) ·
+[polski](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf).
+One source, four PDFs: A4 at 12pt is the one to read on a screen or print at
+home, and it is what the download links above point at.
 
 > **Early draft.** The structure, the build, the bilingual tooling and
 > **Program F1 in both languages** are done. Forty-six of forty-seven programs
@@ -184,8 +190,11 @@ the Mermaid source in place of the figure rather than failing.
 
 | Command | Does |
 |---|---|
-| `make` | Everything |
+| `make` | Everything, in the 17 × 24 cm trade format |
+| `make a4` | Both editions on A4 |
+| `make all-formats` | All four PDFs |
 | `make en` / `make pl` | One edition, and check its log properly |
+| `make en-a4` / `make pl-a4` | The same, on A4 |
 | `make numbers` | Regenerate `figures/values` from `code/` |
 | `make verify` | Fail if any committed number has drifted from its script |
 | `make check` | `checklog` + `parity` + `reflist`, without rebuilding |
@@ -203,7 +212,8 @@ everybody believed was green. Use `tools/checklog.py`.
 ## Repository structure
 
 ```
-main-en.tex  main-pl.tex   the two editions; they differ in \booklang
+main-{en,pl}.tex           17 x 24 cm; main-{en,pl}-a4.tex is the same book on A4
+body.tex                   the document body — ONE copy, read by all four
 preamble.tex               all machinery, shared
 structure.tex              THE part and program sequence — one list, both editions
 lang/en.tex  lang/pl.tex   every user-visible string, and the notation contract
@@ -223,8 +233,10 @@ CLAUDE.md                  working notes: conventions, traps hit, resolved quest
 ## Links
 
 - **[The two-minute summary](https://konradcinkusz.github.io/math-for-ai-engineers/)** — and the current PDFs:
-  [English](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf) ·
-  [polski](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf)
+  [English A4](https://konradcinkusz.github.io/math-for-ai-engineers/book-en-a4.pdf) ·
+  [polski A4](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl-a4.pdf) ·
+  [English 17×24](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf) ·
+  [polski 17×24](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf)
 - **[LangChain, LangGraph and Async Python](https://github.com/konradcinkusz/llm-book)** — companion volume
 - **[Microsoft Agent Framework for .NET Engineers](https://github.com/konradcinkusz/maf-book)** — companion volume
 

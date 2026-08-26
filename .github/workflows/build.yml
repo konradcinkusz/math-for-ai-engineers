@@ -125,8 +125,12 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
+  # Two languages times two paper formats. The A4 pair is not a cosmetic extra:
+  # a format change moves every page boundary, and a table that fits on one page
+  # in the trade format can overflow its vbox on A4 without the trade build
+  # noticing. Compiling only one format would let that ship.
   build:
-    name: Compile ${{ matrix.lang }}
+    name: Compile ${{ matrix.lang }} (${{ matrix.fmt }})
     runs-on: ubuntu-latest
     needs: [numbers, diagrams]
     strategy:
@@ -134,9 +138,21 @@ jobs:
       matrix:
         include:
           - lang: en
+            fmt: standard
+            job: main-en
             pdf: Mathematics-from-Zero-for-the-AI-Engineer
           - lang: pl
+            fmt: standard
+            job: main-pl
             pdf: Matematyka-od-zera-dla-inzyniera-AI
+          - lang: en
+            fmt: a4
+            job: main-en-a4
+            pdf: Mathematics-from-Zero-for-the-AI-Engineer-A4
+          - lang: pl
+            fmt: a4
+            job: main-pl-a4
+            pdf: Matematyka-od-zera-dla-inzyniera-AI-A4
     steps:
       - uses: actions/checkout@v5
 
@@ -155,7 +171,7 @@ jobs:
       - name: Compile with latexmk
         uses: xu-cheng/latex-action@v4
         with:
-          root_file: main-${{ matrix.lang }}.tex
+          root_file: ${{ matrix.job }}.tex
           latexmk_use_lualatex: false
           # pdflatex is sufficient; the preamble degrades gracefully when the
           # optional font packages are missing.
@@ -167,7 +183,7 @@ jobs:
       # \IfFileExists branch stopped siunitx loading in a build everybody
       # believed was green, and the decimal comma silently did not work.
       - name: Check the log properly
-        run: python3 tools/checklog.py main-${{ matrix.lang }}.log
+        run: python3 tools/checklog.py ${{ matrix.job }}.log
 
       # if: always(), so it must survive a cancelled or failed compile that
       # left no log behind -- a reporting step that fails because there is
@@ -180,15 +196,15 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
-          LOG="main-${{ matrix.lang }}.log"
+          LOG="${{ matrix.job }}.log"
           if [ ! -f "$LOG" ]; then
-            echo "### \`${{ matrix.lang }}\` edition" >> "$GITHUB_STEP_SUMMARY"
+            echo "### \`${{ matrix.lang }}\` edition, ${{ matrix.fmt }}" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "_No log — the compile did not run to completion._" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           {
-            echo "### \`${{ matrix.lang }}\` edition"
+            echo "### \`${{ matrix.lang }}\` edition, ${{ matrix.fmt }}"
             echo ""
             echo '```'
             python3 tools/checklog.py "$LOG" || true
@@ -200,11 +216,11 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Rename artefact
-        run: mv main-${{ matrix.lang }}.pdf "${{ matrix.pdf }}.pdf"
+        run: mv ${{ matrix.job }}.pdf "${{ matrix.pdf }}.pdf"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: book-${{ matrix.lang }}
+          name: book-${{ matrix.lang }}-${{ matrix.fmt }}
           path: ${{ matrix.pdf }}.pdf
           retention-days: 14
 
@@ -213,7 +229,7 @@ jobs:
       # one it finds no labels at all -- and reports "0 mismatches", which is a
       # check passing because it read nothing.
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && matrix.fmt == 'standard'
         with:
           name: aux-${{ matrix.lang }}
           path: |

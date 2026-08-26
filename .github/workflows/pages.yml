@@ -11,6 +11,12 @@ name: Pages
 #   https://konradcinkusz.github.io/math-for-ai-engineers/
 #   .../Mathematics-from-Zero-for-the-AI-Engineer.pdf
 #   .../Matematyka-od-zera-dla-inzyniera-AI.pdf
+#   .../book-en-a4.pdf   .../book-pl-a4.pdf
+#
+# Four PDFs, not two: the same source in the 17 x 24 cm trade format and on A4.
+# The trade format is the one that matches the companion volumes; A4 is the one
+# that reads well on a screen and prints on an office printer without landing
+# in the middle of the sheet.
 #
 # It duplicates the compile steps from build.yml deliberately. Pages must never
 # publish a PDF that did not build, so it runs the same gate -- checklog.py, not
@@ -87,11 +93,25 @@ jobs:
           root_file: main-pl.tex
           args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
 
+      - name: Compile the English edition on A4
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-en-a4.tex
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+
+      - name: Compile the Polish edition on A4
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-pl-a4.tex
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+
       # The same gate the rest of the repository uses. -interaction=nonstopmode
       # writes a PDF over the top of an error and -file-line-error puts a path
       # where `grep '^!'` expects a bang, so a broken build looks green to both.
       - name: Refuse to publish a build that only looked like it worked
-        run: python3 tools/checklog.py main-en.log main-pl.log
+        run: |
+          python3 tools/checklog.py \
+            main-en.log main-pl.log main-en-a4.log main-pl-a4.log
 
       - name: Assemble the site
         run: |
@@ -103,6 +123,8 @@ jobs:
           # have to carry the whole title.
           cp main-en.pdf _site/book-en.pdf
           cp main-pl.pdf _site/book-pl.pdf
+          cp main-en-a4.pdf _site/book-en-a4.pdf
+          cp main-pl-a4.pdf _site/book-pl-a4.pdf
           ls -la _site
 
       - name: Report what was published
@@ -113,11 +135,13 @@ jobs:
             echo "## Published to Pages"
             echo ""
             echo '```'
-            python3 tools/checklog.py --summary main-en.log main-pl.log || true
+            python3 tools/checklog.py --summary \
+              main-en.log main-pl.log main-en-a4.log main-pl-a4.log || true
             echo '```'
             echo ""
             echo "- \`book-en.pdf\` / \`Mathematics-from-Zero-for-the-AI-Engineer.pdf\`"
             echo "- \`book-pl.pdf\` / \`Matematyka-od-zera-dla-inzyniera-AI.pdf\`"
+            echo "- \`book-en-a4.pdf\` / \`book-pl-a4.pdf\` (A4, 12pt)"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/configure-pages@v5

@@ -657,30 +657,74 @@ SKELETON_RE = re.compile(
     r"(?:\{([^}]*)\})?")
 
 
+# Two languages times two paper formats. The A4 pair exists because the trade
+# format serves neither of the two things a reader actually does with this book
+# -- read it on a screen, print it on an office printer.
+FORMATS = ["", "-a4"]
+
+
 def check_main_files(rep: Report) -> None:
-    """The two main files must wire the book up identically.
+    """Every main file must wire the book up identically.
 
     This exists because main-en.tex was once rewritten with the introduction
     dropped, and every other check passed: the programs were in step, the
     labels matched, both editions built with zero errors, and one of the two
     was simply missing a chapter of front matter. Nothing that compares
     programs can see that, because the difference is in the wiring.
+
+    Adding the A4 format could have made that worse -- four copies of the
+    wiring, four chances to drop a chapter. Instead the wiring moved into
+    body.tex, which every main file reads, so the defect C15 was built for is
+    now structurally impossible. What this check does today is guard the
+    structure that makes it impossible: every main file reads the same body,
+    and nothing has quietly grown a second copy of it.
     """
     seq = {}
     for lang in LANGS:
-        src = COMMENT_RE.sub("", (ROOT / f"main-{lang}.tex").read_text(encoding="utf8"))
-        seq[lang] = [(m.group(1), re.sub(r"/(en|pl)/", "/L/", m.group(2) or ""))
-                     for m in SKELETON_RE.finditer(src)]
-    if seq["en"] == seq["pl"]:
-        rep.good("C15-mainfiles", f"both main files wire up {len(seq['en'])} identical steps")
-        return
-    import difflib
-    for line in difflib.unified_diff(
-            [f"{a} {b}".strip() for a, b in seq["en"]],
-            [f"{a} {b}".strip() for a, b in seq["pl"]],
-            fromfile="main-en.tex", tofile="main-pl.tex", lineterm="", n=1):
-        if line.startswith(("+", "-")) and not line.startswith(("+++", "---")):
-            rep.bad("C15-mainfiles", line)
+        for fmt in FORMATS:
+            name = f"main-{lang}{fmt}.tex"
+            src = COMMENT_RE.sub("", (ROOT / name).read_text(encoding="utf8"))
+            seq[name] = [(m.group(1), re.sub(r"/(en|pl)/", "/L/", m.group(2) or ""))
+                         for m in SKELETON_RE.finditer(src)]
+
+    ref_name = f"main-{LANGS[0]}.tex"
+    ref = seq[ref_name]
+
+    # The body is the wiring, so a main file that does not read it is either
+    # carrying its own copy or missing the book entirely.
+    for name, steps in seq.items():
+        if ("input", "body") not in steps:
+            rep.bad("C15-mainfiles", f"{name} does not \\input{{body}}")
+
+    ok = True
+    for name, steps in seq.items():
+        if steps == ref:
+            continue
+        ok = False
+        import difflib
+        for line in difflib.unified_diff(
+                [f"{a} {b}".strip() for a, b in ref],
+                [f"{a} {b}".strip() for a, b in steps],
+                fromfile=ref_name, tofile=name, lineterm="", n=1):
+            if line.startswith(("+", "-")) and not line.startswith(("+++", "---")):
+                rep.bad("C15-mainfiles", line)
+
+    if ok:
+        rep.good("C15-mainfiles",
+                 f"{len(seq)} main files read one shared body ({len(ref)} steps)")
+
+    # And the body itself must still wire up a whole book, or all four main
+    # files agree on nothing.
+    body = COMMENT_RE.sub("", (ROOT / "body.tex").read_text(encoding="utf8"))
+    steps = [(m.group(1), re.sub(r"/(en|pl)/", "/L/", m.group(2) or ""))
+             for m in SKELETON_RE.finditer(body)]
+    kinds = {a for a, _ in steps}
+    missing = {"frontmatter", "mainmatter", "appendix", "backmatter"} - kinds
+    if missing:
+        rep.bad("C15-mainfiles",
+                f"body.tex is missing: {', '.join(sorted(missing))}")
+    else:
+        rep.good("C15-mainfiles", f"body.tex wires up {len(steps)} steps")
 
 
 # --------------------------------------------------------------------------

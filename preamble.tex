@@ -14,16 +14,39 @@
 
 \usepackage{etoolbox}   % loaded first: the language switch below needs it
 
-% ---------- Page geometry ----------
-% Same 17 x 24 cm block as the other two books in this series, so a reader who
-% owns one recognises the second. Frames are short, so the measure matters
-% more here than in a prose book: a frame that runs past a page turn defeats
-% the cover-the-next-frame discipline the whole method rests on.
-\usepackage[
-  paperwidth=17cm, paperheight=24cm,
-  inner=2.2cm, outer=1.8cm, top=2.2cm, bottom=2.4cm,
-  head=23pt, headsep=0.7cm, footskip=1.2cm
-]{geometry}
+% ---------- Paper format ----------
+% Two formats, chosen by the main file, and the only thing that varies between
+% them is this block and the class's point size.
+%
+%   standard -- 17 x 24 cm at 11pt. The trade format shared with the two
+%               companion volumes, so a reader who owns one recognises the
+%               second.
+%   a4       -- A4 at 12pt. What a reader actually does with this book is read
+%               it on a screen or print it on the office printer, and the trade
+%               format serves neither: it either sits small in a viewer or
+%               lands in the middle of an A4 sheet surrounded by white.
+%
+% Frames are short, so the measure matters more here than in a prose book: a
+% frame that runs past a page turn defeats the cover-the-next-frame discipline
+% the whole method rests on. Both formats are therefore set to about the same
+% number of characters per line -- A4 spends its extra width on margin, not on
+% a longer measure. A 15.5 cm block at 12pt would be some eighty-five
+% characters, which is past the point where the eye loses the line return, and
+% "it reads badly" would have been fixed into the wrong shape.
+\providecommand{\bookpaper}{standard}
+\ifdefstring{\bookpaper}{a4}{%
+  \usepackage[
+    a4paper,
+    inner=3.4cm, outer=2.8cm, top=2.6cm, bottom=3.0cm,
+    head=26pt, headsep=0.8cm, footskip=1.4cm
+  ]{geometry}%
+}{%
+  \usepackage[
+    paperwidth=17cm, paperheight=24cm,
+    inner=2.2cm, outer=1.8cm, top=2.2cm, bottom=2.4cm,
+    head=23pt, headsep=0.7cm, footskip=1.2cm
+  ]{geometry}%
+}
 
 % ---------- Encoding & fonts ----------
 \usepackage[T1]{fontenc}
@@ -186,13 +209,42 @@
 % ---------- Headings ----------
 % \raggedright on the title body is load-bearing, not cosmetic: at \Huge on a
 % 13 cm text block a long title that cannot break overflows the margin badly.
+% Several titles here are over 35 characters and a justified one cannot break.
+%
+% A program opens between two rules: a hairline above the PROGRAM Fn line and a
+% heavy one under the title. Programs are the thing a reader navigates by --
+% every Summary back-reference, every Quiz route and every cross-reference in
+% the book names a program and a frame -- and a coloured title alone does not
+% survive being thumbed past. The rules make the opening a landmark you can
+% find with the pages half shut.
 \titleformat{\chapter}[display]
   {\normalfont\huge\bfseries\color{mblue}\raggedright}
-  {\normalfont\normalsize\color{mgrey}\MakeUppercase{\chaptertitlename}\ \thechapter}
-  {8pt}{\Huge\raggedright}
-\titlespacing*{\chapter}{0pt}{10pt}{28pt}
+  {\color{codeframe}\titlerule[0.6pt]\vspace{7pt}%
+   \normalfont\normalsize\bfseries\color{mgrey}%
+   \MakeUppercase{\chaptertitlename}\ \thechapter}
+  {7pt}{\Huge\raggedright}
+  [\vspace{9pt}{\color{mblue}\titlerule[1.8pt]}]
+\titlespacing*{\chapter}{0pt}{8pt}{30pt}
+
+% A part page is a divider and had been left at the class default -- plain
+% black, centred, indistinguishable from any other book's. It is the coarsest
+% level of the structure and it was carrying none of the book's typography.
+\titleformat{\part}[display]
+  {\normalfont\centering}
+  {\normalfont\large\bfseries\color{mgrey}%
+   \MakeUppercase{\partname}\ \thepart}
+  {14pt}
+  {\Huge\bfseries\color{mblue}}
+  [\vspace{16pt}{\color{mblue}\titlerule[2pt]}]
+
 \titleformat{\section}{\normalfont\Large\bfseries\color{mblue}}{\thesection}{0.8em}{}
 \titleformat{\subsection}{\normalfont\large\bfseries\color{mgrey}}{\thesubsection}{0.7em}{}
+
+% Sections inside a program need more air above than the class gives them.
+% A section heading is competing with a frame rule for the reader's eye, and
+% at the default spacing the rule wins -- which is backwards.
+\titlespacing*{\section}{0pt}{24pt plus 4pt minus 3pt}{9pt}
+\titlespacing*{\subsection}{0pt}{18pt plus 3pt minus 2pt}{7pt}
 
 % head=23pt in the geometry options above, not \setlength{\headheight}:
 % fancyhdr computes the height it needs from the running-head font and the
@@ -261,40 +313,77 @@
 }
 \makeatother
 
-\newcommand{\framerule}{%
-  \par\penalty-200\vspace{9pt}%
-  \noindent\textcolor{codeframe}{\rule{\linewidth}{0.5pt}}%
-  \par\vspace{5pt}%
-}
-
-% The frame number as a filled badge, set in the text flow rather than in the
-% margin. A margin number would have to alternate sides under `twoside` and
-% would be the first thing to overflow on a 17 cm page; a badge cannot.
+% The frame number as a filled badge. NOT in the margin: a margin number has
+% to alternate sides under `twoside` and would be the first thing to overflow
+% on a 17 cm page.
 \newcommand{\framebadge}{%
   \begingroup
-  \setlength{\fboxsep}{2.5pt}%
-  \colorbox{mblue}{\textcolor{white}{\bfseries\scriptsize\theframeno}}%
-  \endgroup\hspace{0.7em}%
+  \setlength{\fboxsep}{3pt}%
+  \colorbox{mblue}{\textcolor{white}{\bfseries\footnotesize\theframeno}}%
+  \endgroup
 }
 
+% The boundary between two frames: a rule with the new frame's number sitting
+% on its left end, like a tab on a card.
+%
+% The badge used to be the first thing in the text flow instead. That reads
+% correctly only when a frame opens with a sentence -- and about a third of
+% them open with \ans, whose box starts a new vertical block, so the badge was
+% left stranded alone on the line above it with the box beneath. Putting the
+% number on the rule makes the boundary one object, and it no longer matters
+% what the frame opens with.
+%
+% \smash inside a zero-width \makebox: the badge must not contribute height,
+% or it would push the rule down and reintroduce the gap it was meant to close.
+% Order matters: the rule goes down FIRST, inside an \rlap so it contributes no
+% width, and the badge is painted over it second. Drawing the badge first and
+% the rule second -- the obvious way round -- puts a hairline straight through
+% the digit, and at this size that reads as a struck-out number rather than as
+% a badge sitting on a line.
+%
+% The shift is measured rather than guessed: centre the badge's own box on the
+% rule, so the alignment survives a change of point size. It has to, because
+% the A4 edition sets 12pt and the trade edition 11pt from the same source.
+\newcommand{\framerule}{%
+  \par\penalty-250
+  \vspace{\mfaframeabove}%
+  \noindent
+  \rlap{\textcolor{codeframe}{\rule{\linewidth}{0.6pt}}}%
+  \sbox0{\framebadge}%
+  \smash{\raisebox{\dimexpr0.3pt-0.5\ht0+0.5\dp0\relax}{\usebox0}}%
+  \par\nobreak\vspace{\mfaframebelow}%
+  \nobreak
+}
+
+% The gutter between frames. This is the single most load-bearing number in
+% the layout: the frame is the unit the reader covers with a hand, and two
+% frames a hairline apart are one block of text to the eye no matter what the
+% rule says. Generous above, tighter below, so the white space reads as
+% belonging to the frame that follows it rather than floating between the two.
+\newlength{\mfaframeabove}
+\newlength{\mfaframebelow}
+\setlength{\mfaframeabove}{17pt}
+\setlength{\mfaframebelow}{10pt}
+
 \newenvironment{fr}{%
-  \framerule
   \refstepcounter{frameno}%
-  \nopagebreak
-  \noindent\framebadge\ignorespaces
+  \framerule
+  \noindent\ignorespaces
 }{\par}
 
 % The answer to the previous frame. Set apart and centred so the eye can find
 % the edge to cover, and so a reader who has answered can check in one glance
 % without reading on.
+% The -4pt that used to sit here pulled the box up under the stranded frame
+% badge. The badge is on the rule now, so the box starts where it says it does.
 \newcommand{\ans}[1]{%
-  \par\nobreak\vspace{-4pt}%
+  \par\nobreak
   \begin{tcolorbox}[
     enhanced, sharp corners, boxrule=0pt, leftrule=2.5pt,
     colback=mfaint, colframe=mgreen,
-    left=8pt, right=8pt, top=4pt, bottom=4pt,
+    left=8pt, right=8pt, top=5pt, bottom=5pt,
     width=0.86\linewidth, center, halign=center,
-    before skip=2pt, after skip=7pt]
+    before skip=0pt, after skip=10pt]
     #1
   \end{tcolorbox}%
   \nobreak\noindent\ignorespaces
@@ -306,10 +395,11 @@
   \begin{tcolorbox}[
     enhanced, breakable, sharp corners, boxrule=0pt, leftrule=2.5pt,
     colback=mfaint, colframe=mgreen,
-    left=8pt, right=8pt, top=5pt, bottom=5pt]
+    left=10pt, right=10pt, top=6pt, bottom=6pt,
+    before skip=0pt, after skip=10pt]
 }{%
   \end{tcolorbox}%
-  \nopagebreak\par\vspace{2pt}\noindent\ignorespaces
+  \nopagebreak\par\noindent\ignorespaces
 }
 
 % The row of dots. Stroud's signal that the reader is to supply a word, a
@@ -577,18 +667,43 @@
 %  something no other box does; a seventh would be a smell.
 % ============================================================
 
+% Two shared styles, so the eight boxes below carry one set of spacing numbers
+% between them rather than eight copies that drift apart. `before skip` and
+% `after skip` are the point of this: tcolorbox's defaults are a couple of
+% points, which is not enough air to read as a separate block, and every box
+% having its own value is how a page ends up looking arbitrary.
+%
+% \emph{tinted} is a block the reader may read in passing -- a tint and a thick
+% left bar, no outline. \emph{outlined} is a block the reader must stop at, and
+% it gets a full rule on white. That is the whole visual grammar; a third
+% treatment would mean the first two are not carrying their meaning.
+\tcbset{
+  mfa tinted/.style={
+    enhanced, breakable, sharp corners,
+    boxrule=0pt, leftrule=3.5pt,
+    left=10pt, right=10pt, top=7pt, bottom=7pt,
+    before skip=13pt, after skip=13pt,
+    fonttitle=\bfseries\small,
+  },
+  mfa outlined/.style={
+    enhanced, breakable, sharp corners,
+    boxrule=0.8pt,
+    left=10pt, right=10pt, top=7pt, bottom=7pt,
+    before skip=13pt, after skip=13pt,
+    fonttitle=\bfseries\small,
+  },
+}
+
 \newtcolorbox{note}[1][]{
-  enhanced, breakable, sharp corners,
-  colback=mlight, colframe=mblue, boxrule=0pt, leftrule=3pt,
-  left=8pt, right=8pt, top=6pt, bottom=6pt,
-  fonttitle=\bfseries\small, title={\lblNote}, #1
+  mfa tinted,
+  colback=mlight, colframe=mblue,
+  title={\lblNote}, #1
 }
 
 \newtcolorbox{warning}[1][]{
-  enhanced, breakable, sharp corners,
-  colback=mlight, colframe=mred, boxrule=0pt, leftrule=3pt,
-  left=8pt, right=8pt, top=6pt, bottom=6pt,
-  fonttitle=\bfseries\small, title={\lblWarning}, #1
+  mfa tinted,
+  colback=mlight, colframe=mred,
+  title={\lblWarning}, #1
 }
 
 % The misconception, stated as a summary after it has been walked into. The
@@ -596,10 +711,9 @@
 % flatly that it is wrong -- and this box is the thing the reader marks with a
 % finger and comes back to.
 \newtcolorbox{trapbox}[1][]{
-  enhanced, breakable, sharp corners,
-  colback=white, colframe=mred, boxrule=0.8pt,
-  left=8pt, right=8pt, top=6pt, bottom=6pt,
-  fonttitle=\bfseries\small, title={\lblTrap}, #1
+  mfa outlined,
+  colback=white,  colframe=mred,
+  title={\lblTrap}, #1
 }
 
 % Where the mathematics just done shows up in a system the reader has actually
@@ -607,20 +721,18 @@
 % it is also the one most easily filled with waffle: if it cannot name a
 % specific line of a specific system, it should not be written.
 \newtcolorbox{aibox}[1][]{
-  enhanced, breakable, sharp corners,
-  colback=mlight, colframe=mteal, boxrule=0pt, leftrule=3pt,
-  left=8pt, right=8pt, top=6pt, bottom=6pt,
-  fonttitle=\bfseries\small, title={\lblInAI}, #1
+  mfa tinted,
+  colback=mlight, colframe=mteal,
+  title={\lblInAI}, #1
 }
 
 % What is being asserted rather than proved, and where to read the proof.
 % Stroud's method buys fluency at the cost of rigour, and the honest thing is
 % to say so at each point rather than once in an introduction nobody rereads.
 \newtcolorbox{rigourbox}[1][]{
-  enhanced, breakable, sharp corners,
-  colback=white, colframe=mgrey, boxrule=0.6pt,
-  left=8pt, right=8pt, top=6pt, bottom=6pt,
-  fonttitle=\bfseries\small, title={\lblRigour}, #1
+  mfa outlined,
+  colback=white,  colframe=mgrey,
+  title={\lblRigour}, #1
 }
 
 % Notation that genuinely differs -- between the Polish and English editions,
@@ -628,10 +740,9 @@
 % conventions, and half the confusion about backpropagation is a transpose
 % that came from the other one.
 \newtcolorbox{notationbox}[1][]{
-  enhanced, breakable, sharp corners,
-  colback=mlight, colframe=mamber, boxrule=0pt, leftrule=3pt,
-  left=8pt, right=8pt, top=6pt, bottom=6pt,
-  fonttitle=\bfseries\small, title={\lblNotation}, #1
+  mfa tinted,
+  colback=mlight, colframe=mamber,
+  title={\lblNotation}, #1
 }
 
 % The maths analogue of the sibling books' "run this before you trust it".
@@ -639,17 +750,15 @@
 % in with \val, or it carries this box. Nothing ships to a reader with one
 % still attached.
 \newtcolorbox{verifybox}[1][]{
-  enhanced, breakable, sharp corners,
-  colback=white, colframe=mamber, boxrule=0.8pt,
-  left=8pt, right=8pt, top=6pt, bottom=6pt,
-  fonttitle=\bfseries\small, title={\lblVerify}, #1
+  mfa outlined,
+  colback=white,  colframe=mamber,
+  title={\lblVerify}, #1
 }
 
 \newtcolorbox{exercisebox}[1][]{
-  enhanced, breakable, sharp corners,
-  colback=white, colframe=mgreen, boxrule=0pt, leftrule=3pt,
-  left=8pt, right=8pt, top=6pt, bottom=6pt,
-  fonttitle=\bfseries\small, title={\lblExercise}, #1
+  mfa tinted,
+  colback=white,  colframe=mgreen,
+  title={\lblExercise}, #1
 }
 
 % ============================================================

@@ -54,6 +54,7 @@
   .dl a:hover { background: var(--blue); color: var(--bg); }
   .dl small { display: block; font-weight: 400; color: var(--grey); font-size: .78rem; }
   .dl a:hover small { color: var(--bg); }
+  .alt { font-size: .88rem; color: var(--grey); margin-top: -.4rem; }
 </style>
 </head>
 <body>
@@ -69,16 +70,25 @@
 </p>
 
 <div class="dl">
-  <a href="book-en.pdf">Download the English edition
-    <small>PDF &middot; rebuilt on every push to main</small></a>
-  <a href="book-pl.pdf">Pobierz wydanie polskie
-    <small>PDF &middot; przebudowywane przy każdym pushu do main</small></a>
+  <a href="book-en-a4.pdf">Download the English edition
+    <small>A4 &middot; 12pt &middot; rebuilt on every push to main</small></a>
+  <a href="book-pl-a4.pdf">Pobierz wydanie polskie
+    <small>A4 &middot; 12pt &middot; przebudowywane przy każdym pushu do main</small></a>
 </div>
+
+<p class="alt">
+  Also in the 17&nbsp;&times;&nbsp;24&nbsp;cm trade format, matching the
+  companion volumes:
+  <a href="book-en.pdf">English</a> &middot;
+  <a href="book-pl.pdf">polski</a>.
+  Same source, same page for page; A4 is the one to read on a screen or print
+  at home.
+</p>
 
 <div class="banner">
   <strong>Early draft.</strong> The structure, the build, the bilingual tooling
-  and <strong>Program F1 in both languages</strong> are done — 169 pages in
-  English and 171 in Polish, zero errors, zero overfull vboxes, and a parity
+  and <strong>Program F1 in both languages</strong> are done — 163 pages on A4
+  in each language, zero errors, zero overfull vboxes, and a parity
   check that reports no failures across 56 file pairs. Forty-six of
   forty-seven programs are stubs carrying the brief they must satisfy. Every
   ledger is printed on every CI build, so the debt is visible rather than

@@ -1,15 +1,15 @@
 % ============================================================
-%  Matematyka od zera dla inżyniera AI
+%  Mathematics from Zero for the AI Engineer
 %  Konrad Cinkusz
 %
-%  POLISH edition, 17 x 24 cm at 11pt -- the trade format shared with the companion volumes.
+%  ENGLISH edition, A4 at 12pt -- the format to read on a screen or print at home.
 %
 %  Four main files exist: two languages times two paper formats. They differ
 %  only in the five lines below -- the class options, \booklang, \bookpaper
 %  and the PDF title. Everything else, including the whole document body, is
 %  shared, so a chapter cannot go missing from one of them.
 %
-%  Build:  latexmk -pdf main-pl.tex          (or: make pl)
+%  Build:  latexmk -pdf main-en-a4.tex       (or: make en-a4)
 %          make          -- both editions, 17 x 24 cm
 %          make a4       -- both editions, A4
 %          make debt     -- every outstanding-work ledger
@@ -19,14 +19,14 @@
 %  where they would have been.
 % ============================================================
 
-\documentclass[11pt,twoside,openright]{book}
+\documentclass[12pt,twoside,openright]{book}
 
-\def\booklang{pl}
-\def\bookpaper{standard}
+\def\booklang{en}
+\def\bookpaper{a4}
 \input{preamble}
 
-\hypersetup{pdftitle={Matematyka od zera dla inżyniera AI}}
+\hypersetup{pdftitle={Mathematics from Zero for the AI Engineer}}
 
-% \includeonly{programs/pl/F01-numbers-powers-roots}
+% \includeonly{programs/en/F01-numbers-powers-roots}
 
 \input{body}

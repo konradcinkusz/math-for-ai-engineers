@@ -1,0 +1,52 @@
+% ============================================================
+%  body.tex --- the document body. ONE copy, read by every main file.
+%
+%  There are four main files: two languages times two paper formats. Before
+%  this file existed there were two, each carrying its own copy of the wiring
+%  below, and one of them was once rewritten with the introduction dropped --
+%  every other check passed, because nothing that compares programs can see a
+%  difference that lives in the wiring. C15 was written to catch that.
+%
+%  Four copies would have been four chances to make the same mistake. So the
+%  wiring lives here once and is parameterised by \booklang, exactly as
+%  structure.tex already parameterises the program sequence. C15 still runs,
+%  and now it is checking that the main files agree about *which* body they
+%  read rather than about the body itself.
+% ============================================================
+
+\begin{document}
+
+% ------------------------------------------------------------
+\frontmatter
+
+\input{frontmatter/\booklang/titlepage}
+
+\tableofcontents
+
+\input{frontmatter/\booklang/how-to-use}
+\input{frontmatter/\booklang/introduction}
+
+% ------------------------------------------------------------
+\mainmatter
+
+\input{structure}
+
+% ------------------------------------------------------------
+%  Appendix A carries the answers. They are collected as the programs are
+%  typeset, so this part must come after \input{structure} and nothing may
+%  call \printanswers as well -- doing both prints every answer twice.
+\appendix
+\part{\lblPartAppendices}
+\include{appendices/\booklang/appA-answers}
+\include{appendices/\booklang/appB-notation}
+\include{appendices/\booklang/appC-formulae}
+\include{appendices/\booklang/appD-terminology}
+\include{appendices/\booklang/appE-further-reading}
+\include{appendices/\booklang/appF-manifest}
+
+% ------------------------------------------------------------
+\backmatter
+
+\printindex
+
+\end{document}
