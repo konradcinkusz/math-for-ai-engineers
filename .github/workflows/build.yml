@@ -166,22 +166,35 @@ jobs:
       - name: Check the log properly
         run: python3 tools/checklog.py main-${{ matrix.lang }}.log
 
-      - name: Report overfull boxes
+      # if: always(), so it must survive a cancelled or failed compile that
+      # left no log behind -- a reporting step that fails because there is
+      # nothing to report turns one red job into two.
+      #
+      # It calls tools/checklog.py rather than counting boxes inline: one
+      # implementation of "did this build actually succeed", used by CI and by
+      # `make check` alike. A second copy in YAML would drift from it.
+      - name: Report the build
         if: always()
+        continue-on-error: true
         run: |
-          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-          import re
-          log = open('main-${{ matrix.lang }}.log', encoding='utf8', errors='replace').read()
-          h = [float(x) for x in re.findall(r'Overfull \\hbox \(([\d.]+)pt', log)]
-          v = [float(x) for x in re.findall(r'Overfull \\vbox \(([\d.]+)pt', log)]
-          pg = re.search(r'Output written on .*\((\d+) pages', log)
-          print(f"### `${{ matrix.lang }}` edition\n")
-          print(f"**Pages:** {pg.group(1) if pg else '?'}\n")
-          print(f"**Overfull hbox:** {len(h)} "
-                f"{sorted((round(x,1) for x in h), reverse=True)[:10]}\n")
-          print(f"**Overfull vbox:** {len(v)} --- these are the expensive ones; "
-                "a vbox means a boxed table grew past a page and could not break.\n")
-          PY
+          LOG="main-${{ matrix.lang }}.log"
+          if [ ! -f "$LOG" ]; then
+            echo "### \`${{ matrix.lang }}\` edition" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "_No log — the compile did not run to completion._" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          {
+            echo "### \`${{ matrix.lang }}\` edition"
+            echo ""
+            echo '```'
+            python3 tools/checklog.py "$LOG" || true
+            echo '```'
+            echo ""
+            echo "_An overfull **vbox** is the expensive one: a boxed block grew"
+            echo "past a page and could not break. Split the table; do not shrink"
+            echo "the text._"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Rename artefact
         run: mv main-${{ matrix.lang }}.pdf "${{ matrix.pdf }}.pdf"
@@ -192,11 +205,18 @@ jobs:
           path: ${{ matrix.pdf }}.pdf
           retention-days: 14
 
+      # The WHOLE aux tree, not just the main file. reflist.py follows the
+      # \@input{} chain into the per-program aux files, and given only the main
+      # one it finds no labels at all -- and reports "0 mismatches", which is a
+      # check passing because it read nothing.
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: aux-${{ matrix.lang }}
-          path: main-${{ matrix.lang }}.aux
+          path: |
+            main-${{ matrix.lang }}.aux
+            programs/${{ matrix.lang }}/*.aux
+            appendices/${{ matrix.lang }}/*.aux
           retention-days: 3
 
   # A \label may resolve to program F8 in one edition and F9 in the other the

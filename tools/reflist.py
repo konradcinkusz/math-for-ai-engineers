@@ -70,6 +70,17 @@ def main() -> int:
 
     print("-" * 68)
     print(f"  {len(en)} labels in en, {len(pl)} in pl, {fails} mismatches")
+
+    # A check that passes because it read nothing is worse than no check. The
+    # aux tree is a \@input{} chain, so being handed only the main file finds
+    # zero labels in both editions and reports zero mismatches -- which looks
+    # exactly like success.
+    if not en or not pl:
+        print("  FAIL  no labels found. The per-program .aux files are part of")
+        print("        the \\@input{} chain and must be present, not just the")
+        print("        main file.")
+        return 1
+
     return 1 if fails else 0
 
 
