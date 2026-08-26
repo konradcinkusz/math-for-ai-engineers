@@ -1,0 +1,263 @@
+name: Build
+
+# Validates both editions on every push and pull request. The release workflow
+# only runs on tags and is therefore too late to catch a broken pull request;
+# this is the one that gives contributors feedback.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -------------------------------------------------------------------------
+  # The numbers come first, and they gate everything. If a script no longer
+  # produces the value the book prints, nothing downstream is worth building.
+  # -------------------------------------------------------------------------
+  numbers:
+    name: Recompute every number
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install --quiet numpy sympy
+      - name: Regenerate figures/values from code/
+        run: make numbers
+      - name: Fail if any committed value has drifted
+        run: |
+          if ! git diff --quiet -- figures/values; then
+            echo "::error::A computed value in the book differs from what code/ now produces."
+            git diff -- figures/values
+            exit 1
+          fi
+          echo "Every computed value in the book matches its script."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: values
+          path: figures/values
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # -------------------------------------------------------------------------
+  # Parity is a hard gate. A bilingual book fails by having a correction
+  # applied to one edition and missed in the other; this is what stops that.
+  # -------------------------------------------------------------------------
+  parity:
+    name: Polish and English in step
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: The manifest and the tree agree
+        run: python3 tools/gen_stubs.py --check
+
+      - name: Compare the two editions
+        run: python3 tools/parity.py
+
+  diagrams:
+    name: Render diagrams
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Render every Mermaid source to PDF
+        run: |
+          shopt -s nullglob
+          SRC=(figures/mermaid/*/*.mmd)
+          if [ ${#SRC[@]} -eq 0 ]; then
+            echo "No Mermaid sources yet."
+            mkdir -p figures/diagrams
+            exit 0
+          fi
+          # mermaid-cli bundles its own Chromium; --no-sandbox is required in a
+          # container running as root.
+          printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
+          FAILED=0
+          for f in "${SRC[@]}"; do
+            lang=$(basename "$(dirname "$f")")
+            key=$(basename "$f" .mmd)
+            mkdir -p "figures/diagrams/$lang"
+            echo "::group::$lang/$key"
+            if ! npx -y @mermaid-js/mermaid-cli@11 \
+                 -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
+                 -p .puppeteer.json -c figures/mermaid/config.json \
+                 -b transparent --pdfFit; then
+              echo "::error file=$f::Mermaid failed to render $lang/$key"
+              FAILED=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $FAILED
+      - name: Both languages must carry the same diagram keys
+        run: |
+          a=$(cd figures/mermaid/en 2>/dev/null && ls *.mmd 2>/dev/null | sort || true)
+          b=$(cd figures/mermaid/pl 2>/dev/null && ls *.mmd 2>/dev/null | sort || true)
+          if [ "$a" != "$b" ]; then
+            echo "::error::The two editions have different diagram sets."
+            diff <(echo "$a") <(echo "$b") || true
+            exit 1
+          fi
+          echo "Diagram keys match across both editions."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: diagrams
+          path: figures/diagrams
+          retention-days: 14
+          if-no-files-found: ignore
+
+  build:
+    name: Compile ${{ matrix.lang }}
+    runs-on: ubuntu-latest
+    needs: [numbers, diagrams]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lang: en
+            pdf: Mathematics-from-Zero-for-the-AI-Engineer
+          - lang: pl
+            pdf: Matematyka-od-zera-dla-inzyniera-AI
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        continue-on-error: true
+        with:
+          name: values
+          path: figures/values
+
+      - uses: actions/download-artifact@v5
+        continue-on-error: true
+        with:
+          name: diagrams
+          path: figures/diagrams
+
+      - name: Compile with latexmk
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-${{ matrix.lang }}.tex
+          latexmk_use_lualatex: false
+          # pdflatex is sufficient; the preamble degrades gracefully when the
+          # optional font packages are missing.
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+
+      # Not `grep '^!' main.log`. With -file-line-error an error line begins
+      # with a path, and -interaction=nonstopmode writes a PDF over the top of
+      # it, so both the exit code and the PDF say "fine". A broken
+      # \IfFileExists branch stopped siunitx loading in a build everybody
+      # believed was green, and the decimal comma silently did not work.
+      - name: Check the log properly
+        run: python3 tools/checklog.py main-${{ matrix.lang }}.log
+
+      # if: always(), so it must survive a cancelled or failed compile that
+      # left no log behind -- a reporting step that fails because there is
+      # nothing to report turns one red job into two.
+      #
+      # It calls tools/checklog.py rather than counting boxes inline: one
+      # implementation of "did this build actually succeed", used by CI and by
+      # `make check` alike. A second copy in YAML would drift from it.
+      - name: Report the build
+        if: always()
+        continue-on-error: true
+        run: |
+          LOG="main-${{ matrix.lang }}.log"
+          if [ ! -f "$LOG" ]; then
+            echo "### \`${{ matrix.lang }}\` edition" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "_No log — the compile did not run to completion._" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          {
+            echo "### \`${{ matrix.lang }}\` edition"
+            echo ""
+            echo '```'
+            python3 tools/checklog.py "$LOG" || true
+            echo '```'
+            echo ""
+            echo "_An overfull **vbox** is the expensive one: a boxed block grew"
+            echo "past a page and could not break. Split the table; do not shrink"
+            echo "the text._"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Rename artefact
+        run: mv main-${{ matrix.lang }}.pdf "${{ matrix.pdf }}.pdf"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book-${{ matrix.lang }}
+          path: ${{ matrix.pdf }}.pdf
+          retention-days: 14
+
+      # The WHOLE aux tree, not just the main file. reflist.py follows the
+      # \@input{} chain into the per-program aux files, and given only the main
+      # one it finds no labels at all -- and reports "0 mismatches", which is a
+      # check passing because it read nothing.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aux-${{ matrix.lang }}
+          path: |
+            main-${{ matrix.lang }}.aux
+            programs/${{ matrix.lang }}/*.aux
+            appendices/${{ matrix.lang }}/*.aux
+          retention-days: 3
+
+  # A \label may resolve to program F8 in one edition and F9 in the other the
+  # moment a numbered thing exists in one and not the other. Both builds stay
+  # internally consistent and neither warns, so this compares the resolved
+  # numbers out of the two .aux files after the fact.
+  crossrefs:
+    name: Cross-references resolve the same
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: aux-*
+          merge-multiple: true
+      - run: python3 tools/reflist.py main-en.aux main-pl.aux
+
+  ledgers:
+    name: Outstanding work
+    runs-on: ubuntu-latest
+    # Advisory. These are counted on every build so the debt is visible rather
+    # than quietly carried, but a draft is allowed to carry debt.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Print every ledger
+        run: |
+          {
+            echo "## Outstanding work"
+            echo ""
+            echo '```'
+            make -s debt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

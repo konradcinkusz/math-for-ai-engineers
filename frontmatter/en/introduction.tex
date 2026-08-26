@@ -1,0 +1,144 @@
+\chapter*{Introduction}
+\phantomsection
+\addcontentsline{toc}{chapter}{Introduction}
+\markboth{INTRODUCTION}{INTRODUCTION}
+
+\section*{Who this book is for}
+
+You can call \code{softmax} and you cannot say why it subtracts its own maximum
+first. You have trained a model and you have never derived the gradient it was
+following. You read a paper, understand every sentence around the equations,
+and skip the equations.
+
+That is not a character flaw and it is not unusual. It is what happens when a
+field grows faster than its textbooks, and when the mathematics that field
+rests on is taught in an order designed for mathematicians. This book is
+written for the engineer in that position: professionally competent, formally
+under-equipped, and aware of it.
+
+\textbf{It assumes no mathematics beyond school arithmetic.} Not algebra, not
+trigonometry, not calculus. Part~I begins with arithmetic and means it, and if
+you have a degree in a numerate subject the Quizzes exist precisely so you can
+skip what you already have.
+
+\textbf{It does assume you already work with these systems.} That is a
+different floor and it is worth stating, because the two are easy to run
+together. Program~F1 has you compute what a seven-billion-parameter model
+weighs, and it does not stop to say what a parameter is; a later program reads
+an attention step as a shape. Every payoff in this book is a payoff \emph{in
+your job}, so the vocabulary of that job \dash{} model, token, parameter,
+training run, evaluation \dash{} is assumed throughout and the mathematics is
+not.
+
+If you have never trained or served a model, the mathematics here will still
+be correct and the reasons for caring about it will not land. There is no
+shame in that and this is not the book for it.
+
+\section*{What it is for}
+
+Fluency, not rigour. When you have finished it you will be able to derive
+scaled dot-product attention, say exactly what the $1/\sqrt{d_k}$ is doing and
+what goes wrong without it, read a loss function as an expression rather than a
+name, and look at a benchmark table and say whether the difference in it is
+real.
+
+You will not be able to prove things. That is a deliberate limitation of the
+method and it is stated again, in each place it bites, in a box that names what
+is being asserted and where the proof lives. A book that pretends to give you
+both in one volume gives you neither.
+
+\section*{Why the format is strange}
+
+This book uses K.~A. Stroud's programmed-learning method, from
+\emph{Engineering Mathematics} (1970). The material is entirely different; the
+machinery is his, and it is used because it is the only widely deployed format
+in mathematics teaching that was ever measured against a control group.
+
+The machinery is simple. The book is a sequence of numbered \emph{frames}.
+Nearly every one demands a response, and the answer is at the top of the next
+frame, so you are asked to commit before you check. Over one program that
+happens forty to seventy times. The effect is that retrieval practice is not
+something you have to organise for yourself at the end of a chapter \dash{} it is
+the only way the pages can be turned.
+
+The design also grades its own support: worked example, then example with gaps,
+then \emph{one for you to do}, then unaided problems. And it sets traps on
+purpose. Where a topic has a standard misconception, the text will walk you
+into it, let you commit to the wrong answer, then say flatly that it is wrong
+and show you why. That is uncomfortable and it is the most valuable thing in
+the format, because a misconception that has been elicited and corrected is
+gone, and one that has merely been avoided is waiting.
+
+\section*{How the book is organised}
+
+Nine parts, forty-six programs.
+
+\textbf{Part~I \dash{} Foundation} (F1--F13) assumes nothing and is triaged by
+Quiz. It is bent towards the payoff rather than towards a school syllabus:
+logarithms get a whole program because log-space arithmetic is load-bearing
+three parts later, and the chain rule gets the longest program in the part
+because backpropagation is the chain rule and nothing else.
+
+\textbf{Part~II \dash{} Number, precision and cost} (P1--P3) comes before linear
+algebra, which is a departure from every mathematics curriculum and is
+deliberate. Everything after it is arithmetic performed by a finite machine on
+a budget. A book that waits four hundred pages to admit that the machine cannot
+represent $\num{0.1}$ has spent four hundred pages teaching a fiction.
+
+\textbf{Part~III \dash{} Linear algebra} (P4--P10) is the largest part, because it
+is the subject this audience uses daily and understands least.
+
+\textbf{Part~IV \dash{} Discrete structures and argument} (P11--P13) covers
+counting, graphs, and how to read a theorem without believing more than it
+says. It sits before the calculus so that \emph{DAG} and \emph{for all
+$\varepsilon$} are defined the first time they are needed.
+
+\textbf{Part~V \dash{} Calculus and automatic differentiation} (P14--P17) takes the
+chain rule all the way to what \code{loss.backward()} does.
+
+\textbf{Part~VI \dash{} Optimisation} (P18--P21) is absent from Stroud's first
+volume entirely.
+
+\textbf{Part~VII \dash{} Probability and statistics} (P22--P27) goes past the
+normal distribution, where Stroud stops, to inference and Bayes \dash{} because
+this audience's real statistical job is deciding whether a measured difference
+is real, and that is the part no engineering mathematics text covers.
+
+\textbf{Part~VIII \dash{} Information theory} (P28--P30) is where the loss function
+comes from.
+
+\textbf{Part~IX \dash{} Assembling it} (P31--P33) spends the whole book on one
+architecture, one training run and one evaluation, and introduces no new
+mathematics.
+
+\section*{Two rules this book holds itself to}
+
+\begin{note}
+\textbf{Every number is computed, not remembered.} Every numeric value printed
+here is produced by a script in \code{code/} and pulled into the text
+mechanically. The book does not contain the digits; it contains a reference to
+them. A value the scripts stop producing prints a visible marker and fails the
+build. This exists because a wrong digit in a mathematics book is not a broken
+example \dash{} it is something the reader will carry.
+\end{note}
+
+\begin{note}
+\textbf{What has not been measured is labelled as judgement.} Ten experiments
+are specified in these programs. Where one has not been run, the claim it would
+support says so, and the table that would hold its numbers stays empty. Empty
+tables are not an oversight; they are the mechanism.
+\end{note}
+
+\section*{Both languages, one source}
+
+This book exists in Polish and in English, built from one repository. The two
+editions share their structure, their figures, their exercise numbering and
+their answers; only the prose differs. A check on every build proves that the
+two have the same programs, the same frame counts and the same numbers, so a
+correction applied to one edition cannot silently miss the other.
+
+Where Polish and English mathematical usage genuinely differ \dash{} $\mathrm{tg}$ against
+$\mathrm{tan}$, the decimal comma, the angle brackets Polish tradition uses for a
+closed interval, $D^2(X)$ against $\Var(X)$ \dash{} the decision is recorded in
+Appendix~B rather than left to a translator's memory, and it is executed by the
+typesetting rather than applied by hand.

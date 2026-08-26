@@ -1,0 +1,11 @@
+*.tex   text diff=tex
+*.mmd   text
+*.md    text
+*.py    text diff=python
+*.png   binary
+*.pdf   binary
+
+# The programs are prose. Word-level diffs are far more readable than
+# line-level ones when a paragraph gets rewrapped, and the Polish and English
+# editions are reviewed side by side.
+*.tex   diff=word

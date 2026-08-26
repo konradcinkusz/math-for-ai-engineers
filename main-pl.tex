@@ -1,0 +1,63 @@
+% ============================================================
+%  Matematyka od zera dla inżyniera AI
+%  Konrad Cinkusz
+%
+%  WYDANIE POLSKIE. Wydanie angielskie to main-en.tex; oba korzystają z tej
+%  samej preambuły, tego samego pliku struktury, tych samych rysunków i tego
+%  samego kodu, a różnią się wyłącznie zawartością programs/<lang>/ oraz
+%  lang/<lang>.tex.
+%
+%  Budowanie:  latexmk -pdf main-pl.tex      (albo: make pl)
+%              make            -- oba wydania, razem z diagramami
+%              make debt       -- wszystkie rejestry zaległości
+%
+%  Aby pracować nad jednym programem, odkomentuj \includeonly. Budowanie
+%  częściowe nie może wypisać odpowiedzi do programów, których nie złożyło,
+%  i mówi o tym w miejscu, w którym by się znalazły.
+% ============================================================
+
+\documentclass[11pt,twoside,openright]{book}
+
+\def\booklang{pl}
+\input{preamble}
+
+\hypersetup{pdftitle={Matematyka od zera dla inżyniera AI}}
+
+% \includeonly{programs/pl/F01-numbers-powers-roots}
+
+\begin{document}
+
+% ------------------------------------------------------------
+\frontmatter
+
+\input{frontmatter/pl/titlepage}
+
+\tableofcontents
+
+\input{frontmatter/pl/how-to-use}
+\input{frontmatter/pl/introduction}
+
+% ------------------------------------------------------------
+\mainmatter
+
+\input{structure}
+
+% ------------------------------------------------------------
+%  Dodatek A niesie odpowiedzi. Są zbierane w trakcie składania programów,
+%  więc ta część musi następować po \input{structure}, a nic innego nie może
+%  wywołać \printanswers -- zrobienie obu wypisze każdą odpowiedź dwa razy.
+\appendix
+\part{\lblPartAppendices}
+\include{appendices/pl/appA-answers}
+\include{appendices/pl/appB-notation}
+\include{appendices/pl/appC-formulae}
+\include{appendices/pl/appD-terminology}
+\include{appendices/pl/appE-further-reading}
+\include{appendices/pl/appF-manifest}
+
+% ------------------------------------------------------------
+\backmatter
+
+\printindex
+
+\end{document}

@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+"""Program F1 --- Numbers, powers and roots.
+
+Every number Program F1 prints is computed here and written to
+figures/values/f01.tex, which the book \\input{}s. The book contains no digits
+of its own for this program; it contains references. A value that changes here
+changes in both editions at once, and a value that stops being produced prints
+a visible marker and fails CI.
+
+Run:  python3 code/f01_numbers.py      (or: make numbers)
+"""
+from __future__ import annotations
+
+import math
+from pathlib import Path
+
+VALUES: dict[str, tuple[str, bool]] = {}
+
+
+def emit(key: str, value, digits: int | None = None) -> None:
+    """Record one value under the name the book will reference it by.
+
+    Also decides here whether the value is a number, because this end knows for
+    free and the LaTeX end does not. \val passes its body to siunitx, which
+    raises a fatal error on anything that is not a number; the book's \val
+    refuses a value emitted as text and names \valtext instead.
+    """
+    if isinstance(value, float) and digits is not None:
+        body = f"{value:.{digits}f}"
+    elif isinstance(value, float):
+        body = repr(value)
+    else:
+        body = str(value)
+    try:
+        float(body.replace("e", "E"))
+        numeric = True
+    except ValueError:
+        numeric = False
+    VALUES[key] = (body, numeric)
+
+
+# --------------------------------------------------------------------------
+# Sizing a model. The worked payoff of the program: parameters times bytes per
+# parameter is memory, and the reader computes it rather than repeating it.
+# --------------------------------------------------------------------------
+PARAMS = 7_000_000_000                 # a "7B" model
+BYTES_FP16 = 2
+BYTES_FP32 = 4
+
+weights_bytes = PARAMS * BYTES_FP16
+emit("f01.params", PARAMS)
+emit("f01.weights.bytes", weights_bytes)
+emit("f01.weights.gb", weights_bytes / 1e9, 0)            # decimal gigabytes
+emit("f01.weights.gib", weights_bytes / 2**30, 2)         # binary gibibytes
+emit("f01.weights.fp32.gb", PARAMS * BYTES_FP32 / 1e9, 0)
+
+# The kilo/kibi gap, expressed the way the book states it: a gibibyte is N per
+# cent MORE bytes than a gigabyte. The reciprocal form (a gigabyte is 6.9% of a
+# gibibyte less) is also true, reads as a different number, and is not used --
+# so it is not emitted. A value the book does not reference is a number carried
+# without justification, and `make debt` counts it.
+
+# --------------------------------------------------------------------------
+# 2^10 against 10^3. The approximation everyone uses, and the error it carries
+# when it is compounded -- which is where it stops being harmless.
+#
+# NOTE: this is the SAME quantity as the kilo/kibi gap emitted below, and it is
+# deliberately not emitted twice. One quantity printed at two precisions --
+# 2.4% in a table and 2.40% in a trap -- is a defect: a reader who meets both
+# is entitled to think one of them is wrong. The prefix gaps below are the
+# single source, and the trap frame references f01.kib.over.si.pct.
+# --------------------------------------------------------------------------
+emit("f01.two.eighty", 2**80)
+emit("f01.two.eighty.err.pct", (2**80 / 10**24 - 1) * 100, 2)
+
+# --------------------------------------------------------------------------
+# Training cost, to an order of magnitude. The standard estimate is that
+# training costs about 6 FLOPs per parameter per token: two for the forward
+# multiply-accumulate and four for the backward pass. It is an estimate and the
+# book says so; what matters here is that the reader can do the arithmetic.
+# --------------------------------------------------------------------------
+TOKENS = 2_000_000_000_000              # 2 trillion training tokens
+FLOPS_PER_PARAM_TOKEN = 6
+train_flops = FLOPS_PER_PARAM_TOKEN * PARAMS * TOKENS
+emit("f01.tokens", TOKENS)
+emit("f01.train.flops", f"{train_flops:.2e}".replace("e+", "e"))
+emit("f01.train.flops.exp", len(str(train_flops)) - 1)
+
+# A device sustaining 4e14 FLOP/s at a realistic utilisation.
+DEVICE_FLOPS = 4e14
+UTILISATION = 0.4
+device_seconds = train_flops / (DEVICE_FLOPS * UTILISATION)
+emit("f01.device.flops", f"{DEVICE_FLOPS:.0e}".replace("e+", "e"))
+emit("f01.device.util.pct", UTILISATION * 100, 0)
+# A duration rounds to nearest; a COUNT OF DEVICES takes a ceiling. Two
+# hundred and two and a half devices do not finish the job. The distinction is
+# made explicit here because the two emitters used the same rounding rule and
+# happened to agree, which is the kind of agreement that stops holding.
+emit("f01.device.days", device_seconds / 86400, 0)
+emit("f01.device.years", device_seconds / (86400 * 365), 1)
+emit("f01.devices.for.30.days", math.ceil(device_seconds / (86400 * 30)))
+
+# A larger model, for the exercise the reader does unaided.
+BIG_PARAMS = 70_000_000_000
+emit("f01.big.params", BIG_PARAMS)
+emit("f01.big.gb", BIG_PARAMS * BYTES_FP16 / 1e9, 0)
+
+# The binary prefixes, so the table in the program is generated rather than
+# typed. A table of powers is exactly the kind of thing that acquires a typo.
+# All four at the SAME precision, for the same reason. Two decimal places,
+# because the tera gap is 9.95% and rounding it to 10.0% makes it look like a
+# round number the reader can check in their head, which it is not.
+for name, k in (("kib", 10), ("mib", 20), ("gib", 30), ("tib", 40)):
+    if name == "gib":                      # the only one the text spells out
+        emit(f"f01.{name}.bytes", 2**k)
+    emit(f"f01.{name}.over.si.pct", (2**k / 10 ** (3 * (k // 10)) - 1) * 100, 2)
+
+# Estimating: a novel of 100,000 words, at the rule of thumb that a token is
+# about three quarters of an English word.
+WORDS = 100_000
+emit("f01.novel.words", WORDS)
+emit("f01.novel.tokens", round(WORDS / 0.75))
+
+# --------------------------------------------------------------------------
+# Ratios and percentages. "50% faster" is ambiguous and the ambiguity is
+# expensive; the program makes the reader compute both readings.
+# --------------------------------------------------------------------------
+BASE_MS = 200.0
+emit("f01.base.ms", BASE_MS, 0)
+emit("f01.fifty.pct.less.ms", BASE_MS * 0.5, 0)          # half the time
+emit("f01.fifty.pct.more.rate.ms", BASE_MS / 1.5, 1)     # 1.5x the throughput
+emit("f01.speedup.discrepancy.ms", BASE_MS / 1.5 - BASE_MS * 0.5, 1)
+
+# --------------------------------------------------------------------------
+# Write the file the book reads.
+# --------------------------------------------------------------------------
+OUT = Path(__file__).resolve().parent.parent / "figures" / "values" / "f01.tex"
+
+
+def main() -> None:
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "% Generated by code/f01_numbers.py --- do not edit.",
+        "% Regenerate with `make numbers`; `make verify` fails if this file and",
+        "% the script disagree, which is what stops a number in the book drifting",
+        "% away from the computation that justifies it.",
+        "",
+    ]
+    lines += [
+        f"\\{'mfaval' if numeric else 'mfavaltext'}{{{k}}}{{{body}}}"
+        for k, (body, numeric) in VALUES.items()
+    ]
+    OUT.write_text("\n".join(lines) + "\n", encoding="utf8")
+    width = max(len(k) for k in VALUES)
+    for k, (body, numeric) in VALUES.items():
+        print(f"  {k:<{width}}  {body}{'' if numeric else '   (text)'}")
+    print(f"\n  {len(VALUES)} values -> {OUT.relative_to(OUT.parents[2])}")
+
+
+if __name__ == "__main__":
+    main()

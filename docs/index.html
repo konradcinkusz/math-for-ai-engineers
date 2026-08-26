@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mathematics from Zero for the AI Engineer</title>
+<meta name="description" content="A programmed-learning course from arithmetic to scaled dot-product attention, in Polish and English, built from one repository.">
+<style>
+  :root {
+    --blue: #1F4E79; --green: #2E6B4F; --teal: #0E7C7B; --amber: #B26A00; --red: #9B2C2C;
+    --grey: #5A5A5A; --light: #F4F6F8; --bg: #ffffff; --fg: #1a1a1a;
+    --border: #D8DEE4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a; --fg: #e8eaed; --light: #1e2328; --grey: #9aa3ab;
+      --blue: #7BAEDC; --teal: #4FC3C2; --amber: #E0A24A; --red: #E08A8A;
+      --border: #2b3238;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.15; color: var(--blue); margin: 0 0 .4rem; }
+  .sub { color: var(--grey); font-size: 1.1rem; margin: 0 0 2rem; }
+  h2 { font-size: 1.25rem; color: var(--blue); margin: 2.5rem 0 .75rem; }
+  a { color: var(--teal); }
+  .banner {
+    background: var(--light); border-left: 3px solid var(--red);
+    padding: .9rem 1.1rem; margin: 1.5rem 0 2rem; border-radius: 0 4px 4px 0;
+  }
+  .banner strong { color: var(--red); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .94rem; }
+  th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--grey); font-weight: 600; white-space: nowrap; }
+  .scroll { overflow-x: auto; }
+  code { background: var(--light); padding: .1rem .35rem; border-radius: 3px; font-size: .9em; }
+  ul { padding-left: 1.2rem; }
+  li { margin: .35rem 0; }
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--grey); font-size: .9rem; }
+  .pill {
+    display: inline-block; background: var(--light); border: 1px solid var(--border);
+    border-radius: 999px; padding: .15rem .7rem; font-size: .82rem; color: var(--grey); margin-right: .4rem;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Mathematics from Zero<br>for the AI Engineer</h1>
+<p class="sub">Matematyka od zera dla inżyniera AI — forty-seven programs, worked.</p>
+
+<p>
+  <span class="pill">47 programs</span>
+  <span class="pill">Polish + English</span>
+  <span class="pill">one repository</span>
+</p>
+
+<div class="banner">
+  <strong>Early draft.</strong> The structure, the build, the bilingual tooling
+  and <strong>Program F1 in both languages</strong> are done — 169 pages in
+  English and 171 in Polish, zero errors, zero overfull vboxes, and a parity
+  check that reports no failures across 56 file pairs. Forty-six of
+  forty-seven programs are stubs carrying the brief they must satisfy. Every
+  ledger is printed on every CI build, so the debt is visible rather than
+  quietly carried.
+</div>
+
+<h2>Why</h2>
+<p>
+  You can call <code>softmax</code> and you cannot say why it subtracts its own
+  maximum first. You have trained a model and never derived the gradient it was
+  following. You read a paper, understand every sentence around the equations,
+  and skip the equations.
+</p>
+<p>
+  Every book in this field is a <em>second</em> book. Each assumes a floor —
+  algebraic automaticity — that it does not teach and does not test. This one
+  starts at arithmetic and means it, and it uses K. A. Stroud's
+  programmed-learning format, which means it cannot be read. It has to be
+  worked.
+</p>
+
+<h2>What a program looks like</h2>
+<p>
+  A stream of numbered <strong>frames</strong>. Nearly every frame ends by
+  asking you for something, and <strong>the answer is at the top of the next
+  frame</strong> — so you commit before you check. Over one program that happens
+  forty to seventy times.
+</p>
+<p>
+  And it sets traps on purpose. Where a topic has a standard misconception the
+  text walks you into it, lets you commit to the wrong answer, then says flatly
+  that it is wrong. Thirty-eight of them are catalogued, each phrased in the
+  reader's own voice.
+</p>
+
+<h2>Every number is computed, not remembered</h2>
+<p>
+  A numeric value lives in a script, is written to a generated file, and reaches
+  the page as a reference. The book contains no digits of its own — so a changed
+  number shows up in review as a diff, and CI fails the build when a script no
+  longer produces what the book prints. A few from Program F1:
+</p>
+<div class="scroll">
+<table>
+  <tr><th>2<sup>10</sup> against 10<sup>3</sup></th><td>2.40% above</td></tr>
+  <tr><th>2<sup>80</sup> against 10<sup>24</sup></th><td><strong>20.89% above</strong> — the same error, compounded eight times</td></tr>
+  <tr><th>7 billion parameters at 2 bytes</th><td>14 GB, and 13.04 GiB</td></tr>
+  <tr><th>A gibibyte against a gigabyte</th><td>7.37% more bytes</td></tr>
+  <tr><th>“Fifty per cent faster” on 200 ms</th><td>100 ms or 133.3 ms — <strong>33.3 ms apart</strong></td></tr>
+</table>
+</div>
+<p>
+  Ten experiments are specified across the book and <strong>none has been
+  run</strong>. Until one is, the claim it would support is labelled as
+  judgement and its table stays empty.
+</p>
+
+<h2>Two editions that cannot drift apart</h2>
+<p>
+  One repository builds both. There is exactly one list of programs, and every
+  user-visible string lives in a language catalogue, so the two editions cannot
+  contain different programs or a label defined in only one of them.
+</p>
+<p>
+  The parity check compares an <em>ordered</em> structural signature, per-frame
+  maths digests, every numeric literal in order and strictly, the two main
+  files' wiring, and — after the build — what the cross-references actually
+  resolved to in each edition.
+</p>
+<p>
+  Where Polish and English usage genuinely differ, the difference is a macro
+  rather than a translator's memory. The rule is the <strong>keyboard
+  test</strong>: if the reader will type the token, both editions use the code
+  spelling; if they will only read it, the Polish edition uses the Polish form.
+  So <code>tg</code> for the tangent and <code>tanh</code> — not
+  <code>tgh</code> — for the hyperbolic tangent.
+</p>
+
+<h2>Contents</h2>
+<div class="scroll">
+<table>
+  <tr><th>I — Foundation</th><td>Numbers · Algebra · Logarithms · Sums · Functions · Equations · Exponentials · Trigonometry · Vectors · Sets and counting · The derivative · The chain rule · Accumulation and expectation</td></tr>
+  <tr><th>II — Number, precision, cost</th><td>Floating point · Numerical stability and log-space · O-notation, FLOPs and memory</td></tr>
+  <tr><th>III — Linear algebra</th><td>Vector spaces · Inner products and norms · Matrices as maps · <strong>Tensors, shapes and index notation</strong> · Rank and least squares · Determinants · Eigenvalues · SVD and conditioning</td></tr>
+  <tr><th>IV — Discrete structures</th><td>Combinatorics · Graphs and DAGs · Logic and reading theorems</td></tr>
+  <tr><th>V — Calculus and autodiff</th><td>The gradient · Jacobians and autodiff · The Hessian · Matrix calculus</td></tr>
+  <tr><th>VI — Optimisation</th><td>Convexity · SGD to Adam · Stochastic optimisation · Lagrange multipliers</td></tr>
+  <tr><th>VII — Probability and statistics</th><td>Bayes · Distributions · CLT and Monte Carlo · Maximum likelihood · Inference · Bayesian inference</td></tr>
+  <tr><th>VIII — Information theory</th><td>Entropy · Cross-entropy and KL · Mutual information</td></tr>
+  <tr><th>IX — Assembling it</th><td>The transformer, derived · Anatomy of a training run · Measuring a model honestly</td></tr>
+</table>
+</div>
+<p>
+  Part II comes <em>before</em> the linear algebra, deliberately. Everything
+  after it is arithmetic performed by a finite machine on a budget, and a book
+  that waits four hundred pages to admit the machine cannot represent
+  <code>0.1</code> has spent four hundred pages teaching a fiction.
+</p>
+
+<h2>The evidence, and the adverse evidence</h2>
+<p>
+  Stroud's programs were validated above an <strong>80/80</strong> standard —
+  at least 80% of students scoring at least 80% — and the finding worth having
+  is that the spread narrowed, not that the mean rose.
+  <strong>This book has not been read by anybody</strong>, so it may not borrow
+  that, and every build prints it as outstanding.
+</p>
+<p>
+  And the general evidence for programmed instruction is adverse: a 1982
+  meta-analysis found the format did not typically raise achievement in
+  secondary education. That is in the front matter, in a warning box, rather
+  than left out. The defence this book actually makes is narrower —
+  <strong>retrieval practice</strong> and <strong>errorful generation</strong>,
+  which is what the frame and the trap are for.
+</p>
+<p>
+  One consequence is stated plainly and should not be softened:
+  <strong>the method feels worse than reading while you are doing it.</strong>
+  Readers rate the method they retain less from as the more effective one.
+</p>
+
+<footer>
+  <p>
+    <a href="https://github.com/konradcinkusz/math-for-ai-engineers">Repository</a> ·
+    <a href="https://github.com/konradcinkusz/llm-book">LangChain, LangGraph and Async Python</a> ·
+    <a href="https://github.com/konradcinkusz/maf-book">Microsoft Agent Framework for .NET Engineers</a>
+  </p>
+  <p>
+    Prose CC BY-NC-SA 4.0 · code MIT. The programmed-learning method is
+    K. A. Stroud's; this book borrows it and is not affiliated with his.
+  </p>
+</footer>
+
+</div>
+</body>
+</html>

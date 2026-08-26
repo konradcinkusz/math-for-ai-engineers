@@ -1,0 +1,45 @@
+# LaTeX build output
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.out
+*.pdf
+*.synctex.gz
+*.toc
+*.dgm
+*.ans
+*.xdv
+
+# Rendered diagrams are build output. The .mmd source is the committed
+# artefact, so diagram changes review as text.
+figures/diagrams/
+
+# NOTE: figures/values/ is deliberately NOT ignored. The generated numbers are
+# committed, because committing them is what makes a change to a printed number
+# show up in review as a diff -- and what lets CI fail the build when a script
+# no longer produces what the book prints. They are build output that is also
+# evidence.
+
+# mermaid-cli browser path is machine-specific
+figures/mermaid/.puppeteer.json
+
+# Python (code/ holds the verification scripts)
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/

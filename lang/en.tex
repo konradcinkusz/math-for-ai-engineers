@@ -1,0 +1,128 @@
+% ============================================================
+%  lang/en.tex — every user-visible string in the English edition
+%
+%  Nothing in programs/en/ may hard-code a word that a macro also typesets.
+%  If a label is needed and is not here, add it here AND in lang/pl.tex; CI
+%  fails the build when the two files do not define the same macro set.
+% ============================================================
+
+% ---------- Structure ----------
+\newcommand{\lblProgram}{Program}
+\newcommand{\lblPrograms}{Programs}
+\newcommand{\lblFrame}{Frame}
+\newcommand{\lblFrames}{Frames}
+\newcommand{\lblOutcomes}{Learning outcomes --- when you have finished this program you will be able to}
+\newcommand{\lblQuiz}{Quiz}
+\newcommand{\lblSummary}{Summary}
+\newcommand{\lblCanYou}{Can you?}
+\newcommand{\lblOnEntryYouCould}{On entry this program promised you would be able to}
+\newcommand{\lblTestExercises}{Test exercises}
+\newcommand{\lblFurther}{Further problems}
+\newcommand{\lblAnswers}{Answers}
+\newcommand{\lblYourTurn}{Now one for you to do.}
+
+
+% ---------- Part titles ----------
+% These live here rather than in structure.tex, and the reason is a rule this
+% repository states and then broke once: nothing outside a language file may
+% hard-code a word that the other edition also sets. Part titles written with
+% \ifpl put nine user-visible strings outside the reach of the parity check
+% that compares the two catalogues -- and, because \ifpl was fragile, produced
+% a build failure in exactly one of the two editions.
+\newcommand{\lblPartI}{Foundation}
+\newcommand{\lblPartII}{Number, precision and cost}
+\newcommand{\lblPartIII}{Linear algebra}
+\newcommand{\lblPartIV}{Discrete structures and argument}
+\newcommand{\lblPartV}{Calculus and automatic differentiation}
+\newcommand{\lblPartVI}{Optimisation}
+\newcommand{\lblPartVII}{Probability and statistics}
+\newcommand{\lblPartVIII}{Information theory}
+\newcommand{\lblPartIX}{Assembling it}
+\newcommand{\lblPartAppendices}{Appendices}
+
+% ---------- Instructions the method depends on ----------
+\newcommand{\lblQuizIntro}{%
+  Take this before you read the program and again after you have finished it.
+  If you score well now, work only the frames the questions send you to. The
+  frame numbers beside each question are the route back.}
+\newcommand{\lblCanYouIntro}{%
+  Rate yourself against each item, 1 (no) to 5 (yes, unaided). Anything below
+  4 is not a matter for reflection: go back to the frames named beside it and
+  work them again. The Summary's bracketed numbers are the same route.}
+\newcommand{\lblCanYouFooter}{%
+  Then take the Quiz a second time. It was a diagnostic on the way in and it
+  is a test on the way out; the difference between the two scores is the only
+  honest measure of what this program did for you.}
+\newcommand{\lblTestIntro}{%
+  These test exactly what the program taught, in the order it taught it.
+  There are no traps here and nothing needs an idea you have not met.}
+\newcommand{\lblFurtherIntro}{%
+  Consolidation. Work these until the method is automatic rather than
+  recalled --- that is the whole of the difference between having understood a
+  technique and being able to use it.}
+\newcommand{\lblAnswersIntro}{%
+  Answers to the quizzes (Q), the test exercises (T) and the further problems
+  (P) of every program, in program order.}
+
+% The punctuation dash. English sets an em dash closed up; Polish sets a
+% polpauza with a space on each side. Authors write \dash and never type a
+% dash directly, because a translator cannot be expected to carry a typographic
+% convention in their head forty-six programs deep.
+\newcommand{\dash}{---}
+
+% ---------- Admonition titles ----------
+\newcommand{\lblNote}{Note}
+\newcommand{\lblWarning}{Watch out}
+\newcommand{\lblTrap}{The trap}
+\newcommand{\lblInAI}{Where this shows up in AI}
+\newcommand{\lblRigour}{What we are not proving}
+\newcommand{\lblNotation}{Notation}
+\newcommand{\lblVerify}{Check this before you trust it}
+\newcommand{\lblExercise}{Exercise}
+
+% ---------- Build-state markers ----------
+\newcommand{\lblNotWritten}{NOT YET WRITTEN}
+\newcommand{\lblNotRendered}{NOT RENDERED --- run \texttt{make diagrams}}
+\newcommand{\lblSourceMissing}{Mermaid source missing}
+\newcommand{\lblNoOutcomes}{No learning outcomes were declared for this program.}
+\newcommand{\lblNoAnswers}{No answers were stored. This is a partial build.}
+\newcommand{\lblDiagramManifest}{Diagram manifest}
+
+% ============================================================
+%  NOTATION CONTRACT — English edition
+%  Every macro here has a counterpart in lang/pl.tex. Where the two editions
+%  set different symbols, the difference is deliberate and is recorded in the
+%  notation appendix.
+% ============================================================
+\newcommand{\mfadecimalmarker}{.}
+
+% Trigonometric names. English uses tan/cot/arctan; Polish uses tg/ctg/arc tg,
+% which is not a stylistic preference there but the universal convention.
+\DeclareMathOperator{\tg}{tan}
+\DeclareMathOperator{\ctg}{cot}
+\DeclareMathOperator{\arctg}{arctan}
+\DeclareMathOperator{\arcctg}{arccot}
+
+% Probability. Both editions use Var and E, matching the literature the reader
+% will actually be reading. The Polish edition carries a notation box saying
+% so, because Polish textbooks classically write D^2(X) and M(X).
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Ex}{\mathbb{E}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\Corr}{Corr}
+
+% Number theory. Polish writes NWD and NWW.
+\DeclareMathOperator{\gcdop}{gcd}
+\DeclareMathOperator{\lcmop}{lcm}
+
+% Intervals. Polish tradition writes a closed interval with angle brackets,
+% \langle a,b \rangle. Both editions use square brackets, because every paper
+% the reader will meet does; the Polish edition says so in a notation box.
+\newcommand{\intcc}[2]{[#1,\,#2]}
+\newcommand{\intoo}[2]{(#1,\,#2)}
+\newcommand{\intco}[2]{[#1,\,#2)}
+\newcommand{\intoc}[2]{(#1,\,#2]}
+
+% The date the book's facts were last checked. User-visible, so it lives here.
+\newcommand{\pinnedon}{August 2026}

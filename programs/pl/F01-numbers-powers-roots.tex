@@ -1,0 +1,926 @@
+%% F01 --- Liczby, potęgi i pierwiastki
+%%
+%% Każda liczba w tym programie pochodzi z code/f01_numbers.py i jest wciągana
+%% przez \val{}. Rachunki, których program UCZY (2^5 = 32), są wpisane wprost,
+%% bo czytelnik ma je wykonać; wszystko, czego nie policzy w pamięci, jest
+%% policzone przez skrypt.
+
+\program{Liczby, potęgi i pierwiastki}
+\label{prog:F01}
+\index{liczby!zbiory}
+\index{pomiar!rzędy wielkości}
+
+\begin{outcomes}
+\outcome{1--7}{powiedzieć, do którego zbioru należy dana liczba i dlaczego
+  odpowiedź zmienia to, co program może z nią zrobić}
+\outcome{8--15}{posługiwać się prawami działań na potęgach, łącznie z
+  wykładnikiem zerowym i ujemnym, bez zatrzymywania się na namysł}
+\outcome{16--22}{czytać wykładnik ułamkowy jako pierwiastek i przechodzić
+  między obiema postaciami w dowolną stronę}
+\outcome{23--28}{zapisać dowolną wielkość w notacji naukowej oraz mnożyć,
+  dzielić i porównywać wielkości bez wychodzenia z tej postaci}
+\outcome{29--33}{oszacować rząd wielkości w pamięci i powiedzieć, na ile temu
+  oszacowaniu można ufać}
+\outcome{34--37}{policzyć pamięć potrzebną na wagi modelu, znając liczbę
+  parametrów i precyzję zapisu}
+\outcome{38--41}{odróżnić gigabajt od gibibajta i powiedzieć, który z nich
+  raportuje dane narzędzie}
+\outcome{42--45}{podać przyspieszenie jednoznacznie i dostrzec dwa odczytania
+  zwrotu \enquote{pięćdziesiąt procent szybciej}}
+\end{outcomes}
+
+\begin{quiz}
+\item Które z liczb $-4$, $\tfrac{7}{2}$, $\sqrt{9}$ i $\sqrt{7}$ są wymierne?
+  \teachesat{1--7}
+  \answerto{Wszystkie poza $\sqrt{7}$. Zauważ, że $\sqrt{9}=3$, czyli liczba
+  całkowita \dash{} postać zapisu liczby to nie to samo co zbiór, do którego
+  ona należy.}
+\item Uprość $2^{6} \times 2^{-2}$. \teachesat{9--13}
+  \answerto{$2^{4} = 16$.}
+\item Ile wynosi $5^{0}$ i dlaczego? \teachesatone{12}
+  \answerto{$1$. Z zależności $a^{m}/a^{m} = a^{m-m} = a^{0}$, a cokolwiek
+  niezerowego podzielone przez siebie daje $1$.}
+\item Zapisz $81^{3/4}$ bez wykładnika. \teachesat{16--21}
+  \answerto{$27$. Pierwiastek czwartego stopnia z $81$ to $3$; podniesiony do
+  sześcianu daje $27$.}
+\item Czy $\sqrt{9+16}$ równa się $\sqrt{9}+\sqrt{16}$? \teachesatone{22}
+  \answerto{Nie. $\sqrt{25}=5$, a $3+4=7$. Pierwiastek nie rozdziela się
+  względem sumy.}
+\item Zapisz $\num{0.00042}$ w notacji naukowej. \teachesat{23--24}
+  \answerto{$\num{4.2e-4}$.}
+\item Oblicz $(\num{3e8}) \times (\num{2e-3})$. \teachesat{25--26}
+  \answerto{$\num{6e5}$. Pomnóż mantysy, dodaj wykładniki.}
+\item O ile procent $2^{10}$ przewyższa $10^{3}$? \teachesat{30--31}
+  \answerto{$2^{10} = 1024$, czyli o \val{f01.kib.over.si.pct}\% powyżej
+  $10^{3}$.}
+\item Model ma \val{f01.params} parametrów zapisanych w formacie
+  2-bajtowym. Ile bajtów zajmują jego wagi? \teachesat{34--36}
+  \answerto{$\val{f01.weights.bytes}$ bajtów, czyli \val{f01.weights.gb}~GB.}
+\item Twój rachunek mówi 14~GB, a narzędzie raportuje \val{f01.weights.gib}~GiB. Który wynik
+  jest błędny? \teachesat{38--40}
+  \answerto{Żaden. To są różne jednostki: gibibajt to $2^{30}$ bajtów, a
+  gigabajt $10^{9}$, więc gibibajt ma o \val{f01.gib.over.si.pct}\% bajtów
+  więcej.}
+\item Żądanie trwało \val{f01.base.ms}~ms i jest teraz \enquote{pięćdziesiąt
+  procent szybsze}. Ile trwa? \teachesat{42--43}
+  \answerto{Niejednoznacznie, i o to właśnie chodzi:
+  \val{f01.fifty.pct.less.ms}~ms przy połowie czasu,
+  \val{f01.fifty.pct.more.rate.ms}~ms przy półtorakrotnym tempie.}
+\item Oszacuj liczbę FLOP-ów potrzebną, aby wytrenować model o
+  \val{f01.params} parametrach na \val{f01.tokens} tokenach, przyjmując mniej
+  więcej 6 FLOP-ów na parametr i token. \teachesat{29--33}
+  \answerto{$\val{f01.train.flops}$, czyli około
+  $10^{\val{f01.train.flops.exp}}$.}
+\end{quiz}
+
+% ============================================================
+\section{Jakie są liczby}
+\label{sec:F01-sets}
+\index{liczby!naturalne}
+\index{liczby!wymierne}
+
+\begin{fr}
+Liczenie jest najstarszą czynnością arytmetyki, a liczby, którymi się liczy, to
+\emph{liczby naturalne}: $0, 1, 2, 3, \dots$ i dalej bez końca. Zapisuje się je
+jako $\N$.
+
+To, czy $0$ należy do $\N$, jest kwestią konwencji i nie jest ona ustalona: w
+jednych krajach uczy się, że należy, w innych, że nie. Ta książka przyjmuje
+$0 \in \N$ i mówi o tym tutaj, zamiast pozwolić ci odkryć to z przykładu.
+
+Teraz pytanie. Masz zapisać temperaturę trzech stopni poniżej zera. Czy da się
+to zrobić liczbą naturalną?
+\end{fr}
+
+\begin{fr}
+\ans{Nie. Potrzebny jest znak, a nie tylko wartość.}
+Rozszerz $\N$ o liczby ujemne, a otrzymasz \emph{liczby całkowite}, $\Z$:
+\[ \dots,\; -3,\; -2,\; -1,\; 0,\; 1,\; 2,\; 3,\; \dots \]
+Każda liczba naturalna jest całkowita. Odwrotnie już nie, i właśnie to czyni z
+tego rozszerzenie, a nie zmianę nazwy.
+
+Dalej: masz trzy ciastka do podziału między dwie osoby. Którego zbioru
+potrzebujesz?
+\end{fr}
+
+\begin{fr}
+\ans{Żadnego z dotychczasowych. Potrzebujesz liczby między $1$ a $2$.}
+Liczba \emph{wymierna} to taka, którą da się zapisać jako iloraz dwóch liczb
+całkowitych, $p/q$ przy $q \ne 0$. Zbiór oznacza się $\Q$. Należy do niego
+$\tfrac{3}{2}$, należy $-17$ (jako $-17/1$) i należy $\num{0.1}$ (jako
+$1/10$).
+
+Zapisz rozwinięcie dziesiętne liczby $\tfrac{1}{3}$.
+\end{fr}
+
+\begin{fr}
+\ans{$\num{0.333}\dots$, powtarzające się bez końca.}
+Rozwinięcie dziesiętne liczby wymiernej albo się kończy, albo powtarza w
+nieskończoność. Nic ciekawszego nigdy nie robi. $\tfrac{1}{3}$ się powtarza;
+$\tfrac{1}{4} = \num{0.25}$ się kończy; $\tfrac{1}{7} =
+\num{0.142857142857}\dots$ powtarza się z okresem sześciu cyfr.
+
+To, że $\tfrac{1}{3}$ nie da się zapisać dokładnie dziesiętnie, nie jest faktem
+o $\tfrac{1}{3}$. Jest faktem o \emph{podstawie dziesięć}. Przy podstawie trzy
+$\tfrac{1}{3}$ to dokładnie $\num{0.1}$.
+
+Zapamiętaj to. A teraz: czy $\num{0.1}$ to liczba prosta, czy kłopotliwa?
+\end{fr}
+
+\begin{fr}
+\ans{Prosta. To $\tfrac{1}{10}$, jedna cyfra, dokładnie.}
+Taka jest poprawna odpowiedź przy podstawie dziesięć i taka jest błędna
+odpowiedź o twoim komputerze, a przepaść między tymi dwoma zdaniami jest
+tematem Programu~\ref{prog:P01}.
+
+\begin{trapbox}
+Twoja maszyna nie pracuje przy podstawie dziesięć. Pracuje przy podstawie dwa,
+a przy podstawie dwa $\tfrac{1}{10}$ zachowuje się dokładnie tak, jak
+$\tfrac{1}{3}$ zachowuje się przy podstawie dziesięć: powtarza się bez końca,
+a każda skończona maszyna musi gdzieś przestać je zapisywać.
+
+Liczba, którą program przechowuje po wpisaniu \code{0.1}, nie jest więc
+$\num{0.1}$. Jest najbliższą liczbą, jaką maszyna potrafi przedstawić, i nie
+jest to ta sama liczba. To nie jest drobna niedokładność w wielkim rachunku;
+jest już w pojedynczym przypisaniu, zanim jakikolwiek rachunek się odbył.
+
+Nic w tym programie od tego nie zależy. Wszystko w
+Programie~\ref{prog:P01} zależy.
+\end{trapbox}
+
+Istnieją też liczby, które w ogóle nie są wymierne. $\sqrt{2}$ jest jedną z
+nich, $\pi$ drugą: ich rozwinięcia dziesiętne ani się nie kończą, ani nie
+powtarzają. Razem z wymiernymi tworzą \emph{liczby rzeczywiste}, $\R$.
+\end{fr}
+
+\mermaidfig{f01-number-sets}{%
+  Cztery zbiory, jeden w drugim, i ten jeden, który nie mieści się w tej
+  hierarchii. To, co przechowuje maszyna, jest skończonym podzbiorem liczb
+  wymiernych \dash{} nie zawiera więc ani całego $\Q$, ani dokładnie żadnej
+  liczby niewymiernej.}{%
+  Zagnieżdżone zbiory liczbowe, ze zbiorem zmiennoprzecinkowym maszyny jako
+  skończonym podzbiorem liczb wymiernych.}
+
+\begin{fr}
+Zaklasyfikuj każdą z tych liczb. Napisz $\N$, $\Z$, $\Q$ albo $\R$ \dash{}
+\emph{najmniejszy} zbiór, do którego dana liczba należy:
+\[ 7, \qquad -17, \qquad \tfrac{22}{7}, \qquad \sqrt{2}, \qquad \sqrt{9} \]
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$7 \in \N$. \quad $-17 \in \Z$. \quad $\tfrac{22}{7} \in \Q$. \quad
+$\sqrt{2} \in \R$ i w niczym mniejszym. \quad $\sqrt{9} \in \N$, ponieważ
+$\sqrt{9} = 3$.
+
+Nad ostatnią warto się zatrzymać. $\sqrt{9}$ \emph{wygląda} niewymiernie i taka
+nie jest. Sposób zapisu liczby to nie to samo co zbiór, do którego ona należy,
+a spora część błędów w dalszych programach tej książki bierze się z czytania
+postaci zamiast wartości.
+\end{ansblock}
+
+To całe słownictwo, jakiego potrzebujesz. Przejdźmy do narzędzia, którego
+będziesz używał codziennie.
+\end{fr}
+
+% ============================================================
+\section{Potęgi}
+\label{sec:F01-powers}
+\index{potęgi!prawa działań}
+\index{potęgi}
+
+\begin{fr}
+$a^{n}$, czytane \enquote{$a$ do potęgi $n$}, oznacza $a$ pomnożone przez
+siebie $n$ razy. $a$ to \emph{podstawa}, $n$ to \emph{wykładnik}.
+\[ 2^{5} = 2 \times 2 \times 2 \times 2 \times 2 \]
+Policz.
+\end{fr}
+
+\begin{fr}
+\ans{$2^{5} = 32$}
+Postaw teraz obok siebie dwie potęgi o tej samej podstawie:
+\[ 2^{3} \times 2^{4} = (2\times2\times2) \times (2\times2\times2\times2) \]
+Policz dwójki po prawej stronie. Jest ich siedem, więc iloczyn to $2^{7}$. Nic
+nie zostało zapamiętane; wykładniki zostały policzone.
+
+To pierwsze prawo działań na potęgach:
+\[ a^{m} \times a^{n} = a^{m+n} \]
+Zastosuj je: $10^{3} \times 10^{6} = \blank$
+\end{fr}
+
+\begin{fr}
+\ans{$10^{9}$}
+Dzielenie działa tak samo, tylko w drugą stronę. W $2^{5} / 2^{3}$ na górze są
+pięć dwójek, a na dole trzy; trzy się skracają, zostają dwie:
+\[ \frac{a^{m}}{a^{n}} = a^{m-n} \]
+A potęga potęgi mnoży wykładniki:
+\[ (a^{m})^{n} = a^{mn} \]
+ponieważ $(2^{3})^{4}$ to cztery kopie trzech dwójek.
+
+Teraz pytanie, które nie jest tym, na co wygląda. Czy $2^{3} \times 3^{2}$
+równa się $6^{5}$?
+\end{fr}
+
+\begin{fr}
+\ans{Nie. $2^{3} \times 3^{2} = 8 \times 9 = 72$, a $6^{5} = 7776$.}
+\begin{trapbox}
+\textbf{Każde prawo działań na potęgach wymaga wspólnej podstawy.} Zapis
+$a^{m}\times a^{n} = a^{m+n}$ nie mówi absolutnie nic o $a^{m} \times b^{n}$ i
+nie ma żadnej reguły, która by je łączyła. Pokusa, żeby i tak dodać wykładniki,
+jest silna, bo wzór wygląda na papierze tak samo, i jest to najczęstszy błąd w
+tym materiale.
+
+Gdy podstawy się różnią, masz dwie osobne liczby. Policz je i pomnóż.
+\end{trapbox}
+Teraz dwa przypadki, które wyglądają na wyjątki, a nimi nie są. Ile wynosi
+$5^{0}$?
+\end{fr}
+
+\begin{fr}
+\ans{$1$.}
+To nie jest definicja przyjęta dla wygody. Ona wynika:
+\[ 1 = \frac{5^{3}}{5^{3}} = 5^{3-3} = 5^{0} \]
+Prawo dzielenia ją wymusza. Cokolwiek niezerowego podzielone przez siebie daje
+$1$, a prawo mówi, że tym ilorazem jest $a^{0}$; zatem $a^{0}$ musi być równe
+$1$ dla każdego $a \ne 0$.
+
+Poprowadź to samo rozumowanie o krok dalej:
+\[ \frac{5^{3}}{5^{5}} = 5^{3-5} = 5^{-2} \quad\text{oraz}\quad
+   \frac{5^{3}}{5^{5}} = \frac{1}{5^{2}} \]
+Co zatem oznacza wykładnik ujemny?
+\end{fr}
+
+\begin{fr}
+\ans{Odwrotność: $a^{-n} = \dfrac{1}{a^{n}}$.}
+Wykładnik ujemny to nie jest liczba ujemna. $2^{-3} = \tfrac{1}{8}$, czyli mało
+i dodatnio. Znak wykładnika mówi, w którą stronę idzie dzielenie; o znaku
+wyniku nie mówi nic.
+
+Uprość każde z poniższych, nie zostawiając wykładników ujemnych:
+\[ 3^{2} \times 3^{-5}, \qquad \frac{7^{-2}}{7^{-4}}, \qquad (2^{-1})^{-3} \]
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$3^{2} \times 3^{-5} = 3^{-3} = \tfrac{1}{27}$.
+
+$\dfrac{7^{-2}}{7^{-4}} = 7^{-2-(-4)} = 7^{2} = 49$. Odejmowanie liczby ujemnej
+dodaje; tu właśnie gubią się znaki, więc rób to w dwóch krokach, a nie w
+jednym.
+
+$(2^{-1})^{-3} = 2^{3} = 8$.
+\end{ansblock}
+
+\yourturn
+Uprość $\dfrac{(x^{2})^{3} \times x^{-4}}{x^{-1}}$, podając jedną potęgę $x$.
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(x^{2})^{3} = x^{6}$; następnie $x^{6} \times x^{-4} = x^{2}$; następnie
+$x^{2}/x^{-1} = x^{2+1} = x^{3}$.
+\end{ansblock}
+
+\begin{aibox}
+To nie jest odchrząkiwanie przed właściwym tematem. Krok uwagi w transformerze
+kosztuje rzędu $n^{2}d$ operacji dla ciągu długości $n$ i szerokości $d$, a
+pamięć na jedną zapamiętaną parę klucz--wartość rośnie jak $n d$. Każdy
+argument w tej książce o tym, ile kosztuje długi kontekst, jest argumentem o
+wykładnik przy $n$, a nie da się za nim nadążyć bez sprawności, którą buduje ta
+sekcja.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Pierwiastki}
+\label{sec:F01-roots}
+\index{pierwiastki}
+\index{potęgi!wykładnik ułamkowy}
+
+\begin{fr}
+Pierwiastek kwadratowy odwraca kwadrat. $\sqrt{64} = \blank$
+\end{fr}
+
+\begin{fr}
+\ans{$8$, ponieważ $8^{2} = 64$.}
+Pierwiastki i potęgi to ta sama maszyneria. Przypuśćmy, że $\sqrt{a} = a^{k}$
+dla pewnego wykładnika $k$. Wtedy
+\[ a^{k} \times a^{k} = a^{2k} \quad\text{musi być równe}\quad a^{1} \]
+czyli $2k = 1$. Ile wynosi $k$?
+\end{fr}
+
+\begin{fr}
+\ans{$k = \tfrac{1}{2}$, więc $\sqrt{a} = a^{1/2}$.}
+To samo rozumowanie dla pierwiastka $n$-tego stopnia daje
+$\sqrt[n]{a} = a^{1/n}$, a połączone z prawem potęgi potęgi daje postać
+ogólną:
+\[ a^{m/n} = \left(\sqrt[n]{a}\right)^{m} = \sqrt[n]{a^{m}} \]
+Oba porządki dają ten sam wynik, a jeden z nich jest zwykle znacznie
+łatwiejszy rachunkowo.
+
+\textbf{Przykład rozwiązany.} $81^{3/4}$. Najpierw pierwiastek:
+$\sqrt[4]{81} = 3$, potem $3^{3} = 27$. Zaczynając od potęgi, trzeba by szukać
+pierwiastka czwartego stopnia z $531441$ \dash{} ten sam wynik gorszą drogą.
+\end{fr}
+
+\begin{fr}
+\textbf{Przykład z lukami.} Oblicz $32^{2/5}$.
+
+Pierwiastek piątego stopnia z $32$ to $\blank$, ponieważ $2^{5} = 32$.
+
+Podniesienie tego do potęgi $2$ daje $\blank$.
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\sqrt[5]{32} = 2$, a $2^{2} = 4$. Zatem $32^{2/5} = 4$.
+\end{ansblock}
+
+Ujemny wykładnik ułamkowy łączy obie reguły i nie wnosi nic nowego:
+\[ 16^{-3/4} = \frac{1}{16^{3/4}} = \frac{1}{(\sqrt[4]{16})^{3}}
+             = \frac{1}{2^{3}} = \frac{1}{8} \]
+
+\yourturn
+Oblicz $\left(\dfrac{27}{8}\right)^{-2/3}$.
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Ujemny wykładnik odwraca ułamek: $\left(\tfrac{8}{27}\right)^{2/3}$.
+Pierwiastek trzeciego stopnia z $\tfrac{8}{27}$ to $\tfrac{2}{3}$; podniesiony
+do kwadratu daje $\tfrac{4}{9}$.
+\end{ansblock}
+
+Jeszcze jedno pytanie, zanim zostawimy pierwiastki, i jest to pułapka. Czy
+$\sqrt{9 + 16}$ równa się $\sqrt{9} + \sqrt{16}$?
+\end{fr}
+
+\begin{fr}
+\ans{Nie. $\sqrt{25} = 5$, a $3 + 4 = 7$.}
+\begin{trapbox}
+\textbf{Pierwiastek nie rozdziela się względem sumy.} Potęga też nie:
+$(a+b)^{2} \ne a^{2} + b^{2}$, czym porządnie zajmuje się
+Program~\ref{prog:F02}.
+
+Rozdzielność względem \emph{iloczynu} jest w porządku \dash{}
+$\sqrt{ab} = \sqrt{a}\sqrt{b}$ \dash{} i właśnie to sprawia, że ten błąd tak
+łatwo popełnić: jedno wygląda jak drugie, a prawdziwe jest tylko jedno.
+
+Spotkasz to jeszcze w postaci, która kosztuje realne pieniądze. Norma sumy
+wektorów nie jest sumą norm, a założenie, że jest, pojawia się w wiarygodnie
+wyglądających rozumowaniach o embeddingach. Program~\ref{prog:P05} zajmuje się
+tym na tamtym gruncie.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Notacja naukowa}
+\label{sec:F01-scientific}
+\index{notacja naukowa}
+\index{liczby!rzędy wielkości}
+
+\begin{fr}
+Oto liczba z zadania, które wykonasz za kilka ramek:
+\[ \val{f01.weights.bytes} \]
+Policz jej cyfry. A teraz wyobraź sobie, że masz ją porównać wzrokiem z
+$1400000000$ i powiedzieć, która jest większa i o ile. Trudność nie leży w
+arytmetyce, tylko w tym, że ciąg zer nie ma kształtu.
+
+\emph{Notacja naukowa} \dash{} zwana też postacią wykładniczą \dash{} zapisuje
+każdą liczbę jako
+\[ m \times 10^{e}, \qquad 1 \le m < 10, \quad e \text{ całkowite} \]
+$m$ to mantysa i niesie dokładność; $e$ to wykładnik i niesie wielkość. Zapisz
+$4\,500$ w tej postaci.
+\end{fr}
+
+\begin{fr}
+\ans{$\num{4.5e3}$}
+Wykładnik to liczba miejsc, o które przesuwa się przecinek. Przesunięcie w lewo
+podnosi wykładnik, bo kompensujesz mniejszą mantysę.
+
+Liczby małe przesuwają przecinek w drugą stronę, więc wykładnik jest ujemny:
+\[ \num{0.00042} = \num{4.2e-4} \]
+Zamień $\num{0.0000031}$.
+\end{fr}
+
+\begin{fr}
+\ans{$\num{3.1e-6}$}
+Rachunki w postaci wykładniczej to miejsce, w którym ona się opłaca.
+\textbf{Mnożenie} mnoży mantysy i dodaje wykładniki:
+\[ (\num{3e8}) \times (\num{2e-3})
+   = (3 \times 2) \times 10^{8 + (-3)} = \num{6e5} \]
+\textbf{Dzielenie} dzieli i odejmuje:
+\[ \frac{\num{8e12}}{\num{4e4}} = 2 \times 10^{12-4} = \num{2e8} \]
+Zrób jedno: $(\num{6e-2}) \times (\num{5e7}) = \blank$
+\end{fr}
+
+\begin{fr}
+\ans{$\num{3e6}$. Mantysy dają $30$, co normalizuje się do
+$3 \times 10^{1}$, a $10^{1} \times 10^{5} = 10^{6}$.}
+Ten krok normalizacji jest miejscem, w którym rodzą się błędy: $30 \times
+10^{5}$ to poprawny rachunek i nie jest to postać wykładnicza, a jeśli tak to
+zostawisz, później sam źle odczytasz własny wykładnik.
+
+Teraz dodawanie, które \emph{nie} działa tak samo. Ile wynosi
+$(\num{3e8}) + (\num{2e7})$?
+\end{fr}
+
+\begin{fr}
+\ans{$\num{3.2e8}$}
+\begin{trapbox}
+\textbf{Przy dodawaniu liczb nie wolno dodawać wykładników.} Nie ma tu żadnego
+skrótu: obie wielkości trzeba najpierw sprowadzić do wspólnego wykładnika i
+dopiero wtedy dodać mantysy.
+\[ \num{3e8} + \num{2e7} = \num{3e8} + \num{0.2e8} = \num{3.2e8} \]
+Dlaczego to ma znaczenie poza samą arytmetyką: z tego samego powodu
+zmiennoprzecinkowa suma liczb o bardzo różnych wykładnikach gubi tę małą
+całkowicie. Wyrównaj wykładniki, a cyfry małej liczby wypadną poza koniec
+mantysy. Program~\ref{prog:P02} mierzy dokładnie to.
+\end{trapbox}
+
+\yourturn
+Oblicz $(\num{7.2e5}) + (\num{4e4})$, a następnie
+$\dfrac{\num{1.5e-3}}{\num{5e2}}$.
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\num{7.2e5} + \num{0.4e5} = \num{7.6e5}$.
+
+$\dfrac{\num{1.5}}{5} = \num{0.3}$ oraz $10^{-3-2} = 10^{-5}$, co daje
+$\num{0.3} \times 10^{-5}$, a to normalizuje się do $\num{3e-6}$.
+\end{ansblock}
+\end{fr}
+
+% ============================================================
+\section{Rzędy wielkości}
+\label{sec:F01-magnitudes}
+\index{pomiar!szacowanie}
+\index{rzędy wielkości}
+
+\begin{fr}
+\emph{Rząd wielkości} to sam wykładnik. Dwie wielkości są \enquote{tego samego
+rzędu}, gdy ich iloraz jest bliski jedności, i \enquote{o trzy rzędy różne},
+gdy iloraz wynosi mniej więcej tysiąc.
+
+To narzędzie jest zgrubne celowo. Większość pytań, które warto zadać, zanim
+cokolwiek zbudujesz \dash{} czy to zmieści się w pamięci, czy skończy się w tym
+tygodniu, czy nie będzie kosztować więcej niż cały projekt \dash{} ma
+odpowiedź w postaci wykładnika, a odpowiadanie na nie z dokładnością do trzech
+cyfr znaczących to praca, której nie trzeba było wykonywać.
+
+Oto podstawowy ruch szacującego. W zapisie dwójkowym rozmiary rosną potęgami
+dwójki, a $2^{10} = 1024$. Której potędze dziesiątki to odpowiada?
+\end{fr}
+
+\begin{fr}
+\ans{$10^{3}$. Zatem $2^{10} \approx 10^{3}$, a czynnik $1024$ można czytać
+jako czynnik tysiąc.}
+$2^{10}$ przewyższa $10^{3}$ o \val{f01.kib.over.si.pct}\%, co przy rachunku
+na serwetce nic nie znaczy.
+
+Mów tak i zawsze w tę stronę. \enquote{Przybliżenie jest zaniżone o
+\val{f01.kib.over.si.pct}\%} to inne twierdzenie o innym mianowniku, a obie
+odpowiedzi nie są tą samą liczbą. To \S\ref{sec:F01-ratios} przychodzące
+osiemnaście ramek za wcześnie, i będzie przychodzić dalej.
+
+Teraz je przyciśnij. $2^{80}$ to osiem takich czynników jeden na drugim, więc
+powinno wynosić około $10^{24}$. Czy błąd nadal nic nie znaczy?
+\end{fr}
+
+\begin{fr}
+\ans{Nie. $2^{80} = \val{f01.two.eighty}$, czyli o
+\val{f01.two.eighty.err.pct}\% powyżej $10^{24}$.}
+\begin{trapbox}
+\textbf{Mały błąd względny kumuluje się w duży.} Każdy czynnik $1024$ niesie
+\val{f01.kib.over.si.pct}\%, a błędy się mnożą, a nie dodają, więc osiem z nich
+to nie osiem razy \val{f01.kib.over.si.pct}\% \dash{} to
+\val{f01.two.eighty.err.pct}\%.
+
+Reguła do zabrania ze sobą: przybliżenie jest bezpieczne raz, a powtórzone
+wymaga sprawdzenia. To ta sama arytmetyka, która czyni procent składany
+zaskakującym, i ta sama, przez którą oszacowanie błędu na warstwę z
+Programu~\ref{prog:P02} będzie po dziewięćdziesięciu sześciu warstwach dużo
+gorsze, niż się spodziewasz.
+\end{trapbox}
+
+Szacowanie w postaci wykładniczej ma teraz trzy kroki: zaokrąglij każdą
+wielkość do jednej cyfry znaczącej, dodaj albo odejmij wykładniki i
+znormalizuj.
+\end{fr}
+
+\mermaidfig{f01-magnitudes}{%
+  Wielkości, do których ta książka stale wraca, na jednej drabinie. Każdy
+  szczebel to wykładnik, a każde pytanie o koszt to odejmowanie wzdłuż niej.}{%
+  Drabina logarytmiczna od pojedynczego tokena do liczby FLOP-ów treningu.}
+
+\begin{fr}
+\textbf{Przykład rozwiązany.} Powieść liczy około \val{f01.novel.words} słów.
+Reguła kciuka mówi, że angielskie słowo to mniej więcej trzy czwarte tokena.
+Ile z grubsza tokenów ma ta powieść?
+
+\[ \frac{\num{1e5}}{\num{0.75}} \approx \num{1.3e5} \]
+
+Czyli nieco ponad $10^{5}$ tokenów, a dokładnie \val{f01.novel.tokens}. Okno
+kontekstu o rozmiarze $10^{5}$ tokenów mieści mniej więcej jedną powieść, i to
+jest znacznie użyteczniejsze do zapamiętania niż dokładna liczba.
+
+\begin{note}
+Wartość trzech czwartych jest regułą kciuka, a nie pomiarem, i zmienia się z
+tokenizatorem, językiem i tematyką. Podana jest tutaj jako osąd. Polszczyzna,
+ze swoją fleksją, tokenizuje się gorzej niż angielszczyzna w większości
+tokenizatorów zbudowanych głównie na tekstach angielskich, a ta książka nie
+zmierzyła, o ile.
+\end{note}
+
+\yourturn
+Urządzenie wykonuje około $\num{4e14}$ operacji zmiennoprzecinkowych na
+sekundę. Ile sekund zajęłoby przy tym tempie $\num{8e22}$ operacji?
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\dfrac{\num{8e22}}{\num{4e14}} = 2 \times 10^{22-14} = \num{2e8}$ sekund.
+
+Warto przy okazji przeliczyć $\num{2e8}$ sekund: rok to około $\num{3e7}$
+sekund, więc to sześć albo siedem lat. Na jednym urządzeniu.
+\end{ansblock}
+
+Ta liczba nie jest hipotetyczna, a reszta programu pokazuje, skąd się bierze.
+\end{fr}
+
+% ============================================================
+\section{Ile pamięci zajmuje model}
+\label{sec:F01-sizing}
+\index{pomiar!pamięć modelu}
+\index{parametry!zliczanie}
+
+\begin{fr}
+Wszystko dotąd było arytmetyką. Ta sekcja jest powodem, dla którego warto ją
+było wykonać.
+
+Wagi modelu to liczby. Jeśli wiesz, ile ich jest i ile bajtów zajmuje każda,
+wiesz, ile pamięci potrzeba na wagi. To cały rachunek:
+\[ \text{bajty} = \text{parametry} \times \text{bajty na parametr} \]
+Model \enquote{7B} ma \val{f01.params} parametrów. Ile to bajtów przy zapisie
+dwubajtowym?
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f01.weights.bytes}$ bajtów.}
+W postaci wykładniczej jest to
+\[ (\num{7e9}) \times 2 = \num{1.4e10} \text{ bajtów} \]
+a ponieważ $10^{9}$ bajtów to gigabajt, wychodzi \val{f01.weights.gb}~GB.
+
+Właśnie wyprowadziłeś, z dwóch faktów, które już miałeś, liczbę, którą stale
+się cytuje. Warto zauważyć, jak niewiele było do tego potrzebne.
+
+A teraz: ile potrzeba na ten sam model przy zapisie czterobajtowym?
+\end{fr}
+
+\begin{fr}
+\ans{\val{f01.weights.fp32.gb}~GB. Podwój liczbę bajtów na parametr, a
+podwoisz pamięć.}
+\begin{aibox}
+Dlatego wybór formatu liczbowego jest decyzją inżynierską pierwszego rzędu, a
+nie szczegółem. Zmniejszenie liczby bajtów na parametr o połowę dokładnie o
+połowę zmniejsza pamięć na wagi i jest najtańszą dostępną dźwignią: bez
+ponownego treningu, bez zmiany architektury, jedna flaga.
+
+Ile to kosztuje \dash{} jaką precyzję oddajesz, dlaczego \code{bf16} stał się
+formatem treningowym, podczas gdy \code{fp16} bez sztuczki ze skalowaniem w
+ogóle nie działa, i co naprawdę kupują ci \enquote{dwa bajty} \dash{} to
+Program~\ref{prog:P01} i to jest powód, dla którego ten program stoi przed
+algebrą liniową, a nie za nią.
+\end{aibox}
+
+\begin{warning}
+\textbf{Wagi to nie cały rachunek za pamięć,} a czytelnik, który wyjdzie z tej
+sekcji przekonany, że tak, zaniży wymagania każdej maszyny, jaką kiedykolwiek
+będzie wymiarował. Trening trzyma dodatkowo stan optymalizatora i aktywacje;
+serwowanie trzyma rosnący bufor kluczy i wartości, który skaluje się z ilością
+tekstu w obiegu. Jedno i drugie porządnie liczy Program~\ref{prog:P03}.
+
+To, co masz tutaj, jest dolną granicą, a dolne granice są użyteczne: jeśli nie
+mieszczą się same wagi, reszta nie ma znaczenia.
+\end{warning}
+
+\yourturn
+Model ma \val{f01.big.params} parametrów i jest zapisany po dwa bajty na
+parametr. Ile gigabajtów zajmują jego wagi?
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(\num{7e10}) \times 2 = \num{1.4e11}$ bajtów, czyli \val{f01.big.gb}~GB.
+\end{ansblock}
+
+Warto się zatrzymać: \val{f01.big.gb}~GB to więcej pamięci, niż ma dziś
+pojedynczy powszechnie używany akcelerator, i dlatego model tej wielkości
+trzeba rozdzielić na kilka urządzeń, zanim ktokolwiek w ogóle go uruchomi. To,
+że podział jest konieczny, wynika z arytmetyki; to, jak się go robi i ile
+kosztuje, już nie, i tym ta książka się nie zajmuje.
+\end{fr}
+
+% ============================================================
+\section{Gigabajty i gibibajty}
+\label{sec:F01-prefixes}
+\index{diagnostyka!GB a GiB}
+\index{jednostki!przedrostki dwójkowe}
+
+\begin{fr}
+Policzyłeś \val{f01.weights.gb}~GB. Ładujesz model, patrzysz, co raportuje
+narzędzie, a ono mówi \textbf{\val{f01.weights.gib}~GiB}.
+
+Która z tych dwóch liczb jest błędna?
+\end{fr}
+
+\begin{fr}
+\ans{Żadna. To są różne jednostki i obie opisują te same
+$\val{f01.weights.bytes}$ bajtów.}
+\begin{trapbox}
+\textbf{Gigabajt to $10^{9}$ bajtów. Gibibajt to $2^{30}$ bajtów.} Nie są tej
+samej wielkości i nie są w przybliżeniu tej samej wielkości, gdy się je układa
+jeden na drugim:
+\[ 2^{30} = \val{f01.gib.bytes}, \qquad
+   \text{czyli o } \val{f01.gib.over.si.pct}\% \text{ więcej niż } 10^{9} \]
+Zatem $\val{f01.weights.bytes}$ bajtów to \val{f01.weights.gb}~GB \emph{oraz}
+\val{f01.weights.gib}~GiB. Oba zdania są dokładne. Żadne narzędzie nie kłamie.
+
+Nawyk, który cię ratuje: gdy liczba dotycząca pamięci rozmija się z twoim
+rachunkiem o coś w okolicy siedmiu procent, to jest właśnie to. To najczęstszy
+fałszywy alarm w planowaniu pojemności i za pierwszym razem kosztuje
+popołudnie.
+\end{trapbox}
+\end{fr}
+
+\mermaidfig{f01-prefixes}{%
+  Dwie drabiny przedrostków i przepaść między nimi. Ta przepaść się kumuluje:
+  \val{f01.kib.over.si.pct}\% przy kilo i \val{f01.tib.over.si.pct}\% przy
+  tera, czyli dokładnie to samo kumulowanie co $2^{80}$ wobec $10^{24}$.}{%
+  Przedrostki dziesiętne SI wobec dwójkowych IEC i rosnąca różnica.}
+
+\begin{fr}
+Obie drabiny obok siebie:
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}llrX@{}}
+\toprule
+\textbf{Dziesiętny} & \textbf{Dwójkowy} & \textbf{Dwójkowy większy o} &
+  \textbf{Gdzie to spotkasz} \\
+\midrule
+kB $= 10^{3}$  & KiB $= 2^{10}$ & \val{f01.kib.over.si.pct}\% & Rozmiary plików \\
+MB $= 10^{6}$  & MiB $= 2^{20}$ & \val{f01.mib.over.si.pct}\% & Fragmenty modeli \\
+GB $= 10^{9}$  & GiB $= 2^{30}$ & \val{f01.gib.over.si.pct}\% & Pamięć urządzeń \\
+TB $= 10^{12}$ & TiB $= 2^{40}$ & \val{f01.tib.over.si.pct}\% & Korpusy treningowe \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+Z grubsza świat dzieli się tak: producenci sprzętu i pamięci masowych sprzedają
+w jednostkach dziesiętnych, bo liczba wychodzi większa; systemy operacyjne i
+narzędzia do akceleratorów raportują w dwójkowych, bo tak działają adresy.
+Skróty bywają zapisywane tak samo, nawet gdy jednostka jest inna, więc czytaj
+narzędzie, a nie literki.
+
+\yourturn
+Urządzenie ma reklamowane 80~GB pamięci. Ile to gibibajtów i czy zmieści się na
+nim \val{f01.big.gb}~GB wag?
+\dotline
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$80 \times 10^{9}$ bajtów podzielone przez $2^{30}$ to około $\num{74.5}$~GiB.
+
+I nie: \val{f01.big.gb}~GB wag nie zmieści się w 80~GB, jeszcze zanim
+cokolwiek innego zostanie załadowane. Bez rachunku odpowiedź brzmiałaby
+\enquote{to blisko}, a wcale nie jest blisko.
+\end{ansblock}
+\end{fr}
+
+% ============================================================
+\section{Stosunki, procenty i słowo \enquote{szybciej}}
+\label{sec:F01-ratios}
+\index{pomiar!podawanie przyspieszenia}
+\index{procenty}
+
+\begin{fr}
+Żądanie trwało \val{f01.base.ms}~ms. Ktoś zgłasza, że jest teraz
+\enquote{pięćdziesiąt procent szybsze}.
+
+Ile trwa?
+\end{fr}
+
+\begin{fr}
+\ans{Nie da się powiedzieć, i o to właśnie chodzi.}
+\begin{trapbox}
+\textbf{\enquote{Pięćdziesiąt procent szybciej} ma dwa odczytania, a różnią się
+o \val{f01.speedup.discrepancy.ms}~ms.}
+
+\emph{Połowa czasu}: $\val{f01.base.ms} \times \num{0.5} =
+\val{f01.fifty.pct.less.ms}$~ms.
+
+\emph{Półtorakrotne tempo}: $\val{f01.base.ms} / \num{1.5} =
+\val{f01.fifty.pct.more.rate.ms}$~ms.
+
+Oba są zwykłą polszczyzną i oba są w powszechnym użyciu. Rozbieżność wynosi tu
+jedną trzecią wartości wyjściowej, czyli więcej niż większość poprawek, jakie
+ktokolwiek zgłasza.
+
+\textbf{Podaj liczbę.} \enquote{Opóźnienie spadło z \val{f01.base.ms}~ms do
+\val{f01.fifty.pct.less.ms}~ms} nie da się źle odczytać. Poprawa w procentach
+prawie zawsze się da, a tabela procentów jest jeszcze gorsza, bo czytelnik nie
+ma jak odzyskać wielkości.
+\end{trapbox}
+Jeszcze dwie rzeczy, przy których warto być dokładnym. Jeśli wskaźnik rośnie z
+4\% do 6\%, to wzrósł o dwa procent czy o pięćdziesiąt procent?
+\end{fr}
+
+\begin{fr}
+\ans{O dwa \emph{punkty} procentowe, co jest pięćdziesięcioprocentowym wzrostem
+względnym.}
+Oba opisy są poprawne i brzmią skrajnie różnie, dlatego to rozróżnienie ma
+własne słownictwo. Gdy sama wielkość jest procentem, mów \emph{punkty
+procentowe} o różnicy, a \emph{procent} o stosunku, a zdanie przestaje być
+niejednoznaczne.
+
+Ostatnia rzecz. Czy \enquote{trzy razy szybciej} to to samo co \enquote{trzy
+razy dłużej}?
+\end{fr}
+
+\begin{fr}
+\ans{Nie \dash{} to są wzajemne odwrotności. Trzy razy szybciej to jedna
+trzecia czasu.}
+Przyspieszenie jest stosunkiem temp; czas trwania jest odwrotnością tempa.
+Zapis \enquote{$3\times$} obok wartości opóźnienia zostawia czytelnikowi
+zgadywanie, o które z nich chodziło, a połowa zgadnie źle.
+
+\begin{aibox}
+To ostatnia sekcja programu i to ona będzie wracać najczęściej. Prawie każde
+twierdzenie o modelu, jakie przeczytasz \dash{} szybszy, tańszy, lepszy
+\dash{} jest stosunkiem podanym bez obu wielkości.
+Program~\ref{prog:P34} jest o tym, jak takie twierdzenia czytać, a
+Program~\ref{prog:P27} o tym, jak rozstrzygnąć, czy różnica w którymkolwiek z
+nich w ogóle jest prawdziwa. Nawyk zaczyna się tutaj: odzyskaj obie liczby albo
+nie powtarzaj twierdzenia.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--5}{$\N \subset \Z \subset \Q \subset \R$. Ta książka przyjmuje
+  $0 \in \N$. Rozwinięcie dziesiętne liczby wymiernej kończy się albo powtarza;
+  nic innego nie robi. To, co się powtarza, zależy od \emph{podstawy}, i
+  dlatego $\num{0.1}$ jest dokładne przy podstawie dziesięć, a w twojej
+  maszynie nie jest.}
+\sumitem{9--11}{$a^{m}a^{n} = a^{m+n}$, \quad $a^{m}/a^{n} = a^{m-n}$, \quad
+  $(a^{m})^{n} = a^{mn}$. Wszystkie trzy wymagają \emph{wspólnej podstawy}.}
+\sumitem{12--13}{$a^{0} = 1$ oraz $a^{-n} = 1/a^{n}$ \dash{} jedno i drugie
+  wymuszone przez prawo dzielenia, a nie zdefiniowane dla wygody.}
+\sumitem{17--18}{$a^{1/n} = \sqrt[n]{a}$ oraz $a^{m/n} =
+  (\sqrt[n]{a})^{m}$. Najpierw pierwiastek; rachunki są mniejsze.}
+\sumitem{22}{$\sqrt{a+b} \ne \sqrt{a} + \sqrt{b}$. Pierwiastek rozdziela się
+  względem iloczynu, nigdy względem sumy.}
+\sumitem{23--24}{Notacja naukowa to $m \times 10^{e}$ przy
+  $1 \le m < 10$.}
+\sumitem{25--26}{Mnożenie dodaje wykładniki, dzielenie je odejmuje, a potem
+  normalizuje się mantysę.}
+\sumitem{27}{Dodawanie wymaga najpierw \emph{wspólnego wykładnika}. Z tego
+  samego powodu suma zmiennoprzecinkowa gubi mały składnik.}
+\sumitem{30--31}{$2^{10}$ przewyższa $10^{3}$ o
+  \val{f01.kib.over.si.pct}\% \dash{} i mów to w tę stronę, bo drugi
+  mianownik daje inną liczbę. Powtórzony, ten błąd się kumuluje:
+  $2^{80}$ jest o \val{f01.two.eighty.err.pct}\% powyżej $10^{24}$.}
+\sumitem{34--36}{Pamięć na wagi $=$ parametry $\times$ bajty na parametr.
+  \val{f01.params} parametrów po dwa bajty to \val{f01.weights.gb}~GB.}
+\sumitem{36}{To jest \emph{dolna granica}. Stan optymalizatora, aktywacje i
+  bufor kluczy i wartości liczy Program~\ref{prog:P03}.}
+\sumitem{38--39}{GB $= 10^{9}$; GiB $= 2^{30}$, większy o
+  \val{f01.gib.over.si.pct}\%. Rozbieżność siedmiu procent między twoim
+  rachunkiem a narzędziem to prawie zawsze to.}
+\sumitem{42--43}{\enquote{Pięćdziesiąt procent szybciej} jest niejednoznaczne o
+  \val{f01.speedup.discrepancy.ms}~ms przy podstawie
+  \val{f01.base.ms}~ms. Podaj obie liczby.}
+\sumitem{44}{\emph{Punkty procentowe} o różnicy między procentami;
+  \emph{procent} o stosunku.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Zaklasyfikuj każdą z liczb $-6$, $\sqrt{16}$, $\tfrac{5}{8}$, $\pi$ do
+  najmniejszego z $\N$, $\Z$, $\Q$, $\R$, do którego należy.
+  \answerto{$-6 \in \Z$; \quad $\sqrt{16} = 4 \in \N$; \quad
+  $\tfrac{5}{8} \in \Q$; \quad $\pi \in \R$.}
+\item Uprość $\dfrac{a^{5} \times a^{-2}}{a^{-4}}$.
+  \answerto{$a^{5-2+4} = a^{7}$.}
+\item Oblicz $4^{-3/2}$.
+  \answerto{$\dfrac{1}{4^{3/2}} = \dfrac{1}{(\sqrt{4})^{3}} = \dfrac{1}{8}$.}
+\item Oblicz $\left(\dfrac{16}{81}\right)^{3/4}$.
+  \answerto{$\left(\tfrac{2}{3}\right)^{3} = \tfrac{8}{27}$.}
+\item Zapisz $\num{0.0000675}$ w notacji naukowej.
+  \answerto{$\num{6.75e-5}$.}
+\item Oblicz $(\num{2.5e-6}) \times (\num{4e11})$.
+  \answerto{$\num{1e6}$.}
+\item Oblicz $(\num{9.4e7}) + (\num{6e6})$.
+  \answerto{$\num{9.4e7} + \num{0.6e7} = \num{1e8}$.}
+\item Model ma $\num{1.3e9}$ parametrów zapisanych po dwa bajty na parametr.
+  Ile gigabajtów zajmują wagi, z dokładnością do jednego miejsca po przecinku?
+  \answerto{$\num{2.6e9}$ bajtów, czyli $\num{2.6}$~GB.}
+\item Wyraź odpowiedź z poprzedniego zadania w gibibajtach.
+  \answerto{$\num{2.6e9} / 2^{30} \approx \num{2.4}$~GiB.}
+\item Zadanie trwało 90 minut, a teraz trwa 60. Podaj poprawę na oba sposoby, o
+  które ostrzega ten program, i powiedz, który wpisałbyś do raportu.
+  \answerto{To $\num{1.5}\times$ tempa i $\num{33.3}\%$ redukcji czasu. Do
+  raportu nie wpisuj żadnego z osobna: napisz \enquote{z 90 minut do 60
+  minut}, czego nie da się źle odczytać.}
+\item O ile procent $2^{40}$ przewyższa $10^{12}$?
+  \answerto{\val{f01.tib.over.si.pct}\%. Cztery skumulowane czynniki po
+  \val{f01.kib.over.si.pct}\%.}
+\item Oszacuj, z dokładnością do jednej cyfry znaczącej, liczbę FLOP-ów
+  potrzebnych do wygenerowania jednego tokena przez model o \val{f01.params}
+  parametrach, przyjmując mniej więcej 2 FLOP-y na parametr i token.
+  \answerto{$2 \times \num{7e9} = \num{1.4e10}$, czyli około $10^{10}$.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Uprość $(2x^{3})^{4}$.
+  \answerto{$16x^{12}$. Wykładnik dotyczy $2$ tak samo jak $x$.}
+\item Uprość $\dfrac{(3a^{2}b)^{3}}{9a^{4}b^{2}}$.
+  \answerto{$\dfrac{27a^{6}b^{3}}{9a^{4}b^{2}} = 3a^{2}b$.}
+\item Oblicz $\left(\dfrac{1}{32}\right)^{-2/5}$.
+  \answerto{$32^{2/5} = 4$.}
+\item Pokaż, że $a^{1/2} \times a^{1/3} = a^{5/6}$.
+  \answerto{$\tfrac{1}{2} + \tfrac{1}{3} = \tfrac{3}{6} + \tfrac{2}{6} =
+  \tfrac{5}{6}$.}
+\item Czy $\sqrt{a^{2} + b^{2}}$ bywa równe $a + b$ dla dodatnich $a$ i $b$?
+  \answerto{Nie. Podniesienie obu stron do kwadratu daje $a^{2}+b^{2}$ wobec
+  $a^{2}+2ab+b^{2}$, a $2ab > 0$.}
+\item Zapisz $\num{6.02e23}$ jako zwykłą liczbę i powiedz, dlaczego nie
+  chciałbyś tego robić.
+  \answerto{$602\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000$. Dwadzieścia cztery cyfry
+  nie mają kształtu, a znaczące są tylko trzy.}
+\item Oblicz $\dfrac{(\num{4.2e-3}) \times (\num{5e8})}{\num{7e2}}$.
+  \answerto{Licznik $\num{2.1e6}$; podzielony przez $\num{7e2}$ daje
+  $\num{3e3}$.}
+\item Uporządkuj według wielkości, nie licząc ich do końca:
+  $2^{20}$, $10^{6}$, $3^{13}$.
+  \answerto{$10^{6} < 2^{20} < 3^{13}$. $2^{20} \approx \num{1.05e6}$, a
+  $3^{13} \approx \num{1.59e6}$.}
+\item Korpus liczy \val{f01.tokens} tokenów. Po 4 bajty na zapisany
+  identyfikator tokena, ile terabajtów ma stokenizowany korpus?
+  \answerto{$\num{8e12}$ bajtów, czyli $8$~TB \dash{} albo około
+  $\num{7.3}$~TiB.}
+\item Trening szacuje się często na 6 FLOP-ów na parametr i token. Dla
+  \val{f01.params} parametrów i \val{f01.tokens} tokenów policz sumę.
+  \answerto{$6 \times \num{7e9} \times \num{2e12} = \val{f01.train.flops}$.}
+\item Urządzenie utrzymuje \val{f01.device.flops} FLOP/s, ale w praktyce
+  osiąga tylko \val{f01.device.util.pct}\% tej wartości. Ile urządzeniodni to
+  poprzedni wynik?
+  \answerto{Około \val{f01.device.days} urządzeniodni, czyli mniej więcej
+  \val{f01.device.years} lat na jednym urządzeniu.}
+\item Ile takich urządzeń skończyłoby ten trening w trzydzieści dni?
+  \answerto{Około \val{f01.devices.for.30.days}. Zauważ, że pomija to każdy
+  koszt ich koordynacji, a to nie jest małe założenie.}
+\item Karta ma reklamowane 24~GB. Wyraź to w gibibajtach.
+  \answerto{$24 \times 10^{9} / 2^{30} \approx \num{22.4}$~GiB.}
+\item Co jest większe: 1~TiB czy $\num{1.1}$~TB?
+  \answerto{1~TiB, przy $\num{1.0995e12}$ bajtach wobec $\num{1.1e12}$
+  \dash{} o włos, i to jest dokładnie ten margines, przy którym zgadywanie
+  zawodzi.}
+\item Opóźnienie spada z 250~ms do 200~ms. Wyraź zmianę jako redukcję
+  procentową i jako współczynnik przyspieszenia.
+  \answerto{Redukcja o $20\%$; przyspieszenie $\num{1.25}\times$.}
+\item Trafność modelu rośnie z 82\% do 86\%. Podaj zmianę na oba sposoby, które
+  ten program rozróżnia.
+  \answerto{Cztery punkty procentowe; wzrost względny o $\num{4.9}\%$. Czy
+  którakolwiek z tych liczb coś znaczy, to Program~\ref{prog:P27}.}
+\item Dwa przebiegi kosztują \$\num{0.004} i \$\num{0.0025} na żądanie. Podaj
+  oszczędność jako procent i jako stosunek, i powiedz, co wstawiłbyś na slajd.
+  \answerto{Redukcja o $\num{37.5}\%$, czyli $\num{1.6}\times$ taniej. Na
+  slajd wstaw obie liczby; czytelnik policzy sobie jedno i drugie.}
+\item Pokaż, że $10^{-3} < 2^{-10} < 10^{-2}$.
+  \answerto{$2^{-10} = 1/1024 \approx \num{9.77e-4}$, co leży między
+  $\num{1e-3}$ a $\num{1e-2}$.}
+\item Oszacuj, ile powieści po \val{f01.novel.words} słów mieści się w oknie
+  kontekstu o rozmiarze $\num{1e6}$ tokenów.
+  \answerto{Jedna powieść to około \val{f01.novel.tokens} tokenów, czyli mniej
+  więcej siedem i pół.}
+\item Bez kalkulatora oszacuj $\dfrac{\num{3.1e12} \times \num{7.9e-5}}
+  {\num{1.9e4}}$ do jednej cyfry znaczącej.
+  \answerto{Zaokrąglij do $3 \times 8 / 2 = 12$, a $10^{12-5-4} = 10^{3}$, co
+  daje $12 \times 10^{3} = \num{1.2e4}$. Wartość dokładna to $\num{1.289e4}$,
+  więc jedna cyfra znacząca wystarczyła, żeby zmieścić się w ośmiu procentach.}
+\end{furtherproblems}

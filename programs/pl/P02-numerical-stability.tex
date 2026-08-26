@@ -1,0 +1,26 @@
+%% P02 --- Błąd numeryczny, stabilność i obliczenia w skali logarytmicznej
+%%
+%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
+%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
+%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
+%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+
+\program{Błąd numeryczny, stabilność i obliczenia w skali logarytmicznej}
+\label{prog:P02}
+
+\programstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: an algorithm can be correct in exact arithmetic and useless in
+floating point; catastrophic cancellation is the mechanism, and there is a
+small catalogue of fixes. Payoff: **why log-sum-exp instead of
+exponentiating.** The reader computes the exact logit at which a naive
+softmax overflows \code{fp32} and \code{fp16}, then derives the max-
+subtraction trick and shows it changes nothing mathematically. Also: why
+cross-entropy is computed from logits and never from probabilities; why the
+naive one-pass variance formula gives a negative variance and Welford's does
+not; why summing a million small gradients in the wrong order loses them.
+
+\medskip
+\textbf{Planowana długość:} 50 ramek.
+}

@@ -1,0 +1,15 @@
+flowchart TB
+  classDef tick fill:#F4F6F8,stroke:#1F4E79,color:#1a1a1a
+  classDef note fill:#FFFFFF,stroke:#B26A00,color:#1a1a1a
+
+  a["10^0 -- one token"]:::tick
+  b["10^3 -- a page of prose"]:::tick
+  c["10^5 -- a novel, in tokens"]:::tick
+  d["10^9 -- parameters in a small model"]:::tick
+  e["10^12 -- tokens in a training corpus"]:::tick
+  f["10^22 -- FLOPs to train on it"]:::tick
+  g["10^15 -- FLOPs a device does in a second"]:::tick
+
+  a --> b --> c --> d --> e --> f
+  f -.->|"divide: subtract the exponents"| g
+  g --> h["10^7 seconds, about a few months<br/>on one device"]:::note

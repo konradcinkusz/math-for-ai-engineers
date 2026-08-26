@@ -1,0 +1,131 @@
+% ============================================================
+%  lang/pl.tex — wszystkie widoczne dla czytelnika napisy wydania polskiego
+%
+%  Żaden plik w programs/pl/ nie może zawierać na sztywno słowa, które
+%  składa makro. Jeśli brakuje etykiety, dodaj ją tutaj ORAZ w lang/en.tex;
+%  CI przerywa budowanie, gdy oba pliki nie definiują tego samego zbioru
+%  makr.
+% ============================================================
+
+% ---------- Struktura ----------
+\newcommand{\lblProgram}{Program}
+\newcommand{\lblPrograms}{Programy}
+\newcommand{\lblFrame}{Ramka}
+\newcommand{\lblFrames}{Ramki}
+\newcommand{\lblOutcomes}{Czego się nauczę z tego programu? --- po jego przerobieniu będziesz umiał}
+\newcommand{\lblQuiz}{Quiz}
+\newcommand{\lblSummary}{Podsumowanie}
+\newcommand{\lblCanYou}{Czy potrafisz?}
+\newcommand{\lblOnEntryYouCould}{Na wejściu program obiecał, że będziesz umiał}
+\newcommand{\lblTestExercises}{Zadania sprawdzające}
+\newcommand{\lblFurther}{Dalsze wyzwania}
+\newcommand{\lblAnswers}{Odpowiedzi}
+\newcommand{\lblYourTurn}{Teraz jeden przykład do wykonania dla ciebie.}
+
+
+% ---------- Tytuły części ----------
+% Znajdują się tutaj, a nie w structure.tex, z powodu zasady, którą to
+% repozytorium ogłasza i raz złamało: nic poza plikiem językowym nie może
+% zawierać na sztywno słowa, które składa również drugie wydanie. Tytuły
+% części zapisane przez \ifpl wyprowadzają dziewięć widocznych napisów poza
+% zasięg kontroli parytetu porównującej oba katalogi.
+\newcommand{\lblPartI}{Podstawy}
+\newcommand{\lblPartII}{Liczba, precyzja i koszt}
+\newcommand{\lblPartIII}{Algebra liniowa}
+\newcommand{\lblPartIV}{Struktury dyskretne i argumentacja}
+\newcommand{\lblPartV}{Rachunek różniczkowy i różniczkowanie automatyczne}
+\newcommand{\lblPartVI}{Optymalizacja}
+\newcommand{\lblPartVII}{Prawdopodobieństwo i statystyka}
+\newcommand{\lblPartVIII}{Teoria informacji}
+\newcommand{\lblPartIX}{Złożenie}
+\newcommand{\lblPartAppendices}{Dodatki}
+
+% ---------- Instrukcje, na których opiera się metoda ----------
+\newcommand{\lblQuizIntro}{%
+  Rozwiąż go przed przerobieniem programu i jeszcze raz po jego ukończeniu.
+  Jeśli teraz wypadniesz dobrze, przerób wyłącznie te ramki, do których
+  odsyła cię pytanie. Numery ramek obok pytań są drogą powrotną.}
+\newcommand{\lblCanYouIntro}{%
+  Oceń się przy każdej pozycji w skali od 1 (nie) do 5 (tak, samodzielnie).
+  Wynik poniżej 4 nie jest powodem do zastanowienia: wróć do wskazanych obok
+  ramek i przerób je jeszcze raz. Liczby w nawiasach kwadratowych w
+  Podsumowaniu prowadzą tą samą drogą.}
+\newcommand{\lblCanYouFooter}{%
+  Następnie rozwiąż Quiz po raz drugi. Na wejściu był testem
+  diagnostycznym, na wyjściu jest testem sprawdzającym; różnica między
+  wynikami to jedyna uczciwa miara tego, co ten program ci dał.}
+\newcommand{\lblTestIntro}{%
+  Sprawdzają dokładnie to, czego uczył program, i w tej samej kolejności.
+  Nie ma tu pułapek ani niczego, co wymagałoby pojęcia, którego jeszcze nie
+  poznałeś.}
+\newcommand{\lblFurtherIntro}{%
+  Utrwalenie. Rozwiązuj je, dopóki metoda nie stanie się odruchem, a nie
+  wspomnieniem --- na tym polega cała różnica między zrozumieniem techniki a
+  umiejętnością jej użycia.}
+\newcommand{\lblAnswersIntro}{%
+  Odpowiedzi do quizów (Q), zadań sprawdzających (T) i dalszych wyzwań (P) ze
+  wszystkich programów, w kolejności programów.}
+
+% Myślnik. Polska typografia składa półpauzę ze spacjami po obu stronach;
+% angielski zwyczaj to pauza bez spacji, który po polsku czyta się obco.
+% Autorzy piszą \dash i nigdy nie wstawiają myślnika wprost.
+\newcommand{\dash}{--}
+
+% ---------- Tytuły ramek wyróżnionych ----------
+\newcommand{\lblNote}{Uwaga}
+\newcommand{\lblWarning}{Ostrożnie}
+\newcommand{\lblTrap}{Pułapka}
+\newcommand{\lblInAI}{Gdzie to spotkasz w AI}
+\newcommand{\lblRigour}{Czego tu nie dowodzimy}
+\newcommand{\lblNotation}{Oznaczenia}
+\newcommand{\lblVerify}{Sprawdź, zanim uwierzysz}
+\newcommand{\lblExercise}{Ćwiczenie}
+
+% ---------- Znaczniki stanu budowania ----------
+\newcommand{\lblNotWritten}{JESZCZE NIENAPISANE}
+\newcommand{\lblNotRendered}{NIEWYRENDEROWANE --- uruchom \texttt{make diagrams}}
+\newcommand{\lblSourceMissing}{Brak źródła Mermaid}
+\newcommand{\lblNoOutcomes}{Ten program nie zadeklarował efektów kształcenia.}
+\newcommand{\lblNoAnswers}{Nie zapisano żadnych odpowiedzi. To jest budowanie częściowe.}
+\newcommand{\lblDiagramManifest}{Spis diagramów}
+
+% ============================================================
+%  KONTRAKT NOTACYJNY — wydanie polskie
+%  Każde makro ma odpowiednik w lang/en.tex. Tam, gdzie oba wydania składają
+%  inny symbol, różnica jest zamierzona i opisana w dodatku o oznaczeniach.
+% ============================================================
+\newcommand{\mfadecimalmarker}{{,}}
+
+% Nazwy funkcji trygonometrycznych. To nie jest preferencja stylistyczna:
+% w polskiej literaturze tg, ctg i arc tg są konwencją powszechną, a tan i
+% arctan czytają się jak kalka.
+\DeclareMathOperator{\tg}{tg}
+\DeclareMathOperator{\ctg}{ctg}
+\DeclareMathOperator{\arctg}{arc\,tg}
+\DeclareMathOperator{\arcctg}{arc\,ctg}
+
+% Rachunek prawdopodobieństwa. Oba wydania piszą Var i E, ponieważ tak pisze
+% literatura, którą czytelnik faktycznie będzie czytał. Klasyczne polskie
+% podręczniki piszą D^2(X) i M(X); mówi o tym ramka z oznaczeniami w
+% programie, w którym to pojęcie pojawia się po raz pierwszy.
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Ex}{\mathbb{E}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\Corr}{Corr}
+
+% Teoria liczb. Polskie skróty to NWD i NWW.
+\DeclareMathOperator{\gcdop}{NWD}
+\DeclareMathOperator{\lcmop}{NWW}
+
+% Przedziały. Polska tradycja zapisuje przedział domknięty nawiasami
+% ostrymi, \langle a,b \rangle. Oba wydania używają nawiasów kwadratowych,
+% bo tak zapisuje je każda praca, którą czytelnik otworzy; ramka z
+% oznaczeniami mówi o tym wprost.
+\newcommand{\intcc}[2]{[#1,\,#2]}
+\newcommand{\intoo}[2]{(#1,\,#2)}
+\newcommand{\intco}[2]{[#1,\,#2)}
+\newcommand{\intoc}[2]{(#1,\,#2]}
+
+% The date the book's facts were last checked. User-visible, so it lives here.
+\newcommand{\pinnedon}{sierpień 2026}

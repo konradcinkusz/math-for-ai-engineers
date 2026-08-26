@@ -1,0 +1,267 @@
+====================================================================================================
+PART A -- F.1 plan claims re-derived
+====================================================================================================
+    OK    f01.gib.over.gb.pct                             plan=7.4                           computed=7.4                           2^30/10^9 - 1
+    OK    f01.gb.under.gib.pct                            plan=6.9                           computed=6.9                           1 - 10^9/2^30
+    OK    f01.gib.bytes                                   plan=1073741824                    computed=1073741824                    2^30
+    OK    prefix gap Ki (fr.50)                           plan=2.4                           computed=2.4                           2^10/10^3 - 1
+    OK    prefix gap Mi (fr.50)                           plan=4.9                           computed=4.9                           2^20/10^6 - 1
+    OK    prefix gap Gi (fr.50)                           plan=7.4                           computed=7.4                           2^30/10^9 - 1
+    OK    prefix gap Ti (fr.50)                           plan=10.0                          computed=10.0                          2^40/10^12 - 1
+    OK    fr.50 first prefix over 5%                      plan=Gi                            computed=Gi                            scan Ki,Mi,Gi,Ti
+    OK    f01.two.ten                                     plan=1024                          computed=1024                          2^10
+    OK    f01.two.ten.err.pct                             plan=2.4                           computed=2.4                           1024/1000 - 1
+    OK    f01.two.ten.err.compounded                      plan=1.2089                        computed=1.2089                        1.024^8
+    OK    f01.two.eighty                                  plan=1208925819614629174706176     computed=1208925819614629174706176     2^80 exact (integer)
+    OK    2^80 digit count (fr.36 'print the 25 digits')  plan=25                            computed=25                            len(str(2^80))
+    OK    f01.two.eighty.err.pct                          plan=20.89                         computed=20.89                         exact Fraction(2^80,10^24) - 1
+    OK    fr.36 mechanism 1.024^8 == 2^80/10^24           plan=1.208926                      computed=1.208926                      1.024^8 vs 2^80/10^24
+    OK    f01.two.twenty.err.pct (T8)                     plan=4.86                          computed=4.86                          exact 2^20/10^6 - 1
+    OK    2^20 (T8)                                       plan=1048576                       computed=1048576                       2^20
+    OK    f01.two.forty.err.pct (P13)                     plan=9.95                          computed=9.95                          exact 2^40/10^12 - 1
+    OK    2^40 (P13)                                      plan=1099511627776                 computed=1099511627776                 2^40
+    OK    f01.norm2.34                                    plan=5                             computed=5.0                           sqrt(3^2+4^2)
+    OK    f01.norm1.34                                    plan=7                             computed=7                             |3|+|4|
+    OK    fr.24 sqrt(9+16)                                plan=5                             computed=5                             sqrt(25)
+    OK    fr.24 sqrt9+sqrt16                              plan=7                             computed=7                             3+4
+    OK    f01.norm2.512                                   plan=13                            computed=13.0                          sqrt(25+144)
+    OK    f01.norm1.512                                   plan=17                            computed=17                            5+12
+    OK    f01.sig3.gap.near1000                           plan=10                            computed=10                            10^(floor(log10 1000)-2)
+    OK    f01.sig3.gap.near1                              plan=0.01                          computed=0.01                          10^(0-2)
+    OK    f01.sig4.gap.near1                              plan=0.001                         computed=0.001                         10^(0-3)
+    OK    f01.sig4.gap.near1e6                            plan=1000                          computed=1000                          10^(6-3)
+    OK    bytes/param fp32                                plan=4                             computed=4                             IEEE binary32 width
+    OK    bytes/param fp16                                plan=2                             computed=2                             IEEE binary16 width
+    OK    bytes/param bf16                                plan=2                             computed=2                             bfloat16 width
+    OK    bytes/param int8                                plan=1                             computed=1                             int8 width
+    OK    fp16 and bf16 same width                        plan=True                          computed=True                          fr.41 claim
+    OK    f01.weights.bytes (7B fp16)                     plan=1.4e10                        computed=1.4e+10                       7e9 x 2
+    OK    f01.weights.gb                                  plan=14                            computed=14.0                          bytes / 10^9
+    OK    f01.weights.gib                                 plan=13.04                         computed=13.04                         bytes / 2^30
+    OK    f01.weights.fp32.gb (fr.42)                     plan=28                            computed=28.0                          7e9 x 4 / 10^9
+    OK    f01.model13.gb (fr.43)                          plan=26                            computed=26.0                          13e9 x 2 / 10^9
+    OK    fr.43 bytes                                     plan=2.6e10                        computed=2.6e+10                       13e9 x 2
+    OK    f01.big.params (fr.46, 70B)                     plan=1.4e11                        computed=1.4e+11                       70e9 x 2
+    OK    f01.big.gb                                      plan=140                           computed=140.0                         1.4e11 / 10^9
+    OK    f01.big.gib                                     plan=130.4                         computed=130.4                         1.4e11 / 2^30
+    OK    f01.train.bytes.per.param                       plan=12                            computed=12                            fp16 w + fp16 g + fp32 m + fp32 v
+    OK    f01.train.mem.gb (7B)                           plan=84                            computed=84.0                          7e9 x 12 / 10^9
+    OK    f01.train.mem.13b.gb (P15, fr.44)               plan=156                           computed=156.0                         13e9 x 12 / 10^9
+    OK    f01.infer.flops.per.token (fr.45)               plan=1.4e10                        computed=1.4e+10                       2 FLOPs/param x 7e9
+    OK    f01.model3.gb (T10)                             plan=6                             computed=6.0                           3e9 x 2 / 10^9
+    OK    f01.model3.gib (T10)                            plan=5.59                          computed=5.59                          6e9 / 2^30
+    OK    f01.model405.gb (P14)                           plan=810                           computed=810.0                         405e9 x 2 / 10^9
+    OK    f01.model405.devices80 (P14)                    plan=11                            computed=11                            ceil(810/80)
+    OK    P14 810/80                                      plan=10.125                        computed=10.125                        810/80
+    OK    fr.37 worked 6ND (7B, 2T)                       plan=8.4e22                        computed=8.4e+22                       6 x 7e9 x 2e12
+    OK    f01.flops.1t (fr.37 R/A)                        plan=4.20e22                       computed=4.20e22                       6 x 7e9 x 1e12
+    OK    f01.flops.3b.1t (T9)                            plan=1.80e22                       computed=1.80e22                       6 x 3e9 x 1e12
+    OK    fr.38 effective FLOP/s                          plan=1.6e14                        computed=1.6e+14                       4e14 x 0.40
+    OK    fr.38 seconds                                   plan=5.25e8                        computed=5.25e+08                      8.4e22 / 1.6e14
+    OK    f01.device.days (fr.38)                         plan=6076                          computed=6076                          5.25e8 s / 86400
+    OK    fr.38 days unrounded                            plan=6076.39                       computed=6076.39                       exact
+    OK    f01.device.years (fr.39)                        plan=16.6                          computed=16.6                          6076.39 / 365
+    OK    f01.devices.for.30.days (fr.39)                 plan=203                           computed=203                           ceil(6076.39/30)
+    OK    f01.devices.for.10.days (fr.39 R/A)             plan=608                           computed=608                           6076.39/10 rounded
+    OK    fr.39 devices-for-10-days, ceiling reading      plan=608                           computed=608                           ceil(607.64)
+    OK    f01.flops.405b (P16)                            plan=3.645e25                      computed=3.645e25                      6 x 405e9 x 15e12
+    OK    P16 seconds                                     plan=1.39e7                        computed=1.39e+07                      3.645e25 / 2.62144e18
+    OK    f01.days.16384 (P16)                            plan=160.9                         computed=160.9                         seconds / 86400
+    OK    f01.kib.bytes                                   plan=1024                          computed=1024                          2^10
+    OK    f01.mib.bytes                                   plan=1048576                       computed=1048576                       2^20
+    OK    f01.tib.bytes                                   plan=1099511627776                 computed=1099511627776                 2^40
+    OK    f01.gib7915.gb (fr.51, P17)                     plan=84.99                         computed=84.99                         79.15 x 2^30 / 10^9
+    OK    f01.gib2328.gb (T11)                            plan=25.0                          computed=25.0                          23.28 x 2^30 / 10^9
+    OK    fr.48 14 GB -> GiB                              plan=13.04                         computed=13.04                         14e9 / 2^30
+    OK    f01.base.ms                                     plan=200                           computed=200                           given
+    OK    f01.fifty.pct.less.ms (fr.53)                   plan=100                           computed=100.0                         200 x 0.5
+    OK    f01.fifty.pct.more.rate.ms (fr.53)              plan=133.3                         computed=133.3                         200 / 1.5
+    OK    f01.speedup.discrepancy.ms (fr.53)              plan=33.3                          computed=33.3                          133.33 - 100, the gap BETWEEN the two readings
+    OK    fr.53 gap is not 200 - 133.3                    plan=66.7                          computed=66.7                          the other subtraction, for contrast
+    OK    fr.53 'a sixth of the original'                 plan=33.3                          computed=33.3                          200/6
+    OK    f01.tok.speedup                                 plan=1.5                           computed=1.5                           45/30
+    OK    f01.tok.throughput.pct                          plan=50                            computed=50.0                          (45/30 - 1) x 100
+    OK    f01.tok.latency.red.pct                         plan=33.3                          computed=33.3                          (1 - 30/45) x 100
+    OK    f01.tok2.speedup                                plan=1.5                           computed=1.5                           180/120
+    OK    f01.tok2.throughput.pct                         plan=50                            computed=50.0                          (180/120 - 1) x 100
+    OK    f01.tok2.latency.red.pct                        plan=33.3                          computed=33.3                          (1 - 120/180) x 100
+    OK    T12 speed-up 250->200 ms                        plan=1.25                          computed=1.25                          250/200
+    OK    T12 % reduction                                 plan=20                            computed=20.0                          (1-200/250) x 100
+    OK    P20 latency reading 200 ms, 30% faster          plan=140                           computed=140.0                         200 x 0.7
+    OK    P20 throughput reading                          plan=130                           computed=130.0                         100 x 1.3
+    OK    fr.11 trap 2^3 x 3^2                            plan=72                            computed=72                            sympy exact
+    OK    fr.11 trap 6^5                                  plan=7776                          computed=7776                          sympy exact
+    OK    fr.16 (10^6)^2/10^-3                            plan=1000000000000000              computed=1000000000000000              sympy exact
+    OK    fr.16 2^10 x 2^10                               plan=1048576                       computed=1048576                       = 2^20
+    OK    fr.17 (2^-2 x 2^5)^2/2^4                        plan=4                             computed=4                             sympy exact
+    OK    fr.15 (x^2)^3 x^-4 / x^-1                       plan=x**3                          computed=x**3                          sympy simplify
+    OK    fr.18 sqrt(64)                                  plan=8                             computed=8                             exact
+    OK    fr.18 cbrt(8)                                   plan=2                             computed=2                             exact
+    OK    fr.19 16^(1/2)                                  plan=4                             computed=4                             exact
+    OK    fr.20 81^(1/4)                                  plan=3                             computed=3                             exact
+    OK    fr.21 27^(2/3)                                  plan=9                             computed=9                             exact
+    OK    fr.21 8^(2/3) root-first                        plan=4                             computed=4                             (cbrt 8)^2
+    OK    fr.21 8^(2/3) power-first                       plan=4                             computed=4                             cbrt(8^2)
+    OK    fr.22 4^(3/2)                                   plan=8                             computed=8                             exact
+    OK    fr.22 9^(-1/2)                                  plan=1/3                           computed=1/3                           exact
+    OK    fr.22 125^(2/3)                                 plan=25                            computed=25                            exact
+    OK    fr.23 16^(-3/4)                                 plan=1/8                           computed=1/8                           exact
+    OK    T3 3^-2                                         plan=1/9                           computed=1/9                           exact
+    OK    T3 (4^2)^3                                      plan=4096                          computed=4096                          = 4^6
+    OK    T4 64^(1/2),(1/3),(2/3),(-1/2)                  plan=8,4,16,1/8                    computed=8,4,16,1/8                    exact
+    OK    T5 81^(3/4)                                     plan=27                            computed=27                            exact
+    OK    T5 32^(-2/5)                                    plan=1/4                           computed=1/4                           exact
+    OK    T2 (2^6 x 2^-2)/2^3                             plan=2                             computed=2                             exact
+    OK    P3 (3^5 x 3^-7)/3^-3                            plan=3                             computed=3                             exact
+    OK    P4 (x^3 y^-2)^2 (x^-1 y^3)                      plan=x**5/y                        computed=x**5/y                        sympy
+    OK    P5 2^4 x 4^2                                    plan=256                           computed=256                           exact
+    OK    P5 8^3                                          plan=512                           computed=512                           exact
+    OK    P6 125^(-2/3)                                   plan=1/25                          computed=1/25                          exact
+    OK    P6 (16/81)^(1/4)                                plan=2/3                           computed=2/3                           exact
+    OK    P7 (1+1)^2 vs 1^2+1^2                           plan=4 vs 2                        computed=4 vs 2                        counterexample
+    OK    P10 (6e-4)^2                                    plan=3.6e-07                       computed=3.6e-07                       exact
+    OK    P10 sqrt(9e-8)                                  plan=3.0e-04                       computed=3.0e-04                       exact
+    OK    fr.28 (5e4)(4e3)                                plan=2.0e+08                       computed=2.0e+08                       renormalised
+    OK    fr.28 (4e6)(2e5)                                plan=8.0e+11                       computed=8.0e+11                       exact
+    OK    fr.29 (8e9)/(2e4)                               plan=4.0e+05                       computed=4.0e+05                       exact
+    OK    fr.29 (6e-3)/(3e-7)                             plan=2.0e+04                       computed=2.0e+04                       exact
+    OK    T7 (2.4e5)(5e-9)                                plan=1.2e-03                       computed=1.2e-03                       exact
+    OK    T7 (9e7)/(3e-2)                                 plan=3.0e+09                       computed=3.0e+09                       exact
+    OK    fr.30 compare                                   plan=1.1e12 larger                 computed=1.1e12 larger                 exact
+    OK    fr.34 orders 10^3 -> 10^9                       plan=6                             computed=6                             exponent difference
+    OK    sci(0.00042)                                    plan=4.2e-4                        computed=4.2e-4                        Decimal place count
+    OK    sci(6400000)                                    plan=6.4e6                         computed=6.4e6                         Decimal place count
+    OK    sci(0.0000000072)                               plan=7.2e-9                        computed=7.2e-9                        Decimal place count
+    OK    sci(1024)                                       plan=1.024e3                       computed=1.024e3                       Decimal place count
+    OK    sci(93000000)                                   plan=9.3e7                         computed=9.3e7                         Decimal place count
+    OK    sci(14000000000)                                plan=1.4e10                        computed=1.4e10                        Decimal place count
+    OK    sci(0.00025)                                    plan=2.5e-4                        computed=2.5e-4                        Decimal place count
+    OK    sci(0.0000061)                                  plan=6.1e-6                        computed=6.1e-6                        Decimal place count
+    OK    sci(0.00000000072)                              plan=7.2e-10                       computed=7.2e-10                       Decimal place count
+    OK    sci(4500000)                                    plan=4.5e6                         computed=4.5e6                         Decimal place count
+    OK    fr.31 s.f. of 6.022e23                          plan=4                             computed=4                             mantissa digits
+    OK    fr.31 s.f. of 1.4e10                            plan=2                             computed=2                             mantissa digits
+    OK    P1 2/8                                          plan=1/4                           computed=1/4                           Fraction
+    OK    P1 sqrt(49)                                     plan=7                             computed=7                             exact
+    OK    P1 sqrt(50) rational?                           plan=False                         computed=False                         sympy
+    OK    P1 0.333... = 1/3                               plan=1/3                           computed=1/3                           exact
+    OK    fr.6/7 sqrt(9) in N                             plan=True                          computed=True                          sympy
+    OK    fr.4 1/3 in base 3 is 0.1                       plan=True                          computed=True                          1/3 = 1 x 3^-1
+    OK    P2 period of 1/7 in base 10                     plan=6                             computed=6                             multiplicative order of 10 mod 7
+    OK    P2 1/7 terminates in base 7                     plan=0                             computed=0                             period 0 = terminates
+    OK    P2 1/7 terminates in base 14                    plan=0                             computed=0                             any multiple of 7
+    OK    fr.4/5 1/10 repeats in base 2                   plan=True                          computed=True                          period > 0
+    OK    fr.4 1/3 terminates in base 3                   plan=0                             computed=0                             period 0
+    OK    fr.4 1/3 period in base 10                      plan=1                             computed=1                             0.333...
+
+PART A: 152 claims checked, 152 OK, 0 FAILED
+
+NOTES:
+  - 2^40/10^12 - 1 is ONE quantity, printed twice at different precisions: frame 50 quotes 10.0% (TiB vs TB) and P13/P18 quote 9.95% -- exact value 9.951163%. Both roundings are right; a reader meeting both is entitled to think one is wrong. Emit ONE key and choose ONE precision.
+  - 2^20/10^6 - 1 likewise: frame 50 quotes 4.9% (MiB vs MB), T8 quotes 4.86% (2^20 vs a million). Same quantity, exact value 4.8576%.
+  - frame 40 rules that a 6ND estimate justifies ONE significant figure (6076 days -> 6e3). P16's answer is quoted as 'about 160 days', which is TWO. One s.f. of 160.9 is 2e+02 days, i.e. 2e2. Either P16 changes to 2e2 or frame 40's rule needs a stated exception.
+  - 11.4 emits devices-for-N-days with '{:.0f}' (round to NEAREST): 607.64 -> 608 and 202.55 -> 203. Both happen to agree with the ceiling. P14 uses math.ceil for the same kind of quantity (10.125 -> 11), where nearest would have given the wrong answer (10). A device count is always a ceiling; the two emitters must not use different rules.
+  - T11 answer is printed '25.0 GB'; the exact figure is 24.99671. 11.4's loop emits it at 2 decimals, i.e. '25.00', which reads as an exact 25 in a program whose frame 40 teaches false precision. Either emit 1 dp or state that it is 25.0 to three significant figures.
+  - frame 54's worked ratio (30 -> 45 tok/s) and P19 (120 -> 180 tok/s) produce an identical triple (1.5, 50.0, 33.3). P19 consolidates nothing the reader has not just been shown; change one of the two ratios.
+
+====================================================================================================
+KEY RECONCILIATION -- digits in sections 4/8/9 with no key in 11.2/11.3
+====================================================================================================
+  fr.38   1.6e14 effective FLOP/s                           device.flops x util is printed but never emitted
+  fr.38   5.25e8 seconds                                    the intermediate the day count is derived from
+  fr.41   4 / 2 / 2 / 1 bytes per format                    the whole table is typed digits
+  fr.44   the four terms 2 + 2 + 4 + 4                      only their sum (12) has a key
+  fr.42   28 GB is keyed; 14 GB x 2 as shown working is not  minor
+  T8      1048576                                           only the percentage 4.86 has a key
+  T12     1.25x and 20%                                     no key; the tok/tok2 keys are the 30->45 and 120->180 pairs
+  P13     1099511627776                                     same integer as f01.tib.bytes under a different role
+  P14     10.125                                            printed in the answer; only the ceiling 11 has a key
+  P16     1.39e7 seconds                                    printed; only the day count has a key
+  P20     140 ms and 130 req/s                              no keys
+
+  Keys listed as emitted but used at no frame in section 4:
+    f01.novel.words
+    f01.novel.tokens
+  (69 keys enumerated in 11.2 + 11.3)
+
+====================================================================================================
+PART B -- machine arithmetic (P1/P2 material; NOT claimed by the F.1 plan)
+====================================================================================================
+  0.1 stored as (exact rational)                   = 3602879701896397 / 2^55   [Fraction(float) is exact]
+  0.1 stored as (exact decimal)                    = 0.1000000000000000055511151231257827021181583404541015625   [Decimal(float) is exact]
+  0.1 exact decimal digit count                    = 55   [len of significand]
+  0.1 bits (binary64)                              = 0x3FB999999999999A   [IEEE-754 punning]
+  0.1 bits (binary64, fields)                      = 0011111110111001100110011001100110011001100110011001100110011010   [sign|exp(11)|frac(52)]
+  0.1 error vs exact 1/10                          = 5.5511151231257827021181583404541015625E-18   [stored - 1/10]
+  0.1 + 0.2 stored as                              = 0.3000000000000000444089209850062616169452667236328125   [the canonical demo]
+  0.1 + 0.2 == 0.3                                 = False   [IEEE-754]
+  0.1 as float16 (exact)                           = 0.0999755859375   [binary16 nearest]
+  0.1 as bfloat16 (exact)                          = 0.099609375   [bf16 = truncate binary32 to 16 bits]
+  eps binary16 (fp16)                              = 1/1024 = 0.0009765625   [2^-(mantissa bits)]
+  eps bfloat16                                     = 1/128 = 0.0078125   [2^-(mantissa bits)]
+  eps binary32 (fp32)                              = 1/8388608 = 1.1920928955078125E-7   [2^-(mantissa bits)]
+  eps binary64 (fp64)                              = 1/4503599627370496 = 2.220446049250313080847263336181640625E-16   [2^-(mantissa bits)]
+  largest consecutive integer binary16 (fp16)      = 2^11 = 2048   [2^p; 2^p+1 is not representable]
+  largest consecutive integer bfloat16             = 2^8 = 256   [2^p; 2^p+1 is not representable]
+  largest consecutive integer binary32 (fp32)      = 2^24 = 16777216   [2^p; 2^p+1 is not representable]
+  largest consecutive integer binary64 (fp64)      = 2^53 = 9007199254740992   [2^p; 2^p+1 is not representable]
+  fp16 max finite                                  = 65504 = 65504   [(2 - 2^-10) x 2^15]
+  fp16 min normal                                  = 0.00006103515625   [2^-14]
+  fp16 min subnormal                               = 5.9604644775390625E-8   [2^-24]
+  fp16 exponent range                              = -14 .. 15   [numpy finfo]
+  fp16 largest finite input that survives          = just below 65520 (bisection lands at 65519.9999999702)   [exact bisection]
+  fp16 exact overflow threshold                    = 65520 = 65520   [midpoint of 65504 and 2^16; ties-to-even -> inf]
+  fp16 65519.9 rounds to                           = 65504.0   [round-to-nearest]
+  fp16 65520 rounds to                             = inf   [ties-to-even overflows]
+  bf16 max finite                                  = 3.3895314e+38   [0x7F7F = (2-2^-7) x 2^127]
+  bf16 min normal                                  = 1.1754944e-38   [2^-126, same as fp32]
+  bf16 vs fp16 max ratio                           = 5.175e+33   [bf16 reaches ~5e33 times further]
+  bf16 exponent bits / fp16 exponent bits          = 8 / 5   [the exponent-for-mantissa trade]
+  bf16 mantissa bits / fp16 mantissa bits          = 8 (7 stored) / 11 (10 stored)   [same 16-bit width]
+  spacing table:  (np.spacing at each magnitude)
+      magnitude      fp16            fp32            fp64
+      0.001          9.53674e-07     1.16415e-10     2.1684e-19
+      1              0.000976562     1.19209e-07     2.22045e-16
+      10             0.0078125       9.53674e-07     1.77636e-15
+      1000           0.5             6.10352e-05     1.13687e-13
+      1e+06          overflow        0.0625          1.16415e-10
+      1e+09          overflow        64              1.19209e-07
+      60000          32              0.00390625      7.27596e-12
+  fp16 spacing at 1024                             = 1.0   [= 1.0, so 1024+0.5 is lost]
+  fp64 spacing at 1                                = 2.220446049250313080847263336181640625E-16   [= 2^-52]
+  fp64 spacing at 1e9                              = 1.1920928955078125e-07   [grows with magnitude]
+  ln(fp16 max)                                     = 11.089866   [exp overflows fp16 above this logit]
+  fp16 exp(11.0)                                   = 59872.0   [still finite]
+  fp16 exp(11.09)                                  = inf   [already over -- 11.09 stores as 11.09375]
+  fp16 exp(11.1)                                   = inf   [overflows]
+  fp16 exp(12.0)                                   = inf   [overflows]
+  fp16 largest logit whose exp is finite           = 11.0859375 -> exp = 65248.0   [scan of representable fp16 values]
+  fp16 next logit up                               = 11.09375 -> exp = inf   [one fp16 ulp (2^-7 near 11) higher]
+  fp32 naive softmax([1000,1000,1000])             = [nan nan nan]   [exp -> inf, inf/inf -> nan]
+  fp32 stable softmax([1000,1000,1000])            = [0.33333334 0.33333334 0.33333334]   [subtract the max first]
+  naive log-sum-exp([1000,1000,1000])              = inf   [log(sum(exp)) -> inf]
+  stable log-sum-exp([1000,1000,1000])             = 1001.0986123085   [m + log(sum(exp(x-m)))]
+  exact log-sum-exp([1000,1000,1000])              = 1001.0986122887   [1000 + ln 3, by hand]
+  stable LSE fp32 error vs exact                   = 1.983e-08   [fp32 resolution at 1000 is 6.1e-05]
+  fp32 spacing at 1000                             = 6.103515625e-05   [why the fix is right but not exact]
+  variance data                                    = [100000004.0, 100000007.0, 100000013.0, 100000016.0]   [1e8 + {4,7,13,16}]
+  exact population variance                        = 45/2 = 22.5   [exact Fraction]
+  exact sample variance                            = 30 = 30.0   [exact Fraction]
+  fp64 naive E[x^2]-E[x]^2                         = 22.0   [catastrophic cancellation]
+  fp64 two-pass                                    = 22.5   [numerically stable]
+  fp64 np.var                                      = 22.5   [numpy uses two-pass]
+  naive relative error                             = 2.22%   [vs exact]
+  fp32 naive E[x^2]-E[x]^2                         = 1073741824.0   [meaningless: see the next two rows]
+  fp32 two-pass                                    = 144.0   [also wrong -- no algorithm can recover data fp32 never held]
+  fp32 stores the four points as                   = [100000000.0, 100000008.0, 100000016.0, 100000016.0]   [spacing 8 at 1e8: two of the four collapse onto one value]
+  fp32 stores 1e8+4 as                             = 100000000.0   [24-bit mantissa; spacing at 1e8 is 8]
+  fp32 spacing at 1e8                              = 8.0   [the offsets 4,7,13,16 are quantised away]
+  variance data (harsher)                          = [1000000004.0, 1000000007.0, 1000000013.0, 1000000016.0]   [1e9 + {4,7,13,16}]
+  exact population variance                        = 45/2 = 22.5   [exact Fraction]
+  fp64 naive at 1e9                                = -128.0   [THE demo: a NEGATIVE variance, exactly -128.0]
+  fp64 two-pass at 1e9                             = 22.5   [stable, recovers 22.5]
+  (0.1+0.2)+0.3                                    = 0.6000000000000001   [float addition is not associative]
+  0.1+(0.2+0.3)                                    = 0.6   [different result]
+  they are equal?                                  = False   [no]
+
+all asserts passed

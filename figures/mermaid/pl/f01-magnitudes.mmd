@@ -1,0 +1,15 @@
+flowchart TB
+  classDef tick fill:#F4F6F8,stroke:#1F4E79,color:#1a1a1a
+  classDef note fill:#FFFFFF,stroke:#B26A00,color:#1a1a1a
+
+  a["10^0 -- jeden token"]:::tick
+  b["10^3 -- strona tekstu"]:::tick
+  c["10^5 -- powiesc, w tokenach"]:::tick
+  d["10^9 -- parametry malego modelu"]:::tick
+  e["10^12 -- tokeny w korpusie treningowym"]:::tick
+  f["10^22 -- FLOP-y na trening na nim"]:::tick
+  g["10^15 -- FLOP-y urzadzenia na sekunde"]:::tick
+
+  a --> b --> c --> d --> e --> f
+  f -.->|"dzielenie: odejmij wykladniki"| g
+  g --> h["10^7 sekund, czyli kilka miesiecy<br/>na jednym urzadzeniu"]:::note

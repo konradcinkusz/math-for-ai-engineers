@@ -1,0 +1,85 @@
+%% appB-notation \dash{} Notation and Symbols
+
+\chapter{Notation and Symbols}
+\label{app:B}
+
+\programstub{%
+Every symbol the book uses, in the order a reader meets it, with the frame
+that introduces it. This is the appendix the front matter's \emph{How to read
+a formula} points back to, and it exists because a reader who has never seen
+$\sum$ must not be stopped by it in Program~F4.
+}
+
+% ============================================================
+\section{The decisions this book has taken}
+\label{sec:appB-decisions}
+
+\noindent
+Where mathematical usage is split, a book must choose, and the choice is worth
+more to a reader than the convention itself. These are the four that bite.
+
+\begin{notationbox}
+\textbf{A logarithm here always carries its base.} This book never writes a
+bare $\mfalogplain$. Natural logarithms are $\ln$; base-two logarithms are
+$\logb{2}$.
+
+The reason is that the two readerships this book serves have been taught
+opposite conventions. In Polish textbooks a bare logarithm means base ten. In
+machine-learning writing it means base $e$. The same three characters carry
+opposite meanings, and they collide hardest in exactly the programs where it
+matters most: entropy is quoted in bits and cross-entropy in nats, and those
+are two programs apart.
+
+A global convention stated once in an appendix is not a fix for that. Writing
+the base costs two characters, and the build refuses a bare logarithm rather
+than trusting anybody to remember.
+\end{notationbox}
+
+\begin{notationbox}
+\textbf{Vectors are columns, and vectors are bold.} $\vect{x} \in \R^{n}$ is a
+column; $\vect{x}\T$ is a row. Polish schooling also writes an arrow above the
+letter; the papers this book is training you to read do not, so neither does
+this book.
+
+\textbf{Matrix derivatives use numerator layout}, declared in Program~P17 and
+never assumed silently. This is not a national split, it is a discipline split,
+and it is the origin of a good half of the transpose confusion in accounts of
+backpropagation.
+\end{notationbox}
+
+\begin{notationbox}
+\textbf{Intervals use square brackets:} $\intcc{a}{b}$ is closed,
+$\intoo{a}{b}$ is open. Polish schooling writes $\langle a, b\rangle$ for the
+closed interval. ISO 80000-2, and every paper you are going to open, do not.
+The book follows the papers, and Program~F6 says so at the first interval a
+reader meets rather than leaving them to wonder.
+\end{notationbox}
+
+\begin{notationbox}
+\textbf{Variance is $\Var(X)$ and expectation is $\Ex[X]$.} Polish teaching
+materials still write $D^{2}(X)$ for the variance today, alongside $\Var$; this
+is current usage and not a historical curiosity, and Program~P23 states the
+equivalence where the concept is introduced. $M(X)$ for the expectation is
+residual and gets a sentence rather than a box.
+\end{notationbox}
+
+% ============================================================
+\section{The keyboard test}
+\label{sec:appB-keyboard}
+
+\noindent
+The Polish edition writes $\tg\theta$ for the tangent and \code{tanh} for the
+hyperbolic tangent, and that looks inconsistent. It is the rule working.
+
+\begin{note}
+\textbf{If you will type the token into a computer, both editions use the
+spelling you will type. If you will only ever read or write it, the Polish
+edition uses the Polish form.}
+
+Nobody types $\tg$ into a program, so the Polish edition sets $\tg$, $\ctg$ and
+$\arctg$, as Polish mathematics does. But \code{tanh} is
+\code{torch.tanh} \dash{} it is an activation function before it is a
+function of a real variable, and a Polish reader who learns \emph{tgh} will not
+find it in any library. Polish mathematical writing does set \emph{tgh}, and
+Program~F8 records that where the function appears.
+\end{note}
