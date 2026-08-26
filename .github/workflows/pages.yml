@@ -1,13 +1,24 @@
 name: Pages
 
-# Publishes docs/ to GitHub Pages -- the two-minute summary of both editions.
+# Builds BOTH editions and publishes the PDFs to GitHub Pages, next to the
+# two-minute summary page.
+#
+# Why this workflow builds rather than just uploading docs/: before this, the
+# only way to get a PDF was a 14-day CI artefact or a tagged release, so the
+# book had no address. Now every push to main leaves the current PDF at a
+# stable URL:
+#
+#   https://konradcinkusz.github.io/math-for-ai-engineers/
+#   .../Mathematics-from-Zero-for-the-AI-Engineer.pdf
+#   .../Matematyka-od-zera-dla-inzyniera-AI.pdf
+#
+# It duplicates the compile steps from build.yml deliberately. Pages must never
+# publish a PDF that did not build, so it runs the same gate -- checklog.py, not
+# `grep '^!'` -- against its own logs rather than trusting another workflow's.
 
 on:
   push:
     branches: [main]
-    paths:
-      - 'docs/**'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -21,22 +32,105 @@ concurrency:
 
 jobs:
   deploy:
+    name: Build both editions and publish
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install --quiet numpy sympy
+
+      - name: Regenerate every number
+        run: make numbers
+
+      - name: Refuse to publish a book whose numbers have drifted
+        run: |
+          if ! git diff --quiet -- figures/values; then
+            echo "::error::A computed value differs from what code/ now produces."
+            git diff -- figures/values
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Render diagrams
+        run: |
+          shopt -s nullglob
+          SRC=(figures/mermaid/*/*.mmd)
+          [ ${#SRC[@]} -eq 0 ] && exit 0
+          printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
+          for f in "${SRC[@]}"; do
+            lang=$(basename "$(dirname "$f")"); key=$(basename "$f" .mmd)
+            mkdir -p "figures/diagrams/$lang"
+            npx -y @mermaid-js/mermaid-cli@11 \
+              -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
+              -p .puppeteer.json -c figures/mermaid/config.json \
+              -b transparent --pdfFit
+          done
+
+      - name: Compile the English edition
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-en.tex
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+
+      - name: Compile the Polish edition
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-pl.tex
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+
+      # The same gate the rest of the repository uses. -interaction=nonstopmode
+      # writes a PDF over the top of an error and -file-line-error puts a path
+      # where `grep '^!'` expects a bang, so a broken build looks green to both.
+      - name: Refuse to publish a build that only looked like it worked
+        run: python3 tools/checklog.py main-en.log main-pl.log
+
+      - name: Assemble the site
+        run: |
+          mkdir -p _site
+          cp -r docs/. _site/
+          cp main-en.pdf "_site/Mathematics-from-Zero-for-the-AI-Engineer.pdf"
+          cp main-pl.pdf "_site/Matematyka-od-zera-dla-inzyniera-AI.pdf"
+          # A short, stable alias each, so a link in a chat message does not
+          # have to carry the whole title.
+          cp main-en.pdf _site/book-en.pdf
+          cp main-pl.pdf _site/book-pl.pdf
+          ls -la _site
+
+      - name: Report what was published
+        if: always()
+        continue-on-error: true
+        run: |
+          {
+            echo "## Published to Pages"
+            echo ""
+            echo '```'
+            python3 tools/checklog.py --summary main-en.log main-pl.log || true
+            echo '```'
+            echo ""
+            echo "- \`book-en.pdf\` / \`Mathematics-from-Zero-for-the-AI-Engineer.pdf\`"
+            echo "- \`book-pl.pdf\` / \`Matematyka-od-zera-dla-inzyniera-AI.pdf\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/configure-pages@v5
         with:
           # The very first deploy has no Pages site to look up yet, so
-          # configure-pages' "Get Pages site" call 404s and the job fails
-          # (seen on the run triggered by merging PR #1). enablement: true
-          # makes it create the site via the API instead of requiring someone
-          # to click it into existence in Settings first.
+          # configure-pages' "Get Pages site" call 404s and the job fails.
+          # enablement: true makes it create the site via the API instead of
+          # requiring someone to click it into existence in Settings first.
           enablement: true
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: _site
+
       - id: deployment
         uses: actions/deploy-pages@v4

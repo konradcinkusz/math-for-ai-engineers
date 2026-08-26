@@ -961,13 +961,13 @@ volumes, where three measurements are still blocked on a provider budget.
 | E1 | P2 | The logit at which a naive softmax overflows `fp32` and `fp16`, and the error of naive against stabilised, across magnitudes | Free |
 | E2 | P3 | Hand-counted FLOPs and bytes for one transformer forward pass against measured wall clock; where the model is wrong and by how much | Free (CPU) |
 | E3 | P5 | Angle between random unit vectors as dimension goes 2 -> 4096; the concentration towards orthogonality | Free |
-| E4 | P10 | Singular-value spectrum of a real open-weights embedding matrix; reconstruction error against rank | Free |
-| E5 | P15 | Forward against reverse mode: time and peak memory against depth; the measured cost of gradient checkpointing | Free |
-| E6 | P19 | SGD, momentum and Adam on a quadratic of known condition number; iterations to tolerance against the predicted count | Free |
-| E7 | P26 | Bootstrap confidence-interval width against evaluation-set size on a public benchmark; the size needed to resolve one point | Free |
-| E8 | P29 | Forward against reverse KL fitted to the same bimodal target; mode covering against mode seeking | Free |
-| E9 | P31 | **The headline.** Logit variance and softmax entropy with and without `1/sqrt(d_k)`, across head sizes | Free |
-| E10 | P32 | A scaling-law power fit on published numbers, with the fit's extrapolation uncertainty reported | Cheap |
+| E4 | P11 | Singular-value spectrum of a real open-weights embedding matrix; reconstruction error against rank | Free |
+| E5 | P16 | Forward against reverse mode: time and peak memory against depth; the measured cost of gradient checkpointing | Free |
+| E6 | P20 | SGD, momentum and Adam on a quadratic of known condition number; iterations to tolerance against the predicted count | Free |
+| E7 | P27 | Bootstrap confidence-interval width against evaluation-set size on a public benchmark; the size needed to resolve one point | Free |
+| E8 | P30 | Forward against reverse KL fitted to the same bimodal target; mode covering against mode seeking | Free |
+| E9 | P32 | **The headline.** Logit variance and softmax entropy with and without `1/sqrt(d_k)`, across head sizes | Free |
+| E10 | P33 | A scaling-law power fit on published numbers, with the fit's extrapolation uncertainty reported | Cheap |
 
 E9 is the one to run first: it is the measurement the whole book is arranged
 around, it costs nothing, and it converts the book's central worked derivation

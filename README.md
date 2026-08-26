@@ -21,6 +21,11 @@ build proves the two editions have the same programs, the same frame numbering
 and the same numbers, so a correction applied to one cannot silently miss the
 other.
 
+**Read it now — both editions, rebuilt on every push to `main`:**
+
+- **[English edition (PDF)](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf)**
+- **[Wydanie polskie (PDF)](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf)**
+
 > **Early draft.** The structure, the build, the bilingual tooling and
 > **Program F1 in both languages** are done. Forty-six of forty-seven programs
 > are stubs carrying the brief they must satisfy. Every ledger below is printed
@@ -217,7 +222,9 @@ CLAUDE.md                  working notes: conventions, traps hit, resolved quest
 
 ## Links
 
-- **[The two-minute summary](https://konradcinkusz.github.io/math-for-ai-engineers/)**
+- **[The two-minute summary](https://konradcinkusz.github.io/math-for-ai-engineers/)** — and the current PDFs:
+  [English](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf) ·
+  [polski](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf)
 - **[LangChain, LangGraph and Async Python](https://github.com/konradcinkusz/llm-book)** — companion volume
 - **[Microsoft Agent Framework for .NET Engineers](https://github.com/konradcinkusz/maf-book)** — companion volume
 
