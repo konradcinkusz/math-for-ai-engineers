@@ -50,10 +50,9 @@
   \answerto{$\num{4.2e-4}$.}
 \item Oblicz $(\num{3e8}) \times (\num{2e-3})$. \teachesat{25--26}
   \answerto{$\num{6e5}$. Pomnóż mantysy, dodaj wykładniki.}
-\item O $2^{10}$ mówi się często \enquote{mniej więcej tysiąc}. O ile procent
-  jest to nietrafione? \teachesat{30--31}
-  \answerto{$2^{10} = 1024$, więc przybliżenie jest zaniżone o
-  \val{f01.two.ten.err.pct}\%.}
+\item O ile procent $2^{10}$ przewyższa $10^{3}$? \teachesat{30--31}
+  \answerto{$2^{10} = 1024$, czyli o \val{f01.kib.over.si.pct}\% powyżej
+  $10^{3}$.}
 \item Model ma \val{f01.params} parametrów zapisanych w formacie
   2-bajtowym. Ile bajtów zajmują jego wagi? \teachesat{34--36}
   \answerto{$\val{f01.weights.bytes}$ bajtów, czyli \val{f01.weights.gb}~GB.}
@@ -483,8 +482,13 @@ dwójki, a $2^{10} = 1024$. Której potędze dziesiątki to odpowiada?
 \begin{fr}
 \ans{$10^{3}$. Zatem $2^{10} \approx 10^{3}$, a czynnik $1024$ można czytać
 jako czynnik tysiąc.}
-Przybliżenie jest zawyżone o \val{f01.two.ten.err.pct}\%, co przy rachunku na
-serwetce nic nie znaczy.
+$2^{10}$ przewyższa $10^{3}$ o \val{f01.kib.over.si.pct}\%, co przy rachunku
+na serwetce nic nie znaczy.
+
+Mów tak i zawsze w tę stronę. \enquote{Przybliżenie jest zaniżone o
+\val{f01.kib.over.si.pct}\%} to inne twierdzenie o innym mianowniku, a obie
+odpowiedzi nie są tą samą liczbą. To \S\ref{sec:F01-ratios} przychodzące
+osiemnaście ramek za wcześnie, i będzie przychodzić dalej.
 
 Teraz je przyciśnij. $2^{80}$ to osiem takich czynników jeden na drugim, więc
 powinno wynosić około $10^{24}$. Czy błąd nadal nic nie znaczy?
@@ -495,8 +499,8 @@ powinno wynosić około $10^{24}$. Czy błąd nadal nic nie znaczy?
 \val{f01.two.eighty.err.pct}\% powyżej $10^{24}$.}
 \begin{trapbox}
 \textbf{Mały błąd względny kumuluje się w duży.} Każdy czynnik $1024$ niesie
-\val{f01.two.ten.err.pct}\%, a błędy się mnożą, a nie dodają, więc osiem z nich
-to nie osiem razy \val{f01.two.ten.err.pct}\% \dash{} to
+\val{f01.kib.over.si.pct}\%, a błędy się mnożą, a nie dodają, więc osiem z nich
+to nie osiem razy \val{f01.kib.over.si.pct}\% \dash{} to
 \val{f01.two.eighty.err.pct}\%.
 
 Reguła do zabrania ze sobą: przybliżenie jest bezpieczne raz, a powtórzone
@@ -794,8 +798,9 @@ nie powtarzaj twierdzenia.
   normalizuje się mantysę.}
 \sumitem{27}{Dodawanie wymaga najpierw \emph{wspólnego wykładnika}. Z tego
   samego powodu suma zmiennoprzecinkowa gubi mały składnik.}
-\sumitem{30--31}{$2^{10} \approx 10^{3}$, zaniżone o
-  \val{f01.two.ten.err.pct}\%. Powtórzone, ten błąd się kumuluje:
+\sumitem{30--31}{$2^{10}$ przewyższa $10^{3}$ o
+  \val{f01.kib.over.si.pct}\% \dash{} i mów to w tę stronę, bo drugi
+  mianownik daje inną liczbę. Powtórzony, ten błąd się kumuluje:
   $2^{80}$ jest o \val{f01.two.eighty.err.pct}\% powyżej $10^{24}$.}
 \sumitem{34--36}{Pamięć na wagi $=$ parametry $\times$ bajty na parametr.
   \val{f01.params} parametrów po dwa bajty to \val{f01.weights.gb}~GB.}
@@ -841,10 +846,9 @@ nie powtarzaj twierdzenia.
   \answerto{To $\num{1.5}\times$ tempa i $\num{33.3}\%$ redukcji czasu. Do
   raportu nie wpisuj żadnego z osobna: napisz \enquote{z 90 minut do 60
   minut}, czego nie da się źle odczytać.}
-\item $2^{40}$ czyta się często jako \enquote{mniej więcej $10^{12}$}. O ile
-  procent jest to zaniżone?
+\item O ile procent $2^{40}$ przewyższa $10^{12}$?
   \answerto{\val{f01.tib.over.si.pct}\%. Cztery skumulowane czynniki po
-  \val{f01.two.ten.err.pct}\%.}
+  \val{f01.kib.over.si.pct}\%.}
 \item Oszacuj, z dokładnością do jednej cyfry znaczącej, liczbę FLOP-ów
   potrzebnych do wygenerowania jednego tokena przez model o \val{f01.params}
   parametrach, przyjmując mniej więcej 2 FLOP-y na parametr i token.

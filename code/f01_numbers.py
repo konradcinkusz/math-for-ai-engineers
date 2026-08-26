@@ -11,6 +11,7 @@ Run:  python3 code/f01_numbers.py      (or: make numbers)
 """
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 VALUES: dict[str, str] = {}
@@ -50,8 +51,13 @@ emit("f01.weights.fp32.gb", PARAMS * BYTES_FP32 / 1e9, 0)
 # --------------------------------------------------------------------------
 # 2^10 against 10^3. The approximation everyone uses, and the error it carries
 # when it is compounded -- which is where it stops being harmless.
+#
+# NOTE: this is the SAME quantity as the kilo/kibi gap emitted below, and it is
+# deliberately not emitted twice. One quantity printed at two precisions --
+# 2.4% in a table and 2.40% in a trap -- is a defect: a reader who meets both
+# is entitled to think one of them is wrong. The prefix gaps below are the
+# single source, and the trap frame references f01.kib.over.si.pct.
 # --------------------------------------------------------------------------
-emit("f01.two.ten.err.pct", (2**10 / 10**3 - 1) * 100, 2)
 emit("f01.two.eighty", 2**80)
 emit("f01.two.eighty.err.pct", (2**80 / 10**24 - 1) * 100, 2)
 
@@ -74,9 +80,13 @@ UTILISATION = 0.4
 device_seconds = train_flops / (DEVICE_FLOPS * UTILISATION)
 emit("f01.device.flops", f"{DEVICE_FLOPS:.0e}".replace("e+", "e"))
 emit("f01.device.util.pct", UTILISATION * 100, 0)
+# A duration rounds to nearest; a COUNT OF DEVICES takes a ceiling. Two
+# hundred and two and a half devices do not finish the job. The distinction is
+# made explicit here because the two emitters used the same rounding rule and
+# happened to agree, which is the kind of agreement that stops holding.
 emit("f01.device.days", device_seconds / 86400, 0)
 emit("f01.device.years", device_seconds / (86400 * 365), 1)
-emit("f01.devices.for.30.days", device_seconds / (86400 * 30), 0)
+emit("f01.devices.for.30.days", math.ceil(device_seconds / (86400 * 30)))
 
 # A larger model, for the exercise the reader does unaided.
 BIG_PARAMS = 70_000_000_000
@@ -85,10 +95,13 @@ emit("f01.big.gb", BIG_PARAMS * BYTES_FP16 / 1e9, 0)
 
 # The binary prefixes, so the table in the program is generated rather than
 # typed. A table of powers is exactly the kind of thing that acquires a typo.
+# All four at the SAME precision, for the same reason. Two decimal places,
+# because the tera gap is 9.95% and rounding it to 10.0% makes it look like a
+# round number the reader can check in their head, which it is not.
 for name, k in (("kib", 10), ("mib", 20), ("gib", 30), ("tib", 40)):
     if name == "gib":                      # the only one the text spells out
         emit(f"f01.{name}.bytes", 2**k)
-    emit(f"f01.{name}.over.si.pct", (2**k / 10 ** (3 * (k // 10)) - 1) * 100, 1)
+    emit(f"f01.{name}.over.si.pct", (2**k / 10 ** (3 * (k // 10)) - 1) * 100, 2)
 
 # Estimating: a novel of 100,000 words, at the rule of thumb that a token is
 # about three quarters of an English word.

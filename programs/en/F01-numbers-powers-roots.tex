@@ -48,10 +48,9 @@
   \answerto{$\num{4.2e-4}$.}
 \item Compute $(\num{3e8}) \times (\num{2e-3})$. \teachesat{25--26}
   \answerto{$\num{6e5}$. Multiply the mantissas, add the exponents.}
-\item $2^{10}$ is often called \enquote{about a thousand}. By what percentage
-  is that wrong? \teachesat{30--31}
-  \answerto{$2^{10} = 1024$, so the approximation is low by
-  \val{f01.two.ten.err.pct}\%.}
+\item By what percentage does $2^{10}$ exceed $10^{3}$? \teachesat{30--31}
+  \answerto{$2^{10} = 1024$, which is \val{f01.kib.over.si.pct}\% above
+  $10^{3}$.}
 \item A model has \val{f01.params} parameters stored in a 2-byte format. How
   many bytes are its weights? \teachesat{34--36}
   \answerto{$\val{f01.weights.bytes}$ bytes, which is \val{f01.weights.gb}~GB.}
@@ -474,8 +473,14 @@ and $2^{10} = 1024$. What decimal power is that near?
 \begin{fr}
 \ans{$10^{3}$. So $2^{10} \approx 10^{3}$, and a factor of $1024$ can be read
 as a factor of a thousand.}
-The approximation is high by \val{f01.two.ten.err.pct}\%, which for a
+$2^{10}$ exceeds $10^{3}$ by \val{f01.kib.over.si.pct}\%, which for a
 back-of-envelope answer is nothing.
+
+Say it that way round, and always. \enquote{The approximation is low by
+\val{f01.kib.over.si.pct}\%} is a different claim about a different
+denominator, and the two answers are not the same number. This is
+\S\ref{sec:F01-ratios} arriving eighteen frames early, and it will keep
+arriving.
 
 Now push it. $2^{80}$ is eight of those factors stacked up, so it should be
 about $10^{24}$. Is the error still nothing?
@@ -486,8 +491,8 @@ about $10^{24}$. Is the error still nothing?
 \val{f01.two.eighty.err.pct}\% above $10^{24}$.}
 \begin{trapbox}
 \textbf{A small relative error compounds into a large one.} Each factor of
-$1024$ carries \val{f01.two.ten.err.pct}\% and the errors multiply rather than
-add, so eight of them is not eight times \val{f01.two.ten.err.pct}\% \dash{}
+$1024$ carries \val{f01.kib.over.si.pct}\% and the errors multiply rather than
+add, so eight of them is not eight times \val{f01.kib.over.si.pct}\% \dash{}
 it is \val{f01.two.eighty.err.pct}\%.
 
 The rule to carry away: an approximation is safe once, and a repeated
@@ -785,8 +790,9 @@ claim.
   renormalise the mantissa.}
 \sumitem{27}{Adding requires a \emph{common exponent} first. This is also why a
   floating-point sum loses a small addend.}
-\sumitem{30--31}{$2^{10} \approx 10^{3}$, low by
-  \val{f01.two.ten.err.pct}\%. Repeated, that error compounds:
+\sumitem{30--31}{$2^{10}$ exceeds $10^{3}$ by
+  \val{f01.kib.over.si.pct}\% \dash{} and state it that way round, because
+  the other denominator is a different number. Repeated, the error compounds:
   $2^{80}$ is \val{f01.two.eighty.err.pct}\% above $10^{24}$.}
 \sumitem{34--36}{Weight memory $=$ parameters $\times$ bytes per parameter.
   \val{f01.params} parameters at two bytes is \val{f01.weights.gb}~GB.}
@@ -832,10 +838,9 @@ claim.
   \answerto{It is $\num{1.5}\times$ the rate, and it is a $\num{33.3}\%$ reduction in time.
   Put neither in a report on its own: write \enquote{90 minutes to 60
   minutes}, which cannot be misread.}
-\item $2^{40}$ is often read as \enquote{about $10^{12}$}. By what percentage
-  is that low?
+\item By what percentage does $2^{40}$ exceed $10^{12}$?
   \answerto{\val{f01.tib.over.si.pct}\%. Four compounded factors of
-  \val{f01.two.ten.err.pct}\%.}
+  \val{f01.kib.over.si.pct}\%.}
 \item Estimate, to one significant figure, the FLOPs needed to generate one
   token from a \val{f01.params}-parameter model, given roughly 2 FLOPs per
   parameter per token.
