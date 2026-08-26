@@ -1,0 +1,28 @@
+% ============================================================
+%  main-en.tex --- the English edition.
+%
+%  The ONLY difference between the two main files is \booklang. Everything
+%  else -- the part and program sequence -- lives in structure.tex, which both
+%  read, so the two editions cannot contain different programs.
+% ============================================================
+\documentclass[11pt,twoside,openright]{book}
+\def\booklang{en}
+\input{preamble}
+\begin{document}
+\frontmatter
+\input{frontmatter/en/titlepage}
+\tableofcontents
+\input{frontmatter/en/how-to-use}
+\mainmatter
+\input{structure}
+\appendix
+\include{appendices/en/appA-answers}
+\include{appendices/en/appB-notation}
+\include{appendices/en/appC-formulae}
+\include{appendices/en/appD-terminology}
+\include{appendices/en/appE-further-reading}
+\include{appendices/en/appF-manifest}
+\backmatter
+\printanswers
+\printindex
+\end{document}

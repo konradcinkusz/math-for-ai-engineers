@@ -1,0 +1,32 @@
+%% P29 --- Entropia krzyżowa i dywergencja Kullbacka--Leiblera
+%%
+%% Zalążek. Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co
+%% ma dać czytelnikowi. Napisanie programu oznacza usunięcie bloku
+%% \programstub{} i zastąpienie go programem. Jeśli po przerobieniu materiału
+%% opis okaże się błędny, popraw go i odnotuj sprzeczność w CLAUDE.md w sekcji
+%% *Resolved questions*.
+
+\program{Entropia krzyżowa i dywergencja Kullbacka--Leiblera}
+\label{prog:P29}
+
+\programstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: cross-entropy is the cost of coding one distribution with
+another's code; KL is the excess; it is non-negative, zero only when the
+distributions agree, and it is not symmetric. Payoff: the question the brief
+asks for --- what the asymmetry costs you when you pick a loss. Forward KL
+is mode-covering: it pays an unbounded price for putting no mass where the
+target has some, so it spreads. Reverse KL is mode-seeking: it pays for
+putting mass where the target has none, so it collapses onto one mode.
+Distillation minimises one, a variational objective and a KL-regularised
+policy the other, and the difference is visible in the output. Measured on a
+bimodal target, not asserted. Also: "KL distance" is a misnomer and the
+triangle inequality fails; Jensen--Shannon as the symmetric alternative and
+what it costs; and the observation that minimising cross-entropy against a
+fixed dataset is minimising forward KL to the empirical distribution, which
+closes the loop with P25.
+
+\medskip
+\textbf{Planowana długość:} 55 ramek.
+}

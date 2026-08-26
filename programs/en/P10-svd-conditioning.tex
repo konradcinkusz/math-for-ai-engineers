@@ -1,0 +1,27 @@
+%% P10 --- SVD, low-rank approximation and conditioning
+%%
+%% Stub. The brief below is the contract for this program: what it must argue,
+%% and what it must buy the reader. Writing the program means deleting the
+%% \programstub{} block and replacing it with the program. If the brief turns
+%% out to be wrong once the mathematics has been worked, change it and record
+%% the contradiction in CLAUDE.md under *Resolved questions*.
+
+\program{SVD, low-rank approximation and conditioning}
+\label{prog:P10}
+
+\programstub{%
+Argument: every matrix, square or not, factors into rotate--stretch--rotate.
+Truncating the stretch gives the provably best approximation of a given rank
+(Eckart--Young, stated). The ratio of largest to smallest singular value is
+the condition number, and it is the amplification factor from input error to
+output error. Payoff: the singular-value spectrum of a real embedding
+matrix, plotted, showing how few directions carry the energy --- the
+empirical case for LoRA and for embedding compression, measured; the
+pseudoinverse as least squares done properly; why the normal equations
+square the condition number and a QR solve does not, which is the concrete
+form of "do not invert"; and the condition number as the number that
+predicts how many iterations an optimiser will need, handed forward to P19.
+
+\medskip
+\textbf{Planned length:} 60 frames.
+}

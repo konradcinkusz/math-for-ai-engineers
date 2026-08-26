@@ -1,0 +1,139 @@
+\chapter*{Wstęp}
+\phantomsection
+\addcontentsline{toc}{chapter}{Wstęp}
+\markboth{WSTĘP}{WSTĘP}
+
+\section*{Dla kogo jest ta książka}
+
+Umiesz wywołać \code{softmax} i nie umiesz powiedzieć, dlaczego najpierw
+odejmuje się od niego jego własne maksimum. Wytrenowałeś model i nigdy nie
+wyprowadziłeś gradientu, za którym szedł. Czytasz artykuł, rozumiesz każde
+zdanie wokół wzorów i wzory pomijasz.
+
+To nie jest wada charakteru ani nic wyjątkowego. Tak się dzieje, gdy dziedzina
+rośnie szybciej niż jej podręczniki, a matematyka, na której się opiera, jest
+wykładana w kolejności zaprojektowanej dla matematyków. Ta książka jest
+napisana dla inżyniera w takiej sytuacji: zawodowo sprawnego, formalnie
+niedowyposażonego i świadomego tego.
+
+Nie zakłada \textbf{niczego}. Ani algebry, ani trygonometrii, ani rachunku
+różniczkowego. Część~I zaczyna się od arytmetyki i to nie jest figura
+retoryczna. Jeśli masz wykształcenie ścisłe, nie szkodzi --- Quizy istnieją
+właśnie po to, żebyś mógł pominąć to, co już umiesz --- ale podłoga jest
+naprawdę podłogą, bo książka, która twierdzi, że zaczyna od zera, a potem po
+cichu zakłada potęgi, zaczęła od jedynki.
+
+\section*{Po co jest}
+
+Dla sprawności, nie dla ścisłości. Po jej przerobieniu wyprowadzisz mechanizm
+uwagi \emph{scaled dot-product}, powiesz dokładnie, co robi czynnik
+$1/\sqrt{d_k}$ i co się psuje bez niego, przeczytasz funkcję straty jako
+wyrażenie, a nie jako nazwę, i spojrzysz na tabelę wyników, żeby powiedzieć,
+czy różnica w niej jest prawdziwa.
+
+Nie nauczysz się dowodzić. To zamierzone ograniczenie metody i jest ono
+powtórzone w każdym miejscu, w którym daje o sobie znać, w ramce nazywającej
+to, co zostało przyjęte bez dowodu, i wskazującej, gdzie ten dowód znaleźć.
+Książka udająca, że daje jedno i drugie w jednym tomie, nie daje żadnego.
+
+\section*{Dlaczego format jest dziwny}
+
+Ta książka korzysta z metody nauczania programowanego K.~A. Strouda, z
+\emph{Engineering Mathematics} (1970). Materiał jest zupełnie inny; maszyneria
+jest jego i została użyta dlatego, że jest jedynym szeroko stosowanym formatem
+w nauczaniu matematyki, który kiedykolwiek zmierzono wobec grupy kontrolnej.
+
+Maszyneria jest prosta. Książka to ciąg ponumerowanych \emph{ramek}. Prawie
+każda żąda odpowiedzi, a odpowiedź znajduje się na początku następnej ramki,
+więc masz się zadeklarować, zanim sprawdzisz. W obrębie jednego programu dzieje
+się to od czterdziestu do siedemdziesięciu razy. Efekt jest taki, że
+przypominanie z pamięci nie jest czymś, co musisz sobie sam zorganizować na
+końcu rozdziału --- jest jedynym sposobem, w jaki da się przewracać strony.
+
+Konstrukcja stopniuje też własne wsparcie: przykład rozwiązany, potem przykład
+z lukami, potem \emph{jeden do wykonania dla ciebie}, potem zadania
+samodzielne. I celowo zastawia pułapki. Tam, gdzie temat ma typowe błędne
+przekonanie, tekst wprowadzi cię w nie, pozwoli ci się zadeklarować przy złej
+odpowiedzi, a potem stwierdzi wprost, że jest błędna, i pokaże dlaczego. To
+jest niewygodne i jest najcenniejszą rzeczą w tym formacie, bo błędne
+przekonanie wywołane i skorygowane znika, a takie, którego jedynie uniknięto,
+czeka.
+
+\section*{Jak książka jest zbudowana}
+
+Dziewięć części, czterdzieści sześć programów.
+
+\textbf{Część~I --- Podstawy} (F1--F13) nie zakłada niczego i jest sortowana
+Quizami. Jest nachylona ku temu, co się później opłaci, a nie ku szkolnemu
+programowi: logarytmy dostają cały program, bo arytmetyka w skali
+logarytmicznej jest nośna trzy części dalej, a reguła łańcuchowa dostaje
+najdłuższy program w części, bo propagacja wsteczna \emph{jest} regułą
+łańcuchową i niczym więcej.
+
+\textbf{Część~II --- Liczba, precyzja i koszt} (P1--P3) wyprzedza algebrę
+liniową, co jest odejściem od każdego programu nauczania matematyki i jest
+zamierzone. Wszystko po niej to arytmetyka wykonywana przez skończoną maszynę
+przy ograniczonym budżecie. Książka, która czeka czterysta stron, zanim
+przyzna, że maszyna nie potrafi przedstawić liczby $0{,}1$, przez czterysta
+stron uczyła fikcji.
+
+\textbf{Część~III --- Algebra liniowa} (P4--P10) jest największa, bo to
+dziedzina, z której ten czytelnik korzysta codziennie i którą rozumie
+najsłabiej.
+
+\textbf{Część~IV --- Struktury dyskretne i argumentacja} (P11--P13) obejmuje
+zliczanie, grafy oraz czytanie twierdzenia bez wierzenia w więcej, niż ono
+mówi. Stoi przed rachunkiem różniczkowym, żeby \emph{DAG} i \emph{dla każdego
+$\varepsilon$} były zdefiniowane wtedy, gdy są pierwszy raz potrzebne.
+
+\textbf{Część~V --- Rachunek różniczkowy i różniczkowanie automatyczne}
+(P14--P17) prowadzi regułę łańcuchową aż do tego, co robi \code{loss.backward()}.
+
+\textbf{Część~VI --- Optymalizacja} (P18--P21) w pierwszym tomie Strouda nie
+występuje w ogóle.
+
+\textbf{Część~VII --- Prawdopodobieństwo i statystyka} (P22--P27) wychodzi poza
+rozkład normalny, na którym Stroud się zatrzymuje, ku wnioskowaniu i metodzie
+bayesowskiej --- bo prawdziwym statystycznym zadaniem tego czytelnika jest
+rozstrzygnięcie, czy zmierzona różnica jest prawdziwa, a tego nie obejmuje
+żaden podręcznik matematyki inżynierskiej.
+
+\textbf{Część~VIII --- Teoria informacji} (P28--P30) to miejsce, z którego
+bierze się funkcja straty.
+
+\textbf{Część~IX --- Złożenie} (P31--P33) poświęca całą książkę jednej
+architekturze, jednemu treningowi i jednemu pomiarowi, i nie wprowadza nowej
+matematyki.
+
+\section*{Dwie zasady, których ta książka pilnuje}
+
+\begin{note}
+\textbf{Każda liczba jest policzona, nie zapamiętana.} Każda wartość liczbowa
+tutaj wydrukowana pochodzi ze skryptu w katalogu \code{code/} i jest wciągana
+do tekstu mechanicznie. Książka nie zawiera cyfr; zawiera odwołanie do nich.
+Wartość, której skrypty przestaną produkować, drukuje widoczny znacznik i
+przerywa budowanie. Istnieje to dlatego, że błędna cyfra w książce
+matematycznej nie jest zepsutym przykładem --- jest czymś, co czytelnik ze
+sobą zabierze.
+\end{note}
+
+\begin{note}
+\textbf{To, czego nie zmierzono, jest oznaczone jako osąd.} W tych programach
+opisano dziesięć eksperymentów. Tam, gdzie któregoś nie przeprowadzono, teza,
+którą by wspierał, mówi o tym wprost, a tabela, która miałaby zawierać jego
+liczby, pozostaje pusta. Puste tabele nie są przeoczeniem --- są mechanizmem.
+\end{note}
+
+\section*{Dwa języki, jedno źródło}
+
+Ta książka istnieje po polsku i po angielsku i jest budowana z jednego
+repozytorium. Oba wydania dzielą strukturę, rysunki, numerację zadań i
+odpowiedzi; różni je wyłącznie tekst. Kontrola przy każdym budowaniu dowodzi,
+że oba mają te same programy, te same liczby ramek i te same liczby, więc
+poprawka wprowadzona w jednym wydaniu nie może po cichu ominąć drugiego.
+
+Tam, gdzie polski i angielski uzus matematyczny naprawdę się różnią ---
+$\tg$ wobec $\tan$, przecinek dziesiętny, nawiasy ostre polskiej tradycji dla
+przedziału domkniętego, $D^2(X)$ wobec $\Var(X)$ --- decyzja jest zapisana w
+Dodatku~B, a nie zostawiona pamięci tłumacza, i jest wykonywana przez skład, a
+nie stosowana ręcznie.

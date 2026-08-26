@@ -1,0 +1,897 @@
+% ============================================================
+%  preamble.tex — styling, environments, macros
+%
+%  Shared by BOTH editions. main-en.tex and main-pl.tex each define
+%  \booklang before \input{preamble}; nothing else differs between them at
+%  this level. Every user-visible string lives in lang/en.tex or lang/pl.tex,
+%  so a label that appears in one edition and not the other is a missing macro
+%  rather than a silent divergence.
+% ============================================================
+
+% \booklang must be set by the main file. Default to English rather than
+% failing, so a stray \input{preamble} still compiles and says what it did.
+\providecommand{\booklang}{en}
+
+\usepackage{etoolbox}   % loaded first: the language switch below needs it
+
+% ---------- Page geometry ----------
+% Same 17 x 24 cm block as the other two books in this series, so a reader who
+% owns one recognises the second. Frames are short, so the measure matters
+% more here than in a prose book: a frame that runs past a page turn defeats
+% the cover-the-next-frame discipline the whole method rests on.
+\usepackage[
+  paperwidth=17cm, paperheight=24cm,
+  inner=2.2cm, outer=1.8cm, top=2.2cm, bottom=2.4cm,
+  head=23pt, headsep=0.7cm, footskip=1.2cm
+]{geometry}
+
+% ---------- Encoding & fonts ----------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\IfFileExists{lmodern.sty}{\usepackage{lmodern}}{}
+\IfFileExists{newtxtext.sty}{\usepackage{newtxtext}}{}
+\IfFileExists{newtxmath.sty}{\usepackage{newtxmath}}{}
+\IfFileExists{inconsolata.sty}{\usepackage[varqu,scaled=0.95]{inconsolata}}{}
+\IfFileExists{lmodern.sty}{\usepackage{microtype}}{\usepackage[expansion=false]{microtype}}
+
+% ---------- Language ----------
+% Loading babel with a language whose .ldf is absent is a *fatal* error, not a
+% warning, so both the package and each language file are probed before either
+% is requested. This is inherited from the sibling books, where a minimal TeX
+% installation without texlive-lang-polish aborted the run with no PDF and an
+% error message that named neither babel nor the language.
+%
+% The Polish edition needs Polish as the main language for hyphenation; the
+% English edition needs British. Both editions load the other language too,
+% because the glossary appendix is bilingual in both.
+\IfFileExists{babel.sty}{%
+  \IfFileExists{polish.ldf}{%
+    \IfFileExists{british.ldf}{%
+      \ifdefstring{\booklang}{pl}%
+        {\usepackage[british,main=polish]{babel}}%
+        {\usepackage[polish,main=british]{babel}}%
+    }{\usepackage[polish]{babel}}%
+  }{%
+    \IfFileExists{british.ldf}{\usepackage[british]{babel}}{}%
+  }%
+}{}
+
+% babel-polish makes " an active shorthand. listings reads its body verbatim
+% and an active character in a verbatim context is a category-code accident
+% waiting to happen, so the shorthand is turned off globally. Polish quotation
+% marks are produced with \enquote-style macros from lang/pl.tex instead.
+\ifdefstring{\booklang}{pl}{\AtBeginDocument{\shorthandoff{"}}}{}
+
+% ---------- Core packages ----------
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\IfFileExists{mathtools.sty}{\usepackage{mathtools}}{}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{imakeidx}
+\usepackage[hidelinks]{hyperref}
+
+% ---------- Palette ----------
+% Deliberately the same family as the sibling books, shifted green so the three
+% spines are distinguishable on a shelf.
+\definecolor{mblue}{HTML}{1F4E79}
+\definecolor{mgreen}{HTML}{2E6B4F}
+\definecolor{mteal}{HTML}{0E7C7B}
+\definecolor{mamber}{HTML}{B26A00}
+\definecolor{mred}{HTML}{9B2C2C}
+\definecolor{mgrey}{HTML}{5A5A5A}
+\definecolor{mlight}{HTML}{F4F6F8}
+\definecolor{mfaint}{HTML}{FBFCFD}
+\definecolor{codebg}{HTML}{FAFAFA}
+\definecolor{codeframe}{HTML}{D8DEE4}
+\definecolor{kw}{HTML}{0B5394}
+\definecolor{str}{HTML}{9B2C2C}
+\definecolor{cmt}{HTML}{4F7A4F}
+\definecolor{typ}{HTML}{0E7C7B}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=mblue,
+  urlcolor=mteal,
+  citecolor=mblue,
+  pdfauthor={Konrad Cinkusz}
+}
+
+% \ifpl{Polish text}{English text} -- for the handful of places where a string
+% is structural rather than content and belongs in the shared files:
+% structure.tex's part titles, and the main files' front matter wiring.
+% Anything longer than a few words belongs in lang/ or in the edition's own
+% source, not here.
+% \DeclareRobustCommand, not \newcommand. A fragile \ifpl inside a \part title
+% is expanded one level as it is written to the .toc, which lands
+% "\ifdefstring {en}{pl}{...}{...}" in the file -- and that fails on the next
+% run with "Extra }, or forgotten \endgroup", an error that names neither the
+% part nor this macro.
+\DeclareRobustCommand{\ifpl}[2]{\ifdefstring{\booklang}{pl}{#1}{#2}}
+
+% A robust macro cannot go into a PDF bookmark string either -- hyperref strips
+% \ifdefstring and warns once per part title. Tell it which branch to take
+% instead, so the bookmarks carry the right language rather than nothing.
+\makeatletter
+\pdfstringdefDisableCommands{%
+  \ifdefstring{\booklang}{pl}{\let\ifpl\@firstoftwo}{\let\ifpl\@secondoftwo}%
+}
+\makeatother
+
+% ---------- Language strings ----------
+% Every user-visible word the macros below typeset comes from here. Nothing in
+% programs/ or appendices/ may hard-code an English or a Polish word inside a
+% macro argument that the other edition also uses.
+\input{lang/\booklang}
+
+% ============================================================
+%  PROGRAM NUMBERING
+%  ---------------------------------------------------------
+%  Part F programs are F1..F13; the main programs restart at 1. That is
+%  Stroud's scheme and it is worth reproducing, because the Foundation part is
+%  explicitly optional and numbering it separately is what makes skipping it
+%  feel permitted rather than delinquent.
+%
+%  \theHchapter is hyperref's *destination* name, and it must stay unique
+%  across the whole document. Resetting the chapter counter without also
+%  changing \theHchapter produces duplicate PDF destinations, a pile of
+%  warnings, and bookmarks that jump to the wrong program.
+% ============================================================
+\newcommand{\foundationnumbering}{%
+  \setcounter{chapter}{0}%
+  \renewcommand{\thechapter}{F\arabic{chapter}}%
+  \renewcommand{\theHchapter}{F\arabic{chapter}}%
+}
+\newcommand{\mainnumbering}{%
+  \setcounter{chapter}{0}%
+  \renewcommand{\thechapter}{\arabic{chapter}}%
+  \renewcommand{\theHchapter}{M\arabic{chapter}}%
+}
+
+% \appendix resets the chapter counter and switches \thechapter to letters, but
+% it knows nothing about \theHchapter, so appendix A would claim the same PDF
+% destination as main program 1. Patch it once, here.
+\apptocmd{\appendix}{\renewcommand{\theHchapter}{A\Alph{chapter}}}{}{%
+  \PackageWarning{mfabook}{Could not patch \string\appendix\space for hyperref destinations}}
+
+% A program is a chapter. \chaptername is set from the language file so the
+% word above the title is "Program" in both editions (it happens to be the
+% same word, which is a small piece of luck).
+\AtBeginDocument{\renewcommand{\chaptername}{\lblProgram}}
+
+% ---------- Headings ----------
+% \raggedright on the title body is load-bearing, not cosmetic: at \Huge on a
+% 13 cm text block a long title that cannot break overflows the margin badly.
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{mblue}\raggedright}
+  {\normalfont\normalsize\color{mgrey}\MakeUppercase{\chaptertitlename}\ \thechapter}
+  {8pt}{\Huge\raggedright}
+\titlespacing*{\chapter}{0pt}{10pt}{28pt}
+\titleformat{\section}{\normalfont\Large\bfseries\color{mblue}}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries\color{mgrey}}{\thesubsection}{0.7em}{}
+
+% head=23pt in the geometry options above, not \setlength{\headheight}:
+% fancyhdr computes the height it needs from the running-head font and the
+% rule, wants 22.5 pt at this size, and silently overprints the top of the text
+% block if it does not get it. Setting it through geometry keeps the text block
+% where geometry put it instead of pushing it down.
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\nouppercase{\leftmark}}
+% The recto head carries the FRAME number, not the section. In a book of
+% numbered frames "where am I" is a frame question: every Summary
+% back-reference, every Quiz route and every cross-reference between programs
+% is a frame number, and hunting for one by page is the single most annoying
+% thing about reading a programmed text. \theframeno at shipout is the last
+% frame begun on the page, which is what a reader flicking through wants.
+\fancyhead[RO]{\small\lblFrame~\theframeno}
+\fancyfoot[LE,RO]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% This MUST come after \pagestyle{fancy}: fancyhdr installs its own \chaptermark
+% at that point and silently overwrites anything defined earlier. The symptom is
+% a running-head change that appears to do nothing at all.
+%
+% The running head carries the *frame* number as well as the program, because
+% in a book of numbered frames "where am I" is a frame question, not a page
+% question, and the summary's back-references are frame numbers.
+\renewcommand{\chaptermark}[1]{\markboth{\lblProgram\ \thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+% ============================================================
+%  FRAMES — the unit the whole method is built from
+%  ---------------------------------------------------------
+%  A program is a stream of numbered frames. Nearly every frame ends by asking
+%  the reader for something, and the answer opens the *next* frame, so that the
+%  reader can cover what is below and commit to an answer before seeing it.
+%
+%  The environment is called `fr` rather than `frame` for two reasons. First,
+%  \frame is already defined by LaTeX2e (it draws a box in a picture
+%  environment) and an environment named `frame` would silently redefine it.
+%  Second, this is typed forty to seventy times per program, so it wants to be
+%  short in the source.
+%
+%    \begin{fr}
+%    \ans{$x = 3$}            % the answer to the previous frame, optional
+%    Teaching text, ending in a question.
+%    \end{fr}
+% ============================================================
+
+\newcounter{frameno}[chapter]
+\renewcommand{\theframeno}{\arabic{frameno}}
+
+% Frames are referenced constantly -- by the Summary, by the Quiz, by the
+% "Can you?" checklist and by other programs. \label inside a frame must
+% therefore capture the frame number, not the section number.
+\makeatletter
+\newcommand{\framelabelfix}{%
+  \@namedef{theHframeno}{\theHchapter.\arabic{frameno}}%
+}
+\makeatother
+
+\newcommand{\framerule}{%
+  \par\penalty-200\vspace{9pt}%
+  \noindent\textcolor{codeframe}{\rule{\linewidth}{0.5pt}}%
+  \par\vspace{5pt}%
+}
+
+% The frame number as a filled badge, set in the text flow rather than in the
+% margin. A margin number would have to alternate sides under `twoside` and
+% would be the first thing to overflow on a 17 cm page; a badge cannot.
+\newcommand{\framebadge}{%
+  \begingroup
+  \setlength{\fboxsep}{2.5pt}%
+  \colorbox{mblue}{\textcolor{white}{\bfseries\scriptsize\theframeno}}%
+  \endgroup\hspace{0.7em}%
+}
+
+\newenvironment{fr}{%
+  \framerule
+  \refstepcounter{frameno}%
+  \nopagebreak
+  \noindent\framebadge\ignorespaces
+}{\par}
+
+% The answer to the previous frame. Set apart and centred so the eye can find
+% the edge to cover, and so a reader who has answered can check in one glance
+% without reading on.
+\newcommand{\ans}[1]{%
+  \par\nobreak\vspace{-4pt}%
+  \begin{tcolorbox}[
+    enhanced, sharp corners, boxrule=0pt, leftrule=2.5pt,
+    colback=mfaint, colframe=mgreen,
+    left=8pt, right=8pt, top=4pt, bottom=4pt,
+    width=0.86\linewidth, center, halign=center,
+    before skip=2pt, after skip=7pt]
+    #1
+  \end{tcolorbox}%
+  \nobreak\noindent\ignorespaces
+}
+
+% A multi-paragraph or worked answer, where a centred box would be wrong.
+\newenvironment{ansblock}{%
+  \par\nopagebreak
+  \begin{tcolorbox}[
+    enhanced, breakable, sharp corners, boxrule=0pt, leftrule=2.5pt,
+    colback=mfaint, colframe=mgreen,
+    left=8pt, right=8pt, top=5pt, bottom=5pt]
+}{%
+  \end{tcolorbox}%
+  \nopagebreak\par\vspace{2pt}\noindent\ignorespaces
+}
+
+% The row of dots. Stroud's signal that the reader is to supply a word, a
+% number or an expression. \blank is inline; \dotline occupies its own line,
+% which is what a longer derivation step wants.
+\newcommand{\blank}[1][4em]{\makebox[#1]{\dotfill}}
+\newcommand{\dotline}{\par\vspace{2pt}\noindent\makebox[\linewidth]{\dotfill}\par\vspace{2pt}}
+
+% "Now one for you to do." The third rung of the scaffolding gradient, and the
+% one most often skipped by authors who think they have written an exercise
+% when they have written another worked example.
+\newcommand{\yourturn}{%
+  \par\vspace{4pt}\noindent
+  {\bfseries\color{mgreen}\lblYourTurn}\par\nobreak\vspace{2pt}\noindent\ignorespaces
+}
+
+% ============================================================
+%  THE PROGRAM SKELETON
+%  ---------------------------------------------------------
+%  Every program carries the same seven parts, in the same order. They are
+%  macros rather than a convention so that a missing one is a build-time
+%  absence rather than something a reader notices.
+% ============================================================
+
+% ---- Learning outcomes, on entry ----------------------------------------
+% Stored as well as printed, because "Can you?" at the end of the program must
+% be the same list, one for one. Storing it is what makes that structural
+% rather than a promise: the checklist is generated from the outcomes, so the
+% two cannot drift.
+\newcounter{outcomeno}[chapter]
+
+\makeatletter
+% The key under which everything belonging to the current program is stored.
+% It must expand to the printed program number (F1, F2, ..., 1, 2, ...), which
+% is what makes an answer findable from the program that owns it.
+\newcommand{\mfa@progkey}{\thechapter}
+\newcommand{\outcome}[2]{% #1 = frames that teach it, #2 = the outcome
+  \stepcounter{outcomeno}%
+  \csgdef{mfa@out@\mfa@progkey @\theoutcomeno}{#2}%
+  \csgdef{mfa@outfr@\mfa@progkey @\theoutcomeno}{#1}%
+  % The "Can you?" row is built here rather than looped over later. A \loop
+  % inside a tabularx body does not survive alignment scanning: TeX needs to
+  % see the & and the row break while it reads the cell, and a conditional
+  % hides them. Accumulating the rows as tokens at declaration time sidesteps
+  % that entirely, and has the better property anyway -- the checklist is
+  % literally made of the outcomes, so the two cannot disagree.
+  \csgappto{mfa@rows@\mfa@progkey}{%
+    #2 & {\footnotesize\color{mgrey}#1}
+      & \ratingcell & \ratingcell & \ratingcell & \ratingcell & \ratingcell
+    \tabularnewline}%
+  \item #2\hfill{\footnotesize\color{mgrey}[\lblFrames~#1]}%
+}
+\makeatother
+
+\makeatletter
+\newenvironment{outcomes}{%
+  \setcounter{outcomeno}{0}%
+  \csgdef{mfa@rows@\mfa@progkey}{}%
+  \begin{tcolorbox}[
+    enhanced, breakable, sharp corners,
+    colback=mlight, colframe=mblue, boxrule=0pt, leftrule=3pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    fonttitle=\bfseries\small, title={\lblOutcomes}]
+  \begin{itemize}[leftmargin=1.3em, itemsep=3pt, topsep=2pt]
+}{%
+  \end{itemize}
+  \end{tcolorbox}
+}
+\makeatother
+
+% ---- "Can you?" -----------------------------------------------------------
+% Generated from the stored outcomes, not written out again by hand. Five
+% columns rather than a tick box, because a self-assessment with a midpoint is
+% one people actually use and a yes/no one is one they lie to.
+\newcommand{\ratingcell}{\textcolor{codeframe}{\rule[-0.15em]{0.8em}{0.8em}}}
+
+\makeatletter
+\newcommand{\canyou}{%
+  \section*{\lblCanYou}%
+  \phantomsection\addcontentsline{toc}{section}{\lblCanYou}%
+  \noindent\lblCanYouIntro\par\vspace{8pt}
+  \noindent
+  \begingroup\small
+  \ifcsvoid{mfa@rows@\mfa@progkey}{%
+    {\color{mred}\lblNoOutcomes}\par
+  }{%
+    \begin{tabularx}{\linewidth}{@{}Xcccccc@{}}
+    \toprule
+    \textbf{\lblOnEntryYouCould} & \textbf{\lblFrames} & 1 & 2 & 3 & 4 & 5 \\
+    \midrule
+    \csuse{mfa@rows@\mfa@progkey}
+    \bottomrule
+    \end{tabularx}%
+  }%
+  \endgroup
+  \par\vspace{6pt}\noindent{\footnotesize\color{mgrey}\lblCanYouFooter}\par
+}
+\makeatother
+
+% ============================================================
+%  QUIZ, SUMMARY, EXERCISES
+% ============================================================
+
+% ---- Quiz -----------------------------------------------------------------
+% Foundation programs only. It is a diagnostic on the way in and the same test
+% on the way out, which is what lets one book serve a reader who needs the
+% whole program and a reader who needs four frames of it. Each question names
+% the frames that teach it, so a wrong answer routes the reader somewhere
+% specific rather than back to the beginning.
+\newlist{quizlist}{enumerate}{1}
+\setlist[quizlist]{label=\arabic*., leftmargin=2.0em, itemsep=5pt, topsep=3pt}
+
+\makeatletter
+\newenvironment{quiz}{%
+  \section*{\lblQuiz}%
+  \phantomsection\addcontentsline{toc}{section}{\lblQuiz}%
+  \def\mfa@exkey{Q\arabic{quizlisti}}%
+  \noindent\lblQuizIntro\par\vspace{5pt}
+  \begin{quizlist}
+}{%
+  \end{quizlist}
+}
+\makeatother
+
+% The frames that teach the question just asked.
+\newcommand{\teachesat}[1]{\hfill{\footnotesize\color{mgrey}(\lblFrames~#1)}}
+
+% ---- Summary --------------------------------------------------------------
+% Every item carries the frame number it came from, in square brackets. That
+% is the eighth-edition improvement and it is the single cheapest thing in the
+% format: it turns a summary into a return index, so a reader who fails one
+% line of "Can you?" knows exactly which four frames to reread.
+\newenvironment{summarybox}{%
+  \section*{\lblSummary}%
+  \phantomsection\addcontentsline{toc}{section}{\lblSummary}%
+  \begin{tcolorbox}[
+    enhanced, breakable, sharp corners,
+    colback=mlight, colframe=mblue, boxrule=0pt, leftrule=3pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt]
+  \begin{itemize}[leftmargin=1.3em, itemsep=5pt, topsep=2pt]
+}{%
+  \end{itemize}
+  \end{tcolorbox}
+}
+
+% \sumitem{12}{text} -- the frame reference is not decoration, it is the point.
+\newcommand{\sumitem}[2]{\item #2~{\footnotesize\color{mgrey}[#1]}}
+
+% ---- Answers ---------------------------------------------------------------
+%  Answers are authored at the point of use and printed at the back.
+%
+%  They are carried there by a global macro store rather than by an auxiliary
+%  file. The sibling books collect their figure and screenshot manifests with
+%  \@starttoc and a custom file extension, which works because those entries
+%  are one line of text; it is the wrong mechanism for an answer, because an
+%  answer contains displayed maths, and material written to an .aux-style file
+%  and read back is expanded at shipout, where fragile commands break in ways
+%  whose error messages name neither the answer nor the program.
+%
+%  \include is sequential within a run, so a macro defined globally while
+%  typesetting program F1 is still defined when the back matter is typeset.
+%  That is all this needs.
+\makeatletter
+\newcommand{\mfa@storeanswer}[3]{% #1 program key, #2 item key, #3 body
+  \csgdef{mfa@a@#1@#2}{#3}%
+  % \listcsxadd, not \listcsgadd: the item must be EXPANDED as it is stored.
+  % Storing the token \mfa@exkey means every entry in the list expands to
+  % whatever the key happens to be at the time the back matter is typeset,
+  % which is the last one.
+  \listcsxadd{mfa@akeys@#1}{#2}%
+}
+% Used inside an exercise item. Prints nothing here; the body reappears at the
+% back of the book under this program's heading.
+\newcommand{\answerto}[1]{\mfa@storeanswer{\mfa@progkey}{\mfa@exkey}{#1}}
+\providecommand{\mfa@exkey}{?}
+\makeatother
+
+\newlist{exlist}{enumerate}{1}
+\setlist[exlist]{label=\arabic*., leftmargin=2.0em, itemsep=6pt, topsep=3pt}
+\newlist{fplist}{enumerate}{1}
+\setlist[fplist]{label=\arabic*., leftmargin=2.0em, itemsep=5pt, topsep=3pt}
+
+% These MUST be defined inside \makeatletter. Outside it, \def\mfa@exkey{...}
+% parses as \def\mfa @exkey{...} -- a definition of \mfa with a delimited
+% parameter text -- which raises no error at all and quietly leaves every
+% answer filed under the same key. That failure is invisible until the answers
+% section at the back of the book prints one program's answers twice.
+\makeatletter
+\newenvironment{testexercises}{%
+  \section*{\lblTestExercises}%
+  \phantomsection\addcontentsline{toc}{section}{\lblTestExercises}%
+  \def\mfa@exkey{T\arabic{exlisti}}%
+  \noindent\lblTestIntro\par\vspace{5pt}
+  \begin{exlist}
+}{%
+  \end{exlist}
+}
+
+\newenvironment{furtherproblems}{%
+  \section*{\lblFurther}%
+  \phantomsection\addcontentsline{toc}{section}{\lblFurther}%
+  \def\mfa@exkey{P\arabic{fplisti}}%
+  \noindent\lblFurtherIntro\par\vspace{5pt}
+  \begin{fplist}
+}{%
+  \end{fplist}
+}
+\makeatother
+
+% ---- The programs register -------------------------------------------------
+% \program{Title} opens a program: it is \chapter plus the bookkeeping that
+% lets the back matter reproduce this program's answers under its own name.
+\makeatletter
+\newcommand{\program}[1]{%
+  \chapter{#1}%
+  \csgdef{mfa@title@\thechapter}{#1}%
+  % Expanded, for the same reason as the answer keys above.
+  \listxadd{\mfaprograms}{\thechapter}%
+}
+\newcommand{\mfa@printoneanswer}[2]{% #1 program key, #2 item key
+  \item[\textbf{#2}] \csuse{mfa@a@#1@#2}%
+}
+\newcommand{\mfa@answerprogram}[1]{%
+  \subsection*{\lblProgram~#1\quad\textmd{\itshape\csuse{mfa@title@#1}}}%
+  \ifcsdef{mfa@akeys@#1}{%
+    \begin{list}{}{%
+      \setlength{\leftmargin}{3.2em}\setlength{\labelwidth}{2.7em}%
+      \setlength{\labelsep}{0.5em}\setlength{\itemsep}{3pt}%
+      \setlength{\topsep}{3pt}\setlength{\parsep}{0pt}%
+      \renewcommand{\makelabel}[1]{\hfill##1}}
+      \forlistcsloop{\mfa@printoneanswer{#1}}{mfa@akeys@#1}
+    \end{list}%
+  }{%
+    \par\noindent{\color{mred}\lblNoAnswers}\par
+  }%
+}
+% The answers body, without a heading of its own, so the appendix that carries
+% it can be a numbered appendix like any other and appear in the running heads
+% and the ToC in the ordinary way.
+\newcommand{\answersbody}{%
+  \noindent\lblAnswersIntro\par\vspace{8pt}
+  \ifdef{\mfaprograms}{\forlistloop{\mfa@answerprogram}{\mfaprograms}}{%
+    \noindent{\color{mred}\lblNoAnswers}\par}%
+}
+% Unnumbered form, for a draft build that has no appendix wiring yet.
+\newcommand{\printanswers}{%
+  \chapter*{\lblAnswers}%
+  \phantomsection\addcontentsline{toc}{chapter}{\lblAnswers}%
+  \markboth{\lblAnswers}{\lblAnswers}%
+  \answersbody
+}
+\makeatother
+
+% ============================================================
+%  ADMONITIONS
+%  ---------------------------------------------------------
+%  A deliberately small, fixed vocabulary. Each one earns its place by doing
+%  something no other box does; a seventh would be a smell.
+% ============================================================
+
+\newtcolorbox{note}[1][]{
+  enhanced, breakable, sharp corners,
+  colback=mlight, colframe=mblue, boxrule=0pt, leftrule=3pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\small, title={\lblNote}, #1
+}
+
+\newtcolorbox{warning}[1][]{
+  enhanced, breakable, sharp corners,
+  colback=mlight, colframe=mred, boxrule=0pt, leftrule=3pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\small, title={\lblWarning}, #1
+}
+
+% The misconception, stated as a summary after it has been walked into. The
+% trap itself belongs in the frames -- elicit the wrong answer, then say
+% flatly that it is wrong -- and this box is the thing the reader marks with a
+% finger and comes back to.
+\newtcolorbox{trapbox}[1][]{
+  enhanced, breakable, sharp corners,
+  colback=white, colframe=mred, boxrule=0.8pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\small, title={\lblTrap}, #1
+}
+
+% Where the mathematics just done shows up in a system the reader has actually
+% deployed. This is the box that separates the book from a maths textbook, and
+% it is also the one most easily filled with waffle: if it cannot name a
+% specific line of a specific system, it should not be written.
+\newtcolorbox{aibox}[1][]{
+  enhanced, breakable, sharp corners,
+  colback=mlight, colframe=mteal, boxrule=0pt, leftrule=3pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\small, title={\lblInAI}, #1
+}
+
+% What is being asserted rather than proved, and where to read the proof.
+% Stroud's method buys fluency at the cost of rigour, and the honest thing is
+% to say so at each point rather than once in an introduction nobody rereads.
+\newtcolorbox{rigourbox}[1][]{
+  enhanced, breakable, sharp corners,
+  colback=white, colframe=mgrey, boxrule=0.6pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\small, title={\lblRigour}, #1
+}
+
+% Notation that genuinely differs -- between the Polish and English editions,
+% and between disciplines. Matrix calculus alone has two incompatible layout
+% conventions, and half the confusion about backpropagation is a transpose
+% that came from the other one.
+\newtcolorbox{notationbox}[1][]{
+  enhanced, breakable, sharp corners,
+  colback=mlight, colframe=mamber, boxrule=0pt, leftrule=3pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\small, title={\lblNotation}, #1
+}
+
+% The maths analogue of the sibling books' "run this before you trust it".
+% A number in this book is either produced by a script under code/ and pulled
+% in with \val, or it carries this box. Nothing ships to a reader with one
+% still attached.
+\newtcolorbox{verifybox}[1][]{
+  enhanced, breakable, sharp corners,
+  colback=white, colframe=mamber, boxrule=0.8pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\small, title={\lblVerify}, #1
+}
+
+\newtcolorbox{exercisebox}[1][]{
+  enhanced, breakable, sharp corners,
+  colback=white, colframe=mgreen, boxrule=0pt, leftrule=3pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  fonttitle=\bfseries\small, title={\lblExercise}, #1
+}
+
+% ============================================================
+%  CODE LISTINGS
+%  ---------------------------------------------------------
+%  Code appears here for one reason only: to check a number. Every listing in
+%  this book is runnable and every number it prints is the number in the text.
+% ============================================================
+\lstdefinelanguage{pythonx}{
+  language=Python,
+  morekeywords={as, with, assert, match, case},
+  morekeywords=[2]{
+    float64,float32,float16,bfloat16,int8,uint8,
+    np,numpy,array,asarray,frombuffer,nextafter,finfo,iinfo,
+    exp,log,log1p,expm1,logaddexp,sum,max,abs,sqrt,mean,var
+  },
+  sensitive=true
+}
+
+\lstdefinestyle{mfacode}{
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{kw}\bfseries,
+  keywordstyle=[2]\color{typ},
+  stringstyle=\color{str},
+  commentstyle=\color{cmt}\itshape,
+  numbers=left,
+  numberstyle=\ttfamily\tiny\color{mgrey},
+  numbersep=8pt,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  framesep=6pt,
+  breaklines=true,
+  breakatwhitespace=false,
+  postbreak=\mbox{\textcolor{mgrey}{$\hookrightarrow$}\space},
+  showstringspaces=false,
+  tabsize=4,
+  columns=fullflexible,
+  keepspaces=true,
+  captionpos=b,
+  aboveskip=1.2em,
+  belowskip=1.2em,
+  % Maps the characters most likely to be pasted into a listing by accident.
+  %
+  % Do NOT add a mapping for U+00A0 (non-breaking space). It looks like the
+  % obvious next entry and it makes `listings` abort the run with "Improper
+  % alphabetic constant" -- fatal, no PDF, and the message names neither the
+  % character nor this line. The ASCII-in-listings convention is the guard
+  % against it instead. This trap has now been hit in two of the three books
+  % in this series.
+  literate={ł}{{\l}}1 {Ł}{{\L}}1 {ą}{{\k a}}1 {ę}{{\k e}}1
+           {ś}{{\'s}}1 {ć}{{\'c}}1 {ż}{{\.z}}1 {ź}{{\'z}}1 {ó}{{\'o}}1 {ń}{{\'n}}1
+           {Ą}{{\k A}}1 {Ę}{{\k E}}1 {Ś}{{\'S}}1 {Ć}{{\'C}}1
+           {Ż}{{\.Z}}1 {Ź}{{\'Z}}1 {Ó}{{\'O}}1 {Ń}{{\'N}}1
+           {—}{{-{}-}}2 {–}{{-}}1 {‘}{{'}}1 {’}{{'}}1
+           {“}{{"}}1 {”}{{"}}1 {°}{{\textdegree}}1
+}
+
+\lstset{style=mfacode}
+
+\lstnewenvironment{python}[1][]
+  {\lstset{language=pythonx,style=mfacode,#1}}
+  {}
+
+\lstnewenvironment{shellcmd}[1][]
+  {\lstset{language=bash,style=mfacode,numbers=none,keywordstyle=\color{mteal}\bfseries,#1}}
+  {}
+
+% Terminal transcripts: no line numbers, no keyword colouring. Everything in
+% one of these was copied from a real run.
+\lstnewenvironment{console}[1][]
+  {\lstset{style=mfacode,numbers=none,basicstyle=\ttfamily\scriptsize,
+           keywordstyle=\color{black},backgroundcolor=\color{white},#1}}
+  {}
+
+\newcommand{\pyfile}[3]{%
+  \lstinputlisting[language=pythonx,style=mfacode,caption={#2},label={#3}]{#1}%
+}
+\newcommand{\pyregion}[4]{%
+  \lstinputlisting[
+    language=pythonx, style=mfacode,
+    linerange={--8<--\ [start:#2]--- 8<--\ [end:#2]},
+    includerangemarker=false,
+    caption={#3}, label={#4}]{#1}%
+}
+
+% Inline literals
+\newcommand{\code}[1]{\texttt{\small #1}}
+\newcommand{\pkg}[1]{\texttt{\small\color{mblue}#1}}
+\newcommand{\api}[1]{\texttt{\small\color{mteal}#1}}
+
+% ============================================================
+%  COMPUTED VALUES
+%  ---------------------------------------------------------
+%  The house rule in the sibling books is "run the listing, or mark it". The
+%  analogue here is stronger, because a wrong digit in a maths book is not a
+%  broken example, it is a lie the reader will carry.
+%
+%  Every number that came out of a computation is written by a script under
+%  code/ into figures/values/<program>.tex as
+%
+%      \mfaval{f01.eps64}{2.220446049250313e-16}
+%
+%  and pulled into the text with \val{f01.eps64}. The script is the source of
+%  truth; the book cannot disagree with it, because the book does not contain
+%  the digits. A value the scripts no longer produce prints a visible marker
+%  and is counted by `make debt`.
+%
+%  \val also applies the locale's decimal separator, which is how the Polish
+%  edition gets its decimal comma without a translator having to remember.
+% ============================================================
+\IfFileExists{siunitx.sty}{%
+  \usepackage{siunitx}%
+  \sisetup{
+    group-digits = integer,
+    group-minimum-digits = 5,
+    group-separator = {\,},
+    exponent-product = \cdot,
+    output-decimal-marker = {\mfadecimalmarker}
+  }%
+  \newcommand{\mfanum}[1]{\num{##1}}%
+}{%
+  \newcommand{\mfanum}[1]{##1}%
+}
+
+\makeatletter
+\newcommand{\mfaval}[2]{\csgdef{mfaval@#1}{#2}\listxadd{\mfavalues}{#1}}
+\newcommand{\val}[1]{%
+  \ifcsdef{mfaval@#1}{\mfanum{\csuse{mfaval@#1}}}%
+    {\textcolor{mred}{\textbf{[?\,#1]}}}%
+}
+% The raw stored string, for the cases where a number must appear exactly as
+% the machine printed it -- inside a console block, or where the digits
+% themselves are the point and grouping them would obscure the pattern.
+\newcommand{\rawval}[1]{%
+  \ifcsdef{mfaval@#1}{\csuse{mfaval@#1}}%
+    {\textcolor{mred}{\textbf{[?\,#1]}}}%
+}
+\makeatother
+
+% figures/values/all.tex is generated by `make numbers` and does nothing but
+% \input each program's value file. A build with no values yet still compiles;
+% every \val{} in it prints a visible marker instead of a number, which is the
+% correct behaviour for a draft and an obvious failure for a release.
+\IfFileExists{figures/values/all.tex}{\input{figures/values/all}}{%
+  \AtBeginDocument{\PackageWarning{mfabook}{No computed values found. Run `make numbers`.}}}
+
+% ============================================================
+%  DIAGRAMS — Mermaid pipeline
+%  ---------------------------------------------------------
+%  \mermaidfig{key}{caption}{one-line manifest description}
+%
+%  Source of truth is figures/mermaid/<lang>/<key>.mmd, committed. `make
+%  diagrams` renders each to figures/diagrams/<lang>/<key>.pdf, which is build
+%  output and is not committed, so a diagram change reviews as a text diff.
+%
+%  The source is per-language because a diagram with English labels in the
+%  Polish edition is exactly the kind of half-translation that makes a
+%  bilingual book feel machine-made. CI checks that both languages carry the
+%  same set of keys.
+%
+%  If the rendered PDF is absent the macro draws a placeholder AND typesets the
+%  Mermaid source, so a build without mermaid-cli still shows the structure.
+% ============================================================
+\makeatletter
+\newcommand{\listofdiagrams}{%
+  \section*{\lblDiagramManifest}%
+  \phantomsection\addcontentsline{toc}{section}{\lblDiagramManifest}%
+  \@starttoc{dgm}%
+}
+\makeatother
+
+\newcommand{\mermaidfig}[3]{%
+  \addcontentsline{dgm}{subsection}{\protect\numberline{}\texttt{#1.mmd} --- #3}%
+  \begin{figure}[htbp]
+  \centering
+  \IfFileExists{figures/diagrams/\booklang/#1.pdf}{%
+    \includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/diagrams/\booklang/#1.pdf}%
+  }{%
+    \begin{tcolorbox}[
+      enhanced, breakable, width=0.98\linewidth, sharp corners,
+      colback=white, colframe=mgrey, boxrule=0.8pt,
+      left=8pt, right=8pt, top=8pt, bottom=8pt]
+      {\bfseries\color{mgrey}\small \lblNotRendered}\\[4pt]
+      {\ttfamily\scriptsize\color{mgrey} figures/mermaid/\booklang/#1.mmd}\\[6pt]
+      \IfFileExists{figures/mermaid/\booklang/#1.mmd}{%
+        \lstinputlisting[style=mfacode,numbers=none,basicstyle=\ttfamily\scriptsize,
+                         backgroundcolor=\color{mlight},frame=none,
+                         keywordstyle=\color{black}]{figures/mermaid/\booklang/#1.mmd}%
+      }{%
+        {\small\color{mred} \lblSourceMissing: \texttt{figures/mermaid/\booklang/#1.mmd}}%
+      }%
+    \end{tcolorbox}%
+  }%
+  \caption{#2}\label{fig:#1}
+  \end{figure}%
+}
+
+% ============================================================
+%  PROGRAM STUBS
+%  ---------------------------------------------------------
+%  Prints a visible marker so an unwritten program cannot be mistaken for a
+%  written one and the page count never flatters the draft. `make debt` counts
+%  them, and CI publishes the count on every build.
+% ============================================================
+\newcommand{\programstub}[1]{%
+  \begin{tcolorbox}[
+    enhanced, breakable, width=\linewidth, sharp corners,
+    colback=mlight, colframe=mred, boxrule=1pt,
+    borderline={0.6pt}{3pt}{mred, dashed},
+    left=12pt, right=12pt, top=12pt, bottom=12pt]
+    {\bfseries\color{mred}\large \lblNotWritten}\\[8pt]
+    \small\raggedright #1
+  \end{tcolorbox}%
+}
+
+% ============================================================
+%  MATHEMATICAL OPERATORS
+%  ---------------------------------------------------------
+%  Language-invariant names live here. The ones that genuinely differ between
+%  Polish and English usage -- tan/tg, Var/D^2, gcd/NWD, and the interval
+%  brackets -- are defined in lang/en.tex and lang/pl.tex instead, so the
+%  notation contract is executed by the build rather than remembered by a
+%  translator.
+% ============================================================
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\relu}{ReLU}
+\DeclareMathOperator{\softmax}{softmax}
+\DeclareMathOperator{\logsumexp}{logsumexp}
+\DeclareMathOperator{\fl}{fl}
+\DeclareMathOperator{\ulp}{ulp}
+\DeclareMathOperator{\round}{round}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Fset}{\mathbb{F}}          % the floating-point numbers, F1's subject
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\T}{^{\mathsf{T}}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\inner}[2]{\left\langle #1, #2 \right\rangle}
+\newcommand{\eps}{\varepsilon}
+
+% ============================================================
+%  INDEX
+%  ---------------------------------------------------------
+%  Two-column, and its entries include \texttt{} names that do not hyphenate.
+%  Ragged right keeps multi-word entries off the margin; it cannot help a
+%  single token wider than the column, so keep verbatim index entries under
+%  about 29 characters and index longer names by concept instead. Both sibling
+%  books learned this the same way.
+% ============================================================
+\apptocmd{\theindex}{\raggedright}{}{%
+  \PackageWarning{mfabook}{Could not patch theindex for ragged-right setting}}
+
+\makeindex
+
+% ============================================================
+%  PINNED FACTS — single source of truth
+%  Change these here; they propagate through both editions.
+% ============================================================
+\newcommand{\bookedition}{0.1}
+\newcommand{\pinnedon}{August 2026}
+\newcommand{\pyver}{Python 3.13}
+\newcommand{\numpyver}{2.3}

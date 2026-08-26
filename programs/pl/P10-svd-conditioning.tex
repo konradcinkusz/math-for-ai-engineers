@@ -1,0 +1,29 @@
+%% P10 --- Rozkład SVD, aproksymacja niskiego rzędu i uwarunkowanie
+%%
+%% Zalążek. Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co
+%% ma dać czytelnikowi. Napisanie programu oznacza usunięcie bloku
+%% \programstub{} i zastąpienie go programem. Jeśli po przerobieniu materiału
+%% opis okaże się błędny, popraw go i odnotuj sprzeczność w CLAUDE.md w sekcji
+%% *Resolved questions*.
+
+\program{Rozkład SVD, aproksymacja niskiego rzędu i uwarunkowanie}
+\label{prog:P10}
+
+\programstub{%
+\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+
+Argument: every matrix, square or not, factors into rotate--stretch--rotate.
+Truncating the stretch gives the provably best approximation of a given rank
+(Eckart--Young, stated). The ratio of largest to smallest singular value is
+the condition number, and it is the amplification factor from input error to
+output error. Payoff: the singular-value spectrum of a real embedding
+matrix, plotted, showing how few directions carry the energy --- the
+empirical case for LoRA and for embedding compression, measured; the
+pseudoinverse as least squares done properly; why the normal equations
+square the condition number and a QR solve does not, which is the concrete
+form of "do not invert"; and the condition number as the number that
+predicts how many iterations an optimiser will need, handed forward to P19.
+
+\medskip
+\textbf{Planowana długość:} 60 ramek.
+}

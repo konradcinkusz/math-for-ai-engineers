@@ -1,0 +1,215 @@
+name: Build
+
+# Validates both editions on every push and pull request. The release workflow
+# only runs on tags and is therefore too late to catch a broken pull request;
+# this is the one that gives contributors feedback.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -------------------------------------------------------------------------
+  # The numbers come first, and they gate everything. If a script no longer
+  # produces the value the book prints, nothing downstream is worth building.
+  # -------------------------------------------------------------------------
+  numbers:
+    name: Recompute every number
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install --quiet numpy sympy
+      - name: Regenerate figures/values from code/
+        run: make numbers
+      - name: Fail if any committed value has drifted
+        run: |
+          if ! git diff --quiet -- figures/values; then
+            echo "::error::A computed value in the book differs from what code/ now produces."
+            git diff -- figures/values
+            exit 1
+          fi
+          echo "Every computed value in the book matches its script."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: values
+          path: figures/values
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # -------------------------------------------------------------------------
+  # Parity is a hard gate. A bilingual book fails by having a correction
+  # applied to one edition and missed in the other; this is what stops that.
+  # -------------------------------------------------------------------------
+  parity:
+    name: Polish and English in step
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Compare the two editions
+        run: python3 tools/check_parity.py
+
+  diagrams:
+    name: Render diagrams
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Render every Mermaid source to PDF
+        run: |
+          shopt -s nullglob
+          SRC=(figures/mermaid/*/*.mmd)
+          if [ ${#SRC[@]} -eq 0 ]; then
+            echo "No Mermaid sources yet."
+            mkdir -p figures/diagrams
+            exit 0
+          fi
+          # mermaid-cli bundles its own Chromium; --no-sandbox is required in a
+          # container running as root.
+          printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
+          FAILED=0
+          for f in "${SRC[@]}"; do
+            lang=$(basename "$(dirname "$f")")
+            key=$(basename "$f" .mmd)
+            mkdir -p "figures/diagrams/$lang"
+            echo "::group::$lang/$key"
+            if ! npx -y @mermaid-js/mermaid-cli@11 \
+                 -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
+                 -p .puppeteer.json -c figures/mermaid/config.json \
+                 -b transparent --pdfFit; then
+              echo "::error file=$f::Mermaid failed to render $lang/$key"
+              FAILED=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $FAILED
+      - name: Both languages must carry the same diagram keys
+        run: |
+          a=$(cd figures/mermaid/en 2>/dev/null && ls *.mmd 2>/dev/null | sort || true)
+          b=$(cd figures/mermaid/pl 2>/dev/null && ls *.mmd 2>/dev/null | sort || true)
+          if [ "$a" != "$b" ]; then
+            echo "::error::The two editions have different diagram sets."
+            diff <(echo "$a") <(echo "$b") || true
+            exit 1
+          fi
+          echo "Diagram keys match across both editions."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: diagrams
+          path: figures/diagrams
+          retention-days: 14
+          if-no-files-found: ignore
+
+  build:
+    name: Compile ${{ matrix.lang }}
+    runs-on: ubuntu-latest
+    needs: [numbers, diagrams]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lang: en
+            pdf: Mathematics-from-Zero-for-the-AI-Engineer
+          - lang: pl
+            pdf: Matematyka-od-zera-dla-inzyniera-AI
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        continue-on-error: true
+        with:
+          name: values
+          path: figures/values
+
+      - uses: actions/download-artifact@v5
+        continue-on-error: true
+        with:
+          name: diagrams
+          path: figures/diagrams
+
+      - name: Compile with latexmk
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-${{ matrix.lang }}.tex
+          latexmk_use_lualatex: false
+          # pdflatex is sufficient; the preamble degrades gracefully when the
+          # optional font packages are missing.
+          args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
+
+      - name: Check for unresolved references
+        run: |
+          if grep -q "Reference.*undefined" main-${{ matrix.lang }}.log; then
+            echo "::error::Unresolved cross-references remain after the final pass."
+            grep "Reference.*undefined" main-${{ matrix.lang }}.log | sort -u
+            exit 1
+          fi
+          echo "No unresolved references."
+
+      - name: Report overfull boxes
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import re
+          log = open('main-${{ matrix.lang }}.log', encoding='utf8', errors='replace').read()
+          h = [float(x) for x in re.findall(r'Overfull \\hbox \(([\d.]+)pt', log)]
+          v = [float(x) for x in re.findall(r'Overfull \\vbox \(([\d.]+)pt', log)]
+          pg = re.search(r'Output written on .*\((\d+) pages', log)
+          print(f"### `${{ matrix.lang }}` edition\n")
+          print(f"**Pages:** {pg.group(1) if pg else '?'}\n")
+          print(f"**Overfull hbox:** {len(h)} "
+                f"{sorted((round(x,1) for x in h), reverse=True)[:10]}\n")
+          print(f"**Overfull vbox:** {len(v)} --- these are the expensive ones; "
+                "a vbox means a boxed table grew past a page and could not break.\n")
+          PY
+
+      - name: Rename artefact
+        run: mv main-${{ matrix.lang }}.pdf "${{ matrix.pdf }}.pdf"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book-${{ matrix.lang }}
+          path: ${{ matrix.pdf }}.pdf
+          retention-days: 14
+
+  ledgers:
+    name: Outstanding work
+    runs-on: ubuntu-latest
+    # Advisory. These are counted on every build so the debt is visible rather
+    # than quietly carried, but a draft is allowed to carry debt.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Print every ledger
+        run: |
+          {
+            echo "## Outstanding work"
+            echo ""
+            echo '```'
+            make -s debt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
