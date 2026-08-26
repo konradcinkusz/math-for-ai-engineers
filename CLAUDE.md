@@ -246,6 +246,19 @@ Each cost time; none is obvious from its error message.
   so the decimal comma — the single most visible feature of a Polish
   mathematics book — silently did not work.
 
+- **`amssymb` alongside `newtxmath` is a fatal clash**, and it is invisible on a
+  machine without newtx. `newtxmath` supplies the AMS symbols itself, so loading
+  `amssymb` too gives
+  `amssymb.sty:261: LaTeX Error: Command \Bbbk already defined` and no PDF.
+  This is the one to remember, because of *how* it was found: every local build
+  was green for hours, because this container has no newtx and the preamble
+  degrades past it. **CI, on a fuller TeX Live, failed on the first line of the
+  first program.** A preamble that probes for optional packages is only tested
+  by a machine that has them.
+
+  The preamble loads `amsmath` first, then `newtxmath` if present and `amssymb`
+  only if it is not.
+
 - **`grep '^!' main.log` cannot see that error.** With `-file-line-error` an
   error line begins with a *path*, and `-interaction=nonstopmode` writes a PDF
   over the top of it, so the exit code and the PDF both say fine. This is the
