@@ -408,8 +408,9 @@ program means deleting the stub. If the brief turns out to be wrong once the
 mathematics has been worked, change it and record the contradiction here.
 
 **Forward prerequisites, all declared rather than discovered.** An adversarial
-review of the curriculum found four, and the rule is now that each is stated in
-the owning program's Learning outcomes with a pointer:
+review of the curriculum found four and a later pass found a fifth, and the rule
+is now that each is stated in the owning program's Learning outcomes with a
+pointer:
 
 - **P21** (stochastic optimisation) needs random variables and variance from
   **P24–P25**, two parts later. P25 revisits minibatch noise once the machinery
@@ -419,8 +420,20 @@ the owning program's Learning outcomes with a pointer:
 - **P18** (matrix calculus) carries the book's most reused derivation, the
   softmax–cross-entropy gradient, and cross-entropy is not defined until
   **P30**. P18 gives it a definitional frame; P26 and P30 each return to it.
+- **P22** (constrained optimisation) states its whole payoff in terms of a
+  **KL-penalised objective** — the multiplier as the price of a constraint, and
+  the equivalence of a hard KL constraint with a KL penalty — and KL is not
+  defined until **P30**. This one the review missed; it was found by building the
+  dependency graph in `tools/programs.json` and checking every edge against the
+  declared list. Either declare the one fact it needs, as P18 does, or carry the
+  payoff with a plain quadratic penalty and have P30 return to it. **The author's
+  call, but it may not be left undeclared** — the brief now says so.
 
-Anything else is a dependency error, not a forward reference.
+Anything else is a dependency error, not a forward reference. **The graph is now
+machine-checkable:** every program in `tools/programs.json` carries `deps`, so a
+forward edge that is not on this list is findable in one pass rather than by
+reading forty-seven briefs. That is how the fifth was found, and it is worth
+re-running after any curriculum change.
 
 ### Changes the curriculum review forced, August 2026
 
