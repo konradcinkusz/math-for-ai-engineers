@@ -79,6 +79,14 @@
 \usepackage{titlesec}
 \usepackage{caption}
 \usepackage{imakeidx}
+% csquotes with autostyle follows babel's active language, so the identical
+% source \enquote{x} sets 'x' in the English edition and the Polish quotation
+% marks in the Polish one. This is not a nicety: babel-polish makes " an active
+% shorthand, which is turned off above precisely because an active character
+% near a listings body is a category-code accident waiting to happen -- so a
+% quotation mark has to come from a macro rather than from a keyboard key.
+\IfFileExists{csquotes.sty}{\usepackage[autostyle=true]{csquotes}}{%
+  \providecommand{\enquote}[1]{``##1''}}
 \usepackage[hidelinks]{hyperref}
 
 % ---------- Palette ----------
@@ -859,6 +867,27 @@
 \DeclareMathOperator{\ulp}{ulp}
 \DeclareMathOperator{\round}{round}
 
+% A bare \log is FORBIDDEN in this book, and tools/check_notation.py fails the
+% build on one. In Polish textbooks \log means base ten; in machine-learning
+% writing it means base e. The same three characters carry opposite meanings to
+% the two readerships this book serves, and they collide hardest in exactly the
+% programs where it matters most -- entropy in bits and cross-entropy in nats
+% are two programs apart. Write \ln for nats and \logb{2} for bits. It costs
+% two characters and removes the ambiguity entirely.
+\makeatletter
+\let\mfa@origlog\log
+\renewcommand{\log}{%
+  \PackageError{mfabook}{A bare \string\log\space is forbidden in this book}%
+    {Write \string\ln\space for natural logarithms or \string\logb{2}\space for
+     bits. The base is never left to a convention here; see Appendix B.}%
+  \mfa@origlog}
+% The one legitimate form: an explicit base.
+\newcommand{\logb}[1]{\mathop{\mfa@origlog}\nolimits_{#1}}
+% ...and a way to write the forbidden thing when the subject IS the ban, which
+% is Appendix B and nowhere else.
+\newcommand{\mfalogplain}{\mathop{\mfa@origlog}\nolimits}
+\makeatother
+
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
@@ -892,6 +921,8 @@
 %  Change these here; they propagate through both editions.
 % ============================================================
 \newcommand{\bookedition}{0.1}
-\newcommand{\pinnedon}{August 2026}
+% \pinnedon is a user-visible string and lives in lang/<lang>.tex, not here.
+% It said "August 2026" on the Polish title page for exactly as long as it
+% took somebody to read the Polish title page.
 \newcommand{\pyver}{Python 3.13}
 \newcommand{\numpyver}{2.3}

@@ -4,9 +4,83 @@
 \label{app:B}
 
 \programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
-
 Wszystkie symbole używane w książce, w kolejności, w jakiej czytelnik je
-spotyka, wraz z numerem ramki wprowadzającej. To do tego dodatku odsyła
-wstęp \emph{Jak czytać wzór}.
+spotyka, wraz z numerem ramki wprowadzającej. To do tego dodatku odsyła wstęp
+\emph{Jak czytać wzór}; istnieje, bo czytelnika, który nigdy nie widział
+$\sum$, nie może to zatrzymać w Programie~F4.
 }
+
+% ============================================================
+\section{Decyzje, które ta książka podjęła}
+\label{sec:appB-decisions}
+
+\noindent
+Tam, gdzie uzus matematyczny jest podzielony, książka musi wybrać, a sam wybór
+jest dla czytelnika wart więcej niż konwencja. Oto cztery, które naprawdę
+bolą.
+
+\begin{notationbox}
+\textbf{Logarytm zawsze niesie tutaj swoją podstawę.} Ta książka nigdy nie
+pisze samego $\mfalogplain$. Logarytm naturalny to $\ln$, logarytm o podstawie
+dwa to $\logb{2}$.
+
+Powód jest taki, że dwie grupy czytelników, którym ta książka służy, zostały
+nauczone przeciwnych konwencji. W polskich podręcznikach sam logarytm oznacza
+podstawę dziesięć. W piśmiennictwie uczenia maszynowego oznacza podstawę $e$.
+Te same trzy znaki niosą przeciwne znaczenia i zderzają się najmocniej
+dokładnie w tych programach, w których najbardziej się to liczy: entropię
+podaje się w bitach, a entropię krzyżową w natach, a dzielą je dwa programy.
+
+Konwencja ogłoszona raz w dodatku tego nie naprawia. Napisanie podstawy
+kosztuje dwa znaki, a build odrzuca sam logarytm, zamiast liczyć na czyjąś
+pamięć.
+\end{notationbox}
+
+\begin{notationbox}
+\textbf{Wektory są kolumnami i są pogrubione.} $\vect{x} \in \R^{n}$ jest
+kolumną, a $\vect{x}\T$ wierszem. Polska szkoła pisze też strzałkę nad literą;
+prace, do których czytania ta książka cię przygotowuje, tego nie robią, więc
+ta książka też nie.
+
+\textbf{Pochodne macierzowe używają układu licznikowego}, zadeklarowanego w
+Programie~P17 i nigdy nie przyjmowanego milcząco. To nie jest różnica polsko-
+-angielska, tylko różnica między dziedzinami, i bierze się z niej dobra połowa
+zamieszania z transpozycjami w opisach propagacji wstecznej.
+\end{notationbox}
+
+\begin{notationbox}
+\textbf{Przedziały zapisujemy nawiasami kwadratowymi:} $\intcc{a}{b}$ jest
+domknięty, $\intoo{a}{b}$ otwarty. Polska szkoła zapisuje przedział domknięty
+jako $\langle a, b\rangle$. Norma ISO 80000-2 i każda praca, którą otworzysz,
+tego nie robią. Książka idzie za pracami, a Program~F6 mówi o tym przy
+pierwszym przedziale, zamiast zostawiać czytelnika z niepewnością.
+\end{notationbox}
+
+\begin{notationbox}
+\textbf{Wariancja to $\Var(X)$, a wartość oczekiwana to $\Ex[X]$.} Polskie
+materiały dydaktyczne do dziś piszą $D^{2}(X)$ obok $\Var$ --- to jest bieżący
+uzus, a nie ciekawostka historyczna, i Program~P23 podaje tę równoważność tam,
+gdzie pojęcie się pojawia. $M(X)$ na wartość oczekiwaną jest formą reliktową i
+dostaje zdanie, a nie ramkę.
+\end{notationbox}
+
+% ============================================================
+\section{Test klawiatury}
+\label{sec:appB-keyboard}
+
+\noindent
+Wydanie polskie pisze $\tg\theta$ na tangens i \code{tanh} na tangens
+hiperboliczny, co wygląda na niekonsekwencję. To jest reguła w działaniu.
+
+\begin{note}
+\textbf{Jeśli będziesz wpisywał dany zapis do komputera, oba wydania używają
+pisowni, którą wpiszesz. Jeśli będziesz go wyłącznie czytał albo pisał ręcznie,
+wydanie polskie używa formy polskiej.}
+
+Nikt nie wpisuje $\tg$ do programu, więc wydanie polskie składa $\tg$, $\ctg$ i
+$\arctg$ tak, jak robi to polska matematyka. Ale \code{tanh} to
+\code{torch.tanh} \dash{} jest funkcją aktywacji, zanim jest funkcją zmiennej
+rzeczywistej, a polski czytelnik, który nauczy się \emph{tgh}, nie znajdzie jej
+w żadnej bibliotece. Polskie piśmiennictwo matematyczne pisze \emph{tgh} i
+Program~F8 odnotowuje to w miejscu, w którym ta funkcja się pojawia.
+\end{note}

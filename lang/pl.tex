@@ -22,6 +22,24 @@
 \newcommand{\lblAnswers}{Odpowiedzi}
 \newcommand{\lblYourTurn}{Teraz jeden przykład do wykonania dla ciebie.}
 
+
+% ---------- Tytuły części ----------
+% Znajdują się tutaj, a nie w structure.tex, z powodu zasady, którą to
+% repozytorium ogłasza i raz złamało: nic poza plikiem językowym nie może
+% zawierać na sztywno słowa, które składa również drugie wydanie. Tytuły
+% części zapisane przez \ifpl wyprowadzają dziewięć widocznych napisów poza
+% zasięg kontroli parytetu porównującej oba katalogi.
+\newcommand{\lblPartI}{Podstawy}
+\newcommand{\lblPartII}{Liczba, precyzja i koszt}
+\newcommand{\lblPartIII}{Algebra liniowa}
+\newcommand{\lblPartIV}{Struktury dyskretne i argumentacja}
+\newcommand{\lblPartV}{Rachunek różniczkowy i różniczkowanie automatyczne}
+\newcommand{\lblPartVI}{Optymalizacja}
+\newcommand{\lblPartVII}{Prawdopodobieństwo i statystyka}
+\newcommand{\lblPartVIII}{Teoria informacji}
+\newcommand{\lblPartIX}{Złożenie}
+\newcommand{\lblPartAppendices}{Dodatki}
+
 % ---------- Instrukcje, na których opiera się metoda ----------
 \newcommand{\lblQuizIntro}{%
   Rozwiąż go przed przerobieniem programu i jeszcze raz po jego ukończeniu.
@@ -47,6 +65,11 @@
 \newcommand{\lblAnswersIntro}{%
   Odpowiedzi do quizów (Q), zadań sprawdzających (T) i dalszych wyzwań (P) ze
   wszystkich programów, w kolejności programów.}
+
+% Myślnik. Polska typografia składa półpauzę ze spacjami po obu stronach;
+% angielski zwyczaj to pauza bez spacji, który po polsku czyta się obco.
+% Autorzy piszą \dash i nigdy nie wstawiają myślnika wprost.
+\newcommand{\dash}{~-- }
 
 % ---------- Tytuły ramek wyróżnionych ----------
 \newcommand{\lblNote}{Uwaga}
@@ -103,3 +126,6 @@
 \newcommand{\intoo}[2]{(#1,\,#2)}
 \newcommand{\intco}[2]{[#1,\,#2)}
 \newcommand{\intoc}[2]{(#1,\,#2]}
+
+% The date the book's facts were last checked. User-visible, so it lives here.
+\newcommand{\pinnedon}{sierpień 2026}

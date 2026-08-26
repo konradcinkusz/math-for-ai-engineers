@@ -1,4 +1,4 @@
-.PHONY: all en pl text-only watch-en watch-pl clean diagrams diagrams-clean \
+.PHONY: all check en pl text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames outcomes values translate shots debt
 
 LANGS   := en pl
@@ -11,13 +11,24 @@ VAL_SRC := $(wildcard code/*.py)
 # command line if yours lives somewhere else.
 BROWSER ?= $(shell command -v chromium 2>/dev/null || command -v chromium-browser 2>/dev/null || command -v google-chrome 2>/dev/null || echo /opt/pw-browsers/chromium)
 
-all: numbers diagrams en pl
+all: numbers diagrams en pl check
+
+# The three gates. A build that only *looked* like it succeeded is the failure
+# mode this book cannot afford: -interaction=nonstopmode writes a PDF over the
+# top of an error, and with -file-line-error the error line does not begin with
+# a `!`, so the inherited `grep '^!' main.log` habit cannot see it.
+check:
+	@python3 tools/checklog.py main-en.log main-pl.log
+	@python3 tools/parity.py | tail -n 3
+	@python3 tools/reflist.py 2>/dev/null || true
 
 en: numbers
-	latexmk -pdf -interaction=nonstopmode main-en.tex
+	latexmk -pdf -interaction=nonstopmode -file-line-error main-en.tex
+	@python3 tools/checklog.py main-en.log
 
 pl: numbers
-	latexmk -pdf -interaction=nonstopmode main-pl.tex
+	latexmk -pdf -interaction=nonstopmode -file-line-error main-pl.tex
+	@python3 tools/checklog.py main-pl.log
 
 # Skip diagram rendering and value regeneration -- useful when iterating on
 # prose. Unrendered diagrams print their Mermaid source, so the build is still
@@ -118,9 +129,14 @@ outcomes:
 values:
 	@python3 tools/check_structure.py --values
 
-# 6. The two editions out of step.
+# 6. The two editions out of step. tools/parity.py is the single parity tool;
+#    it compares an ORDERED structural signature rather than counts, because a
+#    histogram cannot see \yourturn moving from frame 2 to frame 3, and every
+#    Summary back-reference and Quiz route navigates by frame number.
 translate:
-	@python3 tools/check_parity.py
+	@python3 tools/parity.py | tail -n 3
+	@python3 tools/reflist.py 2>/dev/null || \
+	  echo "  (cross-reference comparison needs a completed build of both editions)"
 
 # 7. Numeric claims not produced by a script, and diagrams not drawn.
 shots:

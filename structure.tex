@@ -9,7 +9,7 @@
 
 \newcommand{\includeprogram}[1]{\include{programs/\booklang/#1}}
 
-\part{\ifpl{Podstawy}{Foundation}}
+\part{\lblPartI}
 \foundationnumbering
 \includeprogram{F01-numbers-powers-roots}
 \includeprogram{F02-language-algebra}
@@ -25,13 +25,13 @@
 \includeprogram{F12-chain-rule}
 \includeprogram{F13-integral}
 
-\part{\ifpl{Liczba, precyzja i koszt}{Number, precision and cost}}
+\part{\lblPartII}
 \mainnumbering
 \includeprogram{P01-floating-point}
 \includeprogram{P02-numerical-stability}
 \includeprogram{P03-orders-of-magnitude}
 
-\part{\ifpl{Algebra liniowa}{Linear algebra}}
+\part{\lblPartIII}
 \includeprogram{P04-vector-spaces}
 \includeprogram{P05-inner-product-norms}
 \includeprogram{P06-matrices-as-maps}
@@ -40,24 +40,24 @@
 \includeprogram{P09-eigenvalues}
 \includeprogram{P10-svd-conditioning}
 
-\part{\ifpl{Struktury dyskretne i argumentacja}{Discrete structures and argument}}
+\part{\lblPartIV}
 \includeprogram{P11-combinatorics}
 \includeprogram{P12-graphs-dags}
 \includeprogram{P13-logic-proof}
 
-\part{\ifpl{Rachunek różniczkowy i różniczkowanie automatyczne}{Calculus and automatic differentiation}}
+\part{\lblPartV}
 \includeprogram{P14-gradient}
 \includeprogram{P15-autodiff}
 \includeprogram{P16-hessian-taylor}
 \includeprogram{P17-matrix-calculus}
 
-\part{\ifpl{Optymalizacja}{Optimisation}}
+\part{\lblPartVI}
 \includeprogram{P18-convexity-jensen}
 \includeprogram{P19-gradient-descent}
 \includeprogram{P20-stochastic-optimisation}
 \includeprogram{P21-constrained-optimisation}
 
-\part{\ifpl{Prawdopodobieństwo i statystyka}{Probability and statistics}}
+\part{\lblPartVII}
 \includeprogram{P22-probability-bayes}
 \includeprogram{P23-distributions}
 \includeprogram{P24-clt-monte-carlo}
@@ -65,12 +65,12 @@
 \includeprogram{P26-inference}
 \includeprogram{P27-bayesian-inference}
 
-\part{\ifpl{Teoria informacji}{Information theory}}
+\part{\lblPartVIII}
 \includeprogram{P28-entropy}
 \includeprogram{P29-cross-entropy-kl}
 \includeprogram{P30-mutual-information}
 
-\part{\ifpl{Złożenie}{Assembling it}}
+\part{\lblPartIX}
 \includeprogram{P31-transformer-derived}
 \includeprogram{P32-training-run}
 \includeprogram{P33-measuring-honestly}

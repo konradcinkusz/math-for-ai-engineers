@@ -1,28 +1,63 @@
 % ============================================================
-%  main-en.tex --- the English edition.
+%  Mathematics from Zero for the AI Engineer
+%  Konrad Cinkusz
 %
-%  The ONLY difference between the two main files is \booklang. Everything
-%  else -- the part and program sequence -- lives in structure.tex, which both
-%  read, so the two editions cannot contain different programs.
+%  ENGLISH edition. The Polish edition is main-pl.tex. The two share this
+%  repository's preamble, its structure file, its figures and its code, and
+%  differ only in programs/<lang>/, frontmatter/<lang>/, appendices/<lang>/
+%  and lang/<lang>.tex.
+%
+%  Build:  latexmk -pdf main-en.tex      (or: make en)
+%          make            -- both editions, with diagrams
+%          make debt       -- every outstanding-work ledger
+%
+%  To work on one program only, uncomment \includeonly. Note that a partial
+%  build cannot print the answers of programs it did not typeset, and says so
+%  where they would have been.
 % ============================================================
+
 \documentclass[11pt,twoside,openright]{book}
+
 \def\booklang{en}
 \input{preamble}
+
+\hypersetup{pdftitle={Mathematics from Zero for the AI Engineer}}
+
+% \includeonly{programs/en/F01-numbers-powers-roots}
+
 \begin{document}
+
+% ------------------------------------------------------------
 \frontmatter
+
 \input{frontmatter/en/titlepage}
+
 \tableofcontents
+
 \input{frontmatter/en/how-to-use}
+\input{frontmatter/en/introduction}
+
+% ------------------------------------------------------------
 \mainmatter
+
 \input{structure}
+
+% ------------------------------------------------------------
+%  Appendix A carries the answers. They are collected as the programs are
+%  typeset, so this part must come after \input{structure} and nothing may
+%  call \printanswers as well -- doing both prints every answer twice.
 \appendix
+\part{\lblPartAppendices}
 \include{appendices/en/appA-answers}
 \include{appendices/en/appB-notation}
 \include{appendices/en/appC-formulae}
 \include{appendices/en/appD-terminology}
 \include{appendices/en/appE-further-reading}
 \include{appendices/en/appF-manifest}
+
+% ------------------------------------------------------------
 \backmatter
-\printanswers
+
 \printindex
+
 \end{document}

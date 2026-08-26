@@ -530,8 +530,125 @@ def check_notation(rep: Report, path: Path) -> None:
             if not in_listing(m.start()):
                 rep.soft("C10-notation",
                          f"{rel}:{src.count(chr(10), 0, m.start())+1} "
-                         f'straight quote -- Polish opens with \\pq{{...}} (,,...")')
+                         f'straight quote -- use \\enquote{{...}}, which csquotes '
+                         f'sets as Polish quotation marks under babel')
                 break
+
+
+# ---- folded in from the second parity tool --------------------------------
+# These three came from tools/check_parity.py, which this file replaces. Two
+# parity tools that disagree are worse than one, and each of these catches
+# something the ordered signature above cannot.
+
+NUMBER_RE = re.compile(r"(?<![\w.,])\d+(?:\.\d+)?(?:[eE][-+]?\d+)?")
+VERB_ENV_RE = re.compile(
+    r"\\begin\{(python|console|shellcmd)\}(?:\[[^\]]*\])?(.*?)\\end\{\1\}", re.S)
+MACRO_RE = re.compile(r"\\([a-zA-Z@]+)")
+# Macros whose count may legitimately differ: they are prose decoration, and a
+# good translation uses more or fewer of them.
+PROSE_MACROS = {
+    "emph", "textbf", "textit", "quad", "qquad", "noindent", "par", "medskip",
+    "smallskip", "bigskip", "hfill", "vspace", "mbox", "footnote", "ldots",
+    "dots", "text", "dash", "enquote", "-",
+}
+
+
+def check_numbers(rep: Report, en: Doc, pl: Doc) -> None:
+    """Every numeric literal, in order, compared STRICTLY.
+
+    Deliberately not normalising the Polish decimal comma to a full stop. The
+    other tool did, which let a hand-localised $0.1$ / $0{,}1$ pair through --
+    and a number localised by hand rather than by \num{} is exactly the defect
+    this book cannot afford, because it is authored twice and only one copy
+    will be corrected. C10 forbids the bare decimal; comparing strictly here is
+    what makes that ban visible rather than merely stated.
+    """
+    a = NUMBER_RE.findall(COMMENT_RE.sub("", en.path.read_text(encoding="utf8")))
+    b = NUMBER_RE.findall(COMMENT_RE.sub("", pl.path.read_text(encoding="utf8")))
+    if a == b:
+        rep.good("C12-numbers", f"{en.path.name}: {len(a)} numeric literals identical")
+        return
+    for i, (x, y) in enumerate(zip(a, b)):
+        if x != y:
+            rep.bad("C12-numbers",
+                    f"{en.path.name}: numeric literal #{i+1} en={x} pl={y}")
+            return
+    rep.bad("C12-numbers",
+            f"{en.path.name}: numeric literal count en={len(a)} pl={len(b)}")
+
+
+def check_verbatim_ascii(rep: Report, path: Path) -> None:
+    """listings cannot handle multi-byte UTF-8 in a verbatim body.
+
+    The preamble maps the Polish diacritics and the common dashes, but the
+    convention is ASCII inside a listing regardless -- and a non-breaking space
+    in that literate list is fatal with an error naming neither the character
+    nor the line. This is the cheap guard.
+    """
+    src = path.read_text(encoding="utf8")
+    for m in VERB_ENV_RE.finditer(src):
+        for i, ch in enumerate(m.group(2)):
+            if ord(ch) > 127:
+                line = src.count("\n", 0, m.start(2) + i) + 1
+                rep.bad("C13-ascii",
+                        f"{path.relative_to(ROOT)}:{line} U+{ord(ch):04X} "
+                        f"{ch!r} inside a {m.group(1)} listing")
+                return
+
+
+def check_macro_histogram(rep: Report, en: Doc, pl: Doc) -> None:
+    """Cheap breadth: a macro dropped in translation.
+
+    The ordered signature catches a dropped \yourturn or \ans because those
+    are structural tokens. This catches everything else -- a \trapbox, a
+    \notationbox, an \index entry that exists in one edition only.
+    """
+    from collections import Counter
+
+    def counts(p: Path) -> Counter:
+        c = Counter(MACRO_RE.findall(COMMENT_RE.sub("", p.read_text(encoding="utf8"))))
+        for m in PROSE_MACROS:
+            c.pop(m, None)
+        return c
+
+    ca, cb = counts(en.path), counts(pl.path)
+    diffs = [f"\\{k}: en={ca.get(k,0)} pl={cb.get(k,0)}"
+             for k in sorted(set(ca) | set(cb)) if ca.get(k, 0) != cb.get(k, 0)]
+    if diffs:
+        rep.bad("C14-macros", f"{en.path.name}: " + "; ".join(diffs[:6])
+                + (f" (+{len(diffs)-6} more)" if len(diffs) > 6 else ""))
+
+
+SKELETON_RE = re.compile(
+    r"\\(input|include|part|appendix|frontmatter|mainmatter|backmatter|"
+    r"printindex|printanswers|answersbody|tableofcontents)"
+    r"(?:\{([^}]*)\})?")
+
+
+def check_main_files(rep: Report) -> None:
+    """The two main files must wire the book up identically.
+
+    This exists because main-en.tex was once rewritten with the introduction
+    dropped, and every other check passed: the programs were in step, the
+    labels matched, both editions built with zero errors, and one of the two
+    was simply missing a chapter of front matter. Nothing that compares
+    programs can see that, because the difference is in the wiring.
+    """
+    seq = {}
+    for lang in LANGS:
+        src = COMMENT_RE.sub("", (ROOT / f"main-{lang}.tex").read_text(encoding="utf8"))
+        seq[lang] = [(m.group(1), re.sub(r"/(en|pl)/", "/L/", m.group(2) or ""))
+                     for m in SKELETON_RE.finditer(src)]
+    if seq["en"] == seq["pl"]:
+        rep.good("C15-mainfiles", f"both main files wire up {len(seq['en'])} identical steps")
+        return
+    import difflib
+    for line in difflib.unified_diff(
+            [f"{a} {b}".strip() for a, b in seq["en"]],
+            [f"{a} {b}".strip() for a, b in seq["pl"]],
+            fromfile="main-en.tex", tofile="main-pl.tex", lineterm="", n=1):
+        if line.startswith(("+", "-")) and not line.startswith(("+++", "---")):
+            rep.bad("C15-mainfiles", line)
 
 
 # --------------------------------------------------------------------------
@@ -541,6 +658,7 @@ def main() -> int:
     pairs = check_filesets(rep)
     check_includes(rep)
     check_lang_catalogue(rep)
+    check_main_files(rep)
 
     docs: list[Doc] = []
     for en_p, pl_p in pairs:
@@ -551,6 +669,10 @@ def main() -> int:
         check_math(rep, en, pl)
         check_notation(rep, en_p)
         check_notation(rep, pl_p)
+        check_numbers(rep, en, pl)
+        check_macro_histogram(rep, en, pl)
+        check_verbatim_ascii(rep, en_p)
+        check_verbatim_ascii(rep, pl_p)
 
     check_value_defs(rep, docs)
     check_diagram_sources(rep, docs)

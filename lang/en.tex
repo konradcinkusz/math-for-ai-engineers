@@ -21,6 +21,25 @@
 \newcommand{\lblAnswers}{Answers}
 \newcommand{\lblYourTurn}{Now one for you to do.}
 
+
+% ---------- Part titles ----------
+% These live here rather than in structure.tex, and the reason is a rule this
+% repository states and then broke once: nothing outside a language file may
+% hard-code a word that the other edition also sets. Part titles written with
+% \ifpl put nine user-visible strings outside the reach of the parity check
+% that compares the two catalogues -- and, because \ifpl was fragile, produced
+% a build failure in exactly one of the two editions.
+\newcommand{\lblPartI}{Foundation}
+\newcommand{\lblPartII}{Number, precision and cost}
+\newcommand{\lblPartIII}{Linear algebra}
+\newcommand{\lblPartIV}{Discrete structures and argument}
+\newcommand{\lblPartV}{Calculus and automatic differentiation}
+\newcommand{\lblPartVI}{Optimisation}
+\newcommand{\lblPartVII}{Probability and statistics}
+\newcommand{\lblPartVIII}{Information theory}
+\newcommand{\lblPartIX}{Assembling it}
+\newcommand{\lblPartAppendices}{Appendices}
+
 % ---------- Instructions the method depends on ----------
 \newcommand{\lblQuizIntro}{%
   Take this before you read the program and again after you have finished it.
@@ -44,6 +63,12 @@
 \newcommand{\lblAnswersIntro}{%
   Answers to the quizzes (Q), the test exercises (T) and the further problems
   (P) of every program, in program order.}
+
+% The punctuation dash. English sets an em dash closed up; Polish sets a
+% polpauza with a space on each side. Authors write \dash and never type a
+% dash directly, because a translator cannot be expected to carry a typographic
+% convention in their head forty-six programs deep.
+\newcommand{\dash}{---}
 
 % ---------- Admonition titles ----------
 \newcommand{\lblNote}{Note}
@@ -98,3 +123,6 @@
 \newcommand{\intoo}[2]{(#1,\,#2)}
 \newcommand{\intco}[2]{[#1,\,#2)}
 \newcommand{\intoc}[2]{(#1,\,#2]}
+
+% The date the book's facts were last checked. User-visible, so it lives here.
+\newcommand{\pinnedon}{August 2026}
