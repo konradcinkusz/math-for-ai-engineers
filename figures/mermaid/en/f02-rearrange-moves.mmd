@@ -1,0 +1,12 @@
+flowchart LR
+  A["y = w*x + b<br/>the printed formula"]
+  B["y - b = w*x"]
+  C["(y - b)/w = x"]
+  D["x = (y - b)/w<br/>x is now the subject"]
+
+  A -->|"subtract b<br/>from both sides"| B
+  B -->|"divide both sides by w<br/>CONDITION ACQUIRED:<br/>w != 0"| C
+  C -->|"read the equation<br/>the other way round"| D
+
+  N["The condition is not in the<br/>original: y = w*x + b is<br/>well defined at w = 0.<br/>x = (y - b)/w is not, and the<br/>printed line does not say why."]
+  C -.-> N

@@ -1,22 +1,1431 @@
 %% F02 --- Język algebry
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f02_algebra.py i jest wciągana przez \val{}. Rachunki,
+%% których program UCZY -- każde usunięcie nawiasów, każdy rozkład na
+%% czynniki, 2 + 3 x 4^2 -- są wpisane wprost, bo czytelnik ma je wykonać.
+%%
+%% Bliźniak: programs/en/F02-language-algebra.tex. Ramka w ramkę, makro w
+%% makro, liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Język algebry}
 \label{prog:F02}
+\index{algebra!symbole i wyrazy}
+\index{zapis!czytanie wydrukowanego wzoru}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{powiedzieć, co oznacza każdy symbol w wyrażeniu, i obliczyć
+  wartość wyrażenia przez podstawienie, także dla wartości ujemnych}
+\outcome{7--12}{redukować wyrazy podobne i powiedzieć, dlaczego dwóch wyrazów
+  wyglądających podobnie zredukować się nie da}
+\outcome{13--19}{stosować kolejność działań i odtwarzać nawiasy, których
+  wydrukowany wzór nie zapisuje, gdy spłaszczasz go do jednej linii kodu}
+\outcome{20--27}{usuwać nawiasy w iloczynie, łącznie z $(a \pm b)^{2}$ oraz
+  $(a+b)(a-b)$, i powiedzieć, ile dokładnie iloczynów daje para nawiasów}
+\outcome{28--31}{wyłączyć wspólny czynnik przed nawias i rozłożyć różnicę
+  kwadratów, a postać iloczynową czytać jako tę samą wartość policzoną mniejszą
+  liczbą działań}
+\outcome{32--37}{dodawać i upraszczać ułamki algebraiczne oraz skracać czynnik,
+  nie skracając wyrazu}
+\outcome{38--44}{przekształcić wzór tak, by wyznaczyć z niego wskazaną
+  wielkość, podać założenie, którego to przekształcenie wymaga, i sprawdzić je
+  przez podstawienie}
+\outcome{45--50}{przeczytać opublikowany wzór dokładnie tak, jak go
+  wydrukowano \dash{} z częściami całkowitymi i pierwiastkami \dash{} i
+  zamienić go na wyrażenie, którego da się bronić}
+\end{outcomes}
 
-Argument: a symbol stands for a quantity you have not fixed yet, and
-rearranging is a sequence of legal moves. Payoff: read a paper's equation as
-executable code; rearrange a loss so the thing you want is on the left.
-Trap: $(a+b)^{2}$ and the reader who writes $a^{2}+b^{2}$, elicited before
-it sets.
+\begin{quiz}
+\item Oblicz $wx + b$ dla $w = -2$, $x = 5$ i $b = 3$. \teachesat{1--6}
+  \answerto{$-7$. Mnożenie wykonuje się przed dodawaniem.}
+\item Czy w zapisie $W^{(2)}x$ indeks górny jest wykładnikiem?
+  \teachesat{4--5}
+  \answerto{Nie \dash{} to etykieta warstwy. Nic w zapisie nie odróżnia obu
+  znaczeń, nawias jest konwencją, a konwencja nie jest powszechna.}
+\item Oblicz $2 + 3 \times 4^{2}$. \teachesat{13--14}
+  \answerto{$50$. Najpierw potęga, potem mnożenie, na końcu dodawanie.}
+\item Oblicz $-3^{2}$ oraz $(-3)^{2}$. \teachesat{14--15}
+  \answerto{$-9$ i $9$. Wykładnik wiąże mocniej niż znak.}
+\item Zapisz wydrukowane $\frac{x - \mu}{\sqrt{\sigma^{2} + \eps}}$ jako jedną
+  linię kodu. \teachesat{16--18}
+  \answerto{\code{(x - mu) / sqrt(sigma2 + eps)}. Kreska ułamkowa i znak
+  pierwiastka to nawiasy, których nikt nie wydrukował.}
+\item Uprość $4p^{2} - 2p + 3 - p^{2} + 5p$. \teachesat{7--11}
+  \answerto{$3p^{2} + 3p + 3$.}
+\item Usuń nawiasy w $(a+b)^{2}$. \teachesat{22--23}
+  \answerto{$a^{2} + 2ab + b^{2}$. Sprawdź przy $a = 3$ i $b = 4$: wynik to
+  $49$, a nie $25$.}
+\item Usuń nawiasy w $(2x+3)(2x-3)$. \teachesat{24--25}
+  \answerto{$4x^{2} - 9$. Oba wyrazy mieszane się znoszą i jest to jedyny
+  częsty przypadek, w którym tak się dzieje.}
+\item Rozłóż na czynniki $4x^{2} - 6x$. \teachesat{28--29}
+  \answerto{$2x(2x - 3)$.}
+\item Sprowadź $\frac{1}{x} + \frac{1}{y}$ do jednego ułamka.
+  \teachesat{33--34}
+  \answerto{$\frac{y + x}{xy}$.}
+\item Uprość $\frac{a + b}{a}$. \teachesat{34--35}
+  \answerto{$1 + \frac{b}{a}$, a nie $b$. Czynnik wolno skrócić; wyrazu nie.}
+\item $L = (y - \hat{y})^{2}$. Wyznacz $\hat{y}$. \teachesat{41--42}
+  \answerto{$\hat{y} = y \pm \sqrt{L}$ \dash{} dwie odpowiedzi. Strata mówi,
+  jak daleko jesteś, i nigdy nie mówi, po której stronie.}
+\item Przy $W = \val{f02.conv.w}$, $k = \val{f02.conv.k}$,
+  $p = \val{f02.conv.p}$ i $s = \val{f02.conv.s}$ \dash{} jaki jest rozmiar
+  wyjścia splotu? \teachesat{45--48}
+  \answerto{$3$. Część całkowita należy do wzoru: $\num{3.5}$ nie jest
+  kształtem, a $4$ to zła poprawka. Jedna kolumna wejściowa zostaje odrzucona,
+  po cichu.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 50 ramek.
-}
+% ============================================================
+\section{Symbole i to, co każdy z nich oznacza}
+\label{sec:F02-symbols}
+\index{algebra!podstawianie}
+\index{zapis!indeks górny jako etykieta}
+
+\begin{fr}
+Arytmetyka to działania na liczbach, które masz. Algebra to działania na
+liczbach, których jeszcze nie ustaliłeś, i na tej różnicy opiera się cały ten
+program.
+
+\emph{Symbol} oznacza wielkość. Dopóki nie powiesz, która to wielkość, oznacza
+dowolną z nich:
+\[ y = wx + b \]
+Cztery symbole i dwa działania \dash{} a zarazem najmniejszy model w tej
+książce: wejście $x$, waga $w$, bias $b$, wyjście $y$. Zauważ, czego ta linia
+nie mówi. Nie mówi, czym jest którakolwiek z tych wielkości, a mimo to jest
+kompletną instrukcją.
+
+Przyjmij $w = 3$, $x = 2$ i $b = 1$. Ile wynosi $y$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$y = 7$}
+Nic z tego nie było algebrą. Podstawiłeś trzy liczby i wykonałeś rachunek, a do
+tego właśnie sprowadza się każde równanie w każdej pracy, którą kiedykolwiek
+przeczytasz \dash{} gdy tylko wiesz, co oznaczają litery.
+
+Ta sama litera pełni cztery różne role, a to, którą akurat pełni, zależy
+wyłącznie od tego, co w danej chwili robisz:
+
+\begin{itemize}
+\item \emph{zmienna} \dash{} wielkość, która się zmienia: $x$ i $y$;
+\item \emph{stała} \dash{} wielkość ustalona raz na zawsze, jak $\pi$;
+\item \emph{parametr} \dash{} ustalony na teraz, wybrany wcześniej: $w$ i $b$;
+\item \emph{współczynnik} \dash{} liczba mnożąca wyraz, czyli znowu $w$,
+  widziany od strony wyrazu.
+\end{itemize}
+
+Przy wnioskowaniu $x$ się zmienia, a $w$ i $b$ pozostają nieruchome. W pętli
+uczenia jest odwrotnie: dane są dane, a parametry są tym, czego szukasz.
+
+Zatem w pętli uczenia: które symbole są niewiadomymi?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$w$ i $b$.}
+Symbolami zapisuje się trzy różne rzeczy, nie są one tym samym, a wiedza o tym,
+na którą z nich właśnie patrzysz, mówi ci, co wolno ci z nią zrobić.
+
+\emph{Wyrażenie} liczy: $2(x+3)$ to przepis, który ma wartość w chwili, gdy
+$x$ ją ma.
+
+\emph{Równanie} twierdzi: $2x = 6$ to twierdzenie prawdziwe dokładnie dla
+jednej wartości $x$. Rozwiązać je znaczy tę wartość znaleźć.
+
+\emph{Tożsamość} to równanie prawdziwe dla \emph{każdej} wartości:
+$2(x+3) = 2x+6$ zachodzi niezależnie od tego, czym jest $x$. Każda reguła w
+dalszej części tego programu jest tożsamością i właśnie dlatego wolno ci
+podmienić jedną stronę na drugą, kiedy tylko ci to pasuje.
+
+Zaklasyfikuj każde z wyrażeń $3x - 1$, $\;3x - 1 = 8$ i
+$\;3x - 1 = x + (2x - 1)$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$3x - 1$ to wyrażenie. \quad $3x - 1 = 8$ to równanie, prawdziwe tylko przy
+$x = 3$. \quad $3x - 1 = x + (2x - 1)$ to tożsamość: usuń nawias po prawej, a
+otrzymasz lewą stronę, niezależnie od tego, czym jest $x$.
+\end{ansblock}
+
+\begin{notationbox}
+Litery nie są dobrane przypadkowo. Piśmiennictwo uczenia maszynowego ustaliło
+mały alfabet, a prace czyta się znacznie szybciej, gdy przestajesz go
+odszyfrowywać:
+
+\begin{itemize}
+\item $x$ to wejście, $y$ to wartość docelowa, $\hat{y}$ to predykcja;
+\item $w$ lub $W$ to waga, $b$ to bias, $\theta$ to wszystkie parametry razem;
+\item $\eta$ to współczynnik uczenia, $L$ to strata, $\eps$ to małe
+  zabezpieczenie przed dzieleniem przez zero;
+\item $n$ to liczność, $d$ to wymiar, $i$ oraz $j$ to indeksy.
+\end{itemize}
+
+Indeks dolny jest niemal zawsze indeksem: $x_{i}$ to $i$-te wejście. Indeks
+górny jest niemal zawsze wykładnikiem \dash{} chyba że stoi w nawiasie, a wtedy
+jest etykietą. $W^{(2)}$ to wagi drugiej warstwy; $W^{2}$ to macierz wag
+podniesiona do kwadratu. Cała robota spoczywa na nawiasie i żadna praca nie
+zatrzymuje się, żeby to powiedzieć.
+\end{notationbox}
+
+Zatem w $W^{(2)}x$: czy $2$ jest wykładnikiem?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie \dash{} to etykieta.}
+Nic w wydrukowanej linii ci tego nie mówi. Indeks górny w nawiasie jest
+konwencją, większość dziedziny jej przestrzega, a wystarczająco duża część nie
+przestrzega, żeby sprawdzać, a nie zakładać. Praca, która w jednej linii pisze
+$W^{(l)}$, a w następnej $x^{2}$, użyła tego samego znaku do dwóch niezwiązanych
+zadań.
+
+Podstawianie niesie własne zagrożenie i znowu chodzi o nawiasy. Aby obliczyć
+$3x^{2}$ przy $x = -2$, zapisz podstawianą wartość \emph{w nawiasie}:
+\[ 3(-2)^{2} = 3 \times 4 = 12 \]
+Opuść je, napisz $3-2^{2}$, a dostaniesz $-1$, czyli odpowiedź na inne
+pytanie.
+
+\yourturn
+Oblicz $wx + b$ przy $w = -2$, $x = 5$ i $b = 3$; następnie oblicz $3x^{2}$
+przy $x = -2$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$wx + b = (-2)(5) + 3 = -10 + 3 = -7$.
+
+$3x^{2} = 3(-2)^{2} = 3 \times 4 = 12$. Kwadrat liczby ujemnej jest dodatni, a
+to nawiasy przenoszą ten fakt do rachunku.
+\end{ansblock}
+
+\begin{aibox}
+Każde równanie w tym programie to linia, którą kiedyś wpiszesz. Praca składa
+$\frac{x - \mu}{\sqrt{\sigma^{2} + \eps}}$ i żaden edytor tego nie przyjmie;
+edytor przyjmuje jedną linię ASCII z nawiasami, których drukarz nigdy nie
+potrzebował, bo drukarz miał do grupowania kreskę ułamkową i znak pierwiastka,
+a ty nie masz ani jednego, ani drugiego.
+
+Ten przekład jest tym, po co jest ten program. Algebra to szkolna algebra,
+którą już spotkałeś. Dyscyplina sprowadzenia jej do jednej linii bez zmiany
+tego, co liczy, już nie \dash{} i to w niej mieszkają błędy.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Wyrazy, współczynniki i wyrazy podobne}
+\label{sec:F02-terms}
+\index{algebra!wyrazy podobne}
+\index{algebra!współczynnik}
+
+\begin{fr}
+Wyrażenie zbudowane jest z \emph{wyrazów}, a wyrazy oddzielają leżące między
+nimi znaki $+$ i $-$. Znak należy do wyrazu, który po nim następuje \dash{}
+przeczytaj to inaczej, a masz gotowy błąd znaku.
+
+Wewnątrz wyrazu wszystko jest wymnożone. Liczba z przodu to
+\emph{współczynnik}, a wymnażane przez siebie składniki to \emph{czynniki}.
+Zatem $4a^{3}$ to jeden wyraz, jego współczynnik to $4$, a jego czynniki to
+$4$, $a$, $a$ i $a$. Wyraz bez wypisanego współczynnika i tak go ma: $a$
+znaczy $1a$, a $-a$ znaczy $-1a$.
+
+Teraz przeczytaj to:
+\[ 3x^{2} - 5x + 7 \]
+Ile ma wyrazów i jaki jest współczynnik przy $x$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Trzy wyrazy; współczynnik przy $x$ wynosi $-5$.}
+Minus należy do wyrazu. Jest to $-5$, a nie $5$, i pomyłka w tym miejscu to
+najczęstsze potknięcie w całej algebrze.
+
+Dwa wyrazy są \emph{podobne}, gdy zawierają dokładnie te same litery podniesione
+dokładnie do tych samych potęg. Wyrazy podobne redukują się:
+\[ 3x + 4x = 7x \]
+i nie jest to reguła do zapamiętania. To rozdzielność mnożenia względem
+dodawania przeczytana wstecz, $3x + 4x = x(3 + 4) = 7x$. Tę samą własność
+spotkasz w przód w \S\ref{sec:F02-expanding}; tutaj pracuje w drugą stronę.
+
+Uprość $5a + 2b - 3a + b$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$2a + 3b$}
+Bierz wyrazy po kolei i pilnuj, by każdy znak został przy swoim wyrazie:
+$5a - 3a = 2a$ oraz $2b + b = 3b$. Nic więcej zrobić się nie da, bo $a$ i $b$
+nie są podobne i żadna reguła ich nie łączy.
+
+Warto powiedzieć to wprost. \textbf{Wyrazy niepodobne się nie redukują.}
+$x^{2}$ i $x$ to różne wyrazy i żadne wpatrywanie się ich nie połączy \dash{}
+dokładnie tak, jak $2^{3}$ i $3^{2}$ nie dały się połączyć w
+Programie~\ref{prog:F01}. Prawo działań na potęgach wymaga wspólnej podstawy;
+redukcja wyrazów wymaga tych samych liter w tych samych potęgach. To jedna
+reguła w dwóch przebraniach.
+
+Które z wyrażeń $2x^{2} + 3x^{2}$ i $2x^{2} + 3x$ zwija się do jednego wyrazu?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$2x^{2} + 3x^{2} = 5x^{2}$. Drugie się nie zwija. $2x^{2} + 3x$ jest już tak
+krótkie, jak się da, a zapisanie go jako $5x^{2}$ czy $5x^{3}$ jest błędem.
+\end{ansblock}
+
+\begin{warning}
+Twój framework cię nie powstrzyma. Dodanie tablicy o kształcie $(n,1)$ do
+tablicy o kształcie $(n,d)$ to ten sam błąd \dash{} dodane dwie rzeczy
+niepodobne \dash{} a biblioteka, zamiast odmówić, rozgłasza pierwszą po drugiej
+i oddaje całkiem zwyczajny wynik o kształcie $(n,d)$. Bez wyjątku, bez
+ostrzeżenia i z liczbą na końcu, która jest błędna w sposób, którego nie
+sprawdza żaden z twoich testów.
+
+Matematyka odmawia dodawania wyrazów niepodobnych. Biblioteki tablicowe nie, i
+dlatego Program~\ref{prog:P07} poświęca kształtom całą swoją długość.
+\end{warning}
+
+\yourturn
+Uprość $4p^{2} - 2p + 3 - p^{2} + 5p$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Zredukuj najpierw wyrazy z $p^{2}$, potem te z $p$, na końcu same liczby:
+\[ (4p^{2} - p^{2}) + (-2p + 5p) + 3 = 3p^{2} + 3p + 3 \]
+Zauważ, że $-p^{2}$ ma współczynnik $-1$, a nie $0$. Brakująca cyfra to nie
+brakujący wyraz.
+\end{ansblock}
+
+Mnożenie wyrazów to inne działanie niż ich dodawanie, a mylenie obu jest tutaj
+drugim co do częstości potknięciem. Gdy wyrazy się mnoży, współczynniki się
+mnożą, a wykładniki dodają:
+\[ 3x \times 4x = (3 \times 4)(x \times x) = 12x^{2} \]
+Druga połowa tego zapisu to pierwsze prawo działań na potęgach z
+Programu~\ref{prog:F01}, pojawiające się tam, gdzie faktycznie się przydaje.
+
+Uprość $2a \times 5a^{3}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$10a^{4}$}
+Współczynniki dają $2 \times 5 = 10$, a wykładniki $1 + 3 = 4$. Samotne $a$
+niesie wykładnik $1$, który jest niewidoczny i łatwo go zgubić.
+
+\begin{aibox}
+Redukcja wyrazów podobnych to dokładnie to, co robisz ręcznie, ilekroć liczysz
+parametry modelu. Warstwa o $m$ wejściach i $n$ wyjściach wnosi $mn$ wag i $n$
+biasów, a blok feed-forward oryginalnego transformera to dwie takie warstwy
+jedna za drugą: $d$ na wejściu i $4d$ na wyjściu, potem $4d$ na wejściu i $d$
+na wyjściu. Jego wagi redukują się zatem do $4d^{2} + 4d^{2} = 8d^{2}$, zanim
+policzysz choć jeden bias. To jedna redukcja wyrazów podobnych przeprowadzona
+na własnych liczbach prawdziwego modelu, a Program~\ref{prog:P32} robi to dla
+całego bloku.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Nawiasy i to, czego wydrukowany wzór nie zapisuje}
+\label{sec:F02-precedence}
+\index{zapis!niewidoczne nawiasy}
+\index{algebra!kolejność działań}
+
+\begin{fr}
+Wszystko dotychczas czytało się od lewej do prawej bez oporu. Tutaj to się
+kończy, bo wyrażenia nie czyta się w kolejności, w jakiej zostało zapisane.
+
+Kolejność jest ustalona i jest to ta sama kolejność, której używa twój język:
+
+\begin{enumerate}
+\item nawiasy;
+\item potęgi;
+\item mnożenie i dzielenie, od lewej do prawej;
+\item dodawanie i odejmowanie, od lewej do prawej.
+\end{enumerate}
+
+Dwie rzeczy w tej liście znaczą więcej niż sama lista. Jest to kolejność
+\emph{wiązania}, a nie polecenie pracy etapami \dash{} mówi, które działanie
+jest właścicielem którego argumentu. A tam, gdzie czytelnik mógłby pójść w obie
+strony, nawiasy nie są uprzejmością; są jedyną rzeczą, która niesie to, co
+miałeś na myśli.
+
+Oblicz $2 + 3 \times 4^{2}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$50$}
+Najpierw wiąże potęga, dając $4^{2} = 16$; potem mnożenie, $3 \times 16 = 48$;
+na końcu dodawanie, $2 + 48 = 50$. Odpowiedź $80$ oznacza dodawanie przed
+mnożeniem, a odpowiedź $400$ \dash{} mnożenie przed potęgowaniem.
+
+Teraz coś mniejszego, co łapie więcej osób niż pierwsze pytanie. Oblicz
+$-3^{2}$, a następnie oblicz $(-3)^{2}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$-3^{2} = -9$ \quad oraz \quad $(-3)^{2} = 9$}
+\begin{trapbox}
+\textbf{Wykładnik wiąże mocniej niż stojący przed nim znak.} $-3^{2}$ znaczy
+$-(3^{2})$, czyli $-9$. Dopiero nawias w $(-3)^{2}$ czyni minus częścią tego,
+co się podnosi do kwadratu.
+
+Warto nazwać, skąd bierze się to przekonanie, bo nie jest to niedbałość.
+Czytasz $-3$ jako jedną liczbę \dash{} czym w niemal każdym innym kontekście
+ona jest \dash{} a potem ją podnosisz do kwadratu. Zapis się z tobą nie zgadza:
+tutaj minus jest operatorem zastosowanym do $3^{2}$, a nie znakiem doklejonym
+do $3$.
+
+Twój język zgadza się z matematyką, a nie z tobą. W Pythonie \code{-3**2} daje
+$-9$. JavaScript nie zgaduje w ogóle: \code{-3 ** 2} to błąd składni, a
+komunikat mówi, że potrzebny jest nawias, by rozstrzygnąć kolejność działań. Ta
+odmowa jest własną puentą tej pułapki \dash{} linia jest niejednoznaczna dla
+czytelnika dokładnie tak samo, jak jest jednoznaczna dla parsera.
+
+Zatem gdy twoje odczytanie i twój program się rozjeżdżają, błąd jest w twoim
+wzorze, a błąd kwadratowy, który wychodzi ujemny, to często dokładnie
+to. \emph{Wariancja}, która wychodzi ujemna, to inna usterka o innej
+przyczynie \dash{} katastrofalne znoszenie się w jednoprzebiegowym wzorze
+\dash{} i należy do Programu~\ref{prog:P01}.
+\end{trapbox}
+Coś jeszcze wypada z wydrukowanej strony i zwykle ofiarą jest mnożenie: $2x$
+znaczy $2 \times x$, tylko że znak nie został wydrukowany. Nieszkodliwe,
+dopóki nie spotka dzielenia. Przeczytaj $1/2x$ \dash{} jakie są jego dwa
+odczytania?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Czyta się to albo jako $\frac{1}{2}x$, albo jako $\frac{1}{2x}$, a te dwa
+wyrażenia różnią się o czynnik $x^{2}$. Ścisła kolejność działań daje pierwsze,
+bo $/$ i $\times$ mają równe prawa i idą od lewej do prawej. Spora część świata
+pisze to, mając na myśli drugie.
+
+\end{ansblock}
+
+I tu dochodzimy do reguły, dla której ta sekcja istnieje.
+
+\textbf{Wydrukowana kreska ułamkowa i wydrukowany znak pierwiastka to nawiasy,
+których nikt nie wydrukował.} Grupują to, co pod nimi stoi, i robią to
+położeniem, a nie znakiem \dash{} więc zapis jednoznaczny na papierze staje się
+niejednoznaczny w chwili, gdy spłaszczysz go do jednej linii.
+
+Przykład. Zapis
+\[ \frac{a + b}{c + d} \]
+niesie dwie niewidoczne pary nawiasów, jedną wokół licznika i jedną wokół
+mianownika. Spłaszczony bez nich, \code{a + b / c + d} liczy
+$a + \frac{b}{c} + d$, czyli inną liczbę, i niczego przy tym nie zgłasza.
+Uczciwe spłaszczenie to \code{(a + b) / (c + d)}.
+
+\yourturn
+Oto prawdziwy przypadek \dash{} normalizacja warstwowa, która centruje wiersz
+liczb i dzieli go przez jego własny rozrzut:
+\[ \frac{x - \mu}{\sqrt{\sigma^{2} + \eps}} \]
+Spłaszcz to do jednej linii kodu, dostawiając każdy nawias, którego drukarz nie
+potrzebował.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\begin{center}
+\code{(x - mu) / sqrt(sigma2 + eps)}
+\end{center}
+Trzy spłaszczenia, które wyglądają dobrze i dobre nie są:
+
+\begin{itemize}
+\item \code{x - mu / sqrt(sigma2 + eps)} odejmuje iloraz od $x$: zniknął
+  niewidoczny nawias licznika.
+\item \code{(x - mu) / sqrt(sigma2) + eps} dodaje $\eps$ po dzieleniu: zniknął
+  niewidoczny nawias pierwiastka, a razem z nim cały powód istnienia $\eps$.
+\item \code{(x - mu) / (sqrt(sigma2) + eps)} trzyma $\eps$ poza pierwiastkiem,
+  ale wewnątrz dzielnika. Bliżej, a wciąż nie to, co wydrukowano.
+\end{itemize}
+\end{ansblock}
+
+Potraktuj te dwa ostatnie przez chwilę poważnie. Czy wydrukowana linia to
+\code{sqrt(sigma2) + eps}, czy \code{sqrt(sigma2 + eps)}, i czy ta różnica
+dociera do liczb?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{To drugie \dash{} i tak, dociera do liczb.}
+$\eps$ siedzi pod pierwiastkiem, bo tam wykonuje swoją pracę: nie pozwala, by
+pierwiastek z niemal zerowej wariancji był niemal zerowy, a więc nie pozwala
+dzieleniu wybuchnąć.
+
+Weź wiersz o wariancji $\val{f02.lnorm.var}$ \dash{} wiersz niemal stały, czyli
+ten przypadek, dla którego $\eps$ istnieje \dash{} przy
+$\eps = \val{f02.lnorm.eps}$, $x = \val{f02.lnorm.x}$ i
+$\mu = \val{f02.lnorm.mu}$. Odczytana tak, jak ją wydrukowano, linia daje
+$\val{f02.ln.eps.inside}$. Odczytana błędnie, z $\eps$ poza pierwiastkiem, daje
+$\val{f02.ln.eps.outside}$, czyli o \val{f02.ln.eps.diff.pct}\% powyżej
+wydrukowanej wartości.
+
+\begin{aibox}
+To prawdziwa linia prawdziwego systemu \dash{} normalizacja warstwowa, z pracy
+Ba, Kirosa i Hintona \dash{} i siedzi w każdym transformerze, którego użyjesz.
+$\eps$ jest decyzją numeryczną, a nie interpunkcją, i to, gdzie stoi, zmienia
+działanie warstwy na cesze niemal stałej.
+
+Zwróć uwagę na uczciwe ograniczenie powyższej liczby. Wariancja została dobrana
+mała celowo: przy zdrowej wariancji oba odczytania zgadzają się do kilku miejsc
+po przecinku i pokaz niczego by nie pokazał. Ten stosunek nie jest typowy. Tryb
+awarii jest. Przed czym $\eps$ chroni i ile z tego dany format liczbowy jest w
+stanie wchłonąć \dash{} to Program~\ref{prog:P02}.
+\end{aibox}
+
+Jeszcze jeden przypadek, a tym razem widziałeś już ten kształt. Krok
+optymalizatora drukuje się jako
+\[ \theta \leftarrow \theta - \eta \, \frac{\hat{m}}{\sqrt{\hat{v}} + \eps} \]
+Czy \code{eta * mhat / sqrt(vhat) + eps} to ta linia?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Ta linia dzieli przez $\sqrt{\hat{v}}$, a potem dodaje $\eps$ do całego
+kroku, przez co dzielenie zostaje bez żadnego zabezpieczenia. Wydrukowana linia
+umieszcza $\eps$ wewnątrz dzielnika:
+\begin{center}
+\code{eta * mhat / (sqrt(vhat) + eps)}
+\end{center}
+\end{ansblock}
+
+To krok Adama, z pracy Kingmy i Ba, i jest to druga prawdziwa linia w tej
+sekcji, którą jedna brakująca para nawiasów zmienia, nic o tym nie mówiąc.
+
+\begin{note}
+W literaturze pojawiają się obie konwencje umieszczenia $\eps$ w tym kroku:
+część prac i część implementacji wkłada $\eps$ pod pierwiastek, jako
+$\sqrt{\hat{v} + \eps}$, a różnica jest mała, choć nie zerowa. To nie jest
+przypadek, w którym jedna z tych postaci jest literówką. Czytaj linię, którą
+praca faktycznie wydrukowała \dash{} a jeśli reimplementujesz, czytaj też
+implementację referencyjną, bo linia z pracy jest wiążąca dla tej pracy, a
+żadna z nich nie jest wiążąca dla biblioteki, której akurat używasz.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Usuwanie nawiasów}
+\label{sec:F02-expanding}
+\index{algebra!usuwanie nawiasów}
+\index{algebra!różnica kwadratów}
+
+\begin{fr}
+Usuwanie nawiasu to ruch, który wykonasz częściej niż jakikolwiek inny, a stoi
+za nim jedna reguła:
+\[ a(b + c) = ab + ac \]
+To nie jest pewnik do przełknięcia. Policz prostokąt. Prostokąt o wysokości $a$
+i szerokości $b + c$ ma pole $a(b+c)$; przetnij go wzdłuż złączenia, a masz dwa
+prostokąty, jeden $a$ na $b$ i jeden $a$ na $c$, o polach $ab$ i $ac$. Ten sam
+obszar policzony na dwa sposoby.
+
+To, co robi znak, dostajesz za darmo: $a(b - c) = ab - ac$, bo zabranie $c$ z
+szerokości zabiera $ac$ z pola.
+
+Usuń nawiasy: $3(2x + 5) = \blank$ oraz $x(x - 4) = \blank$
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$3(2x + 5) = 6x + 15$ \quad oraz \quad $x(x - 4) = x^{2} - 4x$.
+
+W drugim przypadku $x$ pomnożone przez $x$ daje $x^{2}$: wykładniki się
+dodają, dokładnie tak jak w \S\ref{sec:F02-terms}.
+\end{ansblock}
+
+Dwa nawiasy pomnożone przez siebie to ta sama reguła zastosowana dwukrotnie.
+Potraktuj pierwszy nawias jak jedną wielkość, rozdziel, a potem rozdziel
+jeszcze raz:
+\[ (a + b)(c + d) = a(c + d) + b(c + d) = ac + ad + bc + bd \]
+\textbf{Dwa nawiasy po dwa wyrazy dają cztery iloczyny, po jednym z każdej
+komórki siatki $2 \times 2$.} Nie trzy i nie dwa \dash{} cztery, za każdym
+razem, a siatka jest sposobem, by mieć pewność, że masz je wszystkie.
+
+Przykład. $(x + 2)(x + 3)$ daje $x \times x = x^{2}$, potem
+$x \times 3 = 3x$, potem $2 \times x = 2x$, potem $2 \times 3 = 6$. Zredukuj
+dwa wyrazy podobne w środku i wychodzi $x^{2} + 5x + 6$.
+\end{fr}
+
+\begin{fr}
+Zasłoń resztę strony.
+
+\textbf{Zapisz rozwinięcie $(a + b)^{2}$. Jedna linia, bez rachunków, tak
+szybko, jak potrafisz.}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jeśli napisałeś $a^{2} + b^{2}$, jesteś w większości, a to jest właśnie ta
+pułapka, wokół której zbudowano ten program.
+
+Sprawdź. Weź $a = 3$ i $b = 4$:
+\[ (3 + 4)^{2} = 7^{2} = 49 \qquad \text{wobec} \qquad
+   3^{2} + 4^{2} = 9 + 16 = 25 \]
+Różnica wynosi $24$, nie jest to kwestia zaokrąglenia, a jest to $2ab$.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{$(a+b)^{2} = a^{2} + 2ab + b^{2}$.} Kwadrat sumy niesie wyraz mieszany,
+a wyraz mieszany jest zwykle jego największą częścią.
+
+Rozumowanie, które daje błędną odpowiedź, to prawdziwa reguła uogólniona poza
+swoje założenie. Wykładnik \emph{rzeczywiście} rozdziela się względem iloczynu
+i względem ilorazu: $(ab)^{2} = a^{2}b^{2}$ to własne prawo
+Programu~\ref{prog:F01} i jest poprawne. Względem czegokolwiek innego się nie
+rozdziela. Suma nie jest iloczynem, a siatka pokazuje dokładnie, co błędna
+reguła wyrzuca \dash{} zachowuje dwie komórki narożne i kasuje dwie komórki
+krawędziowe.
+
+Spotkałeś to już raz, jako $\sqrt{a + b} \ne \sqrt{a} + \sqrt{b}$ w
+Programie~\ref{prog:F01}, który przekazał ten problem tutaj. Pierwiastki,
+kwadraty i każdy inny wykładnik zachowują się wobec sumy tak samo.
+\end{trapbox}
+Wersja ze znakiem nie wymaga osobnego wysiłku pamięci:
+\[ (a - b)^{2} = a^{2} - 2ab + b^{2} \]
+Usuń nawiasy w $(x - 5)^{2}$.
+\nextframe
+\end{fr}
+
+\mermaidfig{f02-expansion-grid}{%
+  Cztery iloczyny z $(a+b)(c+d)$, rozdzielone na dwie komórki narożne i dwie
+  krawędziowe, oraz to, co dzieje się z krawędziami w dwóch przypadkach, które
+  warto znać na pierwszy rzut oka. Błędna reguła to ta, która zachowuje
+  narożniki i wyrzuca krawędzie.}{%
+  Siatka iloczynów dwa na dwa, jej komórki narożne i krawędziowe.}
+
+\begin{fr}
+\ans{$x^{2} - 10x + 25$}
+Teraz jedyny przypadek, w którym wyrazy mieszane naprawdę znikają, a warto go
+znać na pierwszy rzut oka:
+\[ (a + b)(a - b) = a^{2} - ab + ab - b^{2} = a^{2} - b^{2} \]
+Oba środkowe iloczyny są równe co do wartości i przeciwne co do znaku, więc się
+znoszą. To \emph{różnica kwadratów} i to przez nią błędna reguła przeżywa
+zderzenie z doświadczeniem: każdy czytelnik spotkał przypadek, który wyglądał
+jak $(a+b)^{2} = a^{2} + b^{2}$ i wyszedł poprawnie. To był ten przypadek, a
+jest to inne wyrażenie.
+
+Usuń nawiasy w $(2x + 3)(2x - 3)$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$4x^{2} - 9$}
+Oto po co było warto poświęcić to popołudnie. Błąd kwadratowy \dash{} strata
+pod bardzo wieloma kiedykolwiek dopasowanymi modelami \dash{} to
+\[ L = (y - \hat{y})^{2} = y^{2} - 2y\hat{y} + \hat{y}^{2} \]
+Popatrz, co robi środkowy wyraz. $y^{2}$ wie tylko o wartości docelowej, a
+$\hat{y}^{2}$ wie tylko o predykcji; \textbf{wyraz mieszany $-2y\hat{y}$ to
+jedyna część straty, która wie o obu.} Skasuj go, a strata przestaje zależeć od
+związku między tym, co przewidziałeś, a tym, co było prawdą \dash{} czyli od
+całego swojego zadania.
+
+Weź $y = \val{f02.err.y}$ i $\hat{y} = \val{f02.err.yhat}$. Policz stratę
+porządnie, a potem policz wersję z pułapki, $y^{2} + \hat{y}^{2}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Porządnie: $(y - \hat{y})^{2} = \val{f02.sq.correct}$.
+
+Wersja z pułapki daje $\val{f02.sq.wrong}$, czyli ponad trzy razy tyle.
+Dzieli je sam wyraz mieszany, $2y\hat{y} = \val{f02.sq.cross}$, który jest
+większy niż strata, z której go wyrzucono.
+\end{ansblock}
+
+\begin{aibox}
+Ten kształt wraca, ze zmienionymi literami, częściej niż jakikolwiek inny w tej
+książce.
+
+Kwadrat długości sumy dwóch wektorów to
+$\norm{a + b}^{2} = \norm{a}^{2} + 2\,a \cdot b + \norm{b}^{2}$, a wyraz
+mieszany jest tam iloczynem skalarnym mierzącym, na ile oba wskazują w tę samą
+stronę (Program~\ref{prog:P05}). Wariancja sumy dwóch wielkości losowych
+rozkłada się na te same trzy części, a wyraz mieszany jest tam kowariancją
+(Program~\ref{prog:P24}). Oba to $(a+b)^{2}$ z innym mnożeniem pod spodem.
+
+Ilekroć więc rozumowanie o embeddingach albo o szumie po cichu wyrzuca wyraz
+mieszany, twierdzi tym samym, że dwie rzeczy są niezwiązane. Czasem są. Nigdy
+nie jest to za darmo.
+\end{aibox}
+
+\yourturn
+Usuń nawiasy w $(3a - 2b)^{2}$ oraz w $\left(x + \frac{1}{x}\right)^{2}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(3a - 2b)^{2} = 9a^{2} - 12ab + 4b^{2}$. Współczynniki też idą do kwadratu:
+$(3a)^{2} = 9a^{2}$, a wyraz mieszany to $2 \times 3a \times 2b = 12ab$.
+
+$\left(x + \frac{1}{x}\right)^{2} = x^{2} + 2 + \frac{1}{x^{2}}$. Tutaj wyraz
+mieszany to $2 \times x \times \frac{1}{x} = 2$ i stąd bierze się stała w
+środku.
+\end{ansblock}
+
+Trzy iloczyny warto znać na pierwszy rzut oka, a nie wyprowadzać za każdym
+razem, bo będziesz je spotykał bez przerwy:
+\[ (a+b)^{2} = a^{2} + 2ab + b^{2} \]
+\[ (a-b)^{2} = a^{2} - 2ab + b^{2} \]
+\[ (a+b)(a-b) = a^{2} - b^{2} \]
+\end{fr}
+
+% ============================================================
+\section{Rozkład na czynniki}
+\label{sec:F02-factorising}
+\index{algebra!rozkład na czynniki}
+\index{algebra!wspólny czynnik}
+
+\begin{fr}
+Rozkład na czynniki to poprzednia sekcja czytana wstecz. Tam, gdzie usuwanie
+nawiasów zamienia $3(2x + 3)$ na $6x + 9$, rozkład na czynniki zamienia
+$6x + 9$ z powrotem na $3(2x + 3)$, a ruch jest zawsze ten sam: znajdź to, co
+mają wspólne wszystkie wyrazy, i wyłącz to przed nawias.
+
+W $6x + 9$ oba wyrazy dzielą się przez $3$, a nic większego nie dzieli obu,
+więc $3$ wychodzi przed nawias, a w środku zostaje to, czym staje się każdy
+wyraz po tym dzieleniu.
+
+Litera wychodzi na tych samych zasadach. W $x^{2} + 5x$ oba wyrazy niosą $x$,
+więc jest to $x(x + 5)$.
+
+Rozłóż na czynniki $4x^{2} - 6x$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$2x(2x - 3)$}
+Wspólny czynnik to $2x$: $2$ dzieli oba współczynniki, a $x$ jest w obu
+wyrazach. Wyłączenie samego $2$ albo samego $x$ nie jest błędem \dash{} jest
+niedokończone, a \enquote{rozłożone do końca} znaczy, że nie zostało już nic do
+wyłączenia.
+
+Różnica kwadratów działa również wstecz i jest to jedyny wzór, który warto
+rozpoznawać na pierwszy rzut oka: cokolwiek postaci $a^{2} - b^{2}$ jest równe
+$(a+b)(a-b)$, więc $x^{2} - 9$ to $(x+3)(x-3)$.
+
+Jest tu spostrzeżenie warte znacznie więcej niż sama technika. \textbf{Postać
+iloczynowa to ta sama wartość policzona mniejszą liczbą działań.} Obliczenie
+$x^{2} + 5x + 6$ kosztuje dwa mnożenia i dwa dodawania; obliczenie
+$(x+2)(x+3)$ kosztuje jedno mnożenie i dwa dodawania. Ta sama wartość, mniej
+pracy.
+
+Bądź jednak dokładny co do tego, względem czego liczysz ten zysk.
+Przekształcenie Hornera tego samego wielomianu, $x(x + 5) + 6$, to również
+jedno mnożenie i dwa dodawania, a nie rozkłada niczego na czynniki. To, co
+rozkład na czynniki tutaj pokonuje, to \emph{naiwna} postać rozwinięta, a nie
+najlepsza z rozwiniętych \dash{} a przenośny nawyk jest ten sam pod jednym i
+drugim: policz działania, zamiast ufać kształtowi.
+
+Rozłóż na czynniki $x^{2} - 49$, a następnie $9y^{2} - 1$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$x^{2} - 49 = (x + 7)(x - 7)$, ponieważ $49 = 7^{2}$.
+
+$9y^{2} - 1 = (3y + 1)(3y - 1)$, ponieważ $9y^{2} = (3y)^{2}$ oraz
+$1 = 1^{2}$. Współczynnik, który sam jest kwadratem, jest tym, co czyni ten
+przypadek widocznym.
+\end{ansblock}
+
+\begin{aibox}
+Wyłączenie wspólnego czynnika z sumy jest tym, co pozwala stałej uciec ze
+średniej,
+\[ \frac{1}{n}(cx_{1} + \dots + cx_{n})
+   = c \cdot \frac{1}{n}(x_{1} + \dots + x_{n}) \]
+i dlatego przeskalowanie każdego przykładu skaluje stratę, a zostawia w spokoju
+argument, który ją minimalizuje (Program~\ref{prog:F05}).
+
+A najmniejszy przykład w tej książce daje największy zysk. Pochodna funkcji
+logistycznej rozkłada się na $\sigma(x)\bigl(1 - \sigma(x)\bigr)$, więc przejście
+wstecz przez nią kosztuje jedno mnożenie wartości, którą już masz, a nie nową
+funkcję wykładniczą. Programy~\ref{prog:F07} i~\ref{prog:F12} to wyprowadzają;
+powód, dla którego jest to tanie, leży w tej sekcji.
+\end{aibox}
+
+\yourturn
+Rozłóż na czynniki $2x^{2} + 8x$, a następnie $t^{2} - 16$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$2x^{2} + 8x = 2x(x + 4)$.
+
+$t^{2} - 16 = (t + 4)(t - 4)$.
+\end{ansblock}
+
+\begin{note}
+Ta książka nie ćwiczy rozkładu na czynniki dalej niż do tego miejsca. Wspólny
+czynnik i różnica kwadratów pokrywają razem to, czego faktycznie potrzebują
+dalsze programy, a ogólne równanie kwadratowe załatwione jest tam, gdzie się go
+używa: Program~\ref{prog:F06} rozwiązuje równania kwadratowe, ze wzoru, w
+miejscu, w którym trzeba je rozwiązać.
+
+Jeśli twoja szkoła obejmowała godziny rozkładania trójmianów metodą prób, nic
+nie tracisz, nie powtarzając ich tutaj.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Ułamki algebraiczne i to, co wolno skrócić}
+\label{sec:F02-fractions}
+\index{algebra!ułamki}
+\index{diagnostyka!skracanie wyrazu}
+
+\begin{fr}
+Ułamek z literami podlega dokładnie tej arytmetyce, którą już masz. W tej
+sekcji nic nowego się nie pojawia. Nowe jest to, jak łatwo złamać w niej
+regułę, której na liczbach nigdy byś nie złamał.
+
+Mnożenie mnoży liczniki i mianowniki:
+\[ \frac{a}{b} \times \frac{c}{d} = \frac{ac}{bd} \]
+Dzielenie mnoży przez odwrotność:
+\[ \frac{a}{b} \div \frac{c}{d} = \frac{a}{b} \times \frac{d}{c}
+   = \frac{ad}{bc} \]
+Uprość $\frac{a}{b} \times \frac{b}{c}$, a następnie
+$\frac{x}{2} \div \frac{x}{6}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\frac{a}{b} \times \frac{b}{c} = \frac{ab}{bc} = \frac{a}{c}$. $b$
+znika, bo jest czynnikiem licznika i czynnikiem mianownika.
+
+$\frac{x}{2} \div \frac{x}{6} = \frac{x}{2} \times \frac{6}{x}
+= \frac{6x}{2x} = 3$.
+\end{ansblock}
+
+Dodawanie to działanie, które najpierw czegoś żąda. Dwa ułamki można dodać
+dopiero wtedy, gdy stoją nad tym samym mianownikiem:
+\[ \frac{a}{c} + \frac{b}{c} = \frac{a + b}{c} \]
+a gdy mianowniki się różnią, doprowadzasz je do zgody, mnożąc każdy ułamek w
+liczniku i mianowniku przez to, co ma ten drugi, a czego on nie ma.
+
+To żądanie też nie jest nowe. Program~\ref{prog:F01} mówił, że nie można dodać
+dwóch liczb w notacji naukowej, dopóki nie mają wspólnego wykładnika. To ten
+sam kształt: dodawanie potrzebuje obu argumentów wyrażonych w tych samych
+jednostkach, a mianownik jest jednostką.
+
+Sprowadź $\frac{1}{x} + \frac{1}{y}$ do jednego ułamka.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\dfrac{y + x}{xy}$}
+Pomnóż pierwszy przez $\frac{y}{y}$, a drugi przez $\frac{x}{x}$. Oba te
+ułamki są równe $1$, więc nic się nie zmieniło poza sposobem zapisu.
+
+Teraz zasłoń resztę strony.
+
+\textbf{Uprość $\frac{a + b}{a}$. Zapisz odpowiedź, zanim pójdziesz dalej.}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jeśli napisałeś $b$, skróciłeś $a$ przez $a$, a jest to drugi z dwóch błędów,
+dla których usunięcia ten program istnieje.
+
+Sprawdź. Weź $a = 2$ i $b = 6$:
+\[ \frac{2 + 6}{2} = \frac{8}{2} = 4 \qquad \text{wobec} \qquad b = 6 \]
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Skracanie to dzielenie licznika i mianownika przez wspólny
+\emph{czynnik}.} Czynnik to coś, przez co pomnożony jest cały licznik. W
+$\frac{ab}{a}$ licznik to $a$ razy $b$, więc $a$ jest czynnikiem i znika. W
+$\frac{a + b}{a}$ licznik to $a$ \emph{plus} $b$: to $a$ jest wyrazem, nie
+jest czynnikiem całości i zostaje.
+
+Błąd wziął się stąd, że oko dopasowało literę, a nie rolę, którą ta litera
+pełniła. Oba wyrażenia niosą $a$ w liczniku i $a$ w mianowniku; tylko jedno z
+nich niesie je jako czynnik.
+
+Uczciwe uproszczenie zamiast tego rozbija ułamek:
+\[ \frac{a + b}{a} = \frac{a}{a} + \frac{b}{a} = 1 + \frac{b}{a} \]
+\end{trapbox}
+Czy $\frac{x^{2} + x}{x}$ równa się $x + 1$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak \dash{} tutaj $x$ naprawdę jest czynnikiem obu wyrazów.}
+$x^{2} + x = x(x + 1)$, więc licznik to $x$ razy coś i $x$ znika uczciwie. To
+ten sam bliski przypadek co różnica kwadratów w \S\ref{sec:F02-expanding}:
+błędna reguła przeżywa, bo czytelnik spotkał sytuację, w której wyglądała na
+działającą, a w tamtej sytuacji litera akurat rzeczywiście była czynnikiem.
+
+\begin{aibox}
+Softmax dzieli każdą funkcję wykładniczą przez sumę ich wszystkich:
+\[ p_{i} = \frac{e^{z_{i}}}{e^{z_{1}} + e^{z_{2}} + \dots + e^{z_{n}}} \]
+Mianownik jest \emph{sumą}, więc żadna pojedyncza funkcja wykładnicza się z
+niego nie skraca. To reguła tej sekcji i to przez nią softmaksu nie da się
+policzyć po jednym wpisie naraz, a cały wiersz trzeba zsumować, zanim
+poznasz choć jedno prawdopodobieństwo. To także powód, dla którego liczby w tym
+wierszu nie są od siebie niezależne, o czym mówią
+Programy~\ref{prog:F07} i~\ref{prog:P30}.
+\end{aibox}
+
+\yourturn
+Uprość $\frac{3x^{2} - 6x}{3x}$, a następnie powiedz, czy
+$\frac{x + 3}{x + 5}$ da się uprościć.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\frac{3x^{2} - 6x}{3x} = \frac{3x(x - 2)}{3x} = x - 2$. Rozłóż najpierw
+licznik na czynniki, a wspólny czynnik stanie się widoczny; skracanie przed
+rozkładem to sposób na popełnienie poprzedniej pułapki.
+
+$\frac{x + 3}{x + 5}$ nie da się uprościć. Ani $x$, ani $3$, ani $5$ nie jest
+czynnikiem licznika i mianownika naraz, a zapis jest już tak krótki, jak się
+da.
+\end{ansblock}
+
+Jedno zdanie do wyniesienia z tej sekcji: \textbf{skracaj czynnik, nigdy
+wyraz.}
+\end{fr}
+
+% ============================================================
+\section{Przekształcanie wzoru}
+\label{sec:F02-rearranging}
+\index{algebra!przekształcanie wzoru}
+\index{diagnostyka!znak utracony pod pierwiastkiem}
+
+\begin{fr}
+Równanie jest wagą. Cokolwiek zrobisz jednej stronie, robisz drugiej, a
+równanie pozostaje prawdziwe. To jedyna reguła tej sekcji; reszta z niej
+wynika.
+
+Rozwiązywanie to odwracanie działań w odwrotnej kolejności. Żeby przeczytać
+$3x + 7 = 22$ w przód, mnożysz przez $3$, a potem dodajesz $7$, więc żeby to
+odwrócić, najpierw zabierasz $7$, a dopiero potem dzielisz przez $3$ \dash{}
+ostatnie wykonane działanie odwraca się jako pierwsze.
+\[ 3x + 7 = 22 \quad\longrightarrow\quad 3x = 15
+   \quad\longrightarrow\quad x = 5 \]
+Potem sprawdź przez podstawienie: $3 \times 5 + 7 = 22$. Sprawdzenie kosztuje
+pięć sekund i to ono czyni tę metodę bezpieczną.
+
+Rozwiąż $5x - 4 = 26$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x = 6$}
+Z $5x - 4 = 26$ wychodzi $5x = 30$, a potem $x = 6$, a
+$5 \times 6 - 4 = 26$ to potwierdza.
+
+Teraz te same ruchy z literami zamiast liczb. \emph{Przekształcenie wzoru}
+polega na przestawieniu go tak, by szukana wielkość stanęła sama po lewej
+stronie. Nic nowego nie jest potrzebne: reguła wagi nie dba o to, czy
+przenoszona rzecz jest cyfrą, czy literą.
+
+Zacznij od linii, którą ten program się otworzył, $y = wx + b$, i wyznacz $x$.
+
+\begin{itemize}
+\item Odejmij $b$ od obu stron: $\quad y - b = wx$.
+\item Podziel obie strony przez $w$: $\quad \frac{y - b}{w} = x$.
+\item Przeczytaj równanie w drugą stronę:
+  $\quad x = \frac{y - b}{w}$.
+\end{itemize}
+
+Dwa ruchy i odczytanie. Każdy ruch to jedno działanie zastosowane do całości
+obu stron i właśnie to czyni ten łańcuch sprawdzalnym: możesz wskazać krok, w
+którym wydarzyła się dowolna rzecz.
+\end{fr}
+
+\mermaidfig{f02-rearrange-moves}{%
+  Jedno przekształcenie jako łańcuch dozwolonych ruchów, z działaniem odwrotnym
+  na każdej krawędzi. Założenie pojawia się przy dzieleniu i przy żadnym innym
+  kroku, i o to właśnie chodzi: przekształcony wzór zbiera swoje założenia po
+  drodze, a nie niesie ich od początku.}{%
+  Wyznaczanie $x$ z $y = wx + b$, po jednym węźle na dozwolony ruch, z
+  założeniem doczepionym do kroku, który je wprowadza.}
+
+\begin{fr}
+Popatrz, co to przekształcenie zebrało po drodze.
+
+$y = wx + b$ jest całkiem dobrze określone przy $w = 0$. Mówi wtedy $y = b$, co
+jest modelem nudnym i dozwolonym. Ale $x = \frac{y - b}{w}$ nie jest tam
+określone w ogóle, a nic w wydrukowanej linii nie zapisuje, skąd ten zakaz się
+wziął.
+
+\textbf{Przekształcony wzór niesie założenia, których wersja wyjściowa nie
+potrzebowała.} Zbiera je w kroku, który je wprowadza \dash{} tutaj przy
+dzieleniu \dash{} a jeśli nie zapiszesz ich w tym kroku, nikt dalej ich nie
+odtworzy. Sam wzór i wzór razem z $w \ne 0$ to dwa różne stwierdzenia i tylko
+to drugie jest prawdziwe.
+
+Wyznacz $x$ ze wzoru $y = \frac{x - m}{s}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x = sy + m$}
+Pomnóż obie strony przez $s$, potem dodaj $m$. A co do założeń: wersja
+wyjściowa i tak potrzebowała $s \ne 0$, żeby dało się ją w ogóle zapisać, więc
+to przekształcenie nie zebrało niczego nowego. Tak też bywa i warto zauważyć,
+kiedy tak jest.
+
+Teraz zasłoń resztę strony. Znowu błąd kwadratowy:
+\[ L = (y - \hat{y})^{2} \]
+\textbf{Wyznacz $\hat{y}$. Zapisz wynik, zanim pójdziesz dalej.}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jeśli napisałeś $\hat{y} = y - \sqrt{L}$, algebra jest poprawna, a odpowiedź
+niepełna. Pierwiastek kwadratowy ma dwa pierwiastki:
+\[ \hat{y} = y \pm \sqrt{L} \]
+Strata równa $\val{f02.sq.correct}$ jest zgodna z predykcją o $\num{2.5}$
+powyżej wartości docelowej i z predykcją o $\num{2.5}$ poniżej niej, a strata
+nie powie ci, którą z nich masz.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Podniesienie do kwadratu wyrzuciło znak i żadne przekształcenie go nie
+odzyska.} $(-3)^{2}$ i $3^{2}$ dają oba $9$, więc podnoszenie do kwadratu nie
+jest odwracalne: dwa wejścia poszły do jednego wyjścia, a przejście wstecz musi
+oddać ci oba.
+
+To nie jest ciekawostka o pierwiastkach. To powód, dla którego \textbf{wartość
+straty mówi, jak bardzo się mylisz, i nigdy nie mówi, w którą stronę}, a zatem
+powód, dla którego żadnej procedury uczenia nigdy nie zbudowano z samych
+wartości straty. Kierunek niesie \emph{gradient} \dash{} pochodna straty, która
+dla tej straty wynosi $-2(y - \hat{y})$ i zachowuje dokładnie ten znak, który
+kwadrat zniszczył. Programy~\ref{prog:F11} i~\ref{prog:P15} to rozbierają.
+\end{trapbox}
+Oto przekształcenie z liczbą na końcu. Program~\ref{prog:F01} liczył pamięć z
+liczby parametrów wzorem
+\[ \text{bajty} = \text{parametry} \times \text{bajty na parametr} \]
+Przekształć go tak, by wyznaczyć liczbę parametrów, a potem powiedz, ile
+parametrów zmieści się w $\val{f02.budget.gb}$~GB po dwa bajty na parametr.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Podziel obie strony przez liczbę bajtów na parametr:
+\[ \text{parametry} = \frac{\text{bajty}}{\text{bajty na parametr}} \]
+$\val{f02.budget.gb}$~GB to $\num{2.4e10}$ bajtów, a po dwa bajty na parametr
+daje to $\val{f02.params.in.budget}$ parametrów \dash{} same wagi, bez niczego
+innego załadowanego.
+\end{ansblock}
+
+To jest obietnica, którą ten program złożył na starcie: \emph{przekształć wzór
+tak, by szukana rzecz stanęła po lewej}. Oto jej wersja, która zarabia
+najwięcej.
+
+Strata na jednym przykładzie w modelu językowym to $L = -\ln p$, gdzie $p$ jest
+prawdopodobieństwem, jakie model przypisał tokenowi, który faktycznie
+wystąpił. Dwa ruchy wyznaczają $p$: zmień znak obu stron, a potem odwróć
+logarytm.
+\[ L = -\ln p \quad\longrightarrow\quad -L = \ln p
+   \quad\longrightarrow\quad p = e^{-L} \]
+Algebra jest tutaj z tego programu. Ostatni krok \dash{} to, że podniesienie
+$e$ do logarytmu go odwraca \dash{} należy do Programu~\ref{prog:F03} i jest
+tutaj wzięty na wiarę, a nie po cichu pożyczony. Przyjmując go, strata równa
+$\val{f02.loss.nats}$ natów mówi, że model dał prawdopodobieństwo
+$\val{f02.prob.from.loss}$ temu, co faktycznie się wydarzyło, a to liczba
+znacznie czytelniejsza niż sama strata.
+
+\yourturn
+Wyznacz $s$ ze wzoru $z = \frac{x - m}{s}$, a następnie wyznacz $d$ ze wzoru
+$s = \frac{q}{\sqrt{d}}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$s = \frac{x - m}{z}$, przy założeniu $z \ne 0$ \dash{} założeniu, którego
+wersja wyjściowa nie miała.
+
+$s = \frac{q}{\sqrt{d}}$ daje $\sqrt{d} = \frac{q}{s}$, a potem
+$d = \left(\frac{q}{s}\right)^{2}$, przy założeniu $s \ne 0$.
+\end{ansblock}
+
+To drugie to skala uwagi w postaci skalarnej. Czynnik
+$\frac{1}{\sqrt{d}}$, który dzieli wynik w każdym transformerze, to właśnie to
+przekształcenie przeczytane w drugą stronę; wersja wektorowa to
+Program~\ref{prog:P05}, a powód, dla którego dzielnikiem jest $\sqrt{d}$, a nie
+$d$ czy cokolwiek innego, to Program~\ref{prog:P32}.
+
+\begin{note}
+Nawyk, który czyni to wszystko bezpiecznym, kosztuje dziesięć sekund.
+\textbf{Sprawdź przekształcenie, podstawiając liczby, których wynik już znasz.}
+Weź $y = 7$, $w = 3$ i $b = 1$ \dash{} liczby, którymi ten program się
+otworzył, gdzie $x$ wynosiło $2$. Wtedy
+$\frac{y - b}{w} = \frac{7 - 1}{3} = 2$, czyli to $x$, od którego wyszedłeś.
+Przekształcenie, które przechodzi jedno takie sprawdzenie, bardzo rzadko jest
+błędne; to, które go nie przechodzi, jest błędne na pewno.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Czytanie wzoru dokładnie tak, jak go wydrukowano}
+\label{sec:F02-reading}
+\index{zapis!część całkowita}
+\index{diagnostyka!kształt o jeden mniejszy}
+
+\begin{fr}
+Wszystko w tym programie budowało jedną umiejętność, a ta sekcja ją nazywa.
+
+\textbf{Czytanie opublikowanego wzoru jest procedurą, a nie aktem
+zrozumienia.} Cztery kroki, w tej kolejności:
+
+\begin{enumerate}
+\item nazwij każdy symbol i powiedz, które z nich są ustalone, a które się
+  zmieniają;
+\item znajdź niewidoczne nawiasy \dash{} każdą kreskę ułamkową, każdy znak
+  pierwiastka, każdy znak zaokrąglenia;
+\item przeczytaj, co jest \emph{wewnątrz} każdego z nich, i bądź dokładny co do
+  tego, gdzie każdy się kończy;
+\item podstaw przypadek, którego wynik już znasz, i sprawdź.
+\end{enumerate}
+
+Nic w tym sprytnego. To, co w tym jest, to zapisanie tego na papierze, a na tym
+polega cała różnica między umiejętnością a wprawą.
+
+Zastosuj trzy pierwsze kroki do tego wzoru \dash{} szerokości wyjścia splotu
+jednowymiarowego:
+\[ \left\lfloor \frac{W + 2p - k}{s} \right\rfloor + 1 \]
+$W$ to szerokość wejścia, $k$ to szerokość jądra, $p$ to dopełnienie dodane z
+każdej strony, $s$ to przesunięcie (stride). Znaki $\lfloor \cdot \rfloor$ to
+\emph{część całkowita}: zaokrąglają w dół do liczby całkowitej równej lub
+mniejszej. Kreska
+ułamkowa grupuje $W + 2p - k$ nad $s$; część całkowita grupuje cały iloraz;
+$+ 1$ stoi poza częścią całkowitą.
+\end{fr}
+
+\mermaidfig{f02-equation-to-code}{%
+  Cztery kroki zastosowane do linii normalizacji warstwowej z
+  \S\ref{sec:F02-precedence}, z trzema błędnymi spłaszczeniami pokazanymi jako
+  ślepe uliczki, każde opisane tym, co faktycznie liczy. Metoda to trzon;
+  odgałęzienia to to, co dzieje się bez niej.}{%
+  Wzór, cztery kroki czytania i trzy błędne spłaszczenia.}
+
+\begin{fr}
+Krok czwarty. Weź $W = 7$, $k = 3$, $p = 0$ i $s = 2$: wejście o szerokości
+siedmiu, jądro o szerokości trzech, bez dopełnienia, a jądro przesuwa się o dwie
+pozycje naraz.
+
+\textbf{Rozwiązanie z lukami.} Weź trzy etapy w kolejności, którą narzucają
+nawiasy.
+
+Wnętrze części całkowitej to $(7 + 0 - 3)/2 = \blank$
+
+Część całkowita z tego to $\blank$
+
+Zatem szerokość wyjścia, po dodaniu $+ 1$, wynosi $\blank$
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$2$, \quad $2$, \quad $3$}
+$\frac{7 - 3}{2} + 1 = \frac{4}{2} + 1 = 2 + 1 = 3$. Przesunięcie podzieliło
+licznik dokładnie, więc część całkowita dostała liczbę całkowitą i nie zrobiła
+zupełnie nic, a wzór zachował się jak ułamek plus jeden.
+
+Teraz zmień jedną cyfrę i nic poza tym. Weź $W = \val{f02.conv.w}$, przy
+$k = \val{f02.conv.k}$, $p = \val{f02.conv.p}$ i $s = \val{f02.conv.s}$
+dokładnie jak poprzednio.
+
+Jaka jest teraz szerokość wyjścia?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jeśli odpowiedziałeś $\num{3.5}$, część całkowita została pominięta, a kształt
+nie może wynosić $\num{3.5}$. Jeśli odpowiedziałeś $4$, zauważyłeś to i
+zaokrągliłeś w górę, co jest naturalną poprawką i poprawką błędną.
+\[ \left\lfloor \frac{8 + 0 - 3}{2} \right\rfloor + 1
+   = \left\lfloor \num{2.5} \right\rfloor + 1 = 2 + 1 = 3 \]
+Odpowiedź to $3$ \dash{} tyle samo co dla węższego wejścia.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Część całkowita należy do wzoru i zaokrągla w \emph{dół}.} To
+poprzednia ramka kazała ci ją porzucić: tam przesunięcie dzieliło dokładnie,
+część całkowita była ozdobą, a reguła, która nic nie robi w pierwszym sprawdzonym
+przypadku, jest regułą, którą przestajesz wpisywać.
+
+Przypadek, w którym przesunięcie dzieli dokładnie, jest tym, który każdy
+sprawdza pierwszy, i jedynym, w którym części całkowitej w ogóle nie widać.
+
+Zaokrąglanie w górę to zły kierunek, bo część całkowita nie jest konwencją
+zaokrąglania, tylko zliczeniem. Każda pozycja wyjściowa potrzebuje pod sobą
+całego jądra, a gdy przesunięcie nie dzieli licznika, ostatnie okno nie ma gdzie
+wylądować. Końcowe pozycje wejścia zostają odrzucone, żaden błąd nie jest
+zgłaszany, a dylatacja dokłada do licznika kolejny składnik, którego ten
+program nie uczy.
+\end{trapbox}
+Zatem dwa pytania. Ile pozycji wejściowych zostało odrzuconych przy tym
+ustawieniu? I co stanie się z wejściem o szerokości
+$\val{f02.conv.stack.w}$ po trzech takich warstwach?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Liczba odrzuconych pozycji wejściowych wynosi $\val{f02.conv.dropped}$. Trzy
+okna zaczynają się na pozycjach $1$, $3$ i $5$ i sięgają do pozycji $7$; ósmej
+nic nigdy nie ogląda.
+
+Trzy warstwy to moment, w którym przestaje to być ciekawostką. Zacznij od
+$\val{f02.conv.stack.w}$, pomiń część całkowitą, a szerokości pobiegną
+$30 \to \num{14.5} \to \num{6.75} \to \num{2.875}$. Zaokrąglij to na końcu w
+górę, bo kształt musi być liczbą całkowitą, a wyjdzie ci
+$\val{f02.conv.expected.3}$. Części całkowite dają
+$\val{f02.conv.actual.3}$. Brakuje ci $\val{f02.conv.gap.3}$.
+\end{ansblock}
+
+\begin{warning}
+Nic się nie zgłasza. Niezgodność wypływa przy pierwszym działaniu, które
+wymaga zgodności dwóch kształtów, a może to być kilka warstw dalej i wewnątrz
+modułu napisanego przez kogoś innego \dash{} i tam czyta się jak błąd tamtego
+modułu. To standardowe miejsce, w którym ludzie gubią element, i dlatego
+Dumoulin i Visin napisali cały przewodnik po arytmetyce splotów.
+
+Nawyk jest tani: policz kształt na każdej warstwie, zanim cokolwiek uruchomisz,
+i porównaj go z tym, co raportuje framework. Program~\ref{prog:P03} wymiaruje
+w ten sposób sieć, a Program~\ref{prog:P07} czyni ze sprawdzania kształtów
+dyscyplinę.
+\end{warning}
+
+Ostatni przypadek, i nie dostaniesz przy nim żadnej pomocy. Przeczytaj krok
+optymalizatora tak, jak go wydrukowano:
+\[ \theta \leftarrow \theta - \eta \, \frac{\hat{m}}{\sqrt{\hat{v}} + \eps} \]
+Nazwij symbole; dostaw nawiasy; i powiedz, co się zmieni, jeśli $\eps$
+przeczytać jako stojące poza dzielnikiem, przy $\eta = \val{f02.adam.eta}$,
+$\hat{m} = \val{f02.adam.mhat}$, $\hat{v} = \val{f02.adam.vhat}$ i
+$\eps = \val{f02.adam.eps}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\theta$ to parametr, $\eta$ to współczynnik uczenia, $\hat{m}$ i $\hat{v}$ to
+bieżące oszacowania gradientu i jego kwadratu, $\eps$ to zabezpieczenie.
+Nawiasy: kreska ułamkowa grupuje $\hat{m}$ nad całością
+$\sqrt{\hat{v}} + \eps$, a pierwiastek obejmuje $\hat{v}$ i nic więcej.
+\begin{center}
+\code{eta * mhat / (sqrt(vhat) + eps)}
+\end{center}
+Przy tych wartościach $\sqrt{\hat{v}}$ trafia dokładnie na $\eps$, więc
+wydrukowana linia zmniejsza krok o połowę i daje
+$\val{f02.adam.correct}$. Odczytana z $\eps$ dodanym po dzieleniu daje
+$\val{f02.adam.wrong.prec}$, czyli $\val{f02.adam.ratio}$ raza więcej \dash{} a
+gorsze od tego czynnika jest to, że taki krok nie ma żadnego ograniczenia od
+góry, gdy $\hat{v}$ zmierza do zera. To, co usuwa błędne odczytanie, to
+dokładnie zabezpieczenie.
+\end{ansblock}
+
+Oto ten program w jednym zdaniu. \textbf{Wydrukowane równanie jest wyrażeniem z
+pominiętymi nawiasami i przemilczanymi założeniami, a ty odtwarzasz jedno i
+drugie, zanim je wpiszesz.}
+
+Co dalej. Program~\ref{prog:F03} dostarcza kroku wziętego wyżej na wiarę \dash{}
+że logarytm i funkcja wykładnicza odwracają się nawzajem \dash{} i pokazuje,
+dlaczego każde prawdopodobieństwo w tej dziedzinie obsługuje się jako logarytm.
+Program~\ref{prog:F04} czyta $\sum$ jako pętlę, a to ostatni kawałek zapisu
+stojący między tobą a funkcją straty z pracy naukowej.
+Program~\ref{prog:F06} zajmuje się nierównościami, w tym jednym ruchem, którego
+ten program celowo nie uczył \dash{} tym, że pomnożenie nierówności przez
+liczbę ujemną odwraca ją. A Program~\ref{prog:P07} bierze dyscyplinę kształtów
+z tej ostatniej sekcji i robi z niej nawyk.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{Symbol oznacza wielkość, której jeszcze nie ustaliłeś.
+  \emph{Wyrażenie} liczy, \emph{równanie} twierdzi coś o jednej wartości,
+  \emph{tożsamość} jest prawdziwa dla każdej wartości \dash{} i tylko
+  tożsamość wolno podstawiać swobodnie.}
+\sumitem{4--5}{Indeks górny w nawiasie to \emph{etykieta}, a nie wykładnik:
+  $W^{(2)}$ to warstwa, a $W^{2}$ to kwadrat. Podstawiaj w nawiasie, bo inaczej
+  $3x^{2}$ przy $x = -2$ staje się $3-2^{2}$.}
+\sumitem{7--10}{Wyrazy redukują się tylko wtedy, gdy niosą te same litery w tych
+  samych potęgach, a znak należy do wyrazu stojącego za nim. Wyrazy niepodobne
+  się nie zwijają \dash{} czego biblioteka tablicowa ci nie powie.}
+\sumitem{11}{Dodawanie wyrazów i ich mnożenie to różne działania:
+  $3x + 4x = 7x$, ale $3x \times 4x = 12x^{2}$.}
+\sumitem{13--15}{Nawiasy, potęgi, mnożenie i dzielenie, dodawanie i
+  odejmowanie. Wykładnik wiąże mocniej niż stojący przed nim znak, więc
+  $-3^{2} = -9$, a $(-3)^{2} = 9$ \dash{} i twój język się z tym zgadza.}
+\sumitem{16--17}{Wydrukowana kreska ułamkowa i wydrukowany znak pierwiastka to
+  \emph{nawiasy, których nikt nie wydrukował}. Spłaszczenie do jednej linii
+  oznacza ich dostawienie.}
+\sumitem{18--19}{Zależą od tego dwie prawdziwe linie: normalizacja warstwowa,
+  gdzie $\eps$ jest pod pierwiastkiem, i krok Adama, gdzie $\eps$ jest wewnątrz
+  dzielnika.}
+\sumitem{20--21}{$a(b+c) = ab + ac$, a dwa nawiasy po dwa wyrazy dają
+  \emph{cztery} iloczyny \dash{} po jednym na komórkę siatki
+  $2 \times 2$.}
+\sumitem{22--23}{$(a+b)^{2} = a^{2} + 2ab + b^{2}$. Wykładnik rozdziela się
+  względem iloczynu i względem niczego innego. Sprawdź przy $a = 3$, $b = 4$:
+  $49$, a nie $25$.}
+\sumitem{24--26}{$(a+b)(a-b) = a^{2} - b^{2}$ to jedyny przypadek, w którym
+  wyrazy mieszane się znoszą. W $(y - \hat{y})^{2}$ wyraz mieszany jest jedyną
+  częścią straty, która wie o obu wielkościach.}
+\sumitem{28--29}{Rozkład na czynniki to usuwanie nawiasów wstecz, a postać
+  iloczynowa to ta sama wartość policzona mniejszą liczbą działań.}
+\sumitem{33--35}{Dodawanie ułamków wymaga wspólnego mianownika. Skracanie usuwa
+  wspólny \emph{czynnik}: $\frac{a+b}{a} = 1 + \frac{b}{a}$, nigdy $b$.
+  Skracaj czynnik, nigdy wyraz.}
+\sumitem{38--40}{Przekształcanie to reguła wagi stosowana po jednym działaniu,
+  odwracająca w odwrotnej kolejności \dash{} a przekształcony wzór zbiera
+  założenia, których wersja wyjściowa nie potrzebowała, w kroku, który je
+  wprowadza.}
+\sumitem{41--43}{$L = (y - \hat{y})^{2}$ daje $\hat{y} = y \pm \sqrt{L}$:
+  strata mówi jak daleko, a nigdy po której stronie. $L = -\ln p$ daje
+  $p = e^{-L}$.}
+\sumitem{45--48}{Czytaj wzór w czterech krokach: nazwij symbole, znajdź
+  niewidoczne nawiasy, przeczytaj, co jest w środku, podstaw przypadek, który
+  umiesz sprawdzić. Szerokość wyjścia splotu
+  $\left\lfloor \frac{W + 2p - k}{s} \right\rfloor + 1$ ma w sobie część
+  całkowitą, część całkowita zaokrągla w dół, a tam, gdzie przesunięcie nie
+  dzieli, pozycje wejścia są odrzucane po cichu.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Oblicz $2a - 3b$ przy $a = 4$ i $b = -2$.
+  \answerto{$8 - (-6) = 14$.}
+\item Uprość $7x - 3y - 2x + 5y$.
+  \answerto{$5x + 2y$.}
+\item Uprość $3a^{2} \times 4a^{5}$.
+  \answerto{$12a^{7}$. Współczynniki się mnożą, wykładniki dodają.}
+\item Oblicz $10 - 2 \times 3^{2}$.
+  \answerto{$10 - 18 = -8$. Najpierw potęga, potem mnożenie.}
+\item Zapisz wydrukowane $\frac{p - q}{\sqrt{r + 1}}$ jako jedną linię kodu.
+  \answerto{\code{(p - q) / sqrt(r + 1)}.}
+\item Usuń nawiasy w $(x + 4)(x - 2)$.
+  \answerto{$x^{2} + 2x - 8$.}
+\item Usuń nawiasy w $(2a + 5)^{2}$.
+  \answerto{$4a^{2} + 20a + 25$. Wyraz mieszany to
+  $2 \times 2a \times 5 = 20a$.}
+\item Usuń nawiasy w $(3x - 1)(3x + 1)$.
+  \answerto{$9x^{2} - 1$.}
+\item Rozłóż na czynniki $5x^{2} + 15x$.
+  \answerto{$5x(x + 3)$.}
+\item Uprość $\frac{x^{2} - 4x}{x}$.
+  \answerto{$x - 4$. Licznik to $x(x - 4)$, więc $x$ jest czynnikiem obu.}
+\item Wyznacz $r$ ze wzoru $A = \pi r^{2}$ i podaj, czego to przekształcenie
+  wymaga.
+  \answerto{$r = \sqrt{A/\pi}$. Wymaga $A \ge 0$, żeby pierwiastek istniał, a
+  dwie wartości pierwiastka sprowadza do jednej dodatniość promienia \dash{}
+  co jest faktem o zadaniu, a nie o algebrze.}
+\item Splot ma $W = 10$, $k = 4$, $p = 1$ i $s = 3$. Jaka jest szerokość
+  wyjścia?
+  \answerto{$\left\lfloor \frac{10 + 2 - 4}{3} \right\rfloor + 1
+  = \left\lfloor \frac{8}{3} \right\rfloor + 1 = 2 + 1 = 3$. Część całkowita
+  wykonuje tu pracę.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Oblicz $x^{2} - 3x + 2$ przy $x = -1$.
+  \answerto{$1 + 3 + 2 = 6$. Oba minusy mają znaczenie.}
+\item Uprość $2(3x - 1) - 3(x - 4)$.
+  \answerto{$6x - 2 - 3x + 12 = 3x + 10$. Drugi nawias jest mnożony przez
+  $-3$, więc oba jego wyrazy zmieniają znak.}
+\item Usuń nawiasy w $(a + 2b)(a - 3b)$.
+  \answerto{$a^{2} - ab - 6b^{2}$.}
+\item Usuń nawiasy w $\left(x - \frac{1}{x}\right)^{2}$.
+  \answerto{$x^{2} - 2 + \frac{1}{x^{2}}$.}
+\item Wykaż, że $(a+b)^{2} - (a-b)^{2} = 4ab$.
+  \answerto{$(a^{2} + 2ab + b^{2}) - (a^{2} - 2ab + b^{2}) = 4ab$. Kwadraty się
+  znoszą, a oba wyrazy mieszane się dodają.}
+\item Rozłóż na czynniki $12x^{3} - 8x^{2}$.
+  \answerto{$4x^{2}(3x - 2)$. Wyłącz największy wspólny czynnik, a nie
+  pierwszy, który zobaczysz.}
+\item Rozłóż na czynniki $25 - 4t^{2}$.
+  \answerto{$(5 + 2t)(5 - 2t)$.}
+\item Uprość $\frac{x^{2} - 9}{x + 3}$.
+  \answerto{$x - 3$. Rozłóż najpierw licznik jako $(x+3)(x-3)$; zanim to
+  zrobisz, nie ma czego skracać.}
+\item Sprowadź $\frac{2}{a} - \frac{3}{b}$ do jednego ułamka.
+  \answerto{$\frac{2b - 3a}{ab}$.}
+\item Uprość $\frac{a}{b} \div \frac{c}{d} \times \frac{c}{a}$.
+  \answerto{$\frac{a}{b} \times \frac{d}{c} \times \frac{c}{a}
+  = \frac{d}{b}$.}
+\item Wyznacz $t$ ze wzoru $v = u + at$ i podaj założenie.
+  \answerto{$t = \frac{v - u}{a}$, przy założeniu $a \ne 0$. Wersja wyjściowa
+  niczego takiego nie potrzebowała.}
+\item Wyznacz $h$ ze wzoru $V = \pi r^{2} h$.
+  \answerto{$h = \frac{V}{\pi r^{2}}$, przy założeniu $r \ne 0$.}
+\item Wyznacz $b$ ze wzoru $c^{2} = a^{2} + b^{2}$.
+  \answerto{$b = \pm\sqrt{c^{2} - a^{2}}$, przy założeniu $c^{2} \ge a^{2}$.
+  Ten $\pm$ to znak, który zniszczyło podnoszenie do kwadratu.}
+\item Podaj dwa różne spłaszczenia
+  $\frac{x - \mu}{\sqrt{\sigma^{2} + \eps}}$ do jednej linii i powiedz, co
+  liczy każde z nich.
+  \answerto{Jak wydrukowano:
+  \code{(x - mu) / sqrt(sigma2 + eps)}. Bez nawiasu licznika:
+  \code{x - mu / sqrt(sigma2 + eps)}, co odejmuje iloraz od $x$.}
+\item Splot ma $W = 32$, $k = 3$, $p = 1$ i $s = 1$. Jaka jest szerokość
+  wyjścia i po co jest to dopełnienie?
+  \answerto{$\left\lfloor \frac{32 + 2 - 3}{1} \right\rfloor + 1 = 32$.
+  Dopełnienie dobrano tak, by wyjście miało tę samą szerokość co wejście.}
+\item Weź teraz $W = 32$, $k = 3$, $p = 0$ i $s = 2$. Jaka jest szerokość
+  wyjścia i ile pozycji wejściowych zostaje odrzuconych?
+  \answerto{$\left\lfloor \frac{29}{2} \right\rfloor + 1 = 14 + 1 = 15$, a
+  odrzucona zostaje jedna pozycja wejściowa: ostatnie okno kończy się na
+  pozycji $31$.}
+\item Dla $y = 10$ i $\hat{y} = 8$ policz $(y - \hat{y})^{2}$ oraz
+  $y^{2} + \hat{y}^{2}$ i powiedz, z czego składa się różnica.
+  \answerto{$4$ wobec $164$. Różnicą jest wyraz mieszany,
+  $2y\hat{y} = 160$.}
+\item Jeśli $L = -\ln p$, a strata się podwoi, co dzieje się z $p$?
+  \answerto{Zostaje podniesione do kwadratu:
+  $p = e^{-2L} = \left(e^{-L}\right)^{2}$. Dwa razy większa strata to
+  prawdopodobieństwo do kwadratu, a nie o połowę mniejsze.}
+\item O jaki czynnik różnią się dwa odczytania zapisu $1/2x$?
+  \answerto{O $x^{2}$: $\frac{1}{2}x$ podzielone przez $\frac{1}{2x}$ daje
+  $x^{2}$.}
+\item Oblicz $-2^{4}$ oraz $(-2)^{4}$.
+  \answerto{$-16$ i $16$. Wykładnik wiąże przed znakiem.}
+\end{furtherproblems}

@@ -1,0 +1,10 @@
+flowchart LR
+  P["PRINTED<br/>(x - mu)<br/>-----------------<br/>sqrt(sigma^2 + eps)"]
+
+  P --> A["1. name every symbol<br/>2. find the invisible<br/>brackets: the bar<br/>and the root sign"]
+  A --> B["3. read what is<br/>INSIDE each of them<br/>4. substitute a case<br/>you can check"]
+  B --> OK["DEFENSIBLE<br/>(x - mu)<br/>/ sqrt(sigma2 + eps)"]
+
+  A -.-> W1["x - mu / sqrt(sigma2 + eps)<br/>subtracts a quotient from x"]
+  B -.-> W2["(x - mu) / sqrt(sigma2) + eps<br/>adds eps AFTER dividing"]
+  B -.-> W3["(x - mu) / (sqrt(sigma2) + eps)<br/>eps outside the root,<br/>inside the divisor"]

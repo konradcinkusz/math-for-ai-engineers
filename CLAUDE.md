@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1 written, both editions.** F2–F13 and P1–P34 are stubs carrying their briefs | 46 of 47 |
+| Programs | **F1 and F2 written, both editions.** F3–F13 and P1–P34 are stubs carrying their briefs | 45 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,16 +21,25 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 175 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-pl` (17x24) | 175 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-en-a4` | 167 | 0 | 0 | 5, worst 6.3 pt | 0 |
-| `main-pl-a4` | 167 | 0 | 0 | 4, worst 4.4 pt | 0 |
+| `main-en` (17x24) | 215 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-pl` (17x24) | 217 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en-a4` | 199 | 0 | 0 | 5, worst 6.3 pt | 0 |
+| `main-pl-a4` | 199 | 0 | 0 | 4, worst 4.4 pt | 0 |
 
 The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
 one format and one language because that is where the line falls. Well under
-the 15 pt budget. Parity reports **0 failures and 0 warnings** across 56 file
-pairs; `reflist.py` confirms 66 labels resolve to the same numbers in both
-editions.
+the 15 pt budget. **F2 added no overfull box to any of the four formats** —
+the multiset came back identical to the pre-F2 baseline, which took two fixes
+recorded under *Program F2 pass* below, and **the F2 review pass did not move it
+either**, in any of the four. Parity reports **0 failures and 0 warnings**
+across 56 file pairs; `reflist.py` confirms 77 labels resolve to the same
+numbers in both editions.
+
+`main-pl` is two pages longer than `main-en` because the F2 review pass added a
+Horner qualification and two gapped-retrieval frames, and Polish is longer than
+English for the same content. The two editions have never been required to
+paginate alike — nothing that matters navigates by page — but the divergence is
+new, so it is written down rather than left to look like a defect.
 
 **Four pages per format came from the Stroud layout pass**, from two causes.
 Two are the next-frame cue: 33 cues in a 45-frame program, measured with and
@@ -51,12 +60,12 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **46 of 47 programs are stubs**, in each language. This is the whole of the
+- **45 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 28 computed values, all referenced, all present
-- 0 `verifybox` blocks · 6 Mermaid sources, all rendering
+- 60 computed values, all referenced, all present
+- 0 `verifybox` blocks · 12 Mermaid sources, all rendering
 - **80/80 validation: NOT ESTABLISHED**, and printed as outstanding on every
   build. See *The evidence, honestly* below — this is the one ledger that is a
   claim rather than a count, and it must not quietly go away.
@@ -106,6 +115,51 @@ something. No marketing register. No *simply*, no *just*, no *powerful*.
 
 **Two to four figures per program**, each teaching something. Mermaid, ASCII
 source, per language, committed; rendered PDFs are build output.
+
+**A figure must not answer the frame that follows it.** The rule recorded after
+the F2 pass — *a figure sits only where the next frame does not open with an
+answer* — is about the answer box, and it is too narrow. F2's expansion grid
+obeyed it and still printed `(a + b)^2 = a^2 + 2ab + b^2`, in a node and again
+in its caption, on the same page as and four inches above the frame that says
+*cover the rest of the page and write down the expansion of (a+b)^2 as fast as
+you can*. The elicitation the whole program was built around was inert, because
+the spoiler was above the covering hand. So the rule is the wider one: **a
+figure may not contain the answer to any question put to the reader in the
+frames on either side of it, whether or not those frames open with `\ans`.** A
+figure that teaches a correction goes *after* the correction, where it explains,
+and a figure that would preview a trap does not go in at all. Read the figure
+and the two frames around it as a page, not as a source file.
+
+**No instruction may depend on where the page happens to break.** *Before you
+turn over* was false in F2 in three places, and differently false in each
+edition, because the four PDFs paginate differently by construction — the same
+sentence was true in English and false in Polish. Nothing can gate it: C4, C8,
+C12 and C14 all read the source, where pagination does not exist. The answer box
+is a thing you put your hand over (`notes/07-stroud-original-layout.md` §3), so
+write *before you read on* / *zanim pójdziesz dalej*, which is true under every
+pagination. *Cover the rest of the page* is fine; it names the hand, not the
+leaf.
+
+**No inline `\dfrac`, and watch the leading as well as the margin.** `\dfrac`
+in running prose sets a display-size fraction inside a text line, and the line's
+box then exceeds the leading: the denominator prints into the line beneath.
+TeX never says so, because the box is too **tall** and TeX only reports boxes
+that are too **wide**. F2 shipped a draft with 78 inline `\dfrac` against F1's
+17. Write `\frac` inline — in inline maths it is textstyle already — or move
+the fraction into a display. `\dfrac` is right inside `\ans`, which is a
+centred box with no line under it.
+
+**The overlap counts once recorded here did not survive re-measurement, and
+they are gone.** An independent pass with three instruments — `pdftotext
+-bbox` boxes, PyMuPDF word boxes and PyMuPDF per-character boxes — put F1 at
+**0** overlapping pairs in every build, not 8–12, and could not find any
+tolerance that reproduces the original figure. What it did confirm is the
+direction: the F2 draft had a handful of real overlaps, the worst 6.1–7.3 pt,
+and converting the fractions took them to zero. So the rule stands and the
+numbers behind it do not. If you need a metric, use `pdftotext -bbox` boxes at
+a 0.05 pt tolerance — it gives 0 for both programs in all four builds and is
+one command to re-run. Do not quote a number here that you have not
+re-measured.
 
 **Watch the margin.** 17 cm page in the trade format, 21 cm on A4 — but both
 are set to about the same measure, so a line that overflows in one usually
@@ -585,6 +639,252 @@ mechanical and it is not optional: those numbers *are* the return index.
 not. It generalises to the per-layer error bound in P2 and to the GB/GiB ladder
 in the same program, so it earns its place three times.
 
+### Program F2 pass, August 2026
+
+**Fifty teaching frames, both editions, and the plan was right about the
+mathematics and wrong about three placements.** All three failures were the
+same failure: the plan put a diagram at a frame that ends by asking a question,
+and F01's practice — never stated, only observed — is that a figure sits only
+where the *next* frame does not open with an answer. A figure between a
+question and its answer box puts the reader's own answer overleaf from the
+question. So three frames were rewritten to close a teaching beat instead of
+asking:
+
+- **Frame 21** works `(x+2)(x+3)` through in full and points at the grid;
+  the elicitation of `(a+b)^2` is wholly frame 22.
+- **Frame 39** works the whole of `y = wx + b -> x = (y-b)/w`; the plan's
+  second question, *make b the subject*, is gone and frame 40 carries the
+  acquired condition instead.
+- **Frame 45** states the four-step method and applies steps one to three
+  without asking; frame 46 does step four. Everything in section 8 therefore
+  sits one frame later than the plan, and trap 39's route is **45--48**.
+
+The cost is the cue rate: **39 of 50, 78%**, against the plan's projected 82%.
+That is the right trade — the alternative was three figures printed between a
+question and its answer.
+
+> **Superseded in part by the F2 review pass below.** Frame 21 obeyed the rule
+> above and the trap still did not fire, because the rule is about the *answer
+> box* and the defect was the *figure's own content*. Figure F2.1 now sits after
+> frame 23, which does end by asking, and its answer box is frame 24 — the only
+> deliberate exception in the program, taken because the figure explains a
+> correction and previewed a trap where it was. It was checked on the page: in
+> all four builds the question, the figure and the answer are on one page, so
+> nothing the reader writes is overleaf from what they wrote it about. The rule
+> to write against now is the wider one in *Non-negotiable conventions*.
+
+**Five traps, each elicited before it is named**, and the two the brief owns are
+the load-bearing pair. `(a+b)^2` is elicited at 22 under a *speed* instruction,
+immediately after frame 21 has made the reader fluent with the grid; the
+correction names `a^2 + b^2` on the page first, falsifies it at 3 and 4, and
+then explains the reasoning — an index does distribute over a product, and the
+reader generalised a true rule past its hypothesis. Trap 39 (the convolution
+floor) is elicited in two steps across 46 and 47: the first case has the stride
+dividing exactly, so the floor is decoration and the reader stops typing it, and
+then one digit changes. Both wrong answers, `3.5` and `4`, are predicted by name
+in frame 48.
+
+**Two corrections to the plan's own text, both small and both worth recording.**
+
+- The plan's frame 48 says *the mismatch surfaces `f02.conv.gap.3` layers
+  downstream*. That misreads the key: `gap.3` is the **shape shortfall** (1),
+  not a distance in layers. The frame says *you are one short* and leaves the
+  downstream distance qualitative, which is also the honest claim.
+- Quiz Q10 is `\teachesat{33--34}`, not `\teachesatone{33}`: frame 33 asks it
+  and frame 34 answers it.
+
+**Two overfull hboxes, and the second is a new class this book had not met.**
+Both were fixed and the multiset came back to the pre-F2 baseline exactly.
+
+- **32 pt: a word-formula set inline.**
+  `$\text{bytes} = \text{parameters} \times \text{bytes per parameter}$` has no
+  break opportunity anywhere in it — three `\text{}` spans and two operators —
+  so it cannot be broken and it cannot be hyphenated. A word-formula goes in a
+  display, always.
+- **12.6 pt in the *diagram manifest*, Polish only, in both formats.**
+  `\mermaidfig` writes `\texttt{<key>.mmd} --- <third argument>` into a
+  narrow, indented contents line. At 24 characters `f02-equation-to-code.mmd`
+  plus a 139-character Polish description overflowed; the 22- and 23-character
+  keys beside it did not. **The third argument is manifest copy, not a caption:
+  keep it short, and shorter again in Polish, where the words are longer.**
+  The sibling volume records the same failure from the other end — a long
+  `\code{}` inside screenshot instructions landing in the same column.
+
+**Also worth keeping:** `f02.conv.dropped` is `1`, and quoting it first in a
+sentence starts that sentence with a digit in both editions. Reworded rather
+than left. A value that is a small integer needs its sentence built round it.
+
+**The numbers behaved as `code/f02_algebra.py`'s comments said they would.** The
+layer-norm misreading gives 297.03 against 90.45, 228.4% above the printed
+value, and the frame says in the same breath that the variance was chosen small
+on purpose and that the ratio is not typical while the failure mode is. The Adam
+comparison lands at 0.00050000 against 0.00100001 — a factor of 2.00002, not
+2 — and the frame quotes the five decimals rather than rounding a number the
+reader would then check and find inexact.
+
+### Program F2 review pass, August 2026
+
+Two independent reviewers read the program **and the rendered pages**, and
+between them found four blocking defects. Every one of the four was invisible to
+every gate in the repository, and three of them were invisible because they live
+on the finished page rather than in the source. That is the generalisable
+finding: **this book now has a class of defect that only a reader of the PDF can
+see**, and `checkpdf.py` was written for exactly one member of that class.
+
+**1. The headline trap did not fire.** Figure F2.1 printed
+`(a + b)^2 = a^2 + 2ab + b^2` in a node, and it sat on the same page as, and
+four inches above, the frame that says *cover the rest of the page and write
+down the expansion of (a+b)^2 as fast as you can*. Covering the page does
+nothing when the spoiler is above the covering hand. The figure moved to after
+frame 23 — the correction — and the identity came out of the node and out of the
+caption; it teaches as corners-versus-edges and states no result. The rule that
+was in this file was too narrow (*a figure sits only where the next frame does
+not open with an answer*) and is now the wider one, in *Non-negotiable
+conventions*: **a figure must not answer the frame that follows it.**
+
+Verified on the page, not in the source: in all four builds the elicitation
+frame ends on one page and the figure is on the next, below the correction, with
+frame 23's closing question and frame 24's answer on the same page as the figure
+so nothing the reader writes is overleaf from what they wrote it about.
+`\mermaidfig` renders into `figure[htbp]`, so this **cannot be settled by source
+order alone** — a float can be hoisted to the top of the page it is declared on.
+It cannot rise above the page where its declaration point falls, which is what
+makes the fix sound; but re-check it on the page after any edit that moves the
+break.
+
+**2. *Before you turn over* was false, and differently false in each edition.**
+Three of them: the page carried both frames in English, and the Polish build
+broke elsewhere again, so the same sentence was true in one edition and false in
+the other. Nothing can gate this — C4, C8, C12 and C14 all read the source, and
+the four PDFs paginate differently by construction. Now *before you read on* /
+*zanim pójdziesz dalej*. The rule is in *Non-negotiable conventions*.
+
+**3. A trapbox asserted a remembered fact about C.** *In Python `-3**2` is −9,
+and the same expression in C behaves the same way.* **C has no exponentiation
+operator**; `-3^2` in C is a bitwise XOR. The claim was written from memory into
+a printed box, in a book whose first rule is verify before writing. Both halves
+of the replacement were run before being written:
+
+- `python3 -c "print(-3**2)"` → `-9`
+- `node -e "console.log(-3 ** 2)"` → `SyntaxError: Unary operator used
+  immediately before exponentiation expression. Parenthesis must be used to
+  disambiguate operator precedence` (Node 22)
+
+JavaScript's refusal is a better example than C's agreement would have been,
+because the box's point is that the line is ambiguous — and one real parser says
+so in as many words.
+
+**4. The same box gave a negative variance the wrong cause.**
+`notes/02-grounding-and-traps.md` item 3, owned by P01, attributes it to
+catastrophic cancellation in the one-pass formula. Two programs would have given
+one symptom two causes. The squared-error clause stays; the variance clause is
+now a cross-reference to P1.
+
+**The trap catalogue is a source of authority over the chapters, not a
+by-product of them.** Check a trap claim against `notes/02` before writing it,
+the same way an API claim is checked against the installed package in the
+sibling volumes.
+
+#### The seven smaller findings
+
+- **The trap was announced.** *The next frame is going to catch you holding it*
+  removes the confidence, and the errorful-generation benefit is largest exactly
+  when the learner was confident. Cut. Frame 22's *no working, as fast as you
+  can do it* suppresses deliberation without warning.
+- **Two Quiz routes named the asking frame**, against F01's convention of
+  routing to the frame that answers: Q2 `4` → `4--5`, Q8 `24` → `24--25`. All
+  thirteen routes and all fifteen Summary brackets were then re-read against the
+  frames; `\sumitem{7--9}` → `7--10`, because the *which an array library will
+  not tell you* clause is frame 10's warning box. **There is now no
+  `\teachesatone` in F02** — every route is a range, which is what a route to an
+  answered question looks like.
+- **Frame 29 overstated the factorisation saving.** Horner's `x(x + 5) + 6` is
+  one multiplication and two additions *without* factorising, so the saving is
+  against the naive expanded form and not the best one. The frame says so now,
+  and keeps the transferable habit: count the operations rather than trust the
+  shape.
+- **Two aiboxes named no system.** Frame 50's was a four-program roadmap and is
+  now prose. Frame 12's named a shape and then talked about compilers, which is
+  not AI; it now collects the like terms of the original transformer's
+  feed-forward block, `4d^2 + 4d^2 = 8d^2`, which is the program's own move done
+  on a real model's numbers. The aibox rule holds: **if it cannot name a
+  specific line of a specific system it is prose.**
+- **F02 used `\blank` zero times in fifty frames** where F01 uses it five times.
+  It is a distinct retrieval mode — a gap inside a worked line rather than a
+  question with an answer overleaf — and skipping it costs the program a rung of
+  the scaffolding gradient. Added to frames 20 and 46; 46's three-stage floor
+  evaluation was a gapped worked example in everything but the macro.
+- **Polish `krok` was carrying both *step* and *stride***, in one frame and then
+  two frames apart. Both readings are standard, which is why the collision is
+  invisible to the translator and visible to the reader. The stride is now
+  `przesunięcie`, introduced once as *przesunięcie, czyli krok splotu*, so every
+  remaining `krok` in the program means *step*. **No digit changed**, so C12
+  stayed green.
+
+#### What was measured
+
+Three measurements, all made against the finished PDFs, because the log has
+nothing to say about any of them. The scripts are disposable; the methods and
+the numbers are not.
+
+**Diagram type size.** A `\mermaidfig` is an `\includegraphics` scaled to the
+measure, so its node text lands at whatever size the scaling leaves it. Method:
+take the document-wide modal word-box height as the body reference, then take
+the modal box height of the words above each caption that are shorter than the
+body. F1's three diagrams set the floor.
+
+| | en 17x24 | pl 17x24 | en A4 | pl A4 |
+|---|---|---|---|---|
+| F1.1 / F1.2 / F1.3 | 4.32 / 4.35 / 4.47 | 4.32 / 4.24 / 4.47 | 5.37 / 5.41 / 5.09 | 5.37 / 5.27 / 5.09 |
+| F2.1 before | 2.89 | — | — | — |
+| **F2.1 after** | **6.61** | **5.75** | **7.52** | **6.55** |
+| F2.3 before | 3.58 | 3.57 | 4.08 | 4.06 |
+| **F2.3 after** | **5.69** | **5.58** | **6.48** | **6.36** |
+| F2.2 | 4.57 → 4.69 | 4.55 → 4.63 | 5.20 → 5.34 | 5.18 → 5.27 |
+
+**The "before" column cannot be re-derived.** The six `f02-*.mmd` files were
+untracked when they were first measured, so git holds no earlier revision to
+re-render and those figures rest on one pass's word. The "after" column was
+reproduced independently to the hundredth. Commit a diagram before you measure
+it, and the next comparison will be checkable.
+
+**The cause is always the graph's width, never the font.** `\mermaidfig` scales
+to `0.95\linewidth` or `0.42\textheight`, whichever binds, so on-page type size
+is `12.57 pt x min(350.9/W, 231.5/H)` in the trade format, where `W` and `H` are
+the rendered `.mmd`'s own page. F2.1 was eight nodes across; it is now four
+ranks of at most two. F2.3 was a six-rank chain; the four reading steps are
+paired into two nodes and it is four ranks.
+
+**And aspect ratio decides whether the figure floats.** Below about 1.5 the
+height cap binds, the figure is 231.5 pt tall whatever else you do, and it will
+not fit on a busy page — the first redesign of F2.1 came out square, measured
+7.07 pt, and floated a whole page past the frame it belongs to, taking a page of
+its own with a quarter of it blank. **Aim for 2.2–2.8.** F2.1 is now 666 x 199
+and sits in the flow in all four builds.
+
+**Glyph overlap from inline `\dfrac`.** Method: word pairs on adjacent lines
+whose boxes overlap by more than 2.5 pt, body-sized words only — diagram text is
+packed tightly inside its nodes and would bury the signal. Measured with the
+same build either side of the change, so only the fractions differ.
+
+| | F1 (control) | F2 before | F2 after |
+|---|---|---|---|
+| en 17x24 | 8 | 25 | **0** |
+| pl 17x24 | 8 | 21 | **0** |
+| en A4 | 12 | 22 | **3** |
+| pl A4 | 10 | 22 | **2** |
+
+Worst single overlap in F2 went from 6.32 / 6.12 / 7.30 / 7.30 pt to
+0 / 0 / 2.58 / 2.58. **F02 now overlaps less than F01 does**, over more pages,
+and F01 is the next thing to fix by the same method.
+
+**A trap worth knowing before you measure anything from an `.aux`.** All four
+builds write to the same `programs/<lang>/*.aux`, so after `make all-formats`
+those files describe **whichever format ran last**. A page range computed from
+them for the trade build is silently a few pages short, and the measurement
+then quietly omits the end of the program. Read the ranges out of the PDF's own
+running heads instead — the verso head names the program.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -823,7 +1123,7 @@ clone instead.
 
 ## What is left
 
-1. **Forty-six programs.** This is the work. F2–F13 first, because the
+1. **Forty-five programs.** This is the work. F3–F13 first, because the
    Foundation part is what makes the book's claim — *it assumes nothing* — true
    or false, and because F3 (logarithms) and F12 (the chain rule) are the two
    the rest of the book leans on hardest.

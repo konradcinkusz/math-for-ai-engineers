@@ -1,0 +1,12 @@
+flowchart LR
+  A["y = w*x + b<br/>wzor jak wydrukowany"]
+  B["y - b = w*x"]
+  C["(y - b)/w = x"]
+  D["x = (y - b)/w<br/>teraz x jest wyznaczone"]
+
+  A -->|"odejmij b<br/>od obu stron"| B
+  B -->|"podziel obie strony przez w<br/>TU POJAWIA SIE<br/>ZALOZENIE: w != 0"| C
+  C -->|"przeczytaj rownanie<br/>w druga strone"| D
+
+  N["Tego zalozenia nie ma w<br/>wersji wyjsciowej: y = w*x + b<br/>jest dobrze okreslone przy<br/>w = 0. x = (y - b)/w juz nie,<br/>a linia tego nie zapisuje."]
+  C -.-> N

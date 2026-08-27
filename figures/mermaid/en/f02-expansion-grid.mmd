@@ -1,0 +1,9 @@
+flowchart LR
+  H["(a + b)(c + d)<br/>four products,<br/>one per cell of<br/>a 2 x 2 grid"]
+  H --> G["CORNER cells<br/>a * c and b * d<br/>EDGE cells<br/>a * d and b * c"]
+
+  G --> S["case c = a, d = b<br/>both edges are a * b,<br/>so they ADD"]
+  G --> D["case c = a, d = -b<br/>edges are -ab and +ab,<br/>so they CANCEL"]
+
+  S --> SR["the wrong rule keeps<br/>the corners and throws<br/>the edges away"]
+  D --> DR["the near miss that keeps<br/>the wrong rule alive"]
