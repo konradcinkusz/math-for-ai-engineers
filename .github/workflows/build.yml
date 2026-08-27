@@ -185,6 +185,15 @@ jobs:
       - name: Check the log properly
         run: python3 tools/checklog.py ${{ matrix.job }}.log
 
+      # And check the ARTEFACT. A frame opener stranded at the foot of a page
+      # produces no error, no warning and no overfull box, so the log cannot
+      # see it -- and the badge it strands is the book's navigation device.
+      - name: Check the PDF for stranded frame openers
+        run: |
+          command -v pdftotext >/dev/null 2>&1 || \
+            sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          python3 tools/checkpdf.py ${{ matrix.job }}.pdf
+
       # if: always(), so it must survive a cancelled or failed compile that
       # left no log behind -- a reporting step that fails because there is
       # nothing to report turns one red job into two.

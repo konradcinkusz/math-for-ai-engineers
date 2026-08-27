@@ -33,20 +33,58 @@
 % a longer measure. A 15.5 cm block at 12pt would be some eighty-five
 % characters, which is past the point where the eye loses the line return, and
 % "it reads badly" would have been fixed into the wrong shape.
+% marginparsep and marginparwidth are set here, per format, because the frame
+% badge lives in the outer margin and its position must be a declared number
+% rather than whatever geometry would have computed. marginparwidth is the
+% ceiling on the badge, not its size: the badge is set flush to the text block
+% (marginnote's own \raggedrightmarginnote on a recto, \raggedleftmarginnote on
+% a verso), so the width only has to be wide enough that a badge can never
+% overfull the note's own hbox -- which it CAN. A three-digit badge is 27.89 pt
+% at 11 pt and 29.25 pt at 12 pt, both measured; 1.2 cm (34.14 pt) and 1.5 cm
+% (42.68 pt) clear that with room.
+%
+% What this does NOT buy is geometry's own "The marginal notes overrun the
+% paper" warning: \Gm@checkmp is called only under \ifGm@verbose and this
+% preamble does not pass `verbose'. The \AtBeginDocument assertion below is the
+% guard instead, and it is a hard error rather than a warning.
 \providecommand{\bookpaper}{standard}
 \ifdefstring{\bookpaper}{a4}{%
   \usepackage[
     a4paper,
     inner=3.4cm, outer=2.8cm, top=2.6cm, bottom=3.0cm,
-    head=26pt, headsep=0.8cm, footskip=1.4cm
+    head=26pt, headsep=0.8cm, footskip=1.4cm,
+    marginparsep=6pt, marginparwidth=1.5cm
   ]{geometry}%
 }{%
   \usepackage[
     paperwidth=17cm, paperheight=24cm,
     inner=2.2cm, outer=1.8cm, top=2.2cm, bottom=2.4cm,
-    head=23pt, headsep=0.7cm, footskip=1.2cm
+    head=23pt, headsep=0.7cm, footskip=1.2cm,
+    marginparsep=5pt, marginparwidth=1.2cm
   ]{geometry}%
 }
+
+% The margin box must fit the NARROWER of the two outer margins, and it must
+% fail loudly when it does not. A badge sliced off at the trim produces a green
+% log and a mutilated page, so this is an error and not a warning.
+\makeatletter
+\AtBeginDocument{%
+  \begingroup
+  \@tempdima=\marginparwidth \advance\@tempdima\marginparsep
+  \@tempdimb=\paperwidth \advance\@tempdimb-\textwidth
+  \advance\@tempdimb-1in \advance\@tempdimb-\oddsidemargin  % recto outer
+  \@tempdimc=1in \advance\@tempdimc\evensidemargin          % verso outer
+  \ifdim\@tempdimb<\@tempdimc \@tempdimc=\@tempdimb \fi
+  \ifdim\@tempdima>\@tempdimc
+    \PackageError{mfabook}{The frame badge does not fit the outer margin}%
+      {marginparwidth+marginparsep is \the\@tempdima; the narrower outer
+       margin is \the\@tempdimc. Reduce marginparwidth in preamble.tex.}%
+  \else
+    \wlog{mfabook: margin badge \the\@tempdima\space fits outer margin
+          \the\@tempdimc}%
+  \fi
+  \endgroup}
+\makeatother
 
 % ---------- Encoding & fonts ----------
 \usepackage[T1]{fontenc}
@@ -103,11 +141,19 @@
 \usepackage{enumitem}
 \IfFileExists{mathtools.sty}{\usepackage{mathtools}}{}
 \usepackage{listings}
+\usepackage{xstring}   % \teachesat parses its N--M range with \StrCut
 \usepackage[most]{tcolorbox}
 \usepackage{fancyhdr}
 \usepackage{titlesec}
 \usepackage{caption}
 \usepackage{imakeidx}
+% tikz is already pulled in by \usepackage[most]{tcolorbox} above, but the
+% frame badge below calls \tikz directly, so the dependency is declared rather
+% than inherited. This is a no-op when tcolorbox has already loaded it.
+\usepackage{tikz}
+% Non-floating margin notes, for the frame badge. The option list is not
+% cosmetic -- see the frame-boundary block below for why each is there.
+\usepackage[quiet,noadjust]{marginnote}
 % csquotes with autostyle follows babel's active language, so the identical
 % source \enquote{x} sets 'x' in the English edition and the Polish quotation
 % marks in the Polish one. This is not a nicety: babel-polish makes " an active
@@ -206,6 +252,145 @@
 % same word, which is a small piece of luck).
 \AtBeginDocument{\renewcommand{\chaptername}{\lblProgram}}
 
+% ============================================================
+%  THE PROGRAM KEY, AND THE FRAME RANGE ON THE OPENER
+%  ---------------------------------------------------------
+%  \mfa@progkey is the key under which everything belonging to the current
+%  program is stored -- its outcomes, its "Can you?" rows, its answers, and
+%  now its frame total. It must expand to the PRINTED program number
+%  (F1, F2, ..., 1, 2, ...), which is what makes an answer findable from the
+%  program that owns it. It lives here rather than down with the outcomes
+%  because the heading code below needs it too.
+%
+%  The opener carries the reader's contract: "Frames 1 to 47", in a thin-ruled
+%  box at the top right, above everything else. It says how long the
+%  commitment is before the reader starts, and in the original it is the first
+%  thing on the page (notes/07 section 1). The total counts every PRINTED
+%  frame, so it includes the Summary and the Test exercises: those are named
+%  frames and carry the last two numbers in the program.
+%
+%  The total is not known when the opener is typeset, so this is a two-pass
+%  mechanism: each program writes its final frame count to the .aux, and the
+%  next run reads it back before any of the book is typeset.
+%
+%  Three things make it robust, and each of them is a bug the obvious version
+%  has:
+%
+%   1. Neither the key nor the count is recomputed at the moment of writing.
+%      The key is taken in \program, immediately after \chapter has stepped
+%      the counter; the count is taken by every frame. Recomputing either at
+%      the flush breaks twice over: \mainnumbering sets the chapter counter
+%      back to 0 between Part I and Part II, so \thechapter read at the next
+%      \program would expand to "0" rather than to "F13"; and an appendix's
+%      \chapter resets frameno, so \value{frameno} read at \end{document}
+%      would be 0 rather than the last program's total.
+%
+%   2. The write happens at the start of the NEXT program and again at
+%      \end{document}, because nothing else is common to every program. A
+%      written program ends with \furtherproblems and a stub ends with
+%      \programstub, so there is no "end of program" marker to hook -- and
+%      inventing one would mean editing 94 program files and moving every
+%      ordered structural signature the parity check compares.
+%
+%   3. A program with no frames writes {0}, and a total of 0 prints nothing
+%      AND OCCUPIES NO SPACE. That is what separates a stub from a program
+%      whose total this run has not computed yet: the stub is a measured zero,
+%      and the difference is in the .aux rather than in an author's memory.
+%
+%  On the first run no total exists yet. The box then prints NOTHING and
+%  reserves nothing -- not "??" -- and the run raises a rerun warning instead.
+%  46 of the 47 programs are stubs, so a marker here would train the reader of
+%  a draft PDF to ignore it, and printing one would move a page boundary
+%  between run 1 and run 2 on every opener in the book.
+% ============================================================
+\makeatletter
+\newcommand{\mfa@progkey}{\thechapter}
+
+% Read back from the .aux. One line per program, written by the flush below.
+% etoolbox's \csgdef is an unconditional \gdef, so a key written twice in one
+% run resolves to the last value rather than raising "already defined".
+\newcommand{\mfaframetotal}[2]{\csgdef{mfa@frames@#1}{#2}}
+
+% The program the frames currently belong to, and how many of them there have
+% been. The key is set by \program, once, immediately after \chapter has
+% stepped the counter; the count is set by every frame, teaching or named. See
+% (1) above for why neither may be recomputed at the moment of writing.
+\newcommand{\mfa@lastprog}{}
+\newcommand{\mfa@lastcount}{0}
+\newcommand{\mfa@noteframe}{\xdef\mfa@lastcount{\the\value{frameno}}}
+
+% \if@filesw is false under \nofiles; writing then is an error, not a no-op.
+\newcommand{\mfa@flushframetotal}{%
+  \ifdefempty{\mfa@lastprog}{}{%
+    \if@filesw
+      \immediate\write\@auxout{%
+        \string\mfaframetotal{\mfa@lastprog}{\mfa@lastcount}}%
+    \fi
+    \gdef\mfa@lastprog{}%
+  }%
+}
+\AtEndDocument{\mfa@flushframetotal}
+
+% Once per run is enough, and the phrase "Label(s) may have changed" is
+% deliberate: it is what latexmk and rerunfilecheck look for. Writing
+% "Reference ... undefined" instead -- which is what \ref would do -- would be
+% a lie: the total is not a cross-reference the author got wrong, it is a datum
+% this run has not computed yet. tools/checklog.py fails on it in a FINAL log,
+% so a build that stops rerunning while the totals are still moving is caught.
+\newcommand{\mfa@rangewarn}{%
+  \global\let\mfa@rangewarn\relax
+  \@latex@warning@no@line{Label(s) may have changed. Rerun for frame ranges}%
+}
+
+% The box itself. \fbox draws its rule in the current colour, so the rule is
+% coloured from outside and the text is recoloured inside.
+\newcommand{\mfa@rangebox}[1]{%
+  \begingroup
+  \setlength{\fboxsep}{5pt}\setlength{\fboxrule}{0.6pt}%
+  \normalfont\normalsize
+  \textcolor{mgrey}{\fbox{{\small\color{mgrey}#1}}}%
+  \endgroup
+}
+
+% Set for the duration of \chapter by \program, and only by \program, so an
+% appendix -- which is a \chapter and shares this \titleformat -- does not
+% print a frame range it does not have.
+%
+% THE WHOLE EMISSION IS GUARDED, not just the box's contents. Conditioning only
+% the contents means a program with a total of 0 prints no ink but still
+% consumes an empty \makebox line plus the 10 pt skip: measured at 27.58 pt
+% (trade) and 28.75 pt (A4) of dead space on 46 of the book's 47 openers, with
+% no gate able to see it -- no rule is drawn in the gap, no box overflows and
+% the page count does not change.
+%
+% \makebox[\linewidth][r], not \hfill: the title format sets \raggedright,
+% whose \rightskip is 0pt plus 1fil, so an \hfill would share the space with it
+% and land the box in the middle of the measure rather than at its right edge.
+% A box exactly \linewidth wide leaves \rightskip nothing to stretch.
+%
+% No @ in \mfaopenerbadge's name, and that is load-bearing rather than tidy: a
+% \titleformat or \fancyhead argument is tokenised where it is written, so an
+% @-name used there outside \makeatletter is read as two tokens and prints its
+% own tail.
+\newif\ifmfarange
+\newif\ifmfa@hasrange
+\newcommand{\mfaopenerbadge}{%
+  \ifmfarange
+    \mfa@hasrangefalse
+    \ifcsdef{mfa@frames@\mfa@progkey}{%
+      \ifnumgreater{\csuse{mfa@frames@\mfa@progkey}}{0}{\mfa@hasrangetrue}{}%
+    }{\mfa@rangewarn}%
+    \ifmfa@hasrange
+      {\normalfont\normalsize
+       \noindent\makebox[\linewidth][r]{%
+         \mfa@rangebox{\lblFrameRange{1}{\csuse{mfa@frames@\mfa@progkey}}}%
+       }\par}%
+      \vspace{10pt}%
+    \fi
+  \fi
+}
+\makeatother
+
 % ---------- Headings ----------
 % \raggedright on the title body is load-bearing, not cosmetic: at \Huge on a
 % 13 cm text block a long title that cannot break overflows the margin badly.
@@ -219,7 +404,8 @@
 % find with the pages half shut.
 \titleformat{\chapter}[display]
   {\normalfont\huge\bfseries\color{mblue}\raggedright}
-  {\color{codeframe}\titlerule[0.6pt]\vspace{7pt}%
+  {\mfaopenerbadge
+   \color{codeframe}\titlerule[0.6pt]\vspace{7pt}%
    \normalfont\normalsize\bfseries\color{mgrey}%
    \MakeUppercase{\chaptertitlename}\ \thechapter}
   {7pt}{\Huge\raggedright}
@@ -253,34 +439,84 @@
 % where geometry put it instead of pushing it down.
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[LE]{\small\nouppercase{\leftmark}}
-% The recto head carries the FRAME number, not the section. In a book of
-% numbered frames "where am I" is a frame question: every Summary
-% back-reference, every Quiz route and every cross-reference between programs
-% is a frame number, and hunting for one by page is the single most annoying
-% thing about reading a programmed text. \theframeno at shipout is the last
-% frame begun on the page, which is what a reader flicking through wants.
-% Guarded: the front matter and the appendices have no frames, and a head
-% reading "Frame 0" over the introduction is worse than no head at all.
-\fancyhead[RO]{\ifnum\value{frameno}>0\relax\small\lblFrame~\theframeno\fi}
-\fancyfoot[LE,RO]{\small\thepage}
+% Mirrored, as the original is (notes/07 section 5): the PAGE NUMBER goes
+% OUTER and the RUNNING TITLE goes INNER, both in the head, and the foot is
+% empty.
+%
+% The head carries no frame number. It used to, on the argument that "where am
+% I" is a frame question in a book of numbered frames -- which is true, and is
+% now answered better by the margin badge on the frame itself. \theframeno at
+% shipout is the last frame BEGUN on the page, so the head could name a frame
+% that started on the page before; the badge names the frame the reader is
+% actually looking at. Measured before it went: trade page 21 carried badges
+% 7, 8 and 9 under a head reading "Frame 10".
+%
+% The page number moves from the foot to the outer head because that is where
+% a thumb finds it. Chapter openers keep the class's `plain' style, which puts
+% the number at the bottom centre and prints no head -- that is the original's
+% treatment too, and it is why the opener's frame-range box is the first thing
+% on the page. fancyhdr does not touch `plain', so no \fancyfoot line is
+% needed: \fancyhf{} on the line above already cleared the foot.
+%
+% \mfaheadmark is a WIDTH CAP and it is not optional. Putting the page number
+% and a running title on the same line makes them competitors for one measure,
+% and fancyhdr does not referee: an over-long field is set at its natural width
+% and simply prints on top of the number. It does NOT raise an overfull hbox,
+% so neither tools/checklog.py's 15 pt budget nor CI can see it. Measured: with
+% frames written into P25, whose English title is 82 characters, the recto head
+% ran to x = 430.86 pt while the page number occupied 415.92-430.87 pt -- a
+% 15 pt overprint, zero overfull boxes, zero warnings, exit code 0. Seven of
+% the manifest's titles are over 50 characters and P25 is over 75 in both
+% languages, so this fires the first time anyone writes that program.
+%
+% The cap measures the box it is given and scales only if it is too wide, so a
+% short title is untouched: F1's head is at byte-identical coordinates with and
+% without it. It uses \sbox and \resizebox from graphicx, which the preamble
+% already loads -- no new package, and no dependence on font metrics.
+%
+% The 4em reserve is measured at \small, inside the group, so it tracks the
+% point size: 40 pt in the trade format at 11pt and 44 pt on A4 at 12pt. A
+% three-digit page number is about 15 pt, so the clear gap is 25 pt or more.
+\newlength{\mfaheadmax}
+\newsavebox{\mfaheadbox}
+\newcommand{\mfaheadmark}[1]{%
+  \begingroup
+  \small
+  \sbox\mfaheadbox{#1}%
+  \setlength{\mfaheadmax}{\headwidth}%
+  \addtolength{\mfaheadmax}{-4em}%
+  \ifdim\wd\mfaheadbox>\mfaheadmax
+    \resizebox{\mfaheadmax}{!}{\usebox\mfaheadbox}%
+  \else
+    \usebox\mfaheadbox
+  \fi
+  \endgroup}
+\fancyhead[LE,RO]{\small\thepage}
+\fancyhead[RE]{\mfaheadmark{\nouppercase{\leftmark}}}
+\fancyhead[LO]{\mfaheadmark{\itshape\nouppercase{\rightmark}}}
 \renewcommand{\headrulewidth}{0.4pt}
 
 % This MUST come after \pagestyle{fancy}: fancyhdr installs its own \chaptermark
 % at that point and silently overwrites anything defined earlier. The symptom is
 % a running-head change that appears to do nothing at all.
 %
-% The running head carries the *frame* number as well as the program, because
-% in a book of numbered frames "where am I" is a frame question, not a page
-% question, and the summary's back-references are frame numbers.
+% The two marks now carry different things, because the two inner heads do:
+% the verso names the program ("Program F1"), the recto names its title, set
+% italic. That is the original's split.
+%
 % \@chapapp, not \lblProgram. \appendix switches \@chapapp from \chaptername
 % to \appendixname, and babel supplies both in the right language; hard-coding
-% the word gives an appendix a running head reading "Program A. Answers" over a
-% page whose own chapter head reads "APPENDIX A".
+% the word gives an appendix a running head reading "Program A" over a page
+% whose own chapter head reads "APPENDIX A".
+%
+% \sectionmark is silenced. It used to set \rightmark, which the recto head
+% now uses for the program title; leaving it in place would put a section
+% heading there on any page that starts one and the title everywhere else,
+% which reads as a bug rather than as a choice.
 \makeatletter
-\renewcommand{\chaptermark}[1]{\markboth{\@chapapp\ \thechapter.\ #1}{}}
+\renewcommand{\chaptermark}[1]{\markboth{\@chapapp\ \thechapter}{#1}}
 \makeatother
-\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\renewcommand{\sectionmark}[1]{}
 
 % ============================================================
 %  FRAMES — the unit the whole method is built from
@@ -304,56 +540,200 @@
 \newcounter{frameno}[chapter]
 \renewcommand{\theframeno}{\arabic{frameno}}
 
-% Frames are referenced constantly -- by the Summary, by the Quiz, by the
-% "Can you?" checklist and by other programs. \label inside a frame must
-% therefore capture the frame number, not the section number.
+% A \label inside a frame needs no help. \newcounter{frameno}[chapter] declares
+% a parent, so hyperref composes the anchor from \theHchapter and the book
+% already redefines that per numbering scheme: a two-chapter test under
+% \foundationnumbering and \mainnumbering produces frameno.F1.1 and
+% frameno.M1.1. A \framelabelfix macro used to live here against the theory
+% that \theHframeno was undefined and destinations restarted at 1 in every
+% program. It was measured and it is false -- the .aux is byte-identical with
+% and without it -- and the macro was never called by anything, so it has been
+% deleted rather than wired in. Do not reintroduce it.
+
+% The frame number lives in the OUTER margin, in a grey rounded box, and it
+% follows the spread: right on a recto, left on a verso. That is what the
+% original does (notes/07-stroud-original-layout.md, section 3), and the reason
+% is navigational rather than decorative -- a reader thumbing for frame 37 runs
+% a finger down the edge of the block and never crosses the text.
+%
+% The comment this replaces said a margin number "would be the first thing to
+% overflow on a 17 cm page". It is not. Badge widths, \bfseries\normalsize,
+% measured out of the box register on a TeX Live without newtx (Latin Modern):
+%
+%          1 digit   2 digits  3 digits
+%   11pt   15.30pt   21.59pt   27.89pt
+%   12pt   15.75pt   22.50pt   29.25pt
+%
+% The badge is set flush to the text block -- marginnote's own default is
+% \raggedright in the right margin and \raggedleft in the left one -- so the
+% clear paper between badge and trim is (outer margin - marginparsep - badge).
+% Trade format, outer 1.8 cm = 51.21 pt, two digits: 24.62 pt = 0.87 cm.
+% A4, outer 2.8 cm = 79.67 pt, two digits: 51.17 pt = 1.80 cm. Even a
+% three-digit badge leaves 0.64 cm in the trade format, and no program in this
+% book is planned past seventy frames.
+%
+% marginnote, not \marginpar. \marginpar goes through the float mechanism and
+% takes at most one note per line, deferring the rest -- "Marginpar on page N
+% moved" -- and at the four to six frames per page this book runs, that is the
+% normal case rather than an edge case. A badge that has been moved down the
+% page no longer names the rule it belongs to, which is the one thing this
+% element exists to do. \marginnote does not float. It places the note where it
+% was issued and takes the page's parity AND the line's x position from the
+% .aux, so the badge is right from the SECOND run on; it honours \if@twoside
+% and \reversemarginpar, so nothing in this file may set \reversemarginpar.
+%
+% Loaded [noadjust] deliberately. Under the default [fulladjust], marginnote
+% emits a \strut into the line it was called from, which would give the frame
+% rule's line the height and depth of a text line. That is usually invisible --
+% \baselineskip absorbs it -- but not when the following item is tall enough to
+% clamp the interline glue at \lineskip, and \ans opens a tcolorbox immediately
+% after the rule in about a third of all frames. Under [noadjust] the note
+% rides in a box of zero width, zero height and zero depth. Measured against a
+% build with the \marginnote call commented out: every word of main-en landed
+% on the same page at the same coordinates, max |dx| and |dy| both 0.000 pt.
+% The badge cannot move the text; therefore the page it is recorded on cannot
+% change between runs; therefore the side cannot oscillate.
+%
+% [quiet] because marginnote's default is to log a PackageInfo per note, and a
+% finished book has some 2,400 of them.
+
+% The badge is drawn once per distinct frame number and copied thereafter.
+% A tikz node is the honest way to get a filled rounded rectangle, but it costs
+% about 7 ms. \theframeno restarts at 1 in every program, so a cache keyed on
+% the number draws seventy nodes for the whole book rather than 2,415.
+% Benchmarked at 2,415 badges: 1.09 s cached, 16.18 s uncached. The cached box
+% is context-free -- \normalsize and the palette colours are absolute, not
+% relative -- so a copy is always the same badge. About seventy box registers
+% are allocated lazily; \newsavebox is global, so allocating inside the body is
+% safe.
+%
+% The fill is `codeframe', the same grey the rule is drawn in, so the badge
+% reads as a tab on the rule rather than as a second, competing object.
 \makeatletter
-\newcommand{\framelabelfix}{%
-  \@namedef{theHframeno}{\theHchapter.\arabic{frameno}}%
+\newcommand{\mfa@drawbadge}[1]{%
+  \tikz{\node[fill=codeframe, rounded corners=2.5pt,
+              inner xsep=4.5pt, inner ysep=2.2pt, outer sep=0pt,
+              text=mblue, font=\bfseries\normalsize,
+              text height=1.55ex, text depth=0.05ex]{#1};}%
+}
+% \edef, so the cache key and the digits drawn into it are the same token list
+% and cannot drift apart. \theframeno must stay expandable: a robust one makes
+% the \csname below fail with "Missing \endcsname inserted" -- loud, and caught
+% by tools/checklog.py, but a confusing error there is no reason to invite.
+% text height/depth are fixed so that 1 and 45 get boxes of the same height.
+\newcommand{\framebadge}{%
+  \edef\mfa@bdgn{\theframeno}%
+  \expandafter\ifx\csname mfa@bdgbox@\mfa@bdgn\endcsname\relax
+    \expandafter\newsavebox\csname mfa@bdgbox@\mfa@bdgn\endcsname
+    \expandafter\global\expandafter\sbox
+      \csname mfa@bdgbox@\mfa@bdgn\endcsname{\mfa@drawbadge{\mfa@bdgn}}%
+  \fi
+  \expandafter\copy\csname mfa@bdgbox@\mfa@bdgn\endcsname
 }
 \makeatother
 
-% The frame number as a filled badge. NOT in the margin: a margin number has
-% to alternate sides under `twoside` and would be the first thing to overflow
-% on a 17 cm page.
-\newcommand{\framebadge}{%
-  \begingroup
+\newsavebox{\mfabadgebox}
+
+% The boundary between two frames: a hairline across the measure, with the new
+% frame's number in the outer margin beside it.
+%
+% \marginnote is issued from the rule's own line, in horizontal mode, so that
+% the note and the rule share a baseline. That is measured, not assumed: with
+% \zsavepos on the rule and on the marginnote body -- OUTSIDE the \raisebox,
+% because inside it you measure the raise and not the baseline -- \zposy of the
+% two was equal to the scaled point for all 45 frames of F01, at 11 pt and at
+% 12 pt, and on both page parities.
+%
+% The badge is then centred on the rule by measuring its own box, exactly as
+% the old on-the-rule badge was, and the formula is unchanged. The rule is
+% 0.6 pt tall and sits on the baseline, so its centre is 0.3 pt above it; the
+% badge's centre is (\ht-\dp)/2 above its own baseline. Do not replace this
+% with a fixed shift: the trade edition sets 11 pt and the A4 edition 12 pt
+% from this one source, and a hard-coded shift is right in exactly one of them.
+% (The tikzpicture box comes out ht=11.9432pt dp=0pt at 11 pt, so the shift is
+% -5.6716 pt there -- it is NOT near zero, and it is not guessable.)
+% The list icon that sits on the rule of a Summary frame. It is DRAWN, out of
+% three rules, rather than set from a symbol font: pifont, wasysym and the AMS
+% symbols are all reachable here, but this preamble already degrades past newtx
+% on a thin TeX installation, and an icon that is a picture on one machine and
+% a missing-glyph box on another is the one failure this layout cannot absorb.
+% Three rules cannot go missing.
+%
+% Everything is in em, so the glyph scales with the point size: the two formats
+% set 11pt and 12pt from this one source and a hard-coded 6 pt icon is right in
+% exactly one of them.
+\makeatletter
+\newcommand{\mfa@listrow}[1]{% #1 = how far this row sits above the baseline
+  \rlap{\rule[#1]{0.16em}{0.16em}%
+        \kern0.14em
+        \rule[\dimexpr#1+0.03em\relax]{0.62em}{0.10em}}%
+}
+\newcommand{\mfalisticon}{%
+  \begingroup\footnotesize
   \setlength{\fboxsep}{3pt}%
-  \colorbox{mblue}{\textcolor{white}{\bfseries\footnotesize\theframeno}}%
+  % On white, so the hairline is masked rather than drawn through the icon.
+  % A 0.6 pt rule crossing an open glyph reads as a struck-out mark.
+  \colorbox{white}{\color{mblue}%
+    \mfa@listrow{0.50em}\mfa@listrow{0.25em}\mfa@listrow{0em}%
+    \kern0.92em}%
   \endgroup
 }
+\makeatother
 
-% The boundary between two frames: a rule with the new frame's number sitting
-% on its left end, like a tab on a card.
+\newsavebox{\mfamarkbox}
+
+% The boundary between two frames: a hairline across the measure, with the new
+% frame's number in the outer margin beside it, and an optional mark ON the
+% rule at its left end.
 %
-% The badge used to be the first thing in the text flow instead. That reads
-% correctly only when a frame opens with a sentence -- and about a third of
-% them open with \ans, whose box starts a new vertical block, so the badge was
-% left stranded alone on the line above it with the box beneath. Putting the
-% number on the rule makes the boundary one object, and it no longer matters
-% what the frame opens with.
+% RECONCILING TWO ELEMENTS. The number used to sit on the left end of the rule
+% and the Summary's list icon was specified to sit immediately to its right.
+% The number has since moved to the outer margin, so the icon takes over the
+% vacated position -- it is a tab on the rule, which is what it was always for.
+% It does NOT follow the badge into the margin: \marginparwidth is 34.14 pt in
+% the trade format and a two-digit badge plus the icon is about 48 pt, so a
+% badge-and-icon margin note would overfull its own hbox. The mark is masked in
+% white for the same reason the badge was, and it rides inside a \smash so it
+% cannot push the rule down.
 %
-% \smash inside a zero-width \makebox: the badge must not contribute height,
-% or it would push the rule down and reintroduce the gap it was meant to close.
-% Order matters: the rule goes down FIRST, inside an \rlap so it contributes no
-% width, and the badge is painted over it second. Drawing the badge first and
-% the rule second -- the obvious way round -- puts a hairline straight through
-% the digit, and at this size that reads as a struck-out number rather than as
-% a badge sitting on a line.
+% \marginnote is issued from the rule's own line, in horizontal mode, so that
+% the note and the rule share a baseline. That is measured, not assumed: with
+% \zsavepos on the rule and on the marginnote body -- OUTSIDE the \raisebox,
+% because inside it you measure the raise and not the baseline -- \zposy of the
+% two was equal to the scaled point for all 45 frames of F01, at 11 pt and at
+% 12 pt, and on both page parities.
 %
-% The shift is measured rather than guessed: centre the badge's own box on the
-% rule, so the alignment survives a change of point size. It has to, because
-% the A4 edition sets 12pt and the trade edition 11pt from the same source.
-\newcommand{\framerule}{%
+% Both the badge and the mark are centred on the rule by measuring their own
+% boxes. The rule is 0.6 pt tall and sits on the baseline, so its centre is
+% 0.3 pt above it; a box's centre is (\ht-\dp)/2 above its own baseline. Do not
+% replace either with a fixed shift: the trade edition sets 11 pt and the A4
+% edition 12 pt from this one source, and a hard-coded shift is right in
+% exactly one of them. (The badge's tikzpicture box comes out ht=11.9432pt
+% dp=0pt at 11 pt, so its shift is -5.6716 pt -- it is NOT near zero.)
+%
+% \ifblank so that an ordinary frame contributes nothing at all where the mark
+% would go, rather than an empty box.
+\makeatletter
+\newcommand{\mfa@framerule}[1]{%
   \par\penalty-250
   \vspace{\mfaframeabove}%
   \noindent
   \rlap{\textcolor{codeframe}{\rule{\linewidth}{0.6pt}}}%
-  \sbox0{\framebadge}%
-  \smash{\raisebox{\dimexpr0.3pt-0.5\ht0+0.5\dp0\relax}{\usebox0}}%
+  \sbox\mfabadgebox{\framebadge}%
+  \marginnote{%
+    \raisebox{\dimexpr0.3pt-0.5\ht\mfabadgebox+0.5\dp\mfabadgebox\relax}%
+             {\usebox\mfabadgebox}%
+  }%
+  \ifblank{#1}{}{%
+    \sbox\mfamarkbox{#1}%
+    \smash{\raisebox{\dimexpr0.3pt-0.5\ht\mfamarkbox+0.5\dp\mfamarkbox\relax}%
+                    {\usebox\mfamarkbox}}%
+  }%
   \par\nobreak\vspace{\mfaframebelow}%
   \nobreak
 }
+\newcommand{\framerule}{\mfa@framerule{}}
+\makeatother
 
 % The gutter between frames. This is the single most load-bearing number in
 % the layout: the frame is the unit the reader covers with a hand, and two
@@ -363,40 +743,101 @@
 \newlength{\mfaframeabove}
 \newlength{\mfaframebelow}
 \setlength{\mfaframeabove}{17pt}
-\setlength{\mfaframebelow}{10pt}
+% 12 pt, not the 10 pt this was. \mfaframeabove is unchanged and still serves:
+% it is the gap that announces a new frame and nothing about it depended on
+% where the badge sat. \mfaframebelow did depend on it. The old badge hung off
+% the rule's left end and overlapped the gap below, so the boundary read as
+% belonging to the frame beneath it and 10 pt was enough. With the badge out of
+% the flow the rule is a bare hairline and the frame's first line crowds it.
+\setlength{\mfaframebelow}{12pt}
 
+% The \makeatletter pair is required: \mfa@noteframe is tokenised when the
+% environment body is read, and @ is not a letter at that point in the file.
+\makeatletter
+% The same room test \mfa@namedframe carries, and for the same reason: without
+% it the rule and its margin badge are the last things on the page and the
+% frame's body is overleaf. Measured on the unguarded build: 1-2 stranded
+% frames per format, in every one of the four (main-en p.20 f7 and p.26 f21;
+% main-pl p.20 f7, p.29 f28; main-en-a4 f41; main-pl-a4 f20). A badge that
+% names a frame not on the page defeats the one thing the badge is for, and
+% \nobreak cannot prevent it -- about a third of frames open an unbreakable
+% tcolorbox, which simply moves itself to the next page and leaves the rule.
+%
+% FIVE \baselineskip, and the number was swept against tools/checkpdf.py
+% rather than reasoned about. Measured over F1, both editions, trade format:
+%
+%   reserve   main-en   main-pl   stranded openers
+%   3         175 pp    175 pp    1  (frame 28, en)
+%   4         175 pp    175 pp    0
+%   5         173 pp    175 pp    0   <- chosen: clears it at the lowest cost
+%   6         175 pp    175 pp    0
+%   7         175 pp    175 pp    0
+%
+% Note that FIVE costs two pages LESS than four, six or seven. The guard turns
+% pages, so it reshuffles every later break, and the page count is not
+% monotonic in the reservation. Nobody should raise this constant expecting an
+% improvement; at best it is neutral and it can cost two pages.
+%
+% The constant is tuned to one program of forty-seven and cannot be trusted to
+% hold for the rest. What protects the book is tools/checkpdf.py, which reads
+% the finished PDF and fails when a frame opener is the last thing on a page --
+% a defect that produces no error, no warning and no overfull box, so no other
+% gate in this repository can see it. Fix a stranding by re-sweeping this
+% number against that check.
 \newenvironment{fr}{%
+  \par
+  \ifdim\pagegoal=\maxdimen\else
+    \ifdim\dimexpr\pagegoal-\pagetotal\relax<%
+          \dimexpr\mfaframeabove+\mfaframebelow+5\baselineskip\relax
+      \newpage
+    \fi
+  \fi
   \refstepcounter{frameno}%
+  \mfa@noteframe
   \framerule
   \noindent\ignorespaces
 }{\par}
+\makeatother
 
 % The answer to the previous frame. Set apart and centred so the eye can find
 % the edge to cover, and so a reader who has answered can check in one glance
 % without reading on.
 % The -4pt that used to sit here pulled the box up under the stranded frame
 % badge. The badge is on the rule now, so the box starts where it says it does.
+% `unbreakable' must come AFTER `mfa answer': the style carries `breakable'
+% from `mfa outlined', and listing the keys the other way round silently
+% re-enables breaking. Measured on a forty-paragraph box: [mfa answer,
+% unbreakable] sets whole, [unbreakable, mfa answer] splits across two pages.
+%
+% halign=flush center, not halign=center. `center' stretches the interword and
+% maths glue to fill the measure: the frame-11 answer measured 237.68 pt with
+% it and 204.20 pt without, a 16% stretch on a line that fits comfortably.
+% `flush center' cannot stretch, so an over-wide answer overflows visibly and
+% is caught by tools/checklog.py rather than hidden by loose spacing.
 \newcommand{\ans}[1]{%
   \par\nobreak
   \begin{tcolorbox}[
-    enhanced, sharp corners, boxrule=0pt, leftrule=2.5pt,
-    colback=mfaint, colframe=mgreen,
+    mfa answer, unbreakable,
     left=8pt, right=8pt, top=5pt, bottom=5pt,
-    width=0.86\linewidth, center, halign=center,
-    before skip=0pt, after skip=10pt]
+    width=0.86\linewidth, center, halign=flush center]
     #1
   \end{tcolorbox}%
   \nobreak\noindent\ignorespaces
 }
 
 % A multi-paragraph or worked answer, where a centred box would be wrong.
+% `breakable' is restated even though `mfa answer' inherits it, so the
+% difference from \ans is legible where a reader of the preamble looks for it.
+% Note this also moves ansblock's `before skip' from 0pt to the style's 4pt.
+% ansblock is set FULL WIDTH where notes/07 section 3 records the original's
+% answer box as narrower than the measure and centred: a multi-paragraph worked
+% answer with displayed maths at 0.86\linewidth is where the overfull hboxes
+% would come from. The departure is recorded in notes/07.
 \newenvironment{ansblock}{%
   \par\nopagebreak
   \begin{tcolorbox}[
-    enhanced, breakable, sharp corners, boxrule=0pt, leftrule=2.5pt,
-    colback=mfaint, colframe=mgreen,
-    left=10pt, right=10pt, top=6pt, bottom=6pt,
-    before skip=0pt, after skip=10pt]
+    mfa answer, breakable,
+    left=10pt, right=10pt, top=6pt, bottom=6pt]
 }{%
   \end{tcolorbox}%
   \nopagebreak\par\noindent\ignorespaces
@@ -420,6 +861,39 @@
   {\bfseries\color{mgreen}\lblYourTurn}\par\nobreak\vspace{2pt}\noindent\ignorespaces
 }
 
+% The instruction to cover the page and turn over. notes/07 section 3 records
+% it as italic, right-aligned, at the end of every frame that has asked the
+% reader for a response. It is the sentence that operates the method.
+%
+% Where it goes is not a judgement call, and check C16 in tools/parity.py
+% enforces the rule: a frame has asked for a response exactly when the NEXT
+% frame opens by answering it, with \ans or \begin{ansblock}. One cue, last
+% thing in the frame, immediately before \end{fr}.
+%
+% Grey rather than black: the original is monochrome and had only italic to
+% work with. This book has colour, so the cue can be furniture and still keep
+% the original's italic and its right alignment.
+%
+% \nopagebreak on BOTH sides of the \vspace. A break at glue is legal only when
+% the item before the glue is non-discardable, so the leading penalty is the
+% one that forbids a break at the skip itself; the trailing one forbids a break
+% between the skip and the cue. Both are wanted -- the cue must not be orphaned
+% from the question it belongs to.
+%
+% The \par must be INSIDE the group: \raggedleft only takes effect on a
+% paragraph whose \par is seen while it is in force, and moving the brace one
+% token left silently gives a justified, left-aligned line. (\raggedleft also
+% zeroes \parindent, which is why no \noindent is needed.)
+% NOT set in \color{mgrey}, and it was. This is the instruction to cover the
+% page and turn over -- the one sentence the whole method rests on -- and grey
+% made it the faintest text on the page. The book's documented colour
+% departures from the original are palette choices; greying out an instruction
+% is not one of them. The original sets it black italic, and so does this.
+\newcommand{\nextframe}{%
+  \par\nopagebreak\vspace{3pt}\nopagebreak
+  {\raggedleft\itshape\lblNextFrame\par}%
+}
+
 % ============================================================
 %  THE PROGRAM SKELETON
 %  ---------------------------------------------------------
@@ -436,10 +910,6 @@
 \newcounter{outcomeno}[chapter]
 
 \makeatletter
-% The key under which everything belonging to the current program is stored.
-% It must expand to the printed program number (F1, F2, ..., 1, 2, ...), which
-% is what makes an answer findable from the program that owns it.
-\newcommand{\mfa@progkey}{\thechapter}
 \newcommand{\outcome}[2]{% #1 = frames that teach it, #2 = the outcome
   \stepcounter{outcomeno}%
   \csgdef{mfa@out@\mfa@progkey @\theoutcomeno}{#2}%
@@ -454,9 +924,64 @@
     #2 & {\footnotesize\color{mgrey}#1}
       & \ratingcell & \ratingcell & \ratingcell & \ratingcell & \ratingcell
     \tabularnewline}%
-  \item #2\hfill{\footnotesize\color{mgrey}[\lblFrames~#1]}%
+  \item #2\mfa@outframes{#1}%
 }
+% The frame range, set flush right at the end of the outcome's last line.
+% This is amsthm's \qed mechanism, and it is here for the same reason: if
+% the range will not fit after the last word it drops to a line of its own,
+% flush right, instead of running into the margin. \hfill alone cannot do
+% that, and the Polish outcomes are the longer of the two sets.
+%
+% \mfa@outframes has an @ in its name, so it MUST stay inside this
+% \makeatletter block. \mfacheckbox below has not, and must not be moved
+% inside one that ends before \outcome is used.
+%
+% \parfillskip=0pt is confined to the paragraph by the surrounding list group,
+% which restores it -- but any future outcome-like macro that does not end with
+% \mfa@outframes must restore it itself.
+\newcommand{\mfa@outframes}[1]{%
+  \unskip\nobreak\hfil\penalty50\hskip1.2em\null\nobreak\hfil
+  {\footnotesize\color{mgrey}[\lblFrames~#1]}%
+  \parfillskip=0pt \finalhyphendemerits=0 \par}
 \makeatother
+
+% The empty checkbox that opens each outcome. DRAWN, not a font glyph, and
+% the reason is availability rather than looks. \square belongs to amssymb,
+% which this preamble loads ONLY when newtxmath is absent -- so on a full
+% TeX Live the glyph comes from newtxmath and on a thin one from amssymb.
+% That is the same conditional font stack the amssymb/newtxmath clash hid in.
+% wasysym's \Square would mean a new package dependency for one glyph, drawn
+% in the wasy face, which matches nothing else in the book -- and wasysym also
+% silently redefines \Box, \Diamond, \leadsto and \lhd, which in a mathematics
+% book is the worse failure because nothing reports it. A rule has no font to
+% be missing from, and its weight is chosen rather than inherited, so 0.7pt can
+% be set against the book's other rules.
+%
+% Measured at 11pt: \square 8.52pt wide, \Square 8.18pt, this box 6.36pt on
+% a 4.71pt x-height; at 12pt 6.98pt on 5.17pt. The side is written in ex, so
+% it is the same 1.35 x-heights in both formats. Do not convert it to points.
+%
+% THE VERTICAL SHIFT IS MEASURED, NOT DERIVED ON PAPER, and for the reason
+% CLAUDE.md gives for the frame badge. \framebox[w] makes the total width w
+% but adds \fboxrule above and below, so the inner strut is the side less the
+% two rules; and \fbox leaves the finished box with a depth of exactly
+% \fboxrule (0.7pt), not zero. A shift computed from the side and the
+% x-height alone therefore lands the square 0.7pt low -- a hard-coded POINT
+% error inside an ex-based design, i.e. a different fraction of the x-height
+% in each of the two formats. \sbox it and centre it on what it actually is.
+%
+% A dedicated \newsavebox, not \sbox0: box 0 is a scratch register and this
+% macro is expanded inside enumitem's \makelabel, where what else is holding
+% box 0 is not knowable locally.
+\newsavebox{\mfacbbox}
+\newcommand{\mfacheckbox}{%
+  \begingroup
+  \setlength{\fboxsep}{0pt}%
+  \setlength{\fboxrule}{0.7pt}%
+  \sbox{\mfacbbox}{\framebox[1.35ex]{\rule{0pt}{\dimexpr1.35ex-2\fboxrule\relax}}}%
+  \textcolor{mgrey}{%
+    \raisebox{\dimexpr0.5ex-0.5\ht\mfacbbox+0.5\dp\mfacbbox\relax}{\usebox{\mfacbbox}}}%
+  \endgroup}
 
 \makeatletter
 \newenvironment{outcomes}{%
@@ -467,7 +992,24 @@
     colback=mlight, colframe=mblue, boxrule=0pt, leftrule=3pt,
     left=8pt, right=8pt, top=6pt, bottom=6pt,
     fonttitle=\bfseries\small, title={\lblOutcomes}]
-  \begin{itemize}[leftmargin=1.3em, itemsep=3pt, topsep=2pt]
+  % Heading and lead-in are two strings, not one. The heading is the question
+  % the reader asks; the lead-in is the opening clause of the answer, and it
+  % is italic and indented because the original sets it that way. One string
+  % carrying both put a two-line sentence in the title bar.
+  %
+  % The heading stays in the box's blue title bar where the original sets it
+  % as black on the tint. Two reasons, both this repository's own rules: a bold
+  % coloured heading inside a tinted body would be a third box treatment used
+  % by exactly one box in the book, and a tcolorbox title is bound to the start
+  % of a breakable box where a heading set as body text can be orphaned from
+  % the list. Recorded as a departure in notes/07.
+  {\itshape\leftskip=1.2em\relax\noindent\lblOutcomesLead\par}%
+  \nopagebreak\vspace{3pt}%
+  % Empty checkboxes, not bullets. The outcomes list is the same affordance as
+  % the "Can you?" checklist at the end of the program: a thing the reader
+  % comes back to and ticks. A bullet cannot be ticked.
+  \begin{itemize}[label={\mfacheckbox}, leftmargin=1.9em, labelsep=0.65em,
+                  itemsep=5pt, topsep=2pt, parsep=0pt]
 }{%
   \end{itemize}
   \end{tcolorbox}
@@ -478,12 +1020,36 @@
 % Generated from the stored outcomes, not written out again by hand. Five
 % columns rather than a tick box, because a self-assessment with a midpoint is
 % one people actually use and a yes/no one is one they lie to.
-\newcommand{\ratingcell}{\textcolor{codeframe}{\rule[-0.15em]{0.8em}{0.8em}}}
+% Hollow, not filled. This was a solid tinted block, which asks the reader to
+% mark one of five and hands them five that already look marked -- in the one
+% instrument the outcomes checkbox was added to make tickable. It is the same
+% drawn square as \mfacheckbox, one step larger, so the outcomes list and the
+% checklist share a single affordance rather than contradicting each other.
+\newsavebox{\mfaratebox}
+\newcommand{\ratingcell}{%
+  \begingroup
+  \setlength{\fboxsep}{0pt}%
+  \setlength{\fboxrule}{0.6pt}%
+  \sbox{\mfaratebox}{\framebox[1.5ex]{\rule{0pt}{\dimexpr1.5ex-2\fboxrule\relax}}}%
+  \textcolor{mgrey}{%
+    \raisebox{\dimexpr0.5ex-0.5\ht\mfaratebox+0.5\dp\mfaratebox\relax}%
+             {\usebox{\mfaratebox}}}%
+  \endgroup}
 
 \makeatletter
+% Not a named frame, and therefore not room-checked either: what follows this
+% heading is an ordinary paragraph, which \nobreak does hold. What is NOT held
+% is the line after it -- \section* set \clubpenalty=\@M through
+% \@afterheading and this does not, so the heading plus one line can end a
+% page. Measured at 1 of 26 vertical positions in the trade format, against
+% 0 of 26 unpatched. The obvious repair (\@nobreaktrue plus an \everypar hook)
+% moved two ToC page numbers by one for reasons that could not be accounted for
+% from the code, and a change nobody can explain is worse than a widow that can
+% be measured. If it is ever fixed, the gate is that all four .toc files stay
+% byte-identical.
 \newcommand{\canyou}{%
-  \section*{\lblCanYou}%
-  \phantomsection\addcontentsline{toc}{section}{\lblCanYou}%
+  \par\vspace{18pt}%
+  \mfa@endhead{\lblCanYou}%
   \noindent\lblCanYouIntro\par\vspace{8pt}
   \noindent
   \begingroup\small
@@ -499,7 +1065,10 @@
     \end{tabularx}%
   }%
   \endgroup
-  \par\vspace{6pt}\noindent{\footnotesize\color{mgrey}\lblCanYouFooter}\par
+  % Not grey either, and for the same reason: this tells the reader to retake
+  % the Quiz, which is the second half of the instrument. An instruction the
+  % reader is meant to act on is set to be read.
+  \par\vspace{6pt}\noindent{\footnotesize\lblCanYouFooter}\par
 }
 \makeatother
 
@@ -516,41 +1085,256 @@
 \newlist{quizlist}{enumerate}{1}
 \setlist[quizlist]{label=\arabic*., leftmargin=2.0em, itemsep=5pt, topsep=3pt}
 
+% The whole quiz sits inside ONE thin-ruled rectangle, with a column heading
+% over the routes at the top right inside it. The rectangle is the point: the
+% Quiz is a single instrument, taken twice, and a run of loose numbered items
+% under a heading is indistinguishable from the Test exercises three pages
+% later. breakable, because a long quiz does not always fit a page, and an
+% unbreakable box that does not fit is an overfull vbox.
+\newlength{\mfaroutewd}
+\setlength{\mfaroutewd}{1.9em}
+\newsavebox{\mfaroutebox}
+
 \makeatletter
+% One cell of a route: a frame number in a small thin-ruled box.
+% \mfaroutewd is a MINIMUM, not a width: \makebox[\mfaroutewd] alone would let
+% a long number stick out through the rule, which is worse than a wider box.
+% Measure first, pad only if there is room. \strut fixes the height, so every
+% cell on the page is the same box whatever digits are in it.
+\newcommand{\mfa@routecell}[1]{%
+  \begingroup
+  \setlength{\fboxsep}{2.2pt}%
+  \setlength{\fboxrule}{0.4pt}%
+  \sbox\mfaroutebox{\footnotesize\color{mgrey}\strut #1}%
+  \textcolor{mgrey}{\fbox{%
+    \ifdim\wd\mfaroutebox<\mfaroutewd
+      \makebox[\mfaroutewd]{\usebox\mfaroutebox}%
+    \else
+      \usebox\mfaroutebox
+    \fi}}%
+  \endgroup
+}
+
+% Push the route to the right margin, and if it does not fit on the last line
+% of the question, put it on a line of its own -- still at the right margin.
+% A bare \hfill cannot do the second half: infinite glue is a legal breakpoint,
+% and when the route does not fit TeX breaks there, discards the glue, and sets
+% what follows flush LEFT on the next line. Measured: with \hfill a route split
+% as "9" on one line and "to 13" flush left on the next.
+%
+% The \par is BRACED. Without the braces \parfillskip=0pt survives the macro
+% and every later paragraph in the same quiz is set fully justified on its last
+% line. \teachesat happens to hide that because xstring forces it into a
+% \begingroup; \teachesatone has no group, so the leak escaped from it and
+% showed up as a justified final line plus an underfull hbox. Setting the
+% parameter inside braces and breaking the paragraph inside the same braces is
+% the standard idiom and it costs nothing.
+%
+% It ends the paragraph, so \teachesat must be the last thing typeset in a quiz
+% item. \answerto only stores, so it may follow.
+\newcommand{\mfa@pushright}[1]{%
+  \unskip\nobreak\hfil\penalty50\hskip1em\null\nobreak\hfil
+  #1%
+  {\parfillskip\z@ \finalhyphendemerits\z@ \par}%
+}
+
+% lines before break: tcolorbox will happily leave two or three questions
+% stranded at the foot of a page and carry the rest over, and the continuation
+% part carries no column heading -- the reader then meets a column of boxed
+% numbers with nothing saying they are frames. This is not hypothetical: at the
+% default (2) the real F01 quiz broke 3 + 9 in BOTH A4 builds. 12 was measured:
+% 8 keeps the box whole in en-a4 but not pl-a4; 12 and 16 keep it whole in all
+% four builds. It is a threshold, not a constant -- a quiz long enough to need
+% two pages still breaks, and still loses its heading on the second. That is
+% accepted: the original's quiz is one page.
+%
+% The heading is ordinary content at the top of the box, NOT tcolorbox's
+% title / title after break. That variant was built and rejected: the heading
+% does repeat on the continuation, and the FIRST part of the box then has no
+% top rule at all.
+% The heading, the instruction and the rectangle are one instrument, and
+% \section* binds only the first two. Without the room test the heading and its
+% paragraph sat at the foot of the opener and the box began overleaf, in all
+% four builds -- not by chance, by layout. Eight \baselineskip is heading plus
+% instruction plus the first question.
 \newenvironment{quiz}{%
+  \par
+  \ifdim\pagegoal=\maxdimen\else
+    \ifdim\dimexpr\pagegoal-\pagetotal\relax<\dimexpr8\baselineskip\relax
+      \newpage
+    \fi
+  \fi
   \section*{\lblQuiz}%
   \phantomsection\addcontentsline{toc}{section}{\lblQuiz}%
   \def\mfa@exkey{Q\arabic{quizlisti}}%
-  \noindent\lblQuizIntro\par\vspace{5pt}
+  \noindent\lblQuizIntro\par\vspace{7pt}
+  \begin{tcolorbox}[
+    enhanced, breakable, sharp corners,
+    colback=white, colframe=mgrey, boxrule=0.4pt,
+    left=8pt, right=8pt, top=6pt, bottom=8pt,
+    before skip=0pt, after skip=12pt,
+    lines before break=12]
+  \noindent\hfill{\footnotesize\bfseries\color{mgrey}\lblFrames}\par
+  \vspace{1pt}
   \begin{quizlist}
 }{%
   \end{quizlist}
+  \end{tcolorbox}
 }
 \makeatother
 
 % The frames that teach the question just asked. Two forms, because a Quiz
-% question that routes to a single frame reading "Frames 22" is the kind of
-% small wrongness a reader notices and an author never does.
-\newcommand{\teachesat}[1]{\hfill{\footnotesize\color{mgrey}(\lblFrames~#1)}}
-\newcommand{\teachesatone}[1]{\hfill{\footnotesize\color{mgrey}(\lblFrame~#1)}}
+% question that routes to a single frame and shows two boxes with "to" between
+% them is the kind of small wrongness a reader notices and an author never
+% does.
+%
+% The range is split with xstring rather than with a delimited parameter
+% (\def\mfa@teaches#1--#2\@nil). The delimited form works for a literal
+% \teachesat{1--7} and for \teachesat{\a--\b}, but an argument with no "--" in
+% its token list -- \teachesat{12}, an easy typo for \teachesatone{12} -- runs
+% away and dies with "Paragraph ended before \mfa@teaches was complete", which
+% names an internal macro and neither the file nor the argument. \IfSubStr
+% tests first and \StrCut cannot run away, so a bad argument gets a named
+% error at a real file and line, which tools/checklog.py sees.
+%
+% The SOURCE stays \teachesat{1--7}: splitting it into two arguments would make
+% parity's C4 read only the first brace group, so \teachesat{1--9} and
+% \teachesat{1--7} would become indistinguishable to the ordered signature.
+% The split therefore happens here.
+%
+% \noexpandarg is set explicitly: xstring's default is full expansion, which
+% would try to \edef a protected macro appearing in a range.
+%
+% \detokenize in the error message, because \PackageError expands its message.
+% Without it, \teachesat{\wholerange} reports `was given 5--8, which is not a
+% range of the form N--M' -- an error that contradicts itself and sends the
+% author looking in the wrong place. \detokenize prints \wholerange.
+\makeatletter
+\newcommand{\teachesat}[1]{%
+  \begingroup\noexpandarg
+  \IfSubStr{#1}{--}{%
+    \StrCut{#1}{--}{\mfa@rangea}{\mfa@rangeb}%
+    \mfa@pushright{%
+      \mfa@routecell{\mfa@rangea}%
+      \hspace{0.3em}{\footnotesize\color{mgrey}\lblRouteTo}\hspace{0.3em}%
+      \mfa@routecell{\mfa@rangeb}}%
+  }{%
+    \PackageError{mfa}{\string\teachesat\space found no `--' in its argument
+      `\detokenize{#1}'}{A route must be a literal N--M range. Write
+      \string\teachesatone{N} for a single frame; if the ends come from macros,
+      write them either side of the dashes.}%
+  }%
+  \endgroup
+}
+\newcommand{\teachesatone}[1]{\mfa@pushright{\mfa@routecell{#1}}}
+\makeatother
 
 % ---- Summary --------------------------------------------------------------
 % Every item carries the frame number it came from, in square brackets. That
 % is the eighth-edition improvement and it is the single cheapest thing in the
 % format: it turns a summary into a return index, so a reader who fails one
 % line of "Can you?" knows exactly which four frames to reread.
+\makeatletter
+% The heading of a closing part of a program -- Summary, Can you?, Test
+% exercises, Further problems. One size for all four, one step below the
+% numbered topic heads inside the program: those are what the reader is
+% reading, these are what they are checking with.
+%
+% The heading is typeset BEFORE the contents line is written, which is the
+% order \section* uses and the order that gets the page number right. The
+% \write is contributed to whichever page it lands on, so writing it first
+% records the page the heading was going to start on rather than the page it
+% actually starts on -- and the two differ by exactly one whenever the heading
+% begins a page.
+\newcommand{\mfa@endhead}[1]{%
+  {\noindent\large\bfseries\color{mblue}#1\par}%
+  \phantomsection\addcontentsline{toc}{section}{#1}%
+  \nobreak\vspace{7pt}\nobreak
+}
+
+% A named frame must not open at the foot of a page. WITHOUT THIS GUARD the
+% frame rule, the badge, the icon and the heading are stranded at the bottom of
+% a page and the panel begins overleaf. Reproduced at 2 of 26 vertical
+% positions in the trade format and 2 of 26 on A4; the same sweep against the
+% unpatched preamble strands nothing, 0 of 26 in both. \nobreak is not enough:
+% it binds the heading to the GLUE that follows it, but a breakable tcolorbox
+% splits itself in its own code, measures the room left and is perfectly
+% willing to contribute an empty first piece. This is the one service \section*
+% was performing here for free, through \@startsection's penalty before the
+% heading, and it stopped being free the moment the heading stopped being a
+% \section.
+%
+% needspace's stretch-and-penalty trick does NOT fix it, and it was tried
+% first: it relies on TeX's page builder finding the page overfull and
+% preferring an earlier breakpoint, and on a rigid page every candidate is
+% equally awful, so TeX keeps the material and lets tcolorbox split anyway.
+% Measured: 95pt reserved against 54pt left, heading still stranded.
+%
+% So the room is measured and the page is turned explicitly. \pagegoal is
+% \maxdimen on a page with nothing on it yet, which means "unlimited" and not
+% "no room"; testing it the obvious way turns a page at the top of every
+% program. Six \baselineskip is heading plus three lines of panel, and it is
+% expressed in \baselineskip rather than in points because the two formats set
+% 11pt and 12pt from this one source.
+\newcommand{\mfa@namedframe}[2]{% #1 = mark on the rule, #2 = heading
+  \par
+  \ifdim\pagegoal=\maxdimen\else
+    \ifdim\dimexpr\pagegoal-\pagetotal\relax<%
+          \dimexpr\mfaframeabove+\mfaframebelow+6\baselineskip\relax
+      \newpage
+    \fi
+  \fi
+  \refstepcounter{frameno}%
+  % A named frame counts towards the opener's range like any other: the reader
+  % sees frames 46 and 47, so "Frames 1 to 45" on the opener would be a lie.
+  \mfa@noteframe
+  \mfa@framerule{#1}%
+  \mfa@endhead{#2}%
+}
+
+% The continuation mark: a triangle at the bottom right of every piece of a
+% broken panel except the last. `overlay first and middle` is the exact key --
+% `overlay broken` would mark the last piece too and `overlay` would mark a
+% panel that never broke at all, and both are lies to a reader who is being
+% told whether to turn the page. Drawn rather than set from a font, for the
+% reason \mfalisticon is.
+%
+% The coordinates keep the whole mark inside the panel's padding, and that is
+% arithmetic rather than taste. The triangle spans 5pt horizontally and 5.2pt
+% vertically from its apex; the panel pads 8pt right and 6pt bottom. So the
+% apex may sit at most 3pt from frame.east (3+5 = 8) and its vertical centre at
+% most 3.4pt above frame.south (3.4+2.6 = 6). The obvious xshift=-7pt,
+% yshift=4.5pt reaches 12pt into a right padding of 8pt and 7.1pt into a bottom
+% padding of 6pt -- i.e. into the text column, where the descender of a
+% justified last line lives.
+\newcommand{\mfacontinuationmark}{%
+  \path[fill=mblue]
+    ([xshift=-3pt,yshift=3pt]frame.south east) --
+    ++(-5pt,2.6pt) -- ++(0pt,-5.2pt) -- cycle;%
+}
+\makeatother
+
+% Numbered, not bulleted: the items are a list the reader is sent back into by
+% number from "Can you?", and a bullet has no address.
+\newlist{sumlist}{enumerate}{1}
+\setlist[sumlist]{label=\arabic*., leftmargin=2.0em, labelsep=0.5em,
+                  itemsep=5pt, topsep=2pt}
+
+\makeatletter
 \newenvironment{summarybox}{%
-  \section*{\lblSummary}%
-  \phantomsection\addcontentsline{toc}{section}{\lblSummary}%
+  \mfa@namedframe{\mfalisticon}{\lblSummary}%
   \begin{tcolorbox}[
     enhanced, breakable, sharp corners,
     colback=mlight, colframe=mblue, boxrule=0pt, leftrule=3pt,
-    left=8pt, right=8pt, top=6pt, bottom=6pt]
-  \begin{itemize}[leftmargin=1.3em, itemsep=5pt, topsep=2pt]
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    before skip=0pt, after skip=12pt,
+    overlay first and middle={\mfacontinuationmark}]
+  \begin{sumlist}
 }{%
-  \end{itemize}
+  \end{sumlist}
   \end{tcolorbox}
 }
+\makeatother
 
 % \sumitem{12}{text} -- the frame reference is not decoration, it is the point.
 \newcommand{\sumitem}[2]{\item #2~{\footnotesize\color{mgrey}[#1]}}
@@ -595,9 +1379,12 @@
 % answer filed under the same key. That failure is invisible until the answers
 % section at the back of the book prints one program's answers twice.
 \makeatletter
+% A numbered frame, with no icon: the original frames its revision exercises
+% too (frame 15 on p.132). "Can you?" and "Further problems" are deliberately
+% NOT frames -- the first is an instrument rather than content, the second is
+% optional consolidation outside the 80/80 instrument.
 \newenvironment{testexercises}{%
-  \section*{\lblTestExercises}%
-  \phantomsection\addcontentsline{toc}{section}{\lblTestExercises}%
+  \mfa@namedframe{}{\lblTestExercises}%
   \def\mfa@exkey{T\arabic{exlisti}}%
   \noindent\lblTestIntro\par\vspace{5pt}
   \begin{exlist}
@@ -606,8 +1393,8 @@
 }
 
 \newenvironment{furtherproblems}{%
-  \section*{\lblFurther}%
-  \phantomsection\addcontentsline{toc}{section}{\lblFurther}%
+  \par\vspace{18pt}%
+  \mfa@endhead{\lblFurther}%
   \def\mfa@exkey{P\arabic{fplisti}}%
   \noindent\lblFurtherIntro\par\vspace{5pt}
   \begin{fplist}
@@ -621,7 +1408,20 @@
 % lets the back matter reproduce this program's answers under its own name.
 \makeatletter
 \newcommand{\program}[1]{%
+  % The previous program's frame total, written now because this is the first
+  % moment at which that program is certainly over. \AtEndDocument catches the
+  % last one.
+  \mfa@flushframetotal
+  \mfarangetrue
   \chapter{#1}%
+  \mfarangefalse
+  % The key for the program just opened, captured here and not recomputed at
+  % the flush: \mainnumbering resets the chapter counter between Part I and
+  % Part II, so \thechapter read at the next \program would expand to "0".
+  % Zero is the honest starting count -- a program with no frames writes it,
+  % which is what lets the opener tell a stub from a first run.
+  \xdef\mfa@lastprog{\mfa@progkey}%
+  \gdef\mfa@lastcount{0}%
   \csgdef{mfa@title@\thechapter}{#1}%
   % Expanded, for the same reason as the answer keys above.
   \listxadd{\mfaprograms}{\thechapter}%
@@ -691,6 +1491,33 @@
     left=10pt, right=10pt, top=7pt, bottom=7pt,
     before skip=13pt, after skip=13pt,
     fonttitle=\bfseries\small,
+  },
+  % The answer to the previous frame. It is the OUTLINED treatment -- a rule on
+  % white, the thing the reader must stop at -- declared as that style plus its
+  % deviations rather than as a third one, so the padding and the corner
+  % treatment cannot drift away from the admonitions.
+  %
+  % Three deviations, each with a reason:
+  %
+  %   boxrule 0.8 -> 0.6pt. The page then carries exactly two rule weights:
+  %     0.6pt for frame furniture (\framerule and this box) and 0.8pt for
+  %     content the author flagged (the admonitions). The answer box appears
+  %     about thirty times per program against an admonition's four or five,
+  %     so it is the one that has to be quiet.
+  %
+  %   colback mfaint -> white. mfaint is FBFCFD -- nearly white, and at that
+  %     distance from the paper it reads as a smudge rather than as a tint.
+  %     notes/07 section 3: "white inside, narrower than the measure, centred".
+  %
+  %   before skip 13pt -> 4pt. This box almost always sits directly under
+  %     \framerule, which has already laid down \mfaframebelow, so the
+  %     effective gap is that plus 4pt rather than 4pt. 13pt on top of it would
+  %     read as a gap rather than as an opening.
+  mfa answer/.style={
+    mfa outlined,
+    boxrule=0.6pt,
+    colback=white, colframe=mgreen,
+    before skip=4pt, after skip=10pt,
   },
 }
 

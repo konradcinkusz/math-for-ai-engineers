@@ -58,13 +58,15 @@ MATH_ENVS = ("equation", "equation*", "align", "align*", "gather", "gather*",
 KEYED = {
     "label": "LABEL", "ref": "REF", "eqref": "REF", "pageref": "REF",
     "val": "VAL", "rawval": "VAL", "mermaidfig": "FIG",
-    "teachesat": "TEACHESAT", "sumitem": "SUMITEM", "outcome": "OUTCOME",
+    "teachesat": "TEACHESAT", "teachesatone": "TEACHESAT",
+    "sumitem": "SUMITEM", "outcome": "OUTCOME",
 }
 
 # Macros with no payload worth comparing, but whose presence and position are
 # the pedagogy.
 BARE = {
     "yourturn": "YOURTURN", "dotline": "DOTLINE", "blank": "BLANK",
+    "nextframe": "NEXTFRAME",
     "canyou": "CANYOU", "ans": "ANS", "answerto": "ANSWERTO",
     "programstub": "STUB", "program": "PROGRAM", "printanswers": "PRINTANSWERS",
     "foundationnumbering": "FNUM", "mainnumbering": "MNUM",
@@ -391,7 +393,13 @@ def check_lang_catalogue(rep: Report) -> None:
             rep.bad("C3-lang", f"lang/{lang}.tex missing")
             return
         src = COMMENT_RE.sub("", p.read_text(encoding="utf8"))
-        names = set(re.findall(r"\\newcommand\{\\([A-Za-z@]+)\}", src))
+        # Widened past \newcommand{\foo}: a string written \newcommand*{\foo},
+        # \newcommand\foo or \DeclareRobustCommand{\foo} was invisible in BOTH
+        # files, so a label present in one edition only would have passed. That
+        # is the shape of failure this check exists to catch.
+        names = set(re.findall(
+            r"\\(?:newcommand|providecommand|DeclareRobustCommand)\*?\{?\\([A-Za-z@]+)\}?",
+            src))
         names |= set(re.findall(r"\\DeclareMathOperator\*?\{\\([A-Za-z@]+)\}", src))
         defs[lang] = names
     for miss in sorted(defs["en"] - defs["pl"]):
@@ -628,6 +636,63 @@ def check_verbatim_ascii(rep: Report, path: Path) -> None:
                 return
 
 
+def check_next_frame_cues(rep: Report, doc: Doc) -> None:
+    """C16: the next-frame cue sits on exactly the frames that asked a question.
+
+    The cue is the instruction to cover the page and turn over, so it belongs
+    on a frame that has asked the reader for a response and nowhere else. That
+    property is not a matter of taste: a frame has asked for a response exactly
+    when the NEXT frame opens by answering it, with \\ans or \\begin{ansblock}.
+    So the rule is mechanical and is checked rather than remembered.
+
+    C4 compares the two editions and C14 compares the counts. Neither can see
+    an author who forgets the same cue in both editions at once -- which is the
+    failure mode this repository has already been bitten by.
+
+    INVISIBLE names tokens that mark a position without typesetting anything,
+    so a frame that opens `\\begin{fr}\\label{...}\\ans{...}` still counts as
+    opening with its answer. A \\label inside a frame is supported here on
+    purpose -- every Summary back-reference, Quiz route and cross-program
+    reference in the book navigates by frame -- and without this the check
+    fires on correct input, which is worse than not checking at all.
+    """
+    INVISIBLE = {"LABEL"}
+    frames: list[list[str]] = []
+    for t in doc.tokens:
+        if t.kind == "FRAME":
+            frames.append([])
+        elif frames:
+            frames[-1].append(t.key())
+    if not frames:
+        return
+
+    def opens_with_answer(toks: list[str]) -> bool:
+        for k in toks:
+            if k.split("(", 1)[0] in INVISIBLE:
+                continue
+            return k in ("ANS", "BEGIN(ansblock)")
+        return False
+
+    bad = []
+    for i, toks in enumerate(frames, start=1):
+        cues = toks.count("NEXTFRAME")
+        nxt = frames[i] if i < len(frames) else None
+        answers = nxt is not None and opens_with_answer(nxt)
+        if cues > 1:
+            bad.append(f"frame {i}: {cues} cues")
+        elif cues == 1 and not answers:
+            bad.append(f"frame {i}: cue, but frame {i+1} does not answer it")
+        elif cues == 0 and answers:
+            bad.append(f"frame {i}: no cue, but frame {i+1} answers it")
+    if bad:
+        rep.bad("C16-cues", f"{doc.path.parts[-2]}/{doc.path.name}: "
+                + "; ".join(bad[:6])
+                + (f" (+{len(bad)-6} more)" if len(bad) > 6 else ""))
+    else:
+        rep.good("C16-cues", f"{doc.path.parts[-2]}/{doc.path.name}: "
+                 f"{sum(t.count('NEXTFRAME') for t in frames)} cues, all placed")
+
+
 def check_macro_histogram(rep: Report, en: Doc, pl: Doc) -> None:
     """Cheap breadth: a macro dropped in translation.
 
@@ -747,6 +812,8 @@ def main() -> int:
         check_notation(rep, pl_p)
         check_numbers(rep, en, pl)
         check_macro_histogram(rep, en, pl)
+        check_next_frame_cues(rep, en)
+        check_next_frame_cues(rep, pl)
         check_verbatim_ascii(rep, en_p)
         check_verbatim_ascii(rep, pl_p)
 

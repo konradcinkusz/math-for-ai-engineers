@@ -32,6 +32,7 @@ all-formats: numbers diagrams en pl en-a4 pl-a4 check check-a4
 check:
 	@python3 tools/gen_stubs.py --check
 	@python3 tools/checklog.py main-en.log main-pl.log
+	@python3 tools/checkpdf.py main-en.pdf main-pl.pdf
 	@python3 tools/parity.py | tail -n 3
 	@python3 tools/reflist.py 2>/dev/null || true
 
@@ -41,6 +42,7 @@ check:
 # which is exactly the class of defect the trade format's own log cannot see.
 check-a4:
 	@python3 tools/checklog.py main-en-a4.log main-pl-a4.log
+	@python3 tools/checkpdf.py main-en-a4.pdf main-pl-a4.pdf
 
 en: numbers
 	latexmk -pdf -interaction=nonstopmode -file-line-error main-en.tex

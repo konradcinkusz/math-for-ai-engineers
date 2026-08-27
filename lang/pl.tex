@@ -12,7 +12,8 @@
 \newcommand{\lblPrograms}{Programy}
 \newcommand{\lblFrame}{Ramka}
 \newcommand{\lblFrames}{Ramki}
-\newcommand{\lblOutcomes}{Czego się nauczę z tego programu? --- po jego przerobieniu będziesz umiał}
+\newcommand{\lblOutcomes}{Czego się nauczę z tego programu?}
+\newcommand{\lblOutcomesLead}{Po ukończeniu tego programu będziesz potrafił:}
 \newcommand{\lblQuiz}{Quiz}
 \newcommand{\lblSummary}{Podsumowanie}
 \newcommand{\lblCanYou}{Czy potrafisz?}
@@ -20,7 +21,14 @@
 \newcommand{\lblTestExercises}{Zadania sprawdzające}
 \newcommand{\lblFurther}{Dalsze wyzwania}
 \newcommand{\lblAnswers}{Odpowiedzi}
+% The opener's frame-range box. Two arguments rather than a bare word, so
+% the translator owns the word order and not just the preposition -- but the
+% word itself comes from \lblRouteTo, which the Quiz's route boxes also use,
+% so the book says to/do from one place and the two cannot drift.
+\newcommand{\lblFrameRange}[2]{\lblFrames~#1 \lblRouteTo\ #2}
+\newcommand{\lblNextFrame}{Kolejna ramka.}
 \newcommand{\lblYourTurn}{Teraz jeden przykład do wykonania dla ciebie.}
+\newcommand{\lblRouteTo}{do}
 
 
 % ---------- Tytuły części ----------

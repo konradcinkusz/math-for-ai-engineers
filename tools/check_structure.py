@@ -27,6 +27,13 @@ LANGS = ("en", "pl")
 FRAME_BAND = (30, 70)
 
 RE_STUB = re.compile(r"\\programstub\{")
+# \begin{fr} only, deliberately. The Summary and the Test exercises are
+# numbered frames too -- the preamble frames them, so they carry the last two
+# numbers a reader sees -- but they are fixed overhead every program pays and
+# they are not teaching frames. This ledger counts TEACHING frames, which is
+# what the 30--70 band is a statement about, so F01 reports 45 while the book
+# prints 47. Do not "fix" one counter without the other; every program's band
+# would shift by two.
 RE_FRAME = re.compile(r"\\begin\{fr\}")
 RE_ANS = re.compile(r"\\ans\{|\\begin\{ansblock\}")
 RE_OUTCOME = re.compile(r"\\outcome\{")
@@ -40,9 +47,16 @@ RE_ENV = re.compile(
     r"\\begin\{(quiz|testexercises|furtherproblems)\}(.*?)\\end\{\1\}", re.S
 )
 RE_ITEM = re.compile(r"^\s*\\item\b", re.M)
-# A frame demands a response if it contains a row of dots or ends in a
-# question. The dots are the reliable signal; the question mark is a hint.
-RE_DEMANDS = re.compile(r"\\blank|\\dotline|\\yourturn")
+# A frame demands a response if it contains a row of dots, hands the reader a
+# worked example to do, or ends by telling them to turn over. The dots and the
+# cue are the reliable signals; a question mark is a hint.
+#
+# \nextframe is in this list because it IS the demand made explicit: it is the
+# instruction to cover the page and turn over. That makes the check and the
+# placement rule the same rule -- a cue may only sit on a frame the next frame
+# answers -- and parity's C16 enforces the converse, that every such frame
+# carries one.
+RE_DEMANDS = re.compile(r"\\blank|\\dotline|\\yourturn|\\nextframe")
 
 
 def program_files(lang: str) -> list[Path]:
@@ -76,6 +90,32 @@ def check_frames(soft: bool) -> int:
                         f"frame {i + 1} does not open with an answer"
                     )
                     bad += 1
+            # And the cue is the LAST thing in its frame, as preamble.tex says
+            # where \nextframe is defined. It tells the reader to cover the
+            # page and turn over, so anything printed after it is printed after
+            # the reader has gone.
+            #
+            # This is a LINE test, not a token test, and that is not a style
+            # preference. parity's C16 counts cues per frame and cannot see
+            # position, so a cue misplaced identically in both editions is
+            # invisible to C4, to C14 and to C16 alike; and a token test has
+            # its own blind spot, because a cue hoisted above a frame's
+            # closing PROSE tokenises to nothing after it and reads as
+            # correctly placed. Only the line test catches both.
+            for i, b in enumerate(blocks, start=1):
+                body = b.split(r"\end{fr}")[0].splitlines()
+                for k, line in enumerate(body):
+                    if line.strip() != r"\nextframe":
+                        continue
+                    after = [x for x in body[k + 1:] if x.strip()
+                             and not x.lstrip().startswith("%")]
+                    if after:
+                        print(
+                            f"  {lang}/{f.stem}: frame {i}: \\nextframe is not "
+                            f"the last thing in the frame -- "
+                            f"{after[0].strip()[:44]!r} follows it"
+                        )
+                        bad += 1
     if bad == 0:
         print("  Every written program is in band and every question is answered.")
     return 0 if (bad == 0 or soft) else 1

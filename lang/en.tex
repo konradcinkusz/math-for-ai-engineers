@@ -11,7 +11,8 @@
 \newcommand{\lblPrograms}{Programs}
 \newcommand{\lblFrame}{Frame}
 \newcommand{\lblFrames}{Frames}
-\newcommand{\lblOutcomes}{Learning outcomes --- when you have finished this program you will be able to}
+\newcommand{\lblOutcomes}{What will I learn from this program?}
+\newcommand{\lblOutcomesLead}{When you have finished this program you will be able to:}
 \newcommand{\lblQuiz}{Quiz}
 \newcommand{\lblSummary}{Summary}
 \newcommand{\lblCanYou}{Can you?}
@@ -19,7 +20,14 @@
 \newcommand{\lblTestExercises}{Test exercises}
 \newcommand{\lblFurther}{Further problems}
 \newcommand{\lblAnswers}{Answers}
+% The opener's frame-range box. Two arguments rather than a bare word, so
+% the translator owns the word order and not just the preposition -- but the
+% word itself comes from \lblRouteTo, which the Quiz's route boxes also use,
+% so the book says to/do from one place and the two cannot drift.
+\newcommand{\lblFrameRange}[2]{\lblFrames~#1 \lblRouteTo\ #2}
+\newcommand{\lblNextFrame}{Next frame.}
 \newcommand{\lblYourTurn}{Now one for you to do.}
+\newcommand{\lblRouteTo}{to}
 
 
 % ---------- Part titles ----------
