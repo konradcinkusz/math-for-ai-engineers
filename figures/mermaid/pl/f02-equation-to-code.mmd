@@ -1,0 +1,10 @@
+flowchart LR
+  P["WYDRUKOWANE<br/>(x - mu)<br/>-----------------<br/>sqrt(sigma^2 + eps)"]
+
+  P --> A["1. nazwij kazdy symbol<br/>2. znajdz niewidoczne<br/>nawiasy: kreske<br/>i znak pierwiastka"]
+  A --> B["3. przeczytaj, co jest<br/>WEWNATRZ kazdego z nich<br/>4. podstaw przypadek,<br/>ktory umiesz sprawdzic"]
+  B --> OK["DO OBRONY<br/>(x - mu)<br/>/ sqrt(sigma2 + eps)"]
+
+  A -.-> W1["x - mu / sqrt(sigma2 + eps)<br/>odejmuje iloraz od x"]
+  B -.-> W2["(x - mu) / sqrt(sigma2) + eps<br/>dodaje eps PO dzieleniu"]
+  B -.-> W3["(x - mu) / (sqrt(sigma2) + eps)<br/>eps poza pierwiastkiem,<br/>wewnatrz dzielnika"]

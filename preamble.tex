@@ -1337,7 +1337,11 @@
 \makeatother
 
 % \sumitem{12}{text} -- the frame reference is not decoration, it is the point.
-\newcommand{\sumitem}[2]{\item #2~{\footnotesize\color{mgrey}[#1]}}
+% \mbox around the bracket. It is a navigation coordinate, and a coordinate
+% broken across a line -- "[7--" on one line and "9]" on the next -- reads as
+% damage rather than as a reference. It happened in three of the four builds
+% the first time a Summary item ran long.
+\newcommand{\sumitem}[2]{\item #2~\mbox{\footnotesize\color{mgrey}[#1]}}
 
 % ---- Answers ---------------------------------------------------------------
 %  Answers are authored at the point of use and printed at the back.

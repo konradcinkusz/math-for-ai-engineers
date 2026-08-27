@@ -111,11 +111,29 @@ numbers:
 
 # Re-runs the scripts and fails if any committed value would change. This is
 # the check that makes the previous rule mean something.
+# TWO failures, not one, and `git diff` alone can only see the first.
+#
+#   drift     -- a tracked value file no longer matches its script
+#   untracked -- a value file git has never seen, so it was never compared to
+#                anything. Every program's FIRST values file is in this state,
+#                which means every program's first values file used to pass
+#                this gate by being invisible to it. Found when F02 added 32
+#                values and the gate went green on all of them.
+#
+# Staged-but-not-committed is NOT a failure: the content matches the script,
+# which is the whole question this gate asks. Testing `git status --porcelain`
+# instead would fail on a staged file and make the gate unusable mid-commit.
 verify: numbers
-	@git diff --quiet -- figures/values 2>/dev/null \
-	  && echo "All computed values are current." \
-	  || { echo "STALE: figures/values differs from what the scripts now produce."; \
-	       git diff --stat -- figures/values; exit 1; }
+	@drift=$$(git diff --name-only -- figures/values); \
+	 new=$$(git ls-files --others --exclude-standard -- figures/values); \
+	 if [ -n "$$drift" ] || [ -n "$$new" ]; then \
+	   [ -n "$$drift" ] && { echo "STALE: these no longer match their script:"; \
+	                         echo "$$drift"; git diff --stat -- figures/values; }; \
+	   [ -n "$$new" ] && { echo "UNTRACKED: git has never seen these, so they have"; \
+	                       echo "never been compared to anything. git add them:"; \
+	                       echo "$$new"; }; \
+	   exit 1; \
+	 else echo "All computed values are current."; fi
 
 # ---------------------------------------------------------------------------
 # Diagrams. Source of truth is figures/mermaid/<lang>/*.mmd, committed. The

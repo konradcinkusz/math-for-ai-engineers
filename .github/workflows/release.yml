@@ -43,9 +43,16 @@ jobs:
       - name: Recompute every number, and refuse to release on drift
         run: |
           make numbers
-          if ! git diff --quiet -- figures/values; then
-            echo "::error::Refusing to release: a printed number differs from its script."
-            git diff -- figures/values
+          # TWO failures, and `git diff` alone can only see the first: drift in a
+          # tracked file, and a file git has NEVER SEEN -- which is the state
+          # every program's first values file is in, so it used to pass this
+          # gate by being invisible to it.
+          drift=$(git diff --name-only -- figures/values)
+          new=$(git ls-files --others --exclude-standard -- figures/values)
+          if [ -n "$drift" ] || [ -n "$new" ]; then
+            echo "::error::Refusing to release: a printed number differs from its script, or figures/values carries a file git has never seen."
+            [ -n "$drift" ] && git diff -- figures/values
+            [ -n "$new" ] && { echo "Untracked, never compared to anything:"; echo "$new"; }
             exit 1
           fi
 

@@ -1,0 +1,9 @@
+flowchart LR
+  H["(a + b)(c + d)<br/>cztery iloczyny,<br/>po jednym na komorke<br/>siatki 2 x 2"]
+  H --> G["komorki NAROZNE<br/>a * c oraz b * d<br/>komorki KRAWEDZIOWE<br/>a * d oraz b * c"]
+
+  G --> S["przypadek c = a, d = b<br/>obie krawedzie to a * b,<br/>wiec SIE DODAJA"]
+  G --> D["przypadek c = a, d = -b<br/>krawedzie to -ab i +ab,<br/>wiec SIE ZNOSZA"]
+
+  S --> SR["bledna regula zachowuje<br/>narozniki, a krawedzie<br/>wyrzuca"]
+  D --> DR["to ten bliski przypadek,<br/>ktory utrzymuje<br/>bledna regule"]
