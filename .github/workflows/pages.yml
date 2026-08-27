@@ -112,6 +112,10 @@ jobs:
         run: |
           python3 tools/checklog.py \
             main-en.log main-pl.log main-en-a4.log main-pl-a4.log
+          command -v pdftotext >/dev/null 2>&1 || \
+            sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          python3 tools/checkpdf.py \
+            main-en.pdf main-pl.pdf main-en-a4.pdf main-pl-a4.pdf
 
       - name: Assemble the site
         run: |

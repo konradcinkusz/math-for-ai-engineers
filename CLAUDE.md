@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 171 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-pl` (17x24) | 171 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-en-a4` | 163 | 0 | 0 | 5, worst 6.3 pt | 0 |
-| `main-pl-a4` | 163 | 0 | 0 | 4, worst 4.4 pt | 0 |
+| `main-en` (17x24) | 175 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-pl` (17x24) | 175 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en-a4` | 167 | 0 | 0 | 5, worst 6.3 pt | 0 |
+| `main-pl-a4` | 167 | 0 | 0 | 4, worst 4.4 pt | 0 |
 
 The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
 one format and one language because that is where the line falls. Well under
@@ -32,13 +32,30 @@ the 15 pt budget. Parity reports **0 failures and 0 warnings** across 56 file
 pairs; `reflist.py` confirms 66 labels resolve to the same numbers in both
 editions.
 
+**Four pages per format came from the Stroud layout pass**, from two causes.
+Two are the next-frame cue: 33 cues in a 45-frame program, measured with and
+without them. Two are the page-turn guards that stop a frame opener or the Quiz
+heading being stranded at the foot of a page. The frame
+badge, the outcomes checkboxes, the quiz route boxes, the named end-of-program
+frames and the opener's frame range together cost **zero** — the overfull-hbox
+multiset came back byte-identical to the pre-pass baseline in all four formats.
+At F01's 73% cue rate the cost over 2,415 planned frames is of the order of a
+hundred pages, which belongs in the one-volume/two-volume question in
+`notes/01-curriculum.md` §20.
+
+**Compare the hbox multiset only against a baseline built on the same
+machine.** CI has newtx and inconsolata; a bare container has neither, and the
+two measure different line widths. The numbers above are from a container
+build that reproduced the pre-pass table exactly, so they are comparable to
+what was there before.
+
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
 - **46 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 29 computed values, all referenced, all present
+- 28 computed values, all referenced, all present
 - 0 `verifybox` blocks · 6 Mermaid sources, all rendering
 - **80/80 validation: NOT ESTABLISHED**, and printed as outstanding on every
   build. See *The evidence, honestly* below — this is the one ledger that is a
@@ -156,7 +173,7 @@ gates on it.
 | Check | Catches |
 |---|---|
 | C1 files, C2 include order | A program in one edition and not the other |
-| C3 lang catalogue | A label defined in one language only — an undefined control sequence in exactly one build |
+| C3 lang catalogue | A label defined in one language only — an undefined control sequence in exactly one build. The regex reads `\newcommand*`, `\newcommand\foo`, `\providecommand` and `\DeclareRobustCommand` as well as the plain form: it used to see only `\newcommand{\foo}`, so a one-edition macro written any other way passed |
 | **C4 ordered structural signature** | `\yourturn` moved from frame 2 to frame 3. A histogram cannot see reordering; every Summary back-reference and Quiz route navigates by frame number |
 | C5 labels, C6 answer keys | `T3` must be the *same question* in both, not merely the third one |
 | C7 values | A `\val{}` with no script behind it, and a computed value nothing uses |
@@ -166,7 +183,10 @@ gates on it.
 | C13 verbatim ASCII | The `listings` UTF-8 trap |
 | C14 macro histogram | A `\trapbox` or an `\index` dropped in translation |
 | **C15 main-file wiring** | A main file rewritten with a chapter of front matter dropped |
+| **C16 next-frame cues** | A `\nextframe` where the next frame answers nothing, or missing where the next frame answers. C4 and C14 are both blind to a cue dropped in *both* editions at once |
+| `check_structure.py --frames` | A cue that is not the **last thing** in its frame. C16 counts cues and cannot see position, so a cue misplaced identically in both editions is invisible to C4, C14 and C16 alike. It is a *line* test on purpose: a cue hoisted above a frame's closing prose tokenises to nothing after it and reads as correctly placed |
 | `reflist.py` | `\label{prog:F08}` resolving to F8 in one edition and F9 in the other. Both builds stay internally consistent and neither warns |
+| **`checkpdf.py`** | A frame's rule and margin badge stranded at the foot of a page with the frame's body overleaf. It reads the finished PDF, because that defect produces no error, no warning and no overfull box — no log can see it, and the badge it strands is the book's navigation device |
 
 `tools/gen_stubs.py` regenerates every stub and `structure.tex` from
 `tools/programs.json`, which is the single source of the part and program
@@ -286,16 +306,85 @@ defaults to a couple of points, which is not enough air to read as a separate
 block — and every box carrying its own value is how a page ends up looking
 arbitrary.
 
-**The frame boundary is a rule with the frame's number sitting on it**, like a
-tab on a card. The badge used to be the first thing in the *text flow* instead,
-which reads correctly only when a frame opens with a sentence — and about a
-third of them open with `\ans`, whose box starts a new vertical block, so the
-badge was left stranded alone on the line above with the box beneath it.
-`\mfaframeabove` (17 pt) and `\mfaframebelow` (10 pt) are the gutter, and they
+**The frame boundary is a hairline across the measure, with the frame's number
+in the OUTER margin beside it** — right on a recto, left on a verso, following
+the spread, so a reader thumbing for frame 37 runs a finger down the edge of
+the block and never crosses the text. That is the original
+(`notes/07-stroud-original-layout.md` §3) and the reason is navigational.
+
+The badge is a `\marginnote`, never a `\marginpar`: `\marginpar` floats, takes
+one note per line and defers the rest with *Marginpar on page N moved*, and at
+four to six frames a page that is the normal case. A badge that has moved down
+the page no longer names the rule it belongs to, which is the one thing the
+element exists to do. Loaded `[quiet,noadjust]`, and `noadjust` is load-bearing:
+under the default the note emits a `\strut` into the rule's line, which is
+invisible until the next item is tall enough to clamp the interline glue — and
+about a third of frames open a tcolorbox immediately after the rule. Nothing in
+the preamble may set `\reversemarginpar`; marginnote honours it and would move
+every badge to the *inner* margin silently.
+
+`\marginparwidth` and `\marginparsep` are declared per format in the geometry
+options and asserted at `\begin{document}` against the narrower of the two
+outer margins. Left to the class the margin box is 116 pt wide inside a 51.2 pt
+margin and the badge survives by accident. Do **not** reach for geometry's own
+*the marginal notes overrun the paper* warning as the guard: `\Gm@checkmp` is
+called only under `\ifGm@verbose`, this preamble does not pass `verbose`, and a
+deliberately over-wide setting warns about nothing. The assertion is a hard
+error instead.
+
+`\mfaframeabove` (17 pt) and `\mfaframebelow` (12 pt) are the gutter, and they
 are the most load-bearing numbers in the layout: the frame is the unit the
 reader covers with a hand, and two frames a hairline apart are one block of
 text to the eye no matter what the rule says. Generous above, tighter below, so
-the white space reads as belonging to the frame that follows it.
+the white space reads as belonging to the frame that follows it. `below` went
+from 10 pt to 12 pt when the badge left the flow: the old badge hung off the
+rule's left end and filled that gap, and a bare hairline does not.
+
+**A named frame is a frame with a heading.** `summarybox` and `testexercises`
+call `\mfa@namedframe`, so the Summary and the Test exercises are numbered
+frames and take the two numbers after the last teaching frame — 46 and 47 in
+F1. The Summary's badge is joined by a drawn three-row list icon sitting on the
+rule where the number used to be, and a broken Summary panel carries a
+triangular continuation mark on every piece but the last. `Can you?` and
+`Further problems` are deliberately *not* frames; the reasons are in notes/07.
+
+**The debt ledgers count teaching frames, not printed frames.**
+`check_structure.py`'s `RE_FRAME` and `parity.py`'s frame counter both match
+`\begin{fr}` only, so F1 reports 45 while the reader sees 47. That is correct —
+the 30–70 band is a statement about teaching load and the two closing frames
+are fixed overhead every program pays — but it is a quiet disagreement, so it
+is written down in both tools. Do not "fix" one counter without the other, or
+every program's band shifts by two.
+
+**The next-frame cue is placed by rule, not by taste.** A frame carries
+`\nextframe` **if and only if the next frame opens with `\ans` or
+`\begin{ansblock}`**, ignoring a leading `\label`, which marks a position and
+typesets nothing. That is a mechanical property of the file, so it is inserted
+mechanically and checked mechanically: parity's **C16** fails when a cue sits
+where nothing answers it or is missing where something does, and
+`check_structure.py`'s `RE_DEMANDS` treats the cue as the demand it announces.
+C4 and C14 are both blind to a cue dropped in *both* editions at once, which is
+exactly the failure this repository has been bitten by before.
+
+**The opener's frame range is a two-pass value carried in the `.aux`.** Each
+program writes `\mfaframetotal{key}{n}` at the start of the *next* program and
+at `\end{document}`; the next run reads them all back before anything is
+typeset. A total of `0` is a written measurement, not an absence — it is what
+tells a stub from a program whose total this run has not computed yet. Neither
+the key nor the count may be recomputed at the flush: `\mainnumbering` resets
+the chapter counter between Part I and Part II, and an appendix's `\chapter`
+resets `frameno`. A program with no recorded total prints **nothing** and
+reserves nothing, and raises a rerun warning; it must never print `??`, because
+46 of the 47 programs are stubs and a marker on 46 openers trains the reader to
+ignore it.
+
+**The running head no longer carries the frame number.** It is mirrored as the
+original is: page number **outer**, running title **inner** — the program on
+the verso, its title in italic on the recto — and the foot is empty. Chapter
+openers keep the class's `plain` style, number at the foot and no head, which
+is why the frame-range box is the first thing on the page. The old recto head
+named the last frame *begun* on the page, so it could read `Frame 10` over
+badges 7, 8 and 9; the margin badge names the frame the reader is looking at.
 
 **A program opens between two rules** — a hairline above the PROGRAM Fn line, a
 heavy one under the title — and a part page gets the same treatment one level
@@ -336,6 +425,17 @@ Each cost time; none is obvious from its error message.
   **Use `tools/checklog.py`**, which matches both formats and also fails on an
   overfull vbox and on an hbox over the 15 pt budget.
 
+- **A non-converged build exits 0 with a stale number on the page.** Two things
+  in this book ride through the `.aux` on `\@newl@bel` and are keyed on layout:
+  marginnote's record of which margin each frame badge belongs in, and each
+  program's frame total for the range on its opener. Both can oscillate, and
+  both fail *silently* — the failure is a wrong number, not a missing one,
+  which is the same shape as a console block nobody ran. `Label(s) may have
+  changed` used to be in `checklog.py`'s `WARN_IGNORE`, and `report()` never
+  failed on a warning anyway. It is now in `HARD_WARN` alongside `Rerun to
+  get`, `Marginpar on page` and marginnote's `Consecutive odd/even pages`, and
+  a final log carrying any of them fails the build.
+
 - **`\ifpl` was fragile.** A plain `\newcommand` in a `\part` title lands
   *unexpanded* in the `.toc`, and on read-back the English build died with
   `Extra }, or forgotten \endgroup` while the Polish one survived — a
@@ -370,17 +470,65 @@ Each cost time; none is obvious from its error message.
   probes for `polish.ldf` and `british.ldf` before requesting either. Do not
   simplify this back to a bare `\usepackage`.
 
-- **A rule drawn after a badge draws straight through it.** The frame boundary
-  puts the frame number on the separating rule. Doing it the obvious way round
-  — badge first in an `\rlap`, then the rule — paints a hairline across the
-  digit, which at that size reads as a struck-out number rather than as a badge
-  on a line. The rule goes down first, inside the `\rlap`; the badge is painted
-  over it second. Nothing warns; it just looks wrong.
+- **A rule drawn after a mark draws straight through it.** The frame number is
+  in the margin now, but the Summary's list icon still sits *on* the separating
+  rule and the trap is unchanged for it. Doing it the obvious way round — mark
+  first in an `\rlap`, then the rule — paints a hairline across the glyph,
+  which at that size reads as struck out rather than as a tab on a line. The
+  rule goes down first, inside the `\rlap`; the mark is painted over it second,
+  on a white ground so the hairline is masked either side. Nothing warns; it
+  just looks wrong.
 
-- **Do not guess the badge's vertical shift.** It is centred on the rule with
-  `\sbox0` and `\dimexpr0.3pt-0.5\ht0+0.5\dp0`, measured rather than tuned by
-  eye, because the two formats set 11pt and 12pt from the same source and a
-  hard-coded shift is right in exactly one of them.
+- **Do not guess the vertical shift of anything that sits on the frame rule.**
+  The badge and the Summary icon are each centred by measuring their own box —
+  `\dimexpr0.3pt-0.5\ht<box>+0.5\dp<box>` — never by a fixed offset, because
+  the two formats set 11pt and 12pt from the same source and a hard-coded shift
+  is right in exactly one of them. The badge's own tikz box is 11.94 pt tall at
+  11 pt, so the shift is −5.67 pt there: it is nowhere near zero and it is not
+  guessable. Measure the marginnote's baseline **outside** its `\raisebox` if
+  you ever check this; inside it you measure the raise and get a constant
+  −5.67 pt that looks like a defect and is not.
+
+- **A breakable tcolorbox splits itself, in its own code, and will contribute
+  an empty first piece.** So `\nobreak` before one does not keep a heading with
+  its panel: the rule, the badge, the icon and the word *Summary* end up alone
+  at the foot of a page with the panel overleaf. This is the one service
+  `\section*` was performing for free, through `\@startsection`'s penalty, and
+  it stopped being free the moment the heading stopped being a `\section`.
+  needspace does not fix it either — its trick relies on TeX finding the page
+  overfull and preferring an earlier breakpoint, and on a rigid page every
+  candidate is equally awful, so TeX keeps the material and lets tcolorbox
+  split anyway (measured: 95 pt reserved against 54 pt left, still stranded).
+  Measure `\pagegoal-\pagetotal` and turn the page explicitly — and remember
+  `\pagegoal` is `\maxdimen` on a fresh page, which means *unlimited*, not *no
+  room*; testing it the obvious way turns a page at the top of every program.
+
+- **An over-long `fancyhdr` field does not overfull. It prints on top of the
+  field next to it.** With the page number and a running title sharing one
+  measure, fancyhdr sets an over-wide field at its natural width and overprints:
+  measured at 15 pt of overlap with P25's 82-character title, with zero overfull
+  boxes, zero warnings and exit code 0 from both latexmk and `checklog.py`. The
+  15 pt hbox budget is structurally blind to it. Anything placed in a running
+  head must be width-capped; `\mfaheadmark` measures the box and scales only if
+  it is too wide, reserving 4 em at `\small` so the reserve tracks the point
+  size. This is latent today only because no long-titled program is written.
+
+- **`\usebox0` followed by a space typesets that space.** `\usebox` takes an
+  undelimited argument, so `\usebox0 #1` consumes the `0` and sets the space —
+  3.33 pt of it, measured — through which a hairline shows as a short grey stub
+  that looks like dirt on the page. Write `\usebox{0}#1`, or use a named box.
+
+- **`\marginnote` must be called in horizontal mode**, or it attaches to the
+  wrong baseline. `\framerule` issues it after `\noindent` and the rule's
+  `\rlap`, from the rule's own line, which is what makes the note and the rule
+  share a baseline.
+
+- **`\parfillskip=0pt` leaks unless the `\par` is inside the same group.** The
+  flush-right idiom used by the outcomes' frame range and the Quiz's route boxes
+  sets it; `\teachesat` happened to hide the leak because xstring forces it into
+  a `\begingroup`, and `\teachesatone` had no group, so every later paragraph
+  in the same quiz was set fully justified on its last line with an underfull
+  hbox in the log. Brace the parameter and the `\par` together.
 
 ---
 
@@ -436,6 +584,65 @@ mechanical and it is not optional: those numbers *are* the return index.
 2.40% wrong, which is nothing; `2^80` against `10^24` is 20.89% wrong, which is
 not. It generalises to the per-layer error bound in P2 and to the GB/GiB ladder
 in the same program, so it earns its place three times.
+
+### Stroud layout pass, August 2026
+
+The seven structural elements of the original's page, applied from photographed
+reference (`notes/07-stroud-original-layout.md`) rather than from memory: the
+margin frame badge, the answer box and its next-frame cue, the outcomes panel's
+checkboxes, the Quiz's route boxes, the Summary and Test exercises as named
+frames, the opener's frame range and the mirrored running heads, and the
+tooling that gates all of it.
+
+**Everything but the cue is free.** The badge, the checkboxes, the route boxes,
+the named frames and the frame range together moved no page and added no
+overfull box in any of the four formats. The 33 next-frame cues cost two pages
+per format. That is worth knowing before the remaining 46 programs are written,
+because it is the one element whose cost scales.
+
+**Four things the layout could not have been got right by reading about them.**
+
+1. *A margin badge "would overflow a 17 cm page".* It does not — the whole
+   claim rested on `\marginparwidth` being left at the class default of 116 pt
+   inside a 51.2 pt margin. Declared per format and asserted at
+   `\begin{document}`, a two-digit badge leaves 24.6 pt of clear paper in the
+   trade format and 51.2 pt on A4.
+2. *`halign=center` on the answer box was stretching the maths by 16%* —
+   237.68 pt against 204.20 pt on one measured line, in the shipped PDF, not in
+   a scratch file. `flush center` cannot stretch, so an over-wide answer now
+   overflows visibly and `checklog.py` catches it.
+3. *The checkbox derived on paper sat 0.7 pt low*, because `\fbox` leaves the
+   finished box a depth of exactly `\fboxrule`. A constant 0.7 pt inside an
+   ex-based design is a different fraction of the x-height in each of the two
+   formats. Measured with `\sbox`, as the frame badge already was.
+4. *The Quiz box broke 3 + 9 across a page in BOTH A4 builds*, leaving nine
+   questions and a column of boxed numbers under nothing that said they were
+   frames. `lines before break=12` was measured, not guessed: 8 fixes one A4
+   edition and not the other.
+
+**And one the tooling could not see.** `\nextframe` was invisible to C4 *until
+it was added to `parity.py`'s `BARE` table* — before that the ordered signature
+compared byte-identical with 33 cues inserted. The `BARE` entry is what makes a
+one-edition move visible, and it was verified by mutation: moving a cue between
+frames in one edition, or deleting one from the Polish file alone, now fails on
+two or three checks at once and names the token index. Do not trim it.
+
+A cue dropped from **both** editions at once stays invisible to C4 and to C14
+alike, because nothing diverges. C16 exists for that, and it is written against the *mechanical* rule — a frame carries the cue
+if and only if the next frame opens with an answer — so the cues were inserted
+by script in both editions from the same derivation rather than by hand twice.
+
+**The frame range counts 47, not 45.** The Summary and the Test exercises are
+printed frames, so an opener reading `Frames 1 to 45` would contradict two
+frames the reader can see. The ledgers still count 45 because they count
+teaching frames; that divergence is deliberate and is now written into both
+tools rather than left to be rediscovered.
+
+**Dead code removed:** `\framelabelfix`, defined and never called. The theory it
+rested on — that `\theHframeno` is undefined so frame anchors restart in every
+program — is false: `\newcounter{frameno}[chapter]` gives hyperref a parent and
+the `.aux` is byte-identical with and without it. It was deleted rather than
+wired in, which is what the reviewer who measured it recommended.
 
 ### The evidence, honestly
 
