@@ -1,22 +1,1045 @@
 %% F07 --- Funkcja wykładnicza, logistyczna i funkcje hiperboliczne
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f07_exponential.py i wchodzi przez \val{}. Rachunki, których
+%% program UCZY -- e^0 = 1, sigma(0) = 1/2, tanh(0) = 0, softmax dwóch równych
+%% wyników -- są wpisane wprost, bo czytelnik ma je zrobić sam.
+%%
+%% CZEGO TEN PROGRAM NIE MOŻE PODAWAĆ JAKO NOWEGO. Program F05 daje już funkcję
+%% logistyczną, jej tabelę wartości, symetrię względem (0, 1/2), przecięcie w
+%% -b/w oraz logit; Program F06 już ją odwraca i zamienia jej próg w nierówność.
+%% F07 jest czytelnikowi winien to, czego żaden z nich nie dostarczył: SKĄD
+%% BIERZE SIĘ TEN KSZTAŁT. Sekcja 3 wyprowadza go z szansy, zamiast go
+%% powtarzać, i mówi o tym wprost.
+%%
+%% DWIE TOŻSAMOŚCI są powodem, dla którego to nie jest lista tabel, i obie są w
+%% skrypcie zapewnione asercją na całym zakresie, a nie sprawdzone w punkcie:
+%%   tanh(x) = 2 sigma(2x) - 1, więc tanh to funkcja logistyczna po dwóch z
+%%     czterech ruchów z F05, a kto poznał jedną, poznał obie;
+%%   softmax na DWÓCH wynikach to funkcja logistyczna ich różnicy, więc softmax
+%%     zapowiadany w sekcji 6 wcale nie jest nową funkcją.
+%%
+%% CZEGO STRONA NIE MOŻE POWIEDZIEĆ, i to jest ta jedna linia do zapamiętania.
+%% NIE "gradient znika". To zdanie potrzebuje reguły łańcuchowej, żeby cokolwiek
+%% znaczyć, bo jeden mały czynnik da się przeżyć, a iloczynu czterdziestu nie.
+%% F07 posiada KSZTAŁT -- krzywą sto razy mniej stromą na końcach niż w środku
+%% -- a konsekwencję przekazuje Programowi F12.
+%%
+%% Bliźniak: programs/en/F07-exponential-logistic.tex. Ramka w ramkę, makro w
+%% makro, liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Funkcja wykładnicza, logistyczna i funkcje hiperboliczne}
 \label{prog:F07}
+\index{funkcja wykładnicza!skąd bierze się e}
+\index{funkcja!logistyczna}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{powiedzieć, czym jest liczba $e$ i skąd się bierze, oraz co
+  \enquote{wzrost wykładniczy} orzeka o wielkości, a czego nie}
+\outcome{7--12}{odczytać tempo wzrostu albo zaniku z $e^{kt}$, wyliczyć z
+  niego czas połowicznego zaniku i przeliczać między tempem a mnożnikiem na
+  krok}
+\outcome{13--18}{wyprowadzić krzywą logistyczną z szansy oraz odczytać z samej
+  krzywej jej granice, symetrię i szerokość stromej części}
+\outcome{19--22}{zapisać $\tanh$ przez funkcję logistyczną i powiedzieć, która
+  z nich zachowuje się lepiej i pod jakim względem}
+\outcome{23--26}{powiedzieć, co jednostka w nasyceniu robi ze zmianą swojego
+  argumentu, i podać jedną rzecz, którą zmienia w tym $\relu$}
+\outcome{27--31}{zapisać $\softmax$ jako funkcje wykładnicze podzielone przez
+  ich własną sumę, powiedzieć, czym staje się on na dwóch wynikach, i
+  powiedzieć, dlaczego wolno najpierw odjąć stałą od każdego wyniku}
+\end{outcomes}
 
-Argument: $e^{x}$ is the function that is its own rate of change, and the
-logistic curve is what you get when you squash it into \code{[0,1]}. Payoff:
-sigmoid and tanh drawn rather than recited; saturation seen as the flat part
-of a graph, which is the visual form of the vanishing-gradient complaint;
-\code{softmax} previewed as exponentials divided by their own sum.
+\begin{quiz}
+\item Czym jest $e$, z dokładnością do trzech miejsc po przecinku, i skąd się
+  bierze? \teachesat{2--3}
+  \answerto{$\num{2.718}$. To wartość, na której zatrzymuje się
+  $\left(1 + \frac{1}{n}\right)^{n}$ przy rosnącym $n$ \dash{} odsetki
+  dopisywane coraz częściej do salda, które mimo to nie ucieka.}
+\item Co jest większe dla $x = 5$: $e^{x}$ czy $x^{5}$? \teachesat{4--5}
+  \answerto{$x^{5}$, i to znacznie: $3125$ przeciw
+  $\val{f07.poly.at5.exp}$. Funkcja wykładnicza wyprzedza dopiero w
+  $x = \val{f07.poly.crossover}$.}
+\item Wielkość zanika jak $e^{-kt}$ przy $k = \num{0.05}$. Po jakim czasie
+  zmaleje o połowę? \teachesat{7--8}
+  \answerto{Po $\val{f07.decay.halflife}$, z $\frac{\ln 2}{k}$.}
+\item A ile czasów połowicznego zaniku mija, zanim spadnie do jednej dziesiątej
+  wartości początkowej? \teachesat{9--10}
+  \answerto{$\val{f07.decay.tenth.halflives}$, a nie dziesięć i nie pięć.}
+\item Pokaż, że $\frac{e^{x}}{1 + e^{x}}$ i $\frac{1}{1 + e^{-x}}$ to ta sama
+  funkcja. \teachesat{13--14}
+  \answerto{Podziel licznik i mianownik pierwszej przez $e^{x}$.}
+\item Do czego dąży $\sigma(x)$, gdy $x$ rośnie, a do czego, gdy $x$ maleje?
+  \teachesat{14--15}
+  \answerto{Do $1$ i do $0$, i nie osiąga żadnej z nich, bo $e^{-x}$ nigdy nie
+  jest zerem ani nieskończonością.}
+\item Zapisz $\tanh$ przez $e^{x}$ i $e^{-x}$. \teachesatone{19}
+  \answerto{$\tanh x = \frac{e^{x} - e^{-x}}{e^{x} + e^{-x}}$.}
+\item Policz $\tanh(1)$ oraz $2\sigma(2) - 1$. Co zauważasz?
+  \teachesat{19--20}
+  \answerto{Oba wynoszą $\val{f07.tanh.1}$. $\tanh$ to funkcja logistyczna
+  podwojona na wysokość i zsunięta w dół o jeden.}
+\item Co nasyca się mocniej, funkcja logistyczna czy $\tanh$? \teachesat{21--22}
+  \answerto{$\tanh$. Jego stromość spada z $\val{f07.tanh.slope0}$ do
+  $\val{f07.tanh.slope2}$ na dwóch jednostkach; stromość funkcji logistycznej
+  spada z $\val{f07.slope.0}$ do $\val{f07.slope.2}$.}
+\item Dlaczego zatem wolano $\tanh$ od funkcji logistycznej?
+  \teachesat{20--21}
+  \answerto{Bo jest wyśrodkowany na zerze, a funkcja logistyczna nie. To
+  twierdzenie o tym, gdzie leżą jego wartości, a nie o tym, jak łagodnie się
+  wygina.}
+\item Mniej więcej ile razy mniej stroma jest funkcja logistyczna sześć
+  jednostek od środka niż w nim? \teachesat{17--18}
+  \answerto{Około $\val{f07.slope.ratio6}$ razy.}
+\item Co $\relu$ zmienia w kwestii nasycenia? \teachesat{24--25}
+  \answerto{Usuwa je po jednej stronie: powyżej zera wykres jest prostą o
+  stałej stromości i nigdy się nie spłaszcza.}
+\item Zapisz $\softmax$ dla $n$ wyników. \teachesatone{27}
+  \answerto{$\softmax(z)_j = \frac{e^{z_j}}{\sum_k e^{z_k}}$ \dash{} funkcje
+  wykładnicze podzielone przez ich własną sumę.}
+\item Zastosuj $\softmax$ tylko do dwóch wyników, $a$ i $b$. Co dostajesz?
+  \teachesat{28--29}
+  \answerto{$\sigma(a - b)$ dla pierwszego i $\sigma(b - a)$ dla drugiego. Na
+  dwóch wynikach softmax jest funkcją logistyczną.}
+\item Dlaczego wolno odjąć największy wynik od każdego wyniku przed
+  potęgowaniem? \teachesat{29--30}
+  \answerto{Bo stała dodana do każdego wyniku skraca się między licznikiem a
+  mianownikiem, więc wynik się nie zmienia \dash{} a funkcje wykładnicze
+  robią się na tyle małe, że da się je policzyć.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 40 ramek.
-}
+% ============================================================
+\section{Skąd bierze się liczba \texorpdfstring{$e$}{e}}
+\label{sec:F07-e}
+\index{funkcja wykładnicza!procent składany}
+
+\begin{fr}
+Włóż jedną złotówkę na konto, które przez rok płaci sto procent odsetek.
+Wypłacone raz, na koniec, kończysz z $2$.
+
+Teraz niech odsetki będą wypłacane dwa razy, po połowie za każdym razem. Po
+pół roku masz $\num{1.5}$, a druga wypłata to połowa \emph{tego}, więc
+kończysz z $\num{1.5} \times \num{1.5} = \num{2.25}$. Wypłacanie ich częściej
+jest warte więcej, bo odsetki zaczynają zarabiać odsetki.
+
+Wzór to
+\[ \left(1 + \frac{1}{n}\right)^{n} \]
+dla odsetek wypłacanych $n$ razy.
+
+Co dostaniesz, jeśli będą wypłacane co miesiąc \dash{} czyli przy $n = 12$?
+Wystarczy odpowiedź przybliżona; pytanie brzmi, czy to bliżej $2$, bliżej $3$,
+czy powyżej $3$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f07.compound.12}$}
+Bliżej trzech niż dwóch i nie powyżej trzech. Idź dalej:
+
+\begin{center}
+\begin{tabular}{rc}
+\toprule
+$n$ & $\left(1 + \frac{1}{n}\right)^{n}$ \\
+\midrule
+$1$ & \val{f07.compound.1} \\
+$2$ & \val{f07.compound.2} \\
+$12$ & \val{f07.compound.12} \\
+$365$ & \val{f07.compound.365} \\
+$1\,000\,000$ & \val{f07.compound.1000000} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Wypłacanie odsetek milion razy w roku jest warte niemal dokładnie tyle, co
+wypłacanie ich codziennie. Kolumna rośnie i zwalnia.
+
+Czy rośnie w nieskończoność?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie}
+Zatrzymuje się. Każdy wiersz jest większy od tego nad nim i każdy leży poniżej
+jednej konkretnej liczby, a ciąg, który rośnie, ale jest trzymany pod sufitem,
+nie ma dokąd pójść poza tym sufitem. Ta liczba to
+\[ e = \val{f07.e}\ldots \]
+i jest liczbą dokładnie w tym sensie, w jakim liczbą jest $\pi$: nie procesem,
+nie przybliżeniem czegoś innego i nie liczbą wymierną.
+
+Zatem $e^{x}$ znaczy to, co znaczą $2^{x}$ i $10^{x}$, tylko z mniej wygodną
+podstawą. Wszystkie prawa działań na potęgach z Programu~\ref{prog:F01}
+obowiązują bez zmian, a w szczególności $e^{0} = 1$, czyli pusty iloczyn, za
+którym argumentował Program~\ref{prog:F04}. Funkcję zapisuje się też
+$\exp(x)$ i to ten zapis spotkasz w kodzie.
+
+Która z funkcji $2^{x}$, $e^{x}$ i $3^{x}$ rośnie najszybciej dla dużych $x$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$3^{x}$}
+Im większa podstawa, tym szybszy wzrost, a $e$ leży między $2$ a $3$. Zatem
+$e$ nie jest podstawą rosnącą najszybciej i nic w wielkości $e$ nie stanowi o
+jego wyjątkowości.
+
+\begin{rigourbox}
+O wyjątkowości $e$ stanowi twierdzenie o jego \emph{tempie zmiany}: stromość
+$e^{x}$ w dowolnym punkcie równa się wysokości $e^{x}$ w tym punkcie, a $e$
+jest jedyną podstawą, dla której to zachodzi.
+
+Ten program to stwierdza i tego nie dowodzi, bo dowód potrzebuje definicji
+stromości, którą dostarcza Program~\ref{prog:F11}, a której używa
+Program~\ref{prog:F12}. To, co możesz zrobić tutaj, to wziąć konsekwencję:
+wielkość rosnąca wykładniczo to taka, której wzrost w każdej chwili jest
+proporcjonalny do tego, ile jej już jest.
+\end{rigourbox}
+
+Teraz jedno na szybko. Bez liczenia i bez sprawdzania.
+
+\textbf{Co jest większe dla $x = 5$: $e^{x}$ czy $x^{5}$?}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x^{5}$, i nie jest blisko}
+$5^{5} = 3125$ przeciw $e^{5} = \val{f07.poly.at5.exp}$. Wielomian jest
+$\val{f07.poly.at5.ratio}$ razy większy.
+
+\begin{trapbox}
+\textbf{\enquote{Wykładniczy} to twierdzenie o mechanizmie, a nie o
+szybkości.} Mówi, że wzrost w każdej chwili jest proporcjonalny do bieżącego
+rozmiaru. Nie mówi, że wielkość jest duża, ani że jest większa od czegoś
+innego, ani że rośnie teraz szybko.
+
+$e^{x}$ nie wyprzedza $x^{5}$ aż do $x = \val{f07.poly.crossover}$, a do tego
+miejsca wielomian prowadzi nawet dwudziestokrotnie. Ktoś, kto opisuje wielkość
+jako rosnącą wykładniczo, powiedział ci, jaki kształt ma krzywa, i zupełnie
+nic o tym, w którym jej miejscu stoi.
+
+Prawdą jest natomiast to, co czyni to słowo wartym używania, czyli drugi
+koniec: kiedy funkcja wykładnicza już wyprzedzi, nigdy nie wraca. Żaden
+wielomian żadnego stopnia nie utrzyma się przed $e^{x}$ na zawsze, a punkt
+wyprzedzenia przesuwa się jedynie dalej, gdy stopień rośnie.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Mechanizm wart jest jeszcze jednej ramki, bo to on jest znaczeniem tego słowa i
+da się go sprawdzić bez żadnego rachunku różniczkowego.
+
+Weź $x^{5}$ dla $x = 2$ i dla $x = 4$: idzie z $32$ na $1024$, czyli $32$ razy.
+Weź je z $4$ na $8$: z $1024$ na $32768$, znowu $32$ razy. \emph{Podwojenie
+argumentu} mnoży potęgę przez ustaloną liczbę.
+
+Teraz $e^{x}$. Z $x = 2$ na $x = 3$ mnoży się przez $e$; z $3$ na $4$ znowu
+przez $e$. \emph{Dodanie ustalonej wielkości do argumentu} mnoży funkcję
+wykładniczą przez ustaloną liczbę.
+
+Na tym polega cała różnica i dlatego obie krzywe muszą się w końcu przeciąć,
+jakikolwiek byłby wykładnik: funkcja wykładnicza zyskuje stały czynnik na
+każdy krok wzdłuż osi, a czynnik wielomianu na krok maleje, im dalej idziesz.
+\end{fr}
+
+\mermaidfig{f07-e-arrives}{Odsetki wypłacane coraz częściej od tego samego
+salda. Suma rośnie, zwalnia i zatrzymuje się na pewnej liczbie.}{skąd bierze
+się e}
+
+% ============================================================
+\section{Wzrost, zanik i czas połowicznego zaniku}
+\label{sec:F07-decay}
+\index{funkcja wykładnicza!zanik}
+
+\begin{fr}
+Wstaw stałą w wykładnik, a możesz ustawić tempo:
+\[ y = y_0\,e^{kt} \]
+$y_0$ to punkt startu wielkości, bo $e^{0} = 1$. Dodatnie $k$ daje wzrost, a
+ujemne $k$ zanik, i to wielkość $k$ mówi, jak szybko.
+
+Przypadek zanikający spotkałeś, niekoniecznie go nazywając. Współczynnik
+uczenia schodzony gładko w trakcie treningu to
+\[ \eta(t) = \eta_0\,e^{-kt} \]
+a przy $k = \num{0.05}$ to współczynnik spadający na początku o mniej więcej
+pięć procent na krok.
+
+Po ilu krokach współczynnik uczenia jest połową tego, od czego zaczął?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Po $\val{f07.decay.halflife}$ krokach}
+Przyrównaj $e^{-kt} = \frac{1}{2}$, zlogarytmuj obie strony, jak pokazał
+Program~\ref{prog:F03}, i dostaniesz $t = \frac{\ln 2}{k}$. To cofanie z
+Programu~\ref{prog:F06} z logarytmem w miejscu dzielenia.
+
+Zwróć uwagę, czego w tym wzorze \emph{nie ma}: $\eta_0$. Czas połowicznego
+zaniku nie zależy od tego, gdzie wielkość zaczęła, więc współczynnik spadający
+z $\num{0.1}$ i współczynnik spadający z $\num{0.001}$ potrzebują dokładnie
+tylu samo kroków, żeby zmaleć o połowę. \code{code/f07\_exponential.py}
+sprawdza to dla trzech różnych wartości początkowych.
+
+Po ilu krokach współczynnik jest jedną dziesiątą tego, od czego zaczął?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Po $\val{f07.decay.tenth}$ krokach}
+Z $t = \frac{\ln 10}{k}$, tą samą drogą.
+
+Teraz zestaw obie liczby. Uzupełnij lukę: dojście do jednej dziesiątej zajmuje
+\blank\ czasów połowicznego zaniku.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{f07.decay.tenth.halflives}$.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Nie dziesięć i nie pięć.} Obie błędne odpowiedzi biorą się z
+przeniesienia liniowej intuicji na stosunek: dziesięć razy mniej wydaje się
+dziesięcioma połowieniami albo może pięcioma, bo dwa połowienia dają ćwiartkę.
+
+W rzeczywistości jest to $\frac{\ln 10}{\ln 2} = \logb{2} 10$, a powód jest
+ten z Programu~\ref{prog:F03}: każdy czas połowicznego zaniku dzieli przez
+$2$, więc $m$ z nich dzieli przez $2^{m}$, a ty chcesz $2^{m} = 10$.
+
+Program~\ref{prog:F01} podaje $2^{10} \approx 10^{3}$, a to jest ten sam
+fakt z drugiej strony \dash{} dziesięć połowień prowadzi do mniej więcej
+jednej tysięcznej, a nie jednej dziesiątej \dash{} i warto mieć oba kierunki
+tego faktu, bo zawsze potrzebny jest jeden z nich.
+\end{trapbox}
+
+Po $t = 100$ krokach jaka część początkowego współczynnika zostaje?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f07.decay.at100}$}
+Około dwóch trzecich jednego procenta, z $e^{-5}$.
+
+Jedno przeliczenie warto mieć, bo ten sam harmonogram zapisuje się na oba
+sposoby, a wyglądają zupełnie inaczej. Współczynnik mnożony przez $\gamma$ na
+każdym kroku to
+\[ \eta_t = \eta_0\,\gamma^{t} = \eta_0\,e^{t\ln\gamma} \]
+na mocy tego, co Program~\ref{prog:F03} podaje jako
+$\gamma = e^{\ln\gamma}$. Zatem mnożnik na krok $\gamma$ to to samo, co tempo
+$k = -\ln\gamma$.
+
+Przy $\gamma = \num{0.99}$, ile wynosi $k$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Około $\num{0.01}$}
+Bo $-\ln(\num{0.99}) = \num{0.01005}$, a dla $\gamma$ bliskiego $1$ tempo jest
+niemal dokładnie równe $1 - \gamma$. To przybliżenie jest wystarczająco dobre,
+żeby na nim rozumować, i to ono sprawia, że obie postacie tak łatwo pomylić:
+przy $\gamma = \num{0.99}$ zgadzają się do trzech miejsc po przecinku.
+
+\begin{aibox}
+Dwa harmonogramy opisane jako \enquote{mnóż przez $\num{0.99}$ na każdym
+kroku} i \enquote{zanikaj w tempie $\num{0.01}$} to ten sam harmonogram, a
+przeliczenie to jeden logarytm. Dwa opisane jako \enquote{mnóż przez
+$\num{0.5}$ na każdym kroku} i \enquote{zanikaj w tempie $\num{0.5}$}
+\emph{nie} są tym samym: $-\ln(\num{0.5}) = \num{0.693}$, więc drugi zanika o
+połowę szybciej niż pierwszy.
+
+Przybliżenie $k \approx 1 - \gamma$, które godzi pierwszą parę, jest dobre
+tylko blisko $\gamma = 1$, czyli tam, gdzie harmonogramy zwykle żyją, i
+dokładnie dlatego rozbieżność pozostaje niezauważona, dopóki ktoś nie ustawi
+agresywnego.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Ściśnięcie jej do prawdopodobieństwa}
+\label{sec:F07-logistic}
+\index{funkcja!logistyczna}
+\index{szansa!a funkcja logistyczna}
+
+\begin{fr}
+Programy~\ref{prog:F05} i~\ref{prog:F06} używały funkcji logistycznej i żaden
+nie powiedział, skąd bierze się jej kształt. Bierze się z szansy.
+
+Załóżmy, że szansa na coś wynosi $e^{x}$ do jednego \dash{} co jest po prostu
+sposobem, żeby $x$ przebiegało wszystkie liczby rzeczywiste, a szansa
+pozostawała dodatnia, bo $e^{x}$ nigdy nie jest zerem ani liczbą ujemną.
+Szansa $a$ do $1$ znaczy prawdopodobieństwo $\frac{a}{a+1}$, więc
+\[ p = \frac{e^{x}}{1 + e^{x}} \]
+
+To jest funkcja logistyczna i nie jest to oczywiście ta postać, której
+używałeś. Pokaż, że to to samo co $\frac{1}{1 + e^{-x}}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Podziel licznik i mianownik pierwszej przez $e^{x}$:
+$\frac{e^{x}}{1 + e^{x}} = \frac{1}{e^{-x} + 1}$.
+\end{ansblock}
+
+Obie postacie są w użyciu i warto rozpoznawać każdą, bo artykuł piszący jedną
+i kod piszący drugą robią to samo.
+
+Wyprowadzenie tłumaczy też kształt bez żadnego szkicowania krzywych. Gdy $x$
+biegnie od bardzo ujemnych do bardzo dodatnich, szansa biegnie od prawie zera
+do ogromnej, a prawdopodobieństwo zbudowane z szansy jest ściśnięte do $0$ na
+jednym końcu i do $1$ na drugim. Płaskość nie jest cechą, którą ktoś dodał;
+jest tym, co wielkość ograniczona musi robić.
+
+Do czego dąży $\sigma(x)$, gdy $x$ rośnie bez ograniczeń, a do czego, gdy $x$
+maleje bez ograniczeń?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Do $1$ i do $0$, i nie osiąga żadnej z nich.
+\end{ansblock}
+
+Bo $e^{-x}$ spada ku zeru, ale nigdy nie jest zerem, więc
+$\frac{1}{1+e^{-x}}$ wspina się ku $1$, ale nigdy nie jest $1$; a $e^{-x}$
+rośnie bez ograniczeń, ale nigdy nie jest nieskończonością, więc ułamek spada
+ku $0$, nie docierając.
+
+\begin{note}
+\emph{Dąży, ale nie osiąga} nie jest tu pedanterią, tylko faktem, który
+spotkasz jako liczbę. Wartość logistyczna nigdy nie jest dokładnie $1$, więc
+$\ln(1 - p)$ jest zawsze określony w arytmetyce dokładnej \dash{} a w
+arytmetyce zmiennoprzecinkowej nie jest, bo $\sigma$ zaokrągla się do
+dokładnie $\num{1.0}$ od $x = \val{f07.sig.saturates}$ w górę. Program~\ref{prog:P02}
+zajmuje się konsekwencją; tutaj należy to, że matematyka i arytmetyka się nie
+zgadzają i że ta niezgoda ma swoje miejsce.
+\end{note}
+
+Program~\ref{prog:F05} zauważył z tabeli, że $\sigma(-2)$ i $\sigma(2)$ dodają
+się do $1$. Korzystając z postaci przez szansę, powiedz dlaczego.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo szansa $e^{x}$ do $1$ \emph{za} to szansa $1$ do $e^{x}$ \emph{przeciw},
+czyli $e^{-x}$ do $1$ w drugą stronę.
+\end{ansblock}
+
+Zmiana znaku $x$ zamienia to, na który wynik podajesz szansę, a dwa
+prawdopodobieństwa pytania o dwóch wynikach dodają się do $1$. Zatem
+$\sigma(-x) = 1 - \sigma(x)$ nie jest algebraicznym przypadkiem, tylko tą
+zamianą zapisaną.
+
+Funkcja odwrotna wynika z tego samego odczytu, a Program~\ref{prog:F06} już ją
+wyprowadził: cofnięcie $p = \frac{e^{x}}{1+e^{x}}$ daje
+\[ x = \ln\!\left(\frac{p}{1-p}\right) \]
+\dash{} logarytm szansy, i dlatego równie często nazywa się to logarytmem
+szansy, co logitem.
+
+Zatem te trzy obiekty to jeden obiekt widziany na trzy sposoby: $x$ to
+logarytm szansy, $e^{x}$ to szansa, a $\sigma(x)$ to prawdopodobieństwo.
+
+Teraz kształt. Czy krzywa jest płaska wszędzie poza, powiedzmy, $x = \pm 2$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie}
+Jest płaśni\emph{ejsza}, a o ile płaśniejsza, zasługuje na liczbę, a nie na
+przymiotnik. Zmierz stromość \dash{} o ile podnosi się wartość przy małym
+podniesieniu argumentu \dash{} w kilku miejscach:
+
+\begin{center}
+\begin{tabular}{rc}
+\toprule
+$x$ & stromość $\sigma$ \\
+\midrule
+$0$ & \val{f07.slope.0} \\
+$1$ & \val{f07.slope.1} \\
+$2$ & \val{f07.slope.2} \\
+$4$ & \val{f07.slope.4} \\
+$6$ & \val{f07.slope.6} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Dla $x = 2$ krzywa robi jeszcze $\val{f07.slope.2}$, czyli niewiele mniej niż
+połowę swojej największej stromości. Dopiero od $4$ w górę przestaje
+znacząco się ruszać.
+
+Największa wartość w tej kolumnie to $\val{f07.slope.0}$, w środku, i jest to
+dokładnie jedna czwarta. Ile wynosi stromość w $x = 6$ jako ułamek stromości w
+$0$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Około jedną $\val{f07.slope.ratio6}$-tą.
+\end{ansblock}
+
+Sześć jednostek od środka ta sama zmiana argumentu kupuje mniej więcej setną
+część zmiany wartości. To jest liczba, na której zbudowana jest sekcja 5, i
+całe znaczenie słowa \emph{nasycenie}.
+
+Dwie rzeczy o tej ćwiartce warto zatrzymać. Jest to najwięcej, ile funkcja
+logistyczna kiedykolwiek osiąga, więc zmiana argumentu o jeden nigdy nie
+zmienia wartości o więcej niż mniej więcej ćwiartkę \dash{} krzywa jest
+łagodna nawet tam, gdzie jest najbardziej stroma. I leży w $x = 0$, czyli tam,
+gdzie $\sigma$ odczytuje połowę, więc \textbf{jednostka jest najbardziej
+czuła dokładnie wtedy, gdy jest najmniej pewna.}
+\end{fr}
+
+% ============================================================
+\section{\texorpdfstring{$\tanh$}{tanh} to ta sama krzywa}
+\label{sec:F07-tanh}
+\index{funkcja!tangens hiperboliczny}
+
+\begin{fr}
+Tangens hiperboliczny to
+\[ \tanh x = \frac{e^{x} - e^{-x}}{e^{x} + e^{-x}} \]
+i jest to druga funkcja aktywacji z czasów przed $\relu$.
+
+Jego wartości, dla porównania z logistycznymi:
+
+\begin{center}
+\begin{tabular}{rc}
+\toprule
+$x$ & $\tanh x$ \\
+\midrule
+$-2$ & \val{f07.tanh.m2} \\
+$-1$ & \val{f07.tanh.m1} \\
+$0$ & \val{f07.tanh.0} \\
+$1$ & \val{f07.tanh.1} \\
+$2$ & \val{f07.tanh.2} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Jest zerem w zerze, jest nieparzysty \dash{} $\tanh(-x) = -\tanh(x)$, co
+nazwał Program~\ref{prog:F05} \dash{} i biegnie między $-1$ a $1$.
+
+Porównaj teraz $\tanh(1) = \val{f07.tanh.1}$ z liczbą, którą daje
+$2\sigma(2) - 1$, przy $\sigma(2) = \val{f05.sig.2}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$2 \times \val{f05.sig.2} - 1 = \val{f07.tanh.1}$. To ta sama liczba.
+\end{ansblock}
+
+I nie przez przypadek:
+\[ \tanh x = 2\,\sigma(2x) - 1 \]
+co \code{code/f07\_exponential.py} sprawdza na czterystu punktach i
+weryfikuje względem drugiej implementacji na czterech tysiącach, z największą
+rozbieżnością $\val{f07.tanh.identity.err}$.
+
+Przeczytaj prawą stronę tak, jak uczył Program~\ref{prog:F05}. $2x$ w nawiasie
+ściska krzywą poziomo dwukrotnie; $2$ poza nawiasem rozciąga ją do podwójnej
+wysokości; $-1$ zsuwa ją w dół o jeden. Trzy z czterech ruchów, a wychodzi
+krzywa biegnąca od $-1$ do $1$ zamiast od $0$ do $1$.
+
+\textbf{Zatem $\tanh$ nie jest drugą funkcją do nauczenia.} Jest przeskalowaną
+funkcją logistyczną, a każda własność jednej jest własnością drugiej z
+przesuniętymi liczbami.
+
+Skoro tak, to po co istnieją obie?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Ze względu na to, gdzie leżą ich wartości: $\tanh$ jest wyśrodkowany na zerze,
+a funkcja logistyczna na połowie.
+\end{ansblock}
+
+Warstwa, której wszystkie wartości są dodatnie, wysyła do następnej warstwy
+sygnał systematycznie jednoznakowy, a warstwa, której wartości leżą po obu
+stronach zera, nie. To był argument za $\tanh$ przeciw funkcji logistycznej w
+warstwach ukrytych i jest to argument o \emph{położeniu} wartości i o niczym
+innym.
+
+Stąd łatwo zsunąć się w drugie przekonanie. Odpowiedz na to szybko:
+\textbf{czy $\tanh$ nasyca się też łagodniej niż funkcja logistyczna?}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie. Nasyca się mocniej}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+& w $x = 0$ & w $x = 2$ & stosunek \\
+\midrule
+logistyczna & \val{f07.slope.0} & \val{f07.slope.2} & około $2$ \\
+$\tanh$ & \val{f07.tanh.slope0} & \val{f07.tanh.slope2} & około $14$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{trapbox}
+\textbf{$\tanh$ jest bardziej stromy w środku i bardziej płaski na końcach, i
+to właśnie znaczy \enquote{nasyca się mocniej}.} Jego stromość zaczyna od $1$,
+a nie od ćwiartki, a dwie jednostki dalej stracił mniej więcej czternaście
+razy, gdzie funkcja logistyczna straciła mniej więcej dwa.
+
+Wynika to z tożsamości, a nie jest osobnym faktem. Ściśnięcie krzywej poziomo
+dwukrotnie czyni ją dwa razy bardziej stromą; rozciągnięcie pionowo dwukrotnie
+czyni ją dwa razy bardziej stromą jeszcze raz; więc $\tanh$ ma w środku
+czterokrotną stromość funkcji logistycznej \dash{} cztery ćwiartki, czyli $1$.
+To samo ściśnięcie przysuwa jego płaski obszar czterokrotnie bliżej.
+
+Argument za $\tanh$ zawsze dotyczył wyśrodkowania na zerze. Nikt nie twierdził,
+że wygina się łagodniej, i nie wygina.
+\end{trapbox}
+\end{fr}
+
+\mermaidfig{f07-one-curve}{Dwa ruchy z Programu~\ref{prog:F05} przeprowadzają
+jedną krzywą w drugą, więc $\tanh$ to funkcja logistyczna po zmianie
+skali.}{tanh to przesunięta funkcja logistyczna}
+
+% ============================================================
+\section{Nasycenie i jego koszt}
+\label{sec:F07-saturation}
+\index{nasycenie!funkcji aktywacji}
+
+\begin{fr}
+Jednostka jest \textbf{nasycona}, gdy jej argument wyprowadził ją na płaską
+część krzywej. To słowo opisuje położenie, a nie usterkę: nie ma nic złego w
+jednostce odczytującej $\num{0.999}$, a jeśli poprawna odpowiedź jest bliska
+jedynki, to właśnie tam powinna być.
+
+To, co jest prawdą o jednostce nasyconej, jest węższe i jest liczbą z
+poprzedniej sekcji. Sześć jednostek dalej funkcja logistyczna odpowiada na
+zmianę argumentu mniej więcej $\val{f07.slope.ratio6}$-tą częścią zmiany
+wartości, którą dałaby w środku. Cztery jednostki dalej to mniej więcej
+$\val{f07.slope.ratio4}$-ta część.
+
+Jednostka nie jest więc zepsuta ani zablokowana. Jest \emph{cicha}: melduje
+prawie to samo, cokolwiek jej zrobisz, w rozsądnych granicach.
+
+Co by to zrobiło procesowi, który uczy się, patrząc, jak zmienia się wartość
+przy poruszeniu argumentu?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie miałby prawie na co patrzeć.
+\end{ansblock}
+
+Poruszenie daje setną część odpowiedzi, którą dałoby w środku, więc
+jakikolwiek sygnał napędza zmianę, przychodzi sto razy mniejszy.
+
+\begin{rigourbox}
+I na tym ten program się zatrzymuje, a powściągliwość jest zamierzona.
+
+\textbf{To jeszcze nie jest problem znikającego gradientu.} Czynnik jednej
+setnej w jednej warstwie da się przeżyć; czego przeżyć się nie da, to ten sam
+czynnik przychodzący raz na warstwę i \emph{mnożący się}, a mnożenie jest tą
+częścią, która potrzebuje reguły łańcuchowej. Dostarcza jej
+Program~\ref{prog:F12} i dopiero tam zdanie \enquote{gradient znika} niesie
+znaczenie, które mu się przypisuje.
+
+Stąd możesz wziąć kształt i liczbę: ta krzywa jest na końcach mniej więcej sto
+razy mniej czuła niż w środku, a sieć zbudowana z takich krzywych ma własność,
+która kumuluje się z głębokością. Kumulacja należy do F12.
+\end{rigourbox}
+
+Program~\ref{prog:F05} narysował $\relu$ jako pół litery V. Co jego prawa
+połowa robi z tym wszystkim?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Zupełnie nic, i o to chodzi}
+Powyżej zera $\relu(x) = x$ jest prostą o stałej stromości. Porusz argument o
+tyle a tyle, a wartość przesunie się dokładnie o tyle, i to zarówno w $x = 1$,
+jak i w $x = 100$. Po tej stronie nie ma części płaskiej, więc nie ma
+nasycenia i nie ma się co kumulować.
+
+Poniżej zera jest płaska w całości, co jest ostrzejszą wersją tego samego
+problemu, a nie ucieczką od niego \dash{} jednostka siedząca tam nie
+odpowiada nic zamiast odpowiadać słabo. Ta funkcja zamienia więc łagodną
+niewrażliwość na obu końcach na doskonałą czułość po jednej stronie i
+doskonałą niewrażliwość po drugiej.
+
+\begin{aibox}
+To jest cały powód, dla którego $\relu$ wyparł $\tanh$ w sieciach głębokich, a
+argument mieści się w linijce, gdy ma się powyższe liczby: $\tanh$ traci
+mniej więcej czternastokrotnie na dwóch jednostkach po obu stronach zera, a
+$\relu$ nie traci nic na całej swojej dodatniej połowie.
+
+Zauważ, czym ten argument nie jest. Nie jest tym, że $\relu$ jest gładszy,
+prostszy czy lepiej się zachowuje \dash{} ma narożnik tam, gdzie $\tanh$ jest
+gładki, i martwą połowę tam, gdzie $\tanh$ jest tylko cichy. Jest tym, że sieć
+jest złożeniem, a czynnik mnożący się raz na warstwę to jedyna własność, którą
+głębokość czyni kosztowną.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jedno ostrzeżenie na odchodne, bo jest lustrzanym odbiciem pułapki z sekcji 4 i
+równie łatwo je nabyć.
+
+\textbf{Nasycenie nie jest powodem, żeby unikać funkcji logistycznej na
+wyjściu.} Ostatnia warstwa klasyfikatora ma produkować prawdopodobieństwo, to
+płaskość utrzymuje je wewnątrz $\intcc{0}{1}$, a pewne odpowiedzi, które te
+płaskie części reprezentują, to odpowiedzi, o które ci chodziło.
+
+Skarga dotyczy funkcji logistycznej w warstwach \emph{ukrytych}, ułożonych
+jedna na drugiej, gdzie płaskość się kumuluje i niczego nie kupuje. To są dwa
+różne argumenty o tej samej funkcji w dwóch różnych miejscach, a drugi nie
+jest dowodem na pierwszy.
+\end{fr}
+
+\mermaidfig{f07-saturation}{Ta sama zmiana argumentu, zastosowana w środku
+krzywej i na jej końcu.}{ile kosztuje nasycenie}
+
+% ============================================================
+\section{Softmax, zapowiedź}
+\label{sec:F07-softmax}
+\index{softmax!jako funkcje wykładnicze przez ich sumę}
+
+\begin{fr}
+Wszystko do tej pory zamieniało jedną liczbę w jedną liczbę. Klasyfikator o
+więcej niż dwóch odpowiedziach musi zamienić \emph{listę} wyników w listę
+prawdopodobieństw, a standardowym sposobem jest
+\[ \softmax(z)_j = \frac{e^{z_j}}{\sum_k e^{z_k}} \]
+
+Przeczytaj to jako trzy kroki, które już masz. Potraktuj każdy wynik funkcją
+wykładniczą, co czyni je wszystkie dodatnimi i jest odczytem przez szansę z
+sekcji 3. Dodaj je, co jest sigmą z Programu~\ref{prog:F04}. Podziel każdy
+przez tę sumę, co zmusza je do dodawania się do $1$ i czyni z nich rozkład
+prawdopodobieństwa.
+
+Weź wyniki $z = (\num{2.0}, \num{0.5})$. Policz $\softmax(z)$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(\val{f07.softmax2.a},\ \val{f07.softmax2.b})$.
+\end{ansblock}
+
+Z $\frac{e^{2}}{e^{2} + e^{\num{0.5}}}$ i jego partnera, a dodają się do $1$, jak
+muszą.
+
+Spójrz teraz jeszcze raz na tę pierwszą liczbę. To $\sigma(\num{1.5})$
+\dash{} funkcja logistyczna policzona w \emph{różnicy} obu wyników, którą
+Program~\ref{prog:F06} kazał ci liczyć jako $\num{1.5}$ ze zgłoszenia
+$\num{0.8}$.
+
+Pokaż, że to jest ogólne: zastosuj $\softmax$ do dwóch wyników $a$ i $b$ i
+uprość pierwszą składową.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \frac{e^{a}}{e^{a} + e^{b}}
+   = \frac{1}{1 + e^{b-a}} = \sigma(a - b) \]
+\end{ansblock}
+
+Podziel licznik i mianownik przez $e^{a}$, dokładnie jak w sekcji 3.
+
+\textbf{Zatem softmax na dwóch wynikach to funkcja logistyczna, a softmax nie
+jest nową funkcją \dash{} jest tą, którą już masz, uogólnioną poza dwa.}
+\code{code/f07\_exponential.py} sprawdza to dla każdej pary na siatce, z
+największą rozbieżnością $\val{f07.softmax2.err}$.
+
+To rozstrzyga też pytanie zadawane o klasyfikatory binarne: czy użyć jednego
+wyjścia z funkcją logistyczną, czy dwóch z softmaksem. Matematycznie to ten
+sam model, bo dwuwynikowy softmax zależy tylko od $a - b$, a pojedyncze
+wyjście logistyczne jest tą różnicą, której nadano nazwę.
+
+Została jedna własność i to ona czyni softmax używalnym. $e^{20}$ to około pół
+miliarda, a $e^{800}$ nie jest liczbą, którą maszyna utrzyma. Co można zrobić
+najpierw z wynikami, żeby funkcje wykładnicze zostały małe?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Odjąć od wszystkich największy z nich.
+\end{ansblock}
+
+Wtedy największy wynik staje się $0$, jego funkcja wykładnicza staje się $1$, a
+każda inna leży gdzieś między $0$ a $1$. Nic nie może się przepełnić.
+
+I nie zmienia to żadnej odpowiedzi, a tę część trzeba pokazać, a nie mieć
+nadzieję:
+\[ \frac{e^{z_j - c}}{\sum_k e^{z_k - c}}
+   = \frac{e^{-c}\,e^{z_j}}{e^{-c}\sum_k e^{z_k}}
+   = \frac{e^{z_j}}{\sum_k e^{z_k}} \]
+$e^{-c}$ jest stałym czynnikiem przy każdym wyrazie, więc skraca się między
+licznikiem a mianownikiem. Program~\ref{prog:F05} zrobił tę samą obserwację o
+dzieleniu listy przez jedną dodatnią liczbę, a to jest ta obserwacja użyta
+świadomie.
+
+\begin{warning}
+\textbf{Odjęcie maksimum nie jest przybliżeniem ani sztuczką.} Jest
+tożsamością, a wersja softmaksu, która tego nie robi, jest tą błędną \dash{}
+błędną dla dużych wyników, w tym sensie, że produkuje \code{inf}, a potem
+\code{nan}, zamiast produkować nieco inną liczbę.
+
+Program~\ref{prog:P02} liczy dokładny wynik, przy którym naiwny softmax się
+przepełnia, i pokazuje, dlaczego to samo rozumowanie zastosowane do logarytmu
+daje \code{logsumexp}.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Dwie rzeczy, których softmax \emph{nie} robi, a obie wynikają z tego, co już
+ustaliłeś.
+
+Nie zmienia tego, który wynik jest największy. Każdy krok w nim \dash{}
+potraktowanie funkcją wykładniczą i podzielenie przez jedną dodatnią sumę
+\dash{} jest ściśle rosnący albo jest dodatnim skalowaniem, więc wynik
+Programu~\ref{prog:F05} stosuje się bez zmian:
+$\argmax \softmax(z) = \argmax z$.
+
+I nie zamienia wyników w prawdopodobieństwa w żadnym sensie mocniejszym niż
+arytmetyczny. Wartości dodają się do $1$, a każda leży w $\intoo{0}{1}$, czyli
+tak, jak rozkład prawdopodobieństwa ma wyglądać; czy te liczby zasługują na
+wiarę, to pytanie o model, a nie o funkcję, i zadaje je
+Program~\ref{prog:P26}.
+
+\begin{aibox}
+Temperatura z Programu~\ref{prog:F05} wchodzi tu jako dzielnik przy wynikach,
+$\softmax(z/T)$, a mając odczyt przez szansę, można w jednym zdaniu powiedzieć,
+co ona robi: skaluje każdy logarytm szansy przez $\frac{1}{T}$, więc podnosi
+albo obniża stosunek szans między dowolnymi dwoma tokenami o pewną potęgę.
+
+Przy $T = 2$ każdy stosunek szans jest pierwiastkowany; przy
+$T = \frac{1}{2}$ każdy jest podnoszony do kwadratu. Token, który był
+dziesięć razy bardziej prawdopodobny od innego, jest $\num{3.16}$ raza
+bardziej prawdopodobny przy $T = 2$ i sto razy bardziej prawdopodobny przy
+$T = \frac{1}{2}$ \dash{} co jest ostrzejszym sformułowaniem tego samego, co
+zmierzył Program~\ref{prog:F05}, i tłumaczy, dlaczego argmaks nie może się
+ruszyć: potęga o dodatnim wykładniku zachowuje porządek.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{$e$ jest liczbą i jest miejscem, w którym zatrzymuje się
+  kumulowanie.} $\left(1 + \frac{1}{n}\right)^{n}$ wspina się od $2$ ku
+  $\val{f07.e}\ldots$ i nigdy tego nie przekracza. $e^{x}$ spełnia wszystkie
+  prawa potęg z Programu~\ref{prog:F01}, a $e^{0} = 1$.}
+\sumitem{4}{$e$ nie jest podstawą rosnącą najszybciej \dash{} $3^{x}$ ją bije.
+  Wyjątkowe jest to, że \textbf{stromość $e^{x}$ równa się jego wysokości}, co
+  ten program stwierdza, a dowodzą Programy~\ref{prog:F11} i~\ref{prog:F12}.}
+\sumitem{4--6}{\textbf{\enquote{Wykładniczy} to twierdzenie o mechanizmie, a
+  nie o szybkości.} Dla $x = 5$ wielomian $x^{5}$ jest
+  $\val{f07.poly.at5.ratio}$ razy większy od $e^{x}$, a funkcja wykładnicza
+  wyprzedza dopiero w $x = \val{f07.poly.crossover}$. Dodanie ustalonej
+  wielkości do argumentu mnoży funkcję wykładniczą przez ustaloną liczbę i na
+  tym polega całość.}
+\sumitem{7--8}{$y_0 e^{kt}$ rośnie dla $k > 0$ i zanika dla $k < 0$. Czas
+  połowicznego zaniku to $\frac{\ln 2}{k}$, czyli
+  $\val{f07.decay.halflife}$ kroków przy $k = \num{0.05}$, i \textbf{nie zależy
+  od tego, gdzie wielkość zaczęła}.}
+\sumitem{9--10}{\textbf{Dojście do jednej dziesiątej zajmuje
+  $\val{f07.decay.tenth.halflives}$ czasów połowicznego zaniku}, a nie
+  dziesięć i nie pięć, bo $m$ połowień dzieli przez $2^{m}$, a ty chcesz
+  $2^{m} = 10$. Program~\ref{prog:F01} podaje $2^{10} \approx 10^{3}$, a to
+  jest ten sam fakt w drugą stronę.}
+\sumitem{11--12}{Mnożnik na krok $\gamma$ to tempo $k = -\ln\gamma$. Blisko
+  $\gamma = 1$ obie liczby prawie się zgadzają i dlatego się je myli; przy
+  $\gamma = \num{0.5}$ już nie, bo $-\ln(\num{0.5}) = \num{0.693}$.}
+\sumitem{13--14}{\textbf{Funkcja logistyczna bierze się z szansy.} Jeśli
+  szansa wynosi $e^{x}$ do jednego, to prawdopodobieństwo wynosi
+  $\frac{e^{x}}{1+e^{x}}$, czyli $\frac{1}{1+e^{-x}}$ po podzieleniu przez
+  $e^{x}$. Obie postacie są w użyciu.}
+\sumitem{15--16}{Dąży do $1$ i do $0$ i nie osiąga żadnej z nich, bo $e^{-x}$
+  nigdy nie jest zerem ani nieskończonością. $\sigma(-x) = 1 - \sigma(x)$, bo
+  zmiana znaku $x$ zamienia to, na który wynik podana jest szansa. $x$ to
+  logarytm szansy, $e^{x}$ to szansa, $\sigma(x)$ to prawdopodobieństwo: jeden
+  obiekt, trzy odczyty.}
+\sumitem{17--18}{Stromość jest największa w środku, gdzie wynosi dokładnie
+  $\val{f07.slope.0}$, i spada do $\val{f07.slope.6}$ sześć jednostek dalej
+  \dash{} mniej więcej jedna $\val{f07.slope.ratio6}$-ta część.
+  \textbf{Jednostka jest najbardziej czuła dokładnie wtedy, gdy jest najmniej
+  pewna.}}
+\sumitem{19--20}{\textbf{$\tanh x = 2\sigma(2x) - 1$}, sprawdzone do
+  $\val{f07.tanh.identity.err}$. To funkcja logistyczna ściśnięta poziomo,
+  rozciągnięta pionowo i zsunięta w dół \dash{} trzy ruchy z
+  Programu~\ref{prog:F05} \dash{} więc nie jest drugą funkcją do nauczenia.}
+\sumitem{21--22}{\textbf{$\tanh$ nasyca się mocniej, a nie łagodniej.} Jego
+  stromość biegnie od $\val{f07.tanh.slope0}$ do $\val{f07.tanh.slope2}$ na
+  dwóch jednostkach, przeciw $\val{f07.slope.0}$ do $\val{f07.slope.2}$ u
+  funkcji logistycznej, a wynika to z tożsamości: dwa ściśnięcia czynią go w
+  środku czterokrotnie bardziej stromym. Argument za nim zawsze dotyczył
+  wyśrodkowania na zerze.}
+\sumitem{23--24}{Jednostka nasycona jest cicha, a nie zepsuta: odpowiada na
+  zmianę argumentu mniej więcej $\val{f07.slope.ratio6}$-tą częścią
+  odpowiedzi, którą dałaby w środku. \textbf{To jeszcze nie jest problem
+  znikającego gradientu} \dash{} jeden taki czynnik da się przeżyć, a iloczynu
+  czterdziestu nie, a mnożenie należy do Programu~\ref{prog:F12}.}
+\sumitem{25--26}{$\relu$ nie ma po dodatniej stronie żadnej części płaskiej,
+  więc nie ma się tam co kumulować; poniżej zera jest płaski w całości, co jest
+  ostrzejszą wersją problemu, a nie ucieczką. A nasycenie nie jest żadnym
+  argumentem przeciw funkcji logistycznej na \emph{wyjściu}, gdzie to płaskość
+  utrzymuje prawdopodobieństwo w jego zakresie.}
+\sumitem{27--28}{$\softmax(z)_j = \frac{e^{z_j}}{\sum_k e^{z_k}}$: potraktuj
+  funkcją wykładniczą, dodaj, podziel przez sumę. Dla
+  $z = (\num{2.0}, \num{0.5})$ daje
+  $(\val{f07.softmax2.a},\ \val{f07.softmax2.b})$.}
+\sumitem{29}{\textbf{Na dwóch wynikach softmax to funkcja logistyczna ich
+  różnicy}, $\frac{e^{a}}{e^{a}+e^{b}} = \sigma(a-b)$, sprawdzone do
+  $\val{f07.softmax2.err}$. Zatem jedno wyjście logistyczne i dwuwynikowy
+  softmax to ten sam model.}
+\sumitem{30}{\textbf{Odjęcie największego wyniku od każdego wyniku niczego nie
+  zmienia}, bo wspólny czynnik skraca się nad kreską i pod nią \dash{} a to
+  ono powstrzymuje przepełnienie funkcji wykładniczych. To tożsamość, a nie
+  przybliżenie.}
+\sumitem{31}{Softmax nie może przesunąć $\argmax$, na mocy wyniku
+  Programu~\ref{prog:F05}. Podzielenie wyników przez temperaturę skaluje każdy
+  logarytm szansy przez $\frac{1}{T}$, więc podnosi każdy stosunek szans do
+  potęgi \dash{} i dlatego porządek zostaje, a odstępy nie.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Policz $\left(1 + \frac{1}{4}\right)^{4}$ i powiedz, czy jest powyżej,
+  czy poniżej $e$.
+  \answerto{$\num{1.25}^{4} = \num{2.4414}$, poniżej $e$, jak każdy wiersz
+  tabeli.}
+\item Ile wynosi $e^{0}$ i które z praw z Programu~\ref{prog:F01} to mówi?
+  \answerto{$1$, z prawa dzielenia $a^{m}/a^{m} = a^{m-m} = a^{0}$ \dash{}
+  pusty iloczyn z Programu~\ref{prog:F04} drugą drogą.}
+\item Co jest większe dla $x = 2$: $e^{x}$ czy $x^{5}$? A dla $x = 20$?
+  \answerto{$x^{5} = 32$ przeciw $e^{2} \approx \num{7.39}$ dla $x = 2$; dla
+  $x = 20$ funkcja wykładnicza prowadzi o wiele rzędów wielkości, bo wyprzedziła
+  w $x = \val{f07.poly.crossover}$.}
+\item Wielkość zanika przy $k = \num{0.1}$. Podaj jej czas połowicznego zaniku.
+  \answerto{$\frac{\ln 2}{\num{0.1}} \approx \num{6.93}$, czyli połowa
+  $\val{f07.decay.halflife}$ z $k = \num{0.05}$: podwojenie tempa połowi czas.}
+\item Harmonogram mnoży współczynnik uczenia przez $\num{0.9}$ na każdą epokę.
+  Zapisz go jako $e^{-kt}$.
+  \answerto{$k = -\ln(\num{0.9}) \approx \num{0.105}$, więc
+  $\eta_t = \eta_0 e^{-\num{0.105}t}$. Zwróć uwagę, że to nie $\num{0.1}$,
+  choć blisko.}
+\item Pokaż, że $\sigma(x) + \sigma(-x) = 1$, korzystając z odczytu przez
+  szansę.
+  \answerto{$\sigma(x)$ to prawdopodobieństwo przy szansie $e^{x}$ do $1$, a
+  $\sigma(-x)$ przy szansie $e^{-x}$ do $1$, czyli ta sama szansa podana na
+  dwa przeciwne wyniki. Dwa wyniki, więc prawdopodobieństwa dodają się do
+  $1$.}
+\item Co jest większe, $\sigma(3)$ czy $\sigma(30)$, i mniej więcej o ile?
+  \answerto{$\sigma(30)$, o mniej niż jedną dwudziestą. Obie są powyżej
+  $\num{0.95}$, a krzywa nie ma już prawie nic do oddania; to nasycenie
+  wypowiedziane jako porównanie.}
+\item Podaj stromość funkcji logistycznej tam, gdzie jest największa, i
+  powiedz gdzie.
+  \answerto{$\val{f07.slope.0}$, w $x = 0$, czyli tam, gdzie wartość
+  odczytuje połowę.}
+\item Użyj $\tanh x = 2\sigma(2x) - 1$, żeby znaleźć $\tanh(0)$ i
+  $\tanh(-1)$, mając $\sigma(0) = \num{0.5}$ oraz
+  $\sigma(-2) = \val{f05.sig.m2}$.
+  \answerto{$2 \times \num{0.5} - 1 = 0$ oraz
+  $2 \times \val{f05.sig.m2} - 1 = \val{f07.tanh.m1}$.}
+\item Dwoje inżynierów spiera się, czy w warstwie ukrytej użyć $\tanh$, czy
+  funkcji logistycznej. Który z ich argumentów dotyczy nasycenia, a który nie?
+  \answerto{\emph{Wyśrodkowany na zerze} nie dotyczy nasycenia; dotyczy tego,
+  gdzie leżą wartości. \emph{Wygina się łagodniej} dotyczy nasycenia i jest
+  fałszywy \dash{} $\tanh$ wygina się mocniej.}
+\item Dlaczego $\relu$ nie nasyca się dla dodatnich argumentów?
+  \answerto{Bo jest tam prostą $y = x$, a prosta ma wszędzie tę samą
+  stromość.}
+\item Zastosuj $\softmax$ do $(1, 1, 1)$.
+  \answerto{$\left(\frac{1}{3}, \frac{1}{3}, \frac{1}{3}\right)$. Równe wyniki
+  dają równe prawdopodobieństwa, jakiekolwiek by były.}
+\item Zastosuj $\softmax$ do $(101, 100)$ i do $(1, 0)$. Porównaj.
+  \answerto{Identyczne: $(\sigma(1), \sigma(-1))$ w obu przypadkach, bo softmax
+  zależy tylko od różnic. Odjęcie $100$ od pierwszej pary to tożsamość z ramki
+  $30$.}
+\item Klasyfikator ma dwie klasy. Czy jedno wyjście logistyczne różni się od
+  dwuwynikowego softmaksu?
+  \answerto{Nie. Dwuwynikowy softmax zależy tylko od $a - b$, a pojedyncze
+  wyjście logistyczne jest tą różnicą, której nadano nazwę.}
+\item Wyniki $(\num{800}, \num{799})$ trafiają do naiwnego softmaksu. Co się
+  dzieje i co powinno było się stać?
+  \answerto{$e^{800}$ przepełnia się do \code{inf}, a \code{inf/inf} daje
+  \code{nan}. Odjęcie maksimum najpierw daje $(e^{0}, e^{-1})$ i poprawną
+  odpowiedź, $(\sigma(1), \sigma(-1))$.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Tabela z ramki $2$ rośnie i zwalnia. Podaj zgrubny argument, dlaczego nie
+  może przekroczyć $3$.
+  \answerto{Każde kolejne kumulowanie dokłada mniej niż poprzednie, a dokładki
+  maleją dostatecznie szybko, żeby mieć skończoną sumę. Uściślenie tego jest
+  argumentem o zbieżności, a maszyneria do niego mieszka w
+  Programie~\ref{prog:F13}.}
+\item Dlaczego $\left(1 + \frac{1}{n}\right)^{n}$ nie jest w granicy po prostu
+  $1$, skoro $1 + \frac{1}{n}$ dąży do $1$?
+  \answerto{Bo wykładnik rośnie w tym samym czasie. Wielkość dążąca do $1$
+  podniesiona do potęgi dążącej do nieskończoności może zrobić cokolwiek, a to,
+  co zrobi, zależy od tego, jak szybko biegnie każda z nich.}
+\item Wielkość podwaja się co $7$ dni. Zapisz ją jako $e^{kt}$ z $t$ w dniach.
+  \answerto{$k = \frac{\ln 2}{7} \approx \num{0.099}$.}
+\item Dwa harmonogramy zaniku mają czasy połowicznego zaniku $10$ i $20$
+  kroków. Po $20$ krokach jaką część startu zachowuje każdy?
+  \answerto{Jedną czwartą i połowę. Drugi nie jest \enquote{dwa razy
+  wolniejszy} w żadnym sensie pozwalającym dodawać te ułamki.}
+\item Pokaż, że stromość funkcji logistycznej w $x$ równa się
+  $\sigma(x)\bigl(1 - \sigma(x)\bigr)$, przyjmując, że tak jest, i wyjaśnij z
+  tego, dlaczego maksimum wynosi jedną czwartą.
+  \answerto{Iloczyn $p(1-p)$ dla $p$ w $\intcc{0}{1}$ jest największy w
+  $p = \frac{1}{2}$, gdzie wynosi $\frac{1}{4}$. Krzywa jest więc najbardziej
+  stroma tam, gdzie odczytuje połowę, czyli w $x = 0$.}
+\item Przy jakiej wartości $p$ jednostka logistyczna jest o połowę mniej czuła
+  niż tam, gdzie jest najczulsza?
+  \answerto{Tam, gdzie $p(1-p) = \frac{1}{8}$, czyli $p \approx \num{0.146}$
+  albo $p \approx \num{0.854}$. Jednostka meldująca $\num{0.85}$ straciła już
+  połowę swojej czułości.}
+\item Wyjaśnij, dlaczego $\tanh$ jest w początku układu dokładnie cztery razy
+  bardziej stromy od funkcji logistycznej, wyłącznie z tożsamości.
+  \answerto{$2\sigma(2x) - 1$ ściska poziomo $2$-krotnie, co podwaja stromość,
+  i rozciąga pionowo $2$-krotnie, co podwaja ją znowu. $-1$ przesuwa krzywą i
+  nie zmienia żadnej stromości.}
+\item Argument ukrytej jednostki wynosi $-8$. Co melduje ona przy funkcji
+  logistycznej, przy $\tanh$ i przy $\relu$?
+  \answerto{Około $\num{0.0003}$, około $-1$ i dokładnie $0$. Wszystkie trzy są
+  nasycone w sensie braku czułości, a tylko przy $\relu$ jest to dokładne i
+  trwałe.}
+\item Dlaczego funkcja logistyczna na wyjściu klasyfikatora binarnego nie
+  podlega zarzutowi stawianemu jej w warstwach ukrytych?
+  \answerto{Bo jest tylko jedna. Zarzut mówi, że czynnik kumuluje się z
+  głębokością, a jedna warstwa nie jest głębokością.}
+\item Softmax zostaje zastosowany do $(z_1, z_2, z_3)$, a potem jeszcze raz do
+  wyniku. Co drugie zastosowanie robi ze stosunkiem największej do najmniejszej
+  wartości?
+  \answerto{Dramatycznie go zmniejsza, bo argumenty drugiego zastosowania leżą
+  w $\intoo{0}{1}$, a ich różnice są przez to małe. Porządek zostaje, na mocy
+  ramki $31$.}
+\item Podaj różnicę wyników, przy której jeden token jest dokładnie dwa razy
+  bardziej prawdopodobny niż drugi w dwuwynikowym softmaksie.
+  \answerto{$\ln 2 \approx \num{0.693}$, bo stosunek szans wynosi $e^{a-b}$.
+  Różnica $1$ w wynikach to czynnik $e$ w szansie, jakiekolwiek by te wyniki
+  były.}
+\item Co przy temperaturze $T$ dzieje się z tą różnicą wyników?
+  \answerto{Staje się $\frac{a-b}{T}$, więc stosunek szans staje się
+  $e^{(a-b)/T}$ \dash{} pierwotny stosunek podniesiony do potęgi
+  $\frac{1}{T}$.}
+\item Ktoś proponuje liczyć $\ln \softmax(z)_j$, biorąc softmax, a potem
+  logarytm. Co jest z tym nie tak i jaka jest naprawa?
+  \answerto{Softmax może dla małej pozycji zniknąć do dokładnego zera, a
+  $\ln 0$ nie ma odpowiedzi. Licz zamiast tego
+  $z_j - \ln\sum_k e^{z_k}$, odejmując maksimum wewnątrz sumy \dash{} czyli
+  \code{logsumexp}, którym zajmuje się Program~\ref{prog:P02}.}
+\item Dlaczego odjęcie maksimum, a nie średniej, gwarantuje brak
+  przepełnienia?
+  \answerto{Bo czyni największy wykładnik dokładnie $0$, więc każda funkcja
+  wykładnicza jest co najwyżej $1$. Odjęcie średniej zostawia największy
+  wykładnik dodatnim i przy szeroko rozrzuconych wynikach nadal może się
+  przepełnić.}
+\end{furtherproblems}
