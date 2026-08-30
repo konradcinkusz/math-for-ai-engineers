@@ -1232,11 +1232,14 @@ two more, ending at $\num{1e-2}$.
 \end{ansblock}
 
 \begin{note}
-\textbf{Prints, not returns.} That grid is exact in the exponents and not quite
-exact in the numbers. Three of the four values \code{np.logspace} hands back
-are the decade ends to the bit; the first is one unit in the last place below
-$\num{1e-5}$, and the printed form reads \code{1.e-05} either way. It changes
-nothing about a learning-rate sweep, and it is one reason
+\textbf{Prints, not returns.} That grid is exact in the exponents and not
+necessarily exact in the numbers. Ask \code{np.logspace} for the first point and
+you may get $\num{1e-5}$, or you may get the value one unit in the last place
+below it \dash{} which of the two depends on the build, and the printed form
+reads \code{1.e-05} in both cases. The repr is the problem: it will not tell
+you, so if the answer matters, ask for \code{float(x).hex()} instead.
+
+It changes nothing about a learning-rate sweep. It is one reason
 Program~\ref{prog:P01} comes before the linear algebra rather than after it.
 \end{note}
 

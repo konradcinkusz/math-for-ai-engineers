@@ -21,7 +21,7 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 248 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en` (17x24) | 250 | 0 | 0 | 4, worst 4.1 pt | 0 |
 | `main-pl` (17x24) | 256 | 0 | 0 | 4, worst 4.1 pt | 0 |
 | `main-en-a4` | 229 | 0 | 0 | 5, worst 6.3 pt | 0 |
 | `main-pl-a4` | 229 | 0 | 0 | 4, worst 4.4 pt | 0 |
@@ -117,6 +117,24 @@ and the practice, which is exactly where folklore lives. Ten experiments are
 specified in `notes/01-curriculum.md`; **none has been run**, and until one is,
 the claim it would support is labelled as judgement and its table stays empty.
 Nine of the ten are free and finish on a laptop in under a minute.
+
+**And a claim about a LIBRARY can be true here and false on the build server.**
+F03's note box said `np.logspace(-5, -2, 4)[0]` is one unit in the last place
+below `1e-5`, and `code/f03_logarithms.py` asserted it. Both were right on this
+container and **CI failed on the assertion**, because there the first element is
+exactly `1e-5`. Same numpy version string; different answer.
+
+That is the same defect as a claim nobody ran, wearing a disguise: it *was*
+run, on one machine, and one machine is not the population. The fix is not to
+pick the other value — it is to notice that the printed form is `1.e-05` either
+way, so **the repr is the thing that cannot be trusted**, and to say that
+instead. The script now asserts only what is universal (the value lies within
+one ulp of `1e-5`) and *reports* which it got, with its `.hex()`.
+
+Two rules fall out of it. Assert the invariant, never the observation. And when
+a build-dependent fact is interesting, make the dependence the teaching point
+rather than picking a branch — the reader who checks on their machine is the
+reader the book is for, and they must not find it wrong.
 
 **A claim the book makes about the book is still a claim, and it is the one
 class nothing can check.** There is no external source to check it against, and

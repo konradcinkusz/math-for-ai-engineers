@@ -1251,13 +1251,16 @@ potem dwa dalsze, kończąc na $\num{1e-2}$.
 \end{ansblock}
 
 \begin{note}
-\textbf{Wypisuje, a nie zwraca.} Ta siatka jest dokładna w wykładnikach i nie
-całkiem dokładna w liczbach. Trzy z czterech wartości, które oddaje
-\code{np.logspace}, to końce dekad co do bitu; pierwsza leży o jedną jednostkę
-ostatniego miejsca poniżej $\num{1e-5}$, a wypisana postać brzmi
-\code{1.e-05} tak czy inaczej. Dla przeszukiwania współczynnika uczenia nie
-zmienia to nic i jest jednym z powodów, dla których Program~\ref{prog:P01}
-stoi przed algebrą liniową, a nie po niej.
+\textbf{Wypisuje, a nie zwraca.} Ta siatka jest dokładna w wykładnikach i
+niekoniecznie dokładna w liczbach. Zapytaj \code{np.logspace} o pierwszy punkt,
+a dostaniesz $\num{1e-5}$ albo wartość o jedną jednostkę ostatniego miejsca
+niżej \dash{} które z dwojga, zależy od kompilacji, a wypisana postać brzmi
+\code{1.e-05} w obu przypadkach. Problemem jest sama reprezentacja: nie powie
+ci tego, więc jeśli odpowiedź ma znaczenie, poproś o \code{float(x).hex()}.
+
+Dla przeszukiwania współczynnika uczenia nie zmienia to nic. Jest jednym z
+powodów, dla których Program~\ref{prog:P01} stoi przed algebrą liniową, a nie
+po niej.
 \end{note}
 
 To umieszcza $\val{f03.sweep.lin.top.decade}$ z czterech punktów w samej górnej

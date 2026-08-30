@@ -499,13 +499,30 @@ except ImportError:                                  # pragma: no cover
 else:
     _np_log = [float(x) for x in
                _np.logspace(SWEEP_LO_EXP, SWEEP_HI_EXP, SWEEP_N)]
-    assert _np_log[0] == math.nextafter(1e-5, 0.0), (
-        f"np.logspace's first element is {_np_log[0]!r}, not one ulp below "
-        f"1e-5 -- frame 48's note box says it is")
+
+    # DO NOT assert which of the two values comes back. It is not universal:
+    # this container returns the value one ulp below 1e-5 and CI returns 1e-5
+    # exactly, and the earlier version of this script asserted the first and
+    # failed the build on the second. The frame's note box used to assert it
+    # too, which is the same defect written into the page rather than into a
+    # test -- a claim about a library's behaviour that the reader can run and
+    # find false.
+    #
+    # What IS universal, and is the teaching point, is that the printed form
+    # is `1.e-05` either way, so the repr does not tell you which you have.
+    # The note box now says exactly that and sends the reader to .hex().
+    _lo, _hi = math.nextafter(1e-5, 0.0), math.nextafter(1e-5, 1.0)
+    assert _lo <= _np_log[0] <= _hi, (
+        f"np.logspace's first element is not within one ulp of 1e-5: "
+        f"{_np_log[0]!r}")
     assert _np_log[1:] == [1e-4, 1e-3, 1e-2], (
         f"np.logspace's other three are no longer the decade ends: {_np_log!r}")
-    NUMPY_NOTE = (f"numpy {_np.__version__}: np.logspace(-5, -2, 4)[0] is one "
-                  f"ulp below 1e-5, as frame 48's note box says")
+    _exact = _np_log[0] == 1e-5
+    NUMPY_NOTE = (
+        f"numpy {_np.__version__}: np.logspace(-5, -2, 4)[0] is "
+        f"{'exactly 1e-5' if _exact else 'one ulp below 1e-5'} "
+        f"({float(_np_log[0]).hex()}) -- BUILD-DEPENDENT, and frame 48 says so "
+        f"rather than picking one")
 
 # ==========================================================================
 # The transcript frame 33 carries.
