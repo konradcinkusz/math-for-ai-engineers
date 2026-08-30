@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F12 written, both editions.** F13 and P1–P34 are stubs carrying their briefs | 35 of 47 |
+| Programs | **F1–F13 written, both editions \dash{} the whole Foundation part.** P1–P34 are stubs carrying their briefs | 34 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 495 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 505 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 433 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 437 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 515 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 521 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 447 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 453 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,13 +93,13 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **35 of 47 programs are stubs**, in each language. This is the whole of the
+- **34 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
-- 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
+- 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 335 computed values, all referenced, all present, plus the committed console
+- 347 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 72 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 78 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
 - **55 orphan-tail pages: 13 · 14 · 14 · 14** across `main-en`, `main-pl`,
@@ -2876,6 +2876,101 @@ in this file: **a digit stays a digit.**
   remapping — an `\ans{}` that quoted an unrelated value, and a fragment of a
   deleted sentence left in a frame.
 
+### Program F13 pass, August 2026 — the Foundation part is complete
+
+**Twenty-two teaching frames, twenty-four printed, both editions**, against a
+brief that planned twenty and said so as a design decision rather than an
+estimate. Five sections: adding up many small pieces, the notation, the two
+directions, a density, and a weighted average.
+
+**The layout cost was nothing.** Zero new overfull boxes in any of the four
+builds on the first attempt, no stranded openers or headings, no orphaned
+cues, and the orphan-tail count did not move. That has not happened before,
+and the reason is that the four recorded rules — lengthen rather than trim, a
+long `\code{}` at a sentence start, a long span inside an `\answerto` into a
+display, Polish manifest copy kept short — were applied while drafting.
+
+#### The frame band had to learn about a deliberately short program
+
+`check_structure.py` held every program to 30–70 frames, and F13 is planned at
+twenty **on purpose**: the curriculum review cut it from forty-five and its
+brief says *substitution, parts and partial fractions are excluded
+deliberately and by name... twenty frames rather than forty-five, and the
+difference is the point.* Padding it into the band would mean writing the
+material the scope excludes.
+
+So the band is now **taken from the manifest** when a program plans fewer
+frames than the band's floor: such a program must land within a quarter of its
+own plan. That is a real check rather than a waiver — F13 at 22 passes its
+15–26 band, and at 40 or at 12 it would still fail, which was verified by
+running the function on both. Read from `tools/programs.json`, so a curriculum
+change moves the check with it.
+
+**The general lesson: when a gate and a deliberate decision disagree, the gate
+should learn the decision's own criterion, not be switched off.** A hard-coded
+exception for F13 would have been one line and would have stopped being true
+the next time a program is planned short.
+
+#### The measurement is a convergence rate, not a convergence
+
+Right-hand rectangles under $x^{2}$ over $\intcc{0}{1}$ give
+$\val{}$ 0.385, 0.33835, 0.333834, 0.333383 — heading for $\frac13$. Four rows
+suggesting a limit is weaker than what is actually available: the sum of the
+first $n$ squares has a closed form, so the total is **exactly**
+\[ \frac{1}{3} + \frac{1}{2n} + \frac{1}{6n^{2}} \]
+and the script asserts that identity at four sizes rather than asserting that
+the numbers look like they are going somewhere. The frames can then say *how
+fast* — the error halves each time $n$ doubles — which is a claim a reader can
+check on the table in front of them.
+
+#### The trap is a category error, not an approximation
+
+A density's **height** is not bounded by one; its **area** is. The uniform
+density on an interval of width $0.1$ has height $10$, and narrowing the
+interval raises the height without limit while the area stays $1$. So $p(x)$
+is probability *per unit of $x$* — a rate, as a speed is not a distance — and
+a likelihood a library prints above one is not a bug.
+
+That is Program F10's count-against-denominator point in its continuous form,
+and the two frames say so.
+
+#### One claim a reader could have falsified
+
+The notation frame said $\sum_{i=1}^{n} f(x_i)\,\Delta x$ was
+**Program F04's**. F04 has the sigma and does *not* have the $\Delta x$ — it
+writes $\sum_{i=1}^{n} x_i$ and $\sum_{i=1}^{n} a_i b_i$, and a Riemann sum's
+width is new here. The frame now says which half is F04's, which is both
+accurate and more useful. Fifth pass running that a claim about another
+program was the thing that needed fixing.
+
+#### What F13 deliberately does not say
+
+It never says what a probability is. Three programs declare F13 as a
+dependency — P23 (probability as a measure, Bayes), P24 (random variables,
+expectation and variance) and P19 (convexity and Jensen) — so F13 supplies the
+accumulation, the area, the density and the **shape** of a weighted average,
+and hands over every object those shapes turn out to be about. Its last frame
+writes $\int x\,p(x)\,\mathrm{d}x$, says it has a name, and declines to use
+it, because naming it would need three words the book has not defined.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| F13.1 sum-to-integral | 652 / 600 | 7.00 | 6.76 | 7.35 | 7.68 | 8.35 |
+| F13.2 height-not-area | 645 / 657 | 5.87 | 6.84 | 6.71 | 7.76 | 7.62 |
+| F13.3 weighted-average | 657 / 621 | 7.06 | 6.71 | 7.10 | 7.62 | 8.06 |
+
+#### Also
+
+- Three traps added to `notes/02` (71 to 73): a density's height read as a
+  probability, `dx` treated as notation, and an integral confused with an
+  antiderivative.
+- Two parity divergences, both the recorded classes: a number spelled as a
+  word (*dziesięciokrotnie* for `$10$`), and one `\mfavaltext` value that C7
+  reported unused — `1/3` is arithmetic the reader does, so the page writes it
+  rather than referencing it. The F10 finding, applied on sight.
+- Frame numbers remapped: plan `1--5 / 6--9 / 10--12 / 13--17 / 18--20`,
+  program `1--5 / 6--9 / 10--12 / 13--17 / 18--22`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -3125,15 +3220,15 @@ clone instead.
 
 ## What is left
 
-1. **Thirty-five programs.** This is the work. **F13 next**, and it closes the
-   Foundation part: twenty frames, deliberately, to make an expectation an
-   integral and a density integrate to one, and for nothing else. After that
-   the book stops assuming nothing and starts building, and P01 to P03 are the
-   natural continuation because they need only what Part I now has.
+1. **Thirty-four programs, and the whole of Part I is written.** F1 to F13,
+   both editions, so the book's own claim — *it assumes nothing* — is now
+   testable rather than promised. **P01 to P03 are next**, and they are the
+   natural continuation because they need only what Part I has: P01 is
+   floating point, which F11's U-curve and F12's underflowing product both
+   hand it by name, and F13 has just closed the calculus.
 
-   **F12 is written**, so the program the rest of the book leaned on hardest
-   is no longer outstanding. It was owed five things by name and paid all
-   five: F4's sigma and product; F5's composition (its frame 34 hands it over
+   **F12 was the program the rest of the book leaned on hardest.** It was owed
+   five things by name and paid all five: F4's sigma and product; F5's composition (its frame 34 hands it over
    explicitly, and that was verified rather than remembered); F6's
    rearrangement; F7's saturation measurement, left there as a shape and now
    turned into a product of forty; and F11's limit definition and four worked
