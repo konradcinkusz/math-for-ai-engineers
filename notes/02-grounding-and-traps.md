@@ -700,8 +700,8 @@ than to the others.
 The entries in this section came out of writing the Foundation programs
 themselves rather than out of the literature: item 41 out of F3, items 42 to 46
 out of F4, items 47 and 48 out of F5, item 49 out of F6, items 50 and 51 out of
-F7, and items 52 to 54 out of F8. Say which program produced which,
-never how many there are — the count at the head of §3 was stated once and had
+F7, items 52 to 54 out of F8 and items 55 to 57 out of F9. Say which program
+produced which, never how many there are — the count at the head of §3 was stated once and had
 drifted by five before anybody reread it.
 
 They carry the same health warning: the list above is a catalogue of
@@ -827,6 +827,36 @@ on the task. The exactness of the geometry is easy to let launder the
 interpretation. → **F08** for the geometry, **P05** for the baseline it sits
 against, **P34** for how to find out whether a score means anything on your
 data.
+
+**55. "`v + 1` adds one to the vector."** In the mathematics it means
+nothing: `v` is a list and `1` is not, so there is no component-by-component
+pairing to make. An array library will read it as adding `1` to every
+component, which is a reasonable convention with its own rules and is not what
+the mathematics says. The habit worth building is noticing that the line's
+meaning came from the library rather than from the mathematics, because that
+is the line whose behaviour changes when the shapes do. → **F09** for the
+distinction, **P07** for the rules.
+
+**56. "Lengths add: two vectors of length 3 and 4 give one of length 7."**
+Only if they point the same way. At right angles they give 5, and in general
+`|a + b| <= |a| + |b|` with equality exactly when one is a non-negative
+multiple of the other. Two lengths laid end to end on a line *do* measure 7,
+which is where the habit comes from, and a vector carries a direction as well
+as a size. Same shape as items 41, 47 and 51 — a rule carried one step past
+its hypotheses because nothing announced that the setting had changed.
+→ **F09**.
+
+**57. "Nearest neighbour and most similar are the same ranking, so cosine or
+Euclidean makes no difference."** On the unit sphere that is exactly right and
+provably so: `|a - b|^2 = 2 - 2 cos(theta)`, a strictly decreasing function of
+the cosine, which cannot reorder anything. Off it the two name different
+winners — on one query and two candidates, A can be the more similar while B
+is the nearer — and what makes it expensive is that both queries run, both
+return plausible results, and nothing in the output says they disagreed. The
+question to ask of an index is therefore not which measure it uses but whether
+what went into it was normalised. → **F09** for the identity that says when
+they cannot disagree, **P05** for which to prefer when they do and what
+normalising costs.
 
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
