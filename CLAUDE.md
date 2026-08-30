@@ -2029,7 +2029,7 @@ still turns over onto white paper. The cue check goes quiet because the cue
 has company, not because the page got better. Reverted, and the table is in
 `preamble.tex` beside the other three so the fifth person does not re-run it.
 
-#### An answer that overflowed, and a reword that made it worse
+#### An answer that overflowed on ONE TeX installation, and the fix that cannot
 
 The Q14 answer carries `$\max(-1, \min(1, x))$`, which is one unbreakable
 maths span, and in Polish it sits behind a longer clause than in English. It
@@ -2041,8 +2041,27 @@ longer than *w przeciwnym razie*.
 The generalisable part is where it happened: **a back-matter answer is set in
 a narrower measure than the frame it came from**, so a formula that sits
 comfortably inside a frame can overflow inside its own answer, and only the
-answers appendix will show it. Fixed by shortening the clause in both
-editions, and the multiset came back to the pre-F6 baseline in all four.
+answers appendix will show it.
+
+**And shortening the clause did not settle it, because the two TeX
+installations disagree.** With the clause trimmed the container built clean and
+**CI came back with a 22.9 pt box on the same answer**, because newtx is wider
+than Latin Modern and the break the container found is not available there.
+That is the `amssymb`/`newtxmath` trap in its third direction: not a full
+installation failing where a bare one passes, nor a bare one shipping a defect
+a full one hides, but **the same source overflowing on one and not the other
+with no error either way**.
+
+Chasing it with prose is unwinnable, because the metrics that decide it are
+not on this machine. **The fix is to remove the unbreakable run: the formula
+now sits in a display inside the answer.** A display gets its own line, so a
+110 pt formula in a 320 pt column cannot overflow under any metrics, and the
+prose around it wraps freely. `\answerto` takes a display without complaint
+— which is the mechanism CLAUDE.md already says the answer store was chosen
+for.
+
+**The rule: an inline formula of any length inside an `\answerto` is a
+latent overfull box on somebody else's TeX. Put it in a display.**
 
 #### Word order is part of the translation
 

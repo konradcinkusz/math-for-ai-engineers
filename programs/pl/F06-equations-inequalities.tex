@@ -102,8 +102,8 @@
 \item Zapisz $\relu$ jako regułę opartą na nierówności, a potem
   $\clip$ między $-1$ a $1$. \teachesatone{36}
   \answerto{$\relu(x)$ zostawia $x$, gdy jest dodatnie, a poza tym zwraca
-  $0$. $\clip$ to $\max(-1, \min(1, x))$: dwa ograniczenia, jedno po
-  drugim.}
+  $0$, a przycinanie to dwa ograniczenia jedno po drugim:
+  \[ \clip(x) = \max(-1, \min(1, x)) \]}
 \item Wektor gradientu został przycięty \enquote{na $\num{1.0}$}. Czy jego
   długość jest teraz co najwyżej $\num{1.0}$? \teachesat{39--40}
   \answerto{Tylko jeśli przycięto go po \emph{normie}. Przycinanie po wartości

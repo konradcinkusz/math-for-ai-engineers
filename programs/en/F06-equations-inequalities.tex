@@ -102,8 +102,8 @@
 \item Write $\relu$ as an inequality-driven rule, and then $\clip$
   between $-1$ and $1$. \teachesatone{36}
   \answerto{$\relu(x)$ keeps $x$ when it is positive and returns $0$
-  otherwise. $\clip$ is $\max(-1, \min(1, x))$: two bounds, one after the
-  other.}
+  otherwise, and clipping is two bounds applied one after the other:
+  \[ \clip(x) = \max(-1, \min(1, x)) \]}
 \item A gradient vector is clipped \enquote{at $\num{1.0}$}. Is its length now
   at most $\num{1.0}$? \teachesat{39--40}
   \answerto{Only if it was clipped by \emph{norm}. Clipping by value truncates
