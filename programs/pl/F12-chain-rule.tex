@@ -1,21 +1,880 @@
 %% F12 --- Reguły różniczkowania i reguła łańcuchowa
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f12_chain_rule.py i wchodzi na stronę przez \val{}.
+%%
+%% TEZA: cztery reguły plus jedna reguła składania pokrywają wszystko, co ta
+%% książka różniczkuje, a reguła składania jest zawiasem --
+%% PROPAGACJA WSTECZNA TO REGUŁA ŁAŃCUCHOWA ZASTOSOWANA DO ZŁOŻENIA WARSTW.
+%%
+%% KAŻDA REGUŁA JEST SPRAWDZONA WOBEC POCHODNEJ UZYSKANEJ BEZ NIEJ, różnicą
+%% centralną przy h = 1e-5 -- blisko dna krzywej U, którą zmierzył F11. To
+%% jest ta korzyść, na którą F11 zapracował: różnica skończona jest
+%% prawdziwym testem, gdy jej krok dobrać właściwie, i po to właśnie jest.
+%%
+%% POMIARY:
+%%   pułapka reguły iloczynu z liczbami: na x^2 i x^3 w x = 2 poprawna
+%%     odpowiedź to 80, a pierwszy odruch daje 48, a oba wyrażenia zgadzają
+%%     się w dokładnie dwóch punktach całego przebiegu;
+%%   sigma' = sigma(1 - sigma) z DOKŁADNYM maksimum 1/4 w z = 0, sprawdzone w
+%%     szesnastu tysiącach punktów i asertowane algebraicznie;
+%%   zanikający gradient JAKO ILOCZYN: czterdzieści warstw przy wadze jeden
+%%     daje najwyżej 0,25^40 = 8,3e-25, a to ograniczenie jest osiągane tylko
+%%     wtedy, gdy każda jednostka siedzi dokładnie w swoim środku;
+%%   strona eksplodująca, z OSTRYM PROGIEM: czynnik na warstwę to
+%%     w sigma'(z) <= w/4, więc łańcuch logistyczny nie może wzmacniać w
+%%     ogóle, dopóki |w| <= 4. Oba tryby porażki nie są symetryczne i to
+%%     dlatego.
+%%
+%% BRAMKA DRYFU MIĘDZY PROGRAMAMI, nowa w tym przebiegu. F07 zmierzył, że
+%% nasycona jednostka odpowiada mniej więcej setną częścią odpowiedzi ze
+%% środka, i zatwierdził f07.slope.ratio6 = 101. Ten program liczy ten sam
+%% stosunek od zera i ASERTUJE zgodność, więc "ten sam rachunek cytowany dwa
+%% razy" jest bramką, a nie twierdzeniem. Zepsuj arytmetykę któregokolwiek
+%% programu, a `make numbers` padnie i nazwie oba.
+%%
+%% CZEGO TEN PROGRAM CELOWO NIE ROBI, sprawdzone w tools/programs.json:
+%%   pochodne cząstkowe i gradient                                -> P15
+%%   jakobiany, tryb w przód i wstecz, loss.backward() i koszt
+%%     pamięciowy trzymania aktywacji                             -> P16
+%%   hesjan i ograniczenie na krok                                -> P17
+%%   rachunek macierzowy, gradient softmaksu z entropią krzyżową  -> P18
+%%   strumień rezydualny i dlaczego utrzymuje gradienty przy życiu -> P32
+%%
+%% Bliźniak: programs/en/F12-chain-rule.tex. Ramka w ramkę, makro w
+%% makro, liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Reguły różniczkowania i reguła łańcuchowa}
 \label{prog:F12}
+\index{derivative!rules}
+\index{chain rule!and backpropagation}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{różniczkować sumę, wielokrotność stałą i potęgę bez wracania do
+  granicy}
+\outcome{7--13}{różniczkować iloczyn i iloraz oraz powiedzieć, co każda z tych
+  dwóch reguł uwzględnia}
+\outcome{14--20}{zastosować regułę łańcuchową do funkcji funkcji i rozpisać
+  pochodną jednostki w całości}
+\outcome{21--25}{powiedzieć, do czego różniczkuje się złożenie warstw i gdzie
+  w tym wyrażeniu pojawia się każda warstwa}
+\outcome{26--31}{powiedzieć, co długi iloczyn czynników warstwy robi z
+  gradientem, i podać dokładny warunek rozstrzygający, w którą stronę}
+\end{outcomes}
 
-Argument: four rules and one composition rule cover everything the book will
-differentiate. Payoff: **backpropagation is the chain rule applied to a
-composition of layers**, and that sentence is the hinge of the entire book.
-The longest Foundation program for that reason.
+\begin{quiz}
+\item Zróżniczkuj $x^{5}$. \teachesatone{2}
+  \answerto{$5x^{4}$: sprowadź wykładnik na dół i zmniejsz go o jeden.}
+\item Zróżniczkuj $3x^{4} - 5x + 2$. \teachesat{4--5}
+  \answerto{$12x^{3} - 5$. Każdy składnik osobno, a stała znika.}
+\item Czy pochodna $f(x)g(x)$ równa się $f'(x)g'(x)$? \teachesat{7--8}
+  \answerto{Nie. Na $x^{2}$ i $x^{3}$ w $x = \val{f12.trap.x}$ poprawna
+  odpowiedź to $\val{f12.trap.right}$, a ten odruch daje
+  $\val{f12.trap.wrong}$.}
+\item Zapisz regułę iloczynu. \teachesatone{9}
+  \answerto{$(fg)' = f'g + fg'$: zróżniczkuj każdy czynnik, trzymając drugi
+  nieruchomo, i dodaj.}
+\item Zróżniczkuj $\frac{x^{2}}{x + 3}$. \teachesat{12--13}
+  \answerto{$\frac{2x(x+3) - x^{2}}{(x+3)^{2}}$, regułą ilorazu.}
+\item Zapisz regułę łańcuchową dla $f(g(x))$. \teachesatone{15}
+  \answerto{$f'(g(x)) \cdot g'(x)$: zewnętrzna zróżniczkowana w wartości
+  wewnętrznej, razy pochodna wewnętrznej.}
+\item Zróżniczkuj $(3x + 1)^{4}$. \teachesat{15--16}
+  \answerto{$12(3x+1)^{3}$, czyli $4(3x+1)^{3}$ razy pochodna wnętrza, $3$.}
+\item Podaj $\sigma'$ przez $\sigma$. \teachesat{17--18}
+  \answerto{$\sigma'(z) = \sigma(z)\bigl(1 - \sigma(z)\bigr)$.}
+\item Ile najwięcej może wynosić $\sigma'$ i gdzie? \teachesat{18--19}
+  \answerto{$\val{f12.sig.max}$, w $z = 0$.}
+\item Zróżniczkuj $\sigma(wx + b)$ po $x$. \teachesat{19--20}
+  \answerto{$w\,\sigma(wx+b)\bigl(1 - \sigma(wx+b)\bigr)$, regułą łańcuchową.}
+\item Sieć ma $\num{40}$ warstw. Ile czynników wstawia reguła łańcuchowa do
+  pochodnej po wejściu pierwszej warstwy?
+  \teachesat{22--23}
+  \answerto{$\num{40}$, po jednym na warstwę, wszystkie wymnożone.}
+\item Każda z $\val{f12.depth}$ warstw wnosi czynnik co najwyżej
+  $\val{f12.sig.max}$. Ile wynosi iloczyn co najwyżej? \teachesat{26--27}
+  \answerto{$\val{f12.vanish.bound}$, i to tylko wtedy, gdy każda jednostka
+  siedzi dokładnie w swoim środku.}
+\item W warstwie logistycznej o wadze $w$: jak duże musi być $w$, żeby
+  warstwa mogła wzmocnić gradient, a nie go zmniejszyć? \teachesat{28--29}
+  \answerto{Powyżej $\val{f12.explode.w}$, bo czynnikiem jest $w\sigma'$, a
+  $\sigma'$ nigdy nie przekracza $\val{f12.sig.max}$.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 55 ramek.
-}
+% ============================================================
+\section{Cztery reguły zamiast granicy}
+\label{sec:F12-rules}
+\index{derivative!rules}
+
+\begin{fr}
+Program~\ref{prog:F11} policzył trzy pochodne z definicji, a każda zajęła
+akapit algebry. To się nie skaluje i nie musi: definicja jest maszyną do
+\emph{ustalania} reguł, a raz ustalonej reguły się używa.
+
+Ten program ma ich cztery i jeszcze jedną, wartą tamtych czterech razem.
+
+Zacznij od wzorca, przy którym F11 cię zostawił. Znalazł, że $x^{2}$
+różniczkuje się do $2x$, że $mx$ różniczkuje się do $m$, a stała do $0$.
+Zapisz $mx$ jako $mx^{1}$, a stałą jako $cx^{0}$, i zgadnij regułę dla
+$x^{n}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \frac{\mathrm{d}}{\mathrm{d}x}\,x^{n} = n\,x^{n-1} \]
+\end{ansblock}
+
+\textbf{Sprowadź wykładnik na dół jako mnożnik i zmniejsz go o jeden.}
+Sprawdź to na wszystkich trzech wynikach F11: $x^{2} \to 2x^{1}$;
+$x^{1} \to 1x^{0} = 1$, więc $mx \to m$; $x^{0} \to 0x^{-1} = 0$, więc stała
+znika.
+
+To jest \textbf{reguła potęgowa} i zachodzi dla każdego $n$ \dash{} ujemnego i
+ułamkowego też, czyli więcej, niż trzy przypadki mogą pokazać, i dlatego się
+ją podaje, a nie wnioskuje. $\frac{1}{x}$ to $x^{-1}$, więc różniczkuje się do
+$-x^{-2}$; $\sqrt{x}$ to $x^{1/2}$, więc różniczkuje się do
+$\frac{1}{2}x^{-1/2}$.
+
+Zwróć uwagę na zapis, który się właśnie pojawił.
+$\frac{\mathrm{d}}{\mathrm{d}x}$ czyta się \enquote{pochodna po $x$ z} i mówi,
+która litera jest zmienną \dash{} co będzie miało ogromne znaczenie w
+Programie~\ref{prog:P15}, gdzie jest ich więcej niż jedna. Na razie znaczy to
+samo co prim.
+
+Zróżniczkuj $x^{7}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$7x^{6}$}
+Teraz $\sqrt[3]{x}$, czyli $x^{1/3}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\frac{1}{3}x^{-2/3}$}
+Wykładnik zszedł na dół i zmalał o jeden: $\frac{1}{3} - 1 = -\frac{2}{3}$.
+
+Jeszcze dwie reguły, obie tak łagodne, że jedynym powodem, by je podać, jest
+to, że dwie następne takie nie są.
+
+\textbf{Wielokrotność stała} wychodzi wprost: $(cf)' = c f'$. Rozciągnięcie
+wykresu w pionie przez $c$ rozciąga wszystkie jego nachylenia przez $c$, czyli
+ruch spoza nawiasu z Programu~\ref{prog:F05} widziany przez pochodną.
+
+\textbf{Suma} różniczkuje się składnik po składniku: $(f + g)' = f' + g'$.
+Dodanie dwóch krzywych dodaje ich wysokości w każdym punkcie, więc dodaje też
+ich tempa zmian.
+
+Zróżniczkuj $3x^{4} - 5x + 2$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$12x^{3} - 5$}
+Reguła potęgowa na każdym składniku, wielokrotność stała wyciągnięta przed, a
+$2$ znika, bo stała nie ma nachylenia.
+
+\begin{note}
+Każda reguła w tym programie jest sprawdzona w
+\code{code/f12\_chain\_rule.py} wobec pochodnej policzonej \emph{bez} niej
+\dash{} różnicą centralną przy $h = 10^{-5}$, którą Program~\ref{prog:F11}
+znalazł blisko dna swojej krzywej U. Ta zgadza się do $\val{f12.err.sum}$ w
+dwustu punktach.
+
+I po to właśnie różnica skończona jest. F11 pokazał, że robi z niej złą
+definicję; robi z niej doskonałe niezależne sprawdzenie, o ile krok dobierze
+się tam, gdzie krzywa U jest nisko, a nie tak mały, jak się da.
+\end{note}
+
+Zróżniczkuj $\frac{4}{x} + \sqrt{x}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$-\frac{4}{x^{2}} + \frac{1}{2\sqrt{x}}$}
+Zapisując je najpierw jako $4x^{-1}$ i $x^{1/2}$, i to jest nawyk warty
+zbudowania: \textbf{sprowadź wszystko do postaci $x^{n}$, a resztę zrobi
+reguła potęgowa.}
+
+Więc trzy reguły pokrywają każdy wielomian i każdy pierwiastek. Nie pokrywają
+dwóch funkcji \emph{pomnożonych}, i o tym jest następna sekcja.
+\end{fr}
+
+% ============================================================
+\section{Iloczyny i ilorazy}
+\label{sec:F12-product}
+\index{derivative!product and quotient rules}
+
+\begin{fr}
+Suma różniczkuje się na sumę pochodnych. Oto więc odruch, który ma każdy, i
+wart jest wypowiedzenia na głos, zanim zostanie poprawiony.
+
+$f(x) = x^{2}$ i $g(x) = x^{3}$. Zgadnij pochodną $f(x)g(x)$, różniczkując
+każdą i mnożąc, a potem policz prawdziwą odpowiedź, mnożąc najpierw i używając
+reguły potęgowej. Zrób oba w $x = \val{f12.trap.x}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Odruch daje $\val{f12.trap.wrong}$, a prawdą jest $\val{f12.trap.right}$.
+\end{ansblock}
+
+Odruch: $f' = 2x$ i $g' = 3x^{2}$, więc $f'g' = 6x^{3}$, co w
+$x = \val{f12.trap.x}$ daje $\val{f12.trap.wrong}$. Prawda: $fg = x^{5}$, co
+różniczkuje się do $5x^{4}$, a w $x = \val{f12.trap.x}$ daje
+$\val{f12.trap.right}$.
+
+\begin{trapbox}
+\textbf{Różniczkowanie nie rozdziela się na iloczyn.} Rozdziela się na sumę, i
+właśnie dlatego ten odruch jest tak naturalny \dash{} reguła, która działała
+wiersz wcześniej, zostaje przeniesiona o krok poza swoje założenia, czyli ten
+sam kształt co podane w Programie~\ref{prog:F02} $(a+b)^{2}$ i dodawanie
+długości z Programu~\ref{prog:F09}.
+
+Oba wyrażenia zgadzają się w dokładnie $\val{f12.trap.agree}$ punktach całego
+przebiegu, który liczy skrypt, i oba te punkty są przypadkami tego, gdzie
+$5x^{4}$ przecina $6x^{3}$. Nie ma obszaru, w którym ten odruch byłby choćby w
+przybliżeniu poprawny.
+
+Powód wart jest jednego zdania, bo wyjaśnia poprawną regułę, a nie tylko
+zastępuje błędną. Gdy $x$ się przesuwa, przesuwają się \emph{oba} czynniki, a
+iloczyn zmienia się z powodu każdego z nich. Odruch nie uwzględnia żadnej z
+tych zmian osobno; mnoży dwa tempa, a to nie jest tempo czegokolwiek.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Uwzględnij więc obie zmiany osobno. Trzymaj $g$ nieruchomo i pozwól poruszyć
+się $f$: iloczyn zmienia się w tempie $f'g$. Trzymaj $f$ nieruchomo i pozwól
+poruszyć się $g$: zmienia się w tempie $fg'$. Oba dzieją się naraz, więc
+dodaj je.
+
+\[ (fg)' = f'g + fg' \]
+
+To jest \textbf{reguła iloczynu}. Sprawdź ją na przypadku, który przed chwilą
+zawiódł: $f'g + fg' = 2x \cdot x^{3} + x^{2} \cdot 3x^{2} = 2x^{4} + 3x^{4} =
+5x^{4}$, czyli poprawnie. Sprawdzone wobec różnicy skończonej do
+$\val{f12.err.product}$.
+
+\mermaidfig{f12-product-not-product}{Reguła, która się rozdziela, odruch,
+który to podsuwa, i to, co dzieje się zamiast tego.}{dlaczego iloczyn nie jest
+iloczynem pochodnych}
+\end{fr}
+
+\begin{fr}
+Użyj jej. Weź $f(x) = (x+1)$ i $g(x) = (x-3)$ i zastosuj regułę iloczynu do
+$fg$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$2x - 2$}
+Z $1 \cdot (x-3) + (x+1) \cdot 1 = 2x - 2$. I możesz to sprawdzić drogą
+wolniejszą: $(x+1)(x-3) = x^{2} - 2x - 3$, co różniczkuje się do $2x - 2$
+regułą potęgową.
+
+To sprawdzenie warto zamienić w nawyk. \textbf{Gdy iloczyn da się też
+rozwinąć, obie drogi muszą się zgodzić}, a niezgoda znaczy pomyłkę
+rachunkową, a nie wybór metody.
+
+Teraz czwarta reguła, która jest regułą iloczynu w przebraniu. Zróżniczkuj
+$\frac{f}{g}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}} \]
+\end{ansblock}
+
+\textbf{Reguła ilorazu}. Licznik to reguła iloczynu z minusem, i przez to
+kolejność ma znaczenie: $f'g$ idzie pierwsze.
+
+Dwie rzeczy czynią ją zapamiętywalną, a nie wykutą. Minus jest tam dlatego, że
+zwiększenie \emph{mianownika} zmniejsza całość, więc wkład $g$ musi przyjść z
+przeciwnym znakiem niż wkład $f$. A $g^{2}$ pod spodem musi tam być, żeby
+jednostki się zgadzały: jeśli $f$ jest stratą, a $g$ liczbą, to $\frac{f}{g}$
+jest stratą na sztukę, a jej tempo zmiany po $x$ nie może mieć $g$
+pojawiającego się tylko raz.
+
+Zróżniczkuj $\frac{x^{2}}{x+3}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\frac{2x(x+3) - x^{2}}{(x+3)^{2}}$}
+Co upraszcza się do $\frac{x^{2} + 6x}{(x+3)^{2}}$, jeśli chcesz, i nie musi.
+Sprawdzone do $\val{f12.err.quotient}$.
+
+\begin{note}
+Reguła ilorazu jest najrzadziej używaną z czterech w tej książce, bo większość
+ilorazów, które spotkasz, lepiej obsłużyć inaczej \dash{} softmaks jest
+ilorazem, a Program~\ref{prog:P18} różniczkuje go drogą, która zachowuje
+czytelność odpowiedzi. Jest tu dla kompletności i dlatego, że rozumowanie za
+jej minusem się przenosi.
+\end{note}
+
+To cztery reguły. Każda z nich dotyczy łączenia funkcji \emph{obok siebie}:
+dodanych, pomnożonych, podzielonych. Żadna nie dotyczy wstawienia jednej
+funkcji \emph{do wnętrza} drugiej, a tym właśnie jest sieć.
+\end{fr}
+
+% ============================================================
+\section{Reguła łańcuchowa}
+\label{sec:F12-chain}
+\index{chain rule!statement}
+
+\begin{fr}
+Program~\ref{prog:F05} zbudował złożenie: $f(g(x))$, wyjście jednej maszyny
+podane na wejście drugiej. Jego ramka 34 powiedziała wprost, że
+zróżniczkowanie takiego czegoś jest zadaniem tego programu.
+
+Oto pytanie i warto spróbować, zanim przeczytasz dalej. Jeśli $g$ zmienia się
+w tempie $g'$, a $f$ w tempie $f'$, to w jakim tempie zmienia się $f(g(x))$,
+gdy $x$ się przesuwa?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \bigl(f(g(x))\bigr)' = f'\bigl(g(x)\bigr) \cdot g'(x) \]
+\end{ansblock}
+
+\textbf{Tempa się mnożą}, a to zewnętrzne liczy się w \emph{wartości} tego
+wewnętrznego, a nie w $x$.
+
+Rozumowanie ma już twoja intuicja. Jeśli $g$ porusza się trzy razy szybciej
+niż $x$, a $f$ dwa razy szybciej niż $g$, to $f$ porusza się sześć razy
+szybciej niż $x$. Koła zębate: dwa w zazębieniu mnożą swoje przełożenia. To
+jest \textbf{reguła łańcuchowa} i jest jedyną regułą w tym programie
+dotyczącą składania.
+
+Częścią, którą łatwo zgubić, jest to, \emph{gdzie} liczy się $f'$. $f'$ jest
+funkcją, a wartością, której potrzebuje, jest $g(x)$, a nie $x$ \dash{} bo
+tam właśnie jest $f$, gdy złożenie się liczy.
+
+Zróżniczkuj $(3x + 1)^{4}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$12(3x+1)^{3}$}
+Na zewnątrz jest $u^{4}$, którego pochodną jest $4u^{3}$; policzone w
+wnętrzu daje $4(3x+1)^{3}$. Wewnątrz jest $3x+1$, którego pochodną jest $3$.
+Pomnóż: $12(3x+1)^{3}$.
+
+Sprawdź to drogą wolniejszą, jeśli chcesz \dash{} rozwiń $(3x+1)^{4}$ i
+zróżniczkuj składnik po składniku \dash{} a wyjdzie to samo, co warto zrobić
+raz, żeby reguła przestała wyglądać na sztuczkę.
+
+Zróżniczkuj $\sqrt{x^{2} + 1}$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\frac{x}{\sqrt{x^{2}+1}}$}
+Na zewnątrz $u^{1/2}$ daje $\frac{1}{2}u^{-1/2}$, policzone w $x^{2}+1$.
+Wewnątrz $x^{2}+1$ daje $2x$. Pomnóż, a oba $2$ się skracają.
+
+Teraz ta, której ta książka naprawdę potrzebuje. Program~\ref{prog:F07} dał ci
+funkcję logistyczną, $\sigma(z) = \frac{1}{1 + e^{-z}}$, i powiedział, że jej
+pochodna potrzebuje reguły łańcuchowej i przyjdzie tutaj.
+
+Jest ilorazem ze złożeniem w środku, więc bierze obie ostatnie sekcje. Policz
+to albo weź odpowiedź i sprawdź.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \sigma'(z) = \sigma(z)\bigl(1 - \sigma(z)\bigr) \]
+\end{ansblock}
+
+Zapisz $\sigma = (1 + e^{-z})^{-1}$ i użyj reguły łańcuchowej dwa razy:
+zewnętrzne $u^{-1}$ daje $-u^{-2}$, wewnętrzne $1 + e^{-z}$ daje $-e^{-z}$, a
+oba minusy się skracają, zostawiając $\frac{e^{-z}}{(1+e^{-z})^{2}}$. Potem
+rozbij to na $\frac{1}{1+e^{-z}} \times \frac{e^{-z}}{1+e^{-z}}$, a drugi
+czynnik to $1 - \sigma(z)$.
+
+Sprawdzone wobec różnicy skończonej do $\val{f12.err.sigmoid}$ w dwustu
+punktach od $-8$ do $8$.
+
+\begin{note}
+\textbf{Pochodna da się wyrazić przez samą funkcję}, co jest nietypowe i nie
+jest przypadkiem algebry. To powód, dla którego framework potrafi policzyć
+gradient warstwy logistycznej z wartości, którą już zapisał po drodze w przód,
+niczego nie licząc od nowa i nie trzymając wejścia. Ta obserwacja jest
+zalążkiem tego, co Program~\ref{prog:P16} nazywa trybem wstecznym.
+\end{note}
+
+Ile najwięcej może wynosić $\sigma'$ i gdzie?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f12.sig.max}$, w $z = 0$}
+Bo $\sigma(1-\sigma)$ jest iloczynem dwóch liczb sumujących się do $1$, a taki
+iloczyn jest największy, gdy są równe \dash{} przy $\sigma = \frac{1}{2}$,
+czyli $z = 0$. Więc $\sigma' \le \frac{1}{4}$ \textbf{wszędzie, bez wyjątku},
+sprawdzone w szesnastu tysiącach punktów.
+
+Ta liczba jest mała i za chwilę zostanie pomnożona przez siebie czterdzieści
+razy. Trzymaj ją.
+
+Najpierw jeszcze jedno różniczkowanie, i jest to jednostka, do której ta
+książka wciąż wraca. Zróżniczkuj $\sigma(wx + b)$ po $x$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \frac{\mathrm{d}}{\mathrm{d}x}\,\sigma(wx+b)
+   = w\,\sigma(wx+b)\bigl(1 - \sigma(wx+b)\bigr) \]
+\end{ansblock}
+
+Reguła łańcuchowa: na zewnątrz jest $\sigma$, którego pochodną jest
+$\sigma(1-\sigma)$ policzone w $wx+b$; wewnątrz jest $wx+b$, którego pochodną
+jest $w$. Sprawdzone do $\val{f12.err.chain}$ przy
+$w = \val{f12.chain.w}$, $b = \val{f12.chain.b}$.
+
+\textbf{To wyrażenie jest całym wkładem jednej warstwy w gradient}, a każdy
+symbol w nim ma zadanie: $w$, bo warstwa skaluje swoje wejście, i
+$\sigma(1-\sigma)$, bo warstwa je zagina. Zwróć uwagę, czego w nim
+\emph{nie ma}: $b$. Obciążenie przesuwa miejsce zagięcia i nie zmienia tego,
+jak mocno się zagina, i dlatego obciążenie nigdy nie pojawia się w czynniku
+reguły łańcuchowej.
+\end{fr}
+
+% ============================================================
+\section{Sieć jest złożeniem}
+\label{sec:F12-network}
+\index{chain rule!and backpropagation}
+
+\begin{fr}
+Program~\ref{prog:F05} ustalił, że głęboka sieć jest złożeniem i niczym
+więcej. Rozpisz dwie warstwy:
+\[ y = \sigma\bigl(w_2\,\sigma(w_1 x + b_1) + b_2\bigr) \]
+i zróżniczkuj po $x$.
+
+Weź to w dwóch krokach: jaka jest pochodna warstwy wewnętrznej i co robi z nią
+zewnętrzna?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \frac{\mathrm{d}y}{\mathrm{d}x}
+   = \underbrace{w_2\,\sigma'(z_2)}_{\text{zewn.}} \cdot
+     \underbrace{w_1\,\sigma'(z_1)}_{\text{wewn.}} \]
+gdzie $z_1 = w_1x + b_1$, a $z_2 = w_2\sigma(z_1) + b_2$.
+\end{ansblock}
+
+\textbf{Po jednym czynniku na warstwę, wymnożone razem}, a każdy czynnik to
+wyrażenie wyprowadzone w poprzedniej sekcji, policzone we własnym wejściu tej
+warstwy.
+
+Dodaj trzecią warstwę. Ile czynników?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Trzy}
+A wzorzec się nie zmienia: pochodna sieci o $n$ warstwach po jej wejściu jest
+iloczynem $n$ czynników, każdy postaci $w_k\,\sigma'(z_k)$.
+
+\[ \frac{\mathrm{d}y}{\mathrm{d}x}
+   = \prod_{k=1}^{n} w_k\,\sigma'(z_k) \]
+
+używając zapisu iloczynu, który dał ci Program~\ref{prog:F04}. To jedno
+wyrażenie jest tym, do czego ten program istnieje, żeby dojść.
+
+\mermaidfig{f12-composition-chain}{Warstwa bierze wyjście poprzedniej, więc
+całość jest jedną funkcją w drugiej, a jej pochodna jest iloczynem.}{pochodna
+sieci jako iloczyn}
+\end{fr}
+
+\begin{fr}
+Teraz to zdanie.
+
+\begin{aibox}
+\textbf{Propagacja wsteczna to reguła łańcuchowa zastosowana do złożenia
+warstw, z wartościami pośrednimi zapamiętanymi, a nie liczonymi od nowa.} Nie
+ma w niej nic więcej.
+
+Każdy czynnik tego iloczynu potrzebuje $z_k$, czyli wejścia warstwy $k$. Te
+wartości policzono po drodze w przód. Więc algorytm brzmi: idź w przód i
+zapamiętaj je; wracaj, mnożąc czynniki po drodze. \enquote{Wstecz} nazywa
+kierunek, w którym mnożenie się akumuluje, i nic bardziej tajemniczego.
+
+Dwa wnioski wypadają natychmiast i oba są rzeczami, których ludzie uczą się
+boleśnie. Aktywacje trzeba \emph{przechowywać}, więc pamięć rośnie z
+głębokością i z rozmiarem wsadu \dash{} i to właśnie wymienia checkpointing
+gradientu na przeliczanie, co jest tematem Programu~\ref{prog:P16}. A gradient
+po wadze głęboko w sieci zawiera każdy czynnik między nią a stratą, więc nic w
+trenowaniu jednej warstwy nie jest lokalne dla tej warstwy.
+\end{aibox}
+
+Co prowadzi do pytania, o którym jest sekcja 5. Te czynniki są mnożone. Co
+robi długi iloczyn liczb poniżej jedynki?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Idzie do zera, szybko}
+I to jest całość problemu zanikającego gradientu, z którego następna sekcja
+robi arytmetykę.
+
+Przed nią jedno ostrzeżenie co do tego, co właśnie wyprowadzono. To wszystko
+jest \emph{jednowymiarowe}: jedno wejście, jedno wyjście, jedna liczba na
+warstwę. Prawdziwa warstwa bierze wektor i zwraca wektor, więc każdy
+\enquote{czynnik} jest tabelą liczb, a nie jedną, a mnożenie ich jest
+mnożeniem macierzy, a nie arytmetyką.
+
+\textbf{Struktura jest identyczna, a obiekty nie.}
+Program~\ref{prog:P16} robi wersję wektorową, gdzie czynniki nazywają się
+jakobianami, a pytanie, w jakiej kolejności je mnożyć, okazuje się
+rozstrzygać koszt całego rachunku. Przenosi się stąd kształt: po jednym
+czynniku na warstwę, wymnożone, policzone w wartościach zapamiętanych z
+przebiegu w przód.
+\end{fr}
+
+% ============================================================
+\section{Co robi długi iloczyn}
+\label{sec:F12-vanishing}
+\index{chain rule!vanishing and exploding factors}
+
+\begin{fr}
+Weź iloczyn z poprzedniej sekcji z każdą wagą równą $1$, tak że każdy czynnik
+to po prostu $\sigma'(z_k)$.
+
+Program~\ref{prog:F07} zmierzył, co robi nasycona funkcja logistyczna: przy
+$\lvert z \rvert = 6$ odpowiada na zmianę wejścia mniej więcej
+$\val{f12.sat.ratio}$-tą częścią odpowiedzi, jaką daje w środku. To jedna
+warstwa. Ten program liczy ten sam stosunek od zera i asertuje zgodność z
+wynikiem F07, więc oba programy dowodliwie cytują jeden rachunek.
+
+Teraz ustaw czterdzieści z nich jedna za drugą. Sens pytania o przypadek
+najlepszy, a nie realistyczny, jest taki, że przypadek najlepszy jest
+\emph{ograniczeniem}: cokolwiek wytrenowana sieć naprawdę robi, lepiej zrobić
+nie może, więc beznadziejny przypadek najlepszy rozstrzyga sprawę, nie
+wymagając wiedzy o tym, gdzie siedzi którakolwiek jednostka.
+
+Sieć ma $\val{f12.depth}$ warstw, a każda jednostka jest w swoim
+\emph{najlepszym} położeniu \dash{} siedzi dokładnie w środku, gdzie $\sigma'$
+jest największe. Ile wynosi iloczyn?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f12.vanish.bound}$}
+$\val{f12.sig.max}$ podniesione do potęgi $\val{f12.depth}$.
+
+\begin{trapbox}
+\textbf{To jest przypadek najlepszy} i już jest beznadziejny. Każda jednostka
+siedząca dokładnie w swoim najbardziej czułym punkcie \dash{} czego nie robi
+żadna wytrenowana sieć \dash{} i tak traci dwadzieścia cztery rzędy wielkości
+między stratą a wejściem pierwszej warstwy.
+
+Postaw jednostki tam, gdzie Program~\ref{prog:F07} zmierzył nasycenie, czyli
+przy $\sigma' = \val{f12.sat.factor}$, a iloczyn wynosi
+$\val{f12.sat.bound}$. To nie jest mała liczba, to w ogóle nie jest liczba w
+żadnej arytmetyce, którą robi komputer: znika do zera na długo przed
+czterdziestą warstwą, co jest terenem Programu~\ref{prog:P01} i znaczy, że
+pierwsze warstwy dostają \emph{dokładnie} nic, a nie bardzo mało.
+
+Mechanizm nie jest subtelny i o to chodzi. \textbf{Nic tutaj nie jest
+własnością sieci neuronowych.} To jest to, co dzieje się, gdy czterdzieści
+liczb poniżej jedynki się mnoży, a F07 zmierzył te liczby, a ten program je
+pomnożył.
+\end{trapbox}
+
+\mermaidfig{f12-factors-multiply}{Jedna płaska warstwa da się przeżyć;
+iloczyn czterdziestu nie, a mnożenie to wszystko, co się stało.}{zanikanie
+jako iloczyn}
+\end{fr}
+
+\begin{fr}
+Teraz wstaw wagi z powrotem. Każdy czynnik to $w_k\,\sigma'(z_k)$, a nie
+$\sigma'(z_k)$, więc duża waga mogłaby wypchnąć czynnik ponad jedynkę, a
+iloczyn mógłby rosnąć zamiast maleć.
+
+$\sigma'$ nigdy nie przekracza $\val{f12.sig.max}$. Jak duże musi więc być
+$w$, żeby warstwa mogła w ogóle wzmacniać?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Większe niż $\val{f12.explode.w}$}
+Bo czynnik wynosi najwyżej $\frac{w}{4}$, a to dochodzi do $1$ dokładnie przy
+$w = \val{f12.explode.w}$. Sprawdzone przy czterech wagach, każda w
+szesnastu tysiącach wartości $z$.
+
+\textbf{To jest ostry, sprawdzalny próg i warto go mieć.} Warstwa logistyczna
+o wadze $3$ nie może sprawić, że gradient urośnie, bez względu na to, gdzie
+siedzi jej wejście i ile takich warstw jest. Oba tryby porażki nie są
+symetryczne: zanikanie nie potrzebuje nic poza głębokością, a eksplozja
+potrzebuje wag powyżej konkretnej liczby.
+
+Przy $w = \val{f12.explode.big.w}$ czynnik w najlepszym razie wynosi
+$\val{f12.explode.big.factor}$, więc $\val{f12.depth}$ warstw mnoży gradient
+przez $\val{f12.explode.big.depth}$ \dash{} i \emph{to} znaczy arytmetycznie
+\enquote{gradienty eksplodowały}.
+
+\begin{aibox}
+Obie liczby wyjaśniają wybory, które widziałeś. Przycinanie gradientu, które
+Program~\ref{prog:F06} zdefiniował jako operację, jest odpowiedzią na drugą:
+ogranicza iloczyn po fakcie, zamiast mu zapobiegać.
+
+Staranna inicjalizacja jest odpowiedzią na obie i jest twierdzeniem o
+rozkładzie, z którego losuje się wagi, a nie o którejkolwiek wadze \dash{} i
+dlatego należy do Programu~\ref{prog:P25}, bo potrzebuje wariancji.
+
+A własna odpowiedź architektury \dash{} droga od straty do wczesnych warstw,
+która wcale nie jest długim iloczynem \dash{} to połączenie rezydualne, które
+wyprowadza Program~\ref{prog:P32}. Ten program dostarcza powodu, dla którego
+którakolwiek z nich jest potrzebna, a jest nim iloczyn i ograniczenie na
+jeden z jego czynników.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jedno uczciwe ograniczenie tego wszystkiego, bo łatwo to przeczytać za
+szeroko.
+
+Ograniczenie $\sigma' \le \val{f12.sig.max}$ jest dokładne i iloczyn jest
+dokładny, więc arytmetyka nie budzi wątpliwości. Wyborem modelowym jest
+\emph{cała reszta}: że każda warstwa jest logistyczna, że wagi są skalarami,
+że sieć jest zwykłym łańcuchem bez żadnej innej drogi od straty do wejścia.
+
+\textbf{Zmień którekolwiek z tych założeń, a iloczyn się zmieni.} $\relu$ ma
+pochodną $1$ po swojej dodatniej stronie, więc łańcuch takich jednostek nie
+wnosi tam żadnego czynnika zmniejszającego \dash{} co jest większością
+argumentu za jego używaniem, a Program~\ref{prog:F07} zapisał na konto płaską
+stronę tego handlu. Połączenie rezydualne dodaje drogę, której czynniki są
+równe $1$. Warstwa normalizująca zmienia $z_k$, w których liczy się czynniki.
+
+Weź więc z tej sekcji mechanizm i ograniczenie, a z wnioskiem bądź ostrożny.
+\emph{Głęboki stos jednostek nasycających ma zanikający gradient} jest tutaj
+ustalone. \emph{Głębokie sieci mają zanikające gradienty} nie jest: to był
+rzetelny opis sieci, o których ten argument pierwotnie postawiono, a każdą z
+trzech powyższych zmian przyjęto po części dlatego, że przestaje nim być.
+\end{fr}
+
+\begin{fr}
+Uwaga na koniec i dotyczy kształtu całego programu.
+
+Cztery reguły i jedna reguła składania. Te cztery dotyczą funkcji obok siebie
+i są, uczciwie mówiąc, księgowością. Piąta dotyczy funkcji wewnątrz siebie
+nawzajem i wyprodukowała: pochodną funkcji logistycznej, pochodną jednostki,
+pochodną sieci, propagację wsteczną i oba tryby porażki, które czynią
+trenowanie głębokich sieci trudnym.
+
+\textbf{Nie dlatego, że reguła łańcuchowa jest głęboka. Dlatego, że złożenie
+jest tym, czym sieć jest}, a reguła o składaniu jest wobec tego regułą o
+wszystkim, co sieć robi.
+
+Program~\ref{prog:F13} zamyka część Podstawy, idąc w drugą stronę \dash{}
+sumując, a nie różniczkując \dash{} a potem książka przestaje niczego nie
+zakładać i zaczyna budować.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Reguła potęgowa}:
+  $\frac{\mathrm{d}}{\mathrm{d}x}x^{n} = nx^{n-1}$, dla każdego $n$, w tym
+  ujemnego i ułamkowego. Zawiera wszystkie trzy wyniki
+  Programu~\ref{prog:F11} jako przypadki szczególne, a nawykiem, który każe
+  jej wykonać całą pracę, jest \textbf{sprowadzenie wszystkiego najpierw do
+  postaci $x^{n}$}.}
+\sumitem{4--6}{$(cf)' = cf'$ oraz $(f+g)' = f' + g'$. Każda reguła w tym
+  programie jest sprawdzona wobec pochodnej policzonej \emph{bez} niej,
+  różnicą centralną przy $h = 10^{-5}$ \dash{} i po to właśnie różnica
+  skończona jest, czyli krzywa U z Programu~\ref{prog:F11} zaprzęgnięta do
+  pracy, a nie tylko przestrzegająca.}
+\sumitem{7--8}{\textbf{Różniczkowanie nie rozdziela się na iloczyn.} Na
+  $x^{2}$ i $x^{3}$ w $x = \val{f12.trap.x}$ prawdą jest
+  $\val{f12.trap.right}$, a pierwszy odruch daje $\val{f12.trap.wrong}$, a oba
+  wyrażenia zgadzają się w dokładnie $\val{f12.trap.agree}$ punktach całego
+  przebiegu. Ten sam kształt co $(a+b)^{2}$ z F02 i dodawanie długości z F09:
+  reguła przeniesiona o krok poza swoje założenia.}
+\sumitem{9--13}{\textbf{$(fg)' = f'g + fg'$}, bo gdy $x$ się przesuwa,
+  przesuwają się \emph{oba} czynniki i iloczyn zmienia się z powodu każdego z
+  nich; oraz $\left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}$, którego
+  minus jest tam, bo podniesienie mianownika obniża całość. Gdy iloczyn da się
+  też rozwinąć, obie drogi muszą się zgodzić \dash{} darmowe sprawdzenie warte
+  zamienienia w nawyk.}
+\sumitem{14--16}{\textbf{Reguła łańcuchowa: $\bigl(f(g(x))\bigr)' =
+  f'(g(x)) \cdot g'(x)$.} Tempa się mnożą, jak koła zębate w zazębieniu, a
+  pochodna zewnętrzna liczy się w \emph{wartości tej wewnętrznej}, i to jest
+  ta część, którą się gubi.}
+\sumitem{17--18}{\textbf{$\sigma'(z) = \sigma(z)(1-\sigma(z))$}, sprawdzone do
+  $\val{f12.err.sigmoid}$. Pochodna da się wyrazić przez samą funkcję, i
+  dlatego framework potrafi policzyć gradient warstwy logistycznej z wartości,
+  którą już zapisał, idąc w przód \dash{} zalążek tego, co
+  Program~\ref{prog:P16} nazywa trybem wstecznym.}
+\sumitem{19--20}{\textbf{$\sigma' \le \val{f12.sig.max}$ wszędzie}, w
+  $z = 0$, bo $\sigma(1-\sigma)$ to iloczyn dwóch liczb sumujących się do
+  jedynki. A wkład jednej jednostki to $w\,\sigma(wx+b)(1-\sigma(wx+b))$: $w$,
+  bo warstwa skaluje, $\sigma(1-\sigma)$, bo zagina, i \emph{żadnego $b$}, bo
+  obciążenie przesuwa miejsce zagięcia, a nie to, jak mocno się zagina.}
+\sumitem{21--23}{Pochodna sieci o $n$ warstwach po jej wejściu to
+  $\prod_{k=1}^{n} w_k\,\sigma'(z_k)$ \dash{} \textbf{po jednym czynniku na
+  warstwę, wymnożone razem}, każdy policzony we własnym wejściu tej warstwy.}
+\sumitem{24--25}{\textbf{Propagacja wsteczna to reguła łańcuchowa zastosowana
+  do złożenia warstw, z wartościami pośrednimi zapamiętanymi, a nie liczonymi
+  od nowa.} Nie ma w niej nic więcej, a \enquote{wstecz} nazywa kierunek, w
+  którym akumuluje się mnożenie. Dwa wnioski: aktywacje trzeba przechowywać,
+  więc pamięć rośnie z głębokością i wsadem; a gradient po głębokiej wadze
+  zawiera każdy czynnik między nią a stratą, więc nic w trenowaniu jednej
+  warstwy nie jest dla niej lokalne. Wersja wektorowa, gdzie każdy czynnik
+  jest jakobianem, a kolejność mnożenia rozstrzyga koszt, należy do
+  Programu~\ref{prog:P16}.}
+\sumitem{26--27}{\textbf{$\val{f12.depth}$ warstw w najlepszym razie daje
+  $\val{f12.sig.max}^{\val{f12.depth}} = \val{f12.vanish.bound}$}, a żadna
+  wytrenowana sieć nie siedzi w swoim najlepszym razie. Postaw jednostki tam,
+  gdzie Program~\ref{prog:F07} zmierzył nasycenie \dash{}
+  $\val{f12.sat.factor}$, czyli $\val{f12.sat.ratio}$-ta część odpowiedzi ze
+  środka, a ten program przelicza tę wartość od zera i asertuje zgodność z
+  F07 \dash{} a iloczyn wynosi $\val{f12.sat.bound}$, co znika do dokładnie
+  zera na długo przed czterdziestą warstwą.}
+\sumitem{28--29}{\textbf{Łańcuch logistyczny nie może wzmacniać, chyba że
+  $\lvert w \rvert > \val{f12.explode.w}$}, bo czynnikiem jest
+  $w\sigma' \le \frac{w}{4}$. Oba tryby porażki nie są symetryczne: zanikanie
+  potrzebuje tylko głębokości, eksplozja konkretnej wagi. Przy
+  $w = \val{f12.explode.big.w}$ czynnik wynosi
+  $\val{f12.explode.big.factor}$, a $\val{f12.depth}$ warstw mnoży przez
+  $\val{f12.explode.big.depth}$.}
+\sumitem{30--31}{Ograniczenie i iloczyn są dokładne; \textbf{to, że każda
+  warstwa jest logistyczna w zwykłym łańcuchu, jest wyborem modelowym}.
+  $\relu$ wnosi czynnik $1$ po swojej dodatniej stronie, połączenie
+  rezydualne dodaje drogę z samych $1$ (Program~\ref{prog:P32}), a
+  normalizacja zmienia $z_k$. \emph{Głęboki stos jednostek nasycających ma
+  zanikający gradient} jest tu ustalone; \emph{głębokie sieci mają zanikające
+  gradienty} nie jest, a każdą z tych trzech zmian przyjęto po części dlatego,
+  że przestaje nim być. Cztery reguły są księgowością; piąta wyprodukowała
+  propagację wsteczną i oba jej tryby porażki, bo złożenie jest tym, czym
+  sieć jest.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Zróżniczkuj $x^{9}$, $\frac{1}{x^{3}}$ oraz $\sqrt[4]{x}$.
+  \answerto{$9x^{8}$, $-3x^{-4}$ i $\frac{1}{4}x^{-3/4}$. Zapisz dwa ostatnie
+  najpierw jako $x^{-3}$ i $x^{1/4}$.}
+\item Zróżniczkuj $5x^{3} - \frac{2}{x} + 7$.
+  \answerto{$15x^{2} + \frac{2}{x^{2}}$. Środkowy składnik to $-2x^{-1}$,
+  którego pochodną jest $+2x^{-2}$.}
+\item Zróżniczkuj $(x^{2}+1)(x-4)$ dwoma drogami: regułą iloczynu i przez
+  wcześniejsze rozwinięcie.
+  \answerto{Obie dają $3x^{2} - 8x + 1$. Reguła iloczynu daje
+  $2x(x-4) + (x^{2}+1)$; rozwinięcie daje $x^{3} - 4x^{2} + x - 4$.}
+\item Zróżniczkuj $\frac{x+1}{x-1}$.
+  \answerto{$\frac{(x-1) - (x+1)}{(x-1)^{2}} = \frac{-2}{(x-1)^{2}}$.}
+\item Zróżniczkuj $(2x - 5)^{6}$.
+  \answerto{$12(2x-5)^{5}$: zewnętrzna daje $6(2x-5)^{5}$, a wewnętrzna daje
+  $2$.}
+\item Zróżniczkuj $e^{3x}$, wiedząc, że $e^{x}$ różniczkuje się do siebie.
+  \answerto{$3e^{3x}$, regułą łańcuchową z pochodną wnętrza równą $3$.}
+\item Zróżniczkuj $\sigma(-x)$.
+  \answerto{$-\sigma(-x)\bigl(1 - \sigma(-x)\bigr)$. Pochodna wnętrza to
+  $-1$.}
+\item Podaj $\sigma'$ w $z = 0$ i powiedz, dlaczego żadna wartość $z$ tego nie
+  bije.
+  \answerto{$\val{f12.sig.max}$. $\sigma(1-\sigma)$ to iloczyn dwóch liczb
+  sumujących się do jedynki, a taki iloczyn jest największy, gdy są równe.}
+\item Jednostka to $\sigma(3x - 1)$. Podaj jej pochodną w $x = \frac{1}{3}$.
+  \answerto{$3 \times \val{f12.sig.max} = \num{0.75}$, bo w $x = \frac{1}{3}$
+  wnętrze jest zerem, a tam $\sigma'$ osiąga szczyt.}
+\item Zapisz pochodną trójwarstwowej sieci logistycznej po jej wejściu,
+  używając zapisu iloczynu.
+  \answerto{$\prod_{k=1}^{3} w_k\,\sigma'(z_k)$, gdzie $z_k$ jest wejściem
+  warstwy $k$.}
+\item Dlaczego obciążenie nigdy nie pojawia się w czynniku reguły
+  łańcuchowej?
+  \answerto{Bo wnętrzem każdej warstwy jest $w_kx + b_k$, którego pochodną po
+  $x$ jest $w_k$ \dash{} obciążenie jest stałą, a stałe różniczkują się do
+  zera.}
+\item Dziesięć warstw logistycznych ma wagi $1$ i wszystkie siedzą w swoich
+  środkach. Podaj iloczyn.
+  \answerto{$\val{f12.sig.max}^{10}$, czyli około $\num{9.5e-7}$. Dziesięć
+  warstw to już czynnik miliona.}
+\item Warstwa logistyczna ma wagę $\num{3.5}$. Czy może wzmocnić gradient?
+  \answerto{Nie. Czynnik wynosi najwyżej $\frac{\num{3.5}}{4}$, czyli poniżej
+  jedynki, więc żadne ustawienie jej wejścia nie sprawi, że urośnie.}
+\item Powiedz jednym zdaniem, co trzeba zapamiętać w przebiegu w przód i
+  dlaczego.
+  \answerto{Wejście każdej warstwy $z_k$, bo każdy czynnik reguły łańcuchowej
+  go potrzebuje, a przeliczanie ich oznaczałoby uruchamianie sieci od nowa na
+  każdą warstwę.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Wyprowadź regułę iloczynu z definicji, rozwijając
+  \[ \frac{f(x+h)g(x+h) - f(x)g(x)}{h} \]
+  po dodaniu i odjęciu $f(x+h)g(x)$ w liczniku.
+  \answerto{Wyrażenie staje się
+  $\frac{f(x+h)-f(x)}{h}g(x) + f(x+h)\frac{g(x+h)-g(x)}{h}$, którego obie
+  części zatrzymują się na $f'g$ i $fg'$. Sztuczkę z dodaniem i odjęciem
+  wyrazu pośredniego warto rozpoznawać; tak wyprowadza się większość reguł o
+  kształcie iloczynu.}
+\item Pokaż, że reguła ilorazu wynika z reguły iloczynu zastosowanej do
+  $f \cdot g^{-1}$, przy danej regule łańcuchowej.
+  \answerto{$(fg^{-1})' = f'g^{-1} + f(-g^{-2}g') =
+  \frac{f'}{g} - \frac{fg'}{g^{2}}$, co po sprowadzeniu do wspólnego
+  mianownika daje $\frac{f'g - fg'}{g^{2}}$. Więc nie jest to piąta reguła.}
+\item $f(g(x))$, gdzie oba $f$ i $g$ są ściśle rosnące. Co da się powiedzieć o
+  znaku pochodnej złożenia?
+  \answerto{Jest dodatni, bo oba czynniki są. Czyli wynik o zachowaniu
+  porządku z Programu~\ref{prog:F05} widziany przez regułę łańcuchową.}
+\item Pokaż, że $\sigma'(z) = \sigma(z)\sigma(-z)$, i powiedz, co ta postać
+  czyni oczywistym.
+  \answerto{$1 - \sigma(z) = \sigma(-z)$, więc obie postaci są tym samym.
+  Czyni to oczywistą symetrię: $\sigma'$ jest parzysta, więc jednostka jest
+  dokładnie tak czuła w $z$, jak w $-z$.}
+\item Program~\ref{prog:F07} podał $\tanh x = 2\sigma(2x) - 1$. Zróżniczkuj to
+  i uprość.
+  \answerto{$4\sigma(2x)(1 - \sigma(2x))$, którego maksimum wynosi $4 \times
+  \val{f12.sig.max} = 1$ w $x = 0$ \dash{} czyli czynnik cztery, który
+  zmierzył F07, przychodzący tu jako wniosek, a nie obserwacja.}
+\item Łańcuch warstw $\tanh$ z wagami jeden. Podaj czynnik na warstwę w
+  najlepszym razie i powiedz, co to robi z argumentem o zanikaniu.
+  \answerto{$1$, z poprzedniego zadania. Więc przypadek najlepszy w ogóle nie
+  zmniejsza \dash{} ale $\tanh$ nasyca się mocniej niż logistyczna, więc z
+  dala od środka czynniki są mniejsze. Argument przeżywa; ograniczenie nie.}
+\item Dwie sieci mają $10$ i $\val{f12.depth}$ warstw, poza tym identyczne
+  łańcuchy logistyczne w najlepszym razie. Podaj stosunek ich gradientów.
+  \answerto{$\val{f12.sig.max}^{-30}$, czyli $4^{30}$ \dash{} około
+  $10^{18}$. Głębokość kosztuje wykładniczo, a nie proporcjonalnie.}
+\item Wyjaśnij, dlaczego przycinanie gradientu adresuje przypadek
+  eksplodujący, a nie zanikający.
+  \answerto{Przycinanie ogranicza gradient od góry, a to właśnie narusza
+  gradient, który eksplodował. Gradient, który zanikł, jest już wewnątrz
+  każdego ograniczenia; nie ma czego przyciąć.}
+\item Reguła łańcuchowa mnoży czynniki. Tryb wsteczny mnoży je od strony
+  straty, a tryb w przód od strony wejścia. Nie licząc, powiedz, co
+  rozstrzygałoby, który jest tańszy.
+  \answerto{Kształty na obu końcach \dash{} ile wyjść wobec ilu wejść.
+  Skalarna strata i wiele parametrów to jedna skrajność, a liczy to
+  Program~\ref{prog:P16}.}
+\item Argument tego programu jest arytmetyczny, a jego wniosek nie jest
+  uniwersalny. Podaj dokładnie, co jest ustalone, a co nie.
+  \answerto{Ustalone: łańcuch warstw logistycznych o wagach poniżej
+  $\val{f12.explode.w}$ ma gradient ograniczony iloczynem czynników poniżej
+  jedynki, który spada wykładniczo z głębokością. Nieustalone: cokolwiek o
+  sieciach z innymi aktywacjami, drogami rezydualnymi lub normalizacją, z
+  których każda zmienia czynnik albo dodaje drogę.}
+\end{furtherproblems}
