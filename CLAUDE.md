@@ -118,6 +118,28 @@ specified in `notes/01-curriculum.md`; **none has been run**, and until one is,
 the claim it would support is labelled as judgement and its table stays empty.
 Nine of the ten are free and finish on a laptop in under a minute.
 
+**A gate on PAGINATION cannot be hard on two machines that paginate
+differently.** This repository builds on two TeX installations: the container
+that writes the published PDF has neither newtx nor inconsolata, CI has both,
+and the same source gives an overfull multiset of `[4.1 x 4]` here against
+`[1.2 x 4]` there. Every line breaks somewhere else.
+
+`checkpdf.py`'s two checks do not survive that equally. The **stranded frame
+opener** does, because `\begin{fr}`'s reservation is measured in
+`\baselineskip` and holds under either metric — it stays a hard gate
+everywhere. The **orphaned cue** does not: it is one frame's tail landing a
+line past a page boundary, so its location is a property of the installation.
+Trimming the line CI names fixes CI and moves the defect here; trimming the
+line this container names does the reverse. That is an unwinnable loop, and it
+was entered once before it was recognised.
+
+So the cue check is **hard where a person can act on it** (`make check`, on the
+author's own build) and **reported, not fatal, in CI** (`--cues=warn`). The
+count is printed either way and the defect is not dismissed. The real fix is
+structural — the cue should be incapable of standing alone — and it is open;
+three attempts are recorded in `preamble.tex` with their measurements, and all
+three made it worse or did nothing.
+
 **And a claim about a LIBRARY can be true here and false on the build server.**
 F03's note box said `np.logspace(-5, -2, 4)[0]` is one unit in the last place
 below `1e-5`, and `code/f03_logarithms.py` asserted it. Both were right on this

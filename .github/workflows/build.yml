@@ -210,7 +210,7 @@ jobs:
         run: |
           command -v pdftotext >/dev/null 2>&1 || \
             sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
-          python3 tools/checkpdf.py ${{ matrix.job }}.pdf
+          python3 tools/checkpdf.py --cues=warn ${{ matrix.job }}.pdf
 
       # if: always(), so it must survive a cancelled or failed compile that
       # left no log behind -- a reporting step that fails because there is
