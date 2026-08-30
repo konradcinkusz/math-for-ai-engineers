@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F11 written, both editions.** F12–F13 and P1–P34 are stubs carrying their briefs | 36 of 47 |
+| Programs | **F1–F12 written, both editions.** F13 and P1–P34 are stubs carrying their briefs | 35 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 471 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 481 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 414 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 420 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 495 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 505 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 433 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 437 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,23 +93,23 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **36 of 47 programs are stubs**, in each language. This is the whole of the
+- **35 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 314 computed values, all referenced, all present, plus the committed console
+- 335 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 66 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 72 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **51 orphan-tail pages: 11 · 14 · 13 · 13** across `main-en`, `main-pl`,
+- **55 orphan-tail pages: 13 · 14 · 14 · 14** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
-  41 before F8, 43 before F9, 45 before F10 and 49 before F11. The count is
-  the signal and it is going the wrong way, at roughly one to eleven per
-  program written; **F8 added one, F9 two, F10 four and F11 two, against F5's
-  eleven**, and the reason is worth having — all four were written with the
-  two-sided rule from F6 in hand, so a frame whose tail lands badly is
-  lengthened rather than trimmed. **A fourth structural fix was measured in the F6 pass and
+  41 before F8, 43 before F9, 45 before F10, 49 before F11 and 51 before F12.
+  The count is the signal and it is going the wrong way, at roughly one to
+  eleven per program written; **F8 added one, F9 two, F10 four, F11 two and
+  F12 four, against F5's eleven**, and the reason is worth having — all five
+  were written with the two-sided rule from F6 in hand, so a frame whose tail
+  lands badly is lengthened rather than trimmed. **A fourth structural fix was measured in the F6 pass and
   reverted**, because it clears the orphaned *cue* by converting it into more
   orphan *tails* — see *Program F6 pass* and the sweep table in
   `preamble.tex`. `checkpdf.py` prints every one of them on
@@ -2751,6 +2751,131 @@ widen a graph that is already wrapping.**
   program `1--6 / 7--15 / 16--20 / 21--26 / 27--35`. Two outcomes were reworded
   on the usual rule.
 
+### Program F12 pass, August 2026
+
+**Thirty-one teaching frames, thirty-three printed, both editions**, against a
+brief that projected fifty-five and called this the longest Foundation program
+for a reason. It is not the longest, and the reason it is not is worth
+recording: the brief was written before F05, F07 and F11 existed, and each of
+them has since taken a piece of what F12 would otherwise have had to do. F05
+established that a network is a composition; F07 measured the saturation; F11
+supplied the limit definition and four worked derivatives and then said
+explicitly that the pattern in them is F12's to state. **A brief's frame
+estimate is a planning figure from before its neighbours were written**, and
+this is now the fourth program where the written length came in well under it.
+
+#### The hinge, and what it took to reach it
+
+The chapter reaches
+\[ \frac{\mathrm{d}y}{\mathrm{d}x} = \prod_{k=1}^{n} w_k\,\sigma'(z_k) \]
+in five frames from the chain rule, and then says the sentence: **backpropagation
+is the chain rule applied to a composition of layers, with the intermediate
+values kept rather than recomputed, and there is nothing else in it.** Both of
+the consequences people learn the hard way fall straight out of the same
+expression — activations must be stored, and a deep weight's gradient contains
+every factor between it and the loss.
+
+#### A cross-programme drift gate, and it is new machinery
+
+F07 measured that a saturated logistic answers with about a hundredth of its
+centre response and committed `f07.slope.ratio6` = 101. F12 needed the same
+figure to turn one flat layer into a product of forty, and rather than quoting
+it, **`code/f12_chain_rule.py` computes it from scratch and asserts the two
+agree**, reading F07's committed value out of `figures/values/f07.tex`.
+
+That makes *the same computation quoted twice* a gate rather than a claim:
+break either program's arithmetic and `make numbers` fails and names both.
+The repository had no such check before — `make verify` compares a script
+against its own output, and nothing compared two programs against each other.
+**It is three lines and it should be used wherever one program quotes
+another's number.**
+
+#### Every rule checked against a derivative obtained without it
+
+The four rules and the chain rule are each compared with a central difference
+at $h = 10^{-5}$ — near the bottom of the U-curve F11 measured — over two
+hundred points. Worst disagreements: $\val{}$ of order 1e-9 to 1e-11.
+
+That is F11's measurement paying for itself one program later. F11 showed a
+finite difference makes a bad *definition*; this program uses it as an
+excellent independent *check*, with the step chosen where the U-curve is low
+rather than as small as possible.
+
+#### The two bounds, and their asymmetry
+
+- **Vanishing.** $\sigma' \le \frac14$ everywhere, exactly, because
+  $\sigma(1-\sigma)$ is a product of two numbers adding to one. So forty
+  layers at unit weight give at most $0.25^{40} = 8.3 \times 10^{-25}$ — *at
+  their very best*, which no trained network is. At F07's saturated point the
+  product is $4.8 \times 10^{-105}$, which underflows to exactly zero long
+  before layer forty.
+- **Exploding, with a sharp threshold.** The factor is $w\sigma' \le w/4$, so
+  **a logistic chain cannot amplify at all unless $\lvert w \rvert > 4$.** The
+  two failure modes are not symmetric: vanishing needs nothing but depth,
+  exploding needs a specific weight. That is a checkable statement and the
+  frames make it the section's second result rather than a footnote.
+
+#### One claim that overreached, and one filename
+
+- The draft said *deep networks have vanishing gradients* was **already false
+  when this argument was first published**. It was not: the analysis was made
+  about networks that were deep sigmoid chains. What is true is that each of
+  the three changes the frame lists — $\relu$, residual paths, normalisation —
+  was adopted partly because it stops being true. Corrected in both editions
+  and in the summary.
+- **F12 was written to the wrong filename** and the build did not notice:
+  `structure.tex` includes `F12-chain-rule`, and thirty-one frames went into
+  `F12-differentiation-rules.tex`, which nothing reads. Every gate passed —
+  parity compares the pair, `check_structure` reads the files it is given —
+  and the tell was the **page count not moving**. Renamed to the manifest's
+  name, which is the single source. Check the manifest's `file` field before
+  writing, and treat an unchanged page count as a failed build.
+
+#### Layout
+
+Three of the four builds carry no overfull box; the fourth carries the known
+F1 one. Three boxes were cleared, all recorded classes: a long unbreakable
+maths span inside a further-problem answer (into a display, the F6 rule), and
+**two diagram-manifest lines in Polish** — `\mermaidfig`'s third argument is
+manifest copy set in a narrow indented column and is longer in Polish, which
+is F02's finding and its third recurrence. Shorten the Polish third argument,
+always.
+
+One orphaned cue, cleared by lengthening, and the added paragraph earns its
+place: it says why the frame asks for the *best* case rather than a realistic
+one — a best case is a bound, so a hopeless one settles the question without
+needing to know where any unit sits.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| F12.1 product-not-product | 627 / 615 | 4.94 | 7.03 | 7.17 | 7.99 | 8.14 |
+| F12.2 composition-chain | 615 / 643 | 6.61 | 7.17 | 6.85 | 8.14 | 7.78 |
+| F12.3 factors-multiply | 635 / 657 | 6.82 | 6.95 | 6.71 | 7.89 | 7.62 |
+
+`f12-product-not-product` was first drawn with **four** ranks and came out
+860 pt wide, setting 5.12 pt — below the book's band and near F1.1's 4.32.
+That is the opposite failure from F9's and F11's diamonds, and it completes
+the rule: **three ranks is the sweet spot at this measure.** Two is too narrow
+and four is too wide.
+
+#### Parity: six word-order divergences in one program
+
+Four of the recorded `Program~\ref{...}'s <maths>` class, and **two of a
+second class worth naming: a number spelled as a word.** *dwójki się skracają*
+for *the $2$s cancel* and *z samych jedynek* for *a path of $1$s* both drop a
+maths span and a numeric literal, so C8 and C12 both fire. Polish reaches for
+the word far more readily than English does, and the rule is the one already
+in this file: **a digit stays a digit.**
+
+#### Also
+
+- Four traps added to `notes/02` (67 to 70).
+- Frame numbers remapped: plan `1--8 / 9--16 / 17--26 / 27--34 / 35--42`,
+  program `1--6 / 7--13 / 14--20 / 21--25 / 26--31`. Two outcomes were
+  reworded on the usual rule, and two editing slips were caught while
+  remapping — an `\ans{}` that quoted an unrelated value, and a fragment of a
+  deleted sentence left in a frame.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -3000,26 +3125,31 @@ clone instead.
 
 ## What is left
 
-1. **Thirty-six programs.** This is the work. **F12 next**, because it is the
-   one outstanding program the rest of the book leans on hardest and F11 has
-   just set it up: F11 ends by saying explicitly that the pattern in
-   $c \to 0$, $mx+c \to m$, $x^2 \to 2x$ is F12's to state, and the whole of
-   F11's §5 is a mechanism that only reaches a network once F12 supplies the
-   chain rule.
-   It is owed five things by name: F4's sigma
-   and product, F5's composition (frame 34 hands it over explicitly), F6's
-   rearrangement, F7's saturation measurement, which is deliberately left
-   as a shape for F12 to turn into the vanishing-gradient argument, and now
-   F11's limit definition and its four worked derivatives, which F12 must
-   generalise rather than restate. Before
-   estimating any remaining program's length, read its written neighbours:
-   F7's brief projected forty frames and thirty-one were left once F5 and F6
-   had done their share, **F8's projected forty-five against thirty written**,
-   because everything a trigonometry course would add is excluded by the book's
-   own scope statement, and **F9's projected forty against thirty-two**, because
-   P04, P05 and P07 own between them everything F9 might otherwise have said. A brief's frame estimate is a planning
-   figure from before the neighbours existed; it is not a target, and padding
-   to reach it means writing the material the scope excludes.
+1. **Thirty-five programs.** This is the work. **F13 next**, and it closes the
+   Foundation part: twenty frames, deliberately, to make an expectation an
+   integral and a density integrate to one, and for nothing else. After that
+   the book stops assuming nothing and starts building, and P01 to P03 are the
+   natural continuation because they need only what Part I now has.
+
+   **F12 is written**, so the program the rest of the book leaned on hardest
+   is no longer outstanding. It was owed five things by name and paid all
+   five: F4's sigma and product; F5's composition (its frame 34 hands it over
+   explicitly, and that was verified rather than remembered); F6's
+   rearrangement; F7's saturation measurement, left there as a shape and now
+   turned into a product of forty; and F11's limit definition and four worked
+   derivatives, which F12 generalises rather than restates.
+
+   Before estimating any remaining program's length, read its written
+   neighbours. F7's brief projected forty frames and thirty-one were needed
+   once F5 and F6 had done their share; **F8's projected forty-five against
+   thirty written**, because everything a trigonometry course would add is
+   excluded by the book's own scope statement; **F9's projected forty against
+   thirty-two**, because P04, P05 and P07 own between them everything F9 might
+   otherwise have said; and **F12's projected fifty-five against thirty-one**,
+   because F05, F07 and F11 had each taken a piece of it in the meantime.
+   **A brief's frame estimate is a planning figure from before its neighbours
+   were written.** It is not a target, and padding to reach it means writing
+   the material the scope excludes.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
    softmax entropy with and without the `1/√d_k` scaling — is the one to run
    first: it costs nothing and it converts the book's central derivation from an

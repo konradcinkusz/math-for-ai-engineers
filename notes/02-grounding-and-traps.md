@@ -701,8 +701,8 @@ The entries in this section came out of writing the Foundation programs
 themselves rather than out of the literature: item 41 out of F3, items 42 to 46
 out of F4, items 47 and 48 out of F5, item 49 out of F6, items 50 and 51 out of
 F7, items 52 to 54 out of F8, items 55 to 57 out of F9, items 58 to 62 out of
-F10 and items 63 to 66 out of F11. Say which program produced which, never how
-many there are — the count at the head of §3 was stated once and had
+F10, items 63 to 66 out of F11 and items 67 to 70 out of F12. Say which
+program produced which, never how many there are — the count at the head of §3 was stated once and had
 drifted by five before anybody reread it.
 
 They carry the same health warning: the list above is a catalogue of
@@ -931,6 +931,43 @@ steep the ground is *here* and cannot know how far anything is. On
 the point at 0.4 has slope −2.9 and is 1.01 away — the steeper point is the
 nearer one, by a factor of two. Reading distance out of a gradient is asking
 one number for information it was never given. → **F11**.
+
+**67. "The derivative of `fg` is `f'g'`."** Differentiation distributes over
+a *sum*, which is exactly why the guess is so natural, and it does not
+distribute over a product. On `x²` and `x³` at `x = 2` the truth is 80 and the
+guess gives 48, and the two expressions agree at exactly two points in the
+whole range swept — there is no region where the guess is even approximately
+right. When `x` moves, *both* factors move; the guess multiplies two rates,
+which is not a rate of anything. Same shape as items 41, 47, 51 and 56.
+→ **F12**.
+
+**68. "`f'` is evaluated at `x`."** In `f(g(x))`, the outer derivative is
+evaluated at `g(x)` — at the value the inner function produced, not at the
+input. It is the half of the chain rule that gets dropped, and dropping it
+gives an expression that is dimensionally fine and numerically wrong, so
+nothing complains. → **F12**.
+
+**69. "Backpropagation is a special algorithm for neural networks."** It is
+the chain rule applied to a composition of layers, with the intermediate
+values kept rather than recomputed, and there is nothing else in it.
+"Backward" names the direction the multiplication accumulates in. Two things
+follow immediately and are usually learnt the hard way: the activations must
+be *stored*, so memory grows with depth and batch size; and a deep weight's
+gradient contains every factor between it and the loss, so nothing about
+training one layer is local to that layer. → **F12**, **P16** for the vector
+version and the memory trade.
+
+**70. "Deep networks have vanishing gradients."** What is true is narrower and
+arithmetic: a chain of logistic layers multiplies one factor of `w·σ'(z)` per
+layer, and `σ' ≤ ¼` always, so forty layers at unit weight give at most
+`0.25⁴⁰ ≈ 8e-25` — *at their very best*, with every unit sitting exactly at
+its most responsive point. Nothing there is a property of neural networks; it
+is what happens when forty numbers below one are multiplied. And the exploding
+side is **not symmetric**: the factor is at most `w/4`, so a logistic chain
+cannot amplify at all unless `|w| > 4`. Change the activation, add a residual
+path, or normalise, and the factors change — which is why each of those was
+adopted. → **F12** for the mechanism and both bounds, **P32** for the
+architecture's answer.
 
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
