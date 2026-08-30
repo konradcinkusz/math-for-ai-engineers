@@ -699,7 +699,7 @@ than to the others.
 
 The entries in this section came out of writing the Foundation programs
 themselves rather than out of the literature: item 41 out of F3, items 42 to 46
-out of F4, items 47 and 48 out of F5, and item 49 out of F6. Say which program produced which,
+out of F4, items 47 and 48 out of F5, item 49 out of F6, and items 50 and 51 out of F7. Say which program produced which,
 never how many there are — the count at the head of §3 was stated once and had
 drifted by five before anybody reread it.
 
@@ -785,6 +785,23 @@ error is easy precisely because the other four habits are correct, so it is the
 same shape as items 41 and 47 — a true rule carried one step past its
 hypothesis. The reliable fix is not to remember the exception but to avoid the
 step: move the term across instead of dividing. → **F06**.
+
+**50. "Exponential growth means fast growth."** It means growth proportional
+to the current size, and says nothing about where on the curve you are
+standing. At x = 5 the polynomial x^5 is 21.1 times larger than e^x, and e^x
+does not overtake until x = 12.71. What is true, and is why the word is worth
+using, is the other end: once it passes it never comes back, and no polynomial
+of any degree stays ahead forever. → **F07**, and **P03** for what the same
+confusion does to a cost estimate.
+
+**51. "tanh was preferred to the logistic because it saturates more gently."**
+It saturates *harder*. Its steepness runs 1.0 to 0.0707 over two units against
+the logistic's 0.25 to 0.105 — a factor of about 14 against about 2 — and this
+follows from tanh(x) = 2σ(2x) − 1 rather than being a separate fact: two
+squashes make it four times as steep at the centre and move its flat region
+four times closer in. The real case for tanh was always that it is centred on
+zero, which is a claim about where its outputs sit and not about how it bends.
+→ **F07**, and **F12** for why the flatness costs what it costs.
 
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for

@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F6 written, both editions.** F7–F13 and P1–P34 are stubs carrying their briefs | 41 of 47 |
+| Programs | **F1–F7 written, both editions.** F8–F13 and P1–P34 are stubs carrying their briefs | 40 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 350 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-pl` (17x24) | 358 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-en-a4` | 318 | 0 | 0 | 5, worst 6.3 pt | 0 |
-| `main-pl-a4` | 320 | 0 | 0 | 4, worst 4.4 pt | 0 |
+| `main-en` (17x24) | 378 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-pl` (17x24) | 386 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en-a4` | 340 | 0 | 0 | 5, worst 6.3 pt | 0 |
+| `main-pl-a4` | 342 | 0 | 0 | 4, worst 4.4 pt | 0 |
 
 The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
 one format and one language because that is where the line falls. Well under
@@ -81,19 +81,19 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **41 of 47 programs are stubs**, in each language. This is the whole of the
+- **40 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 180 computed values, all referenced, all present, plus the committed console
+- 212 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 36 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 42 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **33 orphan-tail pages: 7 · 9 · 9 · 8** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`, from 15 before F5 and 26 before F6. The count is
-  the signal and it is going the wrong way, at roughly seven to eleven per
-  program written. **A fourth structural fix was measured in the F6 pass and
+- **41 orphan-tail pages: 9 · 12 · 11 · 9** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6 and 33 before
+  F7. The count is the signal and it is going the wrong way, at roughly seven
+  to eleven per program written. **A fourth structural fix was measured in the F6 pass and
   reverted**, because it clears the orphaned *cue* by converting it into more
   orphan *tails* — see *Program F6 pass* and the sweep table in
   `preamble.tex`. `checkpdf.py` prints every one of them on
@@ -411,6 +411,25 @@ code); never translate the spelling of a constant (`e`, `π`, `i`); and where an
 English ML term has no Polish form in real use, keep the English word and
 inflect it Polish. *Embedding*, *transformer*, *token*, *softmax*, *batch* are
 what Polish engineers say; *zanurzenie* is a calque nobody will search for.
+
+**And the rule the lint DOES check, which the translator keeps breaking: order
+is part of the translation.** C4, C8 and C12 compare the two editions'
+structural tokens, maths spans and numeric literals **in order**, so a sentence
+must carry the same spans and numbers in the same sequence, not merely contain
+the same ones. Polish word order fights this in two specific ways, and between
+them they cost F06 three parity rounds and F07 six:
+
+- **A number spelled as a word.** *zerem* for `$0$`, *dwukrotnie* for `$2$`,
+  *ujemne* where the English repeats `$k$`. Each drops a maths span and a
+  digit, and C8 and C12 both fail. Write `$0$`, `$2$-krotnie`, `ujemne $k$`.
+- **A reference behind its maths.** `$2^{10} \approx 10^{3}$ z Programu F01`
+  against `Program F01's $2^{10} \approx 10^{3}$` — same content, swapped
+  order, C4 fails. Rebuild the Polish sentence so the reference leads:
+  *Program F01 podaje $2^{10} \approx 10^{3}$*.
+
+Neither is a mathematical divergence and both are real editorial ones, which is
+why the checks are right to fail. The fix is always to rebuild the Polish
+sentence, never to loosen the check.
 
 ---
 
@@ -2124,6 +2143,111 @@ The script also substitutes every solution it prints back into the equation it
 came from and fails the build if the residual exceeds one part in $10^{12}$.
 That is section 1's own instruction to the reader, executed by the build.
 
+### Program F7 pass, August 2026
+
+**Thirty-one teaching frames, thirty-three printed, both editions**, against a
+brief that projected forty \dash{} the shortest Foundation program so far, and
+the reason is worth recording rather than treating as a shortfall.
+
+**A brief written before its neighbours over-estimates what is left to do.**
+F07's brief was drafted when F05 and F06 were stubs. By the time it came to be
+written, F05 had already given the logistic, its table of values, its symmetry
+about $(0, \frac{1}{2})$, its crossing at $-b/w$ and the logit, and F06 had
+already inverted it and turned its threshold into an inequality. What was
+actually left was narrower and better: **where the shape comes from**. Section
+3 derives it from the odds \dash{} if the odds are $e^{x}$ to one then the
+probability is $\frac{e^{x}}{1+e^{x}}$ \dash{} and the flat ends stop being a
+feature somebody added and become what a bounded quantity has to do. Check the
+neighbours before estimating a length.
+
+#### Two identities, asserted over a range rather than checked at a point
+
+They are the program's spine, and each turns a second function into a
+restatement of one the reader already has:
+
+| Identity | Worst error | Over |
+|---|---|---|
+| $\tanh x = 2\sigma(2x) - 1$ | $\num{3.3e-16}$ | 401 points, and 4001 under numpy |
+| $\softmax$ on two scores $= \sigma(a-b)$ | $\num{2.2e-16}$ | the whole $121 \times 121$ grid |
+
+*These are the same curve* is a claim one agreeing value would not establish,
+which is why both are swept rather than spot-checked. The consequence is that
+$\tanh$ is not a second function to learn and softmax is not a new one to
+meet \dash{} and the second settles the recurring question of whether a binary
+classifier should use one logistic output or a two-way softmax. It is the same
+model, because the two-score softmax depends only on $a - b$.
+
+#### The restraint that matters: this program may not say the gradient vanishes
+
+The measurement is there \dash{} the logistic is about
+\val{f07.slope.ratio6} times less steep six units out than at its centre
+\dash{} and the sentence everybody reaches for is not.
+
+**One factor of a hundredth is survivable; the product of forty is not, and
+the multiplying is the part that needs the chain rule.** F07 owns the shape and
+hands the compounding to F12, in a `rigourbox` that says so. A program that
+delivered the punchline here would leave F12 with nothing to prove and would
+have taught the reader to say a sentence they could not derive.
+
+#### The elicited trap: tanh saturates HARDER
+
+Everyone knows $\tanh$ was preferred to the logistic in hidden layers. Almost
+everyone attributes it to gentler saturation, and that is backwards.
+
+| | at $x = 0$ | at $x = 2$ | ratio |
+|---|---|---|---|
+| logistic | \val{f07.slope.0} | \val{f07.slope.2} | about 2 |
+| $\tanh$ | \val{f07.tanh.slope0} | \val{f07.tanh.slope2} | about 14 |
+
+And it **follows from the identity** rather than being a separate fact:
+squashing horizontally by two doubles the steepness and stretching vertically
+by two doubles it again, so $\tanh$ is four times the logistic's steepness at
+the centre \dash{} four quarters, which is 1 \dash{} and its flat region sits
+four times closer in. The case for $\tanh$ was always that it is centred on
+zero, which is a claim about where its outputs sit and not about how it bends.
+
+The section closes on the mirror-image error, because it is as easy to acquire:
+saturation is no argument against a logistic at an **output**, where the
+flatness is what keeps a probability inside its range. Two arguments about the
+same function in two places, and the second is not evidence for the first.
+
+#### The section 1 trap, and one claim that was written from memory
+
+*Exponential growth means fast growth* is wrong: it means growth proportional
+to the current size. At $x = 5$ the polynomial $x^{5}$ is
+\val{f07.poly.at5.ratio} times larger than $e^{x}$, and the exponential does
+not overtake until $x = \val{f07.poly.crossover}$ \dash{} found by bisection,
+so that changing the power changes the number on the page.
+
+And one claim in section 3 was written from memory and then checked, which is
+the wrong order: that $\sigma$ rounds to exactly $\num{1.0}$ *somewhere around
+$x = 37$*. It does, and the hedge was hiding that nobody had run it. The
+threshold is now computed and asserted from both sides \dash{}
+$x = \val{f07.sig.saturates}$ \dash{} and the page quotes it. **A hedge is not
+a substitute for a measurement; it is a confession that there is not one.**
+
+#### Six parity failures, all one class, now generalised into the rules
+
+Every one was Polish word order against checks that compare **in order**: a
+number spelled as a word (*zerem* for `$0$`, *dwukrotnie* for `$2$`, a dropped
+repeat of `$k$` or `$x$`), or a cross-reference sitting behind its maths
+(`$2^{10} \approx 10^{3}$ z Programu F01` against `Program F01's $2^{10}
+\approx 10^{3}$`).
+
+F06 lost three rounds to the same thing and the note went into that pass's
+write-up, where the next author would not look for it. It is now in
+*Non-negotiable conventions*, beside the notation contract, as part of what the
+translator brief must carry. **A lesson recorded only in a pass note is
+recorded in the wrong place.**
+
+#### What went right, and is worth not re-learning
+
+F07 is the first program since F02 to need no orphaned-cue chase at all: all
+four builds came back with zero cues on the first attempt. The six diagrams
+also landed between 6.8 and 8.0 pt on the first render, all above the
+aspect-ratio crossover, because the width budget was checked before the prose
+was written rather than after.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -2373,16 +2497,16 @@ clone instead.
 
 ## What is left
 
-1. **Forty-one programs.** This is the work. F7–F13 first, because the
-   Foundation part is what makes the book's claim — *it assumes nothing* — true
-   or false. **F12 (the chain rule) is still the one outstanding program the
-   rest of the book leans on hardest**, and it is now owed three things by
-   name: F4's sigma and product, F5's composition (frame 34 hands it over
-   explicitly), and F6's rearrangement. F7 is the natural next one — its brief
-   is the exponential and the logistic, and F5 and F6 between them have already
-   had the reader read the logistic off a table, invert it, and turn its
-   threshold into an inequality, without ever saying where its shape comes
-   from.
+1. **Forty programs.** This is the work. F8–F13 first, because the Foundation
+   part is what makes the book's claim — *it assumes nothing* — true or false.
+   **F12 (the chain rule) is still the one outstanding program the rest of the
+   book leans on hardest**, and it is now owed four things by name: F4's sigma
+   and product, F5's composition (frame 34 hands it over explicitly), F6's
+   rearrangement, and F7's saturation measurement, which is deliberately left
+   as a shape for F12 to turn into the vanishing-gradient argument. Before
+   estimating any remaining program's length, read its written neighbours:
+   F7's brief projected forty frames and thirty-one were left once F5 and F6
+   had done their share.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
    softmax entropy with and without the `1/√d_k` scaling — is the one to run
    first: it costs nothing and it converts the book's central derivation from an

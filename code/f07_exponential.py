@@ -122,7 +122,8 @@ def gap(x: float) -> float:
 
 
 emit("f07.poly.at5.exp", math.exp(5.0), 1)
-emit("f07.poly.at5.poly", float(5 ** POWER), 0)
+# NOT emitted: 5^5 = 3125 is head arithmetic and the frame writes it inline,
+# which is the rule this book states for anything the reader can do.
 emit("f07.poly.at5.ratio", 5.0 ** POWER / math.exp(5.0), 1)
 
 _lo, _hi = 5.0, 40.0                       # gap(5) < 0 and gap(40) > 0
@@ -197,6 +198,20 @@ assert abs(slope(0.0) - 0.25) < 1e-15, "the logistic no longer peaks at a quarte
 _out = [slope(x) for x in SLOPE_AT]
 assert _out == sorted(_out, reverse=True), "the steepness no longer falls away from the centre"
 assert slope(0.0) / slope(6.0) > 50, "the collapse over six units is no longer dramatic"
+
+# The point at which the mathematics and the arithmetic part company. sigma
+# never reaches 1, and in binary64 it rounds to exactly 1.0 from a definite
+# place onwards -- so ln(1 - p) is always defined in exact arithmetic and is
+# not on a machine. The frame quotes the place rather than "around 37", which
+# is what it said when it was written from memory.
+_step = 0.1
+_x = 0.0
+while sigmoid(_x) != 1.0:
+    _x += _step
+SIG_SATURATES = round(_x, 1)
+emit("f07.sig.saturates", SIG_SATURATES, 1)
+assert sigmoid(SIG_SATURATES) == 1.0, "sigma no longer rounds to one there"
+assert sigmoid(SIG_SATURATES - _step) < 1.0, "sigma rounds to one earlier than reported"
 
 # ==========================================================================
 # SECTION 4 --- tanh IS the logistic, moved
