@@ -1,22 +1,900 @@
 %% F08 --- Trygonometria i okrąg jednostkowy
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f08_trigonometry.py i wchodzi na stronę przez \val{}.
+%% Wartości, które trzeba umieć odczytać wprost z okręgu -- cos 0 = 1,
+%% sin(pi/2) = 1, cos pi = -1, cos^2 + sin^2 = 1 -- są napisane wprost,
+%% bo szukanie ich zniweczyłoby cały program.
+%%
+%% TO NIE JEST KURS TRYGONOMETRII. Nie ma tu twierdzenia sinusów ani
+%% cosinusów, nie ma rozwiązywania trójkątów i nie ma listy tożsamości do
+%% wykucia. Zakres książki wyklucza to wszystko. Jest tu jeden obrazek,
+%% którego potrzebuje reszta książki -- punkt idący po okręgu -- i dwie
+%% rzeczy, które ten obrazek kupuje.
+%%
+%% DWIE WYPŁATY, obie są TOŻSAMOŚCIAMI sprawdzonymi w skrypcie na całym
+%% przebiegu, a nie w jednym punkcie:
+%%   podobieństwo kosinusowe JEST kosinusem kąta, sprawdzone wobec kąta
+%%     policzonego niezależnie, najgorszy błąd 7.8e-16 na 3481 parach;
+%%   R(a)q . R(b)k zależy tylko od b - a, najgorszy błąd 3.6e-15 na 1600
+%%     parach, i to jest całe wyjaśnienie, dlaczego obrócenie zapytania i
+%%     klucza o kąt proporcjonalny do pozycji koduje pozycję WZGLĘDNĄ.
+%% Druga jest zdaniem, o które prosi kontrakt: zamienia \enquote{obróć
+%% zapytanie i klucz} w twierdzenie, które czytelnik może sprawdzić.
+%%
+%% PUŁAPKĄ SĄ JEDNOSTKI i jest policzona, a nie opisana. math.sin(90) daje
+%% 0.8940, bo 90 czyta się jako radiany, czyli 14.32 pełnego obrotu. Nic nie
+%% podnosi wyjątku i nic nie ostrzega; liczba po prostu wygląda nijak.
+%%
+%% Bliźniak: programs/en/F08-trigonometry.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Trygonometria i okrąg jednostkowy}
 \label{prog:F08}
+\index{trigonometry!unit circle}
+\index{cosine similarity!is a cosine}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{odczytywać $\cos$ i $\sin$ z punktu idącego po okręgu, pracować
+  w radianach i wyprowadzać jedyną tożsamość, jakiej ta książka potrzebuje,
+  wprost z obrazka}
+\outcome{7--10}{naszkicować obie krzywe na podstawie okręgu i podać ich okres,
+  zbiór wartości i symetrię, nie przypominając sobie żadnej z tych rzeczy}
+\outcome{11--15}{zastosować cztery ruchy z Programu~\ref{prog:F05} do fali i
+  powiedzieć, czym steruje każda z czterech liczb w $A\sin(B\theta + C) + D$}
+\outcome{16--23}{policzyć podobieństwo kosinusowe, powiedzieć, co ono mierzy i
+  co pomija, oraz powiedzieć, czego \emph{nie} mówi}
+\outcome{24--30}{obrócić punkt na płaszczyźnie, powiedzieć, co obrót zostawia
+  bez zmian, i powiedzieć, co z tego wynika, gdy dwa wektory obrócimy o różne
+  kąty}
+\end{outcomes}
 
-Argument: sine and cosine are the coordinates of a point going round a
-circle. Payoff: cosine similarity is literally the cosine of an angle;
-sinusoidal positional encodings and rotary embeddings are rotations, and
-this is the program that makes \enquote{rotate the query and key} a sentence
-rather than an incantation.
+\begin{quiz}
+\item Punkt leży na okręgu o promieniu $1$, ćwierć obrotu w lewo od prawej
+  strony. Jakie są jego współrzędne? \teachesat{2--3}
+  \answerto{$(0, 1)$, więc $\cos$ ćwierci obrotu wynosi $0$, a $\sin$ ćwierci
+  obrotu wynosi $1$.}
+\item Ile radianów ma pełny obrót? \teachesatone{4}
+  \answerto{$2\pi$, bo radian jest zdefiniowany tak, aby kąt równał się
+  drodze przebytej po okręgu o promieniu $1$.}
+\item Co zwraca \code{math.sin(90)}? \teachesat{4--5}
+  \answerto{$\val{f08.sin90rad}$. Argument czytany jest jako radiany, a $90$
+  radianów to $\val{f08.turns90}$ pełnego obrotu.}
+\item Punkt $(\cos\theta, \sin\theta)$ leży na okręgu o promieniu $1$. Jakie
+  równanie z tego wynika? \teachesat{5--6}
+  \answerto{$\cos^{2}\theta + \sin^{2}\theta = 1$, bo to jest równanie okręgu
+  o promieniu $1$ z podstawionymi nazwami współrzędnych.}
+\item Jaki jest okres $\sin$ i jaki jest jego zbiór wartości?
+  \teachesat{7--8}
+  \answerto{$2\pi$ oraz $\intcc{-1}{1}$. Obie rzeczy są własnościami chodzenia
+  po okręgu o promieniu $1$ i wracania tam, skąd się wyszło.}
+\item Zapisz $\cos$ przez $\sin$. \teachesat{8--9}
+  \answerto{$\cos\theta = \sin\!\left(\theta + \frac{\pi}{2}\right)$: ta sama
+  krzywa przesunięta o ćwierć obrotu.}
+\item W $A\sin(B\theta + C) + D$ która litera decyduje, ile fal zmieści się na
+  danym odcinku? \teachesat{12--13}
+  \answerto{$B$. Jest wewnątrz nawiasu, więc ściska falę w poziomie, dokładnie
+  tak, jak mówił Program~\ref{prog:F05}.}
+\item Dwa wektory wskazują dokładnie w tę samą stronę, ale jeden jest
+  dziesięć razy dłuższy. Jakie jest ich podobieństwo kosinusowe?
+  \teachesat{16--17}
+  \answerto{$1$. Długości się skracają, i o to w tej mierze chodzi.}
+\item Jakie jest podobieństwo kosinusowe dwóch wektorów prostopadłych?
+  \teachesat{17--18}
+  \answerto{$0$, bo $\cos$ ćwierci obrotu wynosi $0$.}
+\item Zgłoszono podobieństwo kosinusowe $\num{0.99}$. Jaki to kąt?
+  \teachesat{18--19}
+  \answerto{Około $\val{f08.ang.hi}$ stopni. Kosinus jest płaski w pobliżu
+  zera, więc podobieństwo bliskie $1$ wciąż zostawia widoczny kąt.}
+\item Czy wysokie podobieństwo kosinusowe dwóch zanurzeń oznacza, że dwie
+  rzeczy są podobne znaczeniowo? \teachesat{20--21}
+  \answerto{Samo z siebie nie. Oznacza, że wektory wskazują w tę samą stronę,
+  a czy to odpowiada znaczeniu, jest własnością tego, jak je wytrenowano.}
+\item Zapisz, co obrót o $\theta$ robi z punktem $(x, y)$.
+  \teachesatone{24}
+  \answerto{Przenosi go do
+  $(x\cos\theta - y\sin\theta,\; x\sin\theta + y\cos\theta)$.}
+\item Co obrót robi z długością wektora? \teachesat{25--26}
+  \answerto{Nic. Obrót przesuwa punkt po okręgu o środku w początku układu, a
+  każdy punkt tego okręgu leży w tej samej odległości od środka.}
+\item Dwa wektory obracamy o ten sam kąt. Co dzieje się z ich iloczynem
+  skalarnym? \teachesat{26--27}
+  \answerto{Nic. Kąt między nimi się nie zmienił i żadna z długości też, a
+  iloczyn skalarny zależy tylko od tych trzech rzeczy.}
+\item Zapytanie na pozycji $m$ i klucz na pozycji $n$ obracamy, każde o kąt
+  proporcjonalny do jego pozycji. Od czego zależy ich iloczyn skalarny?
+  \teachesat{27--28}
+  \answerto{Tylko od $n - m$. Obie pozycje bezwzględne się skracają, i
+  dlatego ten sposób koduje pozycję względną.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+% ============================================================
+\section{Punkt idący po okręgu}
+\label{sec:F08-circle}
+\index{radian!as arc length}
+
+\begin{fr}
+Wszystko w tym programie bierze się z jednego obrazka, a obrazek to punkt
+idący w lewo po okręgu o promieniu $1$ i środku w początku układu, startujący
+z prawej strony.
+
+W każdej chwili punkt gdzieś jest, a \enquote{gdzieś} na płaszczyźnie oznacza
+dwie liczby. Te dwie liczby mają nazwy:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+$\cos\theta$ & jak daleko punkt zaszedł w poziomie \\
+$\sin\theta$ & jak wysoko jest \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+To jest cała definicja. Nie stosunek boków, nie coś o trójkątach
+prostokątnych \dash{} współrzędne punktu na okręgu, przy czym $\theta$ mówi,
+jak daleko punkt zaszedł.
+
+Punkt startuje z prawej strony. Jakie są tam jego współrzędne, a zatem ile
+wynoszą $\cos 0$ i $\sin 0$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(1, 0)$, więc $\cos 0 = 1$ oraz $\sin 0 = 0$.
+\end{ansblock}
+
+Teraz przesuń punkt o ćwierć drogi w lewo, tak aby stanął na szczycie okręgu.
+Jakie są jego współrzędne?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$(0, 1)$}
+Dokładnie nad początkiem układu, jedną jednostkę w górę i zero w poziomie.
+Więc $\cos$ ćwierci obrotu wynosi $0$, a $\sin$ ćwierci obrotu wynosi $1$.
+
+Idź dalej, a reszta przychodzi za darmo, bez żadnej tabeli do wykucia:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Położenie & $\cos$ & $\sin$ \\
+\midrule
+prawo & $1$ & $0$ \\
+góra & $0$ & $1$ \\
+lewo & $-1$ & $0$ \\
+dół & $0$ & $-1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Czytaj kolumnami zamiast wierszami, a masz już obie krzywe: jedna zaczyna się
+w $1$ i opada, druga zaczyna się w $0$ i rośnie.
+
+Brakuje jeszcze jednej rzeczy, i to tej, którą w kodzie myli każdy. Jak
+należy mierzyć $\theta$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+W radianach: $\theta$ to \emph{droga, którą punkt przeszedł} po obwodzie.
+\end{ansblock}
+
+To jest cała definicja radiana i to jest powód, dla którego ta jednostka
+istnieje. Okrąg ma promień $1$, więc jego obwód wynosi $2\pi$, więc
+\textbf{pełny obrót to $2\pi$ radianów}, a ćwierć obrotu to $\frac{\pi}{2}$.
+Kąt i długość łuku to ta sama liczba, i to sprawia, że w żadnym późniejszym
+wzorze nie siedzi współczynnik przeliczeniowy.
+
+Stopnie są ludzką konwencją bez matematyki za sobą \dash{} $360$ wybrano,
+bo wygodnie się dzieli \dash{} a każda biblioteka w twoim zawodowym życiu
+przyjmuje radiany.
+
+Co prowadzi do pytania, na które trzeba odpowiedzieć szybko. \textbf{Co
+zwraca \code{math.sin(90)}?}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f08.sin90rad}$}
+Nie $1$.
+
+\begin{trapbox}
+\textbf{Argument czytany jest jako radiany, a $90$ radianów to
+$\val{f08.turns90}$ pełnego obrotu.} Punkt okrążył okrąg ponad czternaście
+razy i stanął w niczym nieciekawym miejscu, a $\val{f08.sin90rad}$ to
+miejsce, w którym akurat wylądował.
+
+Kosztowne jest tu wszystko, co \emph{nie} następuje. Nic nie podnosi wyjątku,
+nic nie ostrzega, a wartość jest zupełnie zwyczajną liczbą między $-1$ a $1$
+\dash{} więc płynie dalej w to, co następne, a pierwszym objawem kłopotu jest
+wynik, który jest po prostu zły.
+
+Nawyk, który temu zapobiega: \textbf{pisz \code{math.radians(90)} zawsze, gdy
+liczba w twojej głowie jest w stopniach}, nawet gdy jesteś pewien, bo
+przeliczenie nie kosztuje nic, a pomyłka kosztuje sesję debugowania
+zaczynającą się daleko od błędu.
+
+\end{trapbox}
+
+Warto mieć jedną tożsamość, i nie wymaga ona dowodu. Punkt $(\cos\theta,
+\sin\theta)$ leży na okręgu o promieniu $1$. Co to mówi?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \cos^{2}\theta + \sin^{2}\theta = 1 \]
+\end{ansblock}
+
+Bo to \emph{jest} równanie okręgu o promieniu $1$: punkt $(x, y)$ leży na nim
+dokładnie wtedy, gdy $x^{2} + y^{2} = 1$, co jest twierdzeniem Pitagorasa
+zastosowanym do odległości poziomej i pionowej. Podstaw nazwy i gotowe.
+
+Najczęściej cytowana tożsamość nie jest więc faktem do zapamiętania, tylko
+definicją odczytaną z powrotem.
+\code{code/f08\_trigonometry.py} sprawdza ją na tysiącu czterystu kątach, a
+najgorsza rozbieżność $\val{f08.pyth.err}$ jest tak blisko dokładnego $1$, jak
+binary64 potrafi.
+
+\begin{note}
+To jedyna tożsamość trygonometryczna, jakiej ta książka używa, i jest tu
+dlatego, że wypada z obrazka. Nie ma tu twierdzenia sinusów, nie ma
+twierdzenia cosinusów, nie ma rozwiązywania trójkątów i nie ma listy wzorów
+do nauczenia \dash{} zakres książki wyklucza to wszystko i nic w dalszej
+części nie jest tego potrzebne. Dalsza część potrzebuje okręgu, a okrąg już
+masz.
+\end{note}
+
+\mermaidfig{f08-unit-circle}{Definicja w jednym wierszu: kąt to droga, którą
+punkt przeszedł, a dwie współrzędne to dwie funkcje.}{sinus i kosinus z
+okręgu}
+\end{fr}
+
+% ============================================================
+\section{Dwie krzywe}
+\label{sec:F08-curves}
+\index{trigonometry!period and range}
+
+\begin{fr}
+Rozwiń ten spacer. Odłóż $\theta$ na osi poziomej i narysuj wysokość punktu, a
+dostaniesz krzywą sinusa; narysuj zamiast tego, jak daleko punkt zaszedł w
+poziomie, a dostaniesz krzywą kosinusa.
+
+Wszystko w obu krzywych jest faktem o chodzeniu po okręgu:
+
+\begin{itemize}
+\item nigdy nie opuszczają $\intcc{-1}{1}$, bo punkt nigdy nie opuszcza
+  okręgu o promieniu $1$;
+\item powtarzają się co $2\pi$, bo to pełny obrót i punkt jest z powrotem
+  tam, skąd wyszedł;
+\item żadna nie ma nigdzie kąta, bo spacer nie ma kątów.
+\end{itemize}
+
+Nic z tego nie wymaga zapamiętania. Jaki jest okres $\sin$ i jaki jest jego
+zbiór wartości?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$2\pi$ oraz $\intcc{-1}{1}$.
+\end{ansblock}
+
+I to samo dla $\cos$, z tego samego powodu.
+
+Teraz symetria, na którą Program~\ref{prog:F05} dał ci słowa. Pójście do tyłu
+po okręgu o $\theta$ stawia punkt w odbiciu lustrzanym, względem osi poziomej,
+tego miejsca, w którym stawia go pójście do przodu. Więc wartość pozioma się
+nie zmienia, a pionowa zmienia znak:
+\[ \cos(-\theta) = \cos\theta \qquad \sin(-\theta) = -\sin\theta \]
+
+$\cos$ jest \emph{parzysty}, a $\sin$ \emph{nieparzysty}, dokładnie w sensie
+Programu~\ref{prog:F05}, i znów obrazek jest dowodem.
+
+Obie krzywe wyglądają jak ten sam kształt przesunięty. Zapisz $\cos$ przez
+$\sin$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \cos\theta = \sin\!\left(\theta + \frac{\pi}{2}\right) \]
+\end{ansblock}
+
+Kosinus to sinus zaczęty o ćwierć obrotu wcześniej. Sprawdzone dla tysiąca
+czterystu kątów przy najgorszej rozbieżności $\val{f08.shift.err}$.
+
+To jest przesunięcie poziome z Programu~\ref{prog:F05}, i ma ten kierunek, o
+którym tamten program ostrzegał: $+\frac{\pi}{2}$ jest wewnątrz nawiasu, więc
+wykres przesuwa się w \emph{drugą} stronę \dash{} sinus przesunięty o ćwierć
+obrotu w lewo to kosinus.
+
+\textbf{Jest tu więc jedna krzywa, a nie dwie}, tak samo jak
+Program~\ref{prog:F07} znalazł jedną krzywą za funkcją logistyczną i za
+$\tanh$. Książka używa obu nazw, bo obie są przyjęte, a nie dlatego, że są tu
+dwie rzeczy do nauczenia.
+
+Który z $\cos$ i $\sin$ daje $1$ przy $\theta = 0$, a który $0$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\cos 0 = 1$ oraz $\sin 0 = 0$.
+\end{ansblock}
+
+I to jedyna rzecz potrzebna, żeby je odróżnić, a bierze się wprost z tego,
+gdzie punkt startuje.
+
+\begin{aibox}
+Sinus i kosinus pojawiają się w kodowaniu pozycyjnym oba, na przemiennych
+współrzędnych, i powodem jest ta ramka: na pozycji zerowej współrzędne
+sinusowe dają $0$, a kosinusowe dają $1$, więc wzorzec na pozycji zerowej nie
+jest samymi zerami i kodowanie odróżnia ją od pozycji, której faktycznie nie
+ma.
+
+Użycie jednej funkcji do wszystkich współrzędnych dałoby pierwszą pozycję
+zakodowaną jako wektor zer, czyli dokładnie to, na co wygląda miejsce
+wypełnione dopełnieniem.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Cztery ruchy na fali}
+\label{sec:F08-moves}
+\index{wave!amplitude, frequency, phase}
+
+\begin{fr}
+Fala w naturze nigdy nie jest gołym $\sin\theta$. Jest nią
+\[ y = A\sin(B\theta + C) + D \]
+a wszystkie cztery litery to cztery ruchy z Programu~\ref{prog:F05},
+zastosowane do krzywej, którą już znasz.
+
+Dwie są poza nawiasem i działają na wyjście, więc czyta się je tak, jak są
+napisane: $A$ rozciąga krzywą w pionie, a $D$ przesuwa ją w górę. Dwie są
+wewnątrz i działają na wejście, więc czyta się je na odwrót: $B$ ściska ją w
+poziomie, a $C$ przesuwa ją na boki, w stronę przeciwną do swojego znaku.
+
+Podaj zbiór wartości $y = 3\sin\theta + 2$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Od $-1$ do $5$}
+Bo $\sin$ biegnie od $-1$ do $1$, potrojenie daje od $-3$ do $3$, a dodanie
+$2$ daje od $-1$ do $5$. $A$ to \textbf{amplituda}, a $D$ to przesunięcie, i
+są to dwie łatwe.
+
+Teraz para wewnętrzna, czyli te, których nazwy warto znać. Ile pełnych fal
+mieści $\sin(2\theta)$ w jednym pełnym obrocie $\theta$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dwie}
+Bo $2\theta$ osiąga $2\pi$, gdy $\theta$ osiąga $\pi$, więc fala zamknęła
+cykl na połowie odcinka. $B$ to \textbf{częstotliwość}, a długość fali wynosi
+$\frac{2\pi}{B}$ \dash{} większe $B$, krótsza fala, czyli ściśnięcie spod
+nawiasu z Programu~\ref{prog:F05} z doczepioną nazwą.
+
+$C$ to \textbf{faza}: przesuwa falę na bok o $\frac{C}{B}$, a dzielenie przez
+$B$ jest tam z tego powodu, który podał Program~\ref{prog:F05}, gdy umieścił
+punkt przecięcia funkcji logistycznej w $-\frac{b}{w}$, a nie w $b$.
+Przesunięcie mierzy się po ściśnięciu.
+
+Jaka jest długość fali $\sin(\num{0.5}\,\theta)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$4\pi$}
+Z $\frac{2\pi}{\num{0.5}}$. Mała częstotliwość to długa fala.
+
+\begin{aibox}
+Sinusoidalne kodowanie pozycyjne to to samo wyrażenie z wieloma różnymi
+wartościami $B$ naraz: jedna para współrzędnych na częstotliwość, a
+częstotliwości rozłożone na ogromnym zakresie. W kodowaniu oryginalnego
+transformera przy $d_{\text{model}} = 512$ długości fal biegną od około
+$\val{f08.pe.first}$ pozycji na najszybszej współrzędnej do około
+$\val{f08.pe.last}$ na najwolniejszej, z $\val{f08.pe.mid}$ pośrodku.
+
+Ten rozrzut jest zamysłem. Fala o długości $\val{f08.pe.first}$ odróżnia
+sąsiednie pozycje i nie mówi nic o pozycjach oddalonych o tysiąc tokenów, bo
+po drodze okrążyła setki razy. Fala o długości $\val{f08.pe.last}$ ledwie
+ruszyła na całej sekwencji, więc nie odróżni sąsiadów, ale odróżni początek
+od końca.
+
+Żadna z nich nie wykona pracy tej drugiej. Razem niosą pozycję na każdej
+skali naraz, czego pojedyncza częstotliwość nie potrafiła.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jedno ostrzeżenie co do częstotliwości, bo jest lustrzanym odbiciem pułapki z
+jednostkami i równie łatwo je nabyć.
+
+\textbf{Długość fali to liczba pozycji, a nie liczba radianów.} Fala
+$\sin(B\theta)$ zamyka cykl, gdy $B\theta$ przyrasta o $2\pi$, więc $\theta$
+przyrasta o $\frac{2\pi}{B}$ \dash{} i to ta druga liczba, a nie $2\pi$, mówi
+ci, o ile tokenów muszą być od siebie oddalone dwie pozycje, zanim
+współrzędna wróci do tego samego wyglądu.
+
+Dwie pozycje oddalone o $\frac{2\pi}{B}$ są na tej jednej współrzędnej nie do
+odróżnienia. Odróżniają je współrzędne wolniejsze, i to jest cały powód, dla
+którego jest ich więcej niż jedna.
+\end{fr}
+
+% ============================================================
+\section{Podobieństwo kosinusowe jest kosinusem}
+\label{sec:F08-cosine-similarity}
+\index{cosine similarity!what it ignores}
+
+\begin{fr}
+Oto wzór, którego używałeś i być może nigdy nie rozpakowałeś. Dla dwóch
+wektorów $a$ i $b$
+\[ \cos\theta = \frac{a \cdot b}{\lVert a \rVert\, \lVert b \rVert} \]
+gdzie $a \cdot b$ to znana z Programu~\ref{prog:F04} suma
+$\sum_i a_i b_i$, a $\lVert a \rVert$ to długość.
+
+\textbf{$\theta$ po lewej jest kątem, a to jest równość, nie analogia.}
+Podobieństwo kosinusowe nie jest \emph{podobne} do kosinusa ani nie jest od
+niego \emph{nazwane}. Jest kosinusem kąta między dwoma wektorami, a
+\code{code/f08\_trigonometry.py} sprawdza to wobec kąta policzonego
+niezależnie na trzech i pół tysiąca par, przy najgorszej rozbieżności
+$\val{f08.cossim.err}$.
+
+Dwa wektory wskazują dokładnie w tę samą stronę, a jeden jest dziesięć razy
+dłuższy od drugiego. Jakie jest ich podobieństwo kosinusowe?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$1$}
+Długości stoją w mianowniku właśnie po to, żeby się skróciły. Taki jest
+zamysł tej miary i to odróżnia ją od gołego iloczynu skalarnego:
+\textbf{podobieństwo kosinusowe dotyczy kierunku i nie wie nic o długości.}
+
+Czy tego chcesz, to osobne pytanie i warto je zadać, zamiast zakładać
+odpowiedź. Jeśli długość zanurzenia niesie informację \dash{} częstość,
+pewność, ile tekstu w nie weszło \dash{} to podobieństwo kosinusowe ją
+wyrzuca.
+
+Policz podobieństwo kosinusowe wektorów $(3, 4)$ i $(-4, 3)$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f08.cos.right}$}
+Bo iloczyn skalarny wynosi $-12 + 12 = 0$. A podobieństwo kosinusowe równe
+$0$ oznacza kąt $\val{f08.ang.right}$ stopni, skoro $\cos$ ćwierci obrotu jest
+zerem \dash{} oba wektory są prostopadłe.
+
+Trzy wartości, które warto umieć odczytać od ręki:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& podobieństwo & kąt \\
+\midrule
+ta sama strona & $\val{f08.cos.same}$ & $\val{f08.ang.same}$° \\
+prostopadłe & $\val{f08.cos.right}$ & $\val{f08.ang.right}$° \\
+przeciwne & $\val{f08.cos.opposite}$ & $\val{f08.ang.opposite}$° \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Teraz liczba, którą naprawdę spotkasz. System wyszukiwania zgłasza
+podobieństwo kosinusowe $\val{f08.cos.hi}$ między dwoma zanurzeniami. Jaki
+to kąt?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Około $\val{f08.ang.hi}$ stopni}
+Czyli kąt widoczny, a nie błąd zaokrąglenia.
+
+\begin{trapbox}
+\textbf{Kosinus jest płaski w pobliżu zera, więc podobieństwa bliskie $1$
+ściskają szeroki zakres kątów w wąski zakres liczb.} To jest nasycenie z
+Programu~\ref{prog:F07} w innej funkcji: $\cos$ ma punkt zwrotny w
+$\theta = 0$, więc pierwsze kilka stopni rozejścia nie kosztuje w
+podobieństwie prawie nic.
+
+Konsekwencja jest tą, o którą ludzie potykają się przy strojeniu progu.
+Przesunięcie odcięcia z $\val{f08.cos.hi}$ na $\val{f08.cos.lo}$ brzmi jak
+drobna korekta, bo liczby są blisko siebie, a poszerza przyjmowany kąt z około
+$\val{f08.ang.hi}$ stopni do około $\val{f08.ang.lo}$. Skala podobieństwa nie
+jest liniowa względem tego, na czym ci zależy, i jest najmniej liniowa
+dokładnie tam, gdzie najpewniej ustawisz próg.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+A teraz pytanie trudniejsze, które w ogóle nie dotyczy matematyki.
+
+Dwa zanurzenia dokumentów mają podobieństwo kosinusowe $\num{0.95}$. Czy to
+znaczy, że oba dokumenty są podobne znaczeniowo?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Samo z siebie nie}
+Znaczy, że oba wektory wskazują prawie w tę samą stronę. Czy to odpowiada
+znaczeniu, jest własnością \emph{tego, jak te wektory powstały}, i jest
+twierdzeniem o procedurze treningu, a nie o geometrii.
+
+\begin{trapbox}
+\textbf{Matematyka jest dokładna, a interpretacja empiryczna, i łatwo pozwolić
+dokładności tej pierwszej wyprać tę drugą.} Kosinus jest kosinusem kąta, z
+dokładnością do piętnastu miejsc po przecinku. To, że kąt śledzi znaczenie,
+jest faktem o modelu, sprawdza się lepiej dla jednych par niż dla innych i
+trzeba to zmierzyć na zadaniu, a nie założyć ze wzoru.
+
+Dwa tryby porażki zgłaszane są na tyle często, że warto się ich spodziewać:
+zanurzenia z wielu modeli są ściśnięte w wąski stożek, więc \emph{wszystko}
+jest podobne do wszystkiego i surowy wynik $\num{0.8}$ może nic nie znaczyć;
+oraz podobieństwo może brać się ze wspólnego tematu, wspólnego stylu, wspólnej
+długości albo wspólnego języka, a nie z tego, co tekst mówi. Ta książka nie
+mierzy żadnego z nich. Program~\ref{prog:P05} mierzy za to punkt odniesienia,
+od którego oba są odchyleniem \dash{} w wysokim wymiarze dwa niezwiązane
+wektory są prawie zawsze prawie prostopadłe \dash{} a Program~\ref{prog:P34}
+mówi, jak sprawdzić, czy wynik cokolwiek znaczy na twoich danych.
+
+Z tego programu wolno ci wziąć geometrię, która jest dokładna. Nie wolno ci
+wziąć tego, że geometria jest znaczeniem.
+\end{trapbox}
+
+\mermaidfig{f08-cosine-angle}{Dzielenie przez obie długości usuwa je, a to,
+co zostaje, jest kątem.}{podobieństwo kosinusowe}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedna własność, bo od niej zaczyna się następna sekcja. Podobieństwo
+kosinusowe zależy od obu wektorów wyłącznie przez kąt między nimi.
+
+To znaczy, że cokolwiek zrobisz obu wektorom, co zostawia kąt w spokoju,
+zostawia w spokoju i podobieństwo. Przeskalowanie obu jest przykładem
+oczywistym i już je widziałeś.
+
+Wskaż inną operację, która zostawiłaby kąt między dwoma wektorami bez zmian.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Obrócenie obu o tyle samo.
+\end{ansblock}
+
+Obróć cały obrazek, a wektory się przesuną, ale kąt między nimi nie, bo kąt
+jest relacją między nimi, a nie własnością żadnego z nich. To widać z obrazka
+i jest to cały temat sekcji 5, gdzie okazuje się wart znacznie więcej, niż
+wygląda.
+\end{fr}
+
+% ============================================================
+\section{Obrót i po co on jest}
+\label{sec:F08-rotation}
+\index{rotation!preserves the dot product}
+
+\begin{fr}
+Żeby obrócić punkt w lewo o kąt $\theta$, przenieś $(x, y)$ do
+\[ (x\cos\theta - y\sin\theta,\quad x\sin\theta + y\cos\theta) \]
+
+Nie musisz tego tutaj wyprowadzać, ale powinieneś sprawdzić to raz na
+przypadku, który widzisz. Weź punkt $(1, 0)$, po prawej stronie okręgu, i
+obróć go o ćwierć obrotu.
+
+Gdzie trafi?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Do $(0, 1)$}
+Bo $\cos$ ćwierci obrotu wynosi $0$, a $\sin$ tej ćwierci wynosi $1$, więc
+wzór daje $(1 \times 0 - 0 \times 1,\; 1 \times 1 + 0 \times 0) = (0, 1)$.
+Punkt z prawej przeszedł na górę, i to właśnie robi ćwierć obrotu w lewo.
+
+Co obrót robi z \emph{długością} wektora?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nic}
+Obrót przesuwa punkt po okręgu o środku w początku układu, a każdy punkt tego
+okręgu leży w tej samej odległości od środka. Sprawdzone dla sześciuset
+kątów, najgorsza zmiana długości $\val{f08.rot.len.err}$.
+
+Warto podać to jako własność, a nie jako obrazek, bo to jest własność, na
+której opiera się cała reszta: \textbf{obrót zmienia to, gdzie rzeczy są, a
+nie to, jak duże są.}
+
+Teraz weź dwa wektory i obróć \emph{oba} o ten sam kąt. Co dzieje się z ich
+iloczynem skalarnym?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nic}
+Najgorsza zmiana $\val{f08.rot.same.err}$ na sześciuset kątach.
+
+I widać, dlaczego, bez żadnej algebry, z poprzedniej sekcji. Iloczyn skalarny
+to
+\[ a \cdot b = \lVert a \rVert\, \lVert b \rVert \cos\theta \]
+po przekształceniu wzoru na podobieństwo kosinusowe. Obrót zostawia obie
+długości w spokoju i zostawia w spokoju kąt między wektorami, bo obraca oba o
+tyle samo. Wszystkie trzy składniki przeżywają, więc iloczyn też.
+
+Teraz krok, o który chodzi. Obróć $a$ o kąt $\alpha$, a $b$ o \emph{inny} kąt
+$\beta$. Od czego może zależeć ich iloczyn skalarny?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Tylko od $\beta - \alpha$.
+\end{ansblock}
+
+Obróć cały obrazek z powrotem o $\alpha$. To jest obrót obu wektorów o tyle
+samo, więc na mocy poprzedniej ramki nic nie zmienia \dash{} a zostawia $a$
+tam, gdzie zaczynał, i $b$ obrócone o $\beta - \alpha$. Więc
+\[ R(\alpha)a \cdot R(\beta)b = a \cdot R(\beta - \alpha)b \]
+i oba kąty bezwzględne zniknęły. Sprawdzone na tysiącu sześciuset parach
+kątów, najgorsza rozbieżność $\val{f08.rot.rel.err}$.
+
+\textbf{I to jest wszystko}, i to jest zdanie, dla którego ten program
+istnieje.
+\end{fr}
+
+\begin{fr}
+Oto to samo z doczepionym słownictwem.
+
+Nadaj każdej pozycji w sekwencji kąt proporcjonalny do niej. Obróć zapytanie
+na pozycji $m$ o jego kąt, a klucz na pozycji $n$ o jego. Wtedy ich iloczyn
+skalarny \dash{} czyli wynik uwagi \dash{} zależy od obu wektorów i od
+$n - m$, i od niczego więcej.
+
+Żaden z tokenów nie wie, gdzie jest bezwzględnie. Wynik wie tylko, jak daleko
+są od siebie.
+
+Skrypt robi to na jednej parze. Na pozycjach $1$ i $2$ zapytanie i klucz
+oddalone o jedną pozycję dają $\val{f08.rot.score.near}$; na pozycjach $9$ i
+$10$ te same dwa wektory dają $\val{f08.rot.score.far}$.
+
+\begin{aibox}
+To jest obrotowe kodowanie pozycyjne, a \enquote{obróć zapytanie i klucz} jest
+teraz zdaniem, a nie zaklęciem: to jedyny sposób, żeby włożyć pozycję do
+iloczynu skalarnego tak, aby odpowiedź zależała od różnicy pozycji, a nie od
+samych pozycji.
+
+Dwie konsekwencje wypadają wprost z tożsamości i warto je mieć. Sekwencja
+przesunięta w całości daje identyczne wyniki uwagi, bo każda różnica jest bez
+zmian \dash{} i to jest własność, której chcesz, a której nie ma dodawanie
+wektora pozycyjnego do zanurzenia. Oraz ten sposób nie potrzebuje żadnych
+uczonych parametrów, bo obrót wyznaczają pozycja i rozkład częstotliwości, i
+nie ma czego dopasowywać.
+
+Czego nie robi, to nie rozciąga się za darmo poza zakres kątów, na których
+model był trenowany. Tożsamość zachodzi dla każdego kąta; czy model widział
+tę część okręgu, jest osobnym pytaniem, i to o nie chodzi w pracach o
+ekstrapolacji.
+\end{aibox}
+
+\mermaidfig{f08-rotate-both}{Dwa obroty o dwie pozycje i iloczyn skalarny,
+który pamięta tylko odstęp między nimi.}{dlaczego obrót koduje różnicę}
+\end{fr}
+
+\begin{fr}
+Jedna uwaga na koniec, wiążąca tę sekcję z poprzednią.
+
+Sekcja 4 powiedziała, że podobieństwo kosinusowe nie zmienia się przy
+obróceniu obu wektorów, i nazwała to oczywistym. Sekcja 5 powiedziała, że
+wynik uwagi nie zmienia się przy obróceniu obu wektorów, i zrobiła z tego
+mechanizm stojący za prawdziwą techniką.
+
+To jest to samo zdanie. Zmieniło się to, że obrót nie jest już czymś, co
+robisz całemu obrazkowi naraz \dash{} jest czymś, co robisz każdemu wektorowi
+o inną wielkość, dobraną tak, aby to, co przeżyje, było dokładnie tą
+wielkością, którą chciałeś zakodować.
+
+\textbf{Obrót jest operacją, która zmienia to, gdzie rzeczy są, nie zmieniając
+tego, jak się mają do siebie}, i właśnie dlatego jest właściwym narzędziem do
+włożenia pozycji do modelu, który poza tym nie ma jej zauważać.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{$\cos\theta$ i $\sin\theta$ to dwie współrzędne punktu
+  na okręgu o promieniu $1$}, po tym, jak przeszedł $\theta$ w lewo od prawej
+  strony. Nie stosunek boków i nic wspólnego z trójkątami \dash{} cały temat
+  to jeden obrazek, a cztery wartości ćwierci obrotu odczytuje się z niego, a
+  nie zapamiętuje.}
+\sumitem{4--5}{\textbf{Kąt jest przebytą drogą, i tym właśnie jest radian},
+  więc pełny obrót to $2\pi$ i żaden współczynnik przeliczeniowy nie przechodzi
+  do dalszych wzorów. \code{math.sin(90)} zwraca $\val{f08.sin90rad}$, bo $90$
+  radianów to $\val{f08.turns90}$ pełnego obrotu \dash{} i nic nie podnosi
+  wyjątku, nic nie ostrzega, a odpowiedź jest zwyczajną liczbą.}
+\sumitem{5--6}{$\cos^{2}\theta + \sin^{2}\theta = 1$ to
+  \textbf{równanie okręgu z podstawionymi nazwami}, więc nie wymaga ani dowodu,
+  ani zapamiętywania. Sprawdzone do $\val{f08.pyth.err}$. To jedyna tożsamość
+  trygonometryczna, jakiej ta książka używa.}
+\sumitem{7--8}{Obie krzywe mają okres $2\pi$ i zbiór wartości $\intcc{-1}{1}$,
+  bo punkt wraca tam, skąd wyszedł, i nigdy nie opuszcza okręgu. $\cos$ jest
+  parzysty, a $\sin$ nieparzysty, co jest chodzeniem do tyłu odbitym w osi
+  poziomej.}
+\sumitem{9--10}{\textbf{$\cos\theta = \sin(\theta + \frac{\pi}{2})$},
+  sprawdzone do $\val{f08.shift.err}$: jedna krzywa, dwie nazwy, a $+$ wewnątrz
+  nawiasu przesuwa wykres w drugą stronę, jak ostrzegał
+  Program~\ref{prog:F05}. Przy $\theta = 0$ dają $1$ i $0$, i to jedyna rzecz,
+  która je odróżnia.}
+\sumitem{11--13}{W $A\sin(B\theta + C) + D$ cztery litery to cztery ruchy z
+  Programu~\ref{prog:F05}: $A$, czyli amplituda, i $D$, czyli przesunięcie,
+  działają na wyjście i czyta się je tak, jak są napisane; $B$, czyli
+  częstotliwość, i $C$, czyli faza, działają na wejście i czyta się je na
+  odwrót. Długość fali to $\frac{2\pi}{B}$, a przesunięcie na bok to
+  $\frac{C}{B}$, dzielone przez $B$, bo mierzy się je po ściśnięciu.}
+\sumitem{14--15}{\textbf{Długość fali to liczba pozycji, a nie liczba
+  radianów.} Sinusoidalne kodowanie pozycyjne to jedna fala na częstotliwość
+  na ogromnym rozrzucie \dash{} od około $\val{f08.pe.first}$ pozycji na
+  najszybszej do $\val{f08.pe.last}$ na najwolniejszej \dash{} bo żaden koniec
+  nie wykona pracy drugiego.}
+\sumitem{16--17}{\textbf{Podobieństwo kosinusowe jest kosinusem kąta między
+  dwoma wektorami}, nie analogią i nie nazwą. Sprawdzone wobec kąta
+  policzonego niezależnie, najgorsza rozbieżność $\val{f08.cossim.err}$. Obie
+  długości stoją w mianowniku po to, żeby się skróciły, więc miara dotyczy
+  kierunku i nie wie nic o długości \dash{} a czy tego chcesz, to pytanie
+  warte zadania.}
+\sumitem{18--19}{$\val{f08.cos.same}$, $\val{f08.cos.right}$ i
+  $\val{f08.cos.opposite}$ to ta sama strona, prostopadłość i przeciwna strona.
+  \textbf{Kosinus jest płaski w pobliżu zera}, więc podobieństwo
+  $\val{f08.cos.hi}$ to wciąż około $\val{f08.ang.hi}$ stopni, a obniżenie
+  odcięcia do $\val{f08.cos.lo}$ wpuszcza $\val{f08.ang.lo}$ \dash{} skala
+  jest najmniej liniowa dokładnie tam, gdzie ustawia się progi.}
+\sumitem{20--21}{\textbf{Matematyka jest dokładna, a interpretacja
+  empiryczna.} Wysokie podobieństwo mówi, że wektory wskazują w tę samą stronę;
+  to, że śledzi to znaczenie, jest twierdzeniem o tym, jak je wytrenowano, i
+  trzeba je zmierzyć na zadaniu.}
+\sumitem{22--23}{Podobieństwo kosinusowe zależy od obu wektorów wyłącznie przez
+  kąt między nimi, więc przeskalowanie obu zostawia je w spokoju \dash{} i tak
+  samo obrócenie obu o tyle samo.}
+\sumitem{24--26}{Obrót przenosi $(x, y)$ do
+  $(x\cos\theta - y\sin\theta,\ x\sin\theta + y\cos\theta)$ i
+  \textbf{zmienia to, gdzie rzeczy są, nie zmieniając tego, jak duże są}:
+  najgorsza zmiana długości $\val{f08.rot.len.err}$ na sześciuset kątach.}
+\sumitem{27--28}{Obrócenie \emph{obu} wektorów o ten sam kąt zostawia iloczyn
+  skalarny w spokoju, do $\val{f08.rot.same.err}$, bo przeżywają wszystkie trzy
+  jego składniki. Więc obrócenie ich o \emph{różne} kąty $\alpha$ i $\beta$
+  zostawia iloczyn skalarny, który może zależeć tylko od $\beta - \alpha$
+  \dash{} sprawdzone do $\val{f08.rot.rel.err}$.}
+\sumitem{29--30}{\textbf{Ta tożsamość to obrotowe kodowanie pozycyjne.} Obróć
+  zapytanie i klucz, każde o kąt proporcjonalny do jego pozycji, a wynik uwagi
+  zależy od odstępu, a nie od obu pozycji: ta sama para daje
+  $\val{f08.rot.score.near}$ na pozycjach $1$ i $2$ oraz
+  $\val{f08.rot.score.far}$ na $9$ i $10$. Nie potrzebuje uczonych parametrów i
+  sama z siebie nie sięga poza kąty, na których model był trenowany.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Punkt siedzi na dole okręgu jednostkowego. Podaj tam $\cos$ i $\sin$.
+  \answerto{$0$ i $-1$. Dokładnie pod początkiem układu: zero w poziomie,
+  jedna jednostka w dół.}
+\item Ile radianów ma pół obrotu, a ile jedna szósta obrotu?
+  \answerto{$\pi$ oraz $\frac{\pi}{3}$, z $2\pi$ podzielonego przez $2$ i
+  przez $6$.}
+\item Kolega pisze \code{math.cos(180)}, mając na myśli drugą stronę okręgu.
+  Co jest źle, jak powinno być i co pójdzie źle w trakcie działania?
+  \answerto{Argument jest w radianach, więc powinno być
+  \begin{center}\code{math.cos(math.radians(180))}\end{center}
+  czyli $-1$. W trakcie działania nic nie pójdzie źle \dash{} zwróci zwyczajną
+  liczbę z $\intcc{-1}{1}$, a wynik będzie po prostu zły.}
+\item Nie zaglądając nigdzie, podaj zbiór wartości $\cos$ i powiedz dlaczego.
+  \answerto{$\intcc{-1}{1}$, bo $\cos$ jest współrzędną punktu na okręgu o
+  promieniu $1$, a żadna współrzędna takiego punktu nie przekroczy co do
+  wartości $1$.}
+\item Podaj amplitudę, długość fali i przesunięcie
+  $y = 4\sin(\num{0.25}\,\theta) - 1$.
+  \answerto{Amplituda $4$, długość fali $\frac{2\pi}{\num{0.25}} = 8\pi$,
+  przesunięcie $-1$. Zbiór wartości od $-5$ do $3$.}
+\item Dwie współrzędne kodowania pozycyjnego mają długości fal $10$ i
+  $\num{10000}$. Która odróżni pozycje $3$ i $5$, a która pozycje $3$ i
+  $\num{3000}$?
+  \answerto{Współrzędna o długości $10$ oddziela $3$ od $5$, a do pozycji
+  $\num{3000}$ okrążyła setki razy; ta o długości $\num{10000}$ ledwie
+  drgnęła między $3$ a $5$, a oddziela $3$ od $\num{3000}$. Dlatego jest ich
+  więcej niż jedna.}
+\item Policz podobieństwo kosinusowe $(1, 0)$ i $(1, 1)$ oraz podaj kąt.
+  \answerto{$\frac{1}{\sqrt{2}} \approx \num{0.7071}$, czyli $45$ stopni.}
+\item Dwa zanurzenia mają podobieństwo kosinusowe $\num{1.0}$, ale bardzo
+  różne długości. Co o nich wiesz?
+  \answerto{Że jedno jest dodatnią wielokrotnością drugiego. Podobieństwo
+  kosinusowe w ogóle nie widzi długości, więc nie odróżni wektora od jego
+  podwojenia.}
+\item Próg przesunięto z $\num{0.98}$ na $\num{0.99}$ i przechodzi znacznie
+  mniej wyników. Wyjaśnij to w kątach.
+  \answerto{Przyjmowany kąt zwęża się z około $\val{f08.ang.lo}$ stopni do
+  około $\val{f08.ang.hi}$. Kosinus jest płaski w pobliżu zera, więc mała
+  zmiana liczby jest dużą zmianą kąta, który ona wpuszcza.}
+\item Obróć $(0, 1)$ o ćwierć obrotu w lewo, korzystając ze wzoru.
+  \answerto{$(0 \times 0 - 1 \times 1,\ 0 \times 1 + 1 \times 0) = (-1, 0)$.
+  Góra okręgu przechodzi na lewo, i to właśnie robi ćwierć obrotu.}
+\item Dwa wektory o długościach $3$ i $5$ mają iloczyn skalarny $\num{7.5}$.
+  Oba obracamy o $\num{1.2}$ radiana. Ile wynosi teraz ich iloczyn skalarny?
+  \answerto{$\num{7.5}$. Obrót obu nie zmienia ani długości, ani kąta między
+  nimi, a iloczyn skalarny nie zależy od niczego innego.}
+\item Zapytanie na pozycji $4$ i klucz na pozycji $7$ obracamy o kąty
+  proporcjonalne do ich pozycji. Która inna para pozycji da ten sam wynik dla
+  tych samych dwóch wektorów?
+  \answerto{Dowolna para oddalona o trzy \dash{} $1$ i $4$, $100$ i $103$.
+  Wynik zależy tylko od różnicy.}
+\item Dlaczego obrotem nie da się zrobić jednego wektora dłuższym od drugiego?
+  \answerto{Bo obrót zachowuje długość. Przesuwa punkty po okręgach o środku w
+  początku układu, a każdy punkt jednego okręgu leży w tej samej odległości od
+  środka.}
+\item Wskaż jedyną tożsamość trygonometryczną, której ten program używa, i
+  powiedz, skąd się bierze.
+  \answerto{$\cos^{2}\theta + \sin^{2}\theta = 1$, czyli równanie okręgu
+  jednostkowego z $\cos$ i $\sin$ podstawionymi za współrzędne.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Pokaż, że $\sin(\theta + 2\pi) = \sin\theta$, korzystając z okręgu, a
+  nie z żadnej tożsamości.
+  \answerto{Dodanie $2\pi$ przeprowadza punkt o pełny obrót po obwodzie, co
+  odstawia go dokładnie w to samo miejsce. Obie współrzędne są więc bez zmian,
+  a $\sin$ jest jedną z nich.}
+\item Falę opisano jako mającą \enquote{częstotliwość $3$}. Podaj jej długość
+  i powiedz, dlaczego obie liczby idą w przeciwne strony.
+  \answerto{$\frac{2\pi}{3}$. $B$ mnoży wejście, więc większe $B$ sprawia, że
+  wejście osiąga $2\pi$ wcześniej \dash{} czyli fala jest krótsza. To
+  ściśnięcie spod nawiasu z Programu~\ref{prog:F05}.}
+\item Dwa wektory mają podobieństwo kosinusowe $-\num{0.5}$. Jaki to kąt i co
+  mówi o ich kierunkach?
+  \answerto{$120$ stopni. Wskazują bardziej od siebie niż ku sobie, ale nie
+  przeciwnie.}
+\item Wszystkie zanurzenia pewnego modelu leżą w granicach $20$ stopni od
+  siebie. Jakie jest najmniejsze podobieństwo kosinusowe, jakie może mieć
+  dowolna para, i dlaczego to jest problem dla progu?
+  \answerto{$\cos 20^{\circ} \approx \num{0.94}$. Każda para dostaje co najmniej
+  tyle, więc próg $\num{0.9}$ wpuszcza wszystko, a liczba nie niesie żadnej
+  informacji o parze.}
+\item Udowodnij, że obrócenie obu wektorów o ten sam kąt nie zmienia ich
+  podobieństwa kosinusowego, mając dane tylko tyle, że obrót zachowuje długość
+  i iloczyn skalarny.
+  \answerto{Podobieństwo to iloczyn skalarny podzielony przez obie długości.
+  Obrót obu zostawia z założenia licznik w spokoju i każdy czynnik mianownika
+  też, więc zostawia w spokoju iloraz.}
+\item Jaką rolę w $R(\alpha)a \cdot R(\beta)b = a \cdot R(\beta - \alpha)b$
+  gra założenie, że oba obroty są wokół tego samego środka?
+  \answerto{To ono sprawia, że \enquote{obróć cały obrazek z powrotem o
+  $\alpha$} jest jednym obrotem zastosowanym do obu. Obracanie wokół dwóch
+  różnych środków nie jest obrotem obrazka i skrócenie nie następuje.}
+\item Wyjaśnij, dlaczego dodanie wektora pozycyjnego do zanurzenia nie daje
+  tej niezmienniczości na przesunięcie, którą daje obrócenie go.
+  \answerto{Dodawanie wkłada do wektora pozycję bezwzględną, więc iloczyn
+  skalarny dwóch takich wektorów zawiera składniki z każdą pozycją osobno.
+  Obracanie wkłada pozycję w \emph{kąt}, a powyższa tożsamość usuwa kąty
+  bezwzględne i zostawia różnicę.}
+\item Sekwencję przesunięto w całości o dziesięć pozycji. Co dzieje się z
+  każdym wynikiem uwagi przy kodowaniu obrotowym i dlaczego?
+  \answerto{Nic. Każdy wynik zależy tylko od różnicy pozycji, a przesunięcie
+  każdej pozycji o tyle samo zostawia każdą różnicę bez zmian.}
+\item Dlaczego to, że tożsamość zachodzi dla każdego kąta, nie oznacza, że
+  model działa przy każdej długości sekwencji?
+  \answerto{Matematyka jest dokładna wszędzie; czy model był trenowany na tej
+  części okręgu, to osobne, empiryczne pytanie. To to samo rozróżnienie, co
+  między dokładnością kosinusa a tym, że podobieństwo coś znaczy.}
+\item Musisz porównywać kierunki wektorów, których długości niosą prawdziwą
+  informację. Powiedz, co kosztowałoby cię podobieństwo kosinusowe, i wskaż
+  jedną rzecz, którą możesz podać obok niego.
+  \answerto{Wyrzuca długości w całości, więc dwa wektory różniące się tylko
+  wielkością są nie do odróżnienia. Podaj same długości albo użyj gołego
+  iloczynu skalarnego, który zachowuje jedno i drugie.}
+\end{furtherproblems}
