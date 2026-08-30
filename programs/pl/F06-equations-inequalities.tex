@@ -1,20 +1,1218 @@
 %% F06 --- Równania, nierówności i prosta
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f06_equations.py i wchodzi przez \val{}. Rachunki, których
+%% program UCZY -- 3x + 7 = 22, eliminacja z sekcji 4, współczynnik
+%% (5-3)/(2-1) -- są wpisane wprost, bo czytelnik ma je zrobić sam.
+%% Rozwiązanie z sekcji 4 celowo NIE jest liczone: czytelnik uczy się
+%% eliminować, więc wypisanie odpowiedzi ze skryptu byłoby teatrem. Skrypt i
+%% tak sprawdza, że leży ona na obu prostych.
+%%
+%% CZEGO TEN PROGRAM NIE MOŻE PODAWAĆ JAKO NOWEGO. Program F02, ramka 39, już
+%% przekształca y = wx + b do x = (y - b)/w w całości, a Program F05 podaje
+%% funkcję logistyczną, jej przecięcie w -b/w i logit. Sekcja 2 wymienia obie
+%% te rzeczy i idzie dalej, zamiast zaczynać od nowa; sekcja 3 mówi wprost, że
+%% współczynnik kierunkowy i wyraz wolny to rozciągnięcie i przesunięcie z F05
+%% pod innymi nazwami.
+%%
+%% GŁÓWNA PUŁAPKA to pułapka sekcji 5: pomnożenie lub podzielenie nierówności
+%% przez liczbę ujemną odwraca ją. Jest wywoływana w ramce 29 pod poleceniem
+%% na czas i prostowana w 30. Sprostowanie musi wyjaśnić rozumowanie, które
+%% dało błąd: każda INNA reguła rozwiązywania równań przenosi się bez zmian,
+%% więc czytelnik uogólnił prawdziwą regułę poza jej jedyny wyjątek.
+%%
+%% SEKCJA 6 NIESIE POMIAR i jest to pozycja 26 katalogu pułapek. Przycinanie
+%% po wartości i po normie biorą ten sam próg i ten sam argument, a ich nazwy
+%% różnią się jednym słowem. Na gradiencie z code/f06_equations.py przycinanie
+%% po wartości zostawia wektor, którego długość NADAL przekracza próg, i
+%% obraca go o 23,9 stopnia; po normie długość trafia dokładnie w próg, a
+%% obrotu nie ma wcale. Oba fakty są asercjami i są sprawdzone względem numpy.
+%%
+%% JEDEN WŁAŚCICIEL WYPROWADZONY OD NOWA, A NIE PRZEPISANY. notes/02 kieruje
+%% przycinanie gradientu do "P19", co napisano przed wstawieniem P7; §3 tego
+%% pliku niesie ogólne ostrzeżenie, że jego numery z optymalizacji są o jeden
+%% za niskie. Z tools/programs.json właścicielem jest P21. Nigdy nie przepisuj
+%% właściciela z notes/02.
+%%
+%% Bliźniak: programs/en/F06-equations-inequalities.tex. Ramka w ramkę, makro
+%% w makro, liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Równania, nierówności i prosta}
 \label{prog:F06}
+\index{równanie!rozwiązywanie jako cofanie}
+\index{nierówność!odwrócenie przy liczbie ujemnej}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{rozwiązać równanie liniowe przez cofnięcie działań, sprawdzić
+  wynik podstawieniem i powiedzieć, kiedy równanie nie ma rozwiązań, a kiedy
+  ma wszystkie}
+\outcome{8--13}{wyznaczyć ze wzoru dowolną literę i odtworzyć argument
+  jednostki logistycznej z prawdopodobieństwa, które zgłosiła}
+\outcome{14--21}{odczytać z równania współczynnik kierunkowy i wyraz wolny,
+  znaleźć prostą przez dwa punkty i powiedzieć, co czyni dwie proste
+  równoległymi albo prostopadłymi}
+\outcome{22--27}{rozwiązać układ dwóch równań z dwiema niewiadomymi i
+  powiedzieć z samych równań, czy ma jedno rozwiązanie, żadnego, czy każdy
+  punkt prostej}
+\outcome{28--35}{rozwiązać nierówność i powiedzieć, który jeden krok
+  rozwiązywania równań nie przenosi się na nią}
+\outcome{36--42}{zapisać próg i wartość przyciętą jako nierówności oraz
+  powiedzieć, co każdy z dwóch sposobów przycinania wektora robi z jego
+  długością i kierunkiem}
+\end{outcomes}
 
-Argument: solving is undoing. Payoff: \code{y = wx + b} is the entire linear
-model; a decision threshold is an inequality; a clipped value is two
-inequalities.
+\begin{quiz}
+\item Rozwiąż $3x + 7 = 22$. \teachesatone{1}
+  \answerto{$x = 5$. Cofnij dodawanie, potem mnożenie \dash{} odwrotnie do
+  kolejności, w jakiej zostały zastosowane.}
+\item Rozwiąż $x^{2} = 4x$. \teachesat{5--6}
+  \answerto{$x = 0$ albo $x = 4$. Podzielenie obu stron przez $x$ daje tylko
+  to drugie i wyrzuca to pierwsze.}
+\item Wyznacz $w$ ze wzoru $y = wx + b$. \teachesat{8--9}
+  \answerto{$w = \frac{y - b}{x}$, dla $x \ne 0$.}
+\item Rozwiąż $x^{2} = 9$. \teachesat{12--13}
+  \answerto{$x = 3$ albo $x = -3$. Pierwiastek brany przez równanie niesie oba
+  znaki.}
+\item Jednostka logistyczna liczy $\sigma(2x - 3)$ i zgłasza $\num{0.8}$. Jaki
+  był jej argument? \teachesat{10--11}
+  \answerto{$x = \val{f06.solve.p8}$, z $x = \frac{\logit(p) - b}{w}$.}
+\item Podaj współczynnik kierunkowy i wyraz wolny prostej $y = 3x - 2$.
+  \teachesat{14--15}
+  \answerto{Współczynnik $3$, wyraz wolny $-2$.}
+\item Jaki jest współczynnik kierunkowy prostej przez $(1, 3)$ i $(2, 5)$?
+  \teachesat{15--16}
+  \answerto{$2$, z $\frac{5 - 3}{2 - 1}$.}
+\item Jaki jest współczynnik kierunkowy prostej prostopadłej do $y = 2x + 1$?
+  \teachesat{19--20}
+  \answerto{$-\frac{1}{2}$. Iloczyn obu współczynników wynosi $-1$.}
+\item Rozwiąż razem $3x + 2y = 12$ oraz $x - y = 1$. \teachesat{22--23}
+  \answerto{$x = \num{2.8}$, $y = \num{1.8}$. Podstaw $x = y + 1$ do
+  pierwszego.}
+\item Dwa równania dają proste o tym samym współczynniku kierunkowym i różnych
+  wyrazach wolnych. Ile jest rozwiązań? \teachesat{24--25}
+  \answerto{Żadnego. Proste są równoległe, więc żaden punkt nie leży na obu.}
+\item Rozwiąż $-2x > 6$. \teachesat{29--30}
+  \answerto{$x < -3$. Dzielenie przez liczbę ujemną odwraca nierówność.}
+\item Zapisz nierównościami \enquote{$x$ leży między $-1$ a $1$ włącznie}.
+  \teachesat{32--33}
+  \answerto{$-1 \le x \le 1$, czyli dwie nierówności naraz.}
+\item Klasyfikator binarny odpala, gdy $\sigma(z) > \num{0.5}$. Zapisz ten
+  warunek przez $z$. \teachesat{34--35}
+  \answerto{$z > 0$, bo $\sigma$ przecina połowę w $z = 0$ i ściśle rośnie.}
+\item Zapisz $\relu$ jako regułę opartą na nierówności, a potem
+  $\clip$ między $-1$ a $1$. \teachesatone{36}
+  \answerto{$\relu(x)$ zostawia $x$, gdy jest dodatnie, a poza tym zwraca
+  $0$, a przycinanie to dwa ograniczenia jedno po drugim:
+  \[ \clip(x) = \max(-1, \min(1, x)) \]}
+\item Wektor gradientu został przycięty \enquote{na $\num{1.0}$}. Czy jego
+  długość jest teraz co najwyżej $\num{1.0}$? \teachesat{39--40}
+  \answerto{Tylko jeśli przycięto go po \emph{normie}. Przycinanie po wartości
+  obcina każdą składową osobno i może zostawić długość powyżej progu.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+% ============================================================
+\section{Rozwiązywanie to cofanie}
+\label{sec:F06-undoing}
+\index{równanie!sprawdzanie przez podstawienie}
+
+\begin{fr}
+Równanie jest pytaniem. $3x + 7 = 22$ pyta: \emph{dla której wartości $x$ obie
+strony są tą samą liczbą?}
+
+Odpowiadasz, cofając to, co zrobiono z $x$, a reguła jest dokładnie jedna.
+\textbf{Cokolwiek robisz jednej stronie, zrób i drugiej.} Znak równości jest
+twierdzeniem, że obie strony to ta sama liczba, a to samo działanie na tej
+samej liczbie daje ten sam wynik, więc twierdzenie się utrzymuje.
+
+Maszyna bierze tu $x$, mnoży przez $3$, potem dodaje $7$. Cofnij więc najpierw
+dodawanie, bo zostało zrobione jako ostatnie:
+\begin{align*}
+3x + 7 &= 22 \\
+3x &= 15 \\
+x &= 5
+\end{align*}
+
+To jest funkcja odwrotna z Programu~\ref{prog:F05}, przybywająca jako
+procedura, a nie jako wykres: \textbf{spotykaj działania w kolejności
+odwrotnej do tej, w jakiej zostały zastosowane.}
+
+Rozwiąż $5 - 2x = 1$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x = 2$}
+Odejmij $5$ od obu stron, dostajesz $-2x = -4$, potem podziel obie strony przez
+$-2$.
+
+Teraz nawyk, dla którego ten program zasługuje na swoje miejsce, a kosztuje
+jedną linijkę. \textbf{Wstaw odpowiedź z powrotem do pierwotnego równania.}
+Tutaj $5 - 2 \times 2 = 5 - 4 = 1$, czyli to, o co pytano. To sprawdzenie
+łapie błąd znaku, zgubiony wyraz i pomyłkę rachunkową, i robi to bez
+konieczności znalezienia pomyłki.
+
+Reszta tego programu sprawdza każde wyprodukowane rozwiązanie, tak samo jak
+\code{code/f06\_equations.py}, który odmawia zbudowania książki, jeśli
+wypisane tu rozwiązanie nie spełnia równania, z którego pochodzi.
+
+Rozwiąż $3x + 4 = x + 10$, gdzie $x$ stoi po obu stronach.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x = 3$}
+Najpierw zbierz wyrazy z $x$ po jednej stronie: odejmij $x$ od obu stron,
+dostajesz $2x + 4 = 10$, dalej jak poprzednio. Sprawdzenie: $9 + 4 = 13$ oraz
+$3 + 10 = 13$.
+
+To, po której stronie zbierasz, nie ma znaczenia. Odjęcie $3x$ daje
+$4 = -2x + 10$, potem $-6 = -2x$, potem znowu $x = 3$. Wybieraj tę wersję, w
+której zostaje ci dodatni współczynnik, bo w niej trudniej zgubić znak.
+
+Rozwiąż $\frac{x}{4} - 1 = 2$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x = 12$}
+Dodaj $1$ do obu stron, potem pomnóż obie strony przez $4$. Sprawdzenie:
+$\frac{12}{4} - 1 = 2$.
+
+Uzupełnij brakujący krok:
+\begin{align*}
+\tfrac{x}{4} - 1 &= 2 \\
+\tfrac{x}{4} &= \blank \\
+x &= 12
+\end{align*}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$3$.
+\end{ansblock}
+
+Teraz jedno na szybko. Bez liczenia i bez sprawdzania.
+
+\textbf{Rozwiąż $x^{2} = 4x$.}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x = 0$ albo $x = 4$}
+Jeśli napisałeś samo $x = 4$, to podzieliłeś obie strony przez $x$ \dash{} nie
+mając pojęcia, czy $x$ jest zerem.
+
+\begin{trapbox}
+\textbf{Dzielenie obu stron przez niewiadomą wyrzuca rozwiązanie.} To jedyny
+ruch w tej sekcji, który nie jest odwracalny, i nie jest odwracalny dokładnie
+dla jednej wartości: dzielenie przez zero nie jest działaniem, więc krok, który
+wykonałeś, jest poprawny tylko przy założeniu, które właśnie próbowałeś
+sprawdzić.
+
+Rozumowanie, które go dało, jest wszędzie indziej poprawne. Dzielenie obu
+stron przez $3$ jest bezpieczne, bo $3$ nie jest zerem i nigdy nie będzie;
+dzielenie obu stron przez $x$ to ten sam gest zastosowany do czegoś, czego
+wartość jest pytaniem.
+
+Zrób to inaczej, a nic nie ginie. Przenieś wszystko na jedną stronę i wyłącz
+przed nawias:
+\[ x^{2} - 4x = 0 \qquad\Longrightarrow\qquad x(x - 4) = 0 \]
+Iloczyn jest zerem, gdy zerem jest jeden z czynników, więc $x = 0$ albo
+$x = 4$, i oba się sprawdzają: $0 = 0$ oraz $16 = 16$.
+
+Nawyk do zabrania: \textbf{gdy coś skracasz, powiedz na głos, co zakładasz, że
+nie jest zerem.} Jeśli nie umiesz tego powiedzieć, to nie rozwiązałeś tego
+równania \dash{} rozwiązałeś inne.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jeszcze dwie rzeczy, które równanie może zrobić, i żadna nie jest błędem.
+
+$x = x + 1$ \textbf{nie ma rozwiązań}. Odejmij $x$ od obu stron, a mówi
+$0 = 1$, co jest fałszem niezależnie od $x$, więc żadna wartość go nie
+uratuje.
+
+$2x = x + x$ ma \textbf{wszystkie} rozwiązania. Odejmij $x + x$, a mówi
+$0 = 0$, co jest prawdą niezależnie od $x$. To nie jest równanie do
+rozwiązania, tylko tożsamość: stwierdzenie, że dwa zapisy tej samej rzeczy się
+zgadzają.
+
+Obie wracają w sekcji 4 z obrazkiem, bo układ dwóch równań z dwiema
+niewiadomymi zawodzi na te same dwa sposoby, a tam zawód widać jako dwie
+proste, które się nie spotykają, albo jedną narysowaną dwa razy.
+
+\begin{note}
+Rozróżnienie zaczyna mieć znaczenie, gdy rozwiązujesz numerycznie, a nie
+ręcznie. Solver, któremu podano układ sprzeczny, nie zawsze o tym mówi;
+niektóre zwracają najbliższą rzecz, jaką znajdą, co jest doskonałą odpowiedzią
+na pytanie, którego nikt nie zadał. Program~\ref{prog:P08} to uściśla, bo
+\emph{najbliższa} wymaga definicji, zanim cokolwiek znaczy.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Wyznaczanie litery ze wzoru}
+\label{sec:F06-subject}
+\index{wzór!przekształcanie}
+
+\begin{fr}
+Przekształcanie wzoru to ta sama umiejętność z odpowiedzią zostawioną w
+literach. Program~\ref{prog:F02} już wyznaczył $x$ ze wzoru $y = wx + b$:
+\[ x = \frac{y - b}{w} \]
+odejmij bias, potem podziel przez wagę, czyli odwrotnie do kolejności, w
+jakiej zostały zastosowane.
+
+Jedyne, co jest tu nowe, to że celem może być dowolna litera. Żeby wyznaczyć
+$w$ z tego samego wzoru, cofnij to, co zrobiono z $w$: został pomnożony przez
+$x$, a potem dodano $b$, więc odejmij $b$ i podziel przez $x$.
+
+Zapisz $w$ wyznaczone ze wzoru.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ w = \frac{y - b}{x} \qquad (x \ne 0) \]
+\end{ansblock}
+
+Zwróć uwagę na warunek i na to, że nie jest ozdobą. Dla $x = 0$ wzór mówi
+$y = b$ niezależnie od $w$, więc dane nie są w stanie podać ci wagi \dash{} co
+jest tą samą obserwacją, którą Program~\ref{prog:F05} zrobił z drugiej strony,
+gdy zabronił biasu i znalazł prostą przyszpiloną do początku układu.
+
+\textbf{Podawaj warunek za każdym razem, gdy dzielisz przez literę.} To nawyk
+z poprzedniej sekcji wpisany we wzór zamiast w rozwiązanie.
+
+Teraz przekształcenie warte zrobienia w całości, bo je spotkasz. Jednostka
+liczy $\sigma(wx + b)$ i zgłasza prawdopodobieństwo $p$. Odtwórz $x$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ x = \frac{\logit(p) - b}{w}, \qquad
+   \logit(p) = \ln\!\left(\frac{p}{1-p}\right) \]
+\end{ansblock}
+
+Trzy cofnięcia, w odwrotnej kolejności. Jednostka pomnożyła przez $w$, dodała
+$b$, potem zastosowała $\sigma$. Zastosuj więc $\sigma^{-1}$, które
+Program~\ref{prog:F05} nazwał logitem; odejmij $b$; podziel przez $w$.
+
+Weź $w = 2$ i $b = -3$ i odczytaj zgłoszenie $p = \num{0.5}$. Wtedy
+$\logit(\num{0.5}) = 0$, więc $x = \frac{0 + 3}{2} = \num{1.5}$ \dash{} czyli
+$-\frac{b}{w}$, punkt przecięcia wyprowadzony przez Program~\ref{prog:F05}. Ta
+sama liczba drugą drogą, i to jest sprawdzenie.
+
+Jednostka zgłasza teraz $p = \num{0.8}$. Jakie było $x$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x = \val{f06.solve.p8}$}
+Bo $\logit(\num{0.8}) = \ln 4$, więc $x = \frac{\ln 4 + 3}{2}$.
+
+Podstaw z powrotem, a $\sigma(2 \times \val{f06.solve.p8} - 3)$ wychodzi
+$\num{0.8}$. To nie jest twierdzenie: \code{code/f06\_equations.py} wykonuje
+podstawienie dla każdego prawdopodobieństwa wypisanego w tej sekcji i wywala
+build, jeśli reszta przekroczy jedną część na $10^{12}$.
+
+Ta sama jednostka zgłasza teraz $p = \num{0.99}$. Jakie było $x$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x = \val{f06.solve.p99}$}
+Teraz porównaj te trzy argumenty. Od prawdopodobieństwa $\num{0.5}$ do
+$\num{0.8}$ argument poszedł z $\num{1.5}$ na $\val{f06.solve.p8}$; od
+$\num{0.8}$ do $\num{0.99}$, przy dużo mniejszej zmianie, poszedł z
+$\val{f06.solve.p8}$ na $\val{f06.solve.p99}$ \dash{} czyli jeszcze dalej.
+
+To jest spłaszczanie się funkcji logistycznej oglądane od strony odwrotnej:
+przy końcach duży ruch argumentu kupuje bardzo mały ruch prawdopodobieństwa.
+Program~\ref{prog:F07} rysuje tę krzywą, a Program~\ref{prog:F12} mówi, ile
+to kosztuje gradient.
+
+To też powód, dla którego pewną jednostkę trudno uczynić jeszcze pewniejszą.
+Ostatni punkt procentowy prawdopodobieństwa kupuje się większym ruchem
+argumentu niż pierwsze pięćdziesiąt i żadne uczenie tego nie zmieni \dash{}
+to własność funkcji, a nie dopasowania.
+
+Zostało jedno i jest w nim pułapka. Rozwiąż $x^{2} = 9$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x = 3$ albo $x = -3$}
+Nie samo $x = 3$.
+
+\begin{trapbox}
+\textbf{Pierwiastek brany przez równanie niesie oba znaki.} Symbol $\sqrt{9}$
+oznacza pierwiastek nieujemny, $3$, i to jest umowa o symbolu.
+\emph{Równanie} $x^{2} = 9$ jest innym obiektem: pyta, które liczby podniesione
+do kwadratu dają dziewięć, a robią to dwie.
+
+Program~\ref{prog:F05} ma powód w zdaniu, które już czytałeś. $x^{2}$ nie jest
+różnowartościowa, więc nie ma funkcji odwrotnej na wszystkich liczbach
+rzeczywistych, więc \enquote{cofnij podnoszenie do kwadratu} nie jest jednym
+działaniem i nie da się go tak zapisać. Zawęź do $x \ge 0$, a da się, i
+odpowiedzią jest $3$.
+
+Konsekwencja w praktyce: ilekroć bierzesz przez równanie pierwiastek,
+logarytm czy jakąkolwiek inną funkcję odwrotną, spytaj, czy funkcja, którą
+cofasz, była różnowartościowa na interesującym cię zakresie. Jeśli nie, to
+wybierasz gałąź, a wybór powinien być świadomy, a nie notacyjny.
+\end{trapbox}
+\end{fr}
+
+\mermaidfig{f06-undo-order}{Rozwiązywanie i przekształcanie to ta sama
+procedura: spotykaj działania w kolejności odwrotnej do tej, w jakiej zostały
+zastosowane.}{cofanie w odwrotnej kolejności}
+
+% ============================================================
+\section{Prosta}
+\label{sec:F06-line}
+\index{prosta!współczynnik kierunkowy i wyraz wolny}
+
+\begin{fr}
+Każde równanie postaci
+\[ y = mx + c \]
+rysuje prostą, a obie litery odczytuje się prosto z niego. $m$ to
+\textbf{współczynnik kierunkowy}: o ile $y$ się wznosi na jedną jednostkę $x$.
+$c$ to \textbf{wyraz wolny}: wartość $y$ tam, gdzie prosta przecina oś
+pionową, bo tam $x = 0$.
+
+To nie są nowe wielkości. Program~\ref{prog:F05} nazwał je rozciągnięciem i
+przesunięciem zastosowanym do $f(x) = x$, a $m$ i $c$ to te same dwie liczby
+pod nazwami, które daje im kurs geometrii. $w$ i $b$ to nazwy, które daje im
+artykuł o uczeniu maszynowym. Trzy słowniki, jedna prosta.
+
+Podaj współczynnik kierunkowy i wyraz wolny prostej $y = 3x - 2$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Współczynnik $3$, wyraz wolny $-2$}
+Odczytaj je; nie ma czego liczyć.
+
+Teraz w drugą stronę. Mając dwa punkty, jaki jest współczynnik kierunkowy
+prostej przez nie? Wzniesienie podzielone przez odległość w bok:
+\[ m = \frac{y_2 - y_1}{x_2 - x_1} \]
+
+Znajdź współczynnik kierunkowy prostej przez $(1, 3)$ i $(2, 5)$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$m = 2$}
+Z $\frac{5 - 3}{2 - 1}$. To, który punkt nazwiesz pierwszym, nie ma znaczenia:
+$\frac{3 - 5}{1 - 2}$ to to samo $2$, bo oba znaki zmieniają się razem.
+
+Teraz znajdź $c$. Prosta ma postać $y = 2x + c$ i przechodzi przez $(1, 3)$,
+więc $3 = 2 + c$ i $c = 1$. Prosta to $y = 2x + 1$ \dash{} ta sama, do której
+Program~\ref{prog:F05} dopasowywał trzy punkty, argumentując za biasem.
+
+Czy punkt $(3, 7)$ na niej leży?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak}
+Bo $2 \times 3 + 1 = 7$. \emph{Leży na prostej} i \emph{spełnia równanie} to
+to samo stwierdzenie w dwóch słownikach, a przechodzenie między nimi jest
+większością tego, po co jest ten program.
+
+\textbf{I to jest cały model liniowy.} Jedno wejście, jedno wyjście, dwie
+liczby do wybrania. Wszystko, co dokłada reszta książki, to więcej wejść,
+więcej wyjść i funkcja z narożnikiem między warstwami; postać $y = wx + b$ się
+nie zmienia.
+
+Ile liczb potrzeba, żeby przyszpilić prostą?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dwóch}
+Współczynnika kierunkowego i wyrazu wolnego, albo równoważnie dwóch punktów,
+albo punktu i współczynnika. Dwóch, jakkolwiek je podasz.
+
+\begin{aibox}
+Warstwa liniowa z jednym wejściem i jednym wyjściem trzyma dokładnie dwie
+liczby, a trenowanie jej znaczy wybranie ich. Dlatego najmniejszy interesujący
+model w tej książce jest mały nie dlatego, że jest prosty, ale dlatego, że
+przestrzeń, którą umie wyrazić, to zbiór prostych i nic więcej.
+
+Poszerz warstwę do $n$ wejść, a trzyma $n + 1$ liczb: $n$ wag i jeden bias.
+Program~\ref{prog:P06} robi z wag macierz i pokazuje, że mnożenie macierzy
+jest złożeniem, czyli argumentem o zwijaniu z Programu~\ref{prog:F05}
+wykonanym w więcej niż jednym wymiarze.
+\end{aibox}
+
+Kiedy dwie proste są równoległe?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Gdy mają równe współczynniki kierunkowe}
+I różne wyrazy wolne, bo inaczej byłyby tą samą prostą. Równoległość znaczy to
+samo wznoszenie wszędzie, więc pionowy odstęp między nimi nigdy się nie
+zmienia i nigdy się nie spotkają.
+
+Prostopadłość jest tą drugą rzeczą wartą zapamiętania: dwie proste są
+prostopadłe, gdy iloczyn ich współczynników kierunkowych wynosi $-1$. Prosta
+wznosząca się o $2$ spotyka pod kątem prostym prostą opadającą o
+$\frac{1}{2}$.
+
+Jakie jest równanie prostej prostopadłej do $y = 2x + 1$ przechodzącej przez
+początek układu?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$y = -\frac{x}{2}$}
+Jej współczynnik kierunkowy to $-\frac{1}{2}$, bo
+$2 \times \left(-\frac{1}{2}\right) = -1$, a przechodzi przez początek układu,
+więc $c = 0$.
+
+To $-1$ wygląda na dowolne i nie jest. Program~\ref{prog:F09} daje wektorom
+kierunek, a Program~\ref{prog:P05} daje im kąt i tam \emph{prostopadłość}
+staje się iloczynem skalarnym równym zeru \dash{} którego użyta przed chwilą
+reguła jest przypadkiem dwuwymiarowym rozpisanym. Warto poznać regułę teraz, a
+powód później, a nie na odwrót.
+
+Została jedna prosta. Jaki jest współczynnik kierunkowy prostej $x = 3$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie ma go \dash{} a raczej wzór daje $\frac{y_2 - y_1}{0}$, co nie jest
+liczbą.
+\end{ansblock}
+
+Prosta pionowa wznosi się nieskończenie daleko na zerową odległość w bok, więc
+współczynnik kierunkowy nie istnieje i żadne $m$ i $c$ jej nie dają.
+\textbf{$y = mx + c$ nie opisuje każdej prostej}, co jest ograniczeniem tej
+postaci, a nie prostych.
+
+To jest też test pionowej linijki z Programu~\ref{prog:F05} przybywający z
+drugiej strony: $x = 3$ nie jest też funkcją zmiennej $x$, bo dla $x = 3$
+spełnia je każde $y$, a wszędzie indziej żadne. Te dwa fakty są jednym faktem.
+
+\begin{note}
+Postać ogólna $ax + by = c$ obejmuje przypadek pionowy, z $b = 0$, i to
+dlatego używa jej sekcja 4. Ma tę wadę, że współczynnika kierunkowego i wyrazu
+wolnego nie da się już z niej odczytać, i dlatego obie postacie żyją dalej.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Dwa równania, dwie niewiadome}
+\label{sec:F06-simultaneous}
+\index{równanie!układ równań}
+
+\begin{fr}
+Jedno równanie z dwiema niewiadomymi nie przyszpila żadnej z nich.
+$x - y = 1$ spełniają $(1, 0)$, $(2, 1)$, $(\num{5.5}, \num{4.5})$ i każdy
+inny punkt pewnej prostej \dash{} czyli dokładnie to, czym poprzednia sekcja
+nazwała prostą.
+
+Dołóż drugie równanie, a pytasz o punkt spełniający oba naraz. Geometrycznie:
+o punkt leżący na obu prostych.
+
+Oto para, na której pracuje ta sekcja:
+\begin{align*}
+3x + 2y &= 12 \\
+x - y &= 1
+\end{align*}
+
+Drugie równanie mówi $x = y + 1$. Wstaw to do pierwszego w miejsce $x$, a masz
+jedno równanie z jedną niewiadomą. Zrób to.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$3(y + 1) + 2y = 12$, więc $5y + 3 = 12$, więc $y = \num{1.8}$ i
+$x = \num{2.8}$.
+\end{ansblock}
+
+To jest \textbf{podstawianie}: użyj jednego równania, żeby wyrazić literę, i
+wydaj ją w drugim. I sprawdź, jak zawsze, w \emph{obu} równaniach \dash{}
+jedno nie wystarczy, bo wynik podstawienia automatycznie spełnia to równanie,
+do którego podstawiałeś.
+
+\[ 3 \times \num{2.8} + 2 \times \num{1.8} = \num{8.4} + \num{3.6} = 12
+   \qquad \num{2.8} - \num{1.8} = 1 \]
+
+Oba się zgadzają, więc $(\num{2.8}, \num{1.8})$ jest punktem przecięcia obu
+prostych.
+
+Jest druga droga. Pomnóż dolne równanie przez $2$ i dodaj je do górnego. Co
+się dzieje?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wyrazy z $y$ się znoszą: $3x + 2y + 2x - 2y = 12 + 2$, więc $5x = 14$ i
+$x = \num{2.8}$.
+\end{ansblock}
+
+To jest \textbf{eliminacja}: przeskaluj jedno albo oba równania, aż litera
+pojawi się z równymi i przeciwnymi współczynnikami, potem dodaj. Ten sam
+wynik, mniej ułamków, i to ta droga się uogólnia \dash{} przy trzech
+niewiadomych podstawianie robi się nieprzyjemne, a eliminacja nie.
+
+Żadna z tych dróg nie jest nowa. Mnożenie równania przez $2$ to reguła
+równowagi z sekcji 1, a dodawanie dwóch równań to zrobienie obu stronom
+pierwszego tego samego: drugiego. Znak równości drugiego równania jest
+gwarancją, że jego lewa i prawa strona to ta sama liczba, więc dodanie jednej
+z nich do lewej strony, a drugiej do prawej, dodaje do obu stron to samo.
+
+Teraz dwa zawody. Rozwiąż $2x + y = 5$ razem z $4x + 2y = 7$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie ma rozwiązania}
+Pomnóż pierwsze przez $2$, a mówi $4x + 2y = 10$. Drugie mówi $4x + 2y = 7$.
+Więc $10 = 7$, co jest fałszem niezależnie od $x$ i $y$.
+
+To jest $x = x + 1$ z sekcji 1 z obrazkiem: oba równania opisują proste o
+współczynniku $-2$, mają różne wyrazy wolne, a proste równoległe nigdy się nie
+spotykają. \textbf{Żaden punkt nie leży na obu, więc nie ma czego szukać.}
+
+Teraz rozwiąż $2x + y = 5$ razem z $4x + 2y = 10$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Każdy punkt prostej $2x + y = 5$}
+Drugie równanie to pierwsze pomnożone przez $2$. To ta sama prosta zapisana
+dwa razy i nie wnosi żadnej informacji.
+
+To jest tożsamość z sekcji 1, $2x = x + x$, przebrana za równanie. Zredukuj
+parę, a dostaniesz $0 = 0$, co jest prawdą i jest bezużyteczne.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Obie proste & Rozwiązania \\
+\midrule
+różne współczynniki & dokładnie jedno, w przecięciu \\
+równe współczynniki, różne wyrazy & żadne \\
+równe współczynniki, równe wyrazy & każdy punkt prostej \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Trzy przypadki i żadnych innych}, a który masz, poznasz po
+współczynnikach, zanim zrobisz jakąkolwiek robotę. To warte chwili: znaczy, że
+na pytanie \emph{czy ten układ ma jedno rozwiązanie} da się odpowiedzieć bez
+rozwiązywania go.
+
+Wypisz współczynniki kierunkowe prostych $3x + 2y = 12$ i $x - y = 1$ i
+powiedz, do którego wiersza tabeli trafiają.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$-\frac{3}{2}$ oraz $1$. Różne, więc pierwszy wiersz: dokładnie jedno
+rozwiązanie.
+\end{ansblock}
+
+Żeby odczytać współczynnik z $ax + by = c$, wyznacz $y$:
+$y = -\frac{a}{b}x + \frac{c}{b}$, więc współczynnikiem jest $-\frac{a}{b}$.
+To umiejętność z sekcji 2 wydana na wzór ogólny, a nie na konkretny \dash{} a
+razem z nią przychodzi warunek z sekcji 2, bo to dzielenie wymaga
+$b \ne 0$. Wykluczany przypadek to prosta pionowa z ramki $21$, czyli jedyna
+prosta bez współczynnika do odczytania.
+
+Wielkość rozstrzygająca między wierszami ma nazwę, którą jeszcze spotkasz. Dwie
+proste mają równe współczynniki, gdy $\frac{a_1}{b_1} = \frac{a_2}{b_2}$, co
+przekształca się do
+\[ a_1 b_2 - a_2 b_1 = 0 \]
+
+\begin{aibox}
+To wyrażenie jest \textbf{wyznacznikiem} tablicy współczynników dwa na dwa, a
+Program~\ref{prog:P09} nadaje mu znaczenie: jest współczynnikiem, przez który
+odwzorowanie skaluje pole, więc wyznacznik równy zeru mówi, że odwzorowanie
+spłaszcza płaszczyznę na prostą i nie da się go cofnąć.
+
+Warto zobaczyć go najpierw tutaj, w postaci, którą sprawdzisz ręcznie, bo
+zanim przybędzie jako własność macierzy, łatwo będzie potraktować go jak wzór
+do zapamiętania. Nie jest nim. Jest odpowiedzią na pytanie \emph{czy te dwie
+proste mają ten sam współczynnik}, a Program~\ref{prog:P08} jest miejscem,
+gdzie rozwiązywanie $Ax = b$ zamienia się w te same trzy przypadki z większą
+liczbą liter.
+\end{aibox}
+\end{fr}
+
+\mermaidfig{f06-two-lines}{Dwa równania z dwiema niewiadomymi to dwie proste, a
+porównanie ich współczynników rozstrzyga liczbę rozwiązań, zanim cokolwiek
+zostanie rozwiązane.}{trzy przypadki układu}
+
+% ============================================================
+\section{Nierówności i jedna reguła, która się zmienia}
+\label{sec:F06-inequalities}
+\index{nierówność!rozwiązywanie}
+
+\begin{fr}
+Nierówność pyta o \emph{zakres}, a nie o wartość. $2x + 1 > 7$ pyta, dla
+których $x$ lewa strona przewyższa prawą, a odpowiedzią będzie zbiór, a nie
+liczba.
+
+Prawie wszystko przenosi się z sekcji 1. Wolno dodać do obu stron tę samą
+liczbę, odjąć tę samą liczbę oraz pomnożyć lub podzielić obie strony przez tę
+samą liczbę \emph{dodatnią}, a nierówność nadal mówi coś prawdziwego.
+
+Więc $2x + 1 > 7$ daje $2x > 6$, daje $x > 3$, dokładnie tak, jakby znak był
+równością.
+
+Rozwiąż $5x - 2 \le 13$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x \le 3$}
+Dodaj $2$, podziel przez $5$. I sprawdź, co dla nierówności znaczy
+przetestowanie wartości wewnątrz zakresu i wartości poza nim: dla $x = 3$ lewa
+strona wynosi $13$, co spełnia $\le$; dla $x = 4$ wynosi $18$, co nie spełnia.
+
+To dwustronne sprawdzenie warto robić. Jednostronne nie odróżnia $x \le 3$ od
+$x \ge 3$, a odróżnienie ich jest całą treścią następnych dwóch ramek.
+
+Bez liczenia. Zapisz pierwszą odpowiedź, jaka ci przyjdzie.
+
+\textbf{Rozwiąż $-2x > 6$.}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x < -3$}
+Nie $x > -3$. Znak się odwraca.
+
+\begin{trapbox}
+\textbf{Pomnożenie albo podzielenie nierówności przez liczbę ujemną odwraca
+ją}, i to jedyny krok z sekcji 1, który nie przeżywa przejścia od równości do
+większości.
+
+Sprawdź to na liczbie, a nie na regule. To prawda, że $2 < 5$. Pomnóż obie
+strony przez $-1$, a dostaniesz $-2$ i $-5$; a $-2$ jest \emph{większe} niż
+$-5$, nie mniejsze. Mnożenie przez liczbę ujemną odbija oś liczbową, a odbicie
+zamienia lewo z prawem.
+
+Błąd jest tak łatwy dlatego, że każda inna reguła przenosi się bez zmian, więc
+masz cztery poprawne nawyki i jeden wyjątek, a wyjątek jest w zapisie
+niewidoczny. Nie ma na stronie znaku, który mówiłby \emph{zaraz podzielisz
+przez liczbę ujemną}.
+
+Niezawodna naprawa polega na uniknięciu tego kroku. Zamiast tego dodaj $2x$
+do obu stron $-2x > 6$, a dostaniesz $0 > 6 + 2x$, potem $-6 > 2x$, potem
+$-3 > x$ \dash{} czyli $x < -3$, osiągnięte bez ani jednego mnożenia przez
+liczbę ujemną. Jeśli nigdy nie dzielisz przez liczbę ujemną, nigdy nie musisz
+pamiętać o odwróceniu.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Potwierdź to testem, a nie argumentem, bo to argument przed chwilą zawiódł.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+$x$ & $-2x$ & Czy $-2x > 6$? \\
+\midrule
+$-4$ & $8$ & tak \\
+$-3$ & $6$ & nie, jest równe \\
+$0$ & $0$ & nie \\
+$4$ & $-8$ & nie \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Działają wartości poniżej $-3$, czyli $x < -3$. Potwierdzone.
+
+Rozwiąż $3 - x \ge 1$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x \le 2$}
+Odejmij $3$, dostajesz $-x \ge -2$, potem pomnóż przez $-1$ i odwróć znak:
+$x \le 2$. Albo przenieś $x$ na drugą stronę i nigdy nie spotkaj liczby
+ujemnej: $3 \ge 1 + x$, więc $2 \ge x$.
+
+Sprawdź oba końce: dla $x = 2$ lewa strona wynosi $1$, co spełnia $\ge$; dla
+$x = 3$ wynosi $0$, co nie spełnia.
+
+Dwie nierówności można trzymać naraz, a zapis je układa. Zapisz symbolami
+\enquote{$x$ jest co najmniej $-1$ i co najwyżej $1$}.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$-1 \le x \le 1$}
+Czytaj to jako dwa stwierdzenia dzielące środek: $-1 \le x$ oraz $x \le 1$.
+Każde działanie musisz wykonać na wszystkich trzech częściach, co jest regułą
+równowagi z jedną stroną więcej do utrzymania w rytmie.
+
+Podwojenie daje więc $-2 \le 2x \le 2$, a zmiana znaku odwraca \emph{oba}
+znaki i zamienia końce: $-1 \le -x \le 1$ jest tu tym samym zbiorem tylko
+dlatego, że akurat jest symetryczny, a $-1 \le x \le 3$ po zmianie znaku daje
+$-3 \le -x \le 1$.
+
+\begin{warning}
+\textbf{Nierówności podwójnej nie odczytuje się jako zakresu w kolejności
+zapisu po tym, jak się na niej działało.} Jeśli dwie zewnętrzne liczby wyszły
+tak, że większa stoi po lewej, to zmieniłeś znak i zapomniałeś zamienić
+końców. Zapis $3 \le x \le -1$ nie opisuje żadnych liczb i prawie zawsze jest
+zgubionym odwróceniem, a nie zbiorem pustym, o który ktoś prosił.
+\end{warning}
+
+Rozwiąż $-1 \le 2x + 3 \le 5$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$-2 \le x \le 1$}
+Odejmij $3$ od wszystkich trzech części, dostajesz $-4 \le 2x \le 2$, potem
+podziel wszystkie trzy na pół. Żaden znak się nie zmienił, bo $2$ jest
+dodatnie.
+
+Teraz zysk, a nie potrzeba do niego niczego nowego. Klasyfikator odpala, gdy
+zgłoszone prawdopodobieństwo przekracza połowę:
+\[ \sigma(z) > \num{0.5} \]
+Program~\ref{prog:F05} pokazał, że $\sigma$ przecina połowę w $z = 0$ i ściśle
+rośnie wszędzie.
+
+Zapisz ten warunek przez samo $z$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$z > 0$}
+A powód jest ten z Programu~\ref{prog:F05}, nie nowy: funkcja ściśle rosnąca
+zachowuje porządek, więc $\sigma(z) > \sigma(0)$ zachodzi dokładnie wtedy, gdy
+$z > \sigma^{-1}(\num{0.5}) = 0$. Zastosowanie $\sigma^{-1}$ do obu stron
+nierówności jest bezpieczne \emph{dlatego}, że $\sigma$ ściśle rośnie; gdyby
+ściśle malała, znak by się odwrócił, z tego samego powodu, dla którego odwraca
+go mnożenie przez $-1$.
+
+\textbf{Próg decyzyjny jest nierównością}, a przesunięcie progu to zmiana
+liczby po jej prawej stronie. Klasyfikator nastrojony tak, by odpalać przy
+$\sigma(z) > \num{0.9}$, to klasyfikator odpalający przy
+$z > \logit(\num{0.9})$, czyli przy $\val{f05.logit.p9}$ \dash{} tej samej
+liczbie, którą policzył Program~\ref{prog:F05}, przybywającej tu jako próg, a
+nie jako droga tam i z powrotem.
+
+\begin{note}
+Dlatego próg modelu da się stroić bez przeliczania choćby jednego
+prawdopodobieństwa. Porównuj logity z $\logit(\text{próg})$, a dostaniesz te
+same decyzje o jedną funkcję wykładniczą mniej na element, co przy dużym
+zbiorze ewaluacyjnym nie jest niczym. Program~\ref{prog:P27} zajmuje się
+pytaniem, jak próg wybrać, a to pytanie jest inne i dużo trudniejsze.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Przycinanie i dwa sposoby, żeby je zrobić}
+\label{sec:F06-clipping}
+\index{przycinanie!po wartości i po normie}
+
+\begin{fr}
+Wartość przycięta to dwie nierówności wymuszone, a nie rozwiązane. Żeby
+utrzymać $x$ wewnątrz $\intcc{-1}{1}$:
+\[ \clip(x) = \max(-1, \min(1, x)) \]
+Czytaj od środka na zewnątrz, jak uczył Program~\ref{prog:F05}: $\min(1, x)$
+wymusza ograniczenie górne, a $\max(-1, \cdot)$ dolne. Obie kolejności
+działają i warto sprawdzić to samemu na $x = 5$ oraz $x = -5$.
+
+$\relu$ to ta sama maszyna z jednym ograniczeniem: $\relu(x) = \max(0, x)$
+przycina od dołu w zerze i nie robi nic powyżej. Program~\ref{prog:F05}
+narysował ją jako pół litery V; tutaj jest jedną zastosowaną nierównością.
+
+Policz $\clip(x)$ między $-1$ a $1$ dla $x = \num{0.5}$, $x = 3$ oraz
+$x = -7$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\num{0.5}$, $1$ oraz $-1$.
+\end{ansblock}
+
+Wewnątrz ograniczeń nic się nie dzieje; poza nimi wartość zostaje zastąpiona
+tym ograniczeniem, które przekroczyła. Ta płaskość poza ograniczeniami jest
+całym zachowaniem i to ona czyni przycinanie tanim oraz to ona gubi
+informację: każdy argument powyżej $1$ daje tę samą wartość, więc z wartości
+nie odtworzysz, który to był.
+
+Teraz ten sam pomysł zastosowany do czegoś, co ma w sobie więcej niż jedną
+liczbę, i tu przestaje być oczywisty. Gradient jest listą liczb, a
+powiedziano ci, żebyś \enquote{przyciął gradient na $\num{1.0}$}.
+
+Zapisz jednym zdaniem, co twoim zdaniem to robi, zanim pójdziesz dalej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Odpowiedzi w powszechnym użyciu są dwie i są to różne działania.
+\end{ansblock}
+
+\textbf{Przycinanie po wartości} stosuje skalarną regułę z poprzedniej ramki do
+każdej składowej osobno. \textbf{Przycinanie po normie} zostawia udział każdej
+składowej w wektorze nietknięty i przeskalowuje całość tak, żeby jej długość
+nie przekraczała progu.
+
+Weź gradient
+\[ g = (6, \num{0.5}, -\num{0.25}) \]
+którego długość wynosi $\lVert g \rVert = \val{f06.grad.norm}$. Oba działania
+zostaną teraz zastosowane z progiem $\num{1.0}$.
+
+Policz, co daje przycinanie po wartości.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ (\val{f06.clip.value.c1},\; \val{f06.clip.value.c2},\;
+   \val{f06.clip.value.c3}) \]
+\end{ansblock}
+
+Poza ograniczeniami była tylko pierwsza składowa, więc tylko ona się zmieniła.
+Pozostałe dwie już leżały między $-1$ a $1$ i zostały dokładnie takie, jakie
+były.
+
+Teraz pytanie, dla którego cała ta sekcja istnieje. Ten wektor został
+\enquote{przycięty na $\num{1.0}$}. Czy jego długość jest co najwyżej
+$\num{1.0}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie. Jego długość wynosi $\val{f06.clip.value.norm}$}
+Powyżej progu, na który rzekomo został przycięty.
+
+\begin{trapbox}
+\textbf{Przycinanie po wartości nie ogranicza długości wektora i nie zachowuje
+też jego kierunku.} Oba zawody biorą się z tego samego: regułę zastosowano do
+każdej składowej osobno, a ani długość, ani kierunek nie są własnością żadnej
+pojedynczej składowej.
+
+Na tym gradiencie obraca ono wektor o $\val{f06.clip.value.angle}$ stopnia.
+Krok, który zostaje zrobiony, nie jest krótszą wersją gradientu; wskazuje
+gdzie indziej.
+
+Przycinanie po \emph{normie} robi to, co sugeruje nazwa \enquote{przytnij na
+$\num{1.0}$}. Mnoży każdą składową przez ten sam czynnik
+$\frac{\num{1.0}}{\lVert g \rVert}$, dając
+\[ (\val{f06.clip.norm.c1},\; \val{f06.clip.norm.c2},\;
+   \val{f06.clip.norm.c3}) \]
+którego długość wynosi dokładnie $\val{f06.clip.norm.norm}$, a kierunek jest
+dokładnie pierwotny, bo przeskalowanie każdej składowej przez jedną dodatnią
+liczbę jest rozciągnięciem, a Program~\ref{prog:F05} pokazał, że rozciągnięcie
+nie zmienia żadnego porównania.
+
+W każdej bibliotece oferującej oba te działania różnią się one jednym słowem,
+biorą ten sam próg i przyjmują ten sam argument. \textbf{Czytaj, które z nich
+wywołujesz.}
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Obie liczby z tej ramki są liczone w \code{code/f06\_equations.py}, a to, co
+skrypt zapewnia asercją, to nie te dwie liczby, tylko dwie własności: że
+przycinanie po normie obraca wektor o zero stopni i sprowadza jego długość
+dokładnie do progu, a przycinanie po wartości nie robi ani jednego, ani
+drugiego. Zmień gradient, a liczby się ruszą; własności nie, a to o własnościach
+mówi ta ramka.
+
+Oba wyniki są też sprawdzone względem drugiej implementacji, z powodu, którego
+Program~\ref{prog:F03} nauczył się kosztownie o twierdzeniu uruchomionym na
+jednej maszynie.
+
+Które z tych dwóch byś wybrał, gdyby problemem było to, że pojedynczy krok
+uczenia robi czasem ogromny skok?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Po normie, bo skarga dotyczy wielkości kroku, a to ją właśnie mierzy norma.
+\end{ansblock}
+
+Kierunek gradientu jest informacją, którą krok niesie; jego długość jest tym,
+co czasem wysiada. Przycinanie po normie zachowuje pierwsze i ogranicza drugie,
+czyli robi dokładnie tę operację, o którą problem prosi. Przycinanie po
+wartości ani nie ogranicza tego, co chciałeś ograniczyć, ani nie zachowuje
+tego, co chciałeś zachować.
+
+To jest ocena typowego przypadku, a nie reguła. Program~\ref{prog:P21} zajmuje
+się tym pytaniem porządnie \dash{} ma model szumu mówiący, dlaczego ten
+ogromny krok w ogóle się zdarza, a przycinanie jest jedną z kilku odpowiedzi
+na to.
+
+\begin{aibox}
+Sam próg jest liczbą, którą ktoś wybrał, a wybór nie jest niewinny: próg
+poniżej typowej normy gradientu przycina \emph{każdy} krok, a wtedy optymalizator
+idzie w kierunku gradientu z długością kroku ustaloną ręcznie, a wielkość
+gradientu jest w całości wyrzucana. To jest inny algorytm niż ten, który
+myślisz, że uruchamiasz, i jest to różnica, o której nic nie melduje.
+
+Wypisuj odsetek kroków, które zostają przycięte. Jeśli jest bliski jedności,
+próg robi coś więcej niż ochronę przed skokami.
+\end{aibox}
+\end{fr}
+
+\mermaidfig{f06-two-clippings}{Jeden gradient, jeden próg i dwa działania,
+których nazwy różnią się słowem. Tylko jedno z nich ogranicza długość i tylko
+jedno zachowuje kierunek.}{przycinanie po wartości i po normie}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Rozwiązywanie to cofanie.} Rób obu stronom to samo i
+  spotykaj działania w kolejności odwrotnej do tej, w jakiej zostały
+  zastosowane \dash{} czyli funkcja odwrotna z Programu~\ref{prog:F05}
+  przybywająca jako procedura.}
+\sumitem{2}{\textbf{Wstaw odpowiedź z powrotem do pierwotnego równania.}
+  Kosztuje jedną linijkę i łapie błąd znaku bez konieczności jego szukania.
+  Każde rozwiązanie wypisane w tym programie jest podstawiane z powrotem przez
+  \code{code/f06\_equations.py}, który wywala build, jeśli któreś się nie
+  domyka.}
+\sumitem{5--6}{\textbf{Dzielenie obu stron przez niewiadomą wyrzuca
+  rozwiązanie.} $x^{2} = 4x$ ma $x = 0$ oprócz $x = 4$, a dzielenie przez $x$
+  zakłada odpowiedź na zadawane pytanie. Wyłącz przed nawias i powiedz na
+  głos, co zakładasz, że nie jest zerem.}
+\sumitem{7}{Równanie może nie mieć rozwiązań ($x = x + 1$ redukuje się do
+  $0 = 1$) albo mieć wszystkie ($2x = x + x$ redukuje się do $0 = 0$). Oba
+  wracają w sekcji 4 z obrazkiem.}
+\sumitem{8--9}{Ze wzoru da się wyznaczyć dowolną literę. Podawaj warunek za
+  każdym razem, gdy dzielisz przez jedną z nich: $w = \frac{y-b}{x}$ wymaga
+  $x \ne 0$, a dla $x = 0$ dane naprawdę nie są w stanie podać ci wagi.}
+\sumitem{10--12}{Jednostka logistyczna jest odwracalna:
+  $x = \frac{\logit(p)-b}{w}$. Dla $w = 2$, $b = -3$ zgłoszenie $\num{0.5}$
+  przyszło z $\num{1.5}$, czyli z $-\frac{b}{w}$, zgodnie z
+  Programem~\ref{prog:F05}; $\num{0.8}$ przyszło z $\val{f06.solve.p8}$, a
+  $\num{0.99}$ z $\val{f06.solve.p99}$. Ostatni kawałek prawdopodobieństwa
+  kosztuje najwięcej argumentu.}
+\sumitem{12--13}{\textbf{Pierwiastek brany przez równanie niesie oba znaki.}
+  $x^{2} = 9$ daje $\pm 3$, bo $x^{2}$ nie jest różnowartościowa, więc nie ma
+  jednej funkcji odwrotnej do zastosowania.}
+\sumitem{14--17}{$y = mx + c$ to współczynnik kierunkowy i wyraz wolny, czyli
+  rozciągnięcie i przesunięcie z Programu~\ref{prog:F05} oraz $w$ i $b$ z
+  artykułu. Współczynnik przez dwa punkty to $\frac{y_2-y_1}{x_2-x_1}$, a
+  \emph{leży na prostej} i \emph{spełnia równanie} to jedno stwierdzenie.}
+\sumitem{17--18}{\textbf{$y = wx + b$ jest całym modelem liniowym}: jedno
+  wejście, jedno wyjście, dwie liczby do wybrania. Szersza warstwa trzyma $n$
+  wag i jeden bias, a w kształcie nic się nie zmienia.}
+\sumitem{19--20}{Równoległość to równe współczynniki kierunkowe;
+  prostopadłość to współczynniki mnożące się do $-1$, co
+  Program~\ref{prog:P05} wypowie na nowo jako iloczyn skalarny równy zeru.}
+\sumitem{21}{$y = mx + c$ nie opisuje prostej pionowej, której współczynnik
+  kierunkowy nie istnieje \dash{} a $x = 3$ nie jest też funkcją zmiennej $x$.
+  Te dwa fakty są jednym faktem, a $ax + by = c$ obejmuje oba przypadki za cenę
+  ukrycia współczynnika.}
+\sumitem{22--24}{Dwa równania z dwiema niewiadomymi to dwie proste,
+  rozwiązywane podstawianiem albo eliminacją. \textbf{Sprawdzaj w obu
+  równaniach}, bo podstawiona odpowiedź spełnia równanie, do którego
+  podstawiałeś, za darmo.}
+\sumitem{24--27}{\textbf{Trzy przypadki i żadnych innych}: różne współczynniki
+  dają jedno przecięcie, równe współczynniki z różnymi wyrazami wolnymi nie
+  dają żadnego, a równe współczynniki z równymi wyrazami dają każdy punkt
+  prostej. Który masz, odczytasz z $a_1 b_2 - a_2 b_1$ przed rozwiązywaniem
+  \dash{} a to wyrażenie jest wyznacznikiem, któremu Program~\ref{prog:P09}
+  nadaje znaczenie.}
+\sumitem{28--29}{Nierówność pyta o zakres. Dodawanie, odejmowanie i skalowanie
+  liczbą \emph{dodatnią} przenoszą się z sekcji 1 bez zmian, a sprawdzenie
+  wymaga wartości wewnątrz zakresu i wartości poza nim.}
+\sumitem{29--31}{\textbf{Pomnożenie albo podzielenie nierówności przez liczbę
+  ujemną odwraca ją} i jest to jedyny krok, który się nie przenosi. $2 < 5$,
+  ale $-2 > -5$: mnożenie przez liczbę ujemną odbija oś.
+  \textbf{Niezawodna naprawa polega na uniknięciu tego kroku} \dash{} przenieś
+  wyraz na drugą stronę, a nigdy nie będziesz musiał pamiętać o odwróceniu.}
+\sumitem{32--33}{$-1 \le x \le 1$ to dwie nierówności dzielące środek, a każde
+  działanie dotyczy wszystkich trzech części. Jeśli większa liczba wylądowała
+  po lewej, zmieniłeś znak i zapomniałeś zamienić końców.}
+\sumitem{34--35}{\textbf{Próg decyzyjny jest nierównością.}
+  $\sigma(z) > \num{0.5}$ to $z > 0$, bo $\sigma$ ściśle rośnie, a
+  Program~\ref{prog:F05} pokazał, że taka funkcja zachowuje porządek. Próg
+  $\num{0.9}$ to $z > \val{f05.logit.p9}$, więc próg da się przesunąć bez
+  policzenia choćby jednego prawdopodobieństwa.}
+\sumitem{36--37}{\textbf{Wartość przycięta to dwie wymuszone nierówności}:
+  $\clip(x) = \max(-1, \min(1, x))$, czytane od środka. $\relu$ to ta sama
+  maszyna z jednym ograniczeniem. Poza ograniczeniami wartość jest stała, więc
+  argumentu z niej nie odtworzysz.}
+\sumitem{38--40}{\textbf{Przycinanie wektora po wartości i po normie to różne
+  działania o nazwach różniących się jednym słowem.} Na
+  $g = (6, \num{0.5}, -\num{0.25})$ o długości $\val{f06.grad.norm}$
+  przycinanie po wartości daje wektor o długości
+  $\val{f06.clip.value.norm}$ \dash{} wciąż powyżej progu \dash{} obrócony o
+  $\val{f06.clip.value.angle}$ stopnia. Po normie długość trafia w
+  $\val{f06.clip.norm.norm}$, a obrotu nie ma wcale, bo skalowanie jedną
+  dodatnią liczbą nie zmienia żadnego porównania.}
+\sumitem{41--42}{Gdy skarga dotyczy wielkości kroku, przycinaj po normie:
+  ogranicza to, co wysiadło, i zachowuje to, co krok niósł. I wypisuj odsetek
+  kroków przycinanych, bo próg poniżej typowej normy to inny algorytm
+  raportowany jako ten sam.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Rozwiąż $7 - 3x = 1$ i sprawdź wynik.
+  \answerto{$x = 2$. Sprawdzenie: $7 - 6 = 1$.}
+\item Rozwiąż $5x - 3 = 2x + 9$.
+  \answerto{$x = 4$. Zbierz: $3x = 12$. Sprawdzenie: $17 = 17$.}
+\item Rozwiąż $x^{2} = 7x$ i powiedz, co ginie przy dzieleniu obu stron przez
+  $x$.
+  \answerto{$x = 0$ albo $x = 7$. Dzielenie przez $x$ zakłada $x \ne 0$, a to
+  jedna z dwóch odpowiedzi.}
+\item Wyznacz $b$ ze wzoru $y = wx + b$, a potem wyznacz $x$ ze wzoru
+  $y = \frac{x - a}{s}$.
+  \answerto{$b = y - wx$; oraz $x = sy + a$, bo odejmowanie cofa się jako
+  ostatnie, skoro zostało zastosowane jako pierwsze.}
+\item Jednostka liczy $\sigma(2x - 3)$. Jaki argument daje zgłoszenie
+  $\num{0.5}$ i skąd to wiesz bez liczenia logarytmu?
+  \answerto{$\num{1.5}$. $\sigma$ odczytuje połowę dokładnie tam, gdzie jej
+  nawias jest zerem, więc $2x - 3 = 0$.}
+\item Rozwiąż $x^{2} = 25$, a potem rozwiąż $\sqrt{x} = 5$.
+  \answerto{$x = \pm 5$ dla pierwszego; $x = 25$ dla drugiego i tylko $25$, bo
+  $\sqrt{\;}$ oznacza pierwiastek nieujemny.}
+\item Znajdź równanie prostej przez $(0, 4)$ i $(2, 0)$.
+  \answerto{Współczynnik $\frac{0-4}{2-0} = -2$, wyraz wolny $4$, więc
+  $y = -2x + 4$.}
+\item Czy $(5, -6)$ leży na prostej $y = -2x + 4$?
+  \answerto{Tak: $-10 + 4 = -6$.}
+\item Podaj prostą równoległą do $y = -3x + 1$ i prostą do niej prostopadłą,
+  obie przez początek układu.
+  \answerto{$y = -3x$ oraz $y = \frac{x}{3}$, bo
+  $-3 \times \frac{1}{3} = -1$.}
+\item Rozwiąż razem $2x + 3y = 8$ oraz $x - y = 1$ i sprawdź w obu.
+  \answerto{$x = \num{2.2}$, $y = \num{1.2}$. Sprawdzenie:
+  $\num{4.4} + \num{3.6} = 8$ oraz $\num{2.2} - \num{1.2} = 1$.}
+\item Nie rozwiązując, powiedz, ile rozwiązań mają $6x - 2y = 3$ oraz
+  $3x - y = 1$.
+  \answerto{Żadnego. Obie mają współczynnik $3$, a pierwsza mówi
+  $3x - y = \num{1.5}$, więc wyrazy wolne są różne i proste są równoległe.}
+\item Rozwiąż $4 - 3x \ge -5$.
+  \answerto{$x \le 3$. Albo podziel przez $-3$ i odwróć znak, albo przenieś
+  wyraz: $9 \ge 3x$.}
+\item Rozwiąż $-3 < 2x + 1 \le 7$.
+  \answerto{$-2 < x \le 3$. Odejmij $1$ od wszystkich trzech części, potem
+  podziel wszystkie trzy na pół; żaden znak się nie odwraca, bo $2$ jest
+  dodatnie.}
+\item Klasyfikator odpala, gdy $\sigma(z) > \num{0.75}$. Zapisz warunek na $z$
+  i powiedz, czy jest większy, czy mniejszy niż warunek dla $\num{0.5}$.
+  \answerto{$z > \logit(\num{0.75}) = \ln 3$, co jest dodatnie, więc poprzeczka
+  jest wyżej niż $z > 0$. Podniesienie progu prawdopodobieństwa podnosi próg
+  logitu, bo logit ściśle rośnie.}
+\item Zapisz $\clip(x)$ między $0$ a $10$ przy użyciu $\max$ i $\min$ i policz
+  go dla $-3$, $4$ oraz $\num{12.5}$.
+  \answerto{$\max(0, \min(10, x))$, co daje $0$, $4$ oraz $10$.}
+\item Gradient $(3, 4)$ zostaje przycięty progiem $\num{2.5}$. Podaj wynik po
+  wartości i po normie.
+  \answerto{Po wartości: $(\num{2.5}, \num{2.5})$, o długości
+  $\num{2.5}\sqrt{2} \approx \num{3.54}$ \dash{} wciąż powyżej progu. Po
+  normie: długość wynosi $5$, więc każda składowa jest połowiona, co daje
+  $(\num{1.5}, 2)$ o długości dokładnie $\num{2.5}$.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Rozwiąż $\frac{2x - 1}{3} = \frac{x + 4}{2}$.
+  \answerto{Pomnóż obie strony przez $6$: $2(2x - 1) = 3(x + 4)$, więc
+  $4x - 2 = 3x + 12$ i $x = 14$. Sprawdzenie: obie strony dają $9$.}
+\item Dlaczego mnożenie obu stron przez $6$ jest tu bezpieczne, skoro dzielenie
+  obu stron przez $x$ nie było bezpieczne w ramce $6$?
+  \answerto{Bo $6$ jest liczbą, o której wiadomo, że nie jest zerem. Reguła nie
+  dotyczy mnożenia ani dzielenia, tylko tego, czy rzecz, której używasz, mogłaby
+  być zerem, a niewiadoma zawsze mogłaby.}
+\item Równanie zostało rozwiązane, a odpowiedź nie przechodzi sprawdzenia przez
+  podstawienie. Wymień trzy rzeczy, które mogły pójść źle, w kolejności wartej
+  sprawdzania.
+  \answerto{Rachunek w ostatnim kroku; znak zgubiony przy przenoszeniu wyrazu
+  przez równość; oraz krok nieodwracalny, taki jak podniesienie do kwadratu
+  albo dzielenie przez niewiadomą \dash{} przy czym ten ostatni może zarówno
+  wprowadzić odpowiedź, jak i ją zgubić.}
+\item Wyznacz $x$ ze wzoru $y = \frac{ax + b}{cx + d}$.
+  \answerto{$y(cx + d) = ax + b$, więc $x(yc - a) = b - yd$, więc
+  $x = \frac{b - yd}{yc - a}$ dla $yc \ne a$. Litera występuje dwa razy, więc
+  zbierz ją przed dzieleniem.}
+\item Trzy punkty to $(1, 2)$, $(2, 4)$ i $(3, 7)$. Pokaż, że żadna prosta nie
+  przechodzi przez wszystkie trzy.
+  \answerto{Współczynnik pierwszej pary wynosi $2$, a drugiej $3$. Prosta ma
+  jeden współczynnik, więc żadna nie zawiera wszystkich trzech, a najlepsze, co
+  możesz zrobić, to prosta, która mija każdy z nich o trochę \dash{} czyli
+  temat Programu~\ref{prog:P08}.}
+\item Dwie proste mają współczynniki $m$ oraz $-\frac{1}{m}$. Co psuje się dla
+  $m = 0$ i czemu to odpowiada geometrycznie?
+  \answerto{$-\frac{1}{m}$ jest nieokreślone. Pierwsza prosta jest pozioma,
+  więc prostopadła jest pionowa, a prosta pionowa nie ma współczynnika \dash{}
+  czyli to, czego ramce $21$ brakowało w $y = mx + c$, ujawnione w regule.}
+\item Rozwiąż $ax + b = cx + d$ względem $x$ i powiedz, co znaczy każdy z dwóch
+  przypadków szczególnych.
+  \answerto{$x = \frac{d - b}{a - c}$, gdy $a \ne c$. Jeśli $a = c$ i
+  $b \ne d$, rozwiązania nie ma (proste równoległe); jeśli $a = c$ i $b = d$,
+  działa każde $x$ (jedna prosta dwa razy).}
+\item Układ dwóch równań zostaje przeskalowany tak, że jedno równanie mnoży się
+  przez $10^{6}$. Czy rozwiązanie się zmienia? Czy zmienia się cokolwiek?
+  \answerto{Rozwiązanie nie \dash{} to ta sama para prostych. Zmienia się to,
+  jak zachowa się solver numeryczny, bo oba wiersze różnią się teraz ogromnie
+  skalą. Program~\ref{prog:P02} zajmuje się tym, dlaczego to ma znaczenie.}
+\item Rozwiąż $x^{2} > 4$.
+  \answerto{$x > 2$ albo $x < -2$. To nie jest $-2 < x < 2$, które jest
+  rozwiązaniem $x^{2} < 4$; naszkicowanie $y = x^{2}$ na tle $y = 4$
+  rozstrzyga to szybciej niż jakakolwiek reguła i tu wykres z
+  Programu~\ref{prog:F05} zarabia na swoje miejsce.}
+\item Dlaczego dzielenie nierówności przez zmienną wymaga większej uwagi niż
+  dzielenie przez nią równania?
+  \answerto{Bo musisz znać \emph{znak}, a nie tylko wiedzieć, że nie jest
+  zerem: dzielenie przez liczbę ujemną odwraca nierówność. Dwa przypadki, a
+  zwykła rada brzmi: mnóż w górę, zamiast dzielić.}
+\item Próg zostaje przesunięty z $\num{0.5}$ na $\num{0.9}$. O ile przesuwa się
+  próg na logicie i czy tak samo jest przy przejściu z $\num{0.9}$ na
+  $\num{0.99}$?
+  \answerto{Z $0$ na $\val{f05.logit.p9}$, a potem na $\ln 99$, czyli mniej
+  więcej $\num{4.6}$. Drugie przejście jest większe przy mniejszej zmianie
+  prawdopodobieństwa, co jest obserwacją z ramki $12$ o funkcji logistycznej
+  oglądaną przy progu.}
+\item Pokaż, że przycinanie po normie progiem $t$ zostawia wektor bez zmian,
+  gdy jego długość już nie przekracza $t$, i powiedz, dlaczego regułę zapisuje
+  się warunkowo, a nie wzorem.
+  \answerto{Czynnik skalujący $\frac{t}{\lVert g \rVert}$ przekracza $1$, gdy
+  $\lVert g \rVert < t$, więc bezwarunkowe zastosowanie \emph{powiększyłoby}
+  mały gradient. Przycinanie jest ograniczeniem, a nie normalizacją, i to
+  warunek czyni je ograniczeniem.}
+\item Podaj wektor, dla którego przycinanie po wartości i po normie dają
+  dokładnie to samo, i powiedz, co charakteryzuje takie wektory.
+  \answerto{Każdy już mieszczący się w progu w obu sensach, na przykład
+  $(\num{0.1}, \num{0.1})$ przy $t = 1$: oba zostawiają go w spokoju. Gdy
+  przycinanie naprawdę zaczyna gryźć, oba zgadzają się tylko w jednym wymiarze,
+  gdzie kierunek jest po prostu znakiem.}
+\item Gradient to $(10, 0, 0, \ldots, 0)$: jedna niezerowa składowa,
+  w tysiącu wymiarów. Co daje każdy rodzaj przycinania progiem $\num{1.0}$?
+  \answerto{Po wartości: ten sam wektor ze składową zmniejszoną do $1$, co ma
+  tu długość dokładnie $1$ \dash{} więc w tym szczególnym przypadku oba się
+  zgadzają. Po normie: to samo, bo długość wynosiła $10$ i każda składowa jest
+  dzielona przez $10$. \textbf{Przycinanie po wartości jest bezpieczne
+  dokładnie wtedy, gdy wektor ma jedną składową}, i dlatego pułapka nie odpala
+  na przykładzie, który ludzie zwykle próbują najpierw.}
+\item Dwoje inżynierów melduje, że \enquote{przycinają gradienty na
+  $\num{1.0}$}, a ich krzywe uczenia się różnią. Zanim spojrzysz na cokolwiek
+  innego, o co zapytasz?
+  \answerto{O to, które z dwóch działań każde z nich ma na myśli. To jedno
+  słowo w wywołaniu, zmienia kierunek każdego przyciętego kroku, a żaden plik
+  konfiguracyjny tego nie powie.}
+\end{furtherproblems}

@@ -563,7 +563,14 @@ runs.
 rescales the whole gradient vector so its norm is at most 1.0, preserving
 direction; clipping *by value* truncates each component independently and does
 not. They are different operations with different failure modes and the API names
-are one word apart. → **P19**.
+are one word apart. Measured in F06 on `(6, 0.5, −0.25)` at a threshold of 1.0:
+by value the length is still **1.1456**, above the threshold it was supposedly
+clipped to, and the vector has turned **23.9°**; by norm the length lands on
+1.0 exactly and the direction is untouched. → **F06** for the two operations
+and that measurement; **P21** for why the enormous step happens at all and what
+else answers it. (This entry said "P19", which predates the insertion of P7 —
+see the warning at the head of §3, and re-derive owners from
+`tools/programs.json`.)
 
 ### Probability and statistics (P22–P27)
 
@@ -692,7 +699,7 @@ than to the others.
 
 The entries in this section came out of writing the Foundation programs
 themselves rather than out of the literature: item 41 out of F3, items 42 to 46
-out of F4, and items 47 and 48 out of F5. Say which program produced which,
+out of F4, items 47 and 48 out of F5, and item 49 out of F6. Say which program produced which,
 never how many there are — the count at the head of §3 was stated once and had
 drifted by five before anybody reread it.
 
@@ -768,6 +775,16 @@ and the weight dividing it is written nowhere. It is the inside-the-bracket
 rule of item 47 with a scaling stacked on it. → **F05**. No program undertakes
 the obvious remedy (parametrise the unit by its threshold rather than by its
 bias), and none is claimed here for it.
+
+**49. "Every rule of equation-solving carries across to an inequality."** All
+but one. Adding, subtracting and scaling by a *positive* number are safe;
+multiplying or dividing by a *negative* number reverses the sign, and nothing
+in the notation marks the moment it happens. `2 < 5` but `−2 > −5`: multiplying
+by a negative reflects the line, and a reflection swaps left and right. The
+error is easy precisely because the other four habits are correct, so it is the
+same shape as items 41 and 47 — a true rule carried one step past its
+hypothesis. The reliable fix is not to remember the exception but to avoid the
+step: move the term across instead of dividing. → **F06**.
 
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
