@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F9 written, both editions.** F10–F13 and P1–P34 are stubs carrying their briefs | 38 of 47 |
+| Programs | **F1–F10 written, both editions.** F11–F13 and P1–P34 are stubs carrying their briefs | 37 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,14 +21,26 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 423 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-pl` (17x24) | 433 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-en-a4` | 376 | 0 | 0 | 5, worst 6.3 pt | 0 |
-| `main-pl-a4` | 380 | 0 | 0 | 4, worst 4.4 pt | 0 |
+| `main-en` (17x24) | 447 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 457 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 396 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 400 | 0 | 0 | **0** | 0 |
 
-The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
-one format and one language because that is where the line falls. Well under
-the 15 pt budget. **F2 added no overfull box to any of the four formats** —
+**Three of the four builds now carry no overfull box at all, and the fourth
+carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
+exists in one format and one language because that is where the line falls,
+and it is well under the 15 pt budget.
+
+The four boxes each build used to carry were `F10`, `F11`, `F12` and `F13` in
+the table of contents, and they were **not** anybody's prose: `book.cls` sizes
+a chapter's number box at 1.5em and a section's at 2.3em, which fit arabic
+numerals and do not fit `F10` or `F10.1`. They had been in the baseline since
+F10 was given a number, which is to say they were there before F10 was
+written and were attributed to nothing. Widened in `preamble.tex`, measured
+rather than guessed, with the reasoning beside them. **Compare any future
+multiset against this table, not against the older one**, and note that
+Part II onward numbers programs 1 to 34, whose labels are narrower, so F13 is
+the binding case for the whole book. **F2 added no overfull box to any of the four formats** —
 the multiset came back identical to the pre-F2 baseline, which took two fixes
 recorded under *Program F2 pass* below, and **the F2 review pass did not move it
 either**, in any of the four. **F3, and both of its review passes, did not move
@@ -81,22 +93,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **38 of 47 programs are stubs**, in each language. This is the whole of the
+- **37 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 252 computed values, all referenced, all present, plus the committed console
+- 281 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 54 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 60 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **45 orphan-tail pages: 10 · 14 · 11 · 10** across `main-en`, `main-pl`,
+- **49 orphan-tail pages: 11 · 14 · 12 · 12** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
-  41 before F8 and 43 before F9. The count is the signal and it is going the
-  wrong way, at roughly one to eleven per program written; **F8 added one and
-  F9 two, against F5's eleven**, and the reason is worth having — both were
-  written with the two-sided rule from F6 in hand, so a frame whose tail lands
-  badly is lengthened rather than trimmed. **A fourth structural fix was measured in the F6 pass and
+  41 before F8, 43 before F9 and 45 before F10. The count is the signal and it
+  is going the wrong way, at roughly one to eleven per program written; **F8
+  added one, F9 two and F10 four, against F5's eleven**, and the reason is
+  worth having — all three were written with the two-sided rule from F6 in
+  hand, so a frame whose tail lands badly is lengthened rather than trimmed. **A fourth structural fix was measured in the F6 pass and
   reverted**, because it clears the orphaned *cue* by converting it into more
   orphan *tails* — see *Program F6 pass* and the sweep table in
   `preamble.tex`. `checkpdf.py` prints every one of them on
@@ -2499,6 +2511,127 @@ the frame they are declared in and answer nothing put to the reader.
   dimension in P5* is a hand-over, and the book says so rather than
   manufacturing a measurement it does not own.
 
+### Program F10 pass, August 2026
+
+**Thirty-seven teaching frames, thirty-nine printed, both editions**, against a
+brief that projected forty. Five sections: what a set throws away, union and
+intersection and the mask, and/or/not, counting without listing, and when a
+count becomes a bill.
+
+**The layout result is the pass's headline and it is not F10's doing.** Three
+of the four builds now carry **zero** overfull boxes and the fourth carries
+one — see the table at the top, and the note under it about where the four
+that had been there all along came from.
+
+#### Scope: five programs declare F10 as a dependency
+
+More than any other Foundation program, so the reading-first discipline that
+F9 established was the whole of the planning. P12 owns the four counting rules
+formally, the pigeonhole principle and the birthday calculation; P14 owns
+implication, quantifiers and proof; P03 owns O-notation; P13 owns graphs; P23
+owns probability. What is left is genuinely F10's and it is the elementary
+layer all five are built on:
+
+- **three counting rules, deliberately three and not four** — product, the
+  two-set union rule, and $2^{n}$ subsets. The two-set union rule is in
+  because a union is not countable without it; the general inclusion--exclusion
+  is P12's.
+- **and/or/not as operations**, which is what a mask does, leaving implication
+  and quantifiers to P14.
+- **the numerator and the denominator**, and the observation that choosing the
+  denominator was a decision — leaving what a probability *is* to P23.
+
+That split lets §5 say *the notation for this growth is P03's; the count is
+yours now, and it is the more useful half in a design review*, which is a
+better sentence than either program could write alone.
+
+#### An assertion caught the author again, and in the direction nobody checks
+
+`code/f10_sets.py` asserted that doubling an all-pairs input multiplies the
+work by **just under four**, written before the prose it was for. It failed on
+the first run. The ratio is
+\[ \frac{\text{pairs}(2n)}{\text{pairs}(n)} = \frac{4n-2}{n-1} \]
+which is 4.020 at a hundred and 4.002 at a thousand, and falls towards four
+**from above**. A frame quoting "four times" flatly would have been wrong, and
+the trapbox now says so and says the assertion failed, because the failure is
+the persuasive part.
+
+This is the second time (after F5's softmax range) that writing the assertion
+*at the computation, before the sentence it supports* has caught a plausible
+number in the same commit that invented it. It is worth treating as the
+method rather than as luck.
+
+#### Three claims a reader could have falsified
+
+- **"There is no single word for it"**, of exclusive or. There is: it is
+  called exclusive or and most languages have an operator. What is true, and
+  is what the frame needs, is that the *three words this section gives you* do
+  not include it, so from those it has to be built. Corrected in the frame and
+  in the further-problem answer.
+- **A borrowed rule, attributed too widely.** The product-rule frame said
+  stating the independence condition was *the habit Program F06 made a rule
+  of*. F06's rule names division: *state the condition every time you divide
+  by a letter*. This is the same move on a different operation, and the frame
+  now says that rather than borrowing the rule whole.
+- **"about thirty years"** for $2^{30}$ seconds, which is 34. Now *over thirty
+  years*, which is what the reader's own arithmetic will support.
+
+#### Rule 2 caught two figures, both by reading rather than by measuring
+
+- `f10-set-and-mask` sat in frame 12 and **frame 13 asks the reader to tell a
+  set from a mask** — which is what the figure says. Moved below the answer,
+  to frame 14.
+- `f10-three-growths`'s third node said *twice as many items gives four times
+  as many pairs*, and **frame 31 asks exactly that**. The node now states
+  frame 30's rule (a pair is one thing named twice, so the product halves)
+  instead of frame 31's answer.
+
+Neither needed a page measurement to condemn: reading the figure against the
+frames on either side of it was enough, which is the order the F03 second
+review pass prescribes and is much cheaper than the alternative.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| F10.1 set-and-mask | 624 / 599 | 5.68 | 7.07 | 7.36 | 8.03 | 8.36 |
+| F10.2 overlap | 570 / 588 | 6.12 | 7.74 | 7.50 | 8.79 | 8.52 |
+| F10.3 three-growths | 639 / 657 | 5.03 | 6.90 | 6.71 | 7.84 | 7.62 |
+
+#### The orphaned cue: trimming measured as a no-op, lengthening cleared it
+
+Three orphaned cues arrived — one in `main-en-a4` and two in `main-pl-a4` —
+and this pass ran the experiment F6 could only do once. **Both editions' three
+frames were trimmed first**, by a clause each, and all four builds were
+rebuilt: the three cues came back on the *same three pages*. Then the same
+three frames were **lengthened** by a paragraph each, and all three cleared.
+
+That is a second confirmation of F6's finding with the failed half measured
+rather than argued: trimming a frame whose tail hangs over a page boundary
+pulls the previous frame's material up to fill the gap, so the page stays full
+and the tail stays where it was. Lengthening pushes the question, the dots and
+the cue over **together**, which is what was wanted.
+
+The paragraphs added were made to earn their place rather than pad: that set
+operations compose because each returns a set; that an English requirement
+containing *or* has to be read twice; and that a grid's constraint is usually
+enforced somewhere further in, so the count is wrong from the start and the
+discovery arrives runs later.
+
+#### Also
+
+- Five traps added to `notes/02` (58 to 62): corpus against vocabulary, two set
+  sizes adding, De Morgan on a filter, $2^{n}$, and twice the data being four
+  times the work.
+- Two long `\code{}` runs went into displays, one of them in an `\answerto` —
+  the F6 rule, now applied on sight rather than after a build named the box.
+- `\val{f10.fault.frac}` was emitted and then removed: the frame's point is
+  that a naive probability is **two counts and a division**, so the page builds
+  $\frac{\val{f10.faults}}{\val{f10.docs}}$ from the two counts it already has
+  rather than being handed a third number to trust. C7 found it, because a
+  non-numeric value is written with `\mfavaltext` and the value ledger scans
+  for `\mfaval` — worth knowing before emitting another text value.
+- Frame numbers remapped after writing: plan `1--7 / 8--14 / 15--21 / 22--29 /
+  30--35`, program `1--7 / 8--15 / 16--22 / 23--30 / 31--37`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -2748,7 +2881,7 @@ clone instead.
 
 ## What is left
 
-1. **Thirty-eight programs.** This is the work. F10–F13 first, because the
+1. **Thirty-seven programs.** This is the work. F11–F13 first, because the
    Foundation part is what makes the book's claim — *it assumes nothing* —
    true or false.
    **F12 (the chain rule) is still the one outstanding program the rest of the

@@ -519,6 +519,30 @@
 % rule, wants 22.5 pt at this size, and silently overprints the top of the text
 % block if it does not get it. Setting it through geometry keeps the text block
 % where geometry put it instead of pushing it down.
+% ---------------------------------------------------------------------------
+% CONTENTS: the number boxes are sized for arabic numerals and this book's
+% Foundation programs are F1..F13.
+%
+% book.cls gives a chapter number a 1.5em box and a section number a 2.3em
+% box. "F10" does not fit the first and "F10.1" does not fit the second, so
+% EVERY entry from F10 onward contributes an overfull hbox -- measured at
+% 4.1 pt per chapter line and 1.4 pt per section line, in every build. The
+% four chapter boxes were in the book's baseline from the day F10 got a
+% number, which is to say they were there before F10 was written and were
+% attributed to nothing.
+%
+% The widths below are measured rather than guessed: \sbox the widest label
+% the numbering can produce (\bfseries F13 for a chapter, F13.9 for a
+% section) and take the next round em. Do not tighten them without
+% re-measuring -- and note that Part II onward numbers programs 1..34, whose
+% labels are narrower, so these are the binding cases for the whole book.
+\makeatletter
+\patchcmd{\l@chapter}{\setlength\@tempdima{1.5em}}%
+                     {\setlength\@tempdima{2.6em}}{}{%
+  \PackageWarning{mfabook}{could not widen the contents chapter number box}}
+\renewcommand*\l@section{\@dottedtocline{1}{2.6em}{3.2em}}
+\makeatother
+
 \pagestyle{fancy}
 \fancyhf{}
 % Mirrored, as the original is (notes/07 section 5): the PAGE NUMBER goes
