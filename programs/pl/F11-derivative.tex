@@ -1,20 +1,934 @@
 %% F11 --- Pochodna: tempo zmian
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f11_derivative.py i wchodzi na stronę przez \val{}. Cała
+%% krzywa U jest zatwierdzonym transkryptem, a nie tabelą, bo argumentem jest
+%% jej kształt, a pięć wierszy pozwoliłoby czytelnikowi sądzić, że środek
+%% zinterpolowano.
+%%
+%% TEZA: pochodna to nachylenie, które dostajesz, zmniejszając cięciwę;
+%% zmniejszanie jej jest GRANICĄ, a nie małą liczbą; a gdy umiesz odczytać
+%% znak i wielkość jednej, masz już mechanizm spadku gradientowego -- zanim
+%% padnie to słowo.
+%%
+%% CZTERY POMIARY:
+%%   cięciwa zbiegająca, 7 -> 6,1 -> 6,01 -> 6,001, z asertowaną algebrą pod
+%%     spodem, żeby granica nie była zgadnięta z czterech wierszy;
+%%   KRZYWA U i to najlepszy pomiar w programie: zmniejszaj h, a błąd spada,
+%%     dochodzi do dna przy 3,6e-08 i WRACA W GÓRĘ do 6,0 -- matematyka mówi,
+%%     że mniejsze jest zawsze lepsze, a maszyna mówi, że nie;
+%%   spadek gradientowy przy trzech krokach, z asertowaną dokładną rekurencją
+%%     x - 3 <- (1 - 2 eta)(x - 3), a nie trzema przebiegami;
+%%   stromo to nie to samo co daleko: na x^4 - 4x^2 stromszy z dwóch punktów
+%%     jest BLIŻSZY minimum.
+%%
+%% CZEGO TEN PROGRAM CELOWO NIE ROBI, sprawdzone w tools/programs.json:
+%%   cztery reguły i reguła łańcuchowa                            -> F12
+%%   pochodne cząstkowe, gradient, najszybszy spadek              -> P15
+%%   druga pochodna, krzywizna, ograniczenie na krok              -> P17
+%%   wypukłość, minima lokalne wobec globalnych                   -> P19
+%%   momentum, Adam, każdy optymalizator z nazwy                  -> P20
+%%   dlaczego istnieje prawa gałąź krzywej U                      -> P01
+%% Więc F11 wyprowadza dwie pochodne z definicji i pozwala czytelnikowi
+%% ZAUWAŻYĆ wzorzec, nie podając reguły potęgowej jako reguły -- podanie jej
+%% jest zadaniem F12, a zauważenie sprawia, że stwierdzenie F12 trafia.
+%%
+%% ASERCJA, KTÓRA ZŁAPAŁA AUTORA: pierwszy test zbieżności pytał, czy marsz
+%% "zbiegł" w sześćdziesięciu krokach, i porównywał to z |1 - 2 eta| < 0,85.
+%% Padł przy eta = 0,08 i zasłużył na to -- mylił ZBIEGA z ZBIEGA
+%% DOSTATECZNIE SZYBKO, A 0,85 było naciągnięciem. Skrypt asertuje teraz
+%% rekurencję jednokrokową i składa ją.
+%%
+%% Bliźniak: programs/en/F11-derivative.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Pochodna: tempo zmian}
 \label{prog:F11}
+\index{derivative!from first principles}
+\index{derivative!sign and size}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{policzyć średnie tempo zmiany funkcji między dwoma punktami i
+  powiedzieć, nachyleniem czego ono jest}
+\outcome{7--15}{zmniejszyć tę odległość i powiedzieć, na czym nachylenia się
+  zatrzymują, oraz zapisać definicję, którą to zatrzymanie jest}
+\outcome{16--20}{powiedzieć, co prawdziwa maszyna robi z tą definicją, gdy
+  odległość maleje, i dobrać odległość odpowiednio}
+\outcome{21--26}{odczytać znak i wielkość pochodnej oraz powiedzieć, o czym
+  każde z nich jest twierdzeniem}
+\outcome{27--35}{zejść w dół, mając tylko pochodną, i powiedzieć, co
+  rozstrzyga, czy marsz dojdzie}
+\end{outcomes}
 
-Argument: the slope of a curve at a point, built from first principles by
-shrinking a chord. Payoff: gradient descent has a mechanism, and the reader
-has seen it before meeting the word.
+\begin{quiz}
+\item Pewna wielkość idzie od $10$ do $22$, gdy druga idzie od $3$ do $5$.
+  Jakie jest średnie tempo zmiany? \teachesat{1--2}
+  \answerto{$6$, z $\frac{22 - 10}{5 - 3}$. Zmiana podzielona przez zmianę.}
+\item Nachyleniem jakiej prostej to jest? \teachesat{2--3}
+  \answerto{Prostej przechodzącej przez dwa punkty krzywej, która nazywa się
+  cięciwą.}
+\item Dla $y = x^{2}$ jakie jest nachylenie cięciwy od $x = 3$ do
+  $x = 3 + h$? \teachesatone{10}
+  \answerto{Dokładnie $6 + h$, jakiekolwiek $h$ by nie było.}
+\item Ile zatem wynosi pochodna $x^{2}$ w $x = 3$? \teachesat{9--10}
+  \answerto{$\val{f11.deriv.at3}$, czyli to, na czym $6 + h$ się zatrzymuje,
+  gdy $h$ maleje \dash{} a żadna cięciwa temu nie dorówna.}
+\item Czy pochodna jest nachyleniem cięciwy o bardzo małej odległości?
+  \teachesat{11--12}
+  \answerto{Nie. Jest liczbą, na której nachylenia cięciw się zatrzymują, co
+  jest twierdzeniem innego rodzaju i dlatego definicja potrzebuje granicy.}
+\item Program liczy pochodną jako $\frac{f(x+h) - f(x)}{h}$, a $h$ robi się
+  coraz mniejsze. Co dzieje się z błędem? \teachesat{16--17}
+  \answerto{Spada, dochodzi do około $\val{f11.fd.best.err}$ przy
+  $h = \val{f11.fd.best.h}$, a potem znowu rośnie.}
+\item Co daje $\frac{f(x+h) - f(x)}{h}$ przy
+  $h = \val{f11.fd.vanishes}$? \teachesat{17--18}
+  \answerto{Dokładnie zero, bo przy tym rozmiarze $x + h$ jest równe $x$, a
+  licznik jest odejmowaniem liczby od niej samej.}
+\item Pochodna jest ujemna. W którą stronę idzie krzywa, gdy $x$ rośnie?
+  \teachesat{21--22}
+  \answerto{W dół. Znak jest kierunkiem.}
+\item Pochodna wynosi zero. Czy to minimum? \teachesat{23--24}
+  \answerto{Niekoniecznie. To miejsce, w którym krzywa jest chwilowo płaska, a
+  maksimum też takie jest.}
+\item Punkt $A$ ma stromszą pochodną niż punkt $B$. Który jest dalej od
+  minimum? \teachesat{25--26}
+  \answerto{Nie da się powiedzieć. Program liczy przypadek, w którym stromszy
+  punkt jest tym bliższym.}
+\item Jesteś w $x$, a pochodna tam jest dodatnia. W którą stronę jest w dół?
+  \teachesat{27--28}
+  \answerto{Ku mniejszym $x$ \dash{} przeciw znakowi pochodnej.}
+\item Dwa marsze używają kroków $\val{f11.gd.small.eta}$ i
+  $\val{f11.gd.big.eta}$ na tej samej krzywej z tego samego startu. Który
+  podejdzie bliżej w ośmiu krokach? \teachesat{30--31}
+  \answerto{Żaden: lądują na dokładnie tej samej liczbie,
+  $\val{f11.gd.small.end}$, a program mówi dlaczego.}
+\item Użyto zamiast tego kroku $\val{f11.gd.toobig.eta}$. Co się dzieje?
+  \teachesat{32--33}
+  \answerto{Marsz oddala się od minimum, dochodząc do
+  $\val{f11.gd.toobig.end}$ po $\val{f11.gd.steps}$ krokach.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+% ============================================================
+\section{Zmiana podzielona przez zmianę}
+\label{sec:F11-average}
+\index{derivative!average rate of change}
+
+\begin{fr}
+Wszystko w tym programie bierze się z jednej wielkości, a ty liczyłeś ją wiele
+razy, nie mając na nią nazwy.
+
+Strata modelu wynosi $\num{2.40}$ w pewnym momencie treningu i $\num{2.28}$
+sto kroków później. Jak szybko spada, na krok?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\num{0.0012}$ na krok, z $\frac{\num{2.40} - \num{2.28}}{100}$.
+\end{ansblock}
+
+Zmiana jednej wielkości podzielona przez zmianę drugiej. To jest
+\textbf{średnie tempo zmiany} i jest jedynym pomysłem w pierwszej połowie tego
+programu.
+
+Spróbuj tego na krzywej zamiast na przebiegu treningu. Weź $y = x^{2}$. Jakie
+jest średnie tempo zmiany między $x = 3$ a $x = 5$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$8$}
+Z $\frac{25 - 9}{5 - 3} = \frac{16}{2}$.
+
+Teraz spójrz, czym ta liczba jest geometrycznie. Zaznacz oba punkty $(3, 9)$ i
+$(5, 25)$ na krzywej i połącz je prostą. Prosta idzie $16$ w górę, idąc $2$ w
+poziomie, więc jej nachylenie wynosi $8$ \dash{} czyli znane z
+Programu~\ref{prog:F06} $m$ w $y = mx + c$, policzone z dwóch punktów na niej.
+
+Ta prosta ma nazwę. To \textbf{cięciwa}: prosta przez dwa punkty krzywej.
+
+Więc średnie tempo zmiany jest nachyleniem cięciwy, a oba zwroty znaczą to
+samo.
+
+Co prowadzi do pytania, dla którego ten program istnieje, i warto zobaczyć,
+dlaczego to pytanie jest wymuszone. Liczba $8$ nie była własnością krzywej w
+$x = 3$; była własnością krzywej między $3$ a $5$. Weź drugi punkt w $x = 6$,
+a nachylenie cięciwy wynosi $\frac{36 - 9}{3} = 9$. Ten sam punkt startowy,
+inna odpowiedź, a żadna z nich nie jest błędna \dash{} są odpowiedziami na
+różne pytania.
+
+Co więc trzeba by zrobić, żeby dostać nachylenie krzywej \emph{w} $x = 3$, a
+nie między $3$ a czymś?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Przysunąć drugi punkt do pierwszego.
+\end{ansblock}
+
+I to jest cały pomysł, a reszta programu to to, co się dzieje, gdy weźmiesz go
+na poważnie.
+
+Zauważ najpierw, dlaczego pytanie nie jest głupie. W samym $x = 3$ jest tylko
+jeden punkt, a nachylenie potrzebuje dwóch \dash{} zmiany podzielonej przez
+zmianę, a pojedynczy punkt nie ma zmiany do podzielenia. Więc
+\enquote{nachylenie w punkcie} nie jest oczywiście czymś, co istnieje, i
+matematyka musi uważać, co przez to rozumie, zanim to policzy.
+
+\mermaidfig{f11-chord-to-tangent}{Dwa punkty dają cięciwę; zsunięcie ich to
+cała definicja.}{od cięciwy do stycznej}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedno słowo, zanim zacznie się zmniejszanie.
+
+Odległość między obiema wartościami $x$ zapiszemy jako $h$, więc drugi punkt
+jest w $x + h$, a nachylenie cięciwy wynosi
+\[ \frac{f(x + h) - f(x)}{h} \]
+czyli zmiana $y$ przez zmianę $x$ z wpisanymi nazwami. Sprawdź to na ostatnim
+rachunku: w $x = 3$ przy $h = 2$ daje
+$\frac{f(5) - f(3)}{2} = \frac{16}{2} = 8$, czyli to, co wyszło.
+
+\begin{note}
+To wyrażenie nazywa się \emph{ilorazem różnicowym}, a oba słowa są dosłowne:
+różnica u góry, iloraz w całości. To nie jest nowy obiekt \dash{} to średnie
+tempo zmiany z literami ustawionymi tak, żeby jedną z nich dało się zmniejszyć.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Dwie uwagi o $h$, i obie mają znaczenie później.
+
+$h$ wolno być \textbf{ujemne}, co stawia drugi punkt po lewej. Cięciwę rysuje
+się wtedy z drugiej strony, a jej nachylenie wychodzi to samo, gdy $h$ maleje,
+i jest to fakt wart sprawdzenia raz i niewart rozwodzenia się.
+
+$h$ \textbf{nigdy nie jest zerem}. Podstawienie $h = 0$ daje
+$\frac{0}{0}$, co nie jest liczbą ani nawet bardzo małą liczbą \dash{} jest
+wyrażeniem bez wartości. Każda trudność następnej sekcji bierze się z chęci
+dojścia do miejsca, w którym to wyrażenie nie jest określone.
+\end{fr}
+
+% ============================================================
+\section{Zmniejszanie cięciwy}
+\label{sec:F11-shrinking}
+\index{derivative!from first principles}
+
+\begin{fr}
+Weź $y = x^{2}$ w $x = 3$ i zmniejszaj $h$. Policz nachylenie cięciwy przy
+$h = 1$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f11.chord.1}$}
+Z $\frac{16 - 9}{1} = \frac{7}{1}$.
+
+Teraz $h = \num{0.1}$, potem $h = \num{0.01}$, potem $h = \num{0.001}$. Nie
+musisz liczyć wszystkich trzech; przewidź wzorzec z dwóch pierwszych.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+$h$ & nachylenie cięciwy \\
+\midrule
+$1$ & $\val{f11.chord.1}$ \\
+$\num{0.1}$ & $\val{f11.chord.01}$ \\
+$\num{0.01}$ & $\val{f11.chord.001}$ \\
+$\num{0.001}$ & $\val{f11.chord.0001}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{ansblock}
+
+Nachylenia zmierzają w oczywiste miejsce. Które?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f11.deriv.at3}$}
+A algebra mówi to dokładnie, co jest lepsze niż cztery wiersze to sugerujące.
+Rozwiń iloraz różnicowy dla $f(x) = x^{2}$ i $x = 3$:
+\[ \frac{(3+h)^{2} - 3^{2}}{h} = \frac{9 + 6h + h^{2} - 9}{h}
+   = \frac{6h + h^{2}}{h} = 6 + h \]
+używając podanego w Programie~\ref{prog:F02} rozwinięcia $(a+b)^{2}$, a
+skrócenie $h$
+jest dozwolone \emph{dlatego, że $h$ nie jest zerem}, i po to poprzednia
+sekcja przy tym obstawała.
+
+\code{code/f11\_derivative.py} sprawdza, że nachylenie cięciwy wynosi
+$6 + h$ dla każdego $h$, przy czterystu wartościach. Gdy $h$ maleje,
+nachylenie zbliża się do $\val{f11.deriv.at3}$ i nigdy do niego nie dochodzi,
+bo dojście wymagałoby $h = 0$, a wtedy nie ma cięciwy.
+
+\textbf{$\val{f11.deriv.at3}$ to liczba, na której nachylenia się zatrzymują},
+a ta liczba to \textbf{pochodna} $x^{2}$ w $x = 3$.
+\end{fr}
+
+\begin{fr}
+Zwrot \enquote{zatrzymują się na} wykonuje prawdziwą pracę i wart jest jednej
+ramki.
+
+Nie znaczy \enquote{wartość przy $h = 0$}, bo tam wartości nie ma. Nie znaczy
+\enquote{wartość przy bardzo małym $h$}, bo każda taka wartość to $6 + h$ i
+żadna z nich nie jest $6$. Znaczy tyle: \textbf{nachylenie cięciwy możesz
+przybliżyć do $\val{f11.deriv.at3}$ tak blisko, jak ktokolwiek zażąda, wybierając
+dostatecznie małe $h$.} Zażądaj z dokładnością do tysięcznej, a $h =
+\num{0.0005}$ to zrobi; zażądaj do milionowej, a zrobi to mniejsze $h$.
+
+To jest \textbf{granica}, a zapis to
+\[ f'(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} \]
+gdzie $f'$ czyta się \enquote{$f$ prim}. Strzałka znaczy \emph{ku}, a nigdy
+\emph{w}.
+
+Czy pochodna jest nachyleniem cięciwy o bardzo małej odległości?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie}
+\begin{trapbox}
+\textbf{Pochodna w ogóle nie jest nachyleniem cięciwy.} Każde nachylenie
+cięciwy dla $x^{2}$ w $3$ wynosi $6 + h$, a żadne z nich nie jest $6$.
+Pochodna jest liczbą, do której one zmierzają, co jest twierdzeniem o całej
+rodzinie cięciw, a nie o którejkolwiek z nich.
+
+To rozróżnienie brzmi jak pedanteria aż do sekcji 3, gdzie maszynę prosi się o
+zmniejszanie $h$, a odpowiedź robi się \emph{gorsza}. Gdyby pochodna była po
+prostu \enquote{cięciwą o maleńkiej odległości}, nie mogłoby się to zdarzyć.
+
+Nawyk wart wzięcia: gdy widzisz $\lim_{h \to 0}$, czytaj to jako \emph{tak
+blisko, jak zechcesz, przez wybór $h$}, a nie jako \emph{przy $h = 0$}.
+Pierwsze jest obietnicą, którą możesz sprawdzić; drugie jest wyrażeniem bez
+wartości.
+\end{trapbox}
+
+Zrób to samo dla $f(x) = x^{2}$ przy dowolnym $x$. Rozwiń i skróć.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \frac{(x+h)^{2} - x^{2}}{h} = \frac{2xh + h^{2}}{h} = 2x + h
+   \quad\longrightarrow\quad f'(x) = 2x \]
+\end{ansblock}
+
+Sprawdź to z poprzednią sekcją: w $x = 3$ daje to $\val{f11.deriv.at3}$, jak
+wcześniej.
+
+Jeszcze dwie, obie szybkie i obie warte zrobienia, a nie przeczytania. Ile
+wynosi pochodna $f(x) = c$, czyli stałej?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$0$}
+Bo iloraz różnicowy to $\frac{c - c}{h} = 0$ dla każdego $h$, więc nachylenia
+nie tyle zatrzymują się na zerze \dash{} one są zerem przez cały czas. Prosta
+pozioma nigdzie nie ma nachylenia, i to właśnie mówi ta odpowiedź.
+
+A $f(x) = mx + c$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$m$}
+Z $\frac{m(x+h) + c - mx - c}{h} = \frac{mh}{h} = m$, znów dla każdego $h$.
+Nachylenie prostej jest wszędzie takie samo i równe $m$, które nazwał
+Program~\ref{prog:F06}, i jest to jedyny przypadek, w którym pochodna nie mówi
+ci nic, czego byś już nie miał.
+
+Trzy wyniki jak dotąd:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+$f(x)$ & $f'(x)$ \\
+\midrule
+$c$ & $0$ \\
+$mx + c$ & $m$ \\
+$x^{2}$ & $2x$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Jest tam wzorzec i pewnie go dostrzegłeś. Nie szukaj jeszcze reguły ogólnej:
+Program~\ref{prog:F12} ją podaje wraz z trzema innymi i dodaje jedną regułę na
+różniczkowanie funkcji funkcji. Tutaj liczy się to, że wszystkie trzy wyszły z \emph{jednej}
+definicji i strony algebry, więc reguły są wnioskami, a nie faktami do
+wydania.
+\end{fr}
+
+% ============================================================
+\section{Co maszyna robi, gdy zmniejszasz $h$}
+\label{sec:F11-machine}
+\index{derivative!and the finite difference}
+
+\begin{fr}
+Definicja mówi: zmniejszaj $h$, a iloraz się zbliży. Więc zapisz to i
+zmniejszaj $h$. Co mogłoby pójść źle?
+
+Oto $\frac{f(3+h) - f(3)}{h}$ dla $f(x) = x^{2}$, policzone przy siedemnastu
+rozmiarach $h$. Prawdziwa odpowiedź to $\val{f11.deriv.at3}$.
+
+Zanim spojrzysz: przy którym $h$ spodziewasz się najmniejszego błędu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie przy najmniejszym.
+\end{ansblock}
+
+\transcript{f11-shrinking-h}
+
+Błąd spada dokładnie tak, jak matematyka mówi, że powinien \dash{} jest równy
+samemu $h$, bo iloraz to $6 + h$ \dash{} aż do około $\val{f11.fd.err.8}$ przy
+$h = \val{f11.fd.best.h}$. A potem \textbf{wraca w górę}, przez
+$\val{f11.fd.err.12}$ przy $h = 10^{-12}$, do $\val{f11.fd.err.16}$ przy
+$h = \val{f11.fd.vanishes}$ \dash{} czyli o całą odpowiedź, błędnie.
+
+Jaka jest wartość przy $h = \val{f11.fd.vanishes}$ i dlaczego?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f11.fd.approx.16}$}
+Dokładnie zero. Przy tym rozmiarze \textbf{$3 + h$ jest równe $3$}: maszyna
+nie ma miejsca, żeby zapisać różnicę, więc licznik jest liczbą odjętą od samej
+siebie, a iloraz wynosi $\frac{0}{h}$.
+
+\begin{trapbox}
+\textbf{\enquote{Mniejsze $h$ jest dokładniejsze} jest prawdą w matematyce i
+fałszem na maszynie}, a rozchodzą się one przy około
+$h = \val{f11.fd.best.h}$.
+
+Wymieniane są dwa błędy i ciągną w przeciwne strony. Zrób $h$ duże, a cięciwa
+nie jest jeszcze styczną, i to jest błąd, o którym mówi definicja. Zrób $h$
+małe, a obie wartości $f$ zbliżą się tak bardzo, że odejmowanie wyrzuci
+większość cyfr, które je odróżniały \dash{} a potem dzielisz te szczątki przez
+coś maleńkiego, co je powiększa.
+
+Program~\ref{prog:P01} jest miejscem, w którym prawa gałąź dostaje swoje
+wyjaśnienie, bo jest faktem o tym, jak maszyna przechowuje liczbę, a nie o
+rachunku różniczkowym. Tutaj należy kształt: \textbf{krzywa błędu jest
+literą U, a jej dno nie jest przy najmniejszym $h$, jakie da się wpisać.}
+\end{trapbox}
+
+\mermaidfig{f11-two-errors}{Dwa błędy ciągnące w przeciwne strony i litera U,
+którą między sobą robią.}{dlaczego zmniejszanie kroku przestaje pomagać}
+\end{fr}
+
+\begin{fr}
+Praktyczny wniosek wart jest wyraźnego powiedzenia, bo wersja tego pojawia się
+w zestawie testów każdego frameworka.
+
+Sprawdzanie pochodnej różnicami skończonymi jest techniką prawdziwą i
+użyteczną \dash{} tak testuje się implementację różniczkowania automatycznego
+\dash{} i działa, gdy $h$ dobierze się blisko dna litery U, a nie tak małe,
+jak się da. Najlepszy wiersz powyżej to $h = \val{f11.fd.best.h}$, z błędem
+$\val{f11.fd.best.err}$, i mniej więcej na tyle stać tę metodę przy wielkości
+tego rzędu.
+
+\begin{aibox}
+Dlatego sprawdzenie gradientu zgłasza zgodność do kilku cyfr, a nie do
+wszystkich, i dlatego takie, które żąda więcej, pada na poprawnym kodzie.
+Porównanie jest między dokładną pochodną a przybliżeniem, którego najlepszy
+możliwy błąd jest rzędu pierwiastka z precyzji maszyny, więc tolerancję trzeba
+ustawić na to, co metoda potrafi dostarczyć.
+
+Implementacja przechodząca sprawdzenie gradientu do trzech czy czterech cyfr
+prawie na pewno ma pochodną poprawną. Ta, która zgadza się do piętnastu, jest
+podejrzana, bo samo sprawdzenie nie może być aż tak dobre.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jedno ostrzeżenie co do czytania tabeli, bo jest to twierdzenie o jednym
+rachunku, a nie o arytmetyce w ogóle.
+
+Punkt zwrotny siedzi tam, gdzie siedzi, przez rozmiar liczb, o które chodzi:
+$f(3) = 9$, a brana różnica jest wobec wartości około $9$. Zrób ten sam
+przebieg w $x = \val{f11.fd.big.x}$, gdzie $f$ wynosi dziewięć milionów, a
+najlepsze $h$ przesuwa się z $\val{f11.fd.best.h}$ na $\val{f11.fd.big.h}$
+\dash{} tysiąckrotnie \dash{} bo cyfry dostępne do zapisania różnicy to cyfry,
+które zostają po przedstawieniu liczby znacznie większej.
+
+\textbf{Więc przenośną częścią jest kształt krzywej, a nie położenie jej
+dna.} To jest to samo rozróżnienie, które zrobił Program~\ref{prog:F09} między
+tożsamością a twierdzeniem o rozkładzie, i warto je robić za każdym razem, gdy
+cytuje się pomiar.
+\end{fr}
+
+% ============================================================
+\section{Czytanie pochodnej}
+\label{sec:F11-reading}
+\index{derivative!sign and size}
+
+\begin{fr}
+Pochodna jest liczbą, a odczytać z niej można dokładnie dwie rzeczy: jej znak
+i jej wielkość. Ta sekcja robi obie, a sekcja 5 ich używa.
+
+Weź $f(x) = x^{2}$, którego pochodną jest $2x$. W $x = -4$ pochodna wynosi
+$-8$. Gdy $x$ rośnie od $-4$, krzywa idzie w górę czy w dół?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{W dół}
+Bo nachylenie jest ujemne, a ujemne nachylenie to prosta idąca w dół, gdy
+idziesz w prawo \dash{} czyli odczyt z Programu~\ref{prog:F06} tego, czym
+jest $m$, zastosowany do stycznej zamiast do całej prostej.
+
+Więc znak jest kierunkiem:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+$f'(x) > 0$ & krzywa rośnie, gdy $x$ rośnie \\
+$f'(x) < 0$ & krzywa opada, gdy $x$ rośnie \\
+$f'(x) = 0$ & krzywa jest chwilowo płaska \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+W $x = 4$ pochodna $x^{2}$ wynosi $8$, a w $x = 1$ wynosi $2$. Co mówi ci
+różnica między $8$ a $2$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Krzywa jest w $x = 4$ cztery razy stromsza niż w $x = 1$.
+\end{ansblock}
+
+I tylko tyle ci mówi: jak stromo krzywa rośnie \emph{właśnie tam}. Pochodna
+jest wielkością lokalną. Liczy się ją z tego, co funkcja robi w dowolnie małym
+otoczeniu jednego punktu, więc nie może nieść informacji o żadnym innym
+miejscu \dash{} ani o tym, gdzie jest minimum, ani jak daleko, ani czy jest
+jeszcze jedno.
+
+Za chwilę będzie to miało ogromne znaczenie. Najpierw trzeci wiersz tabeli.
+Pochodna $x^{2}$ wynosi zero w $x = 0$. Czy to minimum?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tutaj tak}
+Ale nie dlatego, że pochodna jest zerem.
+
+\begin{trapbox}
+\textbf{Zerowa pochodna mówi, że krzywa jest płaska, a maksimum też jest
+płaskie.} Tak samo jak płaskie miejsce w środku krzywej, która idzie w górę,
+wypłaszcza się i idzie w górę dalej.
+
+Weź $f(x) = -x^{2}$. Jego pochodną jest $-2x$, która wynosi zero w $x = 0$, a
+$x = 0$ jest jego \emph{maksimum}. Pochodna nie potrafi odróżnić tych dwóch,
+bo liczy się ją z dowolnie małego otoczenia, a oba wyglądają tam płasko.
+
+Słowo na miejsce z zerową pochodną to \textbf{punkt stacjonarny} i jest
+celowo niezobowiązujące. To, którego jest rodzaju, wymaga więcej informacji,
+niż ma pierwsza pochodna: wymaga pochodnej pochodnej, do której reguły daje
+Program~\ref{prog:F12}, a Program~\ref{prog:P17} zamienia ją w twierdzenie o
+krzywiźnie. A to, czy znalezione minimum jest jedyne, jest znów dalszym
+pytaniem i należy do Programu~\ref{prog:P19}.
+
+Do tego czasu: \textbf{zerowy gradient znaczy, że marsz się zatrzymał, a
+zatrzymanie się to nie to samo co dojście.}
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Teraz wielkość i nieporozumienie, które kosztuje najwięcej.
+
+Oto $f(x) = x^{4} - 4x^{2}$, które ma minimum w $x = \val{f11.min.x}$. Rozważ
+dwa punkty na nim: $x = \val{f11.steep.x}$, gdzie pochodna wynosi
+$\val{f11.steep.slope}$, oraz $x = \val{f11.shallow.x}$, gdzie wynosi
+$\val{f11.shallow.slope}$.
+
+Jeden z tych punktów jest znacznie stromszy od drugiego. Który jest dalej od
+minimum?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Ten \emph{łagodniejszy}, i to dwukrotnie.
+\end{ansblock}
+
+$x = \val{f11.steep.x}$ jest $\val{f11.steep.dist}$ od minimum, a
+$x = \val{f11.shallow.x}$ jest $\val{f11.shallow.dist}$ od niego.
+
+\begin{trapbox}
+\textbf{Duża pochodna nie znaczy, że jest daleko do przejścia.} Znaczy, że
+grunt jest stromy tutaj, a stromy grunt może być krótkim marszem od dna
+wąskiego dołu albo długim marszem po łagodnym zboczu.
+
+To jest teza poprzedniej ramki z doczepioną liczbą: pochodną liczy się z
+dowolnie małego otoczenia, więc \emph{nie może} wiedzieć, jak daleko cokolwiek
+jest. Odczytywanie z niej odległości to proszenie jednej liczby o informację,
+której jej nigdy nie dano.
+
+Konsekwencja, którą ludzie spotykają: \enquote{gradient wciąż jest duży, więc
+jesteśmy daleko od zbieżności} nie jest wnioskiem. Nie jest nim też
+odwrotność \dash{} mały gradient może znaczyć dno, a równie dobrze długi
+płaski odcinek z dnem daleko, i to właśnie produkuje nasycona jednostka, co
+zmierzył Program~\ref{prog:F07}.
+\end{trapbox}
+
+\mermaidfig{f11-sign-and-size}{Znak jest kierunkiem, a wielkość stromością, i
+żadne z nich nie jest odległością.}{co pochodna mówi, a czego nie}
+\end{fr}
+
+% ============================================================
+\section{Marsz w dół}
+\label{sec:F11-downhill}
+\index{derivative!and walking downhill}
+
+\begin{fr}
+Stoisz na krzywej w pewnym $x$, nie widzisz krzywej, a jedyne, o co wolno ci
+poprosić, to pochodna pod twoimi stopami.
+
+Pochodna wraca dodatnia. W którą stronę jest w dół?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Ku mniejszym $x$.
+\end{ansblock}
+
+Bo dodatnia pochodna znaczy, że krzywa rośnie, gdy $x$ rośnie, więc opada, gdy
+$x$ maleje. W dół jest \textbf{przeciw znakowi pochodnej}, zawsze, a to jedno
+zdanie jest całym mechanizmem sterowania wszystkiego, co ta książka nazwie
+później treningiem.
+
+Zapisz to jako instrukcję. Jesteś w $x$ i chcesz przesunąć się w dół o krok
+pewnej wielkości $\eta$. Dokąd idziesz?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ x \;\longleftarrow\; x - \eta\, f'(x) \]
+\end{ansblock}
+
+Minus to \enquote{przeciw pochodnej}. $\eta$ \dash{} grecka litera eta \dash{}
+to jak daleko idziesz, i jest wyborem, a nie czymś, co powiedziała ci
+pochodna, bo na mocy poprzedniej sekcji pochodna nie wie, jak daleko cokolwiek
+jest.
+
+\textbf{To jest spadek gradientowy i nie ma w nim nic więcej.} Każdy
+optymalizator omawiany w tej książce później jest tym wierszem z lepszą
+odpowiedzią na \emph{jak daleko}, a Program~\ref{prog:P20} jest miejscem, w
+którym się je porównuje.
+
+Spróbuj. $f(x) = (x-3)^{2} + 1$, więc $f'(x) = 2(x-3)$. Zacznij w
+$x = \val{f11.gd.start}$ przy $\eta = \val{f11.gd.small.eta}$. Dokąd zabierze
+cię jeden krok?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\num{8.6}$}
+Z $10 - \num{0.1} \times 14$. Pochodna w $10$ wynosi $14$, jest dodatnia, więc
+krok idzie w lewo, czyli w dół.
+
+Zrób to $\val{f11.gd.steps}$ razy, a dojdziesz do
+$\val{f11.gd.small.end}$, zamykając większość odstępu do $3$.
+
+Teraz ten sam marsz przy znacznie większym kroku, $\eta =
+\val{f11.gd.big.eta}$. Przewidź, gdzie skończy po tych samych
+$\val{f11.gd.steps}$ krokach: bliżej niż $\val{f11.gd.small.end}$ czy dalej?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dokładnie tam samo: $\val{f11.gd.big.end}$}
+Co nie jest zbiegiem okoliczności i jest najlepszą rzeczą w tym programie.
+
+Podstaw regułę aktualizacji do tego konkretnego $f$. Krok wynosi
+$\eta \times 2(x-3)$, więc
+\[ x - 3 \;\longleftarrow\; (x - 3) - 2\eta(x - 3) = (1 - 2\eta)(x - 3) \]
+
+\textbf{Odległość do minimum jest mnożona przez $1 - 2\eta$ na każdym kroku.}
+Przy $\eta = \val{f11.gd.small.eta}$ ten czynnik wynosi
+$\val{f11.gd.factor.small}$; przy $\eta = \val{f11.gd.big.eta}$ wynosi
+$-\val{f11.gd.factor.big}$. Ta sama wielkość, przeciwny znak.
+
+Więc mały krok pełznie w dół po jednej stronie, a duży krok przeskakuje
+minimum za każdym razem i ląduje o ten sam ułamek bliżej po drugiej stronie.
+Po parzystej liczbie kroków są w tym samym miejscu, co do cyfry. Asertowane w
+skrypcie krok po kroku i złożone przez sześćdziesiąt, przy trzystu wartościach
+$\eta$.
+\end{fr}
+
+\begin{fr}
+To wyrażenie odpowiada na pytanie, które poprzednie ramki odkładały.
+
+Marsz dochodzi, gdy $\lvert 1 - 2\eta \rvert < 1$, bo odległość mnożona wciąż
+przez coś mniejszego od jedynki dąży do zera. Ucieka, gdy
+$\lvert 1 - 2\eta \rvert > 1$. A przy $\eta = \val{f11.gd.perfect}$ czynnik
+wynosi dokładnie zero, więc marsz ląduje na minimum w \emph{jednym kroku}
+\dash{} co jest ostrzeżeniem w tym samym stopniu co wynikiem, bo ta wartość
+zależy w całości od tego $f$, a w ogólności nikt ci jej nie poda.
+
+Zauważ, co ten zakres mówi, a czego nie. Jest twierdzeniem o tym $f$ i o
+żadnym innym: $2$ pojawia się w $1 - 2\eta$ dlatego, że $f'(x) = 2(x-3)$, a
+inna krzywa stawia tam inną liczbę. Przenosi się kształt tego warunku \dash{}
+że na krok jest górne ograniczenie, że jest ono własnością funkcji, a nie
+gradientu, i że przekroczenie go nie tylko spowalnia marsz.
+
+Spróbuj $\eta = \val{f11.gd.toobig.eta}$ z tego samego startu. Przewidź znak
+wyniku, zanim go policzysz: marsz podchodzi bliżej czy oddala się?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dalej, i szybko}
+Czynnik wynosi $-\val{f11.gd.factor.toobig}$, a jego wielkość przekracza
+jedynkę, więc każdy krok mnoży odległość przez $\val{f11.gd.factor.toobig}$ i
+odwraca jej znak. Po $\val{f11.gd.steps}$ krokach marsz jest w
+$\val{f11.gd.toobig.end}$, wystartowawszy z $\val{f11.gd.start}$ i celując
+w $3$.
+
+\begin{trapbox}
+\textbf{Zbyt duży krok nie przestrzeliwuje raz i nie wraca; przestrzeliwuje za
+każdym razem dalej.} Marsz oscyluje, a oscylacja rośnie, i tak wygląda od
+środka \enquote{strata wybuchła}.
+
+Zauważ, co pochodna zrobiła źle: \emph{nic}. Wskazywała w dół poprawnie na
+każdym kroku. Kierunek był dobry za każdym razem, a odległość za duża, i żadne
+staranniejsze pytanie do pochodnej by nie pomogło, bo ona nie wie, jak daleko
+cokolwiek jest.
+
+To, co ogranicza krok, to \emph{krzywizna}, a nie gradient, a
+Program~\ref{prog:P17} wyprowadza to ograniczenie. Tutaj masz mechanizm i tryb
+porażki, a to wystarczy, żeby ją rozpoznać, gdy ją spotkasz.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedna własność tego marszu i to ta, która czyni spadek gradientowy
+wartym używania, a nie tylko definiowalnym.
+
+Spójrz, czego marsz potrzebował. Potrzebował pochodnej w punkcie, na którym
+stał, i niczego więcej: ani kształtu krzywej, ani tego, gdzie jest minimum,
+ani wartości $f$ gdziekolwiek poza tym miejscem. Ani razu nie policzył nawet
+samego $f$.
+
+Dlatego ta metoda przechodzi do zadań, w których $f$ jest stratą po miliardach
+parametrów i nikt nie mógłby jej narysować ani przeszukać. \textbf{Wielkość
+lokalna wystarczy do sterowania}, a ceną używania samej informacji lokalnej
+jest wszystko, co powiedziała sekcja 4: brak poczucia odległości, brak
+sposobu na odróżnienie minimum od maksimum i krok, który musi wziąć się
+skądinąd.
+\end{fr}
+
+\begin{fr}
+Uwaga na koniec, i to ona jest tym, co ten program budował.
+
+Pochodną zdefiniowano przez zmniejszanie cięciwy, co jest kawałkiem geometrii
+o krzywej na kartce. Nic w tej definicji nie wspominało o optymalizacji,
+stracie ani treningu. A jednak instrukcja z ostatniej sekcji \dash{} zrób krok
+przeciw pochodnej \dash{} wyszła z definicji i z jednego odczytu znaku.
+
+\textbf{Spadek gradientowy nie jest algorytmem, który ktoś wymyślił na
+rachunku różniczkowym. Jest tym, co definicja pochodnej każe robić}, gdy
+chcesz zejść w dół i widzisz tylko swoje stopy.
+
+To, co dodaje Program~\ref{prog:F12}, to umiejętność policzenia $f'$ dla
+funkcji zbudowanych z innych funkcji, i to zamienia to z pokazu na
+$(x-3)^{2}$ w coś, co działa na sieci.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Średnie tempo zmiany to zmiana podzielona przez
+  zmianę}, a geometrycznie jest nachyleniem \textbf{cięciwy} \dash{} prostej
+  przez dwa punkty krzywej. Na $y = x^{2}$ między $x = 3$ a $x = 5$ wynosi
+  $8$.}
+\sumitem{4--6}{Zapisane z odległością $h$ nachylenie cięciwy to
+  $\frac{f(x+h) - f(x)}{h}$. $h$ może być ujemne i \textbf{nigdy nie jest
+  zerem}: przy $h = 0$ wyrażenie to $\frac{0}{0}$, co nie jest liczbą ani małą
+  liczbą, a każda trudność sekcji 3 bierze się z chęci dojścia do miejsca, w
+  którym wyrażenie nie jest określone.}
+\sumitem{7--10}{Dla $x^{2}$ w $x = 3$ nachylenie cięciwy wynosi
+  \textbf{dokładnie $6 + h$}, więc nachylenia biegną $\val{f11.chord.1}$,
+  $\val{f11.chord.01}$, $\val{f11.chord.001}$, $\val{f11.chord.0001}$ i
+  zatrzymują się na $\val{f11.deriv.at3}$ \dash{} co jest \textbf{pochodną}
+  $x^{2}$ w tym punkcie. Skrócenie $h$ jest dozwolone właśnie dlatego, że $h$
+  nie jest zerem.}
+\sumitem{11--12}{\textbf{Pochodna nie jest nachyleniem cięciwy.} Każde
+  nachylenie cięciwy tutaj to $6 + h$ i żadne z nich nie jest $6$; pochodna
+  jest liczbą, do której zmierzają, a $\lim_{h \to 0}$ znaczy \emph{tak
+  blisko, jak zechcesz, przez wybór $h$}, a nigdy \emph{przy $h = 0$}.}
+\sumitem{13--15}{Z samej definicji: $x^{2}$ daje $2x$, stała daje $0$, a
+  $mx + c$ daje $m$. Jest tam wzorzec i Program~\ref{prog:F12} go podaje
+  \dash{} tutaj liczy się to, że wszystkie trzy wyszły z jednej definicji i
+  strony algebry, więc reguły są wnioskami, a nie faktami do wydania.}
+\sumitem{16--18}{\textbf{Mniejsze $h$ jest dokładniejsze w matematyce i fałsz
+  na maszynie.} Błąd spada do $\val{f11.fd.best.err}$ przy
+  $h = \val{f11.fd.best.h}$, a potem wraca do $\val{f11.fd.err.16}$ przy
+  $h = \val{f11.fd.vanishes}$, gdzie $3 + h$ \emph{jest} równe $3$, a iloraz
+  wynosi dokładnie $\val{f11.fd.approx.16}$. Dwa błędy ciągną w przeciwne
+  strony, a krzywa między nimi jest literą U. Prawa gałąź należy do
+  Programu~\ref{prog:P01}.}
+\sumitem{19--20}{Więc sprawdzenie gradientu zgadza się do kilku cyfr, a nie do
+  wszystkich, a takie, które żąda więcej, pada na poprawnym kodzie.
+  \textbf{Kształt krzywej przechodzi, a położenie jej dna nie} \dash{}
+  przesuwa się z rozmiarem odejmowanych liczb.}
+\sumitem{21--23}{\textbf{Znak jest kierunkiem}: dodatni rośnie, ujemny opada,
+  zero jest chwilowo płaskie. \textbf{Wielkość jest stromością, właśnie tutaj.}
+  Pochodną liczy się z dowolnie małego otoczenia, więc nie może nieść
+  informacji o żadnym innym miejscu.}
+\sumitem{24}{\textbf{Zerowa pochodna to \emph{punkt stacjonarny}, a nie
+  minimum}: maksimum też jest płaskie, i tak samo płaskie miejsce w drodze w
+  górę. To, którego jest rodzaju, wymaga więcej niż pierwszej pochodnej
+  \dash{} dostarcza to Program~\ref{prog:P17}. Zatrzymanie się to nie to samo
+  co dojście.}
+\sumitem{25--26}{\textbf{Duża pochodna nie znaczy, że jest daleko.} Na
+  $x^{4} - 4x^{2}$ punkt $x = \val{f11.steep.x}$ ma nachylenie
+  $\val{f11.steep.slope}$ i jest $\val{f11.steep.dist}$ od minimum, a
+  $x = \val{f11.shallow.x}$ ma nachylenie $\val{f11.shallow.slope}$ i jest
+  $\val{f11.shallow.dist}$ od niego. Stromszy punkt jest tym bliższym.}
+\sumitem{27--29}{W dół jest \textbf{przeciw znakowi pochodnej}, a instrukcja
+  brzmi $x \leftarrow x - \eta f'(x)$. \textbf{To jest spadek gradientowy i
+  nie ma w nim nic więcej}; $\eta$ jest wyborem, bo na mocy poprzedniej sekcji
+  pochodna nie wie, jak daleko cokolwiek jest.}
+\sumitem{30--32}{Na $(x-3)^{2} + 1$ aktualizacja to dokładnie
+  $x - 3 \leftarrow (1 - 2\eta)(x-3)$, więc \textbf{odległość jest mnożona
+  przez $1 - 2\eta$ na każdym kroku}. Przy $\eta = \val{f11.gd.small.eta}$ i
+  $\eta = \val{f11.gd.big.eta}$ czynnik ten wynosi
+  $\pm\val{f11.gd.factor.small}$, więc jeden marsz pełznie w dół, a drugi
+  przeskakuje minimum co krok, i oba dochodzą do $\val{f11.gd.small.end}$ co
+  do cyfry. Marsz dochodzi, gdy $\lvert 1 - 2\eta \rvert < 1$.}
+\sumitem{33--35}{\textbf{Zbyt duży krok przestrzeliwuje za każdym razem
+  dalej}: przy $\eta = \val{f11.gd.toobig.eta}$ czynnik wynosi
+  $-\val{f11.gd.factor.toobig}$, a osiem kroków przenosi marsz z
+  $\val{f11.gd.start}$ do $\val{f11.gd.toobig.end}$. Pochodna nie zrobiła nic
+  źle \dash{} wskazywała w dół za każdym razem, a nie wie, jak daleko. Krok
+  ogranicza krzywizna, i to należy do Programu~\ref{prog:P17}. Marsz
+  potrzebował tylko pochodnej pod stopami i ani razu nie policzył $f$, i
+  dlatego wielkość lokalna wystarczy do sterowania \dash{} a \textbf{spadek
+  gradientowy nie jest algorytmem na rachunku różniczkowym, jest tym, co
+  definicja każe robić}, gdy chcesz zejść w dół i widzisz tylko swoje stopy.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Wielkość idzie od $8$ do $20$, gdy druga idzie od $1$ do $4$. Podaj
+  średnie tempo zmiany.
+  \answerto{$4$, z $\frac{20-8}{4-1}$.}
+\item Dla $f(x) = x^{2}$ podaj nachylenie cięciwy między $x = 2$ a $x = 2 + h$
+  w zależności od $h$.
+  \answerto{$4 + h$, tym samym rozwinięciem: $\frac{4 + 4h + h^{2} - 4}{h}$.}
+\item Podaj stąd $f'(2)$.
+  \answerto{$4$, czyli $2x$ w $x = 2$.}
+\item Dlaczego $h = 0$ nie jest dozwolone w ilorazie różnicowym?
+  \answerto{Bo daje $\frac{0}{0}$, co nie ma wartości \dash{} i dlatego, że
+  skrócenie $h$, które daje odpowiedź, wymaga dzielenia przez nie.}
+\item Podaj pochodną $f(x) = 7$ oraz $f(x) = 5x - 2$.
+  \answerto{$0$ i $5$. Stała nigdzie nie ma nachylenia; prosta ma wszędzie to
+  samo.}
+\item Różnicę skończoną policzono przy $h = 10^{-15}$ i odpowiedź jest mocno
+  błędna. Podaj powód w jednym zdaniu i podaj lepsze $h$.
+  \answerto{Obie wartości $f$ są zbyt blisko, żeby odejmowanie zachowało
+  cyfry, które je odróżniały. Coś w okolicy $\val{f11.fd.best.h}$ to mniej
+  więcej najlepsze, na co ta metoda stać.}
+\item Ktoś proponuje sprawdzić gradient różnicami skończonymi do dwunastu
+  miejsc po przecinku. Co jest z tą propozycją nie tak?
+  \answerto{Najlepszy własny błąd tej metody wynosi tu około
+  $\val{f11.fd.best.err}$, więc nie da dwunastu miejsc, a sprawdzenie padłoby
+  na poprawnym kodzie.}
+\item $f'(x) = -3$ w pewnym punkcie. Krzywa tam rośnie czy opada i jak stromo
+  w porównaniu z punktem, gdzie $f'(x) = 1$?
+  \answerto{Opada, i trzy razy stromiej.}
+\item $f(x) = -x^{2}$ ma $f'(0) = 0$. Czy $x = 0$ jest minimum?
+  \answerto{Nie, to maksimum. Zerowa pochodna mówi: płasko, a maksimum jest
+  płaskie.}
+\item Dwa punkty na krzywej mają pochodne $\num{0.1}$ i $\num{40}$. Który jest
+  bliżej swojego minimum?
+  \answerto{Z tych dwóch liczb nie da się odpowiedzieć. Pochodna jest lokalna
+  i nie niesie żadnej informacji o odległości.}
+\item Jesteś w $x = -2$, a $f'(-2) = -6$. Podaj następny punkt przy
+  $\eta = \num{0.25}$.
+  \answerto{$-\num{0.5}$, z $-2 - \num{0.25} \times (-6)$. Ujemna pochodna
+  posyła krok w prawo.}
+\item Na $f(x) = (x-3)^{2} + 1$ podaj czynnik, przez który mnożona jest
+  odległość do minimum na każdym kroku przy $\eta = \num{0.25}$.
+  \answerto{$\num{0.5}$, z $1 - 2 \times \num{0.25}$.}
+\item Przy którym $\eta$ ten marsz dochodzi do minimum w jednym kroku i
+  dlaczego nie jest to użyteczny fakt ogólny?
+  \answerto{$\val{f11.gd.perfect}$, gdzie czynnik wynosi zero. Zależy to w
+  całości od tego $f$, a w ogólności nikt nie poda ci właściwej wartości.}
+\item Podaj zakres $\eta$, dla którego ten marsz w ogóle zbiega.
+  \answerto{$0 < \eta < 1$, czyli tam, gdzie $\lvert 1 - 2\eta \rvert < 1$.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Wyprowadź $f'(x)$ dla $f(x) = x^{3}$ z definicji.
+  \answerto{$\frac{(x+h)^{3} - x^{3}}{h} = 3x^{2} + 3xh + h^{2}$, co
+  zatrzymuje się na $3x^{2}$.}
+\item Pokaż, że nachylenie cięciwy $x^{2}$ w $x$ wychodzi to samo dla $h$ i
+  dla $-h$, gdy maleją.
+  \answerto{Iloraz to $2x + h$ w obu przypadkach, więc oba zmierzają do $2x$.
+  Cięciwa rysowana z lewej i ta z prawej zatrzymują się na jednej liczbie, i
+  to czyni pochodną dobrze określoną.}
+\item Wyjaśnij, dlaczego błąd różnicy skończonej na $x^{2}$ wynosi dokładnie
+  $h$ w dokładnej arytmetyce.
+  \answerto{Iloraz to $2x + h$, a pochodna to $2x$, więc różnicą jest samo
+  $h$. To jest lewa gałąź litery U i dlatego pierwsze wiersze tabeli spadają
+  dziesięciokrotnie za każdym razem.}
+\item Czy użycie $\frac{f(x+h) - f(x-h)}{2h}$ przesunęłoby dno litery U?
+  Powiedz, co byś zmierzył, żeby się dowiedzieć.
+  \answerto{Tak: jej lewa gałąź spada szybciej, więc dno przesuwa się ku
+  większemu $h$ i mniejszemu błędowi. Zmierz to tak samo \dash{} przejedź $h$
+  przez wiele rzędów wielkości wobec znanej pochodnej i narysuj błąd.}
+\item Pochodna funkcji jest zerem w trzech różnych punktach. Co możesz o niej
+  powiedzieć, a czego nie?
+  \answerto{Że jest płaska w trzech miejscach. Które z nich są minimami, które
+  maksimami, a które ani jednym, ani drugim, wymaga więcej niż pierwszej
+  pochodnej, i tak samo to, czy któreś jest najniższe.}
+\item Podaj funkcję i dwa punkty na niej, w których pochodna jest większa w
+  punkcie bliższym minimum. Powiedz, jak to zbudowałeś.
+  \answerto{Dowolna krzywa z wąską niecką i szeroką płytką \dash{}
+  $x^{4} - 4x^{2}$ to własna krzywa programu. Postaw jeden punkt na stromej
+  ścianie wąskiej niecki, a drugi na łagodnym zboczu daleko.}
+\item Aktualizacja to $x \leftarrow x - \eta f'(x)$. Co robiłoby
+  $x \leftarrow x + \eta f'(x)$ i kiedy ktoś mógłby tego chcieć?
+  \answerto{Szłoby w górę. Chce się tego, gdy wielkość ma być maksymalizowana,
+  a nie minimalizowana, i dlatego ta sama maszyneria bywa opisywana jako
+  wznoszenie, a bywa jako spadek.}
+\item Na $(x-3)^{2}+1$ przy $\eta = 1$ opisz marsz z $x = 10$.
+  \answerto{Czynnik wynosi $\lvert 1 - 2 \rvert = 1$, więc odległość nigdy się
+  nie zmienia: marsz odbija się między $10$ a $-4$ na zawsze. Ani nie zbiega,
+  ani nie ucieka, i to jest przypadek graniczny.}
+\item Dlaczego żaden wybór $\eta$ nie uratuje marszu na krzywej, której
+  pochodna jest zerem w punkcie startu, który nie jest minimum?
+  \answerto{Bo krok to $\eta$ razy zero, jakiekolwiek $\eta$ by nie było, więc
+  marsz się nie rusza. Mechanizm nie ma jak opuścić punktu stacjonarnego, i
+  jest to prawdziwe ograniczenie, a nie kwestia strojenia.}
+\item Ten program ani razu nie policzył $f$ w trakcie marszu. Powiedz, co to
+  kupuje i co kosztuje.
+  \answerto{Kupuje stosowalność: metoda działa tam, gdzie $f$ jest stratą po
+  miliardach parametrów i nikt nie mógłby jej przeszukać. Kosztuje każdy
+  rodzaj wiedzy globalnej \dash{} brak poczucia odległości, brak sposobu na
+  odróżnienie minimum od maksimum i krok, który musi wziąć się skądinąd.}
+\end{furtherproblems}

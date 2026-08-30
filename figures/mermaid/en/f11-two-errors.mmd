@@ -1,0 +1,6 @@
+flowchart LR
+  S["shrinking the step<br/>fights two errors at once"]
+  S --> A["too big a step: the chord<br/>is not yet the tangent"]
+  S --> B["too small a step: the two<br/>values are too close to subtract"]
+  A --> C["so the error falls, bottoms<br/>out, and then climbs again"]
+  B --> C
