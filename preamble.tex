@@ -450,6 +450,70 @@
 \titlespacing*{\section}{0pt}{24pt plus 4pt minus 3pt}{9pt}
 \titlespacing*{\subsection}{0pt}{18pt plus 3pt minus 2pt}{7pt}
 
+% A SECTION HEADING MUST NOT BE THE LAST THING ON A PAGE, and without this it
+% very often was. Every numbered section in this book is followed immediately
+% by a frame, and \begin{fr} measures the room left and turns the page when a
+% frame will not fit. By then the heading has been set. It stays behind, and
+% the section it announces begins overleaf.
+%
+% This was pervasive and nothing saw it: 10, 14, 9 and 9 headings left behind
+% in the four builds when it was first measured, in every program from F1 to
+% F4. It produces no error, no warning and no overfull box, so it is a defect
+% of exactly the class tools/checkpdf.py exists for, and that tool now reads
+% the finished PDF for it.
+%
+% The fix is \begin{fr}'s own room test moved one element earlier: ask for the
+% frame's reservation PLUS the heading and its spacing BEFORE the heading is
+% set, so the two cannot be separated. \titlespacing gives the heading 24 pt
+% above and 9 pt below and it sets at \Large, so a heading that wraps to two
+% lines is about four and a half \baselineskip in all.
+%
+% SWEPT AGAINST tools/checkpdf.py OVER ALL FOUR BUILDS, and, exactly as the
+% \begin{fr} reservation does, IT IS NOT MONOTONIC -- a larger reservation
+% turns pages earlier and reshuffles every later break:
+%
+%   reserve   pages en / pl / en-A4 / pl-A4   headings left behind   tails
+%   9         284 / 290 / 262 / 264            3                     18
+%   10        284 / 290 / 262 / 264            1                     18
+%   11        284 / 290 / 260 / 264            0                     16
+%   12        284 / 290 / 260 / 264            0                     15   <- chosen
+%   13        284 / 290 / 260 / 264            0                     15
+%   14        284 / 290 / 260 / 264            0                     15
+%   15        284 / 290 / 260 / 264            0                     15
+%   16        284 / 290 / 260 / 264            0                     16
+%
+% Eleven is what the arithmetic above asks for and it clears the headings.
+% Twelve is chosen because it also reaches the floor of the orphan-tail count
+% (tools/checkpdf.py's fourth check) and costs no page anywhere, which is a
+% tie-break and not a reason. SIXTEEN IS THE ROW TO READ before raising this:
+% it strands no heading and it puts a tail back, in two builds, while taking
+% one out of a third. A larger number is not a safer one.
+%
+% The table is a measurement of THIS tree on THIS TeX installation. Re-sweep it
+% and replace it after any change that moves pages; a sweep table naming a
+% constant the code no longer uses reads as evidence and is worse than none.
+%
+% ONLY NUMBERED SECTIONS. \section* is the Quiz, Can you?, the diagram and
+% answer manifests and the front matter; none of those is followed by a frame,
+% and the Quiz carries a room test of its own, sized for its own contents.
+% Putting this in front of \section* as well would turn pages at the top of
+% every program for no gain.
+\newlength{\mfasectionroom}
+\makeatletter
+\newcommand{\mfa@sectionroom}{%
+  \par
+  \ifdim\pagegoal=\maxdimen\else
+    \ifdim\dimexpr\pagegoal-\pagetotal\relax<\mfasectionroom
+      \newpage
+    \fi
+  \fi
+}
+\let\mfa@plainsection\section
+\renewcommand{\section}{%
+  \@ifstar{\mfa@plainsection*}{\mfa@sectionroom\mfa@plainsection}%
+}
+\makeatother
+
 % head=23pt in the geometry options above, not \setlength{\headheight}:
 % fancyhdr computes the height it needs from the running-head font and the
 % rule, wants 22.5 pt at this size, and silently overprints the top of the text
@@ -768,6 +832,19 @@
 % belonging to the frame beneath it and 10 pt was enough. With the badge out of
 % the flow the rule is a bare hairline and the frame's first line crowds it.
 \setlength{\mfaframebelow}{12pt}
+
+% The room a numbered \section asks for before it will let itself be typeset:
+% the frame reservation above, plus the heading and its own spacing. It has to
+% be set here and not beside \mfa@sectionroom, because \mfaframeabove and
+% \mfaframebelow are declared above and \baselineskip is 0 pt in a preamble --
+% the two formats set 11pt and 12pt from this one source, so the constant is
+% expressed in \baselineskip and evaluated once the body font exists.
+\newcommand{\mfasectionreserve}{12}
+\AtBeginDocument{%
+  \setlength{\mfasectionroom}{%
+    \dimexpr\mfaframeabove+\mfaframebelow
+           +\mfasectionreserve\baselineskip\relax}%
+}
 
 % The \makeatletter pair is required: \mfa@noteframe is tokenised when the
 % environment body is read, and @ is not a letter at that point in the file.

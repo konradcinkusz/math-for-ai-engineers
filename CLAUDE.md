@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1, F2 and F3 written, both editions.** F4–F13 and P1–P34 are stubs carrying their briefs | 44 of 47 |
+| Programs | **F1–F4 written, both editions.** F5–F13 and P1–P34 are stubs carrying their briefs | 43 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 250 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-pl` (17x24) | 256 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-en-a4` | 229 | 0 | 0 | 5, worst 6.3 pt | 0 |
-| `main-pl-a4` | 229 | 0 | 0 | 4, worst 4.4 pt | 0 |
+| `main-en` (17x24) | 284 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-pl` (17x24) | 290 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en-a4` | 260 | 0 | 0 | 5, worst 6.3 pt | 0 |
+| `main-pl-a4` | 264 | 0 | 0 | 4, worst 4.4 pt | 0 |
 
 The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
 one format and one language because that is where the line falls. Well under
@@ -36,24 +36,31 @@ it either**: the four multisets above are element-for-element what the pre-F3
 table recorded, which is now three programs and 33 to 39 pages of new material
 without a new overfull box — and the second F3 review pass moved a figure, cut
 lines out of three frames in both editions and loaded a new package without
-changing one of the twenty numbers. Parity reports **0 failures and 0 warnings**
-across 56 file pairs; `reflist.py` confirms 87 labels resolve to the same
-numbers in both editions.
+changing one of the twenty numbers. **F4 did not move it either, but not for
+free**: its first build added an 11.2 pt box to `main-en-a4` alone, from a
+32-character `\code{}` in a test exercise, and the fix was to set the loop as a
+displayed three-line block instead of running it into the sentence. Parity
+reports **0 failures and 0 warnings** across 56 file pairs; `reflist.py`
+confirms 97 labels resolve to the same numbers in both editions.
 
 **The only page count that moved in the second F3 review pass was `main-pl-a4`,
 231 to 229**, and both of those pages were defects rather than content: a page
 carrying a running head, two italic words and nothing else. See *the orphaned
 cue* below.
 
-`main-pl` is eight pages longer than `main-en` in the trade format, up from two
-after F2, because Polish is longer than English for the same content and F3 is
-the longest program so far. **On A4 the two editions now come out level at 229**,
-which is coincidence and not convergence: A4 spends the extra width on margin,
-so the same text sets in fewer, longer-lived lines and the two editions' page
-counts drift independently of the trade format's. The editions have never been
-required to paginate alike — nothing that matters navigates by page — but the
-trade-format gap grows with every program, so it is written down rather than
-left to look like a defect.
+**All four counts moved again in the F4 review pass**, from 286/294/262/262:
+the editorial cuts account for most of it and the new section room test for
+the rest. Measured separately, the section guard alone took `main-pl` and
+`main-en-a4` down two and put two back on `main-pl-a4` — which is what a guard
+that turns pages does, and why its constant was swept rather than chosen.
+
+`main-pl` is six pages longer than `main-en` in the trade format, down from
+eight, and four pages longer on A4, where the two editions were briefly level
+at 262. That levelness was coincidence and not convergence: A4 spends the extra
+width on margin, so the same text sets in fewer, longer-lived lines and the two
+editions' page counts drift independently of the trade format's. The editions
+have never been required to paginate alike — nothing that matters navigates by
+page — but the gap is written down rather than left to look like a defect.
 
 **Four pages per format came from the Stroud layout pass**, from two causes.
 Two are the next-frame cue: 33 cues in a 45-frame program, measured with and
@@ -74,13 +81,23 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **44 of 47 programs are stubs**, in each language. This is the whole of the
+- **43 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 105 computed values, all referenced, all present, plus **one committed
-  console transcript**, which is inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 18 Mermaid sources, all rendering
+- 136 computed values, all referenced, all present, plus the committed console
+  transcripts, which are inside the same drift gate as of the F3 pass
+- 0 `verifybox` blocks · 24 Mermaid sources, all rendering
+- **0 stranded frame openers and 0 stranded section headings**, in all four
+  builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
+- **15 orphan-tail pages: 1 · 6 · 4 · 4** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`. Thirteen are in F1, F2 and F3 and two are F4's,
+  in the A4 English build alone. `checkpdf.py` prints every one of them on
+  every run and **does not fail the build for them**; the reasoning is in the
+  note above its `main()` and is summarised under *Program F4 review pass*.
+  This is the second ledger that is reported rather than gated, and like the
+  first it must not quietly go away. **When the count goes up, that is the
+  signal.**
 - **80/80 validation: NOT ESTABLISHED**, and printed as outstanding on every
   build. See *The evidence, honestly* below — this is the one ledger that is a
   claim rather than a count, and it must not quietly go away.
@@ -124,21 +141,26 @@ that writes the published PDF has neither newtx nor inconsolata, CI has both,
 and the same source gives an overfull multiset of `[4.1 x 4]` here against
 `[1.2 x 4]` there. Every line breaks somewhere else.
 
-`checkpdf.py`'s two checks do not survive that equally. The **stranded frame
-opener** does, because `\begin{fr}`'s reservation is measured in
-`\baselineskip` and holds under either metric — it stays a hard gate
-everywhere. The **orphaned cue** does not: it is one frame's tail landing a
-line past a page boundary, so its location is a property of the installation.
-Trimming the line CI names fixes CI and moves the defect here; trimming the
-line this container names does the reverse. That is an unwinnable loop, and it
-was entered once before it was recognised.
+`checkpdf.py`'s four checks do not survive that equally. The **stranded frame
+opener** and the **stranded section heading** do, because the reservations
+behind them are measured in `\baselineskip` and hold under either metric: each
+is a statement about a frame or a heading and the room in front of it, not
+about where a particular line falls. Both stay hard gates everywhere. The
+**orphaned cue** and the **orphan tail** do not: each is one frame's tail
+landing a line past a page boundary, so its location is a property of the
+installation. Trimming the line CI names fixes CI and moves the defect here;
+trimming the line this container names does the reverse. That is an unwinnable
+loop, and it was entered once before it was recognised.
 
 So the cue check is **hard where a person can act on it** (`make check`, on the
-author's own build) and **reported, not fatal, in CI** (`--cues=warn`). The
-count is printed either way and the defect is not dismissed. The real fix is
-structural — the cue should be incapable of standing alone — and it is open;
-three attempts are recorded in `preamble.tex` with their measurements, and all
-three made it worse or did nothing.
+author's own build) and **reported, not fatal, in CI** (`--cues=warn`), and the
+orphan tail is **reported and never fatal** while its pre-existing ledger
+stands. The count is printed either way and neither defect is dismissed. The
+real fix for both is structural — the tail of a frame should be incapable of
+standing alone — and it is open; three attempts are recorded in `preamble.tex`
+with their measurements, and a fourth, `\widowpenalty` and `\clubpenalty` at
+10000, was measured in the F4 review pass: **30 orphan tails against 26 and six
+pages added**, and it was reverted.
 
 **And a claim about a LIBRARY can be true here and false on the build server.**
 F03's note box said `np.logspace(-5, -2, 4)[0]` is one unit in the last place
@@ -328,7 +350,9 @@ gates on it.
 | `check_structure.py --frames` | A cue that is not the **last thing** in its frame. C16 counts cues and cannot see position, so a cue misplaced identically in both editions is invisible to C4, C14 and C16 alike. It is a *line* test on purpose: a cue hoisted above a frame's closing prose tokenises to nothing after it and reads as correctly placed |
 | `reflist.py` | `\label{prog:F08}` resolving to F8 in one edition and F9 in the other. Both builds stay internally consistent and neither warns |
 | **`checkpdf.py`** (openers) | A frame's rule and margin badge stranded at the foot of a page with the frame's body overleaf. It reads the finished PDF, because that defect produces no error, no warning and no overfull box — no log can see it, and the badge it strands is the book's navigation device |
+| **`checkpdf.py`** (headings) | The same one element earlier: a numbered section heading as the last thing on a page, with its section beginning overleaf, because `\begin{fr}` turned the page after the heading had been set. It was pervasive — 42 instances across the four builds when the check was written, in every program from F1 to F4 — and every other gate was green. The heading's size is learnt from the document rather than assumed: `\Large` bold measures *smaller* than the body here, because `pdftotext` reports the font's own box |
 | **`checkpdf.py`** (cues) | The mirror image at the other end of the frame: a page whose only text-block content is the next-frame cue, so the reader turns over expecting an answer and gets a running head, two italic words and white paper. A row of dots counts as nothing, because dots-plus-cue is the same defect one breakpoint earlier. The cue is read out of `\lblNextFrame` in `lang/*.tex` rather than hard-coded, so rewording the cue cannot silently switch the check off |
+| **`checkpdf.py`** (tails) | The cue's defect one line less extreme, which the cue test cannot see because the page is not *the cue and nothing else*: a body page whose ink stops in its top quarter. Reported, never fatal — see the ledger at the top of this file and the note above the tool's `main()` |
 
 `tools/gen_stubs.py` regenerates every stub and `structure.tex` from
 `tools/programs.json`, which is the single source of the part and program
@@ -1398,7 +1422,12 @@ same defect one breakpoint earlier.
    cue column by reshuffling breaks, not by fixing anything: **this guard
    reserves room for a frame OPENER and has nothing to say about a frame's
    tail.** Ten orphans two cues that nine does not.
-4. **What worked: shorten the frames whose tails sat on the page boundary, and
+4. **`\widowpenalty` and `\clubpenalty` at 10000**, added and measured in the
+   F4 review pass because the defect looks like a widow and is not quite one.
+   **Worse: 30 orphan tails against 26, and six pages added** across the four
+   builds. Reverted. TeX is being asked to refuse a break it has no better
+   alternative to, and it pays for the refusal somewhere else on the page.
+5. **What worked: shorten the frames whose tails sat on the page boundary, and
    move one figure.** F01's `f01-magnitudes` -- the one figure in the book on the
    wrong side of the aspect-ratio crossover, height-bound at `0.42\textheight`
    and therefore unable to share a page with the frames around it -- moved from
@@ -1432,6 +1461,338 @@ program re-rolls every one of them.
   of three* sentence, *a ratio in the thousands*, `f03-log-axis.mmd`'s A1 node,
   and frame 25's pointer at *the trap at the end of §F3.3, frames 20 and 21*.
   Each was re-read against the source it describes.
+
+### Program F4 pass, August 2026
+
+**Forty-two teaching frames, forty-four printed, both editions**, against a
+plan that projected forty-two and a manifest estimate of forty. The plan was
+right about the mathematics and about the section list; what it got wrong was
+three placements, and all three were forced by the same tool.
+
+**`check_structure.py`'s `RE_DEMANDS` is a design constraint, not a lint.** It
+treats `\blank`, `\dotline`, `\yourturn` and `\nextframe` alike: *any* frame
+containing one of them must be followed by a frame that opens with an answer.
+The plan put a `\blank` in three frames that then closed a teaching beat, which
+is unbuildable. Each was restructured to end by asking, and the section
+boundaries did not move. **Read that regex before planning where the gaps go**;
+it is cheaper than rewriting three frames.
+
+**The debt F3 left is paid, and it is narrower than both the brief and the
+first draft of this note said.** F03 prints `ln p(sequence) = sum_i ln p(token
+i | ...)` and then divides by the token count, having never defined that
+sigma. **The subscript is not part of the debt.** F02 introduces it in as many
+words — *a subscript is nearly always an index: x_i is the i-th input* — uses
+it twice more, and hands the sigma itself forward by name. What stood here
+instead was that *no subscripted variable is introduced anywhere in F01, F02
+or F03*: a statement of non-occurrence, which is the class the rule above
+forbids outright because nothing can check it, and it was false in the one
+file it would have taken one grep to open. It had reached both F04 file
+headers as well. §F4.4 opens by naming F03's sentence, writes
+it as `L = -(1/n) sum ln p_i`, and quotes `\val{f03.seq.tokens}` and
+`\val{f02.loss.nats}` rather than new keys, so the three programs are provably
+quoting one computation. F03 does the same thing back at F01 and F02; naming
+the instances is the point, and counting them is the thing this file keeps
+telling itself not to do.
+
+**Two firsts, both deliberate.** F4 is the first program to use
+`\begin{python}` — four three-line loops, because "a sigma is a loop" is the
+whole argument and a picture of the loop is not the same as the loop. It
+renders correctly inside `fr`, and the listing extracted from the finished PDF
+runs. And §F4.6 carries the book's **first `rigourbox`**, for the convergence
+of the geometric series: the limit is stated, attributed to a first analysis
+course and not proved. Both were open questions in the plan and both are now
+settled by having been done.
+
+**One manifest amendment, on the F03 precedent.** Frame 28's aibox wanted to
+say that a cross-entropy averaged per micro-batch and then averaged again is
+not the mean over the accumulated batch — item 25 of the trap catalogue, and a
+real production defect. **No brief undertook it**: P20's covers AdamW and
+schedules, P21's covers minibatch noise and clipping, and neither mentioned the
+denominator. A clause was added to **P21**'s brief in `tools/programs.json` and
+the stubs regenerated, so the forward pointer now names a program that has
+promised to deliver it.
+
+**And some of the trap catalogue's program numbers are one low.**
+`notes/02-grounding-and-traps.md` §3 was written before P7 was inserted, so its
+optimisation section heads "(P18–P21)" where the manifest says P19–P22 and its
+probability section "(P22–P27)" where the manifest says P23–P28. It now carries
+a warning to that effect at the top of §3. **Never copy an owner out of that
+file**; re-derive it from `tools/programs.json`. Five entries were added there
+for F4's traps, and item 41's own tally — "the third instance in three
+programs" — was replaced by the rule, because F4 made it four.
+
+**Two things the script found that the frames may not say**, both recorded in
+`code/f04_sums.py` at their computation:
+
+- **Bias correction is exact in the algebra and not to the bit.** On a constant
+  sequence the corrected EMA is 1 in exact arithmetic; measured, the worst
+  `|mhat - 1|` over t = 1..5 at both betas is 1.4e-14, and at beta = 0.999,
+  t = 2 it prints `1.0000000000000142`. The script asserts a tolerance and
+  prints the worst error on every run; frame 40 says *exactly right in the
+  algebra* and then says what binary64 does. This is F03's `np.logspace` defect
+  caught before it shipped.
+- **`np.array([]).mean()` emits two RuntimeWarnings, not one** — `Mean of empty
+  slice` and `invalid value encountered in scalar divide`. A frame quoting "the
+  RuntimeWarning" would already have been wrong. The warning frame states only
+  the invariant (one library stops, the other returns `nan` and carries on) and
+  says in as many words that the wording is a property of the installed
+  version.
+
+**A `\blank` inside an `ansblock` is not established practice, and the one draft
+instance was a defect.** Frame 26 opened with `\frac{\blank}{\blank} =
+\frac{91}{110} = 0.8273`, so the gap was answered on its own line. The gap
+belongs in a frame that then gets answered, never in the block that answers it.
+Removed. **Two more were removed in the review pass for the wider version of
+the same rule** — a gap whose answer is printed in the same frame, above it —
+so do not carry a tally of them here; grep for `\blank` and read each one
+against its own frame.
+
+**Two page-level defects, both found only on the finished page.**
+
+- **An 11.2 pt overfull hbox in `main-en-a4` alone**, from
+  `\code{for c, p in zip(counts, prices): total = total + c * p}` run into a
+  test-exercise sentence. `\code{}` does not hyphenate and TeX preferred the
+  overfull line to a very loose one. Set as a displayed three-line block, and
+  the multiset came back to the pre-F4 baseline in all four builds.
+- **An orphaned cue on `main-en` p139**, and it took two trims of frame 26 to
+  clear it: the first merged a paragraph and moved the cue but did not pull it
+  back, the second tightened the throughput sentences. As CLAUDE.md already
+  says, trimming is a random walk across four paginations — but F4 is the last
+  program *written*, so a trim inside it cannot move F01 to F03, which made it
+  a cheap walk. It is not the last program in the book, and a note that says
+  so will stop being true the day F05 is drafted.
+
+**The three diagrams, measured on the page** against the width formula, in the
+trade format:
+
+| | W (en / pl) | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|
+| F4.1 sigma-as-loop | 507 / 524 | 8.68 | 8.40 | 9.88 | 9.56 |
+| F4.2 two-averages | 558 / 579 | 7.89 | 7.60 | 8.98 | 8.65 |
+| F4.3 ema-weights | 510 / 565 | 8.63 | 7.79 | 9.82 | 8.87 |
+
+Predicted and measured agree to a hundredth in all twelve cells. The first cut
+of F4.2 was 447 pt wide and set its node text at **9.87 pt in the trade format
+and 11.21 on A4**, which would have been the largest in the book by a margin —
+so the fix was to make the nodes *wordier*, which is the opposite of the
+instinct. Width is the only quantity that matters above the aspect-ratio
+crossover.
+
+**Rule 2 was checked by reading the figures first and then finding them in all
+four builds**, as the F03 second review pass prescribes. F4.1 shares a page
+with frame 12's question in `main-pl-a4`, F4.2 with frame 29's in both A4
+builds, and F4.3 with frame 39's in three of the four. F4.1 carries no product and F4.2 carries no sequence.
+
+> **F4.3 was wrong and the reasoning above it was wrong**, and the review pass
+> caught it. The node read *newest value 0.10*, which is frame 39's answer at
+> beta = 0.9 by a different route, and it was left on the argument that frame
+> 38 prints that weight in its own answer box **directly above the figure**.
+> That is true in three builds and **false in `main-pl`**, where frame 38's
+> answer is on the previous page and the figure is the only place on the page
+> the number appears. A justification that depends on where a page happens to
+> break is not a justification — the same rule this file already states for
+> *before you turn over*. The ladder now starts at 0.09 and node B keeps the
+> newest weight derivable. Re-checked on the page in all four builds.
+
+### Program F4 review pass, August 2026
+
+Three verifiers read the program and the rendered pages. Between them they
+found six false claims, seven places where an answer was printed before its
+question, one layout defect that turned out to be pervasive across the whole
+book, and four smaller things. As in the F3 pass, **every one of them was
+invisible to every gate in the repository**, and the most expensive class was
+again the book being wrong about the book.
+
+#### The book was wrong about the book, and it had reached this file
+
+Both F04 file headers and this document asserted that F03's sigma used notation
+the reader had not been given, because **no subscripted variable is introduced
+anywhere in F01, F02 or F03**. F02 introduces it in as many words at its
+notation box, uses it again for the constant-factor rule and again for the
+softmax. The claim was a **statement of non-occurrence**, which is exactly the
+class this file's *Non-negotiable conventions* forbid — nothing can check it,
+and a tally decays silently — and it had propagated into the binding document
+the next author reads first. Deleted from all three places.
+
+The debt F03 leaves is real and narrower: it wrote the sum **with a sigma it
+never defined**, and F02 hands that sigma forward by name (*Program F4 reads a
+sum as a loop*). Frame 17 said F03 *ended a section with a sentence it did not
+have the notation to write*; F03 line 846 writes it, with a `\sum`. It now says
+what is true. Frame 1 no longer presents the subscript as new either — it names
+F02 as where the reader met it.
+
+**The generalisable rule, and it is the third pass running that has paid for
+it: before writing a sentence about another program, open that program.** A
+statement about what a file does not contain is one grep away from being
+checked and one draft away from being folklore.
+
+#### The other five false claims
+
+- **A bolded claim about how a real optimiser is implemented.** The frame said
+  momentum *is this recurrence* — the `(1 - beta)` form. Common implementations
+  drop the `(1 - beta)` and fold it into the learning rate. Verified against a
+  real optimiser's own documentation rather than from memory: `optax` ships
+  **both** transforms and its docstrings for `trace` and `ema` say so in one
+  sentence — *`trace = decay * trace + t`, while `ema = decay * ema +
+  (1-decay) * t`. Both are frequently found in the optimization literature* —
+  and `optax.sgd`'s momentum is the first of the two. **No library is named on
+  the page**, deliberately and for the reason this program already gives about
+  numpy's warning text: a library's internals are a fact about a version. What
+  the page carries is the mathematics, which is checkable by the reader — the
+  two forms differ by exactly `1/(1-beta)`, so they give the same direction and
+  a different length, and a constant factor on a step is indistinguishable from
+  a change of step size. The consequence a reader can act on (a step size does
+  not travel between the two forms) is handed to **P20**, and a clause was
+  added to P20's brief in `tools/programs.json` so the forward pointer names a
+  program that has promised to deliver it. The matching further-problem answer
+  was fixed too.
+- **A forward pointer to a worked example nobody had promised.** *Program P3
+  prices this in FLOPs rather than in pairs* pointed at the causal mask; P03's
+  brief never mentions attention, and the transformer count was deliberately
+  moved out of P03 to P32 by the curriculum review. Softened to *prices work in
+  FLOPs rather than counting pairs*, which is what P03 does undertake. Adding
+  the clause to P03's brief was the other option and was rejected: it would
+  have re-inflated a brief that a review had just trimmed for exactly this
+  reason.
+- **A ratio that did not reproduce from the two numbers printed beside it.**
+  The frame prints `(0.9)^50 = 0.005154` and `(1.1)^50 = 117.39` and then said
+  the two were about **22 778** apart. Divide what is on the page and you get
+  22 776. The exact ratio is 22 777.6, so five figures was a precision the page
+  could not support — the same shape as F03's mantissa taken from an unrounded
+  logarithm. `f04.decay.ratio` is now emitted at **three significant figures**,
+  22 800, and `code/f04_sums.py` asserts that dividing the two rounded products
+  gives the same figure, so the page cannot stop reproducing quietly.
+- **An arithmetic nit that had been read twice and never worked.** *With
+  `c = 5` the second gives `5 + 10 = 15` whichever way round you do it* — the
+  right-hand route is `5 x 3`. Both routes are now written out.
+- **`\lblCanYouFooter`, which prints at the end of every program in the book,**
+  told the reader to take the Quiz a second time and called the difference *the
+  only honest measure of what this program did for you*. This file records that
+  the Quiz cannot serve as entry and exit test, because the same items serve
+  both, and that the instrument is the scored Test exercises. The footer now
+  says so, in both languages. It was out of F4's scope and it was printing 47
+  times.
+
+#### Seven spoilers: an answer printed before its question
+
+The pattern is one rule with seven instances, and two of them were in generated
+files, which is the part worth remembering: **a figure and a transcript are
+under the same rule as a frame, and neither is reviewed as prose.**
+
+1. **The transcript answered a question in the frame it sits in.** It ended
+   `>>> math.factorial(0)` / `1`, and the frame closes by asking *So what is
+   0!?* — four lines below the answer, on the same page, where no pagination
+   could separate them. The script's own comment already stated the rule and
+   kept `0.0/0.0` out for it. Removed; `ZERO_FACTORIAL` is still computed and
+   still asserted, and the further problem still asks for `0!` by two routes.
+2. **Figure F4.3 printed `0.10`** — see the correction under *Program F4 pass*
+   above.
+3. **Frame 8's `\blank` was answered by frame 8's own `\ans` box**, which opens
+   the frame with `n + 1`. The third row now prints `n + 1`; the middle row is
+   the only gap.
+4. **Frame 19's `\blank` was answered three lines above it**, by the answer
+   block at the top of the same frame. The cell is filled; the frame's numeric
+   question already carries the retrieval.
+5. **Two outcomes carried the conclusion their traps elicit**, printed on the
+   opener some twenty pages early: *and when it is not* gives away the
+   average-of-averages trap, and *correct the bias its initialisation
+   introduces* gives away section 7's. **F3's review pass fixed the same shape
+   twice and it came back.** An outcome promises a skill; it may not carry a
+   finding.
+6. **Quiz Q14 asked *and what is the one-line fix?***, which tells the reader
+   before frame 1 that the reading is wrong. The clause is gone, and so is the
+   fix from its back-matter answer: the Quiz is a triage instrument, not a
+   teaching one, and F03's review pass had already had to make this cut once.
+7. **Outcome 1--6 promised a skill no frame taught** — *read a sigma aloud*.
+   `\canyou` replays the outcomes, so the reader was being asked to rate
+   themselves on something the program never showed. Frame 1 now gives the
+   spoken form in one clause.
+
+#### The layout defect was pervasive, and nothing had ever looked for it
+
+`\begin{fr}` measures the room left and turns the page when a frame will not
+fit. A `\section` immediately before it has already been typeset by then, so
+**the heading stays behind and its whole section begins overleaf**. §F4.7 was
+alone on a page in three of the four builds — and when a check was written for
+it, it found **10, 14, 9 and 9** headings left behind, in every program from F1
+to F4. No error, no warning, no overfull box; forty-two instances of a defect
+in a book that had been through five review passes.
+
+- `\section` now carries the same room test `\begin{fr}` has, sized for the
+  heading and its spacing as well (`\mfa@sectionroom`, `\mfasectionreserve`).
+  Only numbered sections: `\section*` is the Quiz, *Can you?*, the manifests
+  and the front matter, none of which is followed by a frame.
+- The constant was **swept against the check over all four builds**, and the
+  table is in `preamble.tex` beside it. Nine leaves three headings stranded and
+  ten leaves one; eleven, twelve and thirteen leave none; **sixteen strands
+  none and puts an orphan tail back in two builds while taking one out of a
+  third**, which is the non-monotonicity this file already records for the
+  frame reservation. Twelve is the choice.
+- `tools/checkpdf.py` gained the check, and it was **verified to fire on F02's
+  own instances before the guard was written** — F2.7 in `main-pl` and
+  `main-pl-a4`, F2.8 in `main-en-a4` — which is the only way to know a new
+  check is looking at anything.
+
+Two mechanics worth keeping. The heading is **not** simply taller than the
+body: `\Large` bold measures 12.6 pt against the body's 14.2 pt in the trade
+format, because `pdftotext` reports the font's own box and the two fonts have
+different depths. So the tool **learns** the heading size from the document
+instead of assuming it, the way it already learns the cue string and the text
+block. And the text block had to be measured **per page parity**: the margins
+are mirrored, so one mode over the whole document describes the recto and is
+11 pt wrong about the verso.
+
+#### The orphan tail: a check that reports and does not gate
+
+`checkpdf` also gained the fill-fraction check the second half of the layout
+work asked for: a body page whose ink stops in its top quarter, which is the
+orphaned cue's defect one line less extreme and therefore invisible to the cue
+test. Part pages, chapter openers, blank versos and the last page of a chapter
+are excluded — on that last one there is nothing below to pull back, and the
+index's and the manifests' final pages are short by construction.
+
+The floor was swept and **the interesting result is that it is a plateau**:
+every page the check names carries between 7 and 10 per cent of a block, and
+the next page up the distribution is at 50. Anywhere between a tenth and a half
+names the same set. A quarter is the middle of the gap and is about ten lines.
+
+**It reports and it does not fail the build, and that is a deliberate
+divergence from what was asked.** Two of its own cues cleared editorially and
+one of F4's tail pages with them; of the fifteen that remain, thirteen are in
+F1, F2 and F3. Clearing those means cutting a sentence of reviewed prose out of
+three programs in two languages to move one line on one of four paginations,
+with every later break in that language reshuffled by each cut — and a line is
+about 180 characters on A4 against the fifty of genuine slack those frames
+turned out to hold. A gate that is red on something nobody can responsibly
+clear teaches the next person to stop reading the output, so the count is
+printed in full on every run and carried as a ledger at the top of this file
+instead. **That is the same treatment the 80/80 standard gets, for the same
+reason.** If a later pass finds the structural fix — the tail of a frame should
+be incapable of standing alone — it retires both this ledger and the cue's.
+
+#### Three smaller things
+
+- **An aibox that named no system.** Frame 34's was a generic depth mechanism
+  plus a forward pointer to F12. Demoted to prose, which is what the aibox rule
+  says to do and which also returned the lines the section guard needed.
+- **Polish.** *Zestaw* was doing three jobs and collided with *zbiór* two lines
+  apart, both reading as *evaluation set*; the harness is now *harness*,
+  inflected Polish, on this file's own rule about English ML terms. And
+  *przeżywa więcej starej wartości* is a calque — transitive *przeżywać* is *to
+  live through* — now *zostaje więcej starej wartości*.
+- **This file said F4 was the last program in the book.** It is the last one
+  *written*. The reasoning that rested on it (a trim inside F4 cannot move F01)
+  holds; the sentence stops being true the day F05 is drafted.
+
+#### One thing found and deliberately not fixed
+
+**A blank verso carries a running head.** `main-en-a4` p102 has *88 · Program
+F3* at the top and nothing else on it: the page `\cleardoublepage` inserts is
+blank in the body only. It is a real typographic defect and it is one line of
+preamble to fix, and it was left alone because it is nothing to do with F4 and
+because it moves no page. `checkpdf`'s chapter-final test had to be written
+around it — a page with nothing but a head is what has to be skipped, not a
+page with nothing at all — so the next person will meet it there.
 
 ### Stroud layout pass, August 2026
 
@@ -1682,10 +2043,12 @@ clone instead.
 
 ## What is left
 
-1. **Forty-four programs.** This is the work. F4–F13 first, because the
+1. **Forty-three programs.** This is the work. F5–F13 first, because the
    Foundation part is what makes the book's claim — *it assumes nothing* — true
-   or false. F3 (logarithms) is written, so **F12 (the chain rule) is now the
-   one outstanding program the rest of the book leans on hardest**.
+   or false. F3 and F4 are written, so **F12 (the chain rule) is still the one
+   outstanding program the rest of the book leans on hardest** — and F4 has now
+   handed it the sigma and the product it will need to state a chain of layers
+   as one.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
    softmax entropy with and without the `1/√d_k` scaling — is the one to run
    first: it costs nothing and it converts the book's central derivation from an
