@@ -22,7 +22,13 @@ rather than on the gradient; and the two ways to get a gradient through a
 sampling step \dash{} the score-function estimator (REINFORCE, unbiased and
 high variance) and the reparameterisation trick (low variance, requires a
 differentiable path) \dash{} which is the fork that separates policy-
-gradient RLHF from a VAE.
+gradient RLHF from a VAE. Also the accumulation denominator: a cross-entropy
+averaged per micro-batch and then averaged across micro-batches is not the
+mean over the accumulated batch when the micro-batches hold different
+numbers of real tokens, so gradient accumulation silently optimises a
+different objective from the large batch it is standing in for \dash{} the
+training instance of the average-of-averages error Program~F4 elicits, and
+item 25 of the trap catalogue.
 
 \medskip
 \textbf{Planned length:} 50 frames.

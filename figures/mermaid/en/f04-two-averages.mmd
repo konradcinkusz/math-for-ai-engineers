@@ -1,0 +1,6 @@
+flowchart LR
+  A["two evaluation shards<br/><br/>90 correct of 100<br/>1 correct of 10"]
+  A --> B["MACRO: average the two<br/>group numbers and divide<br/>by 2, the number of groups"]
+  A --> C["MICRO: pool the items and<br/>divide by 110, the number<br/>of items"]
+  B --> D["the same data,<br/>two questions,<br/>two different answers"]
+  C --> D

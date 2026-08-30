@@ -364,11 +364,20 @@ That paragraph is the difference between a defensible TOC and a nostalgic one.
 
 ---
 
-## 3. The misconception list — 41 traps AI engineers actually fall into
+## 3. The misconception list — 46 traps AI engineers actually fall into
 
 Format: the **wrong belief in the reader's own voice** (this is the wording that
 goes in the trap frame, because a trap only works if the reader recognises
 themself), the correction, the owning program, and how well documented it is.
+
+> **Some program numbers in this section are one low.** This list
+> was written *before* P7 (tensors, shapes and index notation) was inserted by
+> the curriculum review, and everything after it moved up one. The section
+> headings say "(P18–P21)" for optimisation where the manifest now says
+> P19–P22, and "(P22–P27)" for probability where it says P23–P28. **Do not copy
+> an owner out of this file.** Re-derive it from `tools/programs.json`, which is
+> the single source of the sequence. Found while writing F4, which needed the
+> owner of item 25.
 
 Frames built from these are `trapbox` in `preamble.tex`. Stroud's own model is
 the harmonic series: ask whether it converges, let the reader say yes because the
@@ -661,9 +670,10 @@ T > 1 flattens, and T does not change the argmax of a single softmax at all — 
 sum. `ln a + ln b` is the logarithm of the *product*, so the wrong rule does not
 produce a near miss — it answers a different question: at a = 2, b = 3 it
 returns ln 6 = 1.7918 where ln 5 = 1.6094 was asked for. The reasoning is a true
-rule generalised past its hypothesis, and it is the **third instance in three
-programs** of exactly that reasoning: F01's √(a+b) ≠ √a + √b, F02's
-(a+b)² ≠ a² + b², and this. Where the reader genuinely needs ln(e^u + e^v),
+rule generalised past its hypothesis, and **the same reasoning keeps arriving
+under a new sign**: F01's √(a+b) ≠ √a + √b, F02's (a+b)² ≠ a² + b², this, and
+F4's Σaᵢbᵢ ≠ (Σaᵢ)(Σbᵢ) at item 42 below. Name the places, never a count — the
+count was stated here as "three in three programs" and F4 made it four. Where the reader genuinely needs ln(e^u + e^v),
 the move is to factor the larger exponential out — v + ln(1 + e^(u−v)) — which
 is why the library ships `logaddexp` and `logsumexp` rather than an identity.
 → **F03**, and it hands the stability half to **P02**.
@@ -675,7 +685,66 @@ practice; this entry is a claim about what a reader will write when asked
 quickly, and it has not been counted. Falsifier 4 in §2.3 applies to it more
 than to the others.
 
-**Selection note.** Forty-one candidates for what the brief asked to be at least
+### Foundation (F01–F13)
+
+The five below came out of writing F4, as item 41 came out of writing F3. They
+carry the same health warning: the list above is a catalogue of misconceptions
+*observed in practice*, and these are claims about what a reader will write when
+asked quickly. **None of them has been counted.** Falsifier 4 in §2.3 applies to
+them more than to the sourced entries.
+
+**42. "A sigma distributes, so the sum of the products is the product of the
+sums."** Σaᵢbᵢ is not (Σaᵢ)(Σbᵢ): at a = (1,2), b = (3,4) the first is 11 and the
+second is 21. The two rules that *are* true — Σ(aᵢ+bᵢ) splits, and a constant
+comes out of the front — are both about a **sum** inside the sigma, and the
+reader carried them across a product. It is item 41's reasoning wearing the
+fourth of its signs, and the AI payoff is direct: an attention score is Σqᵢkᵢ, so
+it cannot be recovered from two running totals. → **F04**, and **P05** for what
+the dot product means.
+
+**43. "Σ from i = 0 to n has n terms — it says n."** Both limits are included, so
+the count is stop − start + 1 and the answer is n + 1. It is the fence-post: a
+hundred-metre fence with a post every ten metres carries eleven posts. The third
+shape, Σ from 0 to n−1, is the one `range(n)` walks and the one that does have n
+terms, which is why the three get confused. → **F04**.
+
+**44. "An empty sum and an empty product are both zero"** — or, from the other
+side, "both are undefined." `sum([]) == 0` and `math.prod([]) == 1`, and neither
+is a convention picked for tidiness: each is the identity element of its
+operation, and no other value leaves the next term alone. *Nothing* has one name
+and the two operations have two identities. It pays twice: a⁰ = 1 is the empty
+product, which is a second and independent route to F01's division-law argument,
+and ln of the empty product is ln 1 = 0, which is the empty sum, so ln ∏ = Σ ln
+holds at zero terms with no special case. The live version is a fully masked
+batch: the empty **sum** is safe and the empty **mean** is not, so the guard
+belongs on the denominator. → **F04**, and **P01** for what the division then
+does.
+
+**45. "To combine two batch losses, average them."** A mean of ratios is not the
+ratio of the sums. 1000 tokens at mean loss 2.0 and 10 tokens at mean loss 8.0
+pool to 2.06, not 5.0 — the reader gave weight one half to two numbers that were
+already averages of very different amounts of evidence. Both quantities are
+real: the **micro** average pools the items, the **macro** average averages the
+group numbers, and they agree exactly when every denominator is equal. So the
+fault is never "you computed the wrong one", it is not knowing which one you are
+holding — they are reported in the same column, under the same word, to the same
+number of decimal places. Item 25 is the training instance of this and item 32
+is its non-linear cousin, and the two have different mechanisms and different
+fixes. → **F04**, with the evaluation half at **P27** and the accumulation half
+at **P21**.
+
+**46. "β = 0.9 means ninety per cent of the new value, so a bigger β reacts
+faster."** β weights the **old** value. With m ← βm + (1−β)g at β = 0.9, m = 1.0
+and g = 11.0, the next reading is 2.0 and not 10.0, and raising β makes the
+average *slower*, not quicker. The misreading is easy because β is the number
+written in the configuration file and the coefficient on g is written nowhere —
+it is 1 − β, computed. Two further corrections come with it: "β = 0.9 averages
+the last ten" names 1/(1−β), which is a scale rather than a count, and half the
+weight actually sits in the last seven; and the coefficient is written both ways
+round in real code, so the same word names two opposite numbers. → **F04**, and
+**P20** for momentum and Adam.
+
+**Selection note.** Forty-six candidates for what the brief asked to be at least
 twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is
 documented outside this book, each has a cheap in-frame demonstration, and each
 has cost somebody real money. Falsifier 4 in §2.3 is the honest way to rank the

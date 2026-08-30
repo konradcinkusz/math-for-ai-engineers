@@ -1,21 +1,1431 @@
 %% F04 --- Sumy, iloczyny i ciągi
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f04_sums.py i jest wciągana przez \val{}. Rachunki, których
+%% program UCZY -- 2 + 5 + 1 + 7, 4! = 24, 8 x 9 / 2 -- są wpisane wprost, bo
+%% czytelnik ma je wykonać.
+%%
+%% DŁUG, KTÓRY TEN PROGRAM SPŁACA. Program F03 zapisał logarytm
+%% prawdopodobieństwa sekwencji jako sigmę po tokenach, a potem podzielił
+%% przez liczbę tokenów -- i tej sigmy nigdy nie zdefiniował; F02 przekazuje
+%% ją dalej z nazwy -- "Program F4 czyta sumę jako pętlę" -- i to F02
+%% wprowadza indeks dolny. Sekcja 4 zaczyna się od nazwania tego długu i
+%% cytuje wartości F03, a nie nowe, żeby trzy programy dowodliwie cytowały
+%% jedno obliczenie.
+%%
+%% DWIE PARY KLUCZY, KTÓRE WYGLĄDAJĄ JAK JEDNA LICZBA WYDRUKOWANA DWA RAZY, A
+%% NIĄ NIE SĄ. f04.geom.ten i f04.ema.w10 różnią się dokładnie o (1 - beta);
+%% f04.geom.inf to ta sama dziesiątka, co efektywne okno wykładniczej średniej
+%% ruchomej. Obie pary to puenta programu przychodząca dwa razy i ramki mówią
+%% to wprost. Patrz docstring modułu code/f04_sums.py.
+%%
+%% Bliźniak: programs/en/F04-sums-products-sequences.tex. Ramka w ramkę, makro
+%% w makro, liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Sumy, iloczyny i ciągi}
 \label{prog:F04}
+\index{zapis sigma!jako pętla}
+\index{iloczyn!zapis pi}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{przeczytać sigmę na głos, rozpisać krótką sumę w całości i
+  zamienić pętlę z akumulatorem na sigmę, a sigmę z powrotem na pętlę}
+\outcome{7--11}{powiedzieć z samych granic, ile wyrazów ma suma, przeindeksować
+  ją tak, żeby zaczynała się tam, gdzie potrzebujesz, i policzyć pary
+  zapytanie--klucz, które liczy maska przyczynowa}
+\outcome{12--16}{zapisać wielokrotne mnożenie w zapisie pi oraz powiedzieć, ile
+  wynoszą pusta suma i pusty iloczyn i dlaczego odpowiedź jest wymuszona, a nie
+  wybrana}
+\outcome{17--22}{zapisać błąd średniokwadratowy i entropię krzyżową w tym samym
+  kształcie oraz wskazać sigmę i dzielnik w dowolnej pokazanej stracie}
+\outcome{23--28}{policzyć średnią po elementach ze średnich grupowych i
+  liczebności grup oraz powiedzieć, którą z dwóch średnich jest podana
+  liczba}
+\outcome{29--34}{zapisać ciąg rekurencyjnie i wzorem ogólnym, zsumować szereg
+  geometryczny i zamienić długi iloczyn na sumę za pomocą logarytmu}
+\outcome{35--42}{zapisać wykładniczą średnią ruchomą jako dwuwierszową
+  rekurencję i jako sumę ważoną, powiedzieć, czym steruje jej współczynnik, i
+  policzyć, co pokaże po $t$ krokach od zadanej wartości początkowej}
+\end{outcomes}
 
-Argument: sigma and pi notation are loops. Payoff: every loss in machine
-learning is a sigma divided by \code{n}; an exponential moving average is a
-two-line recurrence, and it is the whole of momentum and half of Adam, met
-here with no calculus attached.
+\begin{quiz}
+\item Rozpisz $\sum_{i=1}^{4} 2i$ w całości i oblicz. \teachesat{1--2}
+  \answerto{$2 + 4 + 6 + 8 = 20$. Treść jest wyrażeniem zależnym od $i$,
+  liczonym raz dla każdej wartości, którą przyjmuje indeks.}
+\item Ile wyrazów ma $\sum_{i=0}^{n} x_i$? \teachesat{7--8}
+  \answerto{$n + 1$. Obie granice są włączone, więc liczba wyrazów to
+  $\text{koniec} - \text{początek} + 1$.}
+\item Przepisz $\sum_{i=1}^{n} x_i$ tak, żeby indeks zaczynał się od $0$.
+  \teachesat{9--10}
+  \answerto{$\sum_{j=0}^{n-1} x_{j+1}$. Granice w dół o jeden, indeks dolny w
+  górę o jeden, żeby nazwane były te same wyrazy.}
+\item Czy $\sum_{i=1}^{n} a_i b_i$ równa się
+  $\left(\sum_{i=1}^{n} a_i\right)\left(\sum_{i=1}^{n} b_i\right)$?
+  \teachesat{5--6}
+  \answerto{Nie. Dla $a = (1, 2)$ i $b = (3, 4)$ lewa strona wynosi $11$, a
+  prawa $21$.}
+\item Co zwracają \code{sum([])} i \code{math.prod([])}? \teachesat{13--14}
+  \answerto{$0$ i $1$. Każda z tych wartości zostawia następny wyraz bez
+  zmiany, czyli jest elementem neutralnym swojego działania.}
+\item Zapisz błąd średniokwadratowy po $n$ przykładach w zapisie sigma.
+  \teachesat{17--18}
+  \answerto{$\frac{1}{n}\sum_{i=1}^{n} (\hat{y}_i - y_i)^{2}$.}
+\item Batch $1000$ tokenów ma średnią stratę $\num{2.0}$, a batch $10$ tokenów
+  ma średnią stratę $\num{8.0}$. Ile wynosi średnia strata na $1010$ tokenach?
+  \teachesat{23--24}
+  \answerto{$\val{f04.batch.pooled}$. Nie wolno uśrednić dwóch średnich
+  grupowych: jedna z nich reprezentuje sto razy więcej tokenów niż druga.}
+\item Dwa fragmenty zbioru oceny dają $\num{0.90}$ i $\num{0.10}$. Przy jakim
+  warunku średnia z tych dwóch liczb jest trafnością na wszystkich elementach
+  razem? \teachesat{27--28}
+  \answerto{Gdy oba fragmenty mają tyle samo elementów. Wtedy, i tylko wtedy,
+  równe wagi są wagami właściwymi.}
+\item Ile par zapytanie--klucz liczy maska przyczynowa na $n$ pozycjach?
+  \teachesat{10--11}
+  \answerto{$\frac{n(n+1)}{2}$, czyli trochę ponad połowę $n^{2}$.}
+\item Oblicz $\sum_{k=0}^{9} (\num{0.9})^{k}$ i powiedz, do czego dąży ta suma,
+  gdy wyrazów przybywa. \teachesat{31--32}
+  \answerto{$\val{f04.geom.ten}$, a dąży do $\val{f04.geom.inf}$.}
+\item Zapisz $\ln$ iloczynu $n$ czynników jako sumę. \teachesat{33--34}
+  \answerto{$\ln \prod_{i=1}^{n} x_i = \sum_{i=1}^{n} \ln x_i$, dla dodatnich
+  czynników.}
+\item Średnia bieżąca jest prowadzona jako
+  $m \leftarrow \num{0.9}\,m + \num{0.1}\,g$. Teraz pokazuje $\num{1.0}$, a
+  nowe $g$ wynosi $\num{11.0}$. Co pokaże po jednym kroku? \teachesat{35--36}
+  \answerto{$\num{2.0}$. Współczynnik $\num{0.9}$ waży wartość \emph{starą},
+  więc dziewięć dziesiątych historii zostaje, a jedna dziesiąta nowości
+  wchodzi.}
+\item Co szybciej zapomina zmianę: $\beta = \num{0.9}$ czy
+  $\beta = \num{0.999}$? \teachesat{36--37}
+  \answerto{$\beta = \num{0.9}$. Im większy współczynnik, tym więcej starej
+  wartości zostaje i tym wolniej średnia się rusza.}
+\item Wykładnicza średnia ruchoma startuje od $0$, a każda obserwacja wynosi
+  dokładnie $1$. Co pokaże po jednym kroku przy $\beta = \num{0.999}$?
+  \teachesat{39--40}
+  \answerto{$\num{0.001}$, czyli tysięczną część prawdy.}
+\end{quiz}
+
+% ============================================================
+\section{Suma zapisana krótko}
+\label{sec:F04-sigma}
+\index{zapis sigma!cztery części}
+\index{zapis sigma!suma ważona}
+
+\begin{fr}
+Oto pętla, którą pisałeś więcej razy, niż pamiętasz. Sumuje listę strat na
+poszczególnych przykładach:
+
+\begin{python}
+total = 0.0
+for x in losses:
+    total = total + x
+\end{python}
+
+A oto ta sama instrukcja zapisana tak, jak zapisuje ją artykuł:
+\[ \sum_{i=1}^{n} x_i \]
+
+To nie jest nowe działanie i nie ma się w nim czego bać. \textbf{Sigma to
+pętla zapisana krótko.} Wielka grecka sigma robi jednocześnie robotę słowa
+\emph{dla} i słowa \emph{dodaj}, a ma cztery części, które można wskazać
+palcem:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Część & Co mówi \\
+\midrule
+$i$ & nazwa indeksu, czyli tego, co liczy \\
+$i = 1$, pod znakiem & gdzie liczenie się zaczyna \\
+$n$, nad znakiem & gdzie się kończy \\
+$x_i$, po prawej & treść, liczona raz na każdą wartość $i$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Na głos czyta się to \emph{suma, dla $i$ od $1$ do $n$, $x$ indeks $i$}, a
+wzór, który umiesz wymówić, jest wzorem, który utrzymasz w głowie.
+
+Jedyne, co ma ten zapis, a czego nie ma pętla, to nazwa dla \emph{pozycji}
+każdego wyrazu. Indeks dolny dał ci Program~\ref{prog:F02} \dash{} $x_i$ to
+$i$-te wejście \dash{} a tutaj to dzięki niemu wzór może mówić o trzeciej
+stracie, a nie tylko o wszystkich naraz.
+
+Rozpisz $\sum_{i=1}^{4} x_i$ w całości dla $x = (2, 5, 1, 7)$ i podaj sumę.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$15$}
+Rozpisane, $\sum_{i=1}^{4} x_i = 2 + 5 + 1 + 7 = 15$. Cztery wartości indeksu,
+cztery wyrazy, po jednym dodawaniu na każdy i żadnej techniki do opanowania.
+
+Treść nie musi być odczytem z listy. Jest wyrażeniem zależnym od $i$ i jest
+liczona od nowa dla każdej wartości, którą indeks przyjmuje:
+\[ \sum_{i=1}^{3} i^{2} \]
+mówi: wstaw $i = 1$ do $i^{2}$, potem $i = 2$, potem $i = 3$, i dodaj trzy
+wyniki.
+
+Wpisz trzy wyrazy, a potem sumę:
+\[ \sum_{i=1}^{3} i^{2} = \blank + \blank + \blank = \blank \]
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$1 + 4 + 9 = 14$.
+\end{ansblock}
+
+Teraz uruchom tę maszynę w drugą stronę, bo tego kierunku potrzebujesz, gdy
+czytasz cudzy kod i chcesz jednym wierszem powiedzieć, co on liczy:
+
+\begin{python}
+total = 0.0
+for wi, xi in zip(w, x):
+    total = total + wi * xi
+\end{python}
+
+Zapisz tę pętlę jako sigmę.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \sum_{i=1}^{n} w_i x_i \]
+\end{ansblock}
+
+Ma nazwę \dash{} \emph{suma ważona} \dash{} i jest jedną jednostką warstwy
+liniowej, iloczynem skalarnym, na którym zbudowany jest
+Program~\ref{prog:P05}, oraz najczęstszym kształtem w tej książce.
+
+Przychodzą z nią dwie reguły i żadna nie jest nowym faktem. Sigma rozdziela
+się na sumie:
+\[ \sum_{i=1}^{n} (a_i + b_i) = \sum_{i=1}^{n} a_i + \sum_{i=1}^{n} b_i \]
+a stały czynnik wychodzi przed znak:
+\[ \sum_{i=1}^{n} c\,a_i = c \sum_{i=1}^{n} a_i \]
+
+Obie są tylko przestawioną pętlą. Pierwsza mówi, że wolno dodać każdą parę i
+potem zsumować albo zsumować obie listy i potem dodać; druga mówi, że wolno
+przeskalować każdy wyraz albo przeskalować wynik. Sprawdź je na $a = (1, 2)$ i
+$b = (3, 4)$: pierwsza daje $4 + 6 = 10$ po lewej i $3 + 7 = 10$ po prawej, a
+przy $c = 5$ druga daje $5 + 10 = 15$ po lewej i $5 \times 3 = 15$ po
+prawej.
+\end{fr}
+
+\begin{fr}
+Bez rachunków i bez sprawdzania. Zapisz pierwszą odpowiedź, jaka ci przyjdzie
+do głowy, tak szybko, jak potrafisz ją wydobyć.
+
+\textbf{Czy $\sum_{i=1}^{n} a_i b_i$ to ta sama liczba co
+$\left(\sum_{i=1}^{n} a_i\right)\left(\sum_{i=1}^{n} b_i\right)$?}
+
+Tak albo nie.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie}
+Nie są nawet blisko siebie i mówi to najmniejszy przykład. Weź $a = (1, 2)$ i
+$b = (3, 4)$, czyli parę, którą przed chwilą trzymałeś w ręku:
+\[ \sum_{i=1}^{2} a_i b_i = 1 \times 3 + 2 \times 4 = 3 + 8 = 11 \]
+\[ \left(\sum_{i=1}^{2} a_i\right)\left(\sum_{i=1}^{2} b_i\right)
+   = 3 \times 7 = 21 \]
+
+\begin{trapbox}
+\textbf{Nic się tu nie rozdzieliło i na tym polega całość.} Obie reguły z
+poprzedniej ramki dotyczą \emph{sumy} siedzącej wewnątrz sigmy: rozdziel ją
+albo wyciągnij z niej stałą. Żadna nie mówi nic o \emph{iloczynie} siedzącym
+wewnątrz sigmy i żadna reguła tego nie robi.
+
+Błędną odpowiedź wyprodukowała prawdziwa reguła uogólniona poza swoje
+założenie \dash{} czyli rozumowanie, które ta książka łapała już wcześniej pod
+innymi znakami. Program~\ref{prog:F01} ma
+$\sqrt{a+b} \ne \sqrt{a} + \sqrt{b}$; Program~\ref{prog:F02} ma
+$(a+b)^{2} \ne a^{2} + b^{2}$; a Program~\ref{prog:F03} nie ma żadnej reguły
+na $\ln(a + b)$. Każde z nich to działanie rozdzielne względem
+\emph{iloczynu}, od którego żąda się rozdzielności względem \emph{sumy}.
+
+Nie odkładaj więc tego do szuflady jako kolejnego wyjątku. Odłóż tam pytanie:
+jakie to działanie i do czego jest stosowane?
+\end{trapbox}
+
+\begin{aibox}
+Wynik uwagi to $\sum_i q_i k_i$: zapytanie przeciwko kluczowi, po jednym
+iloczynie na współrzędną, wszystkie dodane. Nie jest to
+$\left(\sum_i q_i\right)\left(\sum_i k_i\right)$, więc nie ma takiej wersji
+uwagi, w której trzyma się dwie sumy bieżące i mnoży je na końcu. Każda
+współrzędna musi spotkać swoją partnerkę i dlatego iloczyn skalarny kosztuje
+jedno mnożenie na wymiar, a Program~\ref{prog:P05} poświęca cały program temu,
+co ta jedna liczba znaczy.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Od czego zaczyna się indeks}
+\label{sec:F04-index}
+\index{zapis sigma!przeindeksowanie}
+\index{diagnostyka!błąd o jeden w sumie}
+
+\begin{fr}
+Litera nie niesie żadnego znaczenia. $\sum_{i=1}^{n} x_i$ i
+$\sum_{j=1}^{n} x_j$ to ta sama liczba, a przemianowanie indeksu nie zmienia
+nic, dokładnie tak jak przemianowanie zmiennej sterującej pętli. To nazwa
+związana: istnieje między dwiema granicami i nigdzie indziej.
+
+To, od czego indeks się \emph{zaczyna}, jest już inną sprawą i dwie
+dyscypliny, w których pracujesz, są tu w sporze. Matematyka liczy od jednego.
+Python liczy od zera. Oto jedna lista czterech liczb, opisana na oba sposoby:
+
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+Wartość & $2$ & $5$ & $1$ & $7$ \\
+\midrule
+Matematyka & $x_1$ & $x_2$ & $x_3$ & $x_4$ \\
+Python & \code{x[0]} & \code{x[1]} & \code{x[2]} & \code{x[3]} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Te same cztery wartości w tej samej kolejności, pod dwoma zestawami etykiet. A
+teraz pytanie o etykiety, a nie o wartości.
+
+Ile wyrazów ma $\sum_{i=0}^{n} x_i$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$n + 1$}
+
+\begin{trapbox}
+\textbf{To słupek w płocie i najstarszy błąd o jeden, jaki istnieje.} Płot
+długi na sto metrów ze słupkiem co dziesięć metrów ma jedenaście słupków, a
+nie dziesięć. Policzenie przęseł daje dziesięć, a płot ma dwa końce.
+
+Sigma ma ten sam kształt, bo obie granice są \emph{włączone}. Liczba wyrazów
+wynosi
+\[ \text{koniec} - \text{początek} + 1 \]
+a odpowiedź $n$ bierze się z odjęcia granic i zatrzymania się w tym miejscu.
+To odejmowanie liczy kroki między wyrazami; wyrazów jest o jeden więcej niż
+kroków.
+\end{trapbox}
+
+Trzy kształty i właśnie te trzy będziesz spotykał. Uzupełnij ten jeden
+brakujący:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Suma & Wyrazy & Pętla, którą jest \\
+\midrule
+$\sum_{i=1}^{n}$ & $n$ & \code{range(1, n + 1)} \\
+$\sum_{i=0}^{n-1}$ & \blank & \code{range(n)} \\
+$\sum_{i=0}^{n}$ & $n + 1$ & \code{range(n + 1)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A potem zapisz sigmę, po której chodzi \code{for i in range(5)}.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$n$ wyrazów. A pętla chodzi po
+\[ \sum_{i=0}^{4} x_i \]
+czyli po pięciu wyrazach, od $0$ do $4$ włącznie.
+\end{ansblock}
+
+\begin{notationbox}
+\textbf{Jedno angielskie słowo w dwóch rolach.} Program~\ref{prog:F01} nazywa
+liczbę podniesioną w $a^{n}$ \emph{wykładnikiem}, a angielskie wydanie mówi na
+nią \emph{index}. Ten program nazywa liczbę opuszczoną w $x_i$
+\emph{indeksem}, a angielskie wydanie mówi na nią \emph{index} raz jeszcze.
+Obie są niezależne: jedna mówi, ile razy mnożyć, druga mówi, o który element
+chodzi.
+
+Polszczyzna rozróżnia je słowami \dash{} \emph{wykładnik} i \emph{indeks},
+dwa słowa na dwie role \dash{} a angielszczyzna pozwala im się zderzyć i
+zostawia to czytelnikowi. Warto o tym wiedzieć mimo wszystko, bo artykuły są
+pisane po angielsku.
+\end{notationbox}
+
+Przeindeksowanie jest mechaniczne: przesuń granice w jedną stronę, a indeks
+dolny w drugą, tak żeby nazwane zostały te same wyrazy. Rozpisane w całości,
+raz:
+\[ \sum_{i=1}^{n} x_i = \sum_{j=0}^{n-1} x_{j+1} \]
+Dla $j = 0$ wyrazem jest $x_1$; dla $j = n-1$ jest nim $x_n$. Te same wyrazy,
+ta sama kolejność, ta sama suma.
+
+Przepisz $\sum_{k=2}^{5} k^{2}$ tak, żeby indeks zaczynał się od $0$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \sum_{k=2}^{5} k^{2} = \sum_{j=0}^{3} (j+2)^{2} \]
+Obie strony dają $4 + 9 + 16 + 25 = 54$. Granice poszły w dół o dwa, a indeks
+dolny w górę o dwa, i innego ruchu tu nie ma.
+\end{ansblock}
+
+To nie jest przestawianie zapisu dla samego przestawiania. Pozycje w
+tokenizatorze numeruje się od zera, pozycje w większości artykułów numeruje
+się od jednego, a w modelu obie konwencje biegną naraz. Pomiędzy nimi siedzi
+maska przyczynowa: wiersz $i$ patrzy na klucze od $0$ do $i$ włącznie, więc
+pierwsze zapytanie widzi jeden klucz, drugie widzi dwa, a ostatnie widzi
+wszystkie.
+
+Ile par zapytanie--klucz liczy ta maska na $n = 8$ pozycjach?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$36$, wobec $64$ dla pełnego kwadratu:
+\[ \sum_{i=1}^{8} i = 1 + 2 + \cdots + 8 = \frac{8 \times 9}{2} = 36 \]
+\end{ansblock}
+
+Wzór jawny pochodzi od Gaussa, a rozumowanie mieści się w jednym wierszu.
+Zapisz sumę do przodu i wstecz jedna pod drugą; każda kolumna daje $n + 1$,
+kolumn jest $n$, a wszystko zostało policzone dwa razy:
+\[ \sum_{i=1}^{n} i = \frac{n(n+1)}{2} \]
+
+Przy $n = 2048$ daje to $\val{f04.causal.pairs}$ par wobec
+$\val{f04.causal.sq}$ dla pełnego kwadratu.
+
+\begin{aibox}
+\enquote{Maska przyczynowa zmniejsza pracę o połowę} to zdanie asymptotyczne
+cytowane jak dokładne. Stosunek wynosi
+\[ \frac{n(n+1)/2}{n^{2}} = \frac{n+1}{2n} \]
+i opada do połowy z góry, nigdy do niej nie docierając. Przy $n = 2048$ wynosi
+$\val{f04.causal.ratio}$, czyli dość blisko połowy, żeby tak mówić; przy
+$n = 8$ wynosi $\val{f04.causal.ratio.eight}$, czyli o jedną ósmą pracy więcej
+niż połowa. Nadmiar to przekątna \dash{} każde zapytanie patrzy na własny
+klucz \dash{} więc przy długim kontekście jest błędem zaokrąglenia, a przy
+krótkim realnym składnikiem.
+
+Program~\ref{prog:P03} wycenia pracę we FLOP-ach zamiast liczyć pary, do
+czego nie trzeba nic poza arytmetyką i sigmą, którą już masz.
+\end{aibox}
+\end{fr}
+
+\mermaidfig{f04-sigma-as-loop}{%
+  Ta sama instrukcja w dwóch zapisach. Pętla nie nazywa pozycji, a sigma je
+  nazywa i dlatego sigma musi powiedzieć, od czego zaczyna się jej indeks, a
+  pętla nie musi.}{%
+  Pętla, jej cztery części i dwie konwencje indeksowania.}
+
+% ============================================================
+\section{Iloczyny i dwa przypadki puste}
+\label{sec:F04-products}
+\index{iloczyn!silnia}
+\index{iloczyn!iloczyn pusty}
+
+\begin{fr}
+Drugi symbol to ta sama maszyna z innym działaniem w środku. Tam, gdzie sigma
+dodaje, wielkie greckie pi mnoży:
+
+\begin{python}
+total = 1.0
+for x in values:
+    total = total * x
+\end{python}
+
+\[ \prod_{i=1}^{n} x_i \]
+
+Wszystko z dwóch poprzednich sekcji przenosi się bez zmian: indeks i jego
+nazwa, obie granice, treść, to że obie granice są włączone, oraz cała sprawa
+przeindeksowania. Zmieniło się tylko działanie.
+
+Oblicz $\prod_{i=1}^{4} i$ i powiedz, jak zwykle nazywa się ta liczba.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$1 \times 2 \times 3 \times 4 = 24$, czyli $4!$, cztery silnia. Silnia to pi z
+samym indeksem w treści:
+\[ n! = \prod_{i=1}^{n} i \]
+\end{ansblock}
+
+Spójrz teraz wstecz na obie pętle. Każda od czegoś startuje swój akumulator,
+zanim wykona pierwszy przebieg, i to, od czego startuje, za chwilę będzie warte
+osobnej ramki.
+
+Szybko i bez rachunków. Co zwracają \code{sum([])} i \code{math.prod([])}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$0$ i $1$.
+\end{ansblock}
+
+Nie z pamięci \dash{} z uruchomienia:
+
+\transcript{figures/transcripts/f04-empty.txt}
+
+Treść pętli nie wykonuje się ani razu, więc wraca to, na co akumulator został
+ustawiony, a powód, dla którego został ustawiony właśnie tak, jest w obu
+przypadkach ten sam. Dodanie $0$ zostawia liczbę w spokoju; pomnożenie przez
+$1$ zostawia liczbę w spokoju. Każda z nich jest \emph{elementem neutralnym}
+swojego działania i tylko taka wartość się nadaje: suma zera wyrazów musi być
+tym, co nie zmieni następnego wyrazu, gdy ten nadejdzie, bo inaczej wynik
+pętli zależałby od tego, od czego ją zaczęto.
+
+Ile zatem wynosi $0!$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$0! = 1$}
+To iloczyn pusty i nie potrzebuje osobnego uzasadnienia.
+
+\begin{trapbox}
+\textbf{\enquote{Nic tam nie ma, więc to zero.}} Albo z drugiej strony:
+\enquote{nic tam nie ma, więc to nieokreślone.} Pierwsze jest poprawne dla
+jednego z dwóch działań i błędne dla drugiego; drugie jest błędne dla obu.
+
+Bierze się to stąd, że \emph{nic} ma jedną nazwę, a te dwa działania mają dwa
+elementy neutralne. Pustka nie jest wartością, więc nie może mieć własnej
+wartości; akumulatorowi trzeba ją nadać, a jedynym wyborem, który zachowuje
+spójność pętli, jest element niczego niezmieniający.
+
+To konwencja, która się opłaca, i opłaca się dwa razy. Program~\ref{prog:F01}
+wyprowadził $a^{0} = 1$ z prawa dzielenia i powiedział, że jest to wymuszone,
+a nie wybrane; $a^{0}$ jest też iloczynem zera czynników, więc mamy tu drugą i
+niezależną drogę do tej samej odpowiedzi. A prawo z Programu~\ref{prog:F03}
+przenosi jedną konwencję na drugą: logarytm iloczynu pustego to $\ln 1 = 0$,
+czyli dokładnie suma pusta, więc $\ln \prod = \sum \ln$ obowiązuje przy zerze
+wyrazów bez doklejonego przypadku szczególnego.
+\end{trapbox}
+
+I tu przestaje to być pedanterią. Przychodzi batch, w którym wszystkie tokeny
+zostały zamaskowane, a twój wiersz ze stratą brzmi \code{total / count}.
+
+Ile wynosi \code{total}, ile wynosi \code{count} i co robi ten wiersz?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\code{total} wynosi $0$, czyli jest sumą pustą i jest zupełnie dobrze
+określone. \code{count} też wynosi $0$. Wiersz dzieli zero przez zero.
+\end{ansblock}
+
+\begin{warning}
+\textbf{Twoje narzędzia są tu ze sobą w sporze i milczą o tym.} Obie połowy
+tego zostały uruchomione, a nie przypomniane.
+
+W czystym Pythonie \code{0.0 / 0.0} zgłasza \code{ZeroDivisionError} i program
+zatrzymuje się w wierszu, który to spowodował. W numpy dzielenie jednego
+skalara zmiennoprzecinkowego przez drugi zwraca \code{nan}, ostrzega i idzie
+dalej; a \code{np.array([]).mean()} tak samo zwraca \code{nan}, ostrzega i
+idzie dalej.
+
+\emph{Niezmiennikiem} jest to, że jedna biblioteka się zatrzymuje, a druga
+podaje wartość i kontynuuje. Dokładne brzmienie ostrzeżenia numpy jest
+własnością wersji, którą akurat masz zainstalowaną, więc nie jest tu cytowane
+\dash{} a ostrzeżenie to nie wyjątek: nic nie czeka, aż je przeczytasz.
+\end{warning}
+
+\begin{aibox}
+Użyteczna jest właśnie ta asymetria. \textbf{Suma pusta jest bezpieczna, a
+średnia pusta nie jest}, bo suma jest określona, a dzielenie nie, więc
+zabezpieczenie należy się mianownikowi, a nigdy akumulatorowi.
+
+Strata \code{nan} z jednego w całości zamaskowanego mikrobatcha nie zostaje w
+tym mikrobatchu: dochodzi do gradientów, gradienty dochodzą do wag, a to, co
+widzisz kilka minut później, to model, którego każde wyjście jest \code{nan} i
+nic nie wskazuje wstecz na batch, który to zrobił.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Każda strata to sigma i dzielnik}
+\label{sec:F04-loss}
+\index{strata!jako średnia po batchu}
+\index{zapis sigma!w funkcji straty}
+
+\begin{fr}
+Program~\ref{prog:F03} zapisał tę sumę sigmą, której nigdy nie zdefiniował, a
+resztę straty powiedział słowami: weź logarytm prawdopodobieństwa, jakie model
+dał każdemu tokenowi, dodaj je, podziel przez liczbę tokenów i zmień znak. Przy
+$\val{f03.seq.tokens}$ tokenach po $\val{f02.loss.nats}$ nata każdy to
+właśnie ta strata, którą podaje karta modelu.
+
+Oto to samo zdanie z nazwanym każdym symbolem:
+\[ L = -\frac{1}{n}\sum_{i=1}^{n} \ln p_i \]
+Sigma to dodawanie. $n$ pod nią to liczba dodanych rzeczy. Minus jest, bo
+logarytm prawdopodobieństwa jest ujemny, a stratę podaje się dodatnią. Nic
+nowego się nie stało: zapis dogonił to, co i tak już robiłeś.
+
+Kształt, w którym to siedzi, jest ogólniejszy. Weź cztery predykcje i cztery
+wartości, w które miały trafić:
+\[ y = (3,\ -\num{0.5},\ 2,\ 7) \qquad
+   \hat{y} = (\num{2.5},\ 0,\ 2,\ 8) \]
+Błąd średniokwadratowy to
+\[ \mathrm{MSE} = \frac{1}{n}\sum_{i=1}^{n} (\hat{y}_i - y_i)^{2} \]
+Policz go.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Reszty to $-\num{0.5}$, $\num{0.5}$, $0$, $1$; kwadraty to $\num{0.25}$,
+$\num{0.25}$, $0$, $1$; suma wynosi $\val{f04.mse.sum}$, a po podzieleniu
+przez cztery przykłady $\val{f04.mse}$.
+\end{ansblock}
+
+Zmień treść, a resztę zostaw w spokoju, i masz inną stratę. Średni błąd
+bezwzględny wstawia do treści wielkość reszty zamiast jej kwadratu:
+\[ \mathrm{MAE} = \frac{1}{n}\sum_{i=1}^{n} \lvert \hat{y}_i - y_i \rvert \]
+i na tych samych czterech punktach wychodzi $\val{f04.mae}$. Sigma się nie
+ruszyła. Dzielnik się nie ruszył. Ruszył się jeden wyraz.
+
+\yourturn
+Zapisz entropię krzyżową po batchu $n$ przykładów w tym samym kształcie,
+wiedząc, że wyraz na przykład to minus logarytm prawdopodobieństwa, które
+model dał poprawnej odpowiedzi.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ L = -\frac{1}{n}\sum_{i=1}^{n} \ln p_i \]
+czyli wiersz, od którego zaczęła się ta sekcja, osiągnięty z drugiej strony.
+\end{ansblock}
+
+Trzy straty obok siebie. Tylko jedna z trzech kolumn zmienia się wraz ze
+stratą \dash{} wyraz:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Strata & Kształt & Treść \\
+\midrule
+Błąd średniokwadratowy & $\frac{1}{n}\sum$ & $(\hat{y}_i - y_i)^{2}$ \\
+Średni błąd bezwzględny & $\frac{1}{n}\sum$ & $\lvert \hat{y}_i - y_i \rvert$ \\
+Entropia krzyżowa & $\frac{1}{n}\sum$ & $-\ln p_i$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Użyj tej trzeciej treści. Batch czterech przykładów; model dał poprawnej
+odpowiedzi prawdopodobieństwo $\num{0.9}$, $\num{0.5}$, $\num{0.2}$ i
+$\num{0.05}$. Ile wynosi strata?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f04.ce.mean}$}
+Cztery wyrazy dają $\val{f04.ce.sum}$, a jest ich cztery.
+
+Program~\ref{prog:F03} zamieniał średnią stratę na perplexity przez
+spotęgowanie. Warto zrobić to i tutaj, bo daje to dwie liczby tam, gdzie
+mogłeś spodziewać się jednej. Eksponenta średniej straty wynosi
+$\val{f04.ce.ppl}$. Średnia z czterech wartości perplexity na przykład
+\dash{} czyli średnia z czterech wartości $1/p_i$ \dash{} wynosi
+$\val{f04.ce.ppl.naive}$.
+
+Która z tych dwóch jest liczbą, którą powinien wypisać ranking, i dlaczego?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Eksponenta średniej, czyli $\val{f04.ce.ppl}$. Program~\ref{prog:F03}
+rozstrzygnął to: perplexity to $e$ podniesione do średniej ujemnej
+logarytmicznej wiarogodności, a średnia z wartości perplexity to inna
+wielkość, którą podaje się w tej samej kolumnie.
+\end{ansblock}
+
+Ogólne zdanie, które za tym stoi \dash{} co dzieje się, gdy uśrednia się
+zakrzywioną funkcję wielkości zamiast samej wielkości \dash{} to nierówność
+Jensena i należy do Programu~\ref{prog:P19}. Ten program jest ci winien
+kształt leżący pod spodem:
+
+\textbf{każda strata tutaj to $\frac{1}{n}\sum$ po wyrazie na przykład, a
+jedyne, co rusza się od straty do straty, to ten wyraz.}
+
+\begin{aibox}
+To zdanie jest wierszem kroku uczenia. Entropia krzyżowa modelu językowego
+jest sumowana po pozycjach, których etykieta nie jest indeksem
+ignorowanym, a dzielnikiem jest liczba \emph{tych} pozycji \dash{} a nie
+rozmiar tensora, w którym siedzi też dopełnienie.
+
+Dwie liczby, jedna z nich większa, a strata to suma podzielona przez tę, którą
+kod akurat podniósł. \S\ref{sec:F04-averages} jest o tym, co się dzieje, gdy
+dzielnik policzy się w niewłaściwym miejscu.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jedna rzecz, której sigma nie obiecuje.
+
+W arytmetyce dokładnej suma nie ma kolejności. $a + b + c$ to $c + b + a$ i
+nie ma o czym rozmawiać. W arytmetyce zmiennoprzecinkowej kolejność jest, bo
+każde dodawanie zaokrągla: bardzo mała liczba dodana do dużo większej sumy
+bieżącej może zaokrąglić się do zupełnego niebytu i robi to bez błędu, bez
+ostrzeżenia i bez żadnego znaku. Dodaj milion małych gradientów do jednego
+akumulatora, a części z nich w wyniku nie będzie.
+
+\begin{warning}
+\textbf{Ta ramka celowo nie podaje żadnej liczby.} To, ile się gubi, zależy od
+formatu, od kolejności, od sprzętu i od tego, którą redukcję wybrała
+biblioteka, więc liczba wydrukowana tutaj byłaby liczbą o jednej maszynie w
+jednym dniu.
+
+Program~\ref{prog:P01} mówi, dlaczego suma gradientów nie jest łączna i
+dlaczego dwa akceleratory rozjeżdżają się na ostatnich bitach.
+Program~\ref{prog:P02} mówi, ile kosztuje sumowanie miliona małych liczb w złej
+kolejności i co z tym zrobić.
+
+Sigma nadal jest właściwym zapisem. Jest zdaniem o wartości; twoja maszyna
+liczy jej przybliżenie, w kolejności, której nie wybrałeś.
+\end{warning}
+\end{fr}
+
+% ============================================================
+\section{Kiedy nie wolno uśredniać średnich}
+\label{sec:F04-averages}
+\index{pomiar!średnia mikro i makro}
+\index{diagnostyka!średnia ze średnich}
+
+\begin{fr}
+Tu też bez rachunków. Pierwsza liczba, jaka ci przyjdzie do głowy.
+
+Przeszły dwa mikrobatche. Pierwszy miał $1000$ tokenów i wrócił ze średnią
+stratą $\num{2.0}$. Drugi miał $10$ tokenów i wrócił ze średnią stratą
+$\num{8.0}$.
+
+\textbf{Ile wynosi średnia strata na $1010$ tokenach?}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f04.batch.pooled}$}
+Nie $\num{5.0}$. Każdy token wnosi własną stratę, a w jednym batchu jest ich
+znacznie więcej niż w drugim:
+\[ \frac{1000 \times \num{2.0} + 10 \times \num{8.0}}{1010}
+   = \val{f04.batch.pooled} \]
+Odpowiedź, która przychodzi pierwsza, jest większa od prawdziwej o czynnik
+$\val{f04.batch.factor}$.
+
+\begin{trapbox}
+\textbf{Uśrednione zostały dwie liczby, które już były średnimi.} Dodanie
+$\num{2.0}$ do $\num{8.0}$ i podzielenie przez dwa daje każdej z nich wagę
+jedną drugą \dash{} co byłoby słuszne, gdyby stały za taką samą ilością
+świadectwa, a jedna z nich stoi za stukrotnie większą niż druga.
+
+Obie wielkości są prawdziwe i obie mają nazwy. Średnia \emph{mikro} zsypuje
+elementy razem i dzieli raz, więc każdy token liczy się tak samo. Średnia
+\emph{makro} uśrednia liczby grupowe, więc każda grupa liczy się tak samo.
+Żadnej z nich nie ma się co czepiać.
+
+Błędem nie jest więc to, że policzyłeś nie tę. Błędem jest to, że nie wiesz,
+którą trzymasz, a bierze się to stąd, że podaje się je w tej samej kolumnie,
+pod tym samym słowem i z tą samą liczbą miejsc po przecinku.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+To nie jest jednorazowa sprawa rozmiarów batcha. Drugie wystąpienie siedzi w
+każdym harnessie ewaluacyjnym, jaki uruchamiałeś.
+
+Zbiór oceny został podzielony na dwa fragmenty. Pierwszy ma $100$ elementów i
+model trafia $90$ z nich. Drugi ma $10$ elementów i model trafia $1$. Twój
+harness wypisuje dwie trafności na fragment: $\num{0.90}$ i $\num{0.10}$.
+
+Ile wynosi trafność na $110$ elementach?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \frac{91}{110} = \val{f04.acc.micro} \]
+Każdy trafiony element przez każdy, jaki był. Nie $\num{0.50}$.
+\end{ansblock}
+
+Trzecie wystąpienie, w innej jednostce, i tam przepaść jest największa. Jeden
+przebieg robi $100$ tokenów w $1$ sekundę, drugi $100$ tokenów w $100$ sekund:
+prędkości $100$ i $1$ token na sekundę, o średniej $\num{50.5}$. Prędkość na
+całości pracy to
+\[ \frac{100 + 100}{1 + 100} = \val{f04.rate.micro} \]
+tokena na sekundę, czyli mniej o czynnik $\val{f04.rate.factor}$. Ta liczba
+jest ścisła i sprawdzalna: przy równych licznikach prędkość na całości jest
+średnią \emph{harmoniczną} obu prędkości, $\val{f04.rate.micro}$ co do cyfry.
+
+Powiedz teraz jednym zdaniem, co mają wspólnego te trzy wystąpienia.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+W każdym z nich średnia z ilorazów stanęła tam, gdzie należał się iloraz sum.
+\end{ansblock}
+
+Zapisane raz i ogólnie, dla grupy $i$ o liczniku $a_i$ i mianowniku $b_i$:
+\[ \frac{1}{k}\sum_{i=1}^{k} \frac{a_i}{b_i} \ne
+   \frac{\sum_{i=1}^{k} a_i}{\sum_{i=1}^{k} b_i} \]
+Po lewej jest średnia \emph{makro}: każda grupa niesie wagę $1/k$, cokolwiek
+by za nią stało. Po prawej jest średnia \emph{mikro}: każdy element niesie tę
+samą wagę, więc wpływ grupy jest jej rozmiarem. Obie są równe dokładnie wtedy,
+gdy wszystkie $b_i$ są równe, i nie w innym przypadku.
+
+Trzymaj to z dala od porażki z perplexity z Programu~\ref{prog:F03}, która
+wygląda tak samo, a taka nie jest. Tam do średniej przyłożono funkcję
+zakrzywioną i szkodę zrobiła krzywizna. Tu każdy krok jest liniowy, a szkodę
+robią wagi. Ten sam zapach, inny mechanizm, i nie mają tej samej naprawy.
+
+\yourturn
+Twój harness podaje trafność dla każdego benchmarku i uśrednia te
+liczby. Przy jakim warunku ta średnia jest trafnością na wszystkich elementach
+razem?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Gdy wszystkie benchmarki mają tyle samo elementów. Wtedy równe wagi są wagami
+właściwymi i obie średnie się pokrywają.
+\end{ansblock}
+
+\begin{aibox}
+Dwa miejsca, w których to żyje, i żadne nie jest egzotyczne.
+
+Pierwsze to ranking wielu benchmarków. Jego nagłówkowa liczba to średnia makro
+po benchmarkach, których rozmiary różnią się o rzędy wielkości, więc odpowiada
+na inne pytanie niż wynik zsypany razem, a model można w nim podnieść dobrym
+wynikiem na tych małych. Program~\ref{prog:P27} pyta, czy różnica między
+dwiema takimi liczbami jest większa niż szum w którejkolwiek z nich, a
+Program~\ref{prog:P34} czyni z tego wymóg, który musi spełnić podana liczba.
+
+Drugie to akumulacja gradientu. Entropia krzyżowa modelu językowego jest
+normalizowana liczbą pozycji, które nie zostały zamaskowane, a mikrobatche nie
+mają ich wszystkie po tyle samo. Weź średnią wewnątrz każdego mikrobatcha, a
+potem uśrednij po mikrobatchach, a każdy mikrobatch dostanie równą wagę bez
+względu na to, ile prawdziwych tokenów niósł: optymalizowane jest wtedy nie
+to, co optymalizowałby równoważny duży batch. Mianownik należy do całego
+zakumulowanego batcha. To sprawa Programu~\ref{prog:P21}.
+\end{aibox}
+\end{fr}
+
+\mermaidfig{f04-two-averages}{%
+  Jeden podział jednego zbioru oceny i dwa sposoby dzielenia. Cała różnica
+  tkwi w mianowniku: liczba grup albo liczba elementów.}{%
+  Uśrednianie makro i mikro po dwóch nierównych fragmentach.}
+
+% ============================================================
+\section{Ciągi, rekurencje i szereg geometryczny}
+\label{sec:F04-sequences}
+\index{ciąg!rekurencja}
+\index{ciąg!szereg geometryczny}
+
+\begin{fr}
+\emph{Ciąg} to lista z indeksem: $a_1$, $a_2$, $a_3$ i dalej.
+\emph{Rekurencja} określa każdy wyraz na podstawie poprzedniego, czyli jest
+pętlą, która niesie wartość, a nie akumuluje jej.
+
+Dwa z nich już masz, bez nazw. Ciąg arytmetyczny dodaje w każdym kroku stałą
+wartość; ciąg geometryczny mnoży przez stały czynnik:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+ & Rekurencja & Wzór ogólny \\
+\midrule
+Arytmetyczny & $a_{n+1} = a_n + d$ & $a_n = a_1 + (n-1)d$ \\
+Geometryczny & $a_{n+1} = r\,a_n$ & $a_n = a_1 r^{\,n-1}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Rekurencja mówi, jak zrobić jeden krok. Wzór ogólny mówi, gdzie się kończy,
+bez robienia żadnego \dash{} a tego właśnie chcesz, gdy kroków jest dużo.
+
+Weź $a_1 = 3$ i $a_{n+1} = 2 a_n$. Ile wynosi $a_5$ i jaki jest wzór ogólny?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wyrazy to $3$, $6$, $12$, $24$, $48$, więc $a_5 = 48$; a
+$a_n = 3 \times 2^{\,n-1}$, co daje $3 \times 2^{4} = 48$ bez przechodzenia
+ciągu krok po kroku.
+\end{ansblock}
+
+Postaw teraz obok Program~\ref{prog:F03}. Zlogarytmuj ciąg geometryczny:
+\[ \ln\!\left(a_1 r^{\,n-1}\right) = \ln a_1 + (n-1)\ln r \]
+a to, co jest po prawej, jest ciągiem arytmetycznym względem $n$, ze stałą
+wartością $\ln r$ dodawaną w każdym kroku. \textbf{Logarytm zamienia ciąg
+geometryczny w arytmetyczny} \dash{} czyli oś logarytmiczna z
+Programu~\ref{prog:F03}, osiągnięta z drugiej strony.
+
+Strata połowi się co tysiąc kroków. Jaki kształt ma ta krzywa na osi, której
+podziałki to $1$, $\num{0.1}$, $\num{0.01}$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Linia prosta}
+Każdy tysiąc kroków mnoży przez ten sam czynnik, więc przesuwa o tę samą
+odległość w dół osi. Stały stosunek to stała odległość, a to jest całość tego,
+co robi oś logarytmiczna.
+
+Teraz zsumuj ciąg geometryczny. To jedyny wzór jawny, który ten program chce,
+żebyś umiał wyprodukować, a nie przypomnieć sobie, a produkcja zajmuje trzy
+wiersze. Napisz $S$ na sumę $n$ pierwszych wyrazów ciągu $1$, $r$, $r^{2}$ i
+tak dalej:
+\[ S = \sum_{k=0}^{n-1} r^{k} = 1 + r + r^{2} + \cdots + r^{\,n-1} \]
+Pomnóż cały wiersz przez $r$ i zapisz go pod spodem, przesunięty o jeden:
+\[ rS = r + r^{2} + \cdots + r^{\,n-1} + r^{\,n} \]
+Odejmij drugi od pierwszego. Wszystko w środku się skraca, a to jest ruch,
+który Program~\ref{prog:F02} nazywa redukcją wyrazów podobnych:
+\[ S - rS = 1 - r^{\,n} \qquad\text{a zatem}\qquad S = \blank \]
+
+A potem oblicz $\sum_{k=0}^{9} (\num{0.9})^{k}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ S = \frac{1 - r^{\,n}}{1 - r} \]
+Przy $r = \num{0.9}$ i $n = 10$ wynosi to $\val{f04.geom.ten}$.
+\end{ansblock}
+
+Niech teraz wyrazów przybywa. Jeśli $\lvert r \rvert < 1$, to $r^{\,n}$ opada
+do niebytu, licznik ustala się na $1$, a suma też się ustala:
+\[ \sum_{k=0}^{\infty} r^{k} = \frac{1}{1-r} \]
+co przy $r = \num{0.9}$ daje $\val{f04.geom.inf}$: dziesięć wyrazów wniosło
+już z tego $\val{f04.geom.ten}$, a wszystkie pozostałe razem wzięte dokładają
+resztę.
+
+\begin{rigourbox}
+\textbf{Tego, że suma w ogóle się ustala, nie dowodzimy tutaj.} Sumę
+nieskończenie wielu wyrazów definiuje się jako granicę sum częściowych,
+granica istnieje dokładnie wtedy, gdy $\lvert r \rvert < 1$, a dowód tego jest
+jedną stroną pierwszego kursu analizy.
+
+Ta książka potrzebuje z tego rachunku i granicy przypadków. Poniżej $1$ co do
+wielkości suma jest skończona i wzór obowiązuje. Przy $1$ i powyżej wyrazy nie
+maleją i nie ma żadnej sumy do wzięcia.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Kierunek odwrotny to iloczyn, a nie suma, i rozstrzyga, czy głęboki stos w
+ogóle działa.
+
+Weź czynnik przykładany raz na warstwę, przez pięćdziesiąt warstw:
+\[ (\num{0.9})^{50} = \val{f04.decay.fifty} \qquad
+   (\num{1.1})^{50} = \val{f04.grow.fifty} \]
+Dwa czynniki odległe o $\num{0.2}$ na starcie i o mniej więcej
+$\val{f04.decay.ratio}$ na drugim końcu, a żaden z nich nie był skrajny.
+
+\yourturn
+Policz $50 \ln \num{0.9}$ i powiedz, co to mówi o pierwszej z tych dwóch
+liczb.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$50 \ln \num{0.9} = \val{f04.decay.log}$, więc iloczyn wynosi
+$e^{\val{f04.decay.log}}$, czyli $\val{f04.decay.fifty}$. Pięćdziesiąt mnożeń
+stało się jednym mnożeniem.
+\end{ansblock}
+
+Ten krok jest tożsamością łączącą oba symbole tego programu i jest pierwszym
+prawem z Programu~\ref{prog:F03} zapisanym nad pi, a nie nad dwoma czynnikami:
+\[ \ln \prod_{i=1}^{n} x_i = \sum_{i=1}^{n} \ln x_i \]
+Iloczyn tysiąca prawdopodobieństw liczy się jako sumę tysiąca logarytmów
+dokładnie z tego powodu, a Program~\ref{prog:F03} zmierzył, co się dzieje z
+tym, kto zrobi to na odwrót.
+
+Sygnał przechodzący przez pięćdziesiąt warstw jest mnożony raz na warstwę,
+więc czynnik na warstwę nie sumuje się po stosie \dash{} jest podnoszony do
+pięćdziesiątej potęgi i dlatego $\num{0.9}$ i $\num{1.1}$ na warstwę nie są
+bliskimi sąsiadami. To, dlaczego te czynniki się mnożą, a nie dodają, należy
+do Programu~\ref{prog:F12}: złożenie warstw różniczkuje się regułą
+łańcuchową, a reguła łańcuchowa jest iloczynem.
+\end{fr}
+
+% ============================================================
+\section{Wykładnicza średnia ruchoma}
+\label{sec:F04-ema}
+\index{średnia ruchoma!wykładnicza}
+\index{średnia ruchoma!korekta obciążenia}
+
+\begin{fr}
+Oto problem, który spotkałeś na każdym panelu, w jaki kiedykolwiek patrzyłeś.
+Krzywa straty skacze z kroku na krok, a ty chcesz zobaczyć trend pod spodem.
+Można trzymać ostatnie sto wartości i je uśredniać, ale to znaczy trzymać sto
+wartości, w każdym kroku, dla każdej obserwowanej wielkości.
+
+Jest dwuwierszowa alternatywa, która nie trzyma niczego:
+
+\begin{python}
+m = 0.0
+for g in stream:
+    m = beta * m + (1 - beta) * g
+\end{python}
+
+Jedna liczba stanu i jedno mnożenie z dodawaniem na obserwację. Nazywa się to
+\emph{wykładniczą średnią ruchomą}, a ta sekcja rozbiera ją na części, bo jest
+całym momentum i połową Adama.
+
+Weź $\beta = \num{0.9}$. Szybko i bez rachunków: $m$ pokazuje teraz
+$\num{1.0}$, a nowe $g$ wynosi $\num{11.0}$. Co pokaże $m$ po jednym kroku?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\num{2.0}$}
+\[ \num{0.9} \times \num{1.0} + \num{0.1} \times \num{11.0}
+   = \num{0.9} + \num{1.1} = \num{2.0} \]
+
+\begin{trapbox}
+\textbf{Druga odpowiedź to $\num{10.0}$ i bierze się z odczytania $\beta$ jako
+tego, ile wchodzi z nowej wartości.} Jest odwrotnie. \textbf{$\beta$ waży
+wartość starą}, więc $\beta = \num{0.9}$ zatrzymuje dziewięć dziesiątych
+wszystkiego, co się dotąd wydarzyło, i wpuszcza jedną dziesiątą nowości.
+
+Błędne odczytanie jest tak łatwe dlatego, że $\beta$ to liczba wpisana w plik
+konfiguracyjny, a współczynnik przy $g$ nie jest wpisany nigdzie: wynosi
+$1 - \beta$ i jest wyliczany. Liczba, którą ustawiasz, jest tą, o której
+najtrudniej pomyśleć, że należy do przeszłości.
+
+Razem z tym odwraca się wszystko, co dotyczy zachowania średniej. Podniesienie
+$\beta$ czyni ją \emph{wolniejszą} i gładszą, a nie szybszą w reakcji, bo w
+każdym kroku zostaje więcej starej wartości.
+\end{trapbox}
+
+Co szybciej zapomina zmianę: $\beta = \num{0.9}$ czy $\beta = \num{0.999}$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\beta = \num{0.9}$}
+Wpuszcza w każdym kroku jedną dziesiątą nowości, podczas gdy
+$\beta = \num{0.999}$ wpuszcza jedną tysięczną.
+
+Teraz rozwiń rekurencję w samą siebie, bo to jest ramka, do której cały ten
+program zmierzał. Wstaw definicję $m_{t-1}$ do definicji $m_t$, potem zrób to
+jeszcze raz i jeszcze raz:
+\[ m_t = (1-\beta)\,g_t + (1-\beta)\beta\,g_{t-1}
+       + (1-\beta)\beta^{2} g_{t-2} + \cdots + \beta^{\,t} m_0 \]
+co zwija się w
+\[ m_t = (1-\beta)\sum_{k=0}^{t-1} \beta^{k} g_{t-k} + \beta^{\,t} m_0 \]
+
+\textbf{Dwuwierszowa pętla jest sumą ważoną wszystkiego, co kiedykolwiek
+zobaczyła.} Wagi to ciąg geometryczny z \S\ref{sec:F04-sequences}, a to szereg
+z \S\ref{sec:F04-sequences} mówi, ile one dają. Nic nowego nie było do tego
+potrzebne i dlatego ciągi były wcześniej.
+
+Przy $\beta = \num{0.9}$: jaka waga siedzi na najnowszej wartości $g_t$, a
+jaka na tej przed nią?
+\[ \text{najnowsza: } \blank \qquad\qquad \text{poprzednia: } \blank \]
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$1 - \beta = \num{0.10}$ na najnowszej i $(1-\beta)\beta = \num{0.09}$ na tej
+przed nią.
+\end{ansblock}
+
+To pozwala sprawdzić obiegowe zdanie zamiast je powtarzać.
+\enquote{$\beta = \num{0.9}$ uśrednia ostatnie dziesięć} mówią wszyscy. Wagi
+wynoszą $(1-\beta)\beta^{k}$, więc ostatnie dziesięć niesie
+\[ 1 - (\num{0.9})^{10} = \val{f04.ema.w10} \]
+całej wagi, ostatnie dwadzieścia niesie $\val{f04.ema.w20}$, a reszta jest
+rozłożona za nimi bez końca.
+
+Na pytanie \emph{jak daleko wstecz to coś patrzy} odpowiadają trzy różne
+liczby i żadna z nich nie jest liczbą dziesięciu obserwacji:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Odczyt & Przy $\beta = \num{0.9}$ & \\
+\midrule
+Okno efektywne, $1/(1-\beta)$ & $\val{f04.geom.inf}$ & skala, nie licznik \\
+Środek ciężkości, $\beta/(1-\beta)$ & $\val{f04.ema.com}$ & kroków wstecz \\
+Połowa wagi, $\ln \frac{1}{2} / \ln \beta$ & $\val{f04.ema.halflife}$ & kroków \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Warto nosić przy sobie trzeci wiersz, bo jest najmniejszy z trzech i
+odpowiada na pytanie, które naprawdę masz: \textbf{połowa wagi leży w
+ostatnich $\val{f04.ema.halflife.steps}$ obserwacjach.} Dziesiątka z
+obiegowego zdania to wiersz pierwszy, czyli skala, na której zbudowane są
+wagi, a nie liczba czegokolwiek.
+
+A $\val{f04.ema.w10}$ nie jest przypadkowym drugim spotkaniem z
+\S\ref{sec:F04-sequences} i jej $\val{f04.geom.ten}$. To ta sama suma
+pomnożona przez $1 - \beta$, bo tym właśnie są wagi.
+\end{fr}
+
+\mermaidfig{f04-ema-weights}{%
+  Gdzie wykładnicza średnia ruchoma trzyma swoją wagę. Wartości nie są
+  zapominane na jakimś progu; każda jest warta $\beta$ tego, co po niej, i tak
+  bez końca.}{%
+  Wagi wykładniczej średniej ruchomej i jej połowa wagi.}
+
+\begin{fr}
+\yourturn
+Inicjalizacja, na którą rozwinięcie ma osobny wyraz, a na którą nikt nie
+patrzy.
+
+$m$ startuje od $0$, a każda nadchodząca obserwacja wynosi dokładnie $1$. Co
+pokaże $m$ po jednym kroku przy $\beta = \num{0.9}$, a co po jednym kroku przy
+$\beta = \num{0.999}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\num{0.1}$ i $\num{0.001}$.
+\end{ansblock}
+
+Średnia ze stałej $1$ pokazuje po jednym kroku jedną dziesiątą prawdy, a
+przy $\beta = \num{0.999}$ jedną tysięczną. To nie jest powolny start; to jest
+zła liczba i pozostaje zła przez jakiś czas. Po $t$ krokach odczyt wynosi
+$1 - \beta^{\,t}$ prawdy \dash{} to samo $1 - \beta^{\,t}$, które wyszło z
+sumy geometrycznej, bo jest to ta część wagi, która dotąd dotarła.
+
+I to daje poprawkę, skoro wiesz, jaka część dotarła. Podziel przez nią:
+\[ \hat{m}_t = \frac{m_t}{1 - \beta^{\,t}} \]
+Na ciągu stałym jest to dokładnie trafne przy każdym $t$ w rachunku
+literowym: $m_t$ to $1 - \beta^{\,t}$ razy stała, a dzielenie oddaje ją z
+powrotem. W binary64 jest trafne z dokładnością do mniej więcej ostatniego
+miejsca, co jest zwykłą arytmetyką liczb zmiennoprzecinkowych, a nie usterką
+poprawki.
+
+\begin{aibox}
+To jest korekta obciążenia z Adama, a oba współczynniki są tymi z Adama.
+Praca Kingmy i Ba ustawia $\beta_1 = \num{0.9}$ dla pierwszego momentu i
+$\beta_2 = \num{0.999}$ dla drugiego i wyprowadza dokładnie to samo dzielenie
+z inicjalizacji zerem.
+
+Połowa wagi przypada u nich odpowiednio na $\val{f04.ema.halflife.steps}$ i
+$\val{f04.ema.b999.steps}$ kroków, więc na każdym wczesnym kroku oba momenty
+są obciążone w bardzo różnym stopniu i każdy jest korygowany własnym
+$1 - \beta^{\,t}$. To nie jest drobiazg, który ma znaczenie przez trzy kroki i
+przestaje: przy $\beta = \num{0.999}$ poprawka pracuje przez setki kroków.
+\end{aibox}
+
+Twoja wygładzona krzywa straty startuje dużo poniżej prawdziwej straty i przez
+pierwszych kilkaset kroków pnie się jej naprzeciw. Co się dzieje?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Obciążenie, a nie model. Średnia wciąż wychodzi ze swojej zerowej
+inicjalizacji, a $1 - \beta^{\,t}$ mówi, jak daleko z niej wyszła. Podziel
+przez to, a wspinaczka znika.
+\end{ansblock}
+
+Teraz zainkasuj ten program. \textbf{Momentum to wykładnicza średnia ruchoma
+gradientu, wzdłuż której idzie krok zamiast wzdłuż samego gradientu}, więc
+optymalizator idzie wzdłuż wygładzonego kierunku, a nie wzdłuż ostatniego
+zaszumionego. \textbf{Adam to ta rekurencja
+puszczona dwa razy} \dash{} raz na gradiencie i raz na jego kwadracie \dash{}
+z poprawką z poprzedniej ramki na każdej z nich.
+
+Nic z tego nie użyło rachunku różniczkowego. Każdy wiersz tej sekcji był
+arytmetyką na liście liczb i jest twój teraz, a nie w Części~V.
+Program~\ref{prog:P20} dostarcza gradientu i reszty optymalizatora; czego
+dostarczać nie musi, to średniej.
+
+\begin{warning}
+\textbf{Dwie rzeczy w tym współczynniku są konwencją, a nie matematyką, i ta
+druga zmienia długość kroku.} Pierwszą już znasz: może ważyć wartość starą,
+jak tutaj, albo nową, a $\num{0.9}$ przy jednym odczytaniu jest $\num{0.1}$
+przy drugim.
+
+Druga to samo $1 - \beta$, którego często w ogóle się nie pisze. Zostaw
+$v \leftarrow \beta v + g$, a każda waga w rozwiniętej sumie zostaje
+pomnożona przez $\frac{1}{1-\beta}$: kierunek jest ten sam, a wektor jest
+dziesięć razy dłuższy przy $\beta = \num{0.9}$ i tysiąc razy przy
+$\beta = \num{0.999}$. Stałego czynnika przy kroku nie odróżnisz od zmiany
+długości kroku i dlatego oba zapisy są w użyciu i żaden nie jest błędny. Tego,
+co zmiany nie przetrwa, jest długość kroku przeniesiona z tego drugiego.
+Program~\ref{prog:P20} jest tam, gdzie to ma konsekwencje.
+
+Nic w nazwie nie mówi, którą masz. Przeczytaj wiersz, który uaktualnia stan:
+po której stronie siedzi współczynnik i czy druga strona w ogóle niesie
+czynnik.
+\end{warning}
+
+Ktoś zmienia w średniej bieżącej $\beta = \num{0.99}$ na $\beta = \num{0.9}$,
+żeby \enquote{bardziej wygładzić}. Co się stanie?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wygładzi \emph{mniej}. Połowa wagi przesuwa się z
+$\val{f04.ema.b99.halflife}$ kroków na $\val{f04.ema.halflife}$, więc krzywa
+patrzy wstecz mniej więcej dziesięć razy krócej i odpowiednio bardziej się
+trzęsie.
+\end{ansblock}
 
 \medskip
-\textbf{Planowana długość:} 40 ramek.
-}
+\noindent
+\textbf{Co dalej.} Program~\ref{prog:F05} bierze na warsztat samą funkcję, a
+ciąg jest funkcją, której wejściem jest indeks. Program~\ref{prog:F13} to
+ciągły bliźniak sigmy z tego programu: całka akumuluje po przedziale tam,
+gdzie suma akumuluje po liście. Program~\ref{prog:P03} wycenia model w zapisie
+sigma i nie potrzebuje nic ponad arytmetykę, którą masz.
+Program~\ref{prog:P12} liczy, a liczenie to pi w innym kapeluszu.
+Program~\ref{prog:P19} ma ogólne zdanie stojące za perplexity z
+\S\ref{sec:F04-loss}, a Program~\ref{prog:P20} doczepia gradient do rekurencji
+z \S\ref{sec:F04-ema}. A Program~\ref{prog:P25} odpowiada na pytanie, którego
+ten program starannie nie zadał: jak dokładna jest średnia z $n$ rzeczy i ile
+kupuje kolejny tysiąc?
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Sigma to pętla zapisana krótko.} Jej cztery części to
+  indeks, miejsce, w którym indeks się zaczyna, miejsce, w którym się kończy, i
+  treść \dash{} a treść jest wyrażeniem zależnym od indeksu, liczonym raz na
+  każdą wartość, którą indeks przyjmuje.}
+\sumitem{3--4}{$\sum_{i=1}^{n} w_i x_i$ to \emph{suma ważona}: jedna jednostka
+  warstwy liniowej i kształt, na którym zbudowany jest
+  Program~\ref{prog:P05}. Sigma rozdziela się na sumie, a stały czynnik
+  wychodzi przed znak. Obie reguły są tylko przestawioną pętlą.}
+\sumitem{5--6}{\textbf{$\sum a_i b_i$ to nie $(\sum a_i)(\sum b_i)$}, a dla
+  $a = (1, 2)$, $b = (3, 4)$ wychodzi $11$ i $21$. To reguła o sumie wewnątrz
+  sigmy przeniesiona na iloczyn, czyli rozumowanie, które
+  Programy~\ref{prog:F01}, \ref{prog:F02} i~\ref{prog:F03} złapały każdy pod
+  innym znakiem.}
+\sumitem{7--8}{Liczba wyrazów to $\text{koniec} - \text{początek} + 1$, bo obie
+  granice są włączone. $\sum_{i=0}^{n}$ ma $n+1$ wyrazów, a
+  $\sum_{i=0}^{n-1}$ ma $n$, czyli tyle, po ilu chodzi \code{range(n)}.}
+\sumitem{9}{Przeindeksowanie przesuwa granice w jedną stronę, a indeks dolny w
+  drugą: $\sum_{i=1}^{n} x_i = \sum_{j=0}^{n-1} x_{j+1}$. Zwróć uwagę, że
+  angielszczyzna nazywa \emph{index} i liczbę podniesioną, i opuszczoną, a
+  polszczyzna nie.}
+\sumitem{10--11}{Maska przyczynowa liczy $\frac{n(n+1)}{2}$ par
+  zapytanie--klucz \dash{} $\val{f04.causal.pairs}$ przy $n = 2048$ wobec
+  $\val{f04.causal.sq}$ dla pełnego kwadratu. Stosunek $\frac{n+1}{2n}$ opada
+  do połowy z góry i nigdy jej nie osiąga: $\val{f04.causal.ratio.eight}$ przy
+  $n = 8$.}
+\sumitem{12--13}{$\prod$ to ta sama maszyna z mnożeniem w środku, a silnia to
+  pi z indeksem w treści: $n! = \prod_{i=1}^{n} i$.}
+\sumitem{14--15}{\textbf{Suma pusta wynosi $0$, a iloczyn pusty $1$}, bo każde z
+  nich jest elementem neutralnym swojego działania i żadna inna wartość nie
+  utrzymuje spójności pętli. $a^{0} = 1$ jest iloczynem pustym, co potwierdza
+  drugą drogą wywód z prawa dzielenia z Programu~\ref{prog:F01}, a
+  $\ln 1 = 0$ przenosi jedną konwencję na drugą.}
+\sumitem{16}{Pusta \emph{suma} jest bezpieczna, a pusta \emph{średnia} nie.
+  \code{0.0 / 0.0} zgłasza błąd w czystym Pythonie; numpy zwraca \code{nan},
+  ostrzega i idzie dalej. Zabezpieczenie należy się mianownikowi.}
+\sumitem{17--19}{\textbf{Każda strata tutaj to $\frac{1}{n}\sum$ po wyrazie na
+  przykład} i rusza się tylko ten wyraz: kwadrat reszty, jej wielkość albo
+  $-\ln p_i$. Na czterech punktach błąd średniokwadratowy wynosi
+  $\val{f04.mse}$, a średni błąd bezwzględny $\val{f04.mae}$.}
+\sumitem{20--21}{Perplexity to eksponenta średniej straty, na tym batchu
+  $\val{f04.ce.ppl}$. Średnia z wartości perplexity na przykład wynosi
+  $\val{f04.ce.ppl.naive}$ i jest inną wielkością;
+  Program~\ref{prog:P19} ma stojącą za tym nierówność.}
+\sumitem{22}{W arytmetyce dokładnej suma nie ma kolejności, a w
+  zmiennoprzecinkowej ma. Ten program nie podaje na to żadnej liczby, bo byłaby
+  to liczba o jednej maszynie; należy to do Programów~\ref{prog:P01}
+  i~\ref{prog:P02}.}
+\sumitem{23--26}{\textbf{Średnia z ilorazów to nie iloraz sum.} Dwa batche po
+  $\num{2.0}$ i $\num{8.0}$ dają razem $\val{f04.batch.pooled}$, a nie
+  $\num{5.0}$; dwa fragmenty po $\num{0.90}$ i $\num{0.10}$ dają razem
+  $\val{f04.acc.micro}$, a nie $\num{0.50}$; dwa przebiegi po $100$ i $1$
+  token na sekundę dają razem $\val{f04.rate.micro}$, a nie $\num{50.5}$.}
+\sumitem{27--28}{Średnia makro waży równo grupy, średnia mikro waży równo
+  elementy, a zgadzają się dokładnie wtedy, gdy wszystkie mianowniki są równe.
+  Obie są prawomocne; błędem jest podanie jednej jako drugiej.}
+\sumitem{29--32}{Rekurencja robi jeden krok, a wzór ogólny pomija je wszystkie.
+  $\sum_{k=0}^{n-1} r^{k} = \frac{1-r^{n}}{1-r}$, co wynosi
+  $\val{f04.geom.ten}$ przy $r = \num{0.9}$ i $n = 10$, a dąży do
+  $\frac{1}{1-r} = \val{f04.geom.inf}$.}
+\sumitem{33--34}{$\ln \prod_i x_i = \sum_i \ln x_i$, czyli pierwsze prawo z
+  Programu~\ref{prog:F03} zapisane nad pi. Pięćdziesiąt warstw po $\num{0.9}$
+  daje $\val{f04.decay.fifty}$, a po $\num{1.1}$ daje $\val{f04.grow.fifty}$:
+  dwa czynniki odległe o $\num{0.2}$ są na drugim końcu odległe o mniej więcej
+  $\val{f04.decay.ratio}$.}
+\sumitem{35--38}{Wykładnicza średnia ruchoma to
+  $m \leftarrow \beta m + (1-\beta) g$, a rozwinięta jest sumą ważoną
+  wszystkiego, co zobaczyła, z wagami $(1-\beta)\beta^{k}$.
+  \textbf{$\beta$ waży wartość starą.} Przy $\beta = \num{0.9}$ ostatnie
+  dziesięć niesie $\val{f04.ema.w10}$ wagi, a jej połowa siedzi w ostatnich
+  $\val{f04.ema.halflife.steps}$.}
+\sumitem{39--42}{Start od $0$ obciąża ją: po $t$ krokach pokazuje
+  $1 - \beta^{\,t}$ prawdy, a podzielenie przez to usuwa obciążenie dokładnie.
+  \textbf{To jest momentum, a przy rekurencji puszczonej dwa razy jest to
+  Adam}, i nic z tego nie potrzebowało rachunku różniczkowego.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Rozpisz $\sum_{i=1}^{5} (2i - 1)$ w całości i oblicz.
+  \answerto{$1 + 3 + 5 + 7 + 9 = 25$.}
+\item Ile wyrazów ma $\sum_{i=3}^{9} x_i$?
+  \answerto{$7$, z $9 - 3 + 1$. Obie granice są włączone.}
+\item Przepisz $\sum_{i=1}^{6} x_i$ tak, żeby indeks zaczynał się od $0$.
+  \answerto{$\sum_{j=0}^{5} x_{j+1}$.}
+\item Zapisz tę pętlę jako sigmę:
+  \begin{center}
+  \code{total = 0.0}\\
+  \code{for c, p in zip(counts, prices):}\\
+  \code{\quad total = total + c * p}
+  \end{center}
+  \answerto{$\sum_{i=1}^{n} c_i p_i$, czyli suma ważona.}
+\item Oblicz $\prod_{i=1}^{5} i$.
+  \answerto{$120$, czyli $5!$.}
+\item Co zwracają \code{sum([])} i \code{math.prod([])} i dlaczego akurat te
+  dwie wartości?
+  \answerto{$0$ i $1$. Treść pętli nie wykonuje się ani razu, więc każda z
+  nich zwraca swój akumulator, a akumulator musi być wartością, która zostawia
+  następny wyraz bez zmiany.}
+\item Zapisz błąd średniokwadratowy po $n$ przykładach w zapisie sigma i
+  powiedz, która jego część zmienia się przy przejściu na średni błąd
+  bezwzględny.
+  \answerto{$\frac{1}{n}\sum_{i=1}^{n}(\hat{y}_i - y_i)^{2}$, a zmienia się
+  tylko treść \dash{} na $\lvert \hat{y}_i - y_i \rvert$. Sigma i dzielnik
+  zostają na miejscu.}
+\item Jeden batch $400$ tokenów ma średnią stratę $\num{1.5}$, a drugi
+  $100$ tokenów ma średnią stratę $\num{3.5}$. Ile wynosi średnia strata na
+  $500$ tokenach?
+  \answerto{$\frac{400 \times \num{1.5} + 100 \times \num{3.5}}{500}
+  = \frac{950}{500} = \num{1.9}$, a nie $\num{2.5}$, które wychodzi z
+  uśrednienia obu.}
+\item Jeden fragment daje $30$ na $50$, a drugi $30$ na $150$. Ile wynosi
+  trafność na wszystkich elementach, a ile średnia z obu trafności
+  fragmentów?
+  \answerto{$\frac{60}{200} = \num{0.30}$ razem, wobec
+  $\frac{\num{0.60} + \num{0.20}}{2} = \num{0.40}$ makro. Większy fragment jest
+  tym gorszym, a średnia makro to ukrywa.}
+\item Oblicz $\sum_{k=0}^{3} r^{k}$ dla $r = \frac{1}{2}$ i powiedz, do czego
+  dąży ta suma, gdy wyrazów przybywa.
+  \answerto{$\frac{1 - 1/16}{1/2} = \frac{15}{8} = \num{1.875}$, a dąży do
+  $\frac{1}{1 - 1/2} = 2$.}
+\item Średnia bieżąca z $\beta = \num{0.8}$ pokazuje $5$, a następna
+  obserwacja wynosi $10$. Co pokaże po tym kroku?
+  \answerto{$\num{0.8} \times 5 + \num{0.2} \times 10 = 4 + 2 = 6$.}
+\item Średnia z $\beta = \num{0.5}$ startuje od $0$, a każda obserwacja wynosi
+  $1$. Co pokaże po dwóch krokach i co daje korekta obciążenia?
+  \answerto{$\num{0.5}$, potem $\num{0.75}$, czyli $1 - \beta^{2}$ prawdy.
+  Podzielenie przez $1 - \beta^{2} = \num{0.75}$ daje $1$.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Posługując się pętlą, a nie regułą, uzasadnij, że
+  $\sum_{i=1}^{n}(a_i + b_i) = \sum_{i=1}^{n} a_i + \sum_{i=1}^{n} b_i$.
+  \answerto{Obie strony dodają te same $2n$ liczb; różni je tylko kolejność
+  dodawań, a w arytmetyce dokładnej to nie ma znaczenia. Ramka $22$ mówi, w
+  jakim jednym sensie ma.}
+\item Oblicz $\sum_{i=1}^{100} i$ przez parowanie, a nie przez dodawanie.
+  \answerto{$\frac{100 \times 101}{2} = 5050$. Sparuj pierwszy z ostatnim,
+  drugi z przedostatnim, a każda para daje $101$.}
+\item Ile par zapytanie--klucz liczy maska przyczynowa przy $n = 1024$ i jaką
+  część pełnego kwadratu to stanowi?
+  \answerto{$\frac{1024 \times 1025}{2} = 524800$, czyli $\frac{1025}{2048}$
+  kwadratu \dash{} trochę ponad połowę i powyżej niej.}
+\item Pokaż dwa razy, że $0! = 1$: raz z iloczynu pustego, a raz z
+  $n! = n \times (n-1)!$ czytanego w dół od $1! = 1$.
+  \answerto{Iloczyn zera czynników to element neutralny, czyli $1$. A
+  $1! = 1 \times 0!$ wymusza $0! = 1$, jeśli rekurencja ma obowiązywać przy
+  $n = 1$.}
+\item Twój wiersz ze stratą to \code{total / count}, a batch może przyjść w
+  całości zamaskowany. Napisz zabezpieczenie i powiedz, dlaczego należy się
+  ono \code{count}, a nie \code{total}.
+  \answerto{Pomiń batch albo zwróć zerową stratę, gdy \code{count} wynosi
+  zero. \code{total} jest zupełnie dobrze określoną sumą pustą; to dzielenie
+  nie ma odpowiedzi.}
+\item Weź $y = (0, 0, 0, 10)$ i $\hat{y} = (0, 0, 0, 0)$. Policz błąd
+  średniokwadratowy i średni błąd bezwzględny i powiedz, którym z nich
+  pojedynczy odstający punkt rusza mocniej.
+  \answerto{$\frac{100}{4} = 25$ i $\frac{10}{4} = \num{2.5}$. Podniesienie
+  reszty do kwadratu przed uśrednieniem sprawia, że jeden duży błąd zaczyna
+  dominować sumę, i to jest wybór, którego dokonujesz, wybierając stratę.}
+\item Trzy benchmarki o $1000$, $100$ i $10$ elementach dają wyniki
+  $\num{0.5}$, $\num{0.6}$ i $\num{1.0}$. Ile wynosi średnia makro, a ile
+  trafność na wszystkich elementach?
+  \answerto{Makro to $\frac{\num{2.1}}{3} = \num{0.70}$; razem to
+  $\frac{570}{1110}$, czyli około $\num{0.51}$. Te dwie różnią się bardziej
+  niż większość podawanych różnic między modelami.}
+\item Trzy przebiegi robią po $100$ tokenów, zajmując $1$, $2$ i $4$ sekundy.
+  Podaj średnią z trzech prędkości, prędkość na całości pracy i średnią
+  harmoniczną tych trzech prędkości.
+  \answerto{Prędkości $100$, $50$, $25$; ich średnia to około $\num{58.3}$;
+  prędkość na całości to $\frac{300}{7}$, czyli około $\num{42.9}$; a średnia
+  harmoniczna to $\frac{3}{\num{0.07}}$, czyli te same $\num{42.9}$, bo
+  liczniki są równe.}
+\item Oblicz $\sum_{k=0}^{4} 2^{k}$ tym samym wzorem i powiedz, dlaczego
+  działa on nadal przy $r > 1$, a suma nieskończona nie istnieje.
+  \answerto{$\frac{1 - 32}{1 - 2} = 31$. Wyprowadzenie nie założyło o $r$
+  niczego; \emph{granicy} potrzeba, żeby $r^{n}$ zanikało, a przy $r = 2$
+  rośnie.}
+\item Dlaczego prawdopodobieństwo sekwencji pięćdziesięciu tokenów liczy się
+  jako sumę logarytmów, a nie jako iloczyn?
+  \answerto{Bo $\ln \prod x_i = \sum \ln x_i$, a suma zostaje w zakresie,
+  który mieści liczba zmiennoprzecinkowa. Program~\ref{prog:F03} zmierzył
+  długość, przy której iloczyn osiąga dokładnie zero.}
+\item Pokaż, że wagi $(1-\beta)\beta^{k}$ sumują się do $1$, gdy wyrazów
+  przybywa.
+  \answerto{$(1-\beta)\sum_{k=0}^{\infty}\beta^{k}
+  = (1-\beta) \times \frac{1}{1-\beta} = 1$. Średnia jest średnią, a nie samą
+  sumą.}
+\item Co robi wykładnicza średnia ruchoma przy $\beta = 0$, a co przy
+  $\beta = 1$?
+  \answerto{Przy $\beta = 0$ jest ostatnią obserwacją i nie ma pamięci. Przy
+  $\beta = 1$ nigdy nie rusza się z wartości początkowej i nie ma nowości.
+  Wszystko użyteczne leży ściśle pomiędzy.}
+\item Co robi korekta obciążenia $\frac{1}{1 - \beta^{\,t}}$, gdy $t$ rośnie, i
+  co to znaczy w praktyce?
+  \answerto{$\beta^{\,t}$ zanika, więc czynnik dąży do $1$, a korekta wygasa.
+  Ma znaczenie na początku i nic nie kosztuje później.}
+\item Na ilu obserwacjach leży połowa wagi średniej przy $\beta = \num{0.999}$
+  i jak to wypada wobec $\beta = \num{0.9}$?
+  \answerto{Na $\val{f04.ema.b999.steps}$ obserwacjach, z połową wagi po
+  $\val{f04.ema.b999.halflife}$ kroku, wobec $\val{f04.ema.halflife.steps}$
+  przy $\beta = \num{0.9}$ \dash{} stukrotna różnica ze współczynnika, który
+  przesunął się o mniej niż jedną dziesiątą.}
+\item A przy $\beta = \num{0.99}$?
+  \answerto{Na $\val{f04.ema.b99.steps}$ obserwacjach, z połową wagi po
+  $\val{f04.ema.b99.halflife}$ kroku. Każda dopisana dziewiątka mnoży pamięć
+  mniej więcej przez dziesięć.}
+\item Zapisz dwa wiersze momentum z samej rekurencji, wiedząc, że obserwacją
+  nadchodzącą w każdym kroku jest gradient $g_t$.
+  \answerto{$m \leftarrow \beta m + (1-\beta) g$, a potem krok wzdłuż $m$
+  zamiast wzdłuż $g$. Zapisane jako $v \leftarrow \beta v + g$ jest to ten sam
+  kierunek $\frac{1}{1-\beta}$ razy dłuższy, a różnicę pochłania długość kroku.
+  Program~\ref{prog:P20} dostarcza gradientu i długości kroku.}
+\item Przepisz $\sum_{i=0}^{n-1} x_{i+1}$ tak, żeby indeks zaczynał się od
+  $1$.
+  \answerto{$\sum_{j=1}^{n} x_{j}$. Granice poszły w górę o jeden, a indeks
+  dolny w dół o jeden.}
+\item Przebieg podaje $\num{0.5}$ sekundy na token na $10$ tokenach i
+  $\num{0.1}$ sekundy na token na $100$ tokenach. Ile wynosi czas na token na
+  tych $110$?
+  \answerto{$\frac{5 + 10}{110} = \frac{15}{110}$, czyli około $\num{0.14}$
+  sekundy na token. Uśrednienie $\num{0.5}$ i $\num{0.1}$ daje $\num{0.30}$,
+  czyli ponad dwa razy więcej.}
+\end{furtherproblems}
