@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F4 written, both editions.** F5–F13 and P1–P34 are stubs carrying their briefs | 43 of 47 |
+| Programs | **F1–F5 written, both editions.** F6–F13 and P1–P34 are stubs carrying their briefs | 42 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 284 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-pl` (17x24) | 290 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-en-a4` | 260 | 0 | 0 | 5, worst 6.3 pt | 0 |
-| `main-pl-a4` | 264 | 0 | 0 | 4, worst 4.4 pt | 0 |
+| `main-en` (17x24) | 318 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-pl` (17x24) | 326 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en-a4` | 292 | 0 | 0 | 5, worst 6.3 pt | 0 |
+| `main-pl-a4` | 294 | 0 | 0 | 4, worst 4.4 pt | 0 |
 
 The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
 one format and one language because that is where the line falls. Well under
@@ -81,18 +81,20 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **43 of 47 programs are stubs**, in each language. This is the whole of the
+- **42 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 136 computed values, all referenced, all present, plus the committed console
+- 168 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 24 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 30 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **15 orphan-tail pages: 1 · 6 · 4 · 4** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`. Thirteen are in F1, F2 and F3 and two are F4's,
-  in the A4 English build alone. `checkpdf.py` prints every one of them on
+- **26 orphan-tail pages: 3 · 9 · 7 · 7** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`, up from 15 before F5 and the largest single jump
+  the ledger has taken. Eleven of the eleven added are F5's, which is what 47
+  frames of new material costs at this cue rate; the count is the signal and
+  it is going the wrong way. `checkpdf.py` prints every one of them on
   every run and **does not fail the build for them**; the reasoning is in the
   note above its `main()` and is summarised under *Program F4 review pass*.
   This is the second ledger that is reported rather than gated, and like the
@@ -1782,7 +1784,10 @@ be incapable of standing alone — it retires both this ledger and the cue's.
   live through* — now *zostaje więcej starej wartości*.
 - **This file said F4 was the last program in the book.** It is the last one
   *written*. The reasoning that rested on it (a trim inside F4 cannot move F01)
-  holds; the sentence stops being true the day F05 is drafted.
+  holds; the sentence stops being true the day F05 is drafted — **and F05 is
+  now drafted, so it is F5 that a trim cannot propagate out of.** The rule is
+  the general one: a trim can only move breaks *after* itself, so fix orphans
+  in document order and rebuild all four after every edit.
 
 #### One thing found and deliberately not fixed
 
@@ -1793,6 +1798,168 @@ preamble to fix, and it was left alone because it is nothing to do with F4 and
 because it moves no page. `checkpdf`'s chapter-final test had to be written
 around it — a page with nothing but a head is what has to be skipped, not a
 page with nothing at all — so the next person will meet it there.
+
+### Program F5 pass, August 2026
+
+**Forty-seven teaching frames, forty-nine printed, both editions**, against a
+brief that projected forty-five. Seven sections: what a function is, the graph,
+the four moves, weight and bias, composition, inverses, and the order a
+strictly increasing function keeps. The payoff is the last section's and it is
+why the program sits in the Foundation part: **a strictly increasing function
+keeps the order of a list, so it cannot move the argmax**, and therefore
+temperature cannot change which token is most likely -- only how often the
+others get drawn instead.
+
+**The script's own assertion caught a fabricated number before the prose was
+written, and that is the finding worth keeping.** `code/f05_functions.py`'s
+module docstring said the top probability ran "from 0.1749 to 0.7112 over the
+range used here", written from expectation rather than from output; the
+assertion two hundred lines below it (`TOP_HI / TOP_LO > 3.0`) failed on the
+first run. The real range is 0.7042 down to 0.4042, a factor of 1.74.
+
+This is the first time a guard in this repository has caught a plausible
+number *in the same commit that invented it*, and the reason it worked is
+ordering: **write the assertion at the computation, before writing the
+sentence the computation is for.** The docstring is now the corrected figure
+and the assertion is an invariant rather than a threshold -- the maximum of a
+softmax falls monotonically in T and the minimum rises, which survives a
+change of logits, where `> 3.0` would not have.
+
+#### The tail did not reproduce from the page, which is F4's defect in new digits
+
+The striking figure here is not the top of the distribution but the bottom:
+over T from 0.5 to 2.0 the most likely token falls by a factor of 1.74 while
+the least likely rises by 51.7. The page printed 51.7 beside a table whose tail
+entries are 0.0017 and 0.0902 -- **and those divide to 53.1**, because the
+smaller of them carries two significant figures at four decimal places.
+
+That is exactly F4's `22 778` against a page that divides to `22 776`, and it
+had to be caught the same way: by dividing what is actually printed. The fix is
+not more decimals in one row of an otherwise uniform table. The page now states
+a **bound** -- *more than fiftyfold* -- and `code/f05_functions.py` asserts
+that the exact ratio and the ratio of the rounded printed values both clear it.
+The top ratio is left as a figure, with an assertion that it *does* reproduce
+from the rounded table, because that is the property the tail turned out not to
+have.
+
+**The rule: before quoting a ratio, divide the two numbers as the page prints
+them.** If the answer differs, the page cannot support that precision.
+
+#### Two tables that could not fit, and the fix is transposition
+
+The first build added an overfull hbox of **195.8 pt** and another of
+**79.5 pt** -- by a wide margin the largest this book has produced, against a
+15 pt budget. Measured with `\sbox`, the logistic table was **565.7 pt** wide
+and the softmax table **449.4 pt**, against a 350.9 pt measure.
+
+**A `\val{}` numeric column costs about 70 pt**, so eight of them do not fit
+and no amount of rewording will make them. Both tables were transposed, and
+the softmax one reads better transposed than it did before: with the
+temperatures across the top, the reader scans *down* each column and finds the
+top row largest every time, which is the invariance the section is about. The
+multiset came back to the pre-F5 baseline in all four builds.
+
+#### Five claims a reader could have falsified
+
+Found by re-reading against the sources rather than by any gate, and two of
+them are the book being wrong about the book:
+
+- **"$x > 0$, which Program F03 spent a section on."** F03 has seven sections
+  and none of them is about the domain. It is settled in two frames inside
+  *What a logarithm is*. Now *and Program F03 says why*. Third pass running
+  that this file's rule has been paid for: **open the program before writing a
+  sentence about it.**
+- **"At $w = 5$ the curve does all its work in a window under one unit wide,
+  and outside that window it is flat to three decimal places."** The first
+  clause is measured; the second is false, and not marginally. Outside the
+  0.1-to-0.9 band the curve still has a tenth of its range to cover at each
+  end, and at $w = 5$ it needs nearly another whole unit of $x$ to come within
+  0.001 of its limit. The false clause is gone and the measured one stands
+  alone.
+- **"The best such line has slope 2.4286."** *Best* is not defined until the
+  criterion is named, and least squares and minimax give different answers.
+  Now *the least-squares line of that form*.
+- **"It appears in every binary cross-entropy."** A universal claim about a
+  composition that holds when the input is a logit, which is the usual case and
+  not all of them. Narrowed to what is true.
+- **The trap catalogue routed the threshold trap to P19**, which is *Convexity
+  and Jensen's inequality*. No program in the manifest undertakes parametrising
+  a unit by its threshold, and the entry now says so rather than naming one.
+
+#### CLAUDE.md's own tally of the trap catalogue had drifted by five
+
+This file said the catalogue held **41** misconceptions. The catalogue's own
+heading said **46**. Neither is now stated anywhere: the heading names the list
+and the Foundation section names *which program produced which entry* -- item
+41 out of F3, 42 to 46 out of F4, 47 and 48 out of F5 -- which is checkable and
+does not decay.
+
+The rule this file already carried is *never state a count of occurrences*, and
+the document stating it was carrying two counts that had come apart. **A rule
+written in a file does not audit that file.**
+
+#### Exact in the algebra, and not to the bit
+
+The argmax result is stated as exact, and it is: dividing by a positive $T$ and
+exponentiating are both strictly increasing, and the final division is by one
+positive total. A random search over **200,000 vectors** of two to eight
+entries at seven temperatures found no counterexample.
+
+But push $T$ high enough and every entry becomes the same float -- measured, at
+$T = 10^{6}$ on a vector spanning 3.0 -- and the comparison has nothing left to
+compare. The frame says so, in one clause, exactly as F4 says the bias
+correction is exact in the algebra and 1.4e-14 in binary64. **A result that is
+exact mathematically still owes the reader a sentence about the arithmetic.**
+
+#### The diagrams, and the crossover caught in the act
+
+`f05-four-moves` first rendered at 515 x 344, an aspect ratio of **1.50**,
+against a crossover of 1.53 in the trade format. That is the hazard this file
+records for `f01-magnitudes` and it was caught before it shipped: below the
+crossover the height cap binds and the figure cannot share a page with the
+frames it belongs to. Flattening the tree from three ranks into two rows of
+three took it to 2.65. And `f05-one-output` first came out 492 pt wide, which
+would have set **10.18 pt** on A4 -- the largest node text in the book -- so its
+nodes were made wordier, which is again the opposite of the instinct.
+
+| | W (en / pl) | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|
+| F5.1 one-output | 492 / 538 | 8.97 | 8.20 | 10.18 | 9.31 |
+| F5.2 four-moves | 527 / 508 | 8.37 | 8.68 | 9.50 | 9.86 |
+| F5.3 order-kept | 555 / 544 | 7.95 | 8.11 | 9.02 | 9.20 |
+
+**Rule 2 was checked by reading each figure first and then finding it in all
+four builds**, as the F03 second review pass prescribes. All three figures
+contain an answer to something the program asks -- F5.1 the non-function, F5.2
+the shift direction, F5.3 the argmax -- and all three sit **after** the frame
+that delivers it, by two to five pages in every build:
+
+| | F5.1 / its answer | F5.2 / its answer | F5.3 / its answer |
+|---|---|---|---|
+| `main-en` | 159 / 156 | 167 / 164 | 181 / 178 |
+| `main-pl` | 165 / — | 175 / 170 | 187 / 185 |
+| `main-en-a4` | 140 / 137 | 149 / 145 | 160 / 158 |
+| `main-pl-a4` | 142 / — | 150 / 147 | 161 / 159 |
+
+That is sound by construction as well as by measurement: a float cannot rise
+above the page its declaration point falls on, and every one of these is
+declared at the end of the section that corrects the thing it draws.
+
+#### The orphan-tail ledger took its largest jump, and one cue was a hard gate
+
+`main-pl-a4` shipped a page carrying the words *Kolejna ramka.* and nothing
+else -- the tail of frame 42, the temperature elicitation, one line past the
+boundary. That is the **hard** half of `checkpdf` locally and it was cleared
+editorially: frame 42 lost a clause in both editions (the instruction was
+tightened in English too, so the two editions still say the same thing), and
+`main-pl-a4` lost two pages with it. No digit changed, so C12 stayed green.
+
+The orphan tails went **15 to 26**. All eleven added are F5's, and none is
+clearable without the random walk this file already describes. It is the
+reported ledger and it is going the wrong way; the structural fix -- a frame's
+tail should be incapable of standing alone -- is still open, and the two
+candidates measured so far (a penalty on `\dotline`, and widow/club penalties
+at 10000) both made it worse.
 
 ### Stroud layout pass, August 2026
 
@@ -1970,7 +2137,7 @@ thirteen, because the same items serve as entry and exit test. The instrument is
 now the **scored Test exercises**, which every program has, with entry and exit
 items drawn from the same pool but not identical.
 
-**The trap catalogue** — 41 misconceptions AI engineers actually hold, each
+**The trap catalogue** — the misconceptions AI engineers actually hold, each
 phrased in the reader's own voice with its correction and its owning program —
 is `notes/02-grounding-and-traps.md` §3. A trap frame must *elicit* the error,
 not warn against it, and the correction must explain the reasoning that produced
@@ -2043,12 +2210,14 @@ clone instead.
 
 ## What is left
 
-1. **Forty-three programs.** This is the work. F5–F13 first, because the
+1. **Forty-two programs.** This is the work. F6–F13 first, because the
    Foundation part is what makes the book's claim — *it assumes nothing* — true
-   or false. F3 and F4 are written, so **F12 (the chain rule) is still the one
-   outstanding program the rest of the book leans on hardest** — and F4 has now
-   handed it the sigma and the product it will need to state a chain of layers
-   as one.
+   or false. **F12 (the chain rule) is still the one outstanding program the
+   rest of the book leans on hardest** — and it is now owed two things by name:
+   F4's sigma and product, for stating a chain of layers as one, and F5's
+   composition, which frame 34 hands it explicitly. F6 is the natural next one:
+   its brief is *solving is undoing*, which F5 has already had the reader doing
+   informally at every inverse and every rearranged bracket.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
    softmax entropy with and without the `1/√d_k` scaling — is the one to run
    first: it costs nothing and it converts the book's central derivation from an

@@ -364,7 +364,7 @@ That paragraph is the difference between a defensible TOC and a nostalgic one.
 
 ---
 
-## 3. The misconception list — 46 traps AI engineers actually fall into
+## 3. The misconception list — the traps AI engineers actually fall into
 
 Format: the **wrong belief in the reader's own voice** (this is the wording that
 goes in the trap frame, because a trap only works if the reader recognises
@@ -664,7 +664,10 @@ at T = 0 the expression divides by zero. Implementations that "support
 temperature 0" special-case it to argmax. And note the direction: T < 1 sharpens,
 T > 1 flattens, and T does not change the argmax of a single softmax at all — so
 "raising temperature made the model pick a different top token" is impossible
-*before* sampling and expected *after* it. → **P22, P28**.
+*before* sampling and expected *after* it. → the argmax half is **F05**, which
+proves it from strict monotonicity and measures how much the distribution moves
+while the argmax does not; the T = 0 limit and the sampling behaviour are
+**P22, P28**.
 
 **41. "log(a + b) = log a + log b."** There is no rule for the logarithm of a
 sum. `ln a + ln b` is the logarithm of the *product*, so the wrong rule does not
@@ -687,10 +690,15 @@ than to the others.
 
 ### Foundation (F01–F13)
 
-The five below came out of writing F4, as item 41 came out of writing F3. They
-carry the same health warning: the list above is a catalogue of misconceptions
-*observed in practice*, and these are claims about what a reader will write when
-asked quickly. **None of them has been counted.** Falsifier 4 in §2.3 applies to
+The entries in this section came out of writing the Foundation programs
+themselves rather than out of the literature: item 41 out of F3, items 42 to 46
+out of F4, and items 47 and 48 out of F5. Say which program produced which,
+never how many there are — the count at the head of §3 was stated once and had
+drifted by five before anybody reread it.
+
+They carry the same health warning: the list above is a catalogue of
+misconceptions *observed in practice*, and these are claims about what a reader
+will write when asked quickly. **None of them has been counted.** Falsifier 4 in §2.3 applies to
 them more than to the sourced entries.
 
 **42. "A sigma distributes, so the sum of the products is the product of the
@@ -744,8 +752,26 @@ weight actually sits in the last seven; and the coefficient is written both ways
 round in real code, so the same word names two opposite numbers. → **F04**, and
 **P20** for momentum and Adam.
 
-**Selection note.** Forty-six candidates for what the brief asked to be at least
-twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is
+**47. "f(x − 3) shifts the graph three to the left — the sign says minus."**
+It shifts three to the **right**. Outside the bracket a minus really does move
+the graph down, and that is the true rule the reader is carrying across; inside
+the bracket the number adjusts the *question* rather than the answer, so to see
+the value f gave at 0 you must now stand at x = 3. It is item 41's reasoning
+under a fifth sign, and the parabola settles it without argument: (x − 3)² has
+its lowest point at x = 3. → **F05**.
+
+**48. "The bias is where the unit fires."** σ(wx + b) crosses a half at
+x = −b/w, not at b and not at −b, so one bias sets a different threshold at
+every weight: at b = −2 the crossing is at 2 when w = 1 and at 0.4 when w = 5.
+The misreading is natural because b is the number written in the configuration
+and the weight dividing it is written nowhere. It is the inside-the-bracket
+rule of item 47 with a scaling stacked on it. → **F05**. No program undertakes
+the obvious remedy (parametrise the unit by its threshold rather than by its
+bias), and none is claimed here for it.
+
+**Selection note.** The list is numbered above and the count is deliberately not
+restated here, because it was stated and it decayed. What the brief asked for
+was at least twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is
 documented outside this book, each has a cheap in-frame demonstration, and each
 has cost somebody real money. Falsifier 4 in §2.3 is the honest way to rank the
 rest: **count how often each actually occurs before deciding which get a frame.**

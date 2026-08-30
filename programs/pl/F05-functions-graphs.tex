@@ -1,22 +1,1355 @@
 %% F05 --- Funkcje i wykresy
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f05_functions.py i wchodzi przez \val{}. Rachunki, których
+%% program UCZY -- x^2 dla 0, 1, 2, 3; przesunięcia; 2x+1 dla 0, 1, 2;
+%% sigma(0) = 1/2 -- są wpisane wprost, bo czytelnik ma je zrobić sam.
+%%
+%% GŁÓWNA PUŁAPKA to pułapka sekcji 3: f(x - 3) przesuwa wykres w PRAWO.
+%% Jest wywoływana w ramce 15 pod poleceniem na czas i prostowana w 16, a
+%% sprostowanie musi wyjaśnić rozumowanie, które dało błąd -- poza nawiasem
+%% minus naprawdę przesuwa w dół, a czytelnik przeniósł prawdziwą regułę
+%% przez nawias. To samo rozumowanie złapały Programy F1, F2, F3 i F4, każdy
+%% pod innym znakiem, a ramka z pułapką wymienia te miejsca, zamiast je zliczać.
+%%
+%% ZYSK to zysk sekcji 7 i to on tłumaczy, dlaczego ten program stoi w części
+%% podstawowej, a nie nigdzie: funkcja ściśle rosnąca zachowuje porządek listy,
+%% więc nie może przesunąć argmaksu. Temperatura nie jest więc w stanie zmienić
+%% tego, który token jest najbardziej prawdopodobny -- zmienia tylko to, jak
+%% często losuje się pozostałe. Obie połowy liczy code/f05_functions.py na
+%% jednym ustalonym wektorze logitów i tam ta niezmienniczość jest ZAPEWNIONA
+%% asercją, więc tabela na stronie nie przestanie po cichu być prawdziwa.
+%%
+%% CZEGO STRONA NIE MOŻE POWIEDZIEĆ, a docstring skryptu mówi dlaczego: NIE
+%% "prawdopodobieństwa się nie zmieniają" -- zmieniają się ogromnie, a
+%% uderzająca liczba jest w ogonie, nie na szczycie. Pisz o niezmienniczości
+%% ARGMAKSU.
+%%
+%% Bliźniak: programs/en/F05-functions-graphs.tex. Ramka w ramkę, makro w
+%% makro, liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Funkcje i wykresy}
 \label{prog:F05}
+\index{funkcja!jako maszyna}
+\index{wykres!przekształcenia}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{powiedzieć, czy dana reguła jest funkcją zmiennej $x$, podać
+  wartości $x$, które przyjmuje, i odróżnić maszynę $f$ od liczby $f(x)$}
+\outcome{8--13}{odczytać z wykresu wartość, miejsce przecięcia i odcinek
+  płaski oraz wskazać przedział, na którym funkcja rośnie}
+\outcome{14--23}{przesunąć, rozciągnąć i odbić wykres oraz ustalić kierunek
+  każdego ruchu na podstawie tego, gdzie stoi jego liczba}
+\outcome{24--30}{powiedzieć, co robią z krzywą waga i bias, i ustalić, gdzie
+  krzywa logistyczna przecina połowę}
+\outcome{31--35}{czytać złożenie od środka na zewnątrz i powiedzieć, kiedy w
+  ogóle wolno połączyć dwie funkcje}
+\outcome{36--40}{napisać funkcję odwrotną do krótkiej funkcji, powiedzieć,
+  kiedy ona istnieje, i narysować jej wykres na podstawie oryginału}
+\outcome{41--47}{powiedzieć, co funkcja ściśle rosnąca robi z listą wyników, i
+  na tej podstawie rozstrzygnąć, czy dana zmiana może przesunąć wynik
+  największy}
+\end{outcomes}
 
-Argument: a function is a machine with one output per input, and shifting,
-scaling and reflecting its graph are four moves you can do by eye. Payoff:
-an activation function is a graph you can recognise; weight and bias are
-scale and shift; a monotone transformation does not move the argmax, which
-is why temperature changes what you sample but not what is most likely.
+\begin{quiz}
+\item Czy $y = x^{2}$ jest funkcją zmiennej $x$? A $y^{2} = x$? \teachesat{2--4}
+  \answerto{Pierwsza tak, druga nie. Dla $x = 4$ druga podaje zarówno $y = 2$,
+  jak i $y = -2$, a funkcja zwraca jedną wartość.}
+\item Dla jakich $x$ wyrażenie $f(x) = \frac{1}{x - 2}$ daje wynik?
+  \teachesat{4--5}
+  \answerto{Dla każdego $x$ poza $2$. To jest jej dziedzina, a wykluczony
+  punkt to ten, w którym dzieliłoby się przez zero.}
+\item Czym w kodzie różni się \code{act = relu} od \code{act = relu(x)}?
+  \teachesat{6--7}
+  \answerto{Pierwsze zapisuje maszynę, drugie jedną liczbę, którą maszyna już
+  wyprodukowała. Nawiasy to różnica między posiadaniem funkcji a posiadaniem
+  wartości.}
+\item Naszkicuj $y = 2x + 1$ i powiedz, gdzie przecina oś poziomą.
+  \teachesat{9--10}
+  \answerto{W $x = -\num{0.5}$, tam gdzie $2x + 1 = 0$.}
+\item Dla jakich $x$ funkcja $y = x^{2}$ rośnie? \teachesat{10--11}
+  \answerto{Dla $x \ge 0$. Dla $x \le 0$ maleje, więc \enquote{rośnie} jest
+  zdaniem o przedziale, a nie o funkcji jako całości.}
+\item Masz wykres $y = f(x)$. Gdzie i o ile leży wykres $y = f(x - 3)$?
+  \teachesat{15--16}
+  \answerto{Trzy w prawo. W nawiasie liczba działa na argument, a wykres
+  przesuwa się przeciwnie do znaku.}
+\item Co $y = 2f(x)$ robi z wykresem $y = f(x)$? \teachesat{18--19}
+  \answerto{Podwaja każdą wysokość, rozciągając go od osi poziomej. Punkt,
+  który był na $3$, jest teraz na $6$; punkt na $0$ nie rusza się wcale.}
+\item Gdzie $y = (x + 4)^{2}$ ma najniższy punkt? \teachesat{17--18}
+  \answerto{W $x = -4$, tam gdzie nawias jest zerem.}
+\item Czy $2f(x) + 1$ to to samo co $2\bigl(f(x) + 1\bigr)$? \teachesat{22--23}
+  \answerto{Nie. Dla $f(x) = 3$ pierwsze daje $7$, a drugie $8$. Ruchy
+  wykonuje się w kolejności, w jakiej są zapisane.}
+\item Ile wynosi $\sigma(0)$, gdzie $\sigma(x) = \frac{1}{1 + e^{-x}}$?
+  \teachesatone{25}
+  \answerto{Dokładnie $\num{0.5}$, bo $e^{0} = 1$, a $\frac{1}{1+1}$ to
+  połowa.}
+\item Gdzie $\sigma(wx + b)$ przecina połowę? \teachesat{27--28}
+  \answerto{W $x = -\frac{b}{w}$, co zależy zarówno od wagi, jak i od biasu.}
+\item Dla $g(x) = 2x + 1$ i $f(x) = x^{2}$ policz $f(g(1))$ oraz $g(f(1))$.
+  \teachesat{31--32}
+  \answerto{$9$ i $3$. Złożenie czyta się od środka na zewnątrz, a dwie
+  kolejności to dwie różne funkcje.}
+\item Napisz funkcję odwrotną do $f(x) = 2x + 1$. \teachesatone{36}
+  \answerto{$f^{-1}(y) = \frac{y - 1}{2}$. Cofnij działania w kolejności
+  odwrotnej do tej, w jakiej zostały wykonane.}
+\item Które z funkcji $x^{2}$, $e^{x}$, $-x$ i $\frac{x}{2}$ są ściśle
+  rosnące? \teachesat{41--42}
+  \answerto{$e^{x}$ i $\frac{x}{2}$. Pierwsza maleje dla $x < 0$, a trzecia
+  maleje wszędzie.}
+\item Cztery wyniki to $\num{2.0}$, $\num{1.5}$, $\num{0.5}$ i $-\num{1.0}$.
+  Podziel każdy z nich przez $2$. Który jest teraz największy?
+  \teachesat{44--45}
+  \answerto{Pierwszy, tak jak wcześniej. Podzielenie każdego wyniku na pół nie
+  może zmienić ich kolejności.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+% ============================================================
+\section{Jedna wartość, i tylko jedna}
+\label{sec:F05-machine}
+\index{funkcja!dziedzina}
+\index{funkcja!jedna wartość na argument}
+
+\begin{fr}
+Funkcja to maszyna. Wkładasz liczbę z jednej strony, a z drugiej wychodzi
+dokładnie jedna liczba. Napisałeś ich tysiące:
+
+\begin{python}
+def f(x):
+    return x * x
+\end{python}
+
+Podaj jej $3$, a odda $9$. Podaj jej $3$ jeszcze raz jutro, a odda $9$ znowu
+\dash{} maszyna nie ma pamięci ani nastroju, i właśnie to czyni ją funkcją, a
+nie procesem.
+
+Zapis na papierze jest krótszy i mówi to samo: $f(x) = x^{2}$, czytane
+\emph{f od x równa się x kwadrat}. Litera $x$ jest miejscem na to, co włożysz,
+a $f(3)$ znaczy \emph{liczba, którą ta maszyna daje, gdy podasz jej 3}.
+
+Ile wynosi $f(-3)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$9$}
+Podnoszenie do kwadratu wyrzuca znak, więc $-3$ i $3$ dostają tę samą
+odpowiedź. To jest dozwolone: funkcja może dać tę samą wartość dwóm różnym
+argumentom. Czego nie może, to dać dwie różne wartości temu samemu
+argumentowi.
+
+Oto reguła, która ten warunek łamie. Weź
+\[ x^{2} + y^{2} = 18 \]
+i przeczytaj to jako polecenie: \emph{dane jest $x$, podaj mi $y$}.
+
+Podaj jej $x = 3$. Czy to jest funkcja zmiennej $x$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie}
+Dla $x = 3$ reguła oferuje $y = 3$ i $y = -3$, bo obie liczby spełniają
+$9 + 9 = 18$. Dwie odpowiedzi na jedno pytanie to nie jest maszyna, której da
+się użyć: trzeba by dopytać, którą miała na myśli.
+
+Narysowany na papierze warunek ma nazwę i stosuje się go okiem. Przyłóż
+linijkę pionowo w dowolnym miejscu wykresu. Jeśli gdziekolwiek przetnie
+krzywą dwa razy, obrazek nie jest wykresem funkcji. Okrąg zawodzi od razu;
+parabola nie zawiedzie, jak daleko byś linijki nie przesuwał.
+
+Które z tych trzech są funkcjami zmiennej $x$?
+\[ \text{(a)}\; y = x^{2} \qquad \text{(b)}\; y^{2} = x \qquad
+   \text{(c)}\; y = \lvert x \rvert \]
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+(a) i (c).
+\end{ansblock}
+
+(b) zawodzi: dla $x = 4$ oferuje $y = 2$ i $y = -2$, czyli wina okręgu pod
+inną nazwą. Zauważ, że (c) daje $2$ zarówno dla $x = -2$, jak i dla $x = 2$ i
+jest zupełnie w porządku, z powodu, który podała ramka $2$.
+\emph{Wiele do jednego} to funkcja; \emph{jedno do wielu} nie.
+
+Reguła może zawieść jeszcze na drugi sposób, i ten zawodzi tylko dla
+poszczególnych argumentów, a nie wszędzie. Rozważ
+\[ f(x) = \frac{1}{x - 2} \]
+
+Co daje dla $x = 2$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Zupełnie nic}
+Nie ma liczby, którą mogłaby oddać, bo dzielenie nie ma wyniku. Zatem $2$ nie
+jest argumentem, który ta maszyna przyjmuje.
+
+Zbiór argumentów przyjmowanych przez funkcję nazywa się jej
+\textbf{dziedziną}, a podanie jej jest częścią podania funkcji. Trzy, które
+będziesz spotykał bez przerwy:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Funkcja & Dziedzina \\
+\midrule
+$\frac{1}{x - 2}$ & każde $x$ poza $2$ \\
+$\sqrt{x}$ & $x \ge 0$, jeśli wynik ma być liczbą rzeczywistą \\
+$\ln x$ & $x > 0$, a Program~\ref{prog:F03} mówi dlaczego \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+W kodzie dziedzina to zbiór argumentów, które nie rzucają wyjątkiem, i te dwa
+pojęcia pokrywają się dokładnie: \code{math.sqrt(-1)} i \code{math.log(0)}
+zatrzymują program, i zatrzymują go dlatego, że zadałeś pytanie spoza
+dziedziny, a nie dlatego, że coś poszło źle.
+
+Uzupełnij lukę: dziedziną $\sqrt{x - 5}$ jest $x \ge \blank$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$x \ge 5$.
+\end{ansblock}
+
+Nawias musi wyjść zero lub więcej, więc $x - 5 \ge 0$. Właśnie zrobiłeś robotę
+sekcji 3 o sekcję za wcześnie i zrobiłeś ją bez podanej reguły.
+
+Teraz rozróżnienie, które kosztuje pracujących inżynierów realny czas, bo obie
+rzeczy wyglądają na papierze niemal identycznie. $f$ i $f(x)$ to nie jest ten
+sam obiekt. $f$ to maszyna; $f(x)$ to jedna liczba, którą maszyna wyprodukowała.
+Maszynę można przekazać dalej, wstawić do listy albo oddać czemuś, co uruchomi
+ją później. Z liczbą nie zrobisz nic z tych rzeczy.
+
+W kodzie różnica to dwa znaki:
+
+\begin{python}
+act = relu
+act = relu(x)
+\end{python}
+
+Powiedz, co każda z tych dwóch linii zostawia w \code{act}.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Pierwsza zostawia samą funkcję; druga jedną liczbę, policzoną raz, z tego, czym
+akurat w tamtej chwili było \code{x}.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Nawiasy to wywołanie, a napisanie ich o linijkę za wcześnie to jeden ze
+standardowych sposobów na zbudowanie sieci, która niczego się nie nauczy.}
+Warstwa, której podano \code{relu(x)} zamiast \code{relu}, trzyma stałą. Nie
+przerywa działania, nie ostrzega i produkuje wynik tego samego kształtu w
+każdym kroku \dash{} więc objaw przychodzi jako strata, która nie chce drgnąć,
+a nie jako błąd wskazujący linię.
+
+Nawyk, który temu zapobiega, to czytać każdą nazwę i pytać, na którą z dwóch
+rzeczy się patrzy. \emph{Maszyna czy liczba?} $f$, $\sigma$ i $\ln$ to
+maszyny. $f(3)$, $\sigma(0)$ i $\ln 2$ to liczby.
+\end{trapbox}
+\end{fr}
+
+\mermaidfig{f05-one-output}{Dwie reguły i to, co każda robi z argumentem $3$.
+Górna zwraca jedną wartość i jest funkcją; dolna zwraca dwie, więc nie
+odpowiada na żadne pytanie, które można jej zadać.}{warunek jednej wartości}
+
+% ============================================================
+\section{Wykres i to, co da się z niego odczytać}
+\label{sec:F05-graph}
+\index{wykres!odczytywanie wartości}
+\index{funkcja!rosnąca i malejąca}
+
+\begin{fr}
+Wykres funkcji $f$ to zbiór wszystkich punktów $(x, f(x))$, narysowany.
+Narysowanie niczego nie dodaje \dash{} obrazek i reguła niosą dokładnie tę samą
+informację \dash{} ale obrazek stawia w zasięgu oka kilka pytań, na które
+reguła odpowiada dopiero rachunkiem.
+
+Zbuduj jeden. Weź $f(x) = 2x + 1$ i uzupełnij wartości:
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+$x$ & $0$ & $1$ & $2$ \\
+$f(x)$ & \blank & \blank & \blank \\
+\bottomrule
+\end{tabular}
+\end{center}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$1$, $3$, $5$.
+\end{ansblock}
+
+Zaznacz te trzy punkty, a leżą na prostej, która wznosi się o dwie jednostki
+wysokości na każdą jednostkę w bok. Połącz je i masz wykres.
+
+Trzy rzeczy, które możesz teraz odczytać, nic nie licząc:
+
+\begin{itemize}
+\item \textbf{wartość.} Idź w bok do $x$, którego chcesz, w górę do prostej,
+  odczytaj w poprzek. To jest $f(x)$.
+\item \textbf{miejsce zerowe.} Tam, gdzie prosta spotyka oś poziomą, $f(x)$
+  jest zerem. Tam rozwiązuje się równanie $f(x) = 0$, a
+  Program~\ref{prog:F06} robi to algebrą.
+\item \textbf{kierunek.} To, czy krzywa wznosi się, czy opada, gdy czytasz od
+  lewej do prawej.
+\end{itemize}
+
+Gdzie $y = 2x + 1$ przecina oś poziomą?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{W $x = -\num{0.5}$}
+Bo $2x + 1 = 0$ wymaga $x = -\frac{1}{2}$. Prosta przecina raz i nigdy więcej,
+co jest własnością prostych, a nie wykresów w ogóle.
+
+Teraz kierunek. Funkcja \textbf{rośnie} na przedziale, gdy przesunięcie w
+prawo nigdy nie obniża wartości, i \textbf{ściśle rośnie}, gdy przesunięcie w
+prawo zawsze ją podnosi. Sekcja 7 potrzebuje wersji ścisłej i potrzebuje jej
+dokładnie, więc warto być tu drobiazgowym: $2x + 1$ ściśle rośnie wszędzie, bo
+$2$ jednostki wzniesienia na jednostkę w bok to $2$ jednostki wzniesienia,
+gdziekolwiek stoisz.
+
+Dla jakich wartości $x$ funkcja $y = x^{2}$ rośnie?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dla $x \ge 0$}
+A maleje dla $x \le 0$. W $x = -3$ wartość wynosi $9$; w $x = -1$ wynosi $1$; w
+$x = 0$ wynosi $0$; a potem znowu się wspina. Parabola wpada we własne dno i
+z niego wychodzi.
+
+\begin{warning}
+\textbf{\enquote{Rośnie} jest zdaniem o przedziale, nigdy o samej funkcji.}
+Zdanie mówiące, że \emph{$x^{2}$ rośnie}, pominęło jedyną część, która mogłaby
+uczynić je prawdziwym albo fałszywym. Sekcja 7 obraca się wokół tego
+rozróżnienia i na nic ci się nie przyda, jeśli poniesiesz je luźno.
+\end{warning}
+
+Oto jedna, którą będziesz rysował częściej niż jakąkolwiek inną. ReLU to
+$\relu(x) = \max(0, x)$: przepuszcza liczbę dodatnią nietkniętą i zwraca zero
+dla czegokolwiek ujemnego.
+
+Dla jakich wartości $x$ jej wykres jest płaski?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dla $x \le 0$}
+Na lewo od początku układu wykres leży na osi poziomej; na prawo jest prostą
+$y = x$ pod kątem czterdziestu pięciu stopni. Obie połowy spotykają się w
+początku układu narożnikiem, a nie łukiem.
+
+Ten narożnik wart jest chwili, bo jest całym powodem, dla którego ta funkcja
+tam stoi. Wykres złożony z jednego prostego kawałka jest prostą, jakkolwiek
+byś go wydłużał. Wykres z załamaniem nie jest, a sekcja 5 pokazuje, co to daje.
+
+Porównaj $\relu(x)$ z $\lvert x \rvert$, która też ma narożnik w początku
+układu. Czym te dwie się różnią?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Lewą połową}
+$\lvert x \rvert$ obraca stronę ujemną do góry i wspina się w bok; $\relu$
+spłaszcza ją do zera. Po prawej obie są identyczne.
+
+To są kształty, na których opiera się reszta książki, i warto umieć każdy
+naszkicować w trzy sekundy:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Reguła & Kształt \\
+\midrule
+$y = mx + c$ & prosta wznosząca się o $m$ \\
+$y = x^{2}$ & parabola z dnem w początku układu \\
+$y = \lvert x \rvert$ & litera V ze szpicem w początku układu \\
+$y = \relu(x)$ & prawa połowa tej V, płaska po lewej \\
+$y = \frac{1}{x}$ & dwie gałęzie, żadna nie dotyka osi \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Program~\ref{prog:F07} dokłada dwie, których na tej liście brakuje \dash{}
+wykładniczą i logistyczną \dash{} i rysuje je, zamiast je recytować.
+\end{fr}
+
+% ============================================================
+\section{Cztery ruchy, które zrobisz okiem}
+\label{sec:F05-moves}
+\index{wykres!przesuwanie}
+\index{wykres!rozciąganie}
+\index{wykres!odbijanie}
+
+\begin{fr}
+Potrzebujesz teraz jednej umiejętności i jest to ta, która zamienia stronę
+nieznanych wzorów w pięć znajomych kształtów z liczbami przy nich. Mając
+wykres $f$, powinieneś umieć narysować wykres czegokolwiek zbudowanego z niego
+dodawaniem, mnożeniem i zmianą znaku \dash{} nie licząc ani jednej nowej
+wartości.
+
+Zacznij od łatwiejszej połowy. Weź $f(x) = x^{2}$ i rozważ
+\[ g(x) = f(x) + 2 \]
+
+Każda wartość jest o dwa większa niż była, więc każdy punkt wykresu jest o dwa
+wyżej niż był, więc cały wykres przesuwa się w górę o dwa. Sprawdź to w jednym
+punkcie: $f(3) = 9$, więc $g(3) = 11$.
+
+Gdzie leży wykres $f(x) - 5$ względem wykresu $f$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Pięć niżej}
+Ten sam kształt, zsunięty w dół. Liczba dodana poza nawiasem działa na
+\emph{wartość} i robi dokładnie to, co mówi.
+
+Teraz druga połowa, a na to pytanie odpowiedz bez liczenia i bez sprawdzania.
+Zapisz pierwsze, co ci przyjdzie do głowy.
+
+\textbf{Masz przed sobą wykres $y = f(x)$. Gdzie leży wykres $y = f(x - 3)$ i o
+ile?}
+
+W lewo czy w prawo, i liczba.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Trzy w \emph{prawo}}
+Nie w lewo. Sprawdź to na paraboli, gdzie odpowiedź widać, zamiast się o nią
+spierać. Dla $f(x) = x^{2}$ najniższy punkt siedzi w $x = 0$, bo tam nawias
+jest zerem. Teraz
+\[ g(x) = f(x - 3) = (x - 3)^{2} \]
+a \emph{jej} nawias jest zerem w $x = 3$. Zatem dno paraboli \dash{} a z nim
+cały wykres \dash{} przesunęło się o trzy w prawo.
+
+\begin{trapbox}
+\textbf{W nawiasie wykres przesuwa się przeciwnie do znaku, a rozumowanie,
+które twierdzi inaczej, to prawdziwa reguła przeniesiona o jedno miejsce za
+daleko.}
+
+Poza nawiasem minus naprawdę przesuwa w dół: $f(x) - 5$ leży pięć niżej i to
+miałeś dobrze ramkę temu. W nawiasie inne jest \emph{to, na co liczba działa}.
+Nie poprawia odpowiedzi; poprawia pytanie. $g$ musi sięgnąć trzy jednostki
+wstecz po wartość, którą dałoby $f$, więc żeby dostać wartość, którą $f$ dało w
+$0$, musisz teraz podać $g$ argument $3$.
+
+Powiedz to zdaniem, a przestanie zaskakiwać: \emph{żeby zobaczyć stary obrazek,
+musisz teraz stanąć trzy dalej}.
+
+To czwarty znak, pod którym pojawiło się to rozumowanie.
+Program~\ref{prog:F01} ma $\sqrt{a+b} \ne \sqrt{a} + \sqrt{b}$;
+Program~\ref{prog:F02} ma $(a+b)^{2} \ne a^{2} + b^{2}$;
+Program~\ref{prog:F03} nie ma żadnej reguły dla $\ln(a+b)$;
+Program~\ref{prog:F04} ma $\sum a_i b_i \ne (\sum a_i)(\sum b_i)$. Za każdym
+razem naprawa jest tym samym pytaniem: \emph{co to za działanie i do czego jest
+stosowane?}
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Potwierdź to liczbami, a nie argumentem, bo argument jest właśnie tym, co
+przed chwilą wyszło źle, a tabela ci nie skłamie.
+
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+$x$ & $1$ & $2$ & $3$ & $4$ & $5$ \\
+$(x - 3)^{2}$ & $4$ & $1$ & $0$ & $1$ & $4$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Punkt najniższy jest w $x = 3$, a kształt po obu jego stronach to parabola, od
+której zacząłeś. Trzy w prawo, potwierdzone.
+
+Gdzie jest najniższy punkt $y = (x + 4)^{2}$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{W $x = -4$}
+Tam nawias jest zerem, a znak jest plusem, więc wykres znowu poszedł w drugą
+stronę \dash{} cztery w \emph{lewo}. Zapisz to raz i zatrzymaj:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Zapisane & Robi \\
+\midrule
+$f(x) + c$ & przesuwa wykres w górę o $c$ \\
+$f(x - c)$ & przesuwa wykres w prawo o $c$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Zostały dwa ruchy i są mnożącymi wersjami tej samej pary. Jak wygląda wykres
+$y = 2f(x)$ w porównaniu z wykresem $y = f(x)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dwa razy wyższy}
+Każda wartość jest podwojona, więc każdy punkt jest dwa razy dalej od osi
+poziomej niż był. Punkt, który był na wysokości $3$, jest teraz na $6$; punkt,
+który był na $-1$, jest teraz na $-2$; a punkt, który był na $0$, nie ruszył
+się wcale, bo dwa razy nic to nic. Wykres jest rozciągnięty od osi poziomej, a
+sama oś jest przyszpilona.
+
+Teraz ten w nawiasie. Co robi $y = f(2x)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Ściska go ku osi pionowej, dwukrotnie}
+Znowu odwrotnie i z tego samego powodu co poprzednio. Żeby dostać wartość,
+którą $f$ dało w $6$, podajesz teraz $3$, bo maszyna podwaja to, co jej
+wręczasz, zanim $f$ to w ogóle zobaczy. Wszystko dzieje się więc na połowie
+odległości i wykres jest poziomo ściśnięty, a nie rozciągnięty.
+
+To jest naprawdę użyteczne sprawdzenie, gdy spotykasz nieznany wzór:
+\emph{duża liczba w nawiasie zwęża obrazek, a nie poszerza}.
+
+Dwa odbicia i sekcja jest kompletna. Co robią $y = -f(x)$ oraz $y = f(-x)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$-f(x)$ obraca wykres górą na dół; $f(-x)$ obraca go lewą na prawą.
+\end{ansblock}
+
+Oba są przypadkiem $a = -1$ dwóch rozciągnięć i oba stosują się do tej samej
+reguły o tym, gdzie stoi liczba. Poza nawiasem znak zmienia \emph{wartość},
+więc góra staje się dołem. W nawiasie znak zmienia \emph{argument}, więc
+wartość, która była w $x$, jest teraz w $-x$.
+
+Weź $f(x) = x^{2}$. Jak wygląda $f(-x)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dokładnie tak samo}
+Bo $(-x)^{2} = x^{2}$. Parabola jest własnym odbiciem lustrzanym w osi
+pionowej, więc ruch się wykonuje i nic widocznego z tego nie wynika. Funkcję o
+tej własności nazywa się \textbf{parzystą}; $\lvert x \rvert$ jest kolejną, a
+$\cos$, którą rysuje Program~\ref{prog:F08}, trzecią.
+
+Została jedna rzecz i to na nią idą punkty na egzaminie, a błędy w modelu.
+\textbf{Ruchy nie są przemienne.} Czy $2f(x) + 1$ to ta sama funkcja co
+$2\bigl(f(x) + 1\bigr)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie}
+Weź punkt, w którym $f(x) = 3$. Pierwsza daje $2 \times 3 + 1 = 7$; druga daje
+$2 \times (3 + 1) = 8$. Pierwsza rozciąga, a potem przesuwa; druga przesuwa, a
+potem rozciąga, i przesunięcie zostaje rozciągnięte razem ze wszystkim innym.
+
+Czytaj więc wyrażenie tak, jak czyta je arytmetyka \dash{} najpierw nawiasy,
+potem mnożenie, potem dodawanie \dash{} i stosuj ruchy w tej kolejności. Nie ma
+tu dodatkowej reguły do nauczenia; zwykła kolejność działań jest już
+odpowiedzią.
+\end{fr}
+
+\mermaidfig{f05-four-moves}{Miejsce, w którym stoi liczba, decyduje o kierunku
+jej działania. Poza nawiasem poprawia ona odpowiedź; w nawiasie poprawia
+pytanie, a wykres idzie w drugą stronę.}{cztery ruchy wykresu}
+
+% ============================================================
+\section{Waga i bias to rozciągnięcie i przesunięcie}
+\label{sec:F05-weight-bias}
+\index{funkcja!logistyczna}
+\index{bias!jako przesunięcie}
+
+\begin{fr}
+Wszystko z poprzedniej sekcji było ćwiczeniem do tego. Oto najczęstsze
+wyrażenie w uczeniu maszynowym:
+\[ y = wx + b \]
+
+Czytaj je jako dwa z czterech ruchów zastosowane do najprostszej funkcji, jaka
+istnieje, $f(x) = x$. Waga $w$ mnoży wartość, więc rozciąga prostą od osi
+poziomej i czyni ją bardziej stromą. Bias $b$ jest dodany poza nawiasem, więc
+przesuwa całą prostą w górę. Tym właśnie jest jednostka liniowa:
+rozciągnięciem i przesunięciem, z nazwami z innego słownika.
+
+Dla $w = 3$ i $b = -1$, ile wynosi $y$, gdy $x = 2$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$5$}
+Z $3 \times 2 - 1$. Teraz włóż te same dwa ruchy do krzywej, bo tam ten
+słownik zaczyna zarabiać na siebie. \textbf{Funkcja logistyczna} to
+\[ \sigma(x) = \frac{1}{1 + e^{-x}} \]
+a Program~\ref{prog:F07} wyprowadza jej kształt; tutaj musisz tylko umieć ją
+czytać.
+
+Jedna wartość, którą warto znać bez liczenia: $\sigma(0) = \num{0.5}$,
+dokładnie, bo $e^{0} = 1$, a $\frac{1}{1+1}$ to połowa. Wokół tego środka
+przebiega między $0$ a $1$ i nie osiąga żadnej z nich:
+
+\begin{center}
+\begin{tabular}{rc}
+\toprule
+$x$ & $\sigma(x)$ \\
+\midrule
+$-4$ & \val{f05.sig.m4} \\
+$-2$ & \val{f05.sig.m2} \\
+$-1$ & \val{f05.sig.m1} \\
+$0$ & \val{f05.sig.0} \\
+$1$ & \val{f05.sig.1} \\
+$2$ & \val{f05.sig.2} \\
+$4$ & \val{f05.sig.4} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Patrz na tabelę, a nie na wzór. Jaki jest związek między $\sigma(-2)$ a
+$\sigma(2)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dodają się do $1$: $\val{f05.sig.m2} + \val{f05.sig.2} = 1$.
+\end{ansblock}
+
+Zatem $\sigma(-x) = 1 - \sigma(x)$, a krzywa ma symetrię obrotu o pół obrotu
+względem punktu $\bigl(0, \frac{1}{2}\bigr)$. Każdy wiersz tej tabeli występuje
+w takiej parze, co o połowę zmniejsza to, co jest do zapamiętania.
+
+Teraz zastosuj te dwa ruchy do \emph{argumentu}, bo to właśnie robi warstwa:
+\[ \sigma(wx + b) \]
+
+Waga jest w nawiasie, więc na mocy poprzedniej sekcji ściska krzywą poziomo. Co
+to robi z tym, jak krzywa wygląda?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Czyni ją bardziej stromą}
+Większa waga upycha ten sam wzrost w węższy odcinek $x$, więc krzywa z
+łagodnego zbocza zmienia się w coś zbliżonego do schodka.
+
+To zasługuje na liczbę, a nie na przymiotnik. Zmierz szerokość pasa, w którym
+krzywa wykonuje swoją robotę \dash{} od $\sigma = \num{0.1}$ do
+$\sigma = \num{0.9}$:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Waga & Szerokość pasa & \\
+\midrule
+$w = \num{0.5}$ & \val{f05.band.whalf} & dwa razy szerszy \\
+$w = 1$ & \val{f05.band.w1} & \\
+$w = 5$ & \val{f05.band.w5} & pięć razy węższy \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Pas jest dzielony dokładnie przez $w$, czyli jest to poziome ściśnięcie z ramki
+$20$ z dołączonym pomiarem. Dla $w = 5$ krzywa wykonuje całą swoją robotę w
+oknie $x$ węższym niż jedna jednostka.
+
+Gdzie $\sigma(wx + b)$ przecina połowę?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{W $x = -\frac{b}{w}$}
+Bo przecięcie następuje tam, gdzie nawias jest zerem, a $wx + b = 0$ daje
+$x = -\frac{b}{w}$. Nie w $x = b$ i nie w $x = -b$.
+
+\begin{trapbox}
+\textbf{Bias nie jest położeniem.} Kusi, żeby czytać $b$ jako \emph{miejsce, w
+którym ta jednostka się odpala}, bo to ta liczba przesuwa krzywą w bok i to ją
+widać w konfiguracji. Ale odległość, o jaką przesuwa krzywą, to
+$\frac{b}{w}$, więc ten sam bias znaczy co innego przy różnych wagach.
+
+Dla $b = -2$ krzywa przecina połowę w $x = 2$, gdy $w = 1$, i w
+$x = \num{0.4}$, gdy $w = 5$. Jedna liczba, niezmieniona; próg, który ustawia,
+pięć razy bliżej początku układu.
+
+To jest reguła nawiasu z sekcji 3 z dołożoną drugą komplikacją: liczba działa
+na argument, więc przesuwa wykres w drugą stronę, \emph{i} jest skalowana przez
+to, co jeszcze na ten argument działa. Czytaj $-\frac{b}{w}$, nigdy $b$.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jedno pytanie wciąż jest otwarte. Skoro waga ustawia stromość, a punkt
+przecięcia to $-\frac{b}{w}$, to po co w ogóle nosić bias \dash{} czemu nie
+ustawić $b = 0$ i nie pozwolić wadze robić roboty?
+
+Oto najmniejsza odpowiedź. Weź trzy pomiary:
+\[ (1, 3) \qquad (2, 5) \qquad (3, 7) \]
+Prosta $y = 2x + 1$ przechodzi dokładnie przez wszystkie trzy: $2 + 1$,
+$4 + 1$, $6 + 1$.
+
+Teraz zabroń biasu, więc modelem jest $y = wx$ i nic więcej. Prosta tej
+postaci dopasowana metodą najmniejszych kwadratów ma współczynnik kierunkowy
+$\val{f05.nobias.slope}$, a jej największe odchylenie od tych trzech punktów
+wynosi $\val{f05.nobias.worst}$.
+
+Dlaczego żadna prosta postaci $y = wx$ nie dopasuje się do tych trzech punktów,
+jakiekolwiek $w$ wybierzesz?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo każda taka prosta przechodzi przez początek układu, a te punkty nie leżą na
+żadnej prostej, która przez niego przechodzi.
+\end{ansblock}
+
+$y = wx$ jest warte $0$ w $x = 0$, zawsze, dla każdej wagi. Dane mówią, że
+wartość w $x = 0$ powinna wynosić $1$. Żadna stromość nie sięgnie punktu,
+którego ta rodzina nie umie wyrazić, więc bias nie jest udoskonaleniem \dash{}
+jest różnicą między rodziną prostych przez jeden ustalony punkt a rodziną
+wszystkich prostych.
+
+\begin{aibox}
+Normalizacja warstwy kończy się na $\gamma \hat{x} + \beta$: standaryzuje
+wartości, a potem stosuje wyuczone rozciągnięcie i wyuczone przesunięcie, żeby
+odstawić je tam, gdzie sieć ich chce. To są dokładnie te dwa ruchy spoza
+nawiasu z sekcji 3, po jednym z każdego, i są parametrami, których model się
+uczy.
+
+Normalizacja nie jest więc końcem historii tej warstwy. Usunąwszy skalę i
+przesunięcie, warstwa natychmiast uczy się skali i przesunięcia, żeby je
+nałożyć z powrotem \dash{} co brzmi na kółko, dopóki nie zauważysz, że te,
+których się uczy, nie zależą od paczki, na którą akurat patrzy, a te, które
+usunęła, zależały.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Maszyny połączone szeregowo}
+\label{sec:F05-composition}
+\index{funkcja!złożenie}
+
+\begin{fr}
+Podaj wartość jednej maszyny prosto do następnej, a masz \textbf{złożenie},
+zapisywane $f(g(x))$ i czytane \emph{f od g od x}.
+
+Nie ma tu nowego pomysłu, jest tylko kolejność czytania: pracuj od środka na
+zewnątrz, tak jak uruchomiłbyś kod. Dla $g(x) = 2x + 1$ i $f(x) = x^{2}$:
+\[ f(g(1)) = f(2 \times 1 + 1) = f(3) = 9 \]
+
+Policz teraz $g(f(1))$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$3$}
+Bo $f(1) = 1$, a potem $g(1) = 3$. Dziewięć przeciw trzem z tych samych dwóch
+maszyn i tego samego argumentu: \textbf{kolejność jest częścią funkcji}, a
+$f(g(x))$ i $g(f(x))$ to dwie różne funkcje, które akurat są zbudowane z tych
+samych części.
+
+Oto, co to daje, i jest to powód, dla którego sieć w ogóle ma w sobie funkcje
+aktywacji. Połącz szeregowo dwie jednostki liniowe:
+\[ y = w_2(w_1 x + b_1) + b_2 = (w_2 w_1)x + (w_2 b_1 + b_2) \]
+
+Popatrz, co wyszło. Wymnóż nawias, a całość jest równa $Wx + B$ dla jednej wagi
+$W = w_2 w_1$ i jednego biasu $B = w_2 b_1 + b_2$.
+
+Co to mówi o stosie warstw liniowych, między którymi nie ma nic?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Że jest pojedynczą warstwą liniową, ile byś ich nie ułożył.
+\end{ansblock}
+
+Dwieście z nich zwija się do jednej, z jedną wagą i jednym biasem, a pozostałe
+$199$ nie kupiło niczego poza rachunkami. Sama głębokość nie jest zdolnością.
+
+\begin{aibox}
+To jest cały argument za wstawieniem $\relu$ między warstwy. Jej wykres ma w
+sobie narożnik, z ramki $12$, a żadne rozciąganie i przesuwanie nie zrobi
+narożnika z prostej \dash{} więc
+$\relu(w_2\,\relu(w_1 x + b_1) + b_2)$ się nie zwija i nie da się go przepisać
+jako $Wx + B$.
+
+Funkcja aktywacji nie jest tam po to, żeby wcisnąć wartości w przedział ani
+żeby przypominać biologię. Jest tam dlatego, że bez niej złożenie jest
+dowodliwie marnowaniem parametrów, a dowodem są dwie linijki algebry, które
+właśnie przeczytałeś.
+\end{aibox}
+
+Sieć o $32$ warstwach to $32$ takie maszyny zagnieżdżone. Jak byś to
+zróżniczkował?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Regułą łańcuchową, i po to jest Program~\ref{prog:F12}.
+\end{ansblock}
+
+To jest zawias tej książki, a ta ramka jest miejscem, w którym spotykają się
+dwie połowy. Propagacja wsteczna nie jest algorytmem wymyślonym dla sieci
+neuronowych; jest regułą łańcuchową zastosowaną do złożenia, z zachowanymi, a
+nie przeliczanymi na nowo wynikami pośrednimi. Złożenie właśnie zbudowałeś.
+Programy~\ref{prog:F11} i~\ref{prog:F12} dostarczają różniczkowania.
+
+Jedno ostrzeżenie na odchodne. Nie zawsze wolno połączyć dwie maszyny. Co musi
+być prawdą o $g$, zanim $f(g(x))$ nabierze sensu?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Każda wartość $g$ musi być argumentem, który $f$ przyjmuje \dash{} wartości $g$
+muszą leżeć w dziedzinie $f$.
+\end{ansblock}
+
+Dwa złożenia $\ln$ i $\sigma$ pokazują oba przypadki. $\ln(\sigma(x))$ jest w
+porządku dla każdego $x$, bo $\sigma$ produkuje liczby ściśle dodatnie, a
+dokładnie tego $\ln$ wymaga. Odwróć je, a $\sigma(\ln x)$ wymaga $x > 0$, bo to
+$\ln$ ma zawężoną dziedzinę i to on stoi teraz pierwszy w kolejce.
+
+\begin{note}
+$\ln(\sigma(x))$ warto rozpoznawać, gdy się je spotka. To log-sigmoid i
+pojawia się w binarnej entropii krzyżowej wszędzie tam, gdzie wejściem jest
+logit. Złożenie tych dwóch jest bezpieczne matematycznie, jak wyżej, i
+niebezpieczne w arytmetyce
+zmiennoprzecinkowej dla dużych ujemnych $x$, gdzie $\sigma$ znika do zera,
+zanim $\ln$ ją w ogóle zobaczy. Program~\ref{prog:P02} pokazuje, dlaczego te
+dwa działania robi się jako jedno.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Odwracanie funkcji}
+\label{sec:F05-inverse}
+\index{funkcja!odwrotna}
+
+\begin{fr}
+Jeśli funkcja jest maszyną, to funkcja odwrotna jest maszyną puszczoną wstecz:
+podajesz jej wartość, a ona mówi ci, który argument ją dał. Zapisuje się
+$f^{-1}$.
+
+Znalezienie jej to robota Programu~\ref{prog:F06} wykonana nieformalnie: cofnij
+działania w kolejności odwrotnej do tej, w jakiej zostały zastosowane. Dla
+$f(x) = 2x + 1$ maszyna podwaja, a potem dodaje jeden, więc odwrotna odejmuje
+jeden, a potem dzieli na pół:
+\[ f^{-1}(y) = \frac{y - 1}{2} \]
+Sprawdź: $f(3) = 7$, a $f^{-1}(7) = \frac{6}{2} = 3$.
+
+Jaka jest funkcja odwrotna do $f(x) = x^{3}$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Pierwiastek sześcienny}
+$f^{-1}(y) = \sqrt[3]{y}$, i działa także dla liczb ujemnych, bo podnoszenie do
+sześcianu zachowuje znak.
+
+Podnoszenie do kwadratu nie zachowuje, i na tym polega cały warunek. Funkcja
+odwrotna istnieje tylko wtedy, gdy funkcja jest \textbf{różnowartościowa}:
+różne argumenty muszą dawać różne wartości, inaczej nie da się powiedzieć, z
+którego argumentu wzięła się wartość. $f(x) = x^{2}$ zawodzi, bo $9$ mogło
+przyjść z $3$ albo z $-3$ \dash{} czyli obserwacja z ramki $2$ przybywa jako
+przeszkoda. Zawęź dziedzinę do $x \ge 0$, a funkcja odwrotna znowu istnieje i
+jest nią $\sqrt{y}$.
+
+Mając przed sobą wykres $f$, jak narysujesz wykres $f^{-1}$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Odbij go w prostej $y = x$.
+\end{ansblock}
+
+Bo odbicie w tej prostej zamienia dwie współrzędne każdego punktu miejscami, a
+zamiana współrzędnych to dokładnie to, co robi funkcja odwrotna: punkt
+$(3, 7)$ na wykresie $f$ staje się punktem $(7, 3)$ na wykresie $f^{-1}$.
+
+Jednej takiej pary już użyłeś. Program~\ref{prog:F03} poświęcił cały program
+$\ln$ i $e^{x}$, które są wzajemnie odwrotne: $\ln(e^{x}) = x$ oraz
+$e^{\ln x} = x$ dla $x > 0$. Ich wykresy są lustrzanymi odbiciami w $y = x$, a
+zawężona dziedzina jednej jest zawężonym zbiorem wartości drugiej.
+
+Funkcja logistyczna też ma odwrotną. Rozwiąż $p = \sigma(x)$ względem $x$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ x = \ln\!\left(\frac{p}{1 - p}\right) \]
+\end{ansblock}
+
+Ma nazwę, \textbf{logit}, a $\frac{p}{1-p}$ też ją ma \dash{} to
+\emph{szansa}. Logit jest więc logarytmem szansy, i to jest zdanie, dzięki
+któremu to słowo coś znaczy, zamiast być etykietką na cokolwiek, co wychodzi z
+ostatniej warstwy.
+
+Dla $p = \num{0.9}$ szansa wynosi dziewięć do jednego, a logit
+$\val{f05.logit.p9}$. Przepchnij to z powrotem przez $\sigma$, a dostaniesz
+znowu $\num{0.9}$, z dokładnością do $\val{f05.roundtrip.err}$ \dash{} czyli
+tam i z powrotem działa tak dobrze, jak pozwala binary64, i ani o bit lepiej.
+
+Ostatnie pytanie tej sekcji, i dotyczy zapisu, a nie funkcji. Czy $f^{-1}(x)$
+to to samo co $\frac{1}{f(x)}$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie}
+Nie mają ze sobą nic wspólnego. Dla $f(x) = 2x + 1$ funkcja odwrotna w $7$
+wynosi $3$, a odwrotność w $7$ wynosi $\frac{1}{15}$.
+
+\begin{trapbox}
+\textbf{$-1$ w $f^{-1}$ nie jest wykładnikiem}, choć jest zapisana
+dokładnie tam, gdzie stoi wykładnik, i choć każdy inny górny indeks w tej
+książce nim jest. $f^{2}(x)$ jest w praktyce dwuznaczne \dash{} jedni autorzy
+rozumieją przez to $f(f(x))$, a inni $(f(x))^{2}$ \dash{} a funkcje
+trygonometryczne pogarszają tę kolizję, a nie poprawiają, bo $\sin^{2}x$
+umownie znaczy $(\sin x)^{2}$, podczas gdy $\sin^{-1}x$ znaczy funkcję
+odwrotną.
+
+Ta książka pisze $\arcsin$ na funkcję odwrotną, a Program~\ref{prog:F08}
+przypomina o tym tam, gdzie to ma znaczenie. Gdy czytasz cudzy artykuł,
+jedynym bezpiecznym ruchem jest sprawdzić, co autor robi z przypadkiem, który
+umiesz policzyć.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Porządek, który funkcja zachowuje, i ten, którego nie}
+\label{sec:F05-monotone}
+\index{funkcja!ściśle rosnąca}
+\index{softmax!a temperatura}
+
+\begin{fr}
+Została jedna własność, a reszta tej sekcji to to, co ona daje.
+
+Funkcja \textbf{ściśle rośnie}, gdy nigdy nie daje większemu argumentowi
+mniejszej wartości: ilekroć $a < b$, prawdą jest też, że $f(a) < f(b)$. Nie
+\emph{czasem}, nie \emph{średnio} i nie \emph{w końcu} \dash{} każda para,
+wszędzie tam, gdzie funkcja jest określona.
+
+Dodawanie piątki ściśle rośnie. Podwajanie też. Dzielenie na pół też, i
+dzielenie przez dowolną liczbę dodatnią też, bo dzielenie przez liczbę dodatnią
+zachowuje każde porównanie takim, jakie było.
+
+Które z tych czterech ściśle rosną na wszystkich wartościach, które
+przyjmują?
+\[ x^{2} \qquad e^{x} \qquad -x \qquad \frac{x}{2} \]
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$e^{x}$ i $\frac{x}{2}$.
+\end{ansblock}
+
+$x^{2}$ zawodzi na lewej połowie, gdzie $-3 < -1$, ale $9 > 1$; ostrzeżenie w
+ramce $11$ dotyczyło dokładnie tego. A $-x$ zawodzi wszędzie i systematycznie
+\dash{} ściśle \emph{maleje}, co jest własnością samą w sobie, a nie brakiem
+innej.
+
+Teraz odpowiedz na to bez liczenia i zapisz pierwsze, co ci przyjdzie do
+głowy.
+
+\textbf{Twój sampler produkuje tekst, który się powtarza, więc podnosisz
+temperaturę z $\num{1.0}$ do $\num{2.0}$. Czy to może zmienić, który token
+model uważa za najbardziej prawdopodobny?}
+
+Tak czy nie.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie. Nie może, w żadnej temperaturze}
+Oto dowód przed argumentem. Weź cztery wyniki \dash{} logity, w słowniku
+ostatniej warstwy \dash{} i zamień je na prawdopodobieństwa w trzech
+temperaturach za pomocą
+\[ \softmax(z)_j = \frac{e^{z_j / T}}{\sum_k e^{z_k / T}} \]
+
+\begin{center}
+\begin{tabular}{rccc}
+\toprule
+Wynik $z$ & $T = \num{0.5}$ & $T = \num{1.0}$ & $T = \num{2.0}$ \\
+\midrule
+$\num{2.0}$ & \val{f05.sm.t05.p1} & \val{f05.sm.t10.p1} & \val{f05.sm.t20.p1} \\
+$\num{1.5}$ & \val{f05.sm.t05.p2} & \val{f05.sm.t10.p2} & \val{f05.sm.t20.p2} \\
+$\num{0.5}$ & \val{f05.sm.t05.p3} & \val{f05.sm.t10.p3} & \val{f05.sm.t20.p3} \\
+$-\num{1.0}$ & \val{f05.sm.t05.p4} & \val{f05.sm.t10.p4} & \val{f05.sm.t20.p4} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Czytaj w dół każdej kolumny: jakakolwiek jest temperatura, największa wartość
+jest w górnym wierszu. Teraz czytaj wzdłuż każdego wiersza: każda liczba się
+ruszyła.
+
+\begin{trapbox}
+\textbf{\enquote{Podniesienie temperatury sprawiło, że wybrał inny token na
+szczycie} jest niemożliwe przed losowaniem i spodziewane po nim}, a
+rozdzielenie tych dwóch rzeczy jest całą naprawą.
+
+To, co temperatura zmienia, jest ogromne, i łatwo popatrzeć na niewłaściwy
+koniec rozkładu i uznać, że zmienia niewiele. W tej tabeli najbardziej
+prawdopodobny token spada z \val{f05.sm.t05.top} do \val{f05.sm.t20.top}, czyli
+\val{f05.sm.top.ratio} raza. \emph{Najmniej} prawdopodobny rośnie z
+\val{f05.sm.t05.p4} do \val{f05.sm.t20.p4}, czyli ponad
+\val{f05.sm.tail.floor} razy. Temperatura jest pokrętłem na ogonie rozkładu, a
+to właśnie znaczy \enquote{bardziej twórczy}.
+
+Obserwowalny skutek jest więc realny: szansa wylosowania czegoś innego niż
+token ze szczytu idzie z \val{f05.sm.t05.other} do \val{f05.sm.t20.other}. Co
+się nie zmieniło i nie może, to który token jest na szczycie. Jeśli czytasz
+argmaks, zobaczysz tę samą odpowiedź w każdej temperaturze, jaką wypróbujesz, a
+jeśli z tego wywnioskujesz, że ustawienie jest ignorowane, pójdziesz szukać
+błędu, którego tam nie ma.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Teraz powód, a jest nim jedno zdanie i wniosek.
+
+\textbf{Funkcja ściśle rosnąca zachowuje porządek listy.} Jeśli $z_1 > z_2$, to
+$f(z_1) > f(z_2)$, z definicji i z niczego więcej; zastosuj to do każdej pary,
+a cały ranking przetrwa. W szczególności pozycja, która była największa, jest
+nadal największa, więc położenie maksimum \dash{} $\argmax$ \dash{} nie rusza
+się.
+
+To jest cały wynik. Reszta to sprawdzenie, że części się kwalifikują.
+
+Jakie funkcje ściśle rosnące softmax stosuje do tych wyników, zanim podzieli?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dwie: dzielenie przez $T$, a potem funkcję wykładniczą.
+\end{ansblock}
+
+Dzielenie przez $T$ ściśle rośnie dla każdego $T > 0$, a $e^{x}$ ściśle rośnie
+wszędzie, co rozstrzygnąłeś w ramce $42$. Żadna z nich nie może zaburzyć
+rankingu, więc ranking, który dociera do dzielenia, jest rankingiem, który
+miały wyniki.
+
+I samo dzielenie też nie może go zaburzyć: każda pozycja jest dzielona przez tę
+samą dodatnią sumę, co jest ściśnięciem całej listy ku zeru i zostawia każde
+porównanie takim, jakie było.
+
+Zatem $\argmax \softmax(z / T) = \argmax z$, dla każdego $T > 0$ i każdego $z$.
+W algebrze jest to dokładne i żaden wektor wyników tego nie łamie. Podnieś $T$
+dostatecznie wysoko, a arytmetyka spłaszczy każdą pozycję do tej samej liczby
+zmiennoprzecinkowej i porównaniu nie zostanie nic do porównania \dash{} co jest
+ograniczeniem binary64, a nie wyniku.
+
+Program~\ref{prog:F03} zostawił ci nawyk pracy na logarytmach
+prawdopodobieństw, a nie na prawdopodobieństwach. Czy wzięcie logarytmu
+przesuwa $\argmax$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie}
+$\ln$ ściśle rośnie na całej swojej dziedzinie, a prawdopodobieństwa są
+dodatnie, więc największe prawdopodobieństwo ma największy logarytm.
+
+Dlatego dekoder nigdy nie musi opuszczać przestrzeni logarytmicznej, żeby
+wybrać token, i warto zobaczyć w tym zysk, którym to jest:
+Program~\ref{prog:F03} przyjął logarytmy, bo iloczyny znikają do zera, a ta
+ramka mówi, że to przyjęcie nic nie kosztuje w punkcie, w którym zapada
+decyzja. Porównujesz logarytmy prawdopodobieństw, wybierasz największy i jest
+to ten sam token, który wybrałbyś z prawdopodobieństw \dash{} nie licząc ich
+ani razu.
+
+Zostało jedno pytanie i to ono rozstrzyga, czy masz własność, czy tylko
+przykład. Co funkcja ściśle \emph{malejąca} robi z $\argmax$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Przenosi go tam, gdzie był $\argmin$.
+\end{ansblock}
+
+Każde porównanie jest odwrócone, więc największy staje się najmniejszym, a
+najmniejszy największym. Porządek nie jest zniszczony \dash{} jest obrócony, co
+jest czymś innym i jest równie użyteczne, gdy wiesz, co masz.
+
+\begin{aibox}
+Zmiana znaku jest najprostszą funkcją ściśle malejącą, jaka istnieje, i jest
+powodem, dla którego dwa zdania czytane przez ciebie tysiąc razy są jednym
+zdaniem. \emph{Maksymalizuj wiarogodność} i \emph{minimalizuj ujemny logarytm
+wiarogodności} nazywają te same parametry, bo $\ln$ ściśle rośnie, a zmiana
+znaku ściśle maleje, więc złożenie tych dwóch zamienia $\argmax$ wiarogodności
+w $\argmin$ straty i nigdzie indziej go nie przesuwa.
+
+Dlatego też strata, na której trenujesz, może być przeskalowana, przesunięta o
+stałą albo zlogarytmowana, a najlepszy model będzie tym samym modelem. Nie
+tłumaczy to, dlaczego \emph{gradienty} są te same, bo to osobne pytanie i
+należy do Programu~\ref{prog:F12}.
+\end{aibox}
+\end{fr}
+
+\mermaidfig{f05-order-kept}{Dwa ściśle rosnące kroki, zastosowane jeden po
+drugim do tych samych czterech wyników. Żaden nie może zmienić ich kolejności,
+więc największy pozostaje największym.}{porządek zachowany przez odwzorowania
+rosnące}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--4}{\textbf{Funkcja to maszyna dająca jedną wartość na argument.}
+  Dwie wartości dla jednego argumentu to nie funkcja \dash{}
+  $x^{2} + y^{2} = 18$ oferuje $3$ i $-3$ dla $x = 3$ \dash{} a pionowa
+  linijka to ten warunek stosowany okiem. Dwa argumenty dzielące jedną wartość
+  są zupełnie zwyczajne.}
+\sumitem{4--5}{\emph{Dziedzina} to zbiór argumentów, które maszyna przyjmuje, a
+  podanie jej jest częścią podania funkcji. To ten sam zbiór co argumenty,
+  które nie rzucają wyjątkiem: $\frac{1}{x-2}$ wyklucza $2$, $\sqrt{x}$ wymaga
+  $x \ge 0$, $\ln x$ wymaga $x > 0$.}
+\sumitem{6--7}{$f$ to maszyna, a $f(x)$ to jedna liczba, którą wyprodukowała.
+  \code{act = relu} i \code{act = relu(x)} różnią się dwoma znakami i
+  wszystkim innym, a drugie zawodzi jako strata, która nie chce drgnąć, a nie
+  jako błąd.}
+\sumitem{8--10}{Wykres to zbiór punktów $(x, f(x))$, narysowany, a wartość,
+  miejsce zerowe i kierunek dają się z niego odczytać bez rachunków.}
+\sumitem{10--11}{\textbf{\enquote{Rośnie} jest zdaniem o przedziale.} $x^{2}$
+  rośnie dla $x \ge 0$ i maleje dla $x \le 0$, więc zdanie o samym $x^{2}$
+  pominęło część, która o tym rozstrzyga.}
+\sumitem{12--13}{Pięć kształtów, na których opiera się książka: prosta,
+  parabola, V, pół-V funkcji $\relu$ i $\frac{1}{x}$. $\relu$ jest płaska dla
+  $x \le 0$ i spotyka drugą połowę narożnikiem.}
+\sumitem{14--16}{\textbf{Miejsce, w którym stoi liczba, decyduje o kierunku jej
+  działania.} $f(x) + c$ przesuwa wykres w górę o $c$, a $f(x - c)$ przesuwa go
+  w \emph{prawo} o $c$. Poza nawiasem liczba poprawia odpowiedź; w nawiasie
+  poprawia pytanie, więc musisz stanąć $c$ dalej, żeby zobaczyć stary obrazek.}
+\sumitem{18--21}{$a f(x)$ rozciąga od osi poziomej $a$-krotnie; $f(ax)$ ściska
+  ku osi pionowej $a$-krotnie; $-f(x)$ obraca górą na dół, a $f(-x)$ lewą na
+  prawą. Para z nawiasu idzie odwrotnie, z tego samego powodu co przesunięcie.}
+\sumitem{22--23}{Ruchy nie są przemienne: $2f(x) + 1$ i
+  $2\bigl(f(x)+1\bigr)$ dają $7$ i $8$ tam, gdzie $f(x) = 3$. Zwykła kolejność
+  działań jest całą regułą.}
+\sumitem{24--26}{$y = wx + b$ to rozciągnięcie i przesunięcie zastosowane do
+  $f(x) = x$. $\sigma(0) = \num{0.5}$ dokładnie, a $\sigma(-x) = 1 - \sigma(x)$,
+  więc krzywa ma symetrię obrotu o pół obrotu względem
+  $\bigl(0, \frac{1}{2}\bigr)$.}
+\sumitem{27--28}{W $\sigma(wx + b)$ waga ustawia stromość: pas od $\num{0.1}$
+  do $\num{0.9}$ ma szerokość \val{f05.band.w1} dla $w = 1$ i
+  \val{f05.band.w5} dla $w = 5$, dzieloną dokładnie przez $w$.
+  \textbf{Bias nie jest położeniem} \dash{} przecięcie jest w
+  $-\frac{b}{w}$, więc jeden bias ustawia pięć różnych progów przy pięciu
+  różnych wagach.}
+\sumitem{29--30}{Bez biasu każda prosta przechodzi przez początek układu i
+  żaden wybór wagi nie sięgnie punktu, którego ta rodzina nie umie wyrazić:
+  najlepsze dopasowanie bez biasu do $(1,3)$, $(2,5)$, $(3,7)$ ma współczynnik
+  \val{f05.nobias.slope} i myli się o \val{f05.nobias.worst}, podczas gdy
+  $y = 2x + 1$ jest dokładne. $\gamma$ i $\beta$ normalizacji warstwy to te
+  same dwa ruchy, wyuczone.}
+\sumitem{31--33}{$f(g(x))$ czyta się od środka na zewnątrz, a kolejność jest
+  częścią funkcji. \textbf{Dwie warstwy liniowe szeregowo to jedna warstwa
+  liniowa}, $w_2(w_1x + b_1) + b_2 = (w_2w_1)x + (w_2b_1 + b_2)$, i to jest
+  cały argument za wstawieniem między nie funkcji z narożnikiem.}
+\sumitem{34--35}{Głęboka sieć jest złożeniem i niczym więcej, i dlatego reguła
+  łańcuchowa Programu~\ref{prog:F12} jest zawiasem tej książki. Dwie maszyny
+  składają się tylko wtedy, gdy wartości pierwszej leżą w dziedzinie drugiej.}
+\sumitem{36--38}{Funkcja odwrotna puszcza maszynę wstecz i istnieje tylko dla
+  funkcji różnowartościowej; $x^{2}$ nie ma jej na wszystkich liczbach
+  rzeczywistych, z powodu podanego w ramce $2$. Jej wykres to oryginał odbity w
+  $y = x$.}
+\sumitem{39--40}{Logit $\ln\frac{p}{1-p}$ odwraca funkcję logistyczną \dash{}
+  jest logarytmem szansy, $\val{f05.logit.p9}$ dla $p = \num{0.9}$, a droga tam
+  i z powrotem domyka się do $\val{f05.roundtrip.err}$. \textbf{$-1$ w
+  $f^{-1}$ nie jest wykładnikiem.}}
+\sumitem{41--44}{\textbf{Funkcja ściśle rosnąca zachowuje porządek listy, więc
+  nie może przesunąć $\argmax$.} Dzielenie przez dodatnie $T$ się kwalifikuje,
+  $e^{x}$ się kwalifikuje i dzielenie każdej pozycji przez jedną dodatnią sumę
+  też \dash{} zatem $\argmax \softmax(z/T) = \argmax z$ dla każdego $T > 0$,
+  dokładnie, a nie w przybliżeniu.}
+\sumitem{43}{Temperatura zmienia rozkład bardzo mocno, a jego szczyt
+  najsłabiej. Przy $T$ od $\num{0.5}$ do $\num{2.0}$ najbardziej
+  prawdopodobny token spada \val{f05.sm.top.ratio} raza, a najmniej
+  prawdopodobny rośnie ponad \val{f05.sm.tail.floor} razy; szansa wylosowania
+  czegoś innego niż token ze szczytu idzie z \val{f05.sm.t05.other} do
+  \val{f05.sm.t20.other}. Nie rusza się nigdy to, który token jest na
+  szczycie.}
+\sumitem{46--47}{$\ln$ ściśle rośnie, więc dekoder może porównywać logarytmy
+  prawdopodobieństw i nigdy nie policzyć prawdopodobieństwa. Funkcja ściśle
+  \emph{malejąca} zamienia $\argmax$ z $\argmin$, i dlatego maksymalizowanie
+  wiarogodności i minimalizowanie jej ujemnego logarytmu to jedno polecenie.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Czy $y^{3} = x$ jest funkcją zmiennej $x$? A $y^{4} = x$?
+  \answerto{Pierwsza tak: każde $x$ ma dokładnie jeden rzeczywisty pierwiastek
+  sześcienny. Druga nie: dla $x = 16$ oferuje $y = 2$ i $y = -2$.}
+\item Podaj dziedzinę $f(x) = \frac{\sqrt{x - 1}}{x - 4}$.
+  \answerto{$x \ge 1$ oraz $x \ne 4$. Pierwiastek wymaga nieujemnego nawiasu, a
+  dzielenie niezerowego, i oba warunki obowiązują.}
+\item Kolega buduje warstwę z \code{activation=sigmoid(x)}, a model trenuje
+  się do płaskiej straty. Co poszło źle?
+  \answerto{Nawiasy. Warstwie podano jedną liczbę zamiast funkcji, więc nic z
+  tego, co robi, nie zależy od jej własnego wejścia.}
+\item Gdzie $y = 3x - 6$ przecina każdą z osi?
+  \answerto{W $x = 2$ na osi poziomej i w $y = -6$ na pionowej. W każdym
+  przypadku przyrównaj drugą współrzędną do zera.}
+\item Dla jakich $x$ funkcja $y = -x^{2}$ rośnie?
+  \answerto{Dla $x \le 0$. Zmiana znaku obraca parabolę do góry dnem i odwraca
+  obie połowy.}
+\item Masz wykres $y = f(x)$. Opisz wykresy $y = f(x) - 4$ oraz $y = f(x + 4)$.
+  \answerto{Cztery niżej i cztery w \emph{lewo}. Drugi idzie przeciwnie do
+  swojego znaku, bo liczba jest w nawiasie.}
+\item Gdzie jest najniższy punkt $y = (x - 7)^{2} + 2$?
+  \answerto{W $(7, 2)$. Nawias jest zerem w $x = 7$, a zewnętrzne $+2$ podnosi
+  całą krzywą.}
+\item Opisz wykres $y = \frac{1}{2}f(3x)$ przez wykres $y = f(x)$.
+  \answerto{Dwa razy niższy i trzy razy węższy. $\frac{1}{2}$ stoi poza
+  nawiasem i połowi każdą wysokość; $3$ stoi w nawiasie i ściska poziomo
+  trzykrotnie.}
+\item Gdzie $\sigma(2x - 6)$ przecina połowę i czy jest bardziej stroma, czy
+  łagodniejsza niż $\sigma(x)$?
+  \answerto{W $x = 3$, z $-\frac{-6}{2}$, i dwa razy bardziej stroma.
+  Odczytanie biasu jako punktu przecięcia dałoby $-6$.}
+\item Dla $g(x) = x + 1$ i $f(x) = 3x$ policz $f(g(2))$ oraz $g(f(2))$.
+  \answerto{$9$ i $7$. Pierwsze dodaje, a potem potraja; drugie potraja, a
+  potem dodaje.}
+\item Trzy warstwy liniowe są ułożone jedna na drugiej i nie ma między nimi
+  nic. Ile parametrów ma naprawdę powstała funkcja?
+  \answerto{Dwa \dash{} jedną wagę i jeden bias \dash{} bo złożenie wymnaża się
+  do $Wx + B$, ile by warstw w nie nie weszło.}
+\item Napisz funkcję odwrotną do $f(x) = \frac{x}{3} - 2$.
+  \answerto{$f^{-1}(y) = 3(y + 2)$. Cofnij najpierw odejmowanie, a potem
+  dzielenie, co jest odwrotnością kolejności ich zastosowania.}
+\item Prawdopodobieństwo wynosi $\num{0.25}$. Jaka jest jego szansa i jaki
+  logit?
+  \answerto{Szansa $1$ do $3$, a logit $\ln \frac{1}{3}$, ujemny, bo
+  prawdopodobieństwo jest poniżej połowy.}
+\item Cztery wyniki to $\num{3.0}$, $\num{1.0}$, $\num{0.0}$ i $-\num{2.0}$.
+  Który jest największy po dodaniu $10$ do każdego z nich, a który po
+  potraktowaniu każdego funkcją wykładniczą?
+  \answerto{Pierwszy, w obu przypadkach. Dodanie stałej i funkcja wykładnicza
+  ściśle rosną, więc żadne z nich nie może zmienić kolejności listy.}
+\item Twój sampler chodzi przy $T = \num{2.0}$, a ty chcesz zamiast tego
+  najbardziej prawdopodobny token. Czy obniżenie $T$ ci go da?
+  \answerto{Nie niezawodnie i nie za sprawą $T$. Najbardziej prawdopodobny
+  token jest ten sam w każdej temperaturze; obniżenie $T$ sprawia tylko, że
+  częściej to on zostaje wylosowany. Wzięcie $\argmax$ daje go na pewno przy
+  dowolnym $T$.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Podaj regułę, która przypisuje dokładnie jedną wartość każdemu
+  argumentowi, a mimo to jest bezużyteczna jako wykres do odczytywania
+  wartości.
+  \answerto{Na przykład \emph{$f(x) = 1$, gdy $x$ jest wymierne, i $0$ w
+  przeciwnym razie}. Jest zupełnie porządną funkcją, a jej wykresu nie da się
+  narysować, co przypomina, że obrazek jest wygodą, a nie definicją.}
+\item $f$ ma dziedzinę $x \ge 0$. Jaka jest dziedzina $f(x - 3)$?
+  \answerto{$x \ge 3$. Dziedzina przesuwa się razem z wykresem i w tę samą
+  stronę.}
+\item Pokaż, że $f(x) = \lvert x \rvert$ jest parzysta, a $f(x) = x^{3}$
+  nieparzysta, gdzie \emph{nieparzysta} znaczy $f(-x) = -f(x)$.
+  \answerto{$\lvert -x \rvert = \lvert x \rvert$, więc obrót lewa-prawa nie
+  zmienia wykresu. $(-x)^{3} = -x^{3}$, więc obrót lewa-prawa i obrót
+  góra-dół dają ten sam obrazek.}
+\item O ile i w którą stronę leży wykres $y = f(2x - 6)$ względem
+  $y = f(2x)$?
+  \answerto{Trzy w prawo, a nie sześć. Zapisz to najpierw jako
+  $f\bigl(2(x-3)\bigr)$: przesunięcie mierzy się po ściśnięciu, więc wynosi
+  $\frac{6}{2}$.}
+\item Dwoje studentów opisuje $y = (2x)^{2}$. Jedno mówi, że to wykres $x^{2}$
+  ściśnięty poziomo dwukrotnie, drugie, że rozciągnięty pionowo
+  czterokrotnie. Kto ma rację?
+  \answerto{Oboje, a wykresy są identyczne. $(2x)^{2} = 4x^{2}$, więc jest to
+  jeden z przypadków, w których ruch z nawiasu i ruch spoza nawiasu akurat się
+  pokrywają. Jest to specyficzne dla kwadratu i nie uogólnia się.}
+\item Jednostka liczy $\sigma(wx + b)$, a ty chcesz, żeby była bliska $0$
+  poniżej $x = 10$ i bliska $1$ powyżej, przy przejściu zajmującym mniej więcej
+  jedną jednostkę $x$. Podaj $w$ i $b$.
+  \answerto{Pas od $\num{0.1}$ do $\num{0.9}$ ma szerokość
+  $\frac{\val{f05.band.w1}}{w}$, więc $w$ w okolicy $\num{4.4}$ daje pas
+  szerokości około jednej jednostki, a przecięcie w $10$ wymaga wtedy
+  $b = -10w$, czyli mniej więcej $-44$.}
+\item Dlaczego podniesienie wagi jednostki logistycznej bez zmiany biasu
+  przesuwa jej próg?
+  \answerto{Bo próg to $-\frac{b}{w}$, a waga jest w mianowniku. Podwojenie $w$
+  o połowę skraca odległość progu od początku układu, co jest efektem
+  ubocznym, o który nikt nie prosił, i dobrym powodem, żeby parametryzować
+  progiem.}
+\item Złóż $\relu$ samą ze sobą. Co dostaniesz?
+  \answerto{Znowu $\relu$: $\max(0, \max(0, x)) = \max(0, x)$. Funkcję będącą
+  własnym złożeniem nazywa się idempotentną, a znaczy to, że ułożenie dwóch nie
+  daje zupełnie nic.}
+\item $f(x) = x^{2}$ nie ma funkcji odwrotnej na liczbach rzeczywistych. Podaj
+  dwa różne zawężenia jej dziedziny, z których każde daje jej odwrotną, i
+  odwrotną w każdym przypadku.
+  \answerto{$x \ge 0$ daje $\sqrt{y}$; $x \le 0$ daje $-\sqrt{y}$. Funkcja
+  odwrotna jest własnością funkcji \emph{i} jej dziedziny, a nie wzoru.}
+\item Wykres $f$ przechodzi przez $(0, 1)$ i $(1, e)$. Przez co przechodzi
+  wykres $f^{-1}$?
+  \answerto{Przez $(1, 0)$ i $(e, 1)$. Współrzędne się zamieniają, co jest
+  odbiciem w $y = x$ wykonanym po jednym punkcie.}
+\item Czy $\sigma$ ściśle rośnie? Czy zatem zachowuje $\argmax$ listy wyników
+  branych po jednym?
+  \answerto{Tak na oba. Ranking klasyfikatora binarnego jest więc ten sam, czy
+  sortujesz po logicie, czy po prawdopodobieństwie, i dlatego pole pod krzywą
+  nie zmienia się, gdy pominiesz sigmoidę.}
+\item Strata jest raportowana jako $L$, a kolega raportuje $100L$. Czy oboje
+  zgodzą się co do tego, który z dwóch modeli jest lepszy?
+  \answerto{Tak. Mnożenie przez dodatnią stałą ściśle rośnie, więc $\argmin$ się
+  nie rusza. Nie zgodzą się co do każdego zdania zawierającego słowo
+  \emph{mała}.}
+\item Softmax zastosowano dwa razy: $\softmax(\softmax(z))$. Czy $\argmax$ się
+  przesuwa?
+  \answerto{Nie, bo softmax jest zbudowany z kroków ściśle rosnących i
+  dzielenia przez dodatnią sumę. Wynik jest dużo bardziej płaski niż po jednym
+  zastosowaniu i nie jest rozsądną rzeczą do liczenia, ale pozycja na szczycie
+  jest ta sama.}
+\item W której temperaturze w tabeli z ramki $43$ token z drugiego miejsca jest
+  najbliżej pierwszego i co to sugeruje o losowaniu tam?
+  \answerto{Przy $T = \num{2.0}$, gdzie \val{f05.sm.t20.p1} i
+  \val{f05.sm.t20.p2} są blisko siebie. Ranking się nie zmienił, ale losowanie
+  jest prawie rzutem monetą między nimi, i po to jest to ustawienie.}
+\item Dodanie stałej $c$ do każdego logitu nie zmienia softmaksu. Pokaż to i
+  powiedz, której ramki tego programu jest to przypadkiem.
+  \answerto{$\frac{e^{z_j + c}}{\sum_k e^{z_k + c}}
+  = \frac{e^{c}e^{z_j}}{e^{c}\sum_k e^{z_k}}$, i $e^{c}$ się skraca. To
+  obserwacja z ramki $45$, że dzielenie każdej pozycji przez jedną dodatnią
+  liczbę nie zmienia żadnego porównania \dash{} i dlatego odjęcie maksimum
+  przed potęgowaniem jest darmowe, czego potrzebuje Program~\ref{prog:P02}.}
+\item Podaj funkcję ściśle malejącą względem prawdopodobieństwa, której używa
+  się jako straty, i powiedz, czemu odpowiada jej $\argmin$.
+  \answerto{$-\ln p$. Jej $\argmin$ po parametrach jest $\argmax$
+  wiarogodności, bo $\ln$ ściśle rośnie, a znak minus ściśle maleje.}
+\item Dlaczego cztery ruchy z sekcji 3 nigdy nie zamienią prostej w krzywą?
+  \answerto{Każdy z nich dodaje stałą do argumentu albo wartości, lub mnoży je
+  przez stałą. Funkcja liniowa funkcji liniowej jest liniowa, co jest zwinięciem
+  z ramki $32$ powiedzianym w drugą stronę.}
+\end{furtherproblems}
