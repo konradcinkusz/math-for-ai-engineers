@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F8 written, both editions.** F9–F13 and P1–P34 are stubs carrying their briefs | 39 of 47 |
+| Programs | **F1–F9 written, both editions.** F10–F13 and P1–P34 are stubs carrying their briefs | 38 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 401 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-pl` (17x24) | 409 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-en-a4` | 358 | 0 | 0 | 5, worst 6.3 pt | 0 |
-| `main-pl-a4` | 362 | 0 | 0 | 4, worst 4.4 pt | 0 |
+| `main-en` (17x24) | 423 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-pl` (17x24) | 433 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en-a4` | 376 | 0 | 0 | 5, worst 6.3 pt | 0 |
+| `main-pl-a4` | 380 | 0 | 0 | 4, worst 4.4 pt | 0 |
 
 The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
 one format and one language because that is where the line falls. Well under
@@ -81,22 +81,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **39 of 47 programs are stubs**, in each language. This is the whole of the
+- **38 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 235 computed values, all referenced, all present, plus the committed console
+- 252 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 48 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 54 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **43 orphan-tail pages: 10 · 12 · 11 · 10** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7
-  and 41 before F8. The count is the signal and it is going the wrong way, at
-  roughly two to eleven per program written; **F8 added one, which is the
-  cheapest program so far**, and the reason is worth having — it is the first
-  program written with the two-sided rule from F6 in hand, so the one frame
-  whose tail landed badly was lengthened rather than trimmed. **A fourth structural fix was measured in the F6 pass and
+- **45 orphan-tail pages: 10 · 14 · 11 · 10** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
+  41 before F8 and 43 before F9. The count is the signal and it is going the
+  wrong way, at roughly one to eleven per program written; **F8 added one and
+  F9 two, against F5's eleven**, and the reason is worth having — both were
+  written with the two-sided rule from F6 in hand, so a frame whose tail lands
+  badly is lengthened rather than trimmed. **A fourth structural fix was measured in the F6 pass and
   reverted**, because it clears the orphaned *cue* by converting it into more
   orphan *tails* — see *Program F6 pass* and the sweep table in
   `preamble.tex`. `checkpdf.py` prints every one of them on
@@ -2391,6 +2391,114 @@ identity and the English one did not.
   `1--6 / 7--10 / 11--15 / 16--23 / 24--30`. Fifteen quiz routes moved with
   them.
 
+### Program F9 pass, August 2026
+
+**Thirty-two teaching frames, thirty-four printed, both editions**, against a
+brief that projected forty. Five sections: what a vector is, length, the dot
+product, distance against similarity, and where the picture runs out.
+
+**It is the cheapest program so far by every layout measure**: zero new
+overfull boxes in any of the four builds, no stranded openers or headings, no
+orphaned cues, and two orphan tails. Parity came back clean on its first run,
+which has not happened before. The reason is not luck — it is that F6's
+two-sided rule and F8's `\code{}`-placement rule were both applied while
+drafting rather than after a build named the box.
+
+#### The payoff is a bridge, and the manifest decided its scope
+
+F9 sits after F8, which had already used $a \cdot b$, $\lVert a \rVert$ and
+cosine similarity without defining any of them. So F9's honest job is to
+define what F8 borrowed and then pay it back with an identity:
+
+\[ \lVert a - b \rVert^{2} = \lVert a \rVert^{2} + \lVert b \rVert^{2} - 2(a \cdot b) \]
+
+which is F8's $a \cdot b = \lVert a \rVert \lVert b \rVert \cos\theta$
+rearranged. On the unit sphere it collapses to $2 - 2\cos\theta$, so **distance
+and cosine similarity rank identically and cannot disagree** — confirmed on
+13,026 comparisons. Off it they can, and the frames work one triple where the
+nearest neighbour is not the most similar.
+
+**That split was decided by reading three briefs, not by taste.** P04 owns
+vector spaces, span, independence and basis; P05 owns inner products in
+general, projection, L1 against L2, the disagreement case worked out, what
+normalising costs, and near-orthogonality in high dimension; P07 owns
+broadcasting. What is left for F9 is the arithmetic and **the identity that
+says exactly when the two measures cannot differ** — which is a better
+possession than the general comparison, because it is provable rather than
+empirical. F8's pass had just been burnt by pointing at a P05 that had not
+promised what was claimed; checking first is now cheap and it changed the
+program's shape.
+
+#### One false claim, caught by reading rather than by any gate
+
+The triangle-inequality trapbox said *for numbers on a line the two sides are
+equal, always*. That is false for signed numbers: $3$ and $-4$ give
+$\lvert a + b \rvert = 1$ against $\lvert a \rvert + \lvert b \rvert = 7$.
+What is true, and is the actual source of the habit, is that **two lengths
+laid end to end on a line do measure their sum**, because a length is
+positive. Rewritten to say that.
+
+The shape is worth naming because it is the fourth instance: a sentence
+justifying a trap by appeal to a simpler setting, written from the feel of the
+simpler setting rather than from its arithmetic. F02's `-3**2` box and F04's
+momentum claim were the same, and both were also about a claim the author
+believed and had not evaluated.
+
+#### Two cross-program claims, both checked and both improved by checking
+
+- **F04 works the identical sum.** F09's dot-product example is
+  $1 \times 3 + 2 \times 4 = 3 + 8 = 11$, and F04 line 231 prints exactly that
+  while asking whether a sigma distributes over a product. The frame now says
+  so, so the two programs are provably quoting one computation rather than
+  coincidentally agreeing.
+- **F08 named the length and did not define it**, which is narrower than the
+  draft's *without saying where it came from* and is what the file actually
+  does. Corrected to *named it the length without saying how to compute one*.
+
+Also caught while drafting: frame 2 pointed at *section 6* in a program with
+five sections.
+
+#### The diagrams, and the crossover a third time
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| F9.1 list-or-arrow | 648 / 612 | 5.90 | 6.81 | 7.21 | 7.73 | 8.18 |
+| F9.2 length-twice | 618 / 621 | 5.62 | 7.14 | 7.10 | 8.10 | 8.06 |
+| F9.3 two-questions | 618 / 633 | 3.11 | 7.14 | 6.97 | 8.10 | 7.91 |
+
+`f09-two-questions` was first drawn as a diamond — two nodes converging on one
+— and came out **433 pt wide, setting 11.54 pt on A4**, the same hazard F8's
+`rotate-both` had. Here the F4/F5/F8 fix did **not** work: making the nodes
+wordier changed nothing, because mermaid wraps node text at its own width and
+the graph's width was already at that cap. What fixed it was **adding a rank**:
+splitting the diamond into a source node plus the two branches plus the join
+took it from two columns to three, 433 pt to 618.
+
+So the rule generalises: above the crossover the width is what matters, and
+the width is set by the number of *columns* as much as by the text. Wordier
+nodes widen a chain; only more ranks widen a graph that is already wrapping.
+
+**Rule 2 checked by content first and then on the page in all four builds.**
+Only F9.3 contains an answer to something the program asks — frame 22's *which
+has the higher cosine similarity* — and it sits below frame 23's answer
+everywhere: en p279 y445 against y227, en-a4 p240 y583 against y346, pl p286
+y530 against y241, pl-a4 p245 y409 against y107. F9.1 and F9.2 each restate
+the frame they are declared in and answer nothing put to the reader.
+
+#### Also
+
+- Three traps added to `notes/02` (55 to 57): adding a scalar to a vector,
+  lengths adding, and *nearest* against *most similar*.
+- Frame numbers remapped after writing: plan `1--6 / 7--12 / 13--18 / 19--27 /
+  28--33`, program `1--6 / 7--13 / 14--18 / 19--27 / 28--32`. Two outcomes were
+  reworded on the now-familiar rule — one named the zero vector, which frame 12
+  elicits, and one carried frame 23's finding.
+- The `tabularx` two-column table in frame 31 is the program's own summary of
+  what transfers and what does not, and it is the honest form of the payoff:
+  the brief's *every intuition built in 2-D will have to be tested against high
+  dimension in P5* is a hand-over, and the book says so rather than
+  manufacturing a measurement it does not own.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -2640,7 +2748,7 @@ clone instead.
 
 ## What is left
 
-1. **Thirty-nine programs.** This is the work. F9–F13 first, because the
+1. **Thirty-eight programs.** This is the work. F10–F13 first, because the
    Foundation part is what makes the book's claim — *it assumes nothing* —
    true or false.
    **F12 (the chain rule) is still the one outstanding program the rest of the
@@ -2650,9 +2758,10 @@ clone instead.
    as a shape for F12 to turn into the vanishing-gradient argument. Before
    estimating any remaining program's length, read its written neighbours:
    F7's brief projected forty frames and thirty-one were left once F5 and F6
-   had done their share, and **F8's projected forty-five against thirty
-   written**, because everything a trigonometry course would add is excluded by
-   the book's own scope statement. A brief's frame estimate is a planning
+   had done their share, **F8's projected forty-five against thirty written**,
+   because everything a trigonometry course would add is excluded by the book's
+   own scope statement, and **F9's projected forty against thirty-two**, because
+   P04, P05 and P07 own between them everything F9 might otherwise have said. A brief's frame estimate is a planning
    figure from before the neighbours existed; it is not a target, and padding
    to reach it means writing the material the scope excludes.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and

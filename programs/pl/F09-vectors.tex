@@ -1,21 +1,889 @@
 %% F09 --- Wektory na płaszczyźnie i w przestrzeni
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f09_vectors.py i wchodzi na stronę przez \val{}.
+%% (1,2)+(3,4) = (4,6), 3(1,2) = (3,6) i |(3,4)| = 5 są napisane wprost, bo to
+%% jest arytmetyka, dla której czytelnik tu jest.
+%%
+%% TEZA: wektor to LISTA LICZB, którą można TAKŻE narysować jako strzałkę.
+%% Rysunek jest udogodnieniem dwóch i trzech wymiarów, a nie częścią
+%% definicji, i dlatego arytmetyka przechodzi do 768 wymiarów bez zmian, a
+%% obrazek nie.
+%%
+%% WYPŁATĄ JEST MOST i jest nią tożsamość, nie tabela:
+%%   |a - b|^2 = |a|^2 + |b|^2 - 2 (a . b)
+%% czyli przekształcone a.b = |a||b|cos(theta) z F08. Dwa wnioski, oba
+%% sprawdzone w skrypcie na całym przebiegu:
+%%   na SFERZE JEDNOSTKOWEJ |a - b|^2 = 2 - 2 cos(theta), więc odległość jest
+%%     ściśle malejącą funkcją kosinusa i obie miary NIE MOGĄ ustawić inaczej
+%%     -- sprawdzone na 13026 porównaniach;
+%%   poza nią mogą, i ramki liczą jedną konkretną trójkę, w której najbliższy
+%%     sąsiad według odległości nie jest najbardziej podobny według kosinusa.
+%%
+%% CZEGO TEN PROGRAM CELOWO NIE ROBI, sprawdzone w tools/programs.json, a nie
+%% zapamiętane:
+%%   przestrzenie wektorowe, powłoka, niezależność, baza, wymiar     -> P04
+%%   iloczyn skalarny w ogólności, rzutowanie, L1 kontra L2, rozbieżność
+%%     rozpracowana, koszt normalizacji i prawie-prostopadłość w wysokim
+%%     wymiarze                                                      -> P05
+%%   rozgłaszanie kształtów, reshape, osie                           -> P07
+%% F09 ma arytmetykę i tożsamość mówiącą, kiedy obie miary nie mogą się
+%% różnić. Wszystko, co potrzebuje przestrzeni wektorowej, oddaje dalej.
+%%
+%% Bliźniak: programs/en/F09-vectors.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Wektory na płaszczyźnie i w przestrzeni}
 \label{prog:F09}
+\index{vector!as a list of numbers}
+\index{vector!length and unit vector}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{powiedzieć, czym jest wektor, nie rysując go, dodać i odjąć dwa
+  z nich oraz pomnożyć jeden przez liczbę}
+\outcome{7--13}{policzyć długość w dwóch i w trzech wymiarach oraz zamienić
+  wektor na wektor o długości $1$}
+\outcome{14--18}{powiedzieć, co liczy iloczyn skalarny, i powiązać go z kątem,
+  który znalazł Program~\ref{prog:F08}}
+\outcome{19--27}{zapisać odległość dwóch wektorów przez ich długości i ich
+  iloczyn skalarny oraz powiedzieć, co ta tożsamość rozstrzyga o odległości i
+  podobieństwie kosinusowym}
+\outcome{28--32}{powiedzieć, które części dwuwymiarowego obrazka przechodzą do
+  siedmiuset wymiarów, a których już nie ma}
+\end{outcomes}
 
-Argument: a vector is a list of numbers you may also draw as an arrow.
-Payoff: an embedding is a point in a space with too many dimensions to draw,
-and every intuition the reader is about to build in 2-D will have to be
-tested against high dimension in P5.
+\begin{quiz}
+\item Ile wynosi $(1, 2) + (3, 4)$? \teachesat{1--2}
+  \answerto{$(4, 6)$. Dodawanie robi się po jednej współrzędnej i nic ponadto.}
+\item Ile wynosi $3(1, 2)$? \teachesat{3--4}
+  \answerto{$(3, 6)$. Mnożenie przez liczbę mnoży każdą współrzędną.}
+\item Jaka jest długość $(3, 4)$? \teachesat{7--8}
+  \answerto{$5$, z $\sqrt{3^{2} + 4^{2}}$, czyli z twierdzenia Pitagorasa.}
+\item Jaka jest długość $(2, 3, 6)$? \teachesat{8--9}
+  \answerto{$\val{f09.len3d}$, z $\sqrt{2^{2} + 3^{2} + 6^{2}}$. Pitagoras
+  zastosowany dwa razy.}
+\item Jak zamienić wektor na wektor o długości $1$? \teachesat{11--12}
+  \answerto{Podzielić każdą współrzędną przez jego długość. Da się tak zrobić
+  z każdym wektorem poza wektorem zerowym.}
+\item Który wektor nie ma kierunku? \teachesat{12--13}
+  \answerto{Wektor zerowy. Normalizacja dzieli go przez zero, a nic innego w
+  tym programie nie ma wyjątku.}
+\item Co liczy $a \cdot b$, słowami? \teachesatone{14}
+  \answerto{Mnoży oba wektory współrzędna po współrzędnej i dodaje wyniki.}
+\item Dwa wektory mają długości $3$ i $4$. Co można powiedzieć o długości ich
+  sumy? \teachesat{19--20}
+  \answerto{Jest co najwyżej $7$, a jest równa $7$ tylko wtedy, gdy oba
+  wskazują w tę samą stronę.}
+\item Zapisz kwadrat odległości $\lVert a - b \rVert^{2}$, używając wyłącznie
+  długości i iloczynu skalarnego. \teachesatone{21}
+  \answerto{$\lVert a \rVert^{2} + \lVert b \rVert^{2} - 2\,(a \cdot b)$.}
+\item Dwa wektory mają długość $1$. Jeśli jeden jest bliżej zapytania niż
+  drugi, czy jest też bardziej podobny kosinusowo? \teachesat{22--23}
+  \answerto{Tak, zawsze. Na sferze jednostkowej odległość to
+  $2 - 2\cos\theta$, co maleje, gdy kosinus rośnie, więc oba porządki są
+  jednym porządkiem.}
+\item A jeśli długości nie są równe $1$? \teachesat{24--25}
+  \answerto{Wtedy mogą się różnić, a program liczy przypadek, w którym się
+  różnią.}
+\item Ile współrzędnych ma zanurzenie o wymiarze $\val{f09.dim}$ i ile z nich
+  da się narysować? \teachesat{29--30}
+  \answerto{$\val{f09.dim}$ oraz $\val{f09.drawable}$.}
+\item Co z tego przechodzi do $\val{f09.dim}$ wymiarów: strzałka, arytmetyka
+  czy jedno i drugie? \teachesat{28--30}
+  \answerto{Arytmetyka. Każde działanie w tym programie jest pętlą po
+  współrzędnych i ani razu nie potrzebowało obrazka.}
+\item Wskaż jedną rzecz, której nie wolno założyć o wektorach w
+  $\val{f09.dim}$ wymiarach na podstawie dwuwymiarowego rysunku.
+  \teachesatone{31}
+  \answerto{Dowolna odpowiedź nazywająca twierdzenie o tym, jak wektory są
+  rozłożone, a nie o działaniach. Arytmetyka przechodzi; intuicja o tym, co
+  jest blisko czego, nie, a Program~\ref{prog:P05} mierzy tę różnicę.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 40 ramek.
-}
+% ============================================================
+\section{Lista, którą można też narysować}
+\label{sec:F09-list}
+\index{vector!as a list of numbers}
+
+\begin{fr}
+\textbf{Wektor} to lista liczb.
+
+To jest definicja i warto wziąć ją dokładnie tak dosłownie, jak jest
+napisana, bo wszystko inne w tym programie jest arytmetyką na listach i nic
+z tego nie potrzebuje niczego więcej.
+
+Gdy lista ma dwie liczby, można ją \emph{także} narysować: postaw kropkę w
+tych współrzędnych i strzałkę z początku układu do kropki. Gdy ma trzy, wciąż
+można, z większym trudem. Gdy ma $\val{f09.dim}$, już nie można, a arytmetyka
+tego nie zauważa.
+
+Dwa wektory: $a = (1, 2)$ i $b = (3, 4)$. Jak myślisz, ile wynosi $a + b$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(4, 6)$
+\end{ansblock}
+
+Po jednej współrzędnej: $1 + 3$ oraz $2 + 4$. Nic innego nie mogłoby to
+sensownie znaczyć, a obrazek się zgadza \dash{} połóż strzałkę $b$ na grocie
+strzałki $a$, a dojdziesz do $(4, 6)$.
+
+Zauważ kolejność. Najpierw była arytmetyka, a obrazek się z nią zgodził. Ta
+kolejność znaczy więcej, niż wygląda, i sekcja 5 mówi dlaczego.
+
+Odejmowanie jest takie samo, po jednej współrzędnej. Ile wynosi $b - a$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$(2, 2)$}
+A to ma odczyt, który warto zachować: $b - a$ jest strzałką prowadzącą
+\emph{z} $a$ \emph{do} $b$. Każda odległość w tym programie będzie długością
+różnicy, więc to jest pierwsza połowa tamtego pomysłu.
+
+Trzecie działanie to mnożenie przez zwykłą liczbę \dash{} przez
+\textbf{skalar}, bo tak nazywa się liczba, gdy w pobliżu są wektory. Ile
+wynosi $3(1, 2)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$(3, 6)$}
+Każda współrzędna pomnożona. Strzałka wskazuje w tę samą stronę i jest trzy
+razy dłuższa, więc skalar zmienia rozmiar, a nie kierunek.
+
+Dwa szczególne przypadki warto nazwać już teraz, bo oba wracają:
+
+\begin{itemize}
+\item skalar \textbf{ujemny} odwraca strzałkę, a nie tylko ją skaluje, więc
+  $-1$ razy wektor wskazuje w przeciwną stronę;
+\item \textbf{zero} razy dowolny wektor daje wektor zerowy, którego wszystkie
+  współrzędne są równe $0$ i który jako jedyny nie ma żadnego kierunku.
+\end{itemize}
+
+Te trzy działania \dash{} dodaj, odejmij, przeskaluj \dash{} są całą algebrą.
+Ile wynosi $2(1, 2) - (3, 4)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$(-1, 0)$}
+Z $(2, 4) - (3, 4)$. Najpierw skalowanie, potem odejmowanie; konwencje są te,
+które Program~\ref{prog:F02} ustalił dla liczb, i nie wymaga się od ciebie
+niczego nowego.
+
+\begin{trapbox}
+\textbf{Dodawanie zwykłej liczby do wektora nie jest zdefiniowane}, a warto
+to powiedzieć, bo biblioteka tablicowa i tak to zrobi. W matematyce tego
+programu $v + 1$ nie znaczy nic: $v$ jest listą, $1$ nie jest, i nie ma jak
+sparować tego współrzędna po współrzędnej.
+
+Biblioteka tablicowa odczyta to jako dodanie $1$ do \emph{każdej}
+współrzędnej, co jest rozsądną konwencją i nie jest tym, co mówi matematyka.
+Ma ona nazwę i zestaw reguł, a Program~\ref{prog:P07} je podaje. Do tego
+czasu przydatnym nawykiem jest zauważać, że napisało się wiersz, którego
+znaczenie pochodzi z biblioteki, a nie z matematyki \dash{} bo to jest ten
+wiersz, którego zachowanie zmieni się przy zmianie kształtów.
+\end{trapbox}
+
+\mermaidfig{f09-list-or-arrow}{Definicją jest lista. Strzałka jest
+udogodnieniem, które się kończy.}{wektor jako lista i koniec strzałki}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedno słowo, i to takie, którego książka będzie używać stale.
+
+Liczby na liście to jego \textbf{współrzędne}, a ich liczba mówi, ile ich
+wektor ma \dash{} dwie dla punktu na płaszczyźnie, $\val{f09.dim}$ dla
+zanurzeń, które spotkasz. Gdy dwa wektory mają różną liczbę współrzędnych,
+żadne z trzech powyższych działań nie jest zdefiniowane, bo nie ma z czym
+sparować współrzędnych, które zostały.
+
+To jest cała treść błędu kształtu i dlatego jest on błędem, a nie złą
+odpowiedzią.
+\end{fr}
+
+% ============================================================
+\section{Długość}
+\label{sec:F09-length}
+\index{vector!length and unit vector}
+
+\begin{fr}
+Wektor narysowany jako strzałka ma długość, a długość to twierdzenie
+Pitagorasa.
+
+Dla $(3, 4)$: idź $3$ w poziomie i $4$ w pionie, a strzałka jest
+przeciwprostokątną trójkąta prostokątnego o takich przyprostokątnych. Więc jej
+długość wynosi $\sqrt{3^{2} + 4^{2}}$.
+
+Policz to.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$5$}
+A oznaczeniem jest $\lVert a \rVert$, z podwójną kreską, czytane
+\enquote{długość $a$} albo \enquote{norma $a$}. Już to widziałeś:
+Program~\ref{prog:F08} umieścił to w mianowniku wzoru na podobieństwo
+kosinusowe i nazwał to długością, nie mówiąc, jak ją policzyć, a liczy się ją
+tak.
+
+Teraz trzy współrzędne. Jaka jest długość $(2, 3, 6)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f09.len3d}$}
+Z $\sqrt{2^{2} + 3^{2} + 6^{2}} = \sqrt{4 + 9 + 36} = \sqrt{49}$.
+
+Powód, dla którego to ten sam wzór z jednym kwadratem więcej, warto zobaczyć
+raz, bo to on czyni uogólnienie uczciwym, a nie założonym. Weź strzałkę do
+$(2, 3, 6)$. Jej cień na podłodze to strzałka do $(2, 3)$, której długość
+wynosi $\sqrt{2^{2} + 3^{2}}$ na mocy poprzedniej ramki. Ten cień i wysokość
+$6$ są przyprostokątnymi drugiego trójkąta prostokątnego, a jego
+przeciwprostokątną jest sama strzałka:
+
+\[ \lVert (2, 3, 6) \rVert = \sqrt{\left(\sqrt{2^{2} + 3^{2}}\right)^{2} + 6^{2}}
+   = \sqrt{2^{2} + 3^{2} + 6^{2}} \]
+
+\textbf{Pitagoras zastosowany dwa razy zwija się w jedną sumę kwadratów}, a
+ten sam argument zastosowany po raz czwarty i piąty daje ten sam kształt. Więc
+długość listy o dowolnej liczbie współrzędnych to pierwiastek z sumy ich
+kwadratów, a wyprowadzenie ani razu nie musiało widzieć więcej niż jednego
+trójkąta naraz.
+
+\mermaidfig{f09-length-twice}{Każda kolejna współrzędna to kolejny kwadrat w
+sumie, a argument to znów ten sam trójkąt.}{długość w dwóch i w trzech
+wymiarach}
+\end{fr}
+
+\begin{fr}
+Spróbuj w rozmiarze, którego nie da się narysować. Wektor o $\val{f09.dim}$
+współrzędnych, z których każda wynosi $1$. Jaka jest jego długość?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f09.len.ones}$}
+Bo suma kwadratów to $\val{f09.dim}$ jedynek, więc długość wynosi
+$\sqrt{\val{f09.dim}}$.
+
+To pierwszy rachunek w tej książce, którego nie dałoby się narysować, i poszedł
+bez żadnego incydentu. Zapamiętaj, jak mało to było niezwykłe.
+
+Teraz działanie, które długości używa. \textbf{Wektor jednostkowy} to taki,
+którego długość wynosi $1$. Jak zrobiłbyś taki z $(3, 4)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Podzielić przez jego długość: $\left(\frac{3}{5}, \frac{4}{5}\right)$.
+\end{ansblock}
+
+Podzielenie każdej współrzędnej przez $\lVert a \rVert$ skaluje strzałkę przez
+$\frac{1}{\lVert a \rVert}$, co na mocy poprzedniej sekcji zmienia rozmiar, a
+nie kierunek \dash{} więc wynik wskazuje w tę samą stronę i ma długość
+dokładnie $1$. Nazywa się to \textbf{normalizacją}, a wynik zwykle oznacza się
+$\hat{a}$.
+
+Każdy wektor da się znormalizować poza jednym. Który to i dlaczego?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wektor zerowy: dzielenie przez jego długość dzieli przez zero.
+\end{ansblock}
+
+I nie jest to przypadek arytmetyki. Wektor zerowy naprawdę nie ma kierunku
+\dash{} nie ma sposobu, w który wskazuje \dash{} więc nie ma czym być
+wektorowi jednostkowemu.
+
+\begin{warning}
+Biblioteka powie ci o tym po swojemu, a po jakiemu, zależy od biblioteki. Czysty
+Python podnosi \code{ZeroDivisionError} i się zatrzymuje. Biblioteka tablicowa
+raczej zwróci współrzędne będące same \code{nan} i pójdzie dalej, z
+ostrzeżeniem, którego możesz nie czytać, a wtedy każde późniejsze porównanie
+z tymi współrzędnymi da \code{False} \dash{} łącznie z tymi, które pytają, czy
+jest równa samej sobie.
+
+Zapamiętać należy niezmiennik: \textbf{wektora zerowego nie da się
+znormalizować}, cokolwiek zrobią twoje narzędzia. Potok normalizujący zanurzenia
+potrzebuje odpowiedzi na pusty dokument, a \enquote{cokolwiek zrobi biblioteka}
+odpowiedzią nie jest.
+\end{warning}
+\end{fr}
+
+% ============================================================
+\section{Iloczyn skalarny}
+\label{sec:F09-dot}
+\index{vector!dot product}
+
+\begin{fr}
+Czwarte działanie to takie, które zamienia dwa wektory w jedną liczbę.
+
+\textbf{Iloczyn skalarny} wektorów $a$ i $b$ zapisuje się $a \cdot b$ i liczy,
+mnożąc współrzędne parami i dodając wyniki:
+\[ a \cdot b = \sum_i a_i b_i \]
+czyli sigma z Programu~\ref{prog:F04} z iloczynem w środku i niczym więcej.
+
+Policz $(1, 2) \cdot (3, 4)$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$11$}
+Z $1 \times 3 + 2 \times 4 = 3 + 8$, czyli z sumy, którą liczy
+Program~\ref{prog:F04}, gdy pyta, czy sigma rozdziela się na iloczyn \dash{}
+ten sam rachunek, teraz z nazwą. Zwróć uwagę na kształt odpowiedzi: dwa
+wektory na wejściu, jedna zwykła liczba na wyjściu. Nic w niej nie jest
+wektorem i dlatego bywa nazywana iloczynem \emph{skalarnym}.
+
+Jeden szczególny przypadek warto wziąć teraz, bo oszczędzi ci pisania. Ile
+wynosi $a \cdot a$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Sumę kwadratów współrzędnych, czyli $\lVert a \rVert^{2}$.
+\end{ansblock}
+
+Więc $\lVert a \rVert = \sqrt{a \cdot a}$, a długość wcale nie jest osobnym
+pomysłem \dash{} jest iloczynem skalarnym wektora z samym sobą, z
+pierwiastkiem na zewnątrz. Każdy wzór w dalszej części tego programu, w którym
+jest długość, dałoby się zapisać iloczynem skalarnym, i następna sekcja z tego
+korzysta.
+
+Teraz powiązanie, które już masz. Program~\ref{prog:F08} pokazał, że
+podobieństwo kosinusowe jest kosinusem kąta między dwoma wektorami:
+\[ \cos\theta = \frac{a \cdot b}{\lVert a \rVert\, \lVert b \rVert} \]
+Pomnóż obie strony przez obie długości i odczytaj wynik.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ a \cdot b = \lVert a \rVert\, \lVert b \rVert \cos\theta \]
+\end{ansblock}
+
+\textbf{Iloczyn skalarny to obie długości pomnożone przez siebie, a potem
+przeskalowane przez to, jak bardzo oba są zgodne.} To jest całe znaczenie tego
+działania i dlatego jedna liczba potrafi nieść informację o dwóch wektorach
+naraz: niesie ich rozmiary i ich zgodność wmnożone w siebie.
+
+Trzy przypadki odczytuje się z tego wprost i wszystkie trzy warto umieć podać
+bez liczenia:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Oba wskazują & $\cos\theta$ & $a \cdot b$ \\
+\midrule
+w tę samą stronę & $1$ & $\lVert a \rVert\, \lVert b \rVert$ \\
+prostopadle & $0$ & $0$ \\
+w przeciwne strony & $-1$ & $-\lVert a \rVert\, \lVert b \rVert$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Środkowy wiersz jest tym, który zarabia na siebie: \textbf{iloczyn skalarny
+równy zeru oznacza, że oba są prostopadłe}, niezależnie od ich długości, i
+właśnie w tym znaczeniu używa się zwykle słowa \emph{ortogonalny}, które
+spotkasz.
+
+Dwa wektory mają długości $2$ i $5$ oraz iloczyn skalarny $0$. Jaki jest kąt
+między nimi?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Kąt prosty}
+Bo $\cos\theta = \frac{0}{2 \times 5} = 0$, a długości nigdy nie miały
+znaczenia. Zerowy iloczyn skalarny mówi to samo, do jakiej skali by tych dwóch
+wektorów nie sprowadzić.
+\end{fr}
+
+% ============================================================
+\section{Odległość i kiedy zgadza się z podobieństwem}
+\label{sec:F09-distance}
+\index{vector!distance against similarity}
+
+\begin{fr}
+Dwa wektory, dwa pytania, jakie można o nie zadać.
+
+\textbf{Jak daleko od siebie są?} Odejmij i weź długość różnicy:
+$\lVert a - b \rVert$. To jest \textbf{odległość euklidesowa} i to może
+mierzyć zapytanie do bazy wektorowej.
+
+\textbf{Jak podobne są ich kierunki?} Podziel iloczyn skalarny przez obie
+długości: $\frac{a \cdot b}{\lVert a \rVert \lVert b \rVert}$. To jest
+podobieństwo kosinusowe i to samo zapytanie może mierzyć zamiast tamtego
+właśnie to.
+
+Zanim cokolwiek innego, jedna rzecz o pierwszym z nich. Wektory $a$ i $b$ mają
+długości $3$ i $4$. Ile najwięcej może wynosić $\lVert a + b \rVert$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f09.tri.sum}$}
+I dochodzi tam tylko wtedy, gdy oba wskazują w tę samą stronę, tak że
+położenie jednej strzałki na grocie drugiej idzie po linii prostej. Każdy inny
+kąt i marsz skręca za róg, a róg jest skrótem:
+\[ \lVert a + b \rVert \le \lVert a \rVert + \lVert b \rVert \]
+
+To jest \textbf{nierówność trójkąta}, a jej treścią jest to, że droga
+bezpośrednia nigdy nie jest dłuższa niż przez trzeci punkt. Prostopadle
+\dash{} $(3, 0)$ i $(0, 4)$ \dash{} suma ma długość $\val{f09.tri.actual}$
+wobec $\val{f09.tri.sum}$, które dałoby dodanie długości, więc kąt prosty
+kosztuje dwie jednostki z siedmiu.
+
+\begin{trapbox}
+\textbf{Długości się nie dodają, a błąd polega na przeniesieniu arytmetyki
+liczb dodatnich bez sprawdzenia, czy ona to przetrwa.} Dwie długości $3$ i $4$
+położone na prostej jedna za drugą faktycznie mierzą $7$ i stąd bierze się ten
+nawyk; wektor niesie także kierunek, a gdy tylko kierunki się różnią, obie
+strzałki przestają leżeć jedna za drugą. Równość jest teraz wyjątkiem, a nie
+regułą \dash{} zdarza się tylko wtedy, gdy oba wskazują w tę samą stronę.
+
+To jest ten sam kształt, co pułapka z rozwijaniem w Programie~\ref{prog:F02} i
+pułapka z nierównością w Programie~\ref{prog:F06}: reguła prawdziwa w jednym
+kontekście, uogólniona poza swoje założenia, bo nic nie ogłosiło, że kontekst
+się zmienił. Warto się tego spodziewać, gdy następnym razem działanie dostanie
+argument nowego rodzaju.
+
+Sprawdzone w \code{code/f09\_vectors.py} na każdej parze z siatki
+dwadzieścia pięć na dwadzieścia pięć, przy równości odtwarzanej do
+$\val{f09.tri.parallel.err}$ dla par równoległych.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Teraz połącz oba pytania, bo o tym jest reszta tej sekcji.
+
+Zacznij od $\lVert a - b \rVert^{2}$ i skorzystaj z tego, że kwadrat długości
+jest iloczynem skalarnym z samym sobą. Rozwinięcie daje
+\[ \lVert a - b \rVert^{2} = (a - b) \cdot (a - b)
+   = \lVert a \rVert^{2} + \lVert b \rVert^{2} - 2\,(a \cdot b) \]
+bo środkowe wyrazy to $-a \cdot b$ dwa razy.
+
+Ta tożsamość jest sprawdzona w skrypcie na sześćdziesięciu ośmiu tysiącach par,
+przy najgorszej rozbieżności $\val{f09.law.err}$. Załóż teraz, że oba wektory
+zostały znormalizowane, więc obie długości wynoszą $1$. Czym się to staje?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \lVert a - b \rVert^{2} = 2 - 2\cos\theta \]
+\end{ansblock}
+
+Bo oba kwadraty długości wynoszą $1$, a $a \cdot b$ jest równe $\cos\theta$,
+gdy długości znikną \dash{} czyli wynik Programu~\ref{prog:F08} z mianownikiem
+równym $1$. Sprawdzone do $\val{f09.unit.err}$.
+
+Odczytaj, co to mówi. Po prawej nie ma nic poza kosinusem i przychodzi on ze
+znakiem minus. Więc gdy kosinus rośnie, odległość maleje, a gdy kosinus maleje,
+odległość rośnie, bez wyjątków i bez obszarów, w których zachowanie się zmienia.
+
+Masz zapytanie i dwóch kandydatów, wszystkich troje znormalizowanych. Kandydat
+A jest bliżej zapytania niż kandydat B. Który ma wyższe podobieństwo
+kosinusowe?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{A, z konieczności}
+\textbf{Na sferze jednostkowej odległość i podobieństwo kosinusowe są jednym
+pytaniem o dwóch odpowiedziach.} Nie zwykle i nie w przybliżeniu: ustawiają
+każdą parę kandydatów identycznie, bo jedno jest ściśle malejącą funkcją
+drugiego, a ściśle malejąca funkcja nie może niczego przestawić. Skrypt
+sprawdza to na $\val{f09.rank.checked}$ porównaniach i nie znajduje wyjątku,
+czego po tożsamości należało oczekiwać.
+
+Warto to mieć, bo rozstrzyga spór, który spotkasz. Jeśli twoje wektory są
+znormalizowane, \enquote{kosinus czy odległość euklidesowa?} nie ma
+odpowiedzi, bo nie ma różnicy, o którą można by mieć zdanie.
+
+\mermaidfig{f09-two-questions}{Dwa pytania, które stają się jednym, gdy tylko
+oba wektory mają długość jeden.}{odległość i podobieństwo na sferze
+jednostkowej}
+\end{fr}
+
+\begin{fr}
+A teraz zabierz normalizację, bo tam siedzi kłopot.
+
+Zapytanie wskazuje wzdłuż $(1, 0)$. Dwóch kandydatów:
+\[ A = (\num{0.30},\ \num{0.06}) \qquad B = (\num{0.95},\ \num{0.45}) \]
+
+$A$ wskazuje niemal dokładnie tak jak zapytanie i jest krótki. $B$ wskazuje
+mniej tak samo, ale ma mniej więcej rozmiar samego zapytania.
+
+Który jest najbliższym sąsiadem zapytania, a który najbardziej podobny? Policz
+oba, dla obu, zanim pójdziesz dalej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& kosinus & odległość \\
+\midrule
+$A$ & $\val{f09.dis.cos.a}$ & $\val{f09.dis.dist.a}$ \\
+$B$ & $\val{f09.dis.cos.b}$ & $\val{f09.dis.dist.b}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{ansblock}
+
+\textbf{$A$ jest bardziej podobny, a $B$ jest bliżej.} Obie miary wskazują
+różnych zwycięzców na tych samych trzech wektorach i żadna nie jest w błędzie:
+zadano im różne pytania i one na nie odpowiedziały.
+
+\begin{trapbox}
+\textbf{\enquote{Najbliższy} i \enquote{najbardziej podobny} to ten sam
+porządek tylko na sferze jednostkowej, a poprzednia ramka mówi dokładnie
+dlaczego.} Zabierz długości, a $\lVert a - b \rVert^{2} = 2 - 2\cos\theta$
+staje się $\lVert a \rVert^{2} + \lVert b \rVert^{2} - 2\lVert a \rVert
+\lVert b \rVert \cos\theta$, gdzie obie długości występują samodzielnie.
+Kosinus nie wyznacza już odległości, więc nie może już jej porządkować.
+
+Kosztowne, a nie ciekawe, jest to dlatego, że oba zapytania się wykonują, oba
+zwracają wyniki wyglądające wiarygodnie, a różnica objawia się jako
+wyszukiwanie lekko błędne w sposób, którego nikt nie odtworzy ze wzoru.
+\textbf{Pytaniem do dowolnego indeksu podobieństwa nie jest to, jakiej miary
+używa, tylko to, czy wektory, które do niego weszły, były znormalizowane}, bo
+pierwsze pytanie ma konsekwencje dopiero wtedy, gdy odpowiedź na drugie brzmi
+nie.
+
+Program~\ref{prog:P05} prowadzi to porównanie dalej \dash{} którą miarę wybrać,
+gdy się różnią, i co kosztuje normalizacja.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Ostatnie sprawdzenie na tych samych trzech wektorach, bo czyni poprawkę
+konkretną, a nie hasłem.
+
+Znormalizuj $A$ i $B$, zapytania nie ruszaj \dash{} ma już długość $1$ \dash{}
+i zmierz odległości jeszcze raz. Co musi się stać?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$A$ musi stać się bliższy, bo kosinusy się nie zmieniły, a teraz to one
+wyznaczają odległości.
+\end{ansblock}
+
+I tak jest: $\val{f09.dis.ndist.a}$ wobec $\val{f09.dis.ndist.b}$, gdzie przed
+normalizacją było $\val{f09.dis.dist.a}$ wobec $\val{f09.dis.dist.b}$, czyli
+na odwrót.
+
+Nic w \emph{kierunkach} się nie zmieniło \dash{} normalizacja nie może zmienić
+kierunku, na mocy sekcji 2 \dash{} więc kosinusy to te same dwie liczby, co
+były. Zmieniło się to, że odległość jest teraz funkcją samych kosinusów.
+
+\begin{aibox}
+To jest cały powód, dla którego potok zanurzeń normalizuje przed indeksowaniem,
+i jest to decyzja projektowa, a nie formalność. Znormalizowane wektory czynią
+wybór metryki przez indeks nieistotnym, więc ten sam magazyn odpowiada
+identycznie na zapytanie kosinusowe i odległościowe i nie da się go
+skonfigurować tak, by sam ze sobą się nie zgadzał.
+
+Kosztuje to długości, a długości mogą nieść informację \dash{} ile tekstu
+weszło w zanurzenie, jak pewny był model. Jeśli niosą, normalizacja wyrzuca ją,
+zanim indeks ją w ogóle zobaczy, i to jest decyzja warta podjęcia świadomie, a
+nie przez skopiowanie samouczka.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Gdzie kończy się obrazek}
+\label{sec:F09-highdim}
+\index{vector!in high dimension}
+
+\begin{fr}
+Policz, czego ten program faktycznie użył.
+
+Dodawanie, odejmowanie i skalowanie to jedna pętla po współrzędnych. Długość
+to suma kwadratów i pierwiastek. Iloczyn skalarny to suma iloczynów. Odległość
+to odejmowanie i długość. Każde z nich jest przejściem po liście, a liczba
+współrzędnych pojawia się w dokładnie jednym miejscu: ile razy wokoło pętli.
+
+Które z tych działań staje się trudniejsze, gdy wektor ma $\val{f09.dim}$
+współrzędnych zamiast $2$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Żadne. Każde wykonuje więcej kroków i żadne nie wykonuje kroku innego rodzaju.
+\end{ansblock}
+
+Arytmetyka nigdy nie potrzebowała obrazka i dlatego przetrwała. Strzałki
+rysowałeś w tym programie dlatego, że ułatwiały uwierzenie w przypadek
+dwuwymiarowy, a nie dlatego, że definicje ich używały \dash{} i każda definicja
+była podana jako reguła o współrzędnych, zanim narysowano jakąkolwiek strzałkę.
+
+Teraz druga strona. Które z tych działań da się jeszcze \emph{narysować} przy
+$\val{f09.dim}$ współrzędnych?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Też żadne. $\val{f09.drawable}$ współrzędne da się narysować, a
+$\val{f09.undrawn}$ nie.
+\end{ansblock}
+
+\textbf{Arytmetyka przechodzi, a obrazek nie}, i to jest zdanie, z którym ten
+program ma cię zostawić.
+
+Zanurzenie jest punktem w przestrzeni o zbyt wielu wymiarach, by ją narysować.
+Każdy wzór z tego programu stosuje się do niego dokładnie, bez żadnej korekty.
+Nie stosuje się natomiast twoje wyczucie tego, gdzie rzeczy są: ono wzięło się
+z rysunków dwóch wymiarów i nigdy nie zostało z niczego wyprowadzone.
+\end{fr}
+
+\begin{fr}
+Warto być dokładnym co do tego, które twierdzenia są w której klasie, bo to
+rozróżnienie łatwo się formułuje i trudno utrzymuje.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Przechodzi dokładnie & Nie przechodzi \\
+\midrule
+każda tożsamość z tego programu & ile kierunków jest od siebie daleko \\
+nierówność trójkąta & ile przestrzeni jest blisko środka \\
+zgodność odległości i kosinusa na sferze jednostkowej & jak wygląda
+  \enquote{typowa} para wektorów \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Lewa kolumna jest udowodniona i zachodzi przy dowolnej liczbie współrzędnych.
+Prawa kolumna dotyczy tego, jak wektory są \emph{rozłożone}, co jest pytaniem
+o rozkłady, a nie o działania, i nic z niej nie zostało tu ustalone.
+
+\begin{warning}
+\textbf{Prawa kolumna jest tym, czym wysoki wymiar zaskakuje ludzi, a ten
+program celowo nie podaje ci odpowiedzi.} Program~\ref{prog:P05} je mierzy, a
+powodem zwłoki jest to, że porządne zmierzenie ich potrzebuje słownictwa, które
+ustawia Program~\ref{prog:P04}.
+
+Stąd możesz wziąć dyscyplinę, a nie wynik: gdy przyłapiesz się na
+rozumowaniu o zanurzeniach w $\val{f09.dim}$ wymiarach przez wyobrażanie sobie
+dwóch strzałek na kartce, sprawdź, w której kolumnie jest twoje twierdzenie.
+Jeśli jest tożsamością, obrazek jest uprawnioną pomocą. Jeśli dotyczy tego, co
+jest blisko czego, obrazek jest dowodem o płaszczyźnie, a ty mówisz o czymś
+innym.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Jedna uwaga na koniec, i dotyczy raczej tego, jak ten program został zbudowany,
+niż wektorów.
+
+Każda definicja była tu podana jako działanie na liście, a strzałka przyszła
+potem jako sprawdzenie, że działanie ma sens. Łatwiej byłoby zrobić to na
+odwrót \dash{} zdefiniować wszystko obrazkami, a potem powiedzieć, że wzory to
+liczą \dash{} a wynikiem byłby program, który przestaje działać przy trzech
+współrzędnych.
+
+\textbf{Gdy definicja i obrazek się zgadzają, warto wiedzieć, które z nich jest
+nośne}, bo to ono mówi, gdzie definicja nadal się stosuje, gdy obrazka już nie
+ma.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--4}{\textbf{Wektor to lista liczb.} To cała definicja; strzałka jest
+  udogodnieniem dostępnym przy dwóch i trzech współrzędnych i potem znika.
+  Dodawanie, odejmowanie i mnożenie przez skalar robi się po jednej
+  współrzędnej i żadne z nich nie potrzebuje obrazka.}
+\sumitem{5--6}{Dodanie zwykłej liczby do wektora \textbf{nie jest
+  zdefiniowane} w matematyce, cokolwiek zrobi z tym biblioteka tablicowa
+  (reguły ma Program~\ref{prog:P07}). A dwa wektory o różnej liczbie
+  współrzędnych nie obsługują żadnego z trzech działań, i to jest cała treść
+  błędu kształtu.}
+\sumitem{7--9}{$\lVert a \rVert$ to pierwiastek z sumy kwadratów i jest to
+  Pitagoras zastosowany raz na współrzędną: długość w trzech wymiarach buduje
+  się z długości w dwóch, a ten sam argument biegnie przy dowolnej liczbie.
+  $\lVert (3,4) \rVert = 5$ oraz
+  $\lVert (2,3,6) \rVert = \val{f09.len3d}$.}
+\sumitem{10--13}{\textbf{Normalizacja dzieli każdą współrzędną przez długość} i
+  daje wektor o długości $1$ wskazujący w tę samą stronę, bo skalowanie zmienia
+  rozmiar, a nie kierunek. Każdy wektor da się znormalizować poza zerowym,
+  który nie ma kierunku, jaki mógłby mieć wektor jednostkowy \dash{} a to, co
+  twoje narzędzia z tym przypadkiem zrobią, jest własnością narzędzi, a nie
+  matematyki.}
+\sumitem{14--16}{$a \cdot b = \sum_i a_i b_i$ bierze dwa wektory i zwraca jedną
+  liczbę. $a \cdot a = \lVert a \rVert^{2}$, więc długość nie jest osobnym
+  pomysłem \dash{} jest iloczynem skalarnym z pierwiastkiem na nim.}
+\sumitem{17--18}{\textbf{$a \cdot b = \lVert a \rVert \lVert b \rVert
+  \cos\theta$}, czyli przekształcony wynik Programu~\ref{prog:F08}: iloczyn
+  skalarny niesie oba rozmiary i zgodność wmnożone w siebie. Iloczyn skalarny
+  równy \emph{zeru} oznacza kąt prosty niezależnie od długości, i to znaczy
+  \emph{ortogonalny}.}
+\sumitem{19--20}{\textbf{Długości się nie dodają.}
+  $\lVert a + b \rVert \le \lVert a \rVert + \lVert b \rVert$, z równością
+  tylko wtedy, gdy oba wskazują w tę samą stronę; prostopadle $3$ i $4$ dają
+  $\val{f09.tri.actual}$, a nie $\val{f09.tri.sum}$.}
+\sumitem{21--22}{\textbf{$\lVert a - b \rVert^{2} = \lVert a \rVert^{2} +
+  \lVert b \rVert^{2} - 2\,(a \cdot b)$}, sprawdzone do $\val{f09.law.err}$, a
+  na sferze jednostkowej zwija się do $2 - 2\cos\theta$, sprawdzone do
+  $\val{f09.unit.err}$.}
+\sumitem{23}{Więc \textbf{na sferze jednostkowej odległość i podobieństwo
+  kosinusowe porządkują identycznie} \dash{} jedno jest ściśle malejącą funkcją
+  drugiego i nie może niczego przestawić. Potwierdzone na
+  $\val{f09.rank.checked}$ porównaniach. Jeśli twoje wektory są znormalizowane,
+  \enquote{kosinus czy odległość euklidesowa?} nie ma odpowiedzi.}
+\sumitem{24--25}{\textbf{Poza sferą mogą wskazać różnych zwycięzców.} Na jednym
+  zapytaniu i dwóch kandydatach $A$ jest bardziej podobny
+  ($\val{f09.dis.cos.a}$ wobec $\val{f09.dis.cos.b}$), a $B$ jest bliżej
+  ($\val{f09.dis.dist.b}$ wobec $\val{f09.dis.dist.a}$). Oba zapytania się
+  wykonują, oba zwracają wiarygodne wyniki, a rozbieżność jest w wyniku
+  niewidoczna. Pytaniem do indeksu nie jest to, jakiej miary używa, tylko to,
+  czy to, co do niego weszło, było znormalizowane.}
+\sumitem{26--27}{Znormalizowanie tych samych dwóch kandydatów stawia $A$ bliżej
+  ($\val{f09.dis.ndist.a}$ wobec $\val{f09.dis.ndist.b}$), nie zmieniając
+  żadnego z kierunków \dash{} i dlatego potok normalizuje przed indeksowaniem,
+  a płaci długościami.}
+\sumitem{28--30}{Każde działanie tutaj jest jednym przejściem po współrzędnych,
+  więc \textbf{arytmetyka przechodzi do $\val{f09.dim}$ wymiarów bez zmian, a
+  obrazek nie}: $\val{f09.drawable}$ współrzędne da się narysować, a
+  $\val{f09.undrawn}$ nie.}
+\sumitem{31--32}{Tożsamości przechodzą dokładnie. Twierdzenia o tym,
+  \emph{gdzie rzeczy są} \dash{} co jest blisko czego, jak wygląda typowa para
+  \dash{} dotyczą tego, jak wektory są rozłożone, a nie działań, i żadnego z
+  nich nie ustala rysunek dwóch strzałek. Program~\ref{prog:P05} je mierzy. Gdy
+  definicja i obrazek się zgadzają, wiedz, które z nich jest nośne.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Policz $(2, -1) + (0, 5)$ oraz $(2, -1) - (0, 5)$.
+  \answerto{$(2, 4)$ i $(2, -6)$. Po jednej współrzędnej, za każdym razem.}
+\item Policz $-2(3, -1, 4)$.
+  \answerto{$(-6, 2, -8)$. Każda współrzędna pomnożona, a znak odwraca
+  kierunek.}
+\item Podaj długość $(0, -5)$ oraz $(1, 1, 1, 1)$.
+  \answerto{$5$ i $2$. Druga to $\sqrt{4}$, a ujemne współrzędne nie robią
+  różnicy, bo są podnoszone do kwadratu.}
+\item Znormalizuj $(0, -5)$.
+  \answerto{$(0, -1)$. Podziel obie współrzędne przez $5$; kierunek się nie
+  zmienia, więc nadal wskazuje w dół.}
+\item Wektor ma $\val{f09.dim}$ współrzędnych, z których każda wynosi $1$.
+  Podaj jego długość i powiedz, co się zmieni, gdy każda współrzędna wyniesie
+  $-1$.
+  \answerto{$\val{f09.len.ones}$ za każdym razem. Kwadrat usuwa znak, więc
+  długość jest ta sama i odwrócił się tylko kierunek.}
+\item Policz $(2, 3) \cdot (3, -2)$ i powiedz, co ci to mówi.
+  \answerto{$0$, więc oba są prostopadłe. Nie mówi nic o ich długościach.}
+\item Dwa wektory mają długości $6$ i $\num{0.5}$ oraz wskazują dokładnie w tę
+  samą stronę. Podaj ich iloczyn skalarny.
+  \answerto{$3$, z $\lVert a \rVert \lVert b \rVert \cos\theta$ przy
+  $\cos\theta = 1$.}
+\item Dwa wektory mają długości $2$ i $3$. Podaj największy i najmniejszy
+  możliwy ich iloczyn skalarny.
+  \answerto{$6$ i $-6$, przy $\cos\theta = 1$ oraz $\cos\theta = -1$ \dash{}
+  w tę samą stronę i w przeciwne strony.}
+\item Wektory o długościach $5$ i $12$ są prostopadłe. Podaj długość ich sumy.
+  \answerto{$13$, z $\lVert a + b \rVert^{2} = 25 + 144 - 0$. Nie $17$, które
+  dałoby dodanie długości.}
+\item Dwa wektory jednostkowe są prostopadłe. Użyj
+  $\lVert a - b \rVert^{2} = 2 - 2\cos\theta$, żeby podać odległość między
+  nimi.
+  \answerto{$\sqrt{2}$, bo $\cos\theta = 0$.}
+\item Magazyn trzyma znormalizowane zanurzenia i przełączono go z indeksu
+  kosinusowego na euklidesowy. Co zmienia się w wynikach?
+  \answerto{Nic. Na sferze jednostkowej obie miary porządkują identycznie, więc
+  każde zapytanie zwraca tych samych sąsiadów w tej samej kolejności.}
+\item Ten sam magazyn trzyma nieznormalizowane zanurzenia i robi się to samo
+  przełączenie. Co się zmienia?
+  \answerto{Porządek może się zmienić i nic w wyniku tego nie powie. Odległość
+  karze długie wektory, a kosinus ich nie widzi.}
+\item Które z tych twierdzeń dwuwymiarowy obrazek uzasadnia przy
+  $\val{f09.dim}$ współrzędnych: że zachodzi nierówność trójkąta; że dwa
+  wektory wzięte losowo są zwykle daleko od siebie kątowo?
+  \answerto{Pierwsze. Jest tożsamością i zachodzi przy dowolnej liczbie
+  współrzędnych. Drugie dotyczy tego, jak wektory są rozłożone, a rysunek
+  płaszczyzny nie mówi o tym nic.}
+\item Wyjaśnij jednym zdaniem, dlaczego każde działanie w tym programie
+  kosztuje więcej przy $\val{f09.dim}$ współrzędnych, ale żadne nie staje się
+  trudniejsze.
+  \answerto{Każde jest jednym przejściem po współrzędnych, więc liczba
+  współrzędnych ustala, ile razy wokoło pętli, a nigdy tego, co dzieje się w
+  środku.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Pokaż, że $\lVert ka \rVert = \lvert k \rvert \lVert a \rVert$ dla
+  dowolnego skalara $k$, i powiedz, po co są kreski wartości bezwzględnej.
+  \answerto{Każda współrzędna staje się $k a_i$, więc każdy kwadrat staje się
+  $k^{2} a_i^{2}$, a $k^{2}$ wychodzi spod pierwiastka jako $\lvert k \rvert$.
+  Długość nie może być ujemna, a $k$ może.}
+\item Dwa wektory spełniają $\lVert a + b \rVert = \lVert a \rVert +
+  \lVert b \rVert$. Co o nich wiesz?
+  \answerto{Jeden jest nieujemną wielokrotnością drugiego \dash{} wskazują w tę
+  samą stronę albo jeden z nich jest zerowy. Równość w nierówności trójkąta nie
+  zdarza się nigdzie indziej.}
+\item Pokaż, że $\lVert a + b \rVert^{2} + \lVert a - b \rVert^{2} =
+  2\lVert a \rVert^{2} + 2\lVert b \rVert^{2}$.
+  \answerto{Rozwiń oba kwadraty tożsamością z ramki $21$: $-2(a \cdot b)$ i
+  $+2(a \cdot b)$ się skracają, a zostają cztery kwadraty długości.}
+\item Dwa wektory jednostkowe tworzą kąt $60$ stopni. Podaj odległość między
+  nimi i zauważ, co jest w odpowiedzi szczególnego.
+  \answerto{$1$, z $\sqrt{2 - 2 \times \num{0.5}}$. Oba wektory jednostkowe i
+  ich różnica tworzą trójkąt równoboczny.}
+\item Załóż, że każdy wektor w magazynie pomnożono przez $10$. Co dzieje się z
+  każdym podobieństwem kosinusowym, a co z każdą odległością?
+  \answerto{Każdy kosinus jest bez zmian, bo przeskalowanie obu wektorów
+  zostawia kąt w spokoju. Każda odległość jest pomnożona przez $10$. Porządki
+  według każdej z miar są bez zmian, a obie mogą się nadal różnić dokładnie tak
+  jak wcześniej.}
+\item Kolega zgłasza, że normalizacja zanurzeń \enquote{naprawiła} błąd
+  wyszukiwania. Podaj najbardziej prawdopodobny mechanizm i powiedz, jaki dowód
+  by go potwierdził.
+  \answerto{Indeks porządkował według odległości, a zamierzoną semantyką był
+  kierunek, więc długie wektory były spychane w dół listy. Potwierdziłoby to
+  odkrycie, że dokumenty, które się przesunęły, to te, których zanurzenia miały
+  nietypowe długości.}
+\item Dlaczego zerowy iloczyn skalarny nie może ci powiedzieć, że dwa dokumenty
+  są niepowiązane?
+  \answerto{Bo jest twierdzeniem o kącie między dwoma wektorami, a to, czy kąt
+  śledzi powiązanie, jest faktem o tym, jak te wektory powstały.
+  Program~\ref{prog:F08} mówi to samo o wysokich podobieństwach.}
+\item Podaj parę wektorów dwuwymiarowych o wysokim podobieństwie kosinusowym i
+  dużej odległości euklidesowej oraz powiedz jednym zdaniem, jak ją
+  zbudowałeś.
+  \answerto{Dowolne dwa prawie równoległe wektory o bardzo różnych długościach,
+  na przykład $(1, 0)$ i $(100, 1)$. Weź mały kąt, żeby ustalić kosinus, a
+  potem rozciągnij jeden z nich, żeby odległość była dowolna.}
+\item Twierdzenie o zanurzeniach w $\val{f09.dim}$ wymiarach poparto rysunkiem
+  dwóch strzałek. Podaj jedno pytanie, które należy o nie zadać.
+  \answerto{Czy jest tożsamością, czy dotyczy tego, jak wektory są rozłożone?
+  Tożsamość zachodzi przy dowolnej liczbie współrzędnych; twierdzenie o
+  rozkładzie wymaga pomiaru w przestrzeni, o której mówi.}
+\item Ten program definiował każde działanie najpierw na współrzędnych, a
+  strzałkę rysował drugą. Powiedz, co poszłoby źle, gdyby napisano go na
+  odwrót.
+  \answerto{Każda definicja opierałaby się na obrazku dostępnym przy dwóch i
+  trzech współrzędnych, więc nic nie sięgnęłoby poza trzy bez zdefiniowania od
+  nowa \dash{} a czytelnik nie miałby jak odróżnić, które z jego intuicji
+  pochodzą z definicji, a które z rysunku.}
+\end{furtherproblems}
