@@ -530,11 +530,6 @@ Estimating in standard form is now three steps: round each quantity to one
 significant figure, add or subtract the exponents, and renormalise.
 \end{fr}
 
-\mermaidfig{f01-magnitudes}{%
-  The quantities this book keeps returning to, on one ladder. Every step is
-  an exponent, and every question about cost is a subtraction along it.}{%
-  A logarithmic ladder from a single token to the FLOPs of a training run.}
-
 \begin{fr}
 \textbf{Worked.} A novel runs to about \val{f01.novel.words} words. A rule of
 thumb puts an English word at about three quarters of a token. Roughly how
@@ -543,20 +538,19 @@ many tokens is the novel?
 \[ \frac{\num{1e5}}{\num{0.75}} \approx \num{1.3e5} \]
 
 So a little over $10^{5}$ tokens, and \val{f01.novel.tokens} on the nose. A
-context window of $10^{5}$ tokens holds about one novel, which is a far more
-useful thing to remember than the exact figure.
+context window of $10^{5}$ tokens holds about one novel, which is worth
+remembering in place of the exact figure.
 
 \begin{note}
-The three-quarters figure is a rule of thumb, not a measurement, and it varies
-with the tokeniser, the language and the subject matter. It is quoted here as
-judgement. Polish, with its inflections, tokenises less efficiently than
-English in most tokenisers built primarily on English text, and this book has
-not measured by how much.
+Three quarters is judgement, not a measurement: it varies with the tokeniser,
+the language and the subject matter. Polish, with its inflections, tokenises
+less efficiently than English in most tokenisers built on English text, and
+this book has not measured by how much.
 \end{note}
 
 \yourturn
 A device performs about $\num{4e14}$ floating-point operations per second. How
-many seconds would $\num{8e22}$ operations take, at that rate?
+many seconds would $\num{8e22}$ operations take?
 \dotline
 \nextframe
 \end{fr}
@@ -572,6 +566,11 @@ $\num{3e7}$ seconds, so this is about six or seven years. On one device.
 That number is not hypothetical, and the rest of this program is where it comes
 from.
 \end{fr}
+
+\mermaidfig{f01-magnitudes}{%
+  The quantities this book keeps returning to, on one ladder. Every step is
+  an exponent, and every question about cost is a subtraction along it.}{%
+  A logarithmic ladder from a single token to the FLOPs of a training run.}
 
 % ============================================================
 \section{Sizing a model}

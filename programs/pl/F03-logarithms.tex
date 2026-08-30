@@ -1,23 +1,1472 @@
 %% F03 --- Logarytmy i skale logarytmiczne
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f03_logarithms.py i jest wciągana przez \val{}. Rachunki,
+%% których program UCZY -- log2 64, log_b 1 = 0, 2000 x 2,4 -- są wpisane
+%% wprost, bo czytelnik ma je wykonać.
+%%
+%% PODSTAWA JEST ZAPISYWANA ZA KAŻDYM RAZEM. Sam \log jest w tej książce
+%% błędem budowania; tutaj jest dodatkowo tematem, więc Quiz wejściowy i
+%% sekcja 2 drukują go celowo, przez \mfalogplain. To jedyne takie miejsca w
+%% książce poza Dodatkiem B, który podaje tę zasadę. Nie wpisuj tu LICZBY
+%% wystąpień: było zapisane "raz" i myliło się o pięć w samym tym pliku, a nic
+%% tego nie sprawdza -- wyrażenie regularne C10 nie zagląda do wnętrza nazwy
+%% makra.
+%%
+%% Bliźniak: programs/en/F03-logarithms.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Logarytmy i skale logarytmiczne}
 \label{prog:F03}
+\index{logarytm!definicja}
+\index{logarytm!podstawa}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{powiedzieć jednym zdaniem, czym jest logarytm, obliczyć go w
+  pamięci tam, gdzie wynik jest liczbą całkowitą, i powiedzieć, dlaczego jego
+  argument musi być dodatni}
+\outcome{8--14}{przeliczać między podstawą dwa, podstawą $e$ i podstawą
+  dziesięć oraz powiedzieć, co zmiana podstawy robi z liczbą}
+\outcome{15--24}{zamienić iloczyn na sumę, iloraz na różnicę, a wykładnik na
+  mnożnik \dash{} i wykonać wszystkie trzy zamiany wstecz}
+\outcome{25--29}{odwrócić funkcję wykładniczą, rozwiązać $b^{x} = c$ ze
+  względu na $x$ i przechodzić między prawdopodobieństwem a stratą w obie
+  strony}
+\outcome{30--36}{powiedzieć, dlaczego prawdopodobieństwo sekwencji liczy się
+  jako sumę logarytmów, i wyliczyć długość, przy której dany format
+  zmiennoprzecinkowy przestaje w ogóle mieścić iloczyn}
+\outcome{37--42}{policzyć perplexity ze średniej straty, powiedzieć, co podana
+  wartość perplexity mówi o modelu, a czego nie mówi, oraz odróżnić zsumowany
+  logarytm prawdopodobieństwa od średniego, a średnią arytmetyczną od
+  geometrycznej}
+\outcome{43--48}{czytać oś logarytmiczną, w tym rozumieć, co mierzy odległość
+  wzdłuż niej, i powiedzieć, co oznacza linia prosta na osiach
+  log-log}
+\end{outcomes}
 
-Argument: a logarithm turns multiplication into addition, and that is the
-only reason anybody uses one. Payoff: probabilities of a 2,000-token
-sequence multiply to something no float can hold, so we sum log-
-probabilities instead; perplexity is \code{exp} of a mean log; a loss curve
-is plotted on a log axis because the interesting part is the ratio, not the
-difference. This is the most load-bearing Foundation program in the book.
+\begin{quiz}
+\item Oblicz $\logb{2} 64$ oraz $\logb{10} 1000$. \teachesat{2--3}
+  \answerto{$6$ i $3$. Każdy z nich jest wykładnikiem: $2^{6} = 64$ oraz
+  $10^{3} = 1000$.}
+\item Ile wynosi $\logb{b} 1$ dla dowolnej podstawy $b$ i dlaczego?
+  \teachesat{2--3}
+  \answerto{$0$, zawsze. Wymusza to $b^{0} = 1$, ustalone w
+  Programie~\ref{prog:F01}, więc nie jest to konwencja.}
+\item Ile wynosi $\logb{2}(-8)$? \teachesat{4--5}
+  \answerto{Nie istnieje. Żadna potęga $2$ nie jest ujemna, więc nic nie
+  odpowiada na pytanie, które zadaje logarytm.}
+\item Co zwraca \code{math.log(1000)}? \teachesat{8--9}
+  \answerto{$\val{f03.ln.thousand}$, czyli logarytm przy podstawie $e$. Jeśli
+  spodziewałeś się $3$, odczytałeś tę nazwę jako logarytm dziesiętny, który
+  twoja szkoła zapisuje $\mfalogplain 1000$; oba odczytania stosują konwencję
+  poprawnie, a zapis nie mówi, o które chodzi.}
+\item Zapisz $\logb{2} x$ przez $\ln x$. \teachesat{10--11}
+  \answerto{$\logb{2} x = \frac{\ln x}{\ln 2}$, a $1/\ln 2$ to stała
+  $\val{f03.inv.ln.two}$.}
+\item Strata $\val{f02.loss.nats}$ nata \dash{} ile to w bitach?
+  \teachesat{11--12}
+  \answerto{$\val{f03.nats.to.bits}$ bita. Jeden pomiar, dwie jednostki.}
+\item Zapisz $\ln(x^{3}y)$ jako sumę logarytmów. \teachesat{16--18}
+  \answerto{$3\ln x + \ln y$.}
+\item Uprość $\ln(a + b)$. \teachesat{20--21}
+  \answerto{Nie da się uprościć. Nie ma reguły na logarytm sumy, a
+  $\ln a + \ln b$ to logarytm \emph{iloczynu}.}
+\item Wyznacz $p$ ze wzoru $L = -\ln p$. \teachesat{25--27}
+  \answerto{$p = e^{-L}$. Zmień znak po obu stronach, a potem zastosuj $e$ do
+  obu stron.}
+\item Sekwencja $\val{f03.seq.tokens}$ tokenów dostaje w każdym kroku
+  prawdopodobieństwo $\val{f02.prob.from.loss}$. Dlaczego prawdopodobieństwa
+  całej sekwencji nie liczy się przez mnożenie? \teachesat{30--32}
+  \answerto{Iloczyn wynosi około $\val{f03.seq.prod}$, czego nie mieści żaden
+  format zmiennoprzecinkowy. W float32 bieżący iloczyn jest dokładnie zerem po
+  $\val{f03.f32.zero.at}$ tokenach i nic nie zgłasza błędu.}
+\item Średnia ujemna logarytmiczna wiarogodność modelu wynosi
+  $\val{f02.loss.nats}$ nata. Ile wynosi jego perplexity? \teachesat{37--38}
+  \answerto{$\val{f03.ppl}$ \dash{} eksponenta średniej straty.}
+\item Na osi, której podziałki to $1$, $10$, $100$ w równych odstępach, jaka
+  wartość leży w połowie drogi między podziałką $10$ a podziałką $100$?
+  \teachesat{43--44}
+  \answerto{$\val{f03.axis.mid}$, czyli średnia geometryczna, a nie $55$.
+  Równe odległości na tej osi to równe stosunki.}
+\item Który spadek jest większy: z $\num{4.0}$ do $\num{2.0}$ czy z $\num{0.5}$
+  do $\num{0.25}$ \dash{} i na której osi? \teachesat{45--46}
+  \answerto{Na osi liniowej pierwszy, ośmiokrotnie. Na osi logarytmicznej oba
+  są tym samym odstępem, bo każdy z nich to podzielenie na pół.}
+\item Pewna wielkość układa się w linię prostą na osiach log-log o
+  współczynniku kierunkowym $2$. Jaka jest zależność między obiema
+  wielkościami? \teachesatone{47}
+  \answerto{Prawo potęgowe, $y = ax^{2}$. Współczynnik kierunkowy prostej jest
+  wykładnikiem.}
+\end{quiz}
+
+% ============================================================
+\section{Czym jest logarytm}
+\label{sec:F03-what}
+\index{logarytm!jako wykładnik}
+\index{potęgi!czytane wstecz}
+
+\begin{fr}
+Program~\ref{prog:F01} pytał, ile wynosi $2^{5}$, a ty odpowiedziałeś $32$. Ten
+program zadaje to samo pytanie od drugiej strony.
+
+\emph{Dwa do której potęgi daje 32?}
+
+Odpowiedź to znowu $5$, a jej nazwa to \emph{logarytm}. Zapisuje się go
+$\logb{2} 32 = 5$ i czyta: wykładnik, do którego trzeba podnieść $2$, żeby
+otrzymać $32$.
+
+Ogólnie $\logb{b} x$ to wykładnik, który zamienia $b$ w $x$:
+\[ b^{y} = x \quad\Longleftrightarrow\quad \logb{b} x = y \]
+Dwie linie, jeden fakt, zapisany z dwóch stron. Cała reszta tego programu
+wynika z czytania tej pary w tę stronę, która akurat jest wygodniejsza.
+
+Ile wynosi $\logb{2} 64$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\logb{2} 64 = 6$}
+Bo $2^{6} = 64$ i na tym kończy się całe rozumowanie. Nie ma tu żadnej techniki
+do opanowania.
+
+Jedno zdanie warto wynieść z tej ramki i zabrać do reszty książki:
+\textbf{logarytm jest wykładnikiem i niczym więcej.} Każda reguła w
+\S\ref{sec:F03-laws} jest regułą o wykładnikach w innym przebraniu, a czytelnik,
+który trzyma się tego zdania, nie musi zapamiętać żadnej z nich.
+
+Teraz dwa kolejne, a drugie nie jest pytaniem podchwytliwym.
+
+Ile wynosi $\logb{10} 1000$, a ile $\logb{10} 1$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\logb{10} 1000 = 3$, bo $10^{3} = 1000$.
+
+$\logb{10} 1 = 0$, bo $10^{0} = 1$.
+\end{ansblock}
+
+To drugie zachodzi dla każdej podstawy i nie jest konwencją, którą ktoś wybrał:
+$b^{0} = 1$ to własne prawo Programu~\ref{prog:F01}, więc $\logb{b} 1 = 0$
+niezależnie od tego, czym jest $b$. Faktem towarzyszącym jest
+$\logb{b} b = 1$, z $b^{1} = b$.
+
+Trzy do uzupełnienia, a każde z nich czytaj jako \emph{jaki wykładnik mnie tam
+zaprowadzi}, a nie jako odczyt z tabeli:
+\[ \logb{2} 8 = \blank \qquad \logb{10} 100 = \blank \qquad
+   \logb{5} 25 = \blank \]
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$3$, \quad $2$, \quad $2$. \quad Odpowiednio $2^{3} = 8$, $10^{2} = 100$ oraz
+$5^{2} = 25$.
+\end{ansblock}
+
+Teraz pytanie, które rozstrzyga, co logarytmowi wolno przyjmować.
+
+Logarytm pyta \emph{jaki wykładnik}, więc może odpowiedzieć tylko tam, gdzie
+wykładnik istnieje. Podnieś dodatnią podstawę do dowolnej potęgi rzeczywistej
+\dash{} dodatniej, ujemnej, ułamkowej \dash{} a wróci liczba dodatnia. Nigdy
+zero, nigdy liczba ujemna.
+
+Zatem: ile wynosi $\logb{2} 0$, a ile $\logb{2}(-8)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Żaden nie istnieje. Żadna potęga $2$ nie jest zerem i żadna potęga $2$ nie
+jest ujemna, więc żadne z tych pytań nie ma odpowiedzi.
+
+Dziedziną $\logb{b}$ są liczby rzeczywiste ściśle dodatnie, a granica dziedziny
+jest urwiskiem, a nie zboczem: gdy $x$ opada ku zeru, $\logb{b} x$ opada bez
+ograniczenia.
+\end{ansblock}
+
+\begin{warning}
+Twoje narzędzia nie są w tej sprawie zgodne same ze sobą, a ta niezgodność jest
+cicha. Cztery wywołania:
+
+\begin{itemize}
+\item \code{math.log(0)} zgłasza \code{ValueError: math domain error};
+\item \code{math.log(-8)} zgłasza ten sam \code{ValueError};
+\item \code{np.log(0.0)} zwraca \code{-inf} i wypisuje
+  \code{RuntimeWarning: divide by zero encountered in log};
+\item \code{np.log(-8.0)} zwraca \code{nan} i wypisuje
+  \code{RuntimeWarning: invalid value encountered in log}.
+\end{itemize}
+
+\textbf{Jedna wielkość nieokreślona, trzy różne zachowania, w dwóch
+bibliotekach, które importujesz do tego samego pliku.} Biblioteka standardowa
+zatrzymuje się; biblioteka tablicowa oddaje wartość i idzie dalej. \code{nan},
+który wszedł tutaj do uczenia, wypłynie w zupełnie innym miejscu, jako strata,
+która przestała być liczbą \dash{} a wtedy nic już nie wskazuje logarytmu,
+który go zrobił.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Drugą rzeczą, którą warto znać, zanim pojawią się jakiekolwiek reguły, jest to,
+jak wolno rośnie logarytm. Weź cztery wartości $x$ rozrzucone na ośmiu
+dekadach:
+
+\begin{center}
+\begin{tabular}{rr}
+\toprule
+$x$ & $\logb{10} x$ \\
+\midrule
+$10$ & $1$ \\
+$1000$ & $3$ \\
+$10^{6}$ & $6$ \\
+$10^{9}$ & $9$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Stumilionokrotny wzrost $x$ przesuwa logarytm o osiem.} To ta własność,
+na której opiera się każde zastosowanie w tym programie: logarytm bierze
+zakres zbyt szeroki, żeby go pomieścić, i oddaje zakres, który zapiszesz na
+kartce, naniesiesz na oś albo zmieścisz w liczbie zmiennoprzecinkowej.
+
+Oto pierwsza rzecz, którą to kupuje. Program~\ref{prog:F01} porównał $2^{80}$ z
+$10^{24}$, wypisując wszystkie dwadzieścia pięć cyfr liczby $2^{80}$.
+
+Ile cyfr dziesiętnych ma $2^{80}$, jeśli użyć logarytmów i jednego mnożenia?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f03.two.eighty.digits}$ cyfr}
+Liczba cyfr dziesiętnych dodatniej liczby całkowitej $n$ to
+$\lfloor \logb{10} n \rfloor + 1$, a $\logb{10} 2^{80}$ to $80$ kopii
+$\logb{10} 2$ dodanych do siebie:
+\[ 80 \times \val{f03.log10.two} = \val{f03.two.eighty.exp} \]
+Weź część całkowitą, dodaj jeden \dash{} cyfr jest
+$\val{f03.two.eighty.digits}$.
+
+Przeczytaj tę samą liczbę w drugą stronę, a rozstrzyga ona wprost pytanie
+Programu~\ref{prog:F01}. Wykładnik wynosi $\val{f03.two.eighty.exp}$, więc
+$2^{80}$ to $10^{\val{f03.two.eighty.exp}}$, a nie $10^{24}$ \dash{} przekracza
+$10^{24}$ o $\val{f01.two.eighty.err.pct}$\%, czyli dokładnie tyle, ile
+Program~\ref{prog:F01} otrzymał, dzieląc przez siebie dwie
+dwudziestopięciocyfrowe liczby całkowite.
+
+\textbf{Jedno mnożenie zastąpiło porównanie dwudziestopięciocyfrowych liczb},
+a zdołało to zrobić, bo $\val{f03.log10.two}$ jest stałą, którą można nosić przy
+sobie. To najużyteczniejsza liczba w tym programie i wraca ona w
+\S\ref{sec:F03-scales} w innej roli.
+\end{fr}
+
+% ============================================================
+\section{Podstawa i dlaczego ta książka zawsze ją zapisuje}
+\label{sec:F03-base}
+\index{logarytm!zmiana podstawy}
+\index{zapis!bity i naty}
+
+\begin{fr}
+Trzy podstawy obsługują w tej dziedzinie cały ruch. Podstawa dwa, bo bit to
+wybór dwustronny. Podstawa $e$, bo taką produkuje rachunek różniczkowy i taką
+domyślnie liczy twoja biblioteka. Podstawa dziesięć, bo dekadami liczy się
+rzędy wielkości.
+
+Zanim pójdziesz dalej, zasłoń resztę strony i odpowiedz z pamięci, a nie z
+maszyny.
+
+\textbf{Zapisz wartość $\mfalogplain 1000$.}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Odpowiedzi są dwie, a to, którą zapisałeś, mówi, gdzie się uczyłeś.
+
+$\mfalogplain 1000 = 3$, jeśli czytasz sam znak jako podstawę dziesięć.
+
+$\mfalogplain 1000 = \val{f03.ln.thousand}$, jeśli czytasz go jako podstawę
+$e$.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Wadliwy jest zapis, a nie ty.} Oba odczytania są poprawnym
+zastosowaniem konwencji, tyle że te dwie konwencje nie są wspólne.
+
+Polska szkoła uczy, że sam logarytm oznacza podstawę dziesięć; tak rozumieją
+go tablice, arkusze maturalne i każdy podręcznik na półce. Piśmiennictwo
+uczenia maszynowego ma na myśli podstawę $e$, a jego biblioteki się z tym
+zgadzają \dash{} \code{math.log(1000)} zwraca $\val{f03.ln.thousand}$, a
+dopiero wywołanie \code{math.log10(1000)} daje $3$.
+
+Czytelnik, którego nauczono jednej konwencji, a który czyta pracę napisaną w
+drugiej, nie jest więc zdezorientowany co do logarytmów. Dostał trzy znaki
+oznaczające dwie rzeczy, w dokumencie, który nie mówi, którą.
+
+Groźne jest w tym to, że żadna ze stron niczego nie zauważa. Konwencja
+przyswojona wcześnie nie sprawia wrażenia konwencji; sprawia wrażenie tego, co
+symbol mówi.
+\end{trapbox}
+
+\begin{notationbox}
+\textbf{Ta książka nigdy nie pisze samego logarytmu.} Podstawa jest zapisywana
+za każdym razem: $\ln$ dla podstawy $e$, $\logb{2}$ dla podstawy dwa,
+$\logb{10}$ dla podstawy dziesięć. Budowanie odrzuca sam znak, zamiast liczyć
+na czyjąś pamięć, a odrzucenie jest zawieszone dokładnie tam, gdzie tematem
+jest właśnie ta niejednoznaczność: w tej sekcji, w Quizie wejściowym tego
+programu i w \S\ref{sec:appB-decisions}, który podaje tę zasadę dla całej
+książki.
+
+Kosztuje to dwa znaki i usuwa całą klasę błędów. Koszt tej klasy nie jest
+hipotetyczny: entropię podaje się w bitach, entropię krzyżową w natach, a
+Programy~\ref{prog:P29} i~\ref{prog:P30} sąsiadują ze sobą.
+\end{notationbox}
+\end{fr}
+
+\begin{fr}
+Przejście między nimi to jedno wyprowadzenie i warto je wykonać, a nie
+zapamiętać, bo zapamiętany wzór jest tym, który ludzie zapisują odwrotnie.
+
+Zacznij od tego, co mówi logarytm. Jeśli $y = \logb{b} x$, to $b^{y} = x$.
+Zlogarytmuj obie strony przy jakiejś innej podstawie $c$ i użyj trzeciego prawa
+z \S\ref{sec:F03-laws}, żeby sprowadzić wykładnik na dół:
+\[ \logb{c} x = \logb{c} \left(b^{y}\right) = y \, \logb{c} b \]
+Podziel i $y$ stoi samo:
+\[ \logb{b} x = \frac{\logb{c} x}{\logb{c} b} \]
+Podstawa, której chcesz, jest na dole. To ta połowa, którą ludzie odwracają, a
+wyprowadzenie ma dwie linie \dash{} więc je wyprowadzaj.
+
+Zastosuj to: zapisz $\logb{2} 10$ przez logarytmy naturalne i podaj wartość.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\logb{2} 10 = \dfrac{\ln 10}{\ln 2} = \val{f03.log2.ten}$}
+Zobacz, co robi postać ogólna, gdy $x$ się zmienia, a obie podstawy nie.
+Mianownik $\logb{c} b$ jest stałą, więc
+\[ \logb{b} x = \text{stała} \times \logb{c} x \]
+\textbf{Zmiana podstawy mnoży każdą wartość przez jedną ustaloną liczbę.} Nie
+zagina krzywej, nie przesuwa jej miejsca zerowego i nie zmienia tego, która z
+dwóch wielkości jest większa. Wynikają stąd od razu dwa wnioski, a drugi jest
+tym, który boli.
+
+Kształt narysowanego logarytmu nigdy nie powie ci, jaka jest jego podstawa
+\dash{} każda krzywa logarytmiczna to każda inna przeskalowana pionowo.
+
+A jedyna stała, którą warto nosić przy sobie, to $\ln 2 = \val{f03.ln.two}$
+wraz z jej odwrotnością $1 / \ln 2 = \val{f03.inv.ln.two}$. Te dwie przeliczają
+między natami a bitami, czyli jednostkami podstawy $e$ i podstawy dwa.
+
+Model podaje stratę $\val{f02.loss.nats}$ nata. Ile to w bitach?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f03.nats.to.bits}$ bita}
+Pomnóż przez $1/\ln 2$. Nic w modelu się nie zmieniło: to jeden pomiar w dwóch
+jednostkach, dokładnie tak, jak odległość jest jedną odległością w metrach albo
+w stopach.
+
+Warto przećwiczyć to, w którą stronę idzie stała, więc uzupełnij obie strony
+dla wielkości, której jeszcze nie widziałeś:
+\[ \logb{2} 7 = \blank \times \ln 7 \qquad\qquad
+   \ln 7 = \blank \times \logb{2} 7 \]
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Odpowiednio $\val{f03.inv.ln.two}$ oraz $\val{f03.ln.two}$.
+
+Sposobem na trzymanie ich we właściwych miejscach nie jest pamiętanie stałych,
+tylko pamiętanie, która jednostka jest mniejsza. Bit jest jednostką mniejszą
+niż nat, więc ta sama wielkość niesie \emph{większą} liczbę bitów niż natów
+\dash{} a stała, która daje większą liczbę, czyli $\val{f03.inv.ln.two}$, jest
+tą większą od $1$.
+\end{ansblock}
+
+\begin{aibox}
+W kodzie podstawa siedzi w nazwie funkcji i nigdzie indziej. \code{math.log} i
+\code{np.log} to podstawa $e$; \code{np.log2} oraz \code{np.log10} same mówią,
+jaką mają podstawę. Nie ma argumentu do sprawdzenia ani domyślnej wartości do
+odszukania.
+
+To stan lepszy niż ten, w jakim są prace naukowe, i ma praktyczny skutek, gdy
+którąś z nich reimplementujesz. Linia, która w pracy brzmi $\mfalogplain p$,
+jest niejednoznaczna; linia \code{np.log(p)} w repozytorium nie jest. Gdy oba
+źródła rozjeżdżają się co do podanej liczby o czynnik bliski
+$\val{f03.inv.ln.two}$, to repozytorium mówi prawdę o tym, co zostało
+policzone.
+\end{aibox}
+
+\yourturn
+Trzy przeliczenia.
+
+Mając $\logb{10} 1000 = 3$ oraz $\logb{10} 2 = \val{f03.log10.two}$, ile wynosi
+$\logb{2} 1000$?
+
+Strata jest podana jako $\val{f03.nats.to.bits}$ bita. Ile to w natach?
+
+Dla jednej i tej samej wielkości: która liczba jest większa \dash{} liczba
+bitów czy liczba natów?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\logb{2} 1000 = \frac{3}{\val{f03.log10.two}} = \val{f03.log2.thousand}$.
+Podstawa, której chcesz, idzie na dół.
+
+$\val{f03.nats.to.bits}$ bita to $\val{f02.loss.nats}$ nata: pomnóż przez
+$\ln 2$, czyli wykonaj przeliczenie z poprzedniej ramki wstecz.
+
+Liczba bitów, zawsze, i to o czynnik $\val{f03.inv.ln.two}$.
+\end{ansblock}
+
+Ta ostatnia odpowiedź jest warta więcej, niż wygląda, a
+\S\ref{sec:F03-perplexity} wraca do niej z dwiema kartami modelu i konkretną
+liczbą. Wielkość podana bez podstawy nie jest pomiarem; jest pomiarem i
+rzutem monetą.
+\end{fr}
+
+% ============================================================
+\section{Trzy prawa, czyli prawa działań na potęgach czytane wstecz}
+\label{sec:F03-laws}
+\index{logarytm!prawa działań}
+\index{diagnostyka!logarytm sumy}
+
+\begin{fr}
+Każda reguła w tej sekcji jest regułą, którą już masz.
+Program~\ref{prog:F01} mnożył dwie potęgi jednej podstawy, dodając ich
+wykładniki:
+\[ 2^{3} \times 2^{4} = 2^{7} \]
+Teraz wyrzuć wszystko poza wykładnikami. Zostaje $3 + 4 = 7$.
+
+Te trzy wykładniki mają nazwy. $3$ to $\logb{2} 8$, $4$ to $\logb{2} 16$, a $7$
+to $\logb{2} 128$. Zatem powyższa linia, przeczytana jako zdanie o
+wykładnikach, mówi
+\[ \logb{2}(8 \times 16) = \logb{2} 8 + \logb{2} 16 \]
+\textbf{Prawo działań na potęgach i prawo logarytmów to jedno zdanie.} Jedno
+mówi o liczbach, drugie o ich wykładnikach, i nikt niczego nie udowodnił dwa
+razy. To znaczy, że nie ma w tej sekcji niczego do nauczenia się, czego nie
+nauczyłeś się w Programie~\ref{prog:F01}, jest za to sporo do przećwiczenia.
+
+Uzupełnij i sprawdź potem rachunek:
+\[ \logb{2}(4 \times 32) = \blank + \blank \]
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\logb{2} 4 + \logb{2} 32 = 2 + 5 = 7$, a $4 \times 32 = 128$, którego logarytm
+przy podstawie dwa wynosi $7$. Obie strony się zgadzają, jak muszą.
+\end{ansblock}
+
+Ogólnie i dla dowolnej podstawy. Napisz $x = e^{a}$ oraz $y = e^{b}$, co dla
+dodatnich $x$ i $y$ jest zawsze możliwe, tak że $a = \ln x$ i $b = \ln y$.
+Wtedy $xy = e^{a}e^{b} = e^{a+b}$, a przeczytanie tego przez wykładniki daje
+pierwsze prawo:
+\[ \ln(xy) = \ln x + \ln y \]
+\textbf{Logarytm zamienia mnożenie na dodawanie.} To zdanie jest całą tezą tego
+programu, a wszystko po \S\ref{sec:F03-undoing} jest jego następstwem.
+
+Drugie prawo nie potrzebuje żadnej nowej myśli. Ile wynosi $\ln(x/y)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\ln(x/y) = \ln x - \ln y$}
+To samo wyprowadzenie, jeden znak inaczej: $x/y = e^{a}/e^{b} = e^{a-b}$, a
+prawo dzielenia z Programu~\ref{prog:F01} odejmuje wykładniki.
+
+Iloraz staje się więc różnicą. Zauważ, że tutaj dziedzina z
+\S\ref{sec:F03-what} zaczyna na siebie zarabiać: $x$ i $y$ są dodatnie, więc
+iloraz też jest dodatni i lewa strona istnieje zawsze, gdy istnieje prawa.
+
+Zostało jedno prawo i możesz je odgadnąć z tego samego źródła. Ile wynosi
+$\ln(x^{n})$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\ln(x^{n}) = n \ln x$}
+$x^{n}$ to $n$ kopii $x$ wymnożonych przez siebie, więc jego logarytm to $n$
+kopii $\ln x$ dodanych do siebie. Wykładnik schodzi na dół i staje się
+mnożnikiem, a to nie jest fakt osobny wobec pierwszego prawa \dash{} to
+pierwsze prawo zastosowane $n$ razy.
+
+Trzecie prawo wykonuje później najwięcej pracy, bo to ono zamienia funkcję
+wykładniczą w linię prostą w \S\ref{sec:F03-scales} i to ono czyni obliczalnym
+kryterium największej wiarogodności w Programie~\ref{prog:P26}.
+
+Wszystkie trzy, z lukami:
+\[ \ln(uv) = \blank + \blank \qquad
+   \ln\!\left(\frac{u}{v}\right) = \blank - \blank \]
+\[ \ln\!\left(u^{5}\right) = \blank \]
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\ln u + \ln v$, \quad $\ln u - \ln v$, \quad $5 \ln u$.
+\end{ansblock}
+
+Oto cała sekcja, po jednej linii na prawo, z jego źródłem obok.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Prawo potęg (Program~\ref{prog:F01}) & Prawo logarytmów \\
+\midrule
+$a^{m} a^{n} = a^{m+n}$ & $\ln(xy) = \ln x + \ln y$ \\
+$a^{m} / a^{n} = a^{m-n}$ & $\ln(x/y) = \ln x - \ln y$ \\
+$\left(a^{m}\right)^{n} = a^{mn}$ & $\ln\!\left(x^{n}\right) = n \ln x$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{To nie są dwa zbiory reguł. To jeden zbiór przeczytany z dwóch stron.}
+Czytelnik, który musi którąś z nich sprawdzić, powinien sprawdzać lewą kolumnę,
+bo prawą da się z niej odbudować w jednej linii.
+\end{fr}
+
+\begin{fr}
+Zasłoń resztę strony.
+
+\textbf{Zapisz $\ln(a + b)$ przez $\ln a$ i $\ln b$. Jedna linia, bez
+rachunków, tak szybko, jak potrafisz.}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jeśli zapisałeś $\ln a + \ln b$, jesteś w większości, a to jest właśnie
+pułapka, dla której zbudowano tę sekcję.
+
+Sprawdź przy $a = 2$ i $b = 3$:
+\[ \ln 5 = \val{f03.ln.five} \qquad \text{wobec} \qquad
+   \ln 2 + \ln 3 = \val{f03.ln.six} \]
+Teraz popatrz, czym jest ta druga liczba. $\val{f03.ln.six}$ to $\ln 6$. Błędna
+reguła nie dała wyniku bliskiego ani różnicy zaokrąglenia: policzyła logarytm
+$a$ razy $b$, czyli jedyną rzecz, o którą cię nie proszono.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Nie ma reguły na logarytm sumy.} $\ln(a+b)$ nie rozkłada się i żadne
+przekształcanie tego nie zmieni.
+
+Rozumowaniem, które daje błędną odpowiedź, jest prawdziwa reguła uogólniona
+poza swoje założenie \dash{} i warto je nazwać, bo ta książka łapie to samo
+rozumowanie już trzeci raz. Program~\ref{prog:F01} miał
+$\sqrt{a+b} \ne \sqrt{a} + \sqrt{b}$. Program~\ref{prog:F02} miał
+$(a+b)^{2} \ne a^{2} + b^{2}$. Za każdym razem działanie, które naprawdę
+rozdziela się względem \emph{iloczynu}, przeniesiono na \emph{sumę}, gdzie się
+nie rozdziela.
+
+Logarytm zamienia jedno działanie na drugie: mnożenie staje się dodawaniem.
+O sumie nie ma nic do powiedzenia, bo suma była już tym, \emph{w co} zamienia.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Ten brak liczy się najbardziej w tym jednym miejscu, w którym bardzo chciałbyś
+mieć regułę.
+
+Załóżmy, że $u$ i $v$ są już logarytmami \dash{} powiedzmy logarytmami
+prawdopodobieństw \dash{} a potrzebujesz logarytmu z $e^{u} + e^{v}$. Nie
+możesz najpierw potęgować, bo po to właśnie były te logarytmy.
+
+To, co możesz zrobić, to wyłączyć większy z nich przed nawias, czyli
+zastosować do funkcji wykładniczych rozkład na czynniki z
+Programu~\ref{prog:F02}. Dla $v \ge u$:
+\[ e^{u} + e^{v} = e^{v}\left(e^{u-v} + 1\right)
+   \quad\Longrightarrow\quad
+   \ln\!\left(e^{u} + e^{v}\right) = v + \ln\!\left(1 + e^{u-v}\right) \]
+Niczego nie przybliżono. Wykładnik, który został, czyli $u - v$, jest co
+najwyżej zerem, więc funkcja wykładnicza jest co najwyżej równa $1$ i nie może
+przepełnić zakresu.
+
+Oblicz $\ln\!\left(e^{1000} + e^{1001}\right)$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f03.logsumexp.pair}$}
+Wyłącz większy: wynik to $1001 + \ln\!\left(1 + e^{-1}\right)$, a poprawka do
+$1001$ jest mniejsza niż jedna trzecia.
+
+\begin{aibox}
+Spróbuj wprost, a nie będzie czego ratować:
+
+\begin{itemize}
+\item \code{math.exp(1000)} zgłasza \code{OverflowError: math range error};
+\item \code{np.exp(1000.)} zwraca \code{inf} wraz z
+  \code{RuntimeWarning: overflow encountered in exp}, po czym suma, logarytm i
+  wszystko dalej to już \code{inf};
+\item \code{np.logaddexp(1000., 1001.)} oddaje $\val{f03.logsumexp.pair}$ i
+  nigdy nie tworzy żadnej z tych dwóch potęg.
+\end{itemize}
+
+\textbf{Biblioteka dostarcza funkcję właśnie dlatego, że nie ma czego
+dostarczyć po stronie algebry.} Jej postać ogólna, dla całego wiersza zamiast
+pary, to $\logsumexp$ i jest ona mianownikiem każdego softmaksu, jaki
+kiedykolwiek policzysz. Dlaczego to maksimum wyłącza się przed nawias i ile
+kosztuje, gdy się tego nie robi, mówi Program~\ref{prog:P02}.
+\end{aibox}
+\end{fr}
+
+\mermaidfig{f03-log-mirror}{%
+  Jedno zdanie zapisane z dwóch stron. Mnożenie potęg jednej podstawy dodaje
+  wykładniki; nazwanie tych wykładników logarytmami zamienia tę samą linię w
+  pierwsze prawo. Prawa kolumna z \S\ref{sec:F03-laws} to lewa kolumna
+  przeczytana wstecz.}{%
+  Prawo potęg i prawo logarytmów jako jedno zdanie z dwóch stron.}
+
+\begin{fr}
+\yourturn
+Trzy, a nad trzecim trzeba się zastanowić, a nie go policzyć.
+
+Rozpisz $\ln\!\left(\frac{x^{2} y}{z}\right)$ na osobne logarytmy.
+
+Zwiń $2\ln a + \ln b - 3\ln c$ do jednego logarytmu.
+
+Uprość $\ln(x + y)$.
+\dotline
+\nextframe
+\end{fr}
+
+% ============================================================
+\section{Odwracanie funkcji wykładniczej}
+\label{sec:F03-undoing}
+\index{logarytm!jako funkcja odwrotna}
+\index{strata!jako minus logarytm prawdopodobieństwa}
+
+\begin{fr}
+\begin{ansblock}
+$\ln\!\left(\frac{x^{2} y}{z}\right) = 2\ln x + \ln y - \ln z$. Iloraz stał się
+różnicą, a wykładnik zszedł na przód.
+
+$2\ln a + \ln b - 3\ln c = \ln\!\left(\frac{a^{2} b}{c^{3}}\right)$, czyli
+pierwsza linia przeczytana wstecz.
+
+$\ln(x + y)$ nie upraszcza się i to jest cała odpowiedź. Jeśli sięgnąłeś tu po
+regułę, przeczytaj jeszcze raz pułapkę z końca \S\ref{sec:F03-laws}, ramki~20
+i~21.
+\end{ansblock}
+
+Dziesięć ramek rozbierało logarytmy na części. Ta sekcja robi rzecz odwrotną.
+
+Logarytm i funkcja wykładnicza odwracają się nawzajem, co powiedziała już
+dwustronna definicja z \S\ref{sec:F03-what}:
+\[ e^{\ln x} = x \qquad \text{oraz} \qquad \ln\!\left(e^{x}\right) = x \]
+Jedna z nich wymaga $x > 0$, a druga zachodzi dla każdego rzeczywistego $x$.
+Która która i dlaczego?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$e^{\ln x} = x$ wymaga $x > 0$; $\ln\!\left(e^{x}\right) = x$ nie wymaga.}
+Pierwsza zapisuje $\ln x$, a \S\ref{sec:F03-what} rozstrzygnęła, że coś takiego
+nie istnieje, o ile $x$ nie jest dodatnie. Druga podnosi $e$ do potęgi, co jest
+dozwolone dla każdego rzeczywistego $x$ i zawsze ląduje w liczbach dodatnich,
+więc logarytm na zewnątrz zawsze ma na czym pracować.
+
+Ta para jest narzędziem do wyciągania niewiadomej z wykładnika i wymaga jednego
+ruchu, a nie szukania. Żeby rozwiązać $b^{x} = c$, zlogarytmuj obie strony:
+\[ b^{x} = c \quad\Longrightarrow\quad x \ln b = \ln c
+   \quad\Longrightarrow\quad x = \frac{\ln c}{\ln b} = \logb{b} c \]
+Przykład: $2^{x} = 1000$ daje $x = \logb{2} 1000 = \val{f03.log2.thousand}$,
+co mówi, że $1000$ leży niecałe dziesięć podwojeń nad $1$.
+
+Teraz jedno w drugą stronę i policzysz je w pamięci. Strata startuje z
+$\num{4.0}$ i jest wielokrotnie dzielona na pół. Ile podzieleń na pół sprowadza
+ją do $\num{0.5}$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Trzy}
+$4 \to 2 \to 1 \to \tfrac{1}{2}$, a postać ogólna to $x = \logb{2} 8 = 3$, bo
+strata spadła o czynnik $8$.
+
+Teraz dług. Program~\ref{prog:F02} przekształcił stratę modelu językowego na
+jednym przykładzie,
+\[ L = -\ln p \quad\longrightarrow\quad -L = \ln p
+   \quad\longrightarrow\quad p = e^{-L} \]
+i powiedział wprost, że ostatni krok należy do tego programu i jest brany na
+kredyt. Jest nim pierwsza tożsamość z tej ramki: zastosuj $e$ do obu stron
+$\ln p = -L$, a $e^{\ln p}$ zwija się do $p$. Kredyt był zasadny i właśnie
+został spłacony.
+
+Przy tym założeniu strata $\val{f02.loss.nats}$ nata mówi, że model dał
+prawdopodobieństwo $\val{f02.prob.from.loss}$ temu, co naprawdę wystąpiło. To
+liczba Programu~\ref{prog:F02}, a nie nowa \dash{} ten sam rachunek, cytowany z
+tego samego miejsca \dash{} i zaraz wykona bardzo dużo pracy.
+\end{fr}
+
+\begin{fr}
+Ważniejszy jest kierunek przeciwny. $L = -\ln p$ mówi, że
+\textbf{prawdopodobieństwo i strata to jedna wielkość zapisana w dwóch
+skalach}, a skala, w której ją czytasz, zmienia to, które różnice wyglądają na
+duże.
+
+\begin{center}
+\begin{tabular}{rr}
+\toprule
+$p$ & $L = -\ln p$ \\
+\midrule
+$\num{0.9}$ & $\val{f03.loss.p90}$ \\
+$\num{0.5}$ & $\val{f03.ln.two}$ \\
+$\num{0.1}$ & $\val{f03.ln.ten}$ \\
+$\num{0.01}$ & $\val{f03.loss.p01}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Model pewny swego ma stratę bliską zeru; model zgadujący między dwiema
+możliwościami ma stratę około $\val{f03.ln.two}$; model gruntownie błędny nie
+ma żadnego ograniczenia z góry.
+
+Która zmiana jest większa: $p$ z $\num{0.9}$ na $\num{0.5}$ czy $p$ z
+$\num{0.1}$ na $\num{0.01}$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Czytane jako prawdopodobieństwa \dash{} pierwsza: $\num{0.4}$ wobec
+$\num{0.09}$, więc pierwsza zmiana jest ponad czterokrotnie większa od drugiej.
+
+Czytane jako straty \dash{} druga: $\val{f03.loss.gap.high}$ wobec
+$\val{f03.ln.ten}$, więc druga zmiana jest blisko czterokrotnie większa od
+pierwszej.
+
+Oba odczytania są rachunkowo poprawne i nie zgadzają się co do tego, która
+zmiana jest większa. To nie paradoks; to dwie skale mierzące dwie różne
+rzeczy.
+\end{ansblock}
+
+Skala prawdopodobieństwa mierzy \emph{różnicę}. Skala straty mierzy
+\emph{stosunek}: z $\num{0.1}$ na $\num{0.01}$ to czynnik dziesięć, a odstęp,
+jaki otwiera on w kolumnie straty, to dokładnie $\ln 10 = \val{f03.ln.ten}$
+\dash{} ta sama liczba, co do cyfry, którą tabela podaje jako stratę przy
+$p = \num{0.1}$, bo to prawdopodobieństwo samo leży jeden czynnik dziesięć
+poniżej $1$.
+
+\textbf{Logarytm zamienia stosunki na różnice.} Każde pozostałe zastosowanie w
+tym programie to właśnie to zdanie: prawdopodobieństwo sekwencji w
+\S\ref{sec:F03-logspace}, perplexity w \S\ref{sec:F03-perplexity} i narysowana
+oś w \S\ref{sec:F03-scales}.
+\end{fr}
+
+% ============================================================
+\section{Dlaczego model językowy pracuje w skali logarytmicznej}
+\label{sec:F03-logspace}
+\index{logarytm!logarytmy prawdopodobieństw}
+\index{diagnostyka!niedomiar do zera}
+
+\begin{fr}
+Model językowy nie podaje ci prawdopodobieństwa zdania. Podaje
+prawdopodobieństwo jednego tokenu naraz, każdego pod warunkiem wszystkiego, co
+było wcześniej, a prawdopodobieństwo całej sekwencji jest ich iloczynem:
+\[ p(\text{sekwencja})
+   = \prod_{i} p(\text{token } i \mid \text{wszystko, co wcześniej}) \]
+To reguła łańcuchowa prawdopodobieństwa. Jest dokładna i nie jest założeniem o
+niezależności \dash{} wyprowadza ją Program~\ref{prog:P23}, a tutaj jest
+używana jako dana.
+
+Weź sekwencję $\val{f03.seq.tokens}$ tokenów, czyli kilka stron prozy, i daj
+modelowi $\val{f02.prob.from.loss}$ w każdym kroku \dash{} to
+prawdopodobieństwo, które Program~\ref{prog:F02} otrzymał ze straty
+$\val{f02.loss.nats}$ nata, a jest to zwyczajna wartość dla działającego
+modelu.
+
+Jak wielki jest z grubsza ten iloczyn?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Około $\val{f03.seq.prod}$}
+Nie otrzymałeś tego przez mnożenie i ta książka też nie. Na mocy pierwszego
+prawa logarytm iloczynu to $\val{f03.seq.tokens}$ kopii logarytmu jednego
+tokenu dodanych do siebie, a logarytm jednego tokenu to strata z odwróconym
+znakiem: $\ln p = -\val{f02.loss.nats}$ nata. Podziel przez $\ln 10$, żeby
+przenieść to na skalę dziesiętną:
+\[ \logb{10} p(\text{sekwencja})
+   = \val{f03.seq.tokens} \times \frac{-\val{f02.loss.nats}}{\ln 10}
+   = \val{f03.seq.prod.log10} \]
+więc iloczyn wynosi $10^{\val{f03.seq.prod.log10}}$. Wypisany w całości
+zaczynałby się od ponad dwóch tysięcy zer po przecinku i właśnie dlatego pracę
+wykonał logarytm.
+
+Teraz część, która zamienia ciekawostkę w usterkę. Liczba
+zmiennoprzecinkowa ma najmniejszą dodatnią wartość, jaką potrafi
+przedstawić, a poniżej niej nie ma nic prócz zera:
+
+\begin{itemize}
+\item float64 sięga $\val{f03.f64.tiny}$ jako liczba zwyczajna i
+  $\val{f03.f64.sub}$ jako liczba \emph{subnormalna}, czyli kupiona kosztem
+  precyzji;
+\item float32 sięga tylko $\val{f03.f32.tiny}$ oraz $\val{f03.f32.sub}$.
+\end{itemize}
+
+Czym jest liczba subnormalna i dlaczego format ma dwa progi, a nie jeden, mówi
+Program~\ref{prog:P01}. Tutaj liczy się to, że oba są ogromnie większe od
+powyższego iloczynu.
+
+Przy $\val{f02.prob.from.loss}$ na token \dash{} po ilu tokenach bieżący
+iloczyn jest dokładnie zerem w float32, a po ilu w float64?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Rachunek przewiduje to, zanim spytasz maszynę. Po $n$ tokenach iloczyn wynosi
+$p^{n}$, jego logarytm to $n \ln p$, więc spada poniżej najmniejszej liczby
+subnormalnej, gdy $n$ przekroczy $\ln(\text{subnormalna}) / \ln p$. To
+$\val{f03.f32.predict}$ dla float32 i $\val{f03.f64.predict}$ dla float64.
+
+Przepuść to po jednym tokenie, zaokrąglając do formatu na każdym kroku, a
+pierwsze dokładne zero przychodzi przy tokenie $\val{f03.f32.zero.at}$ i przy
+tokenie $\val{f03.f64.zero.at}$:
+\end{ansblock}
+
+\transcript{figures/transcripts/f03-underflow.txt}
+
+\noindent
+Przewidywanie i pomiar zgadzają się, lądując na pierwszej liczbie całkowitej za
+przewidzianym przejściem.
+
+\begin{warning}
+\textbf{float32 poddaje się po $\val{f03.f32.zero.at}$ tokenach sekwencji
+liczącej $\val{f03.seq.tokens}$ tokenów.} Nic nie zostaje zgłoszone. Iloczyn staje się
+$\num{0.0}$, jego logarytm staje się $-\infty$, strata tej sekwencji staje się
+$\infty$, a pierwsze, co ktokolwiek widzi, to uczenie, które przestało
+produkować liczby \dash{} kilka warstw od mnożenia, które to zrobiło.
+
+Ta usterka milczy również o własnym rozmiarze. Nie ma tu częściowego wyniku do
+obejrzenia ani stopniowej utraty dokładności do zauważenia: wartość jest
+dokładna i jest dokładnie błędna.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Poprawka mieści się w jednej linii i jest otwierającą tezą tego programu z
+pomiarem pod spodem. Zlogarytmuj iloczyn, a pierwsze prawo zamieni go w sumę:
+\[ \ln p(\text{sekwencja})
+   = \sum_{i} \ln p(\text{token } i \mid \text{wszystko, co wcześniej}) \]
+Każdy składnik wynosi mniej więcej $-\val{f02.loss.nats}$, a jest ich
+$\val{f03.seq.tokens}$, więc suma to około $-4800$ \dash{} liczba tak głęboko
+wewnątrz każdego używanego formatu zmiennoprzecinkowego, że żadne jego
+ograniczenia nawet się do niej nie zbliżają.
+
+\textbf{Iloczyn, którego nie mieścił żaden format, stał się sumą, którą mieści
+każdy \dash{} i to jest jedyny powód, dla którego ktokolwiek używa logarytmu.}
+Po drodze niczego nie przybliżono: pierwsze prawo jest tożsamością, więc suma
+jest dokładnie logarytmem iloczynu, również tego iloczynu, którego maszyna nie
+umiała policzyć.
+
+Co mówi ci o sekwencji wartość $-4800$ natów?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Sama z siebie prawie nic, bo skaluje się z długością. Ten sam model na
+sekwencji dwa razy dłuższej i dokładnie tej samej jakości dostanie $-9600$, a
+porównanie tych dwóch liczb ustawiłoby krótszą sekwencję wyżej za to, że jest
+krótsza.
+
+Podziel przez liczbę tokenów. Wychodzi $-\val{f02.loss.nats}$ na token, a to
+już porównuje się między sekwencjami różnej długości \dash{} i ta średnia na
+token, ze zmienionym znakiem, jest stratą.
+\end{ansblock}
+
+\begin{aibox}
+Zsumowany logarytm prawdopodobieństwa nie jest ilustracją; jest linią w pętli
+uczenia. Przebieg w przód modelu produkuje jeden logarytm prawdopodobieństwa na
+pozycję, pętla je sumuje, dzieli przez liczbę tokenów i zmienia znak, a liczba,
+która z tego wychodzi, jest tym, co dostaje optymalizator.
+
+Program~\ref{prog:P26} pokazuje, że maksymalizowanie tej sumy jest metodą
+największej wiarogodności, czyli że strata skądś pochodzi, a nie została
+wybrana dla wygody. Program~\ref{prog:P02} pokazuje, jak policzyć logarytm
+prawdopodobieństwa na token, nie tworząc w ogóle prawdopodobieństwa \dash{}
+czyli to samo unikanie potęgowania, co w ramce z \S\ref{sec:F03-laws}
+poświęconej $\logsumexp$.
+\end{aibox}
+\end{fr}
+
+\mermaidfig{f03-underflow}{%
+  To samo prawdopodobieństwo sekwencji policzone na dwa sposoby. Mnożone spada
+  poniżej dna obu formatów, a maszyna zgłasza czyste zero; sumowane jako
+  logarytmy jest małą liczbą ujemną, z którą nic nie ma kłopotu.}{%
+  Prawdopodobieństwo sekwencji mnożone i sumowane w logarytmach.}
+
+\begin{fr}
+\yourturn
+Weź model, który wybiera między dwiema możliwościami i nie radzi sobie lepiej
+niż moneta, czyli $p = \num{0.5}$ przy każdym tokenie.
+
+Przy jakiej długości bieżący iloczyn staje się dokładnie zerem w float32, a
+przy jakiej w float64? Skorzystaj z dwóch najmniejszych liczb subnormalnych z
+poprzednich ramek i zauważ na starcie, że $\val{f03.f32.sub}$ to dokładnie
+$2^{-149}$, a $\val{f03.f64.sub}$ to dokładnie $2^{-1074}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+float32 przy $\val{f03.half.f32.zero}$ tokenach; float64 przy
+$\val{f03.half.f64.zero}$ tokenach, oba zmierzone tak samo jak wcześniej.
+
+Przewidywania tym razem nie mają żadnej części ułamkowej. Każde podzielenie na
+pół zjada dokładnie jeden wykładnik, więc iloczyn osiąga $2^{-149}$ po
+dokładnie $149$ tokenach, a $2^{-1074}$ po dokładnie $1074$, a token po każdym
+z nich daje pierwsze dokładne zero.
+\end{ansblock}
+
+\textbf{Budżet tokenów jest budżetem wykładnika.} Zakres wykładnika w formacie
+nie jest abstrakcją o bardzo dużych liczbach; jest twardym sufitem tego, jak
+długą sekwencję da się ocenić przez mnożenie \dash{} a sufit dla modelu
+rzucającego monetą w float32 jest krótszy niż strona tekstu.
+
+To temat Programu~\ref{prog:P01} przybywający całą część wcześniej i powód,
+dla którego ta książka umieszcza liczby zmiennoprzecinkowe przed algebrą
+liniową, a nie po niej.
+\end{fr}
+
+% ============================================================
+\section{Perplexity: eksponenta średniego logarytmu}
+\label{sec:F03-perplexity}
+\index{perplexity!definicja}
+\index{pomiar!liczba bez jednostki}
+
+\begin{fr}
+Średni logarytm prawdopodobieństwa to dobra liczba dla optymalizatora i słaba
+dla człowieka. $-\val{f02.loss.nats}$ na token nie mówi w żadnej postaci, którą
+da się sobie wyobrazić, jak bardzo model był niepewny.
+
+Odwróć logarytm, a zacznie mówić. $e^{-\val{f02.loss.nats}}$ to
+$\val{f02.prob.from.loss}$, a jest to konkretne prawdopodobieństwo:
+\emph{średnia geometryczna} prawdopodobieństw poszczególnych tokenów, czyli to,
+co daje uśrednienie logarytmów i spotęgowanie wyniku. Jej odwrotność ma nazwę i
+to ją wszyscy podają:
+\[ \text{perplexity} = e^{\,\text{średnia ujemna log-wiarogodność}} \]
+Przy stracie $\val{f02.loss.nats}$ nata wynosi ona $\val{f03.ppl}$.
+
+Karta modelu podaje perplexity równe $7$. Jakie jest jego średnie geometryczne
+prawdopodobieństwo tokenu i jaka jest jego strata w natach?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Średnie geometryczne prawdopodobieństwo tokenu to $\val{f03.ppl.seven.p}$,
+czyli odwrotność $7$.
+
+Strata wynosi $\ln 7 = \val{f03.ppl.seven.nats}$ nata, czyli
+$\val{f03.ppl.seven.bits}$ bita.
+\end{ansblock}
+
+\textbf{Perplexity równe $7$ mówi}, że na każdym kroku model jest tak samo
+niepewny jak uczciwa kostka siedmiościenna \dash{} nie że zawęził słownik do
+siedmiu kandydatów, ale że rozrzut jego przekonania jest wart tyle samo, co
+równy wybór spośród siedmiu.
+
+\textbf{Nie mówi natomiast}, że model trafia raz na siedem razy. Perplexity
+jest średnią po rozkładzie, a nie odsetkiem trafień, i model może mieć dobre
+perplexity, myląc się co do każdego tokenu, na którym ci zależy.
+
+Dla skali weź słownik liczący około $\val{f03.vocab}$ tokenów i model losujący
+z niego jednostajnie. Jego perplexity wynosi $\val{f03.vocab}$, a strata
+$\val{f03.vocab.nats}$ nata, czyli $\val{f03.vocab.bits}$ bita. Odległość
+między tym a $7$ jest całością tego, czego nauczył się model językowy, a
+logarytm jest tym, co czyni tę odległość czytelną liczbą, a nie stosunkiem
+idącym w tysiące.
+
+Perplexity jako eksponenta \emph{entropii krzyżowej} i jako efektywna liczba
+jednakowo prawdopodobnych wyborów to temat Programu~\ref{prog:P29}. Ta ramka
+jest mu winna definicję i na tym poprzestaje.
+\end{fr}
+
+\begin{fr}
+Dwie karty modeli, od dwóch zespołów, na tym samym benchmarku.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Model A & strata $\val{f02.loss.nats}$ \\
+Model B & strata $\val{f03.nats.to.bits}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Zasłoń resztę strony. \textbf{Który model jest lepszy i o ile?}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+To ten sam model.
+
+$\val{f02.loss.nats}$ nata to $\val{f03.nats.to.bits}$ bita. Zespół A podał
+swoją stratę w natach, a zespół B swoją w bitach i żadna z kart tego nie
+napisała, bo dla każdego z zespołów podstawa była zbyt oczywista, żeby ją
+zapisywać.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Liczba bez podstawy nie jest pomiarem.} Wartość w bitach jest większa
+od wartości w natach o $\val{f03.bits.over.nats.pct}$\%, zawsze i dla każdego
+modelu \dash{} bo przelicznikiem jest ustalona stała
+$1 / \ln 2 = \val{f03.inv.ln.two}$ z \S\ref{sec:F03-base}.
+
+Rozumowaniem, które daje ten błąd, jest własny fakt z ramki~11 użyty wstecz.
+Zmiana podstawy mnoży każdą wartość przez stałą, więc obie skale zgadzają się
+co do \emph{porządku}, a nie zgadzają co do \emph{wielkości}: wewnątrz jednej
+karty liczby są spójne, krzywe mają ten sam kształt i nic na stronie nie
+wygląda źle. Nie ma tam w ogóle wewnętrznego świadectwa jednostek.
+
+A kierunek nie jest neutralny. Zespół podający naty wobec benchmarku podanego w
+bitach raportuje liczbę o $\val{f03.bits.over.nats.pct}$\% lepszą, niż na to
+zasługuje porównanie \dash{} czyli w stronę, której nikt nie sprawdza.
+\end{trapbox}
+
+Program~\ref{prog:P29} spotyka to samo zderzenie dla podanej entropii, gdzie
+jest gorzej: entropia w bitach i entropia w natach są obie zwyczajnymi liczbami
+zwyczajnej wielkości i nie ma progu, który oznaczyłby którąś jako
+niewiarygodną.
+\end{fr}
+
+\begin{fr}
+Oto ten sam kształt błędu, bez żadnych jednostek w polu widzenia.
+
+Dekoder wybiera między dwiema kandydującymi kontynuacjami. Model lubi obie
+dokładnie tak samo i daje każdemu tokenowi w każdej z nich prawdopodobieństwo
+$\num{0.9}$. Jedna kandydatka ma trzy tokeny, a druga dwadzieścia.
+
+Policz zsumowany logarytm prawdopodobieństwa każdej z nich, a następnie średni
+logarytm prawdopodobieństwa każdej z nich.
+
+Potem osobno weź cztery prawdopodobieństwa $\num{0.5}$, $\num{0.2}$,
+$\num{0.9}$ i $\num{0.05}$ i policz zarówno ich średnią arytmetyczną, jak i
+średnią geometryczną.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Zsumowane: $\val{f03.beam.short.sum}$ dla kandydatki trzytokenowej i
+$\val{f03.beam.long.sum}$ dla dwudziestotokenowej.
+
+Średnie: $\val{f03.beam.mean}$ dla obu, identyczne do pięciu miejsc po
+przecinku, czyli tyle, ile należy się spodziewać po dwóch kandydatkach, które
+model lubi tak samo.
+
+Średnia arytmetyczna czterech prawdopodobieństw: $\val{f03.am}$. Średnia
+geometryczna: $\val{f03.gm}$.
+\end{ansblock}
+
+\textbf{Porządkowanie po zsumowanym logarytmie prawdopodobieństwa za każdym
+razem woli kandydatkę krótszą, niezależnie od tego, co uważa model.} Każdy
+dodatkowy token dokłada kolejną liczbę ujemną, więc długość jest karana wprost,
+a jakości nikt nie pyta. Średnia nie zależy od długości i dlatego
+implementacje porządkują po niej albo po czymś z niej wyprowadzonym.
+
+Obie średnie robią drugą połowę tej puenty. $\val{f03.gm}$ leży wyraźnie
+poniżej $\val{f03.am}$ i nie są to dwa oszacowania jednej wielkości: średnia
+arytmetyczna uśrednia prawdopodobieństwa, a geometryczna uśrednia ich
+logarytmy. Zatem średnia z perplexity poszczególnych dokumentów nie jest
+perplexity korpusu, a błąd idzie w jedną stronę, zamiast być szumem.
+Nierówność, która gwarantuje ten kierunek, i jej nazwa należą do
+Programu~\ref{prog:P19}.
+
+\begin{aibox}
+Obie połowy są usterkami występującymi naprawdę, a nie ciekawostkami. Dekoder,
+który porządkuje kandydujące kontynuacje po zsumowanym wyniku, obcina własne
+wyjście, a zwykłą poprawką jest podzielenie przez długość albo przez jej
+potęgę. Ranking, który uśrednia perplexity po dokumentach nierównej długości,
+podaje liczbę, która nie jest perplexity niczego.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Skale logarytmiczne i czytanie wykresu}
+\label{sec:F03-scales}
+\index{logarytm!oś logarytmiczna}
+\index{diagnostyka!środek osi logarytmicznej}
+
+\begin{fr}
+Korzystałeś już z pomysłu stojącego za osią logarytmiczną, choć nikt go
+wtedy nie nazwał. Drabina rzędów wielkości z Programu~\ref{prog:F01} opisuje
+każdy szczebel potęgą dziesiątki, a wspinaczkę mierzy w wykładnikach, a nie w
+samych wielkościach. Oś, która niesie wykładnik zamiast wielkości, jest osią
+logarytmiczną.
+
+Weź teraz taką oś. Jej podziałki to $1$, $10$, $100$, $1000$, w równych
+odstępach. Zanim pójdziesz dalej, i szybko:
+
+\textbf{jaka wartość leży w połowie drogi między podziałką $10$ a podziałką
+$100$?}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{f03.axis.mid}$, a nie $55$.
+
+Połowa drogi między podziałkami to połowa drogi w \emph{wykładniku}: podziałki
+stoją w $10^{1}$ i $10^{2}$, więc środek jest w $10^{\num{1.5}}$, czyli
+$\sqrt{10 \times 100}$.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Połowa drogi na osi logarytmicznej to średnia geometryczna.} Nie
+arytmetyczna, którą jest $55$.
+
+Rozumowaniem, które daje $55$, jest odczytanie osi jak linijki. Na linijce
+połowa drogi między dwiema kreskami to ich średnia, a ten rachunek jest tak
+odruchowy, że nie zgłasza się jako wykonany krok. Ale ta oś nie jest linijką:
+jednostajny jest na niej wykładnik, więc równe odległości to równe
+\emph{stosunki}. Od dziesięciu do $\val{f03.axis.mid}$ i od
+$\val{f03.axis.mid}$ do stu to ten sam stosunek, po około $\sqrt{10}$ każdy, i
+to właśnie czyni z nich tę samą odległość.
+
+Zauważ, gdzie pojawiła się średnia geometryczna. To dokładnie ta wielkość,
+którą uśredniała \S\ref{sec:F03-perplexity}, potęgując średni logarytm, i jest
+tutaj z tego samego powodu: obie uśredniają w wykładniku.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Poprawka uogólnia się w zdanie, dla którego istnieje ta sekcja.
+
+\textbf{Odstęp na osi logarytmicznej jest stosunkiem.} To zdanie
+\emph{logarytm zamienia stosunki na różnice} z \S\ref{sec:F03-undoing},
+przeczytane od strony papieru: oś trzyma logarytm, więc różnica wzdłuż niej
+jest stosunkiem między wielkościami, które ona przedstawia.
+
+Jedno następstwo ma przy sobie liczbę. Podwojenie to ta sama odległość
+niezależnie od tego, gdzie na osi zachodzi, bo podwojenie jest ustalonym
+stosunkiem \dash{} a liczbę, którą jest ta odległość, spotkałeś już w tym
+programie dwukrotnie, za każdym razem przy czymś innym.
+
+Uzupełnij. Na osi logarytmicznej o podstawie dziesięć podwojenie zajmuje
+\blank\ dekady, a czynnik dziesięć zajmuje \blank\ dekady.
+
+Potem jedno do przemyślenia. Krzywa straty spada z $\num{4.0}$ do $\num{2.0}$
+wcześnie w uczeniu i z $\num{0.5}$ do $\num{0.25}$ późno. Który spadek jest
+większy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Podwojenie zajmuje $\val{f03.log10.two}$ dekady; czynnik dziesięć zajmuje całą,
+z definicji dekady. Ta pierwsza liczba to $\logb{10} 2$, stała, która policzyła
+cyfry liczby $2^{80}$ w ramce~7, przybywająca po raz trzeci.
+
+Co do obu spadków: na osi liniowej większy jest pierwszy, ośmiokrotnie, bo
+usuwa $\num{2.0}$ straty, a drugi usuwa $\num{0.25}$. Na osi logarytmicznej są
+tym samym odstępem, bo oba są podzieleniem na pół.
+\end{ansblock}
+
+Żadna z odpowiedzi nie jest poprawna w ogólności, a wybór między nimi jest
+wyborem pytania. Oś liniowa odpowiada na \emph{ile straty usunąłem}; oś
+logarytmiczna odpowiada na \emph{jaką część tego, co zostało, usunąłem}.
+
+Późno w uczeniu widoczną odpowiedź ma tylko drugie pytanie. Wszystko dzieje się
+w ostatnim ułamku zakresu, oś liniowa spłaszcza to wszystko przy podłodze, a
+wykres przestaje nieść informację dokładnie w chwili, gdy zaczynasz jej
+potrzebować. Dlatego krzywe straty publikuje się na osi logarytmicznej i jest
+to decyzja o tym, jakie pytanie wolno zadać czytelnikowi.
+
+Program~\ref{prog:P33} czyta krzywą straty jako materiał dowodowy \dash{} co
+oznaczają plateau, skok i podejrzanie gładki spadek i które z nich da się
+odróżnić od szumu.
+\end{fr}
+
+\mermaidfig{f03-log-axis}{%
+  To samo pytanie zadane dwóm osiom. Na linijce środek między dwiema kreskami
+  jest ich średnią; na osi niosącej wykładnik jest ich średnią geometryczną, a
+  równe odległości są równymi stosunkami, a nie równymi różnicami.}{%
+  Oś liniowa i oś logarytmiczna oraz środek między podziałkami.}
+
+\begin{fr}
+Jeszcze jedna rzecz, którą robi oś logarytmiczna \dash{} i powód, dla którego
+tyle wykresów w tej dziedzinie ma osie logarytmiczne po \emph{obu} stronach.
+
+Weź zależność postaci $y = a x^{b}$, czyli \emph{prawo potęgowe}. Zlogarytmuj
+obie strony, a trzecie prawo z \S\ref{sec:F03-laws} ją wyprostuje:
+\[ \ln y = \ln a + b \ln x \]
+To równanie linii prostej w $\ln x$ i $\ln y$, o wyrazie wolnym $\ln a$ i
+współczynniku kierunkowym $b$.
+
+\textbf{Prawo potęgowe jest linią prostą na osiach log-log, a współczynnik
+kierunkowy prostej jest wykładnikiem.} Jest to zarazem najtańszy dostępny test:
+nanieś dane w ten sposób, a jeśli układają się w prostą, to zależność jest
+prawem potęgowym i wykładnik odczytasz linijką.
+
+\begin{aibox}
+Dlatego każdy wykres praw skalowania, jaki widziałeś, ma osie logarytmiczne po
+obu stronach. Strata modelu wobec liczby parametrów, wobec danych, wobec mocy
+obliczeniowej: stawianą tezą jest to, że zależność jest prawem potęgowym, a
+wykres jest zarówno jej materiałem dowodowym, jak i sposobem odczytania
+wykładnika.
+
+Program~\ref{prog:P33} traktuje takie dopasowanie jako dopasowanie empiryczne z
+podanym błędem ekstrapolacji, a nie jako prawo natury \dash{} i to jest ta
+różnica, która się liczy, gdy ktoś rzutuje je trzy dekady na prawo od
+ostatniego zmierzonego punktu.
+\end{aibox}
+
+Masz budżet na cztery przebiegi uczenia i chcesz przeszukać współczynnik
+uczenia od $\num{1e-5}$ do $\num{1e-2}$. Gdzie umieścisz te cztery punkty?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Na siatce logarytmicznej, po jednym na dekadę: $\num{1e-5}$, $\num{1e-4}$,
+$\num{1e-3}$, $\num{1e-2}$. Wykładniki dają ci to bez żadnej biblioteki
+\dash{} $-5$, $-4$, $-3$, $-2$ w równych odstępach \dash{} a
+\code{np.logspace(-5, -2, 4)} wypisuje te same cztery.
+
+Rozłóż je zamiast tego liniowo, przez \code{np.linspace(1e-5, 1e-2, 4)}, a
+cztery punkty wrócą jako $\num{1e-5}$, potem $\val{f03.sweep.lin.second}$,
+potem dwa dalsze, kończąc na $\num{1e-2}$.
+\end{ansblock}
+
+\begin{note}
+\textbf{Wypisuje, a nie zwraca.} Ta siatka jest dokładna w wykładnikach i nie
+całkiem dokładna w liczbach. Trzy z czterech wartości, które oddaje
+\code{np.logspace}, to końce dekad co do bitu; pierwsza leży o jedną jednostkę
+ostatniego miejsca poniżej $\num{1e-5}$, a wypisana postać brzmi
+\code{1.e-05} tak czy inaczej. Dla przeszukiwania współczynnika uczenia nie
+zmienia to nic i jest jednym z powodów, dla których Program~\ref{prog:P01}
+stoi przed algebrą liniową, a nie po niej.
+\end{note}
+
+To umieszcza $\val{f03.sweep.lin.top.decade}$ z czterech punktów w samej górnej
+dekadzie, a między $\num{1e-5}$ a $\val{f03.sweep.lin.second}$ nie ma
+zupełnie nic \dash{} czyli w dwóch z trzech dekad, które chciałeś przeszukać, a
+w których zwykle okazuje się leżeć działający współczynnik uczenia. Trzy z
+czterech przebiegów dzieli najwyżej trzykrotność.
+
+Powód jest ten z poprzedniej ramki. Współczynnik uczenia liczy się przez swój
+stosunek do sąsiedniego, a siatka liniowa rozstawia punkty według różnicy.
 
 \medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+\noindent
+\textbf{Co dalej.} Program~\ref{prog:F07} daje $e^{x}$ takie potraktowanie,
+jakie ten program dał funkcji do niego odwrotnej, i rysuje krzywą logistyczną,
+która ściska go do $\intcc{0}{1}$. Program~\ref{prog:P01} mówi, czym jest
+liczba subnormalna i dlaczego format ma dwa progi. Program~\ref{prog:P02}
+bierze z \S\ref{sec:F03-laws} $\logsumexp$ i robi z niego dyscyplinę.
+A Programy~\ref{prog:P29} i~\ref{prog:P30} doczepiają jednostki i znaczenie do
+liczby, którą ten program nauczył cię liczyć.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{Logarytm jest \emph{wykładnikiem}: $\logb{b} x$ to potęga, która
+  zamienia $b$ w $x$, a $b^{y} = x$ mówi to samo z drugiej strony.
+  $\logb{b} 1 = 0$ dla każdej podstawy, wymuszone przez $b^{0} = 1$, oraz
+  $\logb{b} b = 1$.}
+\sumitem{4--5}{Argument musi być ściśle dodatni, bo żadna potęga dodatniej
+  podstawy nie jest zerem ani liczbą ujemną. Twoje biblioteki nie zgadzają się
+  co do tego, co robić w zamian: \code{math.log} zgłasza błąd, a \code{np.log}
+  zwraca \code{-inf} albo \code{nan} wraz z ostrzeżeniem.}
+\sumitem{6--7}{Logarytm ściska zakres, którego nie umiesz pomieścić, do
+  takiego, który umiesz. Liczba cyfr $2^{80}$ wymaga jednego mnożenia,
+  $80 \times \val{f03.log10.two} = \val{f03.two.eighty.exp}$, tam gdzie
+  Program~\ref{prog:F01} potrzebował wszystkich
+  $\val{f03.two.eighty.digits}$ cyfr.}
+\sumitem{8--9}{Sam logarytm oznacza podstawę dziesięć dla jednej grupy
+  czytelników i podstawę $e$ dla drugiej, a obie stosują konwencję poprawnie.
+  Zapisuj podstawę za każdym razem; budowanie tej książki nie przyjmie niczego
+  innego.}
+\sumitem{10--11}{Zmiana podstawy to
+  $\logb{b} x = \logb{c} x / \logb{c} b$, z podstawą, której chcesz, na dole.
+  Mnoży ona każdą wartość przez jedną stałą, więc kształt narysowanego
+  logarytmu nigdy nie zdradza jego podstawy.}
+\sumitem{12--14}{$\ln 2 = \val{f03.ln.two}$ oraz
+  $1 / \ln 2 = \val{f03.inv.ln.two}$ przeliczają między natami a bitami. Bit
+  jest jednostką mniejszą, więc liczba bitów jest większa.}
+\sumitem{15--19}{Trzy prawa to prawa działań na potęgach z
+  Programu~\ref{prog:F01} przeczytane wstecz: $\ln(xy) = \ln x + \ln y$,
+  $\ln(x/y) = \ln x - \ln y$, $\ln(x^{n}) = n\ln x$.}
+\sumitem{20--21}{\textbf{Nie ma reguły na logarytm sumy.} $\ln a + \ln b$ to
+  logarytm \emph{iloczynu} \dash{} już trzeci raz w trzech programach reguła
+  prawdziwa dla iloczynu została przeniesiona na sumę.}
+\sumitem{22--23}{Tam, gdzie musisz mieć $\ln(e^{u} + e^{v})$, wyłącz większy
+  przed nawias: $v + \ln(1 + e^{u-v})$. \code{np.exp(1000.)} to \code{inf}; a
+  \code{np.logaddexp} to $\val{f03.logsumexp.pair}$.}
+\sumitem{25--27}{$e^{\ln x} = x$ dla $x > 0$, a $\ln(e^{x}) = x$ zawsze, więc
+  $b^{x} = c$ rozwiązuje się jednym ruchem, a $L = -\ln p$ daje $p = e^{-L}$.}
+\sumitem{28--29}{Prawdopodobieństwo i strata to jedna wielkość w dwóch skalach,
+  a \textbf{logarytm zamienia stosunki na różnice}: czynnik dziesięć od
+  $p = \num{0.1}$ do $p = \num{0.01}$ to odstęp $\val{f03.ln.ten}$ w stracie.}
+\sumitem{30--32}{Sekwencja $\val{f03.seq.tokens}$ tokenów po
+  $\val{f02.prob.from.loss}$ na token ma prawdopodobieństwo około
+  $\val{f03.seq.prod}$. float32 sprowadza bieżący iloczyn do dokładnego zera po
+  $\val{f03.f32.zero.at}$ tokenach, a float64 po
+  $\val{f03.f64.zero.at}$, i za każdym razem nic nie zgłasza.}
+\sumitem{33--34}{Zsumuj zamiast tego logarytmy, a suma będzie mała i ujemna.
+  Podziel przez liczbę tokenów, a ta średnia ze zmienionym znakiem jest stratą
+  \dash{} czyli linią w pętli uczenia.}
+\sumitem{35--36}{\textbf{Budżet tokenów jest budżetem wykładnika.} Przy
+  $p = \num{0.5}$ iloczyn osiąga zero przy $\val{f03.half.f32.zero}$ tokenach w
+  float32 i przy $\val{f03.half.f64.zero}$ w float64.}
+\sumitem{37--38}{Perplexity to eksponenta średniej ujemnej log-wiarogodności i
+  odwrotność średniego geometrycznego prawdopodobieństwa tokenu. Perplexity
+  równe $7$ jest tak niepewne jak uczciwa kostka siedmiościenna; nie jest
+  odsetkiem trafień.}
+\sumitem{39--40}{Strata podana bez podstawy nie jest pomiarem:
+  $\val{f02.loss.nats}$ nata i $\val{f03.nats.to.bits}$ bita to ten sam model,
+  odległy o $\val{f03.bits.over.nats.pct}$\%, w stronę, która pochlebia.}
+\sumitem{41--42}{Porządkowanie po \emph{zsumowanym} logarytmie
+  prawdopodobieństwa woli kandydatkę krótszą, cokolwiek uważa model; średnia
+  nie. A średnia geometryczna $\val{f03.gm}$ nie jest średnią arytmetyczną
+  $\val{f03.am}$, więc średnia z perplexity nie jest perplexity.}
+\sumitem{43--46}{Połowa drogi między dwiema podziałkami osi logarytmicznej to
+  średnia \emph{geometryczna} \dash{} $\val{f03.axis.mid}$ między $10$ a $100$,
+  a nie $55$. Odstęp jest stosunkiem, a podwojenie zajmuje
+  $\val{f03.log10.two}$ dekady, gdziekolwiek wypadnie.}
+\sumitem{46--48}{Oś liniowa odpowiada na \emph{ile usunąłem}, a logarytmiczna
+  na \emph{jaką część tego, co zostało}. $y = ax^{b}$ jest linią prostą na
+  osiach log-log o współczynniku kierunkowym $b$, a współczynnik uczenia
+  przeszukuje się na siatce logarytmicznej z tego samego powodu.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Oblicz $\logb{3} 81$ oraz $\logb{10} \num{0.001}$.
+  \answerto{$4$ i $-3$. To drugie też jest wykładnikiem: $10^{-3}$ to
+  $\num{0.001}$.}
+\item Ile wynosi $\logb{7} 7$, a ile $\logb{7} 1$?
+  \answerto{$1$ i $0$, z $7^{1} = 7$ oraz $7^{0} = 1$.}
+\item Dlaczego $\logb{10}(-100)$ jest nieokreślony, skoro $-100$ jest zupełnie
+  zwyczajną liczbą?
+  \answerto{Bo żadna rzeczywista potęga $10$ nie jest ujemna. Z liczbą jest
+  wszystko w porządku; to pytanie, które zadaje logarytm, nie ma dla niej
+  odpowiedzi.}
+\item Zapisz $\ln\!\left(\frac{a^{3}}{bc}\right)$ jako osobne logarytmy.
+  \answerto{$3\ln a - \ln b - \ln c$. Oba czynniki mianownika są odejmowane.}
+\item Zwiń $\ln x + 2\ln y - \ln z$ do jednego logarytmu.
+  \answerto{$\ln\!\left(\frac{xy^{2}}{z}\right)$.}
+\item Czy $\ln(3 + 4)$ równa się $\ln 3 + \ln 4$? Odpowiedz z uzasadnieniem, a
+  nie kalkulatorem.
+  \answerto{Nie. $\ln 3 + \ln 4$ to $\ln 12$ na mocy pierwszego prawa, a $12$
+  to nie $7$. Nie ma reguły na logarytm sumy.}
+\item Rozwiąż $3^{x} = 50$, zostawiając wynik jako iloraz logarytmów.
+  \answerto{$x = \frac{\ln 50}{\ln 3} = \logb{3} 50$.}
+\item Strata wynosi $\val{f03.ppl.seven.nats}$ nata. Jakie jest średnie
+  geometryczne prawdopodobieństwo tokenu tego modelu i ile wynosi jego
+  perplexity?
+  \answerto{$\val{f03.ppl.seven.p}$ oraz $7$: prawdopodobieństwo to
+  $e^{-\val{f03.ppl.seven.nats}}$, a perplexity jest jego odwrotnością.}
+\item Przelicz stratę $\val{f03.ppl.seven.nats}$ nata na bity.
+  \answerto{$\val{f03.ppl.seven.bits}$ bita \dash{} pomnóż przez
+  $\val{f03.inv.ln.two}$.}
+\item Dlaczego prawdopodobieństwo długiej sekwencji liczy się jako sumę
+  logarytmów, a nie jako iloczyn?
+  \answerto{Bo iloczyn schodzi do dokładnego zera i nic nie zgłasza błędu: przy
+  $\val{f02.prob.from.loss}$ na token dzieje się to po
+  $\val{f03.f32.zero.at}$ tokenach w float32. Suma pozostaje mała i ujemna.}
+\item Na osi logarytmicznej o podziałkach $1$, $10$, $100$ \dash{} co leży w
+  połowie drogi między podziałką $1$ a podziałką $100$?
+  \answerto{$10$, czyli średnia geometryczna $1$ i $100$ \dash{} a zarazem
+  podziałka między nimi, jak być musi.}
+\item Dane układają się w linię prostą na osiach log-log o współczynniku
+  kierunkowym $-\num{0.5}$. Jaka to zależność i co dzieje się z $y$, gdy $x$
+  zostanie pomnożone przez cztery?
+  \answerto{$y = ax^{-1/2}$. Pomnożenie $x$ przez cztery zmniejsza $y$ o
+  połowę, bo $4^{-1/2} = \tfrac{1}{2}$.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Oblicz $\logb{2} 256$, $\logb{5} 125$ oraz $\logb{10} \num{0.01}$.
+  \answerto{$8$, $3$ i $-2$.}
+\item Oblicz $\logb{9} 3$.
+  \answerto{$\tfrac{1}{2}$, bo $9^{1/2} = 3$. Logarytm nie musi być liczbą
+  całkowitą, a ten jest pierwiastkiem w przebraniu wykładnika.}
+\item Zapisz $\ln\!\left(x^{2}\sqrt{y}\right)$ jako osobne logarytmy.
+  \answerto{$2\ln x + \tfrac{1}{2}\ln y$, bo pierwiastek kwadratowy to
+  wykładnik $\tfrac{1}{2}$ z Programu~\ref{prog:F01}.}
+\item Zwiń $\tfrac{1}{2}\ln a - \tfrac{1}{2}\ln b$ do jednego logarytmu.
+  \answerto{$\ln\sqrt{a/b}$.}
+\item Wykaż, że $\logb{b} \frac{1}{x} = -\logb{b} x$.
+  \answerto{$\ln(1/x) = \ln 1 - \ln x = -\ln x$, bo $\ln 1 = 0$. To samo
+  rozumowanie działa w każdej podstawie.}
+\item Rozwiąż $2^{x} = \num{0.001}$.
+  \answerto{$x = \logb{2} \num{0.001} = -\logb{2} 1000
+  = -\val{f03.log2.thousand}$, na mocy poprzedniego zadania.}
+\item Jeśli $\ln p = -3$, ile wynosi $p$?
+  \answerto{$p = e^{-3}$. Zostaw to w tej postaci, o ile nikt nie prosi o
+  liczbę dziesiętną; funkcja wykładnicza jest odpowiedzią, a nie krokiem do
+  niej.}
+\item Strata podwaja się z $L$ na $2L$. Co dzieje się z prawdopodobieństwem?
+  \answerto{Zostaje podniesione do kwadratu:
+  $e^{-2L} = \left(e^{-L}\right)^{2}$. To jedno z dalszych wyzwań
+  Programu~\ref{prog:F02}, które teraz umiesz udowodnić.}
+\item Dwa modele osiągają $\val{f02.loss.nats}$ i $\val{f03.ppl.seven.nats}$
+  nata. Jaki jest stosunek prawdopodobieństw, które przypisują tej samej
+  sekwencji tokenów, w przeliczeniu na token?
+  \answerto{$e^{\val{f02.loss.nats} - \val{f03.ppl.seven.nats}}$ na korzyść
+  drugiego, bo różnica logarytmów jest stosunkiem wielkości.}
+\item Dlaczego strata modelu językowego nie ma ograniczenia z góry, skoro
+  prawdopodobieństwo ma oba ograniczenia?
+  \answerto{$L = -\ln p$, a $\ln p$ opada bez ograniczenia, gdy $p$ zbliża się
+  do zera. Ograniczony przedział $\intcc{0}{1}$ przechodzi na całą półoś
+  nieujemną.}
+\item Ile cyfr dziesiętnych ma $2^{1000}$?
+  \answerto{$\lfloor 1000 \times \val{f03.log10.two} \rfloor + 1 = 302$. To to
+  samo jedno mnożenie co w ramce~7, z innym wykładnikiem.}
+\item Pewna wielkość rośnie o $10$\% na krok. Ile kroków ją podwaja?
+  \answerto{$\frac{\ln 2}{\ln \num{1.1}}$, czyli między siedem a osiem kroków,
+  więc do podwojenia potrzeba ośmiu.}
+\item Czy na osi logarytmicznej odległość od $2$ do $6$ jest większa, mniejsza
+  czy równa odległości od $50$ do $150$?
+  \answerto{Równa. Oba to czynnik trzy, a równe stosunki to równe
+  odległości.}
+\item Wykres pokazuje stratę spadającą z $\num{10.0}$ do $\num{1.0}$ w
+  pierwszej dziesiątej części uczenia i z $\num{1.0}$ do $\num{0.9}$ przez całą
+  resztę. Na której osi druga połowa wygląda jak postęp?
+  \answerto{Na żadnej i o to chodzi: druga połowa to czynnik $\num{1.11}$ wobec
+  czynnika dziesięć w pierwszej. Oś logarytmiczna czyni tę dysproporcję
+  widoczną, zamiast jej pochlebiać.}
+\item \code{np.log(0.0)} i \code{math.log(0)} dotyczą tej samej wielkości
+  nieokreślonej. Dlaczego to pierwsze jest groźniejsze w pętli uczenia?
+  \answerto{Bo zwraca \code{-inf} i idzie dalej, więc usterka podróżuje.
+  Wyjątek zatrzymuje się na linii, która go spowodowała.}
+\item Masz sześć przebiegów na przeszukanie hiperparametru od $\num{1e-6}$ do
+  $\num{1e-1}$. Gdzie je umieścisz i co kosztuje cię siatka liniowa?
+  \answerto{Po jednym na dekadę, od $\num{1e-6}$ do $\num{1e-1}$. Siatka
+  liniowa umieszcza wszystkie poza jednym w górnej dekadzie.}
+\item Wykaż, że $\logb{b} x$ i $\logb{c} x$ mają ten sam znak dla każdego
+  dopuszczalnego $x$, gdy $b$ i $c$ są większe od $1$.
+  \answerto{Różnią się o czynnik $1 / \logb{c} b$, dodatni, gdy obie podstawy
+  przekraczają $1$. Dodatni mnożnik nie może zmienić znaku \dash{} i dlatego
+  właśnie zmiana podstawy nie może niczego przestawić.}
+\item Zespół podaje entropię $\num{2.3}$. Jakie jest pierwsze pytanie do
+  zadania i o ile odpowiedź na nie zmienia tę liczbę?
+  \answerto{Bity czy naty. Oba odczytania różnią się o czynnik
+  $\val{f03.inv.ln.two}$, więc wartość w bitach jest o
+  $\val{f03.bits.over.nats.pct}$\% większa dla tego samego pomiaru.}
+\end{furtherproblems}

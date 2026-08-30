@@ -129,7 +129,7 @@
    "id": "F3",
    "en": "Logarithms and logarithmic scales",
    "pl": "Logarytmy i skale logarytmiczne",
-   "frames": 45,
+   "frames": 48,
    "brief": "Argument: a logarithm turns multiplication into addition, and that is the only reason anybody uses one. Payoff: probabilities of a 2,000-token sequence multiply to something no float can hold, so we sum log-probabilities instead; perplexity is `exp` of a mean log; a loss curve is plotted on a log axis because the interesting part is the ratio, not the difference. This is the most load-bearing Foundation program in the book.",
    "file": "F03-logarithms",
    "key": "F03",
@@ -269,7 +269,7 @@
    "en": "Floating point: what the machine actually computes",
    "pl": "Liczby zmiennoprzecinkowe: co maszyna naprawdę liczy",
    "frames": 45,
-   "brief": "Argument: a float is a sign, an exponent and a fixed number of significant bits, so the gap between representable numbers grows with magnitude, and equality is not a question you should ask. Payoff: why `bf16` is the training format and `fp16` needs loss scaling --- they have the same width and different exponent budgets, and the reader computes the overflow threshold rather than being told it; why a sum of gradients is not associative and two GPUs therefore disagree in the last bits; what machine epsilon is and why comparing two loss values that differ in the eighth decimal is measuring the hardware.",
+   "brief": "Argument: a float is a sign, an exponent and a fixed number of significant bits, so the gap between representable numbers grows with magnitude, and equality is not a question you should ask. Payoff: why `bf16` is the training format and `fp16` needs loss scaling --- they have the same width and different exponent budgets, and the reader computes the overflow threshold rather than being told it; why a sum of gradients is not associative and two GPUs therefore disagree in the last bits; what machine epsilon is and why comparing two loss values that differ in the eighth decimal is measuring the hardware. Also the two thresholds a format has rather than one: the smallest normal value and the smaller subnormal one beneath it, and what a subnormal buys and costs. Program F03 promises this twice while computing where a sequence's probability reaches zero, so it is owed rather than optional.",
    "file": "P01-floating-point",
    "key": "P01",
    "deps": [

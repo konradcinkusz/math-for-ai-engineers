@@ -335,7 +335,7 @@ and Appendix B's tables for them stay empty until they are run.
 | 1 | **The floor claim is wrong.** If practising AI engineers are already algebraically fluent, F01–F13 are a waste of 40% of the book. | 20-item timed diagnostic (log laws, index shift in a summation, rearranging an inequality with a negative multiplier, exponent arithmetic, function composition) to ≥50 practising engineers. Predicted: median under 60%. If median is above 85%, the thesis is dead. | Low; needs recruiting | not run |
 | 2 | **The method claim is wrong.** If responding to frames adds nothing over reading them, the format is decoration. | Two arms on one program: frames-with-response vs identical prose. Same content, same time on task. Test at 7 days, not immediately. | Moderate; needs a cohort | not run |
 | 3 | **The 80/80 standard is not met.** Stroud's own criterion; if a program cannot reach 80% of readers scoring 80% on its exit quiz, the program is not finished. | Instrument the exit quiz of each program with a reader cohort. | Moderate, per program | not run |
-| 4 | **The trap list is folklore.** If the misconceptions in §3 are rare in the wild, the trap frames are the author's hobby-horses. | Mine a defined corpus — framework issue trackers, public postmortems, StackOverflow tags — for each of the 34 items, count incidences, and report the counts including the zeros. | Low; free; do this first | not run |
+| 4 | **The trap list is folklore.** If the misconceptions in §3 are rare in the wild, the trap frames are the author's hobby-horses. | Mine a defined corpus — framework issue trackers, public postmortems, StackOverflow tags — for each of the 41 items, count incidences, and report the counts including the zeros. | Low; free; do this first | not run |
 | 5 | **The prior evidence says no.** Kulik et al.'s 1982 meta-analysis of secondary programmed instruction found it *"did not typically raise student achievement […] nor did it make students feel more positively about the subjects."* Small steps and linear sequencing did not prove essential; immediate reinforcement did not prove critical. | This is already a finding, not a proposed experiment. | — | **known adverse evidence** |
 
 Falsifier 5 must be met head-on in the front matter rather than hidden, because
@@ -364,7 +364,7 @@ That paragraph is the difference between a defensible TOC and a nostalgic one.
 
 ---
 
-## 3. The misconception list — 34 traps AI engineers actually fall into
+## 3. The misconception list — 41 traps AI engineers actually fall into
 
 Format: the **wrong belief in the reader's own voice** (this is the wording that
 goes in the trap frame, because a trap only works if the reader recognises
@@ -657,7 +657,25 @@ T > 1 flattens, and T does not change the argmax of a single softmax at all — 
 "raising temperature made the model pick a different top token" is impossible
 *before* sampling and expected *after* it. → **P22, P28**.
 
-**Selection note.** Forty candidates for what the brief asked to be at least
+**41. "log(a + b) = log a + log b."** There is no rule for the logarithm of a
+sum. `ln a + ln b` is the logarithm of the *product*, so the wrong rule does not
+produce a near miss — it answers a different question: at a = 2, b = 3 it
+returns ln 6 = 1.7918 where ln 5 = 1.6094 was asked for. The reasoning is a true
+rule generalised past its hypothesis, and it is the **third instance in three
+programs** of exactly that reasoning: F01's √(a+b) ≠ √a + √b, F02's
+(a+b)² ≠ a² + b², and this. Where the reader genuinely needs ln(e^u + e^v),
+the move is to factor the larger exponential out — v + ln(1 + e^(u−v)) — which
+is why the library ships `logaddexp` and `logsumexp` rather than an identity.
+→ **F03**, and it hands the stability half to **P02**.
+
+*This one is the book's own rather than sourced.* It was added while F03 was
+being written, because F03 needed a headline trap and the catalogue had none for
+the Foundation part. The list above is a catalogue of misconceptions observed in
+practice; this entry is a claim about what a reader will write when asked
+quickly, and it has not been counted. Falsifier 4 in §2.3 applies to it more
+than to the others.
+
+**Selection note.** Forty-one candidates for what the brief asked to be at least
 twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is
 documented outside this book, each has a cheap in-frame demonstration, and each
 has cost somebody real money. Falsifier 4 in §2.3 is the honest way to rank the

@@ -13,6 +13,13 @@ MMD_SRC := $(wildcard figures/mermaid/en/*.mmd) $(wildcard figures/mermaid/pl/*.
 MMD_PDF := $(patsubst figures/mermaid/%.mmd,figures/diagrams/%.pdf,$(MMD_SRC))
 VAL_SRC := $(wildcard code/*.py)
 
+# Everything a script under code/ writes and git tracks. The book's central
+# promise -- that the page cannot disagree with the script that computed it --
+# is exactly as wide as this variable and no wider, so anything a script emits
+# belongs in it. It was figures/values alone for two programs, and the day a
+# transcript was added the promise quietly stopped covering the whole book.
+COMPUTED := figures/values figures/transcripts
+
 # mermaid-cli drives a headless Chromium. The config below is written on first
 # use and points at whatever browser is available; override BROWSER on the
 # command line if yours lives somewhere else.
@@ -96,7 +103,7 @@ clean:
 # reference to them, so the book and the scripts cannot disagree.
 # ---------------------------------------------------------------------------
 numbers:
-	@mkdir -p figures/values
+	@mkdir -p $(COMPUTED)
 	@for f in $(VAL_SRC); do \
 	  echo "  values: $$f"; \
 	  python3 "$$f" || exit 1; \
@@ -113,27 +120,38 @@ numbers:
 # the check that makes the previous rule mean something.
 # TWO failures, not one, and `git diff` alone can only see the first.
 #
-#   drift     -- a tracked value file no longer matches its script
-#   untracked -- a value file git has never seen, so it was never compared to
+#   drift     -- a tracked file no longer matches its script
+#   untracked -- a file git has never seen, so it was never compared to
 #                anything. Every program's FIRST values file is in this state,
 #                which means every program's first values file used to pass
 #                this gate by being invisible to it. Found when F02 added 32
 #                values and the gate went green on all of them.
 #
+# TWO DIRECTORIES, not one. figures/transcripts holds console transcripts
+# written by the same scripts and pulled into the page with \transcript{}, and
+# for its first program it sat outside this gate entirely: the drift check, all
+# three workflows and the values artefact were scoped to figures/values alone.
+# A transcript is a printed number that happens to be inside a verbatim block,
+# so it is exactly the thing the book promises cannot disagree with its script
+# -- change LOSS_NATS in code/f03_logarithms.py and the transcript on the page
+# was free to contradict every \val{} around it with nothing failing. It is
+# the sibling volume's fabricated-console-block defect with a build step in
+# front of it, which is worse, because the file now LOOKS generated.
+#
 # Staged-but-not-committed is NOT a failure: the content matches the script,
 # which is the whole question this gate asks. Testing `git status --porcelain`
 # instead would fail on a staged file and make the gate unusable mid-commit.
 verify: numbers
-	@drift=$$(git diff --name-only -- figures/values); \
-	 new=$$(git ls-files --others --exclude-standard -- figures/values); \
+	@drift=$$(git diff --name-only -- $(COMPUTED)); \
+	 new=$$(git ls-files --others --exclude-standard -- $(COMPUTED)); \
 	 if [ -n "$$drift" ] || [ -n "$$new" ]; then \
 	   [ -n "$$drift" ] && { echo "STALE: these no longer match their script:"; \
-	                         echo "$$drift"; git diff --stat -- figures/values; }; \
+	                         echo "$$drift"; git diff --stat -- $(COMPUTED); }; \
 	   [ -n "$$new" ] && { echo "UNTRACKED: git has never seen these, so they have"; \
 	                       echo "never been compared to anything. git add them:"; \
 	                       echo "$$new"; }; \
 	   exit 1; \
-	 else echo "All computed values are current."; fi
+	 else echo "All computed output is current: values and transcripts."; fi
 
 # ---------------------------------------------------------------------------
 # Diagrams. Source of truth is figures/mermaid/<lang>/*.mmd, committed. The
@@ -182,8 +200,12 @@ stubs:
 answers:
 	@python3 tools/check_structure.py --answers
 
-# 3. Frame counts against the 30--70 band, and frames that ask a question
-#    nobody answers.
+# 3. Frame counts against the 30--70 band, frames that ask a question nobody
+#    answers, and every frame NUMBER the program quotes -- Quiz routes,
+#    outcome ranges, Summary brackets -- checked against the frames that
+#    exist. Those payloads used to be compared between the editions and never
+#    against the program, so a route to frames 91--93 in a 48-frame program
+#    passed every gate here.
 frames:
 	@python3 tools/check_structure.py --frames
 

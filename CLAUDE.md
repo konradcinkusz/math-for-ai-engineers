@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1 and F2 written, both editions.** F3–F13 and P1–P34 are stubs carrying their briefs | 45 of 47 |
+| Programs | **F1, F2 and F3 written, both editions.** F4–F13 and P1–P34 are stubs carrying their briefs | 44 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,25 +21,39 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 215 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-pl` (17x24) | 217 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-en-a4` | 199 | 0 | 0 | 5, worst 6.3 pt | 0 |
-| `main-pl-a4` | 199 | 0 | 0 | 4, worst 4.4 pt | 0 |
+| `main-en` (17x24) | 248 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-pl` (17x24) | 256 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en-a4` | 229 | 0 | 0 | 5, worst 6.3 pt | 0 |
+| `main-pl-a4` | 229 | 0 | 0 | 4, worst 4.4 pt | 0 |
 
 The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
 one format and one language because that is where the line falls. Well under
 the 15 pt budget. **F2 added no overfull box to any of the four formats** —
 the multiset came back identical to the pre-F2 baseline, which took two fixes
 recorded under *Program F2 pass* below, and **the F2 review pass did not move it
-either**, in any of the four. Parity reports **0 failures and 0 warnings**
-across 56 file pairs; `reflist.py` confirms 77 labels resolve to the same
+either**, in any of the four. **F3, and both of its review passes, did not move
+it either**: the four multisets above are element-for-element what the pre-F3
+table recorded, which is now three programs and 33 to 39 pages of new material
+without a new overfull box — and the second F3 review pass moved a figure, cut
+lines out of three frames in both editions and loaded a new package without
+changing one of the twenty numbers. Parity reports **0 failures and 0 warnings**
+across 56 file pairs; `reflist.py` confirms 87 labels resolve to the same
 numbers in both editions.
 
-`main-pl` is two pages longer than `main-en` because the F2 review pass added a
-Horner qualification and two gapped-retrieval frames, and Polish is longer than
-English for the same content. The two editions have never been required to
-paginate alike — nothing that matters navigates by page — but the divergence is
-new, so it is written down rather than left to look like a defect.
+**The only page count that moved in the second F3 review pass was `main-pl-a4`,
+231 to 229**, and both of those pages were defects rather than content: a page
+carrying a running head, two italic words and nothing else. See *the orphaned
+cue* below.
+
+`main-pl` is eight pages longer than `main-en` in the trade format, up from two
+after F2, because Polish is longer than English for the same content and F3 is
+the longest program so far. **On A4 the two editions now come out level at 229**,
+which is coincidence and not convergence: A4 spends the extra width on margin,
+so the same text sets in fewer, longer-lived lines and the two editions' page
+counts drift independently of the trade format's. The editions have never been
+required to paginate alike — nothing that matters navigates by page — but the
+trade-format gap grows with every program, so it is written down rather than
+left to look like a defect.
 
 **Four pages per format came from the Stroud layout pass**, from two causes.
 Two are the next-frame cue: 33 cues in a 45-frame program, measured with and
@@ -60,12 +74,13 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **45 of 47 programs are stubs**, in each language. This is the whole of the
+- **44 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 60 computed values, all referenced, all present
-- 0 `verifybox` blocks · 12 Mermaid sources, all rendering
+- 105 computed values, all referenced, all present, plus **one committed
+  console transcript**, which is inside the same drift gate as of the F3 pass
+- 0 `verifybox` blocks · 18 Mermaid sources, all rendering
 - **80/80 validation: NOT ESTABLISHED**, and printed as outstanding on every
   build. See *The evidence, honestly* below — this is the one ledger that is a
   claim rather than a count, and it must not quietly go away.
@@ -81,6 +96,15 @@ references, not digits. `figures/values/` is **committed** so a changed number
 shows up in review as a diff, and CI fails the build when a script no longer
 produces what the book prints.
 
+**And a console transcript is a computed number that happens to be verbatim.**
+`figures/transcripts/` is written by the same scripts, pulled in with
+`\transcript{}`, committed for the same reason — and for its first program it
+sat outside every drift gate in the repository, because the Makefile target,
+all three workflows and the values artefact were scoped to `figures/values`
+alone. Both directories are now in `$(COMPUTED)` and in all three workflows.
+Anything a script under `code/` emits belongs in that variable: the promise is
+exactly as wide as the gate, and no wider.
+
 The one exception, and it is a real one: **arithmetic the program is teaching is
 written inline.** `2^5 = 32` is the thing the reader is meant to do; putting it
 behind `\val{}` would be theatre. The rule is *anything the reader cannot do in
@@ -93,6 +117,18 @@ and the practice, which is exactly where folklore lives. Ten experiments are
 specified in `notes/01-curriculum.md`; **none has been run**, and until one is,
 the claim it would support is labelled as judgement and its table stays empty.
 Nine of the ten are free and finish on a laptop in under a minute.
+
+**A claim the book makes about the book is still a claim, and it is the one
+class nothing can check.** There is no external source to check it against, and
+it is the easiest thing in the repository to open and confirm — which is
+exactly why it does not get opened. F03 asserted that a bare logarithm produces
+no PDF (it does; `nonstopmode` writes one over the error, as this file's own
+*Build traps* section says), that its one bare logarithm was the only one in
+the book (there were five in that file), and that F1's ladder of magnitudes
+climbs a decade per rung (it climbs 3, 2, 4, 3 and 10). **Never state a count of
+occurrences**: name the rule and the places it is lifted, because a tally
+decays silently and no lint can see it. And before writing a sentence about
+another program, open that program.
 
 **A bare `\log` is a build error.** In Polish textbooks it means base ten; in
 machine-learning writing it means base *e*. The same three characters carry
@@ -129,6 +165,16 @@ frames on either side of it, whether or not those frames open with `\ans`.** A
 figure that teaches a correction goes *after* the correction, where it explains,
 and a figure that would preview a trap does not go in at all. Read the figure
 and the two frames around it as a page, not as a source file.
+
+**And read the figure's content first, because position does not settle it.**
+Two verifiers disagreed over F03 on exactly this and both were describing
+something real: two of its three figures do sit above the elicitation that
+follows them, in all four builds, and neither contains an answer to it, so
+neither is a defect. The one figure that does carry an answer, F3.3, is below that
+answer's frame in all four builds. So the test is *does this figure say the
+thing the reader is about to be asked for* — and only then *where did it land,
+in all four builds*. The measured pages for F03 are under *Program F3, second
+review pass*.
 
 **No instruction may depend on where the page happens to break.** *Before you
 turn over* was false in F2 in three places, and differently false in each
@@ -238,9 +284,11 @@ gates on it.
 | C14 macro histogram | A `\trapbox` or an `\index` dropped in translation |
 | **C15 main-file wiring** | A main file rewritten with a chapter of front matter dropped |
 | **C16 next-frame cues** | A `\nextframe` where the next frame answers nothing, or missing where the next frame answers. C4 and C14 are both blind to a cue dropped in *both* editions at once |
+| `check_structure.py --frames` (payloads) | A Quiz route, outcome range or Summary bracket naming a frame the program does not have, or a range that runs backwards. `\teachesat`, `\teachesatone`, `\outcome` and `\sumitem` are the whole of the book's return index, and they were compared *between the editions* and never against the program: a probe routing a Quiz question to frames 91--93 of a 48-frame program was green on `parity.py`, `check_structure.py`, `gen_stubs.py --check` and `make verify` alike, and stays green on parity even now, because the Polish edition says 91--93 too. **It closes the existence half only.** Whether frame 20 answers the question routed to it is a reading job, and the tool says so in its own comment rather than letting a green ledger imply otherwise |
 | `check_structure.py --frames` | A cue that is not the **last thing** in its frame. C16 counts cues and cannot see position, so a cue misplaced identically in both editions is invisible to C4, C14 and C16 alike. It is a *line* test on purpose: a cue hoisted above a frame's closing prose tokenises to nothing after it and reads as correctly placed |
 | `reflist.py` | `\label{prog:F08}` resolving to F8 in one edition and F9 in the other. Both builds stay internally consistent and neither warns |
-| **`checkpdf.py`** | A frame's rule and margin badge stranded at the foot of a page with the frame's body overleaf. It reads the finished PDF, because that defect produces no error, no warning and no overfull box — no log can see it, and the badge it strands is the book's navigation device |
+| **`checkpdf.py`** (openers) | A frame's rule and margin badge stranded at the foot of a page with the frame's body overleaf. It reads the finished PDF, because that defect produces no error, no warning and no overfull box — no log can see it, and the badge it strands is the book's navigation device |
+| **`checkpdf.py`** (cues) | The mirror image at the other end of the frame: a page whose only text-block content is the next-frame cue, so the reader turns over expecting an answer and gets a running head, two italic words and white paper. A row of dots counts as nothing, because dots-plus-cue is the same defect one breakpoint earlier. The cue is read out of `\lblNextFrame` in `lang/*.tex` rather than hard-coded, so rewording the cue cannot silently switch the check off |
 
 `tools/gen_stubs.py` regenerates every stub and `structure.tex` from
 `tools/programs.json`, which is the single source of the part and program
@@ -497,6 +545,20 @@ Each cost time; none is obvious from its error message.
   `\pdfstringdefDisableCommands` is then needed as well, because a robust macro
   cannot go into a PDF bookmark string either. The better fix, which is what is
   in the tree, is that part titles do not use `\ifpl` at all.
+
+- **A `listings` body sets `'` as a RIGHT SINGLE QUOTATION MARK, and the code
+  on the page is then not code.** In T1 the input character `'` is
+  `quoteright`, so `struct.unpack('<f', ...)` prints as
+  `struct.unpack(’<f’, ...)`; typed back in that is
+  `SyntaxError: invalid character (U+2019)`. It is **font-dependent**, which is
+  why it shipped: `inconsolata` is loaded with `varqu`, whose whole purpose is
+  an upright quote, so on a full TeX Live the page looks right. This container
+  has neither inconsolata nor newtx, and it is the container the published PDF
+  is built in — the `amssymb`/`newtxmath` trap from the other end, where a bare
+  installation ships a defect a full one hides. The preamble loads `upquote`,
+  which makes `'` the ASCII apostrophe whatever the typewriter font is. Check
+  it the only way that means anything: extract the listing from the finished
+  PDF and run what comes out.
 
 - **`\val{}` does not expand inside a listing.** `listings` reads verbatim and
   the style sets no `escapechar`, so it prints the macro name. **Every console
@@ -850,17 +912,50 @@ it, and the next comparison will be checkable.
 
 **The cause is always the graph's width, never the font.** `\mermaidfig` scales
 to `0.95\linewidth` or `0.42\textheight`, whichever binds, so on-page type size
-is `12.57 pt x min(350.9/W, 231.5/H)` in the trade format, where `W` and `H` are
-the rendered `.mmd`'s own page. F2.1 was eight nodes across; it is now four
-ranks of at most two. F2.3 was a six-rank chain; the four reading steps are
-paired into two nodes and it is four ranks.
+is `12.57 pt x min(350.9/W, 229.2/H)` in the trade format and
+`12.57 pt x min(398.4/W, 284.9/H)` on A4, where `W` and `H` are the rendered
+`.mmd`'s own page in points — `pdfinfo` prints them. Re-measured over all nine
+figures now in the book, in all four builds, that formula reproduces the
+measured type size **to a hundredth of a point every time**. F2.1 was eight
+nodes across; it is now four ranks of at most two. F2.3 was a six-rank chain;
+the four reading steps are paired into two nodes and it is four ranks.
 
-**And aspect ratio decides whether the figure floats.** Below about 1.5 the
-height cap binds, the figure is 231.5 pt tall whatever else you do, and it will
-not fit on a busy page — the first redesign of F2.1 came out square, measured
-7.07 pt, and floated a whole page past the frame it belongs to, taking a page of
-its own with a quarter of it blank. **Aim for 2.2–2.8.** F2.1 is now 666 x 199
-and sits in the flow in all four builds.
+**The aspect ratio is a FLOOR, not a band, and the recorded band was wrong at
+the top.** *Aim for 2.2–2.8* was written from one program's redesign and the
+book's own shipped practice contradicts it: F3's three diagrams are **3.59,
+3.24 and 2.59** and they measure the largest node text in the book. What the
+number actually governs is one thing only.
+
+- **Stay above about 1.5.** Below that the height cap binds — the crossover is
+  `350.9/229.2 = 1.53` in the trade format and `398.4/284.9 = 1.40` on A4 — and
+  the figure is set to its full allowed height whatever its width. It then
+  cannot share a page with the frames it belongs to and floats away with a
+  quarter of its own page blank. That is what happened to the first square
+  redesign of F2.1, at 7.07 pt.
+- **There is no ceiling.** Above the crossover the *width* cap always binds, so
+  the aspect ratio drops out of the type size entirely and only `W` is left:
+  `12.57 x 350.9/W`. F1.3 is 5.50 and F2.2 is 4.35, and both are small for the
+  same reason F3's are large — they are 985 and 939 points wide.
+
+So the working rule is a **width budget**, which is the quantity the type size
+actually depends on: under about 700 pt keeps node text above 6.3 pt, and under
+about 520 pt reaches 8.5 pt, which is where F3 sits. Measured, in the trade
+format:
+
+| | W x H (en) | ratio | binds | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|---|
+| F3.1 log-mirror | 517 x 144 | 3.59 | width | 8.51 | 8.63 | 9.69 | 9.82 |
+| F3.2 underflow | 645 x 199 | 3.24 | width | 6.82 | 7.02 | 7.76 | 7.99 |
+| F3.3 log-axis | 516 x 199 | 2.59 | width | 8.53 | 8.23 | 9.71 | 9.36 |
+| F1.1 magnitudes | 210 x 667 | 0.31 | **height** | 4.32 | 4.32 | 5.37 | 5.37 |
+
+`W` is the English render; the Polish one differs, because Polish labels are
+longer, and that is why the two editions' figures do not measure alike — pl
+log-mirror is 510 wide and sets larger, pl log-axis is 535 and sets smaller.
+Predicted and measured agree to a hundredth in all sixteen cells.
+
+The last row is the hazard, kept in the table because it is the only figure in
+the book on the wrong side of the crossover.
 
 **Glyph overlap from inline `\dfrac`.** Method: word pairs on adjacent lines
 whose boxes overlap by more than 2.5 pt, body-sized words only — diagram text is
@@ -884,6 +979,419 @@ those files describe **whichever format ran last**. A page range computed from
 them for the trade build is silently a few pages short, and the measurement
 then quietly omits the end of the program. Read the ranges out of the PDF's own
 running heads instead — the verso head names the program.
+
+### Program F3 review pass, August 2026
+
+Two independent reviewers read *Logarithms and logarithmic scales* **and
+rendered every page**, as they did for F2, and between them found nine factual
+errors on the page, one false claim the book made about itself in four places,
+five pedagogical defects and two holes in the tooling. Every one of them was
+invisible to every gate in the repository. The generalisable finding is
+narrower and sharper than F2's:
+
+**A book can be wrong about a book. It is the class of claim nothing checks,
+because there is no external source to check it against.** Four of the errors
+were F3 describing the rest of this repository — its build behaviour, its own
+notation ban, another program's figure — and each was written from memory about
+material the author could have opened in the next tab.
+
+#### The one that matters most: the notation box was false about the build
+
+The box said a bare logarithm **"raises an error and no PDF is produced"**. It
+does not. `-interaction=nonstopmode` writes a PDF over the top of the error,
+which is the first entry in this file's own *Build traps* section and the
+reason `tools/checklog.py` exists at all. Appendix B had it right the whole
+time — *the build refuses a bare logarithm* — so the book contradicted itself
+between a chapter and an appendix, in the direction of the stronger claim.
+§F03-base now matches Appendix B word for word in substance.
+
+The same box then said the frame above it was **"the one deliberate exception
+in the whole book"**. There are five typeset `\mfalogplain` in F03 alone — the
+entry Quiz, frame 8, frame 9 twice, frame 13's aibox — plus Appendix B. The
+claim appeared in **four places**: the box, both file headers (as *once*), and
+`preamble.tex`'s own comment on the macro. All four are fixed, and the fix is
+not a corrected count:
+
+> **Record the restriction as a rule, never as a tally.** `preamble.tex` now
+> names the places the ban is lifted — Appendix B, F03's Quiz and §2 — and says
+> in as many words that the count is deliberately not stated, because it was
+> stated, it was wrong by five, and **nothing can check it**: C10's regex
+> cannot see inside the macro name. A tally nobody maintains is a claim that
+> decays silently.
+
+#### The other eight factual errors
+
+- **A wrong answer was printed.** Further problem 17 said `log_b x` and
+  `log_c x` differ by `1/log_b c`. They differ by `log_b c = 1/log_c b` — the
+  printed factor was its reciprocal. `log2(100)/log10(100) = 3.3219 = log2(10)`,
+  and `1/log2(10) = 0.301`. The irony is worth keeping: this is the inversion
+  §2 of the same program warns about by name.
+- **`np.logspace(-5, -2, 4)` does not "return exactly those four".** Element 0
+  is `9.999999999999999e-06`, one ulp below `1e-5`. numpy's repr prints
+  `1.e-05` and hides it, and the script's own guard rounded `log10` to nine
+  decimals and hid it too — a comparison nothing within a few hundred ulp can
+  fail, which is a guard that has already stopped working. The prose now says
+  *prints*, a note box states the ulp, and **the script's assertion is now a
+  bitwise comparison of `struct.pack` bytes**. A second assertion checks the
+  numpy claim wherever numpy exists and **announces itself when it is skipped**,
+  because `make numbers` must run on a plain `python3`.
+- **F3 was false about F1's own figure.** §7 opened by saying F1's ladder of
+  magnitudes *climbs by a factor of ten per rung and prints the rungs evenly
+  spaced*. `f01-magnitudes.mmd` climbs `10^0 -> 10^3 -> 10^5 -> 10^9 -> 10^12
+  -> 10^22` — 3, 2, 4, 3 and 10 decades. Neither predicate was true, and the
+  section's whole argument leant on it. The payoff is kept and the predicates
+  are gone: the ladder *labels every rung with a power of ten and measures the
+  climb in exponents*, which is true and is the same point.
+- **A table contradicted the sentence above it.** *Four values of x a
+  thousand-fold apart* headed a table of 10, 1000, 10^6, 10^9 — the first gap
+  is a hundred-fold. Now *spread over eight decades*, which leaves the payoff
+  sentence (*a hundred-million-fold increase moves the logarithm by eight*)
+  exactly right.
+- **"A ratio with four zeros in it."** The ratio is `50000/7 = 7143` and has no
+  zeros; the four zeros are in `50000`.
+- **"Three of the four runs tested the same order of magnitude as each other."**
+  The linspace points are `1e-5, 3.34e-3, 6.67e-3, 1e-2`; F01 defines an order
+  of magnitude as the exponent alone, so only two share one. Now *within a
+  factor of three of one another*, which is measured: `1e-2/3.34e-3 = 2.99`.
+- **Frame 31's arithmetic was not reproducible from what was printed.** The
+  page said *2000 copies of log10(0.0907) added together*, which gives
+  −2084.79, and then printed −2084.61 — the figure from the **unrounded**
+  `e^-2.4`. The script said so in a comment; the page did not. The step is now
+  written as `2000 x (-2.4)/ln 10`, which is what was computed, reproduces
+  −2084.61 to the digit, and is the better teaching move: it shows the loss
+  becoming a base-ten exponent.
+- **One quantity at two precisions, two inches apart.** `f03-log-axis.mmd` node
+  B3 said 31.6 and the frames print `\val{f03.axis.mid}` = 31.62; on `main-en`
+  p96 both were on the page. The diagram says 31.62.
+- **The diagram's axis marks belonged to a different axis than the question it
+  set up.** Node A1 listed the linear marks as 0, 25, 50, 75, 100 and node A3
+  then asked about 10 -> 100. A1 now states that the marks step by a fixed
+  amount, which is the property being contrasted, and A3 is unchanged.
+
+#### Pedagogy: the entry Quiz was spoiling the program's headline trap
+
+Quiz question 4 read *`math.log(1000)` prints 6.907755 and your schooling says
+log 1000 = 3. Which of the two is wrong?* That is not a question about the
+trap, **it is the trap's reveal, printed before frame 1**. Frame 8 then asks
+the reader to write down `log 1000` from memory and could not fire for anybody
+who took the triage Quiz — which is every reader the Quiz is for. F02's
+precedent is the opposite: its Q7 asks *Expand (a+b)^2* and discloses nothing.
+The question is now *What does `math.log(1000)` return?* and the back-matter
+answer carries both conventions.
+
+Four smaller ones:
+
+- **A `\blank` whose answer was four lines above it.** Frame 45 stated *that
+  distance is log10(2) of a decade* and then asked the reader to fill in *a
+  doubling covers \blank of a decade*. Same frame, same page, nothing to cover.
+  The stating clause is cut; frame 46's `ansblock` delivers it, as it already
+  did. The other four `\blank` sites were checked and are sound.
+- **"Reread the previous frame" pointed at the question.** In frame 25's
+  answer: the previous frame is 24, the `\yourturn` that asked it. The
+  correction is frames 20–21, and the pointer now names the section and the
+  frames.
+- **Two outcomes leant on their traps.** O2's *name the base every time you
+  write a logarithm* is the frame-8/9 trap's moral, and O6 telegraphed the
+  model-card frames. An outcome is read before the program; it may not carry a
+  conclusion the program means to elicit.
+- **A Polish calque.** *float32 poddaje się 44 tokenów w sekwencję 2000
+  tokenów* is *gives up 44 tokens into a 2000-token sequence* carried word for
+  word, and is not Polish. Now *poddaje się po 44 tokenach sekwencji liczącej
+  2000 tokenów* — both digits stay in order, so C12 stayed green. *Na średnią
+  długość nie wpływa*, which parses two ways, is now *Średnia nie zależy od
+  długości*.
+
+#### The two tooling holes, which outlast the program
+
+**1. `figures/transcripts/` was outside every drift gate.** The `\transcript`
+mechanism arrived with F3 and did not carry the guarantee the book makes for
+computed numbers: the Makefile's `verify` target, `build.yml`, `pages.yml`,
+`release.yml` and the `values` artefact were all scoped to `figures/values`
+alone. Change `LOSS_NATS` in `code/f03_logarithms.py` and the transcript on the
+page could disagree with every `\val{}` around it with nothing failing. It is
+the sibling volume's fabricated-console-block defect with a build step in front
+of it, **which is worse, because the file now looks generated**.
+
+Fixed in all five places, behind a `$(COMPUTED)` variable so the next directory
+a script writes has one place to be added. Proved both ways: a script change
+that moves only the transcript is now reported STALE and names the file, and
+the old scoping demonstrably saw nothing; an untracked transcript is reported
+too. One latent instance was found while doing it — the transcript's own
+comment carried `0.0907` as a literal, which is `P_TOKEN` written twice — and
+is now interpolated, byte-identical output.
+
+`\transcript` also had **no `\IfFileExists` guard**, where `\mermaidfig` has had
+one since the diagrams pipeline was written. A clean checkout that has not run
+`make numbers` died on `File not found`. Verified by deleting the transcript
+and building: unguarded, `pdflatex` exits 1 on a Listings error; guarded, it
+exits 0 and prints a marker where the transcript belongs.
+
+**2. Frame-number payloads were compared between the editions and never
+validated against the program.** `\teachesat`, `\teachesatone`, `\outcome` and
+`\sumitem` are the whole of the book's return index — every Quiz route, every
+outcome range, every Summary bracket — and F2 lost a review round to three of
+them. A probe that routed a Quiz question to **frames 91–93 in a 48-frame
+program** passed every gate in the repository, and *still* passes parity when
+both editions carry it, because nothing diverges.
+
+`check_structure.py --frames` now parses those payloads per program and fails
+on an endpoint past the last teaching frame, a range that does not ascend, a
+range starting before frame 1, and a payload that is not a frame range at all.
+Proved by mutation, five faults, each introduced and restored: the 91–93 probe,
+a backwards `\sumitem{45--43}`, an `\outcome{43--49}` one past the end, a
+degenerate `{20--20}`, an en-dash typo `{10-11}` — and the same bad payload in
+**both** editions, where the new check fails and `parity.py` exits 0.
+
+This closes the *existence* half mechanically. **Whether frame 20 actually
+answers the question routed to it stays a reading job**, and the tool says so
+in its own comment rather than letting a green ledger imply otherwise.
+
+#### The layout constant had drifted from its own evidence
+
+`\begin{fr}`'s page-turn reservation was raised from five `\baselineskip` to
+seven while F3 was written, and **the comment above it still carried the sweep
+table that chose five**. A sweep table naming a constant the code no longer
+uses is worse than no table: it reads as evidence. Re-swept over three programs
+and all four builds:
+
+| reserve | en | pl | en A4 | pl A4 | stranded openers |
+|---|---|---|---|---|---|
+| 4 | 250 | 256 | 231 | 231 | 2 |
+| 5 | 252 | 256 | 229 | 231 | 1 |
+| 6 | 250 | 254 | 229 | 231 | 1 |
+| **7** | **248** | **256** | **229** | **231** | **0** |
+| 8 | 250 | 256 | 231 | 231 | 1 |
+
+This also explains a discrepancy worth not re-chasing: the review reported the
+page table as 250/254/229/227, which is the reserve-6 row, not the shipped
+one. **Page counts are a function of this constant**, so re-measure them from
+the build in front of you rather than carrying a figure across a layout change
+— which is the rule this file already states for the overfull multiset.
+
+**Five was right for a one-program book and is wrong for a three-program one**,
+which is the honest reading: the constant is tuned to what is written and has
+now failed once. Seven is the only value in the range that clears all four
+builds. Note that **eight strands a frame seven does not** — the guard turns
+pages, so it reshuffles every later break, and neither page count nor stranding
+count is monotonic in the reservation.
+
+#### One residue, recorded rather than fixed
+
+`\val{f03.seq.prod}` is `2.43e-2085` and the frame prints `10^{-2084.61}`
+beside it; `10^-2084.61` is `2.45e-2085`, because the mantissa comes from the
+unrounded logarithm and the exponent on the page is rounded to two decimals.
+Both statements are true and the answer box says *About*, so this is rounding
+display and not the reproducibility defect above — but it is the same shape,
+and a reader who checks will find it. The choice is between quoting the
+mantissa to fewer figures and not printing the rounded exponent beside it.
+**Left as it is, deliberately, and written down so the next pass decides rather
+than rediscovers.**
+
+### Program F3, second review pass, August 2026
+
+A third round of verifiers read F03 and disagreed with each other about one
+thing. Most of what they reported had already been fixed by the first review
+pass and was re-checked rather than re-fixed; what was left was two claims
+nobody had run, one navigation error, one outcome that gave away its trap, a
+disputed figure question that was settled by measuring, and a page-level defect
+class the repository had no check for.
+
+#### The book's only listing printed invalid Python
+
+`figures/transcripts/f03-underflow.txt` is generated, committed, gated for
+drift, and reproduces exactly in a real REPL. It still printed as
+`struct.unpack(’<f’, struct.pack(’<f’, x))[0]` on page 101 of `main-en` --
+U+2019 at both ends of a string literal, which is
+`SyntaxError: invalid character (U+2019)`. The full trap is in *Build traps*;
+the part worth repeating here is **how it hid**. `inconsolata` is loaded with
+`varqu` precisely so that quotes come out upright, so any machine with
+inconsolata renders it correctly. This container has neither inconsolata nor
+newtx and is the container that builds the published PDF, so the defect existed
+only in the artefact readers get.
+
+That is the `amssymb`/`newtxmath` trap running backwards. There, a full TeX
+Live failed where a bare one passed. Here, a bare one shipped a defect a full
+one hides. **A preamble that probes for optional packages has two failure
+directions and CI only exercises one of them.**
+
+Fixed with `\usepackage{upquote}`, and verified the only way that means
+anything: `pdftotext` the finished page, strip the `>>>` and `...` prompts, and
+run what comes out. It prints 311 and 44, which are the two `\val{}`s beside it.
+
+#### Two more claims about the toolchain, one of them false
+
+`preamble.tex` said a bare `\log` is caught by `tools/check_notation.py`.
+**There is no such file and there never was.** What exists is `parity.py`'s C10,
+which names a file and a line before the build runs, and the `\PackageError`,
+which fails the run. All of it was measured rather than reasoned about, by
+putting a bare `\log` into F03 frame 1:
+
+- `pdflatex` exits 1 **and writes a 244-page PDF over the top of the error**;
+- `grep '^!' main.log` finds nothing, because `-file-line-error` puts a path
+  first;
+- `tools/checklog.py` reports `ERRORS: 1  Package mfabook Error: A bare \log`;
+- `parity.py` reports
+  `FAIL [C10-notation] programs/en/F03-logarithms.tex:100 a bare \log`.
+
+So §F03-base's *the build refuses a bare mark* is true and matches Appendix B,
+and the comment naming a non-existent checker is the thing that was wrong. The
+five typeset `\mfalogplain` in F03 are the entry Quiz plus §2 (frames 8, 9 twice
+and frame 13's aibox), which is what the file header, the notation box and
+`preamble.tex` all now say -- as a rule, with no tally.
+
+#### Every library claim in F03, re-run
+
+Against Python 3.11.15 and numpy 2.4.6. All of them reproduce, so nothing here
+needed changing; it is recorded so the next pass does not re-run them.
+
+| Claim | What it printed |
+|---|---|
+| `math.log(1000)` | `6.907755278982137` |
+| `math.log(0)`, `math.log(-8)` | `ValueError: math domain error` |
+| `np.log(0.0)` | `-inf` + `RuntimeWarning: divide by zero encountered in log` |
+| `np.log(-8.0)` | `nan` + `RuntimeWarning: invalid value encountered in log` |
+| `math.exp(1000)` | `OverflowError: math range error` |
+| `np.exp(1000.)` | `inf` + `RuntimeWarning: overflow encountered in exp` |
+| `np.logaddexp(1000., 1001.)` | `1001.3132616875182` |
+| `np.logspace(-5, -2, 4)` | prints `[1.e-05 1.e-04 1.e-03 1.e-02]`; element 0 is `9.999999999999999e-06` |
+| `np.linspace(1e-5, 1e-2, 4)` | `[1e-05, 0.00334, 0.00667, 0.01]`, ratio of the top three `2.994` |
+
+The last row is the one the first review pass rewrote: *within a factor of three
+of one another* is `1e-2 / 3.34e-3 = 2.994`, so it is measured and it holds.
+
+#### Navigation: one route and one bracket
+
+- **Quiz Q14 routed to `47--48`.** Frame 47 states *a power law is a straight
+  line on log-log axes and the gradient of the line is the exponent*, which is
+  the whole answer; frame 48 is the learning-rate sweep and has nothing to do
+  with it. Now `\teachesatone{47}` -- **the only `\teachesatone` in F03**, and
+  it is right for the same reason F02 has none: F02's routes all point at a
+  question answered in the next frame, and this one points at a frame that
+  states its own answer.
+- **`\sumitem{43--45}`** claims *a doubling is `log10 2` of a decade*, and the
+  number arrives in frame 46's answer block; 45 only asks for it. Now `43--46`,
+  which overlaps `46--48`. Overlap is established practice -- F01 has `34--36`
+  followed by `36`.
+
+All fourteen routes and all nineteen brackets were then re-read against the
+frames. Nothing else misdirects.
+
+**Outcome 7** promised *including where the midpoint between two ticks falls*,
+which is the frame 43/44 trap named on the opener, forty pages before the
+elicitation. The first review pass fixed exactly this shape in outcomes 2 and 6
+and left this one. Now *including what a distance along one measures*, which
+promises the skill and gives away no answer.
+
+#### The disputed one, settled by measuring
+
+Two verifiers disagreed about rule 2 -- *a figure must not answer the frame that
+follows it*. One reported all three F03 figures clear in all four builds; the
+other reported a figure sitting above the elicitation it shades in three of
+four. **Both are describing something real, and the disagreement is that page
+position is not the test.** Measured, page and vertical position, from
+`pdftotext -bbox`:
+
+| build | figure | fig | elicitation | answer |
+|---|---|---|---|---|
+| `main-en` | F3.1 log-mirror | p97 y169 | p97 y340 | p97 y544 |
+| | F3.2 underflow | p103 y357 | p103 y503 | p104 y96 |
+| | F3.3 log-axis | p110 y206 | p108 y186 | p108 y280 |
+| `main-pl` | F3.1 | p102 y238 | p102 y400 | p103 y145 |
+| | F3.2 | p109 y546 | p110 y135 | p110 y273 |
+| | F3.3 | p116 y360 | p114 y370 | p114 y481 |
+| `main-en-a4` | F3.1 | p84 y570 | p85 y168 | p85 y377 |
+| | F3.2 | p90 y308 | p90 y454 | p90 y602 |
+| | F3.3 | p95 y458 | p93 y705 | p94 y108 |
+| `main-pl-a4` | F3.1 | p84 y639 | p85 y168 | p85 y377 |
+| | F3.2 | p90 y310 | p90 y454 | p90 y600 |
+| | F3.3 | p95 y529 | p93 y734 | p94 y158 |
+
+So the second verifier's observation is right: **F3.1 and F3.2 both sit above
+the elicitation that follows them, in all four builds.** And the first
+verifier's conclusion is also right, because neither figure contains an answer
+to the question below it:
+
+- **F3.1** carries the product law and the index mirror. Frame 24 asks the
+  reader to expand `ln(x^2 y / z)`, collapse `2 ln a + ln b - 3 ln c`, and
+  simplify `ln(x+y)`. The figure gives none of the three, and it never writes a
+  sum inside a logarithm, which is the trap.
+- **F3.2** carries 44 and 311 tokens at `p = 0.0907`, both already printed in
+  frames 32 and 33. Frame 35 asks for `p = 0.5`, whose answers are 150 and 1075.
+- **F3.3** is the only one of the three that *does* contain an answer to a
+  question put to the reader -- *halfway from 10 to 100 is 31.62, the geometric
+  mean*, which is frame 43's elicitation -- and it is below frame 44's answer in
+  all four builds: two pages later in the trade format, one page later on A4.
+
+**The generalisable finding: page position does not settle rule 2, and neither
+does source order.** A figure above an elicitation is fine when it answers
+nothing; a figure below one is fatal when it answers it. Read what the figure
+says, then check where it landed -- both, in that order, and in all four builds.
+Nothing changed in F03 as a result of this; the measurement is the deliverable.
+
+#### The orphaned cue: a defect class, and a new check
+
+`main-en-a4` p94, `main-en-a4` p31 and `main-pl-a4` p45 each shipped as a
+running head, the words *Next frame.* / *Kolejna ramka.*, and nothing else. The
+question, its `\dotline` and everything else were on the page before. This is
+`checkpdf.py`'s stranded opener seen in a mirror -- that check looks for a badge
+with no body **below** it; this is a cue with no frame **above** it -- and the
+tool now fails on both. A page of dots-plus-cue counts too, because it is the
+same defect one breakpoint earlier.
+
+**Four things were tried. Three did not work, and each is worth not repeating.**
+
+1. **`\removelastskip` in `\nextframe`.** The obvious fix, and a no-op twice
+   over. Plain `\vspace` in vertical mode is `\vskip#1 \vskip\z@skip`, so
+   `\lastskip` reads the *zero* skip and the 2 pt one behind it is untouched;
+   and `\removelastskip` is `\vskip-\lastskip`, which on the main vertical list
+   cancels the space and leaves the breakpoint exactly where it was. Measured:
+   page counts and the overfull multiset came back identical in all four builds
+   and all three orphans survived.
+2. **`\nobreak` on `\dotline`'s trailing `\vspace`.** Measured, and it makes it
+   **worse: three orphaned cues became seven** -- `main-en` gained two,
+   `main-en-a4` and `main-pl-a4` one each -- and `main-en` grew six pages. This
+   independently reproduces the earlier pass's verdict on that experiment, with
+   a number attached. Do not try it again.
+3. **The `\begin{fr}` reservation.** Swept 4 to 10 against both checks; the
+   table is in `preamble.tex` and is now two columns wide. Seven, eight and nine
+   all clear both, and seven is the cheapest in pages. But the sweep clears the
+   cue column by reshuffling breaks, not by fixing anything: **this guard
+   reserves room for a frame OPENER and has nothing to say about a frame's
+   tail.** Ten orphans two cues that nine does not.
+4. **What worked: shorten the frames whose tails sat on the page boundary, and
+   move one figure.** F01's `f01-magnitudes` -- the one figure in the book on the
+   wrong side of the aspect-ratio crossover, height-bound at `0.42\textheight`
+   and therefore unable to share a page with the frames around it -- moved from
+   between frames 31 and 32 to the end of §F1.5, after frame 33. It no longer
+   crowds frame 32's tail, it summarises the section instead of pre-empting it,
+   and it answers nothing in frame 34 (which asks for bytes; the ladder has
+   none). Three frames then lost a line each in both editions: F01 frame 32, F02
+   frame 5 and F03 frame 43.
+
+**The cost of getting it wrong is that trimming is a random walk.** One source,
+four paginations: a cut that pulls the cue back onto the page in `main-en-a4`
+pushes a different frame over the edge in `main-pl-a4`. Measured twice, in both
+directions -- round one went three orphans to three orphans in different places
+and cost `main-pl-a4` two pages. **Fix them in document order, F01 before F02
+before F03, and rebuild all four after every edit**; a trim in F03 cannot move
+F01, but the reverse is not true.
+
+The class will recur. The three written programs carry 102 cue sites, so across
+four builds there are 408 chances for a frame tail to land within a line of the
+page bottom; a handful of orphans is the expected steady state, and every future
+program re-rolls every one of them.
+`checkpdf.py` is what makes that survivable; the fix is always editorial.
+
+#### Also done in this pass
+
+- The `f01-magnitudes` move is the first time a figure has been relocated for
+  layout rather than for rule 2. It carries no `\ref{}` anywhere, and it is
+  still F1.2 because it stayed between `f01-number-sets` and `f01-prefixes`.
+- Verified rather than re-fixed, because the first review pass had already
+  corrected them: the notation box's claim about the build, the *within a factor
+  of three* sentence, *a ratio in the thousands*, `f03-log-axis.mmd`'s A1 node,
+  and frame 25's pointer at *the trap at the end of §F3.3, frames 20 and 21*.
+  Each was re-read against the source it describes.
 
 ### Stroud layout pass, August 2026
 
@@ -1061,7 +1569,7 @@ thirteen, because the same items serve as entry and exit test. The instrument is
 now the **scored Test exercises**, which every program has, with entry and exit
 items drawn from the same pool but not identical.
 
-**The trap catalogue** — 38 misconceptions AI engineers actually hold, each
+**The trap catalogue** — 41 misconceptions AI engineers actually hold, each
 phrased in the reader's own voice with its correction and its owning program —
 is `notes/02-grounding-and-traps.md` §3. A trap frame must *elicit* the error,
 not warn against it, and the correction must explain the reasoning that produced
@@ -1111,9 +1619,20 @@ summary on every build.
    All four, not two: a format change moves every page boundary, and a table
    that fits on one page in the trade format can overflow its vbox on A4.
 2. `python3 tools/checklog.py main-*.log` — **not** `grep '^!'`
-3. `python3 tools/parity.py` — zero failures before you commit
-4. `make debt` — confirm the ledgers moved the way you expected
-5. Update the Status table and the ledgers at the top of this file
+3. `python3 tools/checkpdf.py main-*.pdf` — the two defects that live on the
+   finished page and in no log: a stranded frame opener, and an orphaned cue.
+   All four PDFs, for the same reason as step 1 — every orphaned cue found so
+   far was in an A4 build only.
+4. `python3 tools/parity.py` — zero failures before you commit
+5. `python3 tools/check_structure.py --frames` — every frame number the program
+   quotes exists, and every cue is the last thing in its frame
+6. `make debt` and `make verify` — confirm the ledgers moved the way you
+   expected, and that no computed value or transcript has drifted from its
+   script
+7. Update the Status table, the page table and the ledgers at the top of this
+   file. **Re-measure the page counts and the overfull multiset from the build
+   in front of you**: both are functions of the layout constants, and neither
+   survives being carried across a change.
 
 Note on tagging: `git push --tags` returns HTTP 403 through the sandbox's git
 proxy, so tags created in a web session exist locally only. Tag from a local
@@ -1123,10 +1642,10 @@ clone instead.
 
 ## What is left
 
-1. **Forty-five programs.** This is the work. F3–F13 first, because the
+1. **Forty-four programs.** This is the work. F4–F13 first, because the
    Foundation part is what makes the book's claim — *it assumes nothing* — true
-   or false, and because F3 (logarithms) and F12 (the chain rule) are the two
-   the rest of the book leans on hardest.
+   or false. F3 (logarithms) is written, so **F12 (the chain rule) is now the
+   one outstanding program the rest of the book leans on hardest**.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
    softmax entropy with and without the `1/√d_k` scaling — is the one to run
    first: it costs nothing and it converts the book's central derivation from an

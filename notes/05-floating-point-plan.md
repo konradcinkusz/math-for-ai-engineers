@@ -663,3 +663,16 @@ for tag, (b, a) in (("", (30, 45)), ("2", (120, 180))):
   literate mapping for U+00A0.
 - After the pass: `make` (both editions), `make check`, `make debt`, and compare the
   overfull hbox **and vbox** multiset against a reverted build.
+
+## Owed to F03: the second threshold
+
+F03 computes the token count at which a sequence's probability reaches zero in
+`float32` and in `float64`, and it points at P1 twice for **what a subnormal is
+and why a format has two thresholds rather than one** -- the smallest normal
+value, and the smaller subnormal one beneath it where precision is traded away
+a bit at a time until the number underflows to zero.
+
+That promise was made before this plan undertook it, and F03's own numbers do
+not make sense without it: the reader who computes 44 tokens for `float32` and
+then reads that the format's smallest positive value is smaller than the one
+they used will be right to ask. It is a debt, not an option.
