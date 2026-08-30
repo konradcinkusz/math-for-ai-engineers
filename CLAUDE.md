@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F7 written, both editions.** F8–F13 and P1–P34 are stubs carrying their briefs | 40 of 47 |
+| Programs | **F1–F8 written, both editions.** F9–F13 and P1–P34 are stubs carrying their briefs | 39 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 378 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-pl` (17x24) | 386 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-en-a4` | 340 | 0 | 0 | 5, worst 6.3 pt | 0 |
-| `main-pl-a4` | 342 | 0 | 0 | 4, worst 4.4 pt | 0 |
+| `main-en` (17x24) | 401 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-pl` (17x24) | 409 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en-a4` | 358 | 0 | 0 | 5, worst 6.3 pt | 0 |
+| `main-pl-a4` | 362 | 0 | 0 | 4, worst 4.4 pt | 0 |
 
 The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
 one format and one language because that is where the line falls. Well under
@@ -81,19 +81,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **40 of 47 programs are stubs**, in each language. This is the whole of the
+- **39 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 212 computed values, all referenced, all present, plus the committed console
+- 235 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 42 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 48 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **41 orphan-tail pages: 9 · 12 · 11 · 9** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6 and 33 before
-  F7. The count is the signal and it is going the wrong way, at roughly seven
-  to eleven per program written. **A fourth structural fix was measured in the F6 pass and
+- **43 orphan-tail pages: 10 · 12 · 11 · 10** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7
+  and 41 before F8. The count is the signal and it is going the wrong way, at
+  roughly two to eleven per program written; **F8 added one, which is the
+  cheapest program so far**, and the reason is worth having — it is the first
+  program written with the two-sided rule from F6 in hand, so the one frame
+  whose tail landed badly was lengthened rather than trimmed. **A fourth structural fix was measured in the F6 pass and
   reverted**, because it clears the orphaned *cue* by converting it into more
   orphan *tails* — see *Program F6 pass* and the sweep table in
   `preamble.tex`. `checkpdf.py` prints every one of them on
@@ -2248,6 +2251,146 @@ also landed between 6.8 and 8.0 pt on the first render, all above the
 aspect-ratio crossover, because the width budget was checked before the prose
 was written rather than after.
 
+### Program F8 pass, August 2026
+
+**Thirty teaching frames, thirty-two printed, both editions**, against a brief
+that projected forty-five. It is the shortest program written so far and
+deliberately: the brief is *sine and cosine are the coordinates of a point
+going round a circle*, and everything trigonometry usually carries with it —
+the sine rule, the cosine rule, solving triangles, the identity list — is
+excluded by the book's own scope statement. What is left is one picture and the
+two things it buys, and padding it back to forty-five would have meant putting
+the excluded material in.
+
+**The two payoffs are identities swept in the script, not shown at a point.**
+Cosine similarity *is* the cosine of the angle, checked against the angle
+computed independently over 3481 pairs; and $R(\alpha)a \cdot R(\beta)b$
+depends only on $\beta - \alpha$, over 1600 pairs. The second is the sentence
+the brief asks for, and it makes "rotate the query and the key" a claim a
+reader can check rather than an incantation.
+
+#### Four claims a reader could have falsified, and two are the recurring class
+
+- **The book was wrong about the book, for the fourth pass running.** Frame 13
+  credited **F06** with putting the logistic's threshold at $-\frac{b}{w}$
+  rather than at $b$. F06 line 302 says in as many words that it is *the
+  crossing point Program F05 derived* — F06 uses it and attributes it. The
+  fix strengthens the paragraph, because the paragraph is about F05's four
+  moves throughout. **Open the program before writing a sentence about it**;
+  this is the fourth time that rule has been paid for and the first where the
+  file being described states the correct attribution on the line that was
+  misread.
+- **A forward pointer to something nobody had promised.** Frame 21 said
+  *Program P05 takes both of these seriously* about embedding anisotropy and
+  about similarity driven by shared style or length. P05's brief undertakes
+  neither: it is the inner product, norms and projection, and what it does
+  undertake is that **in high dimension two unrelated vectors are almost always
+  nearly orthogonal**. That is the *baseline* both failure modes are deviations
+  from, so the pointer is now to what P05 actually promises, and the frame says
+  plainly that neither failure mode is measured in this book. Same shape as
+  F04's P03 pointer, and resolved the same way — by softening rather than by
+  re-inflating another program's brief.
+- **Two counts that were one over.** The page said the identities were checked
+  *at fourteen hundred angles* and *over six hundred angles*; the sweeps were
+  `range(-700, 701)` and `range(-300, 301)`, which are 1401 and 601. The fix is
+  the sweep, not the wording: both now run exactly as many angles as the page
+  says. It is F05's tail-ratio defect in a smaller denomination — **a number on
+  the page that does not reproduce from the thing that produced it.**
+- **A threshold that did not match its own figure.** Frame 18 printed a
+  retrieval score of `0.9899` (from a vector pair) and the trapbox one line
+  below compared cutoffs of `0.99` and `0.98`, quoting *about eleven and a
+  half* degrees from arithmetic nobody had run. Two numbers an inch apart that
+  look like one and are not. Both cutoffs and both angles are now computed —
+  `f08.cos.hi/lo`, `f08.ang.hi/lo` — and the vector pair that produced `0.9899`
+  is gone. The script asserts the **invariant** rather than the two figures:
+  the same drop in similarity buys more than three times as much angle near $1$
+  as it does in the middle of the range, which is what "cosine is flat near
+  zero" means and survives a change of cutoff.
+
+#### Two overfull boxes, and the second is the F6 rule paying off
+
+- **22.0 pt in `main-en`**, from frame 29's run of short unbreakable spans —
+  `$\val{}$ when they sit at positions $1$ and $2$, and $\val{}$` has almost no
+  break opportunity in it. Split into two clauses with a semicolon and it went
+  to zero. Polish had the same sentence and the same fix.
+- **21.0 pt in `main-pl` and 12.6 pt in `main-en-a4`, both in the answers
+  appendix**, from `\code{math.cos(math.radians(180))}` inside an `\answerto`.
+  This is exactly F6's finding — *a back-matter answer is set in a narrower
+  measure than the frame it came from, so an unbreakable run that is
+  comfortable in a frame overflows in its own answer* — and it was chased
+  through three rewordings that each moved the box to a different build before
+  the recorded fix was applied: **put it in a display.** One `\begin{center}`
+  and it is zero in all four. The rule generalises from formulas to any
+  unbreakable run, `\code{}` included, and the rewording detour cost more than
+  the fix.
+
+Also worth not repeating: `$\cos 20°$` is a `\textdegree` **in math mode** and
+warns rather than errors, so `checklog.py` catches it but a `grep` for errors
+does not. Write `^{\circ}` inside maths and keep the bare `°` for the table
+cells, where it sits outside the maths.
+
+**One box was chased into a worse one.** Moving `\code{code/f08_trigonometry.py}`
+into the middle of a Polish sentence to shift the line breaks put a
+24-character `\code{}` at a line end and took a 6.8 pt box to **36.9**. A long
+`\code{}` belongs at the start of a sentence, where it starts a line reliably,
+or in a display — never in the middle of a long paragraph in the edition with
+the longer words.
+
+**The final multiset is element-for-element the pre-F8 baseline** in all four
+builds: `[4.1 x 4]`, `[4.1 x 4]`, `[6.3, 4.4 x 4]`, `[4.4 x 4]`.
+
+#### The diagrams
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| F8.1 unit-circle | 630 / 657 | 5.73 | 7.00 | 6.71 | 7.95 | 7.62 |
+| F8.2 cosine-angle | 599 / 589 | 6.43 | 7.36 | 7.48 | 8.36 | 8.49 |
+| F8.3 rotate-both | 615 / 549 | 5.60 | 7.17 | 8.03 | 8.14 | 9.12 |
+
+`f08-rotate-both` was first drawn at 434 pt, which sets **11.54 pt on A4** and
+would have been by some way the largest node text in the book. Widened by
+making the nodes wordier, which is the same counter-intuitive fix F4 and F5
+both needed and is now three for three: above the aspect-ratio crossover only
+the width matters, so the way to make a diagram's type *smaller* is to give it
+more to say.
+
+**Rule 2 checked by reading the figures first and then finding them in all four
+builds.** Only F8.3 contains an answer to anything the program asks — frame
+27's *what can their dot product depend on* — and it is a page later than both
+that elicitation and frame 28's answer in every build (fig 261/226/269/229
+against elicitation 260/224/267/228). F8.1 and F8.2 carry nothing that is asked
+either side of them.
+
+#### Parity: three word-order failures, all the recorded class
+
+C4 diverged three times and each was Polish putting a maths span or a number
+where English puts a word — the rule already in *Two editions*, now with three
+more instances. `Program~\ref{prog:F04}'s $\sum_i a_i b_i$` against
+`$\sum_i a_i b_i$ z Programu~\ref{prog:F04}` is the clearest: same reference,
+same sum, opposite order, and C4 reads order. And *tak blisko dokładnej
+jedynki* spelled a number as a word, which C12 counts as a missing literal.
+
+One defect the gates caught that a reader would have: rewriting Quiz Q4 from
+*Why is $\cos^2\theta + \sin^2\theta = 1$?* — which prints the identity before
+frame 1 and disarms frame 5's elicitation — left the **answer** still answering
+the old question. C8 failed on it, because the Polish answer stated the
+identity and the English one did not.
+
+#### Also done
+
+- The section title *Rotation, and why it encodes a difference* stated frame
+  27's finding at the head of the section, three frames early, and is now
+  *Rotation, and what it is for*. Two outcomes were reworded on the same rule:
+  one printed the Pythagorean identity on the opener, the other promised
+  *encode a difference*. **Third pass running that an outcome has had to be
+  stripped of its own conclusion** — it is the easiest place in the skeleton to
+  leak an answer, because an outcome reads like a promise and writes like a
+  summary.
+- Frame numbers were remapped after writing, as they must be: the plan's five
+  sections were `1--7 / 8--13 / 14--19 / 20--27 / 28--35` and the program's are
+  `1--6 / 7--10 / 11--15 / 16--23 / 24--30`. Fifteen quiz routes moved with
+  them.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -2497,8 +2640,9 @@ clone instead.
 
 ## What is left
 
-1. **Forty programs.** This is the work. F8–F13 first, because the Foundation
-   part is what makes the book's claim — *it assumes nothing* — true or false.
+1. **Thirty-nine programs.** This is the work. F9–F13 first, because the
+   Foundation part is what makes the book's claim — *it assumes nothing* —
+   true or false.
    **F12 (the chain rule) is still the one outstanding program the rest of the
    book leans on hardest**, and it is now owed four things by name: F4's sigma
    and product, F5's composition (frame 34 hands it over explicitly), F6's
@@ -2506,7 +2650,11 @@ clone instead.
    as a shape for F12 to turn into the vanishing-gradient argument. Before
    estimating any remaining program's length, read its written neighbours:
    F7's brief projected forty frames and thirty-one were left once F5 and F6
-   had done their share.
+   had done their share, and **F8's projected forty-five against thirty
+   written**, because everything a trigonometry course would add is excluded by
+   the book's own scope statement. A brief's frame estimate is a planning
+   figure from before the neighbours existed; it is not a target, and padding
+   to reach it means writing the material the scope excludes.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
    softmax entropy with and without the `1/√d_k` scaling — is the one to run
    first: it costs nothing and it converts the book's central derivation from an

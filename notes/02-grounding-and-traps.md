@@ -699,7 +699,8 @@ than to the others.
 
 The entries in this section came out of writing the Foundation programs
 themselves rather than out of the literature: item 41 out of F3, items 42 to 46
-out of F4, items 47 and 48 out of F5, item 49 out of F6, and items 50 and 51 out of F7. Say which program produced which,
+out of F4, items 47 and 48 out of F5, item 49 out of F6, items 50 and 51 out of
+F7, and items 52 to 54 out of F8. Say which program produced which,
 never how many there are — the count at the head of §3 was stated once and had
 drifted by five before anybody reread it.
 
@@ -802,6 +803,30 @@ squashes make it four times as steep at the centre and move its flat region
 four times closer in. The real case for tanh was always that it is centred on
 zero, which is a claim about where its outputs sit and not about how it bends.
 → **F07**, and **F12** for why the flatness costs what it costs.
+
+**52. "`math.sin(90)` gives 1, because sin 90 degrees is 1."** It gives 0.8940.
+Every library reads the argument as radians, and 90 radians is 14.32 full
+turns, so the point has gone round more than fourteen times and stopped
+somewhere unremarkable. What makes it expensive is what does *not* happen:
+nothing raises, nothing warns, and the answer is an ordinary number between
+−1 and 1, so it flows on and the first symptom is a result that is merely
+wrong. → **F08**.
+
+**53. "A cosine similarity of 0.99 means the two vectors are essentially the
+same direction."** It is an angle of 8.1 degrees, and 0.98 is 11.5 — cosine is
+flat at zero, so its turning point is exactly where thresholds get set and a
+small change in the number is a large change in the angle it admits. The
+similarity scale is not linear in the quantity anybody cares about, and it is
+least linear in the region everybody tunes. → **F08**.
+
+**54. "A high cosine similarity means the two documents are similar in
+meaning."** It means the two vectors point nearly the same way, to fifteen
+decimal places. That the angle tracks meaning is a claim about how the vectors
+were trained, holds better for some pairs than others, and has to be measured
+on the task. The exactness of the geometry is easy to let launder the
+interpretation. → **F08** for the geometry, **P05** for the baseline it sits
+against, **P34** for how to find out whether a score means anything on your
+data.
 
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
