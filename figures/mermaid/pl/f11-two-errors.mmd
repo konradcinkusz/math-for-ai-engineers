@@ -1,0 +1,6 @@
+flowchart LR
+  S["zmniejszanie kroku walczy<br/>z dwoma bledami naraz"]
+  S --> A["za duzy krok: cieciwa nie<br/>jest jeszcze styczna"]
+  S --> B["za maly krok: obie wartosci<br/>sa zbyt blisko, by je odjac"]
+  A --> C["wiec blad spada, dochodzi do<br/>dna i znowu rosnie"]
+  B --> C

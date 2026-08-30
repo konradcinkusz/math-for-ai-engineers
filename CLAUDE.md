@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F10 written, both editions.** F11–F13 and P1–P34 are stubs carrying their briefs | 37 of 47 |
+| Programs | **F1–F11 written, both editions.** F12–F13 and P1–P34 are stubs carrying their briefs | 36 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 447 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 457 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 396 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 400 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 471 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 481 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 414 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 420 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,22 +93,23 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **37 of 47 programs are stubs**, in each language. This is the whole of the
+- **36 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 281 computed values, all referenced, all present, plus the committed console
+- 314 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 60 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 66 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **49 orphan-tail pages: 11 · 14 · 12 · 12** across `main-en`, `main-pl`,
+- **51 orphan-tail pages: 11 · 14 · 13 · 13** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
-  41 before F8, 43 before F9 and 45 before F10. The count is the signal and it
-  is going the wrong way, at roughly one to eleven per program written; **F8
-  added one, F9 two and F10 four, against F5's eleven**, and the reason is
-  worth having — all three were written with the two-sided rule from F6 in
-  hand, so a frame whose tail lands badly is lengthened rather than trimmed. **A fourth structural fix was measured in the F6 pass and
+  41 before F8, 43 before F9, 45 before F10 and 49 before F11. The count is
+  the signal and it is going the wrong way, at roughly one to eleven per
+  program written; **F8 added one, F9 two, F10 four and F11 two, against F5's
+  eleven**, and the reason is worth having — all four were written with the
+  two-sided rule from F6 in hand, so a frame whose tail lands badly is
+  lengthened rather than trimmed. **A fourth structural fix was measured in the F6 pass and
   reverted**, because it clears the orphaned *cue* by converting it into more
   orphan *tails* — see *Program F6 pass* and the sweep table in
   `preamble.tex`. `checkpdf.py` prints every one of them on
@@ -2632,6 +2633,124 @@ discovery arrives runs later.
 - Frame numbers remapped after writing: plan `1--7 / 8--14 / 15--21 / 22--29 /
   30--35`, program `1--7 / 8--15 / 16--22 / 23--30 / 31--37`.
 
+### Program F11 pass, August 2026
+
+**Thirty-five teaching frames, thirty-seven printed, both editions**, against a
+brief that projected forty-five. Five sections: a change divided by a change,
+shrinking the chord, what a machine does when you shrink $h$, reading a
+derivative, and walking downhill.
+
+The brief's payoff is *gradient descent has a mechanism, and the reader has
+seen it before meeting the word*, and §5 delivers it as a consequence rather
+than as an announcement: downhill is against the sign of the derivative, so
+$x \leftarrow x - \eta f'(x)$ is what the definition says to do, and there is
+nothing else in it.
+
+#### Scope, again decided by reading
+
+F12 owns the four rules and the chain rule; P15 the gradient; P17 curvature and
+the step-size bound; P19 convexity; P20 the optimisers; P01 floating point. So
+F11 derives **two** derivatives from the definition, gets a constant and a
+line for free, lays the four results in a table, and then says explicitly:
+*there is a pattern in there and you may well have spotted it; do not go
+looking for the general rule yet.* Noticing it is what makes F12's statement
+of it land, and stating it here would spend F12's opening.
+
+#### An assertion caught a fudge before the prose existed
+
+`code/f11_derivative.py` first checked whether the gradient-descent walk had
+*converged* in sixty steps and compared that against $\lvert 1-2\eta \rvert <
+0.85$. It failed at $\eta = 0.08$ and deserved to: it conflated **converges**
+with **converges fast enough to notice**, and 0.85 was a threshold picked to
+make the two agree. What is actually true is the recurrence
+\[ x - 3 \;\longleftarrow\; (1 - 2\eta)(x - 3) \]
+so that is what is asserted now — one step at a time, then compounded over
+sixty, at three hundred values of $\eta$. Third pass running that writing the
+assertion *at the computation, before the sentence it supports* has caught
+something, and the first time it caught a **fudge factor** rather than a wrong
+number. Worth naming as its own failure mode: a threshold chosen so an
+assertion passes is not an assertion.
+
+The corrected recurrence then produced the best thing in the program, which
+was not planned. At $\eta = 0.1$ and $\eta = 0.9$ the factor is $+0.8$ and
+$-0.8$, so one walk crawls down one side and the other jumps the minimum every
+single step — and **after eight steps they are at the same number to the
+digit**. That is a consequence of the algebra, not a coincidence, and it makes
+$\eta = 1.1$'s divergence obvious before it is computed.
+
+#### The U-curve is the program's best measurement
+
+The whole seventeen-row sweep is a committed transcript rather than a table,
+because the shape is the argument and five rows would let a reader think the
+middle was interpolated. The error falls as the mathematics says (it is $h$
+itself), bottoms out at **3.6e-08 at $h = 10^{-8}$**, and climbs back to
+**6.0** at $h = 10^{-16}$ — where $3 + h$ *is* $3$ and the quotient is exactly
+zero.
+
+The frame that follows it claimed the turning point moves with the size of the
+numbers being subtracted. That was a mechanism argument, so it was **measured**
+rather than left as one: the same sweep at $x = 3000$ puts the best $h$ at
+$10^{-5}$, a thousandfold move. F11 hands the *reason* for the right-hand
+branch to P01, whose subject it is.
+
+#### Three claims a reader could have falsified
+
+All three were pointers, and all three were checked against the manifest:
+
+- *Program F12 \dots proves that they compose.* F12's brief undertakes four
+  rules and one composition rule; proving they compose is not in it. Now
+  *adds the one rule for differentiating a function of a function.*
+- *Which kind of stationary point it is \dash{} Program P17 supplies it.*
+  Neither F12 nor P17 undertakes the one-dimensional classification by name.
+  The frame now says what is true: it takes the derivative of the derivative,
+  which F12 gives the rules for and P17 turns into a statement about
+  curvature.
+- The crossover claim above, now a measurement.
+
+#### The orphaned cue, and lengthening confirmed a third time
+
+Two arrived, both in `main-en`, and both were cleared by **lengthening** —
+which is now the first thing to reach for rather than the second. The first
+addition earns its place particularly well: frame 3 now shows that the chord
+from $3$ to $6$ has slope $9$ where the chord from $3$ to $5$ has slope $8$,
+so the number was never a property of the curve *at* a point, which is what
+forces the question the program exists to answer. (The numbers were chosen to
+avoid $7$ and $6$, which frames 7 to 10 elicit.)
+
+Note the random walk in action: the first lengthening cleared the cue at
+frame 3 and moved a different one to frame 32, which the second cleared.
+Fix them in document order and rebuild all four after every edit.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| F11.1 chord-to-tangent | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| F11.2 two-errors | 609 / 623 | 3.33 | 7.24 | 7.08 | 8.22 | 8.04 |
+| F11.3 sign-and-size | 627 / 637 | 6.73 | 7.03 | 6.91 | 7.99 | 7.85 |
+
+`f11-two-errors` was first drawn as a diamond at 408 pt, setting **12.25 pt on
+A4**. The F10 fix applied unchanged: add a rank, 408 pt to 609. That is now
+twice, so the rule is settled — **wordier nodes widen a chain; only more ranks
+widen a graph that is already wrapping.**
+
+#### Also
+
+- Four traps added to `notes/02` (63 to 66): the derivative not being a chord
+  slope, smaller $h$ not being better, a zero gradient not being a minimum,
+  and a large gradient not meaning a long way to go.
+- **Three C4 word-order divergences, all the same shape**, and all three were
+  `Program~\ref{...}'s <maths>` against `<maths> z Programu~\ref{...}`. That
+  is now so reliable it is worth checking for while translating rather than
+  after: any English possessive attached to a reference will invert in Polish.
+- A 24-character `\code{}` mid-paragraph gave **67.2 pt** in `main-pl` and
+  49.8 in `main-pl-a4` while English was clean — the F6 latency rule. Moved to
+  the start of its sentence in both editions.
+- Six emitted values went unused because the transcript already carries every
+  row; C7 reported them and they were removed rather than referenced. A
+  transcript makes per-row values redundant by construction.
+- Frame numbers remapped: plan `1--7 / 8--15 / 16--22 / 23--30 / 31--38`,
+  program `1--6 / 7--15 / 16--20 / 21--26 / 27--35`. Two outcomes were reworded
+  on the usual rule.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -2881,14 +3000,18 @@ clone instead.
 
 ## What is left
 
-1. **Thirty-seven programs.** This is the work. F11–F13 first, because the
-   Foundation part is what makes the book's claim — *it assumes nothing* —
-   true or false.
-   **F12 (the chain rule) is still the one outstanding program the rest of the
-   book leans on hardest**, and it is now owed four things by name: F4's sigma
+1. **Thirty-six programs.** This is the work. **F12 next**, because it is the
+   one outstanding program the rest of the book leans on hardest and F11 has
+   just set it up: F11 ends by saying explicitly that the pattern in
+   $c \to 0$, $mx+c \to m$, $x^2 \to 2x$ is F12's to state, and the whole of
+   F11's §5 is a mechanism that only reaches a network once F12 supplies the
+   chain rule.
+   It is owed five things by name: F4's sigma
    and product, F5's composition (frame 34 hands it over explicitly), F6's
-   rearrangement, and F7's saturation measurement, which is deliberately left
-   as a shape for F12 to turn into the vanishing-gradient argument. Before
+   rearrangement, F7's saturation measurement, which is deliberately left
+   as a shape for F12 to turn into the vanishing-gradient argument, and now
+   F11's limit definition and its four worked derivatives, which F12 must
+   generalise rather than restate. Before
    estimating any remaining program's length, read its written neighbours:
    F7's brief projected forty frames and thirty-one were left once F5 and F6
    had done their share, **F8's projected forty-five against thirty written**,

@@ -700,8 +700,9 @@ than to the others.
 The entries in this section came out of writing the Foundation programs
 themselves rather than out of the literature: item 41 out of F3, items 42 to 46
 out of F4, items 47 and 48 out of F5, item 49 out of F6, items 50 and 51 out of
-F7, items 52 to 54 out of F8, items 55 to 57 out of F9 and items 58 to 62 out
-of F10. Say which program produced which, never how many there are — the count at the head of §3 was stated once and had
+F7, items 52 to 54 out of F8, items 55 to 57 out of F9, items 58 to 62 out of
+F10 and items 63 to 66 out of F11. Say which program produced which, never how
+many there are — the count at the head of §3 was stated once and had
 drifted by five before anybody reread it.
 
 They carry the same health warning: the list above is a catalogue of
@@ -896,6 +897,40 @@ n items make n(n−1)/2 pairs, so doubling multiplies the work by
 overnight on twice the corpus; it runs for four nights. Worth knowing as a
 count before it is known as a growth rate: → **F10** for the count, **P03**
 for the notation and for what that notation does not say.
+
+**63. "The derivative is the slope of a chord with a very small gap."** It is
+not a chord slope at all. Every chord slope of `x²` at 3 is `6 + h` and none
+of them is 6; the derivative is the number they approach, which is a statement
+about the whole family rather than about any one of them. The distinction
+sounds like pedantry until a machine is asked to shrink `h` and the answer
+gets *worse* — if the derivative were just "the chord with a tiny gap", that
+could not happen. Read `lim h → 0` as *as close as you like, by choosing h*,
+never as *at h = 0*. → **F11**.
+
+**64. "Smaller h is more accurate."** True in the mathematics, false on the
+machine, and the two part company sooner than anybody expects. Two errors pull
+opposite ways — the chord not yet being the tangent, and the two values of `f`
+becoming too close to subtract — so the error curve is a **U**, and its bottom
+is nowhere near the smallest `h` you can type. At `h = 1e-16` the answer is
+exactly zero, because `x + h` *is* `x`. The consequence: a gradient check
+agrees to a handful of digits and one demanding more fails on correct code.
+→ **F11** for the shape, **P01** for the right-hand branch.
+
+**65. "A zero gradient means we have reached a minimum."** It means the curve
+is level, and a maximum is level too, and so is a flat spot on the way up. The
+first derivative is computed from an arbitrarily small neighbourhood and
+cannot tell the three apart; the non-committal word is *stationary point*.
+**Stopping is not the same as arriving.** → **F11** for the distinction,
+**F12** and **P17** for what the second derivative adds, **P19** for whether a
+minimum found is the only one.
+
+**66. "The gradient is still large, so we are far from convergence."** Not an
+inference, and neither is its opposite. A derivative is local: it says how
+steep the ground is *here* and cannot know how far anything is. On
+`x⁴ − 4x²` the point at 1.9 has slope 12.2 and is 0.49 from the minimum, while
+the point at 0.4 has slope −2.9 and is 1.01 away — the steeper point is the
+nearer one, by a factor of two. Reading distance out of a gradient is asking
+one number for information it was never given. → **F11**.
 
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
