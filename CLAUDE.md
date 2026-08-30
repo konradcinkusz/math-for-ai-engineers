@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F5 written, both editions.** F6–F13 and P1–P34 are stubs carrying their briefs | 42 of 47 |
+| Programs | **F1–F6 written, both editions.** F7–F13 and P1–P34 are stubs carrying their briefs | 41 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 318 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-pl` (17x24) | 326 | 0 | 0 | 4, worst 4.1 pt | 0 |
-| `main-en-a4` | 292 | 0 | 0 | 5, worst 6.3 pt | 0 |
-| `main-pl-a4` | 294 | 0 | 0 | 4, worst 4.4 pt | 0 |
+| `main-en` (17x24) | 350 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-pl` (17x24) | 358 | 0 | 0 | 4, worst 4.1 pt | 0 |
+| `main-en-a4` | 318 | 0 | 0 | 5, worst 6.3 pt | 0 |
+| `main-pl-a4` | 320 | 0 | 0 | 4, worst 4.4 pt | 0 |
 
 The 6.3 pt box is `$7\,000\,000\,000$` in F1, which cannot break; it exists in
 one format and one language because that is where the line falls. Well under
@@ -81,20 +81,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **42 of 47 programs are stubs**, in each language. This is the whole of the
+- **41 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside the 30–70 frame band ·
   0 programs without declared learning outcomes
-- 168 computed values, all referenced, all present, plus the committed console
+- 180 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 30 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 36 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **26 orphan-tail pages: 3 · 9 · 7 · 7** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`, up from 15 before F5 and the largest single jump
-  the ledger has taken. Eleven of the eleven added are F5's, which is what 47
-  frames of new material costs at this cue rate; the count is the signal and
-  it is going the wrong way. `checkpdf.py` prints every one of them on
+- **33 orphan-tail pages: 7 · 9 · 9 · 8** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`, from 15 before F5 and 26 before F6. The count is
+  the signal and it is going the wrong way, at roughly seven to eleven per
+  program written. **A fourth structural fix was measured in the F6 pass and
+  reverted**, because it clears the orphaned *cue* by converting it into more
+  orphan *tails* — see *Program F6 pass* and the sweep table in
+  `preamble.tex`. `checkpdf.py` prints every one of them on
   every run and **does not fail the build for them**; the reasoning is in the
   note above its `main()` and is summarised under *Program F4 review pass*.
   This is the second ledger that is reported rather than gated, and like the
@@ -1961,6 +1963,148 @@ tail should be incapable of standing alone -- is still open, and the two
 candidates measured so far (a penalty on `\dotline`, and widow/club penalties
 at 10000) both made it worse.
 
+### Program F6 pass, August 2026
+
+**Forty-two teaching frames, forty-four printed, both editions**, against a
+brief that projected forty-five. Six sections: solving as undoing, making a
+letter the subject, the straight line, two equations in two unknowns,
+inequalities, and clipping. All three of the brief's payoffs are delivered
+where it said they would be \dash{} `y = wx + b` is the entire linear model
+(frame 17), a decision threshold is an inequality (frames 34--35), and a
+clipped value is two inequalities (frame 36).
+
+**Two new operators**, `\logit` and `\clip`, beside `\relu` and `\softmax` in
+`preamble.tex`. Both spell the same in Polish, so neither needs a language
+file entry \dash{} which is the notation contract's keyboard test coming out
+the simple way for once.
+
+#### The orphaned cue: the fix is sometimes to make the frame LONGER
+
+This is the pass's most transferable finding and it contradicts what this file
+has said since F3.
+
+Two orphaned cues arrived with F06, and **shortening the frames did not move
+them**. Two rounds of trimming on the English frame 12 left the cue on exactly
+the same page both times: the page kept ending precisely at the `\dotline`,
+because every line taken out of frame 12 pulled a line of frame 11 up behind
+it. The tail stayed where it was and the page stayed full.
+
+**Lengthening cleared it in one round.** A paragraph added to the frame pushes
+the question, the dots and the cue over the boundary *together*, which is what
+was wanted; trimming can only ever pull more material up to fill the gap. So
+the rule is now two-sided: when a frame's tail sits one line past a page
+boundary, ask which side of the boundary you want it on, and note that adding
+is the move that carries the whole tail and cutting is the move that carries
+none of it.
+
+Both edits were made in **both** editions, so the two say the same thing: the
+English gained a paragraph on why a confident unit is hard to make more
+confident, and both gained a sentence on why adding two equations is the
+balance rule.
+
+#### A fourth structural attempt on the cue, measured and reverted
+
+`preamble.tex` records three failed attempts (`\removelastskip`, a penalty on
+`\dotline`, widow and club penalties). The comment above `\nextframe` said the
+only thing that would close it is "a penalty before that glue, which means
+inside `\dotline`, and that is out of bounds here". That was worth testing, so
+it was tested: give `\dotline` the same room test `\begin{fr}` has, sized for
+the dots plus the cue, and turn the page before the dots when there is not
+enough.
+
+| reserve | pages (en / pl / en-a4 / pl-a4) | orphaned cues | orphan tails |
+|---|---|---|---|
+| none | 352 / 358 / 318 / 320 | 2 | 35 |
+| 2 bl | 354 / 360 / 320 / 322 | 1 | 44 |
+| 4 bl | 354 / 360 / 320 / 320 | **0** | 43 |
+
+The sweep was run mid-pass, so its `none` row is the tree as it stood then and
+not the final page table at the top of this file \dash{} which is the rule
+this file already states about carrying page counts across a change.
+
+**It works, and it is a relabelling.** Every page the guard turns early is a
+page whose ink stops in its top quarter, which is precisely the orphan-tail
+defect: two cues become eight more tails and six more pages, and the reader
+still turns over onto white paper. The cue check goes quiet because the cue
+has company, not because the page got better. Reverted, and the table is in
+`preamble.tex` beside the other three so the fifth person does not re-run it.
+
+#### An answer that overflowed, and a reword that made it worse
+
+The Q14 answer carries `$\max(-1, \min(1, x))$`, which is one unbreakable
+maths span, and in Polish it sits behind a longer clause than in English. It
+produced a **17.4 pt** overfull hbox in `main-pl` \dash{} the first box over
+the 15 pt budget this book has shipped into a build \dash{} and the first
+reword took it to **34.4 pt** on A4, because *w pozostałych przypadkach* is
+longer than *w przeciwnym razie*.
+
+The generalisable part is where it happened: **a back-matter answer is set in
+a narrower measure than the frame it came from**, so a formula that sits
+comfortably inside a frame can overflow inside its own answer, and only the
+answers appendix will show it. Fixed by shortening the clause in both
+editions, and the multiset came back to the pre-F6 baseline in all four.
+
+#### Word order is part of the translation
+
+Three parity failures were the same failure: Polish naturally puts a maths
+span or a number where English puts a word, and **C4, C8 and C12 all compare
+in order**.
+
+- `section 1's $2x = x + x$` against `$2x = x + x$ z sekcji 1` \dash{} the
+  digits arrive as `1, 2` in one edition and `2, 1` in the other.
+- `frame $21$'s gap in $y = mx + c$` against `luka w $y = mx + c$ z ramki $21$`.
+- `\textbf{The $-1$ in $f^{-1}$}` against `Minus jedynka w $f^{-1}$`, where the
+  Polish spelled the number as a word and lost both a maths span and a digit.
+
+None is a mathematical divergence and all three are real editorial ones. The
+rule for the translator: **a sentence containing two maths spans, or a number
+and a maths span, has to keep them in the same order**, not merely contain the
+same ones.
+
+#### Four claims a reader could have falsified
+
+- **A contradictory vector.** A further problem said *a gradient is
+  $(1, 0, 0, \ldots, 0)$ with a single non-zero component equal to $10$*. It
+  is `(10, 0, …, 0)`; the answer beneath it was right and the statement was
+  not.
+- **The English file header named the wrong frames** for its own headline
+  trap \dash{} 33 and 34, where the trap is at 29 and 30 \dash{} because the
+  header was written before the frame-number remap and only the Polish twin
+  was updated. **A file header is a claim about the file and nothing checks
+  it.**
+- **A division with no condition, in the program that insists on conditions.**
+  Frame 27 reads the gradient off $ax + by = c$ as $-\frac{a}{b}$ without
+  saying $b \ne 0$, six frames after section 2 made *state the condition every
+  time you divide by a letter* a rule. It now says it, and names the excluded
+  case as frame 21's vertical line, which closes the loop the program had
+  already opened.
+- **The trap catalogue's owner for gradient clipping was stale** (P19, written
+  before P7 was inserted; P19 is *Convexity and Jensen's inequality*). Item 26
+  now points at F06 for the operations and the measurement and at **P21** for
+  the noise model, and says in as many words why it used to say P19.
+
+#### The measurement
+
+Item 26 of the catalogue, and the one place in F06 where the reader's
+intuition is actively wrong. On $g = (6, \num{0.5}, -\num{0.25})$, of length
+$\num{6.0260}$, with a threshold of $\num{1.0}$:
+
+| | length after | turned by |
+|---|---|---|
+| clipped **by value** | $\num{1.1456}$ \dash{} still above the threshold | $\num{23.9}$° |
+| clipped **by norm** | $\num{1.0000}$ exactly | $0$° |
+
+What `code/f06_equations.py` asserts is not those figures but the two
+properties \dash{} that clipping by norm turns the vector through zero and
+lands its length on the threshold, and that clipping by value does neither
+\dash{} so a change of gradient moves the numbers and cannot quietly falsify
+the frame. Both results are cross-checked against numpy, which announces
+itself when absent.
+
+The script also substitutes every solution it prints back into the equation it
+came from and fails the build if the residual exceeds one part in $10^{12}$.
+That is section 1's own instruction to the reader, executed by the build.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -2210,14 +2354,16 @@ clone instead.
 
 ## What is left
 
-1. **Forty-two programs.** This is the work. F6–F13 first, because the
+1. **Forty-one programs.** This is the work. F7–F13 first, because the
    Foundation part is what makes the book's claim — *it assumes nothing* — true
    or false. **F12 (the chain rule) is still the one outstanding program the
-   rest of the book leans on hardest** — and it is now owed two things by name:
-   F4's sigma and product, for stating a chain of layers as one, and F5's
-   composition, which frame 34 hands it explicitly. F6 is the natural next one:
-   its brief is *solving is undoing*, which F5 has already had the reader doing
-   informally at every inverse and every rearranged bracket.
+   rest of the book leans on hardest**, and it is now owed three things by
+   name: F4's sigma and product, F5's composition (frame 34 hands it over
+   explicitly), and F6's rearrangement. F7 is the natural next one — its brief
+   is the exponential and the logistic, and F5 and F6 between them have already
+   had the reader read the logistic off a table, invert it, and turn its
+   threshold into an inequality, without ever saying where its shape comes
+   from.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
    softmax entropy with and without the `1/√d_k` scaling — is the one to run
    first: it costs nothing and it converts the book's central derivation from an

@@ -1022,10 +1022,30 @@
 % and the overfull multiset came back identical in all four builds, and all
 % three orphaned cues survived.
 %
-% What does close it is a penalty before that glue, which means inside
-% \dotline, and that is out of bounds here. So the guard is the check: the
-% frames are shortened until checkpdf.py is clean, and checkpdf.py is what
-% notices when a later program reopens it.
+% RESERVING ROOM AT \dotline DOES CLOSE IT, AND IS NOT WORTH IT. Measured
+% during the F6 pass, because it is the one structural candidate the note
+% above had not tried: give \dotline the same room test \begin{fr} has,
+% sized for the dots plus the cue, and turn the page before the dots when
+% there is not enough. The dots and the cue then land at the top of the next
+% page, above the answer frame's rule, and the cue is no longer alone.
+%
+%   reserve   pages (en/pl/en-a4/pl-a4)   orphaned cues   orphan tails
+%   none      352 / 358 / 318 / 320             2              35
+%   2 bl      354 / 360 / 320 / 322             1              44
+%   4 bl      354 / 360 / 320 / 320             0              43
+%
+% It works and it is a relabelling. Every page the guard turns early is a
+% page whose ink stops in its top quarter, which is precisely checkpdf's
+% orphan-tail defect -- so two cues become eight more tails and six more
+% pages, and the reader still turns over onto white paper. The cue check goes
+% quiet because the cue has company, not because the page got better.
+%
+% So the guard stays the check: the frames are shortened until checkpdf.py is
+% clean, and checkpdf.py is what notices when a later program reopens it. Note
+% that shortening is not the only editorial move and was not the one that
+% worked in F6 -- see CLAUDE.md's F6 pass. When a frame's tail sits one line
+% past the boundary, LENGTHENING it can push the whole tail over together,
+% where trimming only pulls more of the previous frame up behind it.
 \newcommand{\nextframe}{%
   \par\nopagebreak\vspace{3pt}\nopagebreak
   {\raggedleft\itshape\lblNextFrame\par}%
@@ -2039,6 +2059,10 @@
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\relu}{ReLU}
 \DeclareMathOperator{\softmax}{softmax}
+% \logit spells the same in both editions -- Polish engineers say "logit" --
+% so it needs no language file entry, unlike \tg and \gcdop.
+\DeclareMathOperator{\logit}{logit}
+\DeclareMathOperator{\clip}{clip}
 \DeclareMathOperator{\logsumexp}{logsumexp}
 \DeclareMathOperator{\fl}{fl}
 \DeclareMathOperator{\ulp}{ulp}
