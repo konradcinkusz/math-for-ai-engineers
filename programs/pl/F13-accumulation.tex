@@ -1,25 +1,693 @@
 %% F13 --- Sumowanie, pole i wartość oczekiwana
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f13_accumulation.py i wchodzi na stronę przez \val{}.
+%%
+%% TEZA: całka SUMUJE i jest ciągłym bliźniakiem sigmy z Programu F04.
+%%
+%% DWADZIEŚCIA RAMEK ZAMIAST CZTERDZIESTU PIĘCIU, I O TĘ RÓŻNICĘ CHODZI.
+%% To nie jest kurs technik całkowania. Podstawienie, całkowanie przez części
+%% i ułamki proste są wykluczone celowo i Z NAZWY w ramkach, bo nic, co ta
+%% książka wypłaca, ich nie potrzebuje, a czytelnik, który ich chce, będzie
+%% lepiej obsłużony gdzie indziej.
+%%
+%% POMIARY:
+%%   suma Riemanna zbiegająca, z błędem w POSTACI ZAMKNIĘTEJ -- reguła prawych
+%%     prostokątów na x^2 na [0,1] myli się dokładnie o 1/(2n) + 1/(6n^2), więc
+%%     skrypt asertuje błąd, a nie to, że cztery liczby wyglądają, jakby gdzieś
+%%     zmierzały, a ramki mogą powiedzieć, jak szybko;
+%%   gęstość, której WYSOKOŚĆ PRZEKRACZA JEDEN: jednostajna na [0; 0,1] ma
+%%     wysokość 10. To pułapka, dla której sekcja 4 istnieje -- pole jest
+%%     ograniczone jedynką, a wysokość nie, więc czytanie gęstości jako
+%%     prawdopodobieństwa jest błędem kategorii, a nie przybliżeniem;
+%%   stała normalizująca, policzona: x(1-x) sumuje się do 1/6, więc stała
+%%     wynosi 6, a dzielenie przez nią jest tym samym działaniem, które
+%%     czytelnik spotkał już w softmaksie;
+%%   kształt średniej ważonej, na gęstości symetrycznej (gdzie symetria daje
+%%     odpowiedź przed całką) i na przechylonej (gdzie nie daje).
+%%
+%% CZEGO TEN PROGRAM CELOWO NIE ROBI, sprawdzone w tools/programs.json. TRZY
+%% programy deklarują F13 jako zależność i nie wolno mu wydać ich materiału:
+%%   prawdopodobieństwo jako miara, trzy reguły, warunkowanie, Bayes  -> P23
+%%   zmienne losowe, wartość oczekiwana i wariancja jako podsumowania,
+%%     sześć rozkładów, losowanie kategoryczne                        -> P24
+%%   wypukłość i nierówność Jensena                                   -> P19
+%% Więc F13 dostarcza sumowania, pola, gęstości i KSZTAŁTU średniej ważonej, a
+%% oddaje każdy obiekt, o którym te kształty się okazują być. Ani razu nie
+%% mówi, czym jest prawdopodobieństwo.
+%%
+%% Bliźniak: programs/en/F13-accumulation.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Sumowanie, pole i wartość oczekiwana}
 \label{prog:F13}
+\index{integral!as accumulation}
+\index{density!height against area}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--5}{oszacować zsumowaną całość jako sumę pasków i powiedzieć, co
+  czyni to oszacowanie lepszym}
+\outcome{6--9}{odczytać znak całki i powiedzieć, co nazywa każda jego część}
+\outcome{10--12}{powiedzieć, jak sumowanie i różniczkowanie mają się do siebie}
+\outcome{13--17}{powiedzieć, co czyni krzywą gęstością, i powiedzieć, co mierzy
+  punkt na niej}
+\outcome{18--22}{zapisać średnią ważoną jako całkę i powiedzieć, co nadaje
+  wagi}
+\end{outcomes}
 
-Argument: an integral accumulates, and it is the continuous twin of the
-sigma of Program~F4. Payoff: the probability of a continuous quantity is an
-area, an expectation is an integral, and the denominator that makes a
-density integrate to one is the normalising constant that keeps reappearing.
-NOT a course in integration technique: substitution, parts and partial
-fractions are excluded deliberately and by name, because nothing this book
-pays off needs them and a reader who wants them is better served elsewhere.
-Twenty frames rather than forty-five, and the difference is the point.
+\begin{quiz}
+\item Krzywą pocięto na $n$ pasków, których pola się dodaje. Co dzieje się z
+  sumą, gdy $n$ rośnie? \teachesat{3--4}
+  \answerto{Zatrzymuje się na liczbie \dash{} $\frac{1}{3}$ dla $x^{2}$ na
+  $\intcc{0}{1}$, dochodząc od góry i z błędem malejącym o połowę za każdym
+  podwojeniem $n$.}
+\item Co nazywa $\mathrm{d}x$ w $\int f(x)\,\mathrm{d}x$?
+  \teachesat{6--7}
+  \answerto{Szerokość paska. Nie jest ozdobą i nie jest znakiem mnożenia.}
+\item $\int_{0}^{1} x^{2}\,\mathrm{d}x$ jest liczbą. Jaką i co ona mierzy?
+  \teachesatone{6}
+  \answerto{$\frac{1}{3}$, i mierzy pole między krzywą a osią poziomą od $0$
+  do $1$.}
+\item Jak sumowanie ma się do różniczkowania? \teachesat{10--11}
+  \answerto{Jedno odwraca drugie. Zsumuj tempo, a odzyskasz wielkość;
+  zróżniczkuj zsumowaną całość, a odzyskasz tempo.}
+\item Krzywą nazwano gęstością. Co musi być o niej prawdą?
+  \teachesat{13--14}
+  \answerto{Nigdy nie jest ujemna, a pole pod całą nią wynosi dokładnie $1$.}
+\item Gęstość ma w pewnym punkcie wartość $\val{f13.narrow.height}$. Czy to
+  możliwe? \teachesat{14--15}
+  \answerto{Tak. Wysokość nie jest polem, więc nic nie ogranicza jej do
+  jedynki \dash{} gęstość jednostajna na przedziale szerokości
+  $\val{f13.narrow}$ ma dokładnie taką wysokość.}
+\item Krzywa nigdy nie jest ujemna, a pole pod nią wynosi
+  $\val{f13.unnorm.total}$. Jak zamienić ją w gęstość?
+  \teachesat{16--17}
+  \answerto{Podzielić przez $\val{f13.unnorm.total}$, czyli równoważnie
+  pomnożyć przez $\val{f13.unnorm.const}$. Ten dzielnik to stała
+  normalizująca.}
+\item Zapisz kształt średniej ważonej $x$ przy gęstości $p$.
+  \teachesatone{19}
+  \answerto{$\int x\,p(x)\,\mathrm{d}x$: każda wartość pomnożona przez to, ile
+  jej jest, i zsumowana.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 20 ramek.
-}
+% ============================================================
+\section{Dodawanie wielu małych kawałków}
+\label{sec:F13-accumulate}
+\index{integral!as accumulation}
+
+\begin{fr}
+Program~\ref{prog:F11} pytał, jak szybko coś się zmienia. Ten program zadaje
+pytanie odwrotne, i to jego spotykasz częściej: mając tempo, ile się nazbierało?
+
+Robiłeś to. Usługa obsługuje żądania w tempie zmiennym w ciągu dnia, a ty
+chcesz sumy z całego dnia. Co właściwie robisz?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dzielisz dzień na przedziały, mnożysz każde tempo przez jego przedział i
+dodajesz.
+\end{ansblock}
+
+Tempo razy czas daje ilość; zrób to na przedział i dodaj ilości. To jest cały
+pomysł, a wszystko inne w tym programie jest tym pomysłem wziętym starannie.
+
+Narysuj to, a obrazkiem są pola. Każdy przedział jest prostokątem, którego
+szerokością jest przedział, a wysokością tempo, więc jego polem jest ilość
+zebrana w nim, a sumą jest suma pól.
+
+Spróbuj na krzywej. Weź $y = x^{2}$ od $x = 0$ do $x = 1$, potnij na dziesięć
+pasków szerokości $\num{0.1}$ i weź wysokość każdego paska na jego prawej
+krawędzi. Jaką sumę dają te dziesięć prostokątów?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f13.rect.10}$}
+Dziesięć prostokątów, każdy szerokości $\num{0.1}$, o wysokościach od
+$\num{0.1}^{2}$ do $1^{2}$.
+
+To jest oszacowanie z góry, bo krzywa rośnie, a każdy prostokąt jest tak
+wysoki jak jego prawa krawędź, więc każdy z nich wystaje ponad krzywą. Weź
+zamiast tego sto pasków, a nadmiar zmaleje. Co dostajesz?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+pasków & suma \\
+\midrule
+$10$ & $\val{f13.rect.10}$ \\
+$100$ & $\val{f13.rect.100}$ \\
+$1000$ & $\val{f13.rect.1000}$ \\
+$\num{10000}$ & $\val{f13.rect.10000}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{ansblock}
+
+Zmierza gdzieś, od góry, a tym miejscem jest $\frac{1}{3}$.
+
+\textbf{A tempo jest poznawalne, a nie tylko obserwowalne}, co jest lepsze niż
+cztery wiersze sugerujące granicę. Suma pierwszych $n$ kwadratów ma postać
+zamkniętą, a po wstawieniu jej wychodzi
+\[ \text{suma} = \frac{1}{3} + \frac{1}{2n} + \frac{1}{6n^{2}} \]
+więc błąd to $\frac{1}{2n}$ plus coś mniejszego, i dlatego \textbf{maleje o
+połowę za każdym podwojeniem $n$} \dash{} $\val{f13.err.10}$ przy dziesięciu
+paskach i $\val{f13.err.10000}$ przy dziesięciu tysiącach. Asertowane w
+\code{code/f13\_accumulation.py} przy czterech rozmiarach.
+
+\mermaidfig{f13-sum-to-integral}{Paski, zwężane, i granica, na której się
+zatrzymują.}{suma stająca się całką}
+\end{fr}
+
+\begin{fr}
+Więc to jest ruch z Programu~\ref{prog:F11} jeszcze raz, w drugą stronę.
+
+Tam liczyło się nachylenie cięciwy dla odległości $h$, a potem zmniejszało
+$h$. Tutaj liczy się pole paska dla pewnej szerokości, a potem zmniejsza tę
+szerokość. Oba są granicami i żadna nie jest osiągana przez konkretną wartość.
+
+\textbf{Oba programy są jednym pomysłem użytym dwa razy}: coś szacuje się
+skończonym krokiem, a odpowiedzią jest to, na czym oszacowania się zatrzymują.
+Dlatego zapis dla obu wymyślili w tym samym czasie ci sami ludzie i dlatego
+okazuje się, że jedno odwraca drugie, o czym jest sekcja 3.
+\end{fr}
+
+% ============================================================
+\section{Zapis}
+\label{sec:F13-notation}
+\index{integral!notation}
+
+\begin{fr}
+Granica tych sum ma nazwę i znak.
+
+\[ \int_{0}^{1} x^{2}\,\mathrm{d}x = \frac{1}{3} \]
+
+Przeczytaj to kawałek po kawałku, bo każdy symbol wykonuje zadanie, które
+wykonuje też sigma:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+$\int$ & wydłużone S, od \emph{suma} \\
+$0$ i $1$ & gdzie sumowanie zaczyna się i kończy \\
+$x^{2}$ & wysokość paska w $x$ \\
+$\mathrm{d}x$ & szerokość paska \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Porównaj to z sumą $\sum_{i=1}^{n} f(x_i)\,\Delta x$ \dash{} sigmą z
+Programu~\ref{prog:F04}, z doczepioną do każdego wyrazu szerokością \dash{} a
+odpowiedniość jest dokładna, symbol po symbolu. Całka jest tą sumą z krokiem
+zbiegłym do zera, a znak jest rozciągniętym S, bo tak go narysowano.
+
+Co mówi ci $\mathrm{d}x$, czego nie mówi reszta?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Po której literze się sumuje.
+\end{ansblock}
+
+Co ma znaczenie, gdy tylko liter jest więcej niż jedna.
+$\int x^{2}t\,\mathrm{d}x$ i $\int x^{2}t\,\mathrm{d}t$ to różne wielkości, a
+tylko $\mathrm{d}$ mówi która.
+
+\begin{trapbox}
+\textbf{$\mathrm{d}x$ nie jest ozdobą i nie jest mnożeniem.} Jest szerokością
+paska i jest tam dlatego, że pole potrzebuje szerokości \dash{} opuść je, a
+wyrażenie jest wysokością, czyli czymś innego rodzaju.
+
+Sygnałem, że odczytano je źle, jest całka zapisana bez niego albo taka, w
+której $\mathrm{d}x$ przesunięto za coś, co zależy od $x$. Oba dają wyrażenia,
+które wyglądają wiarygodnie i nic nie znaczą.
+
+To także dlatego jednostki się zgadzają. Jeśli $f$ jest w żądaniach na
+sekundę, a $\mathrm{d}x$ w sekundach, to iloczyn jest w żądaniach, czyli w tym,
+w czym powinna być zsumowana całość. \textbf{Odczytanie jednostek z całki jest
+najtańszym sprawdzeniem, jakie istnieje}, i wyłapuje opuszczone $\mathrm{d}x$
+natychmiast.
+\end{trapbox}
+
+Policz $\int_{0}^{2} 3\,\mathrm{d}x$, gdzie wysokość wszędzie wynosi $3$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$6$}
+Prostokąt szerokości dwa i wysokości trzy. Nie każda całka potrzebuje granicy
+sum, a ta jest przypadkiem, w którym wszystkie paski są takie same, a dodanie
+ich jest mnożeniem.
+
+Dwie własności warte posiadania, obie oczywiste z obrazka i obie używane
+stale:
+
+\begin{itemize}
+\item zsumowanie od $a$ do $b$, a potem od $b$ do $c$ daje to samo co
+  zsumowanie od $a$ do $c$;
+\item zsumowanie sumy dwóch krzywych daje sumę obu sumowań, czyli regułę sumy
+  z Programu~\ref{prog:F12} widzianą z drugiej strony.
+\end{itemize}
+\end{fr}
+
+\begin{fr}
+Jedna rzecz, której ten program \emph{nie} zrobi, powiedziana wprost, żebyś
+wiedział, że to decyzja, a nie przeoczenie.
+
+\textbf{Nie ma tu żadnej techniki całkowania.} Podstawienie, całkowanie przez
+części i ułamki proste to trzy, na które kurs rachunku różniczkowego zużywa
+większość czasu, a żadna nie pojawia się w tej książce, bo nic, co ta książka
+wypłaca, ich nie potrzebuje.
+
+Potrzebne jest to, co całka \emph{znaczy}: zsumowana całość, pole, a za chwilę
+średnia ważona. Te trzy odczyty są w dalszej części książki używane stale, a
+techniki nie są używane wcale. Czytelnik, który ich chce, będzie lepiej
+obsłużony podręcznikiem analizy, a czytelnik, który chce policzyć konkretną
+całkę, będzie lepiej obsłużony komputerem.
+\end{fr}
+
+% ============================================================
+\section{Dwa kierunki}
+\label{sec:F13-inverse}
+\index{integral!and the derivative}
+
+\begin{fr}
+Zsumuj tempo od $0$ do $x$, a dostaniesz całość zależną od $x$. Nazwij ją
+$A(x)$.
+
+Teraz przesuń $x$ trochę dalej, o $h$. Dodatkowo zebrane jest cienkim paskiem:
+wysokość $f(x)$, szerokość $h$, więc mniej więcej $f(x)h$. Ile wynosi
+$\frac{A(x+h) - A(x)}{h}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Mniej więcej $f(x)$, a w granicy dokładnie $f(x)$}
+Czyli iloraz różnicowy z Programu~\ref{prog:F11}, więc to, co przed chwilą
+policzono, to $A'(x)$.
+
+\[ A'(x) = f(x) \]
+
+\textbf{Zróżniczkowanie zsumowanej całości oddaje z powrotem tempo, które
+sumowano.} Oba działania odwracają się nawzajem, co jest \textbf{podstawowym
+twierdzeniem rachunku różniczkowego i całkowego} i dlatego ma taką nazwę: mówi
+ono, że obie połowy tego przedmiotu są jednym przedmiotem.
+
+\begin{rigourbox}
+Podane, nie udowodnione. Powyższy argument jest kształtem dowodu i pomija to,
+co czyni go dowodem \dash{} że owo \enquote{mniej więcej $f(x)h$} trzeba
+kontrolować, gdy $h$ maleje, do czego potrzeba ciągłości $f$ i jednostajności
+tej kontroli. Każdy pierwszy kurs analizy robi to porządnie.
+
+Bezpiecznie wziąć można twierdzenie, którego używa reszta książki, i powód,
+dla którego jest wiarygodne, czyli pasek.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+To twierdzenie jest też sposobem, w jaki liczy się całki ręcznie, i warto to
+zobaczyć raz.
+
+Żeby zsumować $x^{2}$ od $0$ do $1$, znajdź coś, czego pochodną jest $x^{2}$.
+Na mocy reguły potęgowej z Programu~\ref{prog:F12} robi to
+$\frac{x^{3}}{3}$. Wtedy zsumowana całość jest jego wartością na górze minus
+wartość na dole:
+\[ \int_{0}^{1} x^{2}\,\mathrm{d}x
+   = \left[\frac{x^{3}}{3}\right]_{0}^{1} = \frac{1}{3} - 0 = \frac{1}{3} \]
+
+czyli liczbą, do której zmierzały paski.
+
+\begin{trapbox}
+\textbf{Całka i funkcja pierwotna to nie to samo.} Jedna jest zsumowaną
+całością \dash{} liczbą albo polem. Druga jest funkcją, której pochodną jest
+ta, od której się zaczęło. Łączy je twierdzenie, a to twierdzenie jest tym, co
+czyni powyższy rachunek legalnym.
+
+Rozróżnienie warto utrzymać, bo twierdzenie ma założenia, a nawyk traktowania
+obu jako synonimów je ukrywa. Wyjaśnia też, dlaczego mnóstwo zupełnie zwykłych
+funkcji ma całkę, którą da się policzyć numerycznie, i żadnej funkcji
+pierwotnej, którą ktokolwiek umiałby zapisać \dash{} $e^{-x^{2}}$ jest tą,
+którą spotkasz, a jej zsumowana całość jest całością rozkładu normalnego, i
+dlatego istnieją tablice tego rozkładu.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Gęstość}
+\label{sec:F13-density}
+\index{density!height against area}
+
+\begin{fr}
+Oto po co reszcie tej książki całka.
+
+Wielkość, która może przyjąć dowolną wartość z przedziału \dash{} opóźnienie,
+wynik, waga \dash{} nie może mieć prawdopodobieństwa przy każdej pojedynczej
+wartości, bo jest ich nieskończenie wiele i musiałyby sumować się do jedynki.
+Opisuje się zamiast tego krzywą, a prawdopodobieństwami są \emph{pola} pod tą
+krzywą.
+
+Taka krzywa to \textbf{gęstość}. Muszą być o niej prawdziwe dwie rzeczy. Jedną
+jest to, że nigdy nie jest ujemna. Jaka jest druga?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \int_{-\infty}^{\infty} p(x)\,\mathrm{d}x = 1 \]
+\end{ansblock}
+
+\textbf{Całkowite pole wynosi dokładnie jeden}, bo wielkość z pewnością
+przyjmuje \emph{jakąś} wartość, a polem pod całą krzywą jest
+prawdopodobieństwo tego.
+
+Więc gęstość jest krzywą z warunkiem, a tym warunkiem jest całka. To pierwsze
+miejsce w tej książce, w którym całka nie jest opcjonalna: bez niej nie da się
+nawet powiedzieć, czym gęstość \emph{jest}.
+
+Teraz pytanie, dla którego ta sekcja istnieje. Gęstość ma w pewnym punkcie
+wartość $\val{f13.narrow.height}$. Czy to możliwe?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak}
+\begin{trapbox}
+\textbf{Wysokość gęstości nie jest prawdopodobieństwem i nic nie ogranicza jej
+do jedynki.} Ograniczone jest \emph{pole}.
+
+Weź wielkość, o której wiadomo, że leży gdzieś w przedziale szerokości
+$\val{f13.narrow}$, jednakowo prawdopodobnie w każdym miejscu. Pole musi
+wynosić $1$, a szerokość wynosi $\val{f13.narrow}$, więc wysokość wynosi
+$\val{f13.narrow.height}$. Zwęź przedział dalej, a wysokość rośnie bez granic,
+a pole nigdy się nie zmienia.
+
+To nie jest przypadek brzegowy, to jest to, czym gęstość jest. Wartość $p(x)$
+odpowiada na pytanie \enquote{ile prawdopodobieństwa na jednostkę $x$ jest
+właśnie tutaj}, co jest \emph{tempem}, a tempo nie jest prawdopodobieństwem,
+tak jak prędkość nie jest odległością. Program~\ref{prog:F10} zrobił tę samą
+uwagę o liczebności i mianowniku; to jest jej wersja ciągła.
+
+Konsekwencja w praktyce: wiarygodność wypisana przez bibliotekę może być
+większa od jedynki i nie jest to błąd. Dwie takie da się porównać jako
+stosunek, a żadnej nie da się odczytać jako prawdopodobieństwa.
+\end{trapbox}
+
+\mermaidfig{f13-height-not-area}{Pole jest ograniczone, a wysokość nie, a
+zwężanie przedziału je rozdziela.}{dlaczego gęstość może przekroczyć jeden}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedno działanie i to jest to, które będziesz robił najczęściej.
+
+Oto krzywa: $x(1-x)$ na $\intcc{0}{1}$. Nie jest tam nigdy ujemna, więc ma
+pierwszą własność gęstości. Sumuje się do $\val{f13.unnorm.total}$, więc nie
+ma drugiej.
+
+Jak to naprawić?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Podzielić przez $\val{f13.unnorm.total}$ \dash{} czyli pomnożyć przez
+$\val{f13.unnorm.const}$.
+\end{ansblock}
+
+I wtedy pole wynosi jeden, bo podzielenie każdej wysokości przez sumę dzieli
+pole przez sumę.
+
+Ten dzielnik to \textbf{stała normalizująca}, a spotkałeś ją już bez tego
+słowa. Jest mianownikiem softmaksu, który Program~\ref{prog:F07} zbudował,
+potęgując i dzieląc przez sumę tak, żeby wyniki dodawały się do jedynki. To
+samo działanie: \textbf{uczyń to nieujemnym, dodaj do siebie, podziel przez
+sumę.} Suma dla listy, całka dla krzywej.
+
+\begin{aibox}
+Ta stała jest też powodem, dla którego mnóstwo pracy praktycznej nigdy jej nie
+liczy. W wielu sytuacjach kształt gęstości łatwo zapisać, a jej sumę daje
+całka, której nikt nie umie policzyć, więc dostępna jest krzywa
+\emph{z dokładnością do stałej}.
+
+Zwykle to wystarcza, bo większość pytań to stosunki, a stała się skraca: która
+z dwóch wartości jest bardziej prawdopodobna albo o ile bardziej. Pytania,
+które potrzebują tej stałej, to te pytające wprost o prawdopodobieństwo, a
+maszyneria wymyślona po to, żeby jej nie liczyć \dash{} metody próbkowania,
+ograniczenia wariacyjne \dash{} istnieje, bo ta jedna całka jest trudna, a
+wszystko inne nie.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Średnia ważona}
+\label{sec:F13-average}
+\index{integral!as a weighted average}
+
+\begin{fr}
+Ostatni kształt, który ten program jest książce winien.
+
+Zwykła średnia dodaje wartości i dzieli przez to, ile ich jest. Ale jeśli
+jedne wartości występują częściej niż inne, chcesz liczyć każdą według tego,
+ile jej jest \dash{} to \textbf{średnia ważona}, która dla listy wynosi
+$\sum_i x_i p_i$ przy wagach sumujących się do jedynki.
+
+Gęstość jest ciągłym zestawem wag, który całkuje się do jedynki. Co zatem
+zastępuje tę sumę?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \int x\,p(x)\,\mathrm{d}x \]
+\end{ansblock}
+
+Każda wartość pomnożona przez to, ile jej jest, i zsumowana. Sigma staje się
+całką, a $p_i$ staje się $p(x)\,\mathrm{d}x$, czyli wagą paska.
+
+Spróbuj na gęstości z poprzedniej sekcji, znormalizowanym $x(1-x)$. Zanim
+cokolwiek policzysz: jest symetryczna względem $x = \frac{1}{2}$, więc ile
+musi wynosić średnia ważona?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f13.centre}$}
+Symetria to daje, a całka potwierdza \dash{} i to jest właściwa kolejność, bo
+liczba potwierdzająca argument warta jest więcej niż taka, która go zastępuje.
+
+Teraz jedna, przy której symetria nie daje nic. Krzywa $2x$ na $\intcc{0}{1}$
+jest gęstością (jej pole wynosi $1$; sprawdź to) i kładzie więcej wagi na
+górnym końcu. Jej średnia ważona wynosi $\val{f13.lop.centre}$, a nie
+$\num{0.5}$.
+
+\textbf{Więc średnia ważona nie jest środkiem zakresu}, a jedynym sposobem,
+żeby wiedzieć, gdzie jest, jest wykonanie sumowania.
+
+\mermaidfig{f13-weighted-average}{Średnia, ważona, przy czym wagi nadaje
+gęstość.}{od sumy do całki}
+\end{fr}
+
+\begin{fr}
+Ta całka ma nazwę, a ten program celowo jej nie nadaje.
+
+\textbf{To jest wartość oczekiwana}, a to, czego jest wartością oczekiwaną, to
+zmienna losowa, która jest tematem Programu~\ref{prog:P24} i potrzebuje
+najpierw wykładu Programu~\ref{prog:P23} o tym, czym jest prawdopodobieństwo.
+Nazwanie tego tutaj oznaczałoby użycie trzech słów, których ta książka nie
+zdefiniowała.
+
+Twój po tym programie jest \emph{kształt} \dash{} wartość razy gęstość,
+zsumowane \dash{} oraz wiedza, że jest tym, czym staje się średnia, gdy to, po
+czym się uśrednia, jest ciągłe. Każda wartość oczekiwana w dalszej części
+książki jest tym kształtem, a każdą rozpoznasz dzięki tej ramce.
+\end{fr}
+
+\begin{fr}
+To jest część Podstawy.
+
+Trzynaście programów, a trzy ostatnie warto nazwać razem, bo są jednym łukiem.
+Program~\ref{prog:F11} zdefiniował tempo jako granicę różnic.
+Program~\ref{prog:F12} uczynił tempa obliczalnymi i znalazł, że sieć jest ich
+iloczynem. Ten program poszedł w drugą stronę: całość jako granica sum, a oba
+kierunki okazały się odwracać nawzajem.
+
+\textbf{Nic po tym miejscu niczego nie zakłada.} Stąd książka ma arytmetykę,
+algebrę, funkcje, wektory, zbiory i obie połowy rachunku, i zaczyna na nich
+budować, a nie obok nich. Program~\ref{prog:P01} jest następny i dotyczy tego,
+co twoja maszyna faktycznie liczy, a to dobre miejsce, żeby zacząć być
+ostrożnym.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Sumowanie to tempo razy krok, dodane do siebie.} Potnij
+  zakres na paski, pomnóż każdą wysokość przez jej szerokość i zsumuj.
+  Narysowane, są to pola. Na $x^{2}$ na $\intcc{0}{1}$ dziesięć prawych pasków
+  daje $\val{f13.rect.10}$, a dziesięć tysięcy $\val{f13.rect.10000}$.}
+\sumitem{4--5}{Sumy zatrzymują się na $\frac{1}{3}$, a \textbf{tempo jest
+  poznawalne, a nie tylko obserwowalne}: suma prawych pasków wynosi dokładnie
+  $\frac{1}{3} + \frac{1}{2n} + \frac{1}{6n^{2}}$, więc błąd maleje o połowę
+  za każdym podwojeniem $n$ \dash{} $\val{f13.err.10}$ przy dziesięciu
+  paskach, $\val{f13.err.10000}$ przy dziesięciu tysiącach. Ten sam ruch co
+  zmniejszanie cięciwy w Programie~\ref{prog:F11}, w drugą stronę.}
+\sumitem{6--7}{$\int_{a}^{b} f(x)\,\mathrm{d}x$: rozciągnięte S od
+  \emph{sumy}, granice, wysokość i \textbf{$\mathrm{d}x$ jako szerokość
+  paska}. Nie jest ozdobą ani mnożeniem \dash{} mówi, po której literze się
+  sumuje, i to ono sprawia, że jednostki wychodzą jako ilość. Odczytanie
+  jednostek z całki jest najtańszym sprawdzeniem, jakie istnieje.}
+\sumitem{8--9}{Sumowanie dzieli się w punkcie pośrednim i rozdziela na sumę,
+  czyli reguła sumy z Programu~\ref{prog:F12} z drugiej strony. Oraz
+  \textbf{nie ma w tej książce żadnej techniki całkowania}: podstawienie,
+  części i ułamki proste są wykluczone z nazwy, bo nic tutaj ich nie
+  potrzebuje, a potrzebne jest to, co całka \emph{znaczy}.}
+\sumitem{10--11}{\textbf{$A'(x) = f(x)$}: zróżniczkowanie zsumowanej całości
+  oddaje z powrotem sumowane tempo. To jest podstawowe twierdzenie rachunku,
+  podane i nieudowodnione, a nazwa jest zasłużona \dash{} mówi, że obie połowy
+  przedmiotu są jednym przedmiotem.}
+\sumitem{12}{Jest to też sposób, w jaki liczy się całkę ręcznie: znajdź coś,
+  czego pochodną jest funkcja podcałkowa, i weź jej wartość na górze minus
+  wartość na dole. Ale \textbf{całka i funkcja pierwotna to nie to samo}
+  \dash{} jedno jest całością, drugie funkcją \dash{} a mnóstwo zwykłych
+  funkcji ma to pierwsze i nie ma zapisywalnego drugiego, przy czym
+  $e^{-x^{2}}$ jest tą, którą spotkasz.}
+\sumitem{13--14}{\textbf{Gęstość to krzywa, która nigdy nie jest ujemna i
+  której całkowite pole wynosi dokładnie $1$}, a pola pod nią są
+  prawdopodobieństwami. Ten warunek \emph{jest} całką, więc gęstości nie da
+  się zdefiniować bez niej.}
+\sumitem{15}{\textbf{Wysokość gęstości nie jest prawdopodobieństwem i nic nie
+  ogranicza jej do jedynki.} Gęstość jednostajna na przedziale szerokości
+  $\val{f13.narrow}$ ma wysokość $\val{f13.narrow.height}$, a dalsze zwężanie
+  podnosi wysokość bez granic, przy polu wciąż równym $1$. $p(x)$ jest
+  prawdopodobieństwem \emph{na jednostkę $x$} \dash{} tempem, tak jak prędkość
+  nie jest odległością. Wiarygodność powyżej jedynki nie jest błędem.}
+\sumitem{16--17}{Podziel nieujemną krzywą przez jej sumę, a stanie się
+  gęstością: $x(1-x)$ na $\intcc{0}{1}$ sumuje się do
+  $\val{f13.unnorm.total}$, więc \textbf{stała normalizująca} wynosi
+  $\val{f13.unnorm.const}$. To samo działanie co mianownik softmaksu \dash{}
+  uczyń nieujemnym, dodaj, podziel przez sumę \dash{} z całką zamiast sumy.
+  Mnóstwo pracy praktycznej nigdy jej nie liczy, bo stosunki ją skracają.}
+\sumitem{18--20}{\textbf{$\int x\,p(x)\,\mathrm{d}x$ jest średnią ważoną}:
+  każda wartość pomnożona przez to, ile jej jest, i zsumowana. Na gęstości
+  symetrycznej wynosi $\val{f13.centre}$, co symetria daje przed całką; na
+  $2x$ na $\intcc{0}{1}$ wynosi $\val{f13.lop.centre}$, a nie środek \dash{}
+  więc sumowanie jest jedynym sposobem, żeby to wiedzieć.}
+\sumitem{21--22}{Ta całka jest \textbf{wartością oczekiwaną}, a ten program
+  celowo zatrzymuje się przed tym słowem: to, czego jest wartością oczekiwaną,
+  należy do Programu~\ref{prog:P24} i potrzebuje najpierw wykładu
+  Programu~\ref{prog:P23} o prawdopodobieństwie. Twój jest kształt.
+  \textbf{To zamyka część Podstawy}: stąd książka ma arytmetykę, algebrę,
+  funkcje, wektory, zbiory i obie połowy rachunku i przestaje niczego nie
+  zakładać.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Usługa pracuje w tempie $30$ żądań na sekundę przez $10$ sekund, a potem
+  $50$ przez $20$ sekund. Podaj sumę i powiedz, jaki kształt właśnie
+  policzyłeś.
+  \answerto{$1300$ żądań, z $30 \times 10 + 50 \times 20$. Dwa prostokąty,
+  czyli cały pomysł sumowania przy zaledwie dwóch paskach.}
+\item Policz $\int_{0}^{4} 5\,\mathrm{d}x$.
+  \answerto{$20$: prostokąt szerokości cztery i wysokości pięć.}
+\item W $\int_{1}^{3} x t^{2}\,\mathrm{d}t$ po której literze się sumuje, a
+  która jedzie na gapę?
+  \answerto{Sumuje się po $t$, z powodu $\mathrm{d}t$; $x$ jest dla tej całki
+  stałą.}
+\item Funkcja podcałkowa jest w żądaniach na sekundę, a $\mathrm{d}x$ w
+  sekundach. Podaj jednostki wyniku i powiedz, co to wyłapuje.
+  \answerto{Żądania. Wyłapuje opuszczone $\mathrm{d}x$ natychmiast, bo bez
+  niego wyrażenie jest tempem, a nie ilością.}
+\item $A(x)$ sumuje $f$ od $0$ do $x$. Podaj $A'(x)$.
+  \answerto{$f(x)$, na mocy podstawowego twierdzenia.}
+\item Policz $\int_{0}^{2} x^{3}\,\mathrm{d}x$, używając funkcji pierwotnej.
+  \answerto{$4$, z $\left[\frac{x^{4}}{4}\right]_{0}^{2} = 4 - 0$.}
+\item Czy $f(x) = x - 1$ na $\intcc{0}{2}$ jest gęstością?
+  \answerto{Nie. Jej całkowite pole wynosi $0$, a co gorsza jest ujemna na
+  $\intco{0}{1}$ \dash{} nie spełnia obu warunków.}
+\item Gęstość jednostajna rozciąga się na przedziale szerokości $\num{0.02}$.
+  Podaj jej wysokość.
+  \answerto{$50$. Pole musi wynosić $1$, więc wysokość to
+  $\frac{1}{\num{0.02}}$.}
+\item Krzywa jest nieujemna, a jej całkowite pole wynosi $\num{2.5}$. Podaj
+  stałą normalizującą.
+  \answerto{$\num{0.4}$, bo dzielenie przez $\num{2.5}$ to mnożenie przez
+  $\frac{1}{\num{2.5}}$.}
+\item Biblioteka podaje wiarygodność $\num{3.2}$. Czy coś jest nie tak?
+  \answerto{Niekoniecznie. Wysokość gęstości może przekroczyć jedynkę;
+  ograniczone są tylko pola.}
+\item Gęstość jednostajna na $\intcc{0}{1}$. Podaj
+  $\int_{0}^{1} x\,p(x)\,\mathrm{d}x$ bez liczenia całki.
+  \answerto{$\num{0.5}$, przez symetrię: gęstość jest płaska, więc średnia
+  ważona jest środkiem.}
+\item Powiedz jednym zdaniem, dlaczego $2x$ na $\intcc{0}{1}$ ma średnią
+  ważoną powyżej $\num{0.5}$.
+  \answerto{Bo kładzie więcej wagi na górnym końcu zakresu, więc większe
+  wartości liczą się bardziej \dash{} a wartością jest
+  $\val{f13.lop.centre}$.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Reguła lewych prostokątów bierze wysokość każdego paska na jego lewej
+  krawędzi. Powiedz, czy szacuje $\int_{0}^{1} x^{2}\,\mathrm{d}x$ z góry czy
+  z dołu i mniej więcej o ile przy $n$ paskach.
+  \answerto{Z dołu, o mniej więcej $\frac{1}{2n}$ \dash{} lustrzane odbicie
+  nadmiaru reguły prawych, bo krzywa rośnie. Uśrednienie obu daje regułę
+  trapezów i jest znacznie lepsze niż każda z osobna.}
+\item Pokaż, że $\int_{a}^{b} f + \int_{b}^{c} f = \int_{a}^{c} f$ z obrazka z
+  paskami.
+  \answerto{Paski obu pierwszych sumowań są dokładnie paskami trzeciego,
+  podzielonymi w $b$; dodanie dwóch grup tych samych pasków daje całość.}
+\item Wyjaśnij, dlaczego podstawowe twierdzenie potrzebuje, żeby $f$ było
+  porządne, używając argumentu z paskiem.
+  \answerto{Argument przybliża dodatkowo zebrane pole przez $f(x)h$, co
+  wymaga, żeby $f$ nie zmieniało się mocno w poprzek paska. Funkcja skacząca
+  wewnątrz każdego przedziału psuje to przybliżenie, a z nim twierdzenie.}
+\item Gęstość podwojono wszędzie. Co poszło źle i co by to naprawiło?
+  \answerto{Jej całkowite pole wynosi teraz $2$, więc nie jest już gęstością.
+  Podziel przez $2$ \dash{} czyli znormalizuj, i po to ta stała jest.}
+\item Dwie krzywe mają ten sam kształt, ale jedna jest ściśnięta w poziomie
+  $10$-krotnie. Jeśli obie są gęstościami, jak mają się ich wysokości?
+  \answerto{Ściśnięta jest dziesięć razy wyższa, bo pole jest ustalone na $1$,
+  a szerokość podzielono przez dziesięć. To ściśnięcie spod nawiasu z
+  Programu~\ref{prog:F05} przy polu trzymanym stale.}
+\item Dlaczego stosunek wartości dwóch gęstości ma sens, skoro żadna z tych
+  wartości nie jest prawdopodobieństwem?
+  \answerto{Bo stała normalizująca jest dla obu ta sama i się skraca, więc
+  stosunek mówi, o ile więcej prawdopodobieństwa na jednostkę jest w jednym
+  miejscu niż w drugim \dash{} a takiego porównania pojedyncze liczby nie
+  udźwigną.}
+\item Podaj powód, dla którego $\int x\,p(x)\,\mathrm{d}x$ zasługuje na nazwę
+  średniej, w odniesieniu do przypadku dyskretnego.
+  \answerto{Bo jest to $\sum_i x_i p_i$ z sumą zastąpioną całką i $p_i$
+  zastąpionym przez $p(x)\,\mathrm{d}x$; każda część dyskretnej średniej
+  ważonej ma swój odpowiednik i nic nie zostało dodane.}
+\item Gęstość jest symetryczna względem $c$. Ile wynosi jej średnia ważona i
+  co ci to oszczędza?
+  \answerto{$c$. Oszczędza całkę w całości, i dlatego zauważenie symetrii
+  najpierw jest warte więcej niż szybsze liczenie.}
+\item Ten program zatrzymał się przed nazwaniem swojej ostatniej całki.
+  Powiedz, co trzeba by najpierw zdefiniować i dlaczego kolejność ma
+  znaczenie.
+  \answerto{Prawdopodobieństwo i zmienną losową \dash{} to, czego gęstość jest
+  gęstością. Nazwanie wartości oczekiwanej najpierw użyłoby trzech
+  niezdefiniowanych słów, a kształt jest użyteczny bez nich.}
+\item Program~\ref{prog:F11} zmniejszał różnicę, a ten zmniejszał pasek.
+  Powiedz, co obie granice mają wspólnego i czym się różnią.
+  \answerto{Obie są granicami oszacowania o skończonym kroku, gdy krok dąży do
+  zera, i żadnej nie osiąga żaden konkretny krok. Różnią się tym, co się
+  szacuje \dash{} w jednym przypadku stosunek, w drugim całość \dash{} a
+  podstawowe twierdzenie mówi, że oba działania odwracają się nawzajem.}
+\end{furtherproblems}

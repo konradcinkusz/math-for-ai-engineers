@@ -701,8 +701,8 @@ The entries in this section came out of writing the Foundation programs
 themselves rather than out of the literature: item 41 out of F3, items 42 to 46
 out of F4, items 47 and 48 out of F5, item 49 out of F6, items 50 and 51 out of
 F7, items 52 to 54 out of F8, items 55 to 57 out of F9, items 58 to 62 out of
-F10, items 63 to 66 out of F11 and items 67 to 70 out of F12. Say which
-program produced which, never how many there are — the count at the head of §3 was stated once and had
+F10, items 63 to 66 out of F11, items 67 to 70 out of F12 and items 71 to 73
+out of F13. Say which program produced which, never how many there are — the count at the head of §3 was stated once and had
 drifted by five before anybody reread it.
 
 They carry the same health warning: the list above is a catalogue of
@@ -968,6 +968,31 @@ cannot amplify at all unless `|w| > 4`. Change the activation, add a residual
 path, or normalise, and the factors change — which is why each of those was
 adopted. → **F12** for the mechanism and both bounds, **P32** for the
 architecture's answer.
+
+**71. "A density's value at a point is a probability."** It is a probability
+**per unit of x** — a rate, as a speed is not a distance. What is bounded by
+one is the *area*, and nothing bounds the height: the uniform density on an
+interval of width 0.1 has height 10, and narrowing the interval raises the
+height without limit while the area stays 1. So a likelihood a library prints
+above one is not a bug, two of them can be compared as a ratio, and neither
+can be read as a probability. → **F13**, and it is F10's count-against-
+denominator point in its continuous form.
+
+**72. "`dx` is notation you can ignore."** It is the *width of the strip*, and
+an area needs a width — drop it and the expression is a height, which is a
+different kind of thing. It is also what makes the units work: an integrand in
+requests per second times `dx` in seconds gives requests, which is what an
+accumulated total should be. **Reading the units off an integral is the
+cheapest check there is**, and it catches a dropped `dx` immediately.
+→ **F13**.
+
+**73. "An integral is an antiderivative."** They are different objects joined
+by a theorem: one is an accumulated total, a number or an area; the other is a
+function whose derivative is the integrand. Treating them as synonyms hides
+the theorem's conditions, and it obscures why plenty of ordinary functions
+have an integral you can compute numerically and no antiderivative anybody can
+write down — `e^(-x²)` being the one you will meet, whose accumulated total is
+the normal distribution's. → **F13**.
 
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for

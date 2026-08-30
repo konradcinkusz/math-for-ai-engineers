@@ -28,6 +28,44 @@ ROOT = Path(__file__).resolve().parent.parent
 LANGS = ("en", "pl")
 FRAME_BAND = (30, 70)
 
+# The band is a statement about TEACHING LOAD -- how much a reader can hold in
+# one sitting -- and it assumes a program that has a subject's worth of
+# material. One program deliberately does not, and the deliberateness is the
+# point rather than a shortfall.
+#
+# F13's brief, after the curriculum review cut it from forty-five frames, says
+# in as many words: "NOT a course in integration technique: substitution,
+# parts and partial fractions are excluded deliberately and by name, because
+# nothing this book pays off needs them... Twenty frames rather than
+# forty-five, and the difference is the point."
+#
+# Padding it back into the band would mean writing the material the scope
+# excludes, which is exactly what CLAUDE.md warns against. So the band is
+# taken from the manifest when the manifest plans fewer frames than the band's
+# floor: such a program must land within a quarter of ITS OWN plan, which is a
+# real check rather than a waiver -- a twenty-frame plan that came out at
+# forty would still fail.
+#
+# Read from tools/programs.json rather than hard-coded here, so a curriculum
+# change moves the check with it.
+def _planned() -> dict[str, int]:
+    import json
+    data = json.loads((ROOT / "tools" / "programs.json").read_text(encoding="utf8"))
+    progs = data["programs"] if isinstance(data, dict) and "programs" in data else data
+    return {p["file"]: int(p["frames"]) for p in progs if "file" in p and "frames" in p}
+
+
+PLANNED = _planned()
+
+
+def band_for(stem: str) -> tuple[int, int]:
+    """The band this program is held to, and why it might not be the default."""
+    plan = PLANNED.get(stem)
+    if plan is not None and plan < FRAME_BAND[0]:
+        return (int(plan * 0.75), int(plan * 1.25) + 1)
+    return FRAME_BAND
+
+
 RE_STUB = re.compile(r"\\programstub\{")
 # \begin{fr} only, deliberately. The Summary and the Test exercises are
 # numbered frames too -- the preamble frames them, so they carry the last two
@@ -97,8 +135,10 @@ def check_frames(soft: bool) -> int:
                 continue
             frames = RE_FRAME.findall(t)
             n = len(frames)
-            if not (FRAME_BAND[0] <= n <= FRAME_BAND[1]):
-                print(f"  {lang}/{f.stem}: {n} frames, outside {FRAME_BAND}")
+            band = band_for(f.stem)
+            if not (band[0] <= n <= band[1]):
+                note = "" if band == FRAME_BAND else "  (its own plan's band)"
+                print(f"  {lang}/{f.stem}: {n} frames, outside {band}{note}")
                 bad += 1
             # Every frame that demands a response must be followed by a frame
             # that opens with an answer. This is the method failing silently
