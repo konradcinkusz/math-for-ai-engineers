@@ -1,0 +1,7 @@
+flowchart LR
+  A["2000 tokens,<br/>p = 0.0907 each"]
+  A --> B["multiply:<br/>about 10^-2085"]
+  B --> C1["float32 reads<br/>exactly 0.0<br/>after 44 tokens"]
+  B --> C2["float64 reads<br/>exactly 0.0<br/>after 311 tokens"]
+  C1 --> D["add the logarithms:<br/>2000 x (-2.4) = -4800,<br/>which every format holds"]
+  C2 --> D

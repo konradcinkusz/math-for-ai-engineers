@@ -60,11 +60,16 @@ jobs:
           # tracked file, and a file git has NEVER SEEN -- which is the state
           # every program's first values file is in, so it used to pass this
           # gate by being invisible to it.
-          drift=$(git diff --name-only -- figures/values)
-          new=$(git ls-files --others --exclude-standard -- figures/values)
+          #
+          # TWO DIRECTORIES, and this was scoped to figures/values alone until
+          # F03 added a console transcript. A transcript is a printed number
+          # inside a verbatim block: the same promise, the same script, and for
+          # one program it sat outside every drift gate in the repository.
+          drift=$(git diff --name-only -- figures/values figures/transcripts)
+          new=$(git ls-files --others --exclude-standard -- figures/values figures/transcripts)
           if [ -n "$drift" ] || [ -n "$new" ]; then
-            echo "::error::A computed value differs from what code/ now produces, or figures/values carries a file git has never seen."
-            [ -n "$drift" ] && git diff -- figures/values
+            echo "::error::A computed value differs from what code/ now produces, or figures/values or figures/transcripts carries a file git has never seen."
+            [ -n "$drift" ] && git diff -- figures/values figures/transcripts
             [ -n "$new" ] && { echo "Untracked, never compared to anything:"; echo "$new"; }
             exit 1
           fi
@@ -121,7 +126,7 @@ jobs:
             main-en.log main-pl.log main-en-a4.log main-pl-a4.log
           command -v pdftotext >/dev/null 2>&1 || \
             sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
-          python3 tools/checkpdf.py \
+          python3 tools/checkpdf.py --cues=warn \
             main-en.pdf main-pl.pdf main-en-a4.pdf main-pl-a4.pdf
 
       - name: Assemble the site

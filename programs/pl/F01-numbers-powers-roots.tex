@@ -539,11 +539,6 @@ wielkość do jednej cyfry znaczącej, dodaj albo odejmij wykładniki i
 znormalizuj.
 \end{fr}
 
-\mermaidfig{f01-magnitudes}{%
-  Wielkości, do których ta książka stale wraca, na jednej drabinie. Każdy
-  szczebel to wykładnik, a każde pytanie o koszt to odejmowanie wzdłuż niej.}{%
-  Drabina logarytmiczna od pojedynczego tokena do liczby FLOP-ów treningu.}
-
 \begin{fr}
 \textbf{Przykład rozwiązany.} Powieść liczy około \val{f01.novel.words} słów.
 Reguła kciuka mówi, że angielskie słowo to mniej więcej trzy czwarte tokena.
@@ -553,19 +548,18 @@ Ile z grubsza tokenów ma ta powieść?
 
 Czyli nieco ponad $10^{5}$ tokenów, a dokładnie \val{f01.novel.tokens}. Okno
 kontekstu o rozmiarze $10^{5}$ tokenów mieści mniej więcej jedną powieść, i to
-jest znacznie użyteczniejsze do zapamiętania niż dokładna liczba.
+warto zapamiętać zamiast dokładnej liczby.
 
 \begin{note}
-Wartość trzech czwartych jest regułą kciuka, a nie pomiarem, i zmienia się z
-tokenizatorem, językiem i tematyką. Podana jest tutaj jako osąd. Polszczyzna,
-ze swoją fleksją, tokenizuje się gorzej niż angielszczyzna w większości
-tokenizatorów zbudowanych głównie na tekstach angielskich, a ta książka nie
-zmierzyła, o ile.
+Trzy czwarte to osąd, a nie pomiar: zmienia się z tokenizatorem, językiem i
+tematyką. Polszczyzna, ze swoją fleksją, tokenizuje się gorzej niż
+angielszczyzna w większości tokenizatorów zbudowanych na tekstach angielskich,
+a ta książka nie zmierzyła, o ile.
 \end{note}
 
 \yourturn
 Urządzenie wykonuje około $\num{4e14}$ operacji zmiennoprzecinkowych na
-sekundę. Ile sekund zajęłoby przy tym tempie $\num{8e22}$ operacji?
+sekundę. Ile sekund zajęłoby $\num{8e22}$ operacji?
 \dotline
 \nextframe
 \end{fr}
@@ -580,6 +574,11 @@ sekund, więc to sześć albo siedem lat. Na jednym urządzeniu.
 
 Ta liczba nie jest hipotetyczna, a reszta programu pokazuje, skąd się bierze.
 \end{fr}
+
+\mermaidfig{f01-magnitudes}{%
+  Wielkości, do których ta książka stale wraca, na jednej drabinie. Każdy
+  szczebel to wykładnik, a każde pytanie o koszt to odejmowanie wzdłuż niej.}{%
+  Drabina logarytmiczna od pojedynczego tokena do liczby FLOP-ów treningu.}
 
 % ============================================================
 \section{Ile pamięci zajmuje model}

@@ -1,0 +1,13 @@
+>>> import math, struct
+>>> f32 = lambda x: struct.unpack('<f', struct.pack('<f', x))[0]
+>>> p = math.exp(-2.4)                 # about 0.0907 per token
+>>> def tokens_until_zero(round_to):
+...     prod, n = round_to(1.0), 0
+...     while prod != 0.0:
+...         n += 1; prod = round_to(prod * round_to(p))
+...     return n
+...
+>>> tokens_until_zero(float)           # float64
+311
+>>> tokens_until_zero(f32)             # float32
+44

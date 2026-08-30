@@ -20,7 +20,11 @@ same width and different exponent budgets, and the reader computes the
 overflow threshold rather than being told it; why a sum of gradients is not
 associative and two GPUs therefore disagree in the last bits; what machine
 epsilon is and why comparing two loss values that differ in the eighth
-decimal is measuring the hardware.
+decimal is measuring the hardware. Also the two thresholds a format has
+rather than one: the smallest normal value and the smaller subnormal one
+beneath it, and what a subnormal buys and costs. Program F03 promises this
+twice while computing where a sequence's probability reaches zero, so it is
+owed rather than optional.
 
 \medskip
 \textbf{Planned length:} 45 frames.

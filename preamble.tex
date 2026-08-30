@@ -103,6 +103,24 @@
 \IfFileExists{inconsolata.sty}{\usepackage[varqu,scaled=0.95]{inconsolata}}{}
 \IfFileExists{lmodern.sty}{\usepackage{microtype}}{\usepackage[expansion=false]{microtype}}
 
+% upquote, and it is not a refinement. In T1 the input character ' is
+% quoteright, so a `listings` body sets struct.unpack('<f', ...) as
+% struct.unpack(U+2019<f U+2019, ...) -- a right single quotation mark at both
+% ends of what is supposed to be a string literal. Typed back in, that is
+% `SyntaxError: invalid character (U+2019)`, which was verified rather
+% than assumed. The book's only listing is a Python transcript, so the whole
+% of the book's runnable code was unrunnable as printed.
+%
+% It is FONT-DEPENDENT, which is why it survived: inconsolata is loaded with
+% varqu, whose whole purpose is an upright quote, so on a TeX Live that has
+% inconsolata the page looks right. This container has neither inconsolata nor
+% newtx, and it is the container the published PDF is built in. The same shape
+% as the amssymb/newtxmath clash above, from the other end -- there, a full
+% installation failed where a bare one passed; here, a bare one ships a defect
+% a full one hides. upquote makes ' the ASCII apostrophe whatever the
+% typewriter font is, so neither machine can be the one that is right.
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
 % ---------- Language ----------
 % Loading babel with a language whose .ldf is absent is a *fatal* error, not a
 % warning, so both the package and each language file are probed before either
@@ -763,32 +781,52 @@
 % \nobreak cannot prevent it -- about a third of frames open an unbreakable
 % tcolorbox, which simply moves itself to the next page and leaves the rule.
 %
-% FIVE \baselineskip, and the number was swept against tools/checkpdf.py
-% rather than reasoned about. Measured over F1, both editions, trade format:
+% SEVEN \baselineskip, and the number is swept against tools/checkpdf.py
+% rather than reasoned about. RE-SWEPT AT THE F03 REVIEW against BOTH of that
+% tool's checks, because it grew a second one -- the orphaned next-frame cue,
+% which is this defect's mirror image at the other end of the frame. Over three
+% programs and all four builds:
 %
-%   reserve   main-en   main-pl   stranded openers
-%   3         175 pp    175 pp    1  (frame 28, en)
-%   4         175 pp    175 pp    0
-%   5         173 pp    175 pp    0   <- chosen: clears it at the lowest cost
-%   6         175 pp    175 pp    0
-%   7         175 pp    175 pp    0
+%   reserve   en    pl   en-A4  pl-A4   stranded openers   orphaned cues
+%   4         250   256   231    229    1                  2
+%   5         250   256   229    231    0                  4   <- the OLD choice
+%   6         250   254   229    233    0                  3
+%   7         248   256   229    229    0                  0   <- chosen
+%   8         248   256   231    229    0                  0
+%   9         250   258   229    231    0                  0
+%   10        250   258   229    231    0                  2
 %
-% Note that FIVE costs two pages LESS than four, six or seven. The guard turns
-% pages, so it reshuffles every later break, and the page count is not
-% monotonic in the reservation. Nobody should raise this constant expecting an
-% improvement; at best it is neutral and it can cost two pages.
+% FIVE was chosen when F1 was the only program and it cleared the check then.
+% It does not now, on either column. Three values clear both; seven is the
+% cheapest of them in pages, which is a tie-break and not a reason.
 %
-% The constant is tuned to one program of forty-seven and cannot be trusted to
-% hold for the rest. What protects the book is tools/checkpdf.py, which reads
-% the finished PDF and fails when a frame opener is the last thing on a page --
-% a defect that produces no error, no warning and no overfull box, so no other
-% gate in this repository can see it. Fix a stranding by re-sweeping this
-% number against that check.
+% READ THE SECOND COLUMN BEFORE TRUSTING THIS CONSTANT WITH THE CUE. It is not
+% monotonic either -- ten orphans two cues that nine does not -- and, more to
+% the point, this guard has nothing to do with the cue: it reserves room for a
+% frame OPENER, and a cue lands overleaf for reasons at the other end of the
+% frame. Where the sweep clears the cue column it is doing so by reshuffling
+% breaks, not by fixing anything. The cue was cleared editorially, by
+% shortening the three frames whose tails sat on the page boundary; this table
+% only records that seven does not reopen it.
+%
+% Note that EIGHT strands a frame that seven does not in the older measurement:
+% the guard turns pages, so it reshuffles every later break, and neither page
+% count nor defect count is monotonic in the reservation. Nobody should raise
+% this constant expecting an improvement.
+%
+% The constant is tuned to three programs of forty-seven and cannot be trusted
+% to hold for the rest; it has already failed once. What protects the book is
+% tools/checkpdf.py, which reads the finished PDF and fails when a frame opener
+% is the last thing on a page -- a defect that produces no error, no warning
+% and no overfull box, so no other gate in this repository can see it. Fix a
+% stranding by re-sweeping this number against that check, over every program
+% written at the time, and REPLACE THE TABLE ABOVE. A sweep table that names a
+% constant the code no longer uses is worse than none: it reads as evidence.
 \newenvironment{fr}{%
   \par
   \ifdim\pagegoal=\maxdimen\else
     \ifdim\dimexpr\pagegoal-\pagetotal\relax<%
-          \dimexpr\mfaframeabove+\mfaframebelow+5\baselineskip\relax
+          \dimexpr\mfaframeabove+\mfaframebelow+7\baselineskip\relax
       \newpage
     \fi
   \fi
@@ -889,6 +927,28 @@
 % made it the faintest text on the page. The book's documented colour
 % departures from the original are palette choices; greying out an instruction
 % is not one of them. The original sets it black italic, and so does this.
+%
+% AND IT CAN STILL BE ORPHANED. The two \nopagebreak forbid a break at the
+% 3pt skip and between that skip and the cue, and they are not enough: what
+% ends the page is \dotline's own trailing `\vspace{2pt}`, which is glue after
+% a paragraph and therefore a legal breakpoint, and everything this macro
+% contributes arrives after it. Measured on the tree that added
+% tools/checkpdf.py's orphaned-cue check: three pages across the four builds
+% carrying a running head, two italic words and nothing else.
+%
+% \removelastskip HERE DOES NOT FIX IT, and it is the obvious thing to try.
+% Two reasons, either fatal on its own. First, plain \vspace in vertical mode
+% is `\vskip#1 \vskip\z@skip`, so \lastskip reads the ZERO skip and the 2pt one
+% behind it is untouched. Second and worse, \removelastskip is `\vskip-\lastskip`
+% -- on the MAIN vertical list nothing can be taken back, so it cancels the
+% space and leaves the breakpoint exactly where it was. Measured: page counts
+% and the overfull multiset came back identical in all four builds, and all
+% three orphaned cues survived.
+%
+% What does close it is a penalty before that glue, which means inside
+% \dotline, and that is out of bounds here. So the guard is the check: the
+% frames are shortened until checkpdf.py is clean, and checkpdf.py is what
+% notices when a later program reopens it.
 \newcommand{\nextframe}{%
   \par\nopagebreak\vspace{3pt}\nopagebreak
   {\raggedleft\itshape\lblNextFrame\par}%
@@ -1676,6 +1736,48 @@
     caption={#3}, label={#4}]{#1}%
 }
 
+% A terminal transcript written by a script under code/ and pulled in whole.
+%
+% There is no in-source form of this and there must not be. \val{} does not
+% expand inside a verbatim body -- it prints the macro name -- so a transcript
+% typed into a program is a transcript that cannot quote a computed value, and
+% a transcript nobody ran is indistinguishable on the page from one that was.
+% The sibling volume's only outright factual error survived a whole draft
+% inside a fabricated console block for exactly that reason.
+%
+% ONE file serves both editions. Listing comments stay English by standing
+% rule, so the transcript contributes no digits to either program's source and
+% C12's strict numeric comparison stays green. The consequence is that parity's
+% C13 cannot see the file at all -- VERB_ENV_RE scans in-source environments --
+% so the ASCII rule is asserted by the script that writes it.
+%
+% AND IT MUST SURVIVE THE FILE BEING ABSENT. figures/transcripts is written by
+% `make numbers`, exactly as figures/values is, so a clean checkout that has
+% not run it has no transcript -- and \lstinputlisting on a missing file is a
+% fatal `File not found`, which killed the text-only draft build that the rest
+% of this preamble goes to some trouble to keep working. \mermaidfig has had
+% this fallback since the diagrams pipeline was written; \transcript shipped
+% without it and had the same exposure. Same contract: print a visible marker
+% where the missing thing belongs, and build.
+\newcommand{\transcript}[1]{%
+  \par\smallskip
+  \IfFileExists{#1}{%
+    \lstinputlisting[style=mfacode, numbers=none,
+                     basicstyle=\ttfamily\scriptsize,
+                     keywordstyle=\color{black},
+                     backgroundcolor=\color{white}]{#1}%
+  }{%
+    \begin{tcolorbox}[
+      enhanced, breakable, width=\linewidth, sharp corners,
+      colback=white, colframe=mgrey, boxrule=0.8pt,
+      left=8pt, right=8pt, top=8pt, bottom=8pt]
+      {\bfseries\color{mgrey}\small \lblTranscriptMissing}\\[4pt]
+      {\ttfamily\scriptsize\color{mgrey} \detokenize{#1}}%
+    \end{tcolorbox}%
+  }%
+  \par\smallskip
+}
+
 % Inline literals
 \newcommand{\code}[1]{\texttt{\small #1}}
 \newcommand{\pkg}[1]{\texttt{\small\color{mblue}#1}}
@@ -1865,8 +1967,16 @@
 \DeclareMathOperator{\ulp}{ulp}
 \DeclareMathOperator{\round}{round}
 
-% A bare \log is FORBIDDEN in this book, and tools/check_notation.py fails the
-% build on one. In Polish textbooks \log means base ten; in machine-learning
+% A bare \log is FORBIDDEN in this book. TWO things enforce that, and neither
+% is the tool this comment used to name -- there is no tools/check_notation.py
+% and there never was. What exists is parity.py's C10, which fails on a bare
+% \log with a file and a line before the build is run, and the \PackageError
+% below, which fails the run itself. Note what the second one does NOT do:
+% under -interaction=nonstopmode it writes a PDF over the top of the error, so
+% the artefact is not the evidence -- tools/checklog.py is, and it reports the
+% error the log's own `!`-less, -file-line-error form hides.
+%
+% In Polish textbooks \log means base ten; in machine-learning
 % writing it means base e. The same three characters carry opposite meanings to
 % the two readerships this book serves, and they collide hardest in exactly the
 % programs where it matters most -- entropy in bits and cross-entropy in nats
@@ -1881,8 +1991,19 @@
   \mfa@origlog}
 % The one legitimate form: an explicit base.
 \newcommand{\logb}[1]{\mathop{\mfa@origlog}\nolimits_{#1}}
-% ...and a way to write the forbidden thing when the subject IS the ban, which
-% is Appendix B and nowhere else.
+% ...and a way to write the forbidden thing when the subject IS the ban. It is
+% used in Appendix B, which states the convention, and in F03's entry Quiz and
+% section 2, which TEACH it: the trap frame prints a bare logarithm with no
+% base and asks the reader to write down its value, because the two readerships
+% answer that confidently and differently, and the frames and the Quiz answer
+% around it quote the same bare mark while explaining why it is defective.
+% Nowhere else.
+%
+% The COUNT is deliberately not stated here. It was, as "once", and it was
+% wrong by five in F03 alone -- a claim the book made about itself in three
+% places at the same time, and one that nothing could check, because C10's
+% regex cannot see inside this macro name. The restriction is a convention and
+% not a gate; record it as a rule, never as a tally nobody maintains.
 \newcommand{\mfalogplain}{\mathop{\mfa@origlog}\nolimits}
 \makeatother
 

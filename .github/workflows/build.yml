@@ -45,19 +45,30 @@ jobs:
           # tracked file, and a file git has NEVER SEEN -- which is the state
           # every program's first values file is in, so it used to pass this
           # gate by being invisible to it.
-          drift=$(git diff --name-only -- figures/values)
-          new=$(git ls-files --others --exclude-standard -- figures/values)
+          #
+          # TWO DIRECTORIES, and this was scoped to figures/values alone until
+          # F03 added a console transcript. A transcript is a printed number
+          # inside a verbatim block: the same promise, the same script, and for
+          # one program it sat outside every drift gate in the repository.
+          drift=$(git diff --name-only -- figures/values figures/transcripts)
+          new=$(git ls-files --others --exclude-standard -- figures/values figures/transcripts)
           if [ -n "$drift" ] || [ -n "$new" ]; then
-            echo "::error::A computed value differs from what code/ now produces, or figures/values carries a file git has never seen."
-            [ -n "$drift" ] && git diff -- figures/values
+            echo "::error::A computed value differs from what code/ now produces, or figures/values or figures/transcripts carries a file git has never seen."
+            [ -n "$drift" ] && git diff -- figures/values figures/transcripts
             [ -n "$new" ] && { echo "Untracked, never compared to anything:"; echo "$new"; }
             exit 1
           fi
           echo "Every computed value in the book matches its script."
+      # Both directories, so the compile jobs get the transcripts as well as
+      # the values. With two paths the artefact is rooted at their least
+      # common ancestor, figures/, which is why the download below unpacks
+      # into figures/ and not into figures/values/.
       - uses: actions/upload-artifact@v4
         with:
           name: values
-          path: figures/values
+          path: |
+            figures/values
+            figures/transcripts
           retention-days: 14
           if-no-files-found: ignore
 
@@ -167,7 +178,7 @@ jobs:
         continue-on-error: true
         with:
           name: values
-          path: figures/values
+          path: figures
 
       - uses: actions/download-artifact@v5
         continue-on-error: true
@@ -199,7 +210,7 @@ jobs:
         run: |
           command -v pdftotext >/dev/null 2>&1 || \
             sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
-          python3 tools/checkpdf.py ${{ matrix.job }}.pdf
+          python3 tools/checkpdf.py --cues=warn ${{ matrix.job }}.pdf
 
       # if: always(), so it must survive a cancelled or failed compile that
       # left no log behind -- a reporting step that fails because there is

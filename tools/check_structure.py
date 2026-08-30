@@ -5,8 +5,10 @@ Each check answers one question that a reader would care about and that nobody
 can be trusted to remember:
 
   --frames    Is every program inside the 30-70 frame band the method assumes,
-              and does every frame that asks a question get answered by the
-              next one?
+              does every frame that asks a question get answered by the next
+              one, and does every frame number the program QUOTES -- every Quiz
+              route, every outcome range, every Summary bracket -- name a frame
+              that exists?
   --answers   Does every test exercise and further problem have an answer?
   --outcomes  Does every written program declare its learning outcomes?
   --values    Is every \\val{} reference backed by a computed value, and is
@@ -57,6 +59,25 @@ RE_ITEM = re.compile(r"^\s*\\item\b", re.M)
 # answers -- and parity's C16 enforces the converse, that every such frame
 # carries one.
 RE_DEMANDS = re.compile(r"\\blank|\\dotline|\\yourturn|\\nextframe")
+
+# The four macros whose FIRST argument is a frame number or a range of them.
+# Together they are the whole of the book's return index: \teachesat and
+# \teachesatone route a failed Quiz question to the frames that teach it,
+# \outcome tells the reader where an outcome was earned, and \sumitem carries
+# the bracket that sends a Summary line back to the frames behind it.
+#
+# Until this check existed those payloads were compared BETWEEN the editions
+# and never against the program. parity's C4 and C12 both see \teachesat{91--93}
+# in a 48-frame program as correct, because the Polish edition says 91--93 too;
+# a probe that routed a Quiz question there passed every gate in the repository.
+# F02 lost a review round to three of these, found by a person reading.
+#
+# What is checked here is EXISTENCE and shape -- an endpoint past the last
+# frame, a range that runs backwards, a payload that is not a frame range at
+# all. Whether frame 20 actually answers the question routed to it stays a
+# reading job, and no tool in this repository claims otherwise.
+RE_RANGE = re.compile(r"\\(teachesatone|teachesat|outcome|sumitem)\{([^}]*)\}")
+RE_RANGE_ARG = re.compile(r"\A(\d+)(?:--(\d+))?\Z")
 
 
 def program_files(lang: str) -> list[Path]:
@@ -116,8 +137,42 @@ def check_frames(soft: bool) -> int:
                             f"{after[0].strip()[:44]!r} follows it"
                         )
                         bad += 1
+            # And every frame number the program quotes names a frame that
+            # exists. The ceiling is the TEACHING frame count, deliberately:
+            # the Summary and the Test exercises are printed frames too, but
+            # nothing routes a reader to them -- they are where the reader
+            # already is -- so a payload reaching past the last teaching frame
+            # is a defect in every case seen so far.
+            for m in RE_RANGE.finditer(t):
+                macro, arg = m.group(1), m.group(2).strip()
+                shape = RE_RANGE_ARG.match(arg)
+                if shape is None:
+                    print(
+                        f"  {lang}/{f.stem}: \\{macro}{{{arg}}} is not a frame "
+                        f"number or an n--m range"
+                    )
+                    bad += 1
+                    continue
+                lo = int(shape.group(1))
+                hi = int(shape.group(2)) if shape.group(2) else lo
+                if lo < 1:
+                    print(f"  {lang}/{f.stem}: \\{macro}{{{arg}}} starts before frame 1")
+                    bad += 1
+                if shape.group(2) and hi <= lo:
+                    print(
+                        f"  {lang}/{f.stem}: \\{macro}{{{arg}}} does not ascend "
+                        f"-- a range of one frame is written {{{lo}}}"
+                    )
+                    bad += 1
+                if hi > n:
+                    print(
+                        f"  {lang}/{f.stem}: \\{macro}{{{arg}}} names frame {hi}, "
+                        f"and the program has {n} teaching frames"
+                    )
+                    bad += 1
     if bad == 0:
-        print("  Every written program is in band and every question is answered.")
+        print("  Every written program is in band, every question is answered, "
+              "and every frame number quoted exists.")
     return 0 if (bad == 0 or soft) else 1
 
 
