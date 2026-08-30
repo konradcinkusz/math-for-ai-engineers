@@ -1,22 +1,943 @@
 %% F10 --- Zbiory, logika i zliczanie
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/f10_sets.py i wchodzi na stronę przez \val{}. 2^3 = 8 i
+%% drobne iloczyny są napisane wprost, bo to jest arytmetyka na warsztacie.
+%%
+%% TEZA: zbiór, maska i liczba to jeden pomysł widziany z trzech stron, a
+%% policzenie czegoś, czego nie da się wypisać, jest umiejętnością, a nie
+%% wzorem.
+%%
+%% TRZY REGUŁY ZLICZANIA, celowo trzy, a nie cztery:
+%%   iloczyn   niezależne wybory się mnożą        |A x B| = |A| |B|
+%%   suma      wspólną część policzono dwa razy   |A u B| = |A| + |B| - |A n B|
+%%   podzbiory jedno tak-lub-nie na element       zbiór n-elementowy ma 2^n
+%%
+%% CZEGO TEN PROGRAM CELOWO NIE ROBI, sprawdzone w tools/programs.json, a nie
+%% zapamiętane. PIĘĆ programów deklaruje F10 jako zależność i nie wolno mu
+%% wydać ich materiału:
+%%   cztery reguły formalnie, zasada szufladkowa, paradoks urodzin   -> P12
+%%   implikacja, kwantyfikatory, indukcja, czytanie twierdzenia      -> P14
+%%   notacja O i to, czego ona nie mówi                              -> P03
+%%   graf jako zbiór plus relacja                                    -> P13
+%%   sama probabilistyka: przestrzeń zdarzeń, warunkowanie, Bayes    -> P23
+%% Więc F10 daje zliczanie, a P03 daje notację na jego wzrost; F10 daje
+%% mianownik, a P23 mówi, co z nim zrobić; F10 daje i/lub/nie na warunkach, a
+%% P14 daje implikację i dowód.
+%%
+%% ASERCJA, KTÓRA ZŁAPAŁA AUTORA: współczynnik podwojenia dla wszystkich par
+%% wynosi (4n - 2)/(n - 1), czyli spada do czterech OD GÓRY -- 4,020 przy
+%% n = 100 i 4,002 przy n = 1000. Skrypt asertował "tuż poniżej czterech",
+%% zanim napisano prozę, i padł na pierwszym uruchomieniu. Ramki mówią
+%% "odrobinę ponad".
+%%
+%% Bliźniak: programs/en/F10-sets-logic-counting.tex. Ramka w ramkę, makro w
+%% makro, liczba w liczbę; porównuje je tools/parity.py.
 
 \program{Zbiory, logika i zliczanie}
 \label{prog:F10}
+\index{set!membership and operations}
+\index{counting!without listing}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{powiedzieć, co zbiór odrzuca, i powiedzieć, która z dwóch liczb
+  policzonych na tych samych danych jest korpusem, a która słownikiem}
+\outcome{8--15}{policzyć sumę, przecięcie i różnicę oraz zapisać każde z nich
+  jako działanie na masce}
+\outcome{16--22}{poprawnie zaprzeczyć warunkowi złożonemu i powiedzieć, co złe
+  zaprzeczenie robi z filtrem}
+\outcome{23--30}{policzyć siatkę ustawień i rodzinę podzbiorów, nie wypisując
+  żadnej z nich}
+\outcome{31--37}{powiedzieć, co podwojenie wejścia robi z przebiegiem po
+  wszystkich parach, i powiedzieć, którą część naiwnego prawdopodobieństwa
+  daje ten program}
+\end{outcomes}
 
-Argument: membership, union, intersection, and the three ways to count
-without listing. Payoff: a vocabulary is a set and a tokeniser is a function
-into it; a boolean mask is a set indicator; counting is the denominator of
-every naive probability; a nested loop over a set is $n^{2}$ before anybody
-has said \enquote{complexity}.
+\begin{quiz}
+\item Lista $\val{f10.tokens}$ słów zawiera $\val{f10.vocab}$ różnych. Która
+  liczba jest rozmiarem słownika? \teachesat{1--2}
+  \answerto{$\val{f10.vocab}$. Słownik to zbiór różnych słów, a
+  $\val{f10.tokens}$ mówi, ile słów przeszło.}
+\item Wymień dwie rzeczy, które zbiór odrzuca. \teachesat{3--4}
+  \answerto{Powtórzenia i kolejność.}
+\item Dwa zbiory mają $\val{f10.eval.a}$ i $\val{f10.eval.b}$ elementów. Ile
+  jest w ich sumie? \teachesat{8--9}
+  \answerto{Nie da się powiedzieć bez części wspólnej. Tutaj jest ona równa
+  $\val{f10.eval.shared}$, więc suma ma $\val{f10.eval.union}$, a nie
+  $\val{f10.eval.naive}$.}
+\item Czym jest maska? \teachesatone{11}
+  \answerto{Jednym tak-lub-nie na pozycję, w tej samej kolejności co dane:
+  to ta sama informacja co zbiór pozycji, zapisana inaczej.}
+\item Które działanie na zbiorach wykonuje \code{\&} na dwóch maskach?
+  \teachesatone{12}
+  \answerto{Przecięcie. Pozycja przechodzi tylko wtedy, gdy jest w obu.}
+\item Zapisz \enquote{nie (spam i krótki)} bez zewnętrznego zaprzeczenia.
+  \teachesat{17--18}
+  \answerto{\enquote{nie spam lub nie krótki}. \emph{I} staje się
+  \emph{lub}, i to jest ta połowa, którą ludzie gubią.}
+\item Filtr ma zatrzymać wszystko, co nie jest jednocześnie spamem i krótkie, a
+  napisano go jako \enquote{nie spam i nie krótki}. Co on robi?
+  \teachesat{18--19}
+  \answerto{Zatrzymuje dużo mniej: z $\val{f10.rec.total}$ rekordów właściwy
+  filtr zatrzymuje $\val{f10.rec.right}$, a zły $\val{f10.rec.wrong}$.}
+\item Jest $\val{f10.grid.a}$ modeli, $\val{f10.grid.b}$ precyzji i
+  $\val{f10.grid.c}$ rozmiarów wsadu. Ile jest kombinacji? \teachesat{23--24}
+  \answerto{$\val{f10.grid}$, przez mnożenie. Niezależne wybory się mnożą.}
+\item Ile podzbiorów ma zbiór $3$-elementowy?
+  \teachesat{25--26}
+  \answerto{$8$, czyli $2^{3}$: jedno tak-lub-nie na element.}
+\item Zbiór dostaje jeszcze jeden element. Co dzieje się z liczbą podzbiorów?
+  \teachesat{27--28}
+  \answerto{Podwaja się, bo każdy podzbiór albo bierze nowy element, albo nie.}
+\item Ile par da się utworzyć z $\val{f10.docs}$ dokumentów?
+  \teachesat{29--30}
+  \answerto{$\val{f10.pairs}$, czyli
+  $\frac{\val{f10.docs} \times (\val{f10.docs} - 1)}{2}$.}
+\item Liczba dokumentów się podwaja. Co dzieje się z liczbą par?
+  \teachesat{31--32}
+  \answerto{Rośnie o czynnik $\val{f10.pairs.ratio}$ \dash{} odrobinę ponad
+  cztery, a nie dwa.}
+\item $\val{f10.faults}$ żądań z $\val{f10.docs}$ zawiodło. Która z tych dwóch
+  liczb jest liczebnością, a która mianownikiem?
+  \teachesatone{35}
+  \answerto{Obie są liczebnościami. Mianownikiem jest ta, przez którą dzielisz,
+  a wybranie jej jest całym pytaniem.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 40 ramek.
-}
+% ============================================================
+\section{Co zbiór wyrzuca}
+\label{sec:F10-sets}
+\index{set!membership and operations}
+
+\begin{fr}
+\textbf{Zbiór} to kolekcja rzeczy, o której wolno zadać tylko jedno pytanie:
+\emph{czy to jest w nim?}
+
+To pytanie nazywa się \textbf{przynależnością} i jest całą definicją. Wszystko
+inne o zbiorach wynika z dwóch rzeczy, których wobec tego nie potrafią
+zapisać.
+
+Używałeś ich bez tego słowa. Słownik tokenizera jest zbiorem: każdy token w nim
+jest albo go nie ma, nie ma drugiej kopii tokena, a pytanie, który token jest
+\enquote{trzeci}, jest pytaniem o plik, który go akurat zdefiniował, a nie o
+słownik.
+
+Oto mały korpus: $\val{f10.lines}$ wierszy logu, złożonych łącznie z
+$\val{f10.tokens}$ słów. Ile słów jest w jego słowniku?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Z tych dwóch liczb nie da się tego powiedzieć.
+\end{ansblock}
+
+I o to w tym pytaniu chodzi. $\val{f10.tokens}$ liczy każde słowo, które
+przeszło, a słownik liczy te różne, i nic w pierwszej liczbie nie mówi ci
+drugiej.
+
+Dla tego korpusu wynosi ona $\val{f10.vocab}$, więc każde słowo pojawia się
+średnio około $\val{f10.repeat}$ razy. Log powtarza się mocno i dlatego różnica
+jest tutaj tak duża.
+
+Jaka jest różnica w kodzie między tymi dwiema liczbami?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jedno wywołanie: \code{len(tokens)} wobec \code{len(set(tokens))}.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Lista i zbiór są o jedno wywołanie od siebie i odpowiadają na różne
+pytania}, i dlatego mylą się dokładnie tam, gdzie to ma znaczenie.
+
+\enquote{Uczyliśmy na dziesięciu milionach tokenów} i \enquote{nasz słownik ma
+dziesięć milionów} to dziko różne zdania, a tutaj obie liczby różnią się o
+czynnik $\val{f10.repeat}$. Podaj złą, a opisałeś inny system.
+
+Nawyk, który temu zapobiega: gdy w twierdzeniu pojawia się liczba, zapytaj, czy
+policzono \emph{wystąpienia}, czy \emph{rzeczy różne}, i powiedz to w zdaniu.
+Żadna z tych liczb nie jest bardziej poprawna; odpowiadają na różne pytania, a
+słowa na nie nie są wymienne.
+\end{trapbox}
+
+Więc pierwszą rzeczą, którą zbiór odrzuca, są powtórzenia. Co jest drugą?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Kolejność}
+$\{1, 2, 3\}$ i $\{3, 2, 1\}$ to ten sam zbiór, bo każde pytanie o
+przynależność ma dla obu tę samą odpowiedź. Odwróć powyższy korpus, a każda
+lista w nim się zmieni, a słownik nie \dash{} sprawdzone w
+\code{code/f10\_sets.py}.
+
+Warto to wiedzieć dokładnie, bo mówi, czego zbiór jest złym modelem. Ciąg
+tokenów nie jest zbiorem: kolejność jest całą treścią zdania. Słownik jest
+zbiorem: kolejność jest artefaktem tego pliku, który go zapisał.
+
+\begin{aibox}
+Dlatego tokenizer użytecznie opisuje się jako \emph{funkcję} z tekstu w
+słownik. Słownik jest zbiorem, więc nie ma pierwszego ani ostatniego elementu;
+\emph{identyfikatory} tokenów to rzecz osobna, dowolne ponumerowanie wybrane
+przez tego, kto go zbudował, a dwa tokenizery o identycznych słownikach mogą je
+ponumerować inaczej.
+
+Konsekwencję ludzie spotykają: identyfikatory tokenów nie są przenośne między
+modelami, a identyfikator, który przeżywa zmianę tokenizera, przeżywa ją
+przypadkiem. Przenośny jest ciąg znaków, bo to on był zawsze przedmiotem
+przynależności.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Oznaczenia, krótkie i warte posiadania.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+$x \in A$ & $x$ należy do $A$ \\
+$x \notin A$ & $x$ nie należy do $A$ \\
+$\lvert A \rvert$ & ile rzeczy jest w $A$ \\
+$\emptyset$ & zbiór, w którym nic nie ma \\
+$A \subseteq B$ & wszystko z $A$ jest też w $B$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Ostatnie warto na chwilę zatrzymać. $A \subseteq B$ nie mówi nic o tym, czy $B$
+ma coś, czego $A$ nie ma, więc każdy zbiór jest swoim własnym podzbiorem.
+
+Jak myślisz, ile z $\val{f10.lines}$ wierszy powyższego korpusu jest różnych?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f10.distinct.lines}$}
+Więc te same trzy pytania stosują się na każdym poziomie.
+\enquote{Ile wierszy logu widzieliśmy} i \enquote{ile jest rodzajów wiersza
+logu} to znów liczba wystąpień i rozmiar zbioru, a ta druga mówi ci, ile
+różnych rzeczy twój system robi.
+\end{fr}
+
+\begin{fr}
+Jeszcze jedno słowo przed działaniami.
+
+Dwa zbiory są \textbf{rozłączne}, gdy nic nie należy do obu. To zasługuje na
+nazwę, bo jest szczególnym przypadkiem, w którym prawie wszystko w zliczaniu
+robi się łatwiejsze, i na tym obraca się sekcja 3.
+\end{fr}
+
+% ============================================================
+\section{Suma, przecięcie i maska}
+\label{sec:F10-operations}
+\index{set!union and intersection}
+
+\begin{fr}
+Trzy działania, a każde zdefiniowane przez to, co robi z pytaniem o
+przynależność.
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& zapis & $x$ jest w nim, gdy \\
+\midrule
+suma & $A \cup B$ & $x$ jest w $A$ \emph{lub} w $B$ \\
+przecięcie & $A \cap B$ & $x$ jest w $A$ \emph{i} w $B$ \\
+różnica & $A \setminus B$ & $x$ jest w $A$ \emph{i nie} w $B$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Przeczytaj prawą kolumnę: \textbf{każde działanie to jedno słowo zwykłej
+logiki}, z czego sekcja 3 czyni sedno.
+
+Jedna własność wszystkich trzech warta jest posiadania, zanim ich użyjesz.
+Każde bierze dwa zbiory i zwraca zbiór, więc składają się bez przypadków
+szczególnych: $A \cap (B \cup C)$ jest zbiorem z tego samego powodu, z którego
+$A \cup B$ nim jest, i można budować dalej, nie sprawdzając na każdym kroku,
+że wynik jest wciąż tym, co następne działanie przyjmuje.
+
+Dwa zbiory ewaluacyjne. Pierwszy ma $\val{f10.eval.a}$ przykładów, drugi ma
+$\val{f10.eval.b}$. Ile jest przykładów łącznie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Za mało informacji: zależy, ile jest w obu.
+\end{ansblock}
+
+Dodanie ich daje $\val{f10.eval.naive}$, a to jest poprawne tylko wtedy, gdy
+oba są rozłączne. Tutaj $\val{f10.eval.shared}$ przykładów jest w obu, więc
+prawdziwy rozmiar sumy wynosi $\val{f10.eval.union}$.
+
+\begin{trapbox}
+\textbf{Dodanie dwóch rozmiarów zbiorów liczy część wspólną dwa razy.} Reguła,
+która to naprawia, jest jedyną w tym programie wymagającą zapisania:
+\[ \lvert A \cup B \rvert = \lvert A \rvert + \lvert B \rvert
+   - \lvert A \cap B \rvert \]
+odejmując część wspólną raz, bo policzono ją o raz za dużo. Skrypt sprawdza to
+na tysiącu sześciuset parach.
+
+Kosztowny jest tu kształt błędu, a nie jego wielkość. Podanie
+$\val{f10.eval.naive}$ przykładów, gdy jest ich $\val{f10.eval.union}$, zawyża
+pokrycie o $\val{f10.eval.overcount}$ \dash{} a każdy z tych
+$\val{f10.eval.overcount}$ to przykład, na którym model oceniono dwa razy, więc
+waży on w każdej wychodzącej średniej podwójnie. Liczba jest zła i wynik jest
+zły, a widać tylko liczbę.
+
+Program~\ref{prog:P12} uogólnia to na trzy zbiory i więcej, gdzie nazywa się to
+zasadą włączeń i wyłączeń, a znaki się zmieniają na przemian. Dwa zbiory to
+przypadek, który spotykasz codziennie, i jest nim ten jeden wiersz.
+\end{trapbox}
+
+\mermaidfig{f10-overlap}{Dodanie dwóch liczb liczy część wspólną dwa razy, więc
+schodzi ona raz.}{dlaczego dwa rozmiary zbiorów się nie dodają}
+\end{fr}
+
+\begin{fr}
+Ile z $\val{f10.eval.a}$ przykładów pierwszego zbioru \emph{nie} jest w drugim?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f10.eval.onlya}$}
+Z $\val{f10.eval.a} - \val{f10.eval.shared}$, czyli z różnicy $A \setminus B$.
+I zauważ, że różnica nie jest symetryczna: $B$ ma
+$\val{f10.eval.b} - \val{f10.eval.shared}$ przykładów, których pierwszemu
+zbiorowi brakuje, a to inna liczba.
+
+Teraz reprezentacja, której faktycznie używasz w kodzie. Zamiast trzymać zbiór
+rzeczy, trzymaj \textbf{maskę}: jedno tak-lub-nie na pozycję, w tej samej
+kolejności co dane.
+
+Zbiór pozycji i maska nad tymi pozycjami niosą tę samą informację. Jaka jest
+przewaga maski?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jest wyrównana z danymi, więc da się ją do nich zastosować jednym działaniem.
+\end{ansblock}
+
+Zbiór indeksów mówi ci, które wiersze chcesz, i potem musisz po nie pójść.
+Maska ma już ten sam kształt co dane, więc maszyna może iść po obu naraz, a do
+tego biblioteki tablicowe są zbudowane.
+
+Odpowiedniość jest dokładna i to ona czyni słownictwo tego programu użytecznym
+w kodzie:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Na zbiorach & Na maskach & Słowami \\
+\midrule
+$A \cup B$ & \code{a | b} & w którymkolwiek \\
+$A \cap B$ & \code{a \& b} & w obu \\
+$A \setminus B$ & \code{a \& \textasciitilde b} & w pierwszym i nie w drugim \\
+$\lvert A \rvert$ & \code{a.sum()} & ile \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Ostatni wiersz wart jest zatrzymania: \textbf{policzenie maski to dodanie jej},
+bo tak jest jedynką, a nie zerem. Każda liczba w dalszej części tego programu
+mogłaby być zapisana jako suma, czyli jako sigma z Programu~\ref{prog:F04}
+uprawiająca teorię zbiorów.
+\end{fr}
+
+\begin{fr}
+Która z tych dwóch rzeczy jest zbiorem, a która maską?
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+$\{2, 5, 6\}$ & \code{[0, 0, 1, 0, 0, 1, 1, 0]} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Pierwsza jest zbiorem pozycji, druga maską nad ośmioma pozycjami. Mówią to
+samo.
+\end{ansblock}
+
+Pozycje $2$, $5$ i $6$ są zaznaczone, licząc od zera. Maska wie, jak długie są
+dane, a zbiór nie, i to jedyna informacja, której nie dzielą \dash{} i dlatego
+pusta maska nadal ma długość, a zbiór pusty nie.
+
+\mermaidfig{f10-set-and-mask}{Ta sama informacja dwa razy, a każde działanie na
+jednej ma bliźniaka na drugiej.}{zbiór i maska to jedno}
+\end{fr}
+
+\begin{fr}
+Jeden wniosek warty posiadania przed następną sekcją.
+
+\code{a.sum()} liczy maskę, a \code{a.mean()} to ta liczba podzielona przez
+liczbę pozycji. Więc średnia maski jest \emph{ułamkiem danych, który ona
+wybiera}, a odczytanie średniej tablicy logicznej jako ułamka nie jest
+przybliżeniem \dash{} to jest to, co arytmetyka robi.
+
+To najtańsze, co istnieje, sprawdzenie filtra: zastosuj go i spójrz na średnią.
+Filtr, po którym spodziewałeś się kilku procent odrzutu, a który podaje
+$\num{0.4}$, nie zrobił tego, co miałeś na myśli, i mówi to, zanim spojrzałeś
+na jakikolwiek wiersz.
+\end{fr}
+
+% ============================================================
+\section{I, lub, nie}
+\label{sec:F10-logic}
+\index{set!and the logic of a filter}
+
+\begin{fr}
+Prawa kolumna poprzedniej sekcji to były trzy słowa logiki, więc ta sekcja jest
+o tych słowach samych.
+
+Dwa warunki, $p$ i $q$. \textbf{I} jest prawdą, gdy oba są, \textbf{lub} jest
+prawdą, gdy przynajmniej jeden jest, a \textbf{nie} zamienia prawdę i fałsz.
+Wypisane są cztery przypadki i w żadnym nie ma subtelności.
+
+Subtelność siedzi w całości w \emph{lub} i jest faktem o języku, a nie o
+logice. \enquote{Herbata lub kawa} w zdaniu znaczy zwykle jedno albo drugie i
+nie oba naraz. \enquote{$p$ lub $q$} w logice i w każdym języku programowania,
+którego użyjesz, znaczy \textbf{przynajmniej jedno, być może oba}.
+
+Filtr zatrzymuje wiersze, gdzie \code{is\_long or is\_flagged}. Wiersz jest i
+długi, i oznaczony. Czy zostaje zatrzymany?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak}
+Bo \emph{lub} prosi o przynajmniej jedno, a ten wiersz ma dwa. Chcieć
+dokładnie jednego to inne działanie \dash{} \emph{alternatywa wykluczająca}
+\dash{} a trzy słowa z tej sekcji go nie mają, więc trzeba je z nich
+zbudować.
+
+Ta niejednoznaczność warta jest jeszcze jednego zdania, bo to w niej
+specyfikacja rozstaje się ze swoją implementacją. Wymaganie napisane po polsku
+\dash{} \enquote{odrzucaj żądania zbyt duże lub uszkodzone} \dash{} trzeba
+przeczytać dwa razy: raz tak, jak myślał piszący, i raz tak, jak weźmie to
+kompilator. Tutaj się zgadzają, a nie zawsze się zgadzają, a miejscem, w którym
+się różnią, jest wymaganie, którego nikt nie uważał za niejednoznaczne.
+
+Teraz działanie, dla którego ta sekcja istnieje. Zaprzecz
+\enquote{spam \textbf{i} krótki}.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\enquote{nie spam \textbf{lub} nie krótki}
+\end{ansblock}
+
+\textbf{\emph{I} staje się \emph{lub}}, i to jest ta połowa, którą ludzie
+gubią.
+
+Powód wart jest jednego zdania, a nie reguły do wykucia. Żeby nie spełnić
+\enquote{obu}, wystarczy nie spełnić \emph{jednego} z nich, więc niespełnienie
+koniunkcji jest wymogiem znacznie słabszym niż niespełnienie każdej części
+\dash{} a \emph{lub} jest słowem słabszym.
+
+Ten sam argument w drugą stronę daje bliźniaka:
+\[ \lnot(p \land q) = \lnot p \lor \lnot q \qquad
+   \lnot(p \lor q) = \lnot p \land \lnot q \]
+czyli \textbf{prawa De Morgana}, sprawdzone w skrypcie na wszystkich czterech
+podstawieniach.
+
+Teraz wersja, która kosztuje pieniądze. Filtr ma zatrzymać wszystko, co nie
+jest jednocześnie spamem i krótkie. Ktoś pisze \code{not spam and not short}.
+Co on faktycznie zatrzymuje?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Tylko wiersze, które nie są ani spamem, ani krótkie.
+\end{ansblock}
+
+Czyli zbiór znacznie mniejszy. Na $\val{f10.rec.total}$ rekordach z każdą
+kombinacją reprezentowaną równo poprawny filtr zatrzymuje
+$\val{f10.rec.right}$, a zły $\val{f10.rec.wrong}$ \dash{}
+$\val{f10.rec.lost}$ rekordów odrzuconych po cichu.
+
+\begin{trapbox}
+\textbf{Złe zaprzeczenie koniunkcji zawsze zatrzymuje za mało, nigdy za dużo},
+i to sprawia, że trudno je zauważyć.
+
+Filtr, który zatrzymuje za dużo, pokazuje ci wiersze, których się nie
+spodziewałeś, i idziesz popatrzeć. Filtr, który zatrzymuje za mało, nie
+pokazuje ci nic: wierszy, które odrzucił, nie masz przed sobą, potok się
+wykonuje, liczby wychodzą, a jedynym objawem jest zbiór mniejszy, niż powinien
+być \dash{} czyli dokładnie ten objaw, który wszyscy przypisują danym.
+
+Dwa nawyki, oba tanie. Weź średnią maski i porównaj ją z tym, czego się
+spodziewałeś, jak mówiła poprzednia sekcja. A gdy zaprzeczasz warunkowi
+złożonemu, wypisz zaprzeczenie, zamiast stawiać \code{not} przed całością i
+rozdzielać je na oko.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedno, bo to to samo prawo w innym ubraniu i łapie ludzi, którzy prawa
+De Morgana znają doskonale.
+
+Zapytanie zatrzymuje dokumenty, które są
+\begin{center}\code{recent and (english or german)}\end{center}
+a ty chcesz jego dopełnienia. Zapisz je.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\code{not recent or (not english and not german)}
+\end{ansblock}
+
+Dwa zastosowania prawa, od zewnątrz do środka: \code{and} staje się \code{or},
+a potem wewnętrzne \code{or} staje się \code{and} pod swoim własnym
+zaprzeczeniem. Nawiasy muszą zostać, a to, gdzie stoją, zmienia odpowiedź.
+
+To cała logika, jakiej ten program potrzebuje. Co twierdzenie postaci
+\emph{jeśli $p$, to $q$} pozwala i czego nie pozwala, oraz co zmienia się przy
+zamianie dwóch kwantyfikatorów, to inny temat i należy do
+Programu~\ref{prog:P14}, gdzie czytanie twierdzeń dostaje własny program.
+\end{fr}
+
+\begin{fr}
+Ostatnia obserwacja wiążąca obie sekcje.
+
+Każdy filtr, który piszesz, jest zbiorem: zbiorem wierszy, które zatrzymuje.
+Każde złożenie filtrów jest działaniem na zbiorach. A każde pytanie o to,
+\enquote{ile wierszy przeżyje}, jest pytaniem o rozmiar tego zbioru, i od tego
+zaczyna się następna sekcja.
+
+\textbf{Więc działania tej sekcji i poprzedniej są tymi samymi działaniami}, a
+to, czy nazwiesz je działaniami na zbiorach, czy działaniami logicznymi, jest
+pytaniem o to, która reprezentacja stoi przed tobą.
+\end{fr}
+
+% ============================================================
+\section{Zliczanie bez wypisywania}
+\label{sec:F10-counting}
+\index{counting!without listing}
+
+\begin{fr}
+Wszystko dotąd liczyło rzeczy, mając je. Ta sekcja liczy rzeczy, których nikt
+by nie wypisał.
+
+Pierwszej reguły już używasz. Jest $\val{f10.grid.a}$ modeli,
+$\val{f10.grid.b}$ precyzji i $\val{f10.grid.c}$ rozmiarów wsadu do
+wypróbowania, a każda kombinacja jest dozwolona. Ile to przebiegów?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f10.grid}$}
+Z $\val{f10.grid.a} \times \val{f10.grid.b} \times \val{f10.grid.c}$.
+
+To jest \textbf{reguła iloczynu}: \textbf{niezależne wybory się mnożą}. Warto
+podawać ją z doczepionym warunkiem, i jest to uogólniony nawyk
+Programu~\ref{prog:F06}: tamten program zrobił regułę z podawania warunku za
+każdym razem, gdy dzielisz przez literę, a to jest ten sam ruch na innym
+działaniu. \emph{Niezależne} znaczy, że każdy wybór pierwszego zostawia te same
+możliwości dla drugiego. Opuść to, a
+mnożenie jest błędne.
+
+Załóż, że jeden z modeli nie działa w najniższej precyzji. Czy odpowiedzią
+nadal jest $\val{f10.grid}$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie}
+Jest o jeden mniej, bo ta kombinacja nie istnieje: wybory przestały być
+niezależne, skoro to, który model weźmiesz, zmienia to, które precyzje stoją
+przed tobą otworem. To cała treść tego warunku i dlatego przeszukiwania siatki
+po konfiguracji z ograniczeniami nie da się wymierzyć mnożeniem.
+
+Zauważ, gdzie takie ograniczenie zwykle mieszka. Rzadko jest zapisane obok
+siatki; jest wymuszane gdzieś dalej, jako błąd walidacji albo wywrotka, więc
+liczba jest zła od początku, a odkrycie przychodzi wiele przebiegów później.
+Policzenie wykluczeń przy zapisywaniu siatki to minuta pracy i jedyny moment,
+w którym ta liczba jest tania do poprawienia.
+
+Teraz druga reguła. Zbiór ma $3$ elementy. Ile ma podzbiorów, licząc zbiór
+pusty i całość?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$8$}
+A powodem jest znów reguła iloczynu, zastosowana do wyboru, którego mogłeś nie
+zauważyć, że dokonujesz. Żeby zbudować podzbiór, przejdź po elementach po
+jednym i zdecyduj \emph{w środku albo na zewnątrz}. To $3$ niezależne
+tak-lub-nie, więc $2 \times 2 \times 2$.
+
+Dla $n$ elementów jest to \textbf{$2^{n}$ podzbiorów}, jeden czynnik $2$ na
+element.
+
+Zatem zbiór $\val{f10.features}$ cech. Ile podzbiorów?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f10.subsets}$}
+Czyli $2^{\val{f10.features}}$, i jest to ponad milion.
+
+Teraz dodaj jeszcze jedną cechę. Ile?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f10.subsets.one.more}$}
+Podwaja się, bo każdy istniejący podzbiór ma teraz dwie wersje \dash{} jedną
+biorącą nowy element i jedną nie.
+
+\begin{trapbox}
+\textbf{\enquote{Po prostu spróbujmy wszystkich kombinacji} to plan, którego
+koszt trzeba policzyć, zanim się go zaproponuje}, a podwajanie na cechę nie
+jest tempem, z którym radzi sobie czyjakolwiek intuicja.
+
+$\val{f10.features}$ cech daje $\val{f10.subsets}$ podzbiorów, co komputer
+zrobi. Czterdzieści cech daje ponad milion milionów. Krok od jednego do
+drugiego to dwadzieścia dodatkowych tak-lub-nie, co nie \emph{czuje się} jak
+różnica między przerwą na kawę a epoką geologiczną.
+
+Nawyk: gdy plan przechodzi po kombinacjach, zapisz ich liczbę przed napisaniem
+pętli. To jedno mnożenie i to różnica między planem a życzeniem.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Trzeci wzrost jest tym, który ta książka będzie spotykać stale, a bierze się ze
+zliczania \emph{par}, a nie podzbiorów.
+
+Z $\val{f10.docs}$ dokumentów ile par da się utworzyć? Każda para to dwa różne
+dokumenty, a para jest tą samą parą, w jakiej kolejności byś jej nie nazwał.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f10.pairs}$}
+Rozumowane w dwóch krokach. Każdy z $\val{f10.docs}$ dokumentów można sparować
+z każdym z pozostałych $\val{f10.docs} - 1$, co jest regułą iloczynu i daje
+$\val{f10.docs} \times (\val{f10.docs} - 1)$. Ale to liczy każdą parę dwa razy,
+raz z każdego końca, więc podziel przez dwa.
+
+\[ \text{pary} = \frac{n(n-1)}{2} \]
+
+Krok \enquote{podziel przez dwa, bo kolejność nie ma znaczenia} jest faktem o
+zbiorach: $\{a, b\}$ i $\{b, a\}$ to jedna para, bo zbiór odrzuca kolejność,
+czyli drugie zdanie sekcji 1 uprawiające arytmetykę.
+
+\mermaidfig{f10-three-growths}{Trzy sposoby, na jakie liczba rośnie, a każdy to
+reguła iloczynu z innym niezależnym wyborem w środku.}{pomnóż, podwój,
+sparuj}
+\end{fr}
+
+% ============================================================
+\section{Gdy liczba staje się rachunkiem}
+\label{sec:F10-cost}
+\index{counting!as a cost}
+
+\begin{fr}
+Liczba przestaje być ciekawostką, gdy tylko coś trzeba zrobić raz na policzoną
+rzecz.
+
+Odsiewanie duplikatów przez porównanie każdego dokumentu z każdym innym robi
+jedno porównanie na parę. Przy $\val{f10.docs}$ dokumentach to
+$\val{f10.pairs}$ porównań, co jest w porządku.
+
+Korpus się podwaja, do $\val{f10.docs2}$ dokumentów. Ile porównań teraz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f10.pairs2}$}
+Czynnik $\val{f10.pairs.ratio}$ \dash{} \textbf{odrobinę ponad cztery, za dwa
+razy większe wejście}.
+
+\begin{trapbox}
+\textbf{Dwa razy więcej danych to cztery razy więcej pracy, gdy tylko praca
+przypada na parę}, a czynnik jest odrobinę ponad cztery, a nie dokładnie
+cztery: $\frac{4n-2}{n-1}$, czyli $\num{4.020}$ przy stu dokumentach i
+$\val{f10.pairs.ratio}$ przy $\val{f10.docs}$, spadając do czterech w miarę
+wzrostu korpusu.
+
+Ta dokładność nie jest pedanterią, tylko powodem, dla którego liczbę
+policzono, a nie wyrozumowano. Skrypt asertował \enquote{tuż poniżej czterech},
+zanim napisano tę ramkę, i \textbf{padł na pierwszym uruchomieniu}, bo
+współczynnik dochodzi do czterech od góry, a nie od dołu. Ramka podająca
+\enquote{cztery razy} płasko byłaby błędna w kierunku, którego nikt nie
+sprawdza.
+
+Wniosek jest ten do zabrania: pętla zagnieżdżona po kolekcji liczy pary, więc
+jej kosztem rządzi ten wzór, jakkolwiek pętla wygląda. Potok, który przechodził
+przez noc na zeszłomiesięcznym korpusie, nie przechodzi przez noc na dwa razy
+większym \dash{} przechodzi przez cztery noce.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Ten wzrost ma nazwę i notację, a ten program celowo zatrzymuje się przed nimi.
+
+\enquote{Koszt rośnie jak $n^{2}$} jest twierdzeniem o tym, jak wielkość
+zachowuje się, gdy $n$ rośnie, i potrzebuje własnej definicji, własnych
+ostrzeżeń o tym, czego \emph{nie} mówi, oraz rozpracowanego wyjaśnienia,
+dlaczego szybsza dziś z dwóch implementacji może być tą wolniejszą przy skali.
+Program~\ref{prog:P03} robi wszystkie trzy rzeczy.
+
+Stąd masz samą liczbę, czyli tę rzecz, o której notacja mówi. Umiejętność
+powiedzenia \emph{ta pętla robi $\val{f10.pairs}$ porównań} jest na przeglądzie
+projektu bardziej użyteczna niż umiejętność powiedzenia \emph{ta pętla jest
+kwadratowa}, a masz ją już teraz.
+\end{fr}
+
+\begin{fr}
+Ostatnie użycie zliczania w tym programie jest tym, od którego reszta książki
+zależy najbardziej, i bierze dwie liczby, a nie jedną.
+
+Z $\val{f10.docs}$ żądań $\val{f10.faults}$ zawiodło. Zapisz ułamek tych, które
+zawiodły.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\frac{\val{f10.faults}}{\val{f10.docs}}$}
+Liczba u góry i liczba na dole. \textbf{Każde naiwne prawdopodobieństwo to dwie
+liczebności i dzielenie}, a zliczanie jest tą częścią, o której ten program
+był.
+
+Trudne nie jest dzielenie. Trudny jest wybór tego, co idzie na dół \dash{}
+żądania? użytkownicy? sesje? żądania, które doszły aż do modelu? \dash{} a
+każdy wybór daje inną liczbę, wszystkie będące poprawnymi odpowiedziami na
+różne pytania.
+
+\begin{aibox}
+Dlatego liczba dokładności bez podanego mianownika nie jest pomiarem.
+\enquote{Dziewięćdziesiąt dziewięć procent dokładności} to ułamek, którego i
+licznik, i mianownik pominięto, a dwa najczęstsze odczyty \dash{} na żądanie i
+na sesję \dash{} mogą różnić się o rzędy wielkości na tym samym systemie.
+
+Dyscyplina, którą ta książka wciąż zaleca, mieści się w jednym wierszu:
+\textbf{gdy podajesz współczynnik, podaj dwie liczebności, z których wyszedł.}
+To one są potrzebne komuś innemu, żeby to sprawdzić, i zwykle łatwiej je zdobyć
+niż sam współczynnik.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Czym prawdopodobieństwo \emph{jest} \dash{} miarą spełniającą trzy reguły, co
+robi z nim warunkowanie i jak twierdzenie Bayesa wypada z definicji w jednym
+wierszu \dash{} to Program~\ref{prog:P23}, i celowo nie jest tutaj.
+
+Powód jest ten, który ta książka podaje zawsze, gdy rysuje taką granicę. Ułamek
+liczebności jest naiwnym prawdopodobieństwem i jest poprawny dokładnie wtedy,
+gdy każdy wynik jest równie prawdopodobny i policzyłeś właściwe rzeczy. Oba te
+warunki wymagają starannego powiedzenia, a staranne powiedzenie ich wymaga
+programu.
+
+Naprawdę twoje po tym programie są licznik i mianownik oraz świadomość, że
+wybór mianownika był decyzją.
+\end{fr}
+
+\begin{fr}
+Jedna uwaga na koniec, i o tym ten program naprawdę był.
+
+Zbiór, maska, liczba. Zbiór mówi, które rzeczy należą; maska mówi to samo,
+wyrównane z danymi; liczba to maska dodana. Trzy reprezentacje, jeden pomysł, a
+działania na każdej są działaniami na pozostałych.
+
+\textbf{Prawie wszystko, co inżynier robi ze zbiorem danych, jest jedną z tych
+trzech rzeczy widzianą z innej strony} \dash{} filtrowanie to przecięcie,
+odsiewanie duplikatów to wzięcie zbioru, a wymiarowanie zadania to policzenie
+zbioru, którego nikt nie wypisze. Nic z tego nie wymagało nowego pomysłu, a
+wszystko wymagało słownictwa pozwalającego powiedzieć, które z nich masz na
+myśli.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Zbiór odpowiada na jedno pytanie: czy to jest w nim?}
+  Więc odrzuca powtórzenia, a \code{len(tokens)} wobec \code{len(set(tokens))}
+  to różnica między korpusem a słownikiem \dash{} tutaj $\val{f10.tokens}$
+  wobec $\val{f10.vocab}$, czyli czynnik $\val{f10.repeat}$. Gdy w twierdzeniu
+  pojawia się liczba, powiedz, czy policzyła wystąpienia, czy rzeczy różne.}
+\sumitem{4--7}{Odrzuca też \textbf{kolejność}, więc ciąg tokenów źle pasuje do
+  zbioru, a słownik pasuje dobrze \dash{} a \emph{identyfikatory} tokenów to
+  osobne, dowolne ponumerowanie, które nie podróżuje między tokenizerami.
+  $\in$, $\lvert A \rvert$, $\emptyset$, $\subseteq$; dwa zbiory są
+  \emph{rozłączne}, gdy nic nie należy do obu.}
+\sumitem{8--9}{$A \cup B$, $A \cap B$ i $A \setminus B$ to \emph{lub},
+  \emph{i} oraz \emph{i nie}. \textbf{Dodanie dwóch rozmiarów zbiorów liczy
+  część wspólną dwa razy}:
+  $\lvert A \cup B \rvert = \lvert A \rvert + \lvert B \rvert -
+  \lvert A \cap B \rvert$. Dwa zbiory ewaluacyjne o $\val{f10.eval.a}$ i
+  $\val{f10.eval.b}$ elementach, dzielące $\val{f10.eval.shared}$, mieszczą
+  $\val{f10.eval.union}$ przykładów, a nie $\val{f10.eval.naive}$ \dash{} a te
+  $\val{f10.eval.overcount}$ policzone dwa razy są też dwa razy oceniane.}
+\sumitem{10--15}{\textbf{Maska to ta sama informacja wyrównana z danymi}:
+  \code{|} to suma, \code{\&} to przecięcie, \code{\& \textasciitilde} to
+  różnica, a \code{.sum()} to rozmiar, bo tak jest jedynką. Więc
+  \code{.mean()} na masce to ułamek, który ona wybiera, i odczytanie go jest
+  najtańszym sprawdzeniem, jakie filtr ma.}
+\sumitem{16--18}{\emph{Lub} znaczy \textbf{przynajmniej jedno, być może oba},
+  w logice i w każdym języku, którego użyjesz, cokolwiek znaczy po polsku. A
+  \textbf{zaprzeczenie \emph{i} daje \emph{lub}}:
+  $\lnot(p \land q) = \lnot p \lor \lnot q$, bo niespełnienie \emph{obu}
+  wymaga niespełnienia tylko jednego.}
+\sumitem{19--22}{\textbf{Złe zaprzeczenie koniunkcji zawsze zatrzymuje za
+  mało}, i dlatego się go nie zauważa: z $\val{f10.rec.total}$ rekordów
+  właściwy filtr zatrzymuje $\val{f10.rec.right}$, a \code{not spam and not
+  short} zatrzymuje $\val{f10.rec.wrong}$, gubiąc $\val{f10.rec.lost}$ bez
+  żadnego objawu poza małym zbiorem danych. Każdy filtr jest zbiorem, a każde
+  złożenie filtrów działaniem na zbiorach.}
+\sumitem{23--24}{\textbf{Niezależne wybory się mnożą}, a \emph{niezależne} to
+  warunek do powiedzenia, a nie do założenia: $\val{f10.grid.a}$ modeli razy
+  $\val{f10.grid.b}$ precyzji razy $\val{f10.grid.c}$ rozmiarów wsadu to
+  $\val{f10.grid}$ przebiegów, a jedna zabroniona kombinacja czyni to błędnym.}
+\sumitem{25--28}{\textbf{Zbiór $n$-elementowy ma $2^{n}$ podzbiorów}, jedno
+  tak-lub-nie na element: $\val{f10.features}$ cech daje $\val{f10.subsets}$, a
+  jedna cecha więcej to podwaja. Zapisz liczbę przed napisaniem pętli \dash{}
+  to jedno mnożenie i to różnica między planem a życzeniem.}
+\sumitem{29--30}{\textbf{$n$ rzeczy tworzy $\frac{n(n-1)}{2}$ par}, podzielone
+  na pół, bo zbiór odrzuca kolejność i $\{a,b\}$ to $\{b,a\}$.}
+\sumitem{31--33}{\textbf{Dwa razy więcej danych to odrobinę ponad cztery razy
+  więcej pracy, gdy praca przypada na parę}: $\val{f10.docs}$ dokumentów daje
+  $\val{f10.pairs}$ porównań, a $\val{f10.docs2}$ daje $\val{f10.pairs2}$,
+  czyli czynnik $\val{f10.pairs.ratio}$. Współczynnik to $\frac{4n-2}{n-1}$ i
+  spada do czterech \emph{od góry} \dash{} skrypt asertował coś przeciwnego i
+  padł. Notacja na ten wzrost należy do Programu~\ref{prog:P03}; liczba jest
+  twoja już teraz i jest użyteczniejszą połową na przeglądzie projektu.}
+\sumitem{34--37}{\textbf{Każde naiwne prawdopodobieństwo to dwie liczebności i
+  dzielenie}, a trudny jest wybór mianownika, bo żądania, użytkownicy i sesje
+  dają poprawne odpowiedzi na różne pytania. Podaj obie liczebności, a nie sam
+  współczynnik. Czym prawdopodobieństwo \emph{jest}, należy do
+  Programu~\ref{prog:P23}. Zbiór, maska, liczba: trzy reprezentacje jednego
+  pomysłu, a prawie wszystko, co robi się ze zbiorem danych, jest jedną z nich
+  z innej strony.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Plik logu ma $500$ wierszy, z czego $40$ jest różnych. Podaj rozmiar
+  zbioru różnych wierszy i powiedz, co liczy ta druga liczba.
+  \answerto{$40$. Te $500$ liczy wystąpienia \dash{} ile wierszy przeszło.}
+\item Czy $\{3, 1, 3, 2\}$ jest innym zbiorem niż $\{1, 2, 3\}$?
+  \answerto{Nie. Powtórzenia i kolejność są odrzucane, więc to jeden zbiór o
+  trzech elementach.}
+\item Zbiory $A$ i $B$ mają $60$ i $80$ elementów, a dzielą $25$. Podaj
+  $\lvert A \cup B \rvert$ i $\lvert A \setminus B \rvert$.
+  \answerto{$115$ i $35$. Suma to $60 + 80 - 25$; różnica to $60 - 25$.}
+\item Dwa zbiory są rozłączne i mają $60$ oraz $80$ elementów. Podaj rozmiar
+  ich sumy.
+  \answerto{$140$. Rozłączne znaczy, że przecięcie jest puste, więc poprawka
+  wynosi zero \dash{} i to jedyny przypadek, w którym dodawanie jest
+  poprawne.}
+\item Zapisz wyrażenie na maskach dla \enquote{w $A$, ale nie w $B$}.
+  \answerto{\code{a \& \textasciitilde b}.}
+\item Maska logiczna nad $\num{10000}$ wierszami ma średnią $\num{0.03}$. Ile
+  wierszy wybiera?
+  \answerto{$300$. Średnia maski to ułamek, który ona wybiera, więc pomnóż
+  przez liczbę wierszy.}
+\item Zaprzecz \enquote{angielski lub krótki}.
+  \answerto{\enquote{nie angielski i nie krótki}. \emph{Lub} staje się
+  \emph{i}.}
+\item Zaprzecz \enquote{oznaczony i (długi lub zduplikowany)}.
+  \answerto{\enquote{nie oznaczony lub (nie długi i nie zduplikowany)}. Dwa
+  razy, od zewnątrz do środka, a nawiasy zostają.}
+\item Filtr mający odrzucać wiersze, które są jednocześnie puste i
+  nieoznaczone, napisano jako \code{not empty and not untagged}. Powiedz w
+  jednym zdaniu, co idzie źle i dlaczego nikt tego nie zauważa.
+  \answerto{Zatrzymuje tylko wiersze, które nie są ani jednym, ani drugim, więc
+  odrzuca dużo więcej, niż zamierzano \dash{} a odrzuconych wierszy nikt nie ma
+  przed sobą, więc jedynym objawem jest zbiór mniejszy, niż oczekiwano.}
+\item Jest $6$ zapytań, $4$ temperatury i $3$ ziarna. Ile przebiegów?
+  \answerto{$72$, przez regułę iloczynu, o ile każda kombinacja jest
+  dozwolona.}
+\item Ile podzbiorów ma zbiór $10$-elementowy, a ile $11$-elementowy?
+  \answerto{$1024$ i $2048$. Każdy dodatkowy element to podwaja.}
+\item Ile par da się utworzyć z $50$ rzeczy?
+  \answerto{$1225$, z $\frac{50 \times 49}{2}$.}
+\item Zadanie po wszystkich parach na $\num{5000}$ dokumentach trwa godzinę. Ile
+  mniej więcej na $\num{10000}$?
+  \answerto{Około czterech godzin \dash{} odrobinę ponad, tym samym czynnikiem
+  co $\val{f10.pairs.ratio}$. Dwa razy większe wejście to cztery razy więcej
+  par.}
+\item Z $\num{20000}$ żądań $\num{140}$ dało błąd. Podaj ułamek i wskaż jeden
+  inny mianownik, którego ktoś mógłby rozsądnie użyć.
+  \answerto{$\frac{140}{20000}$, czyli $\num{0.007}$. Sesje, użytkownicy albo
+  żądania, które doszły do modelu, są wszystkie do obrony i wszystkie dają inne
+  liczby, i dlatego mianownik trzeba podać.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Pokaż, że $\lvert A \cup B \rvert = \lvert A \rvert + \lvert B \rvert$
+  dokładnie wtedy, gdy $A$ i $B$ są rozłączne.
+  \answerto{Reguła ogólna odejmuje $\lvert A \cap B \rvert$, więc obie zgadzają
+  się dokładnie wtedy, gdy to jest zerem \dash{} a to znaczy rozłączne.}
+\item Podaj największe i najmniejsze możliwe $\lvert A \cup B \rvert$, gdy
+  $\lvert A \rvert = 60$ i $\lvert B \rvert = 80$.
+  \answerto{$140$, gdy są rozłączne, i $80$, gdy $A \subseteq B$. Przecięcie
+  może mieć od $0$ do $60$ elementów.}
+\item Słownik $\num{50000}$ tokenów zbudowano z korpusu miliona słów. Co da się
+  powiedzieć o liczbie słów, które wystąpiły dokładnie raz?
+  \answerto{Z tych dwóch liczb nic \dash{} to rozmiar zbioru i liczba
+  wystąpień, a żadna nie mówi, jak wystąpienia są rozłożone. To osobna liczba i
+  trzeba ją zebrać osobno.}
+\item Wyjaśnij, dlaczego średnia maski logicznej jest ułamkiem, a nie jego
+  przybliżeniem.
+  \answerto{Bo tak jest dokładnie $1$, a nie dokładnie $0$, więc suma jest
+  liczebnością, a podzielenie przez długość jest definicją tego ułamka.}
+\item Dwa filtry stosuje się jeden po drugim. Które to działanie na zbiorach i
+  czy kolejność ma znaczenie?
+  \answerto{Przecięcie, i nie: wiersz przechodzi przez oba albo nie, a
+  \emph{i} nie dba o to, o który zapytano pierwszy. Czy \emph{koszt} jest ten
+  sam, to inne pytanie.}
+\item Chcesz wierszy spełniających dokładnie jedno z $p$ i $q$. Zapisz to przez
+  \emph{i}, \emph{lub} oraz \emph{nie}.
+  \answerto{Dowolne z
+  \begin{center}\code{(p or q) and not (p and q)}\end{center}
+  \begin{center}\code{(p and not q) or (q and not p)}\end{center}
+  Nazywa się to \emph{alternatywą wykluczającą} i większość języków ma na to
+  operator, ale nie jest to jedno z trzech słów tej sekcji, więc z nich trzeba
+  to zbudować.}
+\item Przeszukiwanie siatki ma $4$ modele, $3$ precyzje i $5$ rozmiarów wsadu,
+  ale dwie konkretne pary model-precyzja nie są wspierane. Ile przebiegów?
+  \answerto{$50$: pełna siatka to $60$, a każda niewspierana para usuwa $5$
+  rozmiarów wsadu pod sobą. Reguła iloczynu nie stosuje się do całej siatki,
+  gdy wybory przestają być niezależne, więc policz wykluczenia i odejmij.}
+\item Ktoś proponuje ocenić każdy podzbiór $30$ cech, żeby znaleźć najlepszą
+  kombinację, po sekundzie na podzbiór. Powiedz, ile to potrwa i co
+  zaproponować zamiast tego.
+  \answerto{Ponad miliard podzbiorów, czyli ponad trzydzieści lat. Cokolwiek,
+  co nie przechodzi po wszystkich: przebieg zachłanny, ranking pojedynczych
+  cech albo metoda oceniająca cechy bez próbowania każdej kombinacji.}
+\item Odsiewanie duplikatów po wszystkich parach trwa cztery godziny na
+  dzisiejszym korpusie. Korpus urośnie dziesięciokrotnie. Podaj czynnik i
+  powiedz, co to robi z planem.
+  \answerto{Około stukrotny, bo par przybywa jak $n^{2}$ \dash{} cztery godziny
+  stają się ponad dwoma tygodniami. Plan musi się zmienić, a nie dostać większą
+  maszynę.}
+\item Ten program dał ci licznik i mianownik, i się zatrzymał. Powiedz, na jakie
+  pytanie musiałbyś odpowiedzieć, zanim nazwiesz ten ułamek
+  prawdopodobieństwem.
+  \answerto{Czy rzeczy policzone na dole są właściwe i czy są równie
+  prawdopodobne. Oba wymagają staranności, a Program~\ref{prog:P23} jest
+  miejscem, w którym ją dostają.}
+\end{furtherproblems}

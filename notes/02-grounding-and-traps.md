@@ -700,8 +700,8 @@ than to the others.
 The entries in this section came out of writing the Foundation programs
 themselves rather than out of the literature: item 41 out of F3, items 42 to 46
 out of F4, items 47 and 48 out of F5, item 49 out of F6, items 50 and 51 out of
-F7, items 52 to 54 out of F8 and items 55 to 57 out of F9. Say which program
-produced which, never how many there are — the count at the head of §3 was stated once and had
+F7, items 52 to 54 out of F8, items 55 to 57 out of F9 and items 58 to 62 out
+of F10. Say which program produced which, never how many there are — the count at the head of §3 was stated once and had
 drifted by five before anybody reread it.
 
 They carry the same health warning: the list above is a catalogue of
@@ -857,6 +857,45 @@ question to ask of an index is therefore not which measure it uses but whether
 what went into it was normalised. → **F09** for the identity that says when
 they cannot disagree, **P05** for which to prefer when they do and what
 normalising costs.
+
+**58. "We trained on ten million tokens" and "our vocabulary is ten million"
+are the same claim.**  `len(tokens)` and `len(set(tokens))` are one function
+call apart and answer different questions; on a repetitive corpus they differ
+by a large factor. Neither number is more correct, and the words for them are
+not interchangeable — when a count appears in a claim, say whether it counted
+occurrences or distinct things. → **F10**.
+
+**59. "Two evaluation sets of 1000 and 1200 give 2200 examples."** Only if
+they are disjoint. `|A ∪ B| = |A| + |B| − |A ∩ B|`, and the shared part was
+counted once too often. What makes it expensive is that the error has two
+halves and only one is visible: the count overstates coverage, *and* every
+shared example is scored twice, so it weights double in whatever average comes
+out. → **F10** for two sets, **P12** for inclusion–exclusion in general.
+
+**60. "`not (a and b)` is `not a and not b`."** It is `not a or not b` — the
+`and` becomes an `or`, because failing *both* only requires failing one. The
+wrong negation of a conjunction **always keeps too little, never too much**,
+and that is why it survives: a filter that keeps too much shows you rows you
+did not expect and you go and look, while a filter that keeps too little shows
+you nothing at all and the only symptom is a dataset smaller than it should be
+— which is the symptom everybody attributes to the data. → **F10**.
+
+**61. "Just try all the combinations."** A set of n things has 2^n subsets,
+and doubling per element is not a rate anybody's intuition handles: twenty
+features is a million, forty is more than a million million, and the step
+between them is twenty more yes-or-no choices. When a plan enumerates
+combinations, write the count down before writing the loop. → **F10** for the
+count, **P12** for the four rules formally. Note also that the product rule
+needs its condition stated: it applies to *independent* choices, and one
+forbidden combination makes the multiplication wrong.
+
+**62. "Twice the data is twice the work."** Not when the work is per pair.
+n items make n(n−1)/2 pairs, so doubling multiplies the work by
+(4n−2)/(n−1) — 4.020 at a hundred, 4.002 at a thousand, falling towards four
+**from above**. The overnight job on last month's corpus does not run
+overnight on twice the corpus; it runs for four nights. Worth knowing as a
+count before it is known as a growth rate: → **F10** for the count, **P03**
+for the notation and for what that notation does not say.
 
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
