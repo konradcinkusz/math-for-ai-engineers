@@ -1615,12 +1615,35 @@
   \item[\textbf{#2}] \csuse{mfa@a@#1@#2}%
 }
 \newcommand{\mfa@answerprogram}[1]{%
+  % PURE SHRINK before the heading, and it is load-bearing rather than
+  % cosmetic: 0 pt natural, so nothing moves, and 3 pt a block for TeX to give
+  % back when a page will not otherwise fit.
+  %
+  % It is here rather than on the list below because of where the failure
+  % actually was. Every UNWRITTEN program still gets a heading and a one-line
+  % "no answers were stored", so the tail of this appendix is twenty-two
+  % heading-plus-line units in a row -- eleven on one page -- and those pages
+  % contain no list at all. \subsection* binds its heading to what follows with
+  % \@startsection's penalty and offers about 0.2ex of shrink, so the page was
+  % a concertina of rigid three-line blocks: eleven legal breakpoints and
+  % nothing to give at any of them. \raggedbottom cannot help, because it adds
+  % stretch and the page is too TALL.
+  %
+  % The tell was that adding shrink to the list lengths moved the reported
+  % overflow by not one tenth of a point. Shrink has to be where the material
+  % is, and on those pages the material is headings.
+  \par\vspace{0pt plus 0pt minus 3pt}%
   \subsection*{\lblProgram~#1\quad\textmd{\itshape\csuse{mfa@title@#1}}}%
   \ifcsdef{mfa@akeys@#1}{%
+    % The three list lengths below carry SHRINK, and that is not cosmetic --
+    % see the note above \answersbody. Rigid, they made a page of answers a
+    % block of matter that could give back nothing at all.
     \begin{list}{}{%
       \setlength{\leftmargin}{3.2em}\setlength{\labelwidth}{2.7em}%
-      \setlength{\labelsep}{0.5em}\setlength{\itemsep}{3pt}%
-      \setlength{\topsep}{3pt}\setlength{\parsep}{0pt}%
+      \setlength{\labelsep}{0.5em}%
+      \setlength{\itemsep}{3pt plus 0pt minus 1pt}%
+      \setlength{\topsep}{3pt plus 0pt minus 1pt}%
+      \setlength{\parsep}{0pt plus 0pt minus 0.3pt}%
       \renewcommand{\makelabel}[1]{\hfill##1}}
       \forlistcsloop{\mfa@printoneanswer{#1}}{mfa@akeys@#1}
     \end{list}%
@@ -1631,10 +1654,43 @@
 % The answers body, without a heading of its own, so the appendix that carries
 % it can be a numbered appendix like any other and appear in the running heads
 % and the ToC in the ordinary way.
+%
+% \raggedbottom, and it is the index's cure arriving in the second place that
+% needed it. CI failed `en` A4 on TWO overfull vboxes on ONE page, 12.3 pt and
+% 5.0 pt, deep in this appendix, on source that builds with zero vboxes in the
+% container that writes the published PDF -- the divergence this file already
+% documents, where CI has newtx and this container has not and cannot install
+% it. It was located by page number rather than guessed at: tools/checklog.py
+% now prints the page each box landed on, for exactly this reason.
+%
+% The defect is structural and it was latent rather than new. A page of
+% answers is a `list` whose \topsep, \itemsep and \parsep were all set with
+% \setlength and were therefore RIGID, under book's twoside \flushbottom,
+% which requires every page to be exactly \textheight tall. So the page had
+% almost no glue to give: \subsection*'s own skip carries about 0.2ex of
+% shrink and nothing else did. Adding fifteen answers anywhere in the book
+% moves every later page, and one of them then landed 12.3 pt over with no
+% way to absorb it.
+%
+% Answers are reference matter, like an index: nobody reads them front to
+% back, and every answers section in every textbook lets its pages end short.
+% So the same two-part cure the index needed applies unchanged, and for the
+% same reason -- \raggedbottom lets a page end short, and the SHRINK on the
+% list lengths absorbs a residual that raggedbottom cannot, because
+% raggedbottom adds stretch and an overfull page is too TALL rather than too
+% short.
+%
+% Scoped to this appendix, so no frame, no cue, no orphan tail and no page in
+% the body of the book moves; \clearpage flushes the last answers page before
+% \flushbottom resumes for everything after it. \vfuzz was rejected here for
+% the reason it was rejected for the index: it hides real overfull vboxes
+% everywhere else, which is how a gate goes quiet.
 \newcommand{\answersbody}{%
+  \raggedbottom
   \noindent\lblAnswersIntro\par\vspace{8pt}
   \ifdef{\mfaprograms}{\forlistloop{\mfa@answerprogram}{\mfaprograms}}{%
     \noindent{\color{mred}\lblNoAnswers}\par}%
+  \clearpage\flushbottom
 }
 % Unnumbered form, for a draft build that has no appendix wiring yet.
 \newcommand{\printanswers}{%
@@ -2220,9 +2276,18 @@
 %  (Written with plain lengths, not \z@ and \@plus: this block sits OUTSIDE
 %  the \makeatletter group above, and an @-command here is an undefined
 %  control sequence in every build.)
+%
+%  AND IT CAME BACK, at 0.2 pt of shrink, when Program P12 added its index
+%  entries: CI reported 12.29 pt and 4.99 pt on ONE page of `main-en-a4.ind`,
+%  which is again the two columns of a single page. A fifth of a point over a
+%  column of forty entries is about eight points, and eight points does not
+%  absorb twelve. Half a point does -- about twenty a column -- and it is
+%  still half a point between two index lines, which is nothing. The number
+%  scales with the index and the index only grows, so expect to raise it
+%  again; \vfuzz stays rejected for the reason above.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 0.2pt}}{}{%
+  \setlength{\parskip}{0pt plus 0.3pt minus 0.5pt}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex

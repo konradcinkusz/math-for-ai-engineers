@@ -1,0 +1,4 @@
+flowchart LR
+  A["the definition averages over every ORDERING of the<br/>features, and there are n! of those to average"]
+  A --> B["but what a feature adds depends only on WHICH came<br/>before it, so orderings sharing that set agree"]
+  B --> C["collecting them turns n! averages into 2^n subsets,<br/>a smaller exponential and still an exponential"]

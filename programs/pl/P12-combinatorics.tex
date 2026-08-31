@@ -1,26 +1,1093 @@
 %% P12 --- Kombinatoryka i zliczanie
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Kazda liczba w tym programie, ktorej czytelnik nie policzy w pamieci,
+%% pochodzi z code/p12_combinatorics.py i wchodzi na strone przez \val{}.
+%% Listing konsolowy to zatwierdzony transcript pisany przez ten skrypt.
+%%
+%% TEZA: dwa pytania -- czy kolejnosc ma znaczenie i czy cos moze sie
+%% powtorzyc -- rozstrzygaja, ktora z czterech liczb jest ta wlasciwa, a
+%% niemal kazdy blad w zliczaniu bierze sie z odpowiedzi na zle pytanie.
+%%
+%% CO TEN PROGRAM DOSTAJE, odczytane z plikow, a nie z pamieci:
+%%   F10  jest warstwa elementarna pod tym programem i sam to mowi. Daje
+%%        regule iloczynu z warunkiem niezaleznosci, 2^n podzbiorow, liczbe
+%%        par n(n-1)/2 z krokiem "podziel przez dwa" oraz wlaczenia i
+%%        wylaczenia dla dwoch zbiorow -- a "cztery reguly formalnie,
+%%        szufladki i rachunek urodzinowy" oddaje tutaj z nazwy. TRZY jego
+%%        zatwierdzone wartosci sa w skrypcie sprawdzane bramkami.
+%%   F04  daje silnie jako pi z indeksem w ciele oraz iloczyn pusty, przez co
+%%        0! = 1 nie potrzebuje osobnej reguly.
+%%   F03  daje logarytmy, jedyny sposob, by utrzymac 32000^20 w glowie.
+%%   P02  ma sekcje "Nigdy nie twórz prawdopodobienstwa", a sekcja 4 tutaj to
+%%        to samo odkrycie w miejscu, gdzie nikt sie go nie spodziewa:
+%%        podrecznikowy wzor na kolizje zwraca DOKLADNIE ZERO we float64.
+%%
+%% CZEGO TEN PROGRAM NIE RUSZA, sprawdzone w tools/programs.json:
+%%   czym JEST prawdopodobienstwo i co robi warunkowanie          -> P23
+%%   zmienne losowe, wartosc oczekiwana, wariancja                -> P24
+%%   grafy i ich argumenty zliczajace                             -> P13
+%%   kwantyfikatory, indukcja, pisanie dowodu                     -> P14
+%%   notacja O. Ten program liczy; nigdy nie mowi "kwadratowy"    -> P03
+%%
+%% Blizniak: programs/en/P12-combinatorics.tex. Ramka w ramke, makro w makro,
+%% liczba w liczbe; porownuje je tools/parity.py.
 
 \program{Kombinatoryka i zliczanie}
 \label{prog:P12}
+\index{zliczanie!cztery reguły}
+\index{kombinatoryka}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{zadać dwa pytania rozstrzygające, która reguła zliczania jest
+  właściwa, i powiedzieć, dlaczego pytanie bez obu odpowiedzi nie jest jeszcze
+  pytaniem}
+\outcome{9--16}{policzyć wariacje i kombinacje oraz powiedzieć, skąd bierze
+  się silnia w mianowniku symbolu Newtona}
+\outcome{17--26}{stosować włączenia i wyłączenia dla więcej niż dwóch zbiorów
+  oraz powiedzieć, co gwarantuje zasada szufladkowa, czego nie da żadne
+  prawdopodobieństwo}
+\outcome{27--35}{dobrać rozmiar skrótu do liczby elementów, które ma rozróżnić,
+  i powiedzieć, który z dwóch wzorów na to wolno policzyć}
+\outcome{36--43}{podać liczbę opisującą przestrzeń przeszukiwania i dokładną
+  atrybucję oraz powiedzieć, co ta liczba wyklucza}
+\end{outcomes}
 
-Argument: four counting rules \dash{} product, permutation, combination,
-inclusion--exclusion \dash{} plus the pigeonhole principle and simple
-recurrences. Payoff: the birthday calculation, so the reader can size a hash
-for dataset deduplication and say why 64 bits is not enough and 128 is; the
-size of a beam search's space and why beam width buys so little; **a Shapley
-value is an average over every ordering of the features**, so exact SHAP is
-exponential by construction and every implementation you have used is a
-sampling approximation \dash{} which changes how much you should trust an
-attribution plot.
+\begin{quiz}
+\item Z $\val{p12.four.n}$ cech wybierasz $\val{p12.four.k}$ do ablacji. Na ile
+  sposobów? \teachesat{1--2}
+  \answerto{Pytanie nie jest pełne. Dopóki nie powie, czy kolejność ma
+  znaczenie i czy cechę wolno wybrać dwa razy, ma trzy dające się obronić
+  odpowiedzi, a cała sekcja 1 to właśnie ta para pytań.}
+\item Ile wynosi $\binom{\val{p12.sym.n}}{\val{p12.sym.k}}$ w porównaniu z
+  $\binom{\val{p12.sym.n}}{\val{p12.sym.rest}}$? \teachesat{13--14}
+  \answerto{Tyle samo, oba to $\val{p12.sym.val}$. Wybór
+  $\val{p12.sym.k}$ cech do zostawienia jest wyborem
+  $\val{p12.sym.rest}$ cech do odrzucenia, więc to jedno działanie opisane z
+  dwóch stron.}
+\item Trzy zbiory ewaluacyjne nakładają się parami, a część przykładów jest we
+  wszystkich trzech. Zapisz rozmiar ich sumy. \teachesat{21--22}
+  \answerto{Dodaj trzy, odejmij trzy nakładki parami, dodaj z powrotem część
+  wspólną wszystkich trzech. Ten ostatni składnik jest tam dlatego, że
+  odejmowanie par usunęło ją o raz za dużo.}
+\item Skrót ma $\val{p12.bits64}$ bitów, a dokumentów jest
+  $\val{p12.hash.m}$. Jaka jest z grubsza szansa, że dwa się zderzą?
+  \teachesat{32--33}
+  \answerto{Około $\val{p12.hash.p64}$ procent, czyli
+  $\val{p12.hash.ratio}$ razy więcej niż liczba, do której dochodzi większość
+  ludzi. Znaczenie ma liczba \emph{par}, a nie liczba dokumentów.}
+\item Dokładne wartości Shapleya dla $\val{p12.shap.big}$ cech. Ile koalicji
+  trzeba policzyć? \teachesatone{40}
+  \answerto{$\val{p12.shap.big.coal}$, czyli $2^{\val{p12.shap.big}}$, a nie
+  $\val{p12.shap.big}!$. Liczy się tylko to, \emph{które} cechy były
+  wcześniej, nigdy ich kolejność, a zebranie kolejności zamienia jedną
+  wykładniczą na mniejszą.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+% ============================================================
+\section{Dwa pytania przed każdym wzorem}
+\label{sec:P12-two-questions}
+\index{zliczanie!kolejność i powtórzenia}
+
+\begin{fr}
+Część~IV to zmiana tematu, a nie ciąg dalszy. Nic z Programów
+od~\ref{prog:P04} do~\ref{prog:P11} nie jest tu potrzebne i nic tutaj nie
+potrzebuje macierzy.
+
+Ten program dostaje w spadku Program~\ref{prog:F10}, który policzył trzy
+rzeczy \dash{} przebiegi w siatce, podzbiory zbioru, pary z kolekcji \dash{} a
+potem wprost nazwał to, co zostawia.
+
+Zacznij tam, gdzie on skończył. Masz $\val{p12.four.n}$ cech i zamierzasz
+poddać ablacji $\val{p12.four.k}$ z nich. Na ile sposobów można to zrobić?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Pytanie nie jest skończone, a jeśli podałeś liczbę, była jedną z trzech.
+\end{ansblock}
+
+Przed każdym wzorem dwa pytania:
+
+\begin{itemize}
+\item \textbf{Czy kolejność ma znaczenie?} Ablacja cech $3$, $7$ i $1$ w tej
+  kolejności i ablacja tych samych cech w innej mogą być tym samym
+  eksperymentem albo nie. Zdanie tego nie powiedziało.
+\item \textbf{Czy coś może się powtórzyć?} Cechy nie da się poddać ablacji dwa
+  razy w jednym przebiegu. Token można wylosować ze słownika dwa razy jak
+  najbardziej. Tego zdanie też nie powiedziało.
+\end{itemize}
+
+\textbf{Niemal każdy błąd w zliczaniu w praktyce inżynierskiej to odpowiedź na
+złe z tych dwóch pytań}, a tak łatwo je pominąć dlatego, że w zwykłej mowie
+\enquote{wybierz trzy z dziesięciu} brzmi jak pełne polecenie.
+
+Weź je po kolei. Załóżmy, że kolejność ma znaczenie, a powtórzenia są
+dozwolone \dash{} losujesz $\val{p12.four.k}$ razy z
+$\val{p12.four.n}$ i zapisujesz wynik. Ile jest wyników?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.four.ordrep}$}
+Czyli $\val{p12.four.n}^{\val{p12.four.k}}$, i jest to reguła iloczynu
+z~Programu~\ref{prog:F10} bez żadnego dodatku: trzy niezależne wybory po
+$\val{p12.four.n}$ możliwości.
+
+Ogólnie \textbf{$n^{k}$}, i to jest liczba, której chcesz zawsze wtedy, gdy
+liczony obiekt to \emph{ciąg z ustalonego alfabetu} \dash{} hasło, prompt o
+$k$ tokenach, ciąg bajtów.
+
+Teraz zakaż powtórzeń. Kolejność wciąż ma znaczenie, ale zużytej cechy już
+nie ma. Ile teraz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.four.ordnorep}$}
+Z $\val{p12.four.n} \times 9 \times 8$: dziesięć na pierwszą, dziewięć na
+drugą, bo jedna odpadła, osiem na trzecią.
+
+Ta liczba ma nazwę \dash{} to liczba \textbf{wariacji bez powtórzeń}
+$\val{p12.four.k}$ elementów z $\val{p12.four.n}$ \dash{} i warto się przy
+niej zatrzymać, bo wygląda, jakby łamała regułę, która ją wyprodukowała.
+
+Program~\ref{prog:F10} mówił, że niezależne wybory się mnożą, i starannie
+powiedział, co znaczy niezależne: każdy wybór pierwszego zostawia te same
+możliwości dla drugiego. Tu tak nie jest. Wybierz najpierw cechę $3$, a cecha
+$3$ nie jest już dostępna jako druga. Czy reguła iloczynu obowiązuje, czy nie?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Obowiązuje, a warunek, którego naprawdę potrzebuje, jest słabszy niż ten
+podany.
+\end{ansblock}
+
+Ustalona musi być \textbf{liczba możliwości na każdym kroku, a nie same
+możliwości}. Którakolwiek cecha poszła pierwsza, zostaje dokładnie dziewięć,
+więc każdy z dziesięciu pierwszych wyborów rozgałęzia się na te same
+dziewięć. Drzewo jest jednorodne, choć jego gałęzie noszą różne etykiety, a
+jednorodne drzewo to wszystko, czego reguła iloczynu kiedykolwiek
+potrzebowała.
+
+\begin{note}
+To doprecyzowanie reguły, którą już masz, a nie nowa reguła. Sformułowania
+z~Programu~\ref{prog:F10} używaj przy sprawdzaniu siatki, bo tam możliwości
+naprawdę są za każdym razem te same i jedna zakazana kombinacja psuje wynik.
+To sformułowanie pozwala mnożyć mimo kurczącej się puli, a oba warto trzymać
+osobno: pierwsze mówi o tym, które możliwości istnieją, drugie tylko o tym,
+ile ich jest.
+\end{note}
+
+Teraz porzuć kolejność. Ablacja $\{3, 7, 1\}$ to jeden eksperyment, jakkolwiek
+go wypiszesz. Ile teraz i przez co podzieliłeś?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.four.unordnorep}$, dzieląc przez $\val{p12.kfact}$}
+Bo każdy wybór $\val{p12.four.k}$ cech był liczony raz na każdą kolejność, w
+jakiej dało się go zapisać, a $\val{p12.four.k}$ elementów zapisuje się na
+$\val{p12.four.k}! = \val{p12.kfact}$ sposobów.
+
+\textbf{To jest krok \enquote{podziel przez dwa} z~Programu~\ref{prog:F10} w
+wersji ogólnej.} Tamten program liczył pary, mnożąc $n$ przez $n-1$ i dzieląc
+przez dwa, i mówił, że dzielenie jest faktem o zbiorach: $\{a, b\}$ i
+$\{b, a\}$ to jedna para. To dzielenie było dzieleniem przez $2!$. Przy trzech
+naraz jest to dzielenie przez $3!$, a przy $k$ naraz przez $k!$ \dash{} ten
+sam krok, a jedyny powód, dla którego nie wyglądał na taki, jest ten, że
+dzielenie przez dwa rzadko wygląda na dzielenie przez silnię.
+\end{fr}
+
+\begin{fr}
+Zostaje jedna pusta komórka tabeli: kolejność nie ma znaczenia, a powtórzenia
+\emph{są} dozwolone. Liczenie worków zamiast ciągów \dash{} ile różnych
+multizbiorów $\val{p12.four.k}$ tokenów da się wylosować ze słownika o
+$\val{p12.four.n}$ pozycjach, jeśli nie zapisujesz kolejności.
+
+Odpowiedź to $\binom{n + k - 1}{k}$, czyli tutaj $\val{p12.four.unordrep}$.
+
+\begin{rigourbox}
+Ten wzór jest podany, a nie wyprowadzony. Argument nazywa się \emph{gwiazdki i
+przegródki} i jest w każdym pierwszym kursie kombinatoryki: ustaw w rzędzie
+$k$ elementów i $n-1$ przegródek, a każde ustawienie dwóch rodzajów symboli to
+jeden multizbiór.
+
+W praktyce jest najrzadziej używana z czterech i dlatego stoi tu jako nazwa do
+rozpoznania, a nie jako technika. Kiedy już się pojawia, zwykle w przebraniu:
+liczenie sposobów podziału ustalonego budżetu na $n$ kubełków to ta komórka, i
+tak samo liczenie kształtów wektora worka słów o ustalonej sumie.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Cała sekcja sprowadza się więc do jednej tabeli.
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+ & \textbf{z powtórzeniami} & \textbf{bez powtórzeń} \\
+\midrule
+\textbf{kolejność ma znaczenie} & $n^{k}$ \dash{} $\val{p12.four.ordrep}$
+  & $\frac{n!}{(n-k)!}$ \dash{} $\val{p12.four.ordnorep}$ \\
+\textbf{kolejność bez znaczenia} & $\binom{n+k-1}{k}$ \dash{} $\val{p12.four.unordrep}$
+  & $\binom{n}{k}$ \dash{} $\val{p12.four.unordnorep}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Cztery liczby opisujące te same dziesięć rzeczy branych po trzy, biegnące od
+$\val{p12.four.unordnorep}$ do $\val{p12.four.ordrep}$ \dash{} współczynnik
+ponad ośmiu, rozstrzygnięty w całości przez dwa słowa, których w pytaniu nie
+było.
+
+\mermaidfig{p12-two-questions}{Dwa pytania wskazujące, której z czterech liczb
+domaga się zadanie.}{kolejność, powtórzenia, liczba}
+\end{fr}
+
+% ============================================================
+\section{Wariacje i kombinacje}
+\label{sec:P12-choices}
+\index{kombinatoryka!symbol Newtona}
+
+\begin{fr}
+Weź prawą górną komórkę do granicy. Zamiast ustawiać $\val{p12.four.k}$ z
+$\val{p12.four.n}$ cech, ustaw je wszystkie.
+
+Narzędzie już masz: Program~\ref{prog:F04} zapisał silnię jako pi z indeksem
+we własnym ciele, $n! = \prod_{i=1}^{n} i$. Ile jest ustawień
+$\val{p12.four.n}$ cech?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.fact.n}$}
+Czyli $\val{p12.four.n}!$, i to już liczba, której nikt nie wypisze.
+
+Zauważ, jak wiąże się z liczbą wariacji. Ustawienie wszystkich dziesięciu to
+ustawienie pierwszych trzech, a po nim ustawienie pozostałych siedmiu, więc
+\[ n! = \frac{n!}{(n-k)!} \times (n-k)! \]
+co jest kurczącą się pulą czytaną od tyłu i co tłumaczy, dlaczego liczbę
+wariacji zapisuje się zwykle jako ten iloraz, a nie jako iloczyn $k$
+malejących czynników. Iloraz jest formą schludniejszą; iloczyn tą, którą
+policzysz w pamięci.
+\end{fr}
+
+\begin{fr}
+Prawa dolna komórka ma symbol i nazwę, i warto mieć oba, bo tego używa
+literatura.
+
+\[ \binom{n}{k} = \frac{n!}{k!\,(n-k)!} \]
+
+\textbf{symbol Newtona}: wariacje $k$ z $n$ podzielone przez $k!$ kolejności,
+w których każdy wybór został policzony.
+
+\begin{notationbox}
+Po polsku czyta się to \emph{$n$ po $k$}, a sam symbol nazywa się symbolem
+Newtona. Po angielsku ten sam obiekt czyta się \enquote{$n$ choose $k$}
+\dash{} inna nazwa tego samego obiektu, a nie inny obiekt, i wydanie
+angielskie tej książki używa nazwy angielskiej.
+
+Sama notacja jest w obu ta sama, co jest ogólną zasadą tej książki: to, co
+byś wpisał, zostaje bez zmian, to, co byś powiedział, niekoniecznie.
+\end{notationbox}
+
+Teraz użyj go do czegoś, co już policzyłeś inną drogą.
+Program~\ref{prog:F10} policzył pary z $\val{p12.ie.a}$ dokumentów. Zapisz tę
+liczbę jako symbol Newtona.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\binom{\val{p12.ie.a}}{2} = \val{f10.pairs}$}
+Para to dwa elementy wybrane z wielu z porzuceniem kolejności, czyli prawa
+dolna komórka przy $k = 2$. Rozwiń go, a
+$\frac{n!}{2!\,(n-2)!} = \frac{n(n-1)}{2}$, czyli wzór, który podał tamten
+program.
+
+\begin{note}
+To nie jest podobieństwo. Skrypt \code{code/p12\_combinatorics.py} odczytuje
+zatwierdzoną liczbę par z pliku wartości Programu~\ref{prog:F10} i przerywa
+budowanie, jeśli $\binom{n}{2}$ jej nie odtworzy, więc oba programy nie mogą
+rozjechać się co do tego, czym jest para. Dwie kolejne liczby tamtego programu
+mają w sekcjach poniżej takie same bramki.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Oto własność symbolu Newtona, w którą najtrudniej uwierzyć, i warto najpierw
+się co do niej pomylić.
+
+Z $\val{p12.sym.n}$ cech łatwiej jest wybrać $\val{p12.sym.k}$ z nich czy
+wybrać $\val{p12.sym.rest}$ z nich? Odpowiedz szybko, bez liczenia.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Ani jedno, ani drugie. Oba to $\val{p12.sym.val}$.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{$\binom{n}{k} = \binom{n}{n-k}$, a powód mieści się w jednym zdaniu:
+wybór $\val{p12.sym.k}$ cech do zostawienia \emph{jest} wyborem
+$\val{p12.sym.rest}$ cech do odrzucenia.} Jest jedno działanie, a dwie liczby
+opisują je z przeciwnych stron.
+
+Powodem, dla którego niemal każdy wskazuje mniejszą liczbę, jest to, że oba
+pytania sprawiają wrażenie różnej ilości pracy \dash{} wymienienie trzech
+rzeczy idzie szybciej niż wymienienie siedemnastu. To fakt o zapisywaniu ich,
+a nie o tym, ile ich jest. Wzór czyni to oczywistym, bo zamiana $k$ i $n-k$
+zamienia dwa czynniki w mianowniku, który jest iloczynem.
+
+Ciekawostką przestaje to być na końcach. $\binom{n}{0}$ i $\binom{n}{n}$ to
+oba $1$ \dash{} jest dokładnie jeden sposób, by nie wybrać nic, i dokładnie
+jeden, by wybrać wszystko \dash{} a pierwszy z nich to iloczyn pusty, za
+którym Program~\ref{prog:F04} się wstawiał, przybywający tu jako liczba.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Liczby rosną więc od końców i mają szczyt pośrodku:
+$\binom{\val{p12.sym.n}}{10} = \val{p12.sym.peak}$, największy wyraz w tym
+wierszu.
+
+Ten kształt rozstrzyga prawdziwy eksperyment. Masz $\val{p12.abl.n}$ cech i
+chcesz zrobić badanie ablacyjne. Program~\ref{prog:F10} wycenia sprawdzenie
+\emph{każdego} podzbioru na $2^{n}$, czyli $\val{p12.abl.all}$ przebiegów, i
+to się nie wydarzy.
+
+Ogranicz je zatem: żadnego podzbioru większego niż $\val{p12.abl.k}$. Ile to
+przebiegów?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.abl.upto}$}
+Z $1 + \val{p12.abl.singles} + \val{p12.abl.pairs} + \val{p12.sym.val}$
+\dash{} pusta ablacja, pojedyncze, pary i trójki, czyli
+$\binom{20}{0}$ do $\binom{20}{3}$, wśród nich $\val{p12.sym.val}$ sprzed
+dwóch ramek.
+
+\textbf{$\val{p12.abl.upto}$ przebiegów wobec $\val{p12.abl.all}$ to
+współczynnik $\val{p12.abl.frac}$}, i to jest cała treść decyzji o
+ograniczeniu rozmiaru podzbioru. To także powód, dla którego ogranicza się
+zwykle do dwóch albo trzech, a nie do pięciu: wiersz wciąż tam stromo rośnie,
+więc każdy kolejny rozmiar kosztuje więcej niż wszystkie mniejsze razem.
+
+Nawyk jest ten z~Programu~\ref{prog:F10}, o regułę dalej: zapisz liczbę, zanim
+napiszesz pętlę, a teraz umiesz ją zapisać dla każdego z czterech kształtów, a
+nie tylko dla podzbiorów.
+\end{fr}
+
+% ============================================================
+\section{Reguły, które nie są iloczynami}
+\label{sec:P12-not-products}
+\index{zliczanie!włączenia i wyłączenia}
+\index{zliczanie!zasada szufladkowa}
+
+\begin{fr}
+Wszystko dotąd było regułą iloczynu w różnych przebraniach. Trzy rzeczy nią
+nie są i każda odpowiada na pytanie, do którego iloczyn nie sięga.
+
+Zacznij od najtańszej. Ustal jedną konkretną cechę \dash{} nazwij ją pierwszą
+\dash{} i podziel każdy $k$-podzbiór zbioru $n$-elementowego na dwie kupki
+według tego, czy ta cecha w nim jest. Policz obie kupki.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\binom{n-1}{k-1}$ ją zawiera, a $\binom{n-1}{k}$ nie, więc
+\[ \binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k} \]
+\end{ansblock}
+
+Jeśli cecha jest w środku, pozostałe $k-1$ pochodzi z pozostałych $n-1$; jeśli
+jej nie ma, wszystkie $k$ stamtąd pochodzą. Nic nie jest w obu kupkach i nic
+nie jest poza obiema, więc liczby się dodają.
+
+\textbf{To jest rekurencja i tak właśnie symbol Newtona się liczy.}
+\code{math.comb} nie tworzy $n!$, by je potem wydzielić, co budowałoby liczbę
+o setkach cyfr w odpowiedzi na pytanie, którego odpowiedź ma cztery; schodzi w
+dół trójkąta dodawań, a każda wartość pośrednia jest liczbą czegoś.
+
+Własny nawyk tej książki stosuje się i do wyprowadzenia, nie tylko do
+arytmetyki: argument powyżej to \emph{decyzja tak-lub-nie o jednym elemencie},
+czyli dokładnie ruch, którym Program~\ref{prog:F10} dostał $2^{n}$. Ten sam
+ruch odpowiada tu na drugie pytanie, i to jest kolejna ramka.
+\end{fr}
+
+\begin{fr}
+Zsumuj cały wiersz. Ile wynosi
+$\binom{\val{p12.abl.n}}{0} + \binom{\val{p12.abl.n}}{1} + \cdots +
+\binom{\val{p12.abl.n}}{\val{p12.abl.n}}$ i dlaczego?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.abl.all}$}
+Czyli $2^{\val{p12.abl.n}}$, i jest to liczba podzbiorów
+z~Programu~\ref{prog:F10} co do cyfry.
+
+Powodem jest to, że wiersz \emph{jest} podzbiorami, poukładanymi według
+rozmiaru. Żeby wybrać podzbiór, wolno wskazać jego rozmiar, a potem wskazać
+elementy \dash{} to lewa strona \dash{} albo przejść przez elementy,
+decydując: w środku czy poza, co jest stroną prawą. Jedna kolekcja obiektów
+policzona dwa razy, a tożsamość wypada bez żadnej algebry.
+
+\begin{note}
+To druga z trzech bramek na Programie~\ref{prog:F10}. Skrypt sumuje ten wiersz
+i przerywa budowanie, jeśli suma nie jest liczbą podzbiorów, którą tamten
+program zatwierdził, więc \enquote{kombinacje} tutaj i \enquote{podzbiory}
+tam nie mogą się rozjechać.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Druga reguła, która nie jest iloczynem, jest u ciebie w wersji dla dwóch
+zbiorów.
+
+Program~\ref{prog:F10} miał dwa zbiory ewaluacyjne o $\val{p12.ie.a}$ i
+$\val{p12.ie.b}$ przykładach, dzielące $\val{p12.ie.ab}$, i zwracał uwagę, że
+dodanie rozmiarów liczy część wspólną dwa razy.
+
+To są te same dwa zbiory. Przybył trzeci, o $\val{p12.ie.c}$ przykładach:
+dzieli $\val{p12.ie.ac}$ z pierwszym i $\val{p12.ie.bc}$ z drugim, a
+$\val{p12.ie.abc}$ przykładów jest we wszystkich trzech. Ile to różnych
+przykładów?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.ie.union}$}
+Nie $\val{p12.ie.naive}$, czyli o $\val{p12.ie.over}$ za dużo.
+
+\[ \lvert A \cup B \cup C \rvert = \val{p12.ie.naive}
+   - \val{p12.ie.pairsum} + \val{p12.ie.abc} = \val{p12.ie.union} \]
+
+Dwa pierwsze składniki to reguła, którą miałeś. Trzeci jest nowy i to jego
+warto zrozumieć, a nie zapamiętać: przykład należący do wszystkich trzech
+zbiorów jest przez pierwszy składnik policzony \emph{trzy} razy, a potem przez
+drugi odjęty \emph{trzy} razy, po jednym w każdej nakładce parami. Został więc
+usunięty w całości i musi wrócić raz.
+
+\textbf{Znaki się zmieniają na przemian, bo każda runda poprawek przestrzeliwa
+poprzednią.} To reguła ogólna i właśnie dlatego nazywa się zasadą włączeń i
+wyłączeń.
+
+\begin{note}
+Skrypt buduje te zbiory jako trzy prawdziwe zbiory z ich siedmiu obszarów i
+porównuje wzór z rzeczywistą sumą, zamiast sprawdzać arytmetykę. Dwa pierwsze
+zbiory ma też zabramkowane na zatwierdzonych rozmiarach
+z~Programu~\ref{prog:F10}, więc jest to ten sam przykład ciągnięty dalej, a
+nie nowy, który przypadkiem używa okrągłych liczb.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Dla $n$ zbiorów reguła ma jeden składnik na każdy niepusty podzbiór zbiorów,
+czyli $2^{n} - 1$ składników: $\val{p12.ie.terms3}$ dla trzech zbiorów i
+$\val{p12.ie.terms10}$ dla $\val{p12.ie.sets}$.
+
+\begin{trapbox}
+\textbf{Nikt nie używa włączeń i wyłączeń powyżej trzech zbiorów, a powód
+siedzi w tej liczbie.} Przy $\val{p12.ie.sets}$ źródłach danych żąda ona
+$\val{p12.ie.terms10}$ przecięć, z których każde samo jest obliczeniem, i
+każde musi być poprawne.
+
+Ludzie robią zamiast tego sumę zbiorów i biorą jej rozmiar, co jest jednym
+przejściem po danych i zerem składników poprawkowych \dash{} i jest to dobry
+odruch, bo $2^{n}-1$ składników to $2^{n}$ podzbiorów bez pustego, więc reguła
+kosztuje dokładnie tyle, ile wypisanie tego, czego wypisania miała oszczędzić.
+
+Dwa i trzy zbiory to przypadki, które pojawiają się na przeglądzie projektu, i
+oba mieszczą się w jednej linijce. Te zostaw; po resztę sięgnij po bibliotekę
+zbiorów.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Trzecia reguła nie liczy niczego. Mówi, co \emph{musi} być prawdą, co jest
+innym rodzajem zdania i okazuje się bardziej użyteczne.
+
+Haszujesz $\val{p12.pig.items}$ dokumentów do $\val{p12.pig.buckets}$
+kubełków. Powiedz coś, co jest na pewno prawdą o wyniku, jakakolwiek jest
+funkcja skrótu i jakkolwiek dokumenty się rozłożą.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Któryś kubełek mieści co najmniej $\val{p12.pig.floor}$ dokumentów}
+Bo gdyby każdy kubełek mieścił najwyżej $\val{p12.pig.floor} - 1$, suma
+wynosiłaby najwyżej $\val{p12.pig.buckets} \times 3 = 768$, a dokumentów jest
+$\val{p12.pig.items}$.
+
+To \textbf{zasada szufladkowa}: przy $m$ elementach w $n$ szufladach któraś
+mieści co najmniej $\lceil m/n \rceil$. Dowód jest ten podany wyżej i warto
+zauważyć, że to dowód nie wprost, bez arytmetyki poza jednym mnożeniem.
+
+\begin{note}
+Skrypt sprawdza to na $\val{p12.pig.trials}$ losowych przydziałach i
+\emph{sprawdza} jest tu właściwym słowem. Losowe przeszukanie nie może tu
+niczego odkryć: kontrprzykład obaliłby dowód, więc to, co przeszukanie
+kontroluje, to kod, dokładnie tak jak w~Programie~\ref{prog:P04}.
+\end{note}
+
+Daje też pierwszą uczciwą odpowiedź o kolizje skrótów. Przy większej liczbie
+dokumentów niż kubełków kolizja nie jest prawdopodobna, jest
+\textbf{pewna} \dash{} więc skrót o $\val{p12.bits64}$ bitach nie rozróżni
+więcej niż $\val{p12.hash.n64}$ dokumentów, cokolwiek innego jest prawdą.
+\end{fr}
+
+\begin{fr}
+A to ograniczenie jest niemal bezużyteczne, i o tym jest kolejna sekcja.
+
+Nikt nie ma $\val{p12.hash.n64}$ dokumentów. Liczbą rozstrzygającą, czy skrót
+jest dość duży, nie jest ta, przy której kolizje stają się pewne, tylko o
+wiele mniejsza, przy której stają się \emph{prawdopodobne} \dash{} a o ile
+mniejsza, to najbardziej zaskakująca liczba w tym programie.
+\end{fr}
+
+% ============================================================
+\section{Ile bitów potrzebuje skrót}
+\label{sec:P12-birthday}
+\index{zliczanie!problem urodzinowy}
+\index{haszowanie!kolizja}
+
+\begin{fr}
+Zacznij od wersji, którą każdy zna, bo pomylenie się w niej sprawia, że wersja
+inżynierska trafia.
+
+W pokoju jest $\val{p12.bday.m}$ osób. Jaka jest szansa, że dwie mają
+urodziny tego samego dnia? Zgadnij, zanim policzysz; dni jest
+$\val{p12.bday.n}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.bday.p}$ procent}
+Raczej więcej niż połowa, przy $\val{p12.bday.m}$ osobach i
+$\val{p12.bday.n}$ dniach.
+
+Większość zgaduje coś w okolicach $\val{p12.bday.naive}$ procent, a to
+zgadnięcie to $\val{p12.bday.m}$ podzielone przez $\val{p12.bday.n}$ \dash{}
+czyli całkiem dobra odpowiedź na inne pytanie: na szansę, że ktoś ma urodziny
+tego samego dnia co \emph{ty}.
+
+\begin{trapbox}
+\textbf{Pytanie nie brzmi: ty przeciw pokojowi. Brzmi: każda para w pokoju
+przeciw każdej innej.} $\val{p12.bday.m}$ osób daje
+$\binom{\val{p12.bday.m}}{2} = \val{p12.bday.pairs}$ par, a każda para to
+własna szansa na trafienie.
+
+$\val{p12.bday.pairs}$ szans po jednej na $\val{p12.bday.n}$ to jawnie niemała
+liczba szans, i na tym polega cała niespodzianka. Liczba osób rośnie po
+jednej; liczba par rośnie z kwadratem, co jest wzorem
+z~Programu~\ref{prog:F10} i jego \enquote{dwa razy więcej danych to cztery
+razy więcej pracy} przybywającym w zupełnie innym temacie.
+
+Każdy, kogo to zaskakuje, jest zaskoczony z tego samego powodu: policzył
+niewłaściwe obiekty. Policz pary, a nie zostaje nic do zaskoczenia.
+\end{trapbox}
+
+\mermaidfig{p12-pairs-not-items}{Dlaczego liczą się pary i co to robi z
+potrzebnym rozmiarem skrótu.}{pary, nie elementy}
+\end{fr}
+
+\begin{fr}
+Zdanie dokładne jest iloczynem. Nikt dotąd nie trafił, więc druga osoba musi
+chybić pierwszej, trzecia musi chybić obu, i tak dalej:
+\[ P(\text{no match}) = \prod_{i=0}^{m-1}\left(1 - \frac{i}{N}\right) \]
+czyli pi z~Programu~\ref{prog:F04}, a zarazem rekurencja \dash{} każdy wyraz
+to poprzedni razy jeden czynnik więcej.
+
+Jest drugie wyrażenie na to samo i bierze się wprost z liczby par. Każda z
+$\binom{m}{2}$ par chybia z prawdopodobieństwem $1 - 1/N$, więc
+\[ P(\text{a match}) \approx 1 - e^{-m(m-1)/2N} \]
+używając eksponenty z~Programu~\ref{prog:F07} do zamiany iloczynu liczb
+bliskich jedynce na jeden wyraz.
+
+Dwa wzory na jedną wielkość, jeden dokładny, drugi nie. Którego ma używać
+kod?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+To zależy od reżimu i żaden nie jest bezpiecznym domyślnym wyborem.
+\end{ansblock}
+
+Zmierzone, jako błąd względny wobec odniesienia, którym nie jest żaden z nich:
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+ & \textbf{iloczyn} & \textbf{eksponenta} \\
+\midrule
+$\val{p12.bday.m}$ osób, $\val{p12.bday.n}$ dni
+  & $\val{p12.reg.bday.naive}$ & $\val{p12.reg.bday.closed}$ \\
+$\val{p12.check.m}$ skrótów, $\val{p12.bits64}$ bitów
+  & $\val{p12.reg.mid.naive}$ & $\val{p12.reg.mid.closed}$ \\
+$\val{p12.trap.m}$ skrótów, $\val{p12.bits128}$ bitów
+  & $\val{p12.reg.tiny.naive}$ & $\val{p12.reg.tiny.closed}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Każdy z nich jest dobry dokładnie tam, gdzie drugi zawodzi, i zawodzą
+z przeciwnych powodów.} Iloczyn dokładny jest dokładny w przypadku
+urodzinowym i zwraca błąd względny równy \emph{jeden} przy
+$\val{p12.bits128}$ bitach, czyli nie zwraca nic. Eksponenta myli się o
+$\val{p12.reg.bday.closed}$ w przypadku urodzinowym \dash{} daje
+$\val{p12.bday.closed}$ procent tam, gdzie odpowiedź to
+$\val{p12.bday.p}$ \dash{} a przy skali skrótów jest dobra do piętnastu cyfr.
+\end{fr}
+
+\begin{fr}
+Błąd eksponenty łatwo wytłumaczyć: traktuje pary jako niezależne, a nie są
+całkiem, i ma to znaczenie tylko wtedy, gdy jest ich dość mało, by to
+zauważyć.
+
+Awaria iloczynu to Program~\ref{prog:P02} przybywający tam, gdzie nikt się go
+nie spodziewa. Oto ona w całości:
+
+\transcript{p12-collision-zero}
+
+Każdy czynnik $1 - i/N$ jest liczbą odległą od jedynki o mniej niż jedną
+część na $10^{33}$, a Program~\ref{prog:P01} mówi, co float64 z takimi robi:
+zaokrągla każdy dokładnie do $1$. Iloczyn jest więc dokładnie $1$, a odjęciu
+go od $1$ nie zostaje nic do powiedzenia.
+
+\begin{trapbox}
+\textbf{Prawdopodobieństwo kolizji równe dokładnie zero czyta się jak dowód
+bezpieczeństwa, a jest artefaktem zaokrąglenia.} Nie ma wyjątku, nie ma
+ostrzeżenia i nie ma \code{nan} \dash{} funkcja zwraca liczbę
+zmiennoprzecinkową, ta liczba to \code{0.0}, a \code{0.0} jest zupełnie
+rozsądnie wyglądającą odpowiedzią na zadane pytanie.
+
+Program~\ref{prog:P02} to nazwał i podał regułę: nigdy nie twórz
+prawdopodobieństwa, odejmując od jedynki liczbę jej bliską. Wersja stąd jest
+gorsza od tej, którą tamten program zmierzył, bo tam stratą były cyfry, a tu
+są wszystkie, i dlatego, że zła odpowiedź jest tą, która kończy rozmowę.
+
+Zwróć uwagę i na środkowy wiersz tabeli. Przy $\val{p12.bits64}$ bitach i
+zaledwie $\val{p12.check.m}$ elementach iloczyn stracił \emph{już} pięć cyfr
+znaczących, długo przed tym, nim zawiódł do końca. Wzór nie przestaje działać
+przy progu; degraduje się, a degradacja jest niewidoczna, dopóki ktoś nie
+policzy tego samego inną drogą.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Teraz pytanie inżynierskie. Deduplikujesz korpus przez haszowanie:
+$\val{p12.hash.m}$ dokumentów, skrót o $\val{p12.bits64}$ bitach, czyli
+$\val{p12.hash.n64}$ możliwych wartości.
+
+Jaka jest szansa, że dwa różne dokumenty dostaną ten sam skrót i jeden
+zostanie po cichu wyrzucony?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Około $\val{p12.hash.p64}$ procent}
+A nie $\val{p12.hash.naive64}$, które sugeruje liczba dokumentów przez liczbę
+wartości skrótu. \textbf{Te dwie różnią się o współczynnik
+$\val{p12.hash.ratio}$}, a różnica to w całości pary.
+
+\begin{aibox}
+$\val{p12.hash.p64}$ procent to szansa, której nie zaakceptowałbyś nigdzie
+indziej w potoku. To jeden korpus na czterdzieści zawierający co najmniej
+jedną parę różnych dokumentów, którą krok deduplikacji uznał za identyczne
+\dash{} a to, który z nich zostaje, jest przypadkowe, więc stratą jest
+dokument, po cichu, bez linijki w logu i bez czegokolwiek dalej, co mogłoby to
+zauważyć.
+
+Powodem, dla którego $\val{p12.bits64}$ wydaje się z zapasem, jest rachunek,
+którego nikt nie robi na głos: $\val{p12.hash.n64}$ to ogromna liczba, a
+$\val{p12.hash.m}$ dokumentów to jej mały ułamek. Oba zdania są prawdziwe i
+żadne nie jest tym pytaniem.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jak duży musi więc być korpus, żeby skrót o $\val{p12.bits64}$ bitach był
+rzutem monetą?
+
+Liczba par to około $m^{2}/2$, więc trafienie staje się prawdopodobne, gdy
+$m^{2}/2N$ jest rzędu $1$, co stawia $m$ w okolicach $\sqrt{N}$. Zrobione
+porządnie daje $m = \val{p12.half.c}\sqrt{N}$ dla dokładnie połowy.
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{skrót} & \textbf{wartości} & \textbf{elementów na rzut monetą} \\
+\midrule
+$\val{p12.bits64}$ bitów & $\val{p12.hash.n64}$ & $\val{p12.hash.half64}$ \\
+$\val{p12.bits128}$ bitów & $\num{3.40e38}$ & $\val{p12.hash.half128}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Skrót o $\val{p12.bits64}$ bitach jest rzutem monetą przy
+$\val{p12.hash.half64}$ dokumentach}, a taki korpus istnieje. Przy
+$\val{p12.bits128}$ bitach ten sam próg to $\val{p12.hash.half128}$, a przy
+$\val{p12.hash.m2}$ dokumentach prawdopodobieństwo kolizji wynosi
+$\val{p12.hash.p128}$.
+
+To jest cały argument za $\val{p12.bits128}$ bitami i nie jest nim to, że
+$\val{p12.bits128}$ to dwa razy $\val{p12.bits64}$. \textbf{Podwojenie bitów
+podnosi liczbę wartości do kwadratu, a więc podnosi do kwadratu korpus, który
+zmieścisz}, bo bezpieczna pojemność idzie z pierwiastkiem: $2^{32}$ wobec
+$2^{64}$.
+\end{fr}
+
+\begin{fr}
+Reguła do wyniesienia z tej sekcji mieści się w jednej linijce i jest warta
+więcej niż wzór, z którego pochodzi.
+
+\textbf{Bezpieczna pojemność skrótu to mniej więcej pierwiastek z liczby
+wartości, które może przyjąć}, bo różne muszą zostać pary, a tych jest około
+$m^{2}/2$. Podziel wykładnik na pół i masz odpowiedź: $\val{p12.bits64}$
+bitów mieści około $2^{32}$ elementów, $\val{p12.bits128}$ bitów około
+$2^{64}$.
+
+I dwa zdania, które ta sekcja powiedziała o kolizjach, warto trzymać osobno,
+bo odpowiadają na różne pytania. Zasada szufladkowa mówi, że kolizje stają się
+\textbf{pewne} przy $\val{p12.pig.certain64}$ elementach. Rachunek urodzinowy
+mówi, że stają się \textbf{prawdopodobne} przy $\val{p12.hash.half64}$. Te
+różnią się o współczynnik rzędu czterech miliardów i to zawsze ten drugi
+rozstrzyga projekt.
+\end{fr}
+
+% ============================================================
+\section{Dwie liczby, które rozstrzygają projekt}
+\label{sec:P12-designs}
+\index{zliczanie!przestrzeń przeszukiwania}
+\index{zliczanie!wartość Shapleya}
+
+\begin{fr}
+Jeszcze dwie liczby i żadna nie potrzebuje niczego ponad to, co dały cztery
+poprzednie sekcje. Potrzebują gotowości, by policzyć je przed zaproponowaniem
+tego, co wyceniają.
+
+Dekoder generuje $\val{p12.beam.len}$ tokenów ze słownika o
+$\val{p12.beam.vocab}$ pozycjach. Ile różnych ciągów mógłby wyprodukować?
+Przyda ci się Program~\ref{prog:F03}.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.beam.space}$}
+Czyli $\val{p12.beam.vocab}^{\val{p12.beam.len}}$, lewa górna komórka tabeli
+tego programu \dash{} kolejność ma znaczenie, a tokeny jak najbardziej się
+powtarzają.
+
+Wzięcie $\logb{10}$ z tego to jedyny sposób, by zobaczyć, co to jest:
+$\val{p12.beam.len} \times \logb{10}\val{p12.beam.vocab}$, czyli ociupinę
+ponad dziewięćdziesiąt. Liczba dziewięćdziesięciocyfrowa, przy dwudziestu
+tokenach.
+
+Teraz beam search o szerokości $\val{p12.beam.a}$ przechodzi po tej
+przestrzeni. Na każdym z $\val{p12.beam.len}$ kroków przedłuża każdy ze swoich
+$\val{p12.beam.a}$ żywych ciągów o każdy z $\val{p12.beam.vocab}$ tokenów i
+zatrzymuje najlepsze $\val{p12.beam.a}$. Ile przedłużeń ocenia w sumie?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.beam.scored.a}$}
+Z $\val{p12.beam.len} \times \val{p12.beam.a} \times \val{p12.beam.vocab}$.
+Jako ułamek przestrzeni jest to $\val{p12.beam.frac.a}$.
+
+Podwój szerokość do $\val{p12.beam.b}$, a praca się podwaja, do
+$\val{p12.beam.scored.b}$ ocenionych przedłużeń. Ułamek obejrzanej przestrzeni
+też się podwaja, do $\val{p12.beam.frac.b}$.
+
+\begin{warning}
+\textbf{Ta liczba wyklucza argument, a nie praktykę.} Beam search w sposób
+sprawdzalny daje lepsze wyjście niż dekodowanie zachłanne, a ta książka nie
+zmierzyła, o ile ani gdzie przestaje pomagać.
+
+Ta liczba rozstrzyga, \emph{dlaczego} nie może to być pokrycie. Przejście z
+$\val{p12.beam.a}$ na $\val{p12.beam.b}$ przenosi ułamek obejrzanej
+przestrzeni z $\val{p12.beam.frac.a}$ na $\val{p12.beam.frac.b}$, a oba są
+zerem do każdego praktycznego celu. Szersza wiązka nie może pomagać przez
+oglądanie większej części przestrzeni, bo żadna szerokość, którą ktokolwiek
+uruchomi, nie ogląda jej wcale.
+
+Cokolwiek daje, daje to z \emph{uporządkowania}, które model nakłada na
+przestrzeń \dash{} dobre ciągi nie są rozrzucone po tych dziewięćdziesięciu
+cyfrach losowo, tylko skupione tam, gdzie oceny samego modelu są wysokie, a
+szersza wiązka zabezpiecza przed lokalnie mylącą oceną. To zdanie o modelu, a
+nie o przeszukiwaniu, i to z nim należy dyskutować, gdy ktoś proponuje
+podwojenie wiązki.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Ostatnia liczba to ta, która powinna zmienić sposób, w jaki czytasz wykres.
+
+Wartość Shapleya przypisuje wyjście modelu jego cechom, a definicja jest
+zdaniem zliczającym: \textbf{atrybucją cechy jest jej średni wkład krańcowy po
+wszystkich kolejnościach cech.} Dodawaj cechy po jednej w jakiejś kolejności,
+notuj, ile ta jedna dołożyła, gdy przyszła jej kolej, i uśrednij to po
+wszystkich kolejnościach.
+
+Przy $\val{p12.shap.big}$ cechach ile to kolejności?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.shap.big.ord}$}
+Czyli $\val{p12.shap.big}!$, i to niczego nie rozstrzyga, bo tego nie da się
+policzyć.
+
+Ale spójrz jeszcze raz, czego definicja potrzebuje. Gdy przychodzi kolej
+cechy, to, co dokłada, zależy od zbioru cech już obecnych \dash{} i zupełnie
+nie zależy od kolejności, w jakiej je dodano. Każda kolejność stawiająca przed
+nią ten sam zbiór daje więc ten sam wkład krańcowy i wolno je zebrać.
+
+Zebranie zamienia $\val{p12.shap.big}!$ kolejności na
+$2^{\val{p12.shap.big}} = \val{p12.shap.big.coal}$ podzbiorów, każdy z wagą
+mówiącą, ilu kolejności był przedstawicielem. \textbf{Współczynnik
+$\val{p12.shap.big.ratio}$}, za darmo, i tylko dzięki temu tę wartość w ogóle
+da się policzyć.
+
+\mermaidfig{p12-orderings-or-subsets}{Jak średnia po $n!$ kolejnościach zwija
+się w sumę po $2^{n}$ podzbiorach.}{kolejności w podzbiory}
+\end{fr}
+
+\begin{fr}
+\begin{note}
+Tożsamość jest w \code{code/p12\_combinatorics.py} dowodzona przez wypisanie,
+a nie stwierdzana: przy $\val{p12.shap.n}$ cechach skrypt liczy wartość każdej
+cechy oboma sposobami \dash{} uśredniając po wszystkich
+$\val{p12.shap.orderings}$ kolejnościach i sumując po wszystkich
+$\val{p12.shap.coalitions}$ podzbiorach z wagami \dash{} i wymaga, by były
+równe jako dokładne ułamki.
+
+Ten sam sześciocechowy przykład pokazuje drugą rzecz, po którą sięga się do
+atrybucji. Dwie z jego cech pokrywają dokładnie ten sam teren. Każda z nich
+sama jest warta $\val{p12.shap.alone}$ i każdej przypisuje się
+$\val{p12.shap.redundant}$, podczas gdy cesze pokrywającej teren, do którego
+nic innego nie sięga, przypisuje się całe $\val{p12.shap.top}$, ile jest
+warta. Atrybucje sumują się do $\val{p12.shap.total}$, które osiąga pełny
+zbiór, i ta własność czyni z nich udziały, a nie oceny.
+\end{note}
+
+Zatem $\val{p12.shap.big.coal}$ obliczeń przy $\val{p12.shap.big}$ cechach, co
+komputer zrobi. A teraz $\val{p12.shap.huge}$ cech. Ile?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p12.shap.huge.coal}$}
+Po milisekundzie na sztukę \dash{} co jest optymistyczne dla czegokolwiek z
+modelem w środku \dash{} daje to $\val{p12.shap.huge.years}$ lat.
+
+\begin{trapbox}
+\textbf{Dokładna atrybucja Shapleya jest wykładnicza z konstrukcji, więc każda
+implementacja, jakiej używałeś, jest przybliżeniem przez próbkowanie.} To nie
+jest wada żadnej konkretnej biblioteki. Ta wielkość jest zdefiniowana jako
+średnia po $2^{n}$ podzbiorach i nie ma przekształcenia, które zrobiłoby ich
+mniej, bo każdy z tych podzbiorów naprawdę może dać inną odpowiedź.
+
+To, co z tego wynika, warto zabrać na następny wykres atrybucji, jaki ci
+pokażą. Słupki mają błąd próbkowania, tego błędu zwykle się nie rysuje i jest
+on największy dokładnie tam, gdzie cechy oddziałują \dash{} czyli tam, gdzie
+wykresu używa się do postawienia tezy. Dwa przebiegi tego samego wyjaśniacza
+na tym samym wejściu potrafią przestawić środek rankingu.
+
+Pytanie, które należy zadać takiemu wykresowi, jest tym, które ten program
+zadaje od początku, i jest pytaniem o zliczanie: \textbf{ile z tych
+$2^{n}$ faktycznie policzono?}
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jedna uwaga na koniec, i o to tak naprawdę w tym programie chodziło.
+
+Każda liczba w nim była decyzją uczynioną widoczną. Czy skrót jest dość
+szeroki, czy badanie ablacyjne zmieści się w tygodniu, czy da się poszerzyć
+wiązkę, na ile można ufać atrybucji \dash{} każda z nich została
+rozstrzygnięta liczbą, która zajmuje jedno mnożenie i której niemal nikt nie
+liczy przed zobowiązaniem się do tego, co ona wycenia.
+
+\textbf{Reguły nie są tu częścią użyteczną.} Jest ich cztery i mieszczą się na
+karteczce. Użyteczny jest nawyk zauważania, że plan w ogóle zawiera jakąś
+liczbę, a Program~\ref{prog:F10} ujął to najlepiej: zapisz liczbę, zanim
+napiszesz pętlę.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Dwa pytania rozstrzygają, która reguła obowiązuje}: czy
+  kolejność ma znaczenie i czy coś może się powtórzyć?
+  \enquote{Wybierz $\val{p12.four.k}$ z $\val{p12.four.n}$} brzmi jak pełne
+  polecenie i ma trzy dające się obronić odpowiedzi, dopóki obie nie zostaną
+  ustalone.}
+\sumitem{3--4}{Dwie z czterech liczb, dla $\val{p12.four.k}$ z
+  $\val{p12.four.n}$: $n^{k} = \val{p12.four.ordrep}$ z kolejnością i
+  powtórzeniami oraz $\frac{n!}{(n-k)!} = \val{p12.four.ordnorep}$ z
+  kolejnością bez powtórzeń, gdzie pula kurczy się o jeden na każdym kroku.}
+\sumitem{4--5}{Reguła iloczynu potrzebuje \textbf{ustalonej liczby możliwości
+  na każdym kroku, a nie ustalonych możliwości}, i dlatego kurcząca się pula
+  i tak się mnoży. Mocniejsze sformułowanie z~Programu~\ref{prog:F10} jest do
+  sprawdzania siatki; to słabsze pozwala liczbie wariacji w ogóle być
+  iloczynem.}
+\sumitem{6}{$\binom{n}{k} = \val{p12.four.unordnorep}$ to wariacje podzielone
+  przez $k! = \val{p12.kfact}$ kolejności, w których każdy wybór został
+  policzony, a \textbf{to dzielenie jest krokiem \enquote{podziel przez dwa}
+  z~Programu~\ref{prog:F10} w wersji ogólnej} \dash{} dzielił przez dwa, bo
+  $2! = 2$.}
+\sumitem{7--8}{Czwarta komórka, bez kolejności i z powtórzeniami, to
+  $\binom{n+k-1}{k} = \val{p12.four.unordrep}$, podana i niewyprowadzona.
+  Cztery liczby opisujące te same dziesięć rzeczy branych po trzy rozpinają
+  współczynnik ponad ośmiu.}
+\sumitem{9--10}{$\val{p12.four.n}!$ to $\val{p12.fact.n}$ ustawień, a
+  $n! = \frac{n!}{(n-k)!} \times (n-k)!$ to kurcząca się pula czytana od tyłu
+  \dash{} i dlatego liczbę wariacji zapisuje się jako iloraz, a liczy jako
+  iloczyn.}
+\sumitem{11--12}{$\binom{n}{k} = \frac{n!}{k!(n-k)!}$, po polsku \emph{symbol
+  Newtona}. $\binom{n}{2} = \frac{n(n-1)}{2}$ to liczba par
+  z~Programu~\ref{prog:F10}, a budowanie przerywa się, gdy te dwie się nie
+  zgadzają.}
+\sumitem{13--14}{\textbf{$\binom{n}{k} = \binom{n}{n-k}$, bo wybór tego, co
+  zostaje, jest wyborem tego, co odpada.} Oba to $\val{p12.sym.val}$ przy
+  $\val{p12.sym.n}$ branych po $\val{p12.sym.k}$ albo po
+  $\val{p12.sym.rest}$.}
+\sumitem{15--16}{Ablacja po każdym podzbiorze $\val{p12.abl.n}$ cech to
+  $\val{p12.abl.all}$ przebiegów; ograniczona do $\val{p12.abl.k}$ cech to
+  $\val{p12.abl.upto}$, czyli współczynnik $\val{p12.abl.frac}$.}
+\sumitem{17--20}{\textbf{Rekurencja Pascala
+  $\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}$} to rekurencja i tak
+  właśnie symbol się liczy; suma wiersza daje
+  $\val{p12.abl.all} = 2^{\val{p12.abl.n}}$, bo wskazanie rozmiaru, a potem
+  elementów, to to samo działanie co decyzja w-środku-czy-poza dla każdego
+  elementu.}
+\sumitem{21--23}{\textbf{Włączenia i wyłączenia: znaki zmieniają się na
+  przemian, bo każda runda poprawek przestrzeliwa poprzednią.} Trzy zbiory o
+  $\val{p12.ie.a}$, $\val{p12.ie.b}$ i $\val{p12.ie.c}$ mieszczą
+  $\val{p12.ie.union}$ różnych przykładów, a nie $\val{p12.ie.naive}$. Reguła
+  ma $2^{n}-1$ składników, więc powyżej trzech zbiorów buduj sumę.}
+\sumitem{24--26}{\textbf{Szufladki: $m$ elementów w $n$ szufladach wkłada co
+  najmniej $\lceil m/n \rceil$ do którejś}, cokolwiek robi funkcja skrótu.
+  Czyni kolizje \emph{pewnymi} przy $\val{p12.pig.certain64}$ elementach, a to
+  nie jest liczba rozstrzygająca cokolwiek.}
+\sumitem{27--28}{\textbf{Rachunek urodzinowy liczy pary, a nie elementy.}
+  $\val{p12.bday.m}$ osób daje $\val{p12.bday.pairs}$ par i dzieli urodziny z
+  prawdopodobieństwem $\val{p12.bday.p}$ procent, wobec
+  $\val{p12.bday.naive}$ procent odpowiadających na inne pytanie.}
+\sumitem{29--31}{Dwa wzory, każdy dobry tam, gdzie drugi zawodzi: iloczyn
+  dokładny jest dokładny w przypadku urodzinowym i zwraca \textbf{dokładnie
+  zero} przy $\val{p12.bits128}$ bitach, a eksponenta myli się tam o
+  $\val{p12.reg.bday.closed}$ i jest dobra do piętnastu cyfr przy skali
+  skrótów. Reguła Programu~\ref{prog:P02}, w funkcji skrótu.}
+\sumitem{32--35}{\textbf{Bezpieczna pojemność skrótu to mniej więcej
+  pierwiastek z liczby jego wartości.} $\val{p12.hash.m}$ dokumentów przy
+  $\val{p12.bits64}$ bitach zderza się z prawdopodobieństwem
+  $\val{p12.hash.p64}$ procent \dash{} $\val{p12.hash.ratio}$ razy więcej niż
+  daje naiwne czytanie \dash{} a rzut monetą wypada przy
+  $\val{p12.hash.half64}$ dokumentach wobec $\val{p12.hash.half128}$ dla
+  $\val{p12.bits128}$ bitów.}
+\sumitem{36--38}{$\val{p12.beam.vocab}^{\val{p12.beam.len}}$ to
+  $\val{p12.beam.space}$ ciągów, a wiązka o $\val{p12.beam.a}$ ocenia
+  $\val{p12.beam.scored.a}$ z nich. \textbf{Podwojenie wiązki podwaja ułamek
+  $\val{p12.beam.frac.a}$}, więc pokrycie nie może być powodem, dla którego
+  szersza wiązka pomaga.}
+\sumitem{39--43}{\textbf{Wartość Shapleya uśrednia po każdej kolejności, a
+  kolejności zwijają się w $2^{n}$ podzbiorów}, bo liczy się tylko to, które
+  cechy były wcześniej. $\val{p12.shap.big.coal}$ przy
+  $\val{p12.shap.big}$ cechach i $\val{p12.shap.huge.coal}$ przy
+  $\val{p12.shap.huge}$, więc każda implementacja próbkuje \dash{} a słupki
+  niosą błąd, którego nikt nie rysuje.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Ze słownika o $50$ tokenach ile jest ciągów po $4$ tokeny? A ile
+  \emph{zbiorów} $4$ różnych tokenów?
+  \answerto{$50^{4} = \num{6250000}$ ciągów, bo kolejność ma znaczenie, a
+  tokeny się powtarzają. I $\binom{50}{4} = \num{230300}$ zbiorów, dzieląc
+  $50 \times 49 \times 48 \times 47$ wariacji przez $4! = 24$. Współczynnik
+  ponad $27$ między nimi, rozstrzygnięty przez dwa słowa.}
+\item Dwa źródła danych mieszczą $600$ i $900$ rekordów i dzielą $150$;
+  trzecie mieści $400$, dzieląc $80$ z pierwszym, $120$ z drugim i $40$ z
+  obydwoma. Ile to różnych rekordów?
+  \answerto{$1900 - 350 + 40 = 1590$. Suma $600 + 900 + 400 = 1900$, odejmij
+  $150 + 80 + 120 = 350$, dodaj z powrotem raz część wspólną wszystkich
+  trzech, bo odjęcie trzech par usunęło ją trzy razy po tym, jak była
+  policzona trzy razy.}
+\item Haszujesz $10$ milionów dokumentów w przestrzeń $32$-bitową. Podaj
+  przybliżone prawdopodobieństwo kolizji i powiedz, co czyni je tak dużym.
+  \answerto{W praktyce $1$: liczba par to około $5 \times 10^{13}$ wobec
+  $\num{4.29e9}$ wartości skrótu, więc wykładnik $m(m-1)/2N$ przekracza
+  dziesięć tysięcy. Rzut monetą dla $32$ bitów wypada przy około
+  $\num{7.7e4}$ dokumentach \dash{} $\val{p12.half.c}\sqrt{2^{32}}$ \dash{}
+  więc dziesięć milionów jest daleko za nim.}
+\item Siatka ma $6$ modeli, $4$ współczynniki uczenia i $3$ rozmiary wsadu,
+  ale dwa modele nie uruchomią się przy największym wsadzie. Ile przebiegów?
+  \answerto{$6 \times 4 \times 3 = 72$ minus zakazane. Dwa modele tracą po
+  jednym rozmiarze wsadu przy wszystkich $4$ współczynnikach uczenia, więc
+  odpada $8$: $64$ przebiegi. Warunek Programu~\ref{prog:F10} nałożony na
+  regułę iloczynu i powód, by liczyć wykluczenia przy zapisywaniu siatki.}
+\item Dlaczego $\binom{n}{k}$ liczy się rekurencją Pascala, a nie z silni?
+  \answerto{Bo silnie są ogromne i skracają się niemal w całości:
+  $\binom{50}{4}$ ma sześć cyfr, a $50!$ sześćdziesiąt pięć. Rekurencja
+  Pascala schodzi w dół trójkąta dodawań, w którym każda wartość pośrednia
+  sama jest liczbą czegoś, więc nic nie powstaje po to, by potem zostać
+  wydzielone.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że $\binom{n}{k} = \binom{n}{n-k}$ ze wzoru, w jednej linijce.
+  \answerto{$\binom{n}{n-k} = \frac{n!}{(n-k)!\,(n-(n-k))!} =
+  \frac{n!}{(n-k)!\,k!}$, czyli $\binom{n}{k}$ z dwoma czynnikami mianownika
+  zapisanymi w odwrotnej kolejności. Argument kombinatoryczny jest jeszcze
+  krótszy: wybór $k$ do zostawienia jest wyborem $n-k$ do odrzucenia.}
+\item Wiązka o szerokości $b$ przez $L$ kroków przy słowniku $V$ ocenia
+  $LbV$ przedłużeń. Jaka szerokość byłaby potrzebna, by ocenić jeden procent
+  przestrzeni, przy $V = \val{p12.beam.vocab}$ i $L = \val{p12.beam.len}$?
+  \answerto{$b = \num{0.01}\,V^{L}/(LV)$, czyli około $2 \times 10^{84}$.
+  Sensem zadania jest to, że ta liczba jest nie tyle wielka, co nieosiągalna,
+  więc żadna szerokość nie jest argumentem z pokrycia.}
+\item Iloczyn pusty daje $0! = 1$. Pokaż, że wymusza to rekurencja Pascala, a
+  nie jest to umowa przyjęta dla wygody.
+  \answerto{$\binom{n}{n} = \binom{n-1}{n-1} + \binom{n-1}{n}$, a ostatni
+  składnik jest zerem, bo nie da się wybrać $n$ rzeczy z $n-1$. Zatem
+  $\binom{n}{n} = \binom{n-1}{n-1} = \cdots = \binom{0}{0} = 1$, a
+  $\binom{n}{n} = \frac{n!}{n!\,0!}$ równa się $1$ tylko wtedy, gdy $0! = 1$.
+  Ta sama odpowiedź, do której Program~\ref{prog:F04} doszedł od akumulatora,
+  od którego zaczyna pętla.}
+\item Dlaczego podwojenie skrótu z $\val{p12.bits64}$ na
+  $\val{p12.bits128}$ bitów podnosi mieszczony korpus do kwadratu, a nie
+  podwaja go?
+  \answerto{Bo bezpieczna pojemność idzie z $\sqrt{N}$, a podwojenie bitów
+  podnosi $N$ do kwadratu: $\sqrt{N^{2}} = N$. Zatem $2^{32}$ staje się
+  $2^{64}$, a wykładnik się podwaja, bo pierwiastek dzieli na pół podwojony
+  wykładnik.}
+\item Kolega proponuje policzyć dokładne wartości Shapleya dla modelu o
+  $\val{p12.shap.huge}$ cechach, próbkując kolejności zamiast podzbiorów. Czy
+  to pomaga?
+  \answerto{Próbkowanie robi każda implementacja i jest jedynym wyjściem, ale
+  czyni wynik oszacowaniem, a nie wartością dokładną \dash{} więc słowo
+  \emph{dokładne} musi odpaść. Próbkowanie kolejności i próbkowanie
+  podzbiorów to dwie drogi do tego samego estymatora, bo kolejności dzielące
+  zbiór poprzedników cechy dają jeden wkład; wybór wpływa na wariancję, a nie
+  na to, co się szacuje.}
+\end{furtherproblems}
