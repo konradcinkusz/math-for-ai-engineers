@@ -1,0 +1,7 @@
+>>> from p14_logic_proof import is_prime
+>>> all(is_prime(n * n + n + 41) for n in range(40))
+True
+>>> is_prime(40 ** 2 + 40 + 41)
+False
+>>> 1681 % 41
+0

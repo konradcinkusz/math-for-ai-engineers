@@ -1,27 +1,878 @@
-%% P14 --- Logika, dowód i czytanie twierdzeń
+%% P14 --- Logika, dowod i czytanie twierdzen
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Kazda liczba w tym programie, ktorej czytelnik nie policzy w pamieci,
+%% pochodzi z code/p14_logic_proof.py i trafia na strone przez \val{}.
+%% Listing konsolowy to zatwierdzony transkrypt zapisany przez ten skrypt.
+%%
+%% TEZA: twierdzenie to zalozenia, teza i wiazace je kwantyfikatory, a
+%% prawie kazde naduzycie twierdzenia w tej dziedzinie polega na tym, ze
+%% czytelnik zatrzymuje teze i gubi cos innego.
+%%
+%% CO TEN PROGRAM DOSTAJE, odczytane z plikow, a nie zapamietane:
+%%   F10  daje "i", "lub", "nie" oraz De Morgana, a jego przyklad z filtrem
+%%        jest tutaj kontynuowany -- liczby wypadaja z tabeli prawdy i sa
+%%        bramkowane wzgledem tych, ktore tamten program zatwierdzil.
+%%   P13  ODSYLA TUTAJ Z NAZWY: dowodzi jednego kierunku twierdzenia o
+%%        porzadku topologicznym i mowi, ze czytanie i formulowanie
+%%        twierdzen jest uczone w Programie P14.
+%%   P05  uzyl ograniczenia sumacyjnego przy swoich liczbach o pojemnosci i
+%%        w rigourboxie powiedzial, ze sposob jego uzyskania ma znaczenie.
+%%        Sekcja 5 uzywa tego samego ograniczenia do innej wielkosci.
+%%   KAZDY rigourbox w ksiazce jest tematem tego programu cwiczonym, zanim
+%%        zostal nazwany. NIGDZIE NIE PODAJEMY ICH LICZBY: liczba rosnie z
+%%        kazdym napisanym programem, a CLAUDE.md wprost zakazuje podawania
+%%        liczby wystapien. Nazwij regule, nie liczbe.
+%%
+%% CZEGO NIE ROBI, i mowi to na stronie: nie uczy PISANIA dowodow. Ta
+%% publicznosc musi czytac twierdzenia, a nie ich dowodzic, i udawanie
+%% czegos innego byloby trzecia zla opcja po pominieciu rygoru i po
+%% udawaniu go.
+%%
+%% MNIEJ DO POLICZENIA NIZ W KTORYMKOLWIEK PROGRAMIE, i to fakt o
+%% przedmiocie. Co da sie policzyc: kazde zdanie o implikacji i
+%% kwantyfikatorach jest rozstrzygniete WYCZERPUJACYM przegladem, ktory
+%% jest dowodem, a nie ilustracja. Czego sie nie da, jest tak nazwane, a
+%% nie przebrane za pomiar.
+%%
+%% Blizniak: programs/en/P14-logic-proof.tex. Ramka w ramke, makro w makro,
+%% liczba w liczbe; tools/parity.py je porownuje.
 
 \program{Logika, dowód i czytanie twierdzeń}
 \label{prog:P14}
+\index{proof}
+\index{proof!reading a theorem}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{rozłożyć sformułowane twierdzenie na założenia, tezę i
+  wiążące je kwantyfikatory}
+\outcome{8--14}{powiedzieć, dlaczego zdanie i jego przeciwstawne to jedno
+  twierdzenie, a odwrotne to inne, i co musi pokazać kontrprzykład}
+\outcome{15--19}{odczytać kolejność dwóch kwantyfikatorów i powiedzieć, co
+  się zmienia po ich zamianie}
+\outcome{20--25}{rozpoznać dowód nie wprost i dowód indukcyjny oraz
+  powiedzieć, co by każdy z nich złamało}
+\outcome{26--31}{powiedzieć o trzech wynikach, które ta dziedzina błędnie
+  cytuje, która dokładnie część jest gubiona}
+\end{outcomes}
 
-Argument: implication is not equivalence, a quantifier's order changes the
-claim, and a proof by induction or contradiction is a shape you can
-recognise. Payoff: **the reader can read a paper's theorem and separate its
-hypotheses from its conclusion.** Worked on real examples of the gap: a
-convergence result that assumes convexity being cited about a neural
-network; a bound that holds \enquote{with high probability over the draw of
-the data} quoted as if it held for the dataset in hand; \enquote{universal
-approximation} quoted as if it said anything about learnability. This
-program is the honest, bounded fix for Stroud's absent rigour: it does not
-train the reader to *write* proofs, and says so.
+\begin{quiz}
+\item \emph{Jeśli to kaczka, to kwacze.} Czy wynika stąd, że coś, co kwacze,
+  jest kaczką? \teachesat{9--10}
+  \answerto{Nie. To \emph{odwrotne} zdanie i jest innym twierdzeniem; oba
+  różnią się w $\val{p14.differ}$ z $\val{p14.rows}$ wierszy. Wynika
+  natomiast, że coś, co nie kwacze, nie jest kaczką.}
+\item Ograniczenie zachodzi \enquote{z prawdopodobieństwem $\val{p14.conf}$
+  procent}. Używasz go $\val{p14.uses}$ razy. Jaka jest szansa, że zachodzą
+  wszystkie? \teachesat{28--29}
+  \answerto{Około $\val{p14.allhold}$ procent, więc gdzieś zawodzi w
+  $\val{p14.anyfails}$ procentach przypadków. Pewność podana raz nie jest
+  pewnością wniosku, który budujesz z dwudziestu takich.}
+\item \enquote{Dla każdej tolerancji istnieje sieć} oraz \enquote{istnieje
+  sieć dla każdej tolerancji}. To samo zdanie? \teachesat{15--16}
+  \answerto{Nie, a drugie jest znacznie mocniejsze. Zamiana tych dwóch
+  kwantyfikatorów zmienia to, co od czego może zależeć, a twierdzenie o
+  uniwersalnej aproksymacji jest pierwszym z tej pary.}
+\item Zdanie sprawdzono na czterdziestu kolejnych wejściach i za każdym razem
+  zachodzi. Co zostało ustalone? \teachesat{22--23}
+  \answerto{To, że zachodzi na tych czterdziestu. Wyrażenie $n^{2}+n+41$ jest
+  pierwsze dla każdego $n$ od $0$ do $\val{p14.euler.first}$ wyłącznie, a
+  złożone w $\val{p14.euler.first}$, więc czterdzieści potwierdzeń może być
+  warte zero.}
+\item Twierdzenie o zbieżności zakłada wypukłość funkcji celu. Artykuł cytuje
+  je o sieci neuronowej. Co poszło nie tak? \teachesat{26--27}
+  \answerto{Zgubiono założenie. Teza jest cytowana, a warunek, pod którym ją
+  udowodniono, nie \dash{} a strata sieci neuronowej nie jest wypukła, więc
+  twierdzenie po prostu nie ma zastosowania.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+% ============================================================
+\section{Z czego składa się twierdzenie}
+\label{sec:P14-parts}
+\index{proof!hypotheses and conclusion}
+
+\begin{fr}
+Ten program ma węższy temat, niż się wydaje, i szerszy zysk. Nie nauczy cię
+niczego dowodzić. Nauczy cię czytać twierdzenie, które udowodnił ktoś inny, i
+mówić dokładnie, co ono orzeka, a czego nie \dash{} a tej umiejętności ta
+dziedzina potrzebuje bez przerwy i prawie nigdy jej nie uczy.
+
+Patrzyłeś, jak się to robi. Każdy \emph{rigourbox} w tej książce nazywa coś,
+czego program nie robi, i mówi, gdzie robi się to zamiast tego \dash{} zwykle
+pierwszy kurs przedmiotu, czasem późniejszy program tutaj, a raz pomiar,
+którego nikt nie wykonał. Jeden jest też w tym programie.
+
+Popatrz na ten kształt, a nie na pojedynczy przypadek. Z jakich części składa
+się twierdzenie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Z \textbf{założeń} \dash{} tego, co się przyjmuje. Z \textbf{tezy} \dash{}
+tego, co się orzeka. I z \textbf{kwantyfikatorów} \dash{} tego, po czym każde
+z nich przebiega.
+\end{ansblock}
+
+Trzy części, a prawie każde naduzycie twierdzenia w tej dziedzinie polega na
+tym, że jedna z nich ginie w drodze do cytatu.
+
+\begin{note}
+Warto od razu wyjaśnić, którą częścią jest dowód. Dowód to argument, że
+założenia wymuszają tezę; nie jest jedną z trzech części i można poprawnie
+korzystać z twierdzenia, nigdy go nie widząc. To właśnie czyni ten program
+możliwym \dash{} i dlatego rigourbox nie jest wykrętem. Zatrzymuje argument, a
+daje wszystkie trzy części, czyli wszystko, czego potrzeba, żeby użyć wyniku i
+zauważyć, kiedy ktoś inny używa go źle.
+\end{note}
+
+\mermaidfig{p14-parts-of-a-theorem}{Trzy części i ta, którą się gubi.}{trzy części}
+\end{fr}
+
+\begin{fr}
+Rozłóż prawdziwe twierdzenie. Program~\ref{prog:P13} podał takie:
+
+\begin{quote}
+Graf skierowany ma porządek topologiczny wtedy i tylko wtedy, gdy jest
+acykliczny.
+\end{quote}
+
+Nazwij założenia i tezę. W tym zdaniu jest komplikacja, a znalezienie jej to
+połowa zadania.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+To \emph{dwa} twierdzenia, a każde jest odwrotnym drugiego.
+\end{ansblock}
+
+\enquote{Wtedy i tylko wtedy} to skrót na parę zdań podróżujących razem:
+\emph{jeśli jest acykliczny, to ma porządek topologiczny} oraz \emph{jeśli ma
+porządek topologiczny, to jest acykliczny}. Każde ma własne założenie, własną
+tezę i zwykle własny dowód \dash{} a dokładnie to powiedział
+Program~\ref{prog:P13}, gdy udowodnił jeden kierunek w jednym zdaniu, a drugi
+przekazał tutaj.
+
+\textbf{Założeniem w obu jest \enquote{skierowany}} i słowo to wykonuje
+prawdziwą pracę: graf nieskierowany z jedną krawędzią ma marszrutę tam i z
+powrotem, więc bez tego słowa twierdzenie jest fałszywe, a cała sekcja 4
+Programu~\ref{prog:P13} paruje. Jest to zarazem słowo, które czytelnik
+najchętniej pominie, bo stoi przed rzeczownikiem i czyta się jak dekoracja.
+\end{fr}
+
+\begin{fr}
+O tym wzorcu jest reszta programu, więc nazwijmy go od razu.
+
+\textbf{Najczęstszym nadużyciem twierdzenia jest zatrzymanie tezy i zgubienie
+założenia.} Nie niezrozumienie argumentu, nie wątpienie w wynik \dash{}
+cytowanie tego, co twierdzenie orzeka, z pominięciem warunków, pod którymi je
+udowodniono.
+
+Dlaczego to miałaby być typowa porażka, a nie jakaś inna? Odpowiedz, zanim
+pójdziesz dalej; powód dotyczy ludzi, a nie matematyki.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo teza jest tą częścią, o którą komukolwiek chodziło. Założenia to to, co
+ktoś musiał przyjąć, żeby ją dostać, a nikt nie cytuje twierdzenia dla jego
+założeń.
+\end{ansblock}
+
+Teza jest cytowalna, przenośna i krótka. Założenie jest ograniczeniem, jest
+nudne i zwykle jest techniczną wtrąconą frazą w środku zdania. Podróżuje więc
+teza \dash{} i podróżuje bez tego, co ją uczyniło prawdziwą.
+
+\begin{aibox}
+To nie jest hipotetyczna porażka w tej dziedzinie, tylko normalna, a sekcja 5
+przerabia trzy jej wystąpienia. Kształt jest zawsze ten sam: wynik
+udowodniony pod pewnym warunkiem trafia do wpisu na blogu, na slajd albo do
+komentarza w code review bez tego warunku, po czym zostaje zastosowany do
+systemu, który go nie spełnia.
+
+Obroną jest nawyk, a nie technika. \textbf{Gdy ktoś cytuje ci wynik, spytaj,
+co ten wynik zakładał} \dash{} a jeśli odpowiedzi nie ma w zdaniu, to zdanie
+nie jest jeszcze twierdzeniem o twoim systemie.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jednej rzeczy ten program celowo nie robi i mówi to wprost, bo alternatywą
+jest zostawić cię w niepewności.
+
+\textbf{Nie uczy pisania dowodów.} Ani w wersji skróconej, ani tych łatwych.
+Pisanie dowodów to rzemiosło na kurs i na rok, a prawie nikt wykonujący tę
+pracę go nie potrzebuje.
+
+\begin{rigourbox}
+Trzy opcje dla książki takiej jak ta były następujące: pominąć rygor
+całkowicie, co robi większość praktycznej matematyki dla inżynierów i co
+zostawia czytelnika niezdolnego do czytania literatury; uczyć pisania
+dowodów, co jest inną książką dla innego czytelnika; albo uczyć
+\emph{czytania}, co jest umiejętnością rzeczywiście potrzebną i ułamkiem tej
+pracy.
+
+To jest trzecia opcja, a granicę warto nazwać, żebyś wiedział, co będziesz, a
+czego nie będziesz miał. Po tym programie umiesz powiedzieć, co twierdzenie
+orzeka, co zakłada, co by je obaliło i o czym milczy. Nie umiesz go
+udowodnić i nie będzie ci to potrzebne.
+\end{rigourbox}
+\end{fr}
+
+% ============================================================
+\section{Implikacja to nie równoważność}
+\label{sec:P14-implication}
+\index{proof!implication}
+
+\begin{fr}
+Prawie każda para założenie--teza to \emph{implikacja}: jeśli $P$, to $Q$.
+Program~\ref{prog:F10} dał \emph{i}, \emph{lub} oraz \emph{nie}; to jest
+czwarty spójnik i to jego ludzie rozumieją źle.
+
+Przypadków jest $\val{p14.rows}$, bo $P$ i $Q$ są każde prawdziwe albo
+fałszywe. W ilu z nich \enquote{jeśli $P$ to $Q$} jest \emph{fałszywe}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{W jednym}
+Tylko wtedy, gdy $P$ zachodzi, a $Q$ zawodzi. Jeśli $P$ nie zachodzi,
+implikacja nie orzeka niczego i liczy się jako prawdziwa, co czyta się jak
+formalność, a jest całą treścią tego spójnika.
+
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$P$ & $Q$ & $P \Rightarrow Q$ & $Q \Rightarrow P$ \\
+\midrule
+F & F & T & T \\
+F & T & T & F \\
+T & F & F & T \\
+T & T & T & T \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Czyli \enquote{jeśli $P$ to $Q$} to dokładnie zdanie, że nie ma
+przypadku, w którym $P$ zachodzi, a $Q$ zawodzi.} Nic o przyczynie, nic o
+tym, co się dzieje, gdy $P$ jest fałszywe, nic o tym, że $Q$ jest ciekawe.
+
+Przeczytaj teraz czwartą kolumnę, czyli odwrotne $Q \Rightarrow P$. W ilu
+wierszach nie zgadza się z trzecią?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{W $\val{p14.differ}$ z $\val{p14.rows}$}
+Są to więc różne zdania i znajomość jednego nie mówi nic o drugim.
+
+\begin{trapbox}
+\textbf{Potwierdzanie następnika} to wzięcie $P \Rightarrow Q$,
+zaobserwowanie $Q$ i wywnioskowanie $P$. To drugi wiersz tabeli, w którym
+implikacja zachodzi, a odwrotne zdanie nie.
+
+W tej dziedzinie przychodzi to zwykle jako diagnoza. \emph{Przeuczenie ciągnie
+stratę treningową w dół, a nasza strata treningowa jest w dole, więc się
+przeuczamy.} Pierwsze zdanie może być całkowicie prawdziwe, a wniosek i tak
+nie wynika: model, który naprawdę nauczył się zadania, też ma niską stratę
+treningową.
+
+Test jest mechaniczny i zajmuje sekundę. Zapisz twierdzenie jako \emph{jeśli
+$P$ to $Q$}, zapisz, co zaobserwowano, i sprawdź, która z dwóch liter to
+jest. Jeśli $Q$, masz zdanie odwrotne i nie masz nic.
+\end{trapbox}
+
+Jest błąd będący lustrzanym odbiciem tamtego i to on produkuje fałszywe
+uspokojenie zamiast fałszywej diagnozy.
+
+Weź znowu $P \Rightarrow Q$ i przypuść, że obserwujesz, iż $P$ jest
+\emph{fałszywe}. Co stąd wynika o $Q$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Zupełnie nic}
+Wiersze pierwszy i drugi tabeli: przy $P$ fałszywym implikacja zachodzi tak
+czy owak, więc $Q$ jest wolne. Wywnioskowanie $\lnot Q$ z $\lnot P$ to
+\textbf{zaprzeczanie poprzednikowi} i jest to błąd odwrotnego zdania widziany
+z drugiej strony \dash{} istotnie $\lnot P \Rightarrow \lnot Q$ \emph{jest}
+zdaniem przeciwstawnym do odwrotnego, więc te dwie pomyłki są jedną pomyłką.
+
+Czyta się to jak bezpieczeństwo, a nie jak twierdzenie, i to pozwala mu
+przejść. \emph{Model, który widział zbiór testowy, dostanie podejrzanie dobry
+wynik. Ten go nie widział, więc wynik jest wiarygodny.} Drugie zdanie usuwa
+jedno wyjaśnienie wysokiego wyniku i zostawia każde inne nietknięte.
+
+Teraz trzecia postać. Czy \enquote{jeśli nie $Q$ to nie $P$} zgadza się z
+\enquote{jeśli $P$ to $Q$}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak, we wszystkich $\val{p14.rows}$ wierszach}
+To jest zdanie \textbf{przeciwstawne} i nie jest zdaniem pokrewnym, tylko tym
+samym zapisanym inaczej \dash{} co skrypt sprawdza, przeglądając każdy wiersz,
+więc jest to dowód, a nie ilustracja.
+
+Warto je mieć, bo często jest łatwiejszą połową do wykazania. \emph{Każda
+kaczka kwacze} i \emph{nic, co nie kwacze, nie jest kaczką} to jedno zdanie;
+jeśli drugie łatwiej sprawdzić, to sprawdzenie go udowodniło pierwsze. Tym
+właśnie jest dowód przez kontrapozycję i nie jest to sztuczka.
+
+\mermaidfig{p14-two-rewritings}{Jedno z dwóch przepisań to to samo
+zdanie, a drugie to inne.}{dwa przepisania}
+\end{fr}
+
+\begin{fr}
+Z tabeli wypada jeszcze jedno i jest to najbardziej praktyczna rzecz w tej
+sekcji. Czego trzeba, żeby \emph{obalić} \enquote{jeśli $P$ to $Q$}?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jednego przypadku, w którym $P$ zachodzi, a $Q$ zawodzi. Dokładnie jednego i
+niczego więcej.
+\end{ansblock}
+
+Bo zaprzeczeniem $P \Rightarrow Q$ jest $P \wedge \lnot Q$ \dash{} co jest
+regułą De Morgana z Programu~\ref{prog:F10} o krok dalej, a skrypt sprawdza to
+we wszystkich $\val{p14.rows}$ wierszach.
+
+\textbf{Tym właśnie jest kontrprzykład}, a asymetria zasługuje na uwagę:
+wykazanie implikacji może wymagać argumentu o każdym przypadku, a zniszczenie
+jej wymaga jednego eksponatu. Dlatego recenzent, który podaje jedno
+wystąpienie, zakończył dyskusję, i dlatego \enquote{ale zwykle działa} nie
+jest odpowiedzią.
+
+\begin{note}
+Program~\ref{prog:F10} zmierzył ten sam spójnik psujący się w filtrze: z
+$\val{p14.filter.total}$ rekordów właściwy warunek zachowuje
+$\val{p14.filter.right}$, a \code{not spam and not short} zachowuje
+$\val{p14.filter.wrong}$, gubiąc $\val{p14.filter.lost}$ bez żadnego objawu.
+Skrypt tego programu odbudowuje tamtą populację z tabeli prawdy i przerywa
+budowanie, jeśli którakolwiek z liczb nie zgadza się z tą, którą tamten
+program zatwierdził \dash{} więc logika tutaj i pomiar tam nie mogą się
+rozejść.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Kwantyfikatory i kolejność, która zmienia twierdzenie}
+\label{sec:P14-quantifiers}
+\index{proof!quantifiers}
+
+\begin{fr}
+Drugą częścią twierdzenia, którą ludzie gubią, jest kwantyfikator, a
+dokładnie jego \emph{kolejność}.
+
+Dwa zdania o relacji między $x$ i $y$:
+
+\begin{itemize}
+\item \textbf{Dla każdego $x$ istnieje $y$} takie, że $R(x,y)$.
+\item \textbf{Istnieje $y$} takie, że dla każdego $x$ zachodzi $R(x,y)$.
+\end{itemize}
+
+Używają tych samych pięciu słów. Czy to to samo twierdzenie? Jeśli nie, to
+które jest mocniejsze i dlaczego?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Różne, a drugie jest mocniejsze. W pierwszym $y$ może zależeć od $x$; w
+drugim jedno $y$ musi działać dla wszystkich naraz.
+\end{ansblock}
+
+Skrypt rozstrzyga to, pokazując relację na $\val{p14.dom}$ elementach \dash{}
+każde $x$ w relacji z następnym po okręgu, czyli $\val{p14.rel}$ z
+$\val{p14.pairs}$ par \dash{} dla której pierwsze zdanie jest prawdziwe, a
+drugie fałszywe. Jeden świadek jest dowodem, że to różne twierdzenia, co jest
+asymetrią z sekcji 2 przy pracy.
+
+\begin{note}
+Bezpieczny jest tylko jeden kierunek i warto wiedzieć, który.
+\textbf{Istnieje-$y$-dla-każdego-$x$ zawsze pociąga
+dla-każdego-$x$-istnieje-$y$}, nigdy odwrotnie: świadek uniwersalny służy za
+każdego z osobna. Skrypt sprawdza to dla \emph{każdej} relacji na zbiorze
+trzyelementowym \dash{} wszystkich $\val{p14.qchecked}$ \dash{} co znów jest
+wyczerpującym dowodem, a nie próbką.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Teraz to, co ta dziedzina cytuje najczęściej. Twierdzenie o uniwersalnej
+aproksymacji w postaci, w jakiej zwykle się je podaje:
+
+\begin{quote}
+Dla każdej funkcji ciągłej $f$ na obszarze ograniczonym i każdej tolerancji
+$\varepsilon > 0$ istnieje sieć z jedną warstwą ukrytą, której wyjście jest w
+odległości mniejszej niż $\varepsilon$ od $f$ wszędzie na tym obszarze.
+\end{quote}
+
+Która to kolejność i co wobec tego może od czego zależeć?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dla-każdego, a potem istnieje. Sieć może więc zależeć i od $f$, i od
+$\varepsilon$ \dash{} i zależy.
+\end{ansblock}
+
+Przeczytaj to jeszcze raz z nawykiem z sekcji 2: co to zdanie faktycznie
+orzeka? Że dla każdego żądania \emph{coś} je spełnia. A potem przeczytaj to,
+czego w zdaniu nie ma wcale.
+
+\begin{itemize}
+\item Jak duża musi być ta sieć.
+\item Jak ten rozmiar rośnie, gdy $\varepsilon$ maleje albo gdy obszar
+  zyskuje wymiary.
+\item Jak znaleźć wagi.
+\item Czy jakakolwiek procedura uczenia je znajduje.
+\item Ile danych by to wymagało.
+\end{itemize}
+
+$\val{p14.silent}$ rzeczy, a każda z nich jest tym, o co pytał ten, kto
+cytował twierdzenie.
+
+\mermaidfig{p14-exists-is-not-found}{Co obiecuje twierdzenie o istnieniu i
+trzy pytania, których nie dotyka.}{obietnica istnienia}
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Sieci neuronowe potrafią przybliżyć dowolną funkcję} to teza
+z usuniętym kwantyfikatorem i usuniętym milczeniem.} Twierdzenie jest
+prawdziwe, zdanie jest uczciwym streszczeniem jego tezy, a uzasadnianie nim
+wyboru architektury jest błędem, który ten program umie nazwać precyzyjnie:
+traktuje twierdzenie o istnieniu jak konstrukcję.
+
+Analogia, która to unaocznia, jest taka, że wielomian dostatecznie wysokiego
+stopnia też przybliża dowolną funkcję ciągłą na obszarze ograniczonym i nikt
+nie wnioskuje stąd, że wielomiany są dobrą klasą modeli. O sprawie
+rozstrzyga wszystko to, o czym twierdzenie milczy.
+\end{trapbox}
+
+\begin{warning}
+\textbf{To, jak rośnie wymagany rozmiar, jest prawdziwym pytaniem z
+prawdziwymi odpowiedziami, a ta książka ani nie przeprowadziła
+eksperymentu, ani nie przejrzała tamtej literatury.} Są wyniki w obie strony
+\dash{} konstrukcje wydajne dla pewnych klas funkcji i ograniczenia dolne
+wykładnicze w wymiarze dla innych.
+
+Powiedzenie, który przypadek stosuje się do konkretnej architektury, wykracza
+poza to, co ta książka zrobiła, więc nie jest powiedziane. Ustalony jest tu
+kształt zdania, który jest faktem o kwantyfikatorach i nie potrzebuje
+eksperymentu.
+\end{warning}
+\end{fr}
+
+% ============================================================
+\section{Trzy kształty i to, czego trzeba, by każdy złamać}
+\label{sec:P14-shapes}
+\index{proof!induction}
+\index{proof!contradiction}
+
+\begin{fr}
+Nie musisz pisać dowodów, a musisz rozpoznawać trzy kształty, bo każdy z nich
+mówi, jak musiałoby wyglądać obalenie.
+
+Dowód \textbf{wprost} przyjmuje założenia i dochodzi do tezy. Dowód
+\textbf{nie wprost} przyjmuje założenia oraz zaprzeczenie tezy i wyprowadza
+niemożliwość. Dowód \textbf{indukcyjny} ustala przypadek bazowy i krok od
+każdego przypadku do następnego.
+
+Ten drugi to wynik z sekcji 2 przy pracy. Przyjęcie zaprzeczenia
+\enquote{jeśli $P$ to $Q$} oznacza przyjęcie czego dokładnie?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$P$ oraz nie $Q$}
+Dlatego dowód nie wprost implikacji zawsze zaczyna się od przypuszczenia, że
+założenie zachodzi, a teza zawodzi \dash{} nie jest to wybór stylistyczny,
+tylko jedyne, czym zaprzeczenie może być.
+
+Program~\ref{prog:P13} użył takiego dowodu, nie nazywając go: gdyby graf
+skierowany miał cykl, każdy wierzchołek na nim musiałby stać po następnym w
+koło, a skończona lista tego nie potrafi. Przyjmij założenie, przyjmij, że
+teza zawodzi, dojdź do czegoś niemożliwego.
+\end{fr}
+
+\begin{fr}
+Indukcja jest tu najważniejsza, bo to jej nawyk z inżynierii każe ludziom
+sądzić, że ją mają.
+
+Zdanie o każdej liczbie naturalnej. Sprawdzasz je dla $n = 0$, dla $n = 1$ i
+dalej, i zachodzi za każdym razem, gdy patrzysz. Dlaczego to nie jest dowód i
+co by go dowodem uczyniło?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo sprawdziłeś skończenie wiele przypadków, a zdanie jest o nieskończenie
+wielu. Dowodem czyni je \emph{krok}: argument, że jeśli zachodzi w $n$, to
+zachodzi w $n+1$.
+\end{ansblock}
+
+Przypadek bazowy i krok razem sięgają każdego $n$, a żadne z nich osobno nie
+sięga żadnego. Taki jest cały kształt, a rozpoznanie go mówi, co atakować:
+nieudana indukcja to prawie zawsze krok po cichu zakładający coś więcej, a nie
+zły przypadek bazowy.
+
+Oto dlaczego to rozróżnienie nie jest akademickie. Rozważ $n^{2} + n + 41$.
+
+\transcript{p14-forty-confirmations}
+
+\begin{trapbox}
+\textbf{Jest pierwsze dla każdego $n$ od $0$ do $\val{p14.euler.first}$
+wyłącznie, a złożone w $\val{p14.euler.first}$}, gdzie wynosi
+$\val{p14.euler.at}$ \dash{} czyli $\val{p14.euler.factor}$ do kwadratu.
+
+Czterdzieści kolejnych potwierdzeń. Każdy zestaw testów by to przepuścił;
+każdy recenzent by uwierzył; a zdanie jest fałszywe.
+
+Uczciwa połowa tego jest warta tyle, co pułapka. W inżynierii tysiąc testów
+jest często dokładnie właściwym przyrządem, a ta książka kilka razy użyła
+przeglądu jako dowodu \dash{} ale tylko na dziedzinach \emph{skończonych i
+wyczerpanych}: cztery wiersze, $\val{p14.qchecked}$ relacji,
+$\val{p14.pairs}$ par. \textbf{Sprawdzenie każdego przypadku jest dowodem, a
+sprawdzenie wielu przypadków jest przesłanką}, i różnicą nie jest ile, tylko
+czy któryś został pominięty.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Każdy kształt psuje się na swój sposób, a wiedza o tym, na który, jest tym, co
+czyni rozpoznawanie kształtu cokolwiek wartym. Weź je po kolei: jeśli dowód
+jednego z tych trzech rodzajów jest błędny, gdzie najprawdopodobniej leży
+błąd?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+W dowodzie \emph{wprost} \dash{} w kroku, który nie wynika. W dowodzie
+\emph{nie wprost} \dash{} w źle wziętym zaprzeczeniu. W dowodzie
+\emph{indukcyjnym} \dash{} w kroku, prawie nigdy w przypadku bazowym.
+\end{ansblock}
+
+\begin{itemize}
+\item \textbf{Wprost}: któraś linia nie wynika z linii nad nią, a zwykłym
+  sprawcą jest krok po cichu korzystający z własności, której nikt nie
+  założył.
+\item \textbf{Nie wprost}: zaprzeczenie jest złe. Zaprzeczeniem
+  \emph{dla każdego $x$ istnieje $y$} jest \emph{istnieje $x$, dla którego
+  nie ma $y$}, a pomyłka tutaj sprawia, że cały argument dowodzi czegoś
+  innego. Kwantyfikatory z sekcji 3 i $P \wedge \lnot Q$ z sekcji 2 są tym,
+  co temu zapobiega.
+\item \textbf{Indukcyjny}: krok zachodzi dopiero dla dostatecznie dużych $n$
+  albo po cichu potrzebuje zdania dla \emph{wszystkich} mniejszych $n$, gdy
+  dostępne jest tylko poprzednie. Przypadek bazowy jest prawie zawsze dobry,
+  bo to jego się sprawdza.
+\end{itemize}
+
+\textbf{Trzy kształty są więc trzema pytaniami}, a żadne z nich nie wymaga
+prześledzenia argumentu w szczegółach. Co zostało zaprzeczone? Czy krok zależy
+od tego, że $n$ jest duże? Która linia korzysta z czegoś, czego nie założono?
+To właśnie kupuje rozpoznanie kształtu i to całość tego, co ta sekcja
+obiecywała.
+\end{fr}
+
+% ============================================================
+\section{Trzy wyniki, które ta dziedzina cytuje źle}
+\label{sec:P14-misquoted}
+\index{proof!misquoted results}
+
+\begin{fr}
+Wszystko dotąd było maszynerią. Tutaj zostaje użyta, na trzech zdaniach, które
+spotkasz.
+
+Pierwsze. Twierdzenie o zbieżności mówi, że spadek gradientu z odpowiednim
+krokiem zbiega do minimum globalnego, \emph{o ile funkcja celu jest wypukła}.
+Artykuł cytuje je o sieci neuronowej.
+
+Powiedz, co poszło nie tak, i bądź precyzyjny co do tego, której z trzech
+części to dotyczy.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Zgubiono założenie. Teza jest cytowana, warunek, pod którym ją udowodniono,
+nie jest, a strata sieci neuronowej nie jest wypukła, więc twierdzenie w ogóle
+nie ma zastosowania.
+\end{ansblock}
+
+Nie \enquote{stosuje się w przybliżeniu} i nie \enquote{stosuje się w
+duchu}. Implikacja, której założenie zawodzi, nie orzeka niczego \dash{} to
+pierwsze dwa wiersze tabeli z sekcji 2 i to cała ich treść.
+
+\begin{note}
+Warto być uczciwym co do tego, co przetrwało, bo \enquote{twierdzenie nie ma
+zastosowania} bywa czytane jako \enquote{metoda nie działa}, a to też nie
+wynika. Spadek gradientu w widoczny sposób działa na stratach niewypukłych.
+Znikła \emph{gwarancja}, a z nią prawo do mówienia \enquote{zbiegnie do
+minimum} zamiast \enquote{zbiegał na każdym problemie, który próbowaliśmy}.
+
+To mniejsze twierdzenie i jest uczciwe, a własna reguła tej książki \dash{}
+twierdzenie jest zmierzone, przypisane albo oznaczone jako osąd \dash{} to ta
+sama dyscyplina zastosowana do zdania zamiast do twierdzenia matematycznego.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Drugie i to ono kosztuje pieniądze. Ograniczenie na generalizację zachodzi
+\enquote{z prawdopodobieństwem co najmniej $\val{p14.conf}$ procent po
+losowaniu danych treningowych}.
+
+Czytasz artykuł, który stosuje takie ograniczenie $\val{p14.uses}$ razy
+\dash{} raz na eksperyment albo raz na model w porównaniu. Przy założeniu, że
+losowania są niezależne, jaka jest szansa, że zachodzą wszystkie
+$\val{p14.uses}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Około $\val{p14.allhold}$ procent}
+Szansa, że przynajmniej jedno zawiedzie, wynosi więc $\val{p14.anyfails}$
+procent. \textbf{Bardziej prawdopodobne niż nie, że jedno z dwudziestu zdań w
+tamtej tabeli jest po prostu fałszywe}, a nic w artykule nie zaznacza które.
+
+Dwie kolejne liczby pokazują ten kształt jasno.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+użyć, zanim staje się to rzutem monetą & $\val{p14.flip}$ \\
+pewność na użycie potrzebna do $95\%$ przy $\val{p14.uses}$
+  & $\val{p14.needed}$ procent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Ograniczenie na $\val{p14.conf}$ procent jest rzutem monetą po
+$\val{p14.flip}$ użyciach}, a żeby dwadzieścia z nich zachodziło razem, każde
+musiałoby zachodzić na $\val{p14.needed}$ procent \dash{} czyli
+prawdopodobieństwo porażki $\val{p14.neededdelta}$ procent zamiast $5$, prawie
+dwadzieścia razy ciaśniej.
+
+\begin{note}
+Założenie niezależności wykonuje wyżej pracę i zwykle jest fałszywe:
+dwadzieścia eksperymentów często dzieli dane. Ograniczeniem, które nie
+potrzebuje niezależności, jest ograniczenie sumacyjne, którego
+Program~\ref{prog:P05} użył przy swoich liczbach o pojemności \dash{} a tutaj
+daje ono $\val{p14.uses} \times 5 = \val{p14.union}$ procent, czyli nie mówi
+nic.
+
+Nie jest to porażka ograniczenia sumacyjnego; jest to uczciwe stwierdzenie, że
+przy dwudziestu użyciach na tej pewności żadna gwarancja nie przeżywa. Oba
+rachunki zgadzają się co do tego, co robić, czyli zacieśnić ograniczenie na
+pojedyncze użycie zamiast mieć nadzieję.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Trzecim jest uniwersalna aproksymacja, a sekcja 3 już ją rozłożyła, więc
+zostaje wzorzec wspólny dla tych trzech.
+
+\begin{aibox}
+\textbf{Wypukłość} to zgubione założenie. \textbf{Z wysokim
+prawdopodobieństwem} to zgubiony kwantyfikator \dash{} ograniczenie jest
+kwantyfikowane po losowaniach danych, a cytowanie go o zbiorze, który masz w
+ręku, po cichu zamienia zdanie o rozkładzie na zdanie o próbce.
+\textbf{Uniwersalna aproksymacja} to zgubione milczenie: twierdzenie mówi, że
+coś istnieje, a cytat sugeruje, że da się to znaleźć.
+
+Po jednym z każdego: założenie, kwantyfikator i przepaść między istnieniem a
+konstrukcją. To trzy części z sekcji 1, a czwartego rodzaju pomyłki tu nie
+ma, bo nie ma czwartej części.
+\end{aibox}
+
+Procedura czytania jest więc dość krótka, żeby użyć jej w pociągu. Co jest
+zakładane? Co jest orzekane? Po czym każde z tego przebiega? I o czym zdanie
+milczy, a było potrzebne temu, kto je cytował?
+\end{fr}
+
+\begin{fr}
+Jedna uwaga na koniec i o tym naprawdę był ten program.
+
+Rigourboxy w tej książce nigdy nie były przeprosinami. Każdy z nich nazywa
+to, co zostaje przyjęte, przyznaje, że reszta jest gdzie indziej, i mówi gdzie
+\dash{} co jest dokładnie tą dyscypliną, którą ten program właśnie uczynił
+jawną, ćwiczoną od części Podstawy, zanim została nazwana.
+
+\textbf{Nie brakuje ci dowodu; brakuje ci nawyku pytania, co dany wynik
+zakładał.} Ten nawyk kosztuje jedno zdanie, stosuje się tak samo do artykułu,
+do kolegi i do strony dokumentacji, i jest jedyną częścią tego przedmiotu,
+której będziesz używał co tydzień.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Twierdzenie to założenia, teza i wiążące je
+  kwantyfikatory.} Dowód nie jest żadną z tych trzech części, dlatego z wyniku
+  można poprawnie korzystać, nigdy dowodu nie widząc \dash{} i dlatego
+  rigourbox nie jest wykrętem.}
+\sumitem{3--4}{\enquote{Wtedy i tylko wtedy} to \textbf{dwa} twierdzenia
+  podróżujące razem, każde odwrotne do drugiego. W twierdzeniu o porządku
+  topologicznym z Programu~\ref{prog:P13} nośnym założeniem jest
+  \emph{skierowany} i to słowo czytelnik pomija.}
+\sumitem{5--6}{\textbf{Najczęstszym nadużyciem jest zatrzymanie tezy i
+  zgubienie założenia}, bo teza jest tą częścią, o którą komukolwiek chodziło.
+  Gdy ktoś cytuje ci wynik, spytaj, co ten wynik zakładał.}
+\sumitem{7}{Ten program celowo nie uczy pisania dowodów: trzema opcjami było
+  pominąć rygor, uczyć pisania albo uczyć \emph{czytania}, a czytanie jest
+  umiejętnością potrzebną tej publiczności.}
+\sumitem{8--9}{\textbf{$P \Rightarrow Q$ jest fałszywe w dokładnie jednym z
+  $\val{p14.rows}$ wierszy} \dash{} $P$ prawdziwe i $Q$ fałszywe. Nie mówi nic
+  o przyczynie i nic o przypadku, w którym $P$ zawodzi.}
+\sumitem{9--10}{\textbf{Zdanie odwrotne jest innym twierdzeniem}, niezgodnym w
+  $\val{p14.differ}$ wierszach. Zaobserwowanie $Q$ i wywnioskowanie $P$ to
+  potwierdzanie następnika: \enquote{strata treningowa jest w dole, więc się
+  przeuczamy}.}
+\sumitem{10--11}{\textbf{A $\lnot P$ nie mówi nic o $Q$.} Wywnioskowanie
+  $\lnot Q$ z $\lnot P$ to zaprzeczanie poprzednikowi, czyli błąd odwrotnego
+  zdania z drugiej strony \dash{} czyta się jak uspokojenie i to je
+  przepuszcza.}
+\sumitem{11--12}{\textbf{Zdanie przeciwstawne jest tym samym twierdzeniem}, we
+  wszystkich $\val{p14.rows}$ wierszach, i dlatego jego dowód dowodzi
+  oryginału.}
+\sumitem{13--14}{\textbf{Kontrprzykład to jeden przypadek, w którym założenie
+  zachodzi, a teza zawodzi}, bo
+  $\lnot(P \Rightarrow Q) = P \wedge \lnot Q$. Wykazanie może wymagać każdego
+  przypadku; obalenie wymaga jednego.}
+\sumitem{15--16}{\textbf{Kolejność kwantyfikatorów zmienia twierdzenie.}
+  Istnieje-$y$-dla-każdego-$x$ jest mocniejsze i pociąga drugie; odwrotnie
+  zawodzi, co pokazuje relacja na $\val{p14.dom}$ elementach i potwierdza
+  wszystkie $\val{p14.qchecked}$ relacji na trzech.}
+\sumitem{17--18}{\textbf{Uniwersalna aproksymacja jest dla-każdego-a-potem-
+  istnieje}, więc sieć może zależeć od funkcji i od tolerancji. Milczy o
+  $\val{p14.silent}$ rzeczach, w tym o tym, jak duża musi być sieć i czy
+  uczenie ją znajduje.}
+\sumitem{19}{\enquote{Sieci potrafią przybliżyć dowolną funkcję} traktuje
+  twierdzenie o istnieniu jak konstrukcję. Wielomian wysokiego stopnia robi to
+  samo i nikt z tego nie argumentuje.}
+\sumitem{20--21}{Trzy kształty do rozpoznania: wprost, nie wprost, indukcyjny.
+  \textbf{Zaprzeczeniem implikacji jest $P \wedge \lnot Q$}, dlatego dowód nie
+  wprost implikacji zawsze tam się zaczyna.}
+\sumitem{22--23}{\textbf{Sprawdzenie każdego przypadku jest dowodem;
+  sprawdzenie wielu przypadków jest przesłanką.} Wyrażenie $n^{2}+n+41$ jest
+  pierwsze dla $\val{p14.euler.first}$ kolejnych wartości i złożone w
+  $\val{p14.euler.first}$, gdzie wynosi $\val{p14.euler.factor}$ do kwadratu.}
+\sumitem{24--25}{\textbf{Każdy kształt psuje się w swoim miejscu}: dowód
+  wprost w kroku korzystającym z czegoś, czego nikt nie założył, dowód nie
+  wprost w zaprzeczeniu, a indukcyjny w kroku i prawie nigdy w przypadku
+  bazowym. Trzy pytania i żadne nie wymaga prześledzenia argumentu w
+  szczegółach.}
+\sumitem{26--27}{\textbf{Twierdzenie o zbieżności zakładające wypukłość nie
+  mówi nic o sieci neuronowej.} Traci się gwarancję, a nie metodę \dash{} co
+  jest własną regułą tej książki o pomiarze zastosowaną do zdania.}
+\sumitem{28--29}{\textbf{Ograniczenie na $\val{p14.conf}$ procent użyte
+  $\val{p14.uses}$ razy zachodzi wszędzie tylko w $\val{p14.allhold}$
+  procentach przypadków}, jest rzutem monetą po $\val{p14.flip}$ użyciach i
+  potrzebowałoby $\val{p14.needed}$ procent na każde, żeby dać $95\%$ przy
+  dwudziestu.}
+\sumitem{30--31}{Trzy błędne cytaty to po jednym z każdej części: zgubione
+  założenie, zgubiony kwantyfikator i przepaść między istnieniem a
+  konstrukcją. \textbf{Nie ma czwartego rodzaju pomyłki, bo nie ma czwartej
+  części.}}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item \emph{Jeśli model zapamiętuje, jego strata walidacyjna rośnie.} Strata
+  walidacyjna wzrosła. Co stąd wynika?
+  \answerto{Nic o zapamiętywaniu. To zdanie odwrotne i różni się od oryginału
+  w $\val{p14.differ}$ z $\val{p14.rows}$ wierszy \dash{} przesunięcie
+  rozkładu albo za wysoki krok uczenia też ją podniosą. Wynika natomiast, ze
+  zdania przeciwstawnego, że model, którego strata walidacyjna nie wzrosła,
+  nie zapamiętuje \dash{} co jest prawdziwym i użytecznym wnioskiem z tego
+  samego zdania.}
+\item Zapisz zaprzeczenie zdania \emph{każda partia w tym zbiorze zawiera co
+  najmniej jeden przykład pozytywny} i powiedz, co musiałbyś okazać, żeby
+  obalić oryginał.
+  \answerto{\emph{Pewna partia nie zawiera żadnego przykładu pozytywnego.}
+  Zaprzeczenie dla-każdego daje istnieje i odwraca to, co w środku. Żeby
+  obalić oryginał, okazujesz jedną taką partię \dash{} nie statystykę o
+  partiach, jedną partię.}
+\item Ograniczenie zachodzi z prawdopodobieństwem $99\%$ na użycie. Mniej
+  więcej ile użyć, zanim szansa, że zachodzą wszystkie, spadnie poniżej
+  połowy?
+  \answerto{Około $69$: $\num{0.99}^{n} < \num{0.5}$ wymaga
+  $n > \ln \num{0.5} / \ln \num{0.99}$. Porównaj $\val{p14.flip}$ użyć przy
+  $\val{p14.conf}$ procentach \dash{} zacieśnienie ograniczenia na użycie z
+  $5\%$ do $1\%$ kupuje około pięciu razy więcej użyć, co jest wymianą, którą
+  autor artykułu musiał zrobić i zwykle jej nie podaje.}
+\item \emph{Istnieje krok uczenia działający dla każdej architektury} wobec
+  \emph{dla każdej architektury istnieje działający krok uczenia}. Które
+  wolałbyś mieć, a które jest prawdopodobne?
+  \answerto{Pierwsze jest znacznie mocniejsze i to je domyślna wartość w
+  bibliotece orzeka w domyśle; drugie jest niemal puste i to go ktokolwiek by
+  bronił. Całą różnicą jest kolejność dwóch kwantyfikatorów, a poradnik
+  strojenia, który zsuwa się z drugiego na pierwsze, stawia znacznie większe
+  twierdzenie, niż potrafi obronić.}
+\item Ktoś mówi, że własność zweryfikowano na dziesięciu tysiącach losowych
+  wejść. Co zostało ustalone i kiedy to wystarcza?
+  \answerto{To, że zachodzi na tych dziesięciu tysiącach. Wystarcza, gdy
+  dziedzina jest skończona i były to wszystkie jej elementy \dash{} tak ten
+  program dowodzi swoich zdań o $\val{p14.rows}$ wierszach i
+  $\val{p14.qchecked}$ relacjach \dash{} a poza tym jest przesłanką, a nie
+  dowodem. Wyrażenie $n^{2}+n+41$ przechodzi czterdzieści kolejnych sprawdzeń
+  i jest fałszywe.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż z tabeli prawdy, że $P \Rightarrow Q$ oraz
+  $\lnot P \vee Q$ to to samo zdanie.
+  \answerto{Oba są fałszywe dokładnie w wierszu z $P$ prawdziwym i $Q$
+  fałszywym, a prawdziwe w pozostałych trzech. Dlatego zaprzeczeniem jest
+  $P \wedge \lnot Q$: to De Morgan zastosowany do $\lnot P \vee Q$, czyli
+  reguła z Programu~\ref{prog:F10} przy pracy.}
+\item Dlaczego \emph{jeśli $P$ to $Q$} liczy się jako prawdziwe zawsze, gdy
+  $P$ jest fałszywe, skoro wydaje się, że powinno być nieokreślone?
+  \answerto{Bo alternatywa psuje ten spójnik. \emph{Każdy element zbioru
+  pustego jest pierwszy} musi być prawdziwe, żeby \emph{jeśli każdy element
+  $A$ jest pierwszy i każdy element $B$ jest pierwszy, to każdy element
+  $A \cup B$ jest pierwszy} zachodziło we wszystkich przypadkach. Konwencję
+  dobrano tak, żeby reguły się składały, i z tego samego powodu iloczyn pusty
+  wynosi $1$ w Programie~\ref{prog:F04}.}
+\item Założeniami twierdzenia są $A$ i $B$, a tezą $C$. Twój system spełnia
+  $A$, ale nie $B$. Co, jeśli cokolwiek, wolno stąd wywnioskować?
+  \answerto{Nic z tego twierdzenia, w żadną stronę. Nie mówi ono, że $C$
+  zachodzi, i nie mówi, że $C$ zawodzi; założenia zawiodły, więc implikacja
+  nie orzeka niczego. Wywnioskowanie, że $C$ zawodzi, to zaprzeczanie
+  poprzednikowi, czyli błąd odwrotnego zdania w innym kapeluszu.}
+\item Uniwersalną aproksymację formułuje się dla jednej warstwy ukrytej. Co
+  musiałaby dodać wersja dla dwóch warstw ukrytych, żeby być mocniejszym
+  wynikiem?
+  \answerto{Coś o rozmiarze albo o znajdowalności. Czysto jako twierdzenie o
+  istnieniu byłaby co najwyżej słabsza \dash{} co potrafi jedna warstwa,
+  potrafią dwie \dash{} więc twierdzenie o głębokości jest ciekawe tylko
+  wtedy, gdy ogranicza, jak duża musi być sieć albo jak rośnie ten rozmiar. To
+  jest pytanie, o którym zdanie o jednej warstwie milczy, i tam jest
+  prawdziwa literatura.}
+\item Znajdź trzy rigourboxy w programach, które już przeczytałeś. Wskaż
+  wspólny im kształt i powiedz, co czytelnikowi wolno zrobić z wynikiem
+  podanym w ten sposób.
+  \answerto{Każdy podaje tezę, przyznaje, że reszta jest gdzie indziej
+  \dash{} dowód, późniejszy program albo raz pomiar, którego nikt nie wykonał
+  \dash{} i nazywa gdzie. Czytelnikowi wolno użyć wyniku tak, jakby widział
+  dowód \dash{} wszystkie trzy części są obecne \dash{} a nie wolno go
+  rozszerzać, osłabiać założenia ani stosować poza jego kwantyfikatorami, bo
+  to są ruchy, które argument musiałby uzasadnić.}
+\end{furtherproblems}

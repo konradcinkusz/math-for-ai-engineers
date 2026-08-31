@@ -127,17 +127,35 @@ jobs:
           # mermaid-cli bundles its own Chromium; --no-sandbox is required in a
           # container running as root.
           printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
+          # Install once rather than resolving the package on every diagram.
+          # There are well over a hundred sources and the count grows by about
+          # six per program, so a per-diagram `npx -y` was paying the
+          # resolution cost that many times.
+          npm install -g @mermaid-js/mermaid-cli@11
           FAILED=0
           for f in "${SRC[@]}"; do
             lang=$(basename "$(dirname "$f")")
             key=$(basename "$f" .mmd)
             mkdir -p "figures/diagrams/$lang"
             echo "::group::$lang/$key"
-            if ! npx -y @mermaid-js/mermaid-cli@11 \
+            # A PER-RENDER TIMEOUT, for the reason the job-level one exists.
+            # A headless Chromium that wedges takes the whole 25-minute job
+            # budget with it and reports nothing about WHICH diagram wedged,
+            # which is indistinguishable from a slow queue -- the exact defect
+            # `timeout-minutes` was added to every job to remove, one level
+            # down. Measured: this job renders every source in about four
+            # minutes, so 180 seconds for one diagram is not a tight bound,
+            # it is a hang.
+            if ! timeout 180 mmdc \
                  -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
                  -p .puppeteer.json -c figures/mermaid/config.json \
                  -b transparent --pdfFit; then
-              echo "::error file=$f::Mermaid failed to render $lang/$key"
+              rc=$?
+              if [ $rc -eq 124 ]; then
+                echo "::error file=$f::Mermaid TIMED OUT rendering $lang/$key"
+              else
+                echo "::error file=$f::Mermaid failed to render $lang/$key"
+              fi
               FAILED=1
             fi
             echo "::endgroup::"
