@@ -1,0 +1,6 @@
+>>> float('2.43e-2085')    # F03's sequence probability
+0.0
+>>> 0.5 ** 1075             # a fair coin, one past the floor
+0.0
+>>> 0.5 ** 1074             # and one before it
+5e-324

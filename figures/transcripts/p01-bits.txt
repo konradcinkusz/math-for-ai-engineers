@@ -1,0 +1,12 @@
+>>> import struct
+>>> def parts(x):
+...     n = struct.unpack('<Q', struct.pack('<d', x))[0]
+...     frac = n & (2**52 - 1)
+...     return n >> 63, (n >> 52) & 0x7FF, hex(frac)
+...
+>>> parts(1.0)                  # sign, exponent, significand
+(0, 1023, '0x0')
+>>> parts(2.0)                  # only the exponent moved
+(0, 1024, '0x0')
+>>> parts(1.5)                  # only the significand moved
+(0, 1023, '0x8000000000000')

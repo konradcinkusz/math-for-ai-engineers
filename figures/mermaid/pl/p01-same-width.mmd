@@ -1,0 +1,6 @@
+flowchart LR
+  A["szesnascie bitow i dwa sposoby ich wydania"]
+  A --> B["fp16 bierze piec bitow wykladnika<br/>i zostawia dziesiec na mantyse"]
+  A --> C["bf16 bierze osiem bitow wykladnika<br/>i zostawia siedem na mantyse"]
+  B --> D["szerokosc jest ta sama w obu razach,<br/>wiec bit dodany tu jest bitem zabranym tam"]
+  C --> D

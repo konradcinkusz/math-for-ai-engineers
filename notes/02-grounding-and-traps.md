@@ -392,8 +392,12 @@ stick.
 It is not associative. `(a+b)+c ≠ a+(b+c)` in general, and summing 10⁶ small
 gradients into a large accumulator loses the small ones entirely (absorption).
 Order changes the result; non-determinism in reduction order is why two runs of
-the same seed differ on GPU. → **P01**. Well documented; trivially demonstrable
-in three lines of Python.
+the same seed differ on GPU. → **P01** for the mechanism and the threshold
+(below half a gap a contribution moves the total by exactly nothing), **P02**
+for what a million such losses cost and the catalogue of fixes. This entry used
+to route the whole of it to P01; P02's brief undertakes the accumulated loss by
+name, and writing P01 was what made the split visible. Well documented; trivially
+demonstrable in three lines of Python.
 
 **2. "float16 and bfloat16 are the same thing, both are 16 bits."** They spend
 the bits completely differently. fp16 is 1/5/10 (sign/exponent/mantissa),
@@ -993,6 +997,56 @@ the theorem's conditions, and it obscures why plenty of ordinary functions
 have an integral you can compute numerically and no antiderivative anybody can
 write down — `e^(-x²)` being the one you will meet, whose accumulated total is
 the normal distribution's. → **F13**.
+
+### Number, precision and cost, written (P01)
+
+Items 1 to 7 above came out of the literature before Part II was drafted. These
+came out of writing P01 itself, on the Foundation section's pattern: items 74 to
+79 out of P01.
+
+**74. "Floating-point error is a small random wobble."** It is a *spacing*, and
+the spacing is a fixed fraction of the number rather than a fixed distance. The
+gap to the next double is 2.22e-16 at 1 and 1.19e-07 at a billion — six orders
+of magnitude apart, because a fixed budget of significant bits is a fixed
+*relative* precision. Anybody carrying a mental model of a small absolute
+inaccuracy has it wrong at exactly the magnitudes where it matters. → **P01**.
+
+**75. "`abs(a - b) < 1e-9` is a reasonable equality test."** It is wrong at both
+ends and for the same reason as 74. Near a billion it demands agreement finer
+than the format can express, so it calls equal numbers different; near 1e-12 it
+calls everything equal, including values differing by a factor of a thousand. A
+tolerance has to be relative — some multiple of epsilon times the size of the
+numbers. → **P01**.
+
+**76. "One of these two devices is computing the gradient wrong."** Neither is.
+They partition the reduction differently, so they add the same numbers in a
+different order, and a different order is a different *correctly rounded*
+answer. Bit-exact reproducibility across hardware is something you buy with a
+fixed reduction order, at the cost of parallelism — not something you have.
+→ **P01**.
+
+**77. "A very small contribution makes a very small difference."** Below *half*
+the gap at the running total it makes exactly none: under round-to-nearest the
+nearest representable result is the number you started with, so the addition is
+a no-op that returns successfully. `1.0 + 1e-17 == 1.0` is `True`. The threshold
+is half an epsilon of the total — 6.0e-08 in fp32, 3.9e-03 in bf16 — which is
+why accumulators are kept wider than the values entering them. → **P01** for the
+threshold, **P02** for what it costs at scale.
+
+**78. "bf16 is the better format, so it must be the more precise one."** It is
+the *less* precise one, by a factor of eight, and that is what it was designed
+to be: three bits moved off the significand and onto the exponent buy thirty-
+three orders of magnitude of extra reach. bf16 is fp32 with the bottom of the
+significand removed — same exponent budget, so a conversion between them cannot
+overflow. The design question was never "how accurate" but "what fails first",
+and for training the answer is range. → **P01**.
+
+**79. "A vanishing gradient is a gradient that has become small."** Often it is
+one that has left the number system. F12's forty-layer product reaches 4.8e-105,
+which is a small number in fp64 and *exactly zero* in fp32 — whose smallest
+subnormal is 1.40e-45 — and fp32 is the training format. "Very little" and
+"nothing" behave differently downstream, and only one of them can be rescued by
+scaling. → **P01**, with **F12**.
 
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for

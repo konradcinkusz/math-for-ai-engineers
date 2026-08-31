@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 written, both editions \dash{} the whole Foundation part.** P1–P34 are stubs carrying their briefs | 34 of 47 |
+| Programs | **F1–F13 and P1 written, both editions \dash{} the whole Foundation part, and Part II started.** P2–P34 are stubs carrying their briefs | 33 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 515 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 521 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 447 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 453 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 541 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 545 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 469 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 475 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,18 +93,19 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **34 of 47 programs are stubs**, in each language. This is the whole of the
+- **33 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 347 computed values, all referenced, all present, plus the committed console
+- 410 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 78 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 84 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **55 orphan-tail pages: 13 · 14 · 14 · 14** across `main-en`, `main-pl`,
+- **57 orphan-tail pages: 14 · 14 · 14 · 15** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
-  41 before F8, 43 before F9, 45 before F10, 49 before F11 and 51 before F12.
+  41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12 and
+  55 before P1.
   The count is the signal and it is going the wrong way, at roughly one to
   eleven per program written; **F8 added one, F9 two, F10 four, F11 two and
   F12 four, against F5's eleven**, and the reason is worth having — all five
@@ -787,7 +788,10 @@ equivalent of arithmetic is the number system their hardware implements. It is a
 good argument and it is wrong for *F1*: the Foundation part must assume nothing,
 and a reader who genuinely needs it is not ready for a mantissa on page three.
 The floating-point material became **P1**, placed before the linear algebra
-rather than after it, and `notes/05-floating-point-plan.md` is its plan.
+rather than after it. **`notes/05-floating-point-plan.md` is F1's own
+frame-by-frame plan, not P1's** — its §1 is the F1/P1 boundary argument, which
+is where the filename comes from. The P01 pass below records what else in that
+file the written F01 does not bear out.
 
 What F1 keeps from that argument is the *payoff*: it ends on sizing a model's
 weights, and it points forward to P1 at the exact moment a reader asks why
@@ -2971,6 +2975,239 @@ it, because naming it would need three words the book has not defined.
 - Frame numbers remapped: plan `1--5 / 6--9 / 10--12 / 13--17 / 18--20`,
   program `1--5 / 6--9 / 10--12 / 13--17 / 18--22`.
 
+### Program P1 pass, August 2026 --- Part II begins
+
+**Thirty-five teaching frames, thirty-seven printed, both editions**, against a
+brief that projected forty-five. Five sections: scientific notation in base
+two, the gap growing with magnitude, order changing the answer, one width and
+two splits, and two floors rather than one.
+
+The layout came back to the pre-P01 baseline exactly \dash{} `[]`, `[]`,
+`[6.3]`, `[]` \dash{} with no stranded openers, no stranded headings and no
+orphaned cues. Two orphan tails were added.
+
+#### Reading the neighbour's brief cut the program's best demonstration, correctly
+
+The draft's centrepiece was a million small contributions summed into a running
+total in both orders, with the loss printed. It demonstrates well and **it is
+not P01's**: P02's brief undertakes *why summing a million small gradients in
+the wrong order loses them*, along with cancellation, Welford and the catalogue
+of fixes. Writing it here would have spent P02's payoff and left P02 repeating.
+
+What *is* P01's is the **threshold underneath that loss**, because it is a fact
+about the encoding and follows from the gap table the program has already
+built: under round-to-nearest, a contribution below **half the gap** at the
+running total moves nothing at all. Not *loses precision* \dash{} moves
+nothing. `1.0 + 1e-17 == 1.0` is `True`, and the threshold is half an epsilon
+of the total, so it is a fixed *fraction*: $\num{6.0e-08}$ in `fp32`,
+$\num{3.9e-03}$ in `bf16`.
+
+That is the F07/F12 split applied one part later \dash{} F07 owned the shape of
+saturation and F12 owned the compounding \dash{} and it makes the section
+better rather than shorter, because a threshold is provable where an
+accumulated loss is a demonstration.
+
+**No manifest amendment was needed, and that is the point.** The manifest was
+right and the draft was wrong; checking cost one file read.
+
+#### An assertion that passed on a difference the page could not show
+
+The cut demonstration failed before it was cut. With `TINY = 1e-10` the two
+summation orders printed **the same ten decimal places**, because the gap at
+$1$ is $\num{2.22e-16}$ and $10^{-10}$ sits comfortably inside it, so nothing
+was lost. `assert forward != backward` passed on a difference invisible to a
+reader.
+
+**An assertion on the underlying floats is not an assertion about what the
+reader will read.** Where a frame's argument is that two printed numbers
+differ, assert on the printed strings. The rule is now in
+`code/p01_floating_point.py` at the computation it came from.
+
+#### The cross-programme drift gate caught a live disagreement, first time out
+
+F12 introduced the mechanism \dash{} a script reading another program's
+committed value and asserting agreement. P01 has four such gates, and one of
+them fired on P01 itself.
+
+**P01 made the `fp64` coin-flip cliff 1074 where F03 had committed 1075**, and
+`fp32` 149 against 150. Both statements are true and they count from opposite
+sides of the same boundary: the largest $n$ with $\num{0.5}^{n}$ still
+representable, against the first $n$ at which the product is zero. Printing
+them two hundred pages apart would have put two numbers in the book that look
+like one and are not \dash{} F08's defect, at a distance no reader could
+reconcile. F03 asks *after how many tokens is the product exactly zero*, so
+that is the definition P01 adopted, and the script now checks it against F03's
+value rather than merely resembling it. The other three gates cover F03's four
+format thresholds, F03's sequence probability and F12's underflowing product.
+
+**Use this wherever one program quotes another's number.** It is three lines
+and it is the only thing in the repository that compares two programs against
+each other; `make verify` compares a script against its own output and would
+not have seen any of it.
+
+#### A vacuous assertion, and the program's best demonstration hiding inside it
+
+The F03 gate was written as `_f03 < smallest_subnormal(...)` and passed for
+every format \dash{} **vacuously**, because `float("2.43e-2085")` returns
+`0.0` in Python, and zero is below every floor.
+
+The failure to parse *is* the finding. F03's committed number **cannot be read
+back into a double at all**, which makes it the one computed value in this book
+that a reader cannot paste into a prompt and inspect \dash{} and it is exactly
+why F03 computed it as a logarithm and never as a product. The gate now
+compares the decimal exponent parsed out of the string, never the float, and
+asserts `float(...) == 0.0` so the day that changes the build says so.
+
+**A comparison against a value that silently became zero is not a comparison.**
+It is the same shape as F03's rounded-`log10` guard, which could not fail
+within a few hundred ulp.
+
+#### Six wrong numbers in the draft, all found by dividing what was printed
+
+None was caught by any gate. Every one was caught by re-reading the draft
+against arithmetic, and every one is now computed and asserted rather than
+written from expectation.
+
+- **The `aibox` argued the opposite of what it printed.** Two validation losses
+  differing by $\num{1.7e-6}$ were called *smaller than epsilon at that
+  magnitude*, which is $\num{2.7e-7}$. They differ by six gaps. The pair is now
+  emitted with the gap beside it and an assertion that the difference is
+  smaller.
+- **"About a million times larger"** for the gap at a billion against the gap
+  at $1$. The ratio is $\num{5.4e8}$.
+- **"Each row is about a million times the one above it."** The first step is
+  $512$; only the second is a million. The frame now defers the quantitative
+  claim to the next frame, which states it correctly with the factor-of-two
+  binade caveat.
+- **The decimal-digit counts were one too high in two rows.** An epsilon of
+  $\num{7.81e-3}$ is about **two** decimal digits, not three. Now
+  `round(-log10(eps))`, emitted per format.
+- **"About one epsilon"** for the error in `0.1 + 0.2`. It is *exactly one gap
+  at $\num{0.3}$*, which is a quarter of the gap at $1$ \dash{} and quoting a
+  gap without the magnitude it sits at is the precise mistake the same section
+  warns against. Asserted equal to `math.ulp(0.3)`.
+- **"A fortieth of a per cent"** for `bf16`'s swamping threshold, which is
+  $\num{0.39}$ per cent, sixteen times larger. Now emitted as a percentage.
+
+And one notation error of the same family: `\intcc{2^{29}}{2^{30}}` for the
+range over which a coincidence holds, where $2^{30}$ is precisely the point at
+which the binade changes and the gap doubles. `\intco` exists and is what was
+meant.
+
+**The rule this pass earned: a claim of the form *X is about N times Y* is a
+division, so do the division.** Four of the six were that shape.
+
+#### The coincidence worth keeping, and the assertion that stops it generalising
+
+Half a double's gap at a billion is **exactly** half an `fp32` epsilon, to the
+bit. A billion falls in the binade starting at $2^{29}$, and $29$ is precisely
+the difference between the two significand budgets, $52 - 23$.
+
+It is a property of that magnitude and not a law, so the script asserts both
+halves: that the two are equal at $10^{9}$, **and that they are not equal at
+$10^{10}$**. The second assertion is what stops a true sentence becoming
+folklore, and it is worth copying wherever the book prints a coincidence.
+
+The sentence it buys is the whole subject in one line: *a double counting near
+a billion is as coarse as a float counting near one.* Precision is a property
+of a format and a magnitude together, never of a format alone.
+
+#### Three transcripts, and one of them exists because a console line was typed
+
+The draft carried *ask Python for `float("2.43e-2085")` and it returns 0.0* as
+prose. That is the fabricated-console-block shape with a claim standing in for
+a run, in the program whose stated method is that a claim about what the
+machine stores is settled by asking it. It is now `p01-underflow.txt`,
+generated, committed, gated, and it does a second job \dash{} the two lines
+under it bracket the floor by multiplying rather than by parsing.
+
+Replacing it also cleared the only remaining parity warning, because the Python
+string literal took a straight double quote into Polish prose, where C10 wants
+`\enquote{}`. **A `"` inside `\code{}` in the Polish edition is a warning with
+no correct silencing**; the fix is to move the code into a transcript, where it
+belonged.
+
+All three transcripts were extracted from the finished files and executed, and
+all three reproduce exactly. The width guard is 64 characters, taken from the
+widest listing line already in the book, and **it fired on two of its first
+three runs** \dash{} which is the only way to know a new check is looking at
+anything.
+
+#### The one new overfull box was a Polish table HEADER
+
+$\num{9.9}$ pt in `main-pl` alone, from a header cell reading *odległość do
+następnej liczby podwójnej precyzji powyżej* \dash{} 51 characters where the
+English is 33.
+
+F05 recorded that a `\val{}` numeric column costs about 70 pt and that some
+tables simply cannot fit. This is the same finding one cell over: **the header
+is as capable of overflowing a `tabular` as the data is, and it is longer in
+Polish by a wider margin than the prose is.** Shortened, and the multiset came
+back to the baseline in all four builds.
+
+#### `notes/05-floating-point-plan.md` is F1's plan, and this file said it was P01's
+
+It is F01's frame-by-frame plan; its §1 is the F1/P1 *boundary* decision, which
+is why the filename mentions floating point. Corrected below.
+
+**And its §1.3 records a commitment the written F01 does not contain.** The
+plan says F01 frame 32 plants *a float is normalised scientific notation in
+base 2 on a fixed digit budget* for P01 to cash. Nothing of the sort is in the
+written F01: what F01 has is its `Scientific notation` section, plus the
+base-two trapbox on $\num{0.1}$ and the `aibox` handing `bf16`/`fp16` to P01.
+
+So P01 builds the bridge itself, and it is better for it \dash{} F01's
+section is written, rich and quotable ($m$ carries the precision, $e$ carries
+the size), so P01's opening move is to change the ten to a two and cap the
+mantissa's digits, and everything else follows. **The written program is the
+authority and a plan document is not**, which is the same rule this file states
+for briefs.
+
+#### The trap catalogue's item 1 was stale in the direction nobody checks
+
+It routed the *whole* of the summation story to P01, including the accumulated
+loss that P02's brief undertakes by name. Corrected to name the split, with the
+reason. Items **74 to 79** were added out of writing P01, under a new heading
+of their own, on the Foundation section's pattern.
+
+#### The diagrams
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P1.1 three-fields | 657 / 657 | 7.06 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P1.2 same-width | 657 / 657 | 2.82 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P1.3 two-floors | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six hit mermaid's own wrap cap at 657 pt on the first render, which is
+where a third of the book's figures already sit, so no redesign was needed.
+
+**Rule 2 checked by content first and then on the page.** Only `p01-two-floors`
+contains an answer to something the program asks \dash{} frame 27's *what is
+below the smallest normal* \dash{} and it sits below frame 28's answer in all
+four builds, measured: elicitation at y197/219/238/205, answer at
+y291/317/331/303, figure caption at y522/570/560/556, all on one page.
+
+#### Also
+
+- Frame numbers remapped after writing, as always: sections landed at
+  `1--6 / 7--12 / 13--19 / 20--26 / 27--35` against a plan of
+  `1--7 / 8--14 / 15--21 / 22--30 / 31--38`. Nine quiz routes, six outcomes and
+  fourteen summary brackets moved with them, and **two quiz routes were
+  swapped** by a careless ordered replace \dash{} caught by reading the printed
+  list, which is worth doing after any bulk remap.
+- Four parity divergences, all recorded classes: two numbers spelled as words
+  (*jedynką* for `$1$`, *zerem* for `$0$`) and two references sitting behind
+  their maths. The `Program~\ref{...}'s <maths>` inversion is now so reliable
+  that it is worth fixing while translating.
+- `p01.fp16.max` is $\num{6.55e4}$ and `p01.fp16.max.exact` is $65504$, under
+  two names on purpose: the quiz asks *roughly how large* and the frame asks
+  for the number, and printing a rounding beside the thing it rounds is F08's
+  defect.
+- Four emitted values went unreferenced and were cut rather than forced into
+  the prose; one more, `p01.fp64.max`, earned a sentence instead \dash{} a
+  double spans over six hundred orders of magnitude, which is why it rarely
+  makes you think about either end.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -3220,12 +3457,16 @@ clone instead.
 
 ## What is left
 
-1. **Thirty-four programs, and the whole of Part I is written.** F1 to F13,
-   both editions, so the book's own claim — *it assumes nothing* — is now
-   testable rather than promised. **P01 to P03 are next**, and they are the
-   natural continuation because they need only what Part I has: P01 is
-   floating point, which F11's U-curve and F12's underflowing product both
-   hand it by name, and F13 has just closed the calculus.
+1. **Thirty-three programs, and Part I plus the first of Part II is written.**
+   F1 to F13 and P1, both editions, so the book's own claim — *it assumes
+   nothing* — is testable rather than promised. **P02 is next** and it is the
+   natural continuation: P01 has just established that the arithmetic is not
+   exact and what the shape of the inexactness is, and P02's whole subject is
+   what to do about it — cancellation, log-sum-exp, Welford, and summation
+   order as a discipline. P01 hands it three things by name (the accumulated
+   summation loss, catastrophic cancellation, and the right-hand branch of
+   F11's U-curve), so read those frames before estimating P02's length. Then
+   P03, which needs only arithmetic and sigma notation.
 
    **F12 was the program the rest of the book leaned on hardest.** It was owed
    five things by name and paid all five: F4's sigma and product; F5's composition (its frame 34 hands it over
