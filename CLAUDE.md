@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P6 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first three programs of Part III.** P7–P34 are stubs carrying their briefs | 28 of 47 |
+| Programs | **F1–F13 and P1–P7 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first four programs of Part III.** P8–P34 are stubs carrying their briefs | 27 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 654 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 664 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 563 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 565 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 674 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 684 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 577 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 583 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,14 +93,14 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **28 of 47 programs are stubs**, in each language. This is the whole of the
+- **27 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 587 computed values, all referenced, all present, plus the committed console
+- 606 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 114 Mermaid sources, all rendering
-- 24 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 120 Mermaid sources, all rendering
+- 26 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
@@ -111,7 +111,9 @@ what was there before.
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
   before P6. **P6 added two and the ten transcripts it turned on added three**,
   all of the latter in `main-pl` \dash{} a listing appearing where a marker box
-  used to be moves every break after it
+  used to be moves every break after it. **P7 added none**, which has happened
+  once before (F13) and both times for the same reason: the recorded rules were
+  applied while drafting rather than after a build named the defect
   \dash{} and one of P04's five is the price of the three cues its pass added
   back, which is the Stroud layout pass's measurement arriving from the other
   direction.
@@ -131,7 +133,8 @@ what was there before.
 - **Elicitation rate: 57% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
-  35% in P04, 36% in P05 and 38% in P06.** A frame carries `\nextframe` if and only if the
+  35% in P04, 36% in P05, 38% in P06 and 40% in P07.** Part III is climbing
+  because the rate is now designed in rather than measured afterwards. A frame carries `\nextframe` if and only if the
   next frame opens
   with an answer, so the cue rate *is* the elicitation rate. It halved over
   seventeen programs with every gate green, because `RE_DEMANDS` treats
@@ -4298,6 +4301,121 @@ arrived, all in `main-pl`.
   It is now *it carries a scalar straight through*, which is the second
   linearity property said in words.
 
+### Program P7 pass, August 2026
+
+**Thirty-seven teaching frames, thirty-nine printed, both editions**, against a
+brief that projected fifty-five. Five sections: an array is a shape and a rule
+for reading it, index notation says what a picture cannot, an `einsum` string is
+that sentence with the sigma left out, broadcasting is a rule rather than a
+courtesy, and which of reshape, transpose and permute moves data.
+
+**It cost nothing on any layout ledger.** Zero new overfull boxes in any of the
+four builds, no stranded openers, no stranded headings, no orphaned cues after
+one round, and **the orphan-tail count did not move at all** \dash{} which has
+happened once before, at F13, and both times because the recorded rules were
+applied while drafting rather than after a build named the defect.
+
+#### The program had no plan, and writing one first changed its shape
+
+P07 was inserted by the August 2026 curriculum review rather than designed, so
+its manifest entry is a contract and this file has carried *write the plan
+before the program* as an open item ever since. The plan is
+`notes/08-tensors-plan.md` and it was written before a line of the program.
+
+Two things came out of it that would not have come out of drafting:
+
+- **P06 §4 hands this program four things by name**, including the note that
+  real frameworks stack the batch along the *first* axis and compute
+  $XW\T$. That is the first place a reader's rank-2 model meets a framework, so
+  it is frame 1 \dash{} and the answer is *both, because $XW\T$ is the
+  transpose of $WX$*, which is the last question in the program answerable with
+  a matrix identity. Opening there buys the rest of the program its motivation.
+- **The word *dimension* does three jobs and the word *rank* does two.** P04
+  owns dimension as the number of independent directions and P08 owns rank as
+  what a matrix does. Neither collision is avoidable and both are invisible
+  while drafting; the plan caught them and §1 names them.
+
+#### The headline is an identity, not a demonstration
+
+Predictions of shape $(n)$ minus targets of shape $(n, 1)$ broadcast to
+$(n, n)$, so a loss is averaged over every *pair*. The excess is exactly
+
+\[ \operatorname{mean}_{ij}(p_i - t_j)^2 - \operatorname{mean}_i(p_i - t_i)^2
+   = 2\operatorname{Cov}(p, t) \]
+
+and the two consequences are what make it worth a section rather than a warning
+box. **The error grows as the model improves**, because a covariance is
+precisely what training increases; and **at a perfect fit the reported loss is
+$2\operatorname{Var}(t)$ and cannot fall below it.** Measured, the reported
+number is $\val{p07.mse.ratio.hi}$ times the true one at a poor fit and
+$\val{p07.mse.ratio.lo}$ times at a good one. What an engineer sees is a loss
+that falls, flattens at a number nobody can account for, and stays there, which
+is read as a model that has stopped learning.
+
+No error, no warning, and the training loop is fine. It is the best trap the
+book has found so far, and it is exactly derivable.
+
+#### An assertion refuted the frame it was written for, for the ninth pass running
+
+The first version asserted that **the excess grows monotonically as the fit
+improves**. It failed on the first run: the excess went $1.01$, $1.59$, $1.43$,
+$1.44$ over four noise levels. The excess is
+$2\operatorname{Var}(t) + 2\operatorname{Cov}(\varepsilon, t)$, and the second
+term is a *sample* covariance between the residual and the targets \dash{} a
+random quantity of size about $\sigma\,\mathrm{sd}(t)/\sqrt{n}$ that does not
+shrink in step with $\sigma$. At $n = 64$ it is large enough to reorder the
+rows.
+
+What is true is better: the excess converges to a floor set by the targets while
+the true loss goes to zero underneath it, so **the ratio** is what runs away,
+and it does so monotonically because it is $1 + \text{excess}/\text{true}$ with
+the excess essentially fixed. Both are asserted now \dash{} a Cauchy--Schwarz
+bound that holds for any sample, and the ratio's ordering.
+
+**And the ratio did not reproduce from the page.** At three decimals the good
+fit prints $0.009$ and $2.62/0.009 = 291$ against a stated $286$. That is F04's
+`22 778` and F05's `51.7` for the third time, so the script now carries the
+check as code: it formats both operands and the ratio exactly as the page will,
+divides, and fails if the answer differs. Four decimals fixes it.
+
+#### Also
+
+- Traps 112 to 118 added to `notes/02`, which had **nothing** on shapes before
+  this pass \dash{} the review's \enquote{largest content gap} arriving from a
+  second direction.
+- **Elicitation 40%, the highest in Parts II and III**, from two conversions
+  that added no frame: the column-wise bias shape and the reshape-safety rule
+  are now elicited rather than stated. The second moved a `trapbox` up one frame
+  so the answer block could open the next one, which is the P06 pattern.
+  The two cues cost `main-en` two pages, which is the measured price.
+- **Three Polish parity failures, all one class and all the same word.**
+  *jedynkami*, *jedynką* and a third for `$1$` \dash{} Polish reaches for the
+  spelled-out numeral far more readily than English, and *pad with $1$s*
+  invites it three times in one program. Write *wartościami $1$*.
+- A 6.0 pt box in `main-pl` from two coordinate tuples run into one sentence,
+  and one orphaned cue in `main-en-a4`. The first was fixed by splitting the
+  sentence in both editions; the second by **lengthening** the frame, which is
+  now the fifth confirmation of F06's two-sided rule. The paragraph added earns
+  its place: it says what each of the three axes runs over, which makes the
+  shape concrete without touching the question below it.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P7.1 axes-not-directions | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P7.2 broadcast-alignment | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P7.3 reshape-or-permute | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's own wrap cap on the first render, so no redesign.
+
+**Rule 2, read first and then measured.** P7.1 sits after the answer it
+explains in all four builds and P7.3 sits below both its question and its answer
+on one page in all four. **P7.2 sits above its elicitation in all four and that
+is not a defect**, for the reason F03's second review pass established and P04
+restated: it carries the alignment rule, which the frame above states in full,
+and the question below asks for the resulting *shape*, which appears nowhere in
+the figure. A figure the reader is meant to *apply* belongs above the question,
+not below it.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -4549,21 +4667,19 @@ clone instead.
 
 ## What is left
 
-1. **Twenty-eight programs, and Parts I and II are complete with Part III three
-   programs in.** F1 to F13 and P1 to P6, both editions. Part II's argument — that floating
+1. **Twenty-seven programs, and Parts I and II are complete with Part III four
+   programs in.** F1 to F13 and P1 to P7, both editions. Part II's argument — that floating
    point, numerical stability and cost belong *before* the linear algebra — is
    now made rather than promised: none of the three needed anything beyond
    arithmetic, algebra and a sigma.
 
-   **P07 is next** — tensors, shapes and index notation — and **it still has no
-   frame-by-frame plan**: it was added by curriculum review rather than
-   designed, so its brief is a contract and not a plan. Write the plan before
-   writing the program. P06's closing frame hands it over by name, and P06 has
-   already deferred four things to it explicitly: index notation and einsum,
-   broadcasting, reshape against transpose against permute, and the axes of a
-   rank-4 attention tensor. Read P06 §4 first — it establishes shape as a type
-   signature and the batch as one more column, and says in a note that real
-   frameworks flip the convention, which is P07's opening.
+   **P08 is next** — rank, the four subspaces and least squares — and P07's
+   closing frame hands it over by name: *it goes back to two indices and asks a
+   harder question about them, how much a matrix actually does.* Read P07 §1
+   before writing it, because **the word `rank` now means two things two
+   programs apart** and P07 says so; P08 has to say it back. P04 §5's counting
+   bound and P05 §5's near-orthogonality threshold are the other two neighbours
+   worth reading first.
 
    **And there is now a Part II-shaped job that is nobody's program.** The
    elicitation ledger above puts P01, P02 and P03 at 29–31% against Part I's
@@ -4597,9 +4713,13 @@ clone instead.
    argument into a demonstration.
 3. **Appendices C–F.** C (formula reference) is the one that fixes Stroud's
    fair criticism that a book of frames is a useless reference.
-4. **Program P7 has no plan.** It was added by review rather than designed, so
-   its brief is a contract and not yet a frame-by-frame plan. Write that before
-   writing the program.
+4. **The residual sweep.** Fourteen committed values are measured
+   floating-point residuals rather than invariants — every key ending `.err`
+   across F05, F07, F08, F09, F12 and P05, plus the figures quoted beside them.
+   CI rejected two of P06's for exactly this and they are now emitted as
+   bounds; the rest have survived so far, which is not the same as being
+   reproducible. See the build trap. It is a pass of its own, because each is
+   quoted in prose in two editions.
 5. **`odzera`, the companion library.** One stage per part, every gradient
    checked against finite differences in CI, no GPU, the whole suite under a
    minute. Specified in `notes/01-curriculum.md` §18; nothing built.

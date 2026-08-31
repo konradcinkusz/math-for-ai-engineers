@@ -1,0 +1,7 @@
+>>> from p07_tensors_shapes import mean
+>>> p = [1.0, 2.0, 3.0]        # predictions, shape (n,)
+>>> t = [[1.0], [2.0], [3.0]]  # targets,     shape (n, 1)
+>>> mean([(a - b[0]) ** 2 for a, b in zip(p, t)])
+0.0
+>>> mean([(a - b[0]) ** 2 for b in t for a in p])
+1.3333333333333333
