@@ -394,7 +394,9 @@ gradients into a large accumulator loses the small ones entirely (absorption).
 Order changes the result; non-determinism in reduction order is why two runs of
 the same seed differ on GPU. → **P01** for the mechanism and the threshold
 (below half a gap a contribution moves the total by exactly nothing), **P02**
-for what a million such losses cost and the catalogue of fixes. This entry used
+for what a million such losses cost and the catalogue of fixes (delivered:
+naive `float32` recovers 0% of a million `1e-8` values, sorting 99.6733%, and
+the other three fixes more than 99.9999%). This entry used
 to route the whole of it to P01; P02's brief undertakes the accumulated loss by
 name, and writing P01 was what made the split visible. Well documented; trivially
 demonstrable in three lines of Python.
@@ -1047,6 +1049,70 @@ which is a small number in fp64 and *exactly zero* in fp32 — whose smallest
 subnormal is 1.40e-45 — and fp32 is the training format. "Very little" and
 "nothing" behave differently downstream, and only one of them can be rescued by
 scaling. → **P01**, with **F12**.
+
+### Numerical stability, written (P02)
+
+Items 80 to 86 came out of writing P02, on the same pattern.
+
+**80. "The one-pass variance formula is fine — it is just algebra."** The
+algebra is beyond reproach and the arithmetic is not. On five latency readings
+of 30000 and the four microseconds after it, `E[x^2] - (E[x])^2` in `float32`
+returns **-64**, against a true variance of 2. A variance cannot be negative.
+The two quantities agree to nine significant figures where the format holds
+seven, so the subtraction cancels every digit they share and hands back the
+rounding — and -64 is exactly one `float32` gap at that magnitude, which is
+the smallest non-zero answer it could have given. → **P02**.
+
+**81. "Then run it in float64 and it is fine."** A wider format moves the
+cliff; it does not remove it. The subtraction of two nearly equal large
+quantities is still there, so the same formula fails on data a few orders of
+magnitude larger. The fix is a different algorithm — Welford's never forms
+`E[x^2]`, so every subtraction is of the size of the spread rather than of the
+data. **Every fix in this area has that shape**: remove the destroying
+operation rather than making it more accurate. → **P02**.
+
+**82. "My softmax pivots on the first score rather than the maximum, and it
+has never failed."** That is a fact about the data, not about the code.
+`ln sum exp(z) = c + ln sum exp(z - c)` holds for *every* c, and `fp16`
+tolerates a shortfall of up to 11.09 between the largest score and the pivot,
+so on an ordinary row most choices work. Measured: **three of five pivots keep
+every term inside `fp16`** on one ordinary row. Only the maximum bounds every
+remaining exponent at or below zero, so only the maximum is safe for every
+input — which is what "numerically stable" means as a technical term: not
+*more accurate*, but *safe for inputs you have not tried*. → **P02**.
+
+**83. "Sorting the values before summing fixes it."** It fixes the catastrophe
+and leaves the drift. A million values of `1e-8` added to a `float32` total of
+1 gives exactly 1 naively — every one lost — and sorting ascending
+recovers **99.6733%**, where compensated summation and a pairwise tree recover
+99.9999% and a wider accumulator recovers all of it. Sorting is the cheapest
+fix and the weakest one, and it is the one most often described as sufficient.
+→ **P02**.
+
+**84. "A confident *correct* prediction cannot produce a `nan` loss."** It can,
+and it is the failure that sends people looking for a bug in their data.
+`sigma` rounds to exactly 1.0 from x = 37, so `1 - p` is exactly zero and
+`ln(1 - p)` is `-inf` — the same `-inf` a confident *wrong* prediction
+gives. The other end fails too: below about x = -746 `sigma` underflows to
+zero and `ln(sigma)` is `-inf`. Both ends are removed by keeping the logit and
+letting the loss compose, which is why the library ships one function.
+→ **P02**, with **F05** and **F07**.
+
+**85. "The worst-case error bound is what my network does."** A bound is not a
+prediction. Over 96 layers `fp16`'s worst case is 9.82% and `bf16`'s is
+111.08%, but that assumes every rounding pushes the same way; roundings of
+random sign accumulate like the square root of the depth, about **ten times
+smaller** for `fp16`. Neither number is what your network does — one is an
+upper bound and the other assumes an independence nobody checked. What both
+establish is that depth multiplies your format's epsilon by something between
+sqrt(n) and n. → **P02**, paying **F01**'s compounding argument.
+
+**86. "The epsilon in the layer norm protects the division."** Only if it is
+scaled to the format. `fp16`'s epsilon is around `1e-3`, so an `eps` of `1e-8`
+added inside the square root changes no bit at any variance the format can
+represent, and the division it was supposed to protect is unprotected. That is
+why mixed-precision recipes compute normalisation statistics in `float32` even
+when everything around them is sixteen bits. → **P02**, paying **F02**.
 
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for

@@ -547,11 +547,16 @@ Teraz zrób \code{bf16}, który ma $\val{p01.bf16.ebits}$ bitów wykładnika.
 Arytmetyka jest ta sama, a odpowiedź to $\val{p01.bf16.max}$ \dash{} i postaw
 ją obok sufitu \code{fp32}, który wynosi $\val{p01.fp32.max}$.
 
-Są takie same z dokładnością do trzech cyfr, i nie jest to przypadek:
-\code{bf16} i \code{fp32} mają ten sam budżet wykładnika, po
-$\val{p01.bf16.ebits}$ bitów. \textbf{\code{bf16} to \code{fp32} z uciętym
-dołem mantysy.} Sięga dokładnie tak samo daleko i rozdziela znacznie
-zgrubniej, a konwersja między nimi nie może się przepełnić w żadną stronę.
+Zgadzają się do dwóch cyfr, a nie do trzech, i obie połowy tego są warte
+chwili. Są blisko, bo \code{bf16} i \code{fp32} mają ten sam budżet
+wykładnika, po $\val{p01.bf16.ebits}$ bitów. Nie są równe, bo największa
+wartość formatu to $(2 - 2^{-m}) \times 2^{127}$, a krótsza mantysa
+\code{bf16} czyni jego pierwszy nawias nieco mniejszym \dash{} niedobór
+wynosi $\val{p01.bf16.short.pct}$ procenta.
+
+\textbf{\code{bf16} to \code{fp32} z uciętym dołem mantysy.} Sięga tak samo
+daleko z dokładnością do pół procenta, rozdziela znacznie zgrubniej, a
+konwersja między nimi nie może się przepełnić w żadną stronę.
 \end{fr}
 
 \begin{fr}
