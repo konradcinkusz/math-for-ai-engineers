@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P3 written, both editions \dash{} the whole Foundation part and the whole of Part II.** P4–P34 are stubs carrying their briefs | 31 of 47 |
+| Programs | **F1–F13 and P1–P4 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first program of Part III.** P5–P34 are stubs carrying their briefs | 30 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 587 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 592 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 507 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 511 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 612 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 616 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 527 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 529 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,19 +93,21 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **31 of 47 programs are stubs**, in each language. This is the whole of the
+- **30 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 501 computed values, all referenced, all present, plus the committed console
+- 523 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 96 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 102 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **60 orphan-tail pages: 14 · 16 · 15 · 15** across `main-en`, `main-pl`,
+- **65 orphan-tail pages: 15 · 17 · 17 · 16** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
-  55 before P1, 57 before P2 and 59 before P3.
+  55 before P1, 57 before P2, 59 before P3 and 60 before P4 \dash{} and one of
+  P04's five is the price of the three cues its pass added back, which is the
+  Stroud layout pass's measurement arriving from the other direction.
   The count is the signal and it is going the wrong way, at roughly one to
   eleven per program written; **F8 added one, F9 two, F10 four, F11 two and
   F12 four, against F5's eleven**, and the reason is worth having — all five
@@ -119,6 +121,18 @@ what was there before.
   This is the second ledger that is reported rather than gated, and like the
   first it must not quietly go away. **When the count goes up, that is the
   signal.**
+- **Elicitation rate: 60% of the book's frames put a question to the reader**,
+  and the trend is the ledger rather than the number: **73--78% through
+  F01--F06, 50--66% through F08--F13, and 26--35% across the whole of Part II
+  and P04.** A frame carries `\nextframe` if and only if the next frame opens
+  with an answer, so the cue rate *is* the elicitation rate. It halved over
+  seventeen programs with every gate green, because `RE_DEMANDS` treats
+  `\nextframe`, `\blank`, `\dotline` and `\yourturn` alike and C16 compares
+  the editions rather than the ratio \dash{} **nothing in the repository looked
+  at it.** `make debt` reports it now, per program and for the book, **reported
+  and never fatal**, on the orphan tail's reasoning. The last `\yourturn` in
+  the book is in F04 and the last `\blank` is in F07. **When the rate falls,
+  that is the signal.**
 - **80/80 validation: NOT ESTABLISHED**, and printed as outstanding on every
   build. See *The evidence, honestly* below — this is the one ledger that is a
   claim rather than a count, and it must not quietly go away.
@@ -763,6 +777,22 @@ Each cost time; none is obvious from its error message.
   three of the four page counts had silently not moved. Read the log's own exit
   line, and treat an unchanged page count as a failed build — which is F12's
   tell arriving through a different door.
+
+- **A Test exercise is set in a narrower measure than the frame its numbers
+  came from.** F06 recorded this for `\answerto` and F08 for a long `\code{}`
+  inside one; a `testexercises` item is the third place it bites. Two
+  coordinate pairs, `$(3, 4)$` and `$(4.5981, 1.9641)$`, sit comfortably inside
+  the frame that introduces them and gave **25.8 pt** in `main-en-a4` alone
+  when run into an exercise. The recorded fix works without a detour: **put it
+  in a display.** A display gets its own line, so an unbreakable run cannot
+  overflow under any metrics.
+
+- **A gate that measures a ratio is a different animal from one that measures a
+  property, and this repository had none of the first kind.** `RE_DEMANDS`,
+  parity's C16, C4 and C14 all check that each cue is *correct*; none of them
+  looks at how many there are. The elicitation rate accordingly halved over
+  seventeen programs with every gate green throughout. When a design property
+  is a rate rather than a predicate, the check has to count both sides.
 
 - **`\parfillskip=0pt` leaks unless the `\par` is inside the same group.** The
   flush-right idiom used by the outcomes' frame range and the Quiz's route boxes
@@ -3587,6 +3617,193 @@ either side of them.
 - One markdown `**bold**` pair had to become `\textbf{}`; it sets as literal
   asterisks and nothing warns. Second program running.
 
+### Program P4 pass, August 2026 --- Part III begins
+
+**Thirty-four teaching frames, thirty-six printed, both editions**, against a
+brief that projected fifty-five. Five sections: what a space is, span,
+independence, basis and dimension, and what the counting forces.
+
+It is the first program in the book that needs a new **object** rather than a
+new question, which is what P03's closing frame says and was verified rather
+than remembered.
+
+#### The scope was decided by reading four briefs, and it changed the program
+
+P05 owns inner products, norms, projection and near-orthogonality in high
+dimension; P06 owns matrices as linear maps; P08 owns rank and LoRA; F09 had
+already defined vector arithmetic and then deferred, in a warning box, *how
+vectors are arranged* to P05, saying in as many words that measuring it needs
+the vocabulary P04 supplies.
+
+So P04 never measures an angle, because it has not been given one. **Section 5
+goes as far as a counting theorem and stops.** That is the better possession:
+20,000 tokens in 4,096 dimensions leaves at least 15,904 of the embeddings ---
+80% --- as combinations of the others, it follows from two integers, and no
+amount of training changes it. What it does *not* say is that the model cannot
+distinguish that many things, and the gap between the two is where the
+linear-representation and superposition accounts live. Both are stated as
+hypotheses, with what would falsify each, which is the issue's contract and the
+place a book of this kind slides into folklore.
+
+#### Exact rank over rationals, because P01 established why
+
+`code/p04_vector_spaces.py` computes rank by Gaussian elimination over
+`Fraction`, with **no epsilon anywhere**. That is deliberate and it is P01
+paying off two programs later: a float comparison is not yes-or-no, so a rank
+computed with a tolerance would have made the program's central theorem depend
+on a threshold nobody could defend. Over the rationals the answer is exact and
+the assertion is the theorem: `rank(n random vectors in d dimensions) ==
+min(n, d)`, and separately, over 300 draws at random `n` and `d`, that no set
+ever exceeds rank `d`.
+
+The frames say what those draws are for, because it is not what it looks like:
+**the draws are testing the code.** A search that succeeded would have refuted
+a proof.
+
+#### A cross-programme gate that was fabricated, and caught by writing it out
+
+The first version asserted that F09's `f09.len3d` matched this program's
+`(3, 4)`-vector length. F09's value is **7** and the length here is **5**, and
+they are different computations that happened to sit near each other --- so the
+gate would have failed for the right reason and been "fixed" by loosening it.
+
+It was replaced with a gate on `f09.dim`, which the two programs genuinely
+share: P04 quotes F09's dimension count to give the counting bound a second
+case, so the assertion is that `f09.dim < VOCAB` and the dependent count is
+derived from F09's own committed number rather than from a copy of it.
+
+**A cross-programme gate is only worth having when the two programs are quoting
+one computation.** Two numbers that merely appear together are the defect the
+mechanism exists to catch, not the thing to wire it to.
+
+#### Rule 2, and the pointer that named the wrong program
+
+- **A forward pointer nobody had promised.** *Rotating a model's
+  representations and asking whether it still works --- one that Program P08 is
+  equipped to think about properly.* P08's brief is rank, the four subspaces,
+  least squares and LoRA; it undertakes no such thing. Softened on the F04/F08
+  precedent rather than by re-inflating P08's brief: the rotation is itself a
+  matrix, which is **P06**'s subject, and the book does not run the test.
+  Sixth pass running that a claim about another program was the thing that
+  needed fixing.
+- All three figures were read against the frames either side of them before
+  being measured. Only `p04-basis-not-unique` contains an answer to something
+  the reader is asked, and it is declared after the frame that delivers it.
+
+#### The elicitation rate had halved over seventeen programs, and nothing saw it
+
+The finding is not P04's and it is the most valuable thing this pass produced.
+A frame carries `\nextframe` **if and only if** the next frame opens with an
+answer, so the cue rate *is* the elicitation rate. Measured across the book:
+
+| | F01--F06 | F08--F13 | Part II and P04 |
+|---|---|---|---|
+| frames that elicit | 73--78% | 50--66% | 26--31% |
+
+**The last `\yourturn` in the book is in F04 and the last `\blank` is in F07.**
+Ten and thirteen programs ago respectively. Both are distinct retrieval modes
+rather than decoration --- a gap inside a worked line, and a question with its
+answer overleaf --- and skipping them costs a program a rung of the scaffolding
+gradient, which the F02 review pass had already recorded once.
+
+Every gate stayed green throughout, and the reason is precise:
+`check_structure.py`'s `RE_DEMANDS` treats `\nextframe`, `\blank`, `\dotline`
+and `\yourturn` alike, so a program that elicits rarely satisfies it perfectly.
+Parity's C16 counts cues per frame and compares the editions, so a rate that
+falls identically in both is invisible to it, and to C4 and C14 as well.
+**Nothing in the repository looked at the ratio.**
+
+`make debt` now reports it, per program and for the book, **reported and never
+fatal** --- the orphan tail's treatment, for the orphan tail's reason: there is
+no defensible threshold and a permanently red gate teaches the next person to
+stop reading the output. The book stands at 60%.
+
+P04 was written at 26% and is now at **35%**, the highest in Part II, by three
+conversions that added no frames and therefore needed no renumbering: each took
+a frame that *stated* something the reader could produce, moved the statement
+into the next frame's answer, and ended the first frame by asking. The best of
+the three is *must two bases for the same space contain the same number of
+vectors* --- most readers answer yes without hesitating, which is the right
+answer arrived at the wrong way, and the frame says so before calling it a
+theorem.
+
+**Raising Part I's rate back across P01--P03 is a pass of its own and is not
+this one.** Rewriting three merged programs to chase a ledger introduced in the
+same commit is how a measurement stops being trusted.
+
+#### The front matter was wrong about the book, in two places, and it prints once
+
+Found while checking P04 against its issue, which says *no Quiz (Foundation-only)*.
+
+- *How to use this book* said **Quiz --- Foundation programs only.** Every
+  written program has one, P01 to P04 included, all three of the others merged.
+- The same page told the reader to **retake the Quiz** and called the
+  difference between the two scores *the only honest measure of what a program
+  did for you*. That is the exact claim the F04 review pass removed from
+  `\lblCanYouFooter` --- the same items serve entry and exit, so the difference
+  measures memory --- and the front matter had been contradicting the corrected
+  footer ever since.
+
+Both fixed in both editions, and the loop diagram now runs *Can you?* straight
+into the Test exercises, which is what the book actually scores itself against.
+It was out of P04's scope on the F04 `\lblCanYouFooter` precedent, and taken for
+the same reason: it printed on page one and it was false.
+
+#### Layout
+
+A 25.8 pt overfull hbox in `main-en-a4` alone --- by a wide margin the largest
+since F05's tables --- from the two coordinate pairs `$(3, 4)$` and
+`$(4.5981, 1.9641)$` run inline in a **test exercise**. That is F06's finding
+and F08's, one measure further out: a test-exercise item is set narrower than
+the frame its numbers came from, so a pair of unbreakable spans that is
+comfortable in the frame overflows there. The recorded fix applied without a
+detour --- **put it in a display** --- and the multiset came back to the
+pre-P04 baseline in all four builds.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P4.1 span | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P4.2 saturation | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P4.3 basis-not-unique | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's own wrap cap on the first render, so no redesign.
+
+**The three added cues cost `main-en-a4` two pages and put one orphan tail back
+in `main-pl-a4`.** That is the Stroud layout pass's measurement arriving from
+the other direction \dash{} it priced 33 cues at two pages per format \dash{}
+and it is the honest cost of the elicitation rate. It is worth paying and it is
+worth knowing before Part II's rate is raised.
+
+Measured on the page in all four builds, which is the second half of the check:
+
+| build | P4.1 fig / elicit / answer | P4.2 fig / answer | P4.3 fig / answer |
+|---|---|---|---|
+| `main-en` | 462 y130 / y204 / y283 | 465 y380 / y196 | 469 y130 / 468 y416 |
+| `main-pl` | 466 y130 / y204 / y283 | 469 y389 / y196 | 473 y130 / 472 y443 |
+| `main-en-a4` | 392 y149 / y212 / y294 | 395 y121 / 394 y614 | 398 y149 / 397 y532 |
+| `main-pl-a4` | 395 y361 / y449 / y530 | 397 y630 / y443 | 401 y477 / y270 |
+
+**P4.1 sits above its elicitation in all four builds and that is not a defect**,
+which is precisely the F03 second review pass's finding restated: it carries the
+definition of a span, which the frame above it states in full, and the question
+below it is *what do two vectors span* whose answer \dash{} a plane, usually
+\dash{} appears nowhere in the figure. The question, the figure and the answer
+are on one page in every build, so nothing the reader writes is overleaf from
+what they wrote it about. P4.2 and P4.3 both sit below their answers everywhere.
+
+#### Also
+
+- Traps 93 to 98 added to `notes/02`.
+- `\spanof` added to both language files beside `\gcdop` and `\lcmop`; it sets
+  `span` in English and `lin` in Polish, which is current Polish usage.
+- Two parity failures, both recorded classes: a reference behind its maths in a
+  summary item, and `2,317` in an English aibox against `2317` in Polish ---
+  the thousands comma splits the English literal into `2` and `317`, and a
+  neuron index is an identifier rather than a quantity, so it takes no
+  separator in either edition.
+- Frame numbers were mapped after writing rather than before: sections landed
+  at `1--8 / 9--14 / 15--20 / 21--27 / 28--34`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -3836,20 +4053,30 @@ clone instead.
 
 ## What is left
 
-1. **Thirty-one programs, and Parts I and II are complete.** F1 to F13 and
-   P1 to P3, both editions. Part II's argument — that floating point, numerical
-   stability and cost belong *before* the linear algebra — is now made rather
-   than promised: none of the three needed anything beyond arithmetic, algebra
-   and a sigma.
+1. **Thirty programs, and Parts I and II are complete with Part III begun.**
+   F1 to F13 and P1 to P4, both editions. Part II's argument — that floating
+   point, numerical stability and cost belong *before* the linear algebra — is
+   now made rather than promised: none of the three needed anything beyond
+   arithmetic, algebra and a sigma.
 
-   **P04 is next and it is a different kind of program.** Every program written
-   so far has asked a new *question* about objects the reader already had. P04
-   introduces a new **object** — a vector space — and Part III is the largest
-   part in the book at eight programs. Read F09 first: it defines the
-   arithmetic and hands over span, independence and basis by name, so P04's
-   scope is narrower than its brief suggests. And P07 has **no frame-by-frame
-   plan** — it was added by curriculum review rather than designed — so write
-   that plan before reaching it.
+   **P05 is next**, and P04 has left it a specific debt: P04 goes as far as a
+   counting theorem and stops, saying in as many words that relaxing *exactly
+   independent* to *nearly independent* needs a way to measure \enquote{almost},
+   which means angles, which is P05's. P05's brief undertakes exactly that, and
+   the fact the book cashes in twice later — in high dimension two random
+   vectors are almost always nearly orthogonal — is the measurement P04 declines
+   to make. Read P04 §5 before planning it.
+
+   **P07 still has no frame-by-frame plan** — it was added by curriculum review
+   rather than designed — so write that plan before reaching it.
+
+   **And there is now a Part II-shaped job that is nobody's program.** The
+   elicitation ledger above puts P01, P02 and P03 at 29–31% against Part I's
+   73–78%, and raising them is a pass of its own: it means finding, in three
+   written and merged programs, the frames that state something the reader could
+   produce, and moving the statement into the next frame's answer. P04 did three
+   of those and went 26% to 35% without adding a frame, so the move is cheap per
+   instance and the cost is measured — three cues added two pages to one build.
 
    **F12 was the program the rest of the book leaned on hardest.** It was owed
    five things by name and paid all five: F4's sigma and product; F5's composition (its frame 34 hands it over

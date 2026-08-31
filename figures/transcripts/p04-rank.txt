@@ -1,0 +1,9 @@
+>>> from fractions import Fraction as F
+>>> import random
+>>> random.seed(20260831)
+>>> def draw(n, d):
+...     return [[F(random.randint(-99, 99)) for _ in range(d)]
+...             for _ in range(n)]
+...
+>>> [rank(draw(n, 8)) for n in (2, 4, 8, 12, 20, 40)]
+[2, 4, 8, 8, 8, 8]
