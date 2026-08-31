@@ -1,0 +1,7 @@
+>>> from p10_eigenvalues import eig2, eigvec2, dot
+>>> from fractions import Fraction as F
+>>> S = [[F(2), F(1)], [F(1), F(2)]]      # symmetric
+>>> N = [[F(2), F(1)], [F(0), F(3)]]      # not symmetric
+>>> [dot(eigvec2(M, l), eigvec2(M, k))
+...  for M, (l, k) in ((S, eig2(S)), (N, eig2(N)))]
+[Fraction(0, 1), Fraction(1, 1)]
