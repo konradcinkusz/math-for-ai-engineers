@@ -1,0 +1,7 @@
+>>> from math import log2
+>>> quad = lambda n: 1 * n * n
+>>> linlog = lambda n: 200 * n * log2(n)
+>>> [round(linlog(n) / quad(n), 1) for n in (100, 1000, 100000)]
+[13.3, 2.0, 0.0]
+>>> next(n for n in range(2, 10**6) if quad(n) >= linlog(n))
+2224

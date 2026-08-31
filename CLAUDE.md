@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13, P1 and P2 written, both editions \dash{} the whole Foundation part and two of Part II.** P3–P34 are stubs carrying their briefs | 32 of 47 |
+| Programs | **F1–F13 and P1–P3 written, both editions \dash{} the whole Foundation part and the whole of Part II.** P4–P34 are stubs carrying their briefs | 31 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 565 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 569 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 487 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 495 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 587 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 592 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 507 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 511 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,19 +93,19 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **32 of 47 programs are stubs**, in each language. This is the whole of the
+- **31 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 462 computed values, all referenced, all present, plus the committed console
+- 501 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 90 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 96 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **59 orphan-tail pages: 14 · 16 · 14 · 15** across `main-en`, `main-pl`,
+- **60 orphan-tail pages: 14 · 16 · 15 · 15** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
-  55 before P1 and 57 before P2.
+  55 before P1, 57 before P2 and 59 before P3.
   The count is the signal and it is going the wrong way, at roughly one to
   eleven per program written; **F8 added one, F9 two, F10 four, F11 two and
   F12 four, against F5's eleven**, and the reason is worth having — all five
@@ -3421,6 +3421,172 @@ answer*; this is the milder case and it needed the same fix.
   to be turned into `\emph{}` \dash{} they set as literal asterisks and nothing
   warns.
 
+### Program P3 pass, August 2026 --- Part II is complete
+
+**Thirty-four teaching frames, thirty-six printed, both editions**, against a
+brief that projected forty-five. Five sections: what the notation says, what it
+does not say, counting operations, counting bytes, and operations against bytes.
+
+**It is the cheapest program in the book by every layout measure.** Zero new
+overfull boxes in any of the four builds on the first attempt, no stranded
+openers or headings, no orphaned cues, and one orphan tail. Parity needed four
+rounds, all of them recorded classes.
+
+#### The bare-logarithm ban met the one case where the omission is a theorem
+
+`O(n \log n)` is the standard written form, and this book makes a bare
+logarithm a **build error** \dash{} for good reason, since its two readerships
+read it as two different functions and entropy in bits is two programs from
+cross-entropy in nats. C10 fired seventeen times on the first parity run.
+
+The resolution is not an exception, it is a **notation box**, because inside an
+$O$ the missing base is provable rather than conventional:
+\[ \logb{a} n = \frac{\logb{b} n}{\logb{b} a} \]
+so changing the base multiplies by a constant, and a constant is exactly what
+the notation discards. $O(n \log n)$ therefore names **one** class of growth for
+every base at once, and writing a base inside it would suggest a distinction
+that does not exist. Two sections later the same program writes
+$\val{p03.cross.c2}\,n\logb{2}n$ *with* its base, because there it is outside an
+$O$ and the base is back.
+
+`preamble.tex`'s comment on `\mfalogplain` now names two kinds of legitimate
+place rather than one \dash{} where the ban itself is the subject (Appendix B,
+F03), and inside an $O$, $\Theta$ or $\Omega$ (P03) \dash{} and it still states
+no tally, for the reason that comment already gives.
+
+**The generalisable part: when a house rule and a real convention collide, ask
+whether the convention has a reason.** Here it did, the reason is two lines of
+algebra, and the collision produced a frame rather than a workaround.
+
+#### The measurement F10 asked for by name
+
+F10 said $O$-notation needs *its own definition, its own warnings about what it
+does not say, and a worked account of why the faster of two implementations
+today can be the slower one at scale.* The third is the one that needed a
+number.
+
+Two implementations of one job: $\val{p03.cross.c1}n^{2}$ with a tight inner
+loop, against $\val{p03.cross.c2}\,n\logb{2}n$ with an expensive one. They trade
+places at $n = \val{p03.cross.n}$, found by bisection because
+$n^{2} = c\,n\logb{2}n$ has no elementary solution. At $n = 100$ **the
+asymptotically better algorithm costs $\val{p03.cross.ratio.100}$ times as
+much**; at $n = 100\,000$ the other one costs
+$\val{p03.cross.ratio.100000}$ times as much.
+
+That is the whole argument in two rows, and it is why every sorting library
+ships an $O(n^{2})$ insertion sort inside its $O(n\log n)$ one.
+
+#### F01's largest debt, paid, and the number that explains a common question
+
+F01 said twice that the weights are a **floor**. The rest of the bill:
+
+| | GB |
+|---|---|
+| weights, two bytes | $\val{p03.mem.weights}$ |
+| gradients, two bytes | $\val{p03.mem.grads}$ |
+| master copy, four bytes | $\val{p03.mem.master}$ |
+| two moments, four bytes each | $\val{p03.mem.moment1}$ + $\val{p03.mem.moment2}$ |
+| **total** | **$\val{p03.mem.total}$** |
+
+**The weights are $\val{p03.mem.weights.pct}\%$ of the training bill and the
+whole is $\val{p03.mem.multiple}$ times the model card's number.** That factor
+is the answer to *why will a model that serves on this card not fine-tune on
+it*, and the useful form is that each remedy removes a **row** rather than
+shrinking all of them.
+
+The assertion is the invariant rather than the figure: the weights must be a
+small minority, because a recipe that made them the majority would need the
+frames rewritten and not the number updated.
+
+#### The exponent trap, which is the best thing in the program
+
+**Attention's compute is quadratic in the sequence and its cache is linear**,
+and almost everybody expects both to be quadratic \dash{} the expectation comes
+from somewhere real, because F04 counted exactly those $n^{2}$ pairs.
+
+The cache holds one key and one value per *position*, not per pair; the pairs
+are formed and consumed inside the computation and never stored. Measured:
+$\val{p03.kv.gib}$ GiB at $\val{p03.kv.seq}$ tokens, exactly double at twice the
+length, $\val{p03.kv.per.token.mb}$ MB per token in flight. It is usually larger
+than the weights and it is the term that decides how many users a card serves.
+
+Two quantities, two exponents, one layer. The script asserts the doubling
+rather than the size.
+
+#### Three claims quantified where the folklore is qualitative
+
+- **A matrix multiply is compute-bound only above $n \approx
+  \val{p03.ai.smalln}$.** Its intensity is $\frac{n}{3}$, which *grows*;
+  \enquote{matmuls are compute-bound} is a statement about the large ones,
+  repeated as though it were about the operation. A batch of small ones \dash{}
+  narrow heads, low-rank adapters, a mixture of narrow experts \dash{} is on the
+  wrong side of the line.
+- **An elementwise operation is short of the device by
+  $\val{p03.ai.short}$**, and $n$ does not appear in its intensity at all, so
+  the shortfall is the same however large the arrays are.
+- **Fusion helps and does not rescue.** Fusing $\val{p03.fuse.chain}$
+  elementwise operations divides the bytes by $\val{p03.fuse.factor}$ for
+  exactly the same operations, taking the intensity to
+  $\val{p03.fuse.after}$ \dash{} against a device ratio of
+  $\val{p03.dev.ratio}$. The bytes have a floor: the input must be read once and
+  the output written once whatever happens between. The script asserts that the
+  fused chain is *still* memory-bound, so the frame's point cannot quietly
+  become false.
+
+#### Two smaller things the drafting caught
+
+- **A ratio printed as `0.0`.** The crossover table emitted
+  $\text{linlog}/\text{quad}$ throughout, which is $0.033$ above the crossover
+  and rounds to nothing \dash{} hiding that the quadratic is now thirty times
+  worse. It now always reports the slower against the faster, so the number is
+  above one and reads the same way in both directions.
+- **Two numbers written twice**, once as a word and once as a value:
+  \emph{thirteen times faster} beside a table computing $13$, and \emph{one part
+  in twelve hundred} beside a value of $1200$. Both are now the value. It is
+  F02's rule about small integers, running the other way.
+
+#### A text value cannot be referenced
+
+`p03.cross.loser.*` named which algorithm is slower at each size, and C7
+reported all three as \enquote{used but no script produces it}: the ledger's
+produced set scans for `\mfaval`, and a non-numeric value is written with
+`\mfavaltext`. F10 met the same wall from the other side.
+
+The right reading is not that the check is wrong. **A word is not a computed
+value**, and these words differ between the editions anyway \dash{} so they
+belong in the frames, per edition, and what the script asserts instead is that
+the frames name the right one at each size.
+
+#### Layout and figures
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P3.1 crossover | 654 / 657 | 5.95 | 6.74 | 6.71 | 7.66 | 7.62 |
+| P3.2 memory-bill | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P3.3 roofline | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+**Rule 2 checked by content and then measured.** `p03-memory-bill` contains
+frame 18's answer \dash{} what else is resident while a model trains \dash{} and
+is declared after frame 19, which delivers it. On the page all three land
+together in every build, in the order question, answer, figure, with the caption
+227 to 372 points below the question. The other two figures answer nothing asked
+either side of them.
+
+#### Also
+
+- Traps 87 to 92 added to `notes/02`.
+- Four parity rounds, all recorded classes: a reference behind its maths in a
+  summary item, and three cases of Polish splitting one English maths span into
+  two (`tablic $n$ na $n$` for `$n$-square`). The second is a *new* instance of
+  the ordered-span rule and worth naming: **Polish often needs two spans where
+  English needs one**, and the fix is to find a Polish phrase that keeps it to
+  one (`tablic o boku $n$`), not to add a span to the English.
+- Frame numbers remapped: sections landed at
+  `1--7 / 8--12 / 13--17 / 18--24 / 25--34` against a plan of
+  `1--6 / 7--13 / 14--20 / 21--29 / 30--38`.
+- One markdown `**bold**` pair had to become `\textbf{}`; it sets as literal
+  asterisks and nothing warns. Second program running.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -3670,15 +3836,20 @@ clone instead.
 
 ## What is left
 
-1. **Thirty-two programs, and Part I plus two of Part II is written.** F1 to
-   F13, P1 and P2, both editions. **P03 is next** — orders of magnitude,
-   O-notation, FLOPs and memory — and it is the third question about the same
-   arithmetic: P01 asked what it is, P02 asked which algorithms survive it, P03
-   asks what it costs. It needs only arithmetic and sigma notation, and its
-   brief carries a dependency note worth reading first: the transformer
-   parameter count was deliberately moved out of it to P32, so do not put it
-   back. After that Part III begins, and P04 is the first program in the book
-   that needs a new object rather than a new question.
+1. **Thirty-one programs, and Parts I and II are complete.** F1 to F13 and
+   P1 to P3, both editions. Part II's argument — that floating point, numerical
+   stability and cost belong *before* the linear algebra — is now made rather
+   than promised: none of the three needed anything beyond arithmetic, algebra
+   and a sigma.
+
+   **P04 is next and it is a different kind of program.** Every program written
+   so far has asked a new *question* about objects the reader already had. P04
+   introduces a new **object** — a vector space — and Part III is the largest
+   part in the book at eight programs. Read F09 first: it defines the
+   arithmetic and hands over span, independence and basis by name, so P04's
+   scope is narrower than its brief suggests. And P07 has **no frame-by-frame
+   plan** — it was added by curriculum review rather than designed — so write
+   that plan before reaching it.
 
    **F12 was the program the rest of the book leaned on hardest.** It was owed
    five things by name and paid all five: F4's sigma and product; F5's composition (its frame 34 hands it over

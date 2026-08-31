@@ -1114,6 +1114,56 @@ represent, and the division it was supposed to protect is unprotected. That is
 why mixed-precision recipes compute normalisation statistics in `float32` even
 when everything around them is sixteen bits. → **P02**, paying **F02**.
 
+### Cost and orders of magnitude, written (P03)
+
+Items 87 to 92 came out of writing P03.
+
+**87. "It is O(n log n), so it is the faster one."** A growth rate is not a
+ranking. It says which algorithm wins *eventually*, and eventually may be past
+every input the system will see. Measured: `n^2` against `200 n log2 n` trade
+places at **n = 2224**, and at n = 100 the asymptotically better one costs
+**13 times as much**. Every sorting library in wide use ships an O(n^2)
+insertion sort on short subarrays for exactly this reason, and nobody calls it
+a compromise. → **P03**, paying **F10**'s request for a worked account.
+
+**88. "An algorithm that takes n steps is O(n), not O(n^2)."** It is both. O is
+an *upper bound* on growth, not a description of it, so a linear algorithm is
+honestly O(n^2), O(n^3) and O(2^n) as well. The notation for *exactly this
+growth, no better* is Theta, and it is usually what was meant. The practical
+consequence is that "our retrieval is O(n)" cannot be falsified by a benchmark:
+it is compatible with any constant whatsoever, and the constant is what you
+pay. → **P03**.
+
+**89. "The model is 14 GB, so a 24 GB card can train it."** The weights are
+**12%** of the training bill. Gradients add another copy, and a
+moment-based optimiser with a full-width master copy adds three more at double
+the width: **112 GB in all, eight times the number on the model card.** Each
+remedy removes a *row* rather than shrinking all of them, which is what lets
+you predict whether it will be enough. → **P03**, paying **F01**'s "this is a
+floor" twice over.
+
+**90. "Attention is quadratic, so the cache is quadratic."** The *arithmetic*
+is quadratic in the sequence and the **cache is linear**. It holds one key and
+one value per *position*, not per pair — the pairs are formed and consumed
+inside the computation and never stored. Two quantities, two exponents, one
+layer: 4 GiB at 8192 tokens and 8 at twice that, or about 0.5 MB per token in
+flight. It is usually larger than the weights and it decides how many users a
+card serves. → **P03**.
+
+**91. "Matrix multiplies are compute-bound."** The large ones are. Intensity is
+`2n/(3b)`, which *grows with n*, so on a device doing 200 operations per byte
+delivered a multiply is compute-bound only above about **n = 600**. A batch of
+small multiplies — narrow heads, low-rank adapters, a mixture of narrow experts
+— sits on the wrong side of that line and is governed by data layout rather
+than by operation count. → **P03**.
+
+**92. "Fusing the kernels will make it compute-bound."** It will not. Fusing
+three elementwise operations divides the bytes by three for the same
+operations, taking the intensity from 0.17 to 0.5 — against a device ratio of
+200. **Fusion helps and does not rescue**, because the bytes have a floor: the
+input must be read once and the output written once whatever happens between.
+A plan that assumes otherwise is a plan a profile will disappoint. → **P03**.
+
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
 was at least twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is
