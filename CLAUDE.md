@@ -849,6 +849,16 @@ Each cost time; none is obvious from its error message.
   out \dash{} and it has to be applied to generated transcripts too, precisely
   because they look as though somebody must have.
 
+- **A CI job with no `timeout-minutes` reports nothing when it hangs, for six
+  hours.** The numbers job sat \enquote{in progress} for most of an afternoon
+  on a step that takes half a minute on a laptop, with every other job green
+  and no signal to act on; the token this session runs under cannot cancel or
+  re-run a workflow, so there was not even a way to clear it. GitHub's default
+  is six hours, which is not a ceiling anybody chose. Every job in all three
+  workflows now carries one, sized generously against its own measured cost.
+  **A hung job with a timeout is a failure somebody can read; without one it is
+  indistinguishable from a slow queue.**
+
 - **A fallback that keeps a build alive also keeps a typo alive, and this one
   hid ten of the book's twelve listings.** `\transcript` used to take a whole
   path; nine of the twelve call sites passed a bare stem, so `\IfFileExists`
