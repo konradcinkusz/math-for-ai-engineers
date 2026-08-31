@@ -1,0 +1,4 @@
+flowchart LR
+  A["a directed graph with no cycle admits an order in<br/>which every node comes after everything it needs"]
+  A --> B["there is usually more than one such order, because<br/>nodes that do not depend on each other may swap"]
+  B --> C["and every one of them computes the same values, which<br/>is why a scheduler may choose whichever it likes"]

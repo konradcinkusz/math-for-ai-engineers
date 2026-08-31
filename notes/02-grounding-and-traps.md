@@ -1842,3 +1842,87 @@ features interact, which is where the plot is being used to make an argument.
 Two runs of the same explainer on one input can reorder the middle of the
 ranking. The question to ask is a counting question: how many of the 2^n were
 actually evaluated? → **P12**.
+
+**152. "A graph is a picture."** It is two sets: the things, and the pairs of
+them that are joined. A drawing is one rendering of that relation and there
+are infinitely many; nothing in the definition mentions position, or crossing
+lines, or which way is up. The consequence is practical rather than pedantic —
+a relation survives being a million vertices wide and a picture does not.
+→ **P13**.
+
+**153. "The degrees sum to the number of edges."** Twice it, on an undirected
+graph, because every edge is counted once at each of its two ends. On a
+directed graph the *out-degrees* sum to |E| exactly — each edge leaves one
+vertex — so the two answers differ by a factor of two and which one is right
+depends on a word people skip. It is Program P12's double counting in a new
+coat, and the immediate consequence is that the number of odd-degree vertices
+is even. → **P13**, using **P12**.
+
+**154. "Store the adjacency matrix, it is the definition."** Both the matrix
+and the list are encodings of the same relation and neither is more real. At a
+million vertices and ten million edges the matrix is 1e12 cells against 2.1e7
+slots — a factor of 4.8e4 — and the density is 2e-5, which is what almost
+every real graph looks like. **The matrix earns its place by being
+multipliable, not by being lookupable**, which is the whole of why it survives
+in a subject where it is far too large to store. → **P13**.
+
+**155. "A^k counts the routes from i to j."** It counts *walks*, which may
+revisit a vertex. On an undirected graph (A²)ᵢᵢ is the degree of i, counting
+"step to a neighbour, step back" — a perfectly good walk of length two and
+certainly not a route. Counting **paths**, which do not repeat a vertex, is a
+genuinely harder problem that matrix powers do not solve, because "does not
+repeat" is a condition on the whole sequence and multiplication combines steps
+without knowing what came before them. → **P13**.
+
+**156. "Message passing is like multiplying by the adjacency matrix."** It *is*
+one. The sentence "each vertex aggregates from its neighbours" and the
+expression AX are the same statement, not an analogy and not an implementation
+convenience. Program P06's theorem — a matrix product is a composition — is
+what makes the whole of a graph network's forward pass ordinary linear algebra.
+→ **P13**.
+
+**157. "More layers, more capacity"** — said of a graph neural network. Depth
+there is **reach**, not capacity: k layers apply A k times, so a vertex
+aggregates from exactly those within k steps. On a graph of diameter 3 a fourth
+layer adds parameters, computation and no new information to any vertex, and
+the question "how many layers" has an answer that comes from the graph rather
+than from the budget. (The failure mode past that — representations converging
+because everything aggregates from everything — is called over-smoothing and
+**this book has not measured it**; the reach is a fact about Aᵏ and needs no
+experiment, the collapse is a claim about trained networks and would need one.)
+→ **P13**.
+
+**158. "The topological order."** There are usually many — four out of 720 for
+a six-node graph — and the definite article is what hides the useful fact.
+**Every one of them computes the same values**, because each vertex depends
+only on its parents and every valid order computes the parents first. That is
+exactly why a build system may parallelise, why a scheduler may reorder, and
+why a forward pass is deterministic; and it is why a build system, an agent
+workflow, a query plan and a neural network are one object rather than four
+things that rhyme. → **P13**.
+
+**159. "A dependency cycle makes the build slow."** It makes evaluation
+**undefined**. There is no order in which each target follows what it needs, so
+there is genuinely nothing for the tool to do and reporting the cycle is the
+only correct behaviour. The two ways out are to break the cycle — in a call
+graph usually a layering violation — or to unroll it, which is what a recurrent
+network is: a cycle in the architecture and a DAG in the computation, and the
+reason its memory grows with the number of steps unrolled. → **P13**.
+
+**160. "PageRank is circular: a page is important because important pages link
+to it."** A circular *definition* explains a term using itself. This is a
+*condition*: PᵀP = p says nothing about what the ranking is and instead demands
+that whatever it is, it agrees with itself after one step of the walk. Whether
+such a ranking exists is then a real question with a real answer, and the
+answer is an eigenvector for eigenvalue 1 — which is Program P10's calculation
+under another name. → **P13**.
+
+**161. "The damping factor is a fudge to make the numbers work."** It buys two
+things the theorem needs. Every entry of the matrix becomes positive, so no set
+of pages can trap the walk, which is what makes the fixed point unique; and
+every row sums to one even for a page with no outgoing links, so nothing
+drains. Without it a dangling node takes the probability mass to **exactly**
+zero — measured over the rationals, gone by the third step — and there is no
+stationary distribution at all. The story about a bored surfer motivates it;
+those two properties are what it is for. The constant 0.85 is conventional; the
+need for damping is not. → **P13**.
