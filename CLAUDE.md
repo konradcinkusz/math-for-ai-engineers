@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 786 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 784 | 0 | 0 | **0** | 0 |
 | `main-pl` (17x24) | 796 | 0 | 0 | **0** | 0 |
 | `main-en-a4` | 670 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 678 | 0 | 0 | **0** | 0 |
+| `main-pl-a4` | 676 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -658,6 +658,26 @@ Each cost time; none is obvious from its error message.
 
   The preamble loads `amsmath` first, then `newtxmath` if present and `amssymb`
   only if it is not.
+
+- **A page of REFERENCE MATTER has no glue, and `\flushbottom` requires every
+  page to be exactly `\textheight` tall.** The index was the first place this
+  bit (see below); the **answers appendix** was the second, and it was latent
+  for the whole draft. Its `list` set `\topsep`, `\itemsep` and `\parsep`
+  with `\setlength`, so all three were rigid and a page could give back
+  nothing at all. Adding fifteen answers anywhere in the book moves every
+  later page, and one of them then landed **12.3 pt over with nothing to
+  absorb it** — on CI, on source that built with zero vboxes here.
+
+  The cure is the index's, unchanged and for the same reason: `\raggedbottom`
+  scoped to the appendix, so a page of answers may end short as every answers
+  section in print does, **plus** shrink on the three list lengths, because
+  raggedbottom adds *stretch* and an overfull page is too **tall**. Scoped so
+  that no frame, no cue, no orphan tail and no body page moves.
+
+  **The generalisable rule: anywhere the book sets vertical glue with
+  `\setlength`, ask what gives on that page.** The two places that had none
+  were the two places that failed, three hundred pages apart, and both are
+  matter a reader dips into rather than reads.
 
 - **`grep '^!' main.log` cannot see that error.** With `-file-line-error` an
   error line begins with a *path*, and `-interaction=nonstopmode` writes a PDF
@@ -5241,6 +5261,35 @@ elicitation that follows it in all four and that is not a defect**, which is
 now the fourth instance of the P04/P07 case: it carries the decision procedure,
 which the frame above states in full, and the question below asks for
 $\val{p12.four.n}!$, which appears nowhere in it.
+
+#### CI found a latent defect in the answers appendix, and it took a tool change to see it
+
+The first CI run failed `en` A4 alone on **two overfull vboxes, 12.3 pt and
+5.0 pt**, on source that built with zero vboxes here. That is the recorded
+two-installations divergence, and it was undiagnosable for two reasons that
+had nothing to do with P12:
+
+- **`checklog.py` reported the sizes and not the pages.** \enquote{A page is
+  12.3 pt too tall} is useless precisely when it matters, because the machine
+  that has to fix the box is not the one that saw it and cannot find it by
+  rebuilding. It now scans forward to the shipout marker TeX writes after each
+  complaint and prints `12.3 pt too high on PDF page N`. Proved by splicing
+  two synthetic complaints into a real log in TeX's exact shape, wrapped line
+  included \dash{} which is the only way to know a new check looks at
+  anything.
+- **The log was thrown away.** The workflow uploaded the PDF and the aux tree
+  and never the log, so after a log-only failure the one artefact anybody
+  wants was the one not kept. It is uploaded now, with `if: always()`.
+
+With the page named it took one look: **page 641 of 662, deep in the answers
+appendix**, and both boxes on one page. The defect is in *Build traps* above
+and it was latent for the whole draft \dash{} P12 merely added fifteen answers
+and moved every later page onto it.
+
+**Two cycles, and the first one was diagnosis on purpose.** Guessing at a glue
+change that cannot be measured here is the unwinnable loop this file names by
+name, and the tooling that made the second cycle a single look is worth more
+than the fix.
 
 #### Also
 
