@@ -271,8 +271,8 @@ spostrzeżeniem, że składanie funkcji nigdy nie miało żadnego nawiasowania:
 $A(B(C(x)))$ ma jedno odczytanie, a nawiasy w $ABC$ to notacja, której funkcje
 nie widzą.
 
-Skrypt potwierdza to z dokładnością $\val{p06.assoc.err}$ na losowych
-macierzach, co warto zrobić raz z tego samego powodu, dla którego warto było
+Skrypt potwierdza to z dokładnością lepszą niż $\val{p06.assoc.err}$ na
+losowych macierzach, co warto zrobić raz z tego samego powodu, dla którego warto było
 przeliczyć rzutowanie na całym zakresie: tożsamość zgadzająca się sama ze sobą
 nie jest dowodem, a tutaj arytmetyka mogła w zasadzie zaprzeczyć twierdzeniu.
 \end{fr}
@@ -514,8 +514,8 @@ względem sumy i przepuszcza skalar na wylot.
 
 Skrypt sprawdza tę tożsamość na $\val{p06.collapse.trials}$ losowych wejściach
 przy kształtach $\val{p06.din} \to \val{p06.dmid} \to \val{p06.dout}$,
-największa rozbieżność $\val{p06.collapse.err}$ \dash{} co jest zaokrągleniem,
-a nie różnicą.
+największa rozbieżność poniżej $\val{p06.collapse.err}$ \dash{} co jest
+zaokrągleniem, a nie różnicą.
 \end{fr}
 
 \begin{fr}
@@ -559,8 +559,8 @@ przez tę parę i zobacz, co wychodzi.
 \begin{fr}
 \begin{ansblock}
 Wychodzą zagięte. Odchylenie od prostej to
-$\val{p06.bend}$ odstępu, wobec $\val{p06.bend.affine}$ przez zwiniętą
-macierz.
+$\val{p06.bend}$ odstępu, wobec mniej niż $\val{p06.bend.affine}$ przez
+zwiniętą macierz.
 \end{ansblock}
 
 Zwinięta macierz utrzymuje je współliniowo z dokładnością do zaokrągleń, bo
@@ -670,7 +670,7 @@ większości ludzi przestaje być obrazkiem i musi stać się notacją.
   zapomni.}
 \sumitem{12--14}{\textbf{Łączność jest darmowa}, bo składanie funkcji nigdy nie
   miało nawiasowania: $A(B(C(x)))$ ma jedno odczytanie. Potwierdzone z
-  dokładnością $\val{p06.assoc.err}$, co warto zrobić raz, bo tożsamość
+  dokładnością lepszą niż $\val{p06.assoc.err}$, co warto zrobić raz, bo tożsamość
   zgadzająca się sama ze sobą nie jest dowodem.}
 \sumitem{15--17}{\textbf{Kolejność ma znaczenie, a jeden wymiar nie może tego
   pokazać}, bo liczby są przemienne. Ćwierć obrotu i spłaszczenie na oś poziomą
@@ -694,13 +694,13 @@ większości ludzi przestaje być obrazkiem i musi stać się notacją.
   Programu~\ref{prog:P07}.}
 \sumitem{26--29}{\textbf{Dwie warstwy afiniczne są jedną}: $W_2(W_1x + b_1) +
   b_2 = (W_2W_1)x + (W_2b_1 + b_2)$, sprawdzone na $\val{p06.collapse.trials}$
-  wejściach z dokładnością $\val{p06.collapse.err}$. $k$ warstw marnuje
+  wejściach z dokładnością lepszą niż $\val{p06.collapse.err}$. $k$ warstw marnuje
   $(k-1)/k$ swoich parametrów bez względu na szerokość \dash{}
   $\val{p06.stack.wasted.pct}\%$ przy ośmiu warstwach \dash{} czyli dokładnie
   tę głębokość, którą myślałeś, że kupujesz.}
 \sumitem{30--32}{\textbf{Przekształcenie afiniczne nie potrafi zagiąć
   prostej}, więc trzy współliniowe wejścia wychodzą współliniowo
-  ($\val{p06.bend.affine}$) przez zwiniętą macierz i zagięte
+  (poniżej $\val{p06.bend.affine}$) przez zwiniętą macierz i zagięte
   ($\val{p06.bend}$) przez parę rozdzieloną przez $\relu$. To wyklucza naraz
   każde przekształcenie afiniczne i dlatego wymaganiem wobec aktywacji jest
   tylko \enquote{nie afiniczna}.}

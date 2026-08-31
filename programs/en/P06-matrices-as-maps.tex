@@ -266,7 +266,8 @@ the observation that composing functions has never had a bracketing at all:
 $A(B(C(x)))$ has one reading, and the brackets in $ABC$ are notation the
 functions do not see.
 
-The script confirms it to $\val{p06.assoc.err}$ on random matrices, which is
+The script confirms it to better than $\val{p06.assoc.err}$ on random
+matrices, which is
 worth doing once for the same reason the projection sweep was worth doing: an
 identity agreeing with itself is not evidence, and here the arithmetic could in
 principle have contradicted the theorem.
@@ -510,7 +511,7 @@ distributes over the sum, and it carries a scalar straight through.
 
 The script checks the identity over $\val{p06.collapse.trials}$ random inputs
 at shapes $\val{p06.din} \to \val{p06.dmid} \to \val{p06.dout}$, worst
-disagreement $\val{p06.collapse.err}$ \dash{} which is rounding, not a
+disagreement under $\val{p06.collapse.err}$ \dash{} which is rounding, not a
 difference.
 \end{fr}
 
@@ -553,8 +554,8 @@ collinear inputs through the pair, and look at what comes out.
 \begin{fr}
 \begin{ansblock}
 They come out bent. Measured off the line by
-$\val{p06.bend}$ of the spacing, against $\val{p06.bend.affine}$ through the
-collapsed matrix.
+$\val{p06.bend}$ of the spacing, against under $\val{p06.bend.affine}$ through
+the collapsed matrix.
 \end{ansblock}
 
 The collapsed matrix keeps them collinear to rounding, because it must. The
@@ -661,9 +662,9 @@ array stops being a picture and has to become notation.
   definition, and it can be rebuilt from the sentence whenever it is
   forgotten.}
 \sumitem{12--14}{\textbf{Associativity is free}, because composing functions
-  never had a bracketing: $A(B(C(x)))$ has one reading. Confirmed to
-  $\val{p06.assoc.err}$, which is worth doing once because an identity agreeing
-  with itself is not evidence.}
+  never had a bracketing: $A(B(C(x)))$ has one reading. Confirmed to better
+  than $\val{p06.assoc.err}$, which is worth doing once because an identity
+  agreeing with itself is not evidence.}
 \sumitem{15--17}{\textbf{The order matters, and one dimension cannot show it},
   because numbers commute. A quarter turn and a flattening onto the horizontal
   axis send $(1, 0)$ to $(\val{p06.order.rp.x}, \val{p06.order.rp.y})$ one way
@@ -684,13 +685,13 @@ array stops being a picture and has to become notation.
   the rank-4 case are Program~\ref{prog:P07}'s.}
 \sumitem{26--29}{\textbf{Two affine layers are one}: $W_2(W_1x + b_1) + b_2 =
   (W_2W_1)x + (W_2b_1 + b_2)$, checked over $\val{p06.collapse.trials}$ inputs
-  to $\val{p06.collapse.err}$. $k$ layers waste $(k-1)/k$ of their parameters
+  to better than $\val{p06.collapse.err}$. $k$ layers waste $(k-1)/k$ of their parameters
   whatever their width \dash{} $\val{p06.stack.wasted.pct}\%$ at eight layers
   \dash{} which is exactly the depth you thought you were buying.}
 \sumitem{30--32}{\textbf{An affine map cannot bend a straight line}, so three
-  collinear inputs come out collinear ($\val{p06.bend.affine}$) through the
-  collapsed matrix and bent ($\val{p06.bend}$) through the $\relu$-separated
-  pair. That rules out every single affine map at once, and it is why the
+  collinear inputs come out collinear (under $\val{p06.bend.affine}$) through
+  the collapsed matrix and bent ($\val{p06.bend}$) through the
+  $\relu$-separated pair. That rules out every single affine map at once, and it is why the
   requirement on an activation is only \enquote{not affine}.}
 \sumitem{33--34}{\textbf{Associativity is free and bracketing is not}: the same
   triple product costs $\val{p06.cost.left}$ multiplications one way and

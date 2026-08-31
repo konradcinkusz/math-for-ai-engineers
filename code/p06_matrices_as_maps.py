@@ -107,6 +107,32 @@ def relu(v):
     return [x if x > 0 else 0.0 for x in v]
 
 
+# ==========================================================================
+# A MEASURED FLOATING-POINT RESIDUAL IS A PROPERTY OF THE MACHINE, so it is
+# reported as a BOUND and never as a figure.
+#
+# This was learnt from CI rejecting this file. The committed values said
+# p06.assoc.err = 4.4e-16 and p06.bend.affine = 2.7e-16; CI recomputed them as
+# 2.2e-16 and 2.6e-16 and failed the drift gate, correctly. Nothing was wrong
+# with either number -- they are the rounding noise left over from summing a
+# few dozen doubles, and the order those additions happen in is a property of
+# the interpreter and the build, not of the mathematics.
+#
+# It is the same defect as F03's np.logspace claim wearing different clothes:
+# an OBSERVATION committed where an INVARIANT was meant. The invariant here is
+# "the disagreement is rounding rather than a difference", and the honest way
+# to write that is a ceiling the measurement clears on any machine.
+def bound(x: float) -> str:
+    """The next power of ten strictly above x, as a string for \\val{}."""
+    assert x > 0, "a bound is only meaningful for a positive residual"
+    e = math.ceil(math.log10(x))
+    if 10.0 ** e <= x:                                   # pragma: no cover
+        e += 1
+    out = f"1e{e}"
+    assert float(out) > x, "the bound must clear the measurement"
+    return out
+
+
 _rnd = random.Random(20260831)
 
 # ==========================================================================
@@ -137,7 +163,7 @@ emit("p06.din", DIN)
 emit("p06.dmid", DMID)
 emit("p06.dout", DOUT)
 emit("p06.collapse.trials", COLLAPSE_TRIALS)
-emit("p06.collapse.err", f"{_worst:.1e}")
+emit("p06.collapse.err", bound(_worst))
 assert _worst < 1e-12, (
     f"two affine layers do not collapse to one: worst disagreement {_worst:g}. "
     f"That identity is the whole of section 4.")
@@ -170,7 +196,7 @@ _bend = collinearity_defect(*[with_relu(p) for p in _pts])
 _straight = collinearity_defect(*[[a + b for a, b in zip(matvec(W, p), B)]
                                   for p in _pts])
 emit("p06.bend", f"{_bend:.2f}")
-emit("p06.bend.affine", f"{_straight:.1e}")
+emit("p06.bend.affine", bound(_straight))
 assert _bend > 0.05, (
     f"the relu-separated pair bends collinear inputs by only {_bend:g}, which "
     f"is not enough for the frames to call it a different kind of function")
@@ -239,7 +265,7 @@ Bm = rand_mat(4, 4, _rnd)
 C = rand_mat(4, 4, _rnd)
 _left, _right = matmul(matmul(A, Bm), C), matmul(A, matmul(Bm, C))
 _assoc = max(abs(_left[i][j] - _right[i][j]) for i in range(4) for j in range(4))
-emit("p06.assoc.err", f"{_assoc:.1e}")
+emit("p06.assoc.err", bound(_assoc))
 assert _assoc < 1e-12, (
     f"(AB)C and A(BC) disagree by {_assoc:g}: associativity is a theorem and "
     f"the arithmetic must not be contradicting it")

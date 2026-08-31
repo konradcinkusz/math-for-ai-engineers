@@ -849,6 +849,33 @@ Each cost time; none is obvious from its error message.
   out \dash{} and it has to be applied to generated transcripts too, precisely
   because they look as though somebody must have.
 
+- **A measured floating-point residual is a property of the machine, so it
+  must be committed as a BOUND and never as a figure.** CI rejected P06 over
+  two values: `p06.assoc.err` was `4.4e-16` here and `2.2e-16` there, and
+  `p06.bend.affine` `2.7e-16` against `2.6e-16`. Neither number was wrong.
+  They are the rounding noise left after summing a few dozen doubles, and the
+  order those additions happen in is a property of the interpreter and the
+  build rather than of the mathematics \dash{} so the drift gate was right and
+  the committed value was the defect.
+
+  It is F03's `np.logspace` finding wearing different clothes: an
+  **observation** committed where an **invariant** was meant. The invariant is
+  *the disagreement is rounding rather than a difference*, and the honest way
+  to write that is a ceiling the measurement clears on any machine.
+  `code/p06_matrices_as_maps.py` has a `bound()` helper that rounds up to the
+  next power of ten and asserts the measurement clears it; the page then reads
+  *better than $10^{-15}$* rather than a figure nobody can reproduce.
+
+  **Fourteen more are latent**, in F05, F07, F08, F09, F12 and P05 \dash{}
+  every committed value whose name ends `.err` and every residual quoted
+  beside one. They have survived CI so far, which is not the same as being
+  reproducible. Sweeping them is a pass of its own: each is quoted in prose in
+  two editions, and rewriting six merged programs inside a PR about a seventh
+  is how a measurement stops being trusted. Note that the IEEE-754 constants
+  \dash{} `p01.gap.one`, `p01.fp64.eps`, `f11.fd.vanishes` and the rest
+  \dash{} are **not** in this class: they are exact everywhere and must stay
+  as figures.
+
 - **A CI job with no `timeout-minutes` reports nothing when it hangs, for six
   hours.** The numbers job sat \enquote{in progress} for most of an afternoon
   on a step that takes half a minute on a laptop, with every other job green
