@@ -1,26 +1,886 @@
-%% P09 --- Wyznacznik, macierz odwrotna i zmiana bazy
+%% P09 --- Wyznacznik, odwrotnosc i zmiana bazy
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Blizniak: programs/en/P09-determinant-inverse.tex. Ramka w ramke, makro w
+%% makro, liczba w liczbe; tools/parity.py porownuje oba pliki.
+%%
+%% TEZA: wyznacznik jest wspolczynnikiem skalowania objetosci ze znakiem; zero
+%% oznacza, ze informacja zostala zniszczona, co jest jadrem z Programu P08
+%% ogladanym z drugiej strony; a odwrotnosc istnieje dokladnie wtedy, gdy nic
+%% nie zostalo zniszczone.
+%%
+%% CO TEN PROGRAM DOSTAJE OD SASIADOW, odczytane z plikow, nie z pamieci:
+%%   P04  MA JUZ ZMIANE BAZY JAKO PRZYKLAD -- punkt (3, 4) wzgledem osi
+%%        obroconych o 30 stopni, ze wspolrzednymi, ktore sie zmieniaja, i
+%%        dlugoscia, ktora nie. Wiec IDEA jest wydana. Zostaje lepsza polowa:
+%%        ta zmiana sama jest MACIERZA i jest odwracalna wlasnie dlatego, ze
+%%        nic nie zostalo zniszczone.
+%%   P06  daje skladanie i nieprzemiennosc, wiec det(AB) = det(A)det(B) jest
+%%        zdaniem o skladaniu wspolczynnikow skali, a nie tozsamoscia do
+%%        sprawdzenia.
+%%   P08  przekazuje ten program po imieniu.
+%%   F08  ma macierze obrotu i rotary position embedding w calosci, wiec tutaj
+%%        dochodzi tylko odczyt, ktorego F08 dac nie mogl: obrot jest
+%%        odwracalna ZMIANA BAZY.
+%%
+%% CZEGO TEN PROGRAM NIE RUSZA, sprawdzone w tools/programs.json:
+%%   wartosci wlasne, twierdzenie spektralne, dodatnia okreslonosc     -> P10
+%%   SVD, wskaznik uwarunkowania, pseudoodwrotnosc                     -> P11
 
-\program{Wyznacznik, macierz odwrotna i zmiana bazy}
+\program{Wyznacznik, odwrotność i zmiana bazy}
 \label{prog:P09}
+\index{determinant}
+\index{matrix!inverse}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{powiedzieć, co jedna liczba może zmierzyć w całym
+  odwzorowaniu i dlaczego jej znak nie jest ozdobą}
+\outcome{8--14}{powiedzieć, co wyznacznik równy zeru mówi o wejściach, i
+  połączyć to z tym, co policzył Program~\ref{prog:P08}}
+\outcome{15--19}{powiedzieć, co dzieje się z wyznacznikami wzdłuż iloczynu i
+  dlaczego jeden zły czynnik rozstrzyga cały łańcuch}
+\outcome{20--27}{powiedzieć, kiedy odwzorowanie da się cofnąć, i wycenić to
+  cofanie wobec pytania, które naprawdę się miało}
+\outcome{28--37}{czytać zmianę bazy jako macierz i powiedzieć, co zachowuje
+  zmiana ortogonalna}
+\end{outcomes}
 
-Argument: the determinant is a signed volume scale factor and zero means
-information was destroyed; an inverse exists exactly when nothing was
-destroyed; a change of basis is the same vector described in another
-coordinate system. Payoff: why production code almost never calls
-\code{inv()} and solves a factorised system instead \dash{} stated here,
-measured in P10; a rotation as an orthogonal change of basis, which is what
-rotary position embedding does; the log-determinant term in a normalising
-flow, named so the reader recognises it later without the book promising to
-teach flows.
+\begin{quiz}
+\item Macierz podwaja każde $x$ i potraja każde $y$. Co dzieje się z polem
+  obszaru, do którego ją zastosujesz? \teachesat{1--2}
+  \answerto{Zostaje pomnożone przez $\val{p09.stretch.det}$. Ten czynnik jest
+  ten sam dla każdego obszaru, i to właśnie sprawia, że jedna liczba
+  wystarcza.}
+\item Co wyznacznik równy zeru mówi ci o wejściach? \teachesat{9--10}
+  \answerto{Że dwa różne wejścia dzielą teraz jedno wyjście, więc nic nie
+  odeśle wyniku z powrotem. To jądro z Programu~\ref{prog:P08}, zmierzone
+  objętością zamiast policzone kierunkami.}
+\item $A$ jest $100 \times 100$ i ma wyznacznik $1$. Ktoś mnoży każdy jej wyraz
+  przez $\num{0.1}$. Ile wynosi teraz wyznacznik? \teachesat{13--14}
+  \answerto{$10^{-100}$. Każdy ze stu wierszy wnosi własny czynnik $\num{0.1}$,
+  a w samym odwzorowaniu nic się nie pogorszyło.}
+\item Potrzebujesz $x$ spełniającego $Ax = b$, dla jednego $b$. Taniej
+  rozwiązać, czy zbudować $A^{-1}$ i pomnożyć? \teachesat{24--25}
+  \answerto{Rozwiązać, jakieś $\val{p09.cost.ratio}$ razy taniej przy
+  $n = \val{p09.cost.n}$ \dash{} a obie drogi dają dokładnie tę samą
+  odpowiedź.}
+\item Jaki obiekt zamienia jedną parę współrzędnych punktu na parę mierzoną
+  względem innych osi? \teachesat{28--29}
+  \answerto{Macierz, i to odwracalna. Punkt się nie rusza; zmienia się tylko
+  jego opis, więc stary opis musi dać się odzyskać.}
+\item Macierz ma wyznacznik $1$. Czy musi być obrotem? \teachesat{35--36}
+  \answerto{Nie. Ścinanie ma wyznacznik $1$ i rozciąga niemal każdy wektor,
+  którego dotknie. Zachowanie pola i zachowanie długości to dwa warunki i
+  żaden nie wynika z drugiego.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+% ============================================================
+\section{Co jedna liczba mówi o całym odwzorowaniu}
+\label{sec:P09-signed-area}
+\index{determinant!as a signed area}
+
+\begin{fr}
+Program~\ref{prog:P08} liczył. Pytał, \emph{ile} kierunków wychodzi z drugiej
+strony macierzy, nazwał odpowiedź rzędem i zostawił jedno pytanie otwarte:
+\emph{jak dużo}.
+
+Oto ruch, który na nie odpowiada. Macierz nie przesuwa tylko punktów, przesuwa
+całe obszary, bo obszar składa się z punktów. Weź więc obszar, zastosuj macierz
+i porównaj oba rozmiary.
+
+Weź kwadrat jednostkowy \dash{} rogi $(0,0)$, $(1,0)$, $(1,1)$ i $(0,1)$
+\dash{} oraz macierz, która podwaja każde $x$ i potraja każde $y$. Na jaką
+figurę trafiają cztery rogi i jakie ma ona pole?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Prostokąt o szerokości $2$ i wysokości $3$. Pole $\val{p09.stretch.det}$.
+\end{ansblock}
+
+Teraz uogólnij to, bo odpowiedź nie dotyczyła tamtej macierzy.
+
+Róg $(1,0)$ trafia na pierwszą kolumnę macierzy, a $(0,1)$ na drugą \dash{} tak
+właśnie mnożenie przez macierz działa na te dwa wektory, i Program~\ref{prog:P06}
+tak powiedział. Obrazem kwadratu jednostkowego jest więc zawsze równoległobok
+rozpięty przez obie kolumny.
+
+To pole ma nazwę. To \textbf{wyznacznik}, pisany $\det A$ albo
+$\lvert A \rvert$, a dla powyższej macierzy wynosi $\val{p09.stretch.det}$.
+\end{fr}
+
+\begin{fr}
+Jeden kwadrat to wątła podstawa dla twierdzenia o całym odwzorowaniu, więc oto
+dlaczego wystarcza.
+
+Każdy obszar da się pokryć małymi kwadratami, dowolnie drobno. Macierz jest
+liniowa, więc traktuje każdy z tych małych kwadratów dokładnie tak, jak
+potraktowała jednostkowy \dash{} ten sam kształt obrazu, ten sam stosunek pól.
+Zsumuj je z powrotem, a cały obszar przeskalował się tym samym czynnikiem.
+
+Wyznacznik nie jest więc polem jednego konkretnego równoległoboku. Jest
+\textbf{czynnikiem, którym ta macierz skaluje każde pole naraz}, i dlatego
+jedna liczba może opisać odwzorowanie całej płaszczyzny.
+\end{fr}
+
+\begin{rigourbox}
+Pokrywanie obszaru coraz drobniejszymi kwadratami i sumowanie to dokładnie ta
+konstrukcja, której Program~\ref{prog:F13} użył, by zamienić sumę w całkę, a
+uściślenie jej to ta sama praca: potrzeba, by granica istniała i by pokrycie
+nie miało znaczenia. Oba warunki tu zachodzą i żadnego ta książka nie dowodzi.
+\end{rigourbox}
+
+\mermaidfig{p09-one-number}{Dlaczego jedno porównanie pól opisuje odwzorowanie
+całej płaszczyzny.}{wyznacznik jako jeden czynnik skali}
+
+\begin{fr}
+Teraz macierz, która robi coś, czego samo pole nie widzi.
+
+Weź tę, która zamienia obie współrzędne: posyła $(1,0)$ na $(0,1)$ i $(0,1)$ na
+$(1,0)$. Kwadrat jednostkowy przechodzi na kwadrat jednostkowy, więc pole się
+nie zmienia.
+
+A jednak coś się z płaszczyzną stało. Co?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Została odwrócona na drugą stronę. Lewo i prawo zamieniły się miejscami.
+\end{ansblock}
+
+Wyznacznik to zapisuje, i dlatego mowa o polu \emph{ze znakiem}:
+$\det = \val{p09.flip.det}$ dla zamiany, a nie $+1$.
+
+Maszynerią jest wzór sznurowadłowy, który liczy pole wielokąta z jego rogów i
+daje odpowiedź \emph{ze znakiem} \dash{} dodatnią, gdy rogi wypisano przeciwnie
+do ruchu wskazówek zegara, ujemną, gdy zgodnie. Weź kwadrat jednostkowy,
+zastosuj macierz, przepuść obraz przez wzór sznurowadłowy, a dostaniesz
+dokładnie wyznacznik. Na $\val{p09.area.trials}$ losowych macierzach,
+dokładnie, bez zaokrągleń, bo arytmetyka idzie na ułamkach.
+\end{fr}
+
+\begin{trapbox}
+\textbf{\enquote{Wyznacznik to pole, więc weź wartość bezwzględną.}}
+
+To wyrzuca tę połowę, która ma znaczenie. $\lvert \det A \rvert$ to pole;
+$\det A$ to pole \emph{oraz} orientacja, a tego drugiego żadne mierzenie już
+nie odzyska.
+
+Ma to sprawdzalną konsekwencję: żaden iloczyn obrotów nie jest odbiciem
+lustrzanym, bo każdy obrót ma wyznacznik $+1$, a iloczyn liczb równych $+1$
+wynosi $+1$. Ujemny wyznacznik to inny rodzaj odwzorowania, nie mniejsze
+odwzorowanie.
+\end{trapbox}
+
+\begin{fr}
+Dla macierzy $2 \times 2$ wzór brzmi
+\[ \det \begin{pmatrix} a & b \\ c & d \end{pmatrix} = ad - bc \]
+W trzech wymiarach ta sama wielkość jest \emph{objętością} ze znakiem, a w $n$
+jest $n$-objętością ze znakiem. Wzór robi się nieprzyjemny, a znaczenie nie
+zmienia się wcale, i dlatego ten program nigdy nie wypisuje go dalej niż
+$2 \times 2$: maszyna policzy go eliminacją, i ty też, jeśli kiedyś będziesz
+musiał.
+
+Zastosuj $ad - bc$ do zamiany obu współrzędnych, dla której $a = d = 0$ i
+$b = c = 1$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$0 \times 0 - 1 \times 1 = \val{p09.flip.det}$.
+\end{ansblock}
+
+Czyli to, co dwie ramki temu powiedział wzór sznurowadłowy, tylko wyprowadzone
+z algebry zamiast z obrazka. Rozciągnięcie warto zrobić tak samo: $a = 2$,
+$d = 3$, $b = c = 0$, a $ad - bc$ daje $\val{p09.stretch.det}$.
+
+Warto teraz powiedzieć wprost, co zostało stwierdzone, a co nie, bo wyznacznik
+przyciąga więcej folkloru niż jakakolwiek inna liczba w algebrze liniowej.
+
+Stwierdzona została jedna rzecz: \textbf{wyznacznik jest czynnikiem, którym
+skaluje się objętość ze znakiem}. Wszystko, co ten program robi dalej, jest
+konsekwencją tego zdania, łącznie z dwiema rzeczami, których ludzie uczą się
+osobno \dash{} co znaczy zero i dlaczego wyznaczniki się mnożą.
+
+Jeśli sięgasz po regułę o wyznacznikach, której nie umiesz z tego zdania
+wyprowadzić, to ta reguła jest zapewne o czymś innym.
+\end{fr}
+
+% ============================================================
+\section{Zero i to, co ono niszczy}
+\label{sec:P09-zero}
+\index{determinant!zero}
+
+\begin{fr}
+Weź macierz, której druga kolumna jest dwa razy większa od pierwszej \dash{}
+powiedzmy kolumny $(1, 2)$ i $(2, 4)$.
+
+Gdzie trafia kwadrat jednostkowy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Na odcinek. Obie kolumny wskazują w tę samą stronę, więc równoległobok, który
+rozpinają, jest płaski.
+\end{ansblock}
+
+Płaski równoległobok nie ma pola, więc na mocy poprzedniej sekcji wyznacznik
+wynosi $0$ \dash{} i $ad - bc = 1 \times 4 - 2 \times 2$ to potwierdza.
+
+I to jest całe zero wyznacznika. Nie przypadek szczególny, nie zwyrodnienie,
+które wzór akurat produkuje: kwadrat wyszedł z niczym w środku.
+\end{fr}
+
+\begin{fr}
+A teraz konsekwencja, przez którą ten program stoi za
+Programem~\ref{prog:P08}, a nie przed nim.
+
+Jeśli cała płaszczyzna została przyciśnięta do prostej, to punkty, które były
+osobno, są teraz razem \dash{} dwa różne wejścia dzielą jedno wyjście. Żadna
+reguła nie odeśle tego wyjścia z powrotem, bo musiałaby zwrócić dwie odpowiedzi
+na jeden argument.
+
+Program~\ref{prog:P08} policzył wejścia, którym się to przydarza, nazwał je
+jądrem i powiedział, że macierz jest odwracalna dokładnie wtedy, gdy w tej
+przestrzeni nie ma nic poza zerem. Tutaj to samo, objętością:
+$\det A = 0$ dokładnie wtedy, gdy $\operatorname{rank} A < n$. Sprawdzone na
+$\val{p09.sing.trials}$ macierzach, na ułamkach, zgadza się za każdym razem
+\dash{} co nie jest odkryciem, tylko bramką, bo oba programy nie mogą mieć
+prawa nie zgadzać się co do tego, czym jest osobliwość.
+\end{fr}
+
+\begin{fr}
+Oto obie liczby z jednej macierzy, policzone tą samą eliminacją, którą napisał
+Program~\ref{prog:P04}, a Program~\ref{prog:P08} użył ponownie.
+
+\transcript{p09-singular}
+
+Wiersze to $1, 2, 3$, potem $4, 5, 6$, potem $7, 8, 9$, czyli mniej więcej
+najzwyklejsza macierz, jaka bywa. Dlaczego jej wyznacznik jest zerem?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Trzeci wiersz to dwa razy drugi minus pierwszy. $2 \times (4,5,6) - (1,2,3)
+= (7,8,9)$.
+\end{ansblock}
+
+Te trzy wiersze nie sięgają więc w trzy wymiary. Leżą w płaszczyźnie, a macierz
+o wierszach leżących w płaszczyźnie nie wypełni objętości: sześcian jednostkowy
+wychodzi płaski, a wyznacznik mówi o tym zerem.
+
+Rząd $\val{p09.worked.rank}$ obok jest tym samym zdaniem policzonym zamiast
+zmierzonym, co obiecała poprzednia ramka.
+\end{fr}
+
+\mermaidfig{p09-zero-means-flat}{Wyznacznik równy zeru i strata, którą on
+zgłasza.}{co niszczy zerowy wyznacznik}
+
+\begin{fr}
+Teraz pytanie, którego oczywista odpowiedź jest błędna \dash{} warto zapisać
+swoją, zanim pójdziesz dalej.
+
+$A$ jest $100 \times 100$ i $\det A = 1$. Ktoś mnoży każdy jej wyraz przez
+$\num{0.1}$.
+
+Ile wynosi wyznacznik nowej macierzy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$10^{-100}$.
+\end{ansblock}
+
+Każdy wiersz został przeskalowany przez $\num{0.1}$, a skalowanie wiersza
+skaluje objętość, więc sto wierszy wnosi sto czynników.
+
+W samym odwzorowaniu nic się nie pogorszyło. Posyła wektory niezależne na
+wektory niezależne dokładnie jak wcześniej; każdy kierunek, który przetrwał,
+nadal przetrwa; rząd nie zmienił się i wynosi $100$. Maszyna rozwiązująca z tą
+macierzą zachowa się dokładnie tak samo dobrze. Zmieniły się tylko jednostki.
+\end{fr}
+
+\begin{trapbox}
+\textbf{\enquote{Mały wyznacznik znaczy, że macierz jest prawie osobliwa.}}
+
+Wyznacznik skaluje się jak $n$-ta potęga macierzy, więc w każdym wymiarze,
+którym warto się przejmować, o jego wielkości decyduje skalowanie, a o tym, jak
+blisko płaskiego jest odwzorowanie, nie mówi prawie nic. Powyżej $10^{-100}$,
+dla macierzy, która w żadnym sensie nie jest bliska osobliwej.
+
+Wyznacznik odpowiada dokładnie na pytanie \emph{czy coś zostało zniszczone}, na
+tak i nie. Pytanie \emph{jak blisko zniszczenia} jest innym pytaniem z inną
+odpowiedzią \dash{} to wskaźnik uwarunkowania i należy do
+Programu~\ref{prog:P11}. Czytanie pierwszej odpowiedzi jako przybliżenia
+drugiej to sposób, w jaki praktykujący inżynier goni liczbę, która nigdy nie
+była o tym, o czym myślał.
+\end{trapbox}
+
+% ============================================================
+\section{Czynniki skali się mnożą}
+\label{sec:P09-product}
+\index{determinant!of a product}
+
+\begin{fr}
+$B$ skaluje każde pole przez $\det B$. Potem $A$ skaluje każde pole przez
+$\det A$.
+
+Zastosuj $B$, a potem $A$ \dash{} czyli macierz $AB$, na mocy
+Programu~\ref{prog:P06}. Jakim czynnikiem to skaluje pole?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\det A \times \det B$. Czynnik skali nałożony na czynnik skali to iloczyn.
+\end{ansblock}
+
+Czyli $\det(AB) = \det(A)\det(B)$, sprawdzone dokładnie na dwustu losowych
+parach.
+
+Warto zauważyć, czego to nie wymagało. Nie ma tu żadnego rachunku: ta tożsamość
+jest przeformułowaniem tego, czym wyznacznik \emph{jest}, a jedynym powodem,
+dla którego podaje się ją zwykle jako coś do sprawdzenia, jest to, że wzór
+$2 \times 2$ każe jej wyglądać na przypadek algebry.
+
+I wypada z tego rzecz, która ludzi zaskakuje. Program~\ref{prog:P06} zrobił
+wiele hałasu wokół $AB \ne BA$ \dash{} ale $\det(AB) = \det(BA)$ zawsze, bo
+obie strony to $\det A \det B$, a liczby są przemienne. Kolejność ma znaczenie
+dla odwzorowania, a dla objętości nie.
+\end{fr}
+
+\begin{fr}
+Teraz złóż to z wąskim gardłem z Programu~\ref{prog:P08}.
+
+Łańcuch macierzy stosowany jest jedna po drugiej, a jedna z nich, gdzieś w
+środku, jest osobliwa. Po niej stosowane są jeszcze cztery macierze pełnego
+rzędu.
+
+Ile wynosi wyznacznik całego łańcucha?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Zero. Jeden czynnik równy zeru w iloczynie kończy sprawę.
+\end{ansblock}
+
+Czyli wynik z Programu~\ref{prog:P08} opowiedziany objętościami zamiast
+kierunkami: czego wąska warstwa się pozbyła, tego nic dalej nie odda. Skrypt
+buduje macierz $3 \times 3$ przez środek szerokości $2$, potwierdza, że jest
+osobliwa, a potem układa na niej cztery macierze pełnego rzędu, sprawdzając po
+każdej, że wyznacznik nadal jest dokładnie zerem.
+
+Dwa programy, dwa argumenty, jeden fakt. Program~\ref{prog:P08} doszedł tam,
+licząc kierunki, a ten mnożąc czynniki skali, i druga droga jest krótsza, bo o
+iloczynie liczb rozumuje się łatwiej niż o złożeniu odwzorowań.
+\end{fr}
+
+\begin{fr}
+Jedna praktyczna konsekwencja mnożenia się wyznaczników \dash{} i jest to temat
+z Programu~\ref{prog:P02} pojawiający się w nowym miejscu.
+
+Model składający wiele warstw ma wyznacznik będący iloczynem wielu
+wyznaczników. Każdy z nich jest jakąś zwyczajną liczbą; iloczyn kilkuset z nich
+już nie i zniknie w niedomiarze do zera albo ucieknie w nieskończoność na długo
+przed tym, zanim cokolwiek zacznie znaczyć.
+
+Nikt więc go nie liczy. Zamiast tego niesie się $\ln \lvert \det \rvert$, gdzie
+iloczyn staje się sumą, a suma zostaje w zakresie \dash{} ten sam ruch, który
+Program~\ref{prog:F03} zrobił dla prawdopodobieństwa sekwencji, z tego samego
+powodu, a Program~\ref{prog:P02} mówi, dlaczego nie jest on opcjonalny.
+\end{fr}
+
+\begin{aibox}
+Miejscem, w którym spotkasz ten składnik pod nazwą, jest \emph{normalizing
+flow}, którego cała konstrukcja to łańcuch warstw odwracalnych: skoro każdą
+warstwę da się cofnąć, gęstość można przez nią przepchnąć, a wzór na zamianę
+zmiennych liczy sobie za ten przywilej $\ln \lvert \det \rvert$ jakobianu
+każdej warstwy.
+
+Dlatego architektury przepływowe buduje się z warstw o tanim wyznaczniku
+\dash{} trójkątnych, gdzie jest on iloczynem przekątnej, więc składnik kosztuje
+$n$ mnożeń zamiast $n^{3}$, których wymagałby wyznacznik ogólny.
+
+Ta książka nie uczy przepływów. Nazwa pada tutaj po to, żebyś spotykając
+\code{logdet} w funkcji straty wiedział, za co ona liczy: za objętość, a
+logarytm jest dlatego, że iloczyn nie dawał się przeżyć.
+\end{aibox}
+
+% ============================================================
+\section{Odwrotność i dlaczego kod jej nie buduje}
+\label{sec:P09-inverse}
+\index{matrix!inverse}
+
+\begin{fr}
+$A$ jest kwadratowa. Kiedy istnieje macierz $A^{-1}$, która ją cofa \dash{}
+która odsyła $Ax$ z powrotem na $x$ dla każdego $x$?
+
+Zauważ, że pytanie stawiane jest tylko macierzy kwadratowej, a
+Program~\ref{prog:P08} mówi, dlaczego tak być musi. Szeroka macierz musi
+posłać jakiś niezerowy wektor na zero, więc nie ma jej jak cofnąć; wysoka nie
+sięga większości przestrzeni, w którą odwzorowuje, więc dla większości wyjść
+nie ma czego cofać. Tylko macierz kwadratowa jest w ogóle kandydatem.
+
+Masz już wszystkie części odpowiedzi. Powiedz ją, zanim pójdziesz dalej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dokładnie wtedy, gdy nic nie zostało zniszczone: $\det A \ne 0$.
+\end{ansblock}
+
+Jeśli $\det A = 0$, to dwa wejścia dzielą jedno wyjście, a odwrotność musiałaby
+zwrócić oba. Jeśli $\det A \ne 0$, to żadne dwa wejścia nie dzielą wyjścia, a
+kolumny sięgają całej przestrzeni, więc każde wyjście ma dokładnie jedno
+wejście, na które można je odesłać.
+
+Cztery zdania, jeden warunek:
+
+\begin{itemize}
+\item $A$ jest odwracalna;
+\item $\det A \ne 0$;
+\item $\operatorname{rank} A = n$;
+\item jądro nie zawiera nic poza wektorem zerowym.
+\end{itemize}
+
+Program~\ref{prog:P08} napisał trzecie i czwarte, a ten program dokłada drugie,
+czyli to, które sprawdza się jedną liczbą.
+\end{fr}
+
+\begin{fr}
+Dwa drobne fakty, z których jeden warto wyprowadzić, a nie zapamiętać.
+
+Pierwszy: $A^{-1}A = I$ dokładnie, co skrypt sprawdza na ułamkach na
+sześćdziesięciu macierzach, bo \enquote{dokładnie} jest twierdzeniem, a
+zmiennoprzecinkowa arytmetyka by go nie uniosła.
+
+Drugi: $A$ skaluje objętość przez $\det A$, a $A^{-1}$ to cofa. Ile więc wynosi
+$\det(A^{-1})$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$1/\det A$.
+\end{ansblock}
+
+Z poprzedniej sekcji i z niczego więcej:
+\[ \det(A^{-1})\det(A) = \det(A^{-1}A) = \det I = 1 \]
+
+Zauważ, że to już drugi raz w dwóch sekcjach, gdy fakt o odwrotnościach wypadł
+z reguły iloczynu w jednej linijce. To jest nawyk, który warto stąd zabrać
+\dash{} większość prawd o wyznacznikach wynika z tego, że się mnożą, a
+wyprowadzenie zajmuje mniej czasu niż szukanie.
+\end{fr}
+
+\begin{fr}
+Teraz część, która zmienia to, co piszesz.
+
+Masz $A$ i jedną prawą stronę $b$, i chcesz $x$ spełniające $Ax = b$. Są dwie
+drogi. Wyeliminować w dół kolumn $A$ i odczytać odpowiedź z powrotem w górę.
+Albo zbudować $A^{-1}$, a potem pomnożyć przez $b$.
+
+Obie dają to samo $x$ \dash{} skrypt sprawdza, że zgadzają się dokładnie na
+ułamkach, bo różnica między nimi zrobiłaby z porównania coś innego. Przy
+$n = \val{p09.cost.n}$: która jest tańsza i mniej więcej ile razy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Rozwiązywanie, jakieś $\val{p09.cost.ratio}$ razy.
+\end{ansblock}
+
+$\val{p09.cost.solve}$ mnożeń i dzieleń wobec $\val{p09.cost.invert}$, dla tej
+samej odpowiedzi na to samo pytanie.
+
+Te dwie liczby nie są przepisane z podręcznikowego rachunku operacji. Obie
+procedury liczą własną arytmetykę w trakcie \dash{} każde mnożenie i każde
+dzielenie zwiększa licznik \dash{} więc stosunek na tej stronie jest pomiarem
+kodu obok.
+\end{fr}
+
+\mermaidfig{p09-solve-or-invert}{Dwie drogi do tego samego wektora i praca,
+którą każda wykonuje.}{rozwiazywanie kontra odwracanie}
+
+\begin{fr}
+Powód nie jest subtelny, gdy spojrzeć, co każda droga buduje.
+
+Eliminacja buduje odpowiedź i nic poza nią: $n$ liczb. Budowanie odwrotności
+daje $n^{2}$ liczb, z których używasz potem $n$ \dash{} pozostałe $n^{2} - n$
+to odpowiedzi na prawe strony, o które nikt nie pytał.
+
+Argument za odwrotnością jest więc wtedy, gdy naprawdę masz wiele prawych stron
+i przychodzą one w różnych chwilach. Ten przypadek istnieje i jest rzadszy, niż
+sugeruje kod, bo rozkład $A$ obsługuje powtarzające się prawe strony też, i to
+taniej.
+\end{fr}
+
+\begin{fr}
+Jest i drugi powód, mocniejszy od pierwszego, i nie jest on tego programu do
+oddania.
+
+Budowanie odwrotności jest gorsze \emph{numerycznie}, a nie tylko wolniejsze:
+odpowiedź, którą daje, ma większy błąd niż odpowiedź z eliminacji, z tej samej
+macierzy i tej samej prawej strony. Powiedzenie dlaczego wymaga sposobu na
+mierzenie, jak bardzo macierz wzmacnia błąd, czego ten program nie ma, a
+Program~\ref{prog:P11} buduje.
+
+Uczciwa postać tej rady to więc dwa twierdzenia z dwoma właścicielami. Rachunek
+operacji jest mierzony tutaj. Dokładność należy do Programu~\ref{prog:P11} i
+jest tą połową, która rozstrzyga spór.
+\end{fr}
+
+\begin{aibox}
+Linijka do rozpoznania to zamknięta postać regresji liniowej, wypisana tak, jak
+wyprowadził ją Program~\ref{prog:P08}:
+\begin{center}
+\code{x = inv(A.T @ A) @ A.T @ b}
+\end{center}
+wobec solwera wywołanego na tym samym układzie. Obie liczą dopasowanie metodą
+najmniejszych kwadratów. Pierwsza buduje odwrotność, której nie potrzebuje, i
+buduje ją dla $A\T A$, czyli dla tej jednej macierzy w zadaniu, którą najmniej
+chcesz mieć zbudowaną \dash{} znowu z powodów należących do
+Programu~\ref{prog:P11}.
+
+Pojawia się w mnóstwie działającego kodu, bo jest wzorem tak, jak stoi on na
+kartce, a wzór na kartce jest opisem odpowiedzi, a nie instrukcją jej liczenia.
+Te dwie rzeczy rozchodzą się częściej, niż notacja przyznaje.
+\end{aibox}
+
+% ============================================================
+\section{Zmiana bazy}
+\label{sec:P09-basis}
+\index{basis!change of}
+
+\begin{fr}
+Program~\ref{prog:P04} wziął punkt
+$(\val{p04.basis.x}, \val{p04.basis.y})$, zapisał go względem osi obróconych o
+$\val{p04.basis.angle}$ stopni i dostał
+$(\val{p04.basis.c1}, \val{p04.basis.c2})$ \dash{} współrzędne zmienione,
+długość niezmieniona i równa $\val{p04.basis.len}$.
+
+Czego tam nie powiedziano, to co tej zmiany dokonało. Jaki obiekt bierze jedną
+parę współrzędnych punktu i zwraca parę mierzoną względem innych osi?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Macierz.
+\end{ansblock}
+
+Każda nowa współrzędna to odległość, jaką punkt przebywa wzdłuż jednej nowej
+osi, czyli iloczyn skalarny z tą osią; dwie osie dają dwa iloczyny skalarne;
+dwa iloczyny skalarne ułożone w wiersze to macierz razy wektor. Dla osi
+obróconych o $\theta$ jest to
+\[ \begin{pmatrix} \cos\theta & \sin\theta \\
+                   -\sin\theta & \cos\theta \end{pmatrix} \]
+a skrypt stosuje dokładnie to do punktu z Programu~\ref{prog:P04} pod kątem z
+Programu~\ref{prog:P04} i żąda z powrotem obu współrzędnych zapisanych w
+Programie~\ref{prog:P04}. Oba programy cytują jeden rachunek, a jeśli
+którykolwiek się ruszy, budowanie o tym powie.
+\end{fr}
+
+\begin{fr}
+Teraz wymaganie, w którym ta sekcja łączy się z resztą programu.
+
+Nic się nie ruszyło. Punkt jest tam, gdzie był; zmienił się tylko opis. Zmiana
+musi więc być odwracalna \dash{} ze współrzędnych nowych trzeba umieć odzyskać
+stare, bo inaczej te nowe nie są opisem tego samego punktu.
+
+Na mocy poprzedniej sekcji stawia to warunek na jedną liczbę. Na którą i co ma
+o niej być prawdą?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Na wyznacznik, i nie może on być zerem.
+\end{ansblock}
+
+Czyli dokładnie wymaganie z Programu~\ref{prog:P04}, żeby baza była niezależna,
+przybywające z drugiej strony: osie, które nie byłyby niezależne, zapadłyby
+płaszczyznę, a zapadniętego opisu nie da się cofnąć.
+
+Ze wszystkich dostępnych zmian bazy jedna rodzina jest używana o wiele częściej
+niż reszta: obroty.
+
+Obracanie osi przy nieruszaniu punktu nie zmienia na obrazku żadnej
+odległości, więc obrót nie może skalować pola.
+
+Ile zatem wynosi jego wyznacznik?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p09.rot.det}$.
+\end{ansblock}
+
+Policzone dokładnie, na trójkącie $3$--$4$--$5$, żeby każdy wyraz był ułamkiem
+i żebyś mógł sprawdzić to ręcznie:
+\[ R = \begin{pmatrix} \tfrac{3}{5} & -\tfrac{4}{5} \\[2pt]
+                       \tfrac{4}{5} & \tfrac{3}{5} \end{pmatrix},
+   \qquad \det R = \tfrac{9}{25} + \tfrac{16}{25} = \val{p09.rot.det} \]
+
+Jeszcze dwie własności, obie sprawdzone dokładnie, a nie do tolerancji. Jego
+transpozycja jest jego odwrotnością: $R\T R = I$. I zachowuje długość \dash{}
+wektor $(\val{p04.basis.x}, \val{p04.basis.y})$ ma kwadrat długości
+$\val{p09.rot.len2}$ przed i $\val{p09.rot.len2}$ po.
+\end{fr}
+
+\begin{fr}
+Środkowa z tych trzech własności jest definicją i zasługuje na własną nazwę.
+
+Macierz, której transpozycja jest jej odwrotnością, nazywa się
+\textbf{ortogonalną}. To warunek zwięzły i kupuje bardzo wiele: cofnięcie
+zmiany nie kosztuje nic poza zapisaniem macierzy w drugą stronę, a długości i
+kąty zbudowane w Programie~\ref{prog:P05} są zachowane, bo są zbudowane z
+iloczynów skalarnych, a $R\T R = I$ mówi dokładnie tyle, że iloczyny skalarne
+przeżywają.
+
+W tym sensie ortogonalna zmiana bazy jest darmowa. Nie tania, tylko
+\emph{bezstratna}: żadna informacja o wektorach nie zostaje w starym układzie
+współrzędnych.
+\end{fr}
+
+\begin{fr}
+Co pozwala powiedzieć porządnie ostatnią sekcję Programu~\ref{prog:F08}.
+
+Rotary position embedding daje każdej pozycji kąt i obraca o niego zapytanie
+oraz klucz, a Program~\ref{prog:F08} pokazał, że wynikowy wynik uwagi zależy
+tylko od różnicy obu pozycji.
+
+Czego tam powiedzieć nie było można, to ile ten obrót kosztuje model, bo
+powiedzenie tego wymaga wyznacznika. Obrót jest ortogonalną zmianą bazy: jest
+odwracalny, jego wyznacznik wynosi $\val{p09.rot.det}$ i nic nie niszczy.
+Informacja o pozycji jest dodawana przez \emph{ponowne opisanie} zapytania i
+klucza, a nie przez ich zmianę, więc żaden kierunek zanurzenia nie jest wydany
+na jej niesienie.
+\end{fr}
+
+\begin{fr}
+Ostatnie pytanie programu, i łapie ono większość ludzi.
+
+$\det = 1$ dla obrotu, a obrót zachowuje długość. Oto macierz o wyznaczniku
+$1$:
+\[ S = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix} \]
+Czy zachowuje ona długość?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Posyła $(0,1)$ na $(1,1)$, którego długość wynosi $\sqrt{2}$.
+\end{ansblock}
+
+$S$ jest ścinaniem: przesuwa płaszczyznę na bok o wielkość proporcjonalną do
+wysokości. Pola przeżywają, bo popchnięty równoległobok zachowuje podstawę i
+wysokość. Długości nie.
+
+I ta sama kolizja działa w drugą stronę. Odbicie względem osi $x$ ma wyznacznik
+$\val{p09.reflect.det}$ i zachowuje każdą długość, jaka jest.
+\end{fr}
+
+\begin{trapbox}
+\textbf{\enquote{Wyznacznik $1$ znaczy, że to obrót.}}
+
+Dwa niezależne warunki, i każdy ma na tej stronie kontrprzykład przeciwko
+drugiemu: ścinanie zachowuje pole, a nie długość, odbicie zachowuje długość, a
+nie orientację.
+
+Obrotem czyni $R\T R = I$ \emph{oraz} $\det R = 1$ \dash{} pierwsze dla
+długości, drugie dla orientacji \dash{} a porzucenie któregokolwiek daje inną
+rodzinę odwzorowań. Samo pierwsze to macierze ortogonalne, wśród których są
+odbicia.
+\end{trapbox}
+
+\begin{fr}
+Wyznacznik odpowiedział na pytanie, które zostawił otwartym
+Program~\ref{prog:P08}. Rząd liczy, ile kierunków przeżywa macierz; wyznacznik
+mierzy, jak dużo przestrzeni przeżywa, jedną liczbą ze znakiem, a ta liczba
+jest zerem dokładnie wtedy, gdy coś zostało zniszczone.
+
+Cała reszta programu z tego wyszła. Wyznaczniki się mnożą, bo mnożą się
+czynniki skali. Odwrotność istnieje dokładnie wtedy, gdy wyznacznik nie jest
+zerem, bo to właśnie znaczy, że nic nie przepadło. Zmiana bazy jest odwracalna,
+bo punkt się nie ruszył. Ortogonalna nie kosztuje nic, bo nie zmienia nawet
+długości.
+
+Program~\ref{prog:P10} zadaje następne pytanie i jest ono ostrzejsze. Nie
+\emph{jak dużo} przestrzeni przeżywa, tylko \emph{które kierunki} przechodzą
+nieobrócone \dash{} tylko rozciągnięte. Zwykle jest ich kilka, wielkość
+rozciągnięcia każdego z nich jest liczbą, a wyznacznik okazuje się iloczynem
+tych liczb, czyli jedną liczbą tego programu rozłożoną na części.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Macierz skaluje każde pole jednym czynnikiem}, bo obszar
+  jest pokryciem małymi kwadratami i każdy z nich traktowany jest tak samo. Ten
+  czynnik to \textbf{wyznacznik}, a obrazem kwadratu jednostkowego jest
+  równoległobok rozpięty przez kolumny \dash{} pole $\val{p09.stretch.det}$ dla
+  macierzy, która podwaja $x$ i potraja $y$.}
+\sumitem{4--5}{\textbf{Pole jest ze znakiem}, a znak to orientacja: zamiana obu
+  współrzędnych ma wyznacznik $\val{p09.flip.det}$, bo odwróciła płaszczyznę na
+  drugą stronę. Sprawdzone wzorem sznurowadłowym na $\val{p09.area.trials}$
+  macierzach dokładnie. $\lvert \det \rvert$ to pole; $\det$ to pole i lustro.}
+\sumitem{6--7}{$ad - bc$ w dwóch wymiarach, objętość ze znakiem w trzech,
+  $n$-objętość ze znakiem w $n$. \textbf{Każde późniejsze twierdzenie w tym
+  programie jest konsekwencją \enquote{czynnika, którym skaluje się objętość ze
+  znakiem}}, więc reguła, której z tego zdania nie wyprowadzisz, jest zapewne o
+  czymś innym.}
+\sumitem{8--10}{\textbf{Zero znaczy płasko}, a płasko znaczy, że dwa wejścia
+  dzielą teraz jedno wyjście. $\det A = 0$ dokładnie wtedy, gdy
+  $\operatorname{rank} A < n$, sprawdzone na $\val{p09.sing.trials}$ macierzach
+  \dash{} czyli jądro z Programu~\ref{prog:P08} zmierzone objętością zamiast
+  policzone kierunkami.}
+\sumitem{11--12}{Przykład policzony: wiersze $1,2,3$, potem $4,5,6$, potem
+  $7,8,9$ dają wyznacznik $0$ i rząd $\val{p09.worked.rank}$, bo trzeci wiersz
+  to dwa razy drugi minus pierwszy. \textbf{Wiersze leżące w płaszczyźnie nie
+  wypełnią objętości.}}
+\sumitem{13--14}{\textbf{Mały wyznacznik nie znaczy prawie osobliwa.}
+  Przeskalowanie macierzy $100 \times 100$ przez $\num{0.1}$ sprowadza jej
+  wyznacznik do $10^{-100}$ i nie zmienia w odwzorowaniu niczego. \emph{Czy coś
+  zostało zniszczone} to pytanie wyznacznika; \emph{jak blisko} to pytanie
+  wskaźnika uwarunkowania i należy do Programu~\ref{prog:P11}.}
+\sumitem{15--16}{\textbf{$\det(AB) = \det(A)\det(B)$}, bo czynnik skali
+  nałożony na czynnik skali to iloczyn \dash{} przeformułowanie, a nie rachunek.
+  I $\det(AB) = \det(BA)$ zawsze, choć Program~\ref{prog:P06} pokazał
+  $AB \ne BA$: kolejność ma znaczenie dla odwzorowania, a dla objętości nie.}
+\sumitem{17--18}{\textbf{Jeden osobliwy czynnik czyni cały łańcuch osobliwym},
+  czyli wąskie gardło z Programu~\ref{prog:P08} opowiedziane objętościami:
+  cztery macierze pełnego rzędu ułożone na spłaszczonej zostawiają ją płaską.}
+\sumitem{19}{Iloczyn setek wyznaczników znika w niedomiarze, więc niesie się
+  $\ln \lvert \det \rvert$ \dash{} ruch z Programu~\ref{prog:F03} z powodu
+  podanego w Programie~\ref{prog:P02}. Ten składnik to opłata za zamianę
+  zmiennych w \emph{normalizing flow} i dlatego takie warstwy buduje się
+  trójkątne.}
+\sumitem{20--21}{\textbf{Odwracalna, $\det \ne 0$, pełny rząd i jądro bez
+  niczego poza zerem to jeden warunek w czterech zdaniach}, a drugie z nich
+  rozstrzyga jedna liczba.}
+\sumitem{22--23}{$A^{-1}A = I$ dokładnie na ułamkach, a
+  $\det(A^{-1}) = 1/\det A$ w jednej linijce z reguły iloczynu.
+  \textbf{Większość prawd o wyznacznikach wynika z tego, że się mnożą}, a
+  wyprowadzenie idzie szybciej niż szukanie.}
+\sumitem{24--26}{\textbf{Rozwiązywanie bije odwracanie} \dash{}
+  $\val{p09.cost.solve}$ operacji wobec $\val{p09.cost.invert}$ przy
+  $n = \val{p09.cost.n}$, czyli $\val{p09.cost.ratio}$ razy, policzone przez
+  same procedury. Eliminacja buduje $n$ liczb; odwrotność buduje $n^{2}$, z
+  których używasz $n$.}
+\sumitem{27}{A mocniejszym powodem jest dokładność, nie szybkość, i to należy
+  do Programu~\ref{prog:P11}. \textbf{Wzór na kartce jest opisem odpowiedzi, a
+  nie instrukcją jej liczenia} \dash{} czym właśnie jest
+  \code{inv(A.T @ A) @ A.T @ b}.}
+\sumitem{28--29}{\textbf{Zmiana bazy jest macierzą}, zabramkowana wobec
+  współrzędnych zapisanych w Programie~\ref{prog:P04}: każda nowa współrzędna
+  to iloczyn skalarny z nową osią, a dwa takie ułożone w wiersze to macierz
+  razy wektor.}
+\sumitem{30--31}{Musi być odwracalna, bo punkt się nie ruszył, a stary opis ma
+  dać się odzyskać \dash{} czyli wymaganie niezależności z
+  Programu~\ref{prog:P04} przybywające jako \textbf{wyznacznik, który nie jest
+  zerem}.}
+\sumitem{32--33}{\textbf{Obrót ma wyznacznik $\val{p09.rot.det}$, a jego
+  transpozycja jest jego odwrotnością}, co właśnie znaczy \emph{ortogonalna}.
+  Długości i kąty przeżywają, bo przeżywają iloczyny skalarne, więc ortogonalna
+  zmiana bazy jest \textbf{bezstratna}, a nie tylko tania.}
+\sumitem{34}{I tyle właśnie kosztuje model kodowanie pozycji z
+  Programu~\ref{prog:F08}: nic. \textbf{Obrót zapytania i klucza opisuje je na
+  nowo, zamiast je zmieniać}, więc żaden kierunek zanurzenia nie jest wydany na
+  niesienie pozycji.}
+\sumitem{35--36}{\textbf{Wyznacznik $1$ i zachowywanie długości to dwa
+  warunki.} Ścinanie, które dodaje wysokość punktu do jego szerokości, ma
+  wyznacznik $1$ i rozciąga; odbicie ma wyznacznik $\val{p09.reflect.det}$ i
+  nie rozciąga. Obrót jest jednym i drugim naraz.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Macierz ma pierwszy wiersz $(3, 1)$ i drugi wiersz $(6, 2)$. Policz jej
+  wyznacznik i powiedz bez dalszych rachunków, czy ma odwrotność.
+  \answerto{$3 \times 2 - 1 \times 6 = 0$. Odwrotności nie ma: druga kolumna
+  jest dwa razy większa od pierwszej, więc płaszczyzna zostaje przyciśnięta do
+  prostej i dwa wejścia dzielą jedno wyjście.}
+\item $A$ jest $4 \times 4$ i $\det A = 3$, a $B$ jest $4 \times 4$ i
+  $\det B = -2$. Podaj $\det(AB)$, $\det(BA)$ i $\det(A^{-1})$.
+  \answerto{$-6$, $-6$ i $\frac{1}{3}$. Dwie pierwsze są równe, bo obie to
+  $\det A \det B$, a liczby są przemienne, choć $AB$ i $BA$ to różne macierze.}
+\item Każdy wyraz macierzy $10 \times 10$ o wyznaczniku $2$ zostaje podwojony.
+  Podaj nowy wyznacznik i powiedz, czy macierz zbliżyła się do osobliwej.
+  \answerto{$2 \times 2^{10} = 2048$. Do niczego się nie zbliżyła: skalowanie
+  wszystkich dziesięciu wierszy skaluje objętość dziesięć razy, a odwzorowanie
+  posyła dokładnie te same kierunki dokładnie tam samo, tylko dwa razy dalej.}
+\item Masz jedno $A$ i tysiąc prawych stron, przychodzących po kolei. Podaj
+  argumenty za budowaniem $A^{-1}$ raz i przeciw.
+  \answerto{Za: odwrotność buduje się raz, a każde rozwiązanie to potem jeden
+  iloczyn macierzy przez wektor. Przeciw: rozkład $A$ też buduje się raz, każde
+  rozwiązanie to potem dwa podstawienia trójkątne o tym samym rzędzie kosztu, a
+  odpowiedzi są dokładniejsze. Odwrotność nie wygrywa w żadnym z tych
+  punktów, i dlatego argument za nią jest węższy, niż wygląda.}
+\item Pokaż, że iloczyn dwóch macierzy ortogonalnych jest ortogonalny.
+  \answerto{$(PQ)\T(PQ) = Q\T P\T P Q = Q\T I Q = Q\T Q = I$. Dwie zmiany bazy
+  obrotami to więc jedna zmiana bazy obrotem i nic nie ginie ani razu.}
+\item Macierz posyła $(1,0)$ na $(2,1)$, a $(0,1)$ na $(4,2)$. Podaj jej
+  wyznacznik i powiedz, czym staje się kwadrat jednostkowy.
+  \answerto{Kolumny to $(2,1)$ i $(4,2)$, więc $\det = 2 \times 2 - 4
+  \times 1 = 0$. Kwadrat staje się odcinkiem wzdłuż kierunku $(2,1)$: druga
+  kolumna jest dwa razy większa od pierwszej, więc obie krawędzie lądują na
+  jednej prostej.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Macierz ma dwa identyczne wiersze. Podaj jej wyznacznik bez liczenia
+  czegokolwiek i powiedz dlaczego.
+  \answerto{Zero. Dwa identyczne wiersze nie są niezależne, więc wiersze leżą w
+  przestrzeni o mniejszej liczbie wymiarów, niż macierz jest szeroka, a obraz
+  sześcianu jednostkowego jest płaski.}
+\item $\det(A + B) = \det A + \det B$ jest fałszem. Znajdź kontrprzykład wśród
+  macierzy $2 \times 2$ o wyrazach $0$ i $1$.
+  \answerto{Niech $A$ ma pojedynczą $1$ w lewym górnym rogu, a $B$ pojedynczą
+  $1$ w prawym dolnym, wszystkie pozostałe wyrazy zerowe. Obie mają wyznacznik
+  $0$, a $A + B = I$ ma wyznacznik $1$. Wyznaczniki mnożą się wzdłuż iloczynu;
+  nic nie mówi, że dodają się wzdłuż sumy, a objętości nie mają po temu
+  powodu.}
+\item Obrót o $\theta$ ma wyznacznik $\cos^{2}\theta + \sin^{2}\theta$. Czyja to
+  tożsamość i co pozwala wywnioskować dla wszystkich kątów naraz?
+  \answerto{Z Programu~\ref{prog:F08}. Wynosi ona $1$ dla każdego $\theta$, więc
+  żaden obrót nigdy nie zmienia pola ani orientacji \dash{} czyli jeden rachunek
+  pokrywa całą rodzinę zamiast sprawdzania przy każdym kącie.}
+\item Program~\ref{prog:P08} pokazał, że szeroka macierz musi posyłać jakiś
+  niezerowy wektor na zero. Co to mówi o wyznaczniku macierzy kwadratowej
+  zbudowanej przez złożenie szerokiej z wysoką?
+  \answerto{Samo z siebie nic \dash{} iloczyn wysokiej i szerokiej może być
+  kwadratowy i nieosobliwy. Ale jeśli wspólny wymiar środkowy jest mniejszy niż
+  zewnętrzny, to wyznacznik jest zerem, bo rząd nie przekroczy środka, a
+  kwadratowa macierz pełnego rzędu potrzebuje wszystkich $n$.}
+\item Dlaczego wyznacznik macierzy trójkątnej jest iloczynem jej przekątnej i
+  dlaczego to czyni warstwy trójkątne atrakcyjnymi w \emph{normalizing flow}?
+  \answerto{Eliminacja nie ma czego eliminować, więc elementy główne są już
+  wyrazami przekątnej, a ich iloczyn jest wyznacznikiem. Kosztuje to $n$ mnożeń
+  zamiast ogólnych $n^{3}$, więc składnik $\ln \lvert \det \rvert$ w funkcji
+  straty jest niemal darmowy.}
+\end{furtherproblems}

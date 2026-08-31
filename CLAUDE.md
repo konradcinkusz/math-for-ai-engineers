@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P8 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first five programs of Part III.** P9–P34 are stubs carrying their briefs | 26 of 47 |
+| Programs | **F1–F13 and P1–P9 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first six programs of Part III.** P10–P34 are stubs carrying their briefs | 25 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 694 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 706 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 593 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 597 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 716 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 726 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 611 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 615 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,14 +93,14 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **26 of 47 programs are stubs**, in each language. This is the whole of the
+- **25 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 626 computed values, all referenced, all present, plus the committed console
+- 638 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 126 Mermaid sources, all rendering
-- 28 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 132 Mermaid sources, all rendering
+- 30 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
@@ -111,9 +111,10 @@ what was there before.
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
   before P6. **P6 added two and the ten transcripts it turned on added three**,
   all of the latter in `main-pl` \dash{} a listing appearing where a marker box
-  used to be moves every break after it. **P7 added none**, which has happened
-  once before (F13) and both times for the same reason: the recorded rules were
-  applied while drafting rather than after a build named the defect. **P8 added
+  used to be moves every break after it. **P7 added none, and P9 added none
+  either**, which has now happened three times (F13, P07, P09) and every time
+  for the same reason: the recorded rules were applied while drafting rather
+  than after a build named the defect. **P8 added
   three, over three rounds of lengthening** \dash{} see its pass note for the
   clearest instance yet of the random walk
   \dash{} and one of P04's five is the price of the three cues its pass added
@@ -132,12 +133,14 @@ what was there before.
   This is the second ledger that is reported rather than gated, and like the
   first it must not quietly go away. **When the count goes up, that is the
   signal.**
-- **Elicitation rate: 57% of the book's frames put a question to the reader**,
+- **Elicitation rate: 55% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
-  35% in P04, 36% in P05, 38% in P06, 40% in P07 and 35% in P08.** Part III is
-  climbing because the rate is now designed in rather than measured
-  afterwards. A frame carries `\nextframe` if and only if the
+  35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08 and 40% in P09.**
+  Part III is climbing because the rate is now designed in rather than measured
+  afterwards. The book's own figure falls as Part III grows, because every
+  Part III program sits below Part I's rate \dash{} which is why the per-program
+  column is the ledger and the single number is not. A frame carries `\nextframe` if and only if the
   next frame opens
   with an answer, so the cue rate *is* the elicitation rate. It halved over
   seventeen programs with every gate green, because `RE_DEMANDS` treats
@@ -918,6 +921,25 @@ Each cost time; none is obvious from its error message.
   place where a defect can look intentional.** `\mermaidfig` has the same
   exposure and `\val{}` does not, because a missing value is a `??` nobody
   reads as a choice.
+
+- **A macro from a CONDITIONALLY LOADED package is invisible to both of this
+  project's machines.** A P09 draft used `\begin{psmallmatrix}`, which comes
+  from **mathtools**, and `preamble.tex` loads mathtools inside an
+  `\IfFileExists`. On a TeX installation without it the build dies on an
+  undefined control sequence \dash{} and **neither machine here would have
+  caught it**, because this container has mathtools and CI has a fuller TeX
+  Live than this container. The `amssymb`/`newtxmath` trap is a full
+  installation failing where a bare one passes; the `upquote` trap is a bare
+  one shipping what a full one hides; this is the third direction, latent on
+  every machine that exists here and waiting for a reader's.
+
+  `preamble.tex` carries eleven `\IfFileExists` probes and **mathtools is the
+  only one that supplies macros the prose can use** \dash{} the rest are fonts,
+  `babel`, `upquote`, and `csquotes`, which has a fallback branch. So the rule
+  is narrow: **before using a maths macro you have not used before, grep the
+  preamble for the package that defines it.** No gate was added, because this
+  has never shipped; the rule is here so that the first time it does, somebody
+  knows where to look.
 
 - **A gate that measures a ratio is a different animal from one that measures a
   property, and this repository had none of the first kind.** `RE_DEMANDS`,
@@ -4548,6 +4570,176 @@ declared after the frame that delivers it, which a float cannot rise above.
 Measured on the page: question, answer, figure, in that order, in all four
 builds.
 
+### Program P9 pass, August 2026
+
+**Thirty-seven teaching frames, thirty-nine printed, both editions**, against a
+brief that projected forty-five. Five sections: what one number can say about a
+whole map, zero and what it destroys, scale factors multiply, the inverse and
+why the code does not form it, and change of basis.
+
+Ninth program running under its brief's estimate, and this time three
+neighbours had each taken a piece. **P04 already does change of basis as a
+worked example** \dash{} the point $(3, 4)$ against axes turned by $30$
+degrees, coordinates changing and length not \dash{} so the idea was spent and
+what was left is better: the change is itself a **matrix**, and it is
+invertible exactly because nothing was destroyed. **F08 has rotation matrices
+and rotary position embedding in full**, so P09 adds one frame rather than a
+section: the reading F08 could not give, that a rotation is an orthogonal
+change of basis and therefore costs the model nothing. And **P08 hands the
+program over by name**, which makes the $\det = 0$ frame a gate rather than a
+finding.
+
+#### The brief pointed at the wrong neighbour, and it was the program's own brief
+
+P09's manifest entry says the cost of \code{inv()} is \enquote{stated here,
+measured in P10}. It is wrong twice. **P10 undertakes no such measurement**
+\dash{} it is eigenvalues, the spectral theorem and quadratic forms \dash{}
+while **P11 undertakes \enquote{why the normal equations square the condition
+number and a QR solve does not, which is the concrete form of do not
+invert}**. And the operation count is not merely stated here, it is
+**measured** here.
+
+Seven passes have now found a claim about another program that needed fixing,
+and this is the first where it was **the program's own brief** rather than a
+frame's forward pointer. The manifest is amended: the operation count measured
+here, the accuracy argument owned by P11. Checking cost two file reads.
+
+The split is the F07/F12 one again and it makes the section better rather than
+shorter, because it lets §4 close on a sentence neither program could write
+alone: the operation count is measured here, the accuracy is P11's, **and the
+accuracy is the half that decides the argument**.
+
+#### The cost is a measurement of the code beside it
+
+Both routines count their own arithmetic as they do it \dash{} every multiply
+and every divide increments a counter \dash{} so nothing on the page is quoted
+from a textbook's $n^{3}/3$. At $n = \val{p09.cost.n}$, elimination costs
+$\val{p09.cost.solve}$ multiplications and divisions against
+$\val{p09.cost.invert}$ for forming the inverse and multiplying, a factor of
+$\val{p09.cost.ratio}$ \dash{} and the script asserts that the two routes agree
+**exactly** over the rationals first, because a difference between them would
+have made the comparison about something else.
+
+The reason is then one sentence: elimination builds $n$ numbers and the inverse
+builds $n^{2}$, of which you use $n$.
+
+#### A third kind of cross-programme gate: a shared PREDICATE
+
+The gates this book has built so far read another program's committed
+**value** and assert agreement. P09 has one of those \dash{} the
+change-of-basis matrix applied to P04's point at P04's angle must return P04's
+own two committed coordinates \dash{} wired to a shared computation rather than
+a coincidence, on P04's own rule.
+
+But the $\det = 0$ frame needed something else. P08 defines singular by rank
+and P09 defines it by volume, and **the two programs must not be able to
+disagree about which matrices are singular**. So the script computes both, from
+the same elimination P04 wrote and P08 reused unchanged, and asserts they name
+the same set: on $\val{p09.sing.trials}$ matrices, $143$ of them singular,
+$\det A = 0$ and $\operatorname{rank} A < n$ agreed every time.
+
+That is not a value gate and it is not a discovery. It is two definitions
+checked against each other, and it costs three lines. **Use it wherever two
+programs define the same predicate two ways.**
+
+#### The diamond hazard, a fourth time, and the fix is settled
+
+`p09-solve-or-invert` was first drawn as a fan-out \dash{} one node branching
+into two \dash{} and came out **433.92 pt wide**, which is 10.17 pt in the
+trade format and **11.54 pt on A4**, by some way the largest node text in the
+book. That is exactly F08's `rotate-both` figure to the hundredth of a point,
+which is worth knowing: **a two-column LR graph at this node width lands at
+433.92 pt every time.**
+
+The recorded fix applied unchanged and on sight: **add a rank.** Converging the
+two branches on a fourth node took it from two columns to three and from
+433.92 pt to the wrap cap. Wordier nodes would have done nothing, because
+mermaid was already wrapping. That is now three uses of the add-a-rank fix
+(F09, F11, P09) and none of the wordier-nodes fix on a wrapping graph.
+
+#### A macro from a conditionally-loaded package is invisible to both machines
+
+The draft used `\begin{psmallmatrix}` in a summary item and two exercises.
+`psmallmatrix` comes from **mathtools**, and `preamble.tex` loads mathtools
+inside an `\IfFileExists`. So on a TeX installation without it the build dies
+on an undefined control sequence.
+
+The part worth recording is that **neither of this project's two machines would
+have caught it.** This container has mathtools and CI has a fuller TeX Live
+than this container, so both compile it. The `amssymb`/`newtxmath` trap is a
+full installation failing where a bare one passes; the `upquote` trap is a bare
+one shipping what a full one hides; this is the third direction, where the
+defect is latent on every machine that exists here and waits for a reader's.
+
+`preamble.tex` has eleven `\IfFileExists` probes and **mathtools is the only
+one of them that supplies macros the prose can use** \dash{} the rest are fonts,
+`babel`, `upquote`, and `csquotes`, which has a fallback branch. So the rule is
+narrow and checkable: **before using a maths macro you have not used before,
+grep the preamble for the package that defines it.** No gate was added, because
+this has never shipped; the rule is recorded so that the first time it does,
+somebody knows where to look.
+
+#### Layout
+
+The multiset came back **element for element** to the pre-P09 baseline in all
+four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with no stranded openers,
+no stranded headings, and **no orphan tails added at all**, which has now
+happened three times (F13, P07, P09).
+
+Two things had to be cleared to get there, both recorded classes and both
+applied on sight once the build named them:
+
+- **A 3.5 pt box in `main-en` alone**, from `$\det(A^{-1})\det(A) =
+  \det(A^{-1}A) = \det I = 1$` run inline \dash{} a chain of four unbreakable
+  maths spans with almost no break opportunity in it. Into a display, which is
+  F06's rule, and it went to zero.
+- **One orphaned cue in `main-pl`**, the tail of frame 20. Cleared by
+  **lengthening**, sixth confirmation of F06's two-sided rule, and the
+  paragraph added earns its place: it says why the question is only put to a
+  square matrix, which is Program~\ref{prog:P08}'s two shape facts doing a
+  third job. `main-pl` lost two pages with it.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P9.1 one-number | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P9.2 zero-means-flat | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P9.3 solve-or-invert | 657 / 657 | 2.82 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+**Rule 2 read first and then measured.** Only `p09-zero-means-flat` states an
+answer outright \dash{} its first node *is* frame 9's answer \dash{} but all
+three were placed after the frame that delivers what they carry, and all three
+land in the order question, answer, figure in every build:
+
+| build | fig1 / fr1 / fr2 | fig2 / fr8 / fr9 | fig3 / fr24 / fr25 |
+|---|---|---|---|
+| `main-en` | 565 y586 / 564 / 565 y96 | 569 y493 / 568 / 568 y194 | 575 y321 / 574 / 575 y96 |
+| `main-pl` | 576 y130 / 574 / 575 y96 | 579 y493 / 578 / 578 y194 | 585 y310 / 584 / 585 y96 |
+| `main-en-a4` | 475 y437 / 474 / 474 y514 | 478 y372 / 477 / 477 y203 | 483 y224 / 482 / 482 y380 |
+| `main-pl-a4` | 479 y437 / 478 / 478 y513 | 482 y395 / 481 / 481 y213 | 487 y224 / 486 / 486 y517 |
+
+
+#### Also
+
+- Traps 126 to 131 added to `notes/02`.
+- **Elicitation 40%**, the joint highest in Parts II and III with P07, from two
+  conversions that added no frame: the $2 \times 2$ formula is now applied to
+  the swap and answered overleaf rather than checked in passing, and the
+  condition a change of basis puts on its determinant is asked rather than
+  stated. The second produced the P06 pattern again \dash{} a frame that opens
+  with `\ans` and ends with `\dotline`.
+- **Parity came back clean on its first run**, which has now happened three
+  times (P02, P08, P09). The translator rules are doing it: no number spelled
+  as a word, and every possessive attached to a reference built the other way
+  round while drafting rather than after a failure.
+- The trapbox claiming a shear has determinant $1$ and stretches is **gated
+  rather than argued**: the script asserts $\det S = 1$, that $S$ sends
+  $(0,1)$ to $(1,1)$, and that the squared length becomes $2$. It emits
+  nothing, because those are numbers the reader does in their head \dash{} but
+  an assertion costs nothing and a claim in a printed box should not rest on
+  the author having done the arithmetic in their head either.
+- Frame numbers were mapped after writing: sections landed at
+  `1--7 / 8--14 / 15--19 / 20--27 / 28--37`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -4799,20 +4991,23 @@ clone instead.
 
 ## What is left
 
-1. **Twenty-six programs, and Parts I and II are complete with Part III five
-   programs in.** F1 to F13 and P1 to P8, both editions. Part II's argument — that floating
+1. **Twenty-five programs, and Parts I and II are complete with Part III six
+   programs in.** F1 to F13 and P1 to P9, both editions. Part II's argument — that floating
    point, numerical stability and cost belong *before* the linear algebra — is
    now made rather than promised: none of the three needed anything beyond
    arithmetic, algebra and a sigma.
 
-   **P09 is next** — the determinant, the inverse and change of basis — and
-   P08's closing frame hands it over by name: *rank says how many directions
-   survive; the determinant says how much of the space does, in one number that
-   is zero exactly when something was destroyed, which is P08's null space seen
-   from the other side.* Read P08 §1 first: the null space is the object P09's
-   whole payoff is about, and P08 already establishes that a wide matrix must
-   have one. P06 §3's non-commutativity and P04's basis material are the other
-   two neighbours worth reading.
+   **P10 is next** — eigenvalues, the spectral theorem and quadratic forms —
+   and P09's closing frame hands it over by name: *not how much of the space
+   survives, but which directions come through unturned, only stretched — and
+   the determinant turns out to be the product of the amounts they are
+   stretched by.* Read P09 §1 and §3 first, because that handover is a promise
+   P10 has to keep in its own arithmetic: the product of the eigenvalues must
+   come out as the determinant, and that is a cross-programme gate waiting to
+   be written. Note also P10's **declared forward reference** — its payoff
+   uses the covariance matrix, defined in P24, and the manifest says the two
+   facts it needs (symmetric, positive semi-definite) must be stated in the
+   Learning outcomes with a pointer, exactly as P21 does.
 
    **And there is now a Part II-shaped job that is nobody's program.** The
    elicitation ledger above puts P01, P02 and P03 at 29–31% against Part I's
