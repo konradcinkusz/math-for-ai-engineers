@@ -1,4 +1,5 @@
 >>> from fractions import Fraction as F
+>>> from p04_vector_spaces import rank    # run this from code/
 >>> import random
 >>> random.seed(20260831)
 >>> def draw(n, d):

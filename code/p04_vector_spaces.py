@@ -212,7 +212,13 @@ else:
 # ==========================================================================
 # The transcript. Nothing typed.
 # ==========================================================================
+# `rank` is imported rather than retyped, and that is not tidiness. A
+# transcript is a promise that what is printed is what ran, so the test that
+# matters is extracting it from the finished PDF and running what comes out.
+# Without the import line a reader gets NameError on the last line, which is
+# the fabricated-console-block defect wearing a generated file's clothes.
 RANK_TEXT = """>>> from fractions import Fraction as F
+>>> from p04_vector_spaces import rank    # run this from code/
 >>> import random
 >>> random.seed({seed})
 >>> def draw(n, d):
