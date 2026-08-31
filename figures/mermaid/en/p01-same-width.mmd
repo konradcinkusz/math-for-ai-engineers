@@ -1,0 +1,6 @@
+flowchart LR
+  A["sixteen bits, and two ways of spending them"]
+  A --> B["fp16 takes five bits of exponent<br/>and leaves ten for the significand"]
+  A --> C["bf16 takes eight bits of exponent<br/>and leaves seven for the significand"]
+  B --> D["the width is the same either way,<br/>so a bit added here is a bit taken there"]
+  C --> D
