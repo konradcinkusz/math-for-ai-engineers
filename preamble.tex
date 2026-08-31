@@ -1880,13 +1880,28 @@
 % this fallback since the diagrams pipeline was written; \transcript shipped
 % without it and had the same exposure. Same contract: print a visible marker
 % where the missing thing belongs, and build.
+%
+% THE ARGUMENT IS A STEM, NOT A PATH, and that is a correction rather than a
+% preference. This macro used to take the whole path, and nine of the twelve
+% call sites in the book passed a stem instead -- so \IfFileExists looked for
+% `p06-order.tex`, failed, and printed the marker. TEN OF THE TWELVE
+% TRANSCRIPTS IN THE BOOK HAD NEVER REACHED A PAGE, through nine programs and
+% every gate green, because the fallback that keeps a clean checkout building
+% also makes a typo look deliberate: the marker prints in grey with a label and
+% reads as somebody's decision.
+%
+% Taking the stem makes the wrong call impossible rather than detectable, which
+% is the same move \mermaidfig and \pyregion already make. The detection is
+% kept as well -- tools/check_structure.py fails on a \transcript naming a
+% file that is not there, before the build rather than after it, because on a
+% tree where `make numbers` has run the marker means a typo and nothing else.
 \newcommand{\transcript}[1]{%
   \par\smallskip
-  \IfFileExists{#1}{%
+  \IfFileExists{figures/transcripts/#1.txt}{%
     \lstinputlisting[style=mfacode, numbers=none,
                      basicstyle=\ttfamily\scriptsize,
                      keywordstyle=\color{black},
-                     backgroundcolor=\color{white}]{#1}%
+                     backgroundcolor=\color{white}]{figures/transcripts/#1.txt}%
   }{%
     \begin{tcolorbox}[
       enhanced, breakable, width=\linewidth, sharp corners,

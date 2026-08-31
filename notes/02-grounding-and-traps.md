@@ -1274,6 +1274,57 @@ a point near the centre would return nothing, and finding nothing is not
 measuring nothing. → **P05**, paying **F09**'s "how much of the space is near
 the middle".
 
+### Matrices as linear maps, written (P06)
+
+Items 106 to 111 came out of writing P06.
+
+**106. "Linear means a straight line."** The English word and the mathematical
+word have drifted apart, and the most quoted straight line there is, y = mx + c,
+is linear only when c = 0. Linear means two properties — f(u+v) = f(u)+f(v) and
+f(cv) = c f(v) — which together force f(0) = 0, and that is the quickest test.
+Every layer in a network is *affine*, not linear, because of the bias, and the
+distinction is what makes the collapse argument need two lines of algebra rather
+than one. → **P06**.
+
+**107. "Matrix multiplication is a rule about rows and columns."** It is
+composition of functions, and the rows-into-columns procedure is a consequence.
+The difference is not stylistic: associativity is a hard theorem about
+reordering a triple sum when read as a procedure, and nothing at all to prove
+when read as composition, because A(B(C(x))) never had a bracketing. Whenever a
+fact about matrices looks arbitrary, the reading has slipped back to the
+rectangle. → **P06**.
+
+**108. "AB and BA are two ways of writing the same thing."** The habit is not
+careless — it is a generalisation from the only case anybody had, since every
+multiplication before this one commuted, and a one-dimensional layer's weight is
+a number. Measured: of 5,000 random 3x3 pairs, **none** commute, and none could,
+because commuting is a condition on a set of measure zero. Rotations of the
+*plane* about one centre do commute, which is exactly why two dimensions is the
+misleading case: rotations in three dimensions do not. → **P06**.
+
+**109. "A shape error is a bookkeeping problem, so reshape until it stops
+complaining."** The shape is the domain and the codomain written down, so a
+shape error is a **type** error reported by arithmetic. `(32x768 and 512x768)`
+names two plausible and different bugs — a layer given the wrong width, or
+something transposed that should not have been — and the shapes say which, by
+saying what each factor claims to be a map *between*. → **P06**.
+
+**110. "Stacking linear layers makes the model deeper."** k affine layers with
+nothing between them are one affine layer: W2(W1x + b1) + b2 = (W2W1)x +
+(W2b1 + b2). So (k-1)/k of the parameters are redundant **whatever the width**
+— 87.5% at eight layers — and the waste is exactly the depth that was supposed
+to have been bought. → **P06**, doing **F05**'s one-dimensional argument in more
+than one dimension.
+
+**111. "An activation squashes values into a range."** ReLU is unbounded above
+and squashes nothing, and it works. The requirement met by every activation in
+use is only that it is **not affine**, because an affine one lets the layers
+collapse. The clean test in more than one dimension needs no picture: an affine
+map cannot bend a straight line, so three collinear inputs that come out bent
+rule out every affine map at once rather than failing to find one. That is why
+the field could swap the logistic for ReLU for GELU without rewriting the
+theory. → **P06**.
+
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
 was at least twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is

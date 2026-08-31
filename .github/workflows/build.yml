@@ -90,6 +90,14 @@ jobs:
       - name: Compare the two editions
         run: python3 tools/parity.py
 
+      # Every \transcript{} names a file that is there. The macro's own
+      # fallback prints a marker and BUILDS, which is how ten of the book's
+      # twelve listings went nine programs without reaching a page with every
+      # other gate green -- so this has to be checked in the source, before
+      # the build, rather than looked for in a log that says nothing about it.
+      - name: Every transcript is on the page
+        run: python3 tools/check_structure.py --scripts
+
   diagrams:
     name: Render diagrams
     runs-on: ubuntu-latest

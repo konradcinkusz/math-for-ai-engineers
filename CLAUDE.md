@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P5 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first two programs of Part III.** P6–P34 are stubs carrying their briefs | 29 of 47 |
+| Programs | **F1–F13 and P1–P6 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first three programs of Part III.** P7–P34 are stubs carrying their briefs | 28 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 636 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 638 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 545 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 551 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 654 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 664 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 563 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 565 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,19 +93,25 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **29 of 47 programs are stubs**, in each language. This is the whole of the
+- **28 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 523 computed values, all referenced, all present, plus the committed console
+- 587 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 102 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 114 Mermaid sources, all rendering
+- 24 `\transcript{}` references, every one backed by a committed file and
+  every one now actually on the page \dash{} see *The transcripts were not
+  printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **68 orphan-tail pages: 16 · 18 · 17 · 17** across `main-en`, `main-pl`,
+- **73 orphan-tail pages: 18 · 21 · 17 · 17** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
-  55 before P1, 57 before P2, 59 before P3, 60 before P4 and 65 before P5
+  55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
+  before P6. **P6 added two and the ten transcripts it turned on added three**,
+  all of the latter in `main-pl` \dash{} a listing appearing where a marker box
+  used to be moves every break after it
   \dash{} and one of P04's five is the price of the three cues its pass added
   back, which is the Stroud layout pass's measurement arriving from the other
   direction.
@@ -122,10 +128,10 @@ what was there before.
   This is the second ledger that is reported rather than gated, and like the
   first it must not quietly go away. **When the count goes up, that is the
   signal.**
-- **Elicitation rate: 60% of the book's frames put a question to the reader**,
+- **Elicitation rate: 57% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
-  F01--F06, 50--66% through F08--F13, and 26--35% across the whole of Part II
-  P04, and 36% in P05.** A frame carries `\nextframe` if and only if the
+  F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
+  35% in P04, 36% in P05 and 38% in P06.** A frame carries `\nextframe` if and only if the
   next frame opens
   with an answer, so the cue rate *is* the elicitation rate. It halved over
   seventeen programs with every gate green, because `RE_DEMANDS` treats
@@ -384,6 +390,7 @@ gates on it.
 | **C15 main-file wiring** | A main file rewritten with a chapter of front matter dropped |
 | **C16 next-frame cues** | A `\nextframe` where the next frame answers nothing, or missing where the next frame answers. C4 and C14 are both blind to a cue dropped in *both* editions at once |
 | `check_structure.py --frames` (payloads) | A Quiz route, outcome range or Summary bracket naming a frame the program does not have, or a range that runs backwards. `\teachesat`, `\teachesatone`, `\outcome` and `\sumitem` are the whole of the book's return index, and they were compared *between the editions* and never against the program: a probe routing a Quiz question to frames 91--93 of a 48-frame program was green on `parity.py`, `check_structure.py`, `gen_stubs.py --check` and `make verify` alike, and stays green on parity even now, because the Polish edition says 91--93 too. **It closes the existence half only.** Whether frame 20 answers the question routed to it is a reading job, and the tool says so in its own comment rather than letting a green ledger imply otherwise |
+| **`check_structure.py --scripts`** | A `\transcript{}` naming a file that is not there, or written as a path rather than a stem. The macro's own fallback prints a grey marker and builds, which is what let ten of the book's twelve transcripts go nine programs without reaching a page. Hard gate in `make check`, because on a tree where `make numbers` has run it is always a typo |
 | `check_structure.py --frames` | A cue that is not the **last thing** in its frame. C16 counts cues and cannot see position, so a cue misplaced identically in both editions is invisible to C4, C14 and C16 alike. It is a *line* test on purpose: a cue hoisted above a frame's closing prose tokenises to nothing after it and reads as correctly placed |
 | `reflist.py` | `\label{prog:F08}` resolving to F8 in one edition and F9 in the other. Both builds stay internally consistent and neither warns |
 | **`checkpdf.py`** (openers) | A frame's rule and margin badge stranded at the foot of a page with the frame's body overleaf. It reads the finished PDF, because that defect produces no error, no warning and no overfull box — no log can see it, and the badge it strands is the book's navigation device |
@@ -841,6 +848,33 @@ Each cost time; none is obvious from its error message.
   `upquote` defect \dash{} extract it from the finished PDF and run what comes
   out \dash{} and it has to be applied to generated transcripts too, precisely
   because they look as though somebody must have.
+
+- **A fallback that keeps a build alive also keeps a typo alive, and this one
+  hid ten of the book's twelve listings.** `\transcript` used to take a whole
+  path; nine of the twelve call sites passed a bare stem, so `\IfFileExists`
+  looked for `p06-order.tex`, failed, and printed the macro's
+  file-is-absent marker instead. **Ten transcripts went nine programs without
+  ever reaching a page**, with every gate green, because the marker prints in
+  grey with its own label and reads exactly like somebody's decision. `make
+  verify` compares each file against the script that wrote it and never asks
+  whether a page includes it; `checklog` reads the log, `checkpdf` reads the
+  layout, and parity compares the two editions, which agreed because both were
+  wrong.
+
+  The macro now takes the **stem** and builds the path itself, which makes the
+  wrong call impossible rather than detectable \dash{} the move `\mermaidfig`
+  and `\pyregion` already make. `check_structure.py --scripts` is the second
+  half and is a hard gate in `make check`: on a tree where `make numbers` has
+  run, a `\transcript` naming a file that is not there is a typo and nothing
+  else, and it is worth failing on before the build rather than after it. It
+  refuses a path as well, because a path is the old form and would now resolve
+  to `figures/transcripts/figures/transcripts/...`. Both faults were introduced
+  and reverted to prove the check fires.
+
+  **The generalisable shape: every graceful degradation in this preamble is a
+  place where a defect can look intentional.** `\mermaidfig` has the same
+  exposure and `\val{}` does not, because a missing value is a `??` nobody
+  reads as a choice.
 
 - **A gate that measures a ratio is a different animal from one that measures a
   property, and this repository had none of the first kind.** `RE_DEMANDS`,
@@ -4052,6 +4086,181 @@ All six at mermaid's own wrap cap on the first render, so no redesign.
   dimension, and only the rows the frames quote are written out. F11's finding,
   applied on sight.
 
+### Program P6 pass, August 2026
+
+**Thirty-six teaching frames, thirty-eight printed, both editions**, against a
+brief that projected sixty. Five sections: what makes a function linear,
+multiplication is composition, why the order matters, shape is a type
+signature, and the collapse in more than one dimension.
+
+**It is the cheapest program in Part III by every layout measure.** Zero new
+overfull boxes in any of the four builds on the first attempt, no stranded
+openers, no stranded headings, no orphaned cues, and two orphan tails. Parity
+needed two rounds and both were the recorded word-order class.
+
+#### Two of the brief's four payoffs were already spent, and it was one file read
+
+The brief promises the collapse derived, multi-head attention as a reshape, and
+a batch as one extra index. **F05 already derives the collapse in full**, in one
+dimension, including the $\relu$ argument \dash{} two hundred layers of
+$wx + b$ collapse to one and the activation exists because without it the
+composition is provably a waste. And **P07 owns index notation, einsum,
+broadcasting, reshape against transpose against permute, and the axes of a
+rank-4 attention tensor**, so both the reshape and the batch index are its.
+
+What F06 names is the job that is actually left, and it says so in as many
+words: *P06 makes the weights a matrix and shows that matrix multiplication is
+composition, which is F05's collapse argument done in more than one dimension.*
+Sixth program running whose brief over-estimated what was left, and the reason
+is always the same \dash{} the brief was written before its neighbours.
+
+#### The collapse needed a new argument, and the new one is better
+
+Restating F05's *no amount of stretching and sliding produces a corner* would
+have been repetition. In more than one dimension there is a cleaner test and it
+needs no picture: **an affine map cannot bend a straight line.** Three collinear
+inputs come out collinear through the collapsed matrix ($\val{p06.bend.affine}$
+of the spacing, which is rounding) and bent through the $\relu$-separated pair
+($\val{p06.bend}$).
+
+That rules out **every** affine map at once rather than failing to find one,
+which is a stronger form of the same argument, and it is why the requirement on
+an activation is only \enquote{not affine} \dash{} the field could swap the
+logistic for $\relu$ for GELU without rewriting the theory.
+
+#### Two measurements, and the second is the one the reader gets wrong
+
+- **The waste is the depth.** Eight linear layers of width
+  $\val{p06.stack.width}$ hold $\val{p06.stack.params}$ parameters and express
+  what $\val{p06.stack.collapsed}$ express, so
+  $\val{p06.stack.wasted.pct}\%$ bought nothing. The script asserts
+  $(k-1)/k$ **at every width**, because the fraction not depending on $d$ is
+  the point and the single figure is not.
+- **Of $\val{p06.commute.trials}$ random $3 \times 3$ pairs,
+  $\val{p06.commute.found}$ commute.** Not \enquote{few} \dash{} none, and none
+  could: commuting is a condition on a set of measure zero. This is the frame
+  the reader answers wrongly, so it is elicited before it is stated.
+
+And one that is free and worth having: **the same triple product costs
+$\val{p06.cost.left}$ multiplications one way and $\val{p06.cost.right}$ the
+other**, a factor of $\val{p06.cost.ratio}$, with an identical answer.
+Associativity is free and bracketing is not, which is the mechanical half of
+why a low-rank update is cheap \dash{} P08 owns the other half.
+
+#### The elicitation ledger was designed against, and it moved
+
+P06 is at **38%**, above P05's 36%, P04's 35% and Part II's 29--31%, and it is
+the highest in Part III. Two of the fourteen cues came from converting frames
+that stated something the reader could produce, and **neither conversion added a
+frame**, so no renumbering followed:
+
+- Frame 11 stated why the row of $A$ meets the column of $B$. It now asks, and
+  frame 12 opens with the answer **and then asks the associativity question**
+  \dash{} a frame may open with `\ans` and end with `\dotline`, which is the
+  original's own alternating pattern and satisfies `RE_DEMANDS` and C16 alike.
+- Frame 17's trapbox stated that none of the random pairs commute. The count is
+  now elicited and the trapbox keeps the reasoning that produces the wrong
+  answer, which is where the errorful-generation benefit lives.
+
+**The second conversion moved a figure**, and that is worth recording as a cost
+of raising the rate: `p06-order-matters` had been declared between the new
+question and its answer, which is F02's rule from the other side. Moved below
+the answer frame and re-measured in all four builds.
+
+#### Rule 2, read first and then measured
+
+Only `p06-shape-is-a-type` contains an answer to something the reader is asked
+\dash{} its middle node is frame 20's *which of $AB$ and $BA$ is even defined*
+\dash{} and it is declared after frame 21, which delivers it. Measured:
+question, answer, figure, in that order, on one page in every build.
+
+`p06-order-matters` sits a page after both its elicitation and its answer in
+three builds and below both on one page in `main-en-a4`.
+**`p06-matrix-is-a-function` sits above the elicitation that follows it in all
+four builds and that is not a defect**, which is P04's finding restated: it
+carries the two properties, which the frame above states in full, and the
+question below is *is $f(x) = x + 3$ linear?*, whose answer turns on $f(0)$ and
+appears nowhere in the figure.
+
+| build | fig1 / q / a | fig2 / q / a | fig3 / q / a |
+|---|---|---|---|
+| `main-en` | 504 y530 / 505 y533 / 506 y121 | 512 y250 / 511 y380 / 511 y504 | 513 / 513 y197 / 513 y318 |
+| `main-pl` | 507 y454 / 507 y551 / 508 y121 | 513 y252 / 512 y365 / 512 y502 | 514 / 514 y197 / 514 y318 |
+| `main-en-a4` | 426 y361 / 427 y241 / 427 y349 | 431 y586 / 431 y173 / 431 y299 | 432 / 432 y217 / 432 y342 |
+| `main-pl-a4` | 431 y324 / 431 y427 / 431 y536 | 436 y149 / 435 y372 / 435 y512 | 437 / 436 y512 / 436 y637 |
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P6.1 matrix-is-a-function | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P6.2 order-matters | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P6.3 shape-is-a-type | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's own wrap cap on the first render, so no redesign.
+
+#### The transcripts were not printing, and had not been for nine programs
+
+Found by applying F03's own discipline to P06's transcript \dash{} extract it
+from the finished PDF and run what comes out \dash{} and discovering there was
+nothing on the page to extract. **Ten of the book's twelve transcripts had
+never reached a reader**, from F11 through P05, every gate green throughout.
+The mechanism and the fix are in *Build traps*; what belongs here is what it
+cost and what it changed.
+
+**What it makes false.** Three pass notes in this file describe transcripts as
+though they were on the page: F11's *the whole seventeen-row sweep is a
+committed transcript rather than a table, because the shape is the argument*,
+P04's *verified the only way that means anything: extracted, run from
+`code/`*, and P05's *verified by extraction and execution before the frame
+around it was written*. Each verified the **file**. None of them verified the
+**page**, and the difference is the whole defect. The sentences are left
+standing above with this correction under them, because rewriting them would
+hide that the distinction is easy to miss.
+
+**All twelve were then swept**, extracted from `main-en.pdf` and executed from
+`code/`. All twelve run. The four that do not match their committed file
+character for character differ only in runs of spaces, which is
+`pdftotext -layout` re-columning, and one is a page break inside a listing.
+Quotes come out as ASCII apostrophes, so the `upquote` fix holds for the ten
+listings that had never been checked on a page because they had never been on
+one.
+
+**One was a spoiler, and it was created by making them print.** F11 frame 17
+carries the seventeen-row sweep and then asks *what is the value at
+$h = \val{f11.fd.vanishes}$, and why?* \dash{} whose numeric half is the last
+row of the table, four inches above. The question now points at that row and
+asks only for the reason, which is what frame 18's answer was always about.
+That is P04's rule (**a transcript is under the same rule as a frame**) biting
+a program that had been merged for weeks, and it is the predictable cost of
+switching ten listings on at once: ten frames whose relationship to their own
+listing had never been reviewed on a page. The other eleven were read against
+their frames in the same pass; the four that ask a question after the listing
+\dash{} F04's *what is $0!$*, P01's *what has the exponent done*, P05's *say
+what rule they follow* and P06's *how many pairs commute* \dash{} each ask for
+something the listing does not contain.
+
+**The pages moved and the overfull multiset did not.** A listing is often
+shorter than the marker box it replaced: `main-en` 656 to 654, `main-pl` 658 to
+664, `main-en-a4` unchanged, `main-pl-a4` 567 to 565. Three orphan tails
+arrived, all in `main-pl`.
+
+#### Also
+
+- Traps 106 to 111 added to `notes/02`.
+- **Two parity rounds, both the recorded word-order class**, and both were an
+  English possessive attached to something that inverts in Polish:
+  `Program~\ref{prog:F06}'s $y = wx + b$` in a summary item, and
+  `against $A(BC)$'s $d r d + d^{3} = \dots$` in a further-problem answer. The
+  second is worth naming because the possessive was attached to a **maths
+  span** rather than to a reference, which is the same inversion one step
+  further out.
+- Frame numbers were mapped after writing: sections landed at
+  `1--8 / 9--14 / 15--19 / 20--25 / 26--36`, and every outcome, quiz route and
+  summary bracket moved with them.
+- One garbled clause was caught by reading the draft aloud rather than by any
+  gate \dash{} *it passes through the scalar nothing*, which is not a sentence.
+  It is now *it carries a scalar straight through*, which is the second
+  linearity property said in words.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -4284,7 +4493,9 @@ summary on every build.
    far was in an A4 build only.
 4. `python3 tools/parity.py` — zero failures before you commit
 5. `python3 tools/check_structure.py --frames` — every frame number the program
-   quotes exists, and every cue is the last thing in its frame
+   quotes exists, and every cue is the last thing in its frame. And
+   `--scripts`, which `make check` runs: every `\transcript{}` names a file
+   that is there
 6. `make debt` and `make verify` — confirm the ledgers moved the way you
    expected, and that no computed value or transcript has drifted from its
    script
@@ -4301,20 +4512,21 @@ clone instead.
 
 ## What is left
 
-1. **Twenty-nine programs, and Parts I and II are complete with Part III two
-   programs in.** F1 to F13 and P1 to P5, both editions. Part II's argument — that floating
+1. **Twenty-eight programs, and Parts I and II are complete with Part III three
+   programs in.** F1 to F13 and P1 to P6, both editions. Part II's argument — that floating
    point, numerical stability and cost belong *before* the linear algebra — is
    now made rather than promised: none of the three needed anything beyond
    arithmetic, algebra and a sigma.
 
-   **P06 is next** — matrices as linear maps — and P05's closing frame hands it
-   over by name. Read P04 §5 and P05 §5 first: between them they establish that
-   a rotation is a change of basis, that a method working in any basis measures
-   something real, and that the counting bound constrains far less than it
-   appears to. P06 owns the object all three of those sentences are about.
-
-   **P07 still has no frame-by-frame plan** — it was added by curriculum review
-   rather than designed — so write that plan before reaching it.
+   **P07 is next** — tensors, shapes and index notation — and **it still has no
+   frame-by-frame plan**: it was added by curriculum review rather than
+   designed, so its brief is a contract and not a plan. Write the plan before
+   writing the program. P06's closing frame hands it over by name, and P06 has
+   already deferred four things to it explicitly: index notation and einsum,
+   broadcasting, reshape against transpose against permute, and the axes of a
+   rank-4 attention tensor. Read P06 §4 first — it establishes shape as a type
+   signature and the batch as one more column, and says in a note that real
+   frameworks flip the convention, which is P07's opening.
 
    **And there is now a Part II-shaped job that is nobody's program.** The
    elicitation ledger above puts P01, P02 and P03 at 29–31% against Part I's

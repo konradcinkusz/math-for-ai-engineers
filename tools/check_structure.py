@@ -13,6 +13,7 @@ can be trusted to remember:
   --outcomes  Does every written program declare its learning outcomes?
   --values    Is every \\val{} reference backed by a computed value, and is
               every computed value used?
+  --scripts   Does every \\transcript{} name a file that exists?
 
 Exit code is 0 when the ledger is clean and 1 when it is not, so any of these
 can be turned into a hard CI gate by dropping the --soft flag.
@@ -79,6 +80,7 @@ RE_ANS = re.compile(r"\\ans\{|\\begin\{ansblock\}")
 RE_OUTCOME = re.compile(r"\\outcome\{")
 RE_ANSWERTO = re.compile(r"\\answerto\{")
 RE_VAL = re.compile(r"\\(?:raw)?val\{([^}]+)\}")
+RE_TRANSCRIPT = re.compile(r"\\transcript\{([^}]*)\}")
 RE_MFAVAL = re.compile(r"\\mfaval\{([^}]+)\}")
 # An exercise item: \item at the top level of one of the three list
 # environments. Counted per environment rather than globally, because the
@@ -326,6 +328,46 @@ def check_values(soft: bool) -> int:
     return 0 if (not missing or soft) else 1
 
 
+# A \transcript{} that names nothing prints a grey marker and builds.
+#
+# That fallback is deliberate -- figures/transcripts is written by `make
+# numbers`, so a clean checkout has none and the draft build has to survive it
+# -- and it is also how TEN OF THE TWELVE TRANSCRIPTS IN THIS BOOK went nine
+# programs without reaching a page. The macro used to take a path and nine call
+# sites passed a stem, so \IfFileExists looked for `p06-order.tex`, failed, and
+# printed "TRANSCRIPT NOT COMPUTED" in grey with a label, which reads exactly
+# like somebody's decision. Every gate stayed green: `make verify` compares the
+# file against the script that wrote it and never asks whether a page includes
+# it, checklog reads the log, checkpdf reads the layout, and parity compares
+# the two editions -- which agreed, because both were wrong.
+#
+# The macro now takes the stem, so the wrong call is impossible rather than
+# detectable. This check is the second half: on a tree where `make numbers` has
+# run, a \transcript naming a file that is not there is a typo and nothing
+# else, and it is worth failing on BEFORE the build rather than after it. It
+# also refuses a path, because a path is the old form and would silently
+# resolve to figures/transcripts/figures/transcripts/....
+def check_scripts(soft: bool) -> int:
+    tdir = ROOT / "figures" / "transcripts"
+    bad = 0
+    total = 0
+    for lang in LANGS:
+        for f in program_files(lang) + sorted((ROOT / "appendices").glob(f"*-{lang}.tex")):
+            for stem in RE_TRANSCRIPT.findall(f.read_text(encoding="utf8")):
+                total += 1
+                if "/" in stem or stem.endswith(".txt"):
+                    print(f"  {f.relative_to(ROOT)}: \\transcript{{{stem}}} is a path; "
+                          f"the argument is a bare stem")
+                    bad += 1
+                elif not (tdir / f"{stem}.txt").exists():
+                    print(f"  {f.relative_to(ROOT)}: \\transcript{{{stem}}} names no file "
+                          f"(figures/transcripts/{stem}.txt). Run `make numbers`.")
+                    bad += 1
+    if bad == 0:
+        print(f"  {total} transcript references, every one backed by a committed file.")
+    return 0 if (bad == 0 or soft) else 1
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--frames", action="store_true")
@@ -333,11 +375,13 @@ def main() -> int:
     p.add_argument("--outcomes", action="store_true")
     p.add_argument("--values", action="store_true")
     p.add_argument("--elicit", action="store_true")
+    p.add_argument("--scripts", action="store_true")
     p.add_argument("--all", action="store_true")
     p.add_argument("--soft", action="store_true",
                    help="report but always exit 0 (the default for a draft)")
     a = p.parse_args()
-    if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit, a.all)):
+    if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit,
+                a.scripts, a.all)):
         a.all = True
     rc = 0
     if a.all or a.frames:
@@ -350,6 +394,8 @@ def main() -> int:
         rc |= check_values(a.soft)
     if a.all or a.elicit:
         rc |= check_elicitation(a.soft)
+    if a.all or a.scripts:
+        rc |= check_scripts(a.soft)
     return rc
 
 
