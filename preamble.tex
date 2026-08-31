@@ -2164,8 +2164,30 @@
 %  about 29 characters and index longer names by concept instead. Both sibling
 %  books learned this the same way.
 % ============================================================
-\apptocmd{\theindex}{\raggedright}{}{%
-  \PackageWarning{mfabook}{Could not patch theindex for ragged-right setting}}
+%  And RAGGED BOTTOM, added after CI failed on two OVERFULL VBOXES in the
+%  index -- 3.8 pt and 17.4 pt -- while this container built the same source
+%  clean. That is the metric split this file already records in both its other
+%  directions, and it is the worst of the three, because the index is the one
+%  place where the material is nearly rigid: index lines carry no stretch,
+%  \parskip here is 0pt plus 0.3pt with NO shrink, and \indexspace gives back
+%  only 3 pt. `book` in twoside mode sets \flushbottom, so every column is
+%  held to the full text height with almost nothing to give.
+%
+%  \raggedbottom lets a column end short, which is what every index in print
+%  does, and removes the pressure that forces the choice between a badly
+%  underfull column and an overfull one. It also silences the hundreds of
+%  "Underfull \vbox ... while \output is active" lines the index contributes.
+%
+%  HONESTLY: this could NOT be reproduced here. newtx and inconsolata were
+%  installed to try, and the container's TeX Live is three years behind CI's,
+%  so the metrics still would not have matched -- and leaving them installed
+%  would have broken the very split that makes this container useful (it is
+%  the bare installation that found the upquote defect). They were removed
+%  again. CI is the reproduction, and if this does not clear it, the next step
+%  is to look for what in the index cannot be broken, not to trim an entry
+%  until the number goes away.
+\apptocmd{\theindex}{\raggedbottom\raggedright}{}{%
+  \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex
 
