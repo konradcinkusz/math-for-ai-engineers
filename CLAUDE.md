@@ -4740,6 +4740,73 @@ land in the order question, answer, figure in every build:
 - Frame numbers were mapped after writing: sections landed at
   `1--7 / 8--14 / 15--19 / 20--27 / 28--37`.
 
+### The manifest's own pointers were one low, August 2026
+
+Found while reading P10's brief before writing it, which is the discipline five
+passes have now paid for \dash{} and this time the thing that was wrong was not
+a frame's forward pointer but **`tools/programs.json` itself**, the file this
+document tells everybody to re-derive owners from.
+
+**The mechanism, and it is entirely explicable.** The curriculum review inserted
+**P7** and moved everything after it up one. It renumbered the *sequence*, and
+it re-derived the *declared forward-reference list* \dash{} which is why P18's
+and P22's briefs name P26, P30 and P18 correctly. **It never swept the ordinary
+payoff prose.** So twenty pointers inside nine briefs still named the program
+that used to hold the material.
+
+The clearest case is the one that would have shipped: P10's payoff says the
+Hessian's eigenvalues are \enquote{collected here and spent in P16 and P19}.
+P16 is *autodiff* and P19 is *convexity and Jensen*. The programs that spend
+them are **P17**, whose own brief says *why the largest stable learning rate is
+bounded by the inverse of the curvature*, and **P20**, the optimiser program.
+Issue \#24 says P17 and P20, and F11 and F12 both point their curvature
+material at P17 \dash{} so the manifest disagreed with the issue derived from
+it, with two written programs, and with the destination briefs.
+
+**Every one of the twenty was confirmed against the destination program's own
+brief, which undertakes the named thing in as many words.** None was inferred
+from the off-by-one alone, and the pointers that were already right were left
+alone: P17's *joining P9 and P10 to the optimiser*, P18's and P22's declared
+references, P03's P32, and every reference to P1 to P6, which the insertion
+could not move. The full list, with the destination's own words as the
+justification for each, is in the commit that made the change.
+
+**The generalisable finding is about where a rule lives.** This file already
+says *never copy an owner out of `notes/02`; re-derive it from
+`tools/programs.json`* \dash{} a rule written after the same defect was found in
+the trap catalogue. The rule was right and its destination was not audited, so
+the defect simply moved into the file the rule points at. **A rule that names a
+source of truth has to be accompanied by a check on that source**, and there
+still is not one: nothing compares a brief's prose pointers against what the
+named program undertakes, because doing it mechanically needs the briefs to be
+machine-readable in a way they are not.
+
+What *is* mechanical and worth re-running after any curriculum change is the
+listing that found this: print every `P<n>` in every brief with its surrounding
+clause and the title of the program named, and read the column. It took one
+pass over 47 entries.
+
+#### And a sixth undeclared forward reference, found the same way
+
+Checking the declared list against the graph is how the review found the fifth
+(P22's KL). The same check finds a sixth, and it is in a **merged** program:
+**P07 prints $\operatorname{Cov}(p, t)$ and $\operatorname{Var}(t)$ in its
+headline identity and declares neither.** Both are defined in P24, seventeen
+programs later.
+
+It is milder than P18's and P22's, because P07 never asks the reader to *know*
+what a covariance is \dash{} the sentence it needs (*a covariance is exactly
+what training increases*) is delivered in the frame. But the identity is
+*stated in terms of* the two, so a reader who has not met them cannot check the
+line the whole section rests on, which is the bar P18 and P22 are held to.
+
+**Recorded rather than fixed**, on this file's own rule about rewriting merged
+programs inside a pass about something else. The fix is one clause in P07's
+Learning outcomes, on the P21 pattern. Whoever takes it should also decide
+whether the rule is *declare anything not yet defined* or *declare anything a
+payoff depends on*, because P07 is the first case where those two answers
+differ.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -4872,6 +4939,20 @@ pointer:
   declared list. Either declare the one fact it needs, as P18 does, or carry the
   payoff with a plain quadratic penalty and have P30 return to it. **The author's
   call, but it may not be left undeclared** — the brief now says so.
+
+- **P07** (tensors and shapes) prints $\operatorname{Cov}(p, t)$ and
+  $\operatorname{Var}(t)$ in its headline broadcasting identity and declares
+  neither; both are defined in **P24**. Found by the same check that found the
+  fifth, and **it is in a merged program**, which is why it is recorded here as
+  outstanding rather than fixed inside a pass about something else. It is
+  milder than P18's and P22's \dash{} P07 never asks the reader to know what a
+  covariance *is*, because the sentence it needs is delivered in the frame
+  \dash{} but the identity is stated in terms of the two, so the line the
+  section rests on is not checkable by a reader who has not met them. The fix
+  is one clause in P07's Learning outcomes on the P21 pattern. Whoever takes it
+  should also settle whether the rule is *declare anything not yet defined* or
+  *declare anything a payoff depends on*: P07 is the first case where those two
+  answers differ.
 
 Anything else is a dependency error, not a forward reference. **The graph is now
 machine-checkable:** every program in `tools/programs.json` carries `deps`, so a
