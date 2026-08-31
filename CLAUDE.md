@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P11 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the whole of Part III.** P12–P34 are stubs carrying their briefs | 23 of 47 |
+| Programs | **F1–F13 and P1–P12 written, both editions \dash{} the whole Foundation part, the whole of Part II, the whole of Part III, and the first program of Part IV.** P13–P34 are stubs carrying their briefs | 22 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 758 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 770 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 649 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 656 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 786 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 796 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 670 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 678 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,14 +93,14 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **23 of 47 programs are stubs**, in each language. This is the whole of the
+- **22 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 680 computed values, all referenced, all present, plus the committed console
+- 768 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 144 Mermaid sources, all rendering
-- 34 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 150 Mermaid sources, all rendering
+- 36 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
@@ -124,7 +124,8 @@ what was there before.
   eleven per program written; **F8 added one, F9 two, F10 four, F11 two and
   F12 four, against F5's eleven**, and the reason is worth having — all five
   were written with the two-sided rule from F6 in hand, so a frame whose tail
-  lands badly is lengthened rather than trimmed. **A fourth structural fix was measured in the F6 pass and
+  lands badly is lengthened rather than trimmed. **P12 added none either**,
+  which is the fourth time. **A fourth structural fix was measured in the F6 pass and
   reverted**, because it clears the orphaned *cue* by converting it into more
   orphan *tails* — see *Program F6 pass* and the sweep table in
   `preamble.tex`. `checkpdf.py` prints every one of them on
@@ -137,7 +138,8 @@ what was there before.
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
-  39% in P10 and 39% in P11.**
+  39% in P10, 39% in P11 and **46% in P12**, the first program outside
+  Part I to reach the book's own rate.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -5088,6 +5090,184 @@ model is not, and both programs say so.
 should contain when the book can afford it, and softening it would hide an
 outstanding piece of work. It belongs on the *What is left* list instead.
 
+### Program P12 pass, August 2026 --- Part IV begins
+
+**Forty-three teaching frames, forty-five printed, both editions**, against a
+brief that projected forty-five. Five sections: two questions before any
+formula, arrangements and choices, the rules that are not products, how many
+bits a hash needs, and two counts that decide a design.
+
+**It is the cheapest program in the book by every layout measure and the
+richest by the elicitation one.** Zero new overfull boxes in any of the four
+builds on the first attempt, no stranded openers, no stranded headings, no
+orphaned cues, and **the orphan-tail count did not move at all** \dash{} the
+fourth time (F13, P07, P09, P12) and every time for the same reason: the
+recorded rules were applied while drafting rather than after a build named the
+defect. Parity needed one round.
+
+#### The open curriculum question was decided, and one of its two arguments was dead
+
+`notes/01-curriculum.md` §20 item 4 asks whether this program stays in Part IV
+or opens Part VII, ten programs nearer the probability that consumes it, and
+the issue says to decide before writing. **Decided: it stays**, and the entry
+now records both the decision and the fact that **one of the two arguments it
+gave for staying is falsified by the written book.**
+
+\enquote{P12 also feeds P3} is not true. `P03` is written and merged and needed
+nothing from combinatorics, because `F10` supplied every count it used; and
+`P13`'s declared dependencies are `F10, P6, P10`, not this program. So nothing
+in Part IV depends on P12 at all, and the case cannot rest on the graph.
+
+What it rests on instead is better: **P12's own three payoffs are counting
+payoffs rather than probability ones** \dash{} sizing a hash, the size of a
+beam search's space, the cost of an exact Shapley value \dash{} and only the
+birthday calculation touches probability, needing nothing beyond F10's
+two-counts-and-a-division. The gap is paid inside the program instead, by
+restating the pair count where §4 uses it.
+
+**And the same off-by-one that PR-swept the manifest was still in the notes.**
+`notes/01-curriculum.md` §19 carried the whole dependency graph written out,
+and every edge from `P7` onward named the program that used to hold the
+material \dash{} `P11 <- F10, F4` for combinatorics, and 33 main programs where
+there are 34. That is the *third* file to carry it, after the trap catalogue
+and the manifest, and it is in the file this document tells everybody to
+re-derive owners from.
+
+**The fix was to delete the duplicate rather than correct it.** A corrected
+copy is the next thing to go stale at the next insertion, and the live graph
+is already machine-readable in each program's `deps` field. §19 now says where
+the graph lives, why it is not repeated, and prints the one-line command that
+reads it. **A rule that names a source of truth is worth less than deleting
+the copies that compete with it.**
+
+#### The regime table, which an assertion produced by failing
+
+The first draft asserted that the closed form tracks the exact product to
+$10^{-6}$ at hash scale. It failed \dash{} and the failure named the wrong
+suspect, because the degraded expression is the one labelled *exact*.
+
+Measured against a reference that is neither of them (the product summed in
+log space, which subtracts nothing from one):
+
+| | the product | the exponential |
+|---|---|---|
+| 23 people, 365 days | **exact to the last bit** | 1.4e-2 |
+| 100 000 hashes, 64 bits | 1.3e-5 | 1.7e-15 |
+| 1 000 000 hashes, 128 bits | **1.0** \dash{} it returns zero | 0.0 |
+
+**Each is right exactly where the other fails, and they fail for opposite
+reasons.** The product is destroyed by cancellation when the answer is near
+zero; the exponential drops a second-order term that matters only when the
+terms are large, which is when the answer is near a half. Neither is the safe
+default, and a book that had picked one would have been wrong in one of the two
+places its own examples live.
+
+The middle row is the one worth keeping. **At 64 bits with only 100 000 items
+the textbook expression has already lost five significant figures**, long
+before it fails outright: a formula does not stop working at a threshold, it
+degrades, and the degradation is invisible until somebody computes the same
+thing another way.
+
+#### Program P02's finding, in a hash, and it returns a plausible answer
+
+`1 - prod(1 - i/N)` in float64 at 128 bits returns **exactly `0.0`**. Every
+factor is within one part in $10^{33}$ of one and rounds to `1.0`, so the
+product is `1.0` and the subtraction has nothing left to say. No exception, no
+warning, no `nan` \dash{} a float, and a completely reasonable-looking one.
+
+It is worse than the loss P02 measured, on two counts: there the loss was
+digits and here it is all of them, and **the wrong answer is the one that ends
+the conversation.** A collision probability of zero reads as a proof of safety.
+
+Written up as a committed transcript, extracted from the finished PDF and run:
+both printed values reproduce exactly.
+
+#### The headline, and the ratio that had to be divided as printed
+
+$10^{9}$ documents in a 64-bit hash collide with probability **2.67 per
+cent**, against the $\num{5.42e-11}$ that the documents-over-values reading
+gives \dash{} a factor of $\num{4.93e8}$, and the difference is entirely that
+the quantity is the number of **pairs**. The coin flip is at
+$\num{5.06e9}$ documents, which is a corpus that exists.
+
+The ratio is emitted by dividing the two numbers **as the page prints them**,
+with an assertion that this agrees with the unrounded ratio \dash{} the rule
+F04, F05 and P07 each paid for, applied on sight this time.
+
+And the rule that survives the arithmetic: **a hash's safe capacity is about
+the square root of its number of values**, so doubling the bits squares the
+corpus rather than doubling it.
+
+#### Three cross-programme gates, all to one program, and one of them is a continuation
+
+F10 is the elementary layer under P12 and says so, so all three gates point at
+it. Two are the established kind \dash{} $\binom{n}{2}$ must reproduce F10's
+committed pair count, and $\sum_k \binom{n}{k}$ must reproduce its committed
+subset count, so \enquote{choices} here and \enquote{pairs} and
+\enquote{subsets} there cannot come apart.
+
+**The third is new in kind: the same worked example, continued.** §3's three
+evaluation sets are F10's two with a third added, and the gate asserts that the
+first two sets have F10's own committed sizes and overlap. That is stronger
+than a resemblance and cheaper than a re-derivation, and it is the form to
+reach for whenever a program extends an example rather than inventing one.
+
+#### The brief's \enquote{simple recurrences}, read narrowly
+
+Two recurrences, and neither was invented to discharge the brief: **Pascal's
+rule**, which is also why `math.comb` never forms a factorial it must divide
+away, and **the birthday product**, since $P(m) = P(m-1)(1 - (m-1)/N)$ is how
+the number is actually computed. A counting program's recurrence should count
+something; a generic worked example of a recurrence would have been padding.
+
+#### Rule 2, and the fourth confirmation that four ranks is too wide
+
+All three figures were first drawn with four ranks and came out **881.04 pt**,
+setting 5.01 pt \dash{} below the book's band. Cutting to three ranks took all
+six to mermaid's wrap cap. That is F12's rule confirmed from the wide side:
+**three ranks is the sweet spot; two is too narrow and four is too wide.**
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P12.1 two-questions | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P12.2 pairs-not-items | 657 / 657 | 5.18 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P12.3 orderings-or-subsets | 657 / 657 | 5.18 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+Read by content first and then measured, with the captions read as nodes on
+P11's precedent. P12.2 and P12.3 each carry an answer \dash{} that the pairs
+are what is counted, and that the orderings collapse \dash{} and both sit after
+the frame that delivers it in all four builds. **P12.1 sits above the
+elicitation that follows it in all four and that is not a defect**, which is
+now the fourth instance of the P04/P07 case: it carries the decision procedure,
+which the frame above states in full, and the question below asks for
+$\val{p12.four.n}!$, which appears nowhere in it.
+
+#### Also
+
+- Traps 144 to 151 added to `notes/02`; items 59 and 61 marked delivered, with
+  the note that P12 *refines* F10's independence condition rather than
+  repeating it \dash{} what must be fixed is the **number** of options at each
+  step, not the options, which is why a shrinking pool multiplies anyway.
+- **Elicitation 46%**, the highest outside Part I and the first program in
+  Parts II--IV to reach the book's own rate. It was designed in: the two
+  questions, the product-rule refinement, the symmetry and the pigeonhole
+  guarantee are all elicited before they are stated, and five of the twenty
+  cues sit in section 1 alone, which is where a reader's wrong answer is
+  cheapest.
+- One parity round, two classes, both recorded: the
+  `Program~\ref{...}'s <maths>` inversion, and `$0.0$` written as maths where
+  it is a **repr** \dash{} a name, like P01's `-inf`, so it belongs in
+  `\code{}`. C10 caught it in both editions at once.
+- `p12.trap.right` was emitted and removed: the transcript prints it, and a
+  value a listing already carries is a second copy nothing would correct. F11's
+  finding, applied on sight.
+- One value was deliberately *not* emitted twice: $\binom{20}{3}$ is the
+  symmetry frame's number and the triples in the ablation count, and the script
+  asserts they are equal rather than giving one number two names.
+- Frame numbers mapped after writing: sections landed at
+  `1--8 / 9--16 / 17--26 / 27--35 / 36--43` against a plan of
+  `1--9 / 10--19 / 20--29 / 30--39 / 40--46`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -5353,22 +5533,25 @@ clone instead.
 
 ## What is left
 
-1. **Twenty-three programs, and Parts I, II and III are complete.** F1 to F13
-   and P1 to P11, both editions. Part II's argument — that floating
-   point, numerical stability and cost belong *before* the linear algebra — is
-   now made rather than promised: none of the three needed anything beyond
-   arithmetic, algebra and a sigma.
+1. **Twenty-two programs, and Parts I, II and III are complete, plus the first
+   of Part IV.** F1 to F13 and P1 to P12, both editions. Part II's argument —
+   that floating point, numerical stability and cost belong *before* the linear
+   algebra — is now made rather than promised: none of the three needed
+   anything beyond arithmetic, algebra and a sigma.
 
-   **P12 is next** — combinatorics and counting — and it opens Part IV, which
-   is a change of subject rather than a continuation: no program from P04 to
-   P11 hands it anything. What it *is* owed is **F10**, which declares itself
-   the elementary layer under P12 and deliberately kept only three counting
-   rules, leaving the general inclusion–exclusion, the pigeonhole principle and
-   the birthday calculation here by name. Read F10 §4 before estimating a
-   length. Note also the open curriculum question in
-   `notes/01-curriculum.md` §20: whether P12 should move next to the
-   probability that consumes it, which is a decision this pass could take
-   rather than inherit.
+   **P13 is next** — *Graphs, DAGs and random walks* — and it is the second of
+   Part IV. Unlike P12 it *does* lean on Part III: its declared dependencies
+   are `F10, P6, P10`, because its own brief makes message passing a
+   multiplication by the adjacency matrix and PageRank the stationary
+   distribution of a random walk, which is P10's eigenvector calculation under
+   another name. **Read P06 and P10 before estimating a length**, and read
+   what P12 left: it owns the counting arguments and deliberately did not use
+   them on graphs.
+
+   **P12's open curriculum question is settled** and must not be re-litigated
+   from a search result: `notes/01-curriculum.md` §20 item 4 now records the
+   decision, and records that one of the two arguments it used to give for it
+   is falsified by the written book.
 
    **And Part III left one measurement outstanding, deliberately.** P11's brief
    asks for the singular-value spectrum of a real embedding matrix, measured;

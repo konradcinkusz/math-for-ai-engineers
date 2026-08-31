@@ -726,40 +726,27 @@ F13 <- F11
 
 **Main**
 
+**This list used to be written out here, and it was wrong from `P7` onward.**
+
+The August 2026 curriculum review inserted `P7` (tensors, shapes and index
+notation) and moved everything after it up one. It renumbered the sequence and
+it re-derived the declared forward-reference list; it did not touch this graph,
+so every edge from `P7` on named the program that used to hold the material
+— `P11 <- F10, F4` for combinatorics, which is now `P12`, and so on to the end.
+It also had 33 main programs where there are now 34.
+
+**The graph lives in `tools/programs.json`**, in each program's `deps` field,
+which is what `gen_stubs.py` and the forward-reference check actually read. It
+is not duplicated here, and that is the point: the same off-by-one was found in
+the manifest's own prose pointers and swept out of it in a pass of its own, and
+a corrected copy in this file would simply be the next thing to go stale at the
+next insertion. Re-derive from the manifest; do not copy an edge out of a note.
+
+To read the graph:
+
 ```
-P1  <- F1, F3
-P2  <- P1, F3, F4, F7
-P3  <- F1, F3, F4, F10
-P4  <- F2, F9
-P5  <- P4, F8
-P6  <- P4, P5
-P7  <- P6, P5
-P8  <- P6, P7
-P9  <- P6, P8
-P10 <- P9, P7, P5
-P11 <- F10, F4
-P12 <- F10, P6, P9 (soft, for the spectral section)
-P13 <- F10
-P14 <- F12, P5
-P15 <- P14, P6, P12
-P16 <- P14, P9, F4
-P17 <- P15, P6, F7
-P18 <- P5, F5, F13
-P19 <- P16, P17, F4, P10 (soft, for the conditioning argument)
-P20 <- P19, P23, P24
-P21 <- P14, P18, P29 (soft, for the KL-constrained reading)
-P22 <- F10, F13
-P23 <- P22, F7, F13
-P24 <- P23, F4, P18 (soft, for Jensen)
-P25 <- P23, P24, F3, P14
-P26 <- P24, P25
-P27 <- P22, P25, P23
-P28 <- P23, F3
-P29 <- P28, P25, P18
-P30 <- P28, P29, P22
-P31 <- P2, P3, P5, P6, P15, P17, P24, F8
-P32 <- P1, P16, P17, P19, P20, P25, P26, F3
-P33 <- P3, P25, P26, P27, P28, P29
+python3 -c "import json;[print(f\"{p['key']:4s}<- {', '.join(p['deps'])}\")
+  for p in json.load(open('tools/programs.json'))['programs']]"
 ```
 
 **The one ordering conflict, and how it is resolved.** P20 (stochastic
@@ -1039,11 +1026,34 @@ Appendices:
 2. **`dotnetbox` or `codebox`** --- section 15(c).
 3. **Whether the mathematics packages may be hard requirements**, breaking the
    graceful degradation both companion preambles maintain --- section 15(a).
-4. **Whether P11 (combinatorics) stays in Part IV or opens Part VII.** It is
-   currently ten programs away from the probability that uses it most. The
-   argument for leaving it is that Part IV is coherent as a part and P11 also
-   feeds P3 and P12; the argument against is the gap. Either is defensible.
-5. **Whether P13 (logic and proof) is enough of a fix for Stroud's rigour gap,
+4. **Whether P12 (combinatorics) stays in Part IV or opens Part VII ---
+   DECIDED, August 2026: it stays, and on a different argument from the one
+   recorded here.** The question was numbered `P11` above, from before `P7` was
+   inserted, and was restated correctly in §21.
+
+   **One of the two arguments for leaving it is now falsified by the written
+   book.** "P11 also feeds P3" is not true: `P03` is written and merged and
+   needed nothing from combinatorics, because `F10` supplied every count it
+   used. Nor does `P13` declare it --- the manifest has `P13 <- F10, P6, P10`.
+   So *nothing in Part IV depends on P12*, and the case for leaving it where it
+   is cannot rest on the dependency graph.
+
+   What it rests on instead is stronger. **P12's own three payoffs are counting
+   payoffs, not probability ones**: sizing a hash for deduplication, the size of
+   a beam search's space, and the exponential cost of an exact Shapley value.
+   Only the birthday calculation touches probability at all, and it needs
+   nothing beyond `F10`'s two-counts-and-a-division. Moving the program to
+   Part VII would present it as a prerequisite for probability when its own
+   results are not probabilistic --- and would leave Part IV, *Discrete
+   structures and argument*, with two programs and no counting in it.
+
+   The cost of the decision is the gap, and it is paid inside the program
+   rather than left: `P12` §4 restates the pair count where it uses it, so a
+   reader arriving at `P23` ten programs later does not have to have retained
+   it. Reversing the decision is a renumbering of ten stub programs and their
+   issues, so whoever reverses it should have a better reason than the one this
+   entry used to give.
+5. **Whether P14 (logic and proof) is enough of a fix for Stroud's rigour gap,
    or whether the book should carry a second, later program on writing a proof.**
    The current position is that this audience needs to read theorems and does
    not need to write them, and that position should be stated in the front

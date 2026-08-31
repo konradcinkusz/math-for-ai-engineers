@@ -888,7 +888,7 @@ they are disjoint. `|A ∪ B| = |A| + |B| − |A ∩ B|`, and the shared part wa
 counted once too often. What makes it expensive is that the error has two
 halves and only one is visible: the count overstates coverage, *and* every
 shared example is scored twice, so it weights double in whatever average comes
-out. → **F10** for two sets, **P12** for inclusion–exclusion in general.
+out. → **F10** for two sets, **P12** for inclusion–exclusion in general — **delivered**, as item 146, where the third set makes the alternating sign necessary rather than decorative.
 
 **60. "`not (a and b)` is `not a and not b`."** It is `not a or not b` — the
 `and` becomes an `or`, because failing *both* only requires failing one. The
@@ -903,9 +903,12 @@ and doubling per element is not a rate anybody's intuition handles: twenty
 features is a million, forty is more than a million million, and the step
 between them is twenty more yes-or-no choices. When a plan enumerates
 combinations, write the count down before writing the loop. → **F10** for the
-count, **P12** for the four rules formally. Note also that the product rule
-needs its condition stated: it applies to *independent* choices, and one
-forbidden combination makes the multiplication wrong.
+count, **P12** for the four rules formally — **delivered**, as items 144 to
+147. Note also that the product rule needs its condition stated: it applies to
+*independent* choices, and one forbidden combination makes the multiplication
+wrong. P12 refines that condition rather than repeating it: what has to be
+fixed is the **number** of options at each step and not the options
+themselves, which is why a shrinking pool multiplies anyway.
 
 **62. "Twice the data is twice the work."** Not when the work is per pair.
 n items make n(n−1)/2 pairs, so doubling multiplies the work by
@@ -1774,3 +1777,68 @@ Misconceptions:
 - Dumoulin & Visin, convolution arithmetic — https://arxiv.org/pdf/1603.07285 ; https://github.com/vdumoulin/conv_arithmetic
 - bfloat16 vs float16, loss scaling — https://www.tensorflow.org/guide/mixed_precision ; https://docs.fast.ai/callback.fp16.html
 - Accuracy paradox / base rates — https://en.wikipedia.org/wiki/Accuracy_paradox ; https://arxiv.org/pdf/2010.09470
+
+**144. "Pick three of ten --- that's 120."** It is 120, 220, 720 or 1000, and
+the question does not say which. Two questions decide it and neither is
+usually asked: does the **order** matter, and may anything **repeat**? The
+same ten things taken three at a time span a factor of more than eight
+depending on the answers, and "pick three of ten" sounds in ordinary speech
+like a complete instruction. → **P12**.
+
+**145. "C(20,3) is much smaller than C(20,17)."** They are equal, both 1140.
+Choosing which three to keep *is* choosing which seventeen to drop, so there
+is one act and two descriptions of it. The reason almost everyone says the
+smaller one is easier is that naming three things is quicker than naming
+seventeen --- a fact about writing them down, not about how many there are.
+→ **P12**.
+
+**146. "Three sets of 1000, 1200 and 850 hold 3050 examples."** They hold
+2500. The two-set correction is the one people have; the third term is the one
+they drop. It is a *plus* because subtracting the three pairwise overlaps
+removes the triple region three times after it was counted three times, so it
+has been removed altogether and must come back once. → **F10** for two sets,
+**P12** for three and the alternating sign.
+
+**147. "Inclusion--exclusion is how you size a union of many sets."** It has
+one term per non-empty subset, so 2^n − 1 of them: 7 for three sets and 1023
+for ten, each an intersection that is itself a computation. That is exactly
+the enumeration the rule was meant to avoid, which is why past three sets the
+answer is to build the union and take its size. → **P12**.
+
+**148. "A 64-bit hash has 1.8e19 values and I have a billion documents, so a
+collision is one in eighteen billion."** It is about 2.67 per cent --- a
+factor of 4.9e8 out --- because the quantity is the number of **pairs**, not
+the number of documents, and a billion documents make 5e17 pairs. The rule
+that survives: **a hash's safe capacity is about the square root of its number
+of values**, so 64 bits holds about 2^32 items and a 64-bit hash is a coin
+flip at 5.06e9 documents, which is a corpus that exists. → **P12**, using
+**F10**'s pair count.
+
+**149. "The collision probability came out as 0.0, so we are safe."**
+`1 - prod(1 - i/N)` in float64 at 128 bits returns *exactly* zero, because
+every factor is within one part in 10^33 of one and rounds to 1.0. There is no
+exception and no `nan`; the answer looks reasonable and it ends the
+conversation. Note also that the same expression at 64 bits with only 100 000
+items has **already** lost five significant figures --- a formula does not
+stop working at a threshold, it degrades, and the degradation is invisible
+until somebody computes the same thing another way. → **P02** for the rule,
+**P12** for the instance.
+
+**150. "Widening the beam explores more of the search space."** It doubles a
+fraction of 2e-84. Twenty tokens from a 32 000-token vocabulary is a
+ninety-digit number of sequences, and a beam of 4 scores 2.56e6 continuations
+against it. A wider beam demonstrably helps; the count settles only that
+**coverage cannot be why**, so whatever it buys it buys from the ordering the
+model imposes on the space. That is a claim about the model, and it is the one
+to argue with when somebody proposes doubling the beam. → **P12**.
+
+**151. "The SHAP plot shows feature 3 is the most important."** A Shapley
+value is an average over every ordering of the features, which collapses to a
+weighted sum over 2^n subsets and no fewer --- 1e6 at twenty features and
+1.1e12 at forty, which is 35 years at a millisecond apiece. **So every
+implementation you have used is a sampling approximation**, the bars carry a
+sampling error that is not usually drawn, and it is largest exactly where the
+features interact, which is where the plot is being used to make an argument.
+Two runs of the same explainer on one input can reorder the middle of the
+ranking. The question to ask is a counting question: how many of the 2^n were
+actually evaluated? → **P12**.
