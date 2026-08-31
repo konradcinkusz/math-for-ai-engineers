@@ -550,12 +550,16 @@ Now do \code{bf16}, which has $\val{p01.bf16.ebits}$ exponent bits. The
 arithmetic is the same and the answer is $\val{p01.bf16.max}$ \dash{} and set
 that beside \code{fp32}'s ceiling, which is $\val{p01.fp32.max}$.
 
-They are the same, to three figures, and that is not a coincidence:
-\code{bf16} and \code{fp32} have the same exponent budget,
-$\val{p01.bf16.ebits}$ bits each. \textbf{\code{bf16} is \code{fp32} with the
-bottom of the significand cut off.} It reaches exactly as far and it resolves
-far more coarsely, and a conversion between the two cannot overflow in either
-direction.
+They agree to two figures and not to three, and both halves of that are worth
+a moment. They are close because \code{bf16} and \code{fp32} have the same
+exponent budget, $\val{p01.bf16.ebits}$ bits each. They are not equal because
+the largest value of a format is $(2 - 2^{-m}) \times 2^{127}$, and
+\code{bf16}'s shorter significand makes its first bracket slightly smaller
+\dash{} a shortfall of $\val{p01.bf16.short.pct}$ per cent.
+
+\textbf{\code{bf16} is \code{fp32} with the bottom of the significand cut
+off.} It reaches within half a per cent as far, it resolves far more coarsely,
+and a conversion between the two cannot overflow in either direction.
 \end{fr}
 
 \begin{fr}

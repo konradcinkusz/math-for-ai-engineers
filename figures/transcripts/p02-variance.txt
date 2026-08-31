@@ -1,0 +1,7 @@
+>>> import numpy as np
+>>> xs = [30000 + d for d in range(5)]
+>>> a = np.array(xs, dtype=np.float32)
+>>> float((a * a).mean() - a.mean() ** 2)   # one-pass
+-64.0
+>>> float(a.var())                          # the library
+2.0

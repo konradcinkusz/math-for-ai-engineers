@@ -1,0 +1,7 @@
+>>> import math, numpy as np
+>>> math.log(float(np.finfo(np.float16).max))
+11.089866488461016
+>>> float(np.exp(np.float16(12)))  # RuntimeWarning: overflow
+inf
+>>> math.exp(12)
+162754.79141900392

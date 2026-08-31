@@ -1,26 +1,974 @@
 %% P02 --- Błąd numeryczny, stabilność i obliczenia w skali logarytmicznej
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/p02_numerical_stability.py i trafia na stronę przez \val{}.
+%% Oba listingi konsolowe to zatwierdzone transkrypty pisane przez ten skrypt.
+%%
+%% TEZA: algorytm może być poprawny w arytmetyce dokładnej i bezużyteczny w
+%% zmiennoprzecinkowej. Program P01 powiedział, czym jest ta arytmetyka; ten
+%% program zadaje pytanie inżynierskie, a odpowiedzią jest MAŁY KATALOG, a nie
+%% zasada.
+%%
+%% CO TEN PROGRAM JEST WINIEN I SPŁACA. Siedem programów obiecuje go z nazwy i
+%% każdy z nich został otwarty, zanim to powstało: F01 (ograniczenie błędu na
+%% dziewięćdziesięciu sześciu warstwach), F02 (przed czym chroni epsilon w
+%% normalizacji), F03 (czemu MAKSIMUM wyciąga się przed nawias i ile kosztuje
+%% inny wybór; oraz logarytm prawdopodobieństwa liczony bez tworzenia
+%% prawdopodobieństwa), F05 (czemu log i sigmoida to jedna operacja), F06
+%% (czemu skala wierszy ma znaczenie dla solvera), F07 (dokładny wynik, przy
+%% którym naiwny softmax się przepełnia) i P01 (nagromadzona strata sumowania
+%% wraz z katalogiem poprawek oraz katastrofalne skracanie z nazwy).
+%%
+%% CZEGO F03 I F07 JUŻ NIE ZOSTAWIŁY: F03 wyprowadza dwuskładnikową tożsamość
+%% log-sum-exp w całości, a F07 mówi w ramce ostrzeżenia, że odjęcie maksimum
+%% jest TOŻSAMOŚCIĄ, a nie sztuczką. Oba są tu cytowane w jednym zdaniu i żadne
+%% nie jest wyprowadzane ponownie. Zostaje -- i to lepsza połowa -- KTÓRY
+%% element wyciągnąć i ile kosztuje zły wybór.
+%%
+%% CO TEN PROGRAM ŚWIADOMIE ZOSTAWIA, sprawdzone w tools/programs.json:
+%%   wskaźnik uwarunkowania macierzy, źle uwarunkowane układy      -> P10
+%%   FLOP-y, bajty, intensywność arytmetyczna                      -> P03
+%%   czym JEST prawdopodobieństwo i czemu entropia krzyżowa         -> P26, P30
+%%
+%% Bliźniak: programs/en/P02-numerical-stability.tex. Ramka w ramkę, makro w
+%% makro, liczba w liczbę; tools/parity.py je porównuje.
 
 \program{Błąd numeryczny, stabilność i obliczenia w skali logarytmicznej}
 \label{prog:P02}
+\index{troubleshooting!an algorithm that is correct and useless}
+\index{floating point!catastrophic cancellation}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{powiedzieć, co czyni algorytm niebezpiecznym w arytmetyce
+  zmiennoprzecinkowej, gdy jego algebrze nie można nic zarzucić}
+\outcome{9--13}{powiedzieć, co odejmowanie robi z błędem względnym i czym to
+  się staje na wielu warstwach}
+\outcome{14--21}{policzyć wynik, przy którym eksponenta opuszcza format, i
+  powiedzieć, który składnik wyciągnąć przed log-sum-exp i dlaczego}
+\outcome{22--28}{powiedzieć, czemu prawdopodobieństwa nie tworzy się jako
+  wartości pośredniej, i nazwać operacje, które tego unikają}
+\outcome{29--37}{wybierać spośród sposobów dodawania bardzo wielu liczb i
+  powiedzieć, co daje każdy z nich}
+\end{outcomes}
 
-Argument: an algorithm can be correct in exact arithmetic and useless in
-floating point; catastrophic cancellation is the mechanism, and there is a
-small catalogue of fixes. Payoff: **why log-sum-exp instead of
-exponentiating.** The reader computes the exact logit at which a naive
-softmax overflows \code{fp32} and \code{fp16}, then derives the max-
-subtraction trick and shows it changes nothing mathematically. Also: why
-cross-entropy is computed from logits and never from probabilities; why the
-naive one-pass variance formula gives a negative variance and Welford's does
-not; why summing a million small gradients in the wrong order loses them.
+\begin{quiz}
+\item Pięć odczytów to $\val{p02.var.offset}$ i cztery kolejne mikrosekundy po
+  nim. Ich wariancję liczy się w \code{float32} jako
+  $\Ex[x^{2}] - (\Ex[x])^{2}$. Co wraca? \teachesat{2--3}
+  \answerto{$\val{p02.var.naive}$. Wariancja nie może być ujemna, a prawdziwa
+  odpowiedź to $\val{p02.var.true}$.}
+\item Dwie liczby zgadzają się na dziewięciu cyfrach znaczących i zostają
+  odjęte w \code{float32}. Ile cyfr znaczących ma wynik? \teachesat{5--6}
+  \answerto{Żadnej. \code{float32} niesie około siedmiu, więc obie są
+  przechowywane identycznie na cyfrach, na których się zgadzają, a różnica
+  składa się wyłącznie z tego, co zostało po zaokrągleniu.}
+\item Wynik uwagi sięga $\val{p02.over.fp16.int}$. Co robi jego eksponenta w
+  \code{fp16}? \teachesat{14--15}
+  \answerto{Przepełnia się do \code{inf}. Sufit zostaje przekroczony przy
+  wyniku $\val{p02.over.fp16}$, a wszystko dalej staje się \code{nan}.}
+\item $\ln\sum_i e^{z_i} = c + \ln\sum_i e^{z_i - c}$ zachodzi dla każdego $c$.
+  Czemu zatem bierze się $c$ równe maksimum? \teachesat{17--18}
+  \answerto{Bo to jedyny wybór ograniczający każdy pozostały wykładnik do zera
+  lub poniżej, więc jedyny z gwarancją braku przepełnienia dla każdego wejścia,
+  a nie dla tego jednego.}
+\item Potrzebujesz $\ln \sigma(x)$ przy $x = \val{p02.logsig.under}$. Co daje
+  policzenie najpierw $\sigma$? \teachesat{24--25}
+  \answerto{\code{-inf}, bo $\sigma$ wpadła w niedomiar do
+  dokładnego zera. Policzone jako jedna operacja daje
+  $\val{p02.logsig.stable}$.}
+\item $\val{p02.sum.n}$ wartości równych $\val{p02.sum.small}$ dodaje się po
+  jednej do bieżącej sumy \code{float32}, która startuje z $1$. Ile wynosi
+  suma? \teachesat{29--30}
+  \answerto{$\val{p02.sum.naive32}$. Każda z nich leży poniżej połowy odstępu
+  przy $1$, więc żadna nie rusza sumy.}
+\item Podaj dwa sposoby naprawienia tej sumy i powiedz, który jest lepszy.
+  \teachesat{31--35}
+  \answerto{Dowolne dwa z: dodawanie od najmniejszych, sumowanie z kompensacją
+  (Kahana), drzewo parami, szerszy akumulator. Sortowanie odzyskuje
+  $\val{p02.sum.got.sorted}$\% wkładu, a pozostałe trzy ponad
+  $\val{p02.sum.got.kahan}$\%.}
+\item Czemu entropię krzyżową liczy się z logitów, a nie z prawdopodobieństw?
+  \teachesat{22--23}
+  \answerto{Bo to prawdopodobieństwo jest tą wartością pośrednią, która się
+  przepełnia, wpada w niedomiar albo zaokrągla do dokładnego $0$ lub $1$;
+  złożona operacja nigdy go nie tworzy i nie ma tego problemu z zakresem.}
+\end{quiz}
+
+% ============================================================
+\section{Poprawny w arytmetyce dokładnej}
+\label{sec:P02-correct}
+\index{troubleshooting!an algorithm that is correct and useless}
+
+\begin{fr}
+Program~\ref{prog:P01} ustalił, czym jest ta arytmetyka: skończonym zbiorem
+liczb, rozstawionych proporcjonalnie do swojej wielkości, z zaokrągleniem po
+każdym działaniu. Ten program zadaje pytanie, które z tego wynika, i jest to
+pytanie inżynierskie, a nie matematyczne. \textbf{Skoro tak, które algorytmy to
+przeżyją?}
+
+Zacznij od takiego, który nie przeżywa, a jest to algorytm, który sam pisałeś.
+
+Pięć odczytów opóźnienia, w mikrosekundach: $\val{p02.var.offset}$ i cztery
+kolejne mikrosekundy po nim. Ile wynosi ich wariancja?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p02.var.true}$}
+Cztery wartości w odległościach $-2, -1, 1, 2$ od średniej równej
+$\val{p02.var.offset} + 2$, jedna w zerze, kwadraty sumujące się do $10$,
+podzielone przez pięć.
+
+Teraz obliczenie. Każdy podręcznik podaje wzór jednoprzebiegowy i jest on
+naprawdę kuszący: potrzebuje jednego przejścia i dwóch bieżących sum zamiast
+dwóch przejść.
+\[ \Var(x) = \Ex[x^{2}] - \left(\Ex[x]\right)^{2} \]
+Algebrze nie można nic zarzucić \dash{} rozwiń $(x - \mu)^2$, a wychodzi w
+dwóch linijkach. Przewidz, co zwraca dla tych pięciu odczytów w \code{float32}.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p02.var.naive}$}
+\transcript{p02-variance}
+
+\begin{trapbox}
+\textbf{Wariancja jest średnią kwadratów. Nie może być ujemna, a ta wynosi
+$\val{p02.var.naive}$.}
+
+Nic w algebrze nie poszło źle. Odejmowane wielkości to
+\[ \Ex[x^{2}] = \val{p02.var.ex2}, \qquad
+   \left(\Ex[x]\right)^{2} = \val{p02.var.exsq} \]
+i zgadzają się na $\val{p02.var.shared}$ cyfrach znaczących, podczas gdy
+\code{float32} niesie ich około siedmiu. W tym formacie obie są więc
+przechowywane jako liczby o identycznych cyfrach wiodących, odejmowanie skraca
+każdą wspólną cyfrę, a to, co wraca, składa się z tego, co przypadkiem zostało
+pod spodem \dash{} czyli z zaokrąglenia, a nie z wariancji.
+
+Wynik to dokładnie jeden odstęp przy tej wielkości \dash{} odstęp
+\code{float32} w pobliżu $\val{p02.var.ex2}$ wynosi $\val{p02.var.gap}$
+\dash{} i dlatego jest to $\val{p02.var.naive}$, a nie jakaś poszarpana
+liczba. To najmniejsza niezerowa odpowiedź, jaką to odejmowanie mogło dać. To
+nie jest szum; to rozstaw.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Mechanizm ma nazwę i warto ją mieć, bo rozpoznasz go po kształcie na długo
+przed tym, zanim będziesz umiał go dowieść: \textbf{katastrofalne skracanie}.
+
+Odejmij dwie liczby zgodne na wiodących cyfrach znaczących, a cyfry, na których
+są zgodne, skrócą się do niczego. To nie jest utrata dokładności w odejmowaniu
+\dash{} odejmowanie jest dokładne i często bywa jedynym dokładnym krokiem w
+całym rachunku. Strata nastąpiła wcześniej, gdy zaokrąglano każdy argument, a
+odejmowanie tylko usunęło wszystko inne i ją obnażyło.
 
 \medskip
-\textbf{Planowana długość:} 50 ramek.
-}
+\noindent
+Reguła do zabrania: \textbf{szukaj odejmowania dwóch prawie równych wielkości i
+pytaj, skąd się wzięły.}
+\end{fr}
+
+
+\begin{fr}
+Dwie liczby zgadzają się na $\val{p02.var.shared}$ cyfrach znaczących i zostają
+odjęte w \code{float32}, który niesie ich około siedmiu. Ile cyfr znaczących ma
+wynik?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Żadnej. Nie \enquote{mniej} \dash{} żadnej.}
+Każda cyfra, którą trzymał \code{float32}, jest cyfrą wspólną obu argumentom,
+więc każda się skraca. Cokolwiek wraca, jest zbudowane z bitów, które i tak
+były już błędne.
+
+To jest \emph{katastrofalne} z tej nazwy i jest to prawdziwe urwisko, a nie
+zbocze: zgadzaj się na sześciu cyfrach w \code{float32}, a zostanie ci mniej
+więcej jedna; zgadzaj się na ośmiu, a nie zostanie żadna. Liczy się wielkość
+\emph{ile cyfr dzielą argumenty wobec tego, ile trzyma format}, i warto ją
+policzyć, zanim uwierzysz jakiejkolwiek różnicy.
+\end{fr}
+
+\mermaidfig{p02-cancellation}{Co usuwa odejmowanie i co zostawia po
+sobie.}{gdzie widać zaokrąglenie}
+
+\begin{fr}
+Lekarstwem nie jest większa precyzja. Uruchom ten sam wzór w \code{float64}, a
+te odczyty przeżyje spokojnie \dash{} i polegnie na odczytach o kilka rzędów
+wielkości większych, bo strukturalnie nic się nie zmieniło. \textbf{Szerszy
+format przesuwa urwisko; nie usuwa go.}
+
+Lekarstwem jest inny algorytm, a dla wariancji jest dobry. Metoda Welforda
+trzyma bieżącą średnią i bieżącą sumę kwadratów odchyleń \emph{od tej
+średniej}, aktualizując obie przy każdej nowej wartości:
+\begin{align*}
+  \mu_n &= \mu_{n-1} + \frac{x_n - \mu_{n-1}}{n} \\
+  M_n &= M_{n-1} + (x_n - \mu_{n-1})(x_n - \mu_n)
+\end{align*}
+To wciąż jedno przejście i dwie bieżące sumy. Popatrz, czego nigdy nie tworzy,
+i powiedz, czemu na tym polega cała różnica.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nigdy nie tworzy $\Ex[x^{2}]$, więc nigdy nie ma dużej wielkości, od której
+trzeba odjąć dużą wielkość.
+\end{ansblock}
+
+Każde odejmowanie u Welforda to $x_n - \mu$, czyli wartość minus średnia
+podobnych wartości \dash{} a to różnica rzędu rozrzutu, a nie rzędu danych.
+Katastrofalne odejmowanie zostało wyprojektowane na zewnątrz, a nie
+uczynione dokładniejszym, i na powyższych odczytach metoda zwraca
+$\val{p02.var.welford}$ przy prawdziwej wartości $\val{p02.var.true}$.
+
+\begin{warning}
+\textbf{Taki jest kształt każdej poprawki w tym programie.} Żadna z nich nie
+czyni operacji dokładniejszą. Każda usuwa operację, która niszczyła informację,
+i zastępuje ją arytmetyką na wielkościach porównywalnego rzędu. Jeśli
+proponowane lekarstwo tego nie robi, jest szerszym formatem w przebraniu i
+polegnie później, a nie wcale.
+\end{warning}
+\end{fr}
+
+% ============================================================
+\section{Ile kosztuje odejmowanie i w co się kumuluje}
+\label{sec:P02-cost}
+\index{floating point!relative error}
+
+\begin{fr}
+Ten koszt warto podać jako wielkość, a nie jako ostrzeżenie, bo wtedy da się go
+oszacować.
+
+Załóżmy, że $a$ i $b$ niosą każde błąd względny rzędu $\eps$ \dash{} co według
+reguł Programu~\ref{prog:P01} rzeczywiście robią, gdzie $\eps$ to epsilon
+formatu. Ich błędy bezwzględne wynoszą wtedy około $\eps|a|$ i $\eps|b|$, a
+różnica niesie ich sumę. Jako błąd \emph{względny} wyniku:
+\[ \frac{\eps\left(|a| + |b|\right)}{|a - b|} \]
+Przeczytaj mianownik. Gdy $a$ i $b$ są daleko od siebie, jest porównywalny z
+licznikiem i nic szczególnego się nie dzieje. Gdy są blisko, dąży do zera, a
+licznik nie.
+
+\textbf{Współczynnik wzmocnienia to $\frac{|a| + |b|}{|a - b|}$}, a dla
+powyższej wariancji jest rzędu $10^{\val{p02.var.shared}}$.
+\end{fr}
+
+\begin{fr}
+Ten iloraz warto rozpoznawać, bo nie ogranicza się do odejmowania.
+
+Program~\ref{prog:F06} pytał w zadaniu dodatkowym, co się dzieje, gdy jedno
+równanie układu pomnożyć przez $10^{6}$: rozwiązanie się nie zmienia, para
+prostych się nie zmienia, a zachowanie solvera owszem. Powód jest tą samą
+wielkością. Zadanie, w którym mała względna zmiana wejścia wymusza dużą
+względną zmianę wyjścia, jest \emph{źle uwarunkowane}, a uwarunkowanie jest
+własnością zadania, a nie twojego kodu \dash{} żadna staranność implementacji
+go nie usuwa.
+
+\begin{rigourbox}
+\textbf{Ogólną postacią tej liczby jest wskaźnik uwarunkowania}, a dla układu
+równań jest on stwierdzeniem o macierzy, której ta książka jeszcze nie
+zdefiniowała. Program~\ref{prog:P10} podaje go porządnie. Tutaj należy wersja
+skalarna i nawyk, który ona kupuje: zanim uwierzysz policzonej różnicy, zapytaj,
+jakie błędy względne miały jej wejścia i co zrobiła z nimi ta operacja.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Program~\ref{prog:F01} zostawił temu programowi konkretny dług i uprzedził, że
+odpowiedź będzie gorsza, niż się spodziewasz.
+
+Warstwa sieci wykonuje arytmetykę, więc wyjście każdej warstwy niesie błąd
+względny co najmniej $\eps$. Dziewięćdziesiąt sześć warstw stosuje to
+$\val{p02.layers}$ razy. Gdyby błąd każdej warstwy pchał w tę samą stronę,
+najgorszy przypadek wynosiłby $(1 + \eps)^{\val{p02.layers}} - 1$.
+
+Policz to dla \code{fp16}, którego epsilon Program~\ref{prog:P01} podaje jako
+około $10^{-3}$, i podaj odpowiedź w procentach.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p02.grow.fp16}$\%}
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+ & najgorszy przypadek na $\val{p02.layers}$ warstwach & błędy losowego znaku \\
+\midrule
+\code{fp64} & $\val{p02.grow.fp64}$\% & $\val{p02.walk.fp64}$\% \\
+\code{fp32} & $\val{p02.grow.fp32}$\% & $\val{p02.walk.fp32}$\% \\
+\code{fp16} & $\val{p02.grow.fp16}$\% & $\val{p02.walk.fp16}$\% \\
+\code{bf16} & $\val{p02.grow.bf16}$\% & $\val{p02.walk.bf16}$\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warning}
+\textbf{Ograniczenie nie jest przewidywaniem, a cytowanie pierwszej kolumny
+tak, jakby nim było, to błąd, dla którego ta ramka istnieje.}
+
+Najgorszy przypadek zakłada, że każde zaokrąglenie pcha w tę samą stronę, i to
+właśnie opisuje argument o kumulowaniu z Programu~\ref{prog:F01}. Zaokrąglenia
+losowego znaku nie kumulują się jak liczba warstw; kumulują się jak jej
+pierwiastek, i to jest druga kolumna \dash{} około $\val{p02.grow.ratio}$ razy
+mniej dla \code{fp16}.
+
+Żadna z kolumn nie jest tym, co robi twoja sieć. Pierwsza jest górnym
+ograniczeniem, którego nie da się przekroczyć, a druga oszacowaniem
+zakładającym niezależność, której nie sprawdziłeś. Obie ustalają kształt:
+\textbf{głębokość mnoży epsilon twojego formatu przez coś pomiędzy
+pierwiastkiem z głębokości a samą głębokością}, a na szesnastu bitach jest to
+liczba, o którą trzeba dbać.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+I to ustawia resztę tego programu.
+
+Nie ma zasady, która czyni kod zmiennoprzecinkowy bezpiecznym. Jest mały
+katalog sytuacji niszczących informację, a do każdej znana alternatywa, która
+jej nie niszczy. Pierwszą już poznałeś: odejmowanie prawie równych wielkości,
+naprawiane przez nietworzenie ich.
+
+Pozostałe trzy to te, które spotkasz w pętli treningowej:
+
+\begin{itemize}
+\item eksponenta czegoś dużego, która opuszcza format w całości;
+\item prawdopodobieństwo utworzone jako wartość pośrednia, czyli ten sam
+  problem pod nazwą, której ufasz;
+\item bardzo długa suma, w której małe składniki leżą pojedynczo poniżej
+  progu ustalonego przez Program~\ref{prog:P01}.
+\end{itemize}
+\end{fr}
+
+% ============================================================
+\section{Eksponenta i jej dwa urwiska}
+\label{sec:P02-cliffs}
+\index{floating point!overflow and underflow}
+\index{softmax!why the maximum is subtracted}
+
+\begin{fr}
+Eksponenta jest operacją, która najłatwiej wyprowadza liczbę poza jej format,
+bo zamienia dodawanie wyników na mnożenie rzędów wielkości.
+
+Program~\ref{prog:P01} policzył sufit \code{fp16} z jego budżetu wykładnika.
+Wynik, przy którym $e^{z}$ przekracza ten sufit, nie jest więc nowym faktem
+\dash{} jest logarytmem liczby, którą już masz.
+
+Podaj go z dokładnością do jednego miejsca po przecinku, a potem podaj
+najmniejszy całkowity wynik, który się przepełnia.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p02.over.fp16}$, więc wynik $\val{p02.over.fp16.int}$ się przepełnia.}
+\transcript{p02-cliff}
+
+\textbf{To nie jest liczba egzotyczna.} To wynik w tej skali, w której wyniki
+naturalnie występują, a utrzymanie wyników uwagi dość małymi, by były
+bezpieczne, jest całym zadaniem czynnika $1/\sqrt{d_k}$, który wyprowadza
+Program~\ref{prog:P25}. Awaria nie jest rzadkim zdarzeniem na skraju zakresu
+formatu; jest wartością, przed którą architektura ma wbudowaną poprawkę, a
+produkuje \code{inf}, a potem \code{nan}, a nie błąd, który ktokolwiek nazwałby
+błędem.
+\end{fr}
+
+\begin{fr}
+Oba urwiska we wszystkich czterech formatach \dash{} wynik, przy którym
+eksponenta wychodzi górą, i wynik, przy którym wychodzi dołem:
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+ & przepełnia się powyżej & wpada w niedomiar poniżej \\
+\midrule
+\code{fp64} & $\val{p02.over.fp64}$ & $\val{p02.under.fp64}$ \\
+\code{fp32} & $\val{p02.over.fp32}$ & $\val{p02.under.fp32}$ \\
+\code{fp16} & $\val{p02.over.fp16}$ & $\val{p02.under.fp16}$ \\
+\code{bf16} & $\val{p02.over.bf16}$ & $\val{p02.under.bf16}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Wiersz \code{bf16} równa się wierszowi \code{fp32} u góry, co jest powtórzeniem
+pointy Programu~\ref{prog:P01}: oba dzielą budżet wykładnika, a \textbf{zakres
+eksponenty ustala sam ten budżet}. Mantysa nie pojawia się w tej tabeli nigdzie.
+\end{fr}
+
+\mermaidfig{p02-two-cliffs}{Dwa sposoby, na jakie liczba opuszcza format, i co
+ustala odległość między nimi.}{dwa urwiska}
+
+\begin{fr}
+Program~\ref{prog:F07} rozstrzygnął już, co robić z górnym urwiskiem, i
+rozstrzygnął to algebrą, a nie radą: odjęcie stałej od każdego wyniku przed
+eksponentą nie zmienia softmaksu, bo eksponenta tej stałej skraca się w
+liczniku i mianowniku jednakowo. Jego ramka ostrzeżenia mówi wprost \dash{}
+\textbf{to jest tożsamość, a wersja, która tego nie robi, jest tą błędną.}
+
+Program~\ref{prog:F03} zrobił ten sam krok dla pary logarytmów, wyciągając
+większy z nich przed $\ln(e^{u} + e^{v})$.
+
+Oba zostawiły to samo pytanie otwarte i to ono jest warte sekcji. Ogólnie
+zapisana tożsamość brzmi
+\[ \ln \sum_i e^{z_i} = c + \ln \sum_i e^{z_i - c} \]
+i \emph{zachodzi dla każdego $c$}. Nic powyżej nie wymusza wyboru. Czemu więc
+maksimum jest tym, którego używa każda biblioteka?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo jest jedynym wyborem ograniczającym każdy pozostały wykładnik do zera lub
+poniżej, a więc jedynym z gwarancją braku przepełnienia \dash{} dla każdego
+wejścia, a nie dla tego jednego.
+\end{ansblock}
+
+Przy $c = \max_i z_i$ każde $z_i - c$ jest co najwyżej $0$, więc każde
+$e^{z_i - c}$ jest co najwyżej $1$ i żaden składnik nie przekroczy sufitu
+żadnego formatu. Suma co najwyżej $n$ składników, każdego co najwyżej $1$,
+wynosi co najwyżej $n$, z czym też żaden format nie ma kłopotu.
+
+Weź dowolne inne $c$, a największy tworzony składnik to $e^{\max_i z_i - c}$,
+które jest powyżej $1$ i rośnie wykładniczo w miarę spadku $c$. \textbf{To, czy
+się mieści, jest wtedy własnością twoich danych.}
+\end{fr}
+
+\mermaidfig{p02-pivot}{Przed nawias można wyciągnąć dowolną stałą; zmienia się
+największy składnik, który trzeba utworzyć.}{wybór elementu}
+
+\begin{fr}
+To ostatnie zdanie warte jest pomiaru, bo wyjaśnia, czemu ten wybór tak łatwo
+uchodzi na sucho.
+
+Weź wiersz $\val{p02.pivot.total}$ wyników i wyciągaj kolejno każdy z nich, w
+\code{fp16}. Ile z $\val{p02.pivot.total}$ możliwości utrzymuje każdy składnik
+wewnątrz formatu?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p02.pivot.safe}$ z nich.}
+\begin{trapbox}
+\textbf{Większość błędnych wyborów działa.} \code{fp16} znosi niedobór do
+$\val{p02.over.fp16}$ między największym wynikiem a wyciąganym, a w zwyczajnym
+wierszu większość wpisów mieści się w tym zakresie. Naiwna implementacja, która
+bierze pierwszy wynik albo ostatni, albo nie wyciąga niczego w wierszu, którego
+wyniki akurat są małe, działa poprawnie \dash{} przez zestaw testów, przez
+przegląd kodu i dalej na produkcję.
+
+Najgorszy wybór w tym wierszu musi utworzyć składnik równy
+$\val{p02.pivot.worst}$, co nie jest blisko. Ale jest to najgorszy wybór
+\emph{w tym wierszu}: zmień dane, a granica się przesunie, bo zawsze była
+faktem o danych.
+
+\textbf{Maksimum jest jedynym wyborem, który nim nie jest.} To właśnie znaczy
+\enquote{stabilny numerycznie} jako termin techniczny \dash{} nie
+\emph{dokładniejszy}, lecz \emph{bezpieczny dla każdego wejścia, a nie dla
+tych, które akurat sprawdziłeś}.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Dolne urwisko potrzebuje jednej ramki, bo poprawka na górne załatwia je przy
+okazji.
+
+Po odjęciu maksimum najmniejsze składniki to $e^{z_i - \max}$ dla wyników
+najdalszych od szczytu, a te wpadają w niedomiar do zera, gdy wynik spadnie
+więcej niż $\val{p02.drop.fp16}$ poniżej maksimum w \code{fp16}. To nie jest
+awaria: taki składnik i tak wniósłby mniej niż $\val{p02.drop.fp16.frac}$
+największego, a jego pominięcie nie zmienia niczego mierzalnego.
+
+\textbf{Niedomiar w sumie jest zwykle nieszkodliwy, a przepełnienie nigdy}, i
+warto to wiedzieć, bo mówi, którą stronę chronić. Składnik, który staje się
+zerem, to składnik, którego nie potrzebowałeś. Składnik, który staje się
+\code{inf}, zabiera ze sobą sumę, logarytm, stratę i każdy gradient.
+
+Cała ta operacja \dash{} odjąć maksimum, wziąć eksponentę, zsumować, wziąć
+logarytm, dodać maksimum z powrotem \dash{} to $\logsumexp$, a dla powyższego
+wiersza daje $\val{p02.lse.exact}$.
+\end{fr}
+
+% ============================================================
+\section{Nigdy nie twórz prawdopodobieństwa}
+\label{sec:P02-logits}
+\index{softmax!computed from logits}
+\index{loss!cross-entropy from logits}
+
+\begin{fr}
+Program~\ref{prog:F03} obiecał, że ten program pokaże, jak logarytm
+prawdopodobieństwa tokenu liczy się \emph{bez tworzenia prawdopodobieństwa}, i
+to sformułowanie było celowe. To ta sama instrukcja co w poprzedniej sekcji, o
+poziom wyżej.
+
+Prawdopodobieństwo to liczba między $0$ a $1$. Program~\ref{prog:P01} mówi, ile
+ten zakres kosztuje: poniżej $\val{p02.under.fp16}$ w wykładniku wartość
+\code{fp16} jest zerem, a prawdopodobieństwo blisko $1$ ma swoje interesujące
+cyfry dokładnie tam, gdzie liczba zmiennoprzecinkowa ma ich najmniej, bo odstęp
+przy $1$ jest największym odstępem poniżej $1$.
+
+Prawdopodobieństwo jest więc złą wartością pośrednią na obu końcach, a jego
+logarytm dobrą na obu. \textbf{Reguła brzmi: prawdopodobieństwo nie powinno
+istnieć.}
+\end{fr}
+
+\begin{fr}
+Dla softmaksu oba kroki składają się w jedną operację, a algebrę warto
+zobaczyć, bo ma trzy linijki i usuwa również dzielenie.
+\[ \ln \softmax(z)_j = \ln \frac{e^{z_j}}{\sum_k e^{z_k}}
+   = z_j - \ln \sum_k e^{z_k} = z_j - \logsumexp(z) \]
+Żadnej eksponenty surowego wyniku, żadnego dzielenia, żadnego
+prawdopodobieństwa. Log-softmax to odjęcie wielkości z poprzedniej sekcji od
+wyniku, a odejmowanie odbywa się między liczbami tego samego rzędu, czyli tak,
+jak kazała szukać \S\ref{sec:P02-correct}.
+
+To właśnie ma na myśli biblioteka, gdy mówi o funkcji przyjmującej
+\emph{logity} zamiast prawdopodobieństw, i dlatego podanie jej
+prawdopodobieństw \dash{} przez uczynne zastosowanie softmaksu wcześniej
+\dash{} jest usterką, a nie nadmiarowością.
+\end{fr}
+
+\begin{fr}
+Przypadek dwuklasowy ma ten sam kształt i własną nazwę, a
+Program~\ref{prog:F05} na niego wskazał: $\ln \sigma(x)$, czyli log-sigmoida,
+która pojawia się w każdej dwuklasowej entropii krzyżowej, której wejściem jest
+logit.
+
+Program~\ref{prog:F05} powiedział, że złożenie jest bezpieczne matematycznie i
+niebezpieczne zmiennoprzecinkowo. Powiedz, mniej więcej przy jakim $x$ postać
+złożona zawodzi i co wtedy zwraca.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Poniżej mniej więcej $\val{p02.logsig.under}$ zwraca \code{-inf}.}
+$\sigma(x)$ zachowuje się jak $e^{x}$ dla dużych ujemnych $x$, więc wpada w
+niedomiar do dokładnego zera, gdy $x$ przekroczy $\val{p02.under.fp64}$
+\dash{} to dolne urwisko z poprzedniej sekcji, przychodzące pod inną nazwą. A
+$\ln 0$ to \code{-inf}, które przenosi się do straty, a potem do
+każdego gradientu.
+
+Policzone jako jedna operacja nie sprawia najmniejszego kłopotu:
+\[ \ln \sigma(x) = -\ln\!\left(1 + e^{-x}\right) \]
+co dla ujemnych $x$ przekształca się do $x - \ln(1 + e^{x})$, żeby argument
+eksponenty nigdy nie był dodatni. Przy $x = \val{p02.logsig.under}$ zwraca
+$\val{p02.logsig.stable}$, co jest poprawną odpowiedzią i ledwie odróżnialne od
+samego $x$.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{A drugi koniec też zawodzi, i to jest ta połowa, którą się pomija.}
+
+Program~\ref{prog:F07} zmierzył, że $\sigma$ zaokrągla się do dokładnego
+$\num{1.0}$ mniej więcej od $\val{f07.sig.saturates}$ w górę; pierwszą liczbą
+całkowitą, przy której to robi, jest $\val{p02.logsig.saturates}$. Dwuklasowa
+entropia krzyżowa potrzebuje i $\ln p$, i $\ln(1 - p)$, a w tym punkcie
+$1 - p$ jest dokładnym zerem, więc $\ln(1 - p)$ wynosi
+\code{-inf}.
+
+Pewna \emph{poprawna} predykcja daje więc to samo \code{-inf} co
+pewna błędna, a strata staje się \code{nan} na przykładzie, który model
+odgadł dobrze. To jest ta awaria, która wysyła ludzi na poszukiwanie błędu w
+danych.
+
+\textbf{Oba końce usuwa ten sam ruch}: zachowaj logit i pozwól funkcji straty
+wykonać złożenie. Biblioteka dostarcza jedną funkcję właśnie dlatego, że nie ma
+bezpiecznego sposobu zapisania jej jako dwóch.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Konsekwencja w pętli treningowej, podana jako reguła, którą sprawdzisz czytając
+diffa.
+
+Przejście w przód klasyfikatora kończy się na \emph{logitach} i nic za tym
+punktem nie tworzy prawdopodobieństwa, dopóki coś poza stratą nie potrzebuje go
+wyświetlić. Strata dostaje logity i cele; metryka może dostać
+prawdopodobieństwa, bo metryka mylona o zaokrąglenie jest usterką kosmetyczną,
+a strata równa \code{nan} jest zatrzymanym przebiegiem.
+
+Sygnałem w kodzie jest softmax albo sigmoida bezpośrednio przed logarytmem albo
+przed stratą, której nazwa wspomina logity. Oba to dwuoperacyjna postać czegoś,
+co biblioteka dostarcza jako jedno, i oba działają na wsadach, które
+sprawdziłeś.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jedna granica, żeby ta sekcja nie została odczytana jako coś więcej, niż jest.
+
+Nic tutaj nie mówi, czym prawdopodobieństwo \emph{jest}, czemu jego logarytm
+jest właściwą rzeczą do sumowania ani czemu entropia krzyżowa jest stratą, a
+nie wygodnym wyborem. Program~\ref{prog:P26} wyprowadza tę stratę z metody
+największej wiarygodności, a Program~\ref{prog:P30} nadaje entropii krzyżowej
+znaczenie w bitach.
+
+Do tego programu należy coś węższego i jest to fakt o arytmetyce: \textbf{z
+tych dwóch wielkości to logarytm jest tą, którą twoja maszyna pomieści.} To
+prawda niezależnie od tego, co ta strata się okaże znaczyć.
+\end{fr}
+
+% ============================================================
+\section{Dodawanie bardzo wielu liczb}
+\label{sec:P02-summation}
+\index{floating point!summation order}
+
+\begin{fr}
+Program~\ref{prog:P01} ustalił próg i przekazał konsekwencję tutaj, z nazwy. To
+jest ta sekcja.
+
+Wkład poniżej połowy odstępu przy bieżącej sumie rusza ją o dokładnie nic. Weź
+więc $\val{p02.sum.n}$ wartości równych $\val{p02.sum.small}$ i dodaj je po
+jednej do sumy \code{float32}, która startuje z $1$. Dokładna odpowiedź to
+$\val{p02.sum.exact}$.
+
+Co zwróci ta pętla?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p02.sum.naive32}$. Przepadła każda z nich, co do jednej.}
+Nie większość i nie na skutek zaokrąglenia: odstęp przy $1$ w \code{float32}
+wynosi około $10^{-7}$, jego połowa to około $\val{p01.swamp.fp32}$, a
+$\val{p02.sum.small}$ leży poniżej. Każde dodawanie jest pustą operacją, która
+kończy się powodzeniem, milion razy z rzędu.
+
+\begin{warning}
+\textbf{Nie ma błędu, nie ma ostrzeżenia i nie ma \code{nan}.} Pętla się
+wykonuje, suma jest zupełnie zwyczajną liczbą, a odpowiedź jest błędna o
+$\val{p02.sum.err.naive32}$ \dash{} czyli o całość tego, co sumowałeś.
+Akumulacja gradientu, która to robi, raportuje zdrową stratę i niczego się nie
+uczy, a objawem jest model, który nie chce się trenować, a nie program, który
+nie chce się wykonać.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Katalog ma cztery pozycje i nie są one równoważne. Pierwsza jest darmowa.
+
+\textbf{Dodaj małe wartości do siebie nawzajem, zanim dodasz je do dużej.}
+Sortowanie rosnąco to załatwia: milion drobnych wartości gromadzi się między
+sobą, gdzie są porównywalnego rzędu, a suma spotyka $1$ dopiero na końcu, gdy
+jest już dość duża, by to spotkanie przeżyć.
+
+To brak łączności z trzech wartości Programu~\ref{prog:P01} w skali,
+uruchomiony celowo, a nie przypadkiem. Ile spodziewasz się odzyskać?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p02.sum.got.sorted}$\% wkładu \dash{} prawie całość, ale nie całość.}
+Niedobór wynosi $\val{p02.sum.err.sorted}$ i nie jest jednym zaokrągleniem:
+jest milionem zaokrągleń. Każde dodawanie do rosnącej sumy zaokrągla, błędy w
+większości mają wspólny znak, a przy $\val{p02.sum.n}$ z nich ten dryf staje
+się widoczny.
+
+\textbf{Sortowanie usuwa katastrofę i zostawia dryf}, co jest uczciwym opisem i
+warto go mieć, bo sortowanie to poprawka, po którą ludzie sięgają i na której
+poprzestają.
+\end{fr}
+
+\begin{fr}
+Druga pozycja atakuje dryf wprost. \emph{Sumowanie z kompensacją} \dash{}
+Kahana \dash{} trzyma drugą zmienną z tą częścią ostatniego dodawania, która
+przepadła, i dodaje ją z powrotem do następnego składnika przed jego użyciem:
+\begin{align*}
+  y &= x_i - c \\
+  t &= s + y \\
+  c &= (t - s) - y \\
+  s &= t
+\end{align*}
+Przeczytaj trzecią linijkę. $t - s$ to tyle, o ile dodawanie \emph{naprawdę}
+ruszyło sumę, a $y$ to tyle, o ile miało ją ruszyć; różnica jest dokładnie tym,
+co zostało zaokrąglone, i odzyskuje się ją odejmowaniem dwóch prawie równych
+liczb.
+
+\textbf{Skracanie jest tu mechanizmem, użytym celowo.} Ta sama operacja, która
+zniszczyła wariancję w \S\ref{sec:P02-correct}, jest tutaj jedyną, która w
+ogóle widzi utracone bity.
+\end{fr}
+
+\begin{fr}
+Trzecia to to, co robi biblioteka, i nie potrzebuje dodatkowej zmiennej.
+\textbf{Dodawaj w zrównoważonym drzewie}, a nie w linii: sparuj wartości, dodaj
+pary, sparuj te wyniki i tak dalej. Liczba dodawań się nie zmienia \dash{}
+wciąż jest ich mniej więcej milion \dash{} ale \emph{głębokość} owszem: każda
+wartość dociera teraz do sumy przez mniej więcej dwadzieścia z nich, a nie przez
+milion, więc dryf ma dwadzieścia okazji do nagromadzenia wzdłuż dowolnej ścieżki
+zamiast miliona.
+
+Sumowanie parami to właśnie to, co robi redukcja biblioteki tablicowej, i
+dlatego naiwna pętla Pythona po tablicy bywa \emph{mniej} dokładna niż wywołanie
+biblioteki, które zastąpiła, a nie tylko wolniejsza. Która biblioteka i która
+wersja to fakt o wydaniu, a nie o matematyce, więc ta książka żadnej nie
+wymienia.
+
+Czwarta nie wymaga żadnego sprytu: \textbf{akumuluj w formacie szerszym niż
+wartości.} Wartości szesnastobitowe sumowane do akumulatora \code{float32} albo
+wartości \code{float32} do \code{float64}. Kosztuje odrobinę pamięci i zero
+myślenia, i tak właśnie robi trening w mieszanej precyzji.
+\end{fr}
+
+\begin{fr}
+Wszystkie pięć, na tym samym milionie wartości:
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+ & suma & z wkładu \\
+\midrule
+naiwnie \code{float32} & $\val{p02.sum.naive32}$ & $\val{p02.sum.got.naive32}$\% \\
+od najmniejszych & $\val{p02.sum.sorted}$ & $\val{p02.sum.got.sorted}$\% \\
+z kompensacją & $\val{p02.sum.kahan}$ & $\val{p02.sum.got.kahan}$\% \\
+parami & $\val{p02.sum.pairwise}$ & $\val{p02.sum.got.pairwise}$\% \\
+szerszy akumulator & $\val{p02.sum.wide}$ & $\val{p02.sum.got.wide}$\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Dokładna wartość to $\val{p02.sum.exact}$, policzona na liczbach całkowitych,
+żeby to, do czego porównuje się każdy wiersz, samo nie było wynikiem
+zmiennoprzecinkowym.
+
+Dwie rzeczy w tej tabeli są warte więcej niż sam ranking. Pierwsza to przepaść
+między pierwszym wierszem a każdym innym, czyli różnica między odpowiedzią a
+brakiem odpowiedzi. Druga to fakt, że \textbf{sortowanie wypada o rząd
+wielkości gorzej niż pozostałe trzy} \dash{} jest najtańszą poprawką i
+najsłabszą, a to właśnie ją najczęściej opisuje się jako wystarczającą.
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Program~\ref{prog:F02} zostawił tu pytanie: przed czym chroni $\eps$ w
+normalizacji warstwowej i ile z tego dany format jest w stanie wchłonąć.
+
+Chroni przed dzieleniem przez odchylenie standardowe, które wyszło zerem
+\dash{} co zdarza się, gdy cecha jest stała w całym wsadzie, a także gdy jest
+prawie stała, a wariancję policzono wzorem, od którego ten program się zaczął.
+$\eps$ czyni mianownik dodatnim, cokolwiek zrobił licznik.
+
+Ile format wchłania, jest teraz liczbą, którą umiesz podać: $\eps$ musi być
+większe niż własna podłoga szumu formatu w skali tej wariancji, więc $\eps$
+równe $10^{-8}$ nie robi zupełnie nic w \code{fp16}, którego epsilon jest rzędu
+$10^{-3}$. Dlatego przepisy na mieszaną precyzję liczą statystyki normalizacji
+w \code{float32}, nawet gdy wszystko wokół ma szesnaście bitów.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Ostatnia ramka, i jest listą kontrolną, a nie konkluzją.
+
+Cztery sytuacje niszczą informację, a każda ma znaną alternatywę:
+
+\begin{itemize}
+\item \textbf{odejmowanie prawie równych wielkości} \dash{} znajdź, skąd się
+  wzięły, i policz różnicę wprost, jeśli możesz;
+\item \textbf{eksponenta surowego wyniku} \dash{} odejmij maksimum, zawsze, i
+  bierz logarytm, a nie iloraz;
+\item \textbf{prawdopodobieństwo jako wartość pośrednia} \dash{} zachowaj logit
+  i pozwól stracie wykonać złożenie;
+\item \textbf{długa suma} \dash{} sparuj ją, skompensuj albo poszerz
+  akumulator, i nie poprzestawaj na sortowaniu.
+\end{itemize}
+
+Żadna z tych czterech nie jest o byciu starannym. Każda to konkretna operacja z
+konkretnym zamiennikiem, a umiejętnością jest rozpoznanie operacji, a nie
+zapamiętanie poprawki. Program~\ref{prog:P03} zadaje o tej samej arytmetyce
+następne pytanie \dash{} nie czy jest poprawna, ale ile kosztuje.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Algorytm może być poprawny w arytmetyce dokładnej i
+  bezużyteczny w zmiennoprzecinkowej.} Jednoprzebiegowa wariancja
+  $\Ex[x^{2}] - (\Ex[x])^{2}$ na pięciu odczytach przy $\val{p02.var.offset}$
+  zwraca $\val{p02.var.naive}$ w \code{float32}, przy prawdziwej wartości
+  $\val{p02.var.true}$. Algebrze nie można nic zarzucić, a wynik nie jest
+  wariancją.}
+\sumitem{4--6}{\textbf{Katastrofalne skracanie} jest mechanizmem: obie
+  wielkości zgadzają się na $\val{p02.var.shared}$ cyfrach znaczących, podczas
+  gdy format trzyma siedem, więc odejmowanie skraca każdą wspólną cyfrę i
+  oddaje zaokrąglenie. Odejmowanie jest dokładne; strata nastąpiła przy
+  zaokrąglaniu argumentów. Szukaj różnicy prawie równych wielkości i pytaj,
+  skąd się wzięły.}
+\sumitem{7--8}{\textbf{Lekarstwem nigdy nie jest większa precyzja} \dash{}
+  szerszy format przesuwa urwisko, zamiast je usuwać. Metoda Welforda nigdy nie
+  tworzy $\Ex[x^{2}]$, więc każde odejmowanie jest rzędu rozrzutu, a nie rzędu
+  danych, i zwraca $\val{p02.var.welford}$. Każda poprawka w tym programie ma
+  ten kształt: usuń niszczącą operację, nie czyń jej dokładniejszą.}
+\sumitem{9--10}{Wzmocnienie wynosi $\frac{|a| + |b|}{|a - b|}$ i jest
+  własnością \emph{zadania}. Jego ogólną postacią jest wskaźnik uwarunkowania,
+  który należy do Programu~\ref{prog:P10}, bo jest stwierdzeniem o macierzy.}
+\sumitem{11--13}{Na $\val{p02.layers}$ warstwach najgorszy przypadek
+  \code{fp16} to $\val{p02.grow.fp16}$\%, a \code{bf16} to
+  $\val{p02.grow.bf16}$\% \dash{} ale \textbf{ograniczenie nie jest
+  przewidywaniem}: błędy losowego znaku rosną jak pierwiastek z głębokości,
+  około $\val{p02.grow.ratio}$ razy mniej. Głębokość mnoży epsilon przez coś
+  pomiędzy $\sqrt{n}$ a $n$.}
+\sumitem{14--16}{\textbf{Eksponenta opuszcza format przy logarytmie jego
+  sufitu}, czyli przy $\val{p02.over.fp16}$ dla \code{fp16} \dash{} więc wynik
+  $\val{p02.over.fp16.int}$ się przepełnia, a to zwyczajny logit uwagi.
+  \code{bf16} i \code{fp32} dzielą ten wiersz przy $\val{p02.over.fp32}$, bo
+  zakres to sam budżet wykładnika.}
+\sumitem{17--20}{$\ln\sum_i e^{z_i} = c + \ln\sum_i e^{z_i - c}$ zachodzi dla
+  \emph{każdego} $c$, więc tożsamość nie wymusza wyboru. \textbf{Maksimum jest
+  jedynym $c$ ograniczającym każdy wykładnik do zera lub poniżej}, a więc
+  jedynym bezpiecznym dla każdego wejścia. Zmierzone: $\val{p02.pivot.safe}$ z
+  $\val{p02.pivot.total}$ wyborów działa w jednym zwyczajnym wierszu, i dlatego
+  zły wybór przechodzi przez przegląd \dash{} a najgorszy tworzy
+  $\val{p02.pivot.worst}$.}
+\sumitem{21}{\textbf{Niedomiar w sumie jest zwykle nieszkodliwy, a
+  przepełnienie nigdy.} Składnik, który staje się zerem, i tak nic nie wnosił;
+  składnik, który staje się \code{inf}, zabiera stratę i każdy gradient. Cała
+  ta operacja to $\logsumexp$.}
+\sumitem{22--23}{\textbf{Prawdopodobieństwo jest złą wartością pośrednią na obu
+  końcach}, a jego logarytm dobrą, więc prawdopodobieństwo nie powinno
+  istnieć. $\ln\softmax(z)_j = z_j - \logsumexp(z)$: żadnej eksponenty surowego
+  wyniku, żadnego dzielenia i odejmowanie między liczbami tego samego rzędu.}
+\sumitem{24--26}{$\ln\sigma(x)$ policzone w dwóch krokach zwraca
+  \code{-inf} poniżej mniej więcej $\val{p02.logsig.under}$,
+  gdzie $\sigma$ wpadła w niedomiar; jako jedna operacja zwraca
+  $\val{p02.logsig.stable}$. \textbf{Górny koniec też zawodzi}: $\sigma$ jest
+  dokładnym $\num{1.0}$ od $\val{p02.logsig.saturates}$, więc $\ln(1-p)$ to
+  \code{-inf}, a pewna \emph{poprawna} predykcja produkuje
+  \code{nan}.}
+\sumitem{27--28}{Przejście w przód kończy się na logitach, a strata wykonuje
+  złożenie. Sygnałem w diffie jest softmax albo sigmoida bezpośrednio przed
+  logarytmem. Czym prawdopodobieństwo \emph{jest} i czemu entropia krzyżowa
+  jest stratą, należy do Programów~\ref{prog:P26} i~\ref{prog:P30}; tutaj
+  należy to, że z tych dwóch wielkości logarytm jest tą, którą maszyna
+  pomieści.}
+\sumitem{29--30}{$\val{p02.sum.n}$ wartości równych $\val{p02.sum.small}$
+  dodanych do sumy \code{float32} równej $1$ daje $\val{p02.sum.naive32}$
+  \dash{} \textbf{przepadła każda}, bez błędu i bez ostrzeżenia, z pomyłką o
+  całość sumowanej wielkości.}
+\sumitem{31--35}{Cztery poprawki, i nie są równoważne: od najmniejszych
+  odzyskuje $\val{p02.sum.got.sorted}$\%, kompensacja i drzewo parami
+  $\val{p02.sum.got.kahan}$\%, szerszy akumulator
+  $\val{p02.sum.got.wide}$\%. \textbf{Sortowanie jest najtańsze i najsłabsze},
+  a to je najczęściej nazywa się wystarczającym. Trzecia linijka Kahana
+  odzyskuje utracone bity skracaniem użytym celowo.}
+\sumitem{36--37}{$\eps$ w normalizacji warstwowej chroni dzielenie przez
+  odchylenie standardowe, które wyszło zerem, i musi przekraczać podłogę szumu
+  formatu w skali tej wariancji \dash{} dlatego statystyki normalizacji liczy
+  się w \code{float32} wewnątrz modelu szesnastobitowego. \textbf{Umiejętnością
+  jest rozpoznanie operacji, a nie zapamiętanie poprawki.}}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Powiedz, czym jest katastrofalne skracanie i w którym miejscu rachunku
+  informacja naprawdę przepadła.
+  \answerto{Odejmowaniem dwóch liczb zgodnych na wiodących cyfrach znaczących,
+  więc te cyfry się skracają, a zostaje to, co zbudowały bity niskiego rzędu.
+  Samo odejmowanie jest dokładne; strata nastąpiła przy zaokrąglaniu każdego
+  argumentu.}
+\item Wariancja jednoprzebiegowa zwróciła $\val{p02.var.naive}$ przy prawdziwej
+  wartości $\val{p02.var.true}$. Powiedz, czemu uruchomienie jej w
+  \code{float64} nie jest lekarstwem.
+  \answerto{Przesuwa przesunięcie, przy którym wzór zawodzi, i nie zmienia
+  niczego strukturalnie. Odejmowanie dwóch prawie równych dużych wielkości
+  wciąż tam jest, więc algorytm wciąż niszczy informację dla dostatecznie
+  dużych danych.}
+\item Podaj współczynnik wzmocnienia przy liczeniu $a - b$ z argumentów
+  niosących każdy błąd względny $\eps$ i powiedz, od czego zależy.
+  \answerto{$\frac{|a| + |b|}{|a - b|}$, razy $\eps$. Zależy od tego, jak
+  blisko siebie są argumenty, co jest własnością zadania, a nie kodu.}
+\item Podaj wynik, przy którym eksponenta przepełnia \code{fp16}, i wynik, przy
+  którym przepełnia \code{bf16}, i powiedz, czemu tak bardzo się różnią.
+  \answerto{$\val{p02.over.fp16}$ i $\val{p02.over.bf16}$. Zakres eksponenty to
+  logarytm sufitu formatu, a ten ustala sam budżet wykładnika \dash{} pięć
+  bitów przeciw ośmiu.}
+\item $\ln \sum_i e^{z_i} = c + \ln \sum_i e^{z_i - c}$. Powiedz, co ogranicza
+  $c$ matematycznie, a co w praktyce.
+  \answerto{Matematycznie nic \dash{} tożsamość zachodzi dla każdego $c$. W
+  praktyce tylko $c = \max_i z_i$ ogranicza każdy pozostały wykładnik do zera
+  lub poniżej, więc tylko ono jest bezpieczne dla każdego wejścia.}
+\item Kolega mówi, że jego softmax wyciąga pierwszy wynik zamiast maksimum i
+  nigdy nie zawiódł. Powiedz, co z tego wynika.
+  \answerto{Że jego wiersze nigdy nie były rozrzucone bardziej niż o około
+  $\val{p02.over.fp16}$ w \code{fp16}. To fakt o danych, które widział, a nie o
+  kodzie, a granica przesuwa się w chwili, gdy przesuwają się dane.}
+\item Powiedz, czemu podanie prawdopodobieństw funkcji straty oczekującej
+  logitów jest usterką, a nie równoważną drogą.
+  \answerto{To prawdopodobieństwo jest tą wartością pośrednią, która ma problem
+  z zakresem: nie przepełnia się, ale wpada w niedomiar do zera i zaokrągla do
+  dokładnej jedynki. Postać przyjmująca logity nigdy go nie tworzy i składa oba
+  kroki w arytmetykę na liczbach porównywalnego rzędu.}
+\item Klasyfikator dwuklasowy daje stratę \code{nan} na przykładzie, którego
+  jest pewny i który odgadł dobrze. Podaj mechanizm.
+  \answerto{$\sigma$ zaokrągliła się do dokładnego $\num{1.0}$, co dzieje się
+  od $\val{p02.logsig.saturates}$ w górę, więc $1 - p$ jest dokładnym zerem, a
+  $\ln(1-p)$ to \code{-inf}. Liczenie straty z logitu to usuwa.}
+\item $\val{p02.sum.n}$ wartości równych $\val{p02.sum.small}$ dodaje się do
+  sumy \code{float32} równej $1$. Podaj wynik i powiedz, jakie dostaniesz
+  ostrzeżenie.
+  \answerto{$\val{p02.sum.naive32}$, i żadnego. Każda wartość leży poniżej
+  połowy odstępu przy $1$, więc każde dodawanie kończy się powodzeniem i nic
+  nie rusza.}
+\item Uszereguj cztery poprawki sumowania według tego, ile odzyskują, i
+  powiedz, którą najczęściej się przecenia.
+  \answerto{Szerszy akumulator, potem kompensacja i drzewo parami razem, potem
+  od najmniejszych przy $\val{p02.sum.got.sorted}$\%. Sortowanie jest tą
+  opisywaną jako wystarczająca, a wypada o rząd wielkości gorzej niż pozostałe
+  trzy.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Wyprowadź $\Var(x) = \Ex[x^{2}] - (\Ex[x])^{2}$ z definicji i powiedz, w
+  której linijce wprowadzasz kłopot numeryczny.
+  \answerto{Rozwiń $\Ex[(x - \mu)^{2}] = \Ex[x^{2}] - 2\mu\Ex[x] + \mu^{2}$ i
+  użyj $\Ex[x] = \mu$. Kłopot przychodzi wraz z samym rozwinięciem: zastępuje
+  sumę małych kwadratów odchyleń różnicą dwóch dużych wielkości, a te są równe
+  w arytmetyce dokładnej i nie są równe na maszynie.}
+\item Pokaż, że aktualizacja Welforda utrzymuje
+  $M_n = \sum_{i \le n} (x_i - \mu_n)^2$, i powiedz, czemu dwie różne średnie w
+  jej drugiej linijce nie są literówką.
+  \answerto{Do sprawdzenia jest tożsamość
+  $M_n - M_{n-1} = (x_n - \mu_{n-1})(x_n - \mu_n)$, która wynika z
+  $\mu_n - \mu_{n-1} = (x_n - \mu_{n-1})/n$. Stara i nowa średnia pojawiają się
+  dlatego, że poprawka musi uwzględnić przesunięcie każdego wcześniejszego
+  odchylenia, gdy średnia się rusza, a ich iloczyn robi dokładnie to.}
+\item Wiersz wyników jest rozrzucony w zakresie $200$. Powiedz, co się dzieje
+  pod softmaksem odejmującym maksimum, w \code{fp16}.
+  \answerto{Górne składniki są w porządku, a wszystko ponad
+  $\val{p02.drop.fp16}$ poniżej maksimum wpada w niedomiar do zera, więc te
+  tokeny dostają prawdopodobieństwo dokładnie zerowe. Dostawały mniej niż
+  $\val{p02.drop.fp16.frac}$ największego składnika, więc nic mierzalnego nie
+  ginie \dash{} ale ich gradienty są dokładnie zerowe, a nie bardzo małe.}
+\item Wyjaśnij, czemu $\logsumexp$ wiersza $n$ równych wyników to ten wynik
+  plus $\ln n$, i użyj tego do sprawdzenia implementacji.
+  \answerto{Odjęcie maksimum zostawia $n$ składników równych $1$, których suma
+  wynosi $n$; dodanie maksimum z powrotem daje $z + \ln n$. To najtańszy
+  możliwy test i natychmiast wykrywa błąd wyciągania, bo zły wybór wciąż daje
+  tu poprawną odpowiedź.}
+\item Entropię krzyżową liczy się jako \code{-log(softmax(z)[target])}. Zapisz
+  ją w postaci stabilnej i powiedz, ile eksponent liczy każda wersja.
+  \answerto{$\logsumexp(z) - z_{\text{target}}$. Wersja naiwna bierze
+  eksponentę każdego wyniku, a potem logarytm ilorazu; wersja stabilna bierze
+  eksponentę każdego przesuniętego wyniku raz, wewnątrz $\logsumexp$, a potem
+  wykonuje jedno odejmowanie. Liczba eksponent jest ta sama, a problem z
+  zakresem nie.}
+\item Kompensacja Kahana opiera się na tym, że $(t - s) - y$ odzyskuje
+  zaokrąglenie. Powiedz, jaka własność arytmetyki to umożliwia i kiedy zawodzi.
+  \answerto{Dla dodawania zmiennoprzecinkowego błąd zaokrąglenia sumy $s + y$
+  jest sam reprezentowalny dokładnie, gdy $|s| \ge |y|$, więc odejmowanie
+  odzyskuje go bez własnego błędu. Zawodzi, gdy kompilatorowi wolno zmienić
+  łączność wyrażenia, i dlatego ten algorytm zapisuje się często z barierami.}
+\item Milion gradientów \code{fp16} sumuje się do akumulatora \code{fp16}.
+  Oszacuj, jaka część przetrwa, i powiedz, jaka jedna zmiana naprawia większość.
+  \answerto{Cokolwiek poniżej mniej więcej $\val{p01.swamp.fp16}$ bieżącej sumy
+  nie wnosi nic, więc gdy suma urośnie, późniejsze składniki przepadają
+  hurtem. Akumulowanie w \code{float32} naprawia prawie wszystko za cenę
+  akumulatora, i dlatego jest to standardowy przepis.}
+\item $\eps$ równe $10^{-8}$ dodaje się pod pierwiastkiem w normalizacji
+  warstwowej działającej w \code{fp16}. Powiedz, co to osiąga.
+  \answerto{Nic. Epsilon \code{fp16} jest rzędu $10^{-3}$, więc przy każdej
+  wariancji, którą format reprezentuje, dodanie $10^{-8}$ nie zmienia żadnego
+  bitu. $\eps$ trzeba przeskalować do formatu albo policzyć statystyki w
+  szerszym.}
+\end{furtherproblems}

@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1 written, both editions \dash{} the whole Foundation part, and Part II started.** P2–P34 are stubs carrying their briefs | 33 of 47 |
+| Programs | **F1–F13, P1 and P2 written, both editions \dash{} the whole Foundation part and two of Part II.** P3–P34 are stubs carrying their briefs | 32 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 541 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 545 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 469 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 475 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 565 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 569 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 487 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 495 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,19 +93,19 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **33 of 47 programs are stubs**, in each language. This is the whole of the
+- **32 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 410 computed values, all referenced, all present, plus the committed console
+- 462 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 84 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 90 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **57 orphan-tail pages: 14 · 14 · 14 · 15** across `main-en`, `main-pl`,
+- **59 orphan-tail pages: 14 · 16 · 14 · 15** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
-  41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12 and
-  55 before P1.
+  41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
+  55 before P1 and 57 before P2.
   The count is the signal and it is going the wrong way, at roughly one to
   eleven per program written; **F8 added one, F9 two, F10 four, F11 two and
   F12 four, against F5's eleven**, and the reason is worth having — all five
@@ -742,6 +742,27 @@ Each cost time; none is obvious from its error message.
   wrong baseline. `\framerule` issues it after `\noindent` and the rule's
   `\rlap`, from the rule's own line, which is what makes the note and the rule
   share a baseline.
+
+- **`float()` accepts `inf`, `-inf` and `nan`, so a value ledger that tests
+  numerichood with a bare `try: float(...)` will route them to `\val{}`** —
+  and siunitx answers `Invalid number '-inf'` and **writes a PDF over the top**,
+  which the exit code and the PDF both call fine. Guard with `math.isfinite`.
+  And an infinity is a *name* rather than a computed number: it belongs on the
+  page as `\code{-inf}`, not behind `\val{}`.
+
+- **The four-significant-figure rounding of the largest double is not a
+  double.** `f"{1.7976931348623157e308:.4g}"` gives `1.798e+308`, which is
+  above the ceiling and parses back to `inf`. Anything printing a format's
+  ceiling must truncate towards zero and assert that the printed form is a
+  value the format can hold. Found in P01 *after* P01 had shipped, by the
+  `isfinite` guard above.
+
+- **A background command written `make ... > log 2>&1; echo "EXIT $?"` reports
+  exit 0 whatever make did**, because the notification carries the compound
+  command's status. A build that died with `Error 12` was reported complete and
+  three of the four page counts had silently not moved. Read the log's own exit
+  line, and treat an unchanged page count as a failed build — which is F12's
+  tell arriving through a different door.
 
 - **`\parfillskip=0pt` leaks unless the `\par` is inside the same group.** The
   flush-right idiom used by the outcomes' frame range and the Quiz's route boxes
@@ -3208,6 +3229,198 @@ y291/317/331/303, figure caption at y522/570/560/556, all on one page.
   double spans over six hundred orders of magnitude, which is why it rarely
   makes you think about either end.
 
+### Program P2 pass, August 2026
+
+**Thirty-seven teaching frames, thirty-nine printed, both editions**, against a
+brief that projected fifty. Five sections: an algorithm correct in exact
+arithmetic, what a subtraction costs and compounds to, the exponential's two
+cliffs, never forming a probability, and adding a great many numbers.
+
+Seventh program under its brief's estimate, and the reason is a new one.
+**F03 and F07 had already spent the derivations.** F03 derives the two-term
+log-sum-exp identity in full and F07 states in a warning box that subtracting
+the maximum is an *identity and not a trick*. A P02 that re-derived either
+would have been repeating. What was left is the better half and it is what the
+two of them explicitly deferred: **which** pivot, and what the wrong one costs.
+
+#### An assertion caught a false claim, and the failure is the frame
+
+`code/p02_numerical_stability.py` asserted that only the maximum keeps every
+term of a log-sum-exp inside `fp16`. It failed on the first run: **three of the
+five pivots survive** on an ordinary row, because `fp16` tolerates a shortfall
+of up to $\num{11.09}$ between the largest score and the pivot.
+
+The failed claim is a worse frame than the true one. A pivot $c$ is safe
+exactly when $\max z - c \le \ln(\text{ceiling})$, so whether a non-maximal
+pivot works is **a property of the data**. The maximum is the only choice that
+is safe for every row, every spread and every format, because it makes the
+shortfall zero. Everything else runs through a test suite, through a review and
+into production, and then meets the batch that does not.
+
+That is what \enquote{numerically stable} means as a technical term, and the
+measurement is what makes the sentence land: not *more accurate*, but *safe for
+inputs you have not tried*. Sixth pass running that writing the assertion at
+the computation, before the prose it supports, has caught something.
+
+#### Two data choices that had to be searched for rather than reasoned to
+
+- **The negative variance needed the right offset.** The first draft used
+  readings near $10^{9}$, on the reasoning that a bigger offset cancels harder.
+  It cancels so hard that every reading rounds to the same `fp32` value \dash{}
+  the gap there is $64$ \dash{} and the formula returns exactly $0.0$, which
+  demonstrates nothing. The offset has to be large enough for the squares to
+  cancel and small enough for the readings to stay distinct. A sweep found
+  $30\,000$: five readings a microsecond apart, and the one-pass formula
+  reports $-64$.
+- **And $-64$ is exactly one `fp32` gap** at the magnitude of the quantities
+  being subtracted, which is the smallest non-zero answer the subtraction could
+  have given. The draft said *a multiple of the gap*; it is one, and saying so
+  is both checkable and a better sentence.
+
+#### A tolerance that was wrong about the method rather than the data
+
+The summation section asserted that every fix lands within $10^{-5}$ of the
+exact total, and **sorted failed it**: smallest-first recovers
+$\num{99.6733}\%$ of a million $10^{-8}$ values, not all of them, because a
+million roundings into a growing total drift in a shared direction.
+
+Scoring the fixes pass/fail would have hidden the interesting half. The
+assertion is now the **recovered fraction** plus an ordering \dash{} Kahan and
+pairwise must beat sorting \dash{} and the frames can say the honest thing:
+sorting fixes the catastrophe and leaves the drift, it is the cheapest fix and
+the weakest, and it is the one most often called sufficient.
+
+#### A fabricated console line, and a cross-check that was too narrow
+
+The draft's cliff transcript printed `162754.796875` for
+`float(np.exp(np.float32(12)))`. A direct run gives **`162754.78125`**: the
+draft had interpolated `f32(math.exp(12))`, which is the *fp64* exponential
+rounded to `fp32`, where numpy computes the exponential *in* `fp32`. Two
+different computations under one label, in the program about not trusting what
+a number looks like.
+
+The script already carried a numpy cross-check. **It did not cover that line.**
+A cross-check is only as wide as what it checks, and the tell was noticing that
+the committed transcript and a direct run disagreed. The line is now plain
+`math.exp`, which needs no numpy and is exactly reproducible, and every
+remaining numpy claim in both transcripts is asserted.
+
+**Every transcript line is also wrapped in `float()` on purpose.** numpy 2
+reprs a scalar as `np.float32(-64.0)` where numpy 1 printed `-64.0`, so a
+transcript quoting either is a claim about a numpy version rather than about
+the arithmetic \dash{} F03's `np.logspace` defect in a new coat. `float()`
+returns a plain Python float whose repr is stable, and it is what anybody
+comparing two of these would type.
+
+#### Three build traps, and two of them are new to this repository
+
+- **`float()` accepts `inf`, `-inf` and `nan`.** Both scripts classified an
+  emitted value as numeric by a bare `try: float(body)`, so `-inf` was written
+  as `\mfaval` and `\val{}` handed it to siunitx, which answers
+  `Package siunitx Error: Invalid number '-inf'` **and writes a PDF over the
+  top**. Eight errors, no PDF anybody should ship. The guard is
+  `math.isfinite`, and it is now in both scripts. Latent in P01 and fatal in
+  P02, which is the same shape as the `amssymb` trap.
+
+  The follow-up is better than the fix: `-inf` is a **name**, not a computed
+  number, so it does not belong behind `\val{}` at all. The page writes
+  `\code{-inf}`.
+
+- **The four-figure rounding of the largest double is not a double.**
+  `f"{1.7976931348623157e308:.4g}"` is `1.798e+308`, which is *larger* than the
+  largest double and parses straight back to `inf` \dash{} which is how the
+  `isfinite` guard found it, in P01, after P01 had shipped. A ceiling printed
+  above the ceiling is wrong in precisely the way that program is about.
+  `printed_ceiling()` truncates towards zero instead, and asserts
+  $0 < \text{float(printed)} \le \text{true max}$ for every format.
+
+- **`make ... > log 2>&1; echo "EXIT $?"` in a background task reports exit
+  0.** The task notification carries the *compound* command's status, which is
+  the echo's. A build that failed with `make: *** Error 12` was reported as
+  complete, and the page counts for three of the four formats had silently not
+  moved \dash{} which is F12's tell arriving through a different door. **Read
+  the log's own exit line, and treat an unchanged page count as a failed
+  build.**
+
+#### P01 shipped a claim this pass falsified
+
+Correcting P01's ceilings turned up a sentence that was already wrong:
+\code{bf16}'s ceiling and \code{fp32}'s were said to be *the same, to three
+figures*. They are $\num{3.39}$ and $\num{3.40}$ \dash{} the same to **two**.
+The largest value of a format is $(2 - 2^{-m}) \times 2^{127}$, so
+\code{bf16}'s shorter significand makes its ceiling $\num{0.39}$ per cent
+lower. Both editions now say that, which is more accurate and more
+instructive; the shared exponent budget was always the point.
+
+Same rule as ever, and the fifth time it has paid: **divide the two numbers as
+the page prints them.**
+
+#### Six more claims a reader could have falsified
+
+- **The `aibox`'s two validation losses argued the opposite of their own
+  figures**: a difference of $\num{1.7e-6}$ was called smaller than the gap at
+  that magnitude, which is $\num{2.7e-7}$. It is six gaps. The pair is now
+  emitted with the gap beside it and an assertion that the difference is the
+  smaller.
+- **The signed underflow value was used as a magnitude**, twice \dash{} *once
+  the gap exceeds $-16.6$* is not a statement. `p02.drop.fp16` is the positive
+  number, under its own name.
+- *Less than one part in $10^{5}$* for a term that survives max-subtraction; it
+  is under $6 \times 10^{-8}$ of the largest.
+- *A million values pass through about twenty additions* conflated **depth**
+  with count: the count is unchanged at a million, the depth is twenty, and it
+  is the depth that bounds the drift.
+- *Pairwise summation is the default in most array libraries* is a claim about
+  releases. Narrowed, with the reason stated \dash{} the same reason F04 gives
+  for not naming an optimiser.
+- *An attention logit of twelve is an ordinary afternoon* now names the program
+  that owns the reason: keeping those scores small is the whole job of the
+  $1/\sqrt{d_k}$ factor, which is **P25**'s derivation, checked against the
+  manifest rather than assumed.
+
+#### Layout
+
+Back to the baseline in all four builds. One new box arrived and was cleared:
+$\num{11.3}$ pt in `main-en`, from a **diagram-manifest line** \dash{}
+`p02-cancellation.mmd` plus a 33-character description in the narrow indented
+column. That is F02's finding and its fourth recurrence, and the first time it
+has been the **English** that overflowed rather than the Polish. All three
+third arguments were cut to under 25 characters.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P2.1 cancellation | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P2.2 two-cliffs | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P2.3 pivot | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+**Rule 2 moved a figure, and reading alone was not enough to settle it.**
+`p02-cancellation` was declared after frame 4, where nothing it says is an
+answer \dash{} but frame 5 asks *how many significant figures survive*, and the
+figure's middle node says *every digit they agree on cancels to nothing*, which
+is one step from \enquote{none} for a reader who has just been told the
+operands share nine figures and the format holds seven. On the page it landed
+beside that question in all four builds. Moved below frame 6's answer, and
+re-measured: question, then answer, then figure, in every build.
+
+The generalisable part: **a figure that supplies the last step of an answer is
+as much a spoiler as one that states it.** F02's rule says *contains the
+answer*; this is the milder case and it needed the same fix.
+
+#### Also
+
+- Traps 80 to 86 added to `notes/02`, and item 1's owner split \dash{} which
+  the P01 pass corrected from a promise \dash{} is now marked delivered with
+  the numbers.
+- **Parity came back clean on its first run**, on a program of this size, which
+  has not happened before. The accumulated translator rules did it: no number
+  spelled as a word, and every `Program~\ref{...}'s <maths>` built the other
+  way round while drafting rather than after a failure.
+- Frame numbers remapped after writing: sections landed at
+  `1--8 / 9--13 / 14--21 / 22--28 / 29--37` against a plan of
+  `1--9 / 10--15 / 16--24 / 25--33 / 34--43`. Two markdown asterisk pairs had
+  to be turned into `\emph{}` \dash{} they set as literal asterisks and nothing
+  warns.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -3457,16 +3670,15 @@ clone instead.
 
 ## What is left
 
-1. **Thirty-three programs, and Part I plus the first of Part II is written.**
-   F1 to F13 and P1, both editions, so the book's own claim — *it assumes
-   nothing* — is testable rather than promised. **P02 is next** and it is the
-   natural continuation: P01 has just established that the arithmetic is not
-   exact and what the shape of the inexactness is, and P02's whole subject is
-   what to do about it — cancellation, log-sum-exp, Welford, and summation
-   order as a discipline. P01 hands it three things by name (the accumulated
-   summation loss, catastrophic cancellation, and the right-hand branch of
-   F11's U-curve), so read those frames before estimating P02's length. Then
-   P03, which needs only arithmetic and sigma notation.
+1. **Thirty-two programs, and Part I plus two of Part II is written.** F1 to
+   F13, P1 and P2, both editions. **P03 is next** — orders of magnitude,
+   O-notation, FLOPs and memory — and it is the third question about the same
+   arithmetic: P01 asked what it is, P02 asked which algorithms survive it, P03
+   asks what it costs. It needs only arithmetic and sigma notation, and its
+   brief carries a dependency note worth reading first: the transformer
+   parameter count was deliberately moved out of it to P32, so do not put it
+   back. After that Part III begins, and P04 is the first program in the book
+   that needs a new object rather than a new question.
 
    **F12 was the program the rest of the book leaned on hardest.** It was owed
    five things by name and paid all five: F4's sigma and product; F5's composition (its frame 34 hands it over

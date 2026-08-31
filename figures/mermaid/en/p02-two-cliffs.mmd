@@ -1,0 +1,4 @@
+flowchart LR
+  A["a score too large: the exponential passes<br/>the format's ceiling and becomes inf"]
+  A --> B["a score too small: it passes the floor<br/>and becomes exactly zero"]
+  B --> C["the band between them is set by the exponent<br/>budget alone, so bf16 and fp32 share it"]

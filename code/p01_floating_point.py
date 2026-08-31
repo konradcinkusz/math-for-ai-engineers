@@ -72,8 +72,11 @@ def emit(key: str, value, digits: int | None = None) -> None:
     else:
         body = str(value)
     try:
-        float(body.replace("e", "E"))
-        numeric = True
+        # math.isfinite, not merely a successful parse: float() accepts
+        # "inf", "-inf" and "nan", so the plain try/except classified them as
+        # numbers and \val{} handed them to siunitx, which rejects them with
+        # `Invalid number '-inf'` and no PDF. Latent here and fatal in P02.
+        numeric = math.isfinite(float(body.replace("e", "E")))
     except ValueError:
         numeric = False
     VALUES[key] = (body, numeric)
@@ -126,8 +129,28 @@ def epsilon(mbits: int) -> float:
     return 2.0 ** -mbits
 
 
+def printed_ceiling(x: float, figures: int = 4) -> str:
+    """A ceiling, printed so that the printed form is not above the ceiling.
+
+    THE OBVIOUS ROUTE IS WRONG AND THE BUILD SAID SO. `f"{x:.4g}"` rounds to
+    nearest, so the largest double prints as 1.798e+308 -- which is LARGER
+    than the largest double, and parses straight back to `inf`. A page that
+    quotes a format's ceiling as a number the format cannot hold is wrong in
+    the one way this program is about, so the last figure is truncated
+    towards zero instead and the result is checked below.
+    """
+    from decimal import Decimal, ROUND_DOWN
+    d = Decimal(repr(x)).normalize()
+    exp = d.adjusted()
+    return f"{d.quantize(Decimal(1).scaleb(exp - figures + 1), rounding=ROUND_DOWN):.{figures - 1}e}"
+
+
 for _name, (_e, _m) in FORMATS.items():
-    emit(f"p01.{_name}.max", f"{largest(_e, _m):.4g}")
+    _printed = printed_ceiling(largest(_e, _m))
+    assert 0 < float(_printed) <= largest(_e, _m), (
+        f"{_name}'s ceiling prints as {_printed}, which is not a value the "
+        f"format can hold: a ceiling must never be printed above itself")
+    emit(f"p01.{_name}.max", _printed)
     emit(f"p01.{_name}.minnorm", f"{smallest_normal(_e):.2e}")
     emit(f"p01.{_name}.minsub", f"{smallest_subnormal(_e, _m):.2e}")
     emit(f"p01.{_name}.eps", f"{epsilon(_m):.2e}")
@@ -150,6 +173,18 @@ assert largest(5, 10) == 65504.0, "the fp16 ceiling is no longer 65504"
 # would be two numbers that look like one and are not, which is the defect the
 # F08 pass was caught by.
 emit("p01.fp16.max.exact", f"{largest(5, 10):.0f}")
+
+# bf16 and fp32 share an exponent budget, so their ceilings are CLOSE and are
+# NOT equal: the largest value is (2 - 2^-m) * 2^127, and bf16's shorter
+# significand makes its 2 - 2^-m slightly smaller. The draft said the two agree
+# to three figures, and they do not -- 3.39 against 3.40. They agree to two,
+# and the shortfall is under half a per cent, which is the accurate and more
+# instructive statement.
+_bf, _f32 = largest(8, 7), largest(8, 23)
+emit("p01.bf16.short.pct", f"{(1 - _bf / _f32) * 100:.2f}")
+assert f"{_bf:.2g}" == f"{_f32:.2g}", "bf16 and fp32 ceilings no longer agree to two figures"
+assert f"{_bf:.3g}" != f"{_f32:.3g}", "the two ceilings now agree to three figures after all"
+assert 0 < 1 - _bf / _f32 < 0.005, "the shortfall is no longer under half a per cent"
 
 # bf16's reach against fp16's, which is the number the frames elicit.
 emit("p01.bf16.over.fp16", f"{largest(8, 7) / largest(5, 10):.1e}")
