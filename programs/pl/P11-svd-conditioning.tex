@@ -1,31 +1,830 @@
-%% P11 --- Rozkład SVD, aproksymacja niskiego rzędu i uwarunkowanie
+%% P11 --- Rozklad SVD, aproksymacja niskiego rzedu i uwarunkowanie
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Blizniak: programs/en/P11-svd-conditioning.tex. Ramka w ramke, makro w
+%% makro, liczba w liczbe; tools/parity.py porownuje oba pliki.
+%%
+%% TEZA: kazda macierz, kwadratowa czy nie, rozklada sie na obrot-rozciagniecie
+%% -obrot; obciecie rozciagniecia daje najlepsza aproksymacje danego rzedu; a
+%% stosunek najwiekszego rozciagniecia do najmniejszego mowi, ile bledu solwer
+%% wzmocni.
+%%
+%% P10 PRZEKAZUJE TEN PROGRAM PO IMIENIU, a jego trzy porazki sa tu motywacja.
+%% P09 przekazuje polowe "nie odwracaj" dotyczaca dokladnosci -- splacone w
+%% sekcji 5. P08 nazywa dlug w ramce ostrzezenia: rank collapse "potrzebuje
+%% maszynerii z Programu P11 i prawdziwego modelu". Maszyneria jest tutaj.
+%% Modelu nie ma, i sekcja 3 tak mowi, zamiast go wytwarzac.
 
 \program{Rozkład SVD, aproksymacja niskiego rzędu i uwarunkowanie}
 \label{prog:P11}
+\index{singular value decomposition}
+\index{matrix!condition number}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{powiedzieć, co robią trzy czynniki rozkładu według wartości
+  osobliwych i dlaczego każda macierz taki rozkład ma}
+\outcome{7--11}{powiedzieć, dlaczego wartość osobliwa nie jest wartością
+  własną i co ma zamiast niej macierz prostokątna}
+\outcome{12--19}{powiedzieć, co zachowuje obcięcie do rzędu $r$ i ile ono
+  kosztuje, oraz jak musi wyglądać widmo, żeby było tanie}
+\outcome{20--24}{czytać wskaźnik uwarunkowania jako czynnik wzmocnienia błędu z
+  wejścia na wyjście}
+\outcome{25--33}{powiedzieć, dlaczego tworzenie $A\T A$ jest złym sposobem
+  rozwiązania zadania najmniejszych kwadratów, wraz z cyframi}
+\end{outcomes}
 
-Argument: every matrix, square or not, factors into rotate--stretch--rotate.
-Truncating the stretch gives the provably best approximation of a given rank
-(Eckart--Young, stated). The ratio of largest to smallest singular value is
-the condition number, and it is the amplification factor from input error to
-output error. Payoff: the singular-value spectrum of a real embedding
-matrix, plotted, showing how few directions carry the energy \dash{} the
-empirical case for LoRA and for embedding compression, measured; the
-pseudoinverse as least squares done properly; **why the normal equations
-square the condition number and a QR solve does not**, which is the concrete
-form of \enquote{do not invert}; and the condition number as the number that
-predicts how many iterations an optimiser will need, handed forward to P20.
+\begin{quiz}
+\item Macierz przenosi wektor z przestrzeni jednego rozmiaru do przestrzeni
+  innego. Czy może mieć wektor własny? \teachesat{1--2}
+  \answerto{Nie \dash{} $Av = \lambda v$ wymaga, by $Av$ i $v$ żyły w tej samej
+  przestrzeni, więc tego równania nie da się nawet zapisać. Wartości osobliwe
+  są określone dla każdej macierzy każdego kształtu.}
+\item $A$ ma wartości osobliwe $\val{p11.sig.hi}$ i $\val{p11.sig.lo}$. Podaj
+  wartości własne $A\T A$. \teachesat{7--8}
+  \answerto{$100$ i $4$ \dash{} kwadraty. $A\T A = V\Sigma^{2}V\T$, więc jej
+  wartości własne to kwadraty wartości osobliwych, jakiekolwiek było $A$.}
+\item Aproksymację rzędu $1$ odjęto od $A$. Co zostaje, w terminach wartości
+  osobliwych? \teachesat{14--15}
+  \answerto{Dokładnie $\sigma_2$, jeśli usunięty kawałek był największy. Każdy
+  kawałek rzędu jeden wnosi własną wartość osobliwą i nic poza tym nie wnosi.}
+\item $A$ ma wartości osobliwe między $\val{p11.sig.lo}$ a
+  $\val{p11.sig.hi}$. O ile może wzmocnić błąd względny w najgorszym
+  przypadku? \teachesat{20--21}
+  \answerto{$\val{p11.kappa}$ razy \dash{} to stosunek największego
+  rozciągnięcia do najmniejszego. Ten stosunek jest wskaźnikiem
+  uwarunkowania.}
+\item Tworzysz $A\T A$, żeby rozwiązać zadanie najmniejszych kwadratów. Co
+  zrobiłeś ze wskaźnikiem uwarunkowania? \teachesat{25--26}
+  \answerto{Podniosłeś go do kwadratu. $A\T A$ ma kwadraty wartości osobliwych,
+  więc jej wskaźnik wynosi $\val{p11.kappa.sq}$ tam, gdzie dla $A$ wynosił
+  $\val{p11.kappa}$ \dash{} a to kosztuje cyfry.}
+\end{quiz}
 
-FORWARD REFERENCE, declared: as P10. PCA is an eigen-decomposition of a
-covariance matrix, and covariance is defined in P24.
+% ============================================================
+\section{Co przeżywa, gdy twierdzenie nie przeżywa}
+\label{sec:P11-svd}
+\index{singular value decomposition!definition}
+
+\begin{fr}
+Program~\ref{prog:P10} skończył się trzema macierzami, z którymi nie umiał
+sobie poradzić, a nie były to macierze egzotyczne.
+
+Macierz niesymetryczna, której wektory własne spotykały się pod kątem
+$\val{p10.nonsym.angle}$ stopni zamiast prostego. Ćwierć obrotu bez żadnej
+rzeczywistej wartości własnej. Ścinanie z jedną wartością własną dwa razy i
+tylko jednym kierunkiem na pokaz.
+
+I czwarty przypadek, którego on w ogóle nie podniósł, a który inżynier spotyka
+najczęściej. Zapisz równanie wektora własnego $Av = \lambda v$ dla macierzy o
+większej liczbie kolumn niż wierszy i powiedz, co idzie nie tak.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$Av$ i $v$ żyją w przestrzeniach różnych rozmiarów, więc tego równania nie da
+się w ogóle zapisać.
+\end{ansblock}
+
+Wektor własny to kierunek, który wraca wzdłuż samego siebie, a \enquote{wzdłuż
+samego siebie} wymaga, by wejście i wyjście były w tym samym pokoju. Macierz
+$\val{p11.rect.rows} \times \val{p11.rect.cols}$ przenosi wektory z przestrzeni
+trójwymiarowej do dwuwymiarowej. Niczego, co produkuje, nie da się porównać z
+tym, co pochłonęła.
+
+Cały Program~\ref{prog:P10} stosuje się więc do macierzy kwadratowych, a
+większość macierzy w sieci kwadratowa nie jest.
+\end{fr}
+
+\begin{fr}
+Naprawa zachowuje obraz i rezygnuje z ograniczenia.
+
+Program~\ref{prog:P10} żądał \emph{jednego} zestawu prostopadłych kierunków,
+które macierz jedynie skaluje. To dużo: te same kierunki muszą działać na obu
+końcach.
+
+Zażądaj zamiast tego \textbf{dwóch} zestawów \dash{} prostopadłych kierunków w
+przestrzeni wejściowej i prostopadłych kierunków w przestrzeni wyjściowej, przy
+czym macierz przenosi $i$-ty z pierwszych na wielokrotność $i$-tego z drugich:
+\[ Av_i = \sigma_i u_i \]
+
+Każda macierz to ma, każdego kształtu, bez wyjątków i bez warunków. Liczby
+$\sigma_i$ to jej \textbf{wartości osobliwe}.
+\end{fr}
+
+\begin{fr}
+Zapisane jako rozkład, z wektorami $v$ jako kolumnami $V$ i wektorami $u$ jako
+kolumnami $U$:
+\[ A = U\Sigma V\T \]
+gdzie $U$ i $V$ są ortogonalne \dash{} słowo z Programu~\ref{prog:P09}: ich
+transpozycje są ich odwrotnościami \dash{} a $\Sigma$ jest diagonalna z
+wartościami osobliwymi na przekątnej, umownie od największej.
+
+Czytane od prawej do lewej to trzy ruchy. $V\T$ obraca przestrzeń wejściową
+tak, by wyróżnione kierunki ułożyły się wzdłuż osi. $\Sigma$ rozciąga każdą oś
+własną liczbą. $U$ obraca wynik w to, gdzie mieszka wyjście.
+
+\textbf{Obrót, rozciągnięcie, obrót.} Każda macierz, bez wyjątku.
+\end{fr}
+
+\mermaidfig{p11-three-moves}{Jedyne trzy rzeczy, jakie robi każda macierz, w
+kolejności, w jakiej je robi.}{SVD jako trzy ruchy}
+
+\begin{fr}
+Program~\ref{prog:P10} sprawdził swoje twierdzenie dokładnie, budując
+odpowiedź zamiast jej szukać, i ta sama sztuczka działa tutaj z jedną zmianą
+wartą zauważenia.
+
+Tam $A = QDQ\T$ używało \emph{tego samego} $Q$ po obu stronach, bo dwa zestawy
+kierunków macierzy symetrycznej są tym samym zestawem. Tutaj nie muszą być,
+więc konstrukcja używa dwóch różnych obrotów wymiernych \dash{} jednego z
+trójkąta $3$--$4$--$5$ i jednego z $5$--$12$--$13$ \dash{} i tworzy
+$A = U\Sigma V\T$, gdzie $\Sigma$ niesie $\val{p11.sig.hi}$ i
+$\val{p11.sig.lo}$.
+
+Powstałe $A$ ma wyrazy wybitnie nieprzyjemne, wśród nich $\frac{246}{65}$, i nie
+jest symetryczne. Jego wartości osobliwe to dokładnie $\val{p11.sig.hi}$ i
+$\val{p11.sig.lo}$, bo tam je wstawiono, a skrypt sprawdza
+$Av_i = \sigma_i u_i$ dla obu $i$ na ułamkach.
+
+Zanim pójdziesz dalej, przewidź o nim jedną rzecz. Wiedząc tylko, że jego
+wartości osobliwe to $\val{p11.sig.hi}$ i $\val{p11.sig.lo}$, ile wynosi
+$\lvert\det A\rvert$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p11.detA}$, czyli
+$\val{p11.sig.hi} \times \val{p11.sig.lo}$.
+\end{ansblock}
+
+To nie przypadek i nie jest to nic nowego. $\det(U\Sigma V\T) = \det U \cdot
+\det\Sigma \cdot \det V\T$ na mocy reguły iloczynu z Programu~\ref{prog:P09},
+oba obroty mają wyznacznik $\pm 1$, a $\det\Sigma$ jest iloczynem wartości
+osobliwych. \textbf{Wyznacznik jest iloczynem rozciągnięć, a obroty nie wnoszą
+nic} \dash{} czyli to, co Program~\ref{prog:P09} nazywał objętością,
+powiedziane w języku tego programu.
+\end{fr}
+
+% ============================================================
+\section{Nie wartości własne}
+\label{sec:P11-not-eigen}
+\index{singular value decomposition!against eigenvalues}
+
+\begin{fr}
+Te dwa pojęcia stoją dość blisko siebie, by mylić je bez przerwy, więc oto
+zależność, dokładnie.
+
+Weź $A = U\Sigma V\T$ i utwórz $A\T A$. Wymnóż, używając $U\T U = I$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$A\T A = V\Sigma\T U\T U \Sigma V\T = V\Sigma^{2}V\T$.
+\end{ansblock}
+
+Czyli dokładnie to, co Program~\ref{prog:P10} zapisał jako $QDQ\T$, z $V$ w
+miejsce $Q$ i $\Sigma^{2}$ w miejsce $D$.
+
+Zatem: \textbf{wartości osobliwe $A$ to pierwiastki z wartości własnych
+$A\T A$}, a prawe wektory osobliwe to wektory własne tamtej macierzy. $A\T A$
+jest symetryczna, jakiekolwiek było $A$, więc twierdzenie spektralne zawsze się
+do niej stosuje, a każde $\sigma_i$ jest rzeczywiste i nieujemne, bo jest
+pierwiastkiem z liczby nieujemnej.
+
+Dlatego wartości osobliwe istnieją dla każdej macierzy: są pożyczone z macierzy
+symetrycznej, którą zawsze da się zbudować.
+\end{fr}
+
+\begin{fr}
+Teraz pułapka, a ten przykład dobrano tak, by była trudna, a nie łatwa.
+
+Zbudowane $A$ ma wartości osobliwe $\val{p11.sig.hi}$ i $\val{p11.sig.lo}$.
+Jest kwadratowe, więc ma też własne wartości własne.
+
+Zapisz, jakie według ciebie są, i czytaj dalej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p11.lam.hi}$ i $\val{p11.lam.lo}$. Nie $\val{p11.sig.hi}$ i
+$\val{p11.sig.lo}$.
+\end{ansblock}
+
+Blisko. Na tyle blisko, że na wykresie różnicy byś nie zobaczył, i na tyle
+blisko, że tabela podająca niewłaściwą parę przeszłaby przez recenzję.
+
+\transcript{p11-singular-vs-eigen}
+
+Listing idzie drugą drogą: ślad i wyznacznik $A\T A$ to $104$ i $400$, czyli
+suma i iloczyn liczb $100$ i $4$ \dash{} kwadratów wartości osobliwych,
+dokładnie.
+\end{fr}
+
+\begin{trapbox}
+\textbf{\enquote{Wartości osobliwe to wartości własne.}}
+
+Pokrywają się dla jednej rodziny: macierzy symetrycznych dodatnio
+półokreślonych, gdzie $A\T A = A^{2}$ i pierwiastek cofa kwadrat. Do tej
+rodziny należą macierze kowariancji i macierze Grama, i dlatego nawyk się
+wyrabia.
+
+Wszędzie indziej różnią się, i to nie tylko wartością, ale rodzajem:
+
+\begin{itemize}
+\item wartości osobliwe istnieją dla \textbf{każdej} macierzy, także
+  prostokątnej; wartości własne wymagają kwadratowej;
+\item wartości osobliwe są \textbf{rzeczywiste i nieujemne}, zawsze; wartości
+  własne bywają zespolone, jak pokazała ćwierć obrotu z
+  Programu~\ref{prog:P10};
+\item wartości osobliwych jest zawsze \textbf{tyle, ile wynosi mniejszy
+  wymiar}, z pełnym zestawem kierunków; wektorów własnych może zabraknąć, jak
+  pokazało ścinanie.
+\end{itemize}
+
+Powyższy przykład jest przypadkiem niewygodnym: $\val{p11.lam.hi}$ wobec
+$\val{p11.sig.hi}$ to różnica $5\%$, a wykres jednego opisany jako drugie
+wyglądałby zupełnie rozsądnie.
+\end{trapbox}
+
+\begin{fr}
+Dla macierzy prostokątnej są dwie macierze Grama zamiast jednej, a rozmiary
+warto zobaczyć.
+
+Macierz $\val{p11.rect.rows} \times \val{p11.rect.cols}$ o nazwie $R$ daje
+$R\T R$ rozmiaru $\val{p11.rect.cols} \times \val{p11.rect.cols}$ oraz $RR\T$
+rozmiaru $\val{p11.rect.rows} \times \val{p11.rect.rows}$. Różne macierze,
+różne rozmiary, i żadna z nich nie jest $R$.
+
+Ich ślady zgadzają się na $\val{p11.rect.energy}$, co skrypt sprawdza, i to
+jest wskazówka: obie niosą tę samą sumę, więc implikowane przez nie wartości
+osobliwe są tą samą listą. \textbf{Większa macierz Grama ma po prostu dodatkowe
+zera}, po jednym na każdy wymiar, do którego macierz nie sięga.
+\end{fr}
+
+% ============================================================
+\section{Zachowywanie największych kawałków}
+\label{sec:P11-lowrank}
+\index{matrix!low-rank approximation}
+
+\begin{fr}
+Rozkład można czytać na drugi sposób, i to ten drugi jest użyteczny.
+
+$U\Sigma V\T$ wymnaża się do \emph{sumy}:
+\[ A = \sigma_1 u_1v_1\T + \sigma_2u_2v_2\T + \cdots \]
+Każdy składnik to kolumna razy wiersz, co na mocy Programu~\ref{prog:P08} jest
+macierzą rzędu dokładnie jeden. Macierz jest więc sumą kawałków rzędu jeden, po
+jednym na wartość osobliwą, z nią jako wagą.
+
+Kawałki nie oddziałują: wektory $u$ są prostopadłe i wektory $v$ też. Powiedz,
+co to daje \dash{} na co rozkłada się całkowity \enquote{rozmiar} $A$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Na kwadraty wartości osobliwych i nic poza tym.
+\end{ansblock}
+
+Suma kwadratów wszystkich wyrazów $A$ \dash{} wielkość, którą
+Program~\ref{prog:P05} nazwałby kwadratem długości $A$ czytanego jako jeden
+długi wektor \dash{} wynosi $\sigma_1^{2} + \sigma_2^{2} + \cdots$.
+
+Prostopadłe kawałki dodają się w kwadratach, co jest twierdzeniem Pitagorasa z
+Programu~\ref{prog:F09} z macierzami w miejsce strzałek. Każda wartość osobliwa
+niesie więc swój udział w całości, a udziałem jest $\sigma_i^{2}$.
+\end{fr}
+
+\mermaidfig{p11-keep-the-largest}{Dlaczego kawałki macierzy można ważyć po
+jednym.}{macierz jako suma kawalkow}
+
+\begin{fr}
+Teraz aproksymacja. Zachowaj pierwszych $r$ składników, a resztę wyrzuć.
+
+Właśnie ci powiedziano, co wnosi każdy kawałek. Zatem bez liczenia czegokolwiek:
+co zostaje, mierzone tak samo?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\sigma_{r+1}^{2} + \sigma_{r+2}^{2} + \cdots$ \dash{} dokładnie te kawałki,
+które wyrzuciłeś.
+\end{ansblock}
+
+Na zbudowanej macierzy z sekcji 1 obcięcie do rzędu $1$ zostawia błąd dokładnie
+$\val{p11.ey.err}$, czyli $\sigma_2$, i skrypt sprawdza to na ułamkach.
+
+Błąd nie jest \emph{mniej więcej} $\sigma_2$ ani przez tę wielkość
+ograniczony. Jest $\sigma_2$.
+
+Co prowadzi do pytania, o które chodzi w reszcie sekcji. Obcięcie to
+\emph{jeden} sposób zbudowania macierzy rzędu $1$ blisko $A$. Czy jest lepszy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Nie ma macierzy rzędu $1$ bliższej $A$ niż tamta.
+\end{ansblock}
+
+\textbf{Twierdzenie Eckarta--Younga}, które ta książka podaje i którego nie
+dowodzi. Ze wszystkich macierzy rzędu $r$ obcięty rozkład SVD jest najbliższy
+$A$. Nie dobry wybór, nie dająca się obronić heurystyka: najlepszy, jaki
+istnieje.
+
+To mocna teza \dash{} kwantyfikuje po każdej macierzy rzędu $r$, a jest ich
+nieskończenie wiele \dash{} więc zasługuje na to samo traktowanie, jakie
+Program~\ref{prog:P10} dał twierdzeniu spektralnemu. Skrypt buduje
+$\val{p11.ey.trials}$ innych macierzy rzędu jeden z wymiernych par kierunków,
+bierze najlepsze skalowanie dla każdej i wymaga, by każda była co najmniej tak
+samo zła. Każda jest.
+\end{fr}
+
+\begin{fr}
+Jak w Programie~\ref{prog:P10}, te próby są dowodem o kodzie, a nie o
+twierdzeniu: kontrprzykład obaliłby dowód.
+
+Do czego służą, jest tu jednak inne i warto to oddzielić. Twierdzenie
+spektralne sprawdzano, bo słowo \emph{dokładnie} wymagało dokładnej arytmetyki.
+Eckarta--Younga sprawdza się, bo \textbf{tę tezę łatwo zapamiętać jako
+słabszą, niż jest} \dash{} \emph{dobra aproksymacja} zamiast \emph{najlepsza}
+\dash{} a zobaczenie tysięcy alternatyw, które przegrywają, ustala, którą z
+dwóch czytelnik wyniesie.
+\end{fr}
+
+\begin{fr}
+Oto, co to daje, i to jest powód, dla którego obchodzi to kogokolwiek spoza
+wydziału matematyki.
+
+Weź macierz, której wartości osobliwe biegną $100, 40, 16, 6, 2, 1$. Zachowaj
+$\val{p11.spec.keep}$ największe z $\val{p11.spec.n}$, a cztery wyrzuć.
+
+Jaki ułamek całości nadal masz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p11.spec.pct}\%$, zostawiając $\val{p11.spec.rest.pct}\%$.
+\end{ansblock}
+
+Jedna trzecia kawałków niosąca prawie całą treść. To cały argument za
+przechowywaniem $U_r\Sigma_r V_r\T$ zamiast $A$ i za adapterem niskiego rzędu z
+Programu~\ref{prog:P08}: jeśli macierz jest prawie rzędu
+$\val{p11.spec.keep}$, traktowanie jej jako rzędu $\val{p11.spec.keep}$
+kosztuje prawie nic.
+
+Zauważ kształt warunku. Nie chodzi o rozmiar macierzy. Chodzi o to, jak szybko
+wartości osobliwe \textbf{zanikają}, a macierz o płaskim widmie nie zyskuje
+nic.
+\end{fr}
+
+\begin{warning}
+\textbf{Tamto widmo zostało zbudowane, a ta książka nie zmierzyła żadnego
+prawdziwego.}
+
+Powyższa ramka wybrała sześć liczb, które szybko zanikają, i podała, co z tego
+wynika. Pokazuje \emph{mechanizm} i nie jest dowodem, że jakakolwiek konkretna
+macierz tak się zachowuje.
+
+Teza empiryczna \dash{} że macierze zanurzeń albo wag wytrenowanego modelu mają
+widma skupione na tyle, by aproksymacja rzędu $r$ była niemal darmowa \dash{}
+jest tym, na czym opiera się literatura o adaptacji niskiego rzędu, a
+rozstrzygnięcie jej wymaga wartości osobliwych prawdziwych macierzy prawdziwego
+modelu. Ta książka takiego nie ma i nie pobiera.
+
+To ten sam dług, którego Program~\ref{prog:P08} nie udawał, że spłacił, w
+sprawie rank collapse, i ta sama odpowiedź: maszyneria jest tutaj, modelu nie
+ma, a powiedzenie, co jest czym, jest całą tą dyscypliną.
+\end{warning}
+
+% ============================================================
+\section{Błąd na wejściu, błąd na wyjściu}
+\label{sec:P11-conditioning}
+\index{matrix!condition number}
+
+\begin{fr}
+Inne pytanie o te same trzy ruchy, i to ono rozstrzyga, czy odpowiedzi można
+ufać.
+
+Wejście przychodzi już obarczone błędem \dash{} z pomiaru, z czujnika albo po
+prostu z ostatniego zaokrąglenia, które opisał Program~\ref{prog:P01}. Macierz
+działa na błąd dokładnie tak, jak działa na wszystko inne.
+
+Jeśli błąd wejścia akurat wskazuje wzdłuż $v_1$, zostaje pomnożony przez
+$\sigma_1$. Jeśli wskazuje wzdłuż ostatniego $v$, przez najmniejszą $\sigma$.
+Pytanie brzmi, co dzieje się z błędem \emph{względem} odpowiedzi, a to jest
+stosunek dwóch z nich.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+W najgorszym przypadku błąd względny zostaje pomnożony przez
+$\sigma_{\max}/\sigma_{\min}$.
+\end{ansblock}
+
+W najgorszym przypadku odpowiedź jest tak mała, jak odwzorowanie pozwala, a
+błąd tak duży, jak pozwala, więc oba skrajne przypadki się dzielą.
+
+Ten stosunek to \textbf{wskaźnik uwarunkowania}, pisany $\kappa(A)$, a dla
+macierzy z sekcji 1 wynosi
+$\val{p11.sig.hi}/\val{p11.sig.lo} = \val{p11.kappa}$.
+
+Jest bezwymiarowy i mnoży błąd \emph{względny}. Zatem: wejście dobre do
+szesnastu cyfr znaczących wchodzi w macierz o $\kappa = 10^{6}$. Do mniej
+więcej ilu cyfr dobra jest odpowiedź?
+\dotline
+\nextframe
+\end{fr}
+
+\mermaidfig{p11-error-in-error-out}{Co macierz robi z błędem, który przyszedł
+razem z wejściem.}{wskaznik uwarunkowania jako wzmocnienie}
+
+\begin{fr}
+\begin{ansblock}
+Do jakichś dziesięciu. Sześć z szesnastu przepadło.
+\end{ansblock}
+
+Reguła kciuka jest tą, którą warto nieść: \textbf{tracisz mniej więcej
+$\logb{10}\kappa$ cyfr dziesiętnych}. Podwójna precyzja zaczyna z jakimiś
+szesnastoma, więc wskaźnik $10^{16}$ nie zostawia nic, a wskaźnik
+$\val{p11.spec.kappa}$ kosztuje dwie z szesnastu i jest niczym szczególnym.
+\end{fr}
+
+\begin{fr}
+Dwie rzeczy, którymi on nie jest, a obie są częstymi odczytami.
+
+Nie jest własnością \emph{algorytmu}. Wskaźnik uwarunkowania jest faktem o
+macierzy i mówi, z czym musi się zmierzyć każda poprawna metoda. Źle
+uwarunkowane zadanie rozwiązane doskonałym algorytmem nadal daje kiepską
+odpowiedź, bo odpowiedź naprawdę jest tak czuła na wejście.
+
+I nie jest zgłoszeniem błędu. Wąwóz z Programu~\ref{prog:P10} miał duży
+wskaźnik z założenia; ma go też każde zadanie, w którym jeden kierunek liczy
+się znacznie bardziej niż inny. Ta liczba mówi, ile precyzji zadanie
+kosztuje, a nie że ktoś popełnił pomyłkę.
+
+Oba odczyty biorą się z tego samego miejsca: liczba zapowiadająca zły wynik
+bywa traktowana jak diagnoza. Bliżej jej do prognozy pogody. Mówi, jakie są
+warunki i ile będą kosztować, a uczciwą reakcją jest zaplanowanie tej straty, a
+nie szukanie pomyłki, która ją spowodowała.
+
+Co warto połączyć z czymś już zmierzonym. Dla macierzy symetrycznej dodatnio
+określonej wartości osobliwe \emph{są} wartościami własnymi. Co więc
+Program~\ref{prog:P10} nazwał już $\kappa$, nie używając tego słowa?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Stosunek wartości własnych niecki \dash{} którego pierwiastek mówił, jak
+wydłużona jest elipsa poziomicowa.
+\end{ansblock}
+
+To daje połączenie, wokół którego krążyły dwa programy. Wąwóz to niecka o
+dużym $\kappa$; duże $\kappa$ to zadanie oddające cyfry; a
+Program~\ref{prog:P20} pokaże, że to także zadanie kosztujące optymalizator
+iteracje.
+
+\textbf{Jedna liczba, trzy konsekwencje}, a wkładem tego programu jest ta
+środkowa.
+\end{fr}
+
+% ============================================================
+\section{Dlaczego kod nie tworzy \texorpdfstring{$A\T A$}{A transponowane A}}
+\label{sec:P11-normal}
+\index{least squares!normal equations}
+
+\begin{fr}
+Program~\ref{prog:P09} zmierzył, że rozwiązanie układu kosztuje jakąś piątą
+tego, co jego odwracanie, a potem powiedział coś, czego nie mógł poprzeć:
+
+\begin{quote}
+Rachunek operacji jest mierzony tutaj. Dokładność należy do
+Programu~\ref{prog:P11} i jest tą połową, która rozstrzyga spór.
+\end{quote}
+
+Ta sekcja to spłaca. Nośnikiem są najmniejsze kwadraty, bo tam pokusa jest
+największa: Program~\ref{prog:P08} wyprowadził równania normalne
+$A\T A\hat{x} = A\T b$ jako postać zamkniętą, a postać zamknięta prosi się o
+wpisanie tak, jak stoi.
+
+Wiesz, jakie są wartości osobliwe $A\T A$. Ile więc wynosi jej wskaźnik
+uwarunkowania?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\kappa(A)^{2}$. Wartości osobliwe są podniesione do kwadratu, więc ich
+stosunek też.
+\end{ansblock}
+
+Dla macierzy z sekcji 1 to $\val{p11.kappa.sq}$ wobec $\val{p11.kappa}$, co
+skrypt sprawdza dokładnie.
+
+A teraz zestaw to z regułą kciuka sprzed dwóch ramek. Jeśli tracisz mniej
+więcej $\logb{10}\kappa$ cyfr, a tworzenie $A\T A$ podnosi $\kappa$ do
+kwadratu, to tworzenie $A\T A$ \textbf{podwaja liczbę traconych cyfr}. Nie
+trochę gorzej: dwa razy tyle straty, za krok zrobiony tylko dlatego, że wzór
+tak został zapisany.
+\end{fr}
+
+\begin{fr}
+To był argument. Oto pomiar, i jest to jedyna teza w tym programie naprawdę o
+liczbach zmiennoprzecinkowych, a nie o macierzach.
+
+Prawdziwe zadanie najmniejszych kwadratów: dopasuj wielomian stopnia
+$\val{p11.ls.deg}$ przez $\val{p11.ls.points}$ punktów rozłożonych na
+$\intcc{0}{1}$. Współczynniki są wybrane, więc dokładna odpowiedź jest znana, a
+prawa strona zbudowana na ułamkach, żeby nic nie przepadło przed rozwiązywaniem.
+
+Potem ten sam układ rozwiązuje się dwa razy w zwykłej podwójnej precyzji
+\dash{} raz przez $A\T A$, raz rozkładem, który jej nigdy nie tworzy.
+\end{fr}
+
+\begin{fr}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{droga} & \textbf{błąd względny współczynników} \\
+\midrule
+rozkład, $A\T A$ nigdy nie utworzone & lepszy niż $\val{p11.ls.qr.bound}$ \\
+równania normalne & gorszy niż $\val{p11.ls.ne.floor}$ \\
+\bottomrule
+\end{tabularx}
 
 \medskip
-\textbf{Planowana długość:} 60 ramek.
-}
+Co najmniej $\val{p11.ls.digits}$ cyfr dziesiętnych, oddanych za wpisanie wzoru
+tak, jak stoi. Obie wielkości podano jako ograniczenia, a nie jako pomiary, a
+powód jest z Programu~\ref{prog:P01}: reszta jest własnością maszyny, która ją
+wyprodukowała, więc tym, co się tu zapisuje, jest różnica, która własnością
+maszyny nie jest.
+\end{fr}
+
+\begin{fr}
+Ta porażka ma kształt, który czyni ją groźną, a nie kształt, który czyni ją
+oczywistą.
+
+Nic się nie podnosi. Żadne ostrzeżenie się nie pojawia. Współczynniki, które
+wracają, wyglądają jak współczynniki: właściwy rząd wielkości, właściwe znaki,
+wiarygodne dla każdego, kto nie znał odpowiedzi wcześniej. Są po prostu błędne
+od szóstej cyfry znaczącej wzwyż.
+
+Program~\ref{prog:P07} nazwał ten kształt dokładnie \dash{} usterka łagodna,
+póki się debuguje, a dotkliwa, gdy wszystko zaczyna działać, to najgorszy
+kształt usterki. Tutaj odpowiednikiem jest: usterka, która wygląda jak
+odpowiedź, jest gorsza niż taka, która wygląda jak awaria.
+\end{fr}
+
+\begin{fr}
+Rada \enquote{nie twórz równań normalnych} to więc dwie tezy z dwoma
+właścicielami, i obie mają liczby.
+
+Program~\ref{prog:P09}: tworzenie odwrotności kosztuje jakieś
+$\val{p09.cost.ratio}$ razy tyle arytmetyki co rozwiązywanie, zmierzone
+liczeniem. Ten program: tworzenie $A\T A$ podnosi wskaźnik uwarunkowania do
+kwadratu, więc podwaja tracone cyfry, zmierzone dwukrotnym rozwiązaniem tego
+samego układu.
+
+Ta druga rozstrzyga. Czynnik $\val{p09.cost.ratio}$ w szybkości to kompromis
+inżynierski, który wchłonie szybsza maszyna. Cyfr nie odzyskuje się przy żadnej
+szybkości.
+\end{fr}
+
+\begin{fr}
+Jeszcze jeden obiekt, i jest to definicja, a nie technika.
+
+Program~\ref{prog:P08} pokazał, że wysoki układ zwykle nie ma rozwiązania i że
+najlepszą odpowiedzią jest rzut. SVD daje tej odpowiedzi postać zamkniętą:
+obróć przez $U\T$, podziel przez każdą wartość osobliwą, obróć przez $V$.
+Zapisane jako macierz nazywa się to \textbf{pseudoodwrotnością}, $A^{+}$.
+
+Tam, gdzie $A$ jest odwracalne, zgadza się z $A^{-1}$. Tam, gdzie nie jest,
+daje odpowiedź najmniejszych kwadratów, a gdy kilka odpowiedzi remisuje, daje
+najkrótszą.
+
+Zauważ, że wszystkie trzy kroki to rzeczy, które ten program już nazwał. Obrót
+macierzą ortogonalną to bezstratna zmiana bazy z Programu~\ref{prog:P09};
+dzielenie przez wartości osobliwe to jedyne miejsce, w którym cokolwiek się
+skaluje; a obrót z powrotem to ten sam ruch jeszcze raz. Nic w tej definicji
+nie jest nowe, i dlatego jest to definicja, a nie technika.
+
+Na ten środkowy krok warto popatrzeć dłużej. Dzieli przez \emph{każdą} wartość
+osobliwą, także najmniejszą. Powiedz, co to robi w kierunku, który macierz
+prawie spłaszczyła.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Prawie eksploduje: dzielenie przez coś prawie zerowego.
+\end{ansblock}
+
+To znowu wskaźnik uwarunkowania, przybywający jako dzielenie, które da się
+wskazać palcem.
+
+Dlatego też obcinanie pomaga: odrzucenie najmniejszych wartości osobliwych
+przed odwracaniem ogranicza wzmocnienie, kosztem nieodpowiadania w tych
+kierunkach w ogóle. Czy ten kompromis warto zawrzeć, jest osądem o zadaniu, a
+ta książka nie ma na to reguły.
+\end{fr}
+
+\begin{fr}
+Część III zamyka się w tym miejscu, i zamyka się jednym rozkładem.
+
+Program~\ref{prog:P04} pytał, czym jest przestrzeń, a Program~\ref{prog:P06}
+uczynił macierz funkcją. Program~\ref{prog:P08} policzył, jak dużo przestrzeni
+ją przeżywa, Program~\ref{prog:P09} zmierzył ile, a Program~\ref{prog:P10}
+znalazł kierunki przechodzące nieobrócone \dash{} dla macierzy, które je mają.
+
+$A = U\Sigma V\T$ ma to wszystko. Rząd to liczba niezerowych wartości
+osobliwych; wyznacznik to ich iloczyn; jądro rozpinają te wektory $v$, których
+$\sigma$ jest zerem; najlepsza aproksymacja niskiego rzędu to kilka pierwszych
+składników; a wskaźnik uwarunkowania to pierwsza podzielona przez ostatnią.
+\textbf{Pytania sześciu programów, odpowiedziane odczytaniem jednego
+rozkładu}, i to jest najmocniejszy powód, by wiedzieć, że ten rozkład istnieje.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Równania wektora własnego nie da się w ogóle zapisać dla
+  macierzy prostokątnej}, bo $Av$ i $v$ żyją w przestrzeniach różnych rozmiarów.
+  Program~\ref{prog:P10} stosuje się więc do macierzy kwadratowych, a większość
+  macierzy w sieci kwadratowa nie jest.}
+\sumitem{3--4}{Naprawa żąda \textbf{dwóch} zestawów prostopadłych kierunków
+  zamiast jednego \dash{} $Av_i = \sigma_i u_i$ \dash{} i ma je każda macierz
+  każdego kształtu. Zapisane jako $A = U\Sigma V\T$ jest to \textbf{obrót,
+  rozciągnięcie, obrót}, czytane od prawej do lewej, bez wyjątków i bez
+  warunków.}
+\sumitem{5--6}{Sprawdzone dokładnie na macierzy zbudowanej z \emph{dwóch}
+  różnych obrotów wymiernych, czyli konstrukcją z Programu~\ref{prog:P10} ze
+  zniesionym warunkiem $U = V$. A $\lvert\det A\rvert$ jest iloczynem wartości
+  osobliwych, bo obroty nie wnoszą nic \dash{} czyli objętość z
+  Programu~\ref{prog:P09} w języku tego programu.}
+\sumitem{7--8}{$A\T A = V\Sigma^{2}V\T$, więc \textbf{wartości osobliwe są
+  pierwiastkami z wartości własnych $A\T A$}. Dlatego istnieją dla każdej
+  macierzy: są pożyczone z macierzy symetrycznej, którą zawsze da się zbudować,
+  i twierdzenie spektralne zawsze się do niej stosuje.}
+\sumitem{9--10}{\textbf{Wartości osobliwe to nie wartości własne}, a przykład
+  dobrano tak, by pomyłka była zrozumiała: $\val{p11.lam.hi}$ i
+  $\val{p11.lam.lo}$ wobec $\val{p11.sig.hi}$ i $\val{p11.sig.lo}$, różnica
+  $5\%$, której żaden wykres nie pokaże. Różnią się też rodzajem \dash{}
+  wartości osobliwe istnieją dla każdego kształtu, są zawsze rzeczywiste i
+  nieujemne i nigdy nie brakuje im kierunków.}
+\sumitem{11}{Macierz prostokątna ma \textbf{dwie} macierze Grama różnych
+  rozmiarów, których ślady zgadzają się na $\val{p11.rect.energy}$. Większa
+  niesie po prostu dodatkowe zera, po jednym na każdy wymiar, do którego
+  macierz nie sięga.}
+\sumitem{12--13}{$A$ jest \textbf{sumą kawałków rzędu jeden}, po jednym na
+  wartość osobliwą, i one nie oddziałują \dash{} całkowity rozmiar rozkłada się
+  więc na $\sigma_i^{2}$, co jest twierdzeniem Pitagorasa z
+  Programu~\ref{prog:F09} z macierzami w miejsce strzałek.}
+\sumitem{14--15}{Obcięcie do rzędu $r$ zostawia zatem \textbf{dokładnie}
+  wyrzucone kawałki: $\val{p11.ey.err}$ dla przykładowej macierzy, czyli
+  $\sigma_2$. Nie mniej więcej $\sigma_2$, nie ograniczone przez nią.}
+\sumitem{16--17}{\textbf{Eckart--Young}: ze wszystkich macierzy rzędu $r$
+  obcięcie jest najbliższe. Podane, nie dowodzone, i sprawdzone wobec
+  $\val{p11.ey.trials}$ alternatyw \dash{} nie jako dowód twierdzenia, tylko
+  dlatego, że \textbf{tę tezę łatwo zapamiętać jako słabszą, niż jest}, a
+  patrzenie, jak tysiące alternatyw przegrywa, ustala, którą wersję czytelnik
+  wyniesie.}
+\sumitem{18--19}{Dwie z sześciu wartości osobliwych niosące $\val{p11.spec.pct}\%$
+  to cały argument za przechowywaniem obcięcia i za adapterem niskiego rzędu. A
+  warunek dotyczy \textbf{tego, jak szybko widmo zanika}, a nie rozmiaru
+  macierzy: płaskie widmo nie zyskuje nic.}
+\sumitem{20--21}{Błąd przychodzi z wejściem i jest rozciągany jak wszystko inne,
+  więc w najgorszym przypadku błąd \emph{względny} zostaje pomnożony przez
+  $\sigma_{\max}/\sigma_{\min}$. To \textbf{wskaźnik uwarunkowania}, a dla
+  przykładowej macierzy wynosi $\val{p11.kappa}$.}
+\sumitem{22--23}{\textbf{Tracisz mniej więcej $\logb{10}\kappa$ cyfr
+  dziesiętnych} z szesnastu, od których zaczyna podwójna precyzja. Nie jest to
+  własność algorytmu \dash{} doskonała metoda nadal daje kiepską odpowiedź na
+  źle uwarunkowanym zadaniu \dash{} i nie jest to zgłoszenie błędu.}
+\sumitem{24}{Dla macierzy symetrycznej dodatnio określonej $\kappa$ jest
+  stosunkiem wartości własnych, który zmierzył Program~\ref{prog:P10}, więc
+  \textbf{wąwóz, utrata cyfr i wolny optymalizator to jedna liczba czytana na
+  trzy sposoby}. Ta środkowa należy do tego programu.}
+\sumitem{25--26}{$A\T A$ ma \emph{kwadraty} wartości osobliwych, więc
+  \textbf{$\kappa(A\T A) = \kappa(A)^{2}$} \dash{} $\val{p11.kappa.sq}$ wobec
+  $\val{p11.kappa}$. Podniesienie $\kappa$ do kwadratu podwaja tracone cyfry,
+  za krok zrobiony tylko dlatego, że postać zamknięta z
+  Programu~\ref{prog:P08} tak została zapisana.}
+\sumitem{27--29}{Zmierzone na dopasowaniu stopnia $\val{p11.ls.deg}$ przez
+  $\val{p11.ls.points}$ punktów: rozkład schodzi poniżej
+  $\val{p11.ls.qr.bound}$, równania normalne nie schodzą poniżej
+  $\val{p11.ls.ne.floor}$, \textbf{co najmniej $\val{p11.ls.digits}$ cyfr
+  oddanych}. Zapisane jako ograniczenia, bo reszta należy do maszyny. I nic się
+  nie podnosi: błędne współczynniki wyglądają jak współczynniki, co jest gorsze
+  niż awaria.}
+\sumitem{30}{Rada \enquote{nie twórz równań normalnych} to więc dwie tezy z
+  dwoma właścicielami. Program~\ref{prog:P09} zmierzył arytmetykę, ten program
+  dokładność \dash{} a \textbf{dokładność rozstrzyga}, bo czynnik w szybkości
+  wchłonie szybsza maszyna, a cyfr nie odzyskuje się przy żadnej szybkości.}
+\sumitem{31--32}{\textbf{Pseudoodwrotność} $A^{+}$ to obróć, podziel przez każdą
+  wartość osobliwą, obróć \dash{} zgodna z $A^{-1}$ tam, gdzie ta istnieje, i
+  dająca odpowiedź najmniejszych kwadratów tam, gdzie nie. Dzielenie przez
+  najmniejszą $\sigma$ jest miejscem, w którym wskaźnik uwarunkowania staje się
+  dzieleniem, które da się wskazać palcem, a wcześniejsze obcięcie jest
+  kompromisem, który je ogranicza.}
+\sumitem{33}{\textbf{Jeden rozkład odpowiada na pytania sześciu programów}: rząd
+  to liczba niezerowych $\sigma$, wyznacznik to ich iloczyn, jądro rozpinają te
+  $v$, których $\sigma$ jest zerem, najlepsza aproksymacja niskiego rzędu to
+  kilka pierwszych składników, a $\kappa$ to pierwsza podzielona przez
+  ostatnią.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item $A$ jest $5 \times 3$. Podaj, ile ma wartości osobliwych, i powiedz, czy
+  może mieć wartości własne.
+  \answerto{Trzy \dash{} tyle, ile wynosi mniejszy z wymiarów. Wartości własnych
+  nie może mieć w ogóle: $Av$ żyje w przestrzeni pięciowymiarowej, a $v$ w
+  trójwymiarowej, więc $Av = \lambda v$ nie jest zdaniem, które da się
+  wypowiedzieć.}
+\item $A$ ma wartości osobliwe $6$, $3$ i $1$. Podaj $\kappa(A)$,
+  $\kappa(A\T A)$ oraz z grubsza, ile cyfr dziesiętnych kosztuje każdy.
+  \answerto{$6$ i $36$. Jakieś $\num{0.8}$ cyfry i jakieś $\num{1.6}$ \dash{}
+  $\logb{10}6$ i $\logb{10}36$. Chodzi nie o wielkość żadnego z nich, tylko o
+  to, że drugi jest dwa razy większy od pierwszego, zawsze.}
+\item Obcięcie $A$ do rzędu $2$ zostawia błąd $1$. Co to mówi o $\sigma_3$ i co
+  to mówi o każdej innej macierzy rzędu $2$?
+  \answerto{$\sigma_3 = 1$, dokładnie, bo zostawiony błąd to to, co wyrzucono. A
+  na mocy Eckarta--Younga żadna inna macierz rzędu $2$ nie jest bliżej, więc $1$
+  nie jest błędem tej metody, tylko najlepszym dostępnym.}
+\item Dwie macierze mają widma $(100, 99, 98, 97)$ oraz $(100, 3, 2, 1)$.
+  Powiedz, którą warto aproksymować rzędem $1$ i dlaczego.
+  \answerto{Drugą. Rząd $1$ zachowuje $100^{2}$ z
+  $100^{2}+3^{2}+2^{2}+1^{2}$, czyli ponad $99\%$; pierwsza zachowuje jakąś
+  ćwiartkę, bo jej cztery kierunki liczą się niemal tak samo. \textbf{Warunkiem
+  jest zanik, a nie rozmiar.}}
+\item Ktoś mówi ci, że solwer zwrócił współczynniki, które \enquote{wyglądają
+  rozsądnie}, dla źle uwarunkowanego dopasowania najmniejszych kwadratów.
+  Powiedz, dlaczego to nie uspokaja.
+  \answerto{Bo porażka uwarunkowania nie produkuje bzdur. Produkuje wiarygodne
+  liczby o właściwym znaku i rzędzie wielkości, błędne na cyfrach, których nikt
+  nie sprawdza. \enquote{Wygląda rozsądnie} jest dokładnie tym objawem.}
+\item Dlaczego macierz z zerową wartością osobliwą nie ma odwrotności, w języku
+  tego programu?
+  \answerto{Bo $A^{+}$ dzieli przez każdą wartość osobliwą, a dzielenie przez
+  zero jest miejscem, w którym to się kończy. Równoważnie: $\Sigma$ spłaszcza
+  ten kierunek, więc odwzorowanie nie jest różnowartościowe, co jest jądrem z
+  Programu~\ref{prog:P08} i zerowym wyznacznikiem z Programu~\ref{prog:P09}.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że $\kappa(A) \ge 1$ dla każdej macierzy, i powiedz, które macierze
+  osiągają $1$.
+  \answerto{$\sigma_{\max} \ge \sigma_{\min}$ z definicji, więc stosunek wynosi
+  co najmniej $1$. Równość oznacza, że każda wartość osobliwa jest ta sama, więc
+  $\Sigma$ jest wielokrotnością identyczności, a $A$ obrotem przeskalowanym
+  stałą \dash{} co rozciąga każdy kierunek jednakowo i nie może zniekształcić
+  błędu względnego wcale.}
+\item Program~\ref{prog:P10} powiedział, że ćwierć obrotu nie ma żadnej
+  rzeczywistej wartości własnej. Podaj jej wartości osobliwe.
+  \answerto{Obie $1$. $A\T A = I$ dla każdego obrotu, więc każda wartość
+  osobliwa wynosi $1$, a $\kappa = 1$. SVD nie ma najmniejszej trudności z
+  macierzą, która pokonała wartości własne całkowicie, i to jest teza sekcji 1
+  uczyniona konkretną.}
+\item Macierz zostaje pomnożona przez $1000$. Powiedz, co dzieje się z jej
+  wartościami osobliwymi, z jej wskaźnikiem uwarunkowania i z liczbą cyfr, jakie
+  traci rozwiązanie z nią.
+  \answerto{Każda wartość osobliwa zostaje pomnożona przez $1000$; wskaźnik
+  uwarunkowania nie zmienia się, bo jest stosunkiem; i tracone cyfry też się nie
+  zmieniają. To pułapka z wyznacznikiem z Programu~\ref{prog:P10} od drugiej
+  strony: skalowanie rusza wyznacznikiem ogromnie, a uwarunkowaniem wcale, i
+  dlatego $\kappa$ jest uczciwą miarą \emph{prawie osobliwej}, a $\det$ nie
+  jest.}
+\item Dlaczego pseudoodwrotność macierzy z maleńką wartością osobliwą daje
+  odpowiedź ogromnej długości i jaki jest standardowy środek zaradczy?
+  \answerto{Bo dzieli przez tę wartość osobliwą, więc każda składowa prawej
+  strony wzdłuż odpowiadającego kierunku zostaje wzmocniona jej odwrotnością.
+  Środkiem jest obcięcie \dash{} odrzucenie kłopotliwych wartości osobliwych
+  przed odwracaniem \dash{} co ogranicza wzmocnienie kosztem odmowy
+  odpowiadania w tych kierunkach.}
+\item Program~\ref{prog:P08} dowiódł, że wąskie gardło rzędu $r$ ogranicza rząd
+  wszystkiego po nim, i odmówił twierdzenia, że głębokie stosy tracą rząd bez
+  niego. Powiedz, jaki pomiar rozstrzygnąłby to drugie i dlaczego ta książka go
+  nie wykonała.
+  \answerto{Wartości osobliwe reprezentacji na każdej głębokości: jeśli zanikają
+  coraz stromiej z głębokością, to rząd spada w tym sensie, o który w tezie
+  chodzi. Ta książka pomiaru nie wykonała, bo potrzebuje on wytrenowanego
+  modelu, którego nie ma i nie pobiera \dash{} a zbudowanie widma i podanie go
+  byłoby wytworem, a nie pomiarem.}
+\end{furtherproblems}

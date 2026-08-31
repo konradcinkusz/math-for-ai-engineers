@@ -497,8 +497,10 @@ until P10 was written; P09 is the determinant and has no eigenvector in it.)
 **15. "Singular values are eigenvalues."** They coincide only for symmetric
 positive semi-definite matrices. In general σᵢ(A) = √λᵢ(AᵀA), the singular values
 are real and non-negative for *every* matrix including rectangular ones, and the
-eigenvalues may not exist over the reals. → **P11**, which owns the SVD. (This
-entry said P10 until P10 was written; P10 stops at eigenvalues and says so.)
+eigenvalues may not exist over the reals. → **P11**, delivered: its worked
+matrix has singular values 10 and 2 and eigenvalues 9.5327 and 2.0980, a 5 per
+cent difference chosen so that the confusion is understandable rather than
+absurd — no plot would show it. (This entry said P10 until P10 was written.)
 
 **16. "PCA on my feature matrix."** Two silent preconditions. PCA without
 *centring* returns a first component pointing at the mean, and PCA without
@@ -1470,6 +1472,56 @@ establish: rank collapse in deep attention stacks is a claim about what training
 and the softmax do to a stack with no narrow layer in it, which is a different
 statement, is architecture-dependent, and is not measured in this book.
 → **P08**.
+
+### SVD, low-rank approximation and conditioning, written (P11)
+
+Items 138 to 143 came out of writing P11. Item 15 above is this program's as
+well, and is delivered rather than warned about.
+
+**138. "This matrix has no eigenvalues, so there is nothing to decompose."** A
+rectangular matrix cannot have an eigenvector at all — $Av$ and $v$ live in
+spaces of different sizes, so $Av = \lambda v$ is not a statement that can be
+made. It still has a full singular value decomposition, with as many singular
+values as its smaller dimension. The whole of the eigenvalue apparatus applies
+to square matrices and most of the matrices in a network are not square, which
+is the reason the SVD is the one worth knowing. → **P11**.
+
+**139. "The truncated SVD is a good rank-$r$ approximation."** It is **the
+best one there is** — Eckart–Young, quantified over every matrix of that rank.
+The weaker version is what most people carry away, and the difference matters
+in a design review: *good* invites somebody to look for a better one, and there
+is not one. → **P11**.
+
+**140. "This matrix is huge, so a low-rank approximation will help."** The
+condition is that the singular values **decay**, not that the matrix is large.
+A spectrum of $(100, 99, 98, 97)$ keeps about a quarter of its content at rank
+one; $(100, 3, 2, 1)$ keeps over 99 per cent. Size does not appear in the
+argument anywhere. → **P11**.
+
+**141. "The condition number tells me something is wrong."** It is a fact about
+the problem, not about the algorithm and not a bug report: a perfect method on
+a badly conditioned problem still returns a poor answer, because the answer
+really is that sensitive to the input. It is closer to a weather forecast — the
+honest response is to budget for the $\log_{10}\kappa$ digits it will cost
+rather than to hunt for the mistake that caused it. Program P10's ravine had a
+large condition number by design. → **P11**.
+
+**142. "The determinant is small, so the matrix is nearly singular"** — item 127
+above, now with the instrument that answers it properly. Scaling a matrix by
+1000 multiplies every singular value by 1000, moves the determinant by $1000^n$,
+and **leaves the condition number and the digits lost exactly where they were**,
+because $\kappa$ is a ratio. That is why $\kappa$ is the honest measure of
+*nearly singular* and $\det$ is not. → **P11**, and → **P09** for the trap it
+completes.
+
+**143. "The closed form is `inv(A.T @ A) @ A.T @ b`, so that is what I write."**
+Forming $A^{\mathsf{T}}A$ **squares** the condition number, so it doubles the
+digits lost. Measured: a degree-8 fit through 24 points solved both ways, the
+factorisation clearing $10^{-10}$ and the normal equations failing $10^{-6}$ —
+at least four decimal digits given away. And nothing raises: the coefficients
+that come back have the right signs and magnitudes and are wrong from the sixth
+significant figure. **A defect that looks like an answer is worse than one that
+looks like a crash.** → **P11**, with the operation count owned by **P09**.
 
 ### Eigenvalues, quadratic forms and positive definiteness, written (P10)
 

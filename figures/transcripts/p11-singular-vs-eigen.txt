@@ -1,0 +1,7 @@
+>>> from p11_svd_conditioning import A, ATA, SIG
+>>> [s * s for s in SIG]        # the squared singular values
+[Fraction(100, 1), Fraction(4, 1)]
+>>> tr = ATA[0][0] + ATA[1][1]  # and A^T A's eigenvalues:
+>>> dt = ATA[0][0]*ATA[1][1] - ATA[0][1]*ATA[1][0]
+>>> tr, dt                      # they sum and multiply to these
+(Fraction(104, 1), Fraction(400, 1))

@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P10 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first seven programs of Part III.** P11–P34 are stubs carrying their briefs | 24 of 47 |
+| Programs | **F1–F13 and P1–P11 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the whole of Part III.** P12–P34 are stubs carrying their briefs | 23 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 740 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 750 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 631 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 639 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 758 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 770 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 649 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 656 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,19 +93,19 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **24 of 47 programs are stubs**, in each language. This is the whole of the
+- **23 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 658 computed values, all referenced, all present, plus the committed console
+- 680 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 138 Mermaid sources, all rendering
-- 32 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 144 Mermaid sources, all rendering
+- 34 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **77 orphan-tail pages: 19 · 23 · 17 · 18** across `main-en`, `main-pl`,
+- **78 orphan-tail pages: 19 · 23 · 18 · 18** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -133,11 +133,11 @@ what was there before.
   This is the second ledger that is reported rather than gated, and like the
   first it must not quietly go away. **When the count goes up, that is the
   signal.**
-- **Elicitation rate: 54% of the book's frames put a question to the reader**,
+- **Elicitation rate: 53% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
-  35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09 and
-  39% in P10.**
+  35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
+  39% in P10 and 39% in P11.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -4979,6 +4979,115 @@ one-line transcript and a `None` output.
 - Frame numbers mapped after writing: sections landed at
   `1--10 / 11--17 / 18--23 / 24--32 / 33--43`.
 
+### Program P11 pass, August 2026 --- Part III is complete
+
+**Thirty-three teaching frames, thirty-five printed, both editions**, against a
+brief that projected sixty. Five sections: what survives when the theorem does
+not, not eigenvalues, keeping the largest pieces, error in and error out, and
+why the code does not form $A\T A$.
+
+Part III is now written end to end, and its shape came out as one argument:
+Program~\ref{prog:P04} asked what a space is, \ref{prog:P06} made a matrix a
+function, \ref{prog:P08} counted how much survives it, \ref{prog:P09} measured
+how much, \ref{prog:P10} found the directions that survive unturned, and this
+program says every matrix has all of it in one factorisation.
+
+#### The construction extends P10's by exactly one degree of freedom
+
+P10 built $A = QDQ\T$ with the **same** $Q$ on both sides, because a symmetric
+matrix's two sets of directions are the same set. Here they need not be, so two
+different rational rotations \dash{} $3$--$4$--$5$ and $5$--$12$--$13$ \dash{}
+give $A = U\Sigma V\T$ rational and **not** symmetric, with singular values
+$\val{p11.sig.hi}$ and $\val{p11.sig.lo}$ exactly because they were put there.
+$Av_i = \sigma_i u_i$ is then checked over fractions.
+
+**And that example makes the trap hard rather than easy.** The same matrix's own
+eigenvalues are $\val{p11.lam.hi}$ and $\val{p11.lam.lo}$ \dash{} a $5\%$
+difference no plot would show. A wildly different pair would have been a weaker
+example, because the question is why the confusion survives.
+
+#### The headline measurement, and the cell was chosen by measuring
+
+The debt Program~\ref{prog:P09} handed over by name \dash{} \emph{the accuracy
+is P11's, and it is the half that decides the argument} \dash{} is paid with a
+number: a degree-$\val{p11.ls.deg}$ fit through $\val{p11.ls.points}$ points,
+solved twice in float64, the factorisation clearing $\val{p11.ls.qr.bound}$ and
+the normal equations failing $\val{p11.ls.ne.floor}$.
+
+**The first assertion failed**, because degree $6$ is not ill-conditioned
+enough, and the fix was to sweep degrees $6$ to $14$ and read the table rather
+than guess again. Degree $12$ was rejected on *pedagogy* rather than on
+arithmetic: it gives an answer $395\%$ wrong, which reads as a broken program.
+Degree $8$ gives one that looks plausible and is wrong from the sixth
+significant figure, which is the failure people actually ship.
+
+**Every number in that section is a bound or a count**, and the four digits are
+derived from the two committed bounds rather than from the measurement, so they
+cannot drift between machines even by one. That is the P06 residual rule applied
+before CI could apply it.
+
+#### Rule 2 caught a figure twice, and the second catch is the recorded one
+
+`p11-keep-the-largest`'s third node said *throwing away the smallest pieces
+costs exactly what those pieces were contributing* \dash{} which is frame 15's
+answer, sitting before frame 14's question. Reworded to say that the pieces can
+be judged one at a time, which is what the frames above it deliver.
+
+**Then the caption still said it.** \enquote{Why dropping the smallest pieces
+costs exactly what they were worth} is the same spoiler one line lower, and it
+survived the node fix because a caption does not read like part of the figure.
+That is exactly F02's finding \dash{} the identity was \enquote{in a node and
+again in its caption} \dash{} and it is the second time this book has fixed a
+node and left the caption. **Read the caption as a node.**
+
+#### Also
+
+- Traps 138 to 143 added to `notes/02`, and item 15 marked delivered.
+- **Parity took four rounds**, all recorded classes: a number and a reference in
+  the wrong order in a quiz item, a `Program~\ref{...}'s <maths>` inversion, one
+  Polish sentence repeating `$\sigma_2$` where the English used a pronoun, and a
+  `\mermaidfig` I forgot to place in the Polish at all. The last is worth
+  naming: **C9 catches a diagram present in one edition only**, and nothing else
+  would have.
+- Two bare decimals inside maths (`0.8`, `1.6`) needed `\num{}`; C10 caught them
+  in the English, which is the edition that does not obviously owe a comma.
+- Elicitation 39%, from five conversions that added no frame. Two produced the
+  P06 pattern.
+- The orphaned cue took one round of lengthening in each A4 build, and both
+  added paragraphs earn their place: that a condition number is closer to a
+  weather forecast than to a diagnosis, and that all three steps of the
+  pseudoinverse are things the program has already named.
+- Layout: multiset element for element the pre-P11 baseline in all four builds,
+  no stranded openers or headings, one orphan tail added.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P11.1 three-moves | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P11.2 keep-the-largest | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P11.3 error-in-error-out | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+#### What P11 does NOT claim, and the brief asked for it
+
+The brief asks for \enquote{the singular-value spectrum of a real embedding
+matrix, plotted, showing how few directions carry the energy \dash{} the
+empirical case for LoRA and for embedding compression, **measured**}.
+
+That needs a real model. This book does not have one and does not download one,
+and constructing a spectrum with a plausible decay and reporting it as a
+measurement is precisely the fabrication this book's rules forbid. So the
+spectrum in §3 is **constructed and labelled as such**, it demonstrates the
+mechanism, and a warning box states the empirical claim, says the book has not
+measured it, and says what would settle it.
+
+That is Program~\ref{prog:P08}'s precedent for rank collapse, and P08 had
+already anticipated it: its own warning box says the phenomenon \enquote{needs
+Program P11's machinery **and a real model**}. The machinery is now here. The
+model is not, and both programs say so.
+
+**The manifest brief is left as written**, because it describes what the program
+should contain when the book can afford it, and softening it would hide an
+outstanding piece of work. It belongs on the *What is left* list instead.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -5244,25 +5353,30 @@ clone instead.
 
 ## What is left
 
-1. **Twenty-four programs, and Parts I and II are complete with Part III seven
-   programs in.** F1 to F13 and P1 to P10, both editions. Part II's argument — that floating
+1. **Twenty-three programs, and Parts I, II and III are complete.** F1 to F13
+   and P1 to P11, both editions. Part II's argument — that floating
    point, numerical stability and cost belong *before* the linear algebra — is
    now made rather than promised: none of the three needed anything beyond
    arithmetic, algebra and a sigma.
 
-   **P11 is next** — the SVD, low-rank approximation and conditioning — and
-   P10's closing frame hands it over by name: *every matrix, of any shape,
-   turns out to be a rotation, then a stretch along perpendicular axes, then
-   another rotation, so the picture survives even where the theorem does not.*
-   Read P10 §2 and §3 first: its three failures (non-perpendicular
-   eigenvectors, no real eigenvalue, defective) are exactly what the SVD
-   repairs, and P10's `QDQ\T` construction and exact `eig2` are reusable.
-   P11 carries the **same declared forward reference** as P10 — PCA is an
-   eigen-decomposition of a covariance matrix and covariance is P24's — and
-   P10 discharged it by proving both facts locally, which P11 can cite rather
-   than repeat. Note also that P08 left P11 a specific debt: the rank-collapse
-   phenomenon, which P08 proved the theorem for and explicitly refused to
-   claim, needs the singular-value spectrum at each depth.
+   **P12 is next** — combinatorics and counting — and it opens Part IV, which
+   is a change of subject rather than a continuation: no program from P04 to
+   P11 hands it anything. What it *is* owed is **F10**, which declares itself
+   the elementary layer under P12 and deliberately kept only three counting
+   rules, leaving the general inclusion–exclusion, the pigeonhole principle and
+   the birthday calculation here by name. Read F10 §4 before estimating a
+   length. Note also the open curriculum question in
+   `notes/01-curriculum.md` §20: whether P12 should move next to the
+   probability that consumes it, which is a decision this pass could take
+   rather than inherit.
+
+   **And Part III left one measurement outstanding, deliberately.** P11's brief
+   asks for the singular-value spectrum of a real embedding matrix, measured;
+   the program constructs one, labels it, and says the empirical claim is not
+   settled. Together with P08's rank-collapse warning that is **one debt with
+   two entries**, and both need the same thing: a trained model's real
+   matrices. It is the first item in this book that cannot be done from a
+   sandbox at all.
 
    **And there is now a Part II-shaped job that is nobody's program.** The
    elicitation ledger above puts P01, P02 and P03 at 29–31% against Part I's
