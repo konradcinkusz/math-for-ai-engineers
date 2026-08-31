@@ -794,11 +794,31 @@ Each cost time; none is obvious from its error message.
   put the unbreakable run in a display; an index has almost none. Index lines
   carry no stretch, `\parskip` there is `0pt plus 0.3pt` with **no shrink**,
   and `\indexspace` gives back 3 pt, while `book` in twoside mode holds every
-  column to the full text height. **`\raggedbottom` inside `theindex`** lets a
-  column end short, which is what every index in print does, and removes the
-  pressure rather than moving it. Trimming an index entry is the unwinnable
-  loop this file names, and it is *especially* unwinnable here because the
-  entry that would have to go is chosen by whichever machine is complaining.
+  column to the full text height. **The cure is two lengths and it took two
+  rounds against CI**, which is worth having because the second round is the
+  instructive one:
+
+  1. **`\raggedbottom` inside `theindex`** lets a column end short, which is
+     what every index in print does. CI went from `[17.4, 3.8]` to `[3.8, 3.8]`.
+  2. The pair that remained were **the same size**, and that is the tell:
+     `\output` fires once per column in a `\twocolumn` region, so it is one
+     page overflowing identically in *both* columns \dash{} the index's first,
+     where `\@makeschapterhead` leaves a residual that is not a whole number
+     of lines. `\raggedbottom` cannot touch it, because it adds **stretch**
+     and the page is too **tall**. What an index lacks is **shrink**:
+     `theindex` sets `\parskip` to `0pt plus 0.3pt` with none. A fifth of a
+     point per entry is eight points a column, absorbs the residual under any
+     metrics, and is invisible between two index lines.
+
+  `\vfuzz` was the other candidate and was rejected: raising it hides real
+  overfull vboxes everywhere else, which is how a gate goes quiet. Trimming an
+  index entry is the unwinnable loop this file names, and it is *especially*
+  unwinnable here because the entry that would have to go is chosen by
+  whichever machine is complaining.
+
+  And the patch block sits **outside** the preamble's `\makeatletter` group,
+  so the length is written in plain units; `\z@` and `\@plus` there are an
+  undefined control sequence in every build.
 
 - **You cannot reproduce CI's metrics in this container, and trying breaks
   something worth more.** `texlive-fonts-extra` and `texlive-plain-generic`
