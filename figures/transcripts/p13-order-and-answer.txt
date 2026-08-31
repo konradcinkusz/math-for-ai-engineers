@@ -1,0 +1,10 @@
+>>> from p13_graphs import CALLS, ORDERS
+>>> from p13_graphs import evaluate, topological_orders
+>>> len(topological_orders(6, CALLS))
+4
+>>> evaluate(ORDERS[0], CALLS, 6)
+(1, 2, 2, 3, 4, 5)
+>>> evaluate(ORDERS[-1], CALLS, 6)
+(1, 2, 2, 3, 4, 5)
+>>> topological_orders(6, CALLS + [(5, 0)])
+[]

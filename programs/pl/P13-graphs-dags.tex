@@ -1,26 +1,867 @@
-%% P13 --- Grafy, DAG-i i błądzenie losowe
+%% P13 --- Grafy, DAG-i i bladzenie losowe
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Kazda liczba w tym programie, ktorej czytelnik nie policzy w pamieci,
+%% pochodzi z code/p13_graphs.py i wchodzi na strone przez \val{}. Listing
+%% konsolowy to zatwierdzony transcript pisany przez ten skrypt.
+%%
+%% TEZA: graf to zbior plus relacja; macierz sasiedztwa zamienia kazde pytanie
+%% o sciezki w pytanie o potegi macierzy; a porzadek topologiczny DAG-a jest
+%% tym, co czyni obliczenie dobrze okreslonym -- wiec przeplyw agenta, system
+%% budowania i siec neuronowa sa jednym obiektem.
+%%
+%% CO TEN PROGRAM DOSTAJE, odczytane z plikow, a nie z pamieci:
+%%   F10  ODDAJE "graf jako zbior plus relacja" tutaj Z NAZWY, we wlasnym
+%%        naglowku pliku, i daje zbiory, regule sumy oraz liczbe par.
+%%   P12  ma argumenty zliczajace i celowo nie uzyl ich na grafach. Jego
+%%        przyklad z dokumentami i parami jest tu kontynuowany.
+%%   P06  daje twierdzenie, na ktorym stoi sekcja 3: iloczyn macierzy JEST
+%%        zlozeniem, a wiersz-razy-kolumna z tego wypada. Wlasnie dlatego
+%%        A^k liczy spacery dlugosci k.
+%%   P10  daje wektory wlasne. Rozklad stacjonarny to wektor wlasny dla
+%%        wartosci 1, czyli ten sam rachunek pod inna nazwa.
+%%   P03  daje slownik kosztu potrzebny sekcji 2.
+%%
+%% CO TEN PROGRAM ODDAJE DALEJ: P16 deklaruje P13 jako zaleznosc i potrzebuje
+%% grafu obliczen zdefiniowanego porzadnie, jeden program przed autodiff.
+%%
+%% CZEGO NIE RUSZA, sprawdzone w tools/programs.json:
+%%   jakobian, tryb prosty i odwrotny, co liczy backward()          -> P16
+%%   kwantyfikatory, indukcja, pisanie dowodu                       -> P14
+%%   czym JEST prawdopodobienstwo i co robi warunkowanie            -> P23
+%%
+%% Blizniak: programs/en/P13-graphs-dags.tex. Ramka w ramke, makro w makro, liczba
+%% w liczbe; porownuje je tools/parity.py.
 
 \program{Grafy, DAG-i i błądzenie losowe}
 \label{prog:P13}
+\index{graf}
+\index{graf!macierz sąsiedztwa}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{powiedzieć, czym jest graf, bez rysunku, i policzyć jego
+  krawędzie wobec par, z których są brane}
+\outcome{9--13}{wybrać między macierzą sąsiedztwa a listą sąsiedztwa na
+  podstawie gęstości i operacji, z rachunkiem}
+\outcome{14--20}{czytać potęgę macierzy sąsiedztwa jako liczbę spacerów i
+  powiedzieć, czym to czyni głębokość sieci przekazującej komunikaty}
+\outcome{21--26}{powiedzieć, czym jest porządek topologiczny, dlaczego zwykle
+  jest ich więcej niż jeden i dlaczego wszystkie dają tę samą odpowiedź}
+\outcome{27--34}{czytać rozkład stacjonarny jako wektor własny i powiedzieć,
+  co robi z nim wierzchołek bez krawędzi wychodzącej}
+\end{outcomes}
 
-Argument: a graph is a set plus a relation; adjacency matrix and adjacency
-list are two encodings with different costs; a DAG has a topological order
-and that order is what makes evaluation well defined. Payoff: the
-computation graph, defined properly, one program before autodiff needs it;
-**message passing in a graph neural network is a multiplication by the
-adjacency matrix**, which is where Part III and this part meet; PageRank as
-the stationary distribution of a random walk, which is the same eigenvector
-calculation as P10; an agent workflow, a build system and a neural network
-as the same object.
+\begin{quiz}
+\item Graf ma $\val{p13.g.ne}$ krawędzi. Ile wynosi suma jego stopni?
+  \teachesat{4--5}
+  \answerto{$\val{p13.g.degsum}$, dwa razy tyle co krawędzi, bo każda krawędź
+  jest liczona raz przy każdym ze swoich dwóch końców. To podwójne zliczanie
+  z~Programu~\ref{prog:P12} w nowym przebraniu.}
+\item $\val{p13.big.n}$ wierzchołków i $\val{p13.big.m}$ krawędzi. Ile mniej
+  więcej komórek ma macierz sąsiedztwa? \teachesat{9--10}
+  \answerto{$\val{p13.big.cells}$ \dash{} milion do kwadratu \dash{} wobec
+  $\val{p13.big.slots}$ miejsc dla listy, czyli współczynnik
+  $\val{p13.big.ratio}$. Prawdziwe grafy są rzadkie, a macierz przechowuje
+  się tylko wtedy, gdy zamierza się przez nią mnożyć.}
+\item Co liczy wyraz $(i,j)$ macierzy $A^{2}$? \teachesat{14--15}
+  \answerto{Spacery długości dwa z $i$ do $j$. Suma
+  $\sum_k A_{ik}A_{kj}$ ma wyraz równy $1$ dla każdego wierzchołka pośredniego
+  połączonego z obydwoma, czyli złożenie z~Programu~\ref{prog:P06} robiące
+  arytmetykę.}
+\item Ile porządków topologicznych ma graf skierowany bez cyklu?
+  \teachesat{22--23}
+  \answerto{Zwykle więcej niż jeden \dash{} $\val{p13.topo.count}$ dla
+  sześciowierzchołkowego grafu w tym programie, spośród
+  $\val{p13.topo.total}$ ustawień. Ważne jest to, że każdy z nich liczy te
+  same wartości.}
+\item Strona nie linkuje nigdzie. Co robi błądzenie losowe, gdy na niej
+  wyląduje? \teachesat{31--32}
+  \answerto{Zatrzymuje się, a masa prawdopodobieństwa opuszcza graf: po
+  $\val{p13.drain.zeroat}$ krokach nie zostaje jej dokładnie nic. Po to jest
+  współczynnik tłumienia i nie jest on sztuczką.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 50 ramek.
-}
+% ============================================================
+\section{Zbiór i relacja}
+\label{sec:P13-what}
+\index{graf!definicja}
+
+\begin{fr}
+Program~\ref{prog:F10} powiedział wprost, że graf to zbiór plus relacja i że
+porządne powiedzenie tego należy tutaj. To jest ten program i w
+przeciwieństwie do poprzedniego opiera się na Części~III: do sekcji 3 cały
+temat zamieni się w mnożenie macierzy.
+
+Zacznij konkretnie. Sześć usług woła się nawzajem: brama woła
+\code{auth} i \code{search}; \code{search} woła \code{rank} i
+\code{store}; \code{rank} woła \code{store}; a \code{auth}, \code{rank} i
+\code{store} piszą do \code{log}.
+
+Zapomnij o rysunku, który właśnie kreślisz. Co najmniej trzeba zapisać, żeby
+opisać to w całości?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dwa zbiory: usługi oraz te ich pary, które są połączone.
+\end{ansblock}
+
+To cała definicja. \textbf{Graf} to zbiór $V$ \emph{wierzchołków} i zbiór $E$
+ich par, czyli \emph{krawędzi}. Tutaj
+$\lvert V \rvert = \val{p13.g.nv}$ oraz $\lvert E \rvert = \val{p13.g.ne}$.
+
+Nic o położeniu, nic o przecinających się liniach, nic o wyglądzie. Rysunek
+jest jednym przedstawieniem relacji, a takich są nieskończenie wiele; obiektem
+jest relacja.
+
+\begin{note}
+To punkt Programu~\ref{prog:F10} o zbiorach, przybywający o poziom wyżej.
+Zbiór odpowiada na pytanie \emph{czy to jest w środku}; graf odpowiada na
+pytanie \emph{czy te dwa są połączone}. Wszystko w tym programie jest jednym z
+tych dwóch pytań zadanym większej kolekcji.
+\end{note}
+
+Jednej rzeczy zdanie powyżej jednak nie powiedziało. \emph{Brama woła
+\code{auth}} to nie to samo zdanie co \emph{\code{auth} woła bramę}. Co musi
+się zmienić w definicji, żeby to wyrazić?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Pary muszą być uporządkowane.
+\end{ansblock}
+
+Para \textbf{uporządkowana} $(u, v)$ czyni graf \emph{skierowanym}: krawędź
+biegnie od $u$ do $v$ i nie z powrotem. Para nieuporządkowana $\{u, v\}$ czyni
+go nieskierowanym, a wtedy relacja jest symetryczna z konstrukcji.
+
+Ten jeden wybór to różnica między grafem wywołań, grafem importów i grafem
+zależności z jednej strony \dash{} wszystkie skierowane \dash{} a grafem
+znajomości czy grafem podobieństwa z drugiej. Warto decydować o tym wprost, bo
+prawie każdy graf, jaki spotyka inżynier, jest skierowany, a prawie każdy
+rysunek na tablicy zapomina o strzałkach.
+
+\mermaidfig{p13-set-plus-relation}{Graf to dwa zbiory, a wybór par
+uporządkowanych albo nie jest całym znaczeniem słowa
+\enquote{skierowany}.}{dwa zbiory i relacja}
+\end{fr}
+
+\begin{fr}
+Przeczytaj graf przez chwilę jako nieskierowany. \textbf{Stopień} wierzchołka
+to liczba krawędzi przy nim, która sięga tu $\val{p13.g.degmax}$.
+
+Dodaj wszystkie sześć stopni. Zrób to, zanim pójdziesz dalej, i powiedz, ile
+ta suma musi wynosić w zależności od $\lvert E \rvert$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p13.g.degsum}$, czyli $2\lvert E \rvert$}
+A powód mieści się w jednym zdaniu: każda krawędź ma dwa końce, więc wnosi $1$
+do stopnia przy każdym z nich, a dodanie stopni liczy każdą krawędź dokładnie
+dwa razy.
+
+\textbf{To podwójne zliczanie z~Programu~\ref{prog:P12} w nowym przebraniu.}
+Nazywa się to zwykle lematem o uściskach dłoni, a skrypt sprawdza je na
+$\val{p13.hand.trials}$ losowych grafach \dash{} co, jak
+w~Programie~\ref{prog:P04}, jest testowaniem kodu, a nie szukaniem
+kontrprzykładu, bo kontrprzykład obaliłby dowód.
+
+\begin{note}
+Bezpośredni wniosek warto mieć: skoro stopnie sumują się do liczby parzystej,
+\textbf{wierzchołków o nieparzystym stopniu jest parzyście wiele.} Nie da się
+mieć sieci, w której dokładnie jedna maszyna ma nieparzystą liczbę połączeń, a
+taki argument o parzystości jest często najtańszym sprawdzeniem grafu, który
+się właśnie zbudowało.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Teraz drugi koniec skali. Graf, w którym połączona jest \emph{każda} para,
+nazywa się pełnym. Jeśli ma $\val{p13.complete.n}$ wierzchołków, ile ma
+krawędzi?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p13.complete.e}$}
+Czyli $\binom{n}{2}$, a to liczba par z~Programu~\ref{prog:F10}
+i~Programu~\ref{prog:P12} co do cyfry \dash{} bo krawędź nieskierowana
+\emph{jest} parą nieuporządkowaną, więc liczenie krawędzi w grafie pełnym to
+liczenie par i nic więcej.
+
+\begin{note}
+Skrypt odczytuje zatwierdzoną liczbę par tamtego programu z jego pliku
+wartości i przerywa budowanie, jeśli $\frac{n(n-1)}{2}$ jej nie odtworzy. Trzy
+programy cytują teraz jedno obliczenie i żaden nie może się rozjechać.
+\end{note}
+
+Krawędzie dowolnego grafu o $n$ wierzchołkach są więc \emph{podzbiorem}
+$\binom{n}{2}$ par, a faktycznie obecny ułamek to jego \textbf{gęstość}. To
+słowo za chwilę rozstrzygnie, jak tę rzecz przechowywać.
+\end{fr}
+
+\begin{fr}
+Jedno miejsce, w którym to nie jest analogia. Program~\ref{prog:P12}
+deduplikował korpus, porównując każdą parę dokumentów. Zrób z tego graf:
+dokumenty są wierzchołkami, a dwa są połączone, gdy ich podobieństwo
+przekracza próg.
+
+Wszystko, co tamten program mówił o parach, jest teraz zdaniem o krawędziach.
+Liczba porównań to liczba par, czyli graf pełny; liczba \emph{trafień} to
+liczba krawędzi, czyli o wiele mniej; a grupa dokumentów będących swoimi
+duplikatami to zbiór wierzchołków połączonych ze sobą i z niczym innym.
+
+\begin{aibox}
+Ten ostatni obiekt ma nazwę i spotkałeś go bez niej. \textbf{Spójna składowa}
+to zbiór wierzchołków osiągalnych z siebie nawzajem i z niczego spoza, a
+deduplikacja korpusu jest dokładnie zadaniem znalezienia składowych i
+zostawienia po jednym dokumencie z każdej.
+
+Nazwanie tego ma znaczenie, bo zmienia to, czego szukasz. \enquote{Które pary
+pasują} to pytanie o $\binom{n}{2}$ rzeczy. \enquote{Jakie są składowe} to
+pytanie o $n$ rzeczy, a na to jest standardowy algorytm, który biblioteka do
+grafów już ma.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Dwa zapisy, dwa koszty}
+\label{sec:P13-encodings}
+\index{graf!lista sąsiedztwa}
+
+\begin{fr}
+Relację da się zapisać na dwa sposoby i nie są one wymienne.
+
+\textbf{Macierz sąsiedztwa} $A$ jest $n \times n$, z $A_{ij} = 1$, gdy istnieje
+krawędź z $i$ do $j$, i $0$ w przeciwnym razie. \textbf{Lista sąsiedztwa}
+trzyma dla każdego wierzchołka listę tych, na które wskazuje.
+
+Weź graf o $\val{p13.big.n}$ wierzchołkach i $\val{p13.big.m}$ krawędziach, co
+jest zwykłym rozmiarem dla sieci cytowań albo grafu społecznego. Ile komórek
+ma macierz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p13.big.cells}$}
+Milion do kwadratu. Przy jednym bajcie na komórkę \dash{} co już jest
+absurdem, bo komórka mieści jeden bit informacji \dash{} daje to
+$\val{p13.big.tb}$ terabajt na przechowanie $\val{p13.big.m}$ krawędzi.
+
+Lista potrzebuje jednej głowy na wierzchołek i dwóch końców na krawędź:
+$\val{p13.big.slots}$ miejsc, czyli $\val{p13.big.ratio}$ razy mniej.
+
+\begin{trapbox}
+\textbf{Macierz nie jest definicją, a lista nie jest implementacją.} Oba są
+zapisami tej samej relacji i żaden nie jest bardziej prawdziwy.
+
+Macierz wygląda na kanoniczną dlatego, że w niej pisze się matematykę, a lista
+na praktyczną dlatego, że się mieści. Uczciwe zdanie brzmi: odpowiadają tanio
+na różne pytania, a gęstość rozstrzyga, które pytanie będziesz zadawać. Tutaj
+gęstość wynosi $\val{p13.big.density}$ \dash{} dwie krawędzie na każde sto
+tysięcy możliwych \dash{} i \textbf{prawie każdy graf, jaki spotyka inżynier,
+jest tak samo rzadki}, dlatego prawie każda biblioteka do grafów przyjmuje
+listę jako domyślną.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Operacje różnią się równie ostro jak pamięć i warto ustalić, w którą stronę.
+
+Dwa pytania. \emph{Czy istnieje krawędź z $u$ do $v$?} oraz \emph{jacy są
+wszyscy sąsiedzi $u$?} Dla każdego powiedz, który zapis odpowiada szybciej i
+dlaczego.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Macierz odpowiada na pierwsze w jednym kroku, a na drugie w $n$; lista
+odpowiada na drugie w tylu krokach, ilu $u$ ma sąsiadów, a na pierwsze w
+tyluż.
+\end{ansblock}
+
+Macierz ma odpowiedź na \emph{czy istnieje krawędź} pod znanym adresem, więc
+jest to jedno odczytanie, jakkolwiek graf wygląda. Zapytanie jej o sąsiadów
+oznacza przeczytanie całego wiersza, w większości zer.
+
+Lista ma sąsiadów już zebranych, więc to pytanie kosztuje tyle, ile warta jest
+odpowiedź. Zapytanie jej \emph{czy istnieje krawędź} oznacza przeszukanie
+listy, co kosztuje tyle, co jej przeczytanie.
+
+\begin{note}
+Program~\ref{prog:P03} jest programem od mówienia tego w notacji $O$, a ten
+celowo tego nie robi. \emph{To odczytanie czyta wiersz miliona komórek} jest
+zdaniem użyteczniejszym na przeglądzie projektu niż \emph{to odczytanie jest
+liniowe}, a dostępne bez żadnej notacji.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Lista wygrywa więc na pamięci, wygrywa na sąsiadach i remisuje na odczycie.
+Macierz byłaby dziwną rzeczą do trzymania \dash{} poza jedną własnością, która
+nie ma nic wspólnego z odczytywaniem czegokolwiek.
+
+\textbf{Macierz można pomnożyć.} Następna sekcja jest o tym, co to daje, i to
+jest powód, dla którego macierz sąsiedztwa przetrwała w temacie, w którym jest
+$\val{p13.big.ratio}$ razy za duża, by ją przechować.
+\end{fr}
+
+% ============================================================
+\section{Spacery to potęgi macierzy}
+\label{sec:P13-walks}
+\index{graf!spacer}
+
+\begin{fr}
+\textbf{Spacer} długości $k$ to ciąg $k$ krawędzi ułożonych koniec przy końcu.
+Może odwiedzić wierzchołek ponownie; spacer, który tego nie robi, to
+\emph{ścieżka}.
+
+Teraz pytanie, na którym stoi cała sekcja. Wypisz wyraz $(i,j)$ macierzy
+$A^{2}$ jako sumę, używając wyłącznie definicji mnożenia macierzy:
+\[ (A^{2})_{ij} = \sum_{k} A_{ik}A_{kj} \]
+i powiedz, czym jest każdy wyraz tej sumy, skoro każdy wyraz $A$ to $0$ albo
+$1$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Każdy wyraz to $1$ dokładnie wtedy, gdy $i$ wskazuje na $k$ \emph{oraz} $k$
+wskazuje na $j$, a $0$ w przeciwnym razie. Suma liczy więc wierzchołki
+pośrednie \dash{} czyli spacery długości dwa z $i$ do $j$.
+\end{ansblock}
+
+\textbf{$(A^{k})_{ij}$ to liczba spacerów długości $k$ z $i$ do $j$}, a
+indukcja od dwóch do $k$ to znowu to samo zdanie.
+
+Zauważ, skąd to się wzięło. Program~\ref{prog:P06} dowodził, że iloczyn
+macierzy \emph{jest} złożeniem i że wiersz-razy-kolumna to arytmetyka, która z
+tego wypada. Spacer o dwóch krokach jest złożeniem dwóch kroków, więc liczba
+spacerów jest iloczynem macierzy; twierdzenie to ten argument czytany w drugą
+stronę i nie trzeba było do niego żadnej nowej maszynerii.
+
+\begin{note}
+Skrypt to sprawdza, zamiast wyprowadzać dwa razy: dla każdej pary
+wierzchołków i każdej długości do $\val{p13.walk.maxk}$ wypisuje spacery
+siłowo i wymaga, by ich liczba równała się wyrazowi macierzy \dash{}
+$\val{p13.walk.checks}$ porównań, wszystkie dokładne na liczbach całkowitych.
+Wypisanie nie może się mylić co do tego, czym jest spacer.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Spróbuj na usługach. Ile spacerów długości $\val{p13.walk.k}$ biegnie od bramy
+do \code{log}?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p13.walk.count}$}
+Dwie drogi przez \code{search}: przez \code{rank} i przez \code{store}.
+Odczytanie ich z $A^{3}$ nie wymaga ani szukania, ani przechodzenia grafu, a
+to samo mnożenie odpowiada na to pytanie dla wszystkich par naraz.
+
+Oto drugie czytanie tego samego twierdzenia, warte chwili, bo tu ludzie się
+potykają. W grafie \emph{nieskierowanym} czym jest wyraz z przekątnej
+$(A^{2})_{ii}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Stopniem $i$: spacery długości dwa z $i$ do siebie to dokładnie \enquote{krok
+do sąsiada, krok z powrotem}.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{Spacer to nie ścieżka, a przekątna jest miejscem, gdzie różnica
+widać.} Wyjście i powrót to całkiem porządny spacer długości dwa i jest ich
+tyle, ilu wierzchołek ma sąsiadów; nie jest to ścieżka i z pewnością nie jest
+to cykl.
+
+To pułapka w zdaniu \enquote{$A^{k}$ liczy trasy}, powiedzianym za szybko.
+Jeśli chcesz ścieżek \dash{} tras, które nie powtarzają wierzchołka \dash{}
+potęgi macierzy ich nie dają, a problem zliczania jest naprawdę trudniejszy.
+Potęgi odpowiadają na to pytanie, na które odpowiadają, czyli na to o spacery,
+i właśnie to pytanie zadaje przekazywanie komunikatów.
+\end{trapbox}
+
+\mermaidfig{p13-walks-are-powers}{Jeden krok to macierz, $k$ kroków to jej
+$k$-ta potęga, a przekazywanie komunikatów to właśnie to mnożenie.}{kroki,
+potęgi, komunikaty}
+\end{fr}
+
+\begin{fr}
+To ostatnie zdanie jest zapłatą, więc oto ono w całości.
+
+Grafowa sieć neuronowa daje każdemu wierzchołkowi wektor cech, układa je jako
+wiersze macierzy $X$, a jedna warstwa liczy coś o kształcie
+\[ X' = \sigma(AXW) \]
+Czytaj trzy czynniki od prawej: $W$ miesza własne cechy wierzchołka, $A$
+zastępuje wiersz każdego wierzchołka sumą wierszy jego sąsiadów, a $\sigma$
+jest nieliniowością, bez której Program~\ref{prog:P06} pokazał, że złożenie by
+się zapadło.
+
+\textbf{Przekazywanie komunikatów jest mnożeniem przez macierz sąsiedztwa.}
+Nie jest do niego podobne i nie jest tak zaimplementowane dla wygody; zdanie
+\enquote{każdy wierzchołek zbiera od sąsiadów} i wyrażenie $AX$ to jedno i to
+samo stwierdzenie.
+
+Zatem: po $k$ takich warstwach, które wierzchołki mogły wpłynąć na wiersz
+danego wierzchołka?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dokładnie te w odległości $k$ od niego}
+Bo $k$ warstw stosuje $A$ $k$ razy, a wzór niezerowych wyrazów $A^{k}$ to
+dokładnie pary połączone spacerem długości $k$ \dash{} czyli twierdzenie
+sprzed dwóch ramek, przybywające jako zdanie o architekturze.
+
+Zmierzone na usługach: przy jednym skoku brama sięga
+$\val{p13.reach.one}$ wierzchołków, a przy $\val{p13.hops}$ skokach sięga
+wszystkich $\val{p13.reach}$. Skrypt sprawdza ten zasięg wobec przeszukiwania
+wszerz, które nie wie nic o macierzach, dla każdego wierzchołka i każdej
+głębokości do $\val{p13.walk.maxk}$.
+
+\begin{aibox}
+\textbf{Głębokość w sieci przekazującej komunikaty to zasięg, a nie
+pojemność}, i to prawdziwa różnica wobec każdej innej architektury w tej
+książce. Dodanie warstwy do sieci gęstej daje jej więcej do liczenia; dodanie
+warstwy do sieci grafowej daje każdemu wierzchołkowi szersze sąsiedztwo,
+niezależnie od tego, czy było chciane.
+
+Pytanie \enquote{ile warstw} ma więc odpowiedź płynącą z grafu, a nie z
+budżetu: chodzi o to, jak daleko informacja naprawdę musi przebyć. W grafie o
+średnicy $\val{p13.hops}$ czwarta warstwa nie dodaje do zasięgu nic nowego, a
+w grafie typu małego świata dwie albo trzy warstwy dotykają już większości
+wierzchołków.
+\end{aibox}
+
+\begin{warning}
+Idący za tym tryb awarii \dash{} że przy dostatecznej liczbie warstw każdy
+wierzchołek zbiera niemal z całego grafu, a reprezentacje zbiegają do siebie
+\dash{} nazywa się zwykle nadmiernym wygładzaniem i \textbf{ta książka go nie
+zmierzyła}. Ustalony jest tu zasięg, który jest faktem o $A^{k}$ i nie
+potrzebuje eksperymentu. Czy i kiedy reprezentacje się zapadają, to twierdzenie
+o wytrenowanych sieciach i takiego eksperymentu by wymagało.
+\end{warning}
+\end{fr}
+
+% ============================================================
+\section{DAG i porządek, który czyni obliczenie dobrze określonym}
+\label{sec:P13-dag}
+\index{graf!skierowany acykliczny}
+
+\begin{fr}
+Wróć do grafu wywołań i do własności, której jeszcze nie użyto: nie da się
+wrócić tam, skąd się wyszło.
+
+\textbf{Cykl} to spacer wracający do wierzchołka startowego bez powtarzania
+krawędzi. Graf skierowany bez cykli jest \textbf{acykliczny}, a skierowany graf
+acykliczny to \emph{DAG}.
+
+Zastrzeżenie o powtarzaniu czyni to słowo używalnym i warto się przy nim
+zatrzymać. Każdy graf nieskierowany mający choć jedną krawędź ma spacer, który
+wychodzi z wierzchołka i wraca \dash{} owo \enquote{tam i z powrotem} sprzed
+dwóch ramek \dash{} więc bez tego zastrzeżenia nic nie byłoby acykliczne, a
+słowo nie znaczyłoby nic. W grafie skierowanym zastrzeżenie pracuje mniej, bo
+przejście krawędzią z powrotem jest możliwe tylko wtedy, gdy taka krawędź
+istnieje; \emph{to} jest powód, dla którego acykliczność orzeka się o grafach
+skierowanych, a o nieskierowanych prawie nigdy.
+
+Załóżmy, że musisz uruchomić te sześć usług w jakiejś kolejności, każdą po
+wszystkim, od czego zależy. Co daje ci acykliczność?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+To, że taka kolejność w ogóle istnieje.
+\end{ansblock}
+
+Kolejność, w której każdy wierzchołek stoi za wszystkim, co na niego wskazuje,
+to \textbf{porządek topologiczny}, a twierdzenie mówi, że graf skierowany ma go
+\emph{wtedy i tylko wtedy}, gdy jest acykliczny. Jedna strona jest łatwa i
+warta zrobienia w głowie: gdyby był cykl, każdy jego wierzchołek musiałby stać
+za następnym, a skończona lista tego nie potrafi.
+
+Druga strona jest tym, co czyni słowo \emph{acykliczny} wartym powiedzenia, i
+ta książka jej nie dowodzi \dash{} Program~\ref{prog:P14} jest tam, gdzie
+czytania i formułowania twierdzeń uczy się porządnie.
+
+Teraz je policz. Nasz graf ma $\val{p13.g.nv}$ wierzchołków, więc ustawień
+jest $\val{p13.topo.total}$. Ile z nich to porządki topologiczne?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p13.topo.count}$}
+Cztery, spośród $\val{p13.topo.total}$ \dash{} ułamek
+$\val{p13.topo.frac}$. Krawędzie są mocnym ograniczeniem i większość ustawień
+łamie co najmniej jedno z nich.
+
+Skrypt znajduje je, sprawdzając każdą permutację, a
+Program~\ref{prog:P12} wycenia to na $n!$, co przybywa tu jako koszt: przy
+sześciu jest dobrze, a
+przy dwudziestu beznadziejnie, i prawdziwy planista używa algorytmu, a nie
+przeszukania. Ważne jest tu nie to, jak się je znajduje, lecz to, że jest ich
+więcej niż jeden.
+
+Co prowadzi do pytania, dla którego ta sekcja istnieje. Te
+$\val{p13.topo.count}$ porządki uruchamiają usługi w naprawdę różnych
+sekwencjach. Czy liczą to samo?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak, zawsze}
+Daj każdej usłudze wartość \dash{} powiedzmy o jeden większą od największej
+wartości wśród usług, które ją wołają \dash{} a każdy porządek topologiczny
+wyprodukuje identyczne wartości dla wszystkich sześciu. Nie zwykle, nie prawie:
+identyczne, a skrypt to stwierdza dla wszystkich $\val{p13.topo.count}$.
+
+\transcript{p13-order-and-answer}
+
+Powód jest dość krótki, by go utrzymać. Wartość wierzchołka zależy tylko od
+jego rodziców; porządek topologiczny liczy każdego rodzica przed
+wierzchołkiem; więc jakikolwiek porządek wybrać, każdy wierzchołek widzi te
+same wartości rodziców, gdy przychodzi jego kolej. Nic innego z porządku do
+niego nie sięga.
+
+\mermaidfig{p13-order-not-answer}{Wiele porządków, jedna odpowiedź \dash{} i to
+pozwala planiście wybrać dowolny.}{porządek wolny, odpowiedź nie}
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+To cały powód, dla którego cztery na pozór niezwiązane rzeczy są jednym
+obiektem.
+
+\textbf{System budowania} ma pliki zależne od plików, uruchamia je w porządku
+topologicznym i wolno mu zrównoleglić te części, które od siebie nie zależą
+\dash{} czyli dokładnie tę swobodę, którą reprezentuje
+$\val{p13.topo.count}$ porządków. \textbf{Przepływ agenta} ma kroki zależne od
+kroków. \textbf{Przejście w przód sieci neuronowej} ma tensory zależne od
+tensorów. \textbf{Plan zapytania} ma operatory zależne od operatorów.
+
+Wszystkie cztery są DAG-ami, wszystkie cztery liczy się w porządku
+topologicznym i wszystkie cztery są deterministyczne z tego samego powodu. Gdy
+framework nazywa to, co buduje, \emph{grafem obliczeń}, nie jest to metafora.
+\end{aibox}
+
+Program~\ref{prog:P16} jest tam, gdzie tego grafu się używa, a nie definiuje:
+przejście wstecz przechodzi ten sam DAG w odwrotnym porządku topologicznym, co
+czyni \code{loss.backward()} dobrze określonym i dlatego aktywacje muszą tam
+jeszcze być, gdy ono dotrze.
+\end{fr}
+
+\begin{fr}
+A przypadek negatywny zasługuje na własną ramkę, bo to ten, który się spotyka.
+
+Dodaj jedną krawędź do grafu wywołań \dash{} niech \code{log} woła bramę
+\dash{} i zapytaj znowu o porządki topologiczne. Listing powyżej pokazuje już
+odpowiedź: pustą listę.
+
+\begin{trapbox}
+\textbf{Cykl nie czyni obliczenia trudnym, tylko nieokreślonym.} Nie ma
+kolejności, w której uruchomić usługi, bo każda musiałaby iść po następnej.
+System budowania zgłasza cykl zależności i staje; nie jest nieuprzejmy, tam
+naprawdę nie ma czego robić.
+
+Dwa wyjścia warto rozpoznawać. \emph{Rozerwij cykl} \dash{} znajdź krawędź,
+której nie powinno być, co w grafie wywołań jest zwykle złamaniem warstw. Albo
+\emph{rozwiń go}: sieć rekurencyjna to cykl w architekturze i DAG w obliczeniu,
+bo te same wagi stosuje się w każdym z ustalonej liczby kroków, a te kroki są
+osobnymi wierzchołkami. Dlatego sieć rekurencyjną da się w ogóle
+zróżniczkować i dlatego jej pamięć rośnie z liczbą rozwiniętych kroków.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Gdzie osiada błądzenie losowe}
+\label{sec:P13-walks-random}
+\index{graf!błądzenie losowe}
+\index{graf!PageRank}
+
+\begin{fr}
+Ostatni obiekt, i kładzie on maszynerię Części~III na grafie.
+
+Zamiast pytać, które wierzchołki są osiągalne, idź za krawędziami losowo: z
+wierzchołka wybierz jednostajnie jedną z krawędzi wychodzących i idź. Macierzą
+tych prawdopodobieństw jest $P$, gdzie $P_{ij}$ to szansa kroku z $i$ do $j$
+\dash{} macierz sąsiedztwa z każdym wierszem podzielonym przez jego własną
+sumę.
+
+Ile musi wynosić suma każdego wiersza $P$ i dlaczego?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$1$, bo błądzenie gdzieś idzie}
+Każdy wiersz jest rozkładem prawdopodobieństwa nad tym, gdzie wyląduje
+następny krok, a podzielenie wiersza jedynek przez liczbę jedynek jest
+dokładnie tym, co czyni go jednością.
+
+Teraz połóż rozkład $p$ na wierzchołkach \dash{} szansę bycia w każdym \dash{}
+i zrób krok. Nowym rozkładem jest $P\T p$: szansa dotarcia do $j$ to suma po
+$i$ z \emph{bycia w $i$} razy \emph{kroku z $i$ do $j$}, czyli iloczyn
+macierzy przez wektor i nic więcej.
+
+Zacznij jednostajnie i iteruj. Powiedz, czego się spodziewasz po $p$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Osiada: po dostatecznej liczbie kroków rozkład przestaje się zmieniać.
+\end{ansblock}
+
+Zmierzone na czterostronicowym grafie linków, po $\val{p13.pi.steps}$ krokach:
+$\val{p13.pi.0}$, $\val{p13.pi.1}$, $\val{p13.pi.2}$, $\val{p13.pi.3}$.
+Wartości dokładne to
+$\frac{\val{p13.exact.num.0}}{\val{p13.exact.den.0}}$,
+$\frac{\val{p13.exact.num.1}}{\val{p13.exact.den.1}}$,
+$\frac{\val{p13.exact.num.2}}{\val{p13.exact.den.2}}$ oraz
+$\frac{\val{p13.exact.num.3}}{\val{p13.exact.den.3}}$, rozwiązane na liczbach
+wymiernych, a nie iterowane, a iteracja zgadza się z nimi lepiej niż
+$10^{-\val{p13.pi.bound}}$.
+
+Rozkład, który krok zostawia w spokoju, nazywa się \textbf{stacjonarnym}.
+Zapisz ten warunek jako równanie w $P\T$ i $p$ i powiedz, na co patrzysz.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$P\T p = p$, czyli wektor własny dla wartości własnej $1$}
+Program~\ref{prog:P10} zdefiniował dokładnie to: kierunek, którego macierz nie
+obraca, tylko rozciąga, a tutaj współczynnik rozciągnięcia wynosi $1$.
+
+Rozkład stacjonarny błądzenia losowego jest więc rachunkiem na wektorze
+własnym i wszystko, co tamten program powiedział, stosuje się bez zmian
+\dash{} w tym to, że znajdowanie go przez wielokrotne mnożenie jest metodą
+potęgową i że tempo osiadania rządzi druga wartość własna.
+
+\begin{note}
+Skrypt nie iteruje z nadzieją. Rozwiązuje $(P\T - I)p = 0$ przy
+$\sum p = 1$ dokładnie na liczbach wymiernych, tą samą eliminacją Gaussa,
+którą napisał Program~\ref{prog:P04}, a Programy~\ref{prog:P08}
+i~\ref{prog:P09} wykorzystały, a potem stwierdza $P\T p = p$ bez żadnej
+tolerancji. \enquote{Stacjonarny} to twierdzenie o równości, a porównanie
+zmiennoprzecinkowe uczyniłoby z niego twierdzenie o progu.
+\end{note}
+\end{fr}
+
+\begin{fr}
+To jest \textbf{PageRank} i definicja jest całą jego treścią: rangą strony
+jest jej udział w czasie, który spędza tam nieskończone błądzenie losowe.
+Strona jest ważna, bo linkują do niej ważne strony, co brzmi na okrężne, a
+jest równaniem na wektor własny.
+
+To rozróżnienie warto mieć w słowach, bo \enquote{okrężne} to pierwszy
+zarzut, jaki ktokolwiek podnosi. Okrężna \emph{definicja} tłumaczy pojęcie
+przez nie samo i nie tłumaczy niczego. Zapis $P\T p = p$ nie jest definicją,
+tylko \emph{warunkiem}: nie mówi nic o tym, czym ranking jest, a zamiast tego
+żąda, by \dash{} czymkolwiek jest \dash{} zgadzał się ze sobą po jednym kroku
+błądzenia. Czy jakikolwiek taki ranking w ogóle istnieje, jest wtedy
+prawdziwym pytaniem o prawdziwej odpowiedzi, a odpowiedzią jest wektor własny,
+który istnieje, a przy warunku z kolejnych dwóch ramek jest jedyny.
+
+Ale błądzenie tak opisane psuje się na grafie, jaki sieć z pewnością zawiera.
+Co się dzieje, gdy wyląduje na stronie bez żadnych linków wychodzących?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie ma dokąd pójść, a masa prawdopodobieństwa opuszcza graf.
+\end{ansblock}
+
+Ten wiersz $P$ jest samymi zerami, więc nie jest rozkładem, a iteracja nie
+zachowuje sumy. Zmierzone na trzystronicowym grafie z jedną ślepą uliczką:
+masa pozostała po kolejnych krokach to
+$\frac{\val{p13.drain.num1}}{\val{p13.drain.den1}}$, potem
+$\frac{\val{p13.drain.num2}}{\val{p13.drain.den2}}$, a potem
+\textbf{dokładnie zero} do kroku $\val{p13.drain.zeroat}$.
+
+Nie prawie zero. Zero, na liczbach wymiernych, ze wszystkim, co odeszło.
+\end{fr}
+
+\begin{fr}
+Naprawa mieści się w jednej linijce i zwykle opisuje się ją jako sztuczkę,
+którą nie jest.
+
+Z prawdopodobieństwem $\val{p13.damp}$ idź za linkiem jak dotąd; z pozostałym
+skocz do wierzchołka wybranego jednostajnie losowo. Strona bez linków skacze za
+każdym razem. Wynikają z tego od razu dwie rzeczy i obie są sednem.
+
+\textbf{Każdy wyraz macierzy jest teraz dodatni}, więc każda strona jest
+osiągalna z każdej innej w jednym kroku, a błądzenie nie da się uwięzić w
+podgrafie linkującym tylko do siebie. Oraz \textbf{nic nie wycieka}, bo każdy
+wiersz znowu sumuje się do jedności. Zmierzone na tym samym trzystronicowym
+grafie, tłumione błądzenie osiada na $\val{p13.damped.0}$,
+$\val{p13.damped.1}$ i $\val{p13.damped.2}$, a ślepa uliczka trzyma największy
+udział, zamiast pochłaniać wszystko.
+
+\begin{note}
+Wartość $\val{p13.damp}$ jest umowna, a nie wyprowadzona, i ta książka nie
+będzie udawać inaczej. \emph{Wyprowadzone} jest to, że tłumienie musi tam być:
+bez niego punkt stały albo nie istnieje, albo nie jest jedyny, a z nim macierz
+jest dodatnia, o co prosi odpowiednie twierdzenie.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Jedna uwaga na koniec, i o to tak naprawdę w tym programie chodziło.
+
+Zadano jednemu obiektowi trzy pytania i każde zamieniło się w arytmetykę już
+obecną w książce. \emph{Co może sięgnąć czego} stało się potęgą macierzy. \emph{W
+jakim porządku wolno to liczyć} stało się własnością, której sprawdzenie nic
+nie kosztuje, a kupuje determinizm. \emph{Gdzie osiada uwaga} stało się
+wektorem własnym.
+
+\textbf{Żadne z tych trzech nie potrzebowało rysunku}, a rysunek jest tym, po
+co większość ludzi sięga najpierw. Graf narysowany na tablicy jest
+przedstawieniem relacji; to relacja jest tym, o czym mówi arytmetyka, i tylko
+ona przetrwa bycie szeroką na milion wierzchołków.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Graf to zbiór wierzchołków i zbiór ich par}, i nic
+  więcej \dash{} bez położenia, bez rysunku. \textbf{Pary uporządkowane czynią
+  go skierowanym}, co mają graf wywołań, graf importów i graf zależności, a
+  szkic na tablicy zwykle gubi.}
+\sumitem{4--5}{\textbf{Stopnie sumują się do podwojonej liczby krawędzi}, bo
+  każda krawędź jest liczona przy każdym ze swoich dwóch końców:
+  $\val{p13.g.degsum}$ przy $\val{p13.g.ne}$ krawędziach. Wierzchołków o
+  nieparzystym stopniu jest więc parzyście wiele.}
+\sumitem{6--8}{Graf pełny o $\val{p13.complete.n}$ wierzchołkach ma
+  $\val{p13.complete.e}$ krawędzi, czyli liczbę par z~Programów~\ref{prog:F10}
+  i~\ref{prog:P12} \dash{} krawędź nieskierowana \emph{jest} parą
+  nieuporządkowaną. Deduplikacja to znajdowanie spójnych składowych.}
+\sumitem{9--10}{\textbf{Macierz czy lista to pytanie o gęstość i o to, którą
+  operację powtarzasz.} Przy $\val{p13.big.n}$ wierzchołkach i
+  $\val{p13.big.m}$ krawędziach macierz ma $\val{p13.big.cells}$ komórek wobec
+  $\val{p13.big.slots}$ miejsc, a gęstość wynosi $\val{p13.big.density}$.}
+\sumitem{11--13}{Macierz odpowiada na \emph{czy istnieje krawędź} w jednym
+  kroku, a lista na \emph{jacy są sąsiedzi} w tylu krokach, ilu jest sąsiadów.
+  \textbf{Macierz zarabia na swoje tym, że da się ją pomnożyć}, a nie tym, że
+  da się w niej wyszukać.}
+\sumitem{14--15}{\textbf{$(A^{k})_{ij}$ liczy spacery długości $k$ z $i$ do
+  $j$}, bo każdy wyraz $\sum_k A_{ik}A_{kj}$ to $1$ dokładnie wtedy, gdy oba
+  kroki istnieją \dash{} złożenie z~Programu~\ref{prog:P06} robiące
+  arytmetykę.}
+\sumitem{16--18}{\textbf{Spacer to nie ścieżka}: $(A^{2})_{ii}$ to stopień
+  $i$, liczący \enquote{tam i z powrotem}. Zliczanie ścieżek jest problemem
+  trudniejszym i potęgi macierzy tego nie robią.}
+\sumitem{19--20}{\textbf{Przekazywanie komunikatów jest mnożeniem przez
+  macierz sąsiedztwa}, więc $k$ warstw sięga dokładnie $k$ skoków:
+  $\val{p13.reach.one}$ wierzchołków przy jednym skoku i wszystkie
+  $\val{p13.reach}$ przy $\val{p13.hops}$. \textbf{Głębokość to zasięg, a nie
+  pojemność.}}
+\sumitem{21--23}{\textbf{Graf skierowany ma porządek topologiczny wtedy i
+  tylko wtedy, gdy jest acykliczny}, a zwykle ma ich więcej niż jeden:
+  $\val{p13.topo.count}$ tutaj spośród $\val{p13.topo.total}$.}
+\sumitem{24--25}{\textbf{Każdy porządek topologiczny liczy te same wartości},
+  bo każdy wierzchołek zależy tylko od rodziców, których wszystkie porządki
+  liczą wcześniej. Dlatego system budowania, przepływ agenta, plan zapytania i
+  przejście w przód są jednym obiektem i dlatego planista może swobodnie
+  zrównoleglać.}
+\sumitem{26}{\textbf{Cykl czyni obliczenie nieokreślonym, a nie trudnym.}
+  Rozerwij go albo rozwiń \dash{} czym jest sieć rekurencyjna i dlaczego jej
+  pamięć rośnie z liczbą rozwiniętych kroków.}
+\sumitem{27--30}{Krokiem błądzenia losowego jest $P\T p$, a
+  \textbf{rozkład stacjonarny to wektor własny dla wartości własnej $1$}
+  \dash{} Program~\ref{prog:P10} pod inną nazwą. To jest PageRank i sprawdza
+  się go tutaj jako dokładną równość, a nie tolerancję.}
+\sumitem{31--34}{\textbf{Wierzchołek bez krawędzi wychodzącej wysusza
+  błądzenie}: po $\val{p13.drain.zeroat}$ krokach nie zostaje dokładnie nic
+  masy. Tłumienie na $\val{p13.damp}$ czyni każdy wyraz dodatnim, a każdy
+  wiersz sumującym się do jedności, i to kupuje jedyny punkt stały \dash{}
+  stała jest umowna, potrzeba jej nie.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Graf skierowany ma $12$ wierzchołków i $30$ krawędzi. Ile wynosi suma
+  stopni wyjściowych? A gdyby był nieskierowany, suma stopni?
+  \answerto{$30$ tak czy inaczej dla stopni wyjściowych \dash{} każda krawędź
+  skierowana wychodzi z dokładnie jednego wierzchołka. Nieskierowany daje
+  $60$, dwa razy tyle co krawędzi, bo każda krawędź jest liczona przy obu
+  końcach. Te dwie odpowiedzi różnią się o czynnik dwa, a mylenie ich to
+  najczęstsze potknięcie w tym temacie.}
+\item Masz $50\,000$ wierzchołków i $200\,000$ krawędzi. Podaj rozmiary
+  macierzy i listy i powiedz, co byś przechował.
+  \answerto{$50\,000^{2} = \num{2.5e9}$ komórek wobec
+  $50\,000 + 400\,000 = \num{450000}$ miejsc, czyli około $5500$ razy mniej.
+  Przechowaj listę; gęstość wynosi $\num{1.6e-4}$. Rzadką macierz trzymaj
+  dodatkowo tylko wtedy, gdy zamierzasz przez nią mnożyć.}
+\item $A$ jest macierzą sąsiedztwa grafu nieskierowanego. Ile wynosi suma
+  wszystkich wyrazów $A$? A suma przekątnej $A^{2}$?
+  \answerto{Obie to podwojona liczba krawędzi. Pierwsza, bo każda krawędź
+  ustawia dwa wyrazy; druga, bo $(A^{2})_{ii}$ to stopień $i$, a stopnie
+  sumują się do $2\lvert E \rvert$. Ta sama wielkość dwiema drogami, czyli
+  znowu lemat o uściskach dłoni.}
+\item Budowanie ma $8$ celów i jeden z nich, przechodnio, zależy od siebie. Co
+  zrobi system budowania i jakie masz dwie możliwości?
+  \answerto{Zgłosi cykl zależności i odmówi uruchomienia, bo nie ma
+  kolejności, w której każdy cel stoi za tym, czego potrzebuje. Albo rozerwij
+  cykl \dash{} zwykle złamanie warstw \dash{} albo rozwiń go w osobne kopie,
+  co robi sieć rekurencyjna i dlaczego jej pamięć rośnie z liczbą kroków.}
+\item Grafowa sieć neuronowa ma $6$ warstw, a jej graf ma średnicę $3$. Co
+  szósta warstwa dodaje do zasięgu któregokolwiek wierzchołka?
+  \answerto{Nic. Po $3$ warstwach każdy wierzchołek zbiera już z całej spójnej
+  składowej, więc warstwy od czwartej do szóstej dodają parametry i obliczenia,
+  a żadnej nowej informacji. Głębokość w sieci przekazującej komunikaty to
+  zasięg, a zasięg kończy się na średnicy.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że wierzchołków o nieparzystym stopniu jest parzyście wiele.
+  \answerto{Stopnie sumują się do $2\lvert E \rvert$, czyli do liczby
+  parzystej. Wierzchołki o parzystym stopniu wnoszą sumę parzystą, więc te o
+  nieparzystym też muszą \dash{} a suma liczb nieparzystych jest parzysta
+  tylko wtedy, gdy jest ich parzyście wiele.}
+\item $A$ ma wiersz samych zer. Co to mówi o grafie i co robi z $A^{k}$?
+  \answerto{Ten wierzchołek nie ma krawędzi wychodzącej. Wiersz $i$ macierzy
+  $A^{k}$ jest wtedy zerowy dla każdego $k$, więc żaden spacer żadnej długości
+  z niego nie wychodzi \dash{} czyli ta sama ślepa uliczka, która wysusza
+  błądzenie losowe w sekcji 5, widziana w macierzy sąsiedztwa zamiast w
+  macierzy przejść.}
+\item Dlaczego zliczanie ścieżek nie sprowadza się do potęgi macierzy tak, jak
+  zliczanie spacerów?
+  \answerto{Bo \enquote{nie powtarza wierzchołka} jest warunkiem na cały ciąg,
+  a mnożenie macierzy łączy kroki, nie wiedząc, co było przed nimi. Suma
+  $\sum_k A_{ik}A_{kj}$ nie potrafi wykluczyć wyrazów, w których $k$ równa się
+  $i$ albo $j$, jeśli jej się tego nie powie, a przy długości trzy warunek
+  dotyczy całej trasy, a nie jednego wyrazu.}
+\item DAG ma $n$ wierzchołków i ani jednej krawędzi. Ile ma porządków
+  topologicznych? A przy jednym łańcuchu $n-1$ krawędzi?
+  \answerto{$n!$ bez krawędzi \dash{} kwalifikuje się każde ustawienie \dash{}
+  i dokładnie $1$ dla łańcucha, który ustala porządek w pełni. Każdy DAG leży
+  między tymi dwoma, a ta liczba mierzy, ile swobody ma planista.}
+\item Współczynnik tłumienia opisuje się często jako \enquote{szansę, że
+  surfujący się znudzi}. Co on faktycznie kupuje, matematycznie?
+  \answerto{Dwie rzeczy. Każdy wyraz macierzy staje się dodatni, więc żaden
+  zbiór stron nie uwięzi błądzenia, i to czyni punkt stały jedynym; oraz każdy
+  wiersz sumuje się do jedności nawet dla strony bez linków, więc nic nie
+  wycieka. Opowieść o nudzie to motywacja; tamte dwie własności są tym, czego
+  potrzebuje twierdzenie.}
+\end{furtherproblems}

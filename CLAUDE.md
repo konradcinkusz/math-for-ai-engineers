@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P12 written, both editions \dash{} the whole Foundation part, the whole of Part II, the whole of Part III, and the first program of Part IV.** P13–P34 are stubs carrying their briefs | 22 of 47 |
+| Programs | **F1–F13 and P1–P13 written, both editions \dash{} the whole Foundation part, the whole of Part II, the whole of Part III, and the first two of Part IV.** P14–P34 are stubs carrying their briefs | 21 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 784 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 796 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 670 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 676 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 806 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 820 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 686 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 694 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,20 +93,20 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **22 of 47 programs are stubs**, in each language. This is the whole of the
+- **21 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 768 computed values, all referenced, all present, plus the committed console
+- 815 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 150 Mermaid sources, all rendering
+- 0 `verifybox` blocks · 156 Mermaid sources, all rendering
 - 36 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **78 orphan-tail pages: 19 · 23 · 18 · 18** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
+- **80 orphan-tail pages: 19 · 25 · 18 · 18** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4` \dash{} P12 moved none and P13 two \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
   before P6. **P6 added two and the ten transcripts it turned on added three**,
@@ -138,8 +138,8 @@ what was there before.
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
-  39% in P10, 39% in P11 and **46% in P12**, the first program outside
-  Part I to reach the book's own rate.**
+  39% in P10, 39% in P11, **46% in P12** and **50% in P13**, the highest
+  outside Part I and the first anywhere to pass the book's own rate.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -5364,6 +5364,131 @@ looking for the first, not the fix for it.
   `1--8 / 9--16 / 17--26 / 27--35 / 36--43` against a plan of
   `1--9 / 10--19 / 20--29 / 30--39 / 40--46`.
 
+### Program P13 pass, August 2026
+
+**Thirty-four teaching frames, thirty-six printed, both editions**, against a
+brief that projected fifty. Five sections: a set and a relation, two encodings
+and two costs, walks are matrix powers, a DAG and the order that makes
+evaluation well defined, and where a random walk settles.
+
+**Elicitation 50%** \dash{} the highest outside Part I, and the first program
+anywhere in Parts II to IV to pass the book's own rate. It was designed in from
+the frame plan rather than retrofitted: every section opens by asking, and the
+two questions the reader is most likely to get wrong (what $(A^{2})_{ii}$ is,
+and whether different topological orders compute different things) are both put
+before they are answered.
+
+#### The ground was unspent, and the neighbours supplied the machinery instead
+
+Unlike P12, this program leans hard on Part III \dash{} and unlike P10, whose
+ground was also unspent, the under-run has an easy explanation. A grep for
+\emph{adjacency}, \emph{topological}, \emph{PageRank}, \emph{random walk},
+\emph{DAG} and \emph{computation graph} across every written program returns
+nothing but F10's own file header deferring \enquote{a graph as a set plus a
+relation} here by name. So no content was spent \dash{} but three of the four
+sections turn out to be one theorem each from a program that is already
+written, and a theorem you already have is short to state:
+
+- **§3 is P06.** \enquote{A matrix product is a composition} read backwards
+  gives \enquote{$(A^{k})_{ij}$ counts walks of length $k$} in two sentences.
+- **§5 is P10.** A stationary distribution is an eigenvector for eigenvalue 1,
+  so everything that program said about power iteration applies unchanged.
+- **§1's handshake lemma is P12's double counting**, and the complete graph's
+  edge count is F10's pair count gated in code.
+
+#### The payoff is an assertion over every order, not an example
+
+Six services, eight calls, $\val{p13.topo.total}$ orderings and
+$\val{p13.topo.count}$ topological orders. The script evaluates the graph
+under **all four** and requires the results to be identical, which is what
+makes the sentence in §4 a fact rather than a demonstration: *a build system,
+an agent workflow, a query plan and a forward pass are one object, and all four
+are deterministic for the same reason.* Adding one edge to close a cycle makes
+the list of orders empty, which is asserted too \dash{} a cycle does not make
+evaluation hard, it makes it undefined.
+
+#### Exact over the rationals, twice, and both times deliberately
+
+The walk-counting theorem is checked against walks that are **enumerated**
+rather than against a second formula \dash{} $\val{p13.walk.checks}$
+comparisons \dash{} because an enumeration cannot be wrong about what a walk
+is. And the stationary distribution is solved exactly with P04's Gaussian
+elimination and then asserted as $P\T p = p$ with **no tolerance at all**:
+\enquote{stationary} is a claim about equality, and a float comparison would
+have made it a claim about a threshold.
+
+The dangling-node measurement is the same discipline from the other side. The
+mass left after each step is $\frac23$, then $\frac16$, then **exactly zero**
+\dash{} so it is reported as a step number rather than as a figure, because
+\enquote{0.0000} reads as rounding and this is not rounding. The convergence
+residual went the same way: committed as a **bound** rather than a figure,
+because P06 had two of exactly those rejected by CI for being machine
+properties.
+
+#### Two things caught by checks rather than by reading
+
+- **The file was written to the wrong name.** The manifest says
+  `P13-graphs-dags` and thirty-four frames went into `P13-graphs.tex`. That is
+  F12's trap exactly, and F12 recorded that the tell is the page count not
+  moving \dash{} but here `gen_stubs.py --check` refused before the build
+  finished, naming the file and saying to rename it deliberately. **The check
+  that F12's failure earned is the check that caught its recurrence.**
+- **The transcript named four things it never imported**, which is P04's
+  defect. Fixed with two import lines, and verified the only way that means
+  anything: extracted from the finished PDF and run, printing the four values
+  the page prints.
+
+#### One self-inflicted build failure worth recording
+
+A build was killed with `pkill -f latexmk` to free the tree for a rename, and
+the next run died with a hundred copies of `Text line contains an invalid
+character` on `main-pl.out` line 26. **A killed latexmk can leave a NUL-filled
+auxiliary file**, and hyperref's `.out` is read back on the next run, so the
+failure looks like a source error in a file nobody edited. Deleting the aux
+tree fixes it. The tell is that the error names an `.out`, `.aux` or `.toc`
+rather than a `.tex`.
+
+#### The orphaned cue took two rounds, and both additions earn their place
+
+`main-en-a4` and `main-pl-a4` both orphaned the cue of frame 21; lengthening it
+cleared English and moved the Polish one to frame 31. Eighth confirmation of
+F06's two-sided rule, and the second time the walk has taken two rounds. What
+was added: why the clause \emph{without retracing an edge} is what makes
+\enquote{acyclic} a usable word at all, and why PageRank's apparent circularity
+is a **condition** rather than a definition \dash{} which is the honest content
+of a sentence the frame had been asserting in passing.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P13.1 set-plus-relation | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P13.2 walks-are-powers | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P13.3 order-not-answer | 657 / 657 | 5.18 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's wrap cap on the first render, at three ranks.
+
+**Rule 2 read by content first, captions read as nodes, then measured in all
+four builds.** Only P13.3 carries an answer to something the reader is asked
+\dash{} whether different orders compute different things \dash{} and it is
+declared after the frame that delivers it: question, answer, figure, in that
+order everywhere. P13.1 and P13.2 both sit **above** the elicitation that
+follows them and neither is a defect, which is now the fifth instance of the
+P04/P07 case: each carries what the frames above it state in full, and neither
+mentions the quantity the question below asks for (a degree sum, and a reach in
+hops).
+
+#### Also
+
+- Traps 152 to 161 added to `notes/02`.
+- Layout cost nothing: the overfull multiset is element for element the
+  pre-P13 baseline in all four builds, no stranded openers, no stranded
+  headings. Two orphan tails added, both in `main-pl`.
+- One parity round, one failure, the recorded word-order class:
+  `Program~\ref{prog:P12}'s $n!$` against `$n!$ z~Programu~\ref{prog:P12}`.
+  Four unused values were cut rather than forced into the prose, on F11's
+  finding.
+- Frame numbers mapped after writing: sections landed at
+  `1--8 / 9--13 / 14--20 / 21--26 / 27--34`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -5629,20 +5754,29 @@ clone instead.
 
 ## What is left
 
-1. **Twenty-two programs, and Parts I, II and III are complete, plus the first
-   of Part IV.** F1 to F13 and P1 to P12, both editions. Part II's argument —
+1. **Twenty-three programs, and Parts I, II and III are complete, plus the
+   first two of Part IV.** F1 to F13 and P1 to P13, both editions. Part II's argument —
    that floating point, numerical stability and cost belong *before* the linear
    algebra — is now made rather than promised: none of the three needed
    anything beyond arithmetic, algebra and a sigma.
 
-   **P13 is next** — *Graphs, DAGs and random walks* — and it is the second of
-   Part IV. Unlike P12 it *does* lean on Part III: its declared dependencies
-   are `F10, P6, P10`, because its own brief makes message passing a
-   multiplication by the adjacency matrix and PageRank the stationary
-   distribution of a random walk, which is P10's eigenvector calculation under
-   another name. **Read P06 and P10 before estimating a length**, and read
-   what P12 left: it owns the counting arguments and deliberately did not use
-   them on graphs.
+   **P14 is next** — *Logic, proof and reading theorems* — the last of
+   Part IV, and its only declared dependency is `F10`. It is the one program
+   in the book whose payoff is a *reading* skill rather than a calculation:
+   the reader should be able to take a paper's theorem apart into hypotheses
+   and conclusion. Its brief names three worked examples of the gap — a
+   convergence result that assumes convexity cited about a neural network, a
+   bound that holds *with high probability over the draw of the data* quoted
+   as if it held for the dataset in hand, and *universal approximation* quoted
+   as if it said anything about learnability — and it says in as many words
+   that it does **not** train the reader to write proofs.
+
+   Read what is already spent before estimating a length: F10 owns *and*,
+   *or*, *not* and De Morgan; P13 states two theorems and proves one direction
+   of one of them, deferring the other to P14 by name; and several programs
+   carry `rigourbox` material that P14 is the natural place to characterise.
+   The `rigourbox` convention itself — *what we are not proving, and where the
+   proof lives* — is arguably P14's subject, so read every one in the book.
 
    **P12's open curriculum question is settled** and must not be re-litigated
    from a search result: `notes/01-curriculum.md` §20 item 4 now records the
