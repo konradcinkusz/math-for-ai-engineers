@@ -1218,6 +1218,62 @@ dimensions: 2, 4, 8 vectors reach 2, 4, 8 directions, and 12, 20 and 40 all
 reach 8. The random draws are testing the code, not the claim — a
 counterexample would refute a proof. → **P04**.
 
+### Inner product, norms and high dimension, written (P05)
+
+Items 99 to 105 came out of writing P05.
+
+**99. "A cosine similarity of 0.3 means the two are weakly similar."** Read on
+two-dimensional intuition, where 0.3 is a fairly open angle. In 768 dimensions
+the cosine between two random directions has spread 1/sqrt(768) = 0.036, so 0.3
+sits about **eight spreads** out from what chance produces. It is an enormous
+similarity, not a weak one. The correction is not a threshold to memorise: it
+is to divide by 1/sqrt(d) and ask how many spreads out you are, which has an
+answer at any dimension. → **P05**, paying **F09**'s deferred "what a typical
+pair looks like".
+
+**100. "Normalising the embeddings is a preprocessing step."** It is the
+decision, taken silently, to throw the lengths away. On unit vectors the dot
+product *is* the cosine — checked to 3.3e-16 over 2000 pairs — so normalising
+does not make one behave like the other, it makes the two queries the same
+query. An embedding's length can track token frequency, encoder confidence or
+input length; declaring none of that worth ranking on may well be right, and it
+should not happen in a utility function nobody reviewed. → **P05**.
+
+**101. "Cosine and dot product are rival similarity measures."** One is the
+other multiplied by both lengths. They can only disagree when the lengths
+differ, and the choice is a question about what your embeddings encode in their
+magnitude — which the formulas cannot answer and a benchmark usually will not
+either. → **P05**, extending **F09**'s worked disagreement case.
+
+**102. "High dimension gives you exponentially many nearly-orthogonal
+directions."** True above a threshold, and always quoted without it. The
+tolerance has to sit several spreads out and the spread is 1/sqrt(d), so at a
+tolerance of 0.2 the crossover is at **d = 488**. Below it the relaxation is a
+*harder* requirement than exact orthogonality: at d = 64 the capacity is about
+4, against the 64 that are exactly orthogonal. Above it the capacity runs away
+— about 9,500 at d = 768 and 8e18 at d = 4096. → **P05**, paying **P04**'s
+counting bound its relaxation.
+
+**103. "L1 gives sparsity because the penalty is harsher."** It gives sparsity
+because its unit ball is a diamond and a diamond has corners, and a corner is a
+point where all but one coordinate is zero. A contour arriving from a generic
+direction meets a corner far more often than chance suggests. It is a statement
+about shape, and it would still be true if the optimiser were replaced. → **P05**.
+
+**104. "The L2 norm is the real size and the others approximate it."** Three
+norms are three answers to three different questions, and they do not order
+vectors the same way: (3,-4) and (5,0) are equal under L2, and each is larger
+than the other under one of the remaining two. Only L2 comes from an inner
+product, which is why only L2 has angles attached. → **P05**.
+
+**105. "Most of a ball is somewhere in the middle."** The fraction inside
+radius r is r^d, so in 768 dimensions the inner nine tenths of the radius hold
+7.2e-36 of the volume and the inner half holds 6.4e-232. Essentially all of a
+high-dimensional ball is in its outermost skin — which is why sampling to find
+a point near the centre would return nothing, and finding nothing is not
+measuring nothing. → **P05**, paying **F09**'s "how much of the space is near
+the middle".
+
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
 was at least twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is

@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P4 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first program of Part III.** P5–P34 are stubs carrying their briefs | 30 of 47 |
+| Programs | **F1–F13 and P1–P5 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first two programs of Part III.** P6–P34 are stubs carrying their briefs | 29 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 612 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 616 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 527 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 529 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 636 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 638 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 545 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 551 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,7 +93,7 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **30 of 47 programs are stubs**, in each language. This is the whole of the
+- **29 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
@@ -102,12 +102,13 @@ what was there before.
 - 0 `verifybox` blocks · 102 Mermaid sources, all rendering
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **65 orphan-tail pages: 15 · 17 · 17 · 16** across `main-en`, `main-pl`,
+- **68 orphan-tail pages: 16 · 18 · 17 · 17** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
-  55 before P1, 57 before P2, 59 before P3 and 60 before P4 \dash{} and one of
-  P04's five is the price of the three cues its pass added back, which is the
-  Stroud layout pass's measurement arriving from the other direction.
+  55 before P1, 57 before P2, 59 before P3, 60 before P4 and 65 before P5
+  \dash{} and one of P04's five is the price of the three cues its pass added
+  back, which is the Stroud layout pass's measurement arriving from the other
+  direction.
   The count is the signal and it is going the wrong way, at roughly one to
   eleven per program written; **F8 added one, F9 two, F10 four, F11 two and
   F12 four, against F5's eleven**, and the reason is worth having — all five
@@ -124,7 +125,8 @@ what was there before.
 - **Elicitation rate: 60% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, and 26--35% across the whole of Part II
-  and P04.** A frame carries `\nextframe` if and only if the next frame opens
+  P04, and 36% in P05.** A frame carries `\nextframe` if and only if the
+  next frame opens
   with an answer, so the cue rate *is* the elicitation rate. It halved over
   seventeen programs with every gate green, because `RE_DEMANDS` treats
   `\nextframe`, `\blank`, `\dotline` and `\yourturn` alike and C16 compares
@@ -3876,6 +3878,180 @@ what they wrote it about. P4.2 and P4.3 both sit below their answers everywhere.
 - Frame numbers were mapped after writing rather than before: sections landed
   at `1--8 / 9--14 / 15--20 / 21--27 / 28--34`.
 
+### Program P5 pass, August 2026
+
+**Forty-six teaching frames, forty-eight printed, both editions**, against a
+brief that projected sixty. Five sections: what one more operation buys, norms,
+projection, which measure and what normalising decides, and what high dimension
+actually does.
+
+The layout came back to the pre-P05 baseline exactly \dash{} `[]`, `[]`,
+`[6.3]`, `[]` \dash{} with no stranded openers and no stranded headings. Three
+orphan tails were added, and **one orphaned cue arrived from the figure reword
+below and was cleared by lengthening the frame**, which is the fourth
+confirmation of F06's two-sided rule: the paragraph added says that nothing
+requires a norm to come from an inner product, which is the sentence §2 needed
+anyway.
+
+#### Two predictions refuted by their own assertions, and both are better frames
+
+Eighth pass running that writing the assertion at the computation, before the
+sentence it supports, has caught something. This time it caught two, and the
+second is the section the program is built on.
+
+**One: greedy packing is the wrong construction.** The draft asked P04's
+question \dash{} *what does relaxing exactly-orthogonal to nearly-orthogonal
+buy?* \dash{} by drawing random directions and keeping each one whose cosine
+against every kept direction stayed under a tolerance, asserting that more than
+$d$ would fit. At $d = 64$, tolerance $0.2$, it kept **forty-five**, fewer than
+the sixty-four that are *exactly* orthogonal. Acceptance decays like $p^{k}$ as
+the kept set grows, so the search stalls long before the geometry does: **it
+measures the search, not the space.** No tuning would have rescued it.
+
+Replaced with the **union bound** over the exact cosine density
+$(1-c^{2})^{(d-3)/2}$, integrated numerically and cross-checked against the
+sampled fractions at $d = 10$, $100$ and $768$ \dash{} which is what makes the
+integral trustworthy rather than merely plausible.
+
+**Two: the capacity is not monotone in $d$**, which the redraft asserted:
+
+| $d$ | $P(\lvert\cos\rvert > 0.2)$ | capacity | vs $d$ |
+|---|---|---|---|
+| 3 | 8.0e-1 | 2 | 0.5x |
+| 64 | 1.1e-1 | 4 | 0.07x |
+| 768 | 2.2e-8 | 9 487 | 12x |
+| 4096 | 3.1e-38 | 8.0e18 | 2e15x |
+
+**There is a threshold, at $d = 488$, and it is where the tolerance meets the
+typical spread** \dash{} $0.2$ is $4.4$ spreads out there. Below it, high
+dimension buys nothing over exact orthogonality; above it the capacity runs
+away. Everybody quotes the second half without the qualifier, and that is the
+trap the section is built on. The failed assertion is a better frame than the
+claim it replaced, and §5 says so.
+
+#### The headline, and what four written neighbours were owed
+
+F09's closing table names three claims that "do not transfer" to high dimension
+and defers all three here by name. All three now have numbers.
+
+| $d$ | cosine spread | within 5 deg of a right angle |
+|---|---|---|
+| 2 | 0.715 | 5% |
+| 10 | 0.320 | 21% |
+| 100 | 0.100 | 61% |
+| 768 | 0.035 | **99%** |
+
+The assertion is the **invariant** \dash{} the measured spread tracks
+$1/\sqrt{d}$ to within $2.0\%$ over three decades \dash{} and not any single
+cosine, which is a random variable that would move with the seed. F11 paid for
+the lesson that a threshold chosen so an assertion passes is not an assertion.
+
+The consequence worth carrying out of the program: **a cosine similarity of
+$0.3$ at 768 dimensions is about eight spreads out, and enormous.** Read on
+two-dimensional intuition it looks like a weak signal.
+
+#### The brief promised a worked example that F09 had already spent
+
+P05's brief undertakes "the case where they rank differently worked out". F09
+works it in full \dash{} query $(1,0)$, $A = (0.30, 0.06)$, $B = (0.95,
+0.45)$, $A$ more similar and $B$ nearer, with a table of both measures. Writing
+it again would have been repetition.
+
+What F09's trapbox actually hands forward is narrower and better: **which**
+measure to prefer, and **what normalising costs**. So §4 is a decision rather
+than a demonstration, and it lands on a sentence the worked example could not
+reach: normalising does not make the dot product behave like the cosine, it
+makes the two queries the same query, so it is not a preprocessing step but
+**the decision to throw the lengths away, taken silently**.
+
+That is the fifth program running whose brief over-estimated what was left,
+and the reason is always the same: the brief was written before its neighbours.
+
+#### A percentage that rounded to 100, caught by a guard that is now general
+
+The first draft printed **"100.0 per cent"** of a ball's volume in the outer
+tenth of its radius, twice. At $d = 100$ it is $99.99735\%$. A quantity that
+rounds to a hundred per cent must be reported as its **complement**, where
+every figure is significant: the inner nine tenths hold $2.7\times10^{-5}$ of
+the ball at $d = 100$ and $7.2\times10^{-36}$ at $d = 768$. The script now
+refuses to emit any percentage that rounds to $100$, which is a guard worth
+copying into every script that emits one.
+
+Those figures are computed rather than sampled, and the note in §5 says why:
+the inner half of the radius holds $6.4\times10^{-232}$ of a 768-dimensional
+ball, so a sampled estimate would report zero, and **finding nothing is not
+measuring nothing** \dash{} which is the shape of an assertion that cannot
+fail.
+
+#### The cross-programme gate, wired to a shared computation rather than a coincidence
+
+P04's pass established what one of these is worth and what it is not: its own
+first attempt gated this program's $(3,4)$ length of $5$ against F09's
+`f09.len3d`, which is $7$ and a different vector entirely. Not repeated. What
+P05 and F09 genuinely share is the **dimension**: F09 reasons at `f09.dim`
+throughout and defers the arrangement question here, so the gate asserts that
+the near-orthogonality table measures at exactly that dimension. If F09's
+number ever moves, the table is quietly about a different model and the build
+says so.
+
+#### The transcript imports what it calls, on sight
+
+P04 shipped one that named a function it never imported. P05's imports `unit`
+and `dot` from the script that produced it and was verified by extraction and
+execution before the frame around it was written, printing
+`[0.715, 0.315, 0.099, 0.036]` \dash{} which is $1/\sqrt{d}$ at
+$d = 2, 10, 100, 768$, and is the concentration in one line.
+
+#### Rule 2 moved one figure and reworded another
+
+Both by reading the figure against the frames either side of it first, and then
+measuring, which is the order the F03 second review pass prescribes.
+
+- **`p05-spread-shrinks`** was declared after the $1/\sqrt{d}$ answer, and the
+  next frame asks *how many of a hundred pairs at 768 dimensions are within
+  five degrees of a right angle*. Its third node said *a typical pair is nearly
+  at right angles*, which is one step from "nearly all of them". That is P02's
+  finding \dash{} a figure supplying the last step of an answer is as much a
+  spoiler as one stating it \dash{} so it moved below the answer.
+- **`p05-what-it-buys`** sits above an elicitation in all four builds, which is
+  not by itself a defect. But its third node said *lengths, angles and
+  perpendicular all follow from that one definition*, and the frame below asks
+  the reader to make $\cos\theta$ the subject and say that the equation now
+  **defines** the angle. Node C now states frames 6--7's content instead \dash{}
+  perpendicular stops being a picture and becomes a sum that is zero \dash{}
+  which the frames above it have already delivered.
+
+`p05-closest-point` sits below both its elicitation and its answer in every
+build, measured at y438/443/446/458 against answers at y236/240/241/241.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P5.1 what-it-buys | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P5.2 closest-point | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P5.3 spread-shrinks | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's own wrap cap on the first render, so no redesign.
+
+#### Also
+
+- Traps 99 to 105 added to `notes/02`.
+- **The elicitation rate was designed in rather than retrofitted**, which is
+  the first program written since the ledger existed. P05 is at **36%**, above
+  Part II's 29--31% and P04's 35%, and three of its cues came from converting
+  frames that stated something the reader could produce. It is still far below
+  Part I's 73--78%, and the honest reason is that a derivation-heavy section
+  \dash{} §3 is one \dash{} has fewer places to stop and ask than a section
+  built on numbers.
+- Parity took two rounds. Twenty-two bare decimals inside maths had to be
+  wrapped in `\num{}` (C10, in both editions, because the Polish edition owes a
+  comma), and one C4 divergence was the recorded word-order class with `$A$`
+  rather than a reference: English had `$B$ ... len.b ... $A$'s ... len.a` and
+  Polish had the two values adjacent with `$A$` behind them.
+- Sixteen emitted values went unreferenced and the **emission** was narrowed
+  rather than the prose padded \dash{} the assertions still sweep every
+  dimension, and only the rows the frames quote are written out. F11's finding,
+  applied on sight.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -4125,19 +4301,17 @@ clone instead.
 
 ## What is left
 
-1. **Thirty programs, and Parts I and II are complete with Part III begun.**
-   F1 to F13 and P1 to P4, both editions. Part II's argument — that floating
+1. **Twenty-nine programs, and Parts I and II are complete with Part III two
+   programs in.** F1 to F13 and P1 to P5, both editions. Part II's argument — that floating
    point, numerical stability and cost belong *before* the linear algebra — is
    now made rather than promised: none of the three needed anything beyond
    arithmetic, algebra and a sigma.
 
-   **P05 is next**, and P04 has left it a specific debt: P04 goes as far as a
-   counting theorem and stops, saying in as many words that relaxing *exactly
-   independent* to *nearly independent* needs a way to measure \enquote{almost},
-   which means angles, which is P05's. P05's brief undertakes exactly that, and
-   the fact the book cashes in twice later — in high dimension two random
-   vectors are almost always nearly orthogonal — is the measurement P04 declines
-   to make. Read P04 §5 before planning it.
+   **P06 is next** — matrices as linear maps — and P05's closing frame hands it
+   over by name. Read P04 §5 and P05 §5 first: between them they establish that
+   a rotation is a change of basis, that a method working in any basis measures
+   something real, and that the counting bound constrains far less than it
+   appears to. P06 owns the object all three of those sentences are about.
 
    **P07 still has no frame-by-frame plan** — it was added by curriculum review
    rather than designed — so write that plan before reaching it.

@@ -145,9 +145,14 @@ for _d in DIMS:
                      < 5.0) / PAIRS
     ORTHO[_d] = (mean_abs, sd, within_cos, within_deg)
 
+# QUOTED is not DIMS: the assertions below sweep every dimension, and only the
+# rows the frames actually print are emitted. C7 reports an emitted value that
+# nothing references, and F11 established that the fix is to stop emitting it
+# rather than to work it into a sentence it does not belong in.
+QUOTED = (2, 10, 100, 768)
 emit("p05.pairs", PAIRS)
-for _d, (_ma, _sd, _wc, _wd) in ORTHO.items():
-    emit(f"p05.cos.mean.{_d}", _ma, 4)
+for _d in QUOTED:
+    _ma, _sd, _wc, _wd = ORTHO[_d]
     emit(f"p05.cos.sd.{_d}", _sd, 4)
     emit(f"p05.deg.within.{_d}", round(100 * _wd))
 
@@ -250,7 +255,7 @@ emit("p05.near.cross.sigmas", NEAR_TOL * math.sqrt(CROSS_LO), 1)
 assert capacity(CROSS_LO, NEAR_TOL) > CROSS_LO >= capacity(CROSS_LO - 1, NEAR_TOL), (
     "the bisection did not bracket the crossover")
 
-for _d in (3, 64, 768, 4096):
+for _d in (64, 768, 4096):
     emit(f"p05.near.tail.{_d}", f"{cos_tail(_d, NEAR_TOL):.1e}")
     _n = capacity(_d, NEAR_TOL)
     emit(f"p05.near.n.{_d}", f"{_n:.1e}" if _n >= 1e5 else str(round(_n)))
@@ -286,12 +291,10 @@ NOTES.append(f"at 4096 dimensions exactly 4096 directions are mutually "
 # the inner nine tenths of the radius hold 2.7e-05 of the ball at d = 100 and
 # 2.6e-36 at d = 768. The guard below is general and belongs in any script that
 # emits a percentage.
-SHELL_DIMS = (1, 2, 3, 10)
+SHELL_DIMS = (1, 10)
 for _d in SHELL_DIMS:
     emit(f"p05.shell.outer.{_d}", 100 * (1 - 0.9 ** _d), 1)
-for _d in (100, 768):
-    emit(f"p05.shell.inner.{_d}", f"{0.9 ** _d:.1e}")
-emit("p05.shell.half.100", f"{0.5 ** 100:.1e}")
+emit("p05.shell.inner.768", f"{0.9 ** 768:.1e}")
 emit("p05.shell.half.768", f"{0.5 ** 768:.1e}")
 
 for _k, (_body, _num) in VALUES.items():
