@@ -1615,6 +1615,24 @@
   \item[\textbf{#2}] \csuse{mfa@a@#1@#2}%
 }
 \newcommand{\mfa@answerprogram}[1]{%
+  % PURE SHRINK before the heading, and it is load-bearing rather than
+  % cosmetic: 0 pt natural, so nothing moves, and 3 pt a block for TeX to give
+  % back when a page will not otherwise fit.
+  %
+  % It is here rather than on the list below because of where the failure
+  % actually was. Every UNWRITTEN program still gets a heading and a one-line
+  % "no answers were stored", so the tail of this appendix is twenty-two
+  % heading-plus-line units in a row -- eleven on one page -- and those pages
+  % contain no list at all. \subsection* binds its heading to what follows with
+  % \@startsection's penalty and offers about 0.2ex of shrink, so the page was
+  % a concertina of rigid three-line blocks: eleven legal breakpoints and
+  % nothing to give at any of them. \raggedbottom cannot help, because it adds
+  % stretch and the page is too TALL.
+  %
+  % The tell was that adding shrink to the list lengths moved the reported
+  % overflow by not one tenth of a point. Shrink has to be where the material
+  % is, and on those pages the material is headings.
+  \par\vspace{0pt plus 0pt minus 3pt}%
   \subsection*{\lblProgram~#1\quad\textmd{\itshape\csuse{mfa@title@#1}}}%
   \ifcsdef{mfa@akeys@#1}{%
     % The three list lengths below carry SHRINK, and that is not cosmetic --

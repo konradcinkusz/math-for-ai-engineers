@@ -662,22 +662,38 @@ Each cost time; none is obvious from its error message.
 - **A page of REFERENCE MATTER has no glue, and `\flushbottom` requires every
   page to be exactly `\textheight` tall.** The index was the first place this
   bit (see below); the **answers appendix** was the second, and it was latent
-  for the whole draft. Its `list` set `\topsep`, `\itemsep` and `\parsep`
-  with `\setlength`, so all three were rigid and a page could give back
-  nothing at all. Adding fifteen answers anywhere in the book moves every
-  later page, and one of them then landed **12.3 pt over with nothing to
-  absorb it** — on CI, on source that built with zero vboxes here.
+  for the whole draft. P12 added fifteen answers, moved every later page, and
+  CI came back with two overfull vboxes on one page \dash{} 12.3 pt and 5.0 pt
+  \dash{} on source that built with zero vboxes here.
 
-  The cure is the index's, unchanged and for the same reason: `\raggedbottom`
-  scoped to the appendix, so a page of answers may end short as every answers
-  section in print does, **plus** shrink on the three list lengths, because
-  raggedbottom adds *stretch* and an overfull page is too **tall**. Scoped so
-  that no frame, no cue, no orphan tail and no body page moves.
+  **The instructive part is the first fix, which was right about the mechanism
+  and wrong about the place.** The answers `list` set `\topsep`, `\itemsep`
+  and `\parsep` with `\setlength`, so all three were rigid; adding shrink
+  there and `\raggedbottom` to the appendix moved the whole book by two pages
+  **and the two reported sizes came back identical to the tenth of a point.**
 
-  **The generalisable rule: anywhere the book sets vertical glue with
-  `\setlength`, ask what gives on that page.** The two places that had none
-  were the two places that failed, three hundred pages apart, and both are
-  matter a reader dips into rather than reads.
+  That is the tell, and it is worth more than the fix. The offending page has
+  **no list on it at all.** Every *unwritten* program still gets a heading and
+  a one-line \enquote{no answers were stored}, so the tail of this appendix is
+  twenty-two heading-plus-line units in a row, eleven on one page.
+  `\subsection*` binds its heading to what follows with `\@startsection`'s
+  penalty and offers about 0.2ex of shrink, so the page is a concertina of
+  rigid three-line blocks: eleven legal breakpoints and nothing to give at any
+  of them. The cure is a pure-shrink `\vspace{0pt plus 0pt minus 3pt}` before
+  each heading \dash{} nothing moves, and there are 33 pt for TeX to give back
+  on the page that needs 12.3.
+
+  **Two rules fall out.** *Shrink has to be where the material is* \dash{} an
+  overfull page names a size, not a place, and the first plausible reservoir of
+  glue is not necessarily on that page at all. And *a report that says only how
+  much is not a diagnosis*: `tools/checklog.py` now prints the page or the
+  file and line of every vbox, and distinguishes a page that came out too tall
+  from a fixed box that did not fit, because those need different fixes and
+  looked identical before.
+
+  `\raggedbottom` and the list shrink are kept. They are right for reference
+  matter whatever this failure turned out to be, and both are scoped so that
+  no frame, no cue, no orphan tail and no body page moves.
 
 - **`grep '^!' main.log` cannot see that error.** With `-file-line-error` an
   error line begins with a *path*, and `-interaction=nonstopmode` writes a PDF
@@ -5281,15 +5297,28 @@ had nothing to do with P12:
   and never the log, so after a log-only failure the one artefact anybody
   wants was the one not kept. It is uploaded now, with `if: always()`.
 
-With the page named it took one look: **page 641 of 662, deep in the answers
-appendix**, and both boxes on one page. The defect is in *Build traps* above
-and it was latent for the whole draft \dash{} P12 merely added fifteen answers
-and moved every later page onto it.
+With the page named it took three cycles rather than one, and the two failures
+in between are the useful part.
 
-**Two cycles, and the first one was diagnosis on purpose.** Guessing at a glue
-change that cannot be measured here is the unwinnable loop this file names by
-name, and the tooling that made the second cycle a single look is worth more
-than the fix.
+**Cycle two fixed the right mechanism in the wrong place.** The answers `list`
+had rigid `\topsep`, `\itemsep` and `\parsep`, so shrink went there \dash{}
+and the two reported sizes came back **identical to the tenth of a point**
+after a change that moved the book by two pages. **Cycle three misread that**
+as proof that one of the boxes was a fixed box rather than a page, because
+`checklog.py` could not yet tell the two apart. It could not, and both were
+pages; but the check that was written to settle it is worth keeping, and the
+run that settled it took one look.
+
+The answer is in *Build traps* above: the offending page carries **no list at
+all**. It is eleven consecutive `\subsection*` headings, one per unwritten
+program, each with a single line under it \dash{} so the glue was added to the
+one structure that page does not contain. The cure is pure shrink before each
+heading.
+
+**Three cycles, and the first two were diagnosis on purpose.** Guessing at a
+glue change that cannot be measured here is the unwinnable loop this file names
+by name. What made the third cycle a single look was tooling, not insight, and
+that is the transferable half.
 
 #### Also
 
