@@ -1,0 +1,6 @@
+flowchart LR
+  A["przychodzi jedna prawa strona, a szukany jest<br/>wektor, ktory macierz by na nia przeslala"]
+  A --> B["eliminuj w dol kolumn i odczytaj odpowiedz<br/>z powrotem w gore: nic wiecej nie powstaje"]
+  A --> C["albo zbuduj najpierw cala odwrotnosc, pelna<br/>macierz, i dopiero przez nia pomnoz ten wektor"]
+  B --> D["obie drogi docieraja do dokladnie tego samego<br/>wektora, wiec zostaje spytac tylko o koszt"]
+  C --> D

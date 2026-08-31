@@ -377,7 +377,7 @@
    "en": "Determinant, inverse and change of basis",
    "pl": "Wyznacznik, macierz odwrotna i zmiana bazy",
    "frames": 45,
-   "brief": "Argument: the determinant is a signed volume scale factor and zero means information was destroyed; an inverse exists exactly when nothing was destroyed; a change of basis is the same vector described in another coordinate system. Payoff: why production code almost never calls `inv()` and solves a factorised system instead --- stated here, measured in P10; a rotation as an orthogonal change of basis, which is what rotary position embedding does; the log-determinant term in a normalising flow, named so the reader recognises it later without the book promising to teach flows.",
+   "brief": "Argument: the determinant is a signed volume scale factor and zero means information was destroyed; an inverse exists exactly when nothing was destroyed; a change of basis is the same vector described in another coordinate system. Payoff: why production code almost never calls `inv()` and solves a factorised system instead --- the operation count measured here, the accuracy argument owned by P11; a rotation as an orthogonal change of basis, which is what rotary position embedding does; the log-determinant term in a normalising flow, named so the reader recognises it later without the book promising to teach flows.",
    "file": "P09-determinant-inverse",
    "key": "P09",
    "deps": [

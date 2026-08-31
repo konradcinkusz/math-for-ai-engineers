@@ -1,0 +1,6 @@
+flowchart LR
+  A["one right-hand side arrives, and the answer<br/>wanted is the vector the matrix would send to it"]
+  A --> B["eliminate down the columns and read the<br/>answer back up: nothing else is ever built"]
+  A --> C["or build the whole inverse first, a full<br/>matrix, and then multiply this one vector by it"]
+  B --> D["both routes arrive at exactly the same<br/>vector, so all that is left to ask is the cost"]
+  C --> D

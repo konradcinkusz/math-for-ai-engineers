@@ -1462,6 +1462,61 @@ and the softmax do to a stack with no narrow layer in it, which is a different
 statement, is architecture-dependent, and is not measured in this book.
 → **P08**.
 
+### Determinant, inverse and change of basis, written (P09)
+
+Items 126 to 131 came out of writing P09.
+
+**126. "The determinant is the area, so take the absolute value."** That throws
+away the half of it that matters. $|\det A|$ is the area; $\det A$ is the area
+**and the orientation**, and a negative determinant is a different kind of map
+rather than a smaller one. The checkable consequence: no product of rotations is
+ever a mirror, because every rotation has determinant $+1$ and a product of
+$+1$s is $+1$. → **P09**.
+
+**127. "A small determinant means the matrix is nearly singular."** The
+determinant scales like the $n$th power of the matrix, so in any dimension worth
+caring about its size is dominated by scaling. Multiply a $100 \times 100$
+matrix by $0.1$ and the determinant falls to $10^{-100}$ while nothing about the
+map got worse — same rank, same directions, same behaviour under a solver. *Is
+anything destroyed* is the determinant's question and it answers exactly, in yes
+and no; *how nearly* is the condition number's, → **P11**. Reading the first as
+an approximate answer to the second is how an engineer ends up chasing a number
+that was never about what they thought. → **P09**, **P11**.
+
+**128. "Determinant 1 means it is a rotation."** Two independent conditions,
+each with a counterexample against the other. A shear has determinant $1$ and
+stretches almost every vector it touches; a reflection has determinant $-1$ and
+preserves every length there is. What makes a rotation is $R^{\mathsf{T}}R = I$
+**and** $\det R = 1$ — the first for lengths, the second for orientation — and
+dropping either gives a different family. The first alone is the orthogonal
+matrices, which include the reflections. → **P09**.
+
+**129. "`inv(A)` is how you solve `Ax = b`."** Two separable claims and the
+weaker one is the one people quote. On operation count, measured rather than
+quoted: at $n = 50$, elimination costs 45 375 multiplications and divisions
+against 252 100 for forming the inverse and multiplying, a factor of 5.6 for
+exactly the same answer — because elimination builds $n$ numbers and the inverse
+builds $n^2$ of which you use $n$. The stronger claim is accuracy, and it is
+**P11**'s. The line to recognise is `inv(A.T @ A) @ A.T @ b`, which appears in a
+great deal of working code because it is the formula as written on the page —
+and a formula is a description of the answer, not an instruction for computing
+it. → **P09**, **P11**.
+
+**130. "Many right-hand sides, so form the inverse once."** The case exists and
+is narrower than it looks: a *factorisation* of $A$ is also formed once, each
+later solve is two triangular substitutions of the same order of cost, and the
+answers are more accurate. The inverse wins on neither count, so the reasoning
+that reaches for it has skipped the alternative rather than compared with it.
+→ **P09**, **P11**.
+
+**131. "Adding position by rotation must cost the model something."** It costs
+nothing, and the reason needs a determinant, which is why Program F08 could not
+say it. A rotation is an *orthogonal change of basis*: invertible, determinant
+$1$, transpose equal to inverse, so every length and every angle survives. The
+position is added by **re-describing** the query and the key rather than by
+altering them, and no direction of the embedding is spent on carrying it.
+→ **P09**, and **F08** for the identity underneath.
+
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
 was at least twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is
