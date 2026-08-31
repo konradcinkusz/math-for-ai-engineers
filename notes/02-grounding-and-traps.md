@@ -1325,6 +1325,76 @@ rule out every affine map at once rather than failing to find one. That is why
 the field could swap the logistic for ReLU for GELU without rewriting the
 theory. → **P06**.
 
+### Tensors, shapes and index notation, written (P07)
+
+Items 112 to 118 came out of writing P07. The curriculum review called this the
+largest content gap in the book and in every book in its own survey; the
+catalogue had **nothing** on shapes before this pass, which is the same finding
+arriving from a second direction.
+
+**112. "It is a three-dimensional array, so I am reasoning in three
+dimensions."** Three things in that sentence are called a dimension and they
+answer different questions. For a shape of (32, 128, 768): the number of axes
+is 3, the length of an axis is 32, 128 or 768 depending which, and the
+dimension of the space a stored vector lives in is 768 — a fact about one axis
+rather than about the array. A picture makes it worse, because a picture of
+three axes is a picture of three directions and it is not that. An axis is a
+position in the index tuple. → **P07**, naming the collision with **P04**'s
+dimension.
+
+**113. "Rank is rank."** An array's rank is how many axes it has. A matrix's
+rank is how many independent directions it maps onto, which is a statement
+about what it *does*. A rank-3 array says nothing about either, and neither
+reading implies the other. Two programs apart is close enough to collide and
+far enough to forget. → **P07** and **P08**, which is why P07 writes *number of
+axes* wherever there is doubt.
+
+**114. "A shape mismatch would have raised an error."** Predictions of shape
+(n,) minus targets of shape (n,1) broadcast to (n,n) — every prediction against
+every target — and the mean of n² numbers is still a number, so the training
+loop is content. The excess is **exact**: the reported loss is the true loss
+plus 2·Cov(p, t). Two consequences make this the worst shape a bug can have.
+The error *grows* as the model improves, because a covariance is precisely what
+training increases; and at a perfect fit the reported loss is 2·Var(t) and
+cannot fall below it. Measured, the reported number is 1.8 times the true one
+at a poor fit and 286 times at a good one. What the engineer sees is a loss
+that falls, plateaus at a number nobody can account for, and stays there — read
+as a model that has stopped learning, and in fact a missing `keepdims`.
+→ **P07**.
+
+**115. "Adding the bias worked, so the axes lined up."** A (3) added to a (3,3)
+goes along each *row*; adding it down each *column* needs (3,1). Both are legal,
+both run, and only one is what was meant. Broadcasting aligns from the right and
+pads the shorter shape with 1s in front, so the shape is the whole of the
+instruction and (3) and (3,1) are different instructions. → **P07**.
+
+**116. "A repeated index is summed."** That is the rule for the *summation
+convention*, where there is no arrow and nothing else it could mean. In an
+`einsum` string the arrow makes it optional: a repeated index that also appears
+on the right is a **batch** index. `'bij,bjk->bik'` sums only over j.
+Getting it backwards is not an error — `'bij,bjk->ik'` runs, returns the right
+shape for a single example, and has added together results belonging to
+different members of the batch. → **P07**.
+
+**117. "Same shape, so same array."** `x.reshape(b, s, h, d).transpose(1, 2)`
+and `x.reshape(b, h, s, d)` both produce (b, h, s, d) and differ in 100 of 120
+entries on a small case. Only the first splits heads correctly, because the
+buffer runs with d fastest, then h, then s. This is exactly where **P06**'s
+guarantee stops: P06 made a shape a type signature and a shape error a type
+error, and these two really do have the same type. What differs is which index
+means what, and that is carried in the names you used and nowhere a machine can
+read it. The rule that decides it: a reshape is safe exactly where the axes
+being split or merged are adjacent and already in the buffer's order.
+→ **P07**.
+
+**118. "Reshape is cheap and transpose is expensive."** Wrong twice over.
+Reshape leaves the buffer alone and changes the shape; transpose leaves the
+buffer alone and changes the *rule* for turning an index tuple into a position.
+Neither moves a number. What moves data is asking for the result **contiguous**,
+which is a third operation with its own name, and it is usually the copy nobody
+wrote down that gets attributed to the transpose. → **P07**, with the cost
+itself belonging to **P03**.
+
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
 was at least twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is

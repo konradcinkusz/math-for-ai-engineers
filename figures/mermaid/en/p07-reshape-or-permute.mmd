@@ -1,0 +1,4 @@
+flowchart LR
+  A["one flat run of numbers, and a shape saying<br/>how an index tuple becomes an offset into it"]
+  A --> B["reshape keeps the run and swaps the shape;<br/>permute keeps it and reorders the reading"]
+  B --> C["neither moves a number, and the two orders<br/>build different arrays out of one input"]

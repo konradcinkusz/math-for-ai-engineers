@@ -1,27 +1,873 @@
 %% P07 --- Tensory, kształty i notacja wskaźnikowa
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/p07_tensors_shapes.py i trafia na stronę przez \val{}.
+%% Listing konsolowy to zatwierdzony transkrypt pisany przez ten skrypt.
+%%
+%% TEZA: działanie na tablicach jest stwierdzeniem o tym, które osie się
+%% zestawiają, a notacja wskaźnikowa mówi to dokładnie tam, gdzie obrazek nie
+%% potrafi.
+%%
+%% DLACZEGO TEN PROGRAM ISTNIEJE. Został dodany przez przegląd programu
+%% nauczania z sierpnia 2026, a nie zaprojektowany, i przegląd nazwał go
+%% największą luką treściową w tej książce i w każdej z przeglądu
+%% konkurencyjnego: odbiorca codziennie operuje tablicami rzędu 4, uczono go
+%% wyłącznie notacji rzędu 2, a z tej rozbieżności biorą się błędy kształtu.
+%% Plan ramka po ramce to notes/08-tensors-plan.md, napisany przed pierwszym
+%% wierszem tego pliku.
+%%
+%% CO TEN PROGRAM JEST WINIEN, odczytane z plików, a nie z pamięci:
+%%   P06  Sekcja 4 to cała historia rzędu 2 i przekazuje temu programowi
+%%        cztery rzeczy po imieniu. Kształt to zapisana dziedzina i
+%%        przeciwdziedzina; błąd kształtu jest więc błędem TYPU; partia k
+%%        wejść ma kształt n x k w konwencji P06 -- a jego nota mówi, że
+%%        prawdziwe frameworki układają partię wzdłuż PIERWSZEJ osi, więc
+%%        warstwa liczy X W^T z X o kształcie k x n, i że to P07 nazywa osie.
+%%        Ostatnia ramka P06 przekazuje pytanie o cztery indeksy.
+%%        TEN PROGRAM ZACZYNA WIĘC OD ZAMIANY KONWENCJI.
+%%   P04  ma wymiar jako liczbę niezależnych kierunków, czyli słowo, z którym
+%%        ten program się zderza. Nazwij to zderzenie.
+%%   P03  ma rachunek pamięci i intensywność arytmetyczną, więc koszt kopii
+%%        jest stamtąd cytowany i nigdy tu mierzony ponownie.
+%%
+%% CZEGO TEN PROGRAM NIE RUSZA, sprawdzone w tools/programs.json:
+%%   rząd, cztery podprzestrzenie, najmniejsze kwadraty, LoRA         -> P08
+%%   wyznacznik, odwrotność, zmiana bazy                              -> P09
+%%   transformer złożony z tego wszystkiego                           -> P32
+%%   różniczkowanie przez reshape                                     -> P16, P18
+%%
+%% Bliźniak: programs/en/P07-tensors-shapes.tex. Ramka za ramką, makro za
+%% makrem, liczba za liczbą; tools/parity.py je porównuje.
 
 \program{Tensory, kształty i notacja wskaźnikowa}
 \label{prog:P07}
+\index{tensor!shape}
+\index{tensor!index notation}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{czytać kształt jako krotkę długości osi i mówić, co liczy dana
+  wyjęta z niego liczba}
+\outcome{9--15}{zapisać działanie na tablicach w notacji wskaźnikowej i z
+  samych wskaźników powiedzieć, które osie je przeżywają}
+\outcome{16--22}{czytać napis \code{einsum} jako sumę, którą oznacza, i pisać
+  taki napis dla działania podanego słowami}
+\outcome{23--30}{stosować regułę rozgłaszania dokładnie i rozpoznawać
+  kształty, które zestawiają się w sposób, o który nikt nie prosił}
+\outcome{31--37}{powiedzieć, które z reshape, transpozycji i permute przesuwa
+  dane, i która kolejność poprawnie dzieli partię na głowice}
+\end{outcomes}
 
-Argument: an operation on arrays is a statement about which axes line up,
-and index notation says it exactly where a picture cannot. Payoff: read an
-\code{einsum} string as the sum it denotes; state the broadcasting rules and
-say which axes align for a given pair of shapes; distinguish reshape from
-transpose from permute, and say which of them moves data; count the axes of
-an attention tensor (batch, head, query, key) and say what a matrix multiply
-over them actually contracts. This is the largest gap in every book in the
-field: the audience manipulates rank-4 arrays daily, has only ever been
-taught rank-2 notation, and the mismatch is where the shape errors come
-from.
+\begin{quiz}
+\item Tablica ma kształt $(\val{p07.emb.b}, \val{p07.emb.s}, \val{p07.emb.d})$.
+  Ile to liczb i ile osi? \teachesat{7--8}
+  \answerto{$\val{p07.emb.total}$ liczb na $\val{p07.emb.rank}$ osiach. Liczba
+  wpisów to iloczyn długości; liczba osi to ile jest tych długości, a te dwa
+  pytania są różne.}
+\item W $\sum_k A_{ik} B_{kj}$ które litery lądują na wyniku?
+  \teachesat{9--10}
+  \answerto{$i$ oraz $j$. Wskaźnik, który pojawia się dwa razy, jest sumowany
+  i znika; wskaźnik, który pojawia się raz, przeżywa. Ten jeden wiersz to cała
+  notacja wskaźnikowa.}
+\item Co robi napis \code{einsum} postaci \code{'ij->ji'}? \teachesat{17--18}
+  \answerto{Transponuje. Oba wskaźniki przeżywają i żaden nie jest sumowany;
+  zmieniła się tylko kolejność, w której są zapisane.}
+\item Dwa kształty, $(n)$ i $(n, 1)$. Jaki kształt daje odjęcie jednego od
+  drugiego? \teachesat{25--26}
+  \answerto{$(n, n)$. Zestawienie kształtów od prawej łączy $n$ z $1$, co się
+  rozciąga, a wiodące $n$ nie ma z czym się połączyć, więc zostaje.
+  Powstają wszystkie pary i nic nie protestuje.}
+\item Które z reshape, transpozycji i permute przesuwa liczby w pamięci?
+  \teachesat{31--32}
+  \answerto{Żadne, w typowym przypadku. Każde oddaje ten sam ciąg liczb z inną
+  regułą czytania. Dane przesuwa dopiero żądanie, żeby wynik był spójny w
+  pamięci.}
+\item Tablica o kształcie $(b, s, h \times d)$ ma stać się $(b, h, s, d)$. Czy
+  wystarczy jeden reshape? \teachesat{33--34}
+  \answerto{Nie. Reshape musi rozbić ostatnią oś, co daje $(b, s, h, d)$, a
+  dwie środkowe osie trzeba potem zamienić. Reshape wprost do $(b, h, s, d)$
+  jest legalny, cichy i daje inną tablicę.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 55 ramek.
-}
+% ============================================================
+\section{Tablica to kształt i reguła czytania}
+\label{sec:P07-shape}
+\index{tensor!shape}
+
+\begin{fr}
+Program~\ref{prog:P06} zostawił jedną rzecz niedokończoną, i to celowo.
+
+Pokazał, że partia $k$ wejść przez warstwę $W$ jest macierzą o $k$ kolumnach,
+po jednym wejściu na kolumnę, a potem zauważył, że prawdziwe frameworki tak nie
+robią: układają partię wzdłuż \emph{pierwszej} osi i liczą $XW\T$ z $X$ o
+kształcie $k \times n$.
+
+Dwie konwencje, a tylko jedna z nich może być tą warstwą. Która?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Obie.}
+$XW\T$ jest transpozycją $WX$, a transpozycja nie jest innym rachunkiem. Obie
+konwencje opisują jedno przekształcenie i różnią się tylko tym, którą stroną
+do góry je zapisać.
+
+Warto mieć to jako pierwszą ramkę programu, bo to ostatni raz, kiedy pytanie o
+tablice da się rozstrzygnąć tożsamością macierzową.
+Program~\ref{prog:P06} miał dwa indeksy i każde jego pytanie mieściło się w
+nich. Tensor uwagi ma cztery.
+\end{fr}
+
+\begin{fr}
+Pierwszym zadaniem jest więc definicja, która przeżyje cztery.
+
+\emph{Kształt} tablicy to krotka długości. Kształt $(2, 3)$ to dwa wiersze po
+trzy, a $(\val{p07.emb.b}, \val{p07.emb.s}, \val{p07.emb.d})$ to partia zdań
+złożonych z wektorów. \emph{Oś} jest pozycją w tej krotce.
+
+\textbf{Oś jest pozycją w krotce indeksów, a nie kierunkiem w przestrzeni.}
+Wszystko inne w tym programie to zastosowanie tego zdania.
+\end{fr}
+
+\begin{fr}
+I tu jedno słowo robi trzy rzeczy naraz, które się nie zgadzają.
+
+Tablica o kształcie $(\val{p07.emb.b}, \val{p07.emb.s}, \val{p07.emb.d})$ to
+partia $\val{p07.emb.b}$ zdań, każde po $\val{p07.emb.s}$ tokenów, każdy z
+jednym embeddingiem.
+
+Konkretnie: pierwsza oś biegnie po zdaniach w partii, druga po pozycjach tokenów
+w zdaniu, a trzecia po liczbach tworzących embedding jednego tokenu. Trzy osie i
+trzy całkiem różne rzeczy liczone wzdłuż nich.
+
+Embeddingi są wektorami. Program~\ref{prog:P04} zapytałby o wymiar przestrzeni,
+w której one żyją. Powiedz, ile on wynosi.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p07.emb.d}$.}
+Wektory mają po $\val{p07.emb.d}$ współrzędnych, żyją więc w przestrzeni o
+$\val{p07.emb.d}$ wymiarach i stosuje się do nich cały aparat
+Programu~\ref{prog:P04}.
+
+\begin{trapbox}
+\textbf{Nazwanie tego tablicą trójwymiarową i rozumowanie potem o trzech
+wymiarach jest błędem, a szkodę robi słowo.}
+
+Trzy rzeczy w tamtym zdaniu nazywają się wymiarem, a odpowiedź na pytanie
+\enquote{jaki jest wymiar} jest dla każdej inna:
+
+\begin{itemize}
+\item \textbf{liczba osi} wynosi $\val{p07.emb.rank}$;
+\item \textbf{długość osi} to $\val{p07.emb.b}$,
+  $\val{p07.emb.s}$ albo $\val{p07.emb.d}$, zależnie która;
+\item \textbf{wymiar przestrzeni}, w której żyje zapisany wektor, wynosi
+  $\val{p07.emb.d}$ i jest faktem o jednej osi, a nie o tablicy.
+\end{itemize}
+
+Obrazek tylko pogarsza sprawę, bo obrazek trzech osi jest obrazkiem trzech
+kierunków, a to nie jest to.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+\begin{note}
+A liczba osi nazywa się \emph{rzędem} tablicy, co zderza się z drugą rzeczą
+nazywaną rzędem dwa programy dalej.
+
+Program~\ref{prog:P08} używa tego słowa na liczbę niezależnych kierunków, na
+które macierz odwzorowuje, czyli na stwierdzenie o tym, co macierz
+\emph{robi}. Rząd tablicy jest stwierdzeniem o tym, jak głęboko sięga
+indeksowanie, i o niczym więcej. Tablica rzędu $\val{p07.emb.rank}$ o tamtym
+kształcie nie mówi nic o żadnym z nich i żadne odczytanie nie implikuje
+drugiego.
+
+Te dwa są dość daleko, żeby zapomnieć, i dość blisko, żeby się zderzyć. Ta
+książka pisze \emph{liczba osi} wszędzie tam, gdzie jest jakakolwiek
+wątpliwość.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Pod kształtem leży jeden płaski ciąg liczb, a to znaczy więcej, niż brzmi.
+
+Tablica o kształcie $(\val{p07.emb.b}, \val{p07.emb.s}, \val{p07.emb.d})$
+mieści ile liczb?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p07.emb.total}$.}
+Iloczyn długości, czyli reguła liczenia, którą dał ci Program~\ref{prog:F10}.
+
+Leżą w pamięci w jednej linii, a kształt jest regułą zamieniającą krotkę
+indeksów na pozycję w tej linii. Dla kształtu $(n_0, n_1, n_2)$ wpis o
+indeksach $(i, j, k)$ leży pod
+
+\[ i \, n_1 n_2 + j \, n_2 + k \]
+
+więc ostatni indeks przesuwa się o jeden krok naraz, a pierwszy skacze co
+$n_1 n_2$.
+
+\textbf{Tablica to bufor, kształt i ta reguła.} Sekcja 5 pyta o to, które z
+trzech działań zmienia które z tych trzech, i bez tej ramki nie da się jej
+nawet postawić.
+\end{fr}
+
+\mermaidfig{p07-axes-not-directions}{Czym jest oś i która z trzech rzeczy
+zwanych wymiarem jest która.}{osie to nie kierunki}
+
+% ============================================================
+\section{Notacja wskaźnikowa mówi to, czego obrazek nie potrafi}
+\label{sec:P07-indices}
+\index{tensor!index notation}
+
+\begin{fr}
+Program~\ref{prog:P06} wyprowadził iloczyn macierzy jako złożenie. Zapisany we
+wskaźnikach jest to
+
+\[ C_{ij} = \sum_k A_{ik} B_{kj} \]
+
+czyli to samo stwierdzenie i inny akt: złożenie mówi \emph{dlaczego}, a to mówi
+\emph{które}.
+
+Patrz na litery, a nie na sumę. $i$ oraz $j$ pojawiają się po prawej raz każde;
+$k$ pojawia się dwa razy. Co robi ta różnica?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wskaźnik, który pojawia się dwa razy, jest sumowany i znika; wskaźnik, który
+pojawia się raz, przeżywa na wynik.
+\end{ansblock}
+
+To cała reguła i warto powiedzieć ją płasko, bo wszystko, co zostało w tym
+programie, jest nią zastosowaną do większej liczby liter.
+
+Sigma jest wtedy prawie ozdobą: skoro $k$ pojawia się dwa razy, wiesz, że jest
+sumowane, a skoro $i$ oraz $j$ pojawiają się raz, wiesz, że wynik jest
+indeksowany przez $i$ oraz $j$. \textbf{Kształt wyniku da się odczytać z
+samych liter, bez żadnej arytmetyki.}
+\end{fr}
+
+\begin{fr}
+Przeczytaj więc jedno z powrotem, a to nie jest iloczyn.
+
+\[ D_{ij} = \sum_k A_{ik} B_{jk} \]
+
+Dwa wskaźniki $B$ zamieniły się miejscami. Czym jest $D$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$AB\T$.}
+$B_{jk}$ to wpis w wierszu $j$ i kolumnie $k$, więc sumowanie po drugim
+wskaźniku obu zestawia wiersz $i$ macierzy $A$ z wierszem $j$ macierzy $B$
+\dash{} czyli $A$ razy $B$ transponowane.
+
+Co zamyka pętlę otwartą na początku programu: $XW\T$ jest warstwą frameworka, a
+we wskaźnikach jest to $\sum_k X_{ik} W_{jk}$. \textbf{Transpozycja nigdy nie
+musiała się zdarzyć.} Jest opisem tego, który wskaźnik spotyka który, i żadna
+tablica nie musi być obracana, żeby go spełnić.
+\end{fr}
+
+\begin{fr}
+Teraz cztery litery, na obiekcie, dla którego ten program istnieje.
+
+\[ S_{bhqk} = \sum_d Q_{bhqd} K_{bhkd} \]
+
+Nieważne, jak to się nazywa. Zastosuj regułę: powiedz, które wskaźniki
+przeżywają na $S$, a które są wysumowane.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$b$, $h$, $q$ i $k$ przeżywają; sumowane jest tylko $d$.
+\end{ansblock}
+
+$d$ jest jedyną literą, która pojawia się dwa razy \emph{i} nie ma jej po
+lewej, jest więc jedynym zwężeniem. Wynik ma cztery osie, a jego kształt to
+cztery długości $b$, $h$, $q$ i $k$ w kolejności, w jakiej zostały zapisane.
+
+\textbf{Właśnie odczytałeś wsadowy wielogłowicowy wynik uwagi z samych liter,
+nie wiedząc, co która oznacza.} To argument za tą notacją w jednej ramce:
+obrazek tego obiektu nie istnieje, a zdanie, które go opisuje, mieści się w
+jednej linii.
+\end{fr}
+
+\begin{fr}
+Jedno doprecyzowanie, bo $b$ i $h$ też pojawiają się dwa razy i nie są sumowane.
+
+Reguła w tej postaci jest zbyt zgrubna. Rozstrzyga lewa strona: wskaźnik
+nieobecny po lewej jest sumowany, a wskaźnik obecny po lewej przeżywa,
+niezależnie od tego, jak często pojawia się po prawej. $b$ i $h$ są po lewej,
+są więc wskaźnikami \emph{wsadowymi} \dash{} ten sam rachunek wykonany raz dla
+każdego z nich.
+
+Usuń $b$ z lewej strony, a suma pobiegnie i po nim, dając tablicę o trzech
+osiach zamiast czterech i dodając do siebie rzeczy należące do różnych
+przykładów. Nic nie ostrzega. Sekcja 3 jest miejscem, gdzie to staje się czymś,
+co da się wpisać.
+\end{fr}
+
+% ============================================================
+\section{Napis \texorpdfstring{\code{einsum}}{einsum} to tamto zdanie z pominiętą sigmą}
+\label{sec:P07-einsum}
+\index{tensor!einsum@\texttt{einsum}}
+
+\begin{fr}
+Oto całość.
+
+\begin{center}
+\code{'ik,kj->ij'}
+\end{center}
+
+Przecinek rozdziela argumenty, strzałka wprowadza wynik, a każda grupa liter to
+wskaźniki jednej tablicy po kolei. Porównaj to z $\sum_k A_{ik} B_{kj}$ i nie
+ma w jednym niczego, czego nie ma w drugim.
+
+\textbf{Wszystko na lewo od strzałki, czego nie ma na prawo, jest sumowane.} To
+doprecyzowanie z poprzedniej ramki, zapisane jako składnia, a nie jako
+konwencja \dash{} i po to właśnie jest ta strzałka.
+\end{fr}
+
+\begin{fr}
+Przeczytaj więc trzy na zimno. Powiedz, co robi każdy z nich, przy tablicach
+dwuwymiarowych tam, gdzie potrzebne są dwie.
+
+\begin{center}
+\code{'ij->ji'} \qquad \code{'ii->'} \qquad \code{'ij,j->i'}
+\end{center}
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Transpozycja; ślad; macierz razy wektor.
+\end{ansblock}
+
+Pierwszy zachowuje oba wskaźniki i zmienia ich kolejność. Drugi ma $i$ dwa razy
+i nic po strzałce, więc sumuje po $i$ przy związanych ze sobą wskaźnikach obu
+argumentów \dash{} przekątna, dodana do siebie. Trzeci zestawia drugi wskaźnik
+macierzy z jedynym wskaźnikiem wektora i zachowuje pierwszy.
+
+\textbf{Żaden z tych trzech nie potrzebował nazwy, żeby dał się przeczytać.}
+Zastosowałeś jedną regułę trzy razy, a trzeci to zdanie
+Programu~\ref{prog:P06} \enquote{wektor jest macierzą o jednej kolumnie},
+przybyłe bez tej kolumny.
+\end{fr}
+
+\begin{fr}
+Teraz w drugą stronę, i to tę wartą umieć.
+
+Masz $Q$ i $K$, oba o kształcie (partia, głowica, pozycja, cecha), i chcesz dla
+każdej partii i każdej głowicy iloczyn skalarny każdej pozycji zapytania z
+każdą pozycją klucza. Napisz ten napis.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{\code{'bhqd,bhkd->bhqk'}}
+Pozycje zapytań to $q$, pozycje kluczy to $k$, oś cech $d$ jest tą sumowaną, bo
+iloczyn skalarny sumuje po cechach, a $b$ i $h$ są po obu stronach, bo całość
+wykonuje się raz na element partii i raz na głowicę.
+
+To suma z ramki 12, wpisana. \textbf{Nie jest to nowy pomysł, sztuczka
+biblioteki ani udogodnienie wydajnościowe} \dash{} to sigma z pominiętą sigmą,
+a kto umie przeczytać tę sumę, przeczyta i ten napis.
+\end{fr}
+
+\begin{fr}
+Zostaje ten, który ludzie mylą, i warto w niego wejść.
+
+Rozważ \code{'bij,bjk->bik'}. Trzy litery pojawiają się dwa razy: $b$, $j$ i
+jeszcze jedna. Które z nich są sumowane?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tylko $j$.}
+$b$ pojawia się dwa razy po lewej \emph{i} po prawej, jest więc wskaźnikiem
+wsadowym: ten sam iloczyn macierzy wykonany raz na element partii. $i$ oraz $k$
+pojawiają się po razie. To jest więc partia iloczynów macierzy, czyli to, do
+czego ta notacja służy częściej niż do czegokolwiek innego.
+
+\begin{trapbox}
+\textbf{\enquote{Powtórzony znaczy sumowany} to reguła, którą ludzie stąd
+wynoszą, i jest to reguła dla \emph{sumy}, a nie dla napisu.}
+
+Bierze się z prawdziwej konwencji \dash{} w tradycyjnej konwencji sumacyjnej
+nie ma strzałki, więc powtórzony rzeczywiście znaczy sumowany i nic innego
+znaczyć nie może. Strzałka jest dokładnie tym, co czyni powtórzony wskaźnik
+opcjonalnym, a opuszczenie litery po prawej stronie jest sposobem na
+poproszenie o sumę.
+
+Koszt pomylenia tego nie jest błędem. \code{'bij,bjk->ik'} działa, zwraca
+tablicę o kształcie właściwym dla pojedynczego przykładu i dodało do siebie
+wyniki należące do różnych elementów partii. Strata spada. Model się nie uczy.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Rozgłaszanie jest regułą, a nie uprzejmością}
+\label{sec:P07-broadcast}
+\index{tensor!broadcasting}
+
+\begin{fr}
+Dodanie wektora $(3)$ do macierzy $(3, 3)$ nie jest zdefiniowane przez nic, co
+spotkałeś, a każda biblioteka tablicowa robi to mimo wszystko. To, co robi,
+nazywa się \emph{rozgłaszaniem} i ma dokładną regułę.
+
+\begin{center}
+Zestaw oba kształty \textbf{od prawej}. Uzupełnij krótszy z przodu wartościami
+$1$. Para osi zgadza się, gdy długości są równe albo gdy jedna z nich wynosi
+dokładnie $1$; jeśli któraś para nie spełnia żadnego z tych warunków, działanie
+zostaje odrzucone.
+\end{center}
+
+Trzy zdania, a rozstrzygają każde pytanie o kształt w tej sekcji. Przeczytaj je
+jeszcze raz, zamiast parafrazować \dash{} parafraza, którą się wynosi, brzmi
+\enquote{robi rzecz rozsądną}, a tego nie robi.
+\end{fr}
+
+\mermaidfig{p07-broadcast-alignment}{Jak zestawia się dwa kształty i co liczy
+się jako zgodność.}{zestawianie kształtów}
+
+\begin{fr}
+Zatem $(3)$ przeciwko $(3, 3)$: uzupełnione do $(1, 3)$, pary to $1$ z $3$, co
+się rozciąga, oraz $3$ z $3$, co pasuje. Wektor zostaje dodany wzdłuż każdego
+wiersza.
+
+Załóż, że chcesz go dodać w dół każdej kolumny. Te same trzy liczby, ta sama
+macierz i żadna arytmetyka się nie zmienia. Co musi się zmienić?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Kształt, który nadajesz wektorowi: $(3, 1)$.}
+Pary stają się $3$ z $3$ oraz $1$ z $3$, więc rozciąganie dzieje się w drugą
+stronę.
+
+Oba są legalne, oba działają i tylko jedno jest tym, o co ci chodziło. Nic w
+arytmetyce nie powie ci które. \textbf{Kształt jest całą instrukcją, a $(3)$ i
+$(3, 1)$ to różne instrukcje.}
+
+Co przygotowuje ten, który kosztuje pieniądze, i warto odpowiedzieć, zanim
+pójdziesz dalej.
+
+Masz predykcje w tablicy o kształcie $(n)$ i wartości docelowe w tablicy o
+kształcie $(n, 1)$ \dash{} rzecz zupełnie zwyczajna, bo jedno wyszło z modelu,
+a drugie z kolumny tabeli. Odejmujesz jedno od drugiego.
+
+Zastosuj regułę. Jaki kształt wychodzi?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$(n, n)$.}
+Uzupełnione do $(1, n)$, pary to $1$ przeciwko $n$ oraz $n$ przeciwko $1$. Obie
+się rozciągają. Zamiast $n$ różnic masz więc ich $n^{2}$ \dash{} każdą predykcję
+przeciwko każdej wartości docelowej.
+
+Potem podnosisz do kwadratu i bierzesz średnią, a średnia z $n^{2}$ liczb jest
+liczbą, więc strata jest liczbą, więc pętla treningowa jest zupełnie
+zadowolona.
+
+\textbf{Nie ma błędu, nie ma ostrzeżenia i nie ma kształtu do obejrzenia.} Dwie
+następne ramki są o tym, jak bardzo ta liczba jest zła, a odpowiedź nie brzmi
+\enquote{trochę}.
+\end{fr}
+
+\begin{fr}
+Da się to policzyć dokładnie, a nie zmierzyć, co dla błędu jest rzadkie.
+
+Pisząc $p$ na predykcje i $t$ na wartości docelowe, średnia po wszystkich
+parach rozwija się w trzy składniki, a wychodzi z tego
+
+\[ \frac{1}{n^{2}}\sum_{i,j} (p_i - t_j)^{2}
+   \;=\; \frac{1}{n}\sum_{i} (p_i - t_i)^{2} \;+\; 2\operatorname{Cov}(p, t). \]
+
+Raportowana strata to strata prawdziwa plus podwojona kowariancja predykcji z
+wartościami docelowymi.
+
+Teraz pytanie, dla którego ta tożsamość jest. Załóż, że model staje się
+doskonały, więc każda predykcja równa się swojej wartości docelowej. Co robi
+raportowana strata?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Zatrzymuje się na $2\operatorname{Var}(t)$.}
+Przy doskonałym dopasowaniu prawdziwa strata wynosi zero, a kowariancja jest
+wariancją wartości docelowych, więc raportowana liczba wynosi
+$2\operatorname{Var}(t)$ i nie zejdzie niżej, jakkolwiek dobry byłby model.
+
+\transcript{p07-broadcast}
+
+Trzy predykcje równe swoim trzem wartościom docelowym: prawdziwa strata wynosi
+$0$, a raportowana $\val{p07.demo.floor}$, czyli podwojoną wariancję
+$1, 2, 3$.
+
+\textbf{Inżynier widzi stratę, która spada, wypłaszcza się na liczbie, której
+nikt nie umie wyjaśnić, i tam zostaje.} Czyta się to jako model, który
+przestał się uczyć, a jest to brakujący argument w jednym wierszu.
+\end{fr}
+
+\begin{fr}
+Zmierzone na $\val{p07.mse.n}$ przykładach przy dwóch poziomach szumu, a
+kierunek jest tym, co warto zapamiętać.
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+ & strata prawdziwa & raportowana \\
+\midrule
+słabe dopasowanie & $\val{p07.mse.true.hi}$ & $\val{p07.mse.bcast.hi}$ \\
+dobre dopasowanie & $\val{p07.mse.true.lo}$ & $\val{p07.mse.bcast.lo}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Przy słabym dopasowaniu raportowana strata jest $\val{p07.mse.ratio.hi}$ razy
+większa od prawdziwej. Przy dobrym jest $\val{p07.mse.ratio.lo}$ razy większa.
+
+\textbf{Im lepszy staje się model, tym bardziej raportowana liczba kłamie}, bo
+nadwyżka jest podwojoną kowariancją, a kowariancja jest dokładnie tym, co
+trening zwiększa. Błąd łagodny, dopóki debugujesz, i ostry, gdy wszystko już
+działa, ma najgorszy możliwy kształt.
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Poprawka to jeden argument i warto wiedzieć, co robi, a nie tylko że działa.
+Redukcja tablicy wzdłuż osi normalnie tę oś usuwa: $(n, 1)$ zsumowane wzdłuż
+drugiej osi daje $(n)$. Prośba o jej zachowanie zostawia $(n, 1)$, a różnica
+jest dokładnie tą, o której jest ta sekcja.
+
+\code{keepdims} nie jest więc flagą formatującą. Jest decyzją o zostawieniu osi
+na miejscu, żeby zestawienie w następnym działaniu było wypowiedziane, a nie
+wywnioskowane \dash{} a powodem, żeby sięgać po nią domyślnie, jest to, że
+zachowana oś długości $1$ może się tylko rozciągnąć, podczas gdy oś brakująca
+zestawia się z tym, co akurat naprzeciw.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Które z nich przesuwa dane}
+\label{sec:P07-reshape}
+\index{tensor!reshape}
+
+\begin{fr}
+Trzy działania zmieniają kształt i nie są tym samym działaniem.
+
+\emph{Reshape} zostawia liczby w kolejności, w jakiej są, i czyta je pod nowym
+kształtem. \emph{Transpozycja} zamienia dwie osie. \emph{Permute} zmienia
+kolejność wszystkich naraz, a transpozycja jest przypadkiem szczególnym z
+dwiema.
+
+Sekcja 1 powiedziała, że tablica to bufor, kształt i reguła zamieniająca krotkę
+indeksów na pozycję. Które z tych trzech przesuwa wobec tego liczby w pamięci?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{W typowym przypadku żadne.}
+Reshape zostawia bufor i zmienia kształt, co sekcja 1 uczyniła oczywistym.
+Niespodzianką jest to drugie: transponowanie też niczego nie przesuwa. Zmienia
+\emph{regułę}, tak że krotka indeksów zamienia się na pozycję w drugą stronę, i
+oddaje ten sam bufor.
+
+Dane przesuwa dopiero prośba o wynik \emph{spójny w pamięci} \dash{} o świeży
+bufor, którego kolejność pasuje do kształtu \dash{} a to jest trzecie działanie
+z własną nazwą. Program~\ref{prog:P03} wycenił przebieg przez pamięć; tutaj
+dowiadujesz się, że o niego poprosiłeś.
+
+\textbf{Zdanie \enquote{reshape jest tani, a transpozycja droga} jest więc
+błędne podwójnie}, a wierzy się w nie dlatego, że po transpozycji czasem
+następuje kopia, której nikt nie zapisał.
+\end{fr}
+
+\begin{fr}
+Teraz miejsce, które kosztuje ludzi dzień, i jest to dokładnie to, w którym
+partia staje się głowicami.
+
+Masz tablicę o kształcie $(b, s, h \times d)$: partia, pozycja i jeden długi
+wektor na pozycję, który ma być $h$ głowicami po $d$ cech. Ma stać się
+$(b, h, s, d)$.
+
+Oto dwie drogi do tego. Obie dają ten kształt.
+
+\begin{center}
+\code{x.reshape(b, s, h, d).transpose(1, 2)} \\[2pt]
+\code{x.reshape(b, h, s, d)}
+\end{center}
+
+Czy dają tę samą tablicę?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie.}
+Na tablicy o $\val{p07.split.entries}$ wpisach przy
+$b = \val{p07.split.b}$, $s = \val{p07.split.s}$, $h = \val{p07.split.h}$ i
+$d = \val{p07.split.d}$ oba wyniki różnią się na
+$\val{p07.split.differ}$ z nich.
+
+Poprawna jest tylko pierwsza. Bufor biegnie najszybciej po $d$, potem po $h$,
+potem po $s$, potem po $b$ \dash{} tak mówi kształt $(b, s, h \times d)$ \dash{}
+więc rozbicie ostatniej osi na $h$ i $d$ jest przeetykietowaniem tego, co już
+tam jest, a dwie środkowe osie trzeba potem zamienić.
+
+Druga prosi o liczby w kolejności, której bufor nie ma, i dostaje ją mimo to,
+bo reshape nie sprawdza niczego poza sumą wpisów.
+\end{fr}
+
+\mermaidfig{p07-reshape-or-permute}{Jeden ciąg liczb, dwa kształty nad nim i
+to, czego żaden z nich nie kosztuje.}{reshape albo permute}
+
+\begin{fr}
+To wystarcza, żeby postawić regułę, i warto spróbować postawić ją przed
+przeczytaniem.
+
+Rozbicie ostatniej osi na dwie jest bezpieczne. Scalenie dwóch sąsiadów jest
+bezpieczne. Poproszenie o $(b, h, s, d)$ wprost z $(b, s, h \times d)$ nie jest.
+Powiedz, co mają dwa bezpieczne, a czego nie ma trzecie.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Reshape jest bezpieczny dokładnie tam, gdzie rozbijane albo scalane osie
+sąsiadują ze sobą i są już w kolejności, którą ma bufor.
+\end{ansblock}
+
+Wszystko, co przeniosłoby oś tam, gdzie jej nie ma, wymaga permute, a permute
+musi być pierwszy. Reguła jest rozstrzygalna z samego kształtu i samego
+działania, i to czyni ją wartą posiadania, zamiast pamiętania, który z dwóch
+powyższych wierszy był tym właściwym.
+
+\begin{trapbox}
+\textbf{\enquote{Ten sam kształt} to nie \enquote{ta sama tablica}, a to jedyne
+miejsce, w którym sygnatura typu przestaje pomagać.}
+
+Program~\ref{prog:P06} uczynił kształt sygnaturą typu, a błąd kształtu błędem
+typu, co jest mocną gwarancją i kończy się dokładnie tutaj. Oba wyrażenia wyżej
+mają typ $(b, h, s, d) $. Jedno z nich to głowice twojego modelu, a drugie to
+te same liczby przeplecione.
+
+System typów, który ich nie odróżnia, nie jest zepsuty \dash{} te dwie rzeczy
+naprawdę mają ten sam typ. Różnią się tym, który indeks co znaczy, a to jest
+niesione w nazwach, których użyłeś, w kolejności reshape i nigdzie, gdzie
+maszyna mogłaby to przeczytać.
+\end{trapbox}
+
+\begin{aibox}
+Co jest całym podziałem na głowice, w zdaniu, które umiesz już sprawdzić.
+
+Model liczy zapytania, klucze i wartości jednym szerokim iloczynem macierzy na
+pozycję \dash{} warstwą Programu~\ref{prog:P06}, z osią partii z przodu.
+Głowice nie są osobnym rachunkiem: szeroki wektor zostaje pocięty na $h$
+plasterków po $d$, oś głowic przenosi się przed oś pozycji, a to, co było jednym
+dużym iloczynem macierzy, staje się $h$ małymi wykonywanymi równolegle.
+
+Potem $\code{'bhqd,bhkd->bhqk'}$ zwęża ostatnią oś i tylko ostatnią, więc każda
+pozycja zapytania spotyka każdą pozycję klucza, osobno dla każdej głowicy i
+każdego elementu partii. \textbf{Cztery osie, jedno zwężenie i żaden krok tego
+nie jest nowy.} Program~\ref{prog:P32} składa resztę.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Ostatnia ramka, i jest o tym, co kupiła ta notacja.
+
+Sześć sekcji temu tablica była obrazkiem z trzema kierunkami, a kształt
+księgowością. Jest krotką indeksów i regułą, działanie na niej jest
+stwierdzeniem o tym, które wskaźniki się spotykają, a każda z porażek w tym
+programie wzięła się z kształtu, który był legalny i nie był tym, o co
+chodziło: wskaźnik wsadowy odczytany jako zwężenie, $(n)$ zestawione z
+$(n, 1)$, reshape poproszony o kolejność, której bufor nie miał.
+
+\textbf{Żadna z tych trzech nie jest błędem i być nim nie może.} Biblioteka
+robi dokładnie to, co mówią kształty. Notacja wskaźnikowa jest sposobem
+powiedzenia, o co ci chodziło, i dlatego ten program spędził pięć ramek na
+sigmie, zanim cokolwiek wpisał.
+
+Program~\ref{prog:P08} wraca do dwóch indeksów i zadaje o nich trudniejsze
+pytanie: ile macierz naprawdę robi, co okazuje się liczbą mniejszą niż jej
+kształt.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Oś jest pozycją w krotce indeksów, a nie kierunkiem w
+  przestrzeni.} Kształt to krotka długości, a obie konwencje partii \dash{}
+  $k \times n$ i $n \times k$ \dash{} są jednym przekształceniem zapisanym na
+  dwa sposoby, bo $XW\T$ jest transpozycją $WX$.}
+\sumitem{4--5}{\textbf{Trzy rzeczy nazywają się wymiarem} i odpowiadają na
+  różne pytania: liczba osi ($\val{p07.emb.rank}$ dla kształtu
+  $(\val{p07.emb.b}, \val{p07.emb.s}, \val{p07.emb.d})$), długość jednej osi
+  oraz wymiar przestrzeni, w której żyje zapisany wektor, czyli
+  $\val{p07.emb.d}$, będący faktem o jednej osi, a nie o tablicy.}
+\sumitem{6--8}{\emph{Rząd} tablicy to liczba jej osi, czyli inne słowo niż to z
+  Programu~\ref{prog:P08}. Pod spodem jest jeden bufor
+  $\val{p07.emb.total}$ liczb plus \textbf{reguła zamieniająca krotkę indeksów
+  na pozycję}, i bez niej sekcji 5 nie da się postawić.}
+\sumitem{9--12}{\textbf{Wskaźnik, który pojawia się dwa razy, jest sumowany, a
+  ten, który pojawia się raz, przeżywa}, więc kształt wyniku odczytuje się z
+  liter bez żadnej arytmetyki. $\sum_k A_{ik}B_{jk}$ to $AB\T$, a transpozycja
+  nigdy nie musi się zdarzyć.}
+\sumitem{13--15}{$S_{bhqk} = \sum_d Q_{bhqd}K_{bhkd}$ to wsadowy wielogłowicowy
+  wynik uwagi, czytelny z reguły, zanim padnie którekolwiek z tych słów.
+  \textbf{Rozstrzyga lewa strona}: wskaźnik z niej nieobecny jest sumowany, a
+  obecny jest wskaźnikiem wsadowym, choćby powtarzał się wielokrotnie.}
+\sumitem{16--18}{\textbf{Napis \code{einsum} to tamta suma z pominiętą sigmą.}
+  \code{'ik,kj->ij'} to $\sum_k A_{ik}B_{kj}$; strzałka nazywa tych, co
+  przeżywają, a wszystko na lewo od niej, czego nie ma na prawo, jest sumowane.
+  Zatem \code{'ij->ji'} transponuje, \code{'ii->'} to ślad, a
+  \code{'ij,j->i'} to macierz na wektorze.}
+\sumitem{21--22}{\textbf{\enquote{Powtórzony znaczy sumowany} to reguła dla
+  sumy, a nie dla napisu.} W \code{'bij,bjk->bik'} sumowane jest tylko $j$;
+  $b$ jest wskaźnikiem wsadowym, bo jest też po prawej. Usunięcie go z prawej
+  jest legalne, zwraca właściwy kształt i dodaje do siebie wyniki należące do
+  różnych przykładów.}
+\sumitem{23--25}{\textbf{Rozgłaszanie ma dokładną regułę}: zestaw kształty od
+  prawej, uzupełnij krótszy wartościami $1$, a para zgadza się, gdy długości są
+  równe albo gdy jedna wynosi $1$. $(3)$ dodane do $(3,3)$ idzie wzdłuż wierszy, a
+  $(3,1)$ w dół kolumn; oba są legalne i tylko jedno jest zamierzone.}
+\sumitem{25--29}{\textbf{$(n)$ przeciwko $(n,1)$ daje $(n,n)$}, więc strata
+  jest uśredniana po wszystkich parach, a nadwyżka jest dokładna:
+  $2\operatorname{Cov}(p,t)$. Przy doskonałym dopasowaniu raportowana strata
+  wynosi $2\operatorname{Var}(t)$ i niżej nie zejdzie. Zmierzone: raportowana
+  liczba jest $\val{p07.mse.ratio.hi}$ razy większa od prawdziwej przy słabym
+  dopasowaniu i $\val{p07.mse.ratio.lo}$ razy przy dobrym \dash{} \textbf{im
+  lepszy model, tym bardziej kłamie}.}
+\sumitem{30--32}{\code{keepdims} zostawia oś długości $1$ na miejscu, żeby
+  następne zestawienie było wypowiedziane, a nie wywnioskowane. A
+  \textbf{żadne z reshape, transpozycji i permute nie przesuwa liczby}: każde
+  oddaje ten sam bufor z inną regułą czytania, a dane przesuwa dopiero żądanie
+  wyniku spójnego w pamięci.}
+\sumitem{33--36}{\textbf{Ten sam kształt to nie ta sama tablica.}
+  \code{x.reshape(b, s, h, d).transpose(1, 2)} i \code{x.reshape(b, h, s, d)}
+  dają oba $(b, h, s, d)$ i różnią się na $\val{p07.split.differ}$ z
+  $\val{p07.split.entries}$ wpisów. Reshape jest bezpieczny dokładnie tam,
+  gdzie rozbijane albo scalane osie sąsiadują i są już w kolejności bufora.}
+\end{summarybox}
+
+% ============================================================
+\begin{testexercises}
+\item Tablica ma kształt $(4, 6, 8)$. Podaj liczbę jej osi, liczbę wpisów i
+  wymiar przestrzeni, w której żyje zapisany wektor.
+  \answerto{Trzy osie; $4 \times 6 \times 8 = 192$ wpisów; a wektory mają po
+  $8$ współrzędnych, żyją więc w przestrzeni o $8$ wymiarach. Trzy różne
+  pytania i trzy różne liczby.}
+\item Powiedz, co liczy $\sum_j A_{ij} B_{kj}$, i podaj kształt wyniku, jeśli
+  $A$ jest $m \times n$, a $B$ jest $p \times n$.
+  \answerto{$AB\T$, o kształcie $m \times p$. Powtórzone $j$ jest sumowane, a
+  $i$ oraz $k$ przeżywają, w tej kolejności.}
+\item Napisz napis \code{einsum} dla partii iloczynów macierzy, z partią z
+  przodu.
+  \answerto{\code{'bij,bjk->bik'}. Sumowane jest tylko $j$; $b$ jest też po
+  prawej, jest więc wskaźnikiem wsadowym, a nie zwężeniem.}
+\item Kształty $(5, 1, 4)$ i $(3, 4)$ są łączone po współrzędnych. Podaj
+  kształt wyniku albo powiedz, dlaczego go nie ma.
+  \answerto{$(5, 3, 4)$. Po uzupełnieniu do $(1, 3, 4)$ pary od prawej to
+  $4$ z $4$, $1$ z $3$ i $5$ z $1$ \dash{} wszystkie trzy się zgadzają, a dwie
+  z nich rozciągają.}
+\item Kształty $(5, 4)$ i $(5)$ są łączone po współrzędnych. Powiedz, co się
+  dzieje.
+  \answerto{Odrzucone. Zestawione od prawej pary to $4$ z $5$, co nie jest ani
+  równe, ani $1$. Zapisanie drugiego jako $(5, 1)$ czyni to legalnym i stosuje
+  je w dół kolumn.}
+\item Predykcje o kształcie $(n)$ są porównywane z wartościami docelowymi o
+  kształcie $(n, 1)$. Powiedz, czym jest raportowany błąd średniokwadratowy
+  wobec prawdziwego.
+  \answerto{Prawdziwym plus $2\operatorname{Cov}(p, t)$, bo różnica powstaje
+  dla każdej pary. Przy doskonałym dopasowaniu wynosi $2\operatorname{Var}(t)$
+  i niżej nie zejdzie.}
+\item Powiedz, dlaczego ten błąd jest gorszy niż błąd raportujący losową
+  liczbę.
+  \answerto{Bo nadwyżka jest podwojoną kowariancją, a kowariancję trening
+  zwiększa. Jest łagodny, dopóki model jest zły, i ostry, gdy jest dobry,
+  wygląda więc jak wypłaszczenie, a nie jak usterka.}
+\item Powiedz, które z reshape, transpozycji i permute przesuwa liczby w
+  pamięci i co je przesuwa.
+  \answerto{Żadne, w typowym przypadku: każde zwraca ten sam bufor z inną
+  regułą czytania. Kopiuje dopiero żądanie wyniku spójnego w pamięci, będące
+  osobnym działaniem.}
+\item Tablica o kształcie $(b, s, h \times d)$ ma stać się $(b, h, s, d)$.
+  Podaj działania po kolei i powiedz, dlaczego jeden reshape nie wystarczy.
+  \answerto{Rozbij ostatnią oś, co daje $(b, s, h, d)$, a potem zamień dwie
+  środkowe osie. Jeden reshape do $(b, h, s, d)$ prosi o liczby w kolejności,
+  której bufor nie ma, i dostaje ją, bo reshape sprawdza tylko sumę wpisów.}
+\item Podaj regułę rozstrzygającą, kiedy sam reshape jest bezpieczny.
+  \answerto{Gdy rozbijane albo scalane osie sąsiadują ze sobą i są już w
+  kolejności, którą ma bufor. Wszystko inne wymaga wcześniejszego permute.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Pokaż na wskaźnikach, że $XW\T$ i $WX$ opisują tę samą warstwę.
+  \answerto{$(XW\T)_{ij} = \sum_k X_{ik} W_{jk}$ oraz
+  $(WX)_{ji} = \sum_k W_{jk} X_{ik}$, czyli ta sama suma. Jedno jest więc
+  transpozycją drugiego i różni je tylko kolejność osi.}
+\item Podaj kształt wyniku \code{'bhqd,bhkd->bhqk'} w kategoriach czterech
+  długości osi i powiedz, które długości muszą się zgadzać.
+  \answerto{$(b, h, q, k)$. Długości partii i głowic muszą się zgadzać między
+  argumentami, bo są wspólne, a długość cech $d$ musi się zgadzać, bo jest
+  zwężana. Długości zapytań i kluczy są wolne i mogą się różnić.}
+\item Powiedz, co liczy \code{'bij,bjk->ik'} i dlaczego prawie nigdy nie jest
+  to, o co komukolwiek chodzi.
+  \answerto{Iloczyny partii wysumowane także po partii, co daje jedną macierz.
+  Jest legalne, ma kształt właściwy dla pojedynczego przykładu i dodało do
+  siebie wyniki należące do różnych przykładów \dash{} jest to więc cicha
+  usterka, a nie błąd.}
+\item Udowodnij tożsamość
+  $\operatorname{mean}_{ij}(p_i - t_j)^2 = \operatorname{mean}_i(p_i - t_i)^2
+   + 2\operatorname{Cov}(p, t)$.
+  \answerto{Rozwiń obie strony. Lewa to
+  $\overline{p^{2}} - 2\bar p\,\bar t + \overline{t^{2}}$, bo $i$ oraz $j$
+  biegną niezależnie; prawa to
+  $\overline{p^{2}} - 2\overline{pt} + \overline{t^{2}}$ plus
+  $2(\overline{pt} - \bar p\,\bar t)$. Zgadzają się wyraz po wyrazie.}
+\item Powiedz, dlaczego zachowana oś długości $1$ jest bezpieczniejsza niż oś
+  brakująca.
+  \answerto{Oś długości $1$ może się tylko rozciągnąć, zestawia się więc z tym,
+  co naprzeciw, a zamiar jest zapisany. Oś brakująca zostaje uzupełniona
+  z przodu wartością $1$, zestawia się więc z tą osią, która akurat tam jest, a
+  zamiar jest wywnioskowany z rzędu drugiego argumentu.}
+\item Tablica o kształcie $(2, 3, 4)$ zostaje przekształcona do $(3, 2, 4)$.
+  Powiedz, czy to to samo co zamiana dwóch pierwszych osi.
+  \answerto{Nie. Reshape zachowuje kolejność bufora i przeetykietowuje ją, więc
+  wpis, który był pod $(0, 1, k)$, jest teraz pod $(0, 1, k)$ czytanym inaczej;
+  zamiana kładzie go pod $(1, 0, k)$. Oba dają kształt $(3, 2, 4)$ i są to
+  różne tablice.}
+\item Powiedz, co musiałoby być prawdą o systemie typów, żeby wyłapał zły
+  podział na głowice.
+  \answerto{Musiałby nieść to, co każda oś \emph{znaczy}, a nie tylko jak jest
+  długa \dash{} kształt $(b, h, s, d)$ z czterema nazwami, a nie z czterema
+  liczbami. Oba wyrażenia mają ten sam kształt, więc żaden system rozumujący o
+  samych kształtach ich nie rozdzieli.}
+\item Program~\ref{prog:P03} wycenia przebieg przez pamięć. Powiedz, które z
+  działań sekcji 5 go pociąga i kiedy.
+  \answerto{Tylko żądanie wyniku spójnego w pamięci, i tylko wtedy, gdy bieżąca
+  reguła czytania bufora nie pasuje już do kształtu. Reshape tablicy, która jest
+  już spójna, nie kosztuje nic; ten sam reshape po permute musi kopiować, bo
+  kolejność, której potrzebuje, nie jest tą, która tam jest.}
+\end{furtherproblems}
