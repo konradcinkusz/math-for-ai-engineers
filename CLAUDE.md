@@ -5544,7 +5544,7 @@ wanted all along.
 
 #### Every claim in the program is settled by exhaustive enumeration
 
-Four truth-table rows; all $\val{}$ 512 relations on a three-element set; 36
+Four truth-table rows; all 512 relations on a three-element set; 36
 pairs on a six-element domain. Each is a **proof** rather than a demonstration,
 because the domain is finite and none of it was left out \dash{} and the
 program says so, in the same trapbox as $n^{2}+n+41$, which is prime for every
