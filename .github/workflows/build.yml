@@ -260,6 +260,18 @@ jobs:
             echo "the text._"
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # And when a vbox does fire, TeX's own words, verbatim. checklog.py says
+      # how much and where; this says what TeX was doing at the time -- the
+      # shipout markers and the file it had open immediately before the
+      # complaint. A vbox that survives three glue changes without moving by a
+      # tenth of a point is a vbox whose location the analysis has got wrong,
+      # and at that point the raw log is worth more than another inference.
+      - name: What TeX said around each overfull vbox
+        if: always()
+        run: |
+          grep -n -B 24 -A 2 'Overfull \\vbox' "${{ matrix.job }}.log" \
+            | tail -160 || echo "no overfull vbox in this log"
+
       # The LOG, and it must be `if: always()`, because the only run whose log
       # anybody wants is the one that failed. checklog.py reads the log and
       # then the log is thrown away, so a failure visible ONLY on this machine
