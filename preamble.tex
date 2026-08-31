@@ -2186,7 +2186,28 @@
 %  again. CI is the reproduction, and if this does not clear it, the next step
 %  is to look for what in the index cannot be broken, not to trim an entry
 %  until the number goes away.
-\apptocmd{\theindex}{\raggedbottom\raggedright}{}{%
+%
+%  AND A LITTLE SHRINK, added after \raggedbottom alone took CI from
+%  [17.4, 3.8] to [3.8, 3.8]. The two remaining boxes are the SAME size, which
+%  is the tell: \output fires once per column in a \twocolumn region, so that
+%  is one page overflowing identically in both columns -- the index's first,
+%  where \@makeschapterhead leaves a residual height that is not a whole
+%  number of lines. \raggedbottom cannot help, because it adds STRETCH and the
+%  page is too tall rather than too short.
+%
+%  What an index lacks is shrink. `theindex` sets \parskip to 0pt plus 0.3pt
+%  with none, so a column of forty entries can give back nothing at all and
+%  TeX's only options are an overfull column or a worse break. A fifth of a
+%  point of shrink per entry is eight points per column, absorbs the residual
+%  under any metrics, and is invisible: it is a fraction of a point between two
+%  index lines. \vfuzz was the other candidate and was rejected -- raising it
+%  hides real overfull vboxes everywhere else, which is how a gate goes quiet.
+%  (Written with plain lengths, not \z@ and \@plus: this block sits OUTSIDE
+%  the \makeatletter group above, and an @-command here is an undefined
+%  control sequence in every build.)
+\apptocmd{\theindex}{%
+  \raggedbottom\raggedright
+  \setlength{\parskip}{0pt plus 0.3pt minus 0.2pt}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex

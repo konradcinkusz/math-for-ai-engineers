@@ -787,6 +787,30 @@ Each cost time; none is obvious from its error message.
   in a display.** A display gets its own line, so an unbreakable run cannot
   overflow under any metrics.
 
+- **The index is where the two TeX installations diverge worst, and the cure
+  is not the one prose uses.** CI failed on two OVERFULL VBOXES in
+  `main-en.ind` \dash{} 3.8 pt and 17.4 pt \dash{} on source this container
+  built with zero. Prose has paragraph glue to give and the recorded fix is to
+  put the unbreakable run in a display; an index has almost none. Index lines
+  carry no stretch, `\parskip` there is `0pt plus 0.3pt` with **no shrink**,
+  and `\indexspace` gives back 3 pt, while `book` in twoside mode holds every
+  column to the full text height. **`\raggedbottom` inside `theindex`** lets a
+  column end short, which is what every index in print does, and removes the
+  pressure rather than moving it. Trimming an index entry is the unwinnable
+  loop this file names, and it is *especially* unwinnable here because the
+  entry that would have to go is chosen by whichever machine is complaining.
+
+- **You cannot reproduce CI's metrics in this container, and trying breaks
+  something worth more.** `texlive-fonts-extra` and `texlive-plain-generic`
+  install newtx, inconsolata and `binhex.tex`, and the build then dies on
+  `Font TS1/ntxtlf/m/n/10.95=ts1-qtmr ... invalid font` because the TS1 map is
+  incomplete \dash{} and even complete, this is TeX Live 2023 against CI's
+  2026, so the metrics would still differ. Worse, a container that *has* newtx
+  is no longer the bare installation whose absence of inconsolata found the
+  `upquote` defect, and every page count in this file was measured on the bare
+  one. They were installed, tried and purged. **CI is the reproduction; treat
+  it as the second machine it is, and fix the class rather than the instance.**
+
 - **A generated, committed, drift-gated transcript can still be un-runnable.**
   `make verify` proves a transcript matches the script that wrote it. It says
   nothing about whether the listing on the page executes: P04's called a
