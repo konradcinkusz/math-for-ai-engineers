@@ -20,7 +20,7 @@ with independent unit-variance entries has variance $d_k$, so its standard
 deviation grows as $sqrt(d_k)$; feed that into a softmax and it saturates,
 and the gradient dies; divide by $sqrt(d_k)$ and the logits have unit
 variance regardless of head size. The scaling is a variance correction and
-nothing else, and the reader derives it here and measures it in P31. Also:
+nothing else, and the reader derives it here and measures it in P32. Also:
 Monte Carlo error is the same \code{1/sqrt(n)}, so the number of samples
 needed to halve an error bar is four times as many \dash{} the fact that
 prices every evaluation run in the book.
