@@ -1,0 +1,9 @@
+>>> from p05_inner_product_norms import unit, dot
+>>> import random, statistics          # run this from code/
+>>> rnd = random.Random(20260831)
+>>> def spread(d, n=2000):
+...     return statistics.pstdev(
+...         dot(unit(d, rnd), unit(d, rnd)) for _ in range(n))
+...
+>>> [round(spread(d), 3) for d in (2, 10, 100, 768)]
+[0.715, 0.315, 0.099, 0.036]
