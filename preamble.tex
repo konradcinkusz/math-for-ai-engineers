@@ -2276,9 +2276,18 @@
 %  (Written with plain lengths, not \z@ and \@plus: this block sits OUTSIDE
 %  the \makeatletter group above, and an @-command here is an undefined
 %  control sequence in every build.)
+%
+%  AND IT CAME BACK, at 0.2 pt of shrink, when Program P12 added its index
+%  entries: CI reported 12.29 pt and 4.99 pt on ONE page of `main-en-a4.ind`,
+%  which is again the two columns of a single page. A fifth of a point over a
+%  column of forty entries is about eight points, and eight points does not
+%  absorb twelve. Half a point does -- about twenty a column -- and it is
+%  still half a point between two index lines, which is nothing. The number
+%  scales with the index and the index only grows, so expect to raise it
+%  again; \vfuzz stays rejected for the reason above.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 0.2pt}}{}{%
+  \setlength{\parskip}{0pt plus 0.3pt minus 0.5pt}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex

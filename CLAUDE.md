@@ -659,41 +659,58 @@ Each cost time; none is obvious from its error message.
   The preamble loads `amsmath` first, then `newtxmath` if present and `amssymb`
   only if it is not.
 
+- **A PDF page number does not transfer between two installations that
+  paginate differently, and anchoring on one costs cycles.** CI failed
+  `en` A4 on two overfull vboxes, 12.29 pt and 4.99 pt, reported on page 639
+  of 660. The page was chased into the ANSWERS appendix, because 639 of 660
+  is 21 from the end and 21 from the end of the local 670-page build is the
+  answers. It is the **index**, and TeX said so all along:
+
+  ```
+  (./main-en-a4.ind [637
+  ] [638]
+  Overfull \vbox (12.28888pt too high) has occurred while \output is active
+  Overfull \vbox (4.98888pt too high) has occurred while \output is active
+  ```
+
+  Two complaints, one page, a two-column region: the index's third page
+  overflowing in both columns, which is the shape recorded below for the same
+  file. The arithmetic failed because the answers appendix is *much* shorter
+  under CI's metrics, so the two builds differ by thirty pages at that point
+  and by ten overall. **Anchor on what TeX says it had open, never on distance
+  from either end.**
+
+  Three glue changes were made to the answers appendix before the raw log was
+  read, and **not one moved the reported size by a tenth of a point** \dash{}
+  which was the evidence, ignored twice, that the box was somewhere those
+  changes could not reach. `theindex` carries its own `\raggedbottom` and
+  `\parskip` shrink, so it was immune to all of them by construction.
+
+  **The rule: read the log before the third fix, not after.** `checklog.py`
+  now names the page or the file and line of every vbox and distinguishes a
+  page that came out too tall from a fixed box that did not fit, and the
+  workflow prints TeX's own words around each complaint. Both were written
+  during this chase and both would have ended it at the first cycle.
+
 - **A page of REFERENCE MATTER has no glue, and `\flushbottom` requires every
-  page to be exactly `\textheight` tall.** The index was the first place this
-  bit (see below); the **answers appendix** was the second, and it was latent
-  for the whole draft. P12 added fifteen answers, moved every later page, and
-  CI came back with two overfull vboxes on one page \dash{} 12.3 pt and 5.0 pt
-  \dash{} on source that built with zero vboxes here.
+  page to be exactly `\textheight` tall.** The index is the standing example
+  (see below). The **answers appendix** is a second one, found while looking
+  for the index box and fixed on its own merits rather than because it was
+  this failure: its `list` set `\topsep`, `\itemsep` and `\parsep` with
+  `\setlength`, so all three were rigid, and the tail of the appendix is
+  twenty-two `\subsection*` headings in a row \dash{} one per unwritten
+  program, each with a single line under it, eleven on a page \dash{} which
+  is a concertina of rigid three-line blocks with nothing to give at any of
+  its breakpoints. It now carries `\raggedbottom`, shrink on the three list
+  lengths, and a pure-shrink `\vspace{0pt plus 0pt minus 3pt}` before each
+  heading. Nothing moves; all four page counts and the whole overfull multiset
+  were unchanged by the last of those.
 
-  **The instructive part is the first fix, which was right about the mechanism
-  and wrong about the place.** The answers `list` set `\topsep`, `\itemsep`
-  and `\parsep` with `\setlength`, so all three were rigid; adding shrink
-  there and `\raggedbottom` to the appendix moved the whole book by two pages
-  **and the two reported sizes came back identical to the tenth of a point.**
-
-  That is the tell, and it is worth more than the fix. The offending page has
-  **no list on it at all.** Every *unwritten* program still gets a heading and
-  a one-line \enquote{no answers were stored}, so the tail of this appendix is
-  twenty-two heading-plus-line units in a row, eleven on one page.
-  `\subsection*` binds its heading to what follows with `\@startsection`'s
-  penalty and offers about 0.2ex of shrink, so the page is a concertina of
-  rigid three-line blocks: eleven legal breakpoints and nothing to give at any
-  of them. The cure is a pure-shrink `\vspace{0pt plus 0pt minus 3pt}` before
-  each heading \dash{} nothing moves, and there are 33 pt for TeX to give back
-  on the page that needs 12.3.
-
-  **Two rules fall out.** *Shrink has to be where the material is* \dash{} an
-  overfull page names a size, not a place, and the first plausible reservoir of
-  glue is not necessarily on that page at all. And *a report that says only how
-  much is not a diagnosis*: `tools/checklog.py` now prints the page or the
-  file and line of every vbox, and distinguishes a page that came out too tall
-  from a fixed box that did not fit, because those need different fixes and
-  looked identical before.
-
-  `\raggedbottom` and the list shrink are kept. They are right for reference
-  matter whatever this failure turned out to be, and both are scoped so that
-  no frame, no cue, no orphan tail and no body page moves.
+  **The generalisable rule: anywhere this book sets vertical glue with
+  `\setlength`, ask what gives on that page.** And *shrink has to be where
+  the material is* \dash{} on those heading pages there is no list at all,
+  so the shrink added to the list lengths could not have helped even if the
+  box had been there.
 
 - **`grep '^!' main.log` cannot see that error.** With `-file-line-error` an
   error line begins with a *path*, and `-interaction=nonstopmode` writes a PDF
@@ -5278,47 +5295,48 @@ now the fourth instance of the P04/P07 case: it carries the decision procedure,
 which the frame above states in full, and the question below asks for
 $\val{p12.four.n}!$, which appears nowhere in it.
 
-#### CI found a latent defect in the answers appendix, and it took a tool change to see it
+#### CI failed on the index, and it took five cycles because the page number lied
 
-The first CI run failed `en` A4 alone on **two overfull vboxes, 12.3 pt and
-5.0 pt**, on source that built with zero vboxes here. That is the recorded
-two-installations divergence, and it was undiagnosable for two reasons that
-had nothing to do with P12:
+The first CI run failed `en` A4 alone on **two overfull vboxes, 12.29 pt and
+4.99 pt**, on source that built with zero vboxes here. That is the recorded
+two-installations divergence. What made it expensive was not the divergence.
 
-- **`checklog.py` reported the sizes and not the pages.** \enquote{A page is
-  12.3 pt too tall} is useless precisely when it matters, because the machine
-  that has to fix the box is not the one that saw it and cannot find it by
-  rebuilding. It now scans forward to the shipout marker TeX writes after each
-  complaint and prints `12.3 pt too high on PDF page N`. Proved by splicing
-  two synthetic complaints into a real log in TeX's exact shape, wrapped line
-  included \dash{} which is the only way to know a new check looks at
-  anything.
-- **The log was thrown away.** The workflow uploaded the PDF and the aux tree
-  and never the log, so after a log-only failure the one artefact anybody
-  wants was the one not kept. It is uploaded now, with `if: always()`.
+**Two of the five cycles were tooling and were worth it.** `checklog.py`
+reported the sizes and not the pages, so the report said a page was 12.3 pt
+too tall and not which page; it now prints the page, or the file and line for
+a fixed box, and the two are distinguished because they need different fixes.
+The workflow threw the log away, so after a log-only failure the one artefact
+anybody wants was the one not kept; it is uploaded now, and a step prints
+TeX's own words around each complaint.
 
-With the page named it took three cycles rather than one, and the two failures
-in between are the useful part.
+**Three of the five were wrong, in the same way twice.** The page number said
+639 of 660; 21 from the end of a 670-page local build is the answers
+appendix; so the answers appendix was fixed, three times, and **not one of the
+three moved the reported size by a tenth of a point.** That invariance was the
+evidence and it was read as something else twice \dash{} once as proof the
+list needed shrink, once as proof the box was not a page at all.
 
-**Cycle two fixed the right mechanism in the wrong place.** The answers `list`
-had rigid `\topsep`, `\itemsep` and `\parsep`, so shrink went there \dash{}
-and the two reported sizes came back **identical to the tenth of a point**
-after a change that moved the book by two pages. **Cycle three misread that**
-as proof that one of the boxes was a fixed box rather than a page, because
-`checklog.py` could not yet tell the two apart. It could not, and both were
-pages; but the check that was written to settle it is worth keeping, and the
-run that settled it took one look.
+It is the **index**, and the raw log says so in one line: `(./main-en-a4.ind
+[637 ] [638]` and then both complaints. Two complaints on one page in a
+two-column region is one page overflowing in both columns, which is the shape
+this file already records for the same file. The cure is the one already
+recorded for it too: `theindex`'s `\parskip` shrink, from 0.2 pt to 0.5 pt,
+because a fifth of a point over forty entries is eight and eight does not
+absorb twelve.
 
-The answer is in *Build traps* above: the offending page carries **no list at
-all**. It is eleven consecutive `\subsection*` headings, one per unwritten
-program, each with a single line under it \dash{} so the glue was added to the
-one structure that page does not contain. The cure is pure shrink before each
-heading.
+**The lesson is not about vboxes.** A PDF page number is not a location when
+two installations paginate differently \dash{} the two builds differ by ten
+pages overall and by thirty at the index, because the answers appendix sets
+much shorter under newtx. Anchor on what TeX says it had open. And read the
+raw log before the third fix, not after: the tooling that ended this in one
+look was written in cycle four and would have ended it in cycle one.
 
-**Three cycles, and the first two were diagnosis on purpose.** Guessing at a
-glue change that cannot be measured here is the unwinnable loop this file names
-by name. What made the third cycle a single look was tooling, not insight, and
-that is the transferable half.
+The answers-appendix changes are kept. Its rigid `\setlength` glue and its
+run of twenty-two headings are a real latent fragility of the same class, they
+are scoped so that no frame, no cue, no orphan tail and no body page moves,
+and they are right for reference matter whatever this failure turned out to
+be. They are recorded above as what they are: a second defect found while
+looking for the first, not the fix for it.
 
 #### Also
 
