@@ -35,12 +35,29 @@ RE_UNDEF_REF = re.compile(r"Reference `([^']+)' on page \d+ undefined", re.M)
 RE_UNDEF_CIT = re.compile(r"Citation `([^']+)' on page \d+ undefined", re.M)
 RE_HBOX = re.compile(r"Overfull \\hbox \(([\d.]+)pt")
 RE_VBOX = re.compile(r"Overfull \\vbox \(([\d.]+)pt")
-# The page a box landed on. TeX writes the shipout marker `[N` after the
-# complaint, and for a vbox usually on the same (wrapped) line: "has occurred
-# while \output is active [456]". Without it the report says a page is 12.3 pt
-# too tall and not WHICH page -- which is useless on the machine that cannot
-# reproduce the break, and this repository builds on two that do not agree.
+# WHERE a vbox happened, and it matters that TeX says this two different ways:
+#
+#   Overfull \vbox (12.3pt too high) has occurred while \output is active [456]
+#   Overfull \vbox (5.0pt too high) detected at line 1234
+#
+# The first is a PAGE that came out too tall, and its position moves when
+# anything before it moves. The second is a FIXED BOX -- a \parbox, a minipage,
+# a tcolorbox -- that is too tall for the space it was given, and it is
+# invariant under repagination. Reporting only the size makes the two
+# indistinguishable, and this repository lost a cycle to exactly that: a glue
+# change moved the whole book and the two reported sizes came back identical,
+# which was the tell that at least one of them was not a page at all.
+#
+# The source file is tracked too, because "detected at line 1234" without a
+# file is not a location. TeX brackets each file it opens, so the innermost
+# unclosed `(` at the point of the complaint is the file being read.
 RE_SHIPOUT = re.compile(r"\[(\d+)[^\]]*\]")
+RE_VBOX_WHERE = re.compile(
+    r"has occurred while \\output is active|detected at line (\d+)")
+# Document content only. A .sty or .cls is read in the preamble and can
+# never be where a typeset box was built, so matching them would report the
+# last package loaded and nothing useful.
+RE_FILE_OPEN = re.compile(r"\((\.{0,2}/[^\s()]*\.(?:tex|ind|toc))")
 RE_PAGES = re.compile(r"Output written on \S+ \((\d+) pages")
 RE_MISSING_VAL = re.compile(r"No computed values found")
 # Warnings that are always worth surfacing. Font substitution noise is not.
@@ -74,15 +91,33 @@ HARD_WARN = ("Label(s) may have changed", "Rerun to get", "Marginpar on page",
 HBOX_BUDGET = 15.0   # pt. Anything above this visibly runs into the margin.
 
 
-def _page_after(text: str, pos: int) -> int | None:
-    """The PDF page a complaint at `pos` was reported on, or None.
+def _vbox_where(text: str, pos: int) -> str:
+    """Describe where an overfull vbox at `pos` happened, as TeX reported it.
 
-    Looks only a little way ahead: the marker for the page being shipped out
-    follows the complaint, and taking the first one keeps a box on page 500
-    from being attributed to page 501 by a greedy search.
+    Returns "PDF page N" for a page that came out too tall, or
+    "<file> line N" for a fixed box that did not fit the space it was given.
+    The two need different fixes and only TeX knows which is which.
     """
-    m = RE_SHIPOUT.search(text[pos:pos + 400].replace("\n", ""))
-    return int(m.group(1)) if m else None
+    tail = text[pos:pos + 300].replace("\n", "")
+    m = RE_VBOX_WHERE.search(tail)
+    if m and m.group(1):
+        return f"line {m.group(1)}, {_open_file(text, pos)}"
+    page = RE_SHIPOUT.search(tail)
+    return f"on PDF page {page.group(1)}" if page else "at an unknown location"
+
+
+def _open_file(text: str, pos: int) -> str:
+    """The last file TeX opened before `pos`.
+
+    Deliberately NOT a bracket-matching stack. A TeX log is full of unmatched
+    parentheses in ordinary prose and in package chatter, so a stack empties
+    itself within a few thousand characters and then reports nothing -- which
+    was tried, and did. The last file opened is a starting point rather than a
+    guarantee, and the report says so rather than claiming more than it knows.
+    """
+    opens = list(RE_FILE_OPEN.finditer(text, 0, pos))
+    return (f"in or after {opens[-1].group(1)}" if opens
+            else "in a file TeX did not name")
 
 
 def analyse(path: Path) -> dict:
@@ -95,7 +130,7 @@ def analyse(path: Path) -> dict:
     ]
     h = sorted((float(x) for x in RE_HBOX.findall(text)), reverse=True)
     v = sorted((float(x) for x in RE_VBOX.findall(text)), reverse=True)
-    v_pages = [(float(m.group(1)), _page_after(text, m.end()))
+    v_pages = [(float(m.group(1)), _vbox_where(text, m.end()))
                for m in RE_VBOX.finditer(text)]
     v_pages.sort(key=lambda t: -t[0])
     pages = RE_PAGES.search(text)
@@ -139,15 +174,17 @@ def report(r: dict) -> bool:
     if r["vbox"]:
         ok = False
         print(f"  OVERFULL VBOX   : {len(r['vbox'])} {[round(x, 1) for x in r['vbox'][:5]]}")
-        for size, page in r["vbox_pages"][:5]:
-            where = f"PDF page {page}" if page else "page unknown"
-            print(f"      {size:6.1f} pt too high on {where}")
-        print("      A vbox means a boxed block grew past a page and could not")
-        print("      break. Split the table; do not shrink the text.")
-        print("      The page number is printed because the two TeX")
-        print("      installations this book builds on paginate differently,")
-        print("      so the machine that must fix it may not be the one that")
-        print("      saw it.")
+        for size, where in r["vbox_pages"][:5]:
+            print(f"      {size:6.1f} pt too high, {where}")
+        print("      A vbox means a block grew past the space it had and could")
+        print("      not break. Split the table; do not shrink the text.")
+        print("      READ THE LOCATION: `PDF page N` is a page that came out")
+        print("      too tall and moves when anything before it moves; a file")
+        print("      and line is a FIXED box -- a parbox, a minipage, a")
+        print("      tcolorbox -- that does not. They need different fixes.")
+        print("      It is printed because the two TeX installations this book")
+        print("      builds on paginate differently, so the machine that must")
+        print("      fix it is usually not the one that saw it.")
     else:
         print("  overfull vbox   : 0")
     if r["no_values"]:
