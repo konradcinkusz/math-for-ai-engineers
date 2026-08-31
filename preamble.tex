@@ -2164,8 +2164,51 @@
 %  about 29 characters and index longer names by concept instead. Both sibling
 %  books learned this the same way.
 % ============================================================
-\apptocmd{\theindex}{\raggedright}{}{%
-  \PackageWarning{mfabook}{Could not patch theindex for ragged-right setting}}
+%  And RAGGED BOTTOM, added after CI failed on two OVERFULL VBOXES in the
+%  index -- 3.8 pt and 17.4 pt -- while this container built the same source
+%  clean. That is the metric split this file already records in both its other
+%  directions, and it is the worst of the three, because the index is the one
+%  place where the material is nearly rigid: index lines carry no stretch,
+%  \parskip here is 0pt plus 0.3pt with NO shrink, and \indexspace gives back
+%  only 3 pt. `book` in twoside mode sets \flushbottom, so every column is
+%  held to the full text height with almost nothing to give.
+%
+%  \raggedbottom lets a column end short, which is what every index in print
+%  does, and removes the pressure that forces the choice between a badly
+%  underfull column and an overfull one. It also silences the hundreds of
+%  "Underfull \vbox ... while \output is active" lines the index contributes.
+%
+%  HONESTLY: this could NOT be reproduced here. newtx and inconsolata were
+%  installed to try, and the container's TeX Live is three years behind CI's,
+%  so the metrics still would not have matched -- and leaving them installed
+%  would have broken the very split that makes this container useful (it is
+%  the bare installation that found the upquote defect). They were removed
+%  again. CI is the reproduction, and if this does not clear it, the next step
+%  is to look for what in the index cannot be broken, not to trim an entry
+%  until the number goes away.
+%
+%  AND A LITTLE SHRINK, added after \raggedbottom alone took CI from
+%  [17.4, 3.8] to [3.8, 3.8]. The two remaining boxes are the SAME size, which
+%  is the tell: \output fires once per column in a \twocolumn region, so that
+%  is one page overflowing identically in both columns -- the index's first,
+%  where \@makeschapterhead leaves a residual height that is not a whole
+%  number of lines. \raggedbottom cannot help, because it adds STRETCH and the
+%  page is too tall rather than too short.
+%
+%  What an index lacks is shrink. `theindex` sets \parskip to 0pt plus 0.3pt
+%  with none, so a column of forty entries can give back nothing at all and
+%  TeX's only options are an overfull column or a worse break. A fifth of a
+%  point of shrink per entry is eight points per column, absorbs the residual
+%  under any metrics, and is invisible: it is a fraction of a point between two
+%  index lines. \vfuzz was the other candidate and was rejected -- raising it
+%  hides real overfull vboxes everywhere else, which is how a gate goes quiet.
+%  (Written with plain lengths, not \z@ and \@plus: this block sits OUTSIDE
+%  the \makeatletter group above, and an @-command here is an undefined
+%  control sequence in every build.)
+\apptocmd{\theindex}{%
+  \raggedbottom\raggedright
+  \setlength{\parskip}{0pt plus 0.3pt minus 0.2pt}}{}{%
+  \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex
 

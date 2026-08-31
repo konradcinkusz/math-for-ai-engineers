@@ -1164,6 +1164,60 @@ operations, taking the intensity from 0.17 to 0.5 — against a device ratio of
 input must be read once and the output written once whatever happens between.
 A plan that assumes otherwise is a plan a profile will disappoint. → **P03**.
 
+### Vector spaces and basis, written (P04)
+
+Items 93 to 98 came out of writing P04.
+
+**93. "Embedding dimension 4096 means the model has 4096 independent
+directions to give things."** It means the embeddings live in a space of that
+many dimensions, so at most that many of them *can* be independent. A
+vocabulary of 20,000 in 4096 dimensions leaves **at least 15,904 of the
+embeddings — 80% — as combinations of the others**, and it is a counting
+theorem: no amount of training changes it and no architecture avoids it. The
+only way to move the number is to change one of the two integers.
+→ **P04**.
+
+**94. "So the model cannot represent more than 4096 concepts."** A different
+claim, and the counting bound does not support it. A space of `d` dimensions
+holds exactly `d` mutually independent directions and vastly more that are
+*nearly* independent. Relaxing "exactly" to "nearly" is not a technicality, it
+is the whole of the interesting question — and answering it needs a way to
+measure "almost", which means angles. The bound establishes only that some
+account of the packing is needed, never which one. → **P04** for the bound,
+**P05** for the measurement.
+
+**95. "Superposition explains it, and the counting bound proves superposition."**
+The bound is a theorem; the linear-representation and superposition accounts
+are hypotheses about how a trained network is structured. They are motivated
+and have evidence behind them, and neither is established by the bound. The
+confusion is common because the bound is quoted immediately before the account,
+as though the first entailed the second. It entails only that *some* such
+account is needed. → **P04**.
+
+**96. "Neuron 2317 detects X."** A component is a coordinate against whatever
+basis training happened to land on. A basis is not unique — another run, or the
+same one with a different seed, lands on a different one for a space that may
+be doing the same job. The working test is one line: **a method that works in
+any basis measures something real; a method that needs a particular basis
+measures your choice of axes.** Length, independence and the dimension of a
+span are in the first category; the value of one component is in the second.
+→ **P04**.
+
+**97. "Eight vectors, so eight directions."** Three numbers get attached to a
+list of vectors in the same breath and only the last is the dimension: how many
+vectors there are, how many components each has, and how many independent
+directions they reach between them. Eight vectors of five components each can
+span a plane. The first two are properties of how the data was written down;
+the third is a property of the data. → **P04**.
+
+**98. "Adding more vectors adds more directions."** Rank saturates at the
+number of components, and the reasoning needs no machinery: each new vector
+either points somewhere the earlier ones could not reach, growing the span by
+one, or is already a combination of them and grows it by nothing. Measured in 8
+dimensions: 2, 4, 8 vectors reach 2, 4, 8 directions, and 12, 20 and 40 all
+reach 8. The random draws are testing the code, not the claim — a
+counterexample would refute a proof. → **P04**.
+
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
 was at least twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is

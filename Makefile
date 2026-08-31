@@ -1,6 +1,6 @@
 .PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 \
         text-only watch-en watch-pl clean diagrams diagrams-clean \
-        numbers verify stubs answers frames outcomes values translate shots debt
+        numbers verify stubs answers frames elicit outcomes values translate shots debt
 
 # Two paper formats from one source. `standard` is the 17 x 24 cm trade format
 # shared with the companion volumes; `a4` is A4 at 12pt, which is what the book
@@ -209,6 +209,17 @@ answers:
 frames:
 	@python3 tools/check_structure.py --frames
 
+# 3b. What fraction of each program's frames actually asks the reader
+#     something. REPORTED, NEVER FATAL, like the orphan-tail ledger, and for
+#     the same reason -- there is no defensible threshold and a permanently red
+#     gate teaches people to stop reading the output. It exists because the
+#     number decayed from 78% to 26% over seventeen programs with every other
+#     gate green throughout: RE_DEMANDS treats \nextframe, \blank and
+#     \yourturn alike, so a program that elicits rarely is invisible to
+#     check_frames, to parity's C16, and to C4 and C14.
+elicit:
+	@python3 tools/check_structure.py --elicit
+
 # 4. Programs that declare no learning outcomes. The "Can you?" checklist is
 #    GENERATED from the outcomes, so it can no longer drift from them -- which
 #    means the only failure left is a program that declared none at all.
@@ -242,6 +253,7 @@ debt:
 	@echo; echo "== Exercises with no answer =="  ; $(MAKE) -s answers
 	@echo; echo "== Frames =="                    ; $(MAKE) -s frames
 	@echo; echo "== Learning outcomes =="         ; $(MAKE) -s outcomes
+	@echo; echo "== Elicitation rate =="          ; $(MAKE) -s elicit
 	@echo; echo "== Computed values =="           ; $(MAKE) -s values
 	@echo; echo "== Polish/English parity =="     ; $(MAKE) -s translate
 	@echo; echo "== Unverified claims, diagrams ="; $(MAKE) -s shots

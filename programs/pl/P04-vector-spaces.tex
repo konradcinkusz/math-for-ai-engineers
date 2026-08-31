@@ -1,25 +1,863 @@
 %% P04 --- Wektory, przestrzenie liniowe i baza
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/p04_vector_spaces.py i trafia na stronę przez \val{}.
+%% Listing konsolowy to zatwierdzony transkrypt pisany przez ten skrypt.
+%%
+%% TEZA: powłoka, liniowa niezależność, baza i wymiar to CZTERY SŁOWA NA JEDNĄ
+%% MYŚL, a wymiar jest liczbą niezależnych kierunków, a nie długością listy.
+%%
+%% PIERWSZY PROGRAM W TEJ KSIĄŻCE POTRZEBUJĄCY NOWEGO OBIEKTU. Wszystko przed
+%% nim zadawało nowe pytanie o obiekty, które czytelnik już miał; mówi to
+%% ostatnia ramka Programu P03. Tutaj otwiera się część III.
+%%
+%% CO TEN PROGRAM JEST WINIEN I SPŁACA. Program F09 zdefiniował arytmetykę
+%% wektorów, a potem powiedział w ramce ostrzeżenia, że to, jak wektory są
+%% ROZMIESZCZONE w wysokim wymiarze, jest inną klasą pytania, że mierzy je P05
+%% i że zmierzenie ich porządnie potrzebuje słownika, który ustawia TEN
+%% program. Ten słownik jest całym produktem.
+%%
+%% CO TEN PROGRAM ŚWIADOMIE ZOSTAWIA, sprawdzone w tools/programs.json:
+%%   iloczyny skalarne, normy, rzutowanie i prawie-ortogonalność w wysokim
+%%     wymiarze -- pomiar, który odłożył F09                        -> P05
+%%   macierze jako odwzorowania liniowe, mnożenie jako złożenie     -> P06
+%%   rząd jako własność macierzy i LoRA                             -> P08
+%% P04 nigdy nie mierzy kąta, bo nie dostał żadnego. Sekcja 5 dochodzi do
+%% TWIERDZENIA O ZLICZANIU i zatrzymuje się, i mówi wprost, że opowieści
+%% interpretowalności zbudowane na nim są hipotezami.
+%%
+%% Bliźniak: programs/en/P04-vector-spaces.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; tools/parity.py je porównuje.
 
 \program{Wektory, przestrzenie liniowe i baza}
 \label{prog:P04}
+\index{vector!space}
+\index{basis}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{powiedzieć, co czyni zbiór rzeczy przestrzenią liniową, i
+  sprawdzić dany zbiór pod tym kątem}
+\outcome{9--14}{powiedzieć, co rozpina zbiór wektorów i czym powłoka nie jest}
+\outcome{15--20}{rozstrzygnąć, czy lista wektorów jest niezależna, i
+  powiedzieć, co ogranicza ich liczbę}
+\outcome{21--27}{powiedzieć, czym jest baza, co zlicza wymiar i do którego z
+  dwojga należy zestaw współrzędnych}
+\outcome{28--34}{zastosować ograniczenie zliczeniowe do tablicy zanurzeń i
+  oddzielić to, co ono dowodzi, od tego, czego nie dowodzi}
+\end{outcomes}
 
-Argument: a vector space is closed under two operations; span, linear
-independence, basis and dimension are four words for one idea, and dimension
-is the number of independent directions rather than the length of the list.
-Payoff: what \enquote{embedding dimension 4096} does and does not promise;
-why a set of 20,000 token embeddings in 4,096 dimensions cannot be linearly
-independent, and why the linear-representation and superposition stories are
-therefore *hypotheses about structure*, stated here as hypotheses and not as
-facts.
+\begin{quiz}
+\item Jakie dwa działania ma przestrzeń liniowa i co musi być prawdą o ich
+  wynikach? \teachesat{1--2}
+  \answerto{Dodawanie dwóch wektorów i mnożenie przez skalar, a oba wyniki
+  muszą wylądować z powrotem w zbiorze. To domknięcie jest całą definicją,
+  która tu ma znaczenie.}
+\item Czy zbiór wektorów w $\R^{3}$, których pierwsza współrzędna wynosi $1$,
+  jest przestrzenią liniową? \teachesat{2--3}
+  \answerto{Nie. Dodaj dwa z nich, a pierwsza współrzędna wynosi $2$, co leży
+  poza zbiorem. Zbiór z pierwszą współrzędną $0$ nią jest.}
+\item Dane są dwa wektory w $\R^{3}$. Co one rozpinają? \teachesat{10--11}
+  \answerto{Płaszczyznę przez początek układu \dash{} chyba że jeden jest
+  wielokrotnością drugiego, wtedy prostą. Ten wyjątek to liniowa zależność,
+  zanim została nazwana.}
+\item Czy $\val{p04.family.count}$ wektorów po $\val{p04.family.ambient}$
+  współrzędnych może być liniowo niezależnych? \teachesat{16--17}
+  \answerto{Nie. W $\val{p04.family.ambient}$ wymiarach niezależnych może być
+  co najwyżej $\val{p04.family.ambient}$ wektorów, jakiekolwiek by nie były i
+  ile byś ich nie zapisał.}
+\item Współrzędne wektora zmieniają się przy zmianie bazy. Co się nie zmienia?
+  \teachesat{24--25}
+  \answerto{Wektor. Jego długość i jego relacje z każdym innym wektorem są
+  własnościami przestrzeni, a nie osi, względem których go zapisałeś.}
+\item Model zanurza słownik $\val{p04.vocab}$ tokenów w $\val{p04.embed}$
+  wymiarach. Ile zanurzeń musi być kombinacjami pozostałych?
+  \teachesat{28--29}
+  \answerto{Co najmniej $\val{p04.dependent}$, czyli
+  $\val{p04.dependent.pct}\%$. To twierdzenie o zliczaniu i żadna własność
+  treningu tego nie zmienia.}
+\item Czy to znaczy, że model nie może reprezentować $\val{p04.vocab}$ różnych
+  pojęć? \teachesat{30--31}
+  \answerto{Nie. Znaczy, że nie może dać każdemu z nich własnego niezależnego
+  kierunku. Co robi zamiast tego, jest pytaniem o strukturę, a oferowane
+  odpowiedzi są hipotezami.}
+\end{quiz}
+
+% ============================================================
+\section{Czym jest przestrzeń}
+\label{sec:P04-space}
+\index{vector!space}
+
+\begin{fr}
+Część II zadała trzy pytania o jedną arytmetykę i nie potrzebowała do tego
+nowych obiektów. Ten program potrzebuje jednego i jest pierwszym w tej książce,
+który tak ma.
+
+Program~\ref{prog:F09} dał ci wektor i jego arytmetykę: listę liczb, dodawaną
+po współrzędnych, skalowaną jedną liczbą. Zostawił też coś niedokończonego.
+Jego zamykające ostrzeżenie mówi, że to, jak wektory są \emph{rozmieszczone} w
+wysokim wymiarze, jest inną klasą pytania niż to, jak się na nich liczy, że
+mierzy to Program~\ref{prog:P05} i że zmierzenie tego potrzebuje słownika,
+który ten program musi najpierw dostarczyć.
+
+Zacznij więc tam, gdzie Program~\ref{prog:F09} się zatrzymał. Mając dwa
+wektory, co wolno ci z nimi zrobić?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dodać je i pomnożyć jeden z nich przez liczbę.
+\end{ansblock}
+
+To cała lista, a jej krótkość jest pointą. Nie ma tu mnożenia dwóch wektorów,
+nie ma dzielenia, nie ma porządku. Dwa działania.
+
+\emph{Przestrzeń liniowa} to zbiór, na którym oba te działania są określone i
+który jest \textbf{domknięty} na oba: dodaj dowolne dwa elementy, a odpowiedź
+jest elementem; przeskaluj dowolny, a odpowiedź jest elementem. Są jeszcze inne
+aksjomaty i są tymi, które zapisałbyś bez proszenia \dash{} dodawanie jest
+przemienne, skalowanie się rozdziela \dash{} a domknięcie jest tym, które w
+praktyce kiedykolwiek zawodzi.
+
+Sprawdź to. Czy zbiór wektorów w $\R^{3}$, których pierwsza współrzędna wynosi
+$0$, jest przestrzenią liniową? A zbiór, w którym wynosi ona $1$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Pierwszy jest. Drugi nie.
+\end{ansblock}
+
+Dodaj $(0, a, b)$ i $(0, c, d)$, a pierwsza współrzędna wciąż wynosi $0$;
+przeskaluj jeden, a wciąż wynosi $0$. Domknięty na obu rachunkach.
+
+Dodaj $(1, a, b)$ i $(1, c, d)$, a pierwsza współrzędna wynosi $2$, czego w
+zbiorze nie ma. Jeden kontrprzykład i to nie jest przestrzeń \dash{} i zauważ,
+że ten zbiór jest zupełnie rozsądnym zbiorem wektorów. Jest płaszczyzną, ma
+kształt z $\R^{3}$ i nie zawiera wektora zerowego, co jest najszybszym testem,
+jaki istnieje: \textbf{każda przestrzeń liniowa zawiera wektor zerowy}, bo
+przeskalowanie dowolnego elementu przez $0$ musi wylądować wewnątrz.
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Zbiór zanurzeń, które twój model naprawdę produkuje, nie jest przestrzenią
+liniową, a to rozróżnienie warto trzymać.
+
+Dwadzieścia tysięcy wierszy tablicy to dwadzieścia tysięcy wektorów.
+Przestrzeń, w której żyją, to $\R^{\val{p04.embed}}$ i zawiera ona każdą ich
+kombinację, niezależnie od tego, czy model kiedykolwiek jakąś wyemituje.
+Większość ciekawych twierdzeń w interpretowalności dotyczy tego, \emph{gdzie w
+tej przestrzeni} leżą wyjścia modelu \dash{} czyli podzbioru, a podzbiór ze
+strukturą jest tym, co te twierdzenia próbują opisać.
+
+Mylenie obu jest tym, przez co \enquote{model ma kierunek dla sentymentu} staje
+się dwuznaczne. Kierunek istnieje w przestrzeni z konstrukcji. Czy model go
+\emph{używa}, to pytanie, i przestrzeń go nie rozstrzyga.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedno o definicji, bo to ono czyni ten słownik wartym nauczenia się, a
+nie formalnością.
+
+Nic w tych dwóch działaniach nie wspomina o listach liczb. Wielomiany można
+dodawać i skalować, więc tworzą przestrzeń liniową. Tak samo funkcje, tak samo
+ciągi nieskończone, tak samo macierze, gdy je poznasz.
+
+\textbf{\enquote{Wektor} jest rolą, a nie kształtem.} Wszystko, co ten program
+dowodzi, dowodzi z samego domknięcia, więc całość stosuje się do każdego z
+tych obiektów i niczego nie trzeba wyprowadzać od nowa, gdy obiekty się
+zmienią.
+\end{fr}
+
+\begin{fr}
+Podzbiór, który sam jest przestrzenią przy tych samych dwóch działaniach, to
+\emph{podprzestrzeń}. Powyższy zbiór z pierwszą współrzędną zero nią jest;
+zbiór z pierwszą współrzędną jeden nie.
+
+Podprzestrzenie są tym, gdzie żyje reszta tego programu, bo ciekawe pytanie
+prawie nigdy nie brzmi \enquote{czy to jest przestrzeń} \dash{} brzmi
+\textbf{której części przestrzeni się używa}.
+
+Sprawdź jeszcze jeden, i tego warto nie trafić. Czy zbiór wektorów w $\R^{3}$
+mających co najwyżej jedną niezerową współrzędną jest podprzestrzenią?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie.}
+\begin{trapbox}
+\textbf{Domknięcie musi zachodzić dla \emph{każdej} pary, a zbiór może być
+domknięty na skalowanie i zawieść na dodawaniu.}
+
+Przeskaluj $(a, 0, 0)$ przez cokolwiek, a wciąż ma jedną niezerową
+współrzędną, więc ta połowa jest w porządku. Ale
+$(1, 0, 0) + (0, 1, 0) = (1, 1, 0)$, co ma dwie, a zbiór tego nie zawiera.
+
+Taki jest kształt prawie każdego chybionego rozumowania o domknięciu:
+skalowanie jest oczywiste, kontrprzykład mieszka w dodawaniu, a zbiór, który
+zawodzi, jest zwykle tym, który ktoś opisał jako \enquote{rzadki}. Suma trzech
+osi nie jest podprzestrzenią; płaszczyzna zawierająca dwie z nich owszem.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Słownik ma jak dotąd trzy słowa \dash{} przestrzeń, podprzestrzeń, domknięcie
+\dash{} i jeden test, który zastosujesz w głowie.
+
+Brakuje jakiegokolwiek sposobu powiedzenia, jak \emph{duża} jest
+podprzestrzeń. Trzy osie i płaszczyzna przez dwie z nich są podzbiorami
+$\R^{3}$, a nazwanie jednej większą od drugiej potrzebuje pojęcia rozmiaru,
+którego zliczanie wektorów nie dostarczy: obie zawierają nieskończenie wiele.
+
+Następne trzy sekcje budują to pojęcie i budują je z tych dwóch działań i z
+niczego więcej.
+\end{fr}
+
+% ============================================================
+\section{Powłoka}
+\label{sec:P04-span}
+\index{vector!span}
+
+\begin{fr}
+Weź garstkę wektorów i zastosuj do nich oba działania na wszystkie możliwe
+sposoby: przeskaluj każdy dowolną liczbą, dodaj wyniki, powtórz. Zbiór
+wszystkiego, co da się osiągnąć, to \emph{powłoka} tej garstki.
 
 \medskip
-\textbf{Planowana długość:} 55 ramek.
-}
+\noindent
+$\spanof\{v_1, \dots, v_k\}
+  = \{\, a_1 v_1 + \dots + a_k v_k \;:\; a_i \text{ dowolne liczby} \,\}$
+
+\medskip
+\noindent
+Taka suma to \emph{kombinacja liniowa} i jest jedyną konstrukcją w całym tym
+temacie. Każda poniższa definicja jest zdaniem o kombinacjach liniowych.
+
+Powłoka zawsze jest podprzestrzenią, a powód mieści się w linijce: dodaj dwie
+kombinacje liniowe $v_i$, a dostaniesz kombinację liniową $v_i$.
+\end{fr}
+
+\mermaidfig{p04-span}{Dwa działania zastosowane we wszystkich kombinacjach i
+to, co osiągają.}{czym jest powloka}
+
+\begin{fr}
+Dwa wektory w $\R^{3}$, żaden z nich zerowy. Co one rozpinają?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Płaszczyznę przez początek układu \dash{} zwykle.}
+Przez początek, bo wzięcie obu współczynników równych $0$ jest jedną z tych
+kombinacji i daje wektor zerowy. Każda powłoka go zawiera.
+
+I \emph{zwykle}, bo jest wyjątek, który pewnie już widzisz: jeśli jeden z nich
+jest wielokrotnością drugiego, to każda ich kombinacja jest wielokrotnością
+któregokolwiek, a powłoka jest prostą.
+
+Ten wyjątek jest całą następną sekcją, przybywającą, zanim dostał nazwę.
+\textbf{Dwa wektory nie zawsze dają ci dwa kierunki.}
+\end{fr}
+
+\begin{fr}
+Co prowadzi do pytania, dla którego ten program istnieje. Oto rodzina
+$\val{p04.family.count}$ wektorów, każdy po $\val{p04.family.ambient}$
+współrzędnych, i każdy z nich jest zbudowany z tych samych dwóch:
+\[ v = a\,(1, 0, 2, -1, 3) + b\,(0, 1, -1, 4, 2) \]
+dla ośmiu różnych par $(a, b)$.
+
+Ile wymiarów ma ich powłoka?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p04.family.dim}$.}
+Nie $\val{p04.family.count}$, czyli ile jest wektorów, i nie
+$\val{p04.family.ambient}$, czyli ile współrzędnych ma każdy. Każdy element
+rodziny jest kombinacją dwóch ustalonych wektorów, więc każda kombinacja
+elementów też jest kombinacją tych dwóch, a powłoka jest płaszczyzną, którą
+one wyznaczają.
+
+\textbf{Trzy liczby, wszystkie różne, a wymiarem jest tylko ostatnia:} ile
+wektorów jest na liście, jak długi jest każdy wektor i ile niezależnych
+kierunków naprawdę razem osiągają.
+
+Pierwsze dwie są własnościami tego, jak dane zapisano. Trzecia jest
+własnością danych.
+\end{fr}
+
+\begin{fr}
+To rozróżnienie warte jest jeszcze jednej ramki, bo słów na dwa pierwsze
+używa się na trzecie bez przerwy.
+
+Tablica zanurzeń o $\val{p04.vocab}$ wierszach i $\val{p04.embed}$ kolumnach ma
+przypisane trzy liczby dokładnie tak samo. Ktoś nazwie ją
+\enquote{$\val{p04.embed}$-wymiarową} i ma na myśli drugą z nich \dash{}
+długość każdego wiersza.
+
+Czy te wiersze osiągają $\val{p04.embed}$ niezależnych kierunków, to osobne
+pytanie z osobną odpowiedzią, a sekcja 5 pokazuje, że odpowiedź na pokrewne
+pytanie jest wymuszona. Najpierw potrzebne jest słowo na samą tę własność.
+\end{fr}
+
+% ============================================================
+\section{Niezależność}
+\label{sec:P04-independence}
+\index{vector!linear independence}
+
+\begin{fr}
+Lista wektorów jest \emph{liniowo zależna}, gdy co najmniej jeden z nich jest
+kombinacją liniową pozostałych \dash{} gdy nic nie dodaje do powłoki, tak że
+wyrzucenie go niczego nie zmienia.
+
+Jest \emph{liniowo niezależna}, gdy taki wektor nie istnieje.
+
+Jest druga postać tej definicji, dziwniej wyglądająca i łatwiejsza w użyciu:
+wektory są niezależne, gdy jedynym sposobem złożenia ich w wektor zerowy jest
+wzięcie każdego współczynnika równego zeru.
+
+Obie mówią to samo i warto zobaczyć dlaczego. Jeśli jakaś kombinacja
+$a_1 v_1 + \dots + a_k v_k = 0$ ma niezerowy współczynnik \dash{} powiedzmy
+$a_1$ \dash{} to podzielenie przez niego czyni $v_1$ kombinacją reszty.
+\end{fr}
+
+\begin{fr}
+Teraz pytanie, które ustawiła poprzednia sekcja.
+
+Czy $\val{p04.family.count}$ wektorów, każdy po $\val{p04.family.ambient}$
+współrzędnych, może być liniowo niezależnych? Nie \emph{czy te osiem}, ale czy
+jakiekolwiek osiem takich może.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie, i jest to twierdzenie, a nie fakt o tamtych ośmiu.}
+\transcript{p04-rank}
+
+Transkrypt bierze losowe wektory w $\val{p04.sat.dim}$ wymiarach i zlicza, ile
+niezależnych kierunków osiąga każdy zbiór. Dwa wektory osiągają
+$\val{p04.sat.rank.2}$, cztery osiągają $\val{p04.sat.rank.4}$, osiem osiąga
+$\val{p04.sat.rank.8}$ \dash{} a potem dwanaście osiąga
+$\val{p04.sat.rank.12}$, dwadzieścia osiąga $\val{p04.sat.rank.20}$, a
+czterdzieści osiąga $\val{p04.sat.rank.40}$.
+
+\textbf{Nasyca się, i nasyca się na liczbie współrzędnych.}
+\end{fr}
+
+\mermaidfig{p04-saturation}{Czemu liczba naprawdę nowych kierunków musi
+przestać rosnąć.}{czemu liczba sie nasyca}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{Więcej wektorów nie daje ci więcej kierunków, gdy kierunki do dania się
+skończyły.}
+
+Rozumowanie za tym nasyceniem nie potrzebuje maszynerii. Każdy nowy wektor albo
+wskazuje tam, gdzie wcześniejsze nie sięgały, i wtedy powłoka rośnie o jeden
+wymiar, albo jest już ich kombinacją i wtedy powłoka nie rośnie wcale. Powłoka
+siedzi wewnątrz przestrzeni o $\val{p04.sat.dim}$ wymiarach, więc może urosnąć
+co najwyżej $\val{p04.sat.dim}$ razy.
+
+Skrypt sprawdza to na $\val{p04.sat.trials}$ losowych losowaniach i nigdy nie
+znajduje wyjątku, co jest właściwym rodzajem otuchy i niewłaściwym rodzajem
+dowodu. \textbf{Nie może go znaleźć.} Szukanie, które by się powiodło,
+obaliłoby dowód, a to, co te losowania naprawdę testują, to kod.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Powiedziane wprost, bo wszystko w sekcji 5 na tym się opiera:
+
+\medskip
+\noindent
+\textbf{W przestrzeni o $d$ wymiarach co najwyżej $d$ wektorów może być liniowo
+niezależnych.} Dowolne $d + 1$ z nich są zależne, jakiekolwiek by nie były, jak
+by nie powstały i na czym by nie były trenowane.
+
+Zauważ, czego to nie potrzebuje. Żadnego iloczynu skalarnego, żadnych kątów,
+żadnego pojęcia odległości \dash{} a żadnego z nich ten program nie dostał.
+Wynika z samego domknięcia i zliczania, i dlatego przeżywa każdy wybór sposobu
+mierzenia przestrzeni i dlatego Program~\ref{prog:P05} może przyjść później i
+niczego nie zaburzyć.
+
+Jedno słowo w tym zdaniu szkodzi. \enquote{Zależna} brzmi jak usterka. Czy
+osiem wektorów z sekcji 2 to zbiór wadliwy?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie. To całkowicie porządne osiem wektorów, osiągających dwa kierunki.}
+Zbiór zależny nie jest zbiorem zepsutym. Osiem wektorów z sekcji 2 to
+całkowicie porządne osiem wektorów; po prostu osiągają dwa kierunki, a nie
+osiem. Zależność mówi coś o \emph{liście}, a nie o jej elementach.
+
+A ta nadmiarowość bywa właśnie pointą. Lista niosąca więcej wektorów, niż jej
+powłoka ma wymiarów, jest dokładnie tym, czego chcesz, gdy te dodatkowe są
+tanie, a informację niesie rozmieszczenie \dash{} czyli kształtem argumentu,
+którego sekcja 5 nie zdoła całkiem dokończyć.
+\end{fr}
+
+% ============================================================
+\section{Baza i wymiar}
+\label{sec:P04-basis}
+\index{basis}
+\index{vector!dimension}
+
+\begin{fr}
+Dwie własności zostały wprowadzone osobno, a złożenie ich razem daje obiekt, na
+którym zbudowany jest cały ten temat.
+
+\emph{Baza} przestrzeni to lista wektorów, która jest \textbf{niezależna} i
+\textbf{rozpina} ją: dość wektorów, żeby dosięgnąć wszystkiego, i ani jednego
+więcej, niż trzeba.
+
+Obie połowy są nośne. Wyrzuć wektor z bazy, a przestaje rozpinać; dodaj jeden,
+a przestaje być niezależna. Baza to lista dokładnie tej wielkości, przy której
+te dwie porażki się spotykają.
+
+Przestrzeń ma nieskończenie wiele baz. Wypisz dwie z nich dla tej samej
+przestrzeni. Czy muszą mieć tyle samo wektorów?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak \dash{} i to ten fakt sprawia, że słowo \emph{wymiar} w ogóle coś
+znaczy.}
+
+\medskip
+\noindent
+\textbf{Każda baza danej przestrzeni ma tyle samo wektorów.}
+
+\medskip
+\noindent
+Większość czytelników odpowiada tak bez wahania, czyli dobrze, ale nie z tego
+powodu, z którego trzeba: to nie jest oczywiste i nie jest definicją \dash{} to
+twierdzenie i to o nim naprawdę jest ta sekcja. Gdyby dwie bazy mogły różnić się liczbą elementów,
+słowo \enquote{wymiar} nie nazywałoby niczego.
+
+\begin{rigourbox}
+\textbf{Nie dowodzone tutaj.} Dowód jest krótki i jest argumentem wymiany:
+mając dwie bazy, wstawiaj elementy jednej do drugiej po kolei, pokazując na
+każdym kroku, że wynik wciąż rozpina. Jest w każdym pierwszym kursie algebry
+liniowej. Ten program potrzebuje samego stwierdzenia, a to stwierdzenie czyni
+następny akapit definicją, a nie dwuznacznością.
+\end{rigourbox}
+
+\emph{Wymiar} przestrzeni to liczba elementów którejkolwiek z jej baz.
+\end{fr}
+
+\begin{fr}
+Cztery słowa z tytułu tego programu to więc jedna myśl widziana na cztery
+sposoby.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+powłoka & wszystko, co osiągają oba działania \\
+niezależność & żaden wektor nie jest nadmiarowy \\
+baza & oba naraz, dokładnie w rozmiarze, w którym się spotykają \\
+wymiar & ten rozmiar, który nie zależy od wyboru bazy \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Każde jest zdaniem o kombinacjach liniowych, a każde jest poprzednim z jednym
+warunkiem dodanym albo usuniętym. Uczenie się ich jako czterech definicji jest
+trudniejsze niż uczenie się jako jednej.
+\end{fr}
+
+\begin{fr}
+Teraz własność, która w praktyce ma największe znaczenie, a jest podawana
+najrzadziej.
+
+Baza \textbf{nie jest jedyna}. Standardowe osie płaszczyzny są bazą; jest nią
+też każda inna para niezależnych wektorów, a takich jest nieskończenie wiele.
+
+Weź punkt $(\val{p04.basis.x}, \val{p04.basis.y})$ i zapisz go względem pary
+osi obróconej o $\val{p04.basis.angle}$ stopni. Jego współrzędne stają się
+$(\val{p04.basis.c1}, \val{p04.basis.c2})$.
+
+Dwie rzeczy się stały i dwie nie. Powiedz, która jest która.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Współrzędne się zmieniły. Wektor i jego długość nie.
+\end{ansblock}
+
+$\sqrt{\val{p04.basis.x}^{2} + \val{p04.basis.y}^{2}} = \val{p04.basis.len}$, a
+nowa para daje to samo $\val{p04.basis.len}$ \dash{} co skrypt sprawdza, bo to
+właśnie czyni z tego zmianę bazy, a nie inny wektor.
+
+\textbf{Współrzędne są własnością bazy. Wektor jest własnością przestrzeni.}
+Wszystko, co chciałbyś powiedzieć o wektorze \dash{} jego długość, jego relacja
+z innym wektorem, to czy ich zbiór jest niezależny \dash{} należy do drugiej
+kategorii i przeżywa dowolną zmianę bazy.
+\end{fr}
+
+\mermaidfig{p04-basis-not-unique}{Ten sam wektor względem dwóch zestawów osi i
+to, czego zmiana nie rusza.}{baza nie jest jedyna}
+
+\begin{fr}
+\begin{aibox}
+I to właśnie \enquote{wymiar zanurzenia $\val{p04.embed}$} obiecuje i czego nie
+obiecuje.
+
+\emph{Mówi}, że zanurzenia żyją w przestrzeni o $\val{p04.embed}$ wymiarach,
+więc co najwyżej $\val{p04.embed}$ z nich może być niezależnych, a każda lista
+$\val{p04.embed}$ niezależnych jest bazą tej przestrzeni.
+
+Nie mówi nic o tym, że pojedyncze współrzędne są znaczące. Współrzędna jest
+współrzędną względem bazy, na której trening akurat wylądował, a inny przebieg
+\dash{} albo ten sam z innym ziarnem \dash{} ląduje na innej bazie przestrzeni,
+która może robić to samo. Dlatego \enquote{neuron 2317 wykrywa X} jest
+twierdzeniem o bazie, a nie o modelu, i dlatego porównywanie dwóch modeli
+współrzędna po współrzędnej jest porównywaniem dwóch dowolnych wyborów osi.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jedna konsekwencja warta wypowiedzenia przed ostatnią sekcją, bo jest
+pozytywną postacią tego samego faktu.
+
+Jeśli współrzędne zależą od bazy, a przestrzeń nie, to \emph{metoda działająca
+w dowolnej bazie mierzy coś prawdziwego, a metoda potrzebująca konkretnej bazy
+mierzy twój wybór osi}.
+
+Ten jeden test załatwia zaskakująco wiele. Porównanie dwóch wektorów co do
+długości albo co do niezależności: niezależne od bazy. Odczytanie znaczenia z
+jednej współrzędnej: nie. Obrócenie reprezentacji modelu i zapytanie, czy wciąż
+działa: test dokładnie tego rozróżnienia. Sam obrót jest macierzą, a to
+temat Programu~\ref{prog:P06}; ta książka tego testu nie przeprowadza.
+\end{fr}
+
+% ============================================================
+\section{Co zliczanie wymusza, a czego nie}
+\label{sec:P04-counting}
+\index{vector!dimension}
+\index{counting!embedding bound}
+
+\begin{fr}
+Nagroda, i jest to arytmetyka, którą zrobisz w głowie, gdy słownik jest już na
+miejscu.
+
+Model ma słownik $\val{p04.vocab}$ tokenów i zanurza każdy jako wektor o
+$\val{p04.embed}$ współrzędnych. Wiersze tej tablicy to $\val{p04.vocab}$
+wektorów w przestrzeni o $\val{p04.embed}$ wymiarach.
+
+Co najmniej ile z nich jest kombinacjami liniowymi pozostałych?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p04.dependent}$, czyli $\val{p04.dependent.pct}\%$ z nich.}
+$\val{p04.vocab} - \val{p04.embed} = \val{p04.dependent}$ i nie ma w tym nic
+więcej. Co najwyżej $\val{p04.embed}$ może być niezależnych; reszta jest
+kombinacjami jakiegoś niezależnego podzbioru.
+
+Przy $\val{f09.dim}$ wymiarach, o których rozumował Program~\ref{prog:F09}, ten
+sam słownik zostawia $\val{p04.f09.dependent}$ zależnych.
+
+\begin{warning}
+\textbf{Żadna ilość treningu tego nie zmienia i żadna architektura tego nie
+omija.} To nie jest stwierdzenie o tym, jak dobrze wyuczono zanurzenia, ani ile
+danych użyto, ani o stracie. Wynika z dwóch liczb całkowitych, a jedynym
+sposobem, żeby to przesunąć, jest zmienić jedną z nich.
+
+Warto się przy tym zatrzymać, bo jest to nietypowe. Większość twierdzeń o
+modelu jest empiryczna i tymczasowa. To nie jest ani jedno, ani drugie.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Oto więc pytanie, które to wymusza, i to tutaj ten program musi być ostrożny.
+
+Model najwyraźniej rozróżnia znacznie więcej niż $\val{p04.embed}$ rzeczy.
+Odróżnia $\val{p04.vocab}$ tokenów, a poza tokenami wydaje się reprezentować
+pojęcia, style, role składniowe i wiele więcej, w liczbach, których nikt nie
+policzył, ale które nie są małe.
+
+Czy ograniczenie zliczeniowe mówi, że nie może?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Mówi, że nie może dać każdemu z nich własnego \emph{niezależnego
+kierunku}.
+\end{ansblock}
+
+To są różne twierdzenia, a przerwa między nimi jest całym ciekawym pytaniem.
+
+Przestrzeń o $\val{p04.embed}$ wymiarach mieści dokładnie $\val{p04.embed}$
+wzajemnie niezależnych kierunków i ani jednego więcej \dash{} to jest
+twierdzenie. Mieści zdecydowanie więcej kierunków \emph{prawie} niezależnych, a
+ile, to pytanie, którego ten program nie umie zadać, bo zadanie go potrzebuje
+sposobu mierzenia \enquote{prawie}, czyli kątów, czyli
+Programu~\ref{prog:P05}.
+
+\textbf{Rozluźnienie \enquote{dokładnie} do \enquote{prawie} nie jest tutaj
+drobiazgiem. Jest całym tematem.}
+\end{fr}
+
+\begin{fr}
+Dwie opowieści o tym, co model robi z tą przerwą, są szeroko omawiane, a ten
+program przedstawia obie jako to, czym są.
+
+Opowieść o \emph{reprezentacji liniowej} głosi, że cechy zrozumiałe dla
+człowieka odpowiadają kierunkom w przestrzeni reprezentacji, tak że cechę można
+dodać, usunąć albo zmierzyć, przesuwając się wzdłuż wektora. Opowieść o
+\emph{superpozycji} głosi, że sieć reprezentuje więcej cech, niż ma wymiarów,
+upychając je w kierunkach prawie, ale nie dokładnie niezależnych i tolerując
+wynikającą z tego interferencję, bo większość cech jest rzadka i rzadko
+występuje razem.
+
+\begin{warning}
+\textbf{Obie są hipotezami o strukturze i ta książka przedstawia je jako
+hipotezy.} Są umotywowane, mają za sobą dowody empiryczne i żadna nie jest
+twierdzeniem. Twierdzeniem \emph{jest} powyższe ograniczenie zliczeniowe, i
+dlatego te dwie rzeczy tak często się myli: ograniczenia używa się tak, jakby
+ustanawiało opowieść, a ono jej nie ustanawia. Ustanawia jedynie, że jakaś taka
+opowieść jest potrzebna.
+\end{warning}
+
+Hipoteza, która niczego nie przewiduje, jest hasłem. Co każda z tych dwóch
+musiałaby przewidzieć, żeby test je od siebie odróżnił?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Coś, co mogłoby wypaść inaczej.
+\end{ansblock}
+
+Opowieść liniowa przewiduje, że obecność cechy da się zmienić przez dodanie
+ustalonego wektora i że ten sam wektor działa na różnych wejściach. To jest
+sprawdzalne i bywa sprawdzane. Opowieść o superpozycji przewiduje konkretny
+rodzaj interferencji \dash{} że cechy, które nigdy nie występują razem, mogą
+tanio dzielić bliskie kierunki, a te, które występują razem, nie mogą \dash{} i
+przewiduje, że poszerzenie przestrzeni powinno zmniejszyć upakowanie.
+
+\begin{rigourbox}
+\textbf{Ta książka nie przeprowadza żadnego z tych testów.} Co potrafi, to
+trzymać kategorie osobno: ograniczenie zliczeniowe, które jest dowiedzione,
+opowieść o strukturze, która jest zaproponowana, i pomiar, który by między
+opowieściami rozstrzygnął, a którego tu nie wykonano.
+Program~\ref{prog:P05} dostarcza brakującego kawałka słownika \dash{} co
+\enquote{prawie niezależny} znaczy jako liczba \dash{} i mierzy, ile z tego
+wysoki wymiar daje za darmo.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Ostatnia ramka, i jest o tym, co właśnie zostało kupione.
+
+Cztery słowa, jedna myśl i ograniczenie wynikające z samego zliczania. Nic w
+tym programie nie potrzebowało długości, kąta ani odległości, i nie jest to
+przypadek: to dlatego to ograniczenie zachodzi przy każdym sposobie mierzenia
+przestrzeni, jaki możesz później wybrać.
+
+Program~\ref{prog:F09} powiedział, że jego prawa kolumna \dash{} jak wektory są
+rozmieszczone, jak wygląda typowa para, ile przestrzeni leży blisko środka
+\dash{} jest inną klasą pytania, i odłożył ją. Program~\ref{prog:P05}
+odpowiada na nią, a zaczyna od dania przestrzeni tej jednej rzeczy, którą ten
+program świadomie zatrzymał: sposobu pomnożenia dwóch wektorów tak, żeby wyszła
+liczba.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Przestrzeń liniowa ma dwa działania i jeden warunek,
+  który kiedykolwiek zawodzi}: dodaj dowolne dwa elementy albo przeskaluj
+  dowolny, a odpowiedź musi wylądować z powrotem w zbiorze. Wektory w
+  $\R^{3}$ z pierwszą współrzędną $0$ są przestrzenią; te z pierwszą
+  współrzędną $1$ nie, a najszybszym testem jest to, że \textbf{każda
+  przestrzeń zawiera wektor zerowy}.}
+\sumitem{4--5}{Zanurzenia, które model \emph{produkuje}, są podzbiorem
+  przestrzeni, a nie przestrzenią \dash{} i dlatego \enquote{jest kierunek dla
+  X} jest dwuznaczne: kierunek istnieje z konstrukcji, a czy model go używa,
+  to jest pytanie. I \textbf{\enquote{wektor} jest rolą, a nie kształtem}:
+  wielomiany i funkcje są wektorami, więc wszystko dowiedzione z domknięcia
+  stosuje się do nich bez zmian.}
+\sumitem{6--8}{\textbf{Podprzestrzeń} to podzbiór będący przestrzenią sam w
+  sobie. Domknięcie musi zachodzić dla \emph{każdej} pary: suma trzech osi jest
+  domknięta na skalowanie i zawodzi na dodawaniu, co jest kształtem prawie
+  każdego chybionego rozumowania. Zliczanie elementów nie powie, która
+  podprzestrzeń jest większa, bo obie mają ich nieskończenie wiele.}
+\sumitem{9--11}{\textbf{Powłoka} to wszystko, co oba działania osiągają z
+  początkowej garstki, i zawsze jest podprzestrzenią. Dwa wektory w $\R^{3}$
+  rozpinają płaszczyznę przez początek \dash{} \emph{chyba że} jeden jest
+  wielokrotnością drugiego, czyli zależność przybywająca przed nazwaniem.
+  \textbf{Dwa wektory nie zawsze dają dwa kierunki.}}
+\sumitem{12--14}{\textbf{Trzy liczby, a wymiarem jest tylko ostatnia}: ile
+  wektorów jest na liście ($\val{p04.family.count}$), jak długi jest każdy
+  ($\val{p04.family.ambient}$) i ile niezależnych kierunków osiągają
+  ($\val{p04.family.dim}$). Dwie pierwsze opisują, jak dane zapisano; trzecia
+  opisuje dane.}
+\sumitem{15}{Lista jest \textbf{zależna}, gdy jeden element jest kombinacją
+  pozostałych, równoważnie gdy wektor zerowy ma nietrywialną kombinację;
+  \textbf{niezależna}, gdy ani jedno, ani drugie. Obie postacie to to samo
+  stwierdzenie podzielone przez współczynnik.}
+\sumitem{16--18}{\textbf{Rząd się nasyca.} Losowe wektory w
+  $\val{p04.sat.dim}$ wymiarach osiągają $\val{p04.sat.rank.2}$,
+  $\val{p04.sat.rank.4}$, $\val{p04.sat.rank.8}$ kierunków \dash{} a potem
+  $\val{p04.sat.rank.12}$, $\val{p04.sat.rank.20}$ i
+  $\val{p04.sat.rank.40}$, bo każdy nowy wektor albo dokłada wymiar, albo nie
+  dokłada nic, a przestrzeń ma ich tylko tyle do dania.
+  $\val{p04.sat.trials}$ losowań testuje kod: kontrprzykład obaliłby dowód.}
+\sumitem{19--20}{\textbf{W $d$ wymiarach co najwyżej $d$ wektorów jest
+  niezależnych}, jakiekolwiek by nie były i na czym by nie były trenowane
+  \dash{} i nie potrzeba do tego iloczynu skalarnego, kąta ani odległości, i
+  dlatego przeżywa to każdy późniejszy wybór sposobu mierzenia. \emph{Zależna}
+  nie jest usterką: mówi coś o liście, a nie o elementach.}
+\sumitem{21--23}{\textbf{Baza} jest niezależna i rozpinająca \dash{} dokładnie
+  ten rozmiar, przy którym wyrzucenie jednego psuje rozpinanie, a dodanie
+  jednego psuje niezależność. \textbf{Każda baza przestrzeni ma ten sam
+  rozmiar}, co jest twierdzeniem i to ono pozwala \emph{wymiarowi} cokolwiek
+  nazywać. Powłoka, niezależność, baza i wymiar to jedna myśl widziana na
+  cztery sposoby.}
+\sumitem{24--25}{\textbf{Baza nie jest jedyna.}
+  $(\val{p04.basis.x}, \val{p04.basis.y})$ względem osi obróconych o
+  $\val{p04.basis.angle}$ stopni staje się
+  $(\val{p04.basis.c1}, \val{p04.basis.c2})$, a jego długość wynosi
+  $\val{p04.basis.len}$ tak czy tak. \textbf{Współrzędne należą do bazy;
+  wektor należy do przestrzeni.}}
+\sumitem{26--27}{Więc \enquote{wymiar zanurzenia $\val{p04.embed}$} obiecuje
+  przestrzeń i ograniczenie, a nie obiecuje niczego o tym, że współrzędna coś
+  znaczy sama z siebie \dash{} inny przebieg ląduje na innej bazie. Test
+  roboczy: \textbf{metoda działająca w dowolnej bazie mierzy coś prawdziwego;
+  ta, która potrzebuje konkretnej bazy, mierzy twój wybór osi.}}
+\sumitem{28--29}{\textbf{Fakt zliczeniowy.} $\val{p04.vocab}$ tokenów w
+  $\val{p04.embed}$ wymiarach zostawia co najmniej $\val{p04.dependent}$
+  zanurzeń \dash{} $\val{p04.dependent.pct}\%$ \dash{} jako kombinacje
+  pozostałych; w Programie~\ref{prog:F09}, gdzie wymiarów jest
+  $\val{f09.dim}$, wychodzi $\val{p04.f09.dependent}$. \textbf{Żaden trening tego nie zmienia i żadna
+  architektura tego nie omija}, co czyni to nietypowym: większość twierdzeń o
+  modelu jest tymczasowa, a to nie jest.}
+\sumitem{30--31}{To \emph{nie} mówi, że model nie może rozróżnić tylu rzeczy
+  \dash{} tylko że nie może dać każdej własnego \textbf{niezależnego}
+  kierunku. Przestrzeń o $\val{p04.embed}$ wymiarach mieści dokładnie tyle
+  wzajemnie niezależnych kierunków i zdecydowanie więcej \emph{prawie}
+  niezależnych, a \textbf{rozluźnienie z dokładnie na prawie jest całym
+  tematem}.}
+\sumitem{32--34}{Opowieści o \textbf{reprezentacji liniowej} i
+  \textbf{superpozycji} są \emph{hipotezami o strukturze}, przedstawionymi jako
+  hipotezy: ograniczenie zliczeniowe jest twierdzeniem i często używa się go
+  tak, jakby je ustanawiało, gdy ustanawia jedynie, że jakaś taka opowieść jest
+  potrzebna. Rozstrzygnąłby między nimi pomiar \enquote{prawie}, który
+  potrzebuje kąta \dash{} tej jednej rzeczy, którą ten program świadomie
+  zatrzymał, i pierwszego ruchu Programu~\ref{prog:P05}.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Podaj dwa działania przestrzeni liniowej i warunek, który muszą spełniać
+  ich wyniki.
+  \answerto{Dodawanie dwóch elementów i mnożenie elementu przez skalar; oba
+  wyniki muszą leżeć w zbiorze. To jest domknięcie i to ono zawodzi w
+  praktyce.}
+\item Powiedz, czy zbiór wektorów w $\R^{4}$, których współrzędne sumują się do
+  zera, jest podprzestrzenią, wraz z uzasadnieniem.
+  \answerto{Tak. Dodaj dwa takie wektory, a sumy się dodają, dając zero;
+  przeskaluj jeden, a suma się skaluje, dając zero. Zawiera wektor zerowy, jak
+  musi.}
+\item Podaj zbiór domknięty na skalowanie, a niedomknięty na dodawanie.
+  \answerto{Sumę osi układu: dowolna wielokrotność $(a, 0, 0)$ wciąż ma jedną
+  niezerową współrzędną, ale $(1, 0, 0) + (0, 1, 0)$ ma dwie.}
+\item $\val{p04.family.count}$ wektorów po $\val{p04.family.ambient}$
+  współrzędnych rozpina $\val{p04.family.dim}$ wymiary. Powiedz, która z tych
+  trzech liczb jest wymiarem i czym są dwie pozostałe.
+  \answerto{$\val{p04.family.dim}$. Dwie pozostałe to ile wektorów zapisano i
+  jak długi jest każdy \dash{} fakty o zapisie, a nie o powłoce.}
+\item Powiedz, czemu lista $d + 1$ wektorów w $d$ wymiarach nie może być
+  niezależna, nie licząc niczego.
+  \answerto{Każdy wektor albo dokłada powłoce wymiar, albo nie dokłada nic.
+  Powłoka siedzi w przestrzeni o $d$ wymiarach, więc może urosnąć co najwyżej
+  $d$ razy, a $(d+1)$-szy wektor nie ma już czego dołożyć.}
+\item Zdefiniuj bazę i powiedz, co idzie źle, gdy wyrzucisz z niej wektor i gdy
+  jeden dodasz.
+  \answerto{Niezależna i rozpinająca. Wyrzuć jeden, a przestaje rozpinać;
+  dodaj jeden, a przestaje być niezależna. Baza leży dokładnie tam, gdzie te
+  dwie porażki się spotykają.}
+\item Wektor ma takie współrzędne względem dwóch różnych baz:
+  \[ (\val{p04.basis.x}, \val{p04.basis.y})
+     \qquad\text{oraz}\qquad
+     (\val{p04.basis.c1}, \val{p04.basis.c2}) \]
+  Powiedz, co to mówi o odczytywaniu znaczenia z pojedynczej współrzędnej.
+  \answerto{Że jest to stwierdzenie o bazie, a nie o wektorze. Obie pary
+  współrzędnych opisują ten sam wektor o długości $\val{p04.basis.len}$ i nic
+  nie wyróżnia jednej pary jako prawdziwej.}
+\item Model zanurza $\val{p04.vocab}$ tokenów w $\val{p04.embed}$ wymiarach.
+  Podaj liczbę, która musi być zależna, i powiedz, co by to zmieniło.
+  \answerto{Co najmniej $\val{p04.dependent}$. Tylko zmiana jednej z tych dwóch
+  liczb całkowitych \dash{} mniejszy słownik albo szersze zanurzenie. Żadna
+  ilość treningu tego nie robi.}
+\item Powiedz, co ograniczenie zliczeniowe dowodzi o zdolności modelu do
+  reprezentowania wielu pojęć, a czego nie.
+  \answerto{Dowodzi, że model nie może dać każdemu pojęciu własnego
+  niezależnego kierunku. Nie dowodzi, że model nie może ich rozróżnić, bo
+  kierunków prawie niezależnych jest znacznie więcej, a ograniczenie nic o nich
+  nie mówi.}
+\item Powiedz, czemu opowieści o reprezentacji liniowej i o superpozycji są w
+  tym programie opisane jako hipotezy.
+  \answerto{Bo są twierdzeniami o tym, jak wytrenowana sieć jest zbudowana,
+  popartymi dowodami empirycznymi i nieustanowionymi dowodem matematycznym.
+  Twierdzeniem jest ograniczenie zliczeniowe, a ono pokazuje tylko, że jakaś
+  opowieść tego rodzaju jest potrzebna.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Pokaż wprost z definicji, że powłoka dowolnego zbioru wektorów jest
+  podprzestrzenią.
+  \answerto{Suma dwóch kombinacji liniowych $v_i$ zbiera się w jedną kombinację
+  liniową $v_i$, a wielokrotność skalarna jednej z nich też. Oba wyniki są w
+  powłoce, więc jest ona domknięta na oba działania.}
+\item Pokaż, że dwie definicje niezależności są równoważne.
+  \answerto{Jeśli $a_1 v_1 + \dots + a_k v_k = 0$ przy jakimś $a_j \ne 0$,
+  podziel przez $a_j$ i przenieś, żeby zapisać $v_j$ jako kombinację reszty. Na
+  odwrót, jeśli $v_j$ jest taką kombinacją, przeniesienie go na drugą stronę
+  daje nietrywialną kombinację równą zeru.}
+\item Lista wektorów zawiera wektor zerowy. Powiedz, czy może być niezależna.
+  \answerto{Nie. Weź współczynnik wektora zerowego równy $1$, a każdy inny
+  równy $0$: to jest nietrywialna kombinacja równa zeru. Lista zawierająca
+  wektor zerowy jest zależna, cokolwiek jeszcze na niej jest.}
+\item Dwie podprzestrzenie $\R^{5}$ mają wymiary $3$ i $4$. Powiedz, co da się
+  wywnioskować o ich przecięciu.
+  \answerto{Ma wymiar co najmniej $2$. Ich wymiary sumują się do $7$ w
+  przestrzeni o wymiarze $5$, więc nakładają się co najmniej o nadwyżkę
+  \dash{} w szczególności nie mogą spotykać się tylko w początku układu i jest
+  cała płaszczyzna leżąca w obu.}
+\item Wyjaśnij, czemu ograniczenie zliczeniowe nie potrzebuje iloczynu
+  skalarnego, i powiedz, co to kupuje.
+  \answerto{Niezależność jest zdefiniowana samymi kombinacjami liniowymi, a
+  argument o nasyceniu zlicza wymiary, zamiast cokolwiek mierzyć. Ograniczenie
+  zachodzi więc przy każdym możliwym wyposażeniu przestrzeni w długości i kąty
+  \dash{} nie da się przed nim uciec, wybierając inną metrykę.}
+\item Reprezentacje modelu mnoży się w całości przez ustalony obrót. Powiedz,
+  co z tego się zmienia: wartość współrzędnej, długość wektora, to czy zbiór
+  jest niezależny, wymiar powłoki.
+  \answerto{Tylko wartość współrzędnej. Pozostałe trzy nie zależą od bazy, co
+  jest dokładnie testem, który ten program podaje na to, czy twierdzenie
+  dotyczy modelu, czy osi.}
+\item Załóżmy, że $\val{p04.vocab}$ zanurzeń modelu uczyniono dokładnie
+  niezależnymi przez poszerzenie przestrzeni. Podaj potrzebną szerokość i
+  powiedz, ile by to kosztowało, korzystając z arytmetyki
+  Programu~\ref{prog:P03}.
+  \answerto{$\val{p04.vocab}$ wymiarów. Sama tablica zanurzeń miałaby wtedy
+  $\val{p04.vocab}^{2}$ parametrów \dash{} czterysta milionów \dash{} a
+  szerokość każdej warstwy poszłaby za nią, i dlatego nikt tego nie robi i
+  dlatego pytanie o upakowanie w ogóle istnieje.}
+\item Uzasadnij, że ograniczenie zliczeniowe samo w sobie nie odróżni opowieści
+  o superpozycji od opowieści, w której model po prostu reprezentuje mniej
+  cech, niż ludzie sądzą.
+  \answerto{Ograniczenie dotyczy niezależnych kierunków i nic nie mówi o tym,
+  ile jest cech. Obie opowieści są z nim zgodne: jedna zakłada wiele cech
+  upakowanych w bliskich kierunkach, druga niewiele cech w niezależnych.
+  Rozróżnienie ich potrzebuje pomiaru rozmieszczenia, a nie zliczenia.}
+\end{furtherproblems}

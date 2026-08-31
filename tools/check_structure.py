@@ -216,6 +216,54 @@ def check_frames(soft: bool) -> int:
     return 0 if (bad == 0 or soft) else 1
 
 
+def check_elicitation(soft: bool) -> int:
+    """Report what fraction of each program's frames put a question to the reader.
+
+    REPORTED, NEVER FATAL, and for the reason the orphan-tail ledger is: there
+    is no defensible threshold, and a gate that is red on something nobody can
+    responsibly clear teaches the next person to stop reading the output.
+
+    It exists because this number decayed for seventeen programs and every gate
+    in the repository stayed green while it did. A frame carries \nextframe if
+    and only if the next frame opens with an answer, so the cue rate IS the
+    elicitation rate, measured rather than asserted. It ran at 73-78% through
+    F01-F06, 50-66% through F08-F13, and 26-31% across the whole of Part II --
+    which is the book turning from programmed instruction into prose, one
+    program at a time, in the one property the whole design rests on.
+
+    \blank and \yourturn are counted beside it because they are distinct
+    retrieval modes rather than decoration: \blank is a gap inside a worked
+    line, \yourturn a question with its answer overleaf. The last \yourturn in
+    the book is in F04 and the last \blank is in F07. Nothing noticed.
+
+    RE_DEMANDS treats all four alike, so a program using \nextframe and nothing
+    else passes check_frames, parity C16, C4 and C14 without a murmur. This
+    counter is the only thing that looks at the ratio.
+    """
+    rows = []
+    for f in program_files("en"):
+        t = f.read_text(encoding="utf8")
+        if not written(t):
+            continue
+        n = len(RE_FRAME.findall(t))
+        if n < 5:
+            continue
+        cues = t.count(r"\nextframe")
+        rows.append((f.stem, n, cues, t.count(r"\blank"), t.count(r"\yourturn")))
+    if not rows:
+        print("  No written program to measure.")
+        return 0
+    for stem, n, cues, blanks, turns in rows:
+        print(f"  {stem:<30} {cues:>3}/{n:<3} frames elicit "
+              f"({100 * cues // n:>3}%)   blank {blanks:>2}   yourturn {turns:>2}")
+    total_f = sum(r[1] for r in rows)
+    total_c = sum(r[2] for r in rows)
+    print(f"  {'BOOK':<30} {total_c:>3}/{total_f:<3} frames elicit "
+          f"({100 * total_c // total_f:>3}%)")
+    print("  Reported, never fatal. When the rate falls, that is the signal.")
+    return 0
+
+
 def check_answers(soft: bool) -> int:
     bad = 0
     for lang in LANGS:
@@ -284,11 +332,12 @@ def main() -> int:
     p.add_argument("--answers", action="store_true")
     p.add_argument("--outcomes", action="store_true")
     p.add_argument("--values", action="store_true")
+    p.add_argument("--elicit", action="store_true")
     p.add_argument("--all", action="store_true")
     p.add_argument("--soft", action="store_true",
                    help="report but always exit 0 (the default for a draft)")
     a = p.parse_args()
-    if not any((a.frames, a.answers, a.outcomes, a.values, a.all)):
+    if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit, a.all)):
         a.all = True
     rc = 0
     if a.all or a.frames:
@@ -299,6 +348,8 @@ def main() -> int:
         rc |= check_outcomes(a.soft)
     if a.all or a.values:
         rc |= check_values(a.soft)
+    if a.all or a.elicit:
+        rc |= check_elicitation(a.soft)
     return rc
 
 
