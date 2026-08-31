@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P13 written, both editions \dash{} the whole Foundation part, the whole of Part II, the whole of Part III, and the first two of Part IV.** P14–P34 are stubs carrying their briefs | 21 of 47 |
+| Programs | **F1–F13 and P1–P14 written, both editions \dash{} the whole Foundation part, the whole of Part II, the whole of Part III, and the whole of Part IV.** P15–P34 are stubs carrying their briefs | 20 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 806 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 820 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 686 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 694 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 828 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 840 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 704 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 712 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,20 +93,21 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **21 of 47 programs are stubs**, in each language. This is the whole of the
+- **20 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 815 computed values, all referenced, all present, plus the committed console
+- 837 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 156 Mermaid sources, all rendering
-- 36 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 162 Mermaid sources, all rendering
+- 40 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **80 orphan-tail pages: 19 · 25 · 18 · 18** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4` \dash{} P12 moved none and P13 two \dash{} from 15 before F5, 26 before F6, 33 before F7,
+- **82 orphan-tail pages: 19 · 25 · 19 · 19** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two and P14 two, one
+  in each A4 build \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
   before P6. **P6 added two and the ten transcripts it turned on added three**,
@@ -138,8 +139,9 @@ what was there before.
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
-  39% in P10, 39% in P11, **46% in P12** and **50% in P13**, the highest
-  outside Part I and the first anywhere to pass the book's own rate.**
+  39% in P10, 39% in P11, **46% in P12**, **50% in P13** \dash{} the highest
+  outside Part I and the first anywhere to pass the book's own rate \dash{}
+  and **48% in P14**.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -5489,6 +5491,179 @@ hops).
 - Frame numbers mapped after writing: sections landed at
   `1--8 / 9--13 / 14--20 / 21--26 / 27--34`.
 
+### Program P14 pass, August 2026 --- Part IV is complete
+
+**Thirty-one teaching frames, thirty-three printed, both editions**, against a
+brief that projected forty-five. Five sections: what a theorem is made of,
+implication is not equivalence, quantifiers and the order that changes the
+claim, three proof shapes and what each would take to break, and three results
+this field misquotes.
+
+Tenth program under its brief's estimate, and the reason is a **third** kind.
+Nine of the previous ones came in short because a neighbour had spent the
+material (the F07/P06 case) or because the neighbours supplied the machinery
+(P10/P13). Here neither: **the subject is genuinely small.** Reading a theorem
+is three parts, one four-row table, quantifier order, three proof shapes and
+three worked misquotations, and there is nothing else in it. Padding it to
+forty-five would have meant teaching proof-writing, which the program
+explicitly refuses in its own `rigourbox`. A brief's estimate is a planning
+figure; a scope statement is a decision.
+
+#### The headline: a tally about the book, in four places, replaced by a universal that was also false
+
+The draft said **fourteen** rigour boxes \dash{} in the file header, frame 1,
+the closing frame and further problem 5. There are fifteen counting P14's own,
+so the number was right under exactly one reading and would be wrong the day
+P15 is written. That is F03's `\mfalogplain` defect repeating: a count in four
+places, wrong by five. CLAUDE.md's own rule says **never state a count of
+occurrences**, and this pass paid for it again.
+
+**And the fix was itself a defect, which is the better half of the finding.**
+Replacing the tally with *every rigour box says: here is the statement, it is
+not proved here, and here is where the proof lives* looks safe, because a
+universal is checkable where a tally is not. So it was checked, by opening all
+fifteen \dash{} and it is **false**. Four point at a **later program** rather
+than at a proof (P01 twice, P02, P03), and P04's second points at a
+**measurement nobody has made**. What is true of every one of them:
+
+> each names something the program is not doing, and says where it is done
+> instead \dash{} usually a first course, sometimes a later program here, and
+> once a measurement that has not been made.
+
+**The rule this earns: replacing a tally with a universal is not automatically
+safe.** A universal is the stronger claim, so it needs the same treatment the
+tally needed \dash{} open every instance. Both drafts of that sentence were
+written from the feel of the boxes rather than from the boxes, which is the
+same failure twice in one pass. It is the eleventh pass running where a claim
+about another part of the book was the thing that needed fixing, and the first
+where the fix for such a claim was one too.
+
+The wider reading is better teaching, incidentally: it makes the box a
+**pointer** rather than an apology, which is the sentence the closing frame
+wanted all along.
+
+#### Every claim in the program is settled by exhaustive enumeration
+
+Four truth-table rows; all $\val{}$ 512 relations on a three-element set; 36
+pairs on a six-element domain. Each is a **proof** rather than a demonstration,
+because the domain is finite and none of it was left out \dash{} and the
+program says so, in the same trapbox as $n^{2}+n+41$, which is prime for every
+$n$ below 40 and composite at 40.
+
+That contrast is the section's whole argument, so the book's own method is the
+teaching example: **checking every case is a proof; checking many cases is
+evidence, and the difference is not how many but whether any were left.**
+
+`code/p14_logic_proof.py` carries a thousand confirmations of a *true* claim
+three lines above the forty confirmations of the false one, asserted and
+deliberately **not emitted**: the number of checks is not a measurement, it is
+the rhetorical *a thousand tests* the trapbox names, and a value nothing
+references is a second copy nobody would correct. F11's finding, applied on
+sight; `p14.delta` went the same way, because $100 - 95$ is head arithmetic.
+
+#### One contradiction, caught by extracting the page rather than reading the source
+
+The trapbox printed *prime for every $n$ from $0$ to $40$, and composite at
+$40$* \dash{} which cannot both be true. The Quiz's own answer said *to $40$
+exclusive* and was right; the trapbox, four hundred lines away, was not, and
+the two now say the same thing.
+
+It was found by `pdftotext`-ing the finished PDF for the transcript check and
+reading what came out, which is the F03 discipline finding something it was not
+looking for. **Extracting a listing puts the prose around it in front of you in
+a form you have not read before**, and that is worth as much as the listing
+test itself.
+
+The listing test also passed: extracted from `main-en.pdf` p693 and run from
+`code/`, it prints `True`, `False`, `0`, which is what the page prints.
+
+#### The diagram manifest, fifth recurrence, and the first time it was the KEY
+
+A **20.5 pt** box in `main-en` \dash{} the first over the 15 pt budget since
+F06 \dash{} from `p14-converse-or-contrapositive.mmd`, **34 characters against
+a book whose next longest key is 28**. Six characters clear of anything that
+has ever fitted, and F02's recorded fix (shorten the third argument) could not
+have reached it. Renamed `p14-two-rewritings` (22).
+
+Then a **13.8 pt** box in `main-en-a4` **alone**, from a 26-character key plus
+a 35-character description. Two things worth having:
+
+- **The manifest column constrains the key as well as the copy.** Keep a
+  diagram key under about 28 characters and the manifest line \dash{} key plus
+  four for `.mmd` plus the third argument \dash{} under about 48.
+- **A4 at 12pt is the binding case for that column, not the trade format.**
+  Every previous instance was found in the trade build or in Polish; this one
+  exists in one format and one language, and the trade build was clean.
+
+After both fixes the multiset is element for element the pre-P14 baseline in
+all four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with no stranded
+openers, no stranded headings and **no orphaned cues at any point in the
+pass**. Two orphan tails added, one in each A4 build.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P14.1 parts-of-a-theorem | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P14.2 two-rewritings | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P14.3 exists-is-not-found | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's wrap cap on the first render, at three ranks.
+
+**Rule 2 read by content first, captions read as nodes, then measured.** None
+of the three carries an answer to a question put beside it: P14.1 states the
+three parts, which the frame above delivers in full, and the question below
+asks for the topological-order theorem's hypotheses, which appear nowhere in
+it; P14.2 restates frame 9's own bolded sentence four frames above it, and the
+question below asks what would *refute* an implication; P14.3 restates frame
+18's own list of silences, and the frame after it asks nothing.
+
+| build | fig1 / q3 / a4 | fig2 / q13 / a14 | fig3 / a18 |
+|---|---|---|---|
+| `main-en` | 683 / 683 / 684 | 688 / 688 / 688 | 691 / 690 |
+| `main-pl` | 695 / 695 / 696 | 700 / 700 / 700 | 703 / 702 |
+| `main-en-a4` | 575 / 575 / 575 | 579 / 579 / 579 | 582 / 582 |
+| `main-pl-a4` | 581 / 581 / 581 | 585 / 585 / 585 | 588 / 588 |
+
+**P14.1 sits above the elicitation that follows it in all four builds and that
+is not a defect**, which is now the sixth instance of the P04/P07 case: a
+figure the reader is meant to *apply* belongs above the question.
+
+#### The open curriculum decision, settled
+
+`notes/01-curriculum.md` §21 carried three judgement calls the review left to
+the author. The third \dash{} *is P14 enough of a fix for Stroud's rigour gap,
+or does the book want a later program on writing a proof?* \dash{} is now
+**decided: it is enough, and no second program is wanted**, on the P12
+precedent that an open question is settled in the pass that writes the program.
+
+Two things settled it and neither was available when the question was posed.
+Reading a theorem turned out to be a complete subject rather than a reduced
+one, so a second program would not be finishing this one; and the position is
+now **on the page in two places rather than implicit in neither**. The
+introduction said only what the reader would *not* get \dash{} *you will not be
+able to prove things* \dash{} and now says what they get instead. That is the
+P04 precedent: the front matter prints on page one and was half-silent about
+the book.
+
+#### Also
+
+- Traps 162 to 169 added to `notes/02`.
+- **Parity clean on its first run**, fifth time (P02, P08, P09, P10, P14). The
+  accumulated translator rules did it \dash{} no number spelled as a word, and
+  every possessive attached to a reference built the other way round while
+  drafting.
+- A cross-programme gate rebuilds Program~F10's filter population from the
+  truth table and asserts both of its committed counts, so the logic here and
+  the measurement there cannot come apart.
+- **`MAKE_EXIT 2` while the harness reported exit 0.** The recorded trap fired
+  again and the recorded habit caught it: read the log's own exit line, never
+  the notification.
+- The issue's *No Quiz (Foundation-only)* checkbox is stale in exactly the way
+  the P04 pass found the front matter stale \dash{} every written program has
+  one. P14 has one; consistency with twenty-six merged programs beats a
+  checkbox already known to be false.
+- Frame numbers mapped after writing: sections landed at
+  `1--7 / 8--14 / 15--19 / 20--25 / 26--31`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -5754,69 +5929,55 @@ clone instead.
 
 ## What is left
 
-1. **Twenty-three programs, and Parts I, II and III are complete, plus the
-   first two of Part IV.** F1 to F13 and P1 to P13, both editions. Part II's argument —
-   that floating point, numerical stability and cost belong *before* the linear
-   algebra — is now made rather than promised: none of the three needed
-   anything beyond arithmetic, algebra and a sigma.
+1. **Twenty programs, and Parts I, II, III and IV are complete.** F1 to F13
+   and P1 to P14, both editions. Part IV's argument \dash{} that counting,
+   graphs and the reading of an argument belong together before any calculus
+   \dash{} is now made rather than promised.
 
-   **P14 is next** — *Logic, proof and reading theorems* — the last of
-   Part IV, and its only declared dependency is `F10`. It is the one program
-   in the book whose payoff is a *reading* skill rather than a calculation:
-   the reader should be able to take a paper's theorem apart into hypotheses
-   and conclusion. Its brief names three worked examples of the gap — a
-   convergence result that assumes convexity cited about a neural network, a
-   bound that holds *with high probability over the draw of the data* quoted
-   as if it held for the dataset in hand, and *universal approximation* quoted
-   as if it said anything about learnability — and it says in as many words
-   that it does **not** train the reader to write proofs.
+   **P15 is next** \dash{} *Functions of several variables and the gradient*,
+   fifty-five frames planned, deps `F12` and `P5` \dash{} and it opens Part V.
+   Read what is already spent before estimating a length, which is the
+   discipline eleven passes have now paid for: F11 owns the derivative from
+   first principles and the one-dimensional walk downhill, F12 owns the four
+   rules and the chain rule and the product over layers, P05 owns the dot
+   product and projection, P10 owns the Hessian's eigenvalues (collected there
+   and deliberately not spent, and its own pass note says so), and P17 owns
+   curvature and the step-size bound. What is genuinely left for P15 is the
+   step from one variable to many.
 
-   Read what is already spent before estimating a length: F10 owns *and*,
-   *or*, *not* and De Morgan; P13 states two theorems and proves one direction
-   of one of them, deferring the other to P14 by name; and several programs
-   carry `rigourbox` material that P14 is the natural place to characterise.
-   The `rigourbox` convention itself — *what we are not proving, and where the
-   proof lives* — is arguably P14's subject, so read every one in the book.
+   **And Part IV left nothing outstanding.** Both of its open curriculum
+   questions are now decided in the passes that wrote their programs \dash{}
+   P12's placement, and P14's sufficiency as the fix for the rigour gap
+   \dash{} and both decisions are recorded in `notes/01-curriculum.md` with
+   the arguments the written book falsified.
 
-   **P12's open curriculum question is settled** and must not be re-litigated
-   from a search result: `notes/01-curriculum.md` §20 item 4 now records the
-   decision, and records that one of the two arguments it used to give for it
-   is falsified by the written book.
+   **Part III still leaves one measurement outstanding, deliberately.** P11's
+   brief asks for the singular-value spectrum of a real embedding matrix,
+   measured; the program constructs one, labels it, and says the empirical
+   claim is not settled. Together with P08's rank-collapse warning that is
+   **one debt with two entries**, and both need the same thing: a trained
+   model's real matrices. It is the first item in this book that cannot be
+   done from a sandbox at all.
 
-   **And Part III left one measurement outstanding, deliberately.** P11's brief
-   asks for the singular-value spectrum of a real embedding matrix, measured;
-   the program constructs one, labels it, and says the empirical claim is not
-   settled. Together with P08's rank-collapse warning that is **one debt with
-   two entries**, and both need the same thing: a trained model's real
-   matrices. It is the first item in this book that cannot be done from a
-   sandbox at all.
-
-   **And there is now a Part II-shaped job that is nobody's program.** The
-   elicitation ledger above puts P01, P02 and P03 at 29–31% against Part I's
-   73–78%, and raising them is a pass of its own: it means finding, in three
-   written and merged programs, the frames that state something the reader could
-   produce, and moving the statement into the next frame's answer. P04 did three
-   of those and went 26% to 35% without adding a frame, so the move is cheap per
-   instance and the cost is measured — three cues added two pages to one build.
-
-   **F12 was the program the rest of the book leaned on hardest.** It was owed
-   five things by name and paid all five: F4's sigma and product; F5's composition (its frame 34 hands it over
-   explicitly, and that was verified rather than remembered); F6's
-   rearrangement; F7's saturation measurement, left there as a shape and now
-   turned into a product of forty; and F11's limit definition and four worked
-   derivatives, which F12 generalises rather than restates.
+   **And there is still a Part II-shaped job that is nobody's program.** The
+   elicitation ledger puts P01, P02 and P03 at 29--31% against Part I's
+   73--78%, and raising them is a pass of its own: it means finding, in three
+   written and merged programs, the frames that state something the reader
+   could produce, and moving the statement into the next frame's answer. P04
+   did three of those and went 26% to 35% without adding a frame, so the move
+   is cheap per instance and the cost is measured \dash{} three cues added two
+   pages to one build.
 
    Before estimating any remaining program's length, read its written
    neighbours. F7's brief projected forty frames and thirty-one were needed
    once F5 and F6 had done their share; **F8's projected forty-five against
-   thirty written**, because everything a trigonometry course would add is
-   excluded by the book's own scope statement; **F9's projected forty against
-   thirty-two**, because P04, P05 and P07 own between them everything F9 might
-   otherwise have said; and **F12's projected fifty-five against thirty-one**,
-   because F05, F07 and F11 had each taken a piece of it in the meantime.
+   thirty written**; **F9's projected forty against thirty-two**; **F12's
+   projected fifty-five against thirty-one**; and **P14's projected forty-five
+   against thirty-one**, for a reason none of the others had \dash{} the
+   subject is genuinely small, and padding it would have meant writing the
+   material its own scope statement excludes.
    **A brief's frame estimate is a planning figure from before its neighbours
-   were written.** It is not a target, and padding to reach it means writing
-   the material the scope excludes.
+   were written.** It is not a target.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
    softmax entropy with and without the `1/√d_k` scaling — is the one to run
    first: it costs nothing and it converts the book's central derivation from an
@@ -5836,6 +5997,9 @@ clone instead.
 6. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
    ledger stays open and the book may not claim it.
 
-Two decisions still open, both recorded in `notes/01-curriculum.md` §20: whether
-this is one volume or two (≈2,415 frames is 470–550 pages), and whether P12
-(combinatorics) should move next to the probability that consumes it.
+**One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
+this is one volume or two (≈2,418 frames is 470–550 pages). The other two that
+stood beside it are now settled in the passes that wrote their programs
+\dash{} P12's placement, and whether P14 is enough of a fix for the rigour gap
+\dash{} and each entry records the argument the written book falsified rather
+than only the answer.

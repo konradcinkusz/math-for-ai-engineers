@@ -1926,3 +1926,73 @@ zero — measured over the rationals, gone by the third step — and there is no
 stationary distribution at all. The story about a bored surfer motivates it;
 those two properties are what it is for. The constant 0.85 is conventional; the
 need for damping is not. → **P13**.
+
+### Logic, proof and reading theorems, written (P14)
+
+Items 162 to 169 came out of writing P14.
+
+**162. "The theorem says X, so X applies here."** The commonest misuse of a
+result in this field, and it is not misunderstanding the argument — it is
+keeping the **conclusion** and dropping a **hypothesis**. The reason is about
+people rather than mathematics: a conclusion is quotable, transferable and
+short, while a hypothesis is a restriction, is boring, and is usually the
+technical clause in the middle of the sentence. So the sentence that travels
+is the conclusion, and it travels without the thing that made it true. The
+defence is a habit that costs one sentence: *when a result is quoted at you,
+ask what it assumed*. → **P14**.
+
+**163. "The training loss is down, so we are overfitting."** Affirming the
+consequent: taking *if P then Q*, observing Q, concluding P. The premise may be
+perfectly true and the conclusion still does not follow, because a model that
+has genuinely learnt the task also has a low training loss. The test is
+mechanical — write the claim as *if P then Q*, write down what was observed,
+and check which of the two letters it is. If it is Q you have the converse and
+you have nothing. → **P14**.
+
+**164. "It has not seen the test set, so the score is trustworthy."** Denying
+the antecedent, which is the same mistake as 163 seen from the other side —
+indeed ¬P ⇒ ¬Q *is* the converse's contrapositive. It is the more dangerous
+half because it reads as reassurance rather than as a claim: it removes one
+explanation for a high score and leaves every other one untouched. → **P14**.
+
+**165. "The converse is basically the same thing."** It disagrees in two of the
+four rows, so knowing one tells you nothing about the other. What *is* the same
+statement is the **contrapositive**, in all four rows — which is why proving it
+proves the original, and why proof by contraposition is a method rather than a
+trick. The two rewritings look alike on the page and one of them is a different
+theorem. → **P14**.
+
+**166. "Neural networks can approximate any function."** The conclusion with
+the quantifier and the silence both removed. The theorem is *for every function
+and every tolerance, there exists a network*, so the network may depend on both
+— and it says nothing about how large it must be, how that size grows, how the
+weights are found, whether training finds them, or how much data that takes.
+Using it to justify an architecture treats an existence claim as a
+construction. A polynomial of high enough degree approximates any continuous
+function on a bounded region too, and nobody argues from that. → **P14**.
+
+**167. "The bound holds with 95% probability, so we are 95% covered."** The
+confidence is per use. Applied twenty times over independent draws all of them
+hold only 35.8% of the time, so more likely than not one of the twenty
+statements in that table is false and nothing marks which. It is a coin flip
+after fourteen uses, and holding twenty together needs 99.74% each — a failure
+probability of 0.26% rather than 5, nearly twenty times tighter. Independence
+is usually false as well, since the experiments share data; the union bound,
+which needs none, gives 100% here, which is to say no guarantee survives.
+Both calculations agree about what to do: tighten the per-use bound. → **P14**.
+
+**168. "It passed on forty consecutive inputs, so it holds."** n² + n + 41 is
+prime for every n from 0 to 39 and composite at 40, where it is 41². Any test
+suite would have passed it; the claim is false. The honest half matters as
+much: **checking every case is a proof, checking many cases is evidence**, and
+the difference is not how many but whether any were left. This book uses
+enumeration as a proof several times and only ever over domains that are finite
+and exhausted — four truth-table rows, 512 relations, 36 pairs. → **P14**.
+
+**169. "A rigour box is where the book gave up."** It is the opposite. A
+theorem has three parts — hypotheses, conclusion, quantifiers — and a proof is
+none of them, which is why a result can be used correctly without ever seeing
+one. A rigour box withholds the argument and supplies all three parts, so a
+reader may use the result exactly as if they had seen the proof. What they may
+not do is extend it, weaken a hypothesis, or apply it outside its quantifiers,
+because those are the moves the argument would have had to justify. → **P14**.

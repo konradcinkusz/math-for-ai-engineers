@@ -1098,3 +1098,25 @@ judgement calls for the author rather than defects:
 - whether the book is one volume or two;
 - whether P14 (logic and proof) is enough of a fix for Stroud's rigour gap, or
   whether a second, later program on writing a proof is wanted.
+  **DECIDED, August 2026, in the pass that wrote P14: it is enough, and no
+  second program is wanted.** Two things settled it, and neither was available
+  when the question was posed.
+
+  The first is that P14 is written and it turns out that *reading* a theorem is
+  a complete subject rather than a reduced one: the three parts, the four rows
+  of the implication table, quantifier order, three proof shapes and where each
+  one fails, and three worked misquotations. Nothing in it is a shortened
+  version of a proof-writing course, so a second program would not be
+  finishing this one, it would be a different book — which is exactly what
+  P14's own rigour box says the third option was.
+
+  The second is that the position is now **on the page in two places rather
+  than implicit in neither**. P14 §1 states the three options and takes the
+  third, and the introduction now says what the reader gets instead of
+  proof-writing, where before it named only what they would not get. The
+  issue's requirement was that the position not be left implicit; it is not.
+
+  What the book still does not have, and this is the honest residue: nobody has
+  read P14, so the claim that reading is the skill this audience needs is
+  argued rather than measured — like every other pedagogical claim here, and it
+  sits under the same 80/80 ledger.
