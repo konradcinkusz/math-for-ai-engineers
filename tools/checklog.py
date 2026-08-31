@@ -35,6 +35,12 @@ RE_UNDEF_REF = re.compile(r"Reference `([^']+)' on page \d+ undefined", re.M)
 RE_UNDEF_CIT = re.compile(r"Citation `([^']+)' on page \d+ undefined", re.M)
 RE_HBOX = re.compile(r"Overfull \\hbox \(([\d.]+)pt")
 RE_VBOX = re.compile(r"Overfull \\vbox \(([\d.]+)pt")
+# The page a box landed on. TeX writes the shipout marker `[N` after the
+# complaint, and for a vbox usually on the same (wrapped) line: "has occurred
+# while \output is active [456]". Without it the report says a page is 12.3 pt
+# too tall and not WHICH page -- which is useless on the machine that cannot
+# reproduce the break, and this repository builds on two that do not agree.
+RE_SHIPOUT = re.compile(r"\[(\d+)[^\]]*\]")
 RE_PAGES = re.compile(r"Output written on \S+ \((\d+) pages")
 RE_MISSING_VAL = re.compile(r"No computed values found")
 # Warnings that are always worth surfacing. Font substitution noise is not.
@@ -68,6 +74,17 @@ HARD_WARN = ("Label(s) may have changed", "Rerun to get", "Marginpar on page",
 HBOX_BUDGET = 15.0   # pt. Anything above this visibly runs into the margin.
 
 
+def _page_after(text: str, pos: int) -> int | None:
+    """The PDF page a complaint at `pos` was reported on, or None.
+
+    Looks only a little way ahead: the marker for the page being shipped out
+    follows the complaint, and taking the first one keeps a box on page 500
+    from being attributed to page 501 by a greedy search.
+    """
+    m = RE_SHIPOUT.search(text[pos:pos + 400].replace("\n", ""))
+    return int(m.group(1)) if m else None
+
+
 def analyse(path: Path) -> dict:
     text = path.read_text(encoding="utf8", errors="replace")
     errors = RE_BANG.findall(text) + RE_FILELINE.findall(text)
@@ -78,6 +95,9 @@ def analyse(path: Path) -> dict:
     ]
     h = sorted((float(x) for x in RE_HBOX.findall(text)), reverse=True)
     v = sorted((float(x) for x in RE_VBOX.findall(text)), reverse=True)
+    v_pages = [(float(m.group(1)), _page_after(text, m.end()))
+               for m in RE_VBOX.finditer(text)]
+    v_pages.sort(key=lambda t: -t[0])
     pages = RE_PAGES.search(text)
     return {
         "file": path.name,
@@ -88,6 +108,7 @@ def analyse(path: Path) -> dict:
         "undef_cits": RE_UNDEF_CIT.findall(text),
         "hbox": h,
         "vbox": v,
+        "vbox_pages": v_pages,
         "over_budget": [x for x in h if x > HBOX_BUDGET],
         "pages": int(pages.group(1)) if pages else None,
         "no_values": bool(RE_MISSING_VAL.search(text)),
@@ -118,8 +139,15 @@ def report(r: dict) -> bool:
     if r["vbox"]:
         ok = False
         print(f"  OVERFULL VBOX   : {len(r['vbox'])} {[round(x, 1) for x in r['vbox'][:5]]}")
+        for size, page in r["vbox_pages"][:5]:
+            where = f"PDF page {page}" if page else "page unknown"
+            print(f"      {size:6.1f} pt too high on {where}")
         print("      A vbox means a boxed block grew past a page and could not")
         print("      break. Split the table; do not shrink the text.")
+        print("      The page number is printed because the two TeX")
+        print("      installations this book builds on paginate differently,")
+        print("      so the machine that must fix it may not be the one that")
+        print("      saw it.")
     else:
         print("  overfull vbox   : 0")
     if r["no_values"]:

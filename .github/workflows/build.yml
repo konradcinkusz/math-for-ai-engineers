@@ -260,6 +260,21 @@ jobs:
             echo "the text._"
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # The LOG, and it must be `if: always()`, because the only run whose log
+      # anybody wants is the one that failed. checklog.py reads the log and
+      # then the log is thrown away, so a failure visible ONLY on this machine
+      # -- an overfull vbox on CI's newtx metrics, say -- could be reported
+      # and not diagnosed. The two TeX installations this book builds on
+      # paginate differently, so the machine that has to fix such a box is
+      # usually not the one that saw it.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: log-${{ matrix.lang }}-${{ matrix.fmt }}
+          path: ${{ matrix.job }}.log
+          retention-days: 14
+          if-no-files-found: warn
+
       - name: Rename artefact
         run: mv ${{ matrix.job }}.pdf "${{ matrix.pdf }}.pdf"
 
