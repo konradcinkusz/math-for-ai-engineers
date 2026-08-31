@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P7 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first four programs of Part III.** P8–P34 are stubs carrying their briefs | 27 of 47 |
+| Programs | **F1–F13 and P1–P8 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first five programs of Part III.** P9–P34 are stubs carrying their briefs | 26 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 674 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 684 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 577 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 583 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 694 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 706 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 593 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 597 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,19 +93,19 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **27 of 47 programs are stubs**, in each language. This is the whole of the
+- **26 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 606 computed values, all referenced, all present, plus the committed console
+- 626 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 120 Mermaid sources, all rendering
-- 26 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 126 Mermaid sources, all rendering
+- 28 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **73 orphan-tail pages: 18 · 21 · 17 · 17** across `main-en`, `main-pl`,
+- **76 orphan-tail pages: 19 · 23 · 17 · 17** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -113,7 +113,9 @@ what was there before.
   all of the latter in `main-pl` \dash{} a listing appearing where a marker box
   used to be moves every break after it. **P7 added none**, which has happened
   once before (F13) and both times for the same reason: the recorded rules were
-  applied while drafting rather than after a build named the defect
+  applied while drafting rather than after a build named the defect. **P8 added
+  three, over three rounds of lengthening** \dash{} see its pass note for the
+  clearest instance yet of the random walk
   \dash{} and one of P04's five is the price of the three cues its pass added
   back, which is the Stroud layout pass's measurement arriving from the other
   direction.
@@ -133,8 +135,9 @@ what was there before.
 - **Elicitation rate: 57% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
-  35% in P04, 36% in P05, 38% in P06 and 40% in P07.** Part III is climbing
-  because the rate is now designed in rather than measured afterwards. A frame carries `\nextframe` if and only if the
+  35% in P04, 36% in P05, 38% in P06, 40% in P07 and 35% in P08.** Part III is
+  climbing because the rate is now designed in rather than measured
+  afterwards. A frame carries `\nextframe` if and only if the
   next frame opens
   with an answer, so the cue rate *is* the elicitation rate. It halved over
   seventeen programs with every gate green, because `RE_DEMANDS` treats
@@ -4416,6 +4419,135 @@ and the question below asks for the resulting *shape*, which appears nowhere in
 the figure. A figure the reader is meant to *apply* belongs above the question,
 not below it.
 
+### Program P8 pass, August 2026
+
+**Thirty-four teaching frames, thirty-six printed, both editions**, against a
+brief that projected sixty. Five sections: what a matrix reaches and what it
+discards, one number rather than two, solving what has no solution, a rank
+imposed on purpose, and a rank lost by accident.
+
+Eighth program running under its brief's estimate, and the reason is the
+familiar one plus a new instance of it. **P04 already has rank as a computed
+quantity** \dash{} of a *set of vectors* \dash{} and its trapbox already says
+that the random draws are testing the code rather than hunting a
+counterexample. So the saturation demonstration was spent, and what was left
+is the better half: rank as a property of a **matrix**, which brings the four
+subspaces and the row-rank/column-rank theorem with it.
+
+And **P05 hands least squares over twice and by name**: *the same formula
+projects onto a line in any number of dimensions, and onto a subspace, and
+\dash{} once Program P08 arrives \dash{} onto the column space of a matrix,
+which is what least squares is.* So §3 is one object swapped into a derivation
+the reader already had, and it says so: nothing new is defined to get the
+orthogonality characterisation, and the answer comes with the swap.
+
+#### The worked example is exact and hand-checkable, which was the point of choosing it
+
+Three points, $(1,1)$, $(2,3)$ and $(3,2)$, fitted by
+$y = \val{p08.ls.slope}x + \val{p08.ls.intercept}$. The residuals are
+$-\frac{1}{2}$, $1$, $-\frac{1}{2}$; both orthogonality conditions are
+**exactly zero**; the sum of squares is $\val{p08.ls.sse}$. A reader can check
+the whole thing on the page without a calculator, and the frame asks them to.
+
+The script asserts the **defining property** rather than the answer \dash{} the
+residual is orthogonal to every column \dash{} and then perturbs the fit in
+eight directions and requires every one to be worse, so \enquote{closest} is
+measured rather than asserted. The points were searched for, not chosen: they
+had to give small rationals in the fit, the residuals and both dot products at
+once.
+
+#### Three measurements, all exact over the rationals
+
+No epsilon anywhere, and the elimination is P04's reused unchanged, on purpose:
+two programs that both talk about rank must not be able to disagree about what
+one is.
+
+- **Row rank equals column rank** on $\val{p08.rank.trials}$ matrices of
+  assorted shapes, half of them deliberately built rank-deficient with a thin
+  middle. P04's framing carries: a search that succeeded would have refuted a
+  proof, so the draws are testing the code.
+- **A rank-$\val{p08.chain.r}$ bottleneck survives $\val{p08.chain.len}$
+  full-rank $\val{p08.chain.d} \times \val{p08.chain.d}$ factors** stacked on
+  top with its rank unchanged. That is the exact mechanism under what the
+  literature calls rank collapse \dash{} and the program is careful that they
+  are not the same claim.
+- **The low-rank update priced**: $\val{p08.lora.lowrank}$ against
+  $\val{p08.lora.dense}$, a factor of $\val{p08.lora.factor}$ and
+  $\val{p08.lora.pct}\%$. The ratio is $2r/d$ and depends on nothing about the
+  model.
+
+**The crossover is the part nobody quotes**: $2dr = d^{2}$ exactly at
+$r = d/2$, so an adapter with an inner dimension above half the width
+\emph{costs more} than the dense update while still constraining it. Nobody
+sets $r$ that high, which is why the threshold is worth knowing \dash{} it says
+the saving comes from $r$ being small relative to $d$ and from nothing else.
+
+#### The claim the program refuses to make
+
+The brief asks for rank collapse in deep attention stacks \enquote{described as
+the phenomenon it is}. §5 proves the bottleneck theorem exactly and then puts
+the phenomenon in a `warning` box saying **this book has not measured it and it
+is not the same statement**: the theorem is about a narrow map in the chain,
+the phenomenon is about a stack with no narrow layer in which the rank falls
+anyway, which is a claim about training and the softmax rather than about what
+shapes force. What would settle it is the singular-value spectrum at each
+depth, which needs P11 and a real model.
+
+That split is worth more than a paragraph of hedged prose, and it is the same
+move P05 made with its capacity threshold.
+
+#### The orphaned-cue random walk, in its clearest instance yet
+
+Three rounds, and each one moved the defect rather than clearing it:
+
+| round | edit | result |
+|---|---|---|
+| 1 | lengthened `main-en`'s frame 19 | en cleared, **two** appeared in `main-pl` |
+| 2 | lengthened frames 23 and 27 | pl cleared, **one** appeared in `main-en-a4` |
+| 3 | lengthened frame 27 again | all four clean |
+
+This is what CLAUDE.md means by a random walk across four paginations, and it
+is the first time it has taken three rounds. Every edit was made in **both**
+editions, so the two still say the same thing, and every added paragraph earns
+its place \dash{} that checking the two dot products is checking optimality
+rather than arithmetic; that the two thin factors are the whole of what is
+stored and trained; and that a constraint costing nothing would buy nothing.
+
+Note that the fix was **lengthening** every time. That is now the sixth
+confirmation of F06's two-sided rule and it has not failed yet.
+
+#### Also
+
+- Traps 119 to 125 added to `notes/02`.
+- **Parity came back clean on its first run**, on a program of this size, which
+  has now happened twice (P02 was the first). The accumulated translator rules
+  did it: no number spelled as a word, and every possessive attached to a
+  reference built the other way round while drafting.
+- Elicitation 35%, from five conversions that between them added one frame. The
+  best of the five is frame 3's: after naming the four subspaces, ask which two
+  live in the space $A$ reads from \dash{} because the null space is the one
+  people put in the wrong room, and sorting them once is what makes §1's
+  rank--nullity frame land.
+- A cross-programme gate on P04's `p04.embed`, wired to a shared computation
+  rather than a coincidence: this program quotes the same integer to bound an
+  embedding matrix's rank, so if P04's dimension moves the bound is quietly
+  about a different model and the build says so.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P8.1 one-number | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P8.2 closest-in-the-space | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P8.3 thin-middle | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's own wrap cap on the first render, so no redesign.
+
+**Rule 2 read first and then measured.** All three figures carry an answer to
+something the reader is asked \dash{} the shared dimension, what the residual is
+perpendicular to, and what the rank constraint assumes \dash{} and all three are
+declared after the frame that delivers it, which a float cannot rise above.
+Measured on the page: question, answer, figure, in that order, in all four
+builds.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -4667,19 +4799,20 @@ clone instead.
 
 ## What is left
 
-1. **Twenty-seven programs, and Parts I and II are complete with Part III four
-   programs in.** F1 to F13 and P1 to P7, both editions. Part II's argument — that floating
+1. **Twenty-six programs, and Parts I and II are complete with Part III five
+   programs in.** F1 to F13 and P1 to P8, both editions. Part II's argument — that floating
    point, numerical stability and cost belong *before* the linear algebra — is
    now made rather than promised: none of the three needed anything beyond
    arithmetic, algebra and a sigma.
 
-   **P08 is next** — rank, the four subspaces and least squares — and P07's
-   closing frame hands it over by name: *it goes back to two indices and asks a
-   harder question about them, how much a matrix actually does.* Read P07 §1
-   before writing it, because **the word `rank` now means two things two
-   programs apart** and P07 says so; P08 has to say it back. P04 §5's counting
-   bound and P05 §5's near-orthogonality threshold are the other two neighbours
-   worth reading first.
+   **P09 is next** — the determinant, the inverse and change of basis — and
+   P08's closing frame hands it over by name: *rank says how many directions
+   survive; the determinant says how much of the space does, in one number that
+   is zero exactly when something was destroyed, which is P08's null space seen
+   from the other side.* Read P08 §1 first: the null space is the object P09's
+   whole payoff is about, and P08 already establishes that a wide matrix must
+   have one. P06 §3's non-commutativity and P04's basis material are the other
+   two neighbours worth reading.
 
    **And there is now a Part II-shaped job that is nobody's program.** The
    elicitation ledger above puts P01, P02 and P03 at 29–31% against Part I's

@@ -1395,6 +1395,73 @@ which is a third operation with its own name, and it is usually the copy nobody
 wrote down that gets attributed to the transpose. → **P07**, with the cost
 itself belonging to **P03**.
 
+### Rank, the four subspaces and least squares, written (P08)
+
+Items 119 to 125 came out of writing P08.
+
+**119. "Rank plus nullity is the size of the matrix."** It is the number of
+**columns**, and only that: every input either survives into the column space or
+is sent to zero, and the output side is not being counted at all. The
+consequence is the useful half — a matrix wider than it is tall **must** discard
+something, and one taller than it is wide **cannot** reach everything — and both
+are readable off the shape before a single entry is chosen. → **P08**.
+
+**120. "The bottleneck compresses because training learned to."** It compresses
+because the shape forces it to. A layer narrower than the one before it is a
+wide matrix, a wide matrix has a null space it cannot avoid having, and training
+only chooses *which* directions get discarded. The same sentence covers an
+autoencoder's code, a projection head and an adapter's down-projection:
+**choosing a width is choosing how much to throw away**, and the amount is fixed
+before the weights exist. → **P08**.
+
+**121. "Full rank means every right-hand side is solvable."** Full rank on a
+tall matrix means nothing is lost on the way in, not that everything is
+reachable on the way out. A $9 \times 4$ matrix of rank 4 has a four-dimensional
+column space inside a space of nine, so almost every $b$ lies outside it and
+$Ax = b$ has no solution — which is the ordinary situation in every fitting
+problem, not a pathology. → **P08**.
+
+**122. "There is no solution, so I will solve it approximately."** The move is
+sharper than that and it is a change of question, not a relaxation of one. There
+is an exact test that never attempts a solution: **a right-hand side that raises
+the rank when added as a column is one the columns cannot build.** And the
+replacement question — the closest point of the column space — has an exact
+answer characterised by a property rather than by an optimisation: the residual
+is orthogonal to every column of $A$. That is all least squares is, and it is
+**P05**'s projection with a subspace swapped in for the line. → **P08**.
+
+**123. "A small residual means the model is right; orthogonality means it
+fits."** Backwards on both. Orthogonality says the fit is the best one
+*available*, which is a statement about optimality and not about quality; the
+size of the residual is the separate question and is the one worth reporting. A
+large residual that is orthogonal to every column says the relationship is not a
+combination of the features you supplied, and **the fit can only ever land in
+the column space** — so it will show in the residual rather than in the
+coefficients. → **P08**.
+
+**124. "A low-rank adapter is free."** It costs $2dr$ against $d^{2}$, so the
+ratio is $2r/d$ and depends on nothing about the model — at $d = 4096$ and
+$r = 8$, 0.39%. Two things get lost in the enthusiasm. **The saving stops at
+$r = d/2$**, above which the adapter costs more than the dense update while
+still constraining it. And the constraint is an **assumption**: that the change
+the task needs lies in a few directions rather than being spread over all $d$.
+Every parameter not stored is a matrix not reachable — the refusal *is* the
+saving. Testing the assumption needs singular values and belongs to **P11**;
+**P08** states it.
+
+**125. "A later layer can learn to undo the bottleneck."** This is the one place
+where more capacity provably does not help. A product cannot have more rank than
+either factor, so a rank-$r$ map caps everything after it however deep the stack
+gets: two inputs sent to the same place arrive at every later layer as one
+vector, and a function cannot return two answers for one argument. **Rank is
+lost forwards only.** Note the contrast with **P06**'s collapse, which is the
+mirror image — there depth without a non-linearity was *waste* and had a fix;
+here a narrow layer is *loss* and has none. And note what this does **not**
+establish: rank collapse in deep attention stacks is a claim about what training
+and the softmax do to a stack with no narrow layer in it, which is a different
+statement, is architecture-dependent, and is not measured in this book.
+→ **P08**.
+
 **Selection note.** The list is numbered above and the count is deliberately not
 restated here, because it was stated and it decayed. What the brief asked for
 was at least twenty. Items 4, 8, 17, 22, 25, 27, 28, 34, 35, 37 are the strongest — each is
