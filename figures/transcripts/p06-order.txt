@@ -1,0 +1,7 @@
+>>> from p06_matrices_as_maps import matmul, matvec
+>>> rot  = [[0, -1], [1, 0]]      # a quarter turn
+>>> proj = [[1, 0], [0,  0]]      # flatten onto the x axis
+>>> matvec(matmul(rot, proj), [1, 0])     # project, then rotate
+[0, 1]
+>>> matvec(matmul(proj, rot), [1, 0])     # rotate, then project
+[0, 0]

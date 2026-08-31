@@ -1,4 +1,4 @@
-.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 \
+.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 scripts \
         text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames elicit outcomes values translate shots debt
 
@@ -38,6 +38,7 @@ all-formats: numbers diagrams en pl en-a4 pl-a4 check check-a4
 # a `!`, so the inherited `grep '^!' main.log` habit cannot see it.
 check:
 	@python3 tools/gen_stubs.py --check
+	@python3 tools/check_structure.py --scripts
 	@python3 tools/checklog.py main-en.log main-pl.log
 	@python3 tools/checkpdf.py main-en.pdf main-pl.pdf
 	@python3 tools/parity.py | tail -n 3
@@ -230,6 +231,15 @@ outcomes:
 values:
 	@python3 tools/check_structure.py --values
 
+# 5b. \transcript{} references naming a file that is not there. Not a ledger
+#     of outstanding work -- a hard gate, because it is always a typo on a tree
+#     where `make numbers` has run, and because the macro's own fallback prints
+#     a grey marker and BUILDS. That fallback is what let ten of the book's
+#     twelve transcripts go nine programs without reaching a page with every
+#     other gate green. See the note above check_scripts().
+scripts:
+	@python3 tools/check_structure.py --scripts
+
 # 6. The two editions out of step. tools/parity.py is the single parity tool;
 #    it compares an ORDERED structural signature rather than counts, because a
 #    histogram cannot see \yourturn moving from frame 2 to frame 3, and every
@@ -255,6 +265,7 @@ debt:
 	@echo; echo "== Learning outcomes =="         ; $(MAKE) -s outcomes
 	@echo; echo "== Elicitation rate =="          ; $(MAKE) -s elicit
 	@echo; echo "== Computed values =="           ; $(MAKE) -s values
+	@echo; echo "== Transcripts on the page =="   ; $(MAKE) -s scripts
 	@echo; echo "== Polish/English parity =="     ; $(MAKE) -s translate
 	@echo; echo "== Unverified claims, diagrams ="; $(MAKE) -s shots
 	@echo

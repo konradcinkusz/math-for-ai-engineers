@@ -1,25 +1,808 @@
 %% P06 --- Macierze jako przekształcenia liniowe
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/p06_matrices_as_maps.py i trafia na stronę przez \val{}.
+%% Listing konsolowy to zatwierdzony transkrypt pisany przez ten skrypt.
+%%
+%% TEZA: macierz jest funkcją, która szanuje dodawanie i skalowanie, a mnożenie
+%% macierzy jest składaniem tych funkcji -- co tłumaczy, dlaczego jest łączne,
+%% dlaczego nie jest przemienne i dlaczego kształt jest sygnaturą typu.
+%%
+%% CO TEN PROGRAM JEST WINIEN, odczytane z plików, a nie z pamięci:
+%%   F05  JUŻ WYPROWADZA ZWINIĘCIE, w jednym wymiarze i w całości, razem z
+%%        argumentem o relu -- dwieście warstw liniowych zwija się do jednej, a
+%%        aktywacja istnieje, bo bez niej złożenie jest dowodliwie marnotrawstwem.
+%%        Obietnica z zalążka, żeby wyprowadzić to jeszcze raz, jest WYDANA.
+%%   F06  nazywa to, co naprawdę zostało: "P06 czyni z wag macierz i pokazuje,
+%%        że mnożenie macierzy jest złożeniem, czyli argumentem F05 o zwinięciu
+%%        w więcej niż jednym wymiarze".
+%%   P03  potrzebuje kształtów i tego, czym jest macierz, zanim policzy się blok
+%%        transformera; sam rachunek oddaje do P32.
+%%   P04  obrót sam jest macierzą, więc "czy to przeżyje zmianę bazy" jest
+%%        pytaniem o obiekt tego programu.
+%%   P05  "P06 dodaje kolejny obiekt i wzorzec się powtarza".
+%%
+%% CZEGO TEN PROGRAM NIE RUSZA, sprawdzone w tools/programs.json. Zalążek
+%% obiecuje uwagę wielogłowicową jako reshape i partię jako jeden dodatkowy
+%% indeks; OBIE RZECZY NALEŻĄ DO P07, który ma notację indeksową, einsum,
+%% broadcasting, reshape kontra transpozycję kontra permute oraz osie tensora
+%% uwagi rzędu 4. Napisanie ich tutaj wydałoby zapłatę P07.
+%%   notacja indeksowa, einsum, broadcasting, reshape/transpozycja    -> P07
+%%   rząd, cztery podprzestrzenie, najmniejsze kwadraty, LoRA         -> P08
+%%   wyznacznik, odwrotność, zmiana bazy                              -> P09
+%%   liczenie parametrów bloku transformera                           -> P32
+%%
+%% Bliźniak: programs/en/P06-matrices-as-maps.tex. Ramka za ramką, makro za
+%% makrem, liczba za liczbą; tools/parity.py je porównuje.
 
 \program{Macierze jako przekształcenia liniowe}
 \label{prog:P06}
+\index{matrix!as a linear map}
+\index{matrix!multiplication}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{powiedzieć, co czyni funkcję liniową, i sprawdzić zadaną regułę
+  względem definicji}
+\outcome{9--14}{pomnożyć dwie macierze jako złożenie funkcji, a nie jako regułę
+  o wierszach i kolumnach}
+\outcome{15--19}{powiedzieć, dlaczego mnożenie macierzy nie jest przemienne, i
+  podać parę przekształceń, których dwie kolejności się nie zgadzają}
+\outcome{20--25}{czytać kształt jako sygnaturę typu i mówić, które złożenia są
+  legalne, zanim cokolwiek zostanie policzone}
+\outcome{26--36}{zwinąć stos warstw liniowych do jednej, wycenić, co ten stos
+  kupił, i powiedzieć, po co jest aktywacja}
+\end{outcomes}
 
-Argument: a matrix is a function that respects addition and scaling; matrix
-multiplication is composition of functions, which is why it is associative
-and not commutative; shape is the type signature. Payoff: a linear layer is
-a matrix and a batch is one extra index; **two linear layers with no non-
-linearity between them are one linear layer**, derived, which is the reason
-activations exist; every shape error the reader has ever hit, explained as a
-type error in a composition; multi-head attention as a reshape, which is
-where most readers' mental model breaks.
+\begin{quiz}
+\item Jakie dwie rzeczy musi robić funkcja, żeby nazwać ją liniową?
+  \teachesat{2--3}
+  \answerto{Szanować dodawanie i szanować skalowanie: $f(u + v) = f(u) + f(v)$
+  oraz $f(cv) = c\,f(v)$. Wszystko inne w tym programie z tych dwóch rzeczy
+  wynika.}
+\item Czy $f(x) = x + 3$ jest liniowa? \teachesat{4--5}
+  \answerto{Nie, choć jest prostą. $f(0) = 3$, a funkcja liniowa musi
+  przeprowadzać wektor zerowy na wektor zerowy. Jest
+  \emph{afiniczna} \dash{} liniowa plus przesunięcie.}
+\item Co znaczy iloczyn $AB$, jeśli $A$ i $B$ są funkcjami?
+  \teachesat{9--10}
+  \answerto{Najpierw $B$, potem $A$. Iloczyn jest złożeniem, a kolejność od
+  prawej do lewej jest powodem, dla którego wygląda na odwróconą.}
+\item Podaj dwa działania na płaszczyźnie, których dwie kolejności się nie
+  zgadzają. \teachesat{15--16}
+  \answerto{Ćwierć obrotu i spłaszczenie na oś poziomą. Najpierw rzut, potem
+  obrót przeprowadza $(1, 0)$ na $(\val{p06.order.rp.x},
+  \val{p06.order.rp.y})$; najpierw obrót, potem rzut przeprowadza go na
+  $(\val{p06.order.pr.x}, \val{p06.order.pr.y})$.}
+\item Macierz $m \times n$ mnoży macierz $n \times p$. Jaki jest kształt wyniku
+  i co ten kształt mówi? \teachesat{20--21}
+  \answerto{$m \times p$: przekształcenie z przestrzeni o $p$ wymiarach do
+  przestrzeni o $m$ wymiarach. Wewnętrzne $n$ musi się zgadzać, a potem znika,
+  co jest dokładnie tym, co robi sygnatura typu przy wywołaniu funkcji.}
+\item Dwie warstwy liniowe i nic pomiędzy nimi. Ile to naprawdę warstw?
+  \teachesat{26--27}
+  \answerto{Jedna. $W_2(W_1x + b_1) + b_2 = (W_2W_1)x + (W_2b_1 + b_2)$, czyli
+  pojedyncza macierz i pojedyncze obciążenie. Program~\ref{prog:F05} pokazał to
+  w jednym wymiarze; macierze nie zmieniają w tym argumencie nic.}
+\item $A$, $B$ i $C$ są macierzami. Czy ma znaczenie, jak zanawiasujesz $ABC$?
+  \teachesat{33--34}
+  \answerto{Dla wyniku nie \dash{} jest łączne i jest to twierdzenie. Dla pracy
+  ma znaczenie ogromne: dwa nawiasowania jednego iloczynu kosztują tutaj
+  $\val{p06.cost.left}$ i $\val{p06.cost.right}$ mnożeń.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 60 ramek.
-}
+% ============================================================
+\section{Co czyni funkcję liniową}
+\label{sec:P06-linear}
+\index{matrix!as a linear map}
+
+\begin{fr}
+Program~\ref{prog:P05} kończył się zdaniem, że jedno działanie dodane do gołej
+przestrzeni kupiło długości, kąty, prostopadłość i rzutowanie. Ten program
+dodaje obiekt, a nie działanie, i dzieje się dokładnie to samo.
+
+Oto ten obiekt w postaci, w której każdy spotyka go najpierw: prostokąt liczb.
+
+\[ A = \begin{pmatrix} 2 & 0 \\ 0 & 3 \end{pmatrix} \]
+
+Tak macierz wygląda. Tym macierz nie jest, a przepaść między tymi dwoma
+zdaniami to większość kłopotów, jakie ludzie mają z tym tematem.
+\end{fr}
+
+\begin{fr}
+Macierz bierze wektor i zwraca wektor. Ta wyżej podwaja pierwszą współrzędną i
+potraja drugą, więc przeprowadza $(1, 1)$ na $(2, 3)$.
+
+Dwie własności sprawiają, że zasługuje na własną nazwę. Zastosuj ją do sumy,
+zastosuj do przeskalowanego wektora i powiedz, co wychodzi w każdym z tych
+dwóch przypadków.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ A(u + v) = Au + Av \qquad A(cv) = c\,(Av) \]
+\end{ansblock}
+
+Funkcja o tych dwóch własnościach jest \emph{liniowa}. Sprawdź je na $A$, jeśli
+jeszcze tego nie zrobiłeś: podwajanie i potrajanie po współrzędnych nie może
+zależeć od tego, czy najpierw dodałeś wektory, ani od tego, czy najpierw je
+przeskalowałeś.
+
+\textbf{Wszystko, co jest w tym programie, jest konsekwencją tych dwóch
+wierszy.} Nie większość \dash{} wszystko. Prostokąt liczb to sposób zapisania
+takiej funkcji, a okazuje się, że każdą funkcję liniową z jednej przestrzeni
+skończonego wymiaru w drugą da się tak zapisać.
+\end{fr}
+
+\mermaidfig{p06-matrix-is-a-function}{Jak macierz wygląda i czym
+jest.}{macierz to funkcja}
+
+\begin{fr}
+Co udostępnia test, który zwykle stosuje się na wyczucie.
+
+Czy $f(x) = x + 3$ jest liniowa? To prosta, a słowo \enquote{liniowy} pochodzi
+od \enquote{linii}, więc odpowiedź brzmi zapewne tak.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie.}
+Podstaw $x = 0$: $f(0) = 3$. Ale z liniowości $f(0) = f(0 \cdot 0) = 0 \cdot
+f(0) = 0$, więc funkcja liniowa musi przeprowadzać zero na zero. Jeden
+kontrprzykład i nie jest liniowa.
+
+\begin{trapbox}
+\textbf{\enquote{Liniowy} znaczy w tej książce dwie własności, a nie
+\enquote{prostą}.} Słowo potoczne i słowo matematyczne rozeszły się, a
+$y = mx + c$ \dash{} najczęściej cytowana prosta, jaka istnieje \dash{} jest
+liniowa tylko wtedy, gdy $c = 0$.
+
+Obiekt ogólny nazywa się \emph{afinicznym}: przekształcenie liniowe plus
+przesunięcie. Każda warstwa sieci jest afiniczna, a nie liniowa, przez
+obciążenie, i prawie każde zdanie w tym programie mówi o części liniowej,
+niosąc przesunięcie obok niej.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Przesunięcie zasługuje na jeszcze jedną ramkę, bo to przez nie zwinięcie z
+sekcji 5 potrzebuje drugiego wiersza algebry zamiast jednego.
+
+Warstwa liczy $Wx + b$. Część $W$ jest liniowa; $+ b$ nie jest i to przez nie
+$f(0) \neq 0$ dla prawdziwej warstwy. Program~\ref{prog:F06} zbudował dokładnie
+ten obiekt w jednym wymiarze, $y = wx + b$, i zapowiedział, że wagi stają się
+tutaj macierzą.
+
+Obiekty więc się zgadzają: $w$ staje się $W$, $x$ staje się wektorem, $b$ staje
+się wektorem, a arytmetyka, która była mnożeniem, staje się czymś, co
+potrzebuje własnej definicji.
+\end{fr}
+
+\begin{fr}
+Zanim padnie ta definicja, warto zauważyć jedną rzecz o tym, co daje liniowość,
+bo to przez nią cały temat jest w ogóle wykonalny.
+
+Wiesz, co $A$ robi z $(1, 0)$ i z $(0, 1)$. Czy z samych tych dwóch odpowiedzi
+potrafisz powiedzieć, co $A$ robi z $(5, -2)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Tak: $A(5, -2) = 5\,A(1, 0) - 2\,A(0, 1)$, z tych dwóch własności i z niczego
+więcej.
+\end{ansblock}
+
+\textbf{Przekształcenie liniowe jest w pełni wyznaczone przez to, co robi z
+bazą.} Dlatego prostokąt liczb wystarcza, żeby je zadać: kolumny $A$ to
+dokładnie obrazy wektorów bazy, a cała reszta to kombinacja liniowa, którą
+Program~\ref{prog:P04} nauczył cię budować.
+
+Nieskończenie wiele zachowania, przyszpilone przez $n$ odpowiedzi. Nic innego w
+tej książce nie ściska się tak dobrze.
+\end{fr}
+
+% ============================================================
+\section{Mnożenie jest składaniem}
+\label{sec:P06-composition}
+\index{matrix!multiplication}
+
+\begin{fr}
+Teraz definicja, której wszyscy uczą się jako procedury, a która procedurą nie
+jest.
+
+Masz dwa przekształcenia liniowe: $B$ bierze wektor i zwraca wektor, a $A$
+bierze ten wynik i zwraca następny. Wykonanie obu po kolei samo jest funkcją.
+Czy jest liniowa?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Tak, a sprawdzenie ma dwa wiersze: $A(B(u+v)) = A(Bu + Bv) = ABu + ABv$, i tak
+samo dla skalowania.
+\end{ansblock}
+
+Złożenie jest więc przekształceniem liniowym, ma więc własną macierz, i
+\textbf{ta macierz jest tym, co znaczy $AB$}. Definicją nie jest
+\enquote{mnożenie wierszy przez kolumny} \dash{} to arytmetyka, która z niej
+wychodzi.
+
+Czytaj $AB$ jako \emph{najpierw $B$, potem $A$}, od prawej do lewej, tak jak
+czyta się $f(g(x))$. Kolejność wygląda na odwróconą, bo notacja stawia funkcję
+na lewo od tego, co ona zjada.
+\end{fr}
+
+\begin{fr}
+Wszystko, co niewygodne w tej procedurze, wypada z takiego odczytania, więc
+pierwszą rzecz warto obrócić w palcach samemu.
+
+Reguła mówi, że $i$-ty wiersz $A$ spotyka $j$-tą kolumnę $B$ i zestawia je
+wyraz po wyrazie. Nic w \emph{najpierw $B$, potem $A$} tego wprost nie mówi.
+Skąd to się bierze?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wyraz $(i, j)$ to to, co złożone przekształcenie robi z $j$-tym wektorem bazy,
+odczytane na $i$-tej współrzędnej.
+\end{ansblock}
+
+$B$ przeprowadza $j$-ty wektor bazy na swoją własną $j$-tą kolumnę, a $A$ czyta
+potem tę kolumnę wiersz po wierszu. Procedura jest konsekwencją, a jeśli kiedyś
+ją zapomnisz, odbudujesz ją z tego zdania.
+
+Co prowadzi do własności, której nikt nie musi zapamiętywać, gdy raz jest to
+złożenie. Czy $(AB)C$ to to samo co $A(BC)$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Tak, z konieczności. Oba zapisy znaczą \emph{najpierw $C$, potem $B$, potem
+$A$}.
+\end{ansblock}
+
+Łączność nie jest faktem o arytmetyce, który ktoś sprawdził. Jest
+spostrzeżeniem, że składanie funkcji nigdy nie miało żadnego nawiasowania:
+$A(B(C(x)))$ ma jedno odczytanie, a nawiasy w $ABC$ to notacja, której funkcje
+nie widzą.
+
+Skrypt potwierdza to z dokładnością lepszą niż $\val{p06.assoc.err}$ na
+losowych macierzach, co warto zrobić raz z tego samego powodu, dla którego warto było
+przeliczyć rzutowanie na całym zakresie: tożsamość zgadzająca się sama ze sobą
+nie jest dowodem, a tutaj arytmetyka mogła w zasadzie zaprzeczyć twierdzeniu.
+\end{fr}
+
+\begin{fr}
+\begin{note}
+To cały powód, dla którego ta sekcja mówi o składaniu, a nie o procedurze.
+
+Łączność nie jest oczywista z reguły mnożenia wierszy przez kolumny \dash{}
+rozpisana, jest stwierdzeniem, że potrójną sumę wolno przestawiać, i zobaczenie
+tego kosztuje prawdziwą pracę. Odczytana jako złożenie nie kosztuje pracy
+wcale, bo nigdy nie było czego dowodzić.
+
+To samo będzie prawdą o wszystkim innym w tym programie. Kiedy fakt o
+macierzach wygląda na dowolny, odczytanie zsunęło się z powrotem do prostokąta.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Dlaczego kolejność ma znaczenie}
+\label{sec:P06-order}
+\index{matrix!non-commutativity}
+
+\begin{fr}
+Oto własność, której jeden wymiar nie potrafi pokazać, a powód warto podać
+przed przykładem, a nie po nim.
+
+Program~\ref{prog:F05} i Program~\ref{prog:F06} pracowały z $wx + b$, gdzie $w$
+jest liczbą. Dwie liczby pomnożone w dowolnej kolejności dają ten sam wynik,
+zawsze. Każda intuicja, jaką masz o składaniu takich warstw, powstała więc tam,
+gdzie \textbf{cały temat tej sekcji jest niewidoczny}.
+
+Weź dwa działania na płaszczyźnie: ćwierć obrotu w lewo i spłaszczenie
+wszystkiego na oś poziomą. Zastosuj oba, w obu kolejnościach, do punktu
+$(1, 0)$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Najpierw rzut, potem obrót: $(\val{p06.order.rp.x}, \val{p06.order.rp.y})$.
+Najpierw obrót, potem rzut: $(\val{p06.order.pr.x}, \val{p06.order.pr.y})$.
+\end{ansblock}
+
+Prześledź to. $(1, 0)$ leży już na osi poziomej, więc rzut zostawia go w
+spokoju, a ćwierć obrotu podnosi go potem do
+$(\val{p06.order.rp.x}, \val{p06.order.rp.y})$. W drugą stronę obrót
+przeprowadza go najpierw na $(\val{p06.order.rp.x}, \val{p06.order.rp.y})$, a
+spłaszczenie kasuje go całkowicie.
+
+\textbf{Jedna kolejność gubi punkt, a druga nie.} Dalej od siebie dwie
+odpowiedzi już nie będą.
+\end{fr}
+
+\begin{fr}
+\transcript{p06-order}
+
+Te dwa iloczyny są różnymi macierzami i są różne dlatego, że są różnymi
+funkcjami. Nie ma tu żadnego arytmetycznego wypadku do posprzątania.
+
+\begin{trapbox}
+\textbf{$AB$ i $BA$ nie są dwoma zapisami jednej rzeczy, a nawyk, który mówi
+inaczej, wziął się z arytmetyki.}
+
+Każde mnożenie, jakie wykonałeś przed tą książką, było przemienne. Liczby są
+przemienne, a ponieważ waga jednowymiarowej warstwy jest liczbą, przemienny
+jest też każdy iloczyn w Programach~\ref{prog:F05} i~\ref{prog:F06}. Pierwszy
+raz przestaje to być prawdą wtedy, kiedy waga staje się macierzą, czyli tutaj.
+
+Każde mnożenie przed tym było przemienne, więc nawyk nie jest niedbały. Jest
+uogólnieniem z jedynego przypadku, jaki ktokolwiek miał.
+\end{trapbox}
+
+Skrypt losuje $\val{p06.commute.trials}$ par macierzy $3 \times 3$ i liczy te,
+które są przemienne. Zapisz liczbę, której się spodziewasz, zanim pójdziesz
+dalej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p06.commute.found}$.}
+Nie \enquote{mało} \dash{} ani jednej, i inaczej być nie mogło: przemienność
+jest warunkiem na zbiorze miary zero, więc losowanie chybia go z
+prawdopodobieństwem jeden. Parę przemienną trzeba zbudować, a każda, jaką
+spotkasz, zbudowana została.
+
+\begin{aibox}
+Dlatego \enquote{najpierw uwaga, potem blok feed-forward} i
+\enquote{najpierw blok feed-forward, potem uwaga} opisują dwa różne modele, a
+nie jeden model narysowany na dwa sposoby, i dlatego kolejność działań w
+strumieniu rezydualnym jest częścią architektury, a nie konwencją rysunku.
+
+Dlatego też reguła transpozycji odwraca kolejność: $(AB)\T = B\T A\T$.
+Odczytana jako złożenie, transpozycja przepuszcza przekształcenia w drugą
+stronę, więc kolejność musi obrócić się razem z nią \dash{} co jest zdaniem, a
+nie tożsamością do zapamiętania.
+\end{aibox}
+\end{fr}
+
+\mermaidfig{p06-order-matters}{Dlaczego dwa przekształcenia złożone w drugą
+stronę to inna funkcja.}{kolejność ma znaczenie}
+
+\begin{fr}
+Jedno wyjaśnienie, bo \enquote{nie jest przemienne} bywa nadinterpretowane.
+
+Nie znaczy to, że $AB \neq BA$ zawsze. Niektóre pary są przemienne: dowolna
+macierz z identycznością, dowolna macierz sama ze sobą, dwa obroty płaszczyzny
+wokół tego samego środka.
+
+Przemienność obrotów na płaszczyźnie warto zapamiętać, bo obroty w trzech
+wymiarach przemienne nie są \dash{} obróć książkę najpierw okładką do góry, a
+potem na bok, następnie odwrotnie, a okładki wskażą różne strony. \textbf{Dwa
+wymiary są przypadkiem szczególnym i to w nim zbudowana została intuicja
+każdego z nas.}
+\end{fr}
+
+% ============================================================
+\section{Kształt jest sygnaturą typu}
+\label{sec:P06-shape}
+\index{matrix!shape}
+
+\begin{fr}
+Przekształcenie liniowe idzie \emph{skądś} \emph{dokądś}, a macierz niesie oba
+te fakty w swoim kształcie.
+
+Macierz $m \times n$ bierze wektor o $n$ współrzędnych i zwraca wektor o $m$.
+Kształt nie jest więc księgowością tego, jak przechowywane są liczby \dash{}
+jest zapisaną dziedziną i przeciwdziedziną.
+
+Skoro tak, powiedz, które z $AB$ i $BA$ jest w ogóle określone, gdy $A$ jest
+$3 \times 5$, a $B$ jest $5 \times 2$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tylko $AB$, i jest $3 \times 2$.}
+$B$ odwzorowuje w przestrzeń o $5$ wymiarach, a $A$ taką czyta, więc się
+spotykają. Druga kolejność każe $B$ czytać przestrzeń o $3$ wymiarach, gdy
+oczekuje $2$, i nie ma czego liczyć.
+
+\textbf{Błąd kształtu jest więc błędem typu.} Wewnętrzne wymiary muszą się
+zgadzać, bo tam wyjście jednej funkcji spotyka wejście następnej, a dwa
+zewnętrzne zostają, bo są końcami złożenia.
+
+\[ (m \times n)(n \times p) \longrightarrow (m \times p) \]
+\end{fr}
+
+\mermaidfig{p06-shape-is-a-type}{Dlaczego wewnętrzne wymiary muszą się zgadzać,
+a zewnętrzne zostają.}{kształt jako typ}
+
+\begin{fr}
+\begin{aibox}
+Dlatego błąd, który zgłasza twój framework, wymienia dwie liczby i wygląda na
+bezużyteczny. \code{mat1 and mat2 shapes cannot be multiplied (32x768 and
+512x768)} to błąd typu zgłoszony przez arytmetykę, a lekarstwem nigdy nie jest
+przekształcanie kształtów, aż przestanie narzekać.
+
+Pytanie brzmi, które z dwojga jest złe: czy warstwa dostała złą szerokość, czy
+coś zostało transponowane, co nie powinno? To różne błędy z tym samym
+komunikatem, a kształty mówią który, bo mówią, \emph{między} czym każdy czynnik
+twierdzi, że jest przekształceniem.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jeden kształt zasługuje na własną ramkę, bo to tutaj takie odczytanie zwraca
+się z nawiązką.
+
+Wektor o $n$ współrzędnych jest macierzą $n \times 1$. $Ax$ jest więc iloczynem
+macierzy jak każdy inny, $(m \times n)(n \times 1) \to (m \times 1)$, i nie ma
+drugiej reguły stosowania macierzy do wektora.
+
+Co rodzi pytanie o całą ich partię. Masz $k$ wektorów do przepchnięcia przez tę
+samą warstwę. W jaki kształt należy je ułożyć?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$n \times k$ \dash{} po jednej kolumnie na wektor \dash{} a wtedy $A$ razy to
+jest $m \times k$, po jednej kolumnie wyniku na wektor.
+\end{ansblock}
+
+Całą pracę wykonała reguła złożenia: nic w $A$ się nie zmieniło i nic nowego
+nie zostało zdefiniowane. Ułożenie $k$ wejść obok siebie układa $k$ wyjść obok
+siebie, bo każda kolumna jest obsługiwana niezależnie, a liniowość nigdy nie
+miała nic do powiedzenia o pozostałych kolumnach.
+
+\begin{note}
+Prawdziwe frameworki układają partię wzdłuż \emph{pierwszej} osi, więc warstwa
+liczy $XW\T$ z $X$ o kształcie $k \times n$. To to samo złożenie z odwróconą
+konwencją, a Program~\ref{prog:P07} jest miejscem, w którym osie dostają
+porządne nazwy \dash{} razem z reshape, transpozycją i tablicami rzędu 4,
+których dwa indeksy tego programu nie opiszą.
+\end{note}
+\end{fr}
+
+\begin{fr}
+I własność, dla której kształty warto sprawdzić przed uruchomieniem
+czegokolwiek.
+
+Złożenie $ABC$ jest legalne albo nie jest, a rozstrzygasz to z trzech
+kształtów, nie dotykając żadnej liczby. Po to jest sygnatura typu: odrzuca
+program, zanim ten ruszy, a odrzucenie wskazuje złącze, które nie pasuje, a nie
+objaw pięćdziesiąt wierszy dalej.
+
+\textbf{Przeczytaj stos warstw jako łańcuch kształtów, a większość błędów, na
+jakie wpadłeś, staje się widoczna przed pierwszą partią danych.}
+\end{fr}
+
+% ============================================================
+\section{Zwinięcie, w więcej niż jednym wymiarze}
+\label{sec:P06-collapse}
+\index{matrix!composition of layers}
+
+\begin{fr}
+Program~\ref{prog:F05} postawił już ten argument i postawił go w całości, w
+jednym wymiarze: dwieście warstw $w x + b$ zwija się do jednej, dodatkowe
+$199$ nie kupuje nic poza arytmetyką, a sama głębokość nie jest zdolnością.
+
+Program~\ref{prog:F06} zapowiedział, że wagi stają się tutaj macierzą, i
+zapytał, czy argument to przeżyje. Weź więc dwie warstwy, $W_1 x + b_1$, potem
+$W_2 h + b_2$, i złóż je. Zapisz, co wychodzi.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ W_2(W_1x + b_1) + b_2 = (W_2W_1)\,x + (W_2b_1 + b_2) \]
+\end{ansblock}
+
+Jedna macierz i jeden wektor obciążeń. Argument przeżywa dokładnie, a dwa
+kroki, dzięki którym działa, to dwie własności z sekcji 1: $W_2$ rozdziela się
+względem sumy i przepuszcza skalar na wylot.
+
+Skrypt sprawdza tę tożsamość na $\val{p06.collapse.trials}$ losowych wejściach
+przy kształtach $\val{p06.din} \to \val{p06.dmid} \to \val{p06.dout}$,
+największa rozbieżność poniżej $\val{p06.collapse.err}$ \dash{} co jest
+zaokrągleniem, a nie różnicą.
+\end{fr}
+
+\begin{fr}
+Warto się przy tym zatrzymać, bo stos takich warstw jest dużym obiektem.
+
+Osiem warstw liniowych o szerokości $\val{p06.stack.width}$ mieści
+$\val{p06.stack.params}$ parametrów. Jedna warstwa, do której się zwijają,
+mieści $\val{p06.stack.collapsed}$.
+
+Jaka część tego stosu nie kupiła więc niczego?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p06.stack.wasted.pct}\%$ \dash{} siedem ósmych.}
+A ułamek ten nie jest w ogóle własnością szerokości: $k$ warstw zwija się do
+jednej, więc $(k-1)/k$ parametrów jest zbędnych bez względu na to, jak szerokie
+są. Dodaj warstw, a zbliża się do wszystkich.
+
+\textbf{Marnotrawstwem jest dokładnie ta głębokość, którą myślałeś, że
+kupujesz.}
+\end{fr}
+
+\begin{fr}
+Teraz lekarstwo, które nazwał Program~\ref{prog:F05}, a o którym ten program
+może powiedzieć coś nowego.
+
+Wstaw $\relu$ między dwie warstwy, a złożeniem jest
+$W_2\,\relu(W_1x + b_1) + b_2$. Argument F05 mówił, że żadne rozciąganie i
+przesuwanie nie wytworzy narożnika, więc tej pary nie da się przepisać jako
+jednego przekształcenia afinicznego.
+
+W więcej niż jednym wymiarze jest czystszy sposób, żeby to zobaczyć, i jest
+wart jednej ramki, bo nie potrzebuje obrazka. Przekształcenie afiniczne
+przeprowadza dowolne trzy współliniowe punkty na trzy współliniowe punkty
+\dash{} nie potrafi zagiąć prostej. Zatem: przepuść trzy współliniowe wejścia
+przez tę parę i zobacz, co wychodzi.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wychodzą zagięte. Odchylenie od prostej to
+$\val{p06.bend}$ odstępu, wobec mniej niż $\val{p06.bend.affine}$ przez
+zwiniętą macierz.
+\end{ansblock}
+
+Zwinięta macierz utrzymuje je współliniowo z dokładnością do zaokrągleń, bo
+musi. Para rozdzielona przez $\relu$ nie utrzymuje, więc \textbf{żadne
+pojedyncze przekształcenie afiniczne jej nie odtworzy, jakiekolwiek by ono nie
+było} \dash{} argument wyklucza je wszystkie naraz, zamiast nie znaleźć
+jednego.
+
+To narożnik z F05, powiedziany na nowo w formie, która się uogólnia: liniowość
+jest ograniczeniem tego, co funkcja może zrobić prostej, a aktywacja jest po
+to, żeby je złamać.
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Mówi też, po co aktywacja \emph{nie} jest, a to właśnie tam siedzi folklor. Nie
+po to, żeby ściskać wartości do przedziału \dash{} $\relu$ jest nieograniczony
+od góry i nie ściska. Nie po to, żeby przypominać biologię. Nie po to, żeby
+cokolwiek wygładzać.
+
+Jest po to, że złożenie bez niej jest dowodliwie marnotrawstwem
+$\val{p06.stack.wasted.pct}\%$ parametrów, a wystarczy dowolna funkcja, która
+łamie liniowość. Dlatego dziedzina mogła wymienić logistyczną na $\relu$, a
+potem na GELU, bez przepisywania teorii: wymaganiem jest
+\enquote{nie afiniczna}, a jest ono spełnione z zapasem.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Ostatnia rzecz, którą daje złożenie, i nie kosztuje nic matematycznie, a bardzo
+dużo w praktyce.
+
+$ABC$ jest łączne, więc wolno ci policzyć $(AB)C$ albo $A(BC)$ i dostać tę samą
+odpowiedź. Weź $A$ jako $\val{p06.dims.n} \times \val{p06.dims.m}$, $B$ jako
+$\val{p06.dims.m} \times \val{p06.dims.p}$ i $C$ jako
+$\val{p06.dims.p} \times \val{p06.dims.q}$, i policz mnożenia w obie strony.
+Iloczyn $(m \times n)(n \times p)$ kosztuje $mnp$ z nich.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(AB)C$ kosztuje $\val{p06.cost.left}$, a $A(BC)$ kosztuje
+$\val{p06.cost.right}$ \dash{} czynnik $\val{p06.cost.ratio}$.
+\end{ansblock}
+
+Ta sama odpowiedź, to samo twierdzenie, a jedno nawiasowanie wykonuje
+$\val{p06.cost.ratio}$ razy więcej pracy. $B$ ma jedną kolumnę, więc $AB$ jest
+czymś chudym i tanim; $BC$ to iloczyn zewnętrzny kolumny i wiersza, czyli pełna
+macierz $\val{p06.dims.n} \times \val{p06.dims.q}$, którą $A$ musi potem
+pomnożyć.
+
+\textbf{Łączność jest darmowa, a nawiasowanie nie.} Program~\ref{prog:P03}
+zbudował słownik dokładnie do tego: obie drogi mają identyczne wyniki i różne
+rachunki.
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Ten kształt \dash{} szeroka macierz, bardzo chuda, znów szeroka \dash{} nie
+jest wydumanym przykładem. Tak wygląda aktualizacja niskiego rzędu, a powodem,
+dla którego taka aktualizacja jest tania, jest dokładnie powyższe nawiasowanie:
+trzymaj chudy czynnik w środku i nigdy nie twórz iloczynu dwóch zewnętrznych.
+
+Program~\ref{prog:P08} jest miejscem, w którym chudy wymiar dostaje nazwę, a
+założenie za nim zostaje wypowiedziane. Ten program może powiedzieć połowę
+mechaniczną: oszczędność to łączność wydana świadomie, a framework, który
+uformowałby najpierw $BC$, oddałby te same liczby i
+$\val{p06.cost.ratio}$ razy większy rachunek.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Ostatnia ramka, i jest o tym, co kupił ten obiekt.
+
+Cztery sekcje temu macierz była prostokątem liczb z regułą mnożenia, którą
+trzeba było zapamiętać. Jest funkcją, która szanuje dodawanie i skalowanie, a
+każdy z tych niewygodnych faktów wyszedł z tego zdania bez osobnego uczenia
+się: iloczyn jest złożeniem, więc jest łączny i nie jest przemienny; kształt to
+dwie przestrzenie, więc błąd kształtu jest błędem typu; a stos macierzy jest
+jedną macierzą, więc aktywacja ma zadanie.
+
+Program~\ref{prog:P07} bierze dwa indeksy, które ma ten program, i pyta, co się
+dzieje, gdy jest ich cztery, a to jest miejsce, w którym model tablicy w głowie
+większości ludzi przestaje być obrazkiem i musi stać się notacją.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Macierz jest funkcją, a nie prostokątem.} Bierze wektor
+  i zwraca wektor, i jest \emph{liniowa}: $A(u+v) = Au + Av$ oraz
+  $A(cv) = c\,(Av)$. Wszystko inne w programie jest konsekwencją tych dwóch
+  wierszy, a każde przekształcenie liniowe skończonego wymiaru da się zapisać
+  jako macierz.}
+\sumitem{4--6}{\textbf{\enquote{Liniowy} znaczy te dwie własności, a nie
+  \enquote{prostą}.} $f(x) = x + 3$ nie jest liniowa, bo przekształcenie
+  liniowe musi przeprowadzać zero na zero. Warstwa jest \emph{afiniczna}
+  \dash{} liniowa plus obciążenie \dash{} a Program~\ref{prog:F06} pokazuje
+  ten sam obiekt jeden wymiar niżej jako $y = wx + b$.}
+\sumitem{7--8}{\textbf{Przekształcenie liniowe jest wyznaczone przez to, co
+  robi z bazą}, i dlatego prostokąt liczb wystarcza, żeby je zadać: kolumny są
+  obrazami wektorów bazy, a cała reszta jest kombinacją liniową.}
+\sumitem{9--11}{\textbf{Iloczyn $AB$ jest złożeniem} \dash{} najpierw $B$,
+  potem $A$. Procedura mnożenia wierszy przez kolumny jest tego konsekwencją, a
+  nie definicją, i da się ją odbudować z tego zdania, ilekroć się ją
+  zapomni.}
+\sumitem{12--14}{\textbf{Łączność jest darmowa}, bo składanie funkcji nigdy nie
+  miało nawiasowania: $A(B(C(x)))$ ma jedno odczytanie. Potwierdzone z
+  dokładnością lepszą niż $\val{p06.assoc.err}$, co warto zrobić raz, bo tożsamość
+  zgadzająca się sama ze sobą nie jest dowodem.}
+\sumitem{15--17}{\textbf{Kolejność ma znaczenie, a jeden wymiar nie może tego
+  pokazać}, bo liczby są przemienne. Ćwierć obrotu i spłaszczenie na oś poziomą
+  przeprowadzają $(1, 0)$ na $(\val{p06.order.rp.x}, \val{p06.order.rp.y})$ w
+  jedną stronę i na $(\val{p06.order.pr.x}, \val{p06.order.pr.y})$ w drugą
+  \dash{} jedna kolejność gubi punkt zupełnie.}
+\sumitem{17--19}{Wśród $\val{p06.commute.trials}$ losowych par $3 \times 3$
+  przemiennych jest $\val{p06.commute.found}$ i inaczej być nie mogło:
+  przemienność jest warunkiem miary zero. Niektóre pary są przemienne \dash{}
+  obroty płaszczyzny wokół jednego środka \dash{} a \textbf{obroty w trzech
+  wymiarach nie są}, i dlatego dwa wymiary są przypadkiem mylącym.}
+\sumitem{20--22}{\textbf{Kształt to zapisana dziedzina i przeciwdziedzina},
+  więc $(m \times n)(n \times p) \to (m \times p)$: wewnętrzne wymiary spotykają
+  się tam, gdzie wyjście jednej funkcji jest wejściem następnej. Błąd kształtu
+  jest błędem typu, a kształty mówią, który z dwóch prawdopodobnych błędów to
+  jest.}
+\sumitem{23--25}{Wektor jest macierzą $n \times 1$, więc $Ax$ nie potrzebuje
+  drugiej reguły, a partia $k$ wektorów to $n \times k$ \dash{}
+  \textbf{liniowość nigdy nie miała nic do powiedzenia o pozostałych
+  kolumnach}. Konwencje osi i przypadek rzędu 4 należą do
+  Programu~\ref{prog:P07}.}
+\sumitem{26--29}{\textbf{Dwie warstwy afiniczne są jedną}: $W_2(W_1x + b_1) +
+  b_2 = (W_2W_1)x + (W_2b_1 + b_2)$, sprawdzone na $\val{p06.collapse.trials}$
+  wejściach z dokładnością lepszą niż $\val{p06.collapse.err}$. $k$ warstw marnuje
+  $(k-1)/k$ swoich parametrów bez względu na szerokość \dash{}
+  $\val{p06.stack.wasted.pct}\%$ przy ośmiu warstwach \dash{} czyli dokładnie
+  tę głębokość, którą myślałeś, że kupujesz.}
+\sumitem{30--32}{\textbf{Przekształcenie afiniczne nie potrafi zagiąć
+  prostej}, więc trzy współliniowe wejścia wychodzą współliniowo
+  (poniżej $\val{p06.bend.affine}$) przez zwiniętą macierz i zagięte
+  ($\val{p06.bend}$) przez parę rozdzieloną przez $\relu$. To wyklucza naraz
+  każde przekształcenie afiniczne i dlatego wymaganiem wobec aktywacji jest
+  tylko \enquote{nie afiniczna}.}
+\sumitem{33--34}{\textbf{Łączność jest darmowa, a nawiasowanie nie}: ten sam
+  potrójny iloczyn kosztuje $\val{p06.cost.left}$ mnożeń w jedną stronę i
+  $\val{p06.cost.right}$ w drugą, czyli czynnik $\val{p06.cost.ratio}$.
+  Trzymanie chudego czynnika w środku to ta oszczędność wydana świadomie.}
+\end{summarybox}
+
+% ============================================================
+\begin{testexercises}
+\item Podaj dwie własności, które czynią funkcję liniową.
+  \answerto{$f(u + v) = f(u) + f(v)$ oraz $f(cv) = c\,f(v)$. Razem wymuszają
+  $f(0) = 0$, co jest najszybszym testem, jaki istnieje.}
+\item Powiedz, czy $f(x, y) = (2x, x + y, 0)$ jest liniowa, i uzasadnij.
+  \answerto{Tak. Każda współrzędna wyniku jest sumą współrzędnych wejścia razy
+  stałe, bez wyrazu wolnego, więc obie własności zachodzą. Jej macierz jest
+  $3 \times 2$.}
+\item $A$ jest $4 \times 7$, a $B$ jest $7 \times 2$. Podaj kształt $AB$ i
+  powiedz, czy $BA$ istnieje.
+  \answerto{$AB$ jest $4 \times 2$. $BA$ nie istnieje: $B$ odwzorowuje w
+  przestrzeń o $7$ wymiarach, a $A$ czyta $7$, ale druga kolejność każe $B$
+  czytać $4$, gdy oczekuje $2$.}
+\item Powiedz, co znaczy $AB$, gdy $A$ i $B$ czyta się jako funkcje, i użyj
+  tego, żeby wyjaśnić, dlaczego $(AB)C = A(BC)$, nic nie licząc.
+  \answerto{$AB$ to \emph{najpierw $B$, potem $A$}. Oba nawiasowania znaczą
+  \emph{najpierw $C$, potem $B$, potem $A$}, a w składaniu funkcji nie ma
+  nawiasowania, które można pomylić, więc nie ma czego dowodzić.}
+\item Podaj dwa przekształcenia płaszczyzny, których dwie kolejności się nie
+  zgadzają, i powiedz, gdzie trafia wybrany punkt w każdej z nich.
+  \answerto{Ćwierć obrotu i rzut na oś poziomą. Dla $(1, 0)$: najpierw rzut,
+  potem obrót daje $(\val{p06.order.rp.x}, \val{p06.order.rp.y})$; najpierw
+  obrót, potem rzut daje $(\val{p06.order.pr.x}, \val{p06.order.pr.y})$.}
+\item Powiedz, dlaczego zawodu $AB = BA$ nie dało się zauważyć w
+  Programach~\ref{prog:F05} i~\ref{prog:F06}.
+  \answerto{Ich wagi są liczbami, a liczby są przemienne. Zjawisko pojawia się
+  w chwili, w której waga staje się macierzą, czyli w pierwszym miejscu, gdzie
+  złożenie przestaje być mnożeniem.}
+\item Zwiń $W_2(W_1x + b_1) + b_2$ do jednego przekształcenia afinicznego.
+  \answerto{$(W_2W_1)x + (W_2b_1 + b_2)$. Jedna macierz i jeden wektor
+  obciążeń, przez rozdzielenie $W_2$ względem sumy i przepuszczenie skalara.}
+\item Stos $k$ warstw liniowych o szerokości $d$ nie ma aktywacji. Powiedz,
+  jaka część jego parametrów jest zbędna i czy szerokość ma znaczenie.
+  \answerto{$(k-1)/k$, a szerokość nie ma znaczenia w ogóle \dash{} przy
+  $k = \val{p06.stack.layers}$ jest to $\val{p06.stack.wasted.pct}\%$ dla
+  każdego $d$. Marnotrawstwem jest dokładnie głębokość.}
+\item Powiedz, dlaczego trzy współliniowe wejścia rozstrzygają, czy para warstw
+  jest afiniczna.
+  \answerto{Przekształcenie afiniczne przeprowadza punkty współliniowe na
+  współliniowe, zawsze. Jeśli wyjścia nie są współliniowe, to nie wytwarza ich
+  żadne przekształcenie afiniczne, co wyklucza naraz każdego kandydata, zamiast
+  nie znaleźć jednego.}
+\item Dwa nawiasowania jednego potrójnego iloczynu kosztują
+  $\val{p06.cost.left}$ i $\val{p06.cost.right}$ mnożeń. Powiedz, co to mówi, a
+  czego nie mówi.
+  \answerto{Nie mówi nic o wyniku, który jest identyczny, bo łączność jest
+  twierdzeniem. Mówi, że rachunek różni się o czynnik $\val{p06.cost.ratio}$,
+  więc nawiasowanie jest decyzją inżynierską, którą matematyka zostawia
+  całkowicie wolną.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Pokaż, że kolumny $A$ są obrazami wektorów bazy.
+  \answerto{$e_j$ ma $1$ na pozycji $j$ i zera gdzie indziej, więc $Ae_j$
+  wybiera kolumnę $j$ macierzy $A$ wprost z definicji iloczynu. To właśnie
+  sprawia, że prostokąt liczb wystarcza, żeby zadać przekształcenie.}
+\item Pokaż z definicji, że złożenie przekształceń liniowych jest liniowe.
+  \answerto{$A(B(u+v)) = A(Bu + Bv) = ABu + ABv$ oraz $A(B(cv)) = A(c\,Bv) =
+  c\,ABv$. Każdy krok używa raz liniowości jednego z przekształceń.}
+\item Podaj parę macierzy, które są przemienne, i powiedz, co jest w nich
+  szczególnego.
+  \answerto{Dowolna macierz i identyczność; dowolna macierz i ona sama; dwa
+  obroty płaszczyzny wokół tego samego środka. W ostatnim przypadku oba są
+  obrotami o kąt, a obie kolejności dodają te same dwa kąty.}
+\item Pokaż, że $(AB)\T = B\T A\T$ wynika z czytania iloczynu jako złożenia.
+  \answerto{Transpozycja przepuszcza przekształcenia w drugą stronę, więc
+  złożenie musi się razem z nią odwrócić. Rozpisany wyraz $(i,j)$ lewej strony
+  to wiersz $j$ macierzy $A$ przeciwko kolumnie $i$ macierzy $B$, czyli
+  dokładnie wyraz $(i,j)$ prawej.}
+\item Warstwa to $W x + b$ z $W$ o kształcie $m \times n$. Powiedz, jaki
+  kształt ma partia $k$ wejść w konwencji tego programu i jaki kształt wychodzi.
+  \answerto{$n \times k$ na wejściu i $m \times k$ na wyjściu, po jednej
+  kolumnie na wektor. Nic nowego nie jest definiowane \dash{} reguła złożenia
+  już to obsługuje, bo każda kolumna jest niezależna od pozostałych.}
+\item Wyjaśnij, dlaczego część zmarnowanych parametrów w stosie liniowym nie
+  zależy od szerokości.
+  \answerto{$k$ warstw o szerokości $d$ mieści $k(d^{2} + d)$ parametrów i
+  zwija się do $d^{2} + d$. Stosunek wynosi $1/k$, a $d$ się skraca, więc
+  marnotrawstwo to $(k-1)/k$ przy każdej szerokości.}
+\item Powiedz, dlaczego \enquote{aktywacja ściska wartości do przedziału} nie
+  może być powodem, dla którego aktywacje istnieją.
+  \answerto{$\relu$ jest nieograniczony od góry i nie ściska niczego do
+  przedziału, a działa. Wymaganiem spełnianym przez każdą używaną aktywację
+  jest tylko to, żeby nie była afiniczna, bo afiniczna pozwoliłaby warstwom się
+  zwinąć.}
+\item Mając $A$ o kształcie $d \times d$, $B$ o kształcie $d \times r$ i $C$ o
+  kształcie $r \times d$ z małym $r$, powiedz, które nawiasowanie $ABC$
+  wybrać i z grubsza o ile.
+  \answerto{$(AB)C$: kosztuje $d^{2}r + d r d = 2d^{2}r$, gdy $A(BC)$ kosztuje
+  $d r d + d^{3} = d^{2}r + d^{3}$. Dla małego $r$ drugie jest zdominowane przez
+  $d^{3}$, więc oszczędność wynosi mniej więcej $d/(2r)$ \dash{} i dlatego
+  aktualizacja niskiego rzędu jest tania tylko wtedy, gdy nigdy nie tworzysz
+  iloczynu zewnętrznego.}
+\end{furtherproblems}
