@@ -1,0 +1,8 @@
+>>> from p08_rank_least_squares import rank, transpose
+>>> A = [[1, 1], [2, 1], [3, 1]]   # an x column and a constant
+>>> b = [1, 3, 2]                  # not on any straight line
+>>> rank(A), rank([r + [c] for r, c in zip(A, b)])
+(2, 3)
+>>> r2 = [-1, 2, -1]               # twice the residual
+>>> [sum(c*v for c, v in zip(col, r2)) for col in transpose(A)]
+[0, 0]

@@ -1,26 +1,846 @@
-%% P08 --- Rząd, podprzestrzenie i najmniejsze kwadraty
+%% P08 --- Rząd, cztery podprzestrzenie i najmniejsze kwadraty
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/p08_rank_least_squares.py i trafia na stronę przez \val{}.
+%% Listing konsolowy to zatwierdzony transkrypt pisany przez ten skrypt.
+%%
+%% TEZA: rząd jest uczciwą miarą tego, ile macierz robi, i jest JEDNĄ liczbą, a
+%% nie dwiema -- przestrzeń kolumn i przestrzeń wierszy mają ten sam wymiar, co
+%% nie jest oczywiste i jest osią tego programu.
+%%
+%% CO TEN PROGRAM JEST WINIEN, odczytane z plików, a nie z pamięci:
+%%   P04  MA JUŻ RZĄD JAKO WIELKOŚĆ OBLICZONĄ, dla ZBIORU WEKTORÓW: jego
+%%        sekcja 5 mierzy nasycenie i zamienia je w ograniczenie zliczające dla
+%%        macierzy embeddingów, a jego trapbox mówi już, że losowe próby
+%%        testują kod, a nie polują na kontrprzykład. Demonstracja nasycenia
+%%        jest więc WYDANA. Zostaje rząd jako własność MACIERZY, a z nim cztery
+%%        podprzestrzenie i twierdzenie o równości rzędu wierszowego i
+%%        kolumnowego.
+%%   P05  przekazuje najmniejsze kwadraty dwa razy i po imieniu: ten sam wzór
+%%        rzutuje na prostą w dowolnej liczbie wymiarów, na podprzestrzeń i --
+%%        gdy nadejdzie Program P08 -- na przestrzeń kolumn macierzy, czyli na
+%%        najmniejsze kwadraty. Najmniejsze kwadraty są tu więc JEDNYM
+%%        OBIEKTEM PODSTAWIONYM do wyprowadzenia P05, a nie drugim
+%%        wyprowadzeniem.
+%%   P06  "Program P08 jest miejscem, w którym chudy wymiar dostaje nazwę, a
+%%        założenie za nim zostaje wypowiedziane", skoro połowę mechaniczną
+%%        aktualizacji niskiego rzędu zapłacono już tam.
+%%   P07  mówi, że słowo "rząd" znaczy dwie rzeczy dwa programy od siebie i że
+%%        ten program ma to odpowiedzieć; jego ostatnia ramka obiecuje "ile
+%%        macierz naprawdę robi, co okazuje się liczbą mniejszą niż jej
+%%        kształt".
+%%
+%% CZEGO TEN PROGRAM NIE RUSZA, sprawdzone w tools/programs.json:
+%%   wyznacznik, odwrotność, zmiana bazy                              -> P09
+%%   wartości własne, twierdzenie spektralne, dodatnia określoność    -> P10
+%%   SVD, Eckart-Young, wskaźnik uwarunkowania, pseudoodwrotność      -> P11
+%%     -- JAK DOBRE jest przybliżenie rzędu r należy więc do P11. Ten program
+%%     wypowiada założenie aktualizacji niskiego rzędu i go nie testuje.
+%%   dlaczego równania normalne są w praktyce złą drogą                -> P11
+%%
+%% Bliźniak: programs/en/P08-rank-least-squares.tex. Ramka za ramką, makro za
+%% makrem, liczba za liczbą; tools/parity.py je porównuje.
 
-\program{Rząd, podprzestrzenie i najmniejsze kwadraty}
+\program{Rząd, cztery podprzestrzenie i najmniejsze kwadraty}
 \label{prog:P08}
+\index{matrix!rank}
+\index{least squares}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{powiedzieć, które wektory macierz osiąga, a które przeprowadza
+  na zero, i odczytać jedno i drugie z kształtu przed jakimkolwiek rachunkiem}
+\outcome{9--14}{powiedzieć, czym jest rząd macierzy i dlaczego jest jedną
+  liczbą, a nie dwiema}
+\outcome{15--21}{zamienić układ bez rozwiązania w układ z najlepszą
+  odpowiedzią i powiedzieć, co czyni tę odpowiedź najlepszą}
+\outcome{22--29}{wycenić aktualizację niskiego rzędu wobec gęstej, którą
+  zastępuje, i wypowiedzieć założenie, które przy tym robi}
+\outcome{30--34}{powiedzieć, dlaczego wąska warstwa kosztuje coś, czego żadna
+  późniejsza warstwa nie odzyska}
+\end{outcomes}
 
-Argument: a matrix has a column space, a row space and two null spaces; rank
-is the dimension shared by the first two and it is the honest measure of how
-much a matrix does. Payoff: **LoRA is a rank constraint**, and this is the
-program that makes that sentence carry information \dash{} a \code{d x d}
-update replaced by \code{B A} with inner dimension \code{r}, parameter count
-\code{2dr} against $d^{2}$, and the assumption being made about the update
-stated plainly. Solving \code{Ax = b} when there is no solution: least
-squares as a projection, which is linear regression's closed form. Rank
-collapse in deep attention stacks, described as the phenomenon it is.
+\begin{quiz}
+\item $A$ jest $\val{p08.wide.rows} \times \val{p08.wide.cols}$. Czy jakiś
+  niezerowy wektor musi zostać przeprowadzony na zero? \teachesat{4--5}
+  \answerto{Tak, i jest to wymuszone. Trzy kolumny nie mogą być niezależne w
+  przestrzeni o dwóch wymiarach, więc jakaś ich kombinacja jest zerem, a
+  współczynniki tej kombinacji to wektor, który macierz zabija.}
+\item Kolumny $A$ rozpinają jedną przestrzeń, a wiersze drugą. Czy obie muszą
+  mieć ten sam wymiar? \teachesat{9--10}
+  \answerto{Tak, zawsze, i jest to twierdzenie, a nie zbieg okoliczności. Ta
+  wspólna liczba to \emph{rząd}. Te dwie przestrzenie są różnymi zbiorami i
+  zwykle żyją w pokojach różnych rozmiarów.}
+\item Trzy punkty, które nie leżą na prostej, a ty chcesz prostą przez nie
+  przechodzącą. Co jest złego w tym pytaniu? \teachesat{15--16}
+  \answerto{Takiej prostej nie ma, więc układ w ogóle nie ma rozwiązania.
+  Pytanie trzeba zmienić, zanim da się na nie odpowiedzieć: nie \emph{która
+  prosta przez nie przechodzi}, lecz \emph{która przechodzi najbliżej}.}
+\item Co czyni dopasowanie najmniejszych kwadratów najbliższym?
+  \teachesat{17--18}
+  \answerto{Jego reszta jest prostopadła do każdej kolumny $A$. To własność
+  definiująca, jest to rzutowanie z Programu~\ref{prog:P05} z podprzestrzenią
+  zamiast prostej i to ona czyni odpowiedź rzutem, a nie kompromisem.}
+\item Aktualizacja $\val{p08.lora.d} \times \val{p08.lora.d}$ zostaje
+  zastąpiona dwoma czynnikami z $\val{p08.lora.r}$ pomiędzy nimi. Mniej więcej
+  jaka to część parametrów? \teachesat{23--24}
+  \answerto{$\val{p08.lora.pct}\%$ \dash{} $\val{p08.lora.lowrank}$ wobec
+  $\val{p08.lora.dense}$, czynnik $\val{p08.lora.factor}$.}
+\item Warstwa w środku stosu ma rząd $\val{p08.chain.r}$. Ile najwyżej może
+  mieć cały stos? \teachesat{30--31}
+  \answerto{$\val{p08.chain.r}$. Iloczyn nie może mieć większego rzędu niż
+  którykolwiek z czynników, więc nic postawionego po tej warstwie nie odzyska
+  tego, co ona odrzuciła.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 60 ramek.
-}
+% ============================================================
+\section{Co macierz osiąga, a co odrzuca}
+\label{sec:P08-subspaces}
+\index{matrix!column space}
+
+\begin{fr}
+Program~\ref{prog:P07} przekazał temu programowi trudniejsze pytanie o dwa
+indeksy: \emph{ile macierz naprawdę robi?}
+
+Zacznij od tej połowy, która jest definicją. $A$ przeprowadza każdy wektor
+gdzieś, więc przepuść przez nią wszystkie wektory i zbierz wyniki. Czym jest
+ten zbiór?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wszystkim, co kolumny $A$ potrafią razem zbudować \dash{} ich powłoką.
+\end{ansblock}
+
+$Ax$ to $x_1$ razy pierwsza kolumna plus $x_2$ razy druga i tak dalej, więc
+wynik jest kombinacją liniową kolumn, a $x$ dostarcza współczynników. Każdy
+wynik; nic innego nie jest osiągalne.
+
+Ten zbiór to \emph{przestrzeń kolumn}, a Program~\ref{prog:P04} dał ci już na
+niego słowo i aparat do rozumowania o nim. Jest podprzestrzenią, a to, co czyni
+ten program wartym pisania, to ile wynika z pytania, jak jest duża.
+\end{fr}
+
+\begin{fr}
+Z macierzą przychodzą cztery podprzestrzenie i warto nazwać wszystkie cztery,
+zanim użyje się którejkolwiek.
+
+\begin{itemize}
+\item \textbf{przestrzeń kolumn}: wszystko, co $A$ osiąga;
+\item \textbf{przestrzeń wierszy}: powłoka wierszy, żyjąca w przestrzeni, z
+  której $A$ czyta, a nie w tej, do której pisze;
+\item \textbf{jądro}: każdy wektor, który $A$ przeprowadza na zero;
+\item \textbf{jądro lewostronne}: każdy wektor, który transpozycja przeprowadza
+  na zero.
+\end{itemize}
+
+Pierwsze trzy niosą cały ten program; czwarta jest nazwana po to, żeby zbiór
+był pełny, i nie wraca.
+
+Dwie z tych czterech żyją w przestrzeni, z której $A$ czyta, a nie w tej, do
+której pisze. Które dwie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Przestrzeń wierszy i jądro.}
+Obie składają się z wektorów, do których da się przyłożyć $A$, obie żyją więc
+po stronie wejścia; przestrzeń kolumn i jądro lewostronne żyją po stronie
+wyjścia. Warto posortować je tak raz, bo to jądro ludzie wkładają do złego
+pokoju.
+
+I to ono rozstrzyga najwięcej, więc weź konkretną macierz.
+
+$A$ jest $\val{p08.wide.rows} \times \val{p08.wide.cols}$: czyta przestrzeń o
+$\val{p08.wide.cols}$ wymiarach i pisze do przestrzeni o
+$\val{p08.wide.rows}$.
+
+Czy jakiś niezerowy wektor musi zostać przeprowadzony na zero, czy zależy to od
+wpisów?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Jest wymuszone, jakiekolwiek byłyby wpisy.}
+Trzy kolumny siedzą w przestrzeni o dwóch wymiarach, więc na mocy
+ograniczenia zliczającego z Programu~\ref{prog:P04} nie mogą być niezależne:
+jakaś ich kombinacja jest wektorem zerowym. Współczynniki tej kombinacji
+\emph{są} wektorem, który $A$ zabija, a inny wybór wpisów zmienia tylko to,
+który to wektor.
+
+Zmierzone na tej macierzy: rząd $\val{p08.wide.rank}$, jądro wymiaru
+$\val{p08.wide.null}$, oraz
+
+\[ \val{p08.wide.rank} + \val{p08.wide.null} = \val{p08.wide.cols}. \]
+
+\textbf{To twierdzenie o rzędzie i defekcie}, a prawa strona jest liczbą
+\emph{kolumn} \dash{} rozmiarem przestrzeni, z której $A$ czyta, a nie tej, do
+której pisze.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Rząd plus defekt to rozmiar macierzy} to wersja, którą ludzie
+noszą, i jest błędna pod obydwoma względami.}
+
+Macierz ma dwa rozmiary, a twierdzenie nazywa jeden z nich. Każde wejście jest
+rozliczone dokładnie raz: albo przeżywa do przestrzeni kolumn, albo jest
+częścią tego, co idzie na zero, i nie ma dla niego innego miejsca. Strona
+wyjścia nie jest w ogóle liczona.
+
+Macierz szersza niż wyższa \textbf{musi} więc coś odrzucić, a macierz wyższa
+niż szersza \textbf{nie może} osiągnąć wszystkiego. Oba fakty odczytuje się z
+kształtu, zanim wybierze się choć jeden wpis \dash{} czyli sygnatura typu z
+Programu~\ref{prog:P06} niesie więcej informacji, niż się z początku wydawało.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Czym właśnie jest warstwa wąskiego gardła, powiedziane dokładnie, a nie przez
+analogię.
+
+Autoenkoder ściskający wejście przez wąski środek to macierz szeroka, po której
+idzie wysoka, a ta szeroka ma jądro, którego nie da się nie mieć. Kompresja nie
+jest skutkiem ubocznym treningu: jest wymuszona przez kształt, a trening wybiera
+tylko, \emph{które} kierunki zostają odrzucone.
+
+To samo zdanie obejmuje głowicę rzutującą, projekcję w dół w adapterze i
+dowolną warstwę węższą od poprzedniej. \textbf{Wybór szerokości jest wyborem
+tego, ile wyrzucić}, a ile, ustala się przed istnieniem wag.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedna konsekwencja kształtu, i to ta połowa, której ludzie oczekują
+mniej.
+
+Macierz wysoka \dash{} więcej wierszy niż kolumn \dash{} nie może osiągnąć
+wszystkiego w przestrzeni, do której pisze, bo jej przestrzeń kolumn ma co
+najwyżej tyle wymiarów, ile ma ona kolumn. Istnieją więc prawe strony, dla
+których $Ax = b$ \textbf{nie ma żadnego rozwiązania}, i żaden wybór $x$ nie
+pomoże.
+
+To nie patologia. To zwykła sytuacja, ilekroć pomiarów jest więcej niż
+parametrów, czyli w każdym zadaniu dopasowania, jakie ktokolwiek ma, a sekcja 3
+jest o tym, co robić zamiast tego.
+\end{fr}
+
+% ============================================================
+\section{Jedna liczba, a nie dwie}
+\label{sec:P08-rank}
+\index{matrix!rank}
+
+\begin{fr}
+Teraz pytanie, przez które rząd zasługuje na nazwę.
+
+Przestrzeń kolumn żyje w przestrzeni, do której $A$ pisze; przestrzeń wierszy w
+tej, z której $A$ czyta. Dla macierzy
+$\val{p08.wide.rows} \times \val{p08.wide.cols}$ są to pokoje różnych
+rozmiarów, a te dwie przestrzenie nie są tym samym zbiorem \dash{} nie są nawet
+zrobione z tego samego rodzaju obiektów.
+
+Czy muszą mieć ten sam wymiar?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak, zawsze.}
+Nie zwykle, nie dla porządnych macierzy: zawsze, dla każdej macierzy, jaka
+istnieje. Ta wspólna liczba to \emph{rząd}.
+
+Skrypt sprawdza to na $\val{p08.rank.trials}$ macierzach różnych kształtów,
+połowie z nich zbudowanych celowo tak, by miały niepełny rząd, nad liczbami
+wymiernymi i bez żadnej tolerancji \dash{} a tak jak w Programie~\ref{prog:P04}
+losowe próby testują naprawdę kod. Poszukiwanie, które by się powiodło,
+obaliłoby dowód.
+\end{fr}
+
+\begin{fr}
+Warto powiedzieć wprost, dlaczego to zaskakujące, bo wynik brzmiący oczywiście
+niczego nie uczy.
+
+Nic w definicjach nie łączy tych dwóch. Jedna mówi, co potrafią wyprodukować
+kombinacje kolumn; druga, co potrafią kombinacje wierszy; a dla macierzy
+szerokiej jedna z tych przestrzeni żyje tam, gdzie drugiej nie da się nawet
+porównać.
+
+Wiąże je jedno działanie, i to takie, które już znasz. Które?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Eliminacja \dash{} dodanie wielokrotności jednego wiersza do drugiego.
+\end{ansblock}
+
+Nie zmienia ona ani przestrzeni wierszy (nowe wiersze budują te same
+kombinacje), ani tego, które kolumny są niezależne, więc liczba odczytana na
+końcu jest tą samą liczbą w obie strony.
+
+Co ją ogranicza, a to ograniczenie jest zdaniem, które obiecał
+Program~\ref{prog:P07}.
+
+Rząd nie może przekroczyć liczby wierszy, bo przestrzeń kolumn siedzi w
+przestrzeni o tylu wymiarach; i nie może przekroczyć liczby kolumn, z
+odpowiadającego powodu. Zatem
+
+\[ \operatorname{rank}(A) \le \min(\text{wiersze}, \text{kolumny}) \]
+
+a macierz osiągającą to ograniczenie nazywa się \emph{pełnego rzędu}.
+\textbf{Rząd jest liczbą mniejszą niż kształt, a różnica to tyle kształtu, ile
+nic nie robi.}
+\end{fr}
+
+\mermaidfig{p08-one-number}{Dwie przestrzenie różnych rodzajów i liczba, którą
+dzielą.}{jedna liczba, nie dwie}
+
+\begin{fr}
+\begin{note}
+A to słowo trzeba odpowiedzieć Programowi~\ref{prog:P07}, bo tamten program
+używa go do czegoś innego.
+
+Tam rząd tablicy to liczba jej \emph{osi} \dash{} jak głęboko sięga
+indeksowanie, czyli stwierdzenie o pojemniku. Tutaj rząd macierzy to liczba
+niezależnych kierunków, na które ona odwzorowuje \dash{} stwierdzenie o tym, co
+przekształcenie \emph{robi}, czego żadne oglądanie kształtu ci nie powie.
+
+Tablica rzędu $\val{p08.wide.rows}$ w tamtym sensie mogłaby mieścić macierz
+dowolnego rzędu w tym. Te dwa słowa są ze sobą niezwiązane i oba są
+standardowe, więc ta książka pisze na pierwsze \emph{liczba osi} wszędzie tam,
+gdzie jest wątpliwość.
+\end{note}
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Co czyni rząd uczciwą odpowiedzią na pytanie \enquote{jak duża jest ta
+warstwa}, podczas gdy liczba parametrów odpowiada tylko na \enquote{ile
+kosztowała}.
+
+Macierz wag $d \times d$ ma $d^{2}$ parametrów, jakkolwiek była trenowana.
+Jeśli jej rząd wynosi $r$, wszystko, co robi z każdym wejściem, ląduje w
+przestrzeni o $r$ wymiarach, a pozostałe $d - r$ kierunków jej wyjścia jest
+nieosiągalnych, cokolwiek przyjdzie. Dwie macierze o identycznej liczbie
+parametrów mogą robić dziko różne ilości.
+
+Reszta tego programu to konsekwencje potraktowania tego poważnie: sekcja 4
+narzuca rząd celowo, a sekcja 5 jest o utracie go przypadkiem.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Rozwiązywanie tego, co nie ma rozwiązania}
+\label{sec:P08-least-squares}
+\index{least squares}
+
+\begin{fr}
+Sekcja 1 powiedziała, że macierz wysoka nie osiąga wszystkiego. Oto najmniejszy
+przypadek, w którym przestaje to być abstrakcyjne.
+
+Trzy punkty \dash{} $(1, 1)$, $(2, 3)$ i $(3, 2)$ \dash{} i chcesz przez nie
+prostą. Zapisanie $y = mx + c$ dla każdego punktu daje trzy równania o dwóch
+niewiadomych, więc $A$ jest
+$\val{p08.ls.points} \times 2$: jedna kolumna wartości $x$ i jedna kolumna
+$1$.
+
+Zanim cokolwiek rozwiążesz: czy rozwiązanie istnieje?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie, i to nie w przybliżeniu \dash{} w ogóle żadne.}
+Te trzy punkty nie leżą na prostej, więc żadne $(m, c)$ nie spełnia wszystkich
+trzech równań. Powiedziane językiem tego programu: $b$ nie leży w przestrzeni
+kolumn $A$.
+
+\transcript{p08-least-squares}
+
+Pierwszy wiersz jest tym testem i jest dokładny: $A$ ma rząd $2$, a dodanie $b$
+jako trzeciej kolumny podnosi rząd do $3$. \textbf{Prawa strona, która podnosi
+rząd, to prawa strona, której kolumny nie potrafią zbudować}, i to właśnie
+znaczy \enquote{brak rozwiązania}, bez podejmowania choćby próby.
+\end{fr}
+
+\begin{fr}
+Zmień więc pytanie, bo to jedyny uczciwy ruch, jaki jest dostępny.
+
+Skoro $b$ nie da się osiągnąć, poproś o punkt przestrzeni kolumn leżący
+najbliżej niego. To pytanie jest dobrze postawione, zawsze ma odpowiedź i jest
+pytaniem, na które Program~\ref{prog:P05} już odpowiedział \dash{} dla prostej.
+
+Jego ostatnia ramka o rzutowaniu mówi to wprost: wyprowadzenie użyło trzech
+własności iloczynu skalarnego i niczego więcej, więc ten sam wzór rzutuje na
+prostą, na podprzestrzeń i na przestrzeń kolumn macierzy.
+
+Charakteryzacja przychodzi więc za darmo i warto ją wyprodukować, a nie
+przeczytać. Najbliższy punkt zostawia błąd \dash{} \emph{resztę} \dash{}
+wskazującą od niego do $b$, a rzutowanie na prostą zostawiało tę resztę
+prostopadłą do prostej. Do czego jest ona prostopadła tutaj?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Do całej przestrzeni kolumn \dash{} równoważnie, do każdej kolumny $A$.
+\end{ansblock}
+
+\textbf{Nic nowego nie zostało po drodze zdefiniowane.} Jeden obiekt został
+podstawiony do wyprowadzenia, które czytelnik już miał, a odpowiedź przyszła
+razem z nim.
+
+To całe najmniejsze kwadraty. Gdyby reszta opierała się choć trochę o którąś z
+kolumn, mógłbyś przesunąć się wzdłuż niej i podejść bliżej, więc dopasowanie
+nie byłoby punktem najbliższym.
+
+\textbf{Testem na najlepsze dopasowanie jest więc zestaw iloczynów skalarnych,
+wszystkie zerowe.} Żadnej optymalizacji, żadnej iteracji i nic o kwadratach:
+kwadraty pojawiają się tylko dlatego, że \enquote{najbliżej} zmierzono
+długością, a Program~\ref{prog:P05} mówi, czym jest długość.
+\end{fr}
+
+\begin{fr}
+Policzone na trzech punktach, i każda liczba jest dokładna.
+
+Dopasowanie to $y = \val{p08.ls.slope}x + \val{p08.ls.intercept}$, więc wartości
+dopasowane to $\frac{3}{2}$, $2$ i $\frac{5}{2}$, a reszty to
+$-\frac{1}{2}$, $1$ i $-\frac{1}{2}$.
+
+Warto poświęcić na to trzydzieści sekund, zamiast wziąć to na wiarę, bo
+sprawdzanie tych dwóch iloczynów skalarnych nie jest sprawdzaniem arytmetyki.
+Te dwa warunki \emph{są} definicją odpowiedzi, więc zero w każdym z nich jest
+dowodem, że żadna inna prosta na płaszczyźnie nie podchodzi bliżej \dash{} a to
+znacznie mocniejsza rzecz do potwierdzenia niż to, że dzielenie wyszło.
+
+Sprawdź je ręcznie i zrób to, zanim pójdziesz dalej: reszty przeciwko kolumnie
+$1$ i reszty przeciwko kolumnie wartości $x$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$-\frac{1}{2} + 1 - \frac{1}{2} = 0$ \qquad
+$-\frac{1}{2} + 2 - \frac{3}{2} = 0$
+\end{ansblock}
+
+Oba dokładnie zerowe, a suma kwadratów reszt wynosi $\val{p08.ls.sse}$. Skrypt
+zaburza też dopasowanie w ośmiu kierunkach i każdy z nich jest gorszy, więc
+\enquote{najbliżej} jest zmierzone, a nie stwierdzone.
+\end{fr}
+
+\mermaidfig{p08-closest-in-the-space}{Dlaczego najlepszą odpowiedzią na układ
+bez rozwiązania jest cień.}{najbliższy punkt przestrzeni}
+
+\begin{fr}
+\begin{aibox}
+To jest regresja liniowa, a wzór zamknięty, który wszyscy cytują, to te iloczyny
+skalarne zapisane jednym równaniem: $A\T A\,\hat{x} = A\T b$, \emph{równania
+normalne}, których lewa strona jest dokładnie zdaniem \enquote{spraw, by reszta
+była prostopadła do każdej kolumny}.
+
+Dwie rzeczy warto stąd wynieść. \textbf{Dopasowanie jest rzutem, może więc
+wylądować tylko w przestrzeni kolumn} \dash{} jeśli zależność nie jest
+kombinacją cech, które podałeś, żadne dopasowanie jej nie znajdzie, a powie ci
+o tym reszta, a nie współczynniki.
+
+I ostrzeżenie, którego ten program nie może spieniężyć: utworzenie $A\T A$ i
+rozwiązanie tego układu to najgorszy sposób na maszynie, z powodu, który dotyczy
+uwarunkowania, a nie algebry. Ma go Program~\ref{prog:P11} i to przez niego
+kod produkcyjny nie idzie tu za podręcznikiem.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Rząd narzucony celowo}
+\label{sec:P08-low-rank}
+\index{matrix!low-rank update}
+
+\begin{fr}
+Program~\ref{prog:P06} zostawił temu programowi konkretny dług.
+
+Pokazał, że macierz szeroka razy bardzo chuda razy szeroka jest tania, gdy
+trzymasz chudy czynnik w środku, nazwał to połową mechaniczną i powiedział, że
+to ten program jest miejscem, w którym chudy wymiar dostaje nazwę, a założenie
+za nim zostaje wypowiedziane.
+
+Ta nazwa to $r$ i jest rzędem: zapisanie aktualizacji jako $BA$ z $r$ pomiędzy
+czynnikami wymusza, by iloczyn miał rząd co najwyżej $r$, bo złożenie z
+Programu~\ref{prog:P06} nie osiągnie więcej kierunków, niż pozwala najwęższe
+przekształcenie w nim.
+\end{fr}
+
+\begin{fr}
+Wyceń to więc, bo cena jest całym argumentem.
+
+Pełna aktualizacja macierzy wag $\val{p08.lora.d} \times \val{p08.lora.d}$ ma
+$\val{p08.lora.d}^{2}$ parametrów. Zapisana jako $BA$ z $r =
+\val{p08.lora.r}$ ma $2 \times \val{p08.lora.d} \times \val{p08.lora.r}$.
+
+Te dwa czynniki są całością tego, co się przechowuje, i całością tego, co się
+trenuje: pierwotna macierz wag zostaje tam, gdzie była, a aktualizację odtwarza
+się z $B$ i $A$, ilekroć jest potrzebna. Porównanie jest więc między tymi dwoma
+liczbami i niczym innym.
+
+Policz z grubsza, jaka to część parametrów.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p08.lora.pct}\%$.}
+$\val{p08.lora.lowrank}$ wobec $\val{p08.lora.dense}$, czynnik
+$\val{p08.lora.factor}$.
+
+Ta liczba jest całym argumentem praktycznym i jest arytmetyką, a nie wynikiem:
+dwa chude czynniki mają $2dr$ wpisów, a jeden kwadratowy $d^{2}$, więc stosunek
+to $2r/d$ i nie zależy od niczego w modelu.
+
+\textbf{Kupione zostają nie dokładność, szybkość ani lepsze optimum. Kupiona
+zostaje liczba parametrów, i to na własność.}
+\end{fr}
+
+\begin{fr}
+Przez co warto mieć próg, bo \enquote{niski rząd} jest twierdzeniem o liczbie.
+
+Dwa czynniki kosztują $2dr$, a gęsta aktualizacja $d^{2}$. Przy jakim $r$
+kosztują tyle samo?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$r = \val{p08.lora.cross}$, czyli połowa szerokości.}
+$2dr = d^{2}$ dokładnie wtedy, gdy $r = d/2$, więc adapter o wymiarze
+wewnętrznym powyżej połowy szerokości warstwy \textbf{kosztuje więcej niż gęsta
+aktualizacja, którą zastępuje}, a przy tym ogranicza to, co ona może zrobić.
+
+Nikt nie ustawia $r$ tak wysoko i właśnie dlatego ten próg warto znać: mówi, że
+oszczędność bierze się z małości $r$ względem $d$ i z niczego innego, więc
+szeroka warstwa toleruje większe $r$ przy tej samej części, a wąska nie.
+\end{fr}
+
+\begin{fr}
+I ta część, którą liczba parametrów ukrywa, a którą warto nazwać, zanim
+nazwie się ją za ciebie.
+
+Ograniczenie aktualizacji do rzędu $r$ nie jest neutralną zmianą
+parametryzacji: kupuje oszczędność, odmawiając reprezentowania większości
+macierzy, które gęsta aktualizacja mogłaby dać.
+
+Ta odmowa nie jest ubocznym skutkiem oszczędności \dash{} ona \emph{jest}
+oszczędnością. Każdy nieprzechowany parametr to jedna macierz nieosiągalna, a
+są to dwa policzenia jednego faktu. Ograniczenie, które nic nie kosztuje, nic
+by nie kupiło, a to warto pamiętać, ilekroć jakąś technikę opisuje się jako
+darmową.
+
+Powiedz, co się przez to zakłada.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Że macierz rzędu $r$ jest dość bliska aktualizacji, którą byś zrobił.}
+Równoważnie: że zmiana, której zadanie potrzebuje, leży w kilku kierunkach, a
+nie jest rozłożona na wszystkie $\val{p08.lora.d}$.
+
+To twierdzenie da się przetestować, a ten program nie może tego zrobić:
+mierzenie, ile z macierzy wychwytuje przybliżenie rzędu $r$, jest pytaniem o
+wartości szczególne i należy do Programu~\ref{prog:P11}. \textbf{To, co ten
+program może powiedzieć, to co jest zakładane}, a to warte jest więcej niż
+większość tego, co się o tej technice mówi.
+\end{fr}
+
+\mermaidfig{p08-thin-middle}{Co kupuje chudy czynnik i co przy tym przyjmuje
+za pewnik.}{chudy środek}
+
+\begin{fr}
+\begin{aibox}
+Ten sam kształt pojawia się w trzech innych miejscach, a rozpoznawanie go jest
+sensem posiadania tego słownika.
+
+Głowica rzutująca, która odwzorowuje $d$ w dół na $k$ i z powrotem, ma z
+konstrukcji rząd $k$. Głowica uwagi o wymiarze głowicy $d_k$ wnosi
+przekształcenie rzędu co najwyżej $d_k$, cokolwiek robi sekwencja. A macierz
+embeddingów $V$ tokenów w $d$ wymiarach ma rząd co najwyżej $d$, co jest
+ograniczeniem zliczającym z Programu~\ref{prog:P04} powiedzianym na nowo: co
+najwyżej $\val{p08.emb.rank.max}$ niezależnych kierunków, ilekolwiek byłoby
+tokenów.
+
+Żadne z tych trzech nie jest wadą projektu. Każde jest rzędem wybranym celowo, a
+pytaniem, które przegląd powinien zadać, jest to z poprzedniej ramki: co się
+zakłada o tym, co mieści się w tylu kierunkach?
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Rząd utracony przypadkiem}
+\label{sec:P08-collapse}
+\index{matrix!rank}
+
+\begin{fr}
+Sekcja 4 narzuciła rząd i coś za to dostała. Ta sekcja to ten sam mechanizm
+przybywający bez zaproszenia.
+
+$A$ ma rząd $\val{p08.chain.r}$ i siedzi w środku stosu. Każda macierz po niej
+jest kwadratowa, $\val{p08.chain.d} \times \val{p08.chain.d}$, i pełnego rzędu.
+
+Ile najwyżej może mieć cały iloczyn?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p08.chain.r}$, i żadna głębokość tego nie zmienia.}
+Iloczyn nie może mieć większego rzędu niż którykolwiek z czynników, bo
+Program~\ref{prog:P06} uczynił go złożeniem: czego nie osiągnie pierwsze
+przekształcenie, z tym drugie nie ma z czym pracować. Zmierzone: wąskie gardło
+rzędu $\val{p08.chain.r}$ przeżywa $\val{p08.chain.len}$ czynników pełnego
+rzędu $\val{p08.chain.d} \times \val{p08.chain.d}$ ułożonych na nim, z rzędem
+niezmienionym.
+
+\textbf{Rząd traci się tylko do przodu.} To mocniejsze zdanie, niż brzmi: nie
+chodzi o to, że odzyskanie go jest trudne, wymaga więcej parametrów albo dłużej
+się trenuje. Nie ma niżej niczego, co mogłoby to zrobić.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Późniejsza warstwa nauczy się to odwrócić} to intuicja i
+jedyne miejsce, w którym większa pojemność dowodliwie nie pomaga.}
+
+Ta intuicja nie jest głupia \dash{} szerszy albo głębszy stos nadrabia
+większość rzeczy. Ale dwa wejścia, które wąska warstwa przeprowadziła w to samo
+miejsce, docierają do każdej późniejszej warstwy jako ten sam wektor, a funkcja
+nie zwróci dwóch odpowiedzi na jeden argument. Program~\ref{prog:F05}
+rozstrzygnął to w swojej pierwszej sekcji i jest to prawdą od tamtej pory.
+
+Porównaj to ze zwinięciem z Programu~\ref{prog:P06}, które jest lustrzanym
+odbiciem: tam głębokość bez nieliniowości nic nie kupowała, a lekarstwem było
+ją dodać. Tutaj wąska warstwa coś kosztuje i nie ma na to lekarstwa niżej.
+\textbf{Jedno jest marnotrawstwem, a drugie stratą.}
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Co jest tłem dla zjawiska wartego ostrożnego nazwania, bo wersja ostrożna i
+wersja folklorystyczna to różne twierdzenia.
+
+Często donosi się, że w głębokim stosie warstw uwagi reprezentacje dryfują ku
+sobie, tak że to, co dociera na górę, niesie znacznie mniej niezależnych
+kierunków, niż pozwala jego szerokość \dash{} efekt zwykle nazywany
+\emph{zapadaniem się rzędu}.
+
+\begin{warning}
+\textbf{Ta książka tego nie zmierzyła, a nie jest to to samo stwierdzenie co
+twierdzenie wyżej.}
+
+Twierdzenie jest dokładne i dotyczy wąskiego gardła: wąskie przekształcenie w
+łańcuchu ogranicza wszystko po nim. Zjawisko dotyczy stosu, w którym wąskiej
+warstwy \emph{nie ma}, a rząd i tak spada, co jest twierdzeniem o tym, co robią
+trening i softmax, a nie o tym, co wymuszają kształty. Zależy od architektury,
+głębokości, połączeń rezydualnych i normalizacji, a raportowana siła efektu
+odpowiednio się waha.
+
+Rozstrzygnęłoby to widmo wartości szczególnych reprezentacji na każdej
+głębokości, co wymaga aparatu Programu~\ref{prog:P11} i prawdziwego modelu. Do
+tego czasu ten program wypowiada mechanizm, który potrafi udowodnić, i etykietuje
+resztę tym, czym jest.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Ostatnia ramka, i jest o tym, co kupiła jedna liczba.
+
+Pięć sekcji temu macierz miała kształt, a kształt był dwiema liczbami, które
+muszą się zgodzić na złączu. Ma też rząd, czyli trzecią liczbę, której kształt
+nie wyznacza, a prawie wszystko w tym programie było konsekwencją tej różnicy:
+co macierz musi odrzucić, czego nie osiągnie, co czyni układ bez rozwiązania
+odpowiadalnym, ile kosztuje chudy czynnik i co przy tym zakłada oraz dlaczego
+wąska warstwa jest trwała.
+
+Program~\ref{prog:P09} zadaje pytanie, które ten wciąż odkładał. Rząd mówi,
+\emph{ile} kierunków przeżywa; wyznacznik mówi, \emph{jaka część} przestrzeni
+przeżywa, jedną liczbą, która jest zerem dokładnie wtedy, gdy coś zostało
+zniszczone \dash{} czyli jądrem z tego programu widzianym z drugiej strony.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Przestrzeń kolumn to wszystko, co $A$ osiąga} \dash{}
+  powłoka jej kolumn, bo $Ax$ jest ich kombinacją, w której $x$ daje
+  współczynniki. Z macierzą przychodzą cztery podprzestrzenie: kolumn,
+  wierszy, jądro i jądro lewostronne, dwie o tym, co wychodzi, i dwie o tym, co
+  wchodzi.}
+\sumitem{4--6}{\textbf{Rząd plus defekt to liczba KOLUMN}, a nie rozmiar
+  macierzy: każde wejście albo przeżywa do przestrzeni kolumn, albo idzie na
+  zero. Macierz szeroka musi więc coś odrzucić, a wysoka nie osiągnie
+  wszystkiego, i oba fakty odczytuje się z kształtu przed wyborem wpisu.}
+\sumitem{7--8}{Warstwa wąskiego gardła jest tym faktem, a nie efektem treningu:
+  \textbf{wybór szerokości jest wyborem tego, ile wyrzucić}, a trening wybiera
+  tylko, które kierunki odchodzą. A wysokie $A$ czyni $Ax = b$ nierozwiązywalnym
+  dla większości $b$, czyli w każdym zadaniu dopasowania, jakie istnieje.}
+\sumitem{9--12}{\textbf{Przestrzeń kolumn i przestrzeń wierszy zawsze mają ten
+  sam wymiar}, choć są różnymi zbiorami w pokojach różnych rozmiarów. Ta
+  wspólna liczba to \emph{rząd}, sprawdzony dokładnie na
+  $\val{p08.rank.trials}$ macierzach \dash{} gdzie, jak w
+  Programie~\ref{prog:P04}, losowe próby testują kod, bo poszukiwanie, które by
+  się powiodło, obaliłoby dowód.}
+\sumitem{12--14}{$\operatorname{rank}(A) \le \min(\text{wiersze},
+  \text{kolumny})$, więc \textbf{rząd jest liczbą mniejszą niż kształt, a
+  różnica to tyle kształtu, ile nic nie robi}. \emph{Rząd} z
+  Programu~\ref{prog:P07} to liczba osi i nie ma z tym związku; ta książka pisze
+  na tamto \emph{liczba osi}.}
+\sumitem{15--17}{Prawa strona, która \textbf{podnosi rząd po dodaniu jako
+  kolumna}, jest tą, której kolumny nie zbudują, i to znaczy \enquote{brak
+  rozwiązania}, bez podejmowania próby. Ruchem jest wtedy zmiana pytania:
+  najbliższy punkt przestrzeni kolumn, który Program~\ref{prog:P05} wyprowadził
+  już dla prostej i zapowiedział, że się uogólni.}
+\sumitem{18--20}{\textbf{Reszta najlepszego dopasowania jest prostopadła do
+  każdej kolumny $A$}, i to całe najmniejsze kwadraty \dash{} gdyby opierała
+  się o kolumnę, dałoby się przesunąć wzdłuż niej i podejść bliżej. Policzone
+  dokładnie: $y = \val{p08.ls.slope}x + \val{p08.ls.intercept}$, reszty
+  $-\frac{1}{2}$, $1$, $-\frac{1}{2}$, oba iloczyny skalarne zerowe, suma
+  kwadratów $\val{p08.ls.sse}$.}
+\sumitem{21}{Równania normalne $A\T A\,\hat{x} = A\T b$ to te iloczyny skalarne
+  zapisane raz, czyli wzór zamknięty regresji liniowej.
+  \textbf{Dopasowanie może wylądować tylko w przestrzeni kolumn}, więc zależność
+  spoza niej pokaże się w reszcie, a nie we współczynnikach \dash{} a
+  Program~\ref{prog:P11} ma to, dlaczego tworzenie $A\T A$ jest na maszynie złą
+  drogą.}
+\sumitem{22--24}{Zapisanie aktualizacji jako $BA$ z $r$ pomiędzy czynnikami
+  ogranicza jej rząd do $r$. Przy szerokości $\val{p08.lora.d}$ i
+  $r = \val{p08.lora.r}$ to $\val{p08.lora.lowrank}$ parametrów wobec
+  $\val{p08.lora.dense}$, czynnik $\val{p08.lora.factor}$ i
+  $\val{p08.lora.pct}\%$ \dash{} a stosunek wynosi $2r/d$ i nie zależy od
+  niczego w modelu.}
+\sumitem{25--29}{\textbf{Oszczędność kończy się przy $r = \val{p08.lora.cross}$},
+  czyli połowie szerokości, powyżej której adapter kosztuje więcej niż gęsta
+  aktualizacja, wciąż ją ograniczając. A samo ograniczenie jest
+  \textbf{założeniem} \dash{} że potrzebna zmiana leży w kilku kierunkach
+  \dash{} które Program~\ref{prog:P11} umie przetestować, a ten program nie.}
+\sumitem{30--32}{\textbf{Rząd traci się tylko do przodu.} Iloczyn nie przekroczy
+  rzędu żadnego z czynników, więc wąskie gardło rzędu $\val{p08.chain.r}$
+  przeżywa $\val{p08.chain.len}$ ułożonych na nim czynników pełnego rzędu. Dwa
+  wejścia posłane w jedno miejsce są odtąd wszędzie jednym wektorem, a funkcja
+  nie zwróci dwóch odpowiedzi na jeden argument.}
+\sumitem{32--34}{Zwinięcie z Programu~\ref{prog:P06} i to tutaj są lustrzanymi
+  odbiciami: tam głębokość bez nieliniowości była \textbf{marnotrawstwem} i
+  miała lekarstwo; tutaj wąska warstwa jest \textbf{stratą} i lekarstwa nie ma.
+  Zapadanie się rzędu w głębokich stosach uwagi jest innym i niezmierzonym
+  twierdzeniem, i ta książka to mówi.}
+\end{summarybox}
+
+% ============================================================
+\begin{testexercises}
+\item Powiedz, czym jest przestrzeń kolumn macierzy, w kategoriach jej kolumn.
+  \answerto{Ich powłoką \dash{} każdą ich kombinacją liniową. $Ax$ jest tą
+  kombinacją, której współczynnikami są wpisy $x$, więc przestrzeń kolumn to
+  dokładnie zbiór wyników, jakie macierz potrafi wyprodukować.}
+\item $A$ jest $3 \times 7$. Podaj największy możliwy rząd i najmniejsze możliwe
+  jądro.
+  \answerto{Rząd co najwyżej $3$, bo przestrzeń kolumn siedzi w przestrzeni o
+  trzech wymiarach. Defekt to $7$ minus rząd, czyli co najmniej $4$: macierz tak
+  szeroka musi odrzucić co najmniej cztery wymiary wejścia.}
+\item $A$ jest $9 \times 4$ i ma rząd $4$. Powiedz, czy $Ax = b$ ma rozwiązanie
+  dla każdego $b$, i dlaczego.
+  \answerto{Nie. Przestrzeń kolumn ma cztery wymiary wewnątrz przestrzeni o
+  dziewięciu, więc prawie każde $b$ leży poza nią. Pełny rząd znaczy tu, że nic
+  nie ginie po drodze do środka, a nie że wszystko jest osiągalne na wyjściu.}
+\item Sformułuj twierdzenie o rzędzie i defekcie i powiedz, który z dwóch
+  rozmiarów macierzy w nim występuje.
+  \answerto{Rząd plus defekt równa się liczbie kolumn. Jest to strona wejścia:
+  każdy wektor wejściowy albo przeżywa do przestrzeni kolumn, albo idzie na
+  zero, a liczba wierszy w ogóle nie wchodzi.}
+\item Powiedz, dlaczego przestrzeń wierszy i przestrzeń kolumn muszą mieć ten
+  sam wymiar, w kategoriach eliminacji.
+  \answerto{Operacje na wierszach nie zmieniają ani przestrzeni wierszy, ani
+  tego, które kolumny są niezależne, więc liczba odczytana z macierzy po
+  eliminacji jest tą samą liczbą w obie strony. Te dwie przestrzenie są różnymi
+  zbiorami; wspólna jest tylko liczba.}
+\item Mając $A$ i $b$, podaj test na istnienie rozwiązania $Ax = b$, który nie
+  polega na próbie rozwiązania.
+  \answerto{Porównaj rząd $A$ z rzędem $A$ z dołączonym $b$ jako dodatkową
+  kolumną. Jeśli dodanie $b$ podnosi rząd, to $b$ leży poza przestrzenią kolumn
+  i rozwiązania nie ma.}
+\item Podaj własność, która czyni dopasowanie najmniejszych kwadratów
+  najbliższym.
+  \answerto{Jego reszta jest prostopadła do każdej kolumny $A$. Gdyby nie była,
+  przesunięcie wzdłuż winnej kolumny zmniejszyłoby odległość, więc dopasowanie
+  nie byłoby najbliższe.}
+\item Adapter zastępuje aktualizację $d \times d$ dwoma czynnikami o wymiarze
+  wewnętrznym $r$. Podaj stosunek parametrów i $r$, przy którym oszczędność
+  znika.
+  \answerto{$2r/d$, co nie zależy od niczego innego w modelu. Oszczędność znika
+  przy $r = d/2$; powyżej adapter kosztuje więcej niż gęsta aktualizacja, wciąż
+  ją ograniczając.}
+\item Powiedz, co zakłada aktualizacja rzędu $r$, i nazwij to, co by to
+  założenie sprawdziło.
+  \answerto{Że zmiana, której zadanie potrzebuje, leży w co najwyżej $r$
+  kierunkach, a nie jest rozłożona na wszystkie $d$. Sprawdzenie tego znaczy
+  zapytanie, ile z pełnej aktualizacji wychwytuje macierz rzędu $r$, co jest
+  pytaniem o wartości szczególne i należy do Programu~\ref{prog:P11}.}
+\item Stos zawiera jedną warstwę rzędu $2$ i dwadzieścia kwadratowych warstw
+  pełnego rzędu po niej. Podaj rząd całego stosu i powiedz, dlaczego więcej
+  warstw nie pomaga.
+  \answerto{Co najwyżej $2$. Iloczyn nie przekroczy rzędu żadnego z czynników, a
+  dwa wejścia, które wąska warstwa posłała w jedno miejsce, są odtąd jednym
+  wektorem \dash{} żadna późniejsza funkcja nie zwróci dwóch odpowiedzi na jeden
+  argument.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Pokaż, że $Ax$ jest kombinacją liniową kolumn $A$.
+  \answerto{Wpis $i$ wektora $Ax$ to $\sum_j A_{ij} x_j$, a czytając to wzdłuż
+  indeksu $i$ jest to $x_1$ razy kolumna $1$ plus $x_2$ razy kolumna $2$ i tak
+  dalej. Notacja wskaźnikowa z Programu~\ref{prog:P07} robi z tego jeden
+  wiersz.}
+\item Podaj macierz $2 \times 2$ rzędu $1$ i opisz jej przestrzeń kolumn, jej
+  jądro i to, co robi z płaszczyzną.
+  \answerto{Dowolna macierz o dwóch proporcjonalnych kolumnach, na przykład
+  $\begin{pmatrix} 1 & 2 \\ 2 & 4 \end{pmatrix}$. Jej przestrzeń kolumn to
+  prosta przez $(1, 2)$, jej jądro to prosta przez $(2, -1)$, a ona sama
+  spłaszcza całą płaszczyznę na jedną prostą.}
+\item Pokaż, że $\operatorname{rank}(AB) \le \operatorname{rank}(A)$.
+  \answerto{Każda kolumna $AB$ to $A$ przyłożone do kolumny $B$, więc każda
+  kolumna $AB$ leży w przestrzeni kolumn $A$. Powłoka wektorów wewnątrz
+  przestrzeni nie ma więcej wymiarów niż ta przestrzeń.}
+\item Pokaż, że także $\operatorname{rank}(AB) \le \operatorname{rank}(B)$, i
+  powiedz, dlaczego oba razem dają ograniczenie używane w programie.
+  \answerto{Zastosuj poprzedni argument do transpozycji: $(AB)\T = B\T A\T$,
+  więc rząd $AB$ jest co najwyżej rzędem $B\T$, który równa się rzędowi $B$.
+  Razem dają $\operatorname{rank}(AB) \le \min$ z tych dwóch, czyli zdanie, że
+  wąskie gardło ogranicza wszystko po nim.}
+\item Wyprowadź równania normalne z warunku prostopadłości.
+  \answerto{Resztą jest $b - A\hat{x}$, a prostopadłość do każdej kolumny mówi
+  $A\T(b - A\hat{x}) = 0$, bo wierszami $A\T$ są kolumny $A$. Po przekształceniu
+  jest to $A\T A\,\hat{x} = A\T b$.}
+\item Dopasowanie najmniejszych kwadratów przez $(1,1)$, $(2,3)$, $(3,2)$ ma
+  reszty $-\frac{1}{2}$, $1$, $-\frac{1}{2}$. Sprawdź oba warunki prostopadłości
+  i powiedz, co bada każda kolumna.
+  \answerto{Przeciwko kolumnie $1$: $-\frac{1}{2} + 1 - \frac{1}{2} = 0$, co
+  mówi, że reszty średnio dają zero. Przeciwko kolumnie wartości $x$:
+  $-\frac{1}{2} + 2 - \frac{3}{2} = 0$, co mówi, że w resztach nie został żaden
+  trend w $x$.}
+\item Powiedz, co by znaczyło, że reszta najmniejszych kwadratów jest duża, a
+  mimo to prostopadła do każdej kolumny.
+  \answerto{Że dopasowanie jest najlepsze z dostępnych, a zależność nie jest
+  kombinacją podanych cech. Prostopadłość mówi o optymalności dopasowania, a nie
+  o jego dobroci; rozmiar reszty jest osobnym pytaniem i to jego warto
+  raportować.}
+\item Macierz embeddingów mieści $V$ tokenów w $d$ wymiarach, przy $V$ znacznie
+  większym od $d$. Podaj jej największy możliwy rząd i powiedz, co to implikuje,
+  a czego nie.
+  \answerto{Co najwyżej $d$, co jest ograniczeniem zliczającym z
+  Programu~\ref{prog:P04}. Implikuje, że większość tokenów jest kombinacjami
+  innych; nie implikuje, że model nie rozróżni tylu tokenów, bo do rozróżnienia
+  wystarczy, że się różnią, a nie że są niezależne.}
+\end{furtherproblems}
