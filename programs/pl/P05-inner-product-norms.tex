@@ -1,28 +1,947 @@
 %% P05 --- Iloczyn skalarny, normy i rzutowanie
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Kazda liczba w tym programie, ktorej czytelnik nie policzy w glowie,
+%% pochodzi z code/p05_inner_product_norms.py i wchodzi przez \val{}.
+%%
+%% TEZA: iloczyn skalarny jest jedyna rzecza, ktora daje przestrzeni liniowej
+%% katy i dlugosci, a gdy przestrzen juz go ma, wysoki wymiar zachowuje sie
+%% tak, jak dwa wymiary nikogo nie przygotowaly.
+%%
+%% Blizniak: programs/en/P05-inner-product-norms.tex. Ramka za ramka, makro za
+%% makrem, liczba za liczba; tools/parity.py je porownuje.
 
 \program{Iloczyn skalarny, normy i rzutowanie}
 \label{prog:P05}
+\index{inner product}
+\index{vector!norm}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--9}{powiedzieć, co iloczyn skalarny dodaje do przestrzeni liniowej i
+  czego nie da się powiedzieć o przestrzeni bez niego}
+\outcome{10--16}{policzyć trzy różne normy tego samego wektora i powiedzieć, co
+  mierzy każda z nich}
+\outcome{17--23}{zrzutować jeden wektor na drugi i powiedzieć, dlaczego wynik
+  jest najbliższym punktem, a nie po prostu punktem}
+\outcome{24--30}{wybrać między iloczynem skalarnym a kosinusem dla danego
+  indeksu i powiedzieć, co za ciebie rozstrzyga normalizacja wektorów}
+\outcome{31--46}{powiedzieć, jak wygląda typowa para wektorów w wysokim
+  wymiarze, i użyć tolerancji, żeby odróżnić prawdziwe twierdzenie od hasła}
+\end{outcomes}
 
-Argument: an inner product is the only thing that gives a vector space
-angles and lengths; a projection is the closest point in a subspace;
-different norms measure different things and disagree about which vector is
-bigger. Payoff: dot product, cosine and Euclidean distance compared on the
-same data, with the case where they rank differently worked out \dash{} the
-thing a vector database forces you to choose and nobody explains; why
-normalising embeddings makes cosine and dot product the same query and what
-you lose; L1 against L2 as a shape rather than a slogan, and why the L1
-ball's corners are the whole of the sparsity argument. Also the fact the
-book cashes in twice later: **in high dimension, two random vectors are
-almost always nearly orthogonal**, measured rather than asserted.
+\begin{quiz}
+\item Przestrzeń liniowa ma dodawanie i skalowanie. Podaj pytanie o dwa jej
+  wektory, na które te dwa działania nie odpowiedzą. \teachesat{1--2}
+  \answerto{Cokolwiek o rozmiarze albo kierunku \dash{} jak długi jest ten,
+  jaki kąt jest między nimi, czy są prostopadłe. Same kombinacje nie wyrażą
+  niczego z tego.}
+\item Ile wynosi iloczyn skalarny $(\val{p05.proj.ax}, \val{p05.proj.ay})$ z
+  samym sobą i czym jest ta liczba dla wektora? \teachesat{3--4}
+  \answerto{$\val{p05.proj.ax}^{2} + \val{p05.proj.ay}^{2} = 25$, czyli
+  kwadratem jego długości. Długość wektora to pierwiastek z jego iloczynu
+  skalarnego z samym sobą, i jest to definicja, a nie wynik.}
+\item Iloczyn skalarny dwóch wektorów wynosi zero. Co to o nich mówi?
+  \teachesat{6--7}
+  \answerto{Że są prostopadłe. To definicja prostopadłości w każdej przestrzeni
+  z iloczynem skalarnym i jedyne słowo z geometrii, które przenosi się do
+  wymiarów, których nie narysujesz.}
+\item Wektor to $(3, -4)$. Podaj jego normy L1 i L2. \teachesat{10--11}
+  \answerto{L1 to $3 + 4 = 7$, suma wartości bezwzględnych; L2 to
+  $\sqrt{9 + 16} = 5$. To różne liczby, bo mierzą różne rzeczy, a nie dlatego,
+  że jedna przybliża drugą.}
+\item Zrzutuj $(\val{p05.proj.ax}, \val{p05.proj.ay})$ na oś poziomą. Co
+  zostaje i co jest w tym szczególnego? \teachesat{20--21}
+  \answerto{Rzut to $(\val{p05.proj.t}, 0)$, a zostaje $(0,
+  \val{p05.proj.dist})$, prostopadłe do osi. Ta prostopadłość jest właśnie
+  powodem, dla którego żaden inny punkt osi nie jest bliżej.}
+\item Twój indeks wyszukiwania porządkuje po iloczynie skalarnym. Ktoś
+  normalizuje zanurzenia. Co zmienił? \teachesat{28--29}
+  \answerto{Sprawił, że iloczyn skalarny i kosinus to to samo zapytanie, i
+  wyrzucił długości. Czy to naprawa, czy strata, zależy od tego, czy długości
+  cokolwiek niosły.}
+\item Dwa wektory losujemy w przestrzeni o $\val{f09.dim}$ wymiarach. Jaki
+  mniej więcej kąt jest między nimi? \teachesat{35--36}
+  \answerto{Około prostego, i o wiele pewniej, niż większość ludzi się
+  spodziewa: $\val{p05.deg.within.768}\%$ takich par mieści się w pięciu
+  stopniach od niego. Na płaszczyźnie jest to $\val{p05.deg.within.2}\%$.}
+\item Dokładnie $d$ wektorów może być wzajemnie prostopadłych w $d$ wymiarach.
+  Ile mniej więcej może być wzajemnie \emph{prawie} prostopadłych?
+  \teachesat{41--44}
+  \answerto{Zależy to całkowicie od tego, co znaczy \enquote{prawie}, i to jest
+  cała odpowiedź. Przy tolerancji $\val{p05.near.tol}$ jest ich mniej niż $d$
+  poniżej mniej więcej $\val{p05.near.cross}$ wymiarów i astronomicznie więcej
+  powyżej.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 60 ramek.
-}
+% ============================================================
+\section{Co daje jedno działanie więcej}
+\label{sec:P05-inner}
+\index{inner product}
+
+\begin{fr}
+Program~\ref{prog:P04} skończył, nazywając to, czego sobie odmówił.
+Przestrzeń liniowa ma dwa działania, dodawanie i skalowanie, a wszystko, co
+tamten program udowodnił, było udowodnione z tych dwóch \dash{} i dlatego
+ograniczenie zliczeniowe przeżywa każdy późniejszy wybór sposobu mierzenia
+przestrzeni.
+
+Ceną tej ogólności jest to, że bardzo wielu rzeczy nie da się powiedzieć. Masz
+przestrzeń o $\val{f09.dim}$ wymiarach i żadnego sposobu, żeby zapytać, jak
+długie jest cokolwiek w niej.
+
+Zanim pójdziesz dalej: podaj dwa pytania o parę wektorów, na które dodawanie i
+skalowanie nie odpowiedzą.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jak długi jest ten i jaki kąt jest między nimi.
+\end{ansblock}
+
+Prostopadły, najbliższy, najbardziej podobny, jednostkowej długości, baza
+ortogonalna \dash{} nic z tego nie jest wyrażalne. Program~\ref{prog:F09}
+używał kilku z tych słów swobodnie, a Program~\ref{prog:P04} żadnego, i różnica
+nie była stylistyczna. F09 pracował w $\R^{n}$ z arytmetyką, którą wszyscy
+zakładają; P04 dowodził rzeczy o przestrzeniach w ogóle i musiał ten słownik
+oddać.
+
+To, co dalej, dodaje \textbf{jedno} działanie i odzyskuje każde z tych słów.
+\end{fr}
+
+\begin{fr}
+\emph{Iloczyn skalarny} bierze dwa wektory i zwraca jedną liczbę. W $\R^{n}$
+jest to iloczyn, który zdefiniował Program~\ref{prog:F09}:
+
+\[ a \cdot b = \sum_{i=1}^{n} a_i b_i \]
+
+Wymaga się od niego trzech własności i są to te, które wypisałbyś bez pytania:
+jest symetryczny, jest liniowy w każdym argumencie, a $a \cdot a$ jest dodatnie
+dla każdego $a$ poza wektorem zerowym.
+
+Ta ostatnia robi więcej, niż wygląda. Weź
+$a = (\val{p05.proj.ax}, \val{p05.proj.ay})$ i policz $a \cdot a$. Czym jest ta
+liczba dla wektora?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p05.proj.ax}^{2} + \val{p05.proj.ay}^{2} = 25$, czyli kwadratem jego
+długości.}
+Więc długość jest zdefiniowana \emph{z} iloczynu skalarnego, a nie mierzona
+niezależnie od niego:
+
+\[ \lVert a \rVert = \sqrt{a \cdot a} \]
+
+i tutaj $\lVert a \rVert = \val{p05.proj.alen}$. To jest kierunek definicji,
+który zapamiętuje się na odwrót. Długość nie jest czymś, co przestrzeń już
+miała, a iloczyn skalarny przypadkiem odtwarza. \textbf{Iloczyn skalarny jest
+tym, z czego długość jest zrobiona}, a przestrzeń z innym iloczynem skalarnym
+ma w sobie inne długości.
+\end{fr}
+
+\begin{fr}
+\begin{note}
+Wymaganie, żeby $a \cdot a > 0$ dla każdego niezerowego $a$, jest tym, co czyni
+z $\sqrt{a \cdot a}$ długość, a nie wzór. Porzuć je, a możesz mieć niezerowe
+wektory o zerowej długości i \enquote{najbliższego sąsiada} w odległości niczego
+od połowy przestrzeni.
+
+To nie jest ciekawostka. To powód, dla którego teoria względności mówi
+\emph{interwał}, a nie \emph{odległość}: jej iloczyn skalarny nie jest dodatnio
+określony, a światło biegnie po drogach o zerowym interwale.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Teraz słowo, dla którego ten program istnieje.
+
+Dwa wektory są \emph{ortogonalne}, gdy ich iloczyn skalarny wynosi zero. W
+dwóch wymiarach to dokładnie prostopadłość \dash{} sprawdź na $(1, 0)$ i
+$(0, 1)$ albo na $(\val{p05.proj.ax}, \val{p05.proj.ay})$ i
+$(-\val{p05.proj.ay}, \val{p05.proj.ax})$.
+
+Definicja nigdy nie wspomina o obrazku, kącie ani liczbie wymiarów. Co się
+z nią dzieje przy $\val{f09.dim}$ składowych?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Zupełnie nic. To suma równa zeru, a ona nie wie, jak długa jest.
+\end{ansblock}
+
+\textbf{Ortogonalność jest jedynym kawałkiem geometrii, który przenosi się do
+wysokiego wymiaru bez zastrzeżeń}, bo nigdy nie była geometrią \dash{} jest
+warunkiem arytmetycznym, który akurat znaczy \enquote{prostopadły} w dwóch
+przypadkach, jakie da się narysować.
+
+Program~\ref{prog:F09} otoczył ostrzeżeniem twierdzenia, które się nie
+przenoszą. To jest ta druga kolumna, a sekcja 5 mówi, co przestrzeń pełna
+prawie ortogonalnych kierunków z tym robi.
+\end{fr}
+
+\mermaidfig{p05-what-it-buys}{Jedno działanie i to, czym staje się dzięki
+niemu prostopadłość.}{co daje iloczyn skalarny}
+
+\begin{fr}
+Ostatni dług F08, i możesz go sam spłacić w jednej linijce.
+
+Program~\ref{prog:F08} zmierzył, że $a \cdot b = \lVert a \rVert \lVert b
+\rVert \cos\theta$, na 3481 parach, i używał tego, nie umiejąc powiedzieć, czym
+jest $\lVert \cdot \rVert$. Teraz umie. Wyznacz z tego $\cos\theta$ i powiedz,
+co się zmienia w statusie tego równania, gdy to zrobisz.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\cos\theta = \frac{a \cdot b}{\lVert a \rVert \lVert b \rVert}$, i
+przestaje ono raportować kąt, a zaczyna go definiować.}
+W dwóch wymiarach zgadza się to z kątomierzem. Przy $\val{f09.dim}$ jest to
+\emph{definicja} kąta, nie ma kątomierza, który by się z nią nie zgodził, i
+każda znana ci własność $\cos$ nadal obowiązuje, bo w wyprowadzeniu nic nie
+korzystało z obrazka.
+\end{fr}
+
+% ============================================================
+\section{Normy i to, co każda z nich mierzy}
+\label{sec:P05-norms}
+\index{vector!norm}
+
+\begin{fr}
+Długość zbudowana z iloczynu skalarnego to jeden sposób mierzenia wektora i nie
+jedyny. \emph{Norma} to dowolna funkcja, która przypisuje wektorowi nieujemny
+rozmiar, jest zerowa tylko dla wektora zerowego, skaluje się tak, jak chcesz, i
+spełnia nierówność trójkąta, którą podał Program~\ref{prog:F09}.
+
+Zauważ, czego na tej liście nie ma. Nic nie wymaga, żeby norma pochodziła z
+iloczynu skalarnego, i większość nie pochodzi \dash{} dlatego większość z nich
+nie ma doczepionego pojęcia kąta i dlatego słownik poprzedniej sekcji nie
+podróżuje automatycznie do każdego sposobu mierzenia wektora.
+
+Trzy z nich pojawiają się bez przerwy. Weź $v = (3, -4)$ i policz wszystkie
+trzy: sumę wartości bezwzględnych, pierwiastek z sumy kwadratów i największą
+wartość bezwzględną.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \lVert v \rVert_1 = 7 \qquad \lVert v \rVert_2 = 5 \qquad
+   \lVert v \rVert_\infty = 4 \]
+\end{ansblock}
+
+Nazywają się L1, L2 i L-nieskończoność i są trzema różnymi liczbami dla jednego
+wektora. Nie trzema przybliżeniami prawdziwego rozmiaru \dash{} trzema
+odpowiedziami na trzy różne pytania. L1 pyta, ile przejdziesz wzdłuż osi, L2
+ile w linii prostej, L-nieskończoność jak zła jest najgorsza pojedyncza
+składowa.
+
+Tylko L2 pochodzi z iloczynu skalarnego. Dlatego to ona ma doczepione kąty i
+dlatego pozostałe dwie nie mają w ogóle pojęcia prostopadłości.
+\end{fr}
+
+\begin{fr}
+Sposobem na utrzymanie tej różnicy jest narysowanie tego, co każda z nich
+nazywa wektorem jednostkowym \dash{} zbioru wszystkich $v$ o
+$\lVert v \rVert = 1$.
+
+Dla L2 jest to okrąg. Dla L-nieskończoności kwadrat, bo warunek dotyczy
+największej składowej, a pozostałe są wolne.
+
+A czym jest dla L1?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Kwadratem stojącym na rogu \dash{} rombem, z wierzchołkami na osiach.
+\end{ansblock}
+
+Ten romb jest całym argumentem o rzadkości i warto być precyzyjnym co do tego,
+dlaczego, bo argument cytuje się zwykle jako hasło.
+
+Minimalizacja straty przy małej normie oznacza szukanie, gdzie warstwice straty
+po raz pierwszy dotkną kuli. Kula L2 jest okrągła, więc można jej dotknąć pod
+dowolnym kątem i punkt styczności nie ma powodu leżeć na osi. Kula L1 okrągła
+nie jest: ma rogi, a jej rogi to dokładnie punkty, w których wszystkie
+współrzędne poza jedną są zerowe.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{Rzadkość L1 jest faktem o kształcie kuli, a nie o wielkości kary.}
+
+Warstwica nadchodząca z ogólnego kierunku spotyka romb w rogu o wiele częściej,
+niż sugerowałby przypadek, a róg jest z konstrukcji wektorem rzadkim. Zwiększ
+karę w zadaniu L2, a wszystkie współczynniki kurczą się razem, docierając do
+zera dopiero w granicy; zwiększ ją w zadaniu L1, a współczynniki osiągają
+dokładne zero jeden po drugim.
+
+Więc \enquote{L1 daje rzadkość} nie jest regułą, którą ktoś znalazł
+doświadczalnie. To stwierdzenie o rogach i byłoby prawdziwe także wtedy, gdyby
+wymienić optymalizator.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jedna konsekwencja warta zapamiętania, bo tłumaczy pewną klasę mylących
+pomiarów.
+
+Trzy normy nie porządkują wektorów tak samo. Weź $a = (3, -4)$ i
+$b = (5, 0)$: który jest większy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Przy L2 są równe, po $5$. Przy L1 większy jest $a$, $7$ do $5$. Przy
+L-nieskończoności większy jest $b$, $5$ do $4$.
+\end{ansblock}
+
+Trzy normy, trzy różne odpowiedzi, jedna para wektorów i żadna z nich nie jest
+błędna. \textbf{\enquote{Większy} nie jest własnością pary wektorów, dopóki nie
+zostanie nazwana norma.}
+
+To ten sam kształt co ustalenie Programu~\ref{prog:F09} o najbliższym i
+najbardziej podobnym, o poziom wyżej: tam dwie miary nie zgadzały się co do
+tego, który z dwóch wektorów jest bliżej, tu trzy miary nie zgadzają się co do
+tego, który jest większy, i w obu przypadkach niezgoda jest miarami robiącymi
+swoje.
+\end{fr}
+
+% ============================================================
+\section{Rzutowanie i co znaczy najbliższy}
+\label{sec:P05-projection}
+\index{projection}
+
+\begin{fr}
+Oto pytanie, którego dwie sekcje temu nie dało się zadać.
+
+Masz wektor $a$ i prostą \dash{} wszystkie wielokrotności pewnego $b$. Który
+punkt tej prostej jest najbliżej $a$?
+
+Warto zauważyć, że jest to minimalizacja po nieskończenie wielu kandydatach i
+że odpowiedzią będzie wzór bez żadnego przeszukiwania. To zdarza się tylko
+wtedy, gdy coś to wymusza, a tym czymś jest ortogonalność.
+\end{fr}
+
+\begin{fr}
+Zapisz kandydata jako $t\,b$, a resztę jako $a - t\,b$. Chcesz tego $t$, przy
+którym reszta jest najkrótsza.
+
+Sztuczka polega na zadaniu innego pytania, a to inne pytanie ma odpowiedź w
+jednej linijce: dla którego $t$ reszta jest \emph{ortogonalna} do $b$?
+
+Przyrównaj $(a - t\,b) \cdot b = 0$ i wyznacz $t$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ t = \frac{a \cdot b}{b \cdot b} \]
+\end{ansblock}
+
+Rozwiń $(a - t\,b) \cdot b = a \cdot b - t\,(b \cdot b)$, przyrównaj do zera i
+podziel \dash{} i podaj warunek, bo $b \cdot b = 0$ tylko dla wektora zerowego,
+który nie jest prostą. To reguła Programu~\ref{prog:F06} o dzieleniu przez
+literę, a dodatniość iloczynu skalarnego jest tym, co ją tu spełnia.
+
+\emph{Rzut} wektora $a$ na $b$ to wtedy $t\,b$ i jest odpowiedzią na
+minimalizację, choć nic jeszcze nie zostało zminimalizowane.
+\end{fr}
+
+\begin{fr}
+Co jest krokiem, wobec którego warto być podejrzliwym. Rozwiązanie warunku
+ortogonalności to nie to samo co rozwiązanie warunku najkrótszej długości, a
+ramka po cichu zamieniła jedno na drugie.
+
+Weź $a = (\val{p05.proj.ax}, \val{p05.proj.ay})$ i $b = (1, 0)$. Wzór daje
+$t = \val{p05.proj.t}$, więc rzut to $(\val{p05.proj.t}, 0)$, a reszta to
+$(0, \val{p05.proj.dist})$.
+
+Dlaczego żaden inny punkt tej prostej nie jest bliżej?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo tak mówi Pitagoras, a kąt prosty jest tym, co pozwala go zastosować.
+\end{ansblock}
+
+Każdy inny punkt prostej to $t\,b$ dla innego $t$, a odległość od $a$ do niego
+jest przeciwprostokątną trójkąta prostokątnego, którego przyprostokątnymi są
+reszta i odległość wzdłuż prostej. Przeciwprostokątna jest dłuższa od każdej
+przyprostokątnej, chyba że ta druga jest zerowa.
+
+Więc prostopadła nie jest konstrukcją, która akurat działa. \textbf{Jest
+najkrótszą odległością, a ortogonalność jest powodem, a nie zbiegiem
+okoliczności na obrazku.}
+\end{fr}
+
+\mermaidfig{p05-closest-point}{Dlaczego prostopadła jest najkrótszą drogą do
+prostej.}{czemu prostopadla jest najblizej}
+
+\begin{fr}
+\begin{note}
+Skrypt nie przyjmuje tego argumentu na wiarę. Przechodzi
+$\val{p05.proj.sweep}$ punktów wzdłuż prostej i potwierdza, że żaden nie jest
+bliżej niż rzut, a osobno, że iloczyn skalarny reszty z $b$ jest zerowy z
+dokładnością do $10^{-12}$.
+
+Sens robienia obu jest taki, że wzór zgadzający się sam ze sobą nie jest
+dowodem. Twierdzenie na stronie brzmi \enquote{najbliższy}, więc sprawdzane
+jest to, co najbliższe.
+\end{note}
+\end{fr}
+
+\begin{fr}
+I powód, dla którego zasługuje to na własną sekcję, a nie na wzór.
+
+Wyprowadzenie użyło trzech własności iloczynu skalarnego i niczego więcej.
+Żadnego obrazka, żadnych dwóch wymiarów, żadnego trójkąta prostokątnego
+narysowanego na papierze. Więc ten sam wzór rzutuje na prostą w $\val{f09.dim}$
+wymiarach, i na podprzestrzeń zamiast na prostą, i \dash{} gdy przyjdzie
+Program~\ref{prog:P08} \dash{} na przestrzeń kolumn macierzy, czyli na to, czym
+są najmniejsze kwadraty.
+
+Każde z nich to te same trzy linijki z większym obiektem w środku.
+\end{fr}
+
+% ============================================================
+\section{Która miara i co rozstrzyga normalizacja}
+\label{sec:P05-choosing}
+\index{cosine similarity}
+
+\begin{fr}
+Program~\ref{prog:F09} zostawił pytanie otwarte i je nazwał.
+
+Wziął zapytanie wzdłuż $(1, 0)$ i dwóch kandydatów: jednego krótkiego,
+wskazującego prawie dokładnie właściwie, i jednego mniej więcej długości
+zapytania, wskazującego gorzej. Kosinus wolał pierwszego, a odległość drugiego
+i żadne nie było błędne. Czego F09 nie mógł zrobić, to powiedzieć, którego
+wybrać, bo wybór wymaga słownika, który ten program już zbudował.
+
+Oto trzy liczby dla tej samej pary.
+\end{fr}
+
+\begin{fr}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+& długość & iloczyn skalarny & kosinus \\
+\midrule
+$A$ & $\val{p05.norm.len.a}$ & $\val{p05.norm.dot.a}$ & $\val{p05.norm.cos.a}$ \\
+$B$ & $\val{p05.norm.len.b}$ & $\val{p05.norm.dot.b}$ & $\val{p05.norm.cos.b}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Iloczyn skalarny woli $B$, a kosinus $A$, dokładnie tak, jak znalazł F09.
+Spójrz na pierwszą kolumnę i powiedz, co iloczyn skalarny robi, a kosinus nie.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Mnoży przez długość.
+\end{ansblock}
+
+$a \cdot b = \lVert a \rVert \lVert b \rVert \cos\theta$, więc iloczyn skalarny
+to kosinus z obiema długościami w środku. $B$ wygrywa na iloczynie skalarnym,
+bo ma długość $\val{p05.norm.len.b}$, podczas gdy $A$ ma
+$\val{p05.norm.len.a}$, a ten czynnik około trzech przykrywa preferencję
+kosinusa.
+
+\textbf{Więc te dwie miary nie są rywalkami. Jedna jest drugą pomnożoną przez
+coś, a pytanie brzmi wyłącznie, czy chcesz to coś mieć w odpowiedzi.}
+\end{fr}
+
+\begin{fr}
+Co zamienia wybór w pytanie o twoje dane, a nie w pytanie o geometrię.
+
+Długość zanurzenia nie jest ozdobą. Zależnie od modelu może śledzić, jak częsty
+jest token, jak pewny był koder albo ile tekstu weszło. Czasem jest to sygnał,
+który chcesz mieć w rankingu. Czasem znaczy, że twoje wyszukiwanie po cichu
+woli długie dokumenty.
+
+\textbf{Zapytaj, co znaczy długość w twoich zanurzeniach, i porządkuj po
+iloczynie skalarnym, jeśli znaczy coś, czego chcesz, a po kosinusie, jeśli
+nie.} To cała decyzja i nie da się jej podjąć na podstawie wzorów.
+\end{fr}
+
+\begin{fr}
+Teraz działanie, po które sięga się zamiast po decyzję.
+
+\emph{Normalizacja} zastępuje każdy wektor przez $v / \lVert v \rVert$, który
+ma długość jeden i ten sam kierunek. Zrób to obu argumentom i policz iloczyn
+skalarny. Co dostajesz?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Kosinus, dokładnie \dash{} mianownik jest już jedynką.
+\end{ansblock}
+
+Sprawdzone na $\val{p05.norm.identity.trials}$ losowych parach w wymiarach od
+dwóch do sześćdziesięciu czterech: największa niezgodność to
+$\val{p05.norm.identity.err}$, czyli zaokrąglenie, a nie różnica.
+
+Więc normalizacja nie sprawia, że iloczyn skalarny \emph{zachowuje się jak}
+kosinus. Sprawia, że oba zapytania są \textbf{tym samym zapytaniem}, a po niej
+nie ma już między czym wybierać.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{Normalizacja nie jest naprawą. Jest decyzją, podjętą po cichu, żeby
+wyrzucić długości.}
+
+Przeczytaj to zdanie tak, a przestaje być krokiem przygotowania danych i staje
+się decyzją modelową: zadeklarowałeś, że nic, co twoje zanurzenia kodują w
+swojej wielkości, nie jest warte porządkowania. To może być całkiem słuszne.
+Nie jest to rzecz, która powinna dziać się w funkcji pomocniczej, której nikt
+nie przejrzał.
+
+Reguła Programu~\ref{prog:F09} jest operacyjną połową tego \dash{} pytanie do
+indeksu podobieństwa nie brzmi, której miary używa, tylko czy wektory do niego
+wchodzące były znormalizowane, bo pierwsze pytanie ma konsekwencje tylko wtedy,
+gdy odpowiedź na drugie brzmi nie.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Co wysoki wymiar naprawdę robi}
+\label{sec:P05-high-dimension}
+\index{vector!in high dimension}
+
+\begin{fr}
+Program~\ref{prog:F09} zakończył tabelą o dwóch kolumnach. Lewa to wszystko, co
+przenosi się do wysokiego wymiaru bez zmian; prawa to trzy twierdzenia, o
+których powiedział, że się nie przenoszą, i odłożył je tutaj z nazwy:
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}X@{}}
+\toprule
+ile kierunków jest daleko od siebie \\
+ile przestrzeni jest blisko środka \\
+jak wygląda \enquote{typowa} para wektorów \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Wszystkie trzy są pytaniami o kąty i długości i dlatego musiały czekać. Weź
+najpierw trzecie: dwa wektory losujemy na płaszczyźnie. Jakiego kąta między
+nimi byś oczekiwał?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dowolnego. Na płaszczyźnie kąt między dwoma losowymi kierunkami jest
+jednostajny, więc nie ma wartości oczekiwanej wartej tej nazwy.
+\end{ansblock}
+
+To uczciwa odpowiedź w dwóch wymiarach i dlatego \enquote{typowa} brzmi jak
+słowo bez treści. Każdy kąt jest tak samo prawdopodobny jak każdy inny, więc
+typowa para jest niczym szczególnym.
+
+Teraz to samo pytanie w $\val{f09.dim}$ wymiarach, i odpowiedź jest zupełnie
+inna.
+\end{fr}
+
+\begin{fr}
+Oto pomiar. $\val{p05.pairs}$ losowych par wektorów jednostkowych w każdym z
+sześciu wymiarów, z rozrzutem ich kosinusów:
+
+\transcript{p05-spread}
+
+Zanim przeczytasz następną ramkę: te cztery liczby to $\val{p05.cos.sd.2}$,
+$\val{p05.cos.sd.10}$, $\val{p05.cos.sd.100}$ i $\val{p05.cos.sd.768}$.
+Powiedz, jakiej regule podlegają.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Każda to $1/\sqrt{d}$.}
+$1/\sqrt{2} = \num{0.707}$, $1/\sqrt{10} = \num{0.316}$, $1/\sqrt{100} = \num{0.100}$,
+$1/\sqrt{768} = \num{0.036}$. Zmierzone wobec przewidzianego: największa niezgodność
+w całym zakresie to $\val{p05.sd.err.pct}\%$.
+
+To właśnie sprawdza skrypt, a nie którąkolwiek z tych liczb: konkretny
+zmierzony kosinus jest zmienną losową i ruszyłby się razem z ziarnem, a reguła
+nie.
+
+\textbf{Kosinus między dwoma losowymi kierunkami skupia się wokół zera, a
+szerokość tego skupienia to $1/\sqrt{d}$.}
+\end{fr}
+
+\begin{fr}
+Wyraź to w stopniach, bo tam przestaje być statystyką, a zaczyna zaskakiwać.
+
+Na sto losowych par kierunków przy $\val{f09.dim}$ wymiarach ile z nich
+mieściłoby się, według ciebie, w pięciu stopniach od kąta prostego?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p05.deg.within.768}$ z nich.}
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+$d$ & $2$ & $10$ & $100$ & $\val{f09.dim}$ \\
+\midrule
+w $5^{\circ}$ od $90^{\circ}$ & $\val{p05.deg.within.2}\%$ &
+  $\val{p05.deg.within.10}\%$ & $\val{p05.deg.within.100}\%$ &
+  $\val{p05.deg.within.768}\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Przy $\val{f09.dim}$ wymiarach $\val{p05.deg.within.768}\%$ losowych
+par mieści się w pięciu stopniach od prostopadłości.} Na płaszczyźnie jest to
+$\val{p05.deg.within.2}\%$.
+\end{fr}
+
+\mermaidfig{p05-spread-shrinks}{Czemu typowa para staje się czymś konkretnym,
+gdy wymiar rośnie.}{rozrzut maleje z d}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{Więc podobieństwo kosinusowe $\num{0.3}$ między dwoma zanurzeniami nie jest
+\enquote{słabo podobne}. Jest ogromne.}
+
+Przy $\val{f09.dim}$ wymiarach rozrzut wynosi $\val{p05.cos.sd.768}$, więc
+kosinus $\num{0.3}$ leży jakieś osiem takich rozrzutów od tego, co daje przypadek.
+Czytany na intuicji dwuwymiarowej \dash{} gdzie $\num{0.3}$ to dość otwarty kąt i
+znaczy niewiele \dash{} wygląda na słaby sygnał, a nie jest niczym takim.
+
+Poprawka nie polega na zapamiętaniu progu. Polega na podzieleniu przez
+$1/\sqrt{d}$ i zapytaniu, ile rozrzutów od środka jesteś, co jest pytaniem
+mającym odpowiedź w każdym wymiarze.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Drugie z trójki F09 i to, które brzmi najmniej prawdopodobnie.
+
+Punkt losujemy jednostajnie z kuli o promieniu $1$ w $d$ wymiarach. Ułamek
+objętości kuli w promieniu $r$ to $r^{d}$, o czym warto się przekonać przed
+pójściem dalej: podwojenie długości mnoży pole przez cztery, a objętość przez
+osiem, i $d$ idzie dalej.
+
+Jaki więc ułamek objętości leży w zewnętrznej dziesiątej części promienia
+\dash{} między $\num{0.9}$ a $1$ \dash{} gdy $d = 1$, a gdy $d = 10$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p05.shell.outer.1}\%$ i $\val{p05.shell.outer.10}\%$.
+\end{ansblock}
+
+$1 - \num{0.9}^{1}$ i $1 - \num{0.9}^{10}$. Na prostej zewnętrzna dziesiąta część jest
+dziesiątą częścią, co jest odpowiedzią, którą daje intuicja każdego, a przy
+dziesięciu wymiarach są to już dwie trzecie.
+
+Przy $\val{f09.dim}$ wartą wypisania liczbą jest dopełnienie, bo sam ułamek
+zaokrągla się do stu procent i w tej postaci byłby kłamstwem: wewnętrzne
+dziewięć dziesiątych promienia mieści $\val{p05.shell.inner.768}$ kuli.
+\textbf{Zasadniczo cała kula w wysokim wymiarze jest w swojej skórze.}
+\end{fr}
+
+\begin{fr}
+\begin{note}
+Te liczby są policzone, a nie wylosowane, i powód jest ten sam, który ta
+książka podaje dla nietwierdzenia rzeczy, których nie uruchomiła.
+
+Wewnętrzna połowa promienia mieści $\val{p05.shell.half.768}$ kuli o
+$\val{f09.dim}$ wymiarach. Żadna próbka żadnej wielkości, jaką ktokolwiek
+uruchomi, nie umieści tam punktu, więc oszacowanie z próbki zwróciłoby zero
+\dash{} a nieznalezienie niczego nie jest tym samym co zmierzenie niczego, co
+jest kształtem twierdzenia niezdolnego do porażki.
+\end{note}
+\end{fr}
+
+\begin{fr}
+I trzecie, czyli dług, który Program~\ref{prog:P04} nazwał wprost.
+
+P04 udowodnił, że co najwyżej $d$ wektorów może być wzajemnie ortogonalnych w
+$d$ wymiarach, i zatrzymał się, mówiąc, że rozluźnienie \emph{dokładnie}
+ortogonalnych do \emph{prawie} ortogonalnych wymaga sposobu mierzenia
+\enquote{prawie}, i to właśnie ten program budował.
+
+Rozluźnij więc. Nazwij dwa kierunki prawie ortogonalnymi, gdy ich kosinus co do
+wartości bezwzględnej jest poniżej $\val{p05.near.tol}$. Ile może być
+wzajemnie prawie ortogonalnych w $64$ wymiarach \dash{} więcej niż $64$ czy
+mniej?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Mniej. Około $\val{p05.near.n.64}$.}
+Nie jest to odpowiedź, której prawie ktokolwiek się spodziewa, a szkic tego
+programu twierdził coś przeciwnego, zanim skrypt to obalił.
+
+Powodem jest poprzednia sekcja. Przy $d = 64$ rozrzut wynosi
+$1/\sqrt{64} = \num{0.125}$, więc tolerancja $\val{p05.near.tol}$ leży ledwie
+półtora rozrzutu od środka, a losowa para łamie ją w $\val{p05.near.tail.64}$
+przypadków. Zażądaj, żeby cały zbiór kierunków mieścił się w niej parami, a
+zabraknie ci ich niemal natychmiast.
+
+\textbf{Przy $64$ wymiarach \enquote{prawie ortogonalny} przy tej tolerancji
+jest wymaganiem trudniejszym niż \emph{dokładna} ortogonalność, a nie
+łatwiejszym.}
+\end{fr}
+
+\begin{fr}
+I to jest ramka, którą hasło pomija.
+
+\enquote{Wysoki wymiar daje wykładniczo wiele prawie ortogonalnych kierunków}
+jest prawdziwym wynikiem i cytuje się go bez jego warunku. Warunek brzmi, że
+tolerancja musi leżeć kilka rozrzutów od środka, a rozrzut to $1/\sqrt{d}$,
+więc to, czy dana tolerancja jest hojna czy wymagająca, zależy od wymiaru.
+
+Istnieje więc próg: poniżej niego rozluźnienie nie daje nic, powyżej pojemność
+ucieka. Przy tolerancji $\val{p05.near.tol}$ w jakim mniej więcej wymiarze on
+leży?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$d = \val{p05.near.cross}$, gdzie tolerancja leży
+$\val{p05.near.cross.sigmas}$ rozrzutu od środka.}
+Powyżej niego liczby przestają być porównywalne z $d$ w ogóle:
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+$d$ & $64$ & $\val{f09.dim}$ & $4096$ \\
+\midrule
+$P(\lvert\cos\rvert > \val{p05.near.tol})$ & $\val{p05.near.tail.64}$ &
+  $\val{p05.near.tail.768}$ & $\val{p05.near.tail.4096}$ \\
+pojemność & $\val{p05.near.n.64}$ & $\val{p05.near.n.768}$ &
+  $\val{p05.near.n.4096}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Przy $\val{f09.dim}$ wymiarach jest to około $\val{p05.near.mult.768}$ razy
+$d$. Przy $4096$, gdzie dokładnie $4096$ kierunków jest wzajemnie
+ortogonalnych, mniej więcej $\val{p05.near.n.4096}$ mieści się w
+$\val{p05.near.tol}$ od tego.
+
+\textbf{Ta luka jest tym, czego P04 nie mógł zmierzyć, i dlatego jego
+ograniczenie zliczeniowe ogranicza o wiele mniej, niż się wydaje.}
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+\textbf{Liczby pojemności są oszacowaniem uzyskanym jednym konkretnym
+sposobem, a sposób ma znaczenie.}
+
+Pochodzą z ograniczenia sumacyjnego: wylosuj $n$ kierunków, a oczekiwana liczba
+par bliższych niż tolerancja to $\binom{n}{2}$ razy prawdopodobieństwo dla
+jednej pary, więc największe $n$, przy którym zostaje ono poniżej jedynki, jest
+rozmiarem, jakiego można oczekiwać z losowania. Świadoma konstrukcja poradzi
+sobie lepiej, a prawdziwe maksimum przy danej tolerancji to znany trudny
+problem teorii kodowania, w który ta książka nie wchodzi.
+
+Czym to nie jest, to wynikiem przeszukiwania. Pierwsza wersja tego pomiaru
+losowała kierunki i zachowywała te, które pasowały, i podawała \emph{mniej} niż
+$d$ przy $d = 64$ z powodu niemającego nic wspólnego z geometrią: akceptacja
+spada, gdy zbiór zachowanych rośnie, więc zachłanne przeszukiwanie grzęźnie
+długo przed przestrzenią. Mierzyło przeszukiwanie. Prawdopodobieństwo ogona
+powyżej jest dokładne.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Ostatnia ramka, i jest o tym, co czytelnik potrafi teraz, a F09 nie potrafił.
+
+F09 powiedział, że jego prawa kolumna to inna klasa pytań, i nazwał trzy z
+nich. Wszystkie trzy mają teraz liczby: typowa para mieści się w pięciu
+stopniach od prostopadłości w $\val{p05.deg.within.768}\%$ przypadków przy
+$\val{f09.dim}$ wymiarach, zasadniczo cała kula jest w swojej skórze, a liczba
+prawie ortogonalnych kierunków zależy od tolerancji mierzonej względem
+$1/\sqrt{d}$, a nie od samego wymiaru.
+
+Każde z nich wzięło się z jednego działania zwracającego liczbę, dodanego do
+przestrzeni, która miała tylko dodawanie i skalowanie. Program~\ref{prog:P06}
+dodaje następny obiekt i wzorzec się powtarza: jedna definicja, a bardzo wiele
+z niej wynika.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Przestrzeń liniowa z dwoma działaniami nie wyrazi
+  rozmiaru ani kierunku.} Prostopadły, najbliższy, jednostkowej długości, baza
+  ortogonalna \dash{} nic z tego. Dlatego Program~\ref{prog:P04} nigdy nie
+  używał tych słów, a Program~\ref{prog:F09} używał ich swobodnie: F09 był w
+  $\R^{n}$ z założoną arytmetyką, P04 dowodził rzeczy o przestrzeniach w
+  ogóle.}
+\sumitem{3--5}{\textbf{Iloczyn skalarny} zwraca jedną liczbę z dwóch wektorów,
+  jest symetryczny, liniowy w każdym argumencie i ma $a \cdot a > 0$ dla
+  każdego niezerowego $a$. \textbf{Długość jest z niego zdefiniowana},
+  $\lVert a \rVert = \sqrt{a \cdot a}$, a nie odwrotnie \dash{} inny iloczyn
+  skalarny daje przestrzeni inne długości.}
+\sumitem{6--9}{Dwa wektory są \textbf{ortogonalne}, gdy ich iloczyn skalarny
+  wynosi zero, a ta definicja nigdy nie wspomina obrazka, więc jest jedynym
+  kawałkiem geometrii przenoszącym się do każdego wymiaru bez zmian.
+  Wyznaczenie $\cos\theta$ z tożsamości F08 zmienia ją z raportu w
+  \textbf{definicję} kąta.}
+\sumitem{10--11}{\textbf{Trzy normy, trzy pytania.} L1 to ile wzdłuż osi, L2
+  ile w linii prostej, L-nieskończoność jak zła jest najgorsza składowa; dla
+  $(3, -4)$ jest to $7$, $5$ i $4$. Tylko L2 pochodzi z iloczynu skalarnego i
+  dlatego tylko L2 ma kąty.}
+\sumitem{12--14}{\textbf{Kula L1 jest rombem, a jej rogi są całym argumentem o
+  rzadkości}: róg to punkt, w którym wszystkie współrzędne poza jedną są zerowe,
+  a warstwica nadchodząca z ogólnego kierunku spotyka romb właśnie tam. To
+  stwierdzenie o kształcie, a nie o wielkości kary.}
+\sumitem{15--16}{Trzy normy \textbf{nie porządkują wektorów tak samo}:
+  $(3,-4)$ i $(5,0)$ są równe przy L2, a każdy jest większy od drugiego przy
+  jednej z pozostałych. \enquote{Większy} nie jest własnością pary wektorów,
+  dopóki nie zostanie nazwana norma.}
+\sumitem{17--21}{\textbf{Rzut} wektora $a$ na $b$ to $t\,b$ z $t = (a \cdot
+  b)/(b \cdot b)$, uzyskane przez zażądanie, by reszta była ortogonalna do $b$
+  \dash{} i jest to \emph{najbliższy} punkt, bo Pitagoras czyni
+  przeciwprostokątną dłuższą od przyprostokątnej. Wyprowadzenie używa tylko
+  trzech własności iloczynu skalarnego, więc działa w każdym wymiarze i na
+  każdej podprzestrzeni.}
+\sumitem{24--26}{\textbf{Iloczyn skalarny to kosinus z obiema długościami w
+  środku.} Nie zgadzają się tylko wtedy, gdy długości się różnią, a wybór
+  między nimi jest pytaniem o to, co twoje zanurzenia kodują w swojej
+  wielkości, na co wzory nie odpowiedzą.}
+\sumitem{27--30}{\textbf{Normalizacja czyni z obu zapytań jedno zapytanie}, z
+  dokładnością do $\val{p05.norm.identity.err}$ na
+  $\val{p05.norm.identity.trials}$ parach. Nie jest więc krokiem przygotowania
+  danych \dash{} jest podjętą po cichu decyzją o wyrzuceniu długości.}
+\sumitem{31--37}{\textbf{Kosinus między dwoma losowymi kierunkami skupia się
+  wokół zera z rozrzutem $1/\sqrt{d}$}, zmierzone z dokładnością do
+  $\val{p05.sd.err.pct}\%$ w trzech rzędach wielkości. Przy $\val{f09.dim}$
+  wymiarach $\val{p05.deg.within.768}\%$ par mieści się w pięciu stopniach od
+  kąta prostego, wobec $\val{p05.deg.within.2}\%$ na płaszczyźnie \dash{} więc
+  kosinus $\num{0.3}$ leży jakieś osiem rozrzutów od środka i jest ogromny.}
+\sumitem{38--40}{\textbf{Zasadniczo cała kula w wysokim wymiarze jest w swojej
+  skórze}: ułamek wewnątrz promienia $r$ to $r^{d}$, więc wewnętrzne dziewięć
+  dziesiątych promienia mieści $\val{p05.shell.inner.768}$ kuli o
+  $\val{f09.dim}$ wymiarach. Policzone, a nie wylosowane, bo żadna próbka nigdy
+  by tam nie trafiła.}
+\sumitem{41--45}{\textbf{\enquote{Prawie ortogonalny} nie jest automatycznie
+  tańszy niż ortogonalny.} Przy $d = 64$ i tolerancji $\val{p05.near.tol}$
+  pojemność to $\val{p05.near.n.64}$, poniżej $64$ dokładnych, bo tolerancja
+  leży ledwie półtora rozrzutu od środka. Próg jest przy
+  $d = \val{p05.near.cross}$; powyżej pojemność ucieka, do jakichś
+  $\val{p05.near.n.4096}$ przy $4096$ wymiarach. \textbf{Hasło jest prawdziwe
+  powyżej progu i zawsze cytowane bez niego.}}
+\end{summarybox}
+
+% ============================================================
+\begin{testexercises}
+\item Podaj trzy własności, jakie musi mieć iloczyn skalarny, i powiedz, która
+  z nich czyni z $\sqrt{a \cdot a}$ długość.
+  \answerto{Symetria, liniowość w każdym argumencie i $a \cdot a > 0$ dla
+  każdego niezerowego $a$. Ta trzecia: bez niej niezerowy wektor mógłby mieć
+  zerową długość, a \enquote{najbliższy} przestałby cokolwiek znaczyć.}
+\item Policz normy L1, L2 i L-nieskończoność wektora $(2, -3, 6)$.
+  \answerto{$11$, $7$ i $6$. Norma L2 to $\sqrt{4 + 9 + 36} = \sqrt{49}$, co
+  jest tu dokładne z konstrukcji.}
+\item Powiedz, dlaczego tylko norma L2 ma doczepione pojęcie kąta.
+  \answerto{Bo tylko L2 pochodzi z iloczynu skalarnego, a kąt jest zdefiniowany
+  z iloczynu skalarnego. L1 i L-nieskończoność mierzą rozmiar, nigdy nie
+  wytwarzając liczby z \emph{pary} wektorów.}
+\item Zrzutuj $(2, 5)$ na prostą przez $(1, 1)$ i podaj resztę.
+  \answerto{$t = (2 + 5)/(1 + 1) = \num{3.5}$, więc rzut to $(\num{3.5}, \num{3.5})$, a reszta to
+  $(-\num{1.5}, \num{1.5})$. Jej iloczyn skalarny z $(1, 1)$ wynosi zero, i to jest
+  sprawdzenie.}
+\item Powiedz, dlaczego rzut jest najbliższym punktem prostej, a nie po prostu
+  punktem na niej.
+  \answerto{Reszta jest prostopadła do prostej, więc odległość do każdego
+  innego punktu prostej jest przeciwprostokątną trójkąta prostokątnego z resztą
+  jako przyprostokątną. Przeciwprostokątna jest dłuższa, chyba że druga
+  przyprostokątna jest zerowa.}
+\item Dwa kandydujące wektory mają ten sam kosinus z zapytaniem i różne
+  długości. Powiedz, który woli iloczyn skalarny i dlaczego.
+  \answerto{Dłuższy, bo $a \cdot b = \lVert a \rVert \lVert b \rVert
+  \cos\theta$ ma w sobie obie długości. Kosinus nie rozróżni ich w ogóle.}
+\item Ktoś normalizuje zanurzenia zasilające indeks po iloczynie skalarnym.
+  Powiedz, co się zmieniło i jaka decyzja zapadła.
+  \answerto{Iloczyn skalarny i kosinus stały się tym samym zapytaniem. Zapadła
+  decyzja, że nic, co zanurzenia kodują w swojej wielkości, nie jest warte
+  porządkowania \dash{} co może być słuszne i jest wyborem modelowym, a nie
+  krokiem przygotowania danych.}
+\item Podaj rozrzut kosinusa między dwoma losowymi wektorami jednostkowymi w
+  $d$ wymiarach i użyj go, żeby powiedzieć, jak nietypowy jest kosinus $\num{0.3}$
+  przy $\val{f09.dim}$ wymiarach.
+  \answerto{Rozrzut to $1/\sqrt{d}$, czyli tutaj $\val{p05.cos.sd.768}$, więc
+  $\num{0.3}$ leży jakieś osiem rozrzutów od środka. Daleko mu do słabego: jak na
+  standardy tej przestrzeni to bardzo duże podobieństwo.}
+\item Podaj, jaki ułamek kuli o $d$ wymiarach leży w promieniu $r$, i co to
+  daje dla wewnętrznych dziewięciu dziesiątych przy $\val{f09.dim}$ wymiarach.
+  \answerto{$r^{d}$, więc wewnętrzne dziewięć dziesiątych mieści $\num{0.9}^{768} =
+  \val{p05.shell.inner.768}$ objętości. Zasadniczo cała kula jest w swojej
+  najbardziej zewnętrznej skórze.}
+\item Przy $d = 64$ i tolerancji $\val{p05.near.tol}$: więcej czy mniej niż
+  $64$ kierunków może być wzajemnie prawie ortogonalnych? Podaj powód.
+  \answerto{Mniej \dash{} około $\val{p05.near.n.64}$. Rozrzut przy $d = 64$ to
+  $\num{0.125}$, więc tolerancja leży ledwie półtora rozrzutu od środka, a losowa
+  para łamie ją często. Rozluźnienie staje się tanie dopiero powyżej
+  $d = \val{p05.near.cross}$.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Pokaż, że $\lVert a + b \rVert^{2} = \lVert a \rVert^{2} + 2(a \cdot b) +
+  \lVert b \rVert^{2}$, wprost z definicji normy.
+  \answerto{Zapisz lewą stronę jako $(a+b) \cdot (a+b)$ i rozwiń, korzystając z
+  liniowości w każdym argumencie i z symetrii. Podstawienie $a \cdot b = 0$
+  odtwarza Pitagorasa, i dlatego ortogonalność i kąt prosty to jedno
+  stwierdzenie.}
+\item Pokaż, że normalizacja obu wektorów zrównuje iloczyn skalarny z
+  kosinusem.
+  \answerto{Kosinus to $(a \cdot b)/(\lVert a \rVert \lVert b \rVert)$, a po
+  normalizacji obie długości wynoszą $1$, więc mianownik jest $1$. Z różnicy
+  nie zostaje nic.}
+\item Wektor ma normę L1 równą $1$ i $d$ składowych. Podaj, ile najwięcej i ile
+  najmniej może wynosić jego norma L2.
+  \answerto{Najwięcej $1$, gdy jedna składowa niesie wszystko; najmniej
+  $1/\sqrt{d}$, gdy wszystkie składowe są równe. Luka między nimi rośnie z $d$,
+  i to jest argument o rzadkości wyrażony jako iloraz.}
+\item Wyjaśnij, dlaczego wyprowadzenie rzutu nigdy nie potrzebowało obrazka, i
+  nazwij jedną rzecz, na którą dzięki temu rzutuje.
+  \answerto{Użyło tylko symetrii, liniowości i dodatniości, a żadna z nich nie
+  wspomina wymiaru. Więc rzutuje na prostą w dowolnej liczbie wymiarów, i na
+  podprzestrzeń, i \dash{} gdy przyjdzie Program~\ref{prog:P08} \dash{} na
+  przestrzeń kolumn macierzy, czyli na najmniejsze kwadraty.}
+\item Dwa losowe wektory jednostkowe losujemy w $d$ wymiarach. Powiedz, jak
+  zachowuje się oczekiwany kąt między nimi, gdy $d$ rośnie, i co się nie
+  zmienia.
+  \answerto{Skupia się wokół kąta prostego, z rozrzutem $1/\sqrt{d}$. Nie
+  zmienia się sam oczekiwany kosinus, który jest zerowy w każdym wymiarze
+  \dash{} to \emph{rozrzut} się kurczy, i na tym polega cały efekt.}
+\item Kolega mówi, że wysoki wymiar daje wykładniczo wiele prawie ortogonalnych
+  kierunków. Podaj warunek, którego brakuje w tym zdaniu.
+  \answerto{Że tolerancja musi leżeć kilka rozrzutów od środka, a rozrzut to
+  $1/\sqrt{d}$. Poniżej progu \dash{} $d = \val{p05.near.cross}$ przy
+  tolerancji $\val{p05.near.tol}$ \dash{} rozluźnienie daje mniej kierunków niż
+  dokładna ortogonalność.}
+\item Powiedz, dlaczego liczby pojemności w tym programie są ograniczeniem od
+  dołu, a nie maksimum.
+  \answerto{Pochodzą z ograniczenia sumacyjnego na \emph{losowe} losowania:
+  największe $n$, przy którym oczekiwana liczba zbyt bliskich par zostaje
+  poniżej jedynki. Świadoma konstrukcja upakuje więcej, a prawdziwe maksimum to
+  trudny problem teorii kodowania, w który ta książka nie wchodzi.}
+\item Pierwsza próba tego pomiaru losowała kierunki zachłannie i zachowywała
+  te, które pasowały. Powiedz, dlaczego podała mniej niż $d$ przy $d = 64$ i co
+  naprawdę mierzyła.
+  \answerto{Akceptacja spada, gdy zbiór zachowanych rośnie, bo nowy kierunek
+  musi przejść przy każdym zachowanym naraz, więc przeszukiwanie grzęźnie długo
+  przed geometrią. Mierzyło przeszukiwanie, a nie przestrzeń \dash{} i dlatego
+  podana liczba pochodzi z dokładnego prawdopodobieństwa ogona.}
+\end{furtherproblems}
