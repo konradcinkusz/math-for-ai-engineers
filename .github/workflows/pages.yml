@@ -85,10 +85,13 @@ jobs:
           SRC=(figures/mermaid/*/*.mmd)
           [ ${#SRC[@]} -eq 0 ] && exit 0
           printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
+          # Installed once, and each render carries its own timeout: see the
+          # reasoning in build.yml, which this loop deliberately mirrors.
+          npm install -g @mermaid-js/mermaid-cli@11
           for f in "${SRC[@]}"; do
             lang=$(basename "$(dirname "$f")"); key=$(basename "$f" .mmd)
             mkdir -p "figures/diagrams/$lang"
-            npx -y @mermaid-js/mermaid-cli@11 \
+            timeout 180 mmdc \
               -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
               -p .puppeteer.json -c figures/mermaid/config.json \
               -b transparent --pdfFit

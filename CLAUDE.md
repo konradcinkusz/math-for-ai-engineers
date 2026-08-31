@@ -943,6 +943,39 @@ Each cost time; none is obvious from its error message.
   \dash{} are **not** in this class: they are exact everywhere and must stay
   as figures.
 
+- **A background `sleep` is not a wait, and reading repeated identical poll
+  results as elapsed time is how you invent a failure that never happened.**
+  During P14's CI run five successive polls of the diagrams job returned
+  `in_progress`, and each poll was preceded by a `sleep` started **in the
+  background** \dash{} which returns immediately. Almost no wall time passed.
+  The five identical answers were read as thirty minutes, a hang was diagnosed
+  against a job whose comparable runs finish in seven, and a workflow change
+  was written and pushed on that basis. `date -u` said 5.7 minutes.
+
+  It is this repository's own recurring defect wearing new clothes: **a
+  measurement taken from a misread instrument**, exactly like the CI vbox
+  chased into the answers appendix because a page number was read as a
+  distance from the end. The rule is the same one, and it is cheap: **before
+  concluding anything from elapsed time, ask the clock.** A status that has
+  not changed is not evidence that time has passed.
+
+- **A timeout belongs at the granularity you want the failure reported at.**
+  This one is worth keeping on its own reasoning, separately from the false
+  alarm above that produced it. The diagrams job renders every Mermaid source
+  in one step behind a single 25-minute `timeout-minutes`; one wedged headless
+  Chromium would spend the whole budget and report only *the diagrams job
+  timed out*, naming neither the diagram nor the reason. Each render now
+  carries `timeout 180` and reports the file it was rendering. That is the
+  argument that put `timeout-minutes` on every job, applied one level down.
+
+  In the same place: the loop called `npx -y @mermaid-js/mermaid-cli@11`
+  **once per diagram**, paying package resolution over a hundred and sixty
+  times and growing by six per program. It installs once now. All three
+  workflows carry the same loop and all three were changed, on the
+  `$(COMPUTED)` principle already recorded here. The Makefile's per-target
+  `npx` is deliberately untouched \dash{} a local build is watched by a person
+  who can see it hang.
+
 - **A CI job with no `timeout-minutes` reports nothing when it hangs, for six
   hours.** The numbers job sat \enquote{in progress} for most of an afternoon
   on a step that takes half a minute on a laptop, with every other job green
