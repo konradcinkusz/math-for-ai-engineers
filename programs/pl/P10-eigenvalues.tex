@@ -1,33 +1,1022 @@
-%% P10 --- Wartości własne, formy kwadratowe i dodatnia określoność
+%% P10 --- Wartosci wlasne, formy kwadratowe i dodatnia okreslonosc
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Blizniak: programs/en/P10-eigenvalues.tex. Ramka w ramke, makro w makro,
+%% liczba w liczbe; tools/parity.py porownuje oba pliki.
+%%
+%% TEZA: wektor wlasny to kierunek, ktory macierz tylko rozciaga; macierz
+%% symetryczna ma pelny prostopadly zestaw takich kierunkow; a wartosci wlasne
+%% formy kwadratowej mowia, czy jest ona misa, siodlem, czy grzbietem.
+%%
+%% P09 PRZEKAZUJE TEN PROGRAM PO IMIENIU, a przekazanie jest obietnica o
+%% arytmetyce: wyznacznik ma byc iloczynem wartosci wlasnych. To jest BRAMKA
+%% MIEDZYPROGRAMOWA liczona wlasna funkcja det() z P09.
+%%
+%% ODWOLANIE W PRZOD, ZADEKLAROWANE: macierz kowariancji definiuje P24. Ten
+%% program potrzebuje dwoch faktow -- symetrii i dodatniej polokreslonosci --
+%% i OBA SA TU DOWODZONE z C = (1/n) X^T X, wiec wskaznik jest przypisaniem,
+%% a nie dlugiem.
 
 \program{Wartości własne, formy kwadratowe i dodatnia określoność}
 \label{prog:P10}
+\index{eigenvalue}
+\index{matrix!positive definite}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--10}{powiedzieć, co czyni kierunek wektorem własnym, i odczytać
+  wyznacznik oraz ślad macierzy z jej wartości własnych}
+\outcome{11--17}{wymienić trzy sposoby, na jakie macierz może nie mieć pełnego
+  zestawu prostopadłych wektorów własnych, z przykładem każdego}
+\outcome{18--23}{powiedzieć, co obiecuje twierdzenie spektralne i o których
+  macierzach to obiecuje}
+\outcome{24--32}{sklasyfikować formę kwadratową ze znaków jej wartości
+  własnych i powiedzieć, o czym mówi \emph{dodatnia określoność}}
+\outcome{33--43}{czytać wartości własne macierzy symetrycznej jako kształt
+  czegoś \dash{} największe rozciągnięcie, jakie warstwa może zastosować, i to,
+  jak wydłużona jest niecka}
+\end{outcomes}
 
-Argument: an eigenvector is a direction the matrix only stretches; a
-symmetric matrix has a full orthogonal set of them (the spectral theorem,
-stated and used, not proved); a quadratic form is a bowl, a saddle or a
-ridge, and its eigenvalues say which. Payoff: a covariance matrix is
-symmetric and positive semi-definite, so PCA is an eigen-decomposition and
-not a black box; the spectral norm as the largest stretch, which is the
-Lipschitz constant that bounds how much a layer can amplify; **the Hessian's
-eigenvalues are the shape of the loss basin**, which is where
-\enquote{ravine}, \enquote{sharp minimum} and \enquote{the learning rate is
-too high} all become one statement \dash{} collected here and spent in P17
-and P20.
+\begin{note}
+\textbf{Dwa fakty pożyczone w przód, i nazwane.} Sekcja 5 używa \emph{macierzy
+kowariancji}, którą definiuje Program~\ref{prog:P24}. Ten program potrzebuje o
+niej dokładnie dwóch rzeczy \dash{} że jest symetryczna i że jest dodatnio
+półokreślona \dash{} i obie są \emph{tutaj dowodzone}, a nie zakładane, z
+jednej linijki $C = \frac{1}{n}X\T X$. Nic więc nie czeka na
+Program~\ref{prog:P24} poza znaczeniem słowa, a wskaźnik jest przypisaniem, a
+nie długiem.
+\end{note}
 
-FORWARD REFERENCE, declared: this program's payoff uses the covariance
-matrix, defined in P24. State the two facts it needs -- that a covariance
-matrix is symmetric and positive semi-definite -- in the Learning outcomes
-with the pointer, exactly as P21 does for its probability prerequisites.
+\begin{quiz}
+\item $A$ posyła wektor $(1,1)$ na $(3,3)$. Czym to czyni $(1,1)$ i czym jest
+  liczba $3$? \teachesat{1--2}
+  \answerto{Wektorem własnym $A$, o wartości własnej $3$. Wzdłuż tego jednego
+  kierunku macierz nie zrobiła nic, czego nie zrobiłaby jedna liczba.}
+\item Macierz $2 \times 2$ ma wartości własne $\val{p10.sym.hi}$ i
+  $\val{p10.sym.lo}$. Podaj jej wyznacznik i ślad. \teachesat{8--9}
+  \answerto{$\val{p10.sym.det}$ i $\val{p10.sym.trace}$. Wyznacznik jest
+  iloczynem wartości własnych, a ślad ich sumą, dla każdej macierzy
+  kwadratowej.}
+\item Co ma macierz z wartością własną równą zeru, w języku
+  Programu~\ref{prog:P08}? \teachesat{9--10}
+  \answerto{Nietrywialne jądro, a więc nie ma odwrotności. Wektor własny tej
+  zerowej wartości to wektor, który macierz posyła na zero.}
+\item Dla których macierzy twierdzenie spektralne obiecuje pełny prostopadły
+  zestaw wektorów własnych? \teachesatone{18}
+  \answerto{Dla symetrycznych, $A\T = A$. To warunek, który da się sprawdzić
+  wzrokiem, i wyklucza naraz wszystkie trzy porażki z sekcji 2.}
+\item Forma kwadratowa ma wartości własne $+5$ i $-2$. Czy istnieje kierunek, w
+  którym jest ujemna? \teachesat{28--29}
+  \answerto{Tak \dash{} wzdłuż drugiego wektora własnego. Przeciwne znaki dają
+  siodło, a forma przyjmuje oba znaki.}
+\item Macierz kowariancji powstaje jako $\frac{1}{n}X\T X$. Czy któraś z jej
+  wartości własnych może być ujemna? \teachesat{39--40}
+  \answerto{Nie. $v\T Cv = \frac{1}{n}\lVert Xv\rVert^{2}$ jest sumą kwadratów,
+  więc macierz jest dodatnio półokreślona, jakiekolwiek były dane.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 65 ramek.
-}
+% ============================================================
+\section{Kierunek, który macierz tylko rozciąga}
+\label{sec:P10-eigenvector}
+\index{eigenvector}
+
+\begin{fr}
+Program~\ref{prog:P09} zamknął się obietnicą. Rząd liczy, ile kierunków
+przeżywa macierz, a wyznacznik mierzy, jak dużo przestrzeni przeżywa \dash{} po
+czym padło, że następne pytanie jest ostrzejsze: nie jak dużo przeżywa, tylko
+\emph{które kierunki przechodzą nieobrócone}.
+
+Oto, co to znaczy. Przyłóż macierz do wektora. Na ogół strzałka, która wychodzi,
+wskazuje gdzieś indziej: macierz i obróciła ją, i przeskalowała.
+
+Weź $A = \begin{pmatrix} 2 & 1 \\ 1 & 2 \end{pmatrix}$ i przyłóż ją do
+$(1, 1)$. Co wychodzi i co jest w tym niezwykłego?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(3, 3)$. Czyli $3 \times (1, 1)$ \dash{} ten sam kierunek, trzy razy dłuższy.
+\end{ansblock}
+
+Macierz obróciła tę strzałkę o kąt zerowy. Dla tego jednego wejścia mogła
+zostać zastąpiona liczbą $3$.
+
+Kierunek o tej własności to \textbf{wektor własny} macierzy, a liczba to jego
+\textbf{wartość własna}. Zapisane:
+\[ Av = \lambda v, \qquad v \ne 0 \]
+a warunek $v \ne 0$ naprawdę pracuje, bo wektor zerowy spełnia to równanie dla
+każdego $\lambda$ i uczyniłby definicję pustą.
+\end{fr}
+
+\begin{fr}
+Nazwy są niepomocne i warto powiedzieć to raz. \emph{Eigen} to po niemiecku
+\emph{własny}: wektor własny to kierunek, który macierz posiada, w tym sensie,
+że nie robi z nim nic poza skalowaniem.
+
+Warte znalezienia są one nie dlatego, że są przypadkami szczególnymi. Chodzi o
+to, że wzdłuż jednego z nich macierz \dash{} obiekt z $n^{2}$ liczbami w środku
+\dash{} zachowuje się dokładnie jak pojedyncza liczba. Wszystko, co trudne w
+macierzy, bierze się z mieszania współrzędnych. Wzdłuż wektora własnego nie
+miesza.
+\end{fr}
+
+\mermaidfig{p10-only-stretched}{Co zostaje, gdy macierz obraca kierunek o kąt
+zerowy.}{definicja wektora wlasnego}
+
+\begin{fr}
+Ta sama macierz ma drugi. Spróbuj $(1, -1)$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Znowu $(1, -1)$ \dash{} wartość własna $\val{p10.sym.lo}$.
+\end{ansblock}
+
+$A$ ma więc dwa wektory własne, o wartościach $\val{p10.sym.hi}$ i
+$\val{p10.sym.lo}$, wskazujące wzdłuż $(1,1)$ oraz $(1,-1)$.
+
+Dwie rzeczy w tej parze warto zauważyć teraz, bo są całą treścią dwóch
+następnych sekcji. Są \textbf{prostopadłe}, a przy tym jest ich \textbf{dwa w
+przestrzeni dwuwymiarowej} \dash{} co na mocy Programu~\ref{prog:P04} czyni je
+bazą.
+\end{fr}
+
+\begin{fr}
+Znajdowanie ich to kawałek algebry, a nie szukanie.
+
+$Av = \lambda v$ mówi $(A - \lambda I)v = 0$ przy $v \ne 0$, więc macierz
+$A - \lambda I$ posyła coś niezerowego na zero. Na mocy
+Programu~\ref{prog:P08} ma zatem jądro, a na mocy Programu~\ref{prog:P09} jej
+wyznacznik wynosi $0$.
+
+Wartości własne to więc dokładnie te $\lambda$, dla których
+$\det(A - \lambda I) = 0$.
+
+Wypisz ten wyznacznik dla ogólnej macierzy $2 \times 2$
+$\begin{pmatrix} a & b \\ c & d \end{pmatrix}$ i pozbieraj potęgi $\lambda$.
+Program~\ref{prog:P09} dał ci potrzebny wzór.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$(a - \lambda)(d - \lambda) - bc = \lambda^{2} - (a + d)\lambda + (ad - bc)$.
+\end{ansblock}
+
+Czyli $\lambda^{2} - (\operatorname{tr}A)\lambda + \det A$, gdzie
+$\operatorname{tr}A$, \textbf{ślad}, to suma przekątnej. Nic nowego nie było
+potrzebne: dwa programy dostarczyły całe wyprowadzenie.
+
+Przyłóż to do przykładowej macierzy, której ślad wynosi $\val{p10.sym.trace}$,
+a wyznacznik $\val{p10.sym.det}$:
+\[ \lambda^{2} - \val{p10.sym.trace}\lambda + \val{p10.sym.det} = 0 \]
+
+Rozwiąż. Umiesz to od Programu~\ref{prog:F06}.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\lambda = \val{p10.sym.hi}$ oraz $\lambda = \val{p10.sym.lo}$.
+\end{ansblock}
+
+Czyli te same dwie liczby, które poprzednie ramki znalazły, próbując wektorów
+\dash{} tu otrzymane bez próbowania żadnego.
+
+I spójrz na to równanie kwadratowe jeszcze raz, bo mówi ci dwie rzeczy, które
+inaczej trzeba by pamiętać osobno. Pierwiastki $\lambda^{2} - t\lambda + d$
+mnożą się do $d$ i dodają do $t$.
+\end{fr}
+
+\begin{fr}
+Zatem dla każdej macierzy kwadratowej:
+
+\begin{itemize}
+\item \textbf{wyznacznik jest iloczynem wartości własnych};
+\item \textbf{ślad jest ich sumą}.
+\end{itemize}
+
+Tutaj $\val{p10.sym.hi} \times \val{p10.sym.lo} = \val{p10.sym.det}$ oraz
+$\val{p10.sym.hi} + \val{p10.sym.lo} = \val{p10.sym.trace}$.
+
+Pierwsza linijka to obietnica, którą Program~\ref{prog:P09} złożył w imieniu
+tego programu, a skrypt dotrzymuje jej jako bramki, nie jako zdania: liczy
+wyznacznik własną procedurą z Programu~\ref{prog:P09} i wymaga, by równał się
+iloczynowi. Zepsuj arytmetykę któregokolwiek z tych programów, a budowanie
+powie o tym i nazwie oba.
+
+Rozstrzyga to też pytanie, które Program~\ref{prog:P09} zostawił otwartym, i to
+w jednej linijce zamiast w sekcji. Macierz jest osobliwa dokładnie wtedy, gdy
+jej wyznacznik jest zerem; wyznacznik jest iloczynem wartości własnych; a
+iloczyn jest zerem dokładnie wtedy, gdy zerem jest któryś z czynników.
+
+Kiedy zatem macierz jest osobliwa?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dokładnie wtedy, gdy ma wartość własną równą zeru.
+\end{ansblock}
+
+A wektor własny tej wartości to właśnie wektor, który macierz posyła na zero
+\dash{} czyli jądro z Programu~\ref{prog:P08}, przybywające po raz trzeci pod
+trzecią nazwą.
+
+Trzy programy, trzy drogi, jeden warunek. Program~\ref{prog:P08} doszedł tam,
+licząc kierunki, Program~\ref{prog:P09} mierząc objętość, a ten mnożąc listę
+liczb.
+\end{fr}
+
+% ============================================================
+\section{Trzy sposoby, na jakie obietnica zawodzi}
+\label{sec:P10-failures}
+\index{eigenvector!not orthogonal}
+
+\begin{fr}
+Przykładowa macierz dała dwa prostopadłe wektory własne rozpinające płaszczyznę
+i byłoby wygodnie, gdyby tak było zawsze.
+
+Nie jest, a ta sekcja to trzy sposoby, na jakie to zawodzi, bo każdy z nich jest
+prawdziwą macierzą, którą inżynier spotyka.
+
+Zacznij od tego, który myli niemal wszystkich. Oto
+$N = \begin{pmatrix} 2 & 1 \\ 0 & 3 \end{pmatrix}$. Jej wartości własne to
+$\val{p10.nonsym.hi}$ i $\val{p10.nonsym.lo}$, a wektory własne to $(1, 1)$ i
+$(1, 0)$.
+
+Czy te dwa są prostopadłe? Odpowiedz, zanim pójdziesz dalej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Ich iloczyn skalarny wynosi $1$, a nie $0$, i spotykają się pod kątem
+$\val{p10.nonsym.angle}$ stopni.
+\end{ansblock}
+
+Sprawdź: $(1,1) \cdot (1,0) = 1$. Oba wektory mają długość co najmniej $1$, więc
+na mocy Programu~\ref{prog:P05} cosinus kąta między nimi wynosi $1/\sqrt{2}$, a
+to jest $\val{p10.nonsym.angle}$ stopni.
+
+\transcript{p10-orthogonal}
+
+Dwie macierze, ten sam rachunek, uruchomiony zamiast wyargumentowany: zero dla
+symetrycznej, jeden dla tej.
+\end{fr}
+
+\begin{trapbox}
+\textbf{\enquote{Wektory własne są ortogonalne.}}
+
+Są dla macierzy \textbf{symetrycznej}, a ten przypadek jest dość częsty, by
+wyrobić nawyk \dash{} macierz kowariancji jest symetryczna, macierz Grama jest
+symetryczna, hesjan funkcji gładkiej jest symetryczny.
+
+Macierze, które inżynier faktycznie różniczkuje i mnoży, w większości nie są.
+Macierz uwagi nie jest symetryczna. Macierz przejścia nie jest symetryczna.
+Jakobian nie jest symetryczny. Macierz wag nie jest symetryczna i zwykle nie
+jest nawet kwadratowa.
+
+Rozumowanie prowadzące do błędu jest poprawne, na ile sięga: każdy przykład,
+który ktokolwiek liczy ręcznie, jest symetryczny, bo to te mają ładne
+odpowiedzi. Nawyk pochodzi z obciążonej próby.
+\end{trapbox}
+
+\begin{fr}
+Druga porażka jest gorsza niż nieprostopadłość. Weź ćwierć obrotu,
+\[ R = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix} \]
+o której Program~\ref{prog:P09} pokazał, że ma wyznacznik $1$ i obraca każdą
+strzałkę o kąt prosty.
+
+Które kierunki zostawia ona wskazujące tam, skąd przyszły?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Żadnego. Każdy kierunek jest obracany o kąt prosty, więc żaden nie przeżywa.
+\end{ansblock}
+
+Algebra się zgadza i mówi to użyteczniej. Ślad wynosi $0$, a wyznacznik $1$,
+więc równanie charakterystyczne to $\lambda^{2} + 1 = 0$, które nie ma żadnego
+rozwiązania rzeczywistego.
+
+Macierz rzeczywista może nie mieć \textbf{żadnej rzeczywistej wartości
+własnej}. Ma za to parę zespolonych, a zespolone wartości własne to sposób, w
+jaki algebra mówi \emph{to odwzorowanie obraca}. Ta książka ich nie potrzebuje,
+a uczciwym powodem, by o nich wspomnieć, jest to, żeby czytelnik, który spotka
+zespoloną wartość własną w wyniku biblioteki, wiedział, że to obrót, a nie
+błąd.
+\end{fr}
+
+\begin{fr}
+Trzecia porażka jest najsubtelniejsza i jest to znowu ścinanie z
+Programu~\ref{prog:P09}:
+\[ S = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix} \]
+
+Jej ślad wynosi $2$, a wyznacznik $1$, więc $\lambda^{2} - 2\lambda + 1 =
+(\lambda - 1)^{2}$ i jedyną wartością własną jest $1$, dwukrotnie.
+
+Ile niezależnych kierunków zostawia ona nieobróconych?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jeden. Poziomy.
+\end{ansblock}
+
+$S$ posyła $(1, 0)$ na $(1, 0)$ i nic więcej nie przeżywa: każdy wektor o
+niezerowej drugiej współrzędnej zostaje przesunięty na bok.
+
+Wartość własna może więc przyjść dwa razy i przyprowadzić tylko jeden kierunek.
+Taka macierz nazywa się \textbf{defektywna} i nie ma bazy wektorów własnych w
+ogóle \dash{} co jest prawdziwym ograniczeniem, bo niemal wszystko, co się z
+wektorami własnymi robi, zaczyna się od zapisania wektora w ich terminach.
+\end{fr}
+
+\begin{fr}
+Trzy porażki, i warto mieć je jako listę, bo twierdzenie z następnej sekcji jest
+stwierdzeniem, że dla jednego rodzaju macierzy wszystkie trzy są niemożliwe
+naraz.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Porażka} & \textbf{Przykład} \\
+\midrule
+wektory własne nieprostopadłe & $\begin{pmatrix} 2 & 1 \\ 0 & 3 \end{pmatrix}$,
+  pod kątem $\val{p10.nonsym.angle}$ stopni \\
+brak rzeczywistej wartości własnej & ćwierć obrotu \\
+za mało kierunków na wartości własne & ścinanie \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Każdą z tych trzech macierzy spotkasz. Żadna nie jest egzotyczna.
+\end{fr}
+
+% ============================================================
+\section{Twierdzenie spektralne}
+\label{sec:P10-spectral}
+\index{spectral theorem}
+
+\begin{fr}
+Jeden warunek wyklucza naraz wszystkie trzy porażki, i jest to warunek, który
+da się sprawdzić wzrokiem.
+
+\textbf{Macierz symetryczna} \dash{} taka, że $A\T = A$, czyli wyraz w wierszu
+$i$ i kolumnie $j$ równa się wyrazowi w wierszu $j$ i kolumnie $i$ \dash{} ma
+\textbf{pełny zestaw rzeczywistych wartości własnych, a jej wektory własne da
+się wybrać wzajemnie prostopadłe}.
+
+To jest \emph{twierdzenie spektralne}. Dlatego przykładowa macierz z sekcji 1
+zachowywała się tak dobrze: jest symetryczna, i nic w niej nie było
+przypadkiem.
+\end{fr}
+
+\begin{rigourbox}
+Sformułowane i używane, nie dowodzone. Dowód jest krótki, ale potrzebuje dwóch
+rzeczy, których ta książka nie ma: że wielomian charakterystyczny rzeczywistej
+macierzy symetrycznej ma tylko pierwiastki rzeczywiste, co najłatwiej idzie
+przez liczby zespolone, oraz indukcji po wymiarze. Ma go każdy pierwszy kurs
+algebry liniowej.
+
+Warto za to nieść skąd bierze się prostopadłość, w jednej linijce. Jeśli
+$Av = \lambda v$ i $Aw = \mu w$ przy $\lambda \ne \mu$, to
+$\lambda(v \cdot w) = (Av) \cdot w = v \cdot (Aw) = \mu(v \cdot w)$, przy czym
+w środkowym kroku używa się $A\T = A$. Dwie różne liczby razy ta sama wielkość
+są równe, więc ta wielkość jest zerem.
+\end{rigourbox}
+
+\begin{fr}
+Ten środkowy krok jest całą rzeczą i zasługuje na drugie spojrzenie, bo to
+jedyne miejsce, w którym symetria jest użyta.
+
+$(Av) \cdot w = v \cdot (Aw)$ mówi, że macierz wolno przenieść z jednej strony
+iloczynu skalarnego na drugą. Jest to prawdą dokładnie wtedy, gdy $A\T = A$, a
+poza tym zawodzi \dash{} i właśnie dlatego niesymetryczna macierz dwie sekcje
+temu miała wektory własne pod kątem $\val{p10.nonsym.angle}$ stopni.
+
+Symetria nie jest więc wygodą, która ładniej liczy. Jest własnością, z której
+zrobiony jest wniosek.
+\end{fr}
+
+\begin{fr}
+Twierdzenie sformułowane bez dowodu warto sprawdzić, a to da się sprawdzić
+\emph{dokładnie}, a nie do tolerancji \dash{} co ma znaczenie, bo teza zawiera
+słowo \emph{dokładnie}.
+
+Konstrukcja pochodzi z Programu~\ref{prog:P09}. Ten program zbudował z
+trójkąta $3$--$4$--$5$ obrót o samych ułamkowych wyrazach:
+$Q = \begin{pmatrix} 3/5 & -4/5 \\ 4/5 & 3/5 \end{pmatrix}$, ortogonalny, z
+$Q\T Q = I$ dokładnie.
+
+Powód budowania przykładu, zamiast wybierania go, wart jest jednego zdania.
+Pójdź zwykłą drogą \dash{} wybierz macierz symetryczną i rozwiąż równanie na jej
+wartości własne \dash{} a wyróżnik prawie nigdy nie jest kwadratem, więc
+odpowiedzi są niewymierne i nie zostaje nic dokładnego do porównania. Pójście od
+odpowiedzi wstecz jest tym, co utrzymuje każdą wielkość ułamkiem.
+
+Weź teraz dowolną macierz diagonalną $D$ o dwóch ułamkach i utwórz $Q D Q\T$.
+Co możesz o tej macierzy powiedzieć, zanim policzysz choć jeden wyraz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Że jest symetryczna: $(QDQ\T)\T = Q D\T Q\T = Q D Q\T$, bo $D$ jest diagonalna.
+\end{ansblock}
+
+A nawet więcej: jej wartości własne \emph{to} dwa wyrazy $D$, a wektory własne
+\emph{to} dwie kolumny $Q$, co sprawdza się w jednej linijce. Przyłóż $QDQ\T$
+do pierwszej kolumny $Q$; $Q\T$ wyławia $(1,0)$, bo kolumny są ortonormalne,
+$D$ mnoży to przez swój pierwszy wyraz, a $Q$ odkłada z powrotem.
+
+To jest więc wymierna macierz symetryczna, której odpowiedzi są znane
+\textbf{z konstrukcji, a nie znalezione przez solwer} \dash{} i to czyni ten
+sprawdzian wartym uruchomienia. Na $\val{p10.spectral.trials}$ takich
+macierzach skrypt potwierdza każdą wartość własną, każdy wektor własny i każdy
+kąt prosty, na ułamkach, bez zaokrągleń w żadnym miejscu.
+\end{fr}
+
+\begin{fr}
+Warto jasno powiedzieć, czym te $\val{p10.spectral.trials}$ prób są, a czym
+nie, bo Program~\ref{prog:P04} musiał powiedzieć to samo o własnych losowaniach.
+
+Nie są dowodem twierdzenia. Poszukiwanie, które znalazłoby kontrprzykład,
+obaliłoby dowód, a rozsądnym wnioskiem byłoby, że błąd jest w kodzie.
+
+\textbf{Testują kod}, i są warte tych linijek z drugiego powodu: są jedynym
+miejscem w tej książce, gdzie teza zawierająca słowo \emph{dokładnie} jest
+sprawdzana arytmetyką, która sama jest dokładna. Test na liczbach
+zmiennoprzecinkowych musiałby wybrać tolerancję, a tolerancja jest właśnie
+tym, czego słowo \emph{dokładnie} odmawia.
+
+Teraz zapłata, a masz obie jej połowy. Pełny prostopadły zestaw wektorów
+własnych jest w języku Programu~\ref{prog:P04} jedną rzeczą, a w języku
+Programu~\ref{prog:P09} drugą. Nazwij obie.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\textbf{Bazą} \dash{} oraz \textbf{ortogonalną zmianą bazy}, która nic nie
+kosztuje i nic nie gubi.
+\end{ansblock}
+
+I to jest powód, dla którego macierze symetryczne są w tej dziedzinie wszędzie.
+
+Dla macierzy symetrycznej istnieje więc układ współrzędnych, w którym macierz
+jest \emph{diagonalna}: nie robi nic poza skalowaniem każdej osi własną liczbą.
+Wszystko, co macierz robi trudnego \dash{} mieszanie współrzędnych \dash{}
+znika w odpowiednich współrzędnych, a wektory własne są tymi odpowiednimi
+współrzędnymi.
+\end{fr}
+
+% ============================================================
+\section{Misa, siodło albo grzbiet}
+\label{sec:P10-forms}
+\index{quadratic form}
+
+\begin{fr}
+Teraz obiekt, którego kształtem okazują się być wartości własne.
+
+\textbf{Forma kwadratowa} to to, co dostajesz, wpuszczając wektor w macierz, a
+potem mnożąc wynik skalarnie z powrotem przez wektor, z którego przyszedł:
+\[ q(x) = x \cdot Ax = x\T A x \]
+Dla $A = \begin{pmatrix} 2 & 1 \\ 1 & 2 \end{pmatrix}$ i $x = (x_1, x_2)$ to
+jest $2x_1^{2} + 2x_1x_2 + 2x_2^{2}$: każdy składnik ma łączny stopień dwa, i
+stąd nazwa.
+
+Bierze wektor i zwraca jedną liczbę, ma więc wartość w każdym kierunku, w
+którym można odejść od początku, a pytaniem wartym zadania jest, jak te
+wartości wyglądają razem.
+
+Ale najpierw pytanie rozstrzygające, czy poprzednia sekcja w ogóle się stosuje.
+$x\T Ax$ jest jedną liczbą, więc równa się własnej transpozycji. Co to wymusza
+na tej części $A$, która \emph{nie} jest symetryczna?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Że nie może wpłynąć na $q$ w ogóle.
+\end{ansblock}
+
+$x\T A x = (x\T A x)\T = x\T A\T x$, więc $x\T A x = x\T \big(\frac{A + A\T}{2}
+\big) x$.
+
+Każdą formę kwadratową można więc zapisać macierzą symetryczną i od tej pory
+zawsze się tak robi. Dlatego hesjan, kowariancja i macierz Grama są
+symetryczne: wszystkie są formami kwadratowymi w przebraniu, a niesymetryczna
+część którejkolwiek z nich nigdy nic nie robiła.
+\end{fr}
+
+\begin{fr}
+Weź symetryczne $A$ o wartościach własnych $\lambda_1$ i $\lambda_2$ i zapisz
+$x$ w bazie wektorów własnych z poprzedniej sekcji, czyli $x = c_1v_1 +
+c_2v_2$.
+
+Zapisanie $x$ w ten sposób jest dozwolone dokładnie z powodu podanego w
+poprzedniej sekcji: wektory własne macierzy symetrycznej są bazą, więc każde $x$
+ma w nich współrzędne i żaden wektor nie zostaje pominięty. Ten krok jest
+przemilczany w większości wykładów i to on niesie twierdzenie spektralne.
+
+Wtedy $Ax = \lambda_1c_1v_1 + \lambda_2c_2v_2$, wektory $v$ są prostopadłe i
+jednostkowe, a cała forma zwija się do
+\[ q(x) = \lambda_1c_1^{2} + \lambda_2c_2^{2} \]
+
+Nie zostały żadne wyrazy mieszane. W odpowiednich współrzędnych forma kwadratowa
+jest ważoną sumą kwadratów, a wagami są wartości własne.
+
+Teraz pytanie, dla którego ta sekcja istnieje. Przypuśćmy, że obie wartości
+własne są dodatnie. Czym może być $q(x)$ dla $x \ne 0$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Liczbą dodatnią. Zawsze, w każdym kierunku.
+\end{ansblock}
+
+Dwie liczby dodatnie razy dwa kwadraty, nie oba zerowe. Nie ma czego sprawdzać
+ani jakiego kierunku próbować: współrzędne, w których macierz jest diagonalna,
+czynią odpowiedź widoczną.
+
+Forma o tej własności jest \textbf{dodatnio określona}, a jej macierz nazywa
+się tak samo. Zauważ, jakiego rodzaju to teza \dash{} zdanie o \emph{każdym}
+kierunku, a jest ich nieskończenie wiele, rozstrzygnięte spojrzeniem na dwie
+liczby.
+\end{fr}
+
+\begin{fr}
+A reszta klasyfikacji wypada z tego samego wyrażenia. Wypełnij kształt, który
+daje każdy układ znaków.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+$\lambda_1$ & $\lambda_2$ & \textbf{forma} \\
+\midrule
+$+$ & $+$ & dodatnio określona: misa, w górę w każdym kierunku \\
+$+$ & $-$ & \blank \\
+$+$ & $0$ & \blank \\
+$-$ & $-$ & ujemnie określona: kopuła, w dół w każdym kierunku \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$+,-$ to \emph{siodło}: w górę wzdłuż jednego wektora własnego, w dół wzdłuż
+drugiego. $+,0$ to \emph{grzbiet}: w górę w jedną stronę i zupełnie płasko
+wzdłuż drugiej.
+\end{ansblock}
+
+Skrypt klasyfikuje cztery takie formy z samych wartości własnych, a potem
+próbkuje każdą w $\val{p10.form.dirs}$ kierunkach dookoła okręgu, by potwierdzić
+układ znaków. Misa jest dodatnia w każdym z nich, i o tym właśnie mówi słowo
+\emph{określona}.
+\end{fr}
+
+\begin{fr}
+Grzbiet zasługuje na jeszcze jedną ramkę, bo próbkowanie go czegoś autora
+skryptu nauczyło, a bez tego ramka byłaby uboższa.
+
+Napisane najpierw twierdzenie brzmiało, że najmniejsza spróbkowana wartość
+formy półokreślonej jest zerem. Padło natychmiast i zasłużenie: kierunek płaski
+jest \emph{jednym} kierunkiem z nieskończenie wielu, a
+$\val{p10.form.dirs}$ próbek nigdy w niego nie trafi. Najmniejsza spróbkowana
+wartość jest mała i dodatnia, i żadna liczba dodatkowych próbek tego nie zmieni.
+
+\textbf{Kierunku płaskiego nie da się znaleźć, szukając go.} Znajduje się go,
+licząc wektor własny, i to jest dokładnie argument za liczeniem ich w ogóle
+\dash{} a skrypt sprawdza teraz nieujemność próbkowaniem, a zero obliczeniem
+dokładnie tam, gdzie konstrukcja umieszcza kierunek płaski.
+\end{fr}
+
+\mermaidfig{p10-bowl-or-saddle}{Dlaczego dwie liczby rozstrzygają kształt bez
+próbowania kierunków.}{wartosci wlasne klasyfikuja forme}
+
+\begin{fr}
+Ta zerowa wartość własna też nie jest nowym obiektem.
+
+Jej wektor własny $v$ spełnia $Av = 0v = 0$, więc $v$ jest w jądrze, więc $A$
+jest osobliwa, więc $\det A = 0$.
+
+\textbf{\enquote{Ma zerową wartość własną}, \enquote{jest osobliwa}, \enquote{ma
+nietrywialne jądro} i \enquote{ma płaski kierunek w swojej formie kwadratowej}
+to jeden warunek powiedziany czterokrotnie} \dash{} przez
+Program~\ref{prog:P08}, przez Program~\ref{prog:P09} i dwa razy tutaj. Jest to
+warte więcej niż każdy z nich osobno, bo czytelnik, który spotka jedno z tych
+czterech w komunikacie błędu, zna teraz pozostałe trzy.
+\end{fr}
+
+\begin{fr}
+Jeszcze jedno słowo, a potem zapłata sekcji.
+
+\textbf{Dodatnio półokreślona} znaczy, że każda wartość własna jest $\ge 0$
+\dash{} forma nie jest więc nigdy ujemna, a w pewnych kierunkach może być
+zerowa. Misa i grzbiet są obie dodatnio półokreślone; tylko misa jest dodatnio
+określona.
+
+Rozróżnienie brzmi pedantycznie i nie jest. Macierz dodatnio określona jest
+odwracalna, bo żadna jej wartość własna nie jest zerem. Półokreślona nie musi
+być. Słowo \emph{pół} niesie całą tę różnicę.
+\end{fr}
+
+% ============================================================
+\section{Kształt czegoś}
+\label{sec:P10-shape}
+\index{eigenvalue!spectral norm}
+
+\begin{fr}
+Trzy rzeczy w tej dziedzinie to macierz symetryczna, której ktoś chce poznać
+kształt, i ta sekcja jest wszystkimi trzema. To ta sama matematyka i prawie
+nikt nie spotyka ich jako tej samej matematyki.
+
+Zacznij od najprostszej. Warstwa mnoży wektor przez macierz. O ile najwyżej może
+go wydłużyć, na wszystkich wejściach, jakie istnieją?
+
+Zauważ, jakiego rodzaju to pytanie. Nie \emph{o ile ta warstwa zwykle rozciąga
+wektor}, co jest faktem o wejściach, które akurat dostaje, tylko \emph{o ile
+mogłaby}, co jest faktem o samej warstwie. To drugie jest warte posiadania, bo
+obowiązuje dla partii danych, której nikt jeszcze nie przysłał.
+
+Jest też jedynym z tych dwóch, które się składa. Ułóż dwie warstwy jedna na
+drugiej, a najgorsze przypadki się mnożą, więc ograniczenie na każdą daje
+ograniczenie na parę; zachowanie przeciętne nie daje niczego takiego, bo druga
+warstwa nie dostaje od pierwszej przeciętnego wejścia.
+
+Dla symetrycznego $A$ masz już odpowiedź: zapisz $x$ w bazie wektorów własnych,
+a $Ax$ ma współrzędne $\lambda_ic_i$. Powiedz, jakie jest największe możliwe
+wydłużenie i w którym kierunku zachodzi.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Największe $\lvert\lambda\rvert$, w kierunku jego wektora własnego.
+\end{ansblock}
+
+Ta wartość ma nazwę \dash{} \textbf{norma spektralna} \dash{} i zastosowanie.
+Jest to liczba $L$, dla której $\lVert Ax \rVert \le L\lVert x \rVert$ dla
+każdego $x$, czyli czynnik, którym warstwa może wzmocnić, w najgorszym
+przypadku, po wszystkich wejściach łącznie z tymi, których nikt nie próbował.
+
+Skrypt bierze macierz symetryczną o wartościach własnych $\val{p10.norm.max}$ i
+$-\val{p10.norm.min}$ i mierzy rozciągnięcie w $\val{p10.norm.dirs}$ kierunkach
+dookoła okręgu. Największe wynosi $\val{p10.norm.max}$, najmniejsze
+$\val{p10.norm.min}$, a kierunek, w którym osiągane jest największe, to górny
+wektor własny \dash{} wszystkie trzy sprawdzone.
+
+Zauważ, że to przeglądanie nie jest dowodem. Jest tam, bo teza dotyczy każdego
+kierunku, a czytelnik, który spróbuje kilku, ma prawo zobaczyć maksimum
+siedzące tam, gdzie stawia je teoria.
+\end{fr}
+
+\begin{fr}
+Druga to ta, którą wyda reszta książki.
+
+Powierzchnia straty w pobliżu minimum wygląda jak forma kwadratowa \dash{} to
+teza Programu~\ref{prog:P17}, a ten program jej nie stawia. Ten program może
+powiedzieć, jak \emph{wygląda} forma kwadratowa, a odpowiedzią jest elipsa.
+
+Zbiór punktów, w których forma dodatnio określona przyjmuje jedną ustaloną
+wartość, to elipsa, której osie leżą wzdłuż wektorów własnych. Dłuższa wzdłuż
+małej wartości własnej, krótsza wzdłuż dużej, bo duża wartość własna znaczy, że
+wartość rośnie szybko, więc poziomica zostaje osiągnięta wcześniej.
+\end{fr}
+
+\begin{fr}
+Teraz liczba warta przewidzenia, zanim zostanie podana.
+
+Niecka ma wartości własne $\val{p10.basin.hi}$ i $\val{p10.basin.lo}$ \dash{}
+stosunek $\val{p10.basin.eigratio}$. Mniej więcej ile razy dłuższa niż szersza
+jest jej elipsa poziomicowa?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p10.basin.axisratio}$ razy. \emph{Pierwiastek} z
+$\val{p10.basin.eigratio}$, a nie $\val{p10.basin.eigratio}$.
+\end{ansblock}
+
+Półoś wzdłuż wektora własnego wynosi $1/\sqrt{\lambda}$, bo forma niesie
+współrzędną \emph{podniesioną do kwadratu}. Stosunek osi jest więc pierwiastkiem
+ze stosunku wartości własnych, a skrypt mierzy oba, przeglądając poziomicę,
+zamiast cytować wzór.
+
+Większość ludzi odpowiada $\val{p10.basin.eigratio}$. Pierwiastek jest dużą
+poprawką w uspokajającą stronę i jest powodem, dla którego niecka o
+stukrotnym rozrzucie krzywizny nadal wygląda raczej owalnie niż jak szczelina w
+podłodze.
+\end{fr}
+
+\mermaidfig{p10-ellipse-axes}{Poziomica formy dodatnio określonej i to, co mówi
+o niej jeden stosunek.}{wartosci wlasne jako osie niecki}
+
+\begin{fr}
+Ten stosunek to miejsce, w którym trzy warsztatowe słowa stają się jednym
+zdaniem, i po to zdanie ten program został zbudowany.
+
+\emph{Wąwóz} to niecka o dużym stosunku wartości własnych. \emph{Ostre minimum}
+to takie, którego największa wartość własna jest duża. \emph{Za wysoki
+learning rate} to teza o największej wartości własnej i długości kroku razem.
+Trzy skargi, jedna macierz, trzy różne liczby z niej odczytane.
+
+Ten program zatrzymuje się w tym miejscu, i to celowo. Zamiana trzeciej w
+nierówność potrzebuje rozwinięcia Taylora drugiego rzędu, które należy do
+Programu~\ref{prog:P17}, a życie z pierwszą jest tym, do czego służą
+optymalizatory z Programu~\ref{prog:P20}. Tutaj zbierany jest kształt.
+\end{fr}
+
+\begin{fr}
+Trzecia macierz symetryczna to ta z największą nazwą przy sobie.
+
+Weź jakieś dane, odejmij średnią od każdej kolumny, żeby były wyśrodkowane, i
+utwórz $C = \frac{1}{n}X\T X$. To jest \textbf{macierz kowariancji}, a
+Program~\ref{prog:P24} jest tym, który nadaje jej znaczenie. Dwa fakty o jej
+\emph{kształcie} to wszystko, czego ten program potrzebuje, i oba wynikają z
+tamtej jednej linijki.
+
+Powiedz, które to fakty \dash{} masz wszystko, co potrzebne.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jest symetryczna i jest dodatnio półokreślona.
+\end{ansblock}
+
+Symetryczna, bo $C\T = \frac{1}{n}(X\T X)\T = \frac{1}{n}X\T X = C$.
+
+Dodatnio półokreślona, bo dla dowolnego kierunku $v$
+\[ v\T C v = \tfrac{1}{n}v\T X\T X v = \tfrac{1}{n}\lVert Xv \rVert^{2} \ge 0 \]
+co jest sumą kwadratów i nie może być ujemne. Skrypt sprawdza tę tożsamość, a
+nie samą nierówność, w dwóch tysiącach kierunków na ułamkach.
+
+Twierdzenie spektralne się więc stosuje, każda wartość własna jest rzeczywista
+i nieujemna, a wektory własne są prostopadłe. Wszystko to wiadomo teraz o
+macierzy, której \emph{znaczenia} książka jeszcze nie podała.
+\end{fr}
+
+\begin{fr}
+A $v\T Cv$ nie jest dowolną wielkością. Linijka powyżej pokazuje, że jest to
+$\frac{1}{n}\lVert Xv \rVert^{2}$, średni kwadrat długości cienia danych na
+kierunku $v$.
+
+Powiedz, co to mierzy w danych, zwykłymi słowami \dash{} a potem, czym wobec
+tego musi być górny wektor własny $C$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jak bardzo rozrzucone wyglądają dane z tego kierunku \dash{} więc górny wektor
+własny to kierunek, wzdłuż którego są najbardziej rozrzucone.
+\end{ansblock}
+
+To jest \textbf{analiza głównych składowych}, i nie jest algorytmem. Jest
+spostrzeżeniem, że pytanie o rozrzut i pytanie o wektory własne to jedno
+pytanie.
+
+Zmierzone, na $\val{p10.pca.n}$ punktach, bo teza zasługuje na liczbę.
+
+Skrypt przegląda $\val{p10.pca.dirs}$ kierunków, liczy rozrzut w każdym i
+stwierdza, że największy zgadza się z górną wartością własną $C$. Ten kierunek
+niesie $\val{p10.pca.top.pct}\%$ całego rozrzutu, zostawiając
+$\val{p10.pca.rest.pct}\%$ dla drugiego.
+
+Dwie drogi do tej odpowiedzi: spróbować dwudziestu tysięcy kierunków albo
+rozwiązać równanie kwadratowe. Zgadzają się, a w siedmiuset wymiarach działa
+tylko jedna.
+\end{fr}
+
+\begin{trapbox}
+\textbf{\enquote{PCA znalazła ważne kierunki.}}
+
+Znalazła kierunki największej \emph{wariancji}, a to fakt o jednostkach, w
+których akurat są kolumny. Zmierz jedną cechę w metrach, a tę samą cechę w
+milimetrach, a jej wariancja zmieni się milion razy, więc górna składowa
+zmieni się razem z nią.
+
+Dlatego standaryzacja kolumn nie jest uprzejmością, i dlatego \enquote{PCA na
+mojej macierzy cech} jest zdaniem niepełnym: musi powiedzieć, czy dane były
+wyśrodkowane, co powyższe wyprowadzenie założyło wprost, i czy były
+przeskalowane, o czym wyprowadzenie nie mówi nic.
+
+Nic tu nie jest nie tak z matematyką. Macierz odpowiada dokładnie na pytanie,
+które jej zadano, a pytanie zawierało jednostki.
+\end{trapbox}
+
+\begin{fr}
+Wartości własne okazały się kształtem wszystkiego, czego ta sekcja dotknęła:
+tego, jak bardzo warstwa może rozciągnąć wektor, jak wydłużona jest niecka i w
+którą stronę leży chmura danych.
+
+To jedna idea użyta trzy razy, a jedną ideą jest dzięki twierdzeniu
+spektralnemu \dash{} każda macierz w tej sekcji była symetryczna, więc każda z
+nich miała prostopadłe wektory własne i układ współrzędnych, w którym była
+zwykłą listą liczb.
+
+Program~\ref{prog:P11} pyta, co zostaje, gdy macierz \emph{nie} jest
+symetryczna, a nawet nie jest kwadratowa. Odpowiedź zachowuje z tego niemal
+wszystko: każda macierz, dowolnego kształtu, okazuje się być obrotem, potem
+rozciągnięciem wzdłuż prostopadłych osi, potem jeszcze jednym obrotem \dash{}
+obraz przeżywa więc tam, gdzie twierdzenie nie, a liczby, które daje, to te,
+których niesymetryczne przykłady tego programu nie miały wartości własnych, by
+podać.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Wektor własny to kierunek, który macierz tylko
+  rozciąga}, $Av = \lambda v$ przy $v \ne 0$, a jego sens jest taki, że wzdłuż
+  niego macierz z $n^{2}$ liczbami w środku zachowuje się jak pojedyncza
+  liczba. Wszystko, co trudne w macierzy, bierze się z mieszania współrzędnych;
+  wzdłuż wektora własnego nie miesza.}
+\sumitem{4--5}{Przykładowa macierz ma dwa, w $(1,1)$ i $(1,-1)$, o wartościach
+  własnych $\val{p10.sym.hi}$ i $\val{p10.sym.lo}$ \dash{} i są
+  \textbf{prostopadłe}, a jest ich \textbf{dwa w dwóch wymiarach}, co na mocy
+  Programu~\ref{prog:P04} czyni je bazą. Żadne z tego nie jest przypadkiem, a
+  dwie następne sekcje mówią dlaczego.}
+\sumitem{6--8}{$Av = \lambda v$ znaczy, że $A - \lambda I$ posyła coś
+  niezerowego na zero, więc \textbf{wartości własne to pierwiastki
+  $\det(A - \lambda I) = 0$}, czyli
+  $\lambda^{2} - (\operatorname{tr}A)\lambda + \det A$ dla $2 \times 2$. Nic
+  nowego nie było potrzebne: Program~\ref{prog:P08} dał jądro, a
+  Program~\ref{prog:P09} wyznacznik.}
+\sumitem{9}{\textbf{Wyznacznik jest iloczynem wartości własnych, a ślad ich
+  sumą}, wprost z tego równania kwadratowego. Pierwsze to obietnica, którą
+  Program~\ref{prog:P09} złożył w imieniu tego programu, i jest dotrzymana jako
+  bramka: skrypt liczy wyznacznik procedurą z tamtego programu i wymaga
+  równości z iloczynem.}
+\sumitem{10}{Zatem \textbf{osobliwość, zerowa wartość własna i nietrywialne
+  jądro to jeden warunek}, bo iloczyn jest zerem dokładnie wtedy, gdy zerem
+  jest czynnik. Trzy programy, trzy drogi \dash{} liczenie kierunków, mierzenie
+  objętości, mnożenie listy.}
+\sumitem{11--12}{\textbf{Wektory własne są prostopadłe tylko dla macierzy
+  symetrycznej.} $\begin{pmatrix} 2 & 1 \\ 0 & 3 \end{pmatrix}$ ma wektory
+  własne pod kątem $\val{p10.nonsym.angle}$ stopni, a macierze uwagi, macierze
+  przejścia i jakobiany nie są symetryczne. Nawyk pochodzi z obciążonej próby:
+  ładne przykłady liczone ręcznie to te symetryczne.}
+\sumitem{13--17}{Dwie dalsze porażki. \textbf{Ćwierć obrotu nie ma żadnej
+  rzeczywistej wartości własnej}, bo nic nie przeżywa obrotu o kąt prosty
+  \dash{} zespolona wartość własna to algebra mówiąca \emph{to obraca}. A
+  \textbf{ścinanie ma jedną wartość własną dwa razy, ale tylko jeden kierunek},
+  i to znaczy \emph{defektywna}.}
+\sumitem{18--19}{\textbf{Twierdzenie spektralne}: macierz symetryczna ma
+  rzeczywiste wartości własne i prostopadłe wektory własne. Sformułowane, nie
+  dowodzone \dash{} ale prostopadłość to jedna linijka, i używa $A\T = A$
+  dokładnie raz, by przenieść macierz przez iloczyn skalarny.
+  \textbf{Symetria nie jest wygodą; jest tym, z czego zrobiony jest wniosek.}}
+\sumitem{20--22}{Sprawdzone \emph{dokładnie} na $\val{p10.spectral.trials}$
+  macierzach zbudowanych jako $QDQ\T$ z wymiernego obrotu
+  Programu~\ref{prog:P09}, więc odpowiedzi są znane z konstrukcji, a nie
+  znalezione przez solwer. Jak w Programie~\ref{prog:P04},
+  \textbf{próby testują kod} \dash{} a test zmiennoprzecinkowy potrzebowałby
+  tolerancji, czego słowo \emph{dokładnie} odmawia.}
+\sumitem{23}{Zapłata: pełny prostopadły zestaw wektorów własnych to baza i
+  ortogonalna zmiana bazy, więc \textbf{macierz symetryczna jest diagonalna w
+  odpowiednich współrzędnych}, a wektory własne są tymi współrzędnymi.}
+\sumitem{24--25}{\textbf{Forma kwadratowa} to $x\T Ax$, a \textbf{wpłynąć na
+  nią może tylko symetryczna część $A$} \dash{} dlatego hesjan, kowariancja i
+  macierz Grama są symetryczne i dlatego twierdzenie spektralne zawsze się do
+  formy stosuje.}
+\sumitem{26--27}{W bazie wektorów własnych forma zwija się do
+  $\lambda_1c_1^{2} + \lambda_2c_2^{2}$, więc dwie dodatnie wartości własne
+  czynią ją dodatnią w każdym kierunku. To jest \textbf{dodatnia
+  określoność}: teza o nieskończenie wielu kierunkach, rozstrzygnięta
+  spojrzeniem na dwie liczby.}
+\sumitem{28--29}{$+,-$ to siodło, a $+,0$ to grzbiet, potwierdzone w
+  $\val{p10.form.dirs}$ kierunkach każde. \textbf{Znaki wartości własnych
+  rozstrzygają cały kształt bez próbowania choćby jednego kierunku.}}
+\sumitem{30}{\textbf{Kierunku płaskiego nie da się znaleźć próbkowaniem.}
+  Twierdzenie, że najmniejsza spróbkowana wartość formy półokreślonej jest
+  zerem, padło natychmiast, bo kierunek płaski jest jednym kierunkiem z
+  nieskończenie wielu. To jest argument za liczeniem wektorów własnych zamiast
+  próbowania kierunków.}
+\sumitem{31--32}{\enquote{Zerowa wartość własna}, \enquote{osobliwa},
+  \enquote{jądro} i \enquote{płaski kierunek} to \textbf{jeden warunek
+  powiedziany czterokrotnie}. A \emph{pół}określona dopuszcza zero, więc
+  macierz dodatnio określona jest odwracalna, a półokreślona nie musi być
+  \dash{} i słowo \emph{pół} niesie całą tę różnicę.}
+\sumitem{33--34}{\textbf{Norma spektralna to największe $\lvert\lambda\rvert$}
+  i jest czynnikiem, którym warstwa może wzmocnić w najgorszym przypadku po
+  wszystkich wejściach, także tych nieprzetestowanych. Na
+  $\val{p10.norm.dirs}$ kierunkach: największe $\val{p10.norm.max}$,
+  najmniejsze $\val{p10.norm.min}$, osiągane w górnym wektorze własnym.}
+\sumitem{35--37}{Poziomica formy dodatnio określonej to elipsa o osiach wzdłuż
+  wektorów własnych, a \textbf{stosunek osi jest PIERWIASTKIEM ze stosunku
+  wartości własnych} \dash{} $\val{p10.basin.axisratio}$ przy stosunku
+  $\val{p10.basin.eigratio}$, gdzie większość ludzi odpowiada
+  $\val{p10.basin.eigratio}$.}
+\sumitem{38}{\enquote{Wąwóz}, \enquote{ostre minimum} i \enquote{za wysoki
+  learning rate} to \textbf{trzy liczby odczytane z jednej macierzy}. Kształt
+  jest zbierany tutaj; nierówność należy do Programu~\ref{prog:P17}, a
+  optymalizatory do Programu~\ref{prog:P20}.}
+\sumitem{39--40}{$C = \frac{1}{n}X\T X$ jest \textbf{symetryczna i dodatnio
+  półokreślona}, oba dowiedzione z tamtej jednej linijki, a nie pożyczone, więc
+  twierdzenie spektralne stosuje się do macierzy, której \emph{znaczenie}
+  należy do Programu~\ref{prog:P24} i nie zostało jeszcze podane.}
+\sumitem{41--43}{$v\T Cv$ to rozrzut danych wzdłuż $v$, więc \textbf{kierunek
+  największego rozrzutu to górny wektor własny}. To jest PCA, spostrzeżenie
+  raczej niż algorytm: $\val{p10.pca.top.pct}\%$ rozrzutu na jednym kierunku,
+  znalezione dwiema drogami, które się zgadzają, a z których tylko jedna
+  przeżywa siedemset wymiarów.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Macierz $2 \times 2$ ma ślad $7$ i wyznacznik $12$. Podaj jej wartości
+  własne.
+  \answerto{$\lambda^{2} - 7\lambda + 12 = (\lambda - 3)(\lambda - 4)$, więc
+  $3$ i $4$. Sprawdzenie: mnożą się do $12$ i dodają do $7$.}
+\item $A$ jest $3 \times 3$ o wartościach własnych $2$, $0$ i $-5$. Podaj
+  $\det A$ i powiedz, czy $A$ ma odwrotność.
+  \answerto{$\det A = 2 \times 0 \times (-5) = 0$, więc odwrotności nie ma.
+  Wektor własny zerowej wartości to niezerowy wektor posyłany na zero, i to
+  właśnie uniemożliwia cofnięcie odwzorowania.}
+\item Podaj macierz $2 \times 2$, której wektory własne nie są prostopadłe, i
+  powiedz, dlaczego twoja działa.
+  \answerto{Wystarczy dowolna niesymetryczna o dwóch różnych rzeczywistych
+  wartościach własnych, na przykład trójkątna o wierszach $(2, 1)$ i $(0, 3)$:
+  jej wektory własne to $(1,1)$ i $(1,0)$, a ich iloczyn skalarny wynosi $1$.
+  Argument o prostopadłości potrzebuje $(Av)\cdot w = v\cdot(Aw)$, a to
+  potrzebuje $A\T = A$.}
+\item Macierz symetryczna ma wartości własne $9$ i $4$. Podaj normę spektralną
+  oraz stosunek osi elipsy $x\T Ax = 1$.
+  \answerto{Norma spektralna wynosi $9$. Stosunek osi to
+  $\sqrt{9/4} = \frac{3}{2}$, bo półosie idą jak $1/\sqrt{\lambda}$ \dash{} a
+  nie $9/4$.}
+\item Czy $\begin{pmatrix} 1 & 3 \\ 3 & 1 \end{pmatrix}$ jest dodatnio
+  określona? Odpowiedz z samego śladu i wyznacznika.
+  \answerto{Nie. Wyznacznik wynosi $1 - 9 = -8$, a jest on iloczynem wartości
+  własnych, więc jedna z nich jest ujemna i forma jest siodłem. Dodatnia
+  określoność wymaga obu dodatnich, a więc dodatniego wyznacznika \emph{oraz}
+  dodatniego śladu.}
+\item Dane mają jedną kolumnę w metrach, a drugą w milimetrach. Powiedz, co
+  zgłosi PCA i dlaczego nie jest to wada PCA.
+  \answerto{Górna składowa będzie leżeć niemal w całości wzdłuż kolumny
+  milimetrowej, bo wariancja tej kolumny jest milion razy większa z powodów
+  niemających nic wspólnego z danymi. PCA odpowiada na zadane jej pytanie
+  \dash{} który kierunek ma największą wariancję \dash{} a jednostki były
+  częścią pytania. Najpierw ustandaryzuj kolumny.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że jeśli $v$ jest wektorem własnym $A$ o wartości własnej
+  $\lambda$, to $v$ jest wektorem własnym $A^{2}$ o wartości własnej
+  $\lambda^{2}$.
+  \answerto{$A^{2}v = A(Av) = A(\lambda v) = \lambda(Av) = \lambda^{2}v$, przy
+  użyciu samego składania z Programu~\ref{prog:P06}. Wynika stąd, że macierz
+  symetryczna o każdym $\lvert\lambda\rvert < 1$ ma $A^{k} \to 0$, i dlatego
+  norma spektralna przewiduje, czy powtarzane odwzorowanie zanika.}
+\item Odwracalna $A$ ma wartość własną $\lambda$ o wektorze własnym $v$. Podaj
+  wartość własną $A^{-1}$.
+  \answerto{$1/\lambda$, z tym samym $v$: przyłóż $A^{-1}$ do
+  $Av = \lambda v$ i podziel. Zauważ, że $\lambda \ne 0$ jest zagwarantowane,
+  bo zerowa wartość własna uczyniłaby $A$ osobliwą.}
+\item Dlaczego macierz symetryczna nigdy nie może być defektywna?
+  \answerto{Bo twierdzenie spektralne daje jej pełny zestaw prostopadłych
+  wektorów własnych, a prostopadłe wektory niezerowe są niezależne na mocy
+  Programu~\ref{prog:P04}. Defektywność to za mało niezależnych kierunków, a
+  tego twierdzenie zabrania.}
+\item Macierz jest dodatnio określona. Powiedz, co to czyni jej wyznacznikowi i
+  czy zachodzi twierdzenie odwrotne.
+  \answerto{Jest dodatni, bo jest iloczynem dodatnich wartości własnych.
+  Odwrotne zawodzi w wymiarach parzystych: dwie ujemne wartości własne też dają
+  dodatni wyznacznik, a macierz o wierszach $(-1, 0)$ i $(0, -1)$ jest kopułą,
+  a nie misą.}
+\item Program~\ref{prog:P09} pokazał, że obrót ma wyznacznik $1$. Użyj reguły
+  iloczynu dla wyznaczników, by powiedzieć, do czego muszą mnożyć się wartości
+  własne obrotu dwuwymiarowego, i pogodź to z ustaleniem z sekcji 2, że nie ma
+  ich wcale.
+  \answerto{Muszą mnożyć się do $1$. Rzeczywistych nie ma, więc para jest
+  zespolona, a zespolona para postaci $\cos\theta \pm i\sin\theta$ mnoży się do
+  $\cos^{2}\theta + \sin^{2}\theta = 1$ \dash{} tożsamość z
+  Programu~\ref{prog:F08}, przybywająca tam, gdzie najmniej się jej
+  spodziewano.}
+\end{furtherproblems}

@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P9 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first six programs of Part III.** P10–P34 are stubs carrying their briefs | 25 of 47 |
+| Programs | **F1–F13 and P1–P10 written, both editions \dash{} the whole Foundation part, the whole of Part II, and the first seven programs of Part III.** P11–P34 are stubs carrying their briefs | 24 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 716 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 726 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 611 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 615 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 740 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 750 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 631 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 639 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,19 +93,19 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **25 of 47 programs are stubs**, in each language. This is the whole of the
+- **24 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 638 computed values, all referenced, all present, plus the committed console
+- 658 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 132 Mermaid sources, all rendering
-- 30 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 138 Mermaid sources, all rendering
+- 32 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **76 orphan-tail pages: 19 · 23 · 17 · 17** across `main-en`, `main-pl`,
+- **77 orphan-tail pages: 19 · 23 · 17 · 18** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`, from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -133,10 +133,11 @@ what was there before.
   This is the second ledger that is reported rather than gated, and like the
   first it must not quietly go away. **When the count goes up, that is the
   signal.**
-- **Elicitation rate: 55% of the book's frames put a question to the reader**,
+- **Elicitation rate: 54% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
-  35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08 and 40% in P09.**
+  35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09 and
+  39% in P10.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -4807,6 +4808,177 @@ whether the rule is *declare anything not yet defined* or *declare anything a
 payoff depends on*, because P07 is the first case where those two answers
 differ.
 
+### Program P10 pass, August 2026
+
+**Forty-three teaching frames, forty-five printed, both editions**, against a
+brief that projected sixty-five \dash{} the largest estimate in the manifest.
+Five sections: a direction the matrix only stretches, three ways the promise
+fails, the spectral theorem, a bowl a saddle or a ridge, and the shape of
+something.
+
+**The under-estimate has a different cause this time, and it is worth
+separating from the previous nine.** Those came in short because a neighbour
+had already spent the material. Here nothing had: a grep for \emph{eigenvalue},
+\emph{eigenvector}, \emph{spectral norm}, \emph{Hessian}, \emph{PCA} and
+\emph{positive definite} across every written program found the words only in
+file headers saying \enquote{-> P10}. P10 is the first program in Part III with
+genuinely unspent ground. What made it shorter than sixty-five is that its
+neighbours supplied the \emph{machinery} rather than the content \dash{} the
+null space, the determinant, the dot product and the basis are all borrowed, so
+the derivations are short even though the ideas are new.
+
+#### The spectral theorem, demonstrated with no rounding anywhere
+
+The construction is Program~\ref{prog:P09}'s rational $3$--$4$--$5$ rotation.
+$A = QDQ\T$ with rational $Q$ and $D$ is a rational \emph{symmetric} matrix
+whose eigenvalues \emph{are} $D$'s entries and whose eigenvectors \emph{are}
+$Q$'s columns \dash{} known by construction rather than found by a solver. So
+$\val{p10.spectral.trials}$ trials check every eigenvalue, every eigenvector
+and every right angle over fractions.
+
+**Why that is worth the lines, and it is not the obvious reason.** Going the
+usual way round \dash{} pick a symmetric matrix, solve for its eigenvalues
+\dash{} the discriminant is almost never a perfect square, so the answers are
+irrational and there is nothing exact left to compare. This is the only place
+in the book where a claim containing the word \emph{exactly} is checked with
+arithmetic that is itself exact; a float test would have needed a tolerance,
+which is what that word refuses.
+
+#### The gate P09 asked for
+
+P09's closing frame promised that the determinant is the product of the amounts
+the surviving directions are stretched by. That is now arithmetic rather than a
+sentence: the script computes the determinant with **P09's own `det()`** and
+asserts it equals the product of the eigenvalues, and the trace their sum.
+
+#### An assertion refuted its own frame, for the tenth pass running
+
+The ridge case \dash{} eigenvalues $5$ and $0$ \dash{} was asserted to have a
+sampled minimum of zero over $\val{p10.form.dirs}$ directions. It failed
+immediately and deserved to: **the flat direction is one direction out of
+infinitely many and sampling will never land on it.** That is P05's
+\enquote{finding nothing is not measuring nothing} from the other side.
+
+The replacement is two assertions rather than one \dash{} sample for
+non-negativity, and evaluate \textbf{exactly} at the eigenvector the
+construction already knows \dash{} and it produced the section's best sentence:
+*you cannot find a flat direction by looking for it*, which is the argument for
+computing eigenvectors at all.
+
+#### The measurement people get wrong
+
+Eigenvalues $\val{p10.basin.hi}$ and $\val{p10.basin.lo}$, a ratio of
+$\val{p10.basin.eigratio}$ \dash{} and the level ellipse is
+$\val{p10.basin.axisratio}$ times longer than it is wide. **The square root**,
+because the form carries the coordinate squared. Most readers answer
+$\val{p10.basin.eigratio}$. Guarded, on the recorded rule, so that the printed
+axis ratio reproduces from the printed eigenvalue ratio.
+
+That ratio is where \enquote{ravine}, \enquote{sharp minimum} and \enquote{the
+learning rate is too high} become three numbers read off one matrix. **The
+shape is collected here and deliberately not spent**: the inequality is
+Program~\ref{prog:P17}'s and the optimisers are Program~\ref{prog:P20}'s, which
+is what the manifest says now that the sweep before this program corrected it
+from P16 and P19.
+
+#### The declared forward reference, discharged rather than owed
+
+The manifest requires the covariance matrix's two facts to be declared, since
+P24 defines it. They are declared \dash{} and both are **proved here** from
+$C = \frac{1}{n}X\T X$, symmetric by construction and positive semi-definite
+because $v\T Cv = \frac{1}{n}\lVert Xv\rVert^{2}$ is a sum of squares. So
+nothing waits on P24 but the meaning of the word, and the note says the pointer
+is an attribution rather than a debt. Worth copying: a forward reference whose
+facts can be proved locally should be.
+
+#### The orphaned-cue random walk, two rounds
+
+| round | edit | result |
+|---|---|---|
+| 1 | lengthened frames 20 and 33 | `main-pl-a4` cleared, `main-en` gained one and `main-en-a4` went 1 to 2 |
+| 2 | lengthened frames 26 and 33 again | all four clean |
+
+Seventh confirmation of F06's two-sided rule, and the second time one frame
+needed lengthening twice. Every paragraph added earns its place: why the
+construction runs backwards from the answer; that a worst-case bound is the one
+that \emph{composes} where average behaviour does not; and that writing $x$ in
+the eigenvector basis is the step silently carrying the spectral theorem.
+
+#### `\blank` returns after thirteen programs
+
+CLAUDE.md recorded that the last `\blank` in the book was in F07. P10 has two,
+both in the classification table, where the reader fills in \emph{saddle} and
+\emph{ridge} from the sign patterns above them. It is a distinct retrieval mode
+and the F02 review pass called skipping it a lost rung of the scaffolding
+gradient; it is available in a `tabularx` cell, which F04 and F05 already use.
+
+#### Layout
+
+The multiset came back element for element to the pre-P10 baseline in all four
+builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with **no overfull box added at
+any point in the pass**, no stranded openers and no stranded headings. One
+orphan tail added, in `main-pl-a4`.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P10.1 only-stretched | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P10.2 bowl-or-saddle | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P10.3 ellipse-axes | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's wrap cap on the first render, so no redesign.
+
+**Rule 2 read first and then measured.** `p10-only-stretched` carries frame 1's
+answer in its second node and `p10-bowl-or-saddle` carries frame 29's in its
+third; `p10-ellipse-axes` states that one ratio describes the elongation and
+stops short of the square root, so it does not answer frame 36. All three are
+declared after the frame that delivers what they carry.
+
+| build | fig1 / its answer | fig2 / its answer | fig3 / its answer |
+|---|---|---|---|
+| `main-en` | 587 y479 / 587 y146 | 599 y130 / 598 y144 | 601 y569 / 601 y303 |
+| `main-en-a4` | 495 y315 / 494 y650 | 504 y334 / 503 y494 | 506 y612 / 506 y327 |
+| `main-pl` | 598 y130 / 597 y337 | \dash{} | 611 y541 / 611 y303 |
+| `main-pl-a4` | 500 y288 / \dash{} | \dash{} | 511 y641 / 511 y402 |
+
+**The Polish dashes are extraction failures, not defects, and saying so is the
+honest form.** `pdftotext` hyphenates the Polish anchors and the phrase search
+could not find three of them. The structural argument covers those cases and is
+the one this file already records as making the fix sound: a float cannot rise
+above the page its declaration point falls on, and all three declaration points
+are after the frame that delivers the content. The English columns measure the
+same source in both formats.
+
+#### The transcript splits across a page break
+
+Extracted from the finished PDF and executed, it reproduces
+`[Fraction(0, 1), Fraction(1, 1)]` exactly \dash{} zero for the symmetric
+matrix, one for the non-symmetric. But the seven lines land 3 on one page and 4
+on the next, so the extraction had to join two pages.
+
+Not a defect \dash{} the P06 sweep already found one listing broken this way,
+and this one sits after the answer it evidences rather than before a question.
+Recorded because **an extraction script that assumes a listing is on one page
+will silently read a fragment**, which is how the first attempt here reported a
+one-line transcript and a `None` output.
+
+#### Also
+
+- Traps 132 to 137 added to `notes/02`, and **items 13, 14 and 15 corrected**:
+  13 pointed at P08 and belongs to P09 (where it is now items 129 and 130), 14
+  pointed at P09 and is P10's own trap, 15 pointed at P10 and is P11's. Item 16
+  is marked delivered. Each was settled against the destination program rather
+  than by assuming the off-by-one. **The rest of §3 is not swept** \dash{} items
+  74 onward are correct, items 1--73 are a mix because several were corrected by
+  hand as their program was written, so a blanket renumber would break the ones
+  that are right. It is a pass of its own.
+- **Parity clean on its first run**, on the longest program written so far.
+  Fourth time (P02, P08, P09, P10).
+- Elicitation 39%, from six conversions that between them added no net frame.
+  Two produced the P06 pattern \dash{} a frame opening with `\ans` and ending
+  with `\dotline`.
+- Frame numbers mapped after writing: sections landed at
+  `1--10 / 11--17 / 18--23 / 24--32 / 33--43`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -5072,23 +5244,25 @@ clone instead.
 
 ## What is left
 
-1. **Twenty-five programs, and Parts I and II are complete with Part III six
-   programs in.** F1 to F13 and P1 to P9, both editions. Part II's argument — that floating
+1. **Twenty-four programs, and Parts I and II are complete with Part III seven
+   programs in.** F1 to F13 and P1 to P10, both editions. Part II's argument — that floating
    point, numerical stability and cost belong *before* the linear algebra — is
    now made rather than promised: none of the three needed anything beyond
    arithmetic, algebra and a sigma.
 
-   **P10 is next** — eigenvalues, the spectral theorem and quadratic forms —
-   and P09's closing frame hands it over by name: *not how much of the space
-   survives, but which directions come through unturned, only stretched — and
-   the determinant turns out to be the product of the amounts they are
-   stretched by.* Read P09 §1 and §3 first, because that handover is a promise
-   P10 has to keep in its own arithmetic: the product of the eigenvalues must
-   come out as the determinant, and that is a cross-programme gate waiting to
-   be written. Note also P10's **declared forward reference** — its payoff
-   uses the covariance matrix, defined in P24, and the manifest says the two
-   facts it needs (symmetric, positive semi-definite) must be stated in the
-   Learning outcomes with a pointer, exactly as P21 does.
+   **P11 is next** — the SVD, low-rank approximation and conditioning — and
+   P10's closing frame hands it over by name: *every matrix, of any shape,
+   turns out to be a rotation, then a stretch along perpendicular axes, then
+   another rotation, so the picture survives even where the theorem does not.*
+   Read P10 §2 and §3 first: its three failures (non-perpendicular
+   eigenvectors, no real eigenvalue, defective) are exactly what the SVD
+   repairs, and P10's `QDQ\T` construction and exact `eig2` are reusable.
+   P11 carries the **same declared forward reference** as P10 — PCA is an
+   eigen-decomposition of a covariance matrix and covariance is P24's — and
+   P10 discharged it by proving both facts locally, which P11 can cite rather
+   than repeat. Note also that P08 left P11 a specific debt: the rank-collapse
+   phenomenon, which P08 proved the theorem for and explicitly refused to
+   claim, needs the singular-value spectrum at each depth.
 
    **And there is now a Part II-shaped job that is nobody's program.** The
    elicitation ledger above puts P01, P02 and P03 at 29–31% against Part I's

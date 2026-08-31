@@ -481,22 +481,31 @@ the dimension and tells you almost nothing about conditioning. det(0.1·I₁₀�
 **13. "I need the inverse, so I'll compute the inverse."** You need to *solve*.
 `solve(A, b)` is faster and numerically better conditioned than `inv(A) @ b`,
 and forming an explicit inverse to multiply by it is the standard beginner tell
-in numerical code. → **P08**.
+in numerical code. → **P09**, which wrote it up in full as items 129 and 130
+below — the operation count measured there, the accuracy argument owned by
+**P11**. (This entry said P08 until P09 was written; P08 is rank and least
+squares and never forms an inverse.)
 
 **14. "Eigenvectors are orthogonal."** Only for symmetric (Hermitian) matrices,
 by the spectral theorem. A general square matrix can have non-orthogonal
 eigenvectors, complex eigenvalues, or fail to be diagonalisable at all. Attention
-matrices, transition matrices and Jacobians are not symmetric. → **P09**.
+matrices, transition matrices and Jacobians are not symmetric. → **P10**,
+which elicits it before naming it: the reader is given a non-symmetric matrix's
+two eigenvectors and asked whether they are perpendicular. (This entry said P09
+until P10 was written; P09 is the determinant and has no eigenvector in it.)
 
 **15. "Singular values are eigenvalues."** They coincide only for symmetric
 positive semi-definite matrices. In general σᵢ(A) = √λᵢ(AᵀA), the singular values
 are real and non-negative for *every* matrix including rectangular ones, and the
-eigenvalues may not exist over the reals. → **P10**.
+eigenvalues may not exist over the reals. → **P11**, which owns the SVD. (This
+entry said P10 until P10 was written; P10 stops at eigenvalues and says so.)
 
 **16. "PCA on my feature matrix."** Two silent preconditions. PCA without
 *centring* returns a first component pointing at the mean, and PCA without
 *scaling* returns components dominated by whichever feature is measured in the
-largest units. Neither raises an error. → **P10**.
+largest units. Neither raises an error. → **P10**, delivered: its derivation
+assumes centring outright and its trapbox works the metres-against-millimetres
+case, whose variance differs by a factor of a million.
 
 ### Calculus and autodiff (P14–P17)
 
@@ -1461,6 +1470,60 @@ establish: rank collapse in deep attention stacks is a claim about what training
 and the softmax do to a stack with no narrow layer in it, which is a different
 statement, is architecture-dependent, and is not measured in this book.
 → **P08**.
+
+### Eigenvalues, quadratic forms and positive definiteness, written (P10)
+
+Items 132 to 137 came out of writing P10. Item 14 above is this program's as
+well, and is elicited rather than warned about.
+
+**132. "A matrix has as many independent eigenvectors as it has eigenvalues."**
+An eigenvalue can arrive twice and bring only one direction with it. The shear
+with rows $(1,1)$ and $(0,1)$ has trace 2 and determinant 1, so
+$(\lambda-1)^2$ and the only eigenvalue is 1 — and only the horizontal survives.
+A matrix like that is **defective** and has no basis of eigenvectors at all,
+which matters because almost everything done with eigenvectors starts by
+writing a vector in terms of them. → **P10**.
+
+**133. "Every real matrix has real eigenvalues."** A quarter turn has none: its
+characteristic equation is $\lambda^2 + 1 = 0$. Nothing in the plane survives a
+right-angle turn, so there is no direction for a real eigenvalue to describe.
+What it has instead is a complex pair, and a complex eigenvalue is the algebra's
+way of saying *this map rotates* rather than a sign that something has gone
+wrong. Worth knowing chiefly so that a complex number in a library's output is
+not read as an error. → **P10**.
+
+**134. "The basin has a curvature ratio of 100, so it is 100 times longer than
+it is wide."** It is 10 times. The half-axis of a level set along an eigenvector
+goes as $1/\sqrt{\lambda}$, because the form carries the coordinate *squared*,
+so the ratio of the axes is the **square root** of the ratio of the eigenvalues.
+Measured in P10: eigenvalues 20 and 1 give an ellipse 4.47 times longer than
+wide. The square root is a large correction in the reassuring direction, and it
+is why a basin with a hundredfold spread in curvature still looks merely oval.
+→ **P10**, with the step-size consequence handed to **P17**.
+
+**135. "I tried a thousand directions and the form was positive in all of them,
+so it is positive definite."** A semi-definite form's flat direction is *one*
+direction out of infinitely many, and no amount of sampling will land on it.
+This one is recorded because the script's own assertion made the mistake first:
+`min over 720 directions == 0` failed immediately, and the honest replacement is
+sampling for non-negativity plus an exact evaluation at the eigenvector. **You
+cannot find a flat direction by looking for it**, which is the argument for
+computing eigenvectors at all. → **P10**.
+
+**136. "Positive semi-definite is basically positive definite."** The word
+*semi* carries the whole difference: a positive definite matrix is invertible,
+because none of its eigenvalues is zero, and a positive semi-definite one need
+not be. A covariance matrix is only guaranteed the weaker one, which is why a
+covariance can be singular and a routine that inverts one can fail on real
+data. → **P10**.
+
+**137. "The spectral norm is about how big the entries are."** It is the
+largest $|\lambda|$, and it is the factor by which a layer can amplify a
+vector's length **in the worst case over every input, including the ones nobody
+has tried** — the Lipschitz constant. Entries and eigenvalues are not the same
+size in general, which is the whole reason the norm has to be computed rather
+than eyeballed. → **P10**, and → **P11** for the non-symmetric case, where the
+number wanted is the largest singular value rather than the largest eigenvalue.
 
 ### Determinant, inverse and change of basis, written (P09)
 
