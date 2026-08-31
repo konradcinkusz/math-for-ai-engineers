@@ -1,26 +1,946 @@
 %% P03 --- Rzędy wielkości: notacja O, FLOP-y i pamięć
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Każda liczba w tym programie, której czytelnik nie policzy w pamięci,
+%% pochodzi z code/p03_orders_of_magnitude.py i trafia na stronę przez \val{}.
+%% Listing konsolowy to zatwierdzony transkrypt pisany przez ten skrypt.
+%%
+%% TEZA: notacja asymptotyczna mówi o WZROŚCIE i nic nie mówi o tym, która z
+%% dwóch implementacji jest dziś szybsza. Oba fakty mają znaczenie, a drugi
+%% jest tym, którego potrzebuje przegląd projektu.
+%%
+%% TRZECIE PYTANIE O JEDNĄ ARYTMETYKĘ. P01 pytał, czym ona jest; P02 pytał,
+%% które algorytmy ją przeżyją; ten pyta, ile kosztuje.
+%%
+%% CO TEN PROGRAM JEST WINIEN I SPŁACA. Pięć programów obiecuje go z nazwy:
+%%   F01 -- DWA RAZY i jest to największy dług: wagi są podłogą, a stan
+%%          optymalizatora, aktywacje i cache kluczy i wartości "są policzone
+%%          porządnie w Programie P03"
+%%   F02 -- "Program P03 tak właśnie wymiarowuje sieć"
+%%   F04 -- DWA RAZY: wycenia pracę we FLOP-ach zamiast liczyć pary i wycenia
+%%          model w notacji sigma
+%%   F10 -- najostrzej i wymienia TRZY rzeczy: notacja O potrzebuje własnej
+%%          definicji, własnej listy tego, czego NIE mówi, i przepracowanego
+%%          przypadku, w którym szybsza dziś implementacja jest wolniejsza w
+%%          skali
+%%   P02 -- "nie czy jest poprawna, ale ile kosztuje"
+%%
+%% CO TEN PROGRAM ŚWIADOMIE ZOSTAWIA, sprawdzone w tools/programs.json:
+%%   czym JEST macierz i mnożenie jako złożenie                    -> P06
+%%   liczba parametrów transformera, która potrzebuje kształtów    -> P32
+%%   sprawdzanie kształtów jako dyscyplina, broadcasting, einsum   -> P07
+%% Tam, gdzie ten program potrzebuje mnożenia macierzy, opisuje je jako
+%% iloczyny skalarne, które Program F09 już czytelnikowi dał, i mówi to wprost.
+%%
+%% LICZBY O URZĄDZENIU SĄ PRZYJĘTYMI ZAŁOŻENIAMI, dokładnie jak te z F01, i
+%% ramki to mówią. Przenosi się stosunek i metoda.
+%%
+%% Bliźniak: programs/en/P03-orders-of-magnitude.tex. Ramka w ramkę, makro w
+%% makro, liczba w liczbę; tools/parity.py je porównuje.
 
 \program{Rzędy wielkości: notacja O, FLOP-y i pamięć}
 \label{prog:P03}
+\index{cost!counting operations and bytes}
+\index{O-notation}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{odczytać tempo wzrostu z pętli i powiedzieć, co twierdzi
+  notacja, która je zapisuje}
+\outcome{8--12}{powiedzieć, co notacja pomija, i rozstrzygnąć z jej pomocą
+  między dwiema implementacjami}
+\outcome{13--17}{wycenić pracę w operacjach, wychodząc od liczby, którą już
+  masz}
+\outcome{18--24}{wymiarować pamięć potrzebną modelowi w treningu i w
+  serwowaniu i powiedzieć, który składnik rośnie z czym}
+\outcome{25--34}{podzielić operacje przez bajty i powiedzieć, na które z
+  dwojga dana praca czeka}
+\end{outcomes}
 
-Argument: asymptotic notation is a statement about growth and says nothing
-about which of two implementations is faster today; both facts matter.
-Payoff: bytes, FLOPs as a rate, and arithmetic intensity as a ratio, which
-is the whole justification for kernel fusion; why a large matrix multiply is
-compute-bound and an elementwise operation is memory-bound. DEPENDENCY NOTE:
-an earlier brief had the reader count the parameters of a transformer block
-here, three parts before any program has said what a matrix is. That count
-moves to P32, where the shapes exist. What stays is magnitude and cost,
-which need only arithmetic and sigma notation.
+\begin{quiz}
+\item Algorytm jest $O(n)$. Czy jest też $O(n^{2})$? \teachesat{3--4}
+  \answerto{Tak. $O$ to ograniczenie górne wzrostu, a nie jego opis, a
+  ograniczenie luźne wciąż jest ograniczeniem.}
+\item Algorytm A jest $O(n^{2})$, a algorytm B jest $O(n\mfalogplain n)$. Który
+  wypuszczasz? \teachesat{8--9}
+  \answerto{Za mało danych. Notacja odrzuca stałe, a to stałe rozstrzygają
+  wszystko poniżej punktu przecięcia.}
+\item Dwie implementacje kosztują $\val{p03.cross.c1} n^{2}$ i
+  $\val{p03.cross.c2} n\logb{2} n$. Przy jakim $n$ zamieniają się miejscami?
+  \teachesat{9--10}
+  \answerto{$\val{p03.cross.n}$. Poniżej wygrywa kwadratowa,
+  $\val{p03.cross.ratio.100}$ razy przy $n = 100$.}
+\item Model ma $\val{f01.params}$ parametrów trzymanych po dwa bajty. Ile
+  pamięci potrzeba, żeby go trenować? \teachesat{19--20}
+  \answerto{Około $\val{p03.mem.total}$~GB \dash{}
+  $\val{p03.mem.multiple}$ razy tyle co wagi, które stanowią tylko
+  $\val{p03.mem.weights.pct}\%$ rachunku.}
+\item Serwowana rozmowa rośnie z $\val{p03.kv.seq}$ tokenów do dwa razy
+  dłuższej. Co dzieje się z cache'em kluczy i wartości? \teachesat{22--23}
+  \answerto{Podwaja się, z $\val{p03.kv.gib}$ do
+  $\val{p03.kv.double.gib}$~GiB. Cache jest \emph{liniowy} w długości
+  sekwencji, choć arytmetyka uwagi jest kwadratowa.}
+\item Czym jest intensywność arytmetyczna i z czym się ją porównuje?
+  \teachesat{26--27}
+  \answerto{Operacjami podzielonymi przez przeniesione bajty, a porównuje się
+  ją z własnym stosunkiem urządzenia: operacji na dostarczony bajt \dash{}
+  $\val{p03.dev.ratio}$ przy założeniach tego programu.}
+\item Czy mnożenie macierzy zawsze jest ograniczone przez obliczenia?
+  \teachesat{30--31}
+  \answerto{Nie. Jego intensywność rośnie z rozmiarem, więc jest ograniczone
+  przez obliczenia dopiero powyżej mniej więcej $n = \val{p03.ai.smalln}$ na
+  zakładanym tu urządzeniu. Małe jest ograniczone przez pamięć jak wszystko
+  inne.}
+\item Trzy operacje elementowe biegną jedna po drugiej. Co daje ich zlanie w
+  jedno przejście? \teachesat{32--33}
+  \answerto{Czynnik $\val{p03.fuse.factor}$ w przeniesionych bajtach, przy
+  dokładnie tych samych operacjach \dash{} ale wynik wciąż leży daleko poniżej
+  stosunku urządzenia, więc to pomaga i nie ratuje.}
+\end{quiz}
+
+% ============================================================
+\section{Co ta notacja mówi}
+\label{sec:P03-says}
+\index{O-notation}
+
+\begin{fr}
+Trzy programy, jedna arytmetyka. Program~\ref{prog:P01} pytał, czym ona jest.
+Program~\ref{prog:P02} pytał, które algorytmy ją przeżyją. Ten zadaje pytanie,
+od którego przegląd projektu naprawdę się zaczyna: \textbf{ile to kosztuje?}
+
+Program~\ref{prog:F10} wykonał liczenie i przekazał notację z nazwy, wraz z
+ostrzeżeniem, że notacja potrzebuje własnej definicji, własnej listy tego,
+czego \emph{nie} mówi, i przepracowanego przypadku, w którym asymptotycznie
+gorszy algorytm jest tym do wypuszczenia.
+
+Zacznij od liczenia. Jedna pętla wykonuje $\frac{n(n-1)}{2}$ jednostek pracy;
+druga $3n^{2} + 5n + 100$. Która jest większa przy $n = 10^{6}$ i mniej więcej
+ile razy?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Druga, mniej więcej sześciokrotnie.
+\end{ansblock}
+
+$\frac{n(n-1)}{2}$ to mniej więcej $\frac{n^{2}}{2}$, a $3n^{2} + 5n + 100$ to
+mniej więcej $3n^{2}$, więc stosunek dąży do $6$, a $5n$ i $100$ nie wnoszą
+nic mierzalnego.
+
+Stały się tam dwie rzeczy i obie są całą treścią tej notacji.
+\emph{Składniki niższego rzędu przestały mieć znaczenie}, bo $n^{2}$ przerasta
+$n$ i przerasta stałą. I \emph{współczynnik wiodący przetrwał} jako czynnik
+sześć, który nie rośnie z $n$ i nigdy nie urośnie.
+
+Notacja $O$ zachowuje pierwszą obserwację i wyrzuca drugą. Obie pętle są
+$O(n^{2})$.
+\end{fr}
+
+\begin{fr}
+Definicja, wypowiedziana raz, żeby reszta programu mogła się na niej oprzeć.
 
 \medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+\noindent
+$f(n)$ jest $O(g(n))$, gdy istnieje stała $c$ i rozmiar $n_0$ takie, że
+$f(n) \le c\,g(n)$ dla każdego $n \ge n_0$.
+
+\medskip
+\noindent
+Przeczytaj oba kwantyfikatory. \emph{Pewna} stała, więc stała nie jest
+zapisana. \emph{Powyżej pewnego rozmiaru}, więc o małych wejściach nie twierdzi
+się zupełnie nic.
+
+Oto pierwsza rzecz, którą ludzie biorą źle, i wynika wprost z powyższego.
+Algorytm wykonuje dokładnie $n$ kroków. Czy jest $O(n^{2})$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak.}
+\begin{trapbox}
+\textbf{$O$ to ograniczenie górne wzrostu, a nie jego opis.} Algorytm liniowy
+jest $O(n^{2})$, i $O(n^{3})$, i $O(2^{n})$: każde z tych zdań jest prawdziwe i
+każde jest luźniejsze, niż trzeba.
+
+Powiedzenie, że algorytm \enquote{jest $O(n^{2})$}, mówi więc, że nie jest
+gorszy niż kwadratowy. Nie mówi, że jest kwadratowy. Gdy ktoś ma na myśli
+\emph{dokładnie takie tempo, nie lepsze}, notacją na to jest $\Theta$ i zwykle
+to ją miał na myśli.
+
+Praktyczna konsekwencja nie jest pedanterią. \enquote{Nasze wyszukiwanie jest
+$O(n)$} to twierdzenie, którego żaden benchmark nie obali, bo jest zgodne z
+dowolną stałą \dash{} a to stałą płacisz.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Hierarchia, w kolejności, która ma znaczenie, z powodem, dla którego każdy
+szczebel jest szczeblem:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+wzrost & co oznacza podwojenie wejścia \\
+\midrule
+$O(1)$ & nic się nie zmienia \\
+$O(\mfalogplain n)$ & jeden krok więcej \\
+$O(n)$ & dwa razy tyle pracy \\
+$O(n \mfalogplain n)$ & trochę ponad dwa razy \\
+$O(n^{2})$ & cztery razy \\
+$O(n^{3})$ & osiem razy \\
+$O(2^{n})$ & podnosi pracę do kwadratu \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Program~\ref{prog:F10} zmierzył wiersz $O(n^{2})$ i znalazł stosunek dążący do
+czterech \emph{od góry}; ostatni wiersz to jego liczba podzbiorów, a
+\enquote{podnosi pracę do kwadratu} jest powodem, dla którego jeden element
+więcej bywa tym, który kończy projekt.
+
+Odczytanie tego z pętli jest mechaniczne: \textbf{pętle zagnieżdżone mnożą się,
+a następujące po sobie dodają.} Przebieg po $n$ wewnątrz przebiegu po $n$ to
+$n^{2}$; przebieg po $n$, a po nim przebieg po $n$, to $2n$, czyli $O(n)$.
+
+\begin{notationbox}
+\textbf{Logarytm bez podstawy, w książce, która ich zabrania.} Ten program
+pisze $O(n \mfalogplain n)$, a Dodatek B mówi, że goły logarytm jest tutaj
+błędem budowania, bo dwie obsługiwane przez tę książkę grupy czytelników
+czytają go jako dwie różne funkcje.
+
+Wewnątrz $O$ to pominięcie nie jest konwencją, tylko twierdzeniem. Zmiana
+podstawy mnoży przez stałą:
+\[ \logb{a} n = \frac{\logb{b} n}{\logb{b} a} \]
+a stała jest dokładnie tym, co $O$ odrzuca. Więc $O(n \mfalogplain n)$ nazywa
+jedną klasę wzrostu naraz dla każdej podstawy, a wpisanie podstawy sugerowałoby
+rozróżnienie, którego nie ma.
+
+Poza $O$ podstawa wraca i ma znaczenie, i dlatego
+$\val{p03.cross.c2}\,n\logb{2}n$ dwie sekcje dalej jest zapisane z podstawą.
+\end{notationbox}
+\end{fr}
+
+\begin{fr}
+Dwie pętle, i to koniec części mechanicznej.
+
+Pierwsza chodzi po liście $n$ dokumentów i dla każdego chodzi po liście $m$
+terminów zapytania. Druga chodzi po dokumentach, a potem osobno po terminach.
+Podaj tempo wzrostu każdej.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$O(nm)$ i $O(n + m)$.
+\end{ansblock}
+
+Zagnieżdżone mnożą, następujące po sobie dodają, a różnica między jednym a
+drugim jest różnicą między systemem, który działa, a takim, który nie działa
+\dash{} co warto zauważyć, jest stwierdzeniem, które ta notacja \emph{potrafi}
+wypowiedzieć.
+
+To uczciwe zastosowanie notacji $O$: porównywanie kształtów różniących się
+czynnikiem, który rośnie. Czego nie potrafi, jest tematem następnej sekcji i
+to tam wyrządza się najwięcej szkód.
+\end{fr}
+
+% ============================================================
+\section{Czego ta notacja nie mówi}
+\label{sec:P03-not}
+\index{O-notation!what it omits}
+\index{measurement!against asymptotics}
+
+\begin{fr}
+Algorytm A jest $O(n^{2})$. Algorytm B jest $O(n \mfalogplain n)$. Jutro musisz
+wypuścić jeden z nich.
+
+Który i czego musiałbyś się dowiedzieć?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Za mało danych \dash{} potrzebujesz stałych i rozmiaru $n$.
+\end{ansblock}
+
+Definicja odrzuciła stałe celowo, a to je płacisz. Załóżmy, że A kosztuje
+$\val{p03.cross.c1} n^{2}$, bo jego pętla wewnętrzna to dodawanie na danych już
+w cache'u, a B kosztuje $\val{p03.cross.c2} n\logb{2} n$, bo każdy jego krok
+alokuje, woła przez wskaźnik i chybia.
+
+Poniżej pewnego rozmiaru wygrywa A. Znajdź ten rozmiar.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$n = \val{p03.cross.n}$.}
+\transcript{p03-crossover}
+
+Wzoru na to nie ma \dash{} $n^{2} = c\,n\logb{2} n$ nie ma rozwiązania
+elementarnego \dash{} więc znajduje się go szukaniem, co i tak byś zrobił.
+
+Liczby po obu stronach są pointą:
+
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+przy & wolniejsza kosztuje & i jest to \\
+\midrule
+$n = 100$ & $\val{p03.cross.ratio.100}\times$ & $n \mfalogplain n$ \\
+$n = 1000$ & $\val{p03.cross.ratio.1000}\times$ & $n \mfalogplain n$ \\
+$n = 100\,000$ & $\val{p03.cross.ratio.100000}\times$ & $n^{2}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Asymptotycznie gorszy algorytm jest
+$\val{p03.cross.ratio.100}$ razy szybszy przy $n = 100$} i pozostaje z przodu
+aż do $\val{p03.cross.n}$. Jeśli twoimi wejściami są dokumenty w żądaniu,
+tokeny w prompcie albo cechy w wierszu, możesz nigdy nie dojść do punktu
+przecięcia.
+\end{fr}
+
+\mermaidfig{p03-crossover}{Dwa tempa wzrostu, dwie stałe i powód, dla którego
+notacja tego nie rozstrzyga.}{wzrost przeciw stalym}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Asymptotycznie lepszy} to twierdzenie o granicy, a to ty
+decydujesz, czy kiedykolwiek się tam wybierzesz.}
+
+Nawyk, który to prostuje, to traktowanie tempa wzrostu jak rankingu. Nim nie
+jest: jest stwierdzeniem o tym, który algorytm wygrywa \emph{ostatecznie}, a
+ostatecznie może leżeć za każdym wejściem, jakie twój system zobaczy.
+
+Każda szeroko używana biblioteka sortowania robi dokładnie tę wymianę.
+Uruchamia sortowanie przez wstawianie o koszcie $O(n^{2})$ na krótkich
+podtablicach wewnątrz sortowania $O(n \mfalogplain n)$, bo poniżej progu kilkudziesięciu
+elementów algorytm kwadratowy jest szybszy, a sortowanie miliona elementów
+składa się głównie z sortowań kilkudziesięciu. Nikt nie uważa tego za
+kompromis.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Druga rzecz, której notacja nie mówi, to czym jest operacja.
+
+Tempo wzrostu liczy \emph{kroki} i traktuje każdy krok jako kosztujący tyle
+samo. Na maszynie nie kosztują: dodawanie na wartości już w rejestrze i odczyt
+chybiający każdy poziom cache'u różnią się czynnikiem rzędu setek, a żaden z
+nich nie pojawia się w $O(n)$.
+
+Dlatego przebieg $O(n)$ po liście wiązanej potrafi przegrać z przebiegiem
+$O(n \mfalogplain n)$ po tablicy i dlatego dwie listy z poprzedniej sekcji \dash{} obie
+$O(n)$ \dash{} to wcale nie ten sam program.
+
+\medskip
+\noindent
+Te dwa fakty są więc osobne i potrzebujesz obu. \textbf{Notacja mówi, jak
+koszt się skaluje; pomiar mówi, ile wynosi.} Reszta tego programu jest tym
+drugim.
+\end{fr}
+
+% ============================================================
+\section{Liczenie operacji}
+\label{sec:P03-flops}
+\index{cost!FLOPs}
+
+\begin{fr}
+Program~\ref{prog:F04} policzył pary w warstwie uwagi przyczynowej \dash{}
+$\val{p03.flop.pairs}$ z nich dla swojego kontekstu \dash{} i powiedział, że
+ten program wyceni tę pracę we FLOP-ach zamiast w parach. Oto przekład i nie
+potrzebuje niczego, czego nie masz.
+
+Każda para kosztuje jeden iloczyn skalarny między zapytaniem a kluczem, a
+Program~\ref{prog:F09} mówi, ile kosztuje iloczyn skalarny: dla wektorów
+długości $d$ jest to $d$ mnożeń i $d - 1$ dodawań, co liczy się jako $2d$
+operacji.
+
+Przy szerokości głowicy $\val{p03.flop.dhead}$ podaj operacje dla wyników
+jednej głowicy.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$2 \times \val{p03.flop.pairs} \times \val{p03.flop.dhead}
+  = \val{p03.flop.perhead}$}
+A przy $\val{p03.flop.heads}$ głowicach $\val{p03.flop.allheads}$ operacji
+\dash{} na same wyniki, w jednej warstwie, dla jednej sekwencji.
+
+\begin{note}
+\textbf{FLOP to jedna operacja zmiennoprzecinkowa, a konwencja mówi, że
+mnożenie z dodawaniem to dwie.} Część sprzętu wykonuje tę parę jako jedną
+instrukcję i część producentów liczy ją z tego powodu jako jeden FLOP, więc
+czynnik dwa między liczbami dwóch osób to zwykle to, a nie spór o model.
+Powiedz, której konwencji używasz, a spór się kończy.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Dla całego przebiegu treningu liczenie ma skrót, którego Program~\ref{prog:F01}
+już użył: około $6$ FLOP-ów na parametr na token.
+
+Tę $6$ warto rozpakować, bo to trzy osobne dwójki. Przejście w przód kosztuje
+około $2$ na parametr na token \dash{} jedno mnożenie i jedno dodawanie, czyli
+powyższy iloczyn skalarny. Przejście wstecz liczy dwa gradienty, jeden względem
+wejścia i jeden względem wagi, a każdy kosztuje mniej więcej tyle co przejście
+w przód. Dwa w przód, cztery wstecz, sześć razem.
+
+Dla $\val{f01.params}$ parametrów na $\val{f01.tokens}$ tokenach daje to
+$\val{p03.train.flops}$, czyli liczbę, którą policzył Program~\ref{prog:F01}, a
+skrypt tego programu wyprowadza ją ponownie, żeby obie nie mogły się rozejść.
+\end{fr}
+
+\begin{fr}
+Program~\ref{prog:F02} poprosił o jeden nawyk i to jest ramka, która go winna:
+\textbf{policz kształt w każdej warstwie, zanim cokolwiek uruchomisz, i sprawdź
+go z tym, co raportuje framework.}
+
+Arytmetyka jest ta sama co wyżej. Warstwa, która zamienia wektor długości $d$ w
+inny wektor długości $d$, wykonuje $d$ iloczynów skalarnych długości $d$, czyli
+$2d^{2}$ operacji na pozycję \dash{} a pamięć potrzebna jej na własne parametry
+to $d^{2}$ liczb, czyli to samo $d^{2}$ w innej jednostce.
+
+Tę zbieżność warto zapamiętać i nie przeżywa ona zetknięcia z uwagą, gdzie
+parametrów jest $O(d^{2})$, a pracy $O(d\,n^{2})$ w długości sekwencji.
+\textbf{Liczba parametrów nie jest liczbą pracy}, a mylenie ich to sposób, w
+jaki model, który się mieści, okazuje się nie działać.
+
+\begin{rigourbox}
+\textbf{Czego ten program nie robi, to liczenia parametrów bloku
+transformera.} To potrzebuje kształtów, a kształty potrzebują tego, czym jest
+macierz, czyli Programu~\ref{prog:P06}. Samo liczenie należy do
+Programu~\ref{prog:P32}, gdzie wszystkie części istnieją. Tutaj dostępne są
+arytmetyka i sigma \dash{} co, jak powiedział Program~\ref{prog:F04},
+wystarcza do wyceny pracy.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{Liczba FLOP-ów jest liczbą. Nie jest czasem.}
+
+Program~\ref{prog:F01} zamienił swoje $\val{p03.train.flops}$ na dni
+urządzenia, dzieląc przez tempo urządzenia, a potem dzieląc jeszcze raz przez
+wykorzystanie równe $\val{f01.device.util.pct}\%$, i to drugie dzielenie jest
+całym tematem ostatniej sekcji tego programu.
+
+Nikt nie osiąga reklamowanego tempa urządzenia. Ta luka nie jest marnotrawstwem
+ani usterką: jest czasem, który arytmetyka spędza, czekając na przybycie liczb,
+i da się ją przewidzieć ze stosunku, który liczy ostatnia sekcja. Liczba
+FLOP-ów bez wykorzystania obok niej jest oszacowaniem najlepszego przypadku
+podanym tak, jakby była planem.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Liczenie bajtów}
+\label{sec:P03-bytes}
+\index{cost!memory}
+\index{memory!training against serving}
+
+\begin{fr}
+Program~\ref{prog:F01} policzył pamięć wag modelu, a potem powiedział w ramce
+ostrzeżenia, że wagi są \emph{podłogą} \dash{} że trening trzyma też stan
+optymalizatora i aktywacje, że serwowanie trzyma rosnący cache i że oba są
+policzone porządnie tutaj. Ta sekcja jest tym długiem.
+
+Zacznij od tego, co jest rezydentne. Model jest trenowany. Jego
+$\val{f01.params}$ parametrów jest trzymanych po dwa bajty, czyli
+$\val{p03.mem.weights}$~GB.
+
+Wymień wszystko inne, co musi istnieć w tym samym czasie.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Gradient dla każdego parametru i cokolwiek optymalizator trzyma dla każdego
+parametru.
+\end{ansblock}
+
+Gradienty to łatwiejsza połowa: po jednym na wagę, żywe przez całe przejście
+wstecz, w tych samych dwóch bajtach \dash{} kolejne
+$\val{p03.mem.grads}$~GB.
+
+Optymalizator to połowa, która zaskakuje. Optymalizator momentowy trzyma dwie
+średnie bieżące na parametr \dash{} Program~\ref{prog:F04} zbudował dokładnie
+takie \dash{} a trening w mieszanej precyzji trzyma dodatkowo kopię wzorcową
+wag w pełnej szerokości, bo waga szesnastobitowa nie wchłonie małej poprawki,
+co jest progiem Programu~\ref{prog:P01} przybywającym do pętli treningowej.
+Trzy kopie po cztery bajty.
+\end{fr}
+
+\mermaidfig{p03-memory-bill}{Co jest rezydentne, gdy model się trenuje, i
+czemu wagi są najmniejszym składnikiem.}{rachunek pamieci treningu}
+
+\begin{fr}
+Rachunek, dla $\val{f01.params}$ parametrów:
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+ & GB \\
+\midrule
+wagi, dwa bajty & $\val{p03.mem.weights}$ \\
+gradienty, dwa bajty & $\val{p03.mem.grads}$ \\
+kopia wzorcowa, cztery bajty & $\val{p03.mem.master}$ \\
+pierwszy moment, cztery bajty & $\val{p03.mem.moment1}$ \\
+drugi moment, cztery bajty & $\val{p03.mem.moment2}$ \\
+\midrule
+razem & $\val{p03.mem.total}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Wagi to $\val{p03.mem.weights.pct}\%$ rachunku treningu, a całość jest
+$\val{p03.mem.multiple}$ razy większa niż liczba na karcie modelu.}
+
+\begin{aibox}
+Ten czynnik jest odpowiedzią na pytanie, które ludzie zadają bez przerwy:
+czemu model, który ładuje się i działa na karcie, nie da się na niej dostroić.
+Model o wadze $\val{p03.mem.weights}$~GB na karcie $24$~GB ma miejsce, żeby
+serwować, a potrzebuje $\val{p03.mem.total}$~GB, żeby trenować.
+
+Każde z typowych lekarstw usuwa jeden wiersz, a nie zmniejsza wszystkich.
+Trenowanie małej liczby dodatkowych parametrów zamiast wszystkich usuwa prawie
+całe cztery ostatnie wiersze i zostawia pierwszy. Optymalizator ośmiobitowy
+połowi oba wiersze momentów. Sharding między urządzenia dzieli wiersze, zamiast
+je usuwać. Wiedza o tym, który wiersz atakuje dana technika, pozwala
+przewidzieć, czy to wystarczy, a powyższa arytmetyka to wszystko, czego do tego
+trzeba.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jednego składnika w tej tabeli celowo brakuje, bo w ogóle nie skaluje się z
+parametrami.
+
+\textbf{Aktywacje} to wartości pośrednie zachowane z przejścia w przód,
+ponieważ potrzebuje ich przejście wstecz \dash{} czyli wynik
+Programu~\ref{prog:F12} o regule łańcuchowej, przybywający jako rachunek za
+pamięć. Ich rozmiar zależy od wielkości wsadu, długości sekwencji i głębokości,
+a nie od liczby parametrów, więc ten sam model ma inny rachunek za aktywacje
+przy każdym obciążeniu.
+
+To czyni je składnikiem, który się stroi. Zmniejszenie wsadu o połowę zmniejsza
+je o połowę i nie zmienia nic innego w tabeli. A \emph{gradient checkpointing}
+zachowuje tylko część z nich i przelicza resztę w przejściu wstecz, co wymienia
+operacje na bajty \dash{} dwie wielkości, o których jest ten program, wymienione
+celowo.
+\end{fr}
+
+\begin{fr}
+Teraz serwowanie, gdzie rachunek ma inny kształt.
+
+Rozmowa jest generowana token po tokenie. Każdy nowy token zwraca uwagę na
+wszystkie poprzednie, więc klucze i wartości dla każdej poprzedniej pozycji
+muszą być dostępne \dash{} a zamiast je przeliczać, trzyma się je. To jest
+\emph{cache kluczy i wartości}.
+
+Dla modelu o $\val{p03.kv.layers}$ warstwach i szerokości
+$\val{p03.kv.dmodel}$, po dwa bajty, wynosi on
+\[ 2 \times \text{warstwy} \times \text{szerokość} \times \text{pozycje}
+   \times \text{bajty} \]
+Policz go dla kontekstu $\val{p03.kv.seq}$ tokenów i powiedz, co się stanie,
+gdy rozmowa osiągnie dwa razy taką długość.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p03.kv.gib}$~GiB, a przy dwa razy większej długości
+$\val{p03.kv.double.gib}$~GiB.}
+\begin{trapbox}
+\textbf{Cache jest liniowy w długości sekwencji, a prawie każdy spodziewa się,
+że będzie kwadratowy.}
+
+To oczekiwanie bierze się z czegoś prawdziwego: \emph{arytmetyka} uwagi jest
+kwadratowa w długości sekwencji, bo każda pozycja zwraca uwagę na każdą
+wcześniejszą, a Program~\ref{prog:F04} policzył dokładnie te pary. Umysł
+podstawia więc $n^{2}$ także pod pamięć.
+
+Jest $n$. Cache trzyma jeden klucz i jedną wartość \emph{na pozycję}, a nie na
+parę \dash{} pary powstają i są zużywane wewnątrz obliczenia i nigdy nie są
+przechowywane. Dwie wielkości, dwa wykładniki, jedna warstwa.
+
+Praktyczna postać jest na token: $\val{p03.kv.per.token.mb}$~MB cache'u na
+każdy token w locie, przy tych kształtach. Pomnóż przez tokeny i przez
+równoczesne rozmowy, a masz plan pojemności. Zwykle jest większy od wag i to on
+decyduje, ilu użytkowników obsłuży karta.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jedna linijka porządkowa, bo odpowiada za większość rozbieżności między
+oszacowaniem a panelem monitoringu.
+
+Program~\ref{prog:F01} to rozstrzygnął: GB to $10^{9}$ bajtów, a GiB to
+$2^{30}$, i drugie jest większe o jakieś siedem procent. Każda liczba w tej
+sekcji jest w jednym albo w drugim i mówi, w którym. Plan pojemności mylący się
+o siedem procent to prawie zawsze to, a lekarstwem jest zapisanie jednostki, a
+nie przeliczenie arytmetyki.
+\end{fr}
+
+% ============================================================
+\section{Operacje przeciw bajtom}
+\label{sec:P03-intensity}
+\index{cost!arithmetic intensity}
+\index{cost!compute-bound and memory-bound}
+
+\begin{fr}
+Dwie prace. Jedna mnoży przez siebie dwie duże kwadratowe tablice liczb. Druga
+dodaje elementowo dwie tablice tej samej wielkości.
+
+Obie zajmują czas. Przewidz, która z nich spędza większość tego czasu na
+arytmetyce, a która na czekaniu.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Mnożenie robi arytmetykę; dodawanie elementowe czeka.
+\end{ansblock}
+
+I jest to stosunek, a nie intuicja. Policz operacje, policz bajty, które trzeba
+przenieść z pamięci i do niej, i podziel:
+
+\medskip
+\noindent
+\textbf{intensywność arytmetyczna} $=$ operacje $\div$ przeniesione bajty
+
+\medskip
+\noindent
+Potem porównaj to z liczbą należącą do maszyny, a nie do twojego kodu: ile
+operacji to urządzenie wykonuje na każdy bajt, który jego pamięć potrafi
+dostarczyć. Powyżej tego stosunku czekasz na arytmetykę; poniżej czekasz na
+pamięć.
+\end{fr}
+
+\mermaidfig{p03-roofline}{Jeden stosunek dla pracy, jeden dla maszyny i
+porównanie, które rozstrzyga.}{operacje przeciw bajtom}
+
+\begin{fr}
+Stosunek urządzenia, i jest on w tej książce \emph{przyjętym założeniem}, a nie
+pomiarem, tak jak liczby o urządzeniu z Programu~\ref{prog:F01}.
+
+Weź $\val{p03.dev.flops}$ operacji na sekundę i $\val{p03.dev.bytes}$ bajtów na
+sekundę przepustowości pamięci. Stosunek wynosi
+\[ \frac{\val{p03.dev.flops}}{\val{p03.dev.bytes}}
+   = \val{p03.dev.ratio} \text{ operacji na bajt} \]
+
+Nic poniżej nie zależy od tego, czy te dwie liczby są prawdziwe dla twojego
+sprzętu, i powinieneś podstawić własne. Znaczenie ma to, że ta liczba jest
+rzędu \emph{setek} i że rośnie od dwóch dekad: arytmetyka staniała znacznie
+szybciej, niż pamięć przyspieszyła, i dlatego spór, który kiedyś był o
+operacje, jest dziś prawie zawsze o bajty.
+\end{fr}
+
+\begin{fr}
+Teraz obie prace.
+
+Dodawanie elementowe dwóch tablic czyta dwie wartości i zapisuje jedną na
+każdą wykonaną operację. Po dwa bajty każda daje to sześć bajtów na operację,
+więc intensywność wynosi $\frac{1}{6} = \val{p03.ai.elementwise}$ \dash{} a $n$
+nie pojawia się nigdzie, więc \textbf{jest ona ta sama, jak duże by nie były
+tablice.}
+
+Mnożenie dwóch tablic o boku $n$ wykonuje około $2n^{3}$ operacji, bo jest to
+$n^{2}$ iloczynów skalarnych długości $n$, i przenosi około $3n^{2}$ wartości.
+Jego intensywność to
+\[ \frac{2n^{3}}{3n^{2} \times 2} = \frac{n}{3} \]
+co \emph{rośnie z $n$}. Przy $n = \val{p03.ai.matmul.n}$ wynosi
+$\val{p03.ai.matmul}$.
+\end{fr}
+
+\begin{fr}
+Postaw te trzy liczby obok siebie.
+
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+ & operacji na bajt & przeciw $\val{p03.dev.ratio}$ \\
+\midrule
+mnożenie, $n = \val{p03.ai.matmul.n}$ & $\val{p03.ai.matmul}$ & obliczenia \\
+elementowo, dowolne $n$ & $\val{p03.ai.elementwise}$ & pamięć \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Przepaść między wierszami to czynnik $\val{p03.ai.gap}$, a między drugim
+wierszem a urządzeniem $\val{p03.ai.short}$. \textbf{Operacja elementowa
+wykorzystuje mniej więcej jedną część na $\val{p03.ai.short}$ arytmetyki,
+którą maszyna umie wykonać w tym czasie}, a reszta maszyny stoi bezczynnie,
+czekając na pamięć.
+
+To jest uzasadnienie fuzji jąder, trzymania aktywacji w szybkiej pamięci i
+każdej optymalizacji, która wygląda na dotyczącą ruchu danych, a nie
+matematyki. Wszystkie są atakiem na mianownik.
+\end{fr}
+
+\begin{fr}
+Jedna poprawka do powyższej tabeli, bo czytana jako reguła jest błędna w
+sposób, który kosztuje ludzi czas.
+
+Intensywność mnożenia to $\frac{n}{3}$, więc jest ono ograniczone przez
+obliczenia dopiero wtedy, gdy $\frac{n}{3}$ przekracza stosunek urządzenia.
+Podaj rozmiar, przy którym to następuje.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Mniej więcej $n = \val{p03.ai.smalln}$.}
+\begin{warning}
+\textbf{Małe mnożenie macierzy jest ograniczone przez pamięć jak wszystko
+inne.} Poniżej $n = \val{p03.ai.smalln}$ na zakładanym tu urządzeniu mnożenie
+także czeka na pamięć, a przyspieszanie jego arytmetyki nie daje zupełnie nic.
+
+\enquote{Mnożenia macierzy są ograniczone przez obliczenia} to stwierdzenie o
+tych dużych, powtarzane tak, jakby dotyczyło operacji. Wsad wielu małych
+mnożeń \dash{} czyli to, co produkuje stos wąskich głowic, zbiór adapterów
+niskiego rzędu albo mieszanka ekspertów o wąskich ekspertach \dash{} leży po
+złej stronie tej granicy, a jego wydajnością rządzi układ danych, a nie liczba
+potrzebnych operacji.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Fuzja, jako liczba, a nie jako argument.
+
+Trzy operacje elementowe biegną jedna po drugiej, każda czytając dwie tablice i
+zapisując jedną. Bez zlania to $\val{p03.fuse.chain}$ podróży do pamięci na
+$\val{p03.fuse.chain}$ operacji na element. Zlane w jedno przejście, dane są
+czytane raz, wszystkie trzy operacje są stosowane, a wynik zapisany raz.
+
+Operacje się nie zmieniają. Bajty dzielą się przez
+$\val{p03.fuse.factor}$, więc intensywność mnoży się przez
+$\val{p03.fuse.factor}$, z $\val{p03.ai.elementwise}$ na
+$\val{p03.fuse.after}$.
+\end{fr}
+
+\begin{fr}
+I uczciwy odczyt tej liczby, czyli ten, który warto zabrać.
+
+$\val{p03.fuse.after}$ wciąż leży daleko poniżej $\val{p03.dev.ratio}$. Zlany
+łańcuch jest ograniczony przez pamięć, dokładnie jak niezlany, i pozostanie
+taki, ile operacji by w niego nie złożyć, bo bajty mają podłogę: wejście trzeba
+przeczytać raz, a wyjście zapisać raz, cokolwiek dzieje się pomiędzy.
+
+\textbf{Fuzja pomaga i nie ratuje.} Robi to, że usuwa podróże, które były
+czystym narzutem, co jest tutaj warte czynnika $\val{p03.fuse.factor}$, a w
+dłuższym łańcuchu bywa warte więcej. Czego nie potrafi, to zamienić operacji
+ograniczonej przez pamięć w ograniczoną przez obliczenia, a plan, który
+zakłada, że potrafi, jest planem, który rozczaruje profiler.
+\end{fr}
+
+\begin{fr}
+Ostatnia ramka, i zamyka ona część II.
+
+Trzy programy zadały trzy pytania o jedną arytmetykę, a odpowiedzi się
+składają. Program~\ref{prog:P01}: to skończony zbiór liczb, rozstawionych
+proporcjonalnie do swojej wielkości. Program~\ref{prog:P02}: część algorytmów
+to przeżywa, a część nie, i jest na to katalog, a nie zasada. Ten: kosztem są
+dwie liczby \dash{} operacje i bajty \dash{} oraz stosunek między nimi
+należący do maszyny.
+
+Żaden z tych trzech nie potrzebował niczego poza arytmetyką, algebrą i sigmą.
+To był argument za postawieniem części II przed algebrą liniową, a nie po niej,
+i teraz jest on wykazany, a nie obiecany.
+
+Program~\ref{prog:P04} zaczyna część III i jest pierwszym programem w tej
+książce, który potrzebuje nowego \emph{obiektu}, a nie nowego pytania.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Notacja $O$ zachowuje to, jak koszt rośnie, i wyrzuca
+  stałą.} $\frac{n(n-1)}{2}$ i $3n^{2} + 5n + 100$ różnią się mniej więcej
+  sześciokrotnie przy dużym $n$, a notacja nazywa oba $O(n^{2})$: składniki
+  niższego rzędu naprawdę przestają mieć znaczenie, a współczynnik wiodący
+  nie.}
+\sumitem{3--4}{$f$ jest $O(g)$, gdy $f(n) \le c\,g(n)$ powyżej pewnego $n_0$
+  \dash{} \emph{pewna} stała, \emph{powyżej} pewnego rozmiaru. Więc
+  \textbf{$O$ to ograniczenie górne, a nie opis}: algorytm liniowy jest
+  uczciwie $O(n^{2})$. $\Theta$ jest notacją na \emph{dokładnie takie tempo} i
+  zwykle to ją miano na myśli.}
+\sumitem{5--7}{Podwojenie wejścia: $O(\mfalogplain n)$ dokłada krok, $O(n)$ podwaja,
+  $O(n^{2})$ zwiększa czterokrotnie, $O(2^{n})$ \emph{podnosi} pracę do
+  kwadratu. \textbf{Pętle zagnieżdżone mnożą, następujące po sobie dodają}
+  \dash{} $O(nm)$ przeciw $O(n+m)$, czyli różnica, którą ta notacja
+  \emph{potrafi} wypowiedzieć.}
+\sumitem{8--10}{\textbf{Dwa tempa wzrostu nie szeregują dwóch implementacji.}
+  $\val{p03.cross.c1}n^{2}$ i $\val{p03.cross.c2}n\logb{2}n$ zamieniają się
+  miejscami przy $n = \val{p03.cross.n}$, znalezionym szukaniem, bo wzoru nie
+  ma. Przy $n = 100$ ta asymptotycznie lepsza kosztuje
+  $\val{p03.cross.ratio.100}$ razy tyle; przy $n = 100\,000$ ta druga kosztuje
+  $\val{p03.cross.ratio.100000}$ razy tyle.}
+\sumitem{11--12}{\enquote{Asymptotycznie lepszy} to twierdzenie o granicy, do
+  której możesz nigdy nie dojść \dash{} każda biblioteka sortowania uruchamia z
+  tego powodu sortowanie przez wstawianie $O(n^{2})$ na krótkich podtablicach.
+  I \textbf{notacja nie mówi, czym jest operacja}: dodawanie w rejestrze i
+  chybienie cache'u różnią się czynnikiem rzędu setek, a oba liczą się jako
+  jeden krok. Notacja mówi, jak koszt się skaluje; pomiar mówi, ile wynosi.}
+\sumitem{13--14}{Program~\ref{prog:F04} policzył $\val{p03.flop.pairs}$ par, a
+  tutaj są one wycenione jako praca: każda to iloczyn skalarny długości $\val{p03.flop.dhead}$, czyli
+  $\val{p03.flop.perhead}$ operacji na głowicę i $\val{p03.flop.allheads}$ na
+  $\val{p03.flop.heads}$ głowicach \dash{} same wyniki, jedna warstwa, jedna
+  sekwencja. Mnożenie z dodawaniem to \textbf{dwa} FLOP-y przez konwencję, a
+  czynnik dwa między liczbami dwóch osób to zwykle właśnie to.}
+\sumitem{15--16}{Trening kosztuje około $6$ FLOP-ów na parametr na token: dwa
+  w przód i po dwa na oba gradienty przejścia wstecz. Daje to
+  $\val{p03.train.flops}$ dla $\val{f01.params}$ parametrów na
+  $\val{f01.tokens}$ tokenach, czyli liczbę Programu~\ref{prog:F01}
+  wyprowadzoną ponownie. \textbf{Liczba parametrów nie jest liczbą pracy}:
+  uwaga ma $O(d^{2})$ parametrów i $O(d\,n^{2})$ pracy.}
+\sumitem{17}{\textbf{Liczba FLOP-ów jest liczbą, a nie czasem.} Luka do
+  reklamowanego tempa urządzenia to czas, który arytmetyka spędza, czekając na
+  liczby, i to ją przewiduje ostatnia sekcja. Liczba FLOP-ów bez wykorzystania
+  obok niej to najlepszy przypadek podany jako plan.}
+\sumitem{18--20}{\textbf{Wagi są najmniejszym składnikiem.} Dla
+  $\val{f01.params}$ parametrów: $\val{p03.mem.weights}$~GB wag,
+  $\val{p03.mem.grads}$ gradientów i $\val{p03.mem.optimiser}$ stanu
+  optymalizatora \dash{} razem $\val{p03.mem.total}$~GB, czyli
+  $\val{p03.mem.multiple}$ razy tyle, co liczba z karty modelu, i wagi zostają
+  na $\val{p03.mem.weights.pct}\%$. Ten czynnik jest powodem, dla którego model
+  serwujący się na karcie nie da się na niej dostroić, a każde lekarstwo usuwa
+  \emph{wiersz}.}
+\sumitem{21}{\textbf{Aktywacje nie skalują się z parametrami} \dash{} skalują
+  się z wsadem, sekwencją i głębokością, więc ten sam model ma inny rachunek
+  przy każdym obciążeniu. Trzyma się je, bo potrzebuje ich przejście wstecz,
+  co jest regułą łańcuchową Programu~\ref{prog:F12} jako rachunkiem za pamięć,
+  a checkpointing przelicza je zamiast trzymać: operacje wymienione na bajty
+  celowo.}
+\sumitem{22--23}{\textbf{Cache kluczy i wartości jest liniowy w długości
+  sekwencji, podczas gdy arytmetyka uwagi jest kwadratowa}, a prawie każdy
+  spodziewa się, że oba będą kwadratowe. Trzyma jeden klucz i jedną wartość na
+  \emph{pozycję}, a nie na parę: $\val{p03.kv.gib}$~GiB przy
+  $\val{p03.kv.seq}$ tokenach, $\val{p03.kv.double.gib}$ przy dwa razy
+  większej długości i $\val{p03.kv.per.token.mb}$~MB na token w locie. Zwykle
+  jest większy od wag i to on decyduje, ilu użytkowników obsłuży karta.}
+\sumitem{24}{GB to $10^{9}$, a GiB to $2^{30}$, większe o jakieś siedem
+  procent. Plan pojemności mylący się o siedem procent to prawie zawsze to.}
+\sumitem{25--29}{\textbf{Intensywność arytmetyczna to operacje podzielone
+  przez przeniesione bajty}, porównane z własnym stosunkiem operacji na bajt
+  urządzenia \dash{} $\val{p03.dev.ratio}$ przy przyjętych tu założeniach.
+  Dodawanie elementowe ma $\val{p03.ai.elementwise}$ \emph{przy dowolnym $n$};
+  mnożenie tablic o boku $n$ ma $\frac{n}{3}$, co \emph{rośnie}, i wynosi
+  $\val{p03.ai.matmul}$ przy $n = \val{p03.ai.matmul.n}$.}
+\sumitem{30--31}{Operacji elementowej brakuje do urządzenia
+  $\val{p03.ai.short}$, więc taką część dostępnej arytmetyki wykorzystuje. A
+  \textbf{mnożenie macierzy jest ograniczone przez obliczenia dopiero powyżej
+  $n \approx \val{p03.ai.smalln}$} \dash{} wsad małych mnożeń jest ograniczony
+  przez pamięć jak wszystko inne, a to właśnie produkuje stos wąskich głowic
+  albo ekspertów.}
+\sumitem{32--34}{Zlanie $\val{p03.fuse.chain}$ operacji elementowych dzieli
+  bajty przez $\val{p03.fuse.factor}$ przy dokładnie tych samych operacjach,
+  podnosząc intensywność do $\val{p03.fuse.after}$ \dash{} wciąż daleko poniżej
+  $\val{p03.dev.ratio}$. \textbf{Fuzja pomaga i nie ratuje}, bo wejście trzeba
+  przeczytać raz, a wyjście zapisać raz, cokolwiek dzieje się pomiędzy.
+  \textbf{To zamyka część II}: trzy pytania o jedną arytmetykę, odpowiedziane
+  bez niczego poza arytmetyką, algebrą i sigmą.}
+\end{summarybox}
+
+\canyou
+
+% ============================================================
+\begin{testexercises}
+\item Algorytm wykonuje dokładnie $7n + 3$ kroków. Podaj najciaśniejsze $O$ i
+  powiedz, czy $O(n^{2})$ też jest o nim prawdą.
+  \answerto{$O(n)$, i tak \dash{} $O$ to ograniczenie górne, więc luźniejsze
+  wciąż jest poprawne. $\Theta(n)$ jest notacją na dokładnie takie tempo.}
+\item Dwie pętle po tych samych danych biegną jedna po drugiej, a potem parę
+  umieszcza się wewnątrz pętli po $m$ elementach. Podaj tempo wzrostu.
+  \answerto{$O(mn)$. Dwa przebiegi po sobie dodają się do $O(n)$; zagnieżdżenie
+  tego w $m$ mnoży.}
+\item Implementacja A kosztuje $\val{p03.cross.c1}n^{2}$, a B
+  $\val{p03.cross.c2}n\logb{2}n$. Powiedz, którą wypuścić dla wejść rzędu kilku
+  setek i dlaczego.
+  \answerto{A. Punkt przecięcia leży przy $n = \val{p03.cross.n}$, a przy
+  $n = 100$ B kosztuje $\val{p03.cross.ratio.100}$ razy tyle. Tempo wzrostu
+  dotyczy granicy, do której te wejścia nigdy nie dochodzą.}
+\item Podaj operacje dla wyników uwagi jednej głowicy z liczby par i szerokości
+  głowicy i powiedz, jakiej konwencji użyłeś.
+  \answerto{$2 \times \text{pary} \times \text{szerokość}$, przy mnożeniu z
+  dodawaniem liczonym jako dwa FLOP-y. Dla $\val{p03.flop.pairs}$ par przy
+  $\val{p03.flop.dhead}$ daje to $\val{p03.flop.perhead}$.}
+\item Wyjaśnij, skąd bierze się $6$ w \enquote{$6$ FLOP-ów na parametr na
+  token}.
+  \answerto{Dwa na przejście w przód i po dwa na oba gradienty przejścia wstecz
+  \dash{} jeden względem wejścia i jeden względem wagi.}
+\item Karta ma $24$~GB. Powiedz, czy model o $\val{f01.params}$ parametrach da
+  się na niej serwować i czy da się trenować, z arytmetyką.
+  \answerto{Serwować tak: $\val{p03.mem.weights}$~GB wag zostawia miejsce.
+  Trenować nie: $\val{p03.mem.total}$~GB, bo gradienty i stan optymalizatora są
+  razem $\val{p03.mem.multiple}$ razy większe niż wagi.}
+\item Powiedz, który składnik rachunku pamięci rośnie z wielkością wsadu i co
+  się wymienia, żeby go zmniejszyć.
+  \answerto{Aktywacje. Gradient checkpointing zachowuje część, a resztę
+  przelicza w przejściu wstecz, wymieniając operacje na bajty.}
+\item Serwowana rozmowa podwaja długość. Powiedz, co dzieje się z arytmetyką i
+  co z cache'em.
+  \answerto{Arytmetyka rośnie czterokrotnie, bo uwaga paruje każdą pozycję z
+  każdą wcześniejszą. Cache podwaja się, z $\val{p03.kv.gib}$ do
+  $\val{p03.kv.double.gib}$~GiB, bo trzyma jeden klucz i jedną wartość na
+  pozycję.}
+\item Policz intensywność arytmetyczną mnożenia elementowego dwóch
+  dwubajtowych tablic i powiedz, od czego zależy.
+  \answerto{Jedna operacja na dwie odczytane wartości i jedną zapisaną, czyli
+  $\frac{1}{6} = \val{p03.ai.elementwise}$ operacji na bajt. Nie zależy od
+  niczego \dash{} ani od rozmiaru, ani od kształtu.}
+\item Profil pokazuje duże mnożenie macierzy blisko reklamowanego tempa
+  urządzenia i normalizację przy kilku procentach tego. Powiedz, dlaczego, nie
+  zaglądając do żadnej z implementacji.
+  \answerto{Ich intensywności różnią się o jakieś $\val{p03.ai.gap}$. Mnożenie
+  jest powyżej stosunku urządzenia równego $\val{p03.dev.ratio}$, a
+  normalizacja daleko poniżej, więc jedno jest ograniczone przez arytmetykę, a
+  drugie przez pamięć.}
+\end{testexercises}
+
+% ============================================================
+\begin{furtherproblems}
+\item Pokaż, że $O(n^{2})$ i $O(n^{2} + n)$ to to samo twierdzenie, i powiedz,
+  co z tego wynika dla pisania składników niższego rzędu wewnątrz $O$.
+  \answerto{$n^{2} + n \le 2n^{2}$ dla $n \ge 1$, więc każde ogranicza drugie z
+  dokładnością do stałej. Pisanie składnika niższego rzędu wewnątrz $O$ nic nie
+  wnosi i sugeruje precyzję, której ta notacja nie ma.}
+\item Jeden algorytm jest $O(n \mfalogplain n)$, a drugi $O(n \mfalogplain ^{2} n)$. Podaj
+  rozmiar, przy którym drugi jest dziesięciokrotnie droższy, i skomentuj.
+  \answerto{Stosunek to $\logb{2} n$, więc dochodzi do dziesięciu przy
+  $n = 2^{10}$, czyli $1024$. Dodatkowy logarytm kosztuje czynnik rosnący
+  bardzo powoli \dash{} tysiąckrotny wzrost $n$ kupuje mu czynnik dziesięć.}
+\item Punkt przecięcia w tym programie znaleziono szukaniem. Wyjaśnij, czemu
+  bisekcja tu działa i jakiej własności obu funkcji kosztu potrzebuje.
+  \answerto{Stosunek $c\,n\logb{2}n / n^{2} = c\logb{2}n / n$ maleje
+  monotonicznie, gdy $n > e$, więc predykat \enquote{kwadratowa jest tańsza}
+  przełącza się dokładnie raz. Bisekcja potrzebuje tego jednego przełączenia i
+  niczego więcej.}
+\item Model trenuje się optymalizatorem trzymającym jedną średnią bieżącą
+  zamiast dwóch. Przelicz rachunek i wielokrotność.
+  \answerto{$\val{p03.mem.weights} + \val{p03.mem.grads} +
+  \val{p03.mem.master} + \val{p03.mem.moment1}$, czyli $84$~GB i sześć razy
+  tyle co wagi zamiast $\val{p03.mem.multiple}$. Wciąż znacznie więcej, niż
+  sugeruje karta modelu.}
+\item Dwie konfiguracje serwowania używają tego samego modelu: jedna trzyma
+  cztery rozmowy po $\val{p03.kv.seq}$ tokenów, druga jedną cztery razy
+  dłuższą. Porównaj ich cache i arytmetykę na token.
+  \answerto{Cache jest identyczny \dash{} jest liniowy w łącznej liczbie
+  trzymanych pozycji, a obie trzymają tyle samo. Arytmetyka na wygenerowany
+  token jest czterokrotnie wyższa w długiej rozmowie, bo każdy nowy token
+  zwraca uwagę na cztery razy więcej poprzednich.}
+\item Wyprowadź rozmiar, przy którym mnożenie tablic o boku $n$ staje się
+  ograniczone przez obliczenia na urządzeniu o stosunku $R$, w formacie o $b$
+  bajtach.
+  \answerto{Intensywność to $2n^{3} / (3n^{2}b) = 2n/(3b)$, więc przekracza $R$,
+  gdy $n > 3bR/2$. Zauważ, że rośnie z $b$: szerszy format przesuwa tę granicę
+  \emph{w górę}, bo przenosi więcej bajtów na te same operacje.}
+\item Łańcuch $k$ operacji elementowych zostaje zlany. Podaj intensywność jako
+  funkcję $k$ i powiedz, do czego dąży.
+  \answerto{$k$ operacji na te same trzy przeniesione tablice, czyli $k/(3b)$,
+  co rośnie bez ograniczenia w $k$. W praktyce łańcuch jest krótki, a wejście i
+  tak trzeba przeczytać raz, więc osiągalny zakres jest mały \dash{} i dlatego
+  fuzja jest czynnikiem, a nie rozwiązaniem.}
+\item Uzasadnij, że technika połowiąca liczbę parametrów nie połowi pamięci
+  treningu, korzystając z tabeli tego programu.
+  \answerto{Każdy wiersz skaluje się z parametrami, więc ich połowienie połowi
+  cały rachunek \dash{} poza aktywacjami, których w tabeli nie ma i które
+  skalują się z wsadem, sekwencją i głębokością. Czy to połowienie wystarczy,
+  zależy więc od składnika, którego liczba parametrów nie dotyka.}
+\end{furtherproblems}

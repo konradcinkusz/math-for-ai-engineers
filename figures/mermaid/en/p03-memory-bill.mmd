@@ -1,0 +1,4 @@
+flowchart LR
+  A["the weights, which is what everybody counts<br/>and what a model card reports"]
+  A --> B["the gradients, one for every weight,<br/>alive for the whole backward pass"]
+  B --> C["the optimiser's own copies, which are<br/>wider than the weights and several"]

@@ -2116,12 +2116,21 @@
   \mfa@origlog}
 % The one legitimate form: an explicit base.
 \newcommand{\logb}[1]{\mathop{\mfa@origlog}\nolimits_{#1}}
-% ...and a way to write the forbidden thing when the subject IS the ban. It is
-% used in Appendix B, which states the convention, and in F03's entry Quiz and
-% section 2, which TEACH it: the trap frame prints a bare logarithm with no
-% base and asks the reader to write down its value, because the two readerships
-% answer that confidently and differently, and the frames and the Quiz answer
-% around it quote the same bare mark while explaining why it is defective.
+% ...and a way to write the forbidden thing where the base is genuinely absent.
+% Two kinds of place, and both are stated as rules rather than counted:
+%
+%   * where the ban ITSELF is the subject -- Appendix B, which states the
+%     convention, and F03's entry Quiz and section 2, which teach it. The trap
+%     frame prints a bare logarithm with no base and asks the reader to write
+%     down its value, because the two readerships answer that confidently and
+%     differently.
+%   * INSIDE AN O, THETA OR OMEGA, which is P03's whole subject. There the
+%     omission is a theorem rather than a convention: log_a n = log_b n / log_b a,
+%     so changing the base multiplies by a constant, and a constant is exactly
+%     what the notation discards. O(n log n) therefore names ONE class for every
+%     base, and writing a base inside it would suggest a distinction that does
+%     not exist. P03 has a notation box saying so.
+%
 % Nowhere else.
 %
 % The COUNT is deliberately not stated here. It was, as "once", and it was
