@@ -1619,10 +1619,13 @@
 % lines by 0.5em -- enough to tip the Polish Part V title by 2.3 pt on A4. Three
 % points of last-resort stretch, which TeX uses only on a line it cannot
 % otherwise set, absorbs that and is invisible between two contents entries.
+% Six rather than three, measured: three took the Polish Part V title from
+% 2.33 pt over to 0.57, so the stretch does reach that line and was simply
+% short of it.
 \makeatletter
 \renewcommand{\@pnumwidth}{2.05em}
 \makeatother
-\apptocmd{\tableofcontents}{\emergencystretch=3pt\relax}{}{%
+\apptocmd{\tableofcontents}{\emergencystretch=6pt\relax}{}{%
   \PackageWarning{mfabook}{Could not patch tableofcontents for emergencystretch}}
 
 % ---- The programs register -------------------------------------------------

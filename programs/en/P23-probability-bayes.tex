@@ -576,6 +576,11 @@ property of the traffic.
 Now vary the one quantity nobody stated. Same detector throughout \dash{}
 nothing about it changes \dash{} and only the rate at which faults occur moves.
 
+Holding the instrument fixed is what makes the next four rows an argument
+rather than an illustration. Whatever the answers turn out to be, they cannot
+be a property of the detector, because the detector is the one thing in the
+table that did not change.
+
 Before you read on, fill in the middle row. At a fault rate of one in a
 hundred, a detector wrong one time in a hundred: what fraction of the alarms
 are real?
@@ -860,6 +865,11 @@ prior odds are $1$ to $999$. An alarm has likelihood ratio
 so one alarm gives posterior odds of $\val{p23.lr}$ to $999$, and a probability
 of $\frac{\val{p23.ppv.num}}{\val{p23.ppv.den}}$ \dash{} section 4's answer,
 reached by multiplication instead of by a fraction with two terms underneath.
+
+Odds are worth getting comfortable with for exactly that reason. Multiplying a
+prior by a ratio is arithmetic you can do while somebody is still talking,
+where a fraction with two terms underneath is not; convert to a probability
+once, at the end, and only if somebody asks for one.
 
 A second, independent detector of the same quality now raises an alarm as well.
 What are the posterior odds, and what probability is that?
