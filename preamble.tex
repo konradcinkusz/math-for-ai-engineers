@@ -2299,6 +2299,16 @@
 %  about 29 characters and index longer names by concept instead. Both sibling
 %  books learned this the same way.
 % ============================================================
+%  READ THIS FIRST. EVERYTHING FROM HERE TO THE \apptocmd AT THE BOTTOM OF THE
+%  BLOCK IS A RECORD OF FIVE CI CYCLES SPENT ON THE WRONG MECHANISM, and it is
+%  kept because the reasoning is instructive and because deleting it would
+%  invite the sixth. The index here is not a \twocolumn region -- imakeidx
+%  replaces theindex with multicols -- so \raggedbottom and \vfuzz are both
+%  inert in it and every constant swept below was compensating for a switch
+%  nobody had thrown. The finding, the mechanism and the code that survives it
+%  are at the END of this block. Do not tune anything named here without
+%  reading that first.
+%
 %  And RAGGED BOTTOM, added after CI failed on two OVERFULL VBOXES in the
 %  index -- 3.8 pt and 17.4 pt -- while this container built the same source
 %  clean. That is the metric split this file already records in both its other
