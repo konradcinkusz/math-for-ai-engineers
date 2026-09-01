@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P17 written, both editions \dash{} Parts I to IV entire, and the first three of Part V.** P18–P34 are stubs carrying their briefs | 17 of 47 |
+| Programs | **F1–F13 and P1–P18 written, both editions \dash{} Parts I to IV entire, and the first four of Part V.** P19–P34 are stubs carrying their briefs | 16 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 890 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 906 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 756 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 764 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 910 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 926 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 772 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 780 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,21 +93,21 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **17 of 47 programs are stubs**, in each language. This is the whole of the
+- **16 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 911 computed values, all referenced, all present, plus the committed console
+- 931 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 180 Mermaid sources, all rendering
-- 46 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 186 Mermaid sources, all rendering
+- 48 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **83 orphan-tail pages: 20 · 25 · 19 · 19** across `main-en`, `main-pl`,
+- **84 orphan-tail pages: 21 · 25 · 19 · 19** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
-  **P15 none**, P16 one and **P17 none** \dash{} from 15 before F5, 26 before F6, 33 before F7,
+  **P15 none**, P16 one, **P17 none** and P18 one \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
   before P6. **P6 added two and the ten transcripts it turned on added three**,
@@ -140,9 +140,9 @@ what was there before.
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
-  **50% in P15**, **47% in P16** and **50% in P17** \dash{} P13, P15 and P17
-  are the highest outside Part I and the only ones anywhere to reach the
-  book's own rate.**
+  **50% in P15**, **47% in P16**, **50% in P17** and **48% in P18** \dash{}
+  P13, P15 and P17 are the highest outside Part I and the only ones anywhere
+  to reach the book's own rate.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -6118,6 +6118,154 @@ it agrees with the prose beside it.
 - Frame numbers mapped after writing and then again after the trap frame:
   sections landed at `1--8 / 9--15 / 16--23 / 24--30 / 31--38`.
 
+### Program P18 pass, August 2026
+
+**Thirty-nine teaching frames, forty-one printed, both editions**, against a
+brief that projected sixty. Five sections: the layout convention,
+differentiating by a matrix, the $\softmax$ Jacobian, cross-entropy and the
+gradient everybody uses, and why the two are fused.
+
+Twelfth program under its brief's estimate, and the cause is the P10/P13 kind:
+the neighbours supplied the machinery. **P16** owns the shape rule, the
+finite-difference method and \enquote{nobody forms a Jacobian}; **F07** owns
+$\softmax$ and the two-score identity; **P06** owns the matrix as a function;
+**P15** and **P17** own both derivative objects. What was genuinely left is a
+\emph{layout} and five identities, and this program defines no new object at
+all.
+
+#### The headline has two reasons and they are different in kind
+
+$\vect{p} - \vect{y}$ against the honest two-step route:
+
+- **Cost.** $\val{p18.fuse.ratio}$ times fewer operations at a vocabulary of
+  $\val{p18.vocab}$, and the Jacobian nobody forms would be
+  $\val{p18.fuse.gib}$ GiB.
+- **Definedness.** The two-step route forms $-1/p_c$, and once a logit falls
+  about $\val{p18.cliff}$ below the largest, $p_c$ underflows to exactly zero
+  and it divides by zero. $\vect{p} - \vect{y}$ never forms the reciprocal and
+  returns an ordinary $(\num{0.5}, \num{0.5}, -\num{1.0})$.
+
+**Separating them is worth more than either**, because the cost argument alone
+leaves \enquote{keep the clear route and pay for it} open, and the second
+closes it: the two are not the same function, and the rows where they differ
+are the rows a run meets early, when the model is worst. That is
+Program~\ref{prog:P01}'s floor and Program~\ref{prog:P02}'s sense of
+\enquote{numerically stable} arriving in the field's most reused derivation.
+
+#### An assertion refused a threshold chosen to make it pass
+
+The layer-norm gradient agrees with a central difference to $\num{1.7e-08}$
+and the draft asserted $10^{-8}$. That is a threshold picked so a check would
+pass rather than derived, which is the failure mode Program~\ref{prog:F11}
+paid for and Program~\ref{prog:P15} paid for again. The ceiling is now the
+method's \dash{} one shared $\val{p18.check.ceiling}$ across all five
+identities, an order above every measured gap and orders below any real error,
+because a dropped term disagrees by something of order one rather than by a
+decimal place \dash{} with the per-identity bounds committed separately.
+
+#### Appendix B is wrong about the book, in four of its five pointers
+
+It says numerator layout is \enquote{declared in Program~P17}. P17 is the
+Hessian program and declares nothing of the sort: it is the P7-insertion
+off-by-one surviving in the appendix, and it is **this program's own
+declaration misattributed**. Corrected in both editions, and section 1 is the
+declaration the appendix names, so the pointer now closes rather than merely
+renumbering.
+
+**That is the fourth file to carry that off-by-one**, after the trap
+catalogue, the manifest and the curriculum notes. And checking the one pointer
+found three more false claims in the same appendix, none of them this
+program's and none of them the off-by-one:
+
+- `Program~P23` for the $D^{2}(X)$ notation box. P23 is *Probability and
+  Bayes*; **P24** is *Random variables and distributions*, whose brief names
+  variance in its first sentence. Correcting it needs a clause in P24's brief,
+  which is the F04-to-P20 remedy.
+- \enquote{Program~F6 says so at the first interval a reader meets}: the first
+  interval in the book is F03's, and **F06 carries no notation box at all**.
+- \enquote{Program~F8 records that where the function appears}, of *tgh*: F08
+  mentions $\tanh$ once in passing and records nothing, and F07, which owns
+  $\tanh$, records nothing either.
+
+**Recorded rather than fixed**, on the P07-covariance precedent: each needs a
+merged-program edit or a manifest clause, and doing that inside a pass about
+something else is how a measurement stops being trusted. The generalisable
+part is the finding itself: **Appendix B has never been audited against the
+programs it names, and it is five greps.**
+
+#### Rule 2, and one figure carried two answers at once
+
+`p18-one-transpose` gave frame 4's \enquote{$W$ itself} in its **middle** node
+and frame 6's \enquote{one transpose} in its last, **and its manifest copy
+gave the second one again}. `p18-two-routes`'s last node reached one step past
+frame 33 towards frame 35's answer. Both reworked to state what the frames
+above them deliver.
+
+So Program~\ref{prog:P17}'s finding generalises rather than being about the
+third node: the spoiler is anywhere the chain reaches past the frame it sits
+in, and **the manifest copy is a fourth place to read, after the node and the
+caption**. Measured afterwards in all four builds: all three figures sit after
+the frame that delivers what they carry, and the two that sit above a
+following question do not answer it, which is the P04/P07 case for the seventh
+time.
+
+#### Two gates were right and the emissions were the defect
+
+- **C10 fired on `log-softmax`**, written $\log$-$\softmax$. That is a
+  \emph{name} rather than a logarithm whose base is in question, so it goes in
+  `\code{}` \dash{} Program~\ref{prog:P01}'s `-inf` and P12's `0.0`
+  resolution, not Program~\ref{prog:P03}'s notation box.
+- **C7 reported two shape values as unproduced**, because they were text and
+  the ledger scans for `\mfaval`. The right fix is F10's and P03's: a shape is
+  arithmetic the reader does from two counts already on the page, so the page
+  builds $\val{p18.n.out} \times \val{p18.n.in}$ from what is there and the
+  emission was the defect.
+
+#### Layout
+
+A **24.7 pt** hbox in `main-en`, from four unbreakable maths spans run into
+one sentence \dash{} the score derivative, the summation index and a product
+of two partials, with almost no break opportunity anywhere in it. That is
+Program~\ref{prog:F06}'s rule applied after the build named the box rather
+than while drafting, and the recorded fix worked without a detour: **put it in
+a display.** The frame reads better for it.
+
+**The index shrink came back a fourth time in four programs**, $\num{2.5}$ to
+$\num{3.5}$ pt, and four data points are enough to see the shape: $\num{0.5}$,
+$\num{0.9}$, $\num{1.5}$, $\num{2.5}$, $\num{3.5}$. The requirement grows with
+the index, the index grows with the programs, and twenty-nine programs remain.
+Extrapolated it reaches ten points or so by the end of the book, and ten points
+of shrink between two index lines is no longer invisible. **So the recorded
+advice has a horizon**, and that is now written beside the constant: somewhere
+before Part IX this needs a structural answer instead of another raise.
+
+After both, the multiset is element for element the pre-P18 baseline in all
+four builds, with no stranded openers, no stranded headings and **no orphaned
+cues at any point in the pass**. One orphan tail added, in `main-en`.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P18.1 one-transpose | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P18.2 shape-is-the-check | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P18.3 two-routes | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+#### Also
+
+- Traps 193 to 200 added to `notes/02`, including the one the issue names.
+- **The declared forward reference is discharged as declared**: cross-entropy
+  gets a definitional frame in section 4 and the Learning outcomes say so,
+  with the justification handed to Program~\ref{prog:P26} and the meaning to
+  Program~\ref{prog:P30}. The review found this as an undeclared dependency
+  once; it has not reverted.
+- **Parity came back clean on its ordered checks first time** \dash{} the two
+  failures were C10 and C7, which are not word-order divergences. That is the
+  sixth program with no C4, C8 or C12 round.
+- The listing was extracted from `main-en.pdf` p783 and executed from `code/`:
+  it prints `0.0`, `[0.5, 0.5, -1.0]` and the `ZeroDivisionError`, which is
+  what the page prints and what the frames beside it claim.
+- Frame numbers mapped after writing: sections landed at
+  `1--7 / 8--14 / 15--21 / 22--31 / 32--39`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -6383,25 +6531,26 @@ clone instead.
 
 ## What is left
 
-1. **Seventeen programs, and Parts I to IV are complete, plus the first three
-   of Part V.** F1 to F13 and P1 to P17, both editions.
+1. **Sixteen programs, and Parts I to IV are complete, plus the first four of
+   Part V.** F1 to F13 and P1 to P18, both editions.
 
-   **P18 is next** \dash{} *Matrix calculus*, sixty frames planned, deps `P16`,
-   `P6`, `F7` and `P30`. Read what is already spent before estimating a length,
-   which is the discipline fourteen passes have now paid for: **P16** owns the
-   Jacobian, its shape, the chain rule as a product of them and the fact that
-   nobody forms one; **P06** owns the matrix as a function and the cost of
-   bracketing; **F07** owns the logistic and the two-score softmax identity;
-   **P15** owns the gradient and **P17** the Hessian, so both derivative objects
-   already exist. What is genuinely left is the **layout convention** and the
-   identities derived once each \dash{} and the headline, that the gradient of
-   cross-entropy through a softmax is $p - y$, which is the most reused
-   derivation in the book.
+   **P19 is next** \dash{} *Convexity and Jensen's inequality*, forty-five
+   frames planned, deps `P5`, `F5` and `F13`. Read what is already spent
+   before estimating a length, which is the discipline fifteen passes have now
+   paid for: **F05** owns the function, the graph and the four moves;
+   **F13** owns the weighted average, which is what Jensen's inequality is
+   about; **P05** owns the inner product and the norm; **P17** owns the
+   second derivative and the bowl, so \enquote{one basin} has its object
+   already. What is genuinely left is the promise itself \dash{} every local
+   minimum is global \dash{} and the two payoffs: **why you cannot average
+   perplexities**, and the honest statement that non-convex does not mean
+   hopeless.
 
-   **P18 carries a declared forward reference and it may not be left
-   undeclared.** Cross-entropy is not defined until P30, so P18 owes it a
-   definitional frame, and P26 and P30 each owe a frame returning to it. That
-   is the manifest's own instruction, not an inference.
+   **P19's headline is a measurement the book can afford.** The mean of the
+   exponentials is not the exponential of the mean, so a leaderboard that
+   averages per-document perplexity reports a different quantity from one that
+   exponentiates the mean loss. That is Jensen's inequality with a number
+   attached and it needs no provider, no model and no budget.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -6426,8 +6575,9 @@ clone instead.
    thirty-one**, because the subject is genuinely small; **P15's fifty-five
    against thirty-eight**; **P16's sixty-five against thirty-eight**,
    because P06 had already measured its central result under another name;
-   and **P17's fifty against thirty-eight**, because P15 and P10 between
-   them had left only the model and the inequality.
+   **P17's fifty against thirty-eight**, because P15 and P10 between
+   them had left only the model and the inequality; and **P18's sixty
+   against thirty-nine**, because it defines no new object at all.
    **A brief's frame estimate is a planning figure from before its neighbours
    were written.** It is not a target.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
