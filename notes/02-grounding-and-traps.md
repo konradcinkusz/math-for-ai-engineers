@@ -537,13 +537,16 @@ point. The confusion produces both the belief that autodiff has truncation error
 (it does not) and the belief that it can differentiate through control flow it
 never recorded (it cannot). → **P15**.
 
-### Optimisation (P18–P21)
+### Optimisation (P19–P22)
 
 **21. "My loss surface has local minima, and that's what training gets stuck
 in."** In high dimensions, critical points are overwhelmingly *saddles*, not
 local minima: a critical point is a local minimum only if all d Hessian
 eigenvalues are positive, which is exponentially unlikely at random. What
-training gets stuck near is plateaux around saddles. → **P16, P18**.
+training gets stuck near is plateaux around saddles. → **P17**, which elicits
+the sign count and delivers it. (This entry said "P16, P18", which predates the
+insertion of P7 — see the warning at the head of §3, and re-derive owners from
+`tools/programs.json`.)
 
 **22. "Adam with weight_decay is L2 regularisation."** It is not. L2
 regularisation and weight decay are equivalent for plain SGD (up to a learning-
@@ -551,20 +554,27 @@ rate rescaling), but Loshchilov and Hutter showed *this is not the case for
 adaptive methods such as Adam* — coupling the penalty into the gradient means
 the adaptive denominator rescales it, so the effective regularisation strength
 becomes a time-varying function of each parameter's gradient history. That is
-the whole reason `AdamW` exists. → **P20**. Well documented; ICLR 2019.
+the whole reason `AdamW` exists. → **P20**, which measures it: one lambda
+settles the steep coordinate at 0.909 and the flat one at 0.091, and for plain
+descent the two forms are the same line. Well documented; ICLR 2019.
 
 **23. "`gamma=0.1` in my scheduler means the learning rate goes to 0.1."** It
 multiplies. `StepLR(gamma=0.1)` multiplies the LR by 0.1 at each step boundary,
 so three boundaries take 1e-3 to 1e-6, not to 0.1. Cosine, linear-warmup and
 exponential schedules are each parameterised differently, and reading one as
-another is a routine cause of "the model stopped learning at epoch 30". → **P19**.
+another is a routine cause of "the model stopped learning at epoch 30". →
+**P20**, whose brief owns warmup and cosine schedules and which elicits this
+one. (This entry said "P19", which predates the insertion of P7 — P19 is
+*Convexity and Jensen's inequality* and has nothing to do with schedulers.)
 
 **24. "I halved the batch size, so I'll keep the learning rate."** Batch size and
 learning rate are coupled: the gradient noise scale changes with batch size, and
 the linear-scaling heuristic (scale LR with batch size, with warm-up) exists
 precisely because keeping it fixed is wrong. Whether linear or √-scaling is right
 is model-dependent and contested — this is one to present as *judgement with a
-named disagreement*, not as a rule. → **P20**.
+named disagreement*, not as a rule. → **P21**, whose brief undertakes the
+linear scaling rule in as many words and says to present it as folklore with a
+limited empirical basis. P20 owns the schedules; this is about the batch.
 
 **25. "Gradient accumulation over 4 micro-batches is identical to a 4× batch."**
 It is not, if the loss is a mean over a varying number of tokens. In October 2024
@@ -572,9 +582,11 @@ this was found to be wrong across most popular LLM trainers: cross-entropy is
 normalised by the number of non-ignored tokens, and computing that mean *per
 micro-batch* and then summing weights each micro-batch equally regardless of how
 many real tokens it contains. A mean of means is not the mean. The denominator
-must be computed across the whole accumulated batch. → **P19, P24**. Documented,
-recent, and expensive — it silently changed the objective in production training
-runs.
+must be computed across the whole accumulated batch. → **F04**, which elicits
+the average-of-averages error itself, and **P21**, whose brief undertakes the
+accumulation denominator by name. (This entry said "P19, P24", which predates
+the insertion of P7.) Documented, recent, and expensive — it silently changed
+the objective in production training runs.
 
 **26. "Clipping gradients at 1.0 caps each gradient at 1.0."** Clipping *by norm*
 rescales the whole gradient vector so its norm is at most 1.0, preserving
@@ -2310,3 +2322,65 @@ field wearing different clothes: as the perplexity-averaging error, as the ELBO
 and as the statement that a variance cannot be negative (`E[x²] ≥ (E[x])²`,
 which is Jensen for `x²`). Recognising one inequality is cheaper than meeting
 three results. → **P19**.
+
+**209. "Every optimiser is a different algorithm."** They are one update —
+`w <- w - eta * d` — with a different estimate of `d`, and each addition
+repairs a *named* failure of the one before it: the step-size ceiling set by
+the steepest direction, then the zig-zag that ceiling causes, then the fact
+that one step size has to serve coordinates whose gradients differ by orders of
+magnitude. Read as six recipes it is six things to memorise; read as one line
+and five arguments it is reconstructable. → **P20**.
+
+**210. "Momentum gives a √κ speedup."** It gives a *rate* that improves like
+√κ, which is a different claim, and the gap is not a tuning failure. At the
+optimal coefficients the two roots of the iteration coincide, so the decay
+carries a factor of `k` and the rate is approached from above; and the walk
+first overshoots, because the average has to be built out of gradients before
+it is useful. Measured on a quadratic: 14.6× at κ = 1000 against a √κ of 31.6,
+and 2.8× at κ = 20 against 4.5. Plain descent's predicted count, by contrast,
+is *exact* at every condition number tried. Quote the rate or quote a measured
+count; quoting the rate as though it were a count is how a bound becomes
+folklore. → **P20**.
+
+**211. "`momentum=0.9` means the same thing in every library."** Two forms are
+both in use — `v <- beta v + g` and `v <- beta v + (1-beta) g` — and they point
+the same way while differing in length by `1/(1-beta)`, a factor of ten at
+0.9. Neither is wrong, because a constant on the step is indistinguishable from
+a change of step size. What does not survive is a step size carried across:
+measured, rescaling by ten reproduces a 67-step walk exactly, and not rescaling
+diverges. Read the line that updates the state, not the name of the argument.
+→ **P20**, and **F04** for the average itself.
+
+**212. "Epsilon is a numerical guard, so where it goes doesn't matter."** It
+decides what the guard is compared against. Outside the root it is added to
+`sqrt(v)`, which has the units of a gradient, so its effect is `eps/|g|`.
+Inside, it is added to `v`, a gradient *squared*, so `1e-8` becomes a floor on
+`|g|` of `1e-4` — an enormous gradient to treat as noise. Measured at
+`|g| = 1e-6`: the step is 0.99 per cent short with the epsilon outside and 99
+per cent short with it inside, and the coordinates it silences are exactly the
+small-gradient ones the whole mechanism exists to rescue. → **P20**.
+
+**213. "Adam is faster than SGD."** What is provable is not speed but
+*invariance*. Writing a parameter as `w = c u` leaves the function a network
+computes completely unchanged and multiplies that direction's curvature by
+`c²`, so plain descent at the same step size diverges — measured, 95 times past
+its own bound at `c = 10` — while Adam takes the same number of steps in both
+coordinate systems, because numerator and denominator scale together. Whether
+it reaches a better answer on a real surface is an empirical question this book
+does not settle. → **P20**, resting on **P17**'s rescaling argument.
+
+**214. "A cosine schedule spends less learning rate than a linear one."** Both
+average half the peak over the run, to better than one part in `1e15`, because
+both are symmetric about their midpoint. What differs is entirely *where* the
+budget is spent: a cosine is still at 0.854 of the peak a quarter of the way
+through, where a line is at 0.75, and it gives that back at the end. An
+argument for one shape over another has to be about when the step is spent, not
+about how much of it there is. → **P20**.
+
+**215. "A warmup is there because the model is fragile early."** It is there
+because `sqrt(v)` is an estimate of a coordinate's typical gradient built from
+almost no samples, and it sits in a denominator. Measured on a stream whose
+gradients vary by a factor of 25, the corrected estimate swings by 17.7× over
+the first ten steps and by 1.005× after three hundred. A warmup keeps the step
+small exactly while the quantity it is divided by is least trustworthy, which
+is a statement about the estimator rather than about the model. → **P20**.

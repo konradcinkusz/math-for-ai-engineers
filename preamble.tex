@@ -2358,6 +2358,17 @@
 %  container needs four, so its columns are fuller and demand more shrink --
 %  and a sweep taken on one machine cannot choose a value for the other.
 %
+%  A process note that cost a CI cycle, because it will happen again. The
+%  raise to 5.5 was made, and then a BACKGROUND SWEEP SCRIPT still running in
+%  the tree restored 4.5 on its way out, so the commit carried the old value
+%  and CI reported 18.28874 pt a second time -- to the ten-thousandth of a
+%  point. An identical measurement after a change is this repository's own
+%  signal that the change did not reach what was measured (see the CI vbox
+%  chased into the answers appendix, above). Here it was even simpler than
+%  that: the change did not reach the FILE. Re-read the constant out of the
+%  file immediately before committing it, not several steps earlier, and do
+%  not leave a script that rewrites the tree running behind you.
+%
 %  THE RULE, and it now has both halves:
 %    * Sweep against all four builds and pick a value that clears every one;
 %      do not assume the direction, and do not carry a sweep across a change
@@ -2371,7 +2382,7 @@
 %  else, which is how a gate goes quiet.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 4.5pt}}{}{%
+  \setlength{\parskip}{0pt plus 0.3pt minus 5.5pt}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex

@@ -1,34 +1,942 @@
 %% P20 --- Metoda gradientu prostego: od SGD do Adama
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak programs/en/P20-gradient-descent.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; tools/parity.py porównuje oba pliki.
+%%
+%% UWAGA DLA TŁUMACZA: C4, C8 i C12 porównują znaczniki strukturalne, wzory i
+%% literały liczbowe PO KOLEI. Cyfra zostaje cyfrą (nigdy \enquote{dziesięciu}
+%% zamiast $10$), odwołanie do programu prowadzi zdanie zamiast stać za wzorem,
+%% a skrót jest częścią strumienia znaczników. \enquote{momentum} i
+%% \enquote{warmup} zostają po angielsku i odmieniają się po polsku, bo tak
+%% mówią polscy inżynierowie.
 
-\program{Metoda gradientu prostego: od SGD do Adama}
+\program[Od SGD do Adama]{Metoda gradientu prostego: od SGD do Adama}
 \label{prog:P20}
+\index{optymalizator}
+\index{metoda gradientu prostego}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{zapisać jedną aktualizację, której wariantem jest każdy
+  optymalizator w tym programie, i powiedzieć, co każdy wariant szacuje inaczej}
+\outcome{8--16}{powiedzieć, co naprawia uśrednienie ostatnich kroków i ile ta
+  naprawa jest warta w zależności od wskaźnika uwarunkowania}
+\outcome{17--20}{przeczytać implementację momentum, powiedzieć, której
+  konwencji używa, i powiedzieć, co musi podróżować razem z krokiem}
+\outcome{21--29}{powiedzieć, co daje dzielenie każdej współrzędnej przez jej
+  własny niedawny rozmiar, i gdzie ma stać epsilon}
+\outcome{30--33}{poprawić średnią zaczynającą się od zera i powiedzieć, przed
+  czym chroni warmup}
+\outcome{34--37}{powiedzieć, gdzie wchodzi kara i dlaczego to zmienia jej
+  znaczenie}
+\outcome{38--42}{przeczytać parametry harmonogramu i powiedzieć, co
+  harmonogram robi z krokiem}
+\end{outcomes}
 
-Argument: every optimiser in common use is the same update with a different
-estimate of \enquote{how far and in which direction}, and each addition
-fixes a specific named failure of the one before it. Payoff: the step-size
-bound from P17; momentum as the exponential moving average met in F4, fixing
-the zig-zag from P15, including the \code{(1 - beta)} that F4's form carries
-and most write without \dash{} \code{v <- beta v + g} is the same direction
-and \code{1/(1 - beta)} times as long, so the constant has been folded into
-the learning rate and a step size does not travel between the two forms;
-per-coordinate scaling fixing badly scaled features; **why Adam divides by
-the square root of the second moment \dash{} it is a per-coordinate estimate
-of the gradient's scale, so the update becomes approximately unit-sized
-regardless of how large the gradient is**, which is also precisely why Adam
-is insensitive to loss scaling and why the epsilon must sit outside the
-square root; bias correction derived from the initialisation at zero;
-**weight decay is not L2 regularisation once you divide by a running
-scale**, which is the entire content of AdamW; warmup and cosine schedules
-described as what they do to the effective step rather than as ritual.
+\begin{quiz}
+\item Co mają ze sobą wspólnego wszystkie optymalizatory w tym programie?
+  \teachesat{1--2}
+  \answerto{Tę samą aktualizację: ruch przeciwny do oszacowania kierunku w dół,
+  o pewien krok. Różni je wyłącznie sposób, w jaki powstaje to oszacowanie.}
+\item Co wyznacza sufit kroku? \teachesat{3--4}
+  \answerto{Najbardziej stromy kierunek. Program~P17 wyprowadza
+  $\eta < 2/\lambda_{\max}$, więc jeden kierunek ustala sufit, a każdy
+  płaszczy porusza się potem wolniej, niż mógłby.}
+\item Momentum jest średnią z ostatnich gradientów. Co uśrednianie usuwa, a co
+  zachowuje? \teachesat{8--9}
+  \answerto{Usuwa to, co zmienia znak, a zachowuje to, co go nie zmienia. W
+  wąskiej dolinie składowa boczna zmienia znak w każdym kroku, a składowa
+  wzdłuż doliny nie, więc średnia wskazuje wzdłuż doliny.}
+\item Dlaczego Adam dzieli przez pierwiastek ze średniej bieżącej z kwadratu
+  gradientu? \teachesat{22--24}
+  \answerto{Bo ta wielkość ma jednostki gradientu, więc iloraz jest
+  bezwymiarowy, a krok wynosi około $\eta$ niezależnie od rozmiaru gradientu.
+  Dzięki temu jeden krok znaczy to samo w każdej współrzędnej.}
+\item Czy weight decay to to samo, co dodanie kary $L_2$ do straty?
+  \teachesat{35--36}
+  \answerto{Dla metody gradientu prostego tak. Dla metody adaptacyjnej nie:
+  kara dodana do gradientu jest dzielona przez bieżącą skalę razem ze
+  wszystkim innym, więc jej skuteczna siła jest inna w każdej współrzędnej.}
+\item Harmonogram ma \code{gamma=0.1}. Ile wynosi krok po trzech granicach?
+  \teachesat{38--39}
+  \answerto{Tysiączną część tego, od czego zaczął, bo mnoży. Z $\num{1e-3}$
+  schodzi do $\num{1e-6}$, a nie do $\num{0.1}$.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 65 ramek.
-}
+% ============================================================
+\section{Jedna aktualizacja i to, co trzeba oszacować}
+\label{sec:P20-one-update}
+\index{optymalizator!wspólna aktualizacja}
+
+\begin{fr}
+Programy \ref{prog:P15}, \ref{prog:P17} i \ref{prog:P19} zostawiły tu po
+czymś. \ref{prog:P15} wyprodukował marsz, który marnuje większość kroków, i
+powiedział to wprost. \ref{prog:P17} wyprowadził sufit kroku i powiedział, że
+optymalizatory należą do tego programu. \ref{prog:P19} powiedział, co się
+traci, gdy powierzchnia nie jest wypukła, a co nie.
+
+Zanim cokolwiek z tego zapracuje \dash{} obiekt, o którym wszystkie mówią.
+Zapisz aktualizację wykonywaną przez zwykłą metodę gradientu prostego, a potem
+powiedz, co czytelnik musi wybrać, zanim ona ruszy.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ w \;\leftarrow\; w - \eta\,\nabla f(w) \]
+a wyborem jest $\eta$ \dash{} jak daleko.
+\end{ansblock}
+
+Teraz spostrzeżenie, na którym opiera się cały program. Każdy używany dziś
+optymalizator zapisuje ten sam wiersz. Zmienia się nie kształt aktualizacji,
+lecz \textbf{to, co stoi w miejscu $\nabla f(w)$}: ostatni gradient, średnia z
+niedawnych albo taki podzielony przez własny niedawny rozmiar.
+
+\[ w \;\leftarrow\; w - \eta\,d, \qquad d = \text{oszacowanie, dokąd iść} \]
+
+\mermaidfig{p20-one-update}{Jeden wiersz i to, co różni metody.}{jeden wiersz,
+kilka oszacowań}
+\end{fr}
+
+\begin{fr}
+Warto potraktować to poważnie, a nie jak slogan, bo zmienia to, czego jest się
+do nauczenia. Lista sześciu algorytmów to sześć rzeczy do zapamiętania. Jeden
+wiersz z pięcioma naprawami to jedna rzecz plus pięć argumentów, które da się
+odtworzyć.
+
+Pytaniem w reszcie tego programu nie jest więc \emph{co robi Adam}, tylko
+\emph{co było nie tak z tym, co było przed nim}. Zacznij od tego, co jest nie
+tak z samym wierszem. Program~\ref{prog:P17} wyprowadził ograniczenie na
+$\eta$: jakie i co je wyznacza?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\eta < 2/\lambda_{\max}$ \dash{} a wyznacza je kierunek \emph{najbardziej
+stromy}.
+\end{ansblock}
+
+To cały problem w jednym wierszu. Sufit ustala kierunek o największej
+krzywiźnie, a każdy inny musi pod tym sufitem żyć. Kierunek o krzywiźnie
+$\lambda$ jest w każdym kroku mnożony przez $1 - \eta\lambda$, więc najbardziej
+płaski pełznie, podczas gdy najbardziej stromy stoi na granicy stabilności.
+
+Na misie, której używają Programy \ref{prog:P10}, \ref{prog:P15} i
+\ref{prog:P17} \dash{} krzywizny $\val{p20.lam.hi}$ i $\val{p20.lam.lo}$,
+wskaźnik uwarunkowania $\val{p20.kappa}$ \dash{} najlepszy krok wynosi
+$\val{p20.eta.best}$, marsz kurczy się o $\val{p20.rate.sgd}$ na krok i
+potrzebuje $\val{p20.steps.sgd}$ kroków, by zamknąć $99$ procent odległości.
+
+\begin{note}
+Te trzy liczby należą do Programu~\ref{prog:P17}, a skrypt tego programu
+odczytuje je z jego zatwierdzonych wartości i przerywa budowanie, gdy się nie
+zgadzają. Cztery programy mówią teraz o jednej misie, a nie o czterech, które
+są do siebie podobne.
+\end{note}
+\end{fr}
+
+\begin{fr}
+$\val{p20.steps.sgd}$ kroków na pokonanie odległości około $\num{1.4}$. Gdzie
+idzie ten wysiłek? Program~\ref{prog:P15} to zmierzył: przez pierwsze
+$\val{p15.zig.steps}$ kroków stroma współrzędna zmienia znak
+$\val{p15.zig.crossings}$ razy, a marsz przebywa $\val{p15.zig.ratio}$ raza
+większą drogę, niż wynosi jego przesunięcie.
+
+Powiedz więc, z czego składa się krok tego marszu, w dwóch częściach.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Z dużej składowej bocznej, która odwraca się w każdym kroku, i z małej
+składowej do przodu, która się nie odwraca.
+\end{ansblock}
+
+Część boczna nie jest po prostu zmarnowana. Jest marnowana
+\emph{konsekwentnie}: wskazuje w jedną stronę, potem w drugą, potem z powrotem,
+i na przestrzeni dwóch kroków niemal się znosi. To, co niemal znosi się na
+dwóch krokach, jest dokładnie tym, co usuwa średnia \dash{} czyli następną
+sekcją i własną propozycją Programu~\ref{prog:P15}.
+
+\begin{trapbox}
+\textbf{\enquote{Gradient jest duży, więc jestem daleko od minimum.}} Na tej
+misie gradient jest duży i w większości wskazuje w poprzek doliny, a nie wzdłuż
+niej. Program~\ref{prog:P15} mówi to w całości; tu powtarza się to, bo jest to
+powód, dla którego liczba kroków i norma gradientu się nie zgadzają, i bo każda
+naprawa w tym programie jest naprawą \emph{kierunku}, a nie odległości.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedno trzeba ustalić przed naprawami, bo to właśnie czyni je
+porównywalnymi.
+
+Dla funkcji kwadratowej zwykła metoda gradientu przy najlepszym kroku ma znane
+tempo zbieżności: każdy krok mnoży odległość przez
+\[ \frac{\kappa - 1}{\kappa + 1} \]
+gdzie $\kappa$ to wskaźnik uwarunkowania zdefiniowany w
+Programie~\ref{prog:P11}. Przy $\kappa = \val{p20.kappa}$ daje to
+$\val{p20.rate.sgd}$, więc dojście do jednego procenta początkowej odległości
+wymaga $\val{p20.pred.sgd}$ kroków.
+
+Pomiar to $\val{p20.steps.sgd}$. \textbf{Przewidywanie jest dokładne}, a skrypt
+sprawdza je przy $\val{p20.sweep.kappas}$ wskaźnikach uwarunkowania od $\val{p20.sweep.k.lo}$ do
+$\val{p20.sweep.k.hi}$, a nie przy tym jednym. Zapamiętaj to, bo przewidywanie
+z następnej sekcji zachowuje się inaczej, a ta różnica jest pouczająca.
+\end{fr}
+
+% ============================================================
+\section{Uśrednianie kierunku}
+\label{sec:P20-momentum}
+\index{optymalizator!momentum}
+\index{średnia bieżąca!jako momentum}
+
+\begin{fr}
+Program~\ref{prog:F04} zbudował wykładniczą średnią bieżącą z arytmetyki na
+liście liczb, rozłożył ją na części i zakończył stwierdzeniem, że
+\textbf{momentum to ta średnia z gradientem w środku}.
+
+Nie ma tu więc czego wyprowadzać. Zapisz rekurencję, z $g$ w roli gradientu, i
+powiedz, wzdłuż czego byś kroczył.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ v \;\leftarrow\; \beta v + (1-\beta) g, \qquad
+   w \;\leftarrow\; w - \eta v \]
+\end{ansblock}
+
+Kroczyć wzdłuż średniej, a nie wzdłuż ostatniego gradientu. I teraz argument,
+który Program~\ref{prog:P15} zostawił otwarty: przez ostatnie kroki składowa
+boczna zmienia znak, a składowa do przodu nie, więc średnia zachowuje tę drugą
+i znosi tę pierwszą samą ze sobą.
+
+\mermaidfig{p20-each-fixes-one}{Każdy dodatek naprawia poprzedni.}{ciąg napraw}
+\end{fr}
+
+\begin{fr}
+To jest mechanizm, a mechanizm to nie liczba. Dla funkcji kwadratowej właściwe
+współczynniki są znane w postaci zamkniętej \dash{} na tej misie
+$\beta = \val{p20.beta.best}$ i $\eta = \val{p20.eta.mom}$ \dash{} a tempo,
+które dają, wynosi
+\[ \frac{\sqrt{\kappa} - 1}{\sqrt{\kappa} + 1} \]
+wobec $(\kappa-1)/(\kappa+1)$ dla zwykłej metody gradientu.
+
+Porównaj oba wyrażenia i powiedz jednym słowem, co daje momentum.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\textbf{Pierwiastek}. Momentum zastępuje $\kappa$ przez $\sqrt{\kappa}$.
+\end{ansblock}
+
+Jest to stwierdzenie o \emph{problemie}, a nie o jakiejkolwiek implementacji, i
+dlatego można je przewidzieć przed pomiarem. Przy
+$\kappa = \val{p20.kappa}$ tempo spada z $\val{p20.rate.sgd}$ do
+$\val{p20.rate.mom}$, więc przewidywana liczba kroków spada z
+$\val{p20.pred.sgd}$ do $\val{p20.pred.mom}$.
+
+Pomiar to $\val{p20.steps.mom}$.
+\end{fr}
+
+\begin{fr}
+$\val{p20.steps.mom}$ wobec przewidywanych $\val{p20.pred.mom}$. To spory
+rozjazd, a szkic tego programu zakładał, że oba się zgodzą.
+
+Zanim pójdziesz dalej: przewidywanie nie jest błędne i pomiar nie jest błędny.
+Czego \emph{tempo} może nie opisywać w liczbie kroków?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Początku. Tempo mówi, co każdy krok robi z poprzednim, gdy marsz się już
+ustabilizował; nie mówi nic o tym, jak marsz się zaczyna.
+\end{ansblock}
+
+A ten marsz zaczyna się od pójścia w złą stronę. Zmierzone: odległość do
+minimum \emph{rośnie} do $\val{p20.overshoot}$ raza wartości początkowej
+\dash{} o $\val{p20.overshoot.pct}$ procent dalej \dash{} zanim zacznie
+maleć. Średnią trzeba najpierw zbudować z gradientów, a póki jest budowana,
+wynosi marsz za cel.
+
+Gdy się ustabilizuje, tempo jest właściwe: mierzone przez pięćdziesiąt kroków
+ogona, odległość maleje o $\val{p20.tail.rate}$ na krok wobec przewidywanego
+$\val{p20.rate.mom}$. Na tej misie momentum jest więc warte
+$\val{p20.speedup}$ raza tyle, co zwykła metoda gradientu, wobec
+$\sqrt{\kappa}$ równego $\val{p20.sqrt.kappa}$.
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+Jest i drugi powód, i jest on dokładny, a nie przejściowy. Optymalne
+współczynniki sprawiają, że dwa pierwiastki iteracji \emph{pokrywają się} w
+obu kierunkach własnych naraz \dash{} wyróżnik wynosi $\val{p20.disc}$, co
+skrypt sprawdza \dash{} i właśnie to czyni je optymalnymi. Pierwiastek
+podwójny z jednym wektorem własnym maleje jak $k\rho^{k}$, a nie jak
+$\rho^{k}$, więc przewidywane tempo jest osiągane od góry i nigdy do końca.
+
+Algebra należy do pierwszego kursu i ten program jej nie przeprowadza. Warto
+zachować kształt wniosku: \textbf{tempo jest granicą, a liczba kroków nie}.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Uczciwe porównanie jest więc tym przeglądniętym po wielu problemach, a nie
+zacytowanym na jednym. Dla wskaźników uwarunkowania od $\val{p20.sweep.k.lo}$
+do $\val{p20.sweep.k.hi}$:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& metoda gradientu & momentum \\
+\midrule
+przewidywanie & dokładne przy każdym $\kappa$ & podłoga, do której zmierza \\
+$\kappa = \val{p20.sweep.k.lo}$ & \dash{} & $\val{p20.sweep.ratio.lo}\times$ \\
+$\kappa = \val{p20.sweep.k.hi}$ & \dash{} & $\val{p20.sweep.ratio.hi}\times$ \\
+sufit & \dash{} & $\sqrt{\kappa}$, tu $\val{p20.sweep.sqrt.hi}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Zysk rośnie ze wskaźnikiem uwarunkowania i nigdy nie sięga swojego sufitu.
+Weź pierwszą połowę tego: na jakich problemach momentum ledwie się opłaca i
+dlaczego?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Na dobrze uwarunkowanych. Przy $\kappa = \val{p20.sweep.k.lo}$ zysk wynosi
+$\val{p20.sweep.ratio.lo}$, bo $\sqrt{\kappa}$ jest bliskie $\kappa$, gdy
+$\kappa$ jest małe.
+\end{ansblock}
+
+Druga połowa to niedomiar, i to on sprawia, że $\sqrt{\kappa}$ jest
+ograniczeniem, a nie obietnicą.
+
+\begin{trapbox}
+\textbf{\enquote{Momentum daje przyspieszenie $\sqrt{\kappa}$.}} Daje tempo,
+które poprawia się jak $\sqrt{\kappa}$, a to nie to samo. Zmierzone tutaj,
+liczba kroków poprawia się o $\val{p20.sweep.ratio.hi}$ przy
+$\kappa = \val{p20.sweep.k.hi}$ wobec $\sqrt{\kappa}$ równego
+$\val{p20.sweep.sqrt.hi}$ \dash{} mniej niż połowy tego.
+
+Luka to stan przejściowy i nie znika po dostrojeniu: tyle kosztuje pierwiastek
+podwójny. Podawaj tempo albo podawaj zmierzoną liczbę kroków. Podawanie tempa
+tak, jakby było liczbą kroków, jest sposobem, w jaki ograniczenie staje się
+legendą.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Konwencja, która zmienia krok}
+\label{sec:P20-convention}
+\index{optymalizator!konwencje momentum}
+
+\begin{fr}
+Program~\ref{prog:F04} zasygnalizował to i przekazał konsekwencję tutaj. Dwie
+implementacje momentum:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+A & $v \leftarrow \beta v + (1-\beta) g$ \\
+B & $v \leftarrow \beta v + g$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Obie nazywają się momentum i obie występują w prawdziwym kodzie. Czy to ta
+sama aktualizacja?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Ten sam \emph{kierunek}, ale nie ta sama \emph{długość}. Wektor B jest
+$1/(1-\beta)$ raza dłuższy niż A.
+\end{ansblock}
+
+Przy $\beta = \val{p20.conv.beta}$ ten czynnik wynosi $\val{p20.fold}$. Skoro
+stała mnożąca krok jest nieodróżnialna od zmiany rozmiaru kroku, żadna z form
+nie jest błędna i obie są w użyciu. Nie przeżywa tego natomiast krok
+przeniesiony z jednej do drugiej.
+
+Zmierzone na tej samej misie przy $\eta = \val{p20.conv.eta}$ i
+$\beta = \val{p20.conv.beta}$: forma A zbiega w $\val{p20.conv.same}$ krokach,
+forma B z $\eta$ podzielonym przez $\val{p20.fold}$ odtwarza ten marsz
+\textbf{dokładnie}, krok po kroku \dash{} a forma B z tym samym $\eta$
+rozbiega się.
+\end{fr}
+
+\begin{fr}
+\begin{warning}
+\textbf{Nie \enquote{wolniej}. W ogóle.} Dziesięciokrotność działającego kroku
+na tej misie przekracza ograniczenie Programu~\ref{prog:P17}, więc marsz
+opuszcza nieckę i nie wraca.
+
+Nic w nazwie nie mówi, którą formę masz, i nic w symbolu też. \textbf{Przeczytaj
+wiersz aktualizujący stan}: po której stronie stoi współczynnik i czy druga
+strona w ogóle niesie czynnik. Program~\ref{prog:F04} robi tę samą uwagę o tym,
+którą wartość waży $\beta$; to jest jej druga połowa i to ta, która kosztuje
+przebieg.
+\end{warning}
+
+Gdy więc hiperparametr jest przenoszony z jednej biblioteki do drugiej, co
+musi podróżować razem z nim?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wyrażenie, w którym występuje, a nie liczba.
+\end{ansblock}
+
+Hiperparametr ma znaczenie wyłącznie razem z wierszem, w którym stoi. Dwie
+biblioteki mogą obie oferować \code{momentum=0.9} i mieć na myśli różne
+długości; dwa harmonogramy mogą obie oferować \code{gamma} i mieć na myśli różne
+działania, co jest sekcją 7. Gdy liczba jest przenoszona z jednego ustawienia
+do drugiego, podróżować musi nie liczba, lecz wiersz, w którym siedzi.
+\end{fr}
+
+% ============================================================
+\section{Skalowanie każdej współrzędnej}
+\label{sec:P20-adaptive}
+\index{optymalizator!skalowanie po współrzędnych}
+\index{optymalizator!Adam}
+
+\begin{fr}
+Momentum naprawiło kierunek. Krok wciąż jest jedną liczbą dla wszystkich
+współrzędnych naraz i to jest następna awaria.
+
+Załóżmy dwa parametry, których gradienty rutynowo różnią się rozmiarem sto razy
+\dash{} wiersz zanurzenia dotykany przez każdą partię i wiersz dotykany przez
+rzadki token. Jedno $\eta$ musi obsłużyć oba. Na czym dokładnie polega
+trudność?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Krok właściwy dla jednego jest błędny dla drugiego o ten sam czynnik stu: zbyt
+mały, by ruszyć z miejsca, albo zbyt duży, by być stabilnym.
+\end{ansblock}
+
+Naprawa musi więc sprawić, by krok \emph{znaczył to samo} w każdej
+współrzędnej. Jest to pytanie o jednostki. Aktualizacja $\eta g$ ma jednostki
+$\eta$ razy gradient, więc jej rozmiar zależy od rozmiaru gradientu, a właśnie
+tego nie chcemy.
+
+Przez co można podzielić gradient, żeby to, co zostanie, nie miało żadnych
+jednostek?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Przez coś, co samo jest gradientem. Pierwiastek ze średniej z kwadratu
+gradientu jest takim czymś.
+\end{ansblock}
+
+\[ v \leftarrow \beta_2 v + (1-\beta_2) g^{2}, \qquad
+   w \leftarrow w - \eta\,\frac{g}{\sqrt{v} + \varepsilon} \]
+
+$\sqrt{v}$ ma jednostki gradientu, więc $g/\sqrt{v}$ nie ma żadnych, a
+\textbf{krok wynosi około $\eta$ niezależnie od tego, jak duży jest gradient}.
+
+Postaw teraz średnią z sekcji 2 również w liczniku, tak żeby i kierunek, i
+skala były średnimi bieżącymi. Nazwij to, co zapisałeś.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Adam}
+Ta sama rekurencja puszczona dwa razy \dash{} raz na gradiencie i raz na jego
+kwadracie \dash{} czyli dokładnie to, co Program~\ref{prog:F04} zapowiedział,
+dwie części przed przybyciem jakiegokolwiek rachunku różniczkowego.
+
+To twierdzenie da się sprawdzić, więc jest sprawdzone. Z zimnego stanu
+wykonywany jest pierwszy krok dla gradientów rozpiętych na
+$\val{p20.adam.decades}$ rzędach wielkości:
+
+\transcript{p20-unit-step}
+
+Krok wynosi $\val{p20.adam.eta}$ w każdej współrzędnej dla dużych gradientów i
+jest o $\val{p20.adam.shortfall}$ procent krótszy dla małych.
+\textbf{To dlatego Adam jest niewrażliwy na skalowanie straty}: pomnóż stratę
+przez tysiąc, a każdy gradient zostanie pomnożony przez tysiąc \dash{} licznik i
+mianownik razem.
+\end{fr}
+
+\begin{fr}
+Ten niedomiar nie jest szumem ani przybliżeniem. Pierwszy krok wynosi dokładnie
+\[ \frac{\eta}{1 + \varepsilon/\lvert g\rvert} \]
+co skrypt sprawdza w każdej współrzędnej przy każdej skali. Odchylenie od
+$\eta$ należy więc w całości do epsilona i jest największe tam, gdzie gradient
+jest \emph{najmniejszy} \dash{} po przeciwnej stronie niż ta, o którą ludzie
+się martwią.
+
+Rodzi to pytanie, o którym przy pisaniu epsilona zwykle nikt nie myśli. Jest
+po to, żeby powstrzymać dzielenie przez zero. Gdzie ma stać: w środku
+pierwiastka, dodany do $v$, czy na zewnątrz, dodany do $\sqrt{v}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Na zewnątrz. W środku jest dodawany do \emph{kwadratu} gradientu, a to nie jest
+gradient.
+\end{ansblock}
+
+To znowu argument z jednostek i ma mierzalną konsekwencję. Przy
+$\varepsilon = \val{p20.eps}$ i gradiencie $\val{p20.eps.g}$:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+$\varepsilon$ na zewnątrz pierwiastka & krok krótszy o $\val{p20.eps.short.out}$ procent \\
+$\varepsilon$ w środku pierwiastka & krok krótszy o $\val{p20.eps.short.in}$ procent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Na zewnątrz epsilon jest porównywany z $\lvert g \rvert$, a jego efekt wynosi
+$\varepsilon/\lvert g\rvert$. W środku jest porównywany z $g^{2}$, a jego efekt
+jest rzędu $\varepsilon/g^{2}$, co nie jest małe, gdy gradient jest mały
+\dash{} a współrzędna o małym gradiencie jest dokładnie tą, którą cały ten
+mechanizm ma ratować.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Epsilon to zabezpieczenie numeryczne, więc jego dokładne
+miejsce nie ma znaczenia.}} Decyduje o tym, z czym to zabezpieczenie jest
+porównywane. Zapisany w środku pierwiastka staje się po cichu podłogą na
+\emph{kwadrat} gradientu, więc współrzędne, które tłumi, są wybierane przez
+jednostki straty, a nie przez cokolwiek dotyczącego modelu \dash{} i tłumi je o
+$\val{p20.eps.short.in}$ procent tam, gdzie poprawne umiejscowienie kosztuje
+$\val{p20.eps.short.out}$.
+
+Zabezpieczenie, które zmienia odpowiedź, nie jest zabezpieczeniem.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jest ostrzejszy sposób powiedzenia, co daje to dzielenie, i korzysta z czegoś,
+co Program~\ref{prog:P17} już ustalił.
+
+Ten program pokazał, że zapisanie parametru jako $w = c\,u$ zostawia funkcję
+liczoną przez sieć całkowicie bez zmian, a krzywiznę tego kierunku mnoży przez
+$c^{2}$. Ten sam model, inne współrzędne.
+
+Weź $c = \val{p20.rescale.c}$ na stromym kierunku naszej misy. Co stanie się ze
+zwykłą metodą gradientu przy kroku, który wcześniej był optymalny?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Rozbiegnie się. Krzywizna jest mnożona przez $\val{p20.rescale.csq}$, więc krok
+przekracza teraz $\val{p20.sgd.overshoot}$ razy ograniczenie
+Programu~\ref{prog:P17}.
+\end{ansblock}
+
+A Adam wykonuje $\val{p20.adam.plain}$ kroków przed przeparametryzowaniem i
+$\val{p20.adam.rescaled}$ po nim \dash{} tyle samo, bo i gradient, i jego
+bieżąca skala są mnożone przez $c$, a iloraz zostaje nietknięty.
+
+\textbf{Odpowiedź zwykłej metody gradientu zależy od tego, jak ktoś zapisał
+parametry. Odpowiedź Adama nie.} Jest to mocniejsze stwierdzenie niż porównanie
+szybkości, bo nie zależy od problemu.
+\end{fr}
+
+% ============================================================
+\section{Poprawianie średniej zaczynającej się od zera}
+\label{sec:P20-bias}
+\index{średnia bieżąca!poprawka obciążenia}
+\index{optymalizator!warmup}
+
+\begin{fr}
+Obie te średnie zaczynają się od zera, a Program~\ref{prog:F04} rozłożył i to.
+Jego wynik w jednym wierszu: po $t$ krokach średnia ze stałej wskazuje
+$1 - \beta^{\,t}$ prawdy, więc podzielenie przez $1 - \beta^{\,t}$ ją
+przywraca.
+
+Adam używa dwóch współczynników, $\beta_1 = \num{0.9}$ na gradiencie i
+$\beta_2 = \num{0.999}$ na jego kwadracie. Ich czasy połowicznego zaniku wynoszą
+$\val{f04.ema.halflife.steps}$ i $\val{f04.ema.b999.steps}$ kroków. Co to mówi
+o poprawce?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Że oba momenty są obciążone w bardzo różnym stopniu, więc każdy potrzebuje
+własnego $1 - \beta^{\,t}$ \dash{} i że drugi wykonuje realną pracę przez setki
+kroków, a nie przez trzy.
+\end{ansblock}
+
+To cała poprawka obciążenia w Adamie, a przyszła bez żadnego rachunku
+różniczkowego, w programie z części Podstawy, z sumy geometrycznej.
+
+\begin{note}
+Zauważ, czym ta poprawka \emph{nie} jest. Nie jest protezą na wolny start i nie
+jest dostrojona. Jest dokładną odwrotnością tej części wagi, która już dotarła,
+więc na ciągu stałym jest trafna przy każdym $t$ w algebrze \dash{} i trafna z
+dokładnością do mniej więcej ostatniego miejsca w binary64, co
+Program~\ref{prog:F04} zmierzył.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Poprawka naprawia \emph{skalę} średniej na początku. Nie naprawia jej
+\emph{jakości}, a ta różnica jest tym, o czym mówi ostatni składnik zwykłego
+przepisu na Adama.
+
+Po jednym kroku $v$ widziało jeden gradient. Po dziesięciu \dash{} dziesięć.
+Mianownik jest oszacowaniem typowego rozmiaru gradientu współrzędnej,
+zbudowanym z tej próby. Powiedz, co jest z nim nie tak na początku.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jest oszacowaniem z prawie żadnych danych, więc bardzo się rusza od kroku do
+kroku \dash{} a stoi w mianowniku.
+\end{ansblock}
+
+Zmierzone na strumieniu, w którym rozmiary gradientu różnią się o czynnik $25$:
+przez pierwsze dziesięć kroków poprawione oszacowanie waha się o czynnik
+$\val{p20.warm.early}$, a po trzystu krokach o czynnik $\val{p20.warm.late}$.
+
+\textbf{Przed tym właśnie chroni warmup.} Nie przed kruchym modelem i nie przed
+złą inicjalizacją \dash{} przed mianownikiem oszacowanym z garstki próbek i
+używanym do dzielenia. Podnoszenie $\eta$ przez pierwsze kilkaset kroków
+utrzymuje krok małym dokładnie wtedy, gdy wielkość, przez którą się dzieli,
+jest najmniej godna zaufania.
+\end{fr}
+
+% ============================================================
+\section{Gdzie wchodzi kara}
+\label{sec:P20-decay}
+\index{optymalizator!weight decay}
+\index{optymalizator!AdamW}
+
+\begin{fr}
+Jeszcze dwie naprawy, obie dotyczą rzeczy siedzących \emph{wokół} aktualizacji,
+a nie w niej. Pierwszą jest kara.
+
+Są dwa miejsca, w których można zastosować karę na wagi: dodać ją do gradientu,
+zanim optymalizator go zobaczy, albo odjąć od wagi, gdy optymalizator już
+skończy. Zapisz obie i powiedz, czy różnią się dla zwykłej metody gradientu.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ w \leftarrow w - \eta(g + \lambda w) \qquad\text{wobec}\qquad
+   w \leftarrow w - \eta g - \eta\lambda w \]
+a dla zwykłej metody gradientu to ten sam wiersz przestawiony.
+\end{ansblock}
+
+Dlatego obie nazwy były przez lata używane zamiennie. Skrypt to rozstrzyga: dla
+zwykłej metody gradientu obie zatrzymują się w tym samym miejscu z dokładnością
+lepszą niż $\val{p20.wd.sgd.gap}$.
+
+\mermaidfig{p20-penalty-enters}{Dwa miejsca na tę samą karę.}{gdzie wchodzi
+kara}
+
+Wstaw teraz między nie metodę adaptacyjną. Co dzieje się z pierwszą formą?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Składnik $\lambda w$ jest dzielony przez $\sqrt{v}$ razem ze wszystkim innym,
+więc jego skuteczna siła staje się $\lambda/\sqrt{v}$ \dash{} inną liczbą w
+każdej współrzędnej, i ruchomą.
+\end{ansblock}
+
+Zmierzone. Dwie współrzędne różniące się wyłącznie krzywizną, o czynnik
+$\val{p20.wd.curvratio}$, obie z minimum w $1$, jedna kara
+$\lambda = \val{p20.wd.lambda}$:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& współrzędna stroma & współrzędna płaska \\
+\midrule
+kara w gradiencie & $\val{p20.wd.l2.steep}$ & $\val{p20.wd.l2.flat}$ \\
+kara na wadze & $\val{p20.wd.decoupled}$ & $\val{p20.wd.decoupled}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Ta sama $\lambda$ kurczy jedną współrzędną o dziewięć procent, a drugą o
+dziewięćdziesiąt, czyli o czynnik $\val{p20.wd.l2.spread}$ \dash{} a ta, którą
+niemal unicestwia, jest tą o małym gradiencie. Wiersz odsprzężony to dwie
+identyczne liczby z dokładnością lepszą niż $\val{p20.wd.gap}$, bo ta kara nie
+wie nic o żadnej ze współrzędnych.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Adam z \code{weight\_decay} to regularyzacja $L_2$.}} Nie
+jest, i powyższa tabela mówi dlaczego. Dodanie kary do gradientu czyni jej
+skuteczną siłę funkcją historii gradientów każdego parametru, więc
+\enquote{siła regularyzacji} nie jest jedną liczbą i nie stoi w miejscu.
+
+To jest cała treść różnicy między nimi \dash{} jeden wiersz przeniesiony sprzed
+optymalizatora za niego \dash{} i powód, dla którego współczynnik kary
+dostrojony przy jednym optymalizatorze nie przenosi się na drugi.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Co harmonogram robi z krokiem}
+\label{sec:P20-schedules}
+\index{optymalizator!harmonogram kroku}
+
+\begin{fr}
+Ostatnim składnikiem jest ten opisywany zwykle jako rytuał: krok nie jest
+trzymany na stałe, tylko prowadzony po krzywej.
+
+Weź najczęstszą formę i weź ją jako ćwiczenie z czytania, a nie jako pytanie
+projektowe. Harmonogram jest ustawiony na początkowe tempo
+$\val{p20.sched.lr0}$ i \code{gamma=\val{p20.sched.gamma}}, a przebieg mija
+$\val{p20.sched.boundaries}$ granice. Ile wynosi krok na końcu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p20.sched.after}$.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{\enquote{\code{gamma=0.1} znaczy, że krok schodzi do $\num{0.1}$.}} On
+\emph{mnoży}. Trzy granice sprowadzają $\val{p20.sched.lr0}$ do
+$\val{p20.sched.after}$, co jest $\val{p20.sched.factor}$ razy mniejsze niż
+błędne odczytanie, a obie odpowiedzi dzieli pięć rzędów wielkości.
+
+Dlatego objawem jest \enquote{model przestał się uczyć w epoce $30$}, a nie
+\enquote{uczył się trochę wolniej}: krok nie osiadł na podłodze, tylko szedł
+dalej. A żadne dwie rodziny harmonogramów nie są parametryzowane tak samo, więc
+czytanie trzeba wykonać dla każdej z osobna.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Dwa harmonogramy o tej samej długości przebiegu: cosinus od szczytu do zera i
+prosta od szczytu do zera. Zanim pójdziesz dalej \dash{} który wydaje więcej
+całkowitego budżetu i o ile więcej?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Żaden. Wydają tyle samo, z dokładnością lepszą niż $\val{p20.cos.lin.gap}$
+szczytu.
+\end{ansblock}
+
+Oba dają średnio $\val{p20.cos.area}$ szczytowego tempa przez cały przebieg, bo
+cosinus od $1$ do $0$ jest symetryczny względem swojego środka, i prosta też.
+Różni je wyłącznie to, \emph{gdzie} budżet jest wydawany: cosinus w jednej
+czwartej przebiegu jest wciąż na $\val{p20.cos.quarter}$ szczytu, gdzie prosta
+jest na $\num{0.75}$, i oddaje to na końcu.
+
+Harmonogram nie jest więc sposobem na zużycie mniejszego kroku. Jest sposobem
+na wybranie, kiedy go zużyć \dash{} duży, póki powierzchnia jest badana, mały,
+póki jest zasiedlana \dash{} a argument za jednym kształtem wobec drugiego
+trzeba prowadzić w tych kategoriach albo wcale.
+\end{fr}
+
+\begin{fr}
+To zamyka program i warto powiedzieć, czego \emph{nie} stwierdzono.
+
+Każda naprawa tutaj była wyprowadzona wobec nazwanej awarii i, tam gdzie się
+dało, zmierzona na jednej misie. Nic z tego nie mówi, że Adam jest lepszy od
+momentum ani że cosinus jest lepszy od prostej na powierzchniach, na których
+czytelnicy tej książki naprawdę trenują. To są pytania empiryczne o klasę
+problemów, której nikt nie scharakteryzował, a Program~\ref{prog:P19} już
+powiedział, dlaczego teoria, która by je rozstrzygnęła, tu nie obowiązuje.
+
+Program zostawia natomiast umiejętność przeczytania wiersza aktualizacji
+optymalizatora i powiedzenia, dla której awarii stoi w nim każdy składnik
+\dash{} oraz zauważenia, kiedy hiperparametr został przeniesiony przez zmianę,
+która zmienia jego znaczenie.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--2}{Każdy optymalizator tutaj to $w \leftarrow w - \eta d$ z innym
+  $d$. \textbf{Lista to jeden wiersz i ciąg napraw}, a nie sześć algorytmów.}
+\sumitem{3--4}{Krok ma sufit wyznaczony przez kierunek \emph{najbardziej
+  stromy}, $\eta < 2/\lambda_{\max}$, więc każdy płaszczy porusza się wolniej,
+  niż mógłby. To ograniczenie Programu~\ref{prog:P17} i to je naprawia
+  wszystko, co po nim następuje.}
+\sumitem{5--6}{Zmarnowany wysiłek to składowa boczna odwracająca się w każdym
+  kroku: $\val{p15.zig.crossings}$ zmian znaku w $\val{p15.zig.steps}$ krokach,
+  czyli pomiar Programu~\ref{prog:P15} na tej samej misie.}
+\sumitem{7}{Na tej misie zwykła metoda gradientu potrzebuje
+  $\val{p20.steps.sgd}$ kroków, a jej przewidywana liczba z
+  $(\kappa-1)/(\kappa+1)$ jest \textbf{dokładna przy każdym sprawdzonym
+  wskaźniku uwarunkowania}.}
+\sumitem{8--9}{Momentum to średnia Programu~\ref{prog:F04} z gradientem w
+  środku: znosi to, co zmienia znak, i zachowuje to, co go nie zmienia, czyli
+  dokładnie kształt zygzaka.}
+\sumitem{10--11}{Zastępuje $\kappa$ przez $\sqrt{\kappa}$ \textbf{w tempie}
+  \dash{} $\val{p20.rate.sgd}$ staje się $\val{p20.rate.mom}$.}
+\sumitem{12--14}{Zmierzona liczba to $\val{p20.steps.mom}$ wobec
+  przewidywanych $\val{p20.pred.mom}$, bo marsz najpierw wybiega na
+  $\val{p20.overshoot}$ raza początkową odległość i bo optymalne współczynniki
+  dają pierwiastek podwójny. \textbf{Tempo jest granicą, a liczba kroków nie.}}
+\sumitem{15--16}{Zysk rośnie z $\kappa$ i nigdy nie sięga $\sqrt{\kappa}$:
+  $\val{p20.sweep.ratio.lo}\times$ przy $\kappa = \val{p20.sweep.k.lo}$ i
+  $\val{p20.sweep.ratio.hi}\times$ przy $\kappa = \val{p20.sweep.k.hi}$, wobec
+  sufitu $\val{p20.sweep.sqrt.hi}$.}
+\sumitem{17--19}{$v \leftarrow \beta v + g$ i
+  $v \leftarrow \beta v + (1-\beta)g$ wskazują tak samo i różnią się długością
+  o $1/(1-\beta)$. \textbf{Krok nie podróżuje między nimi}: przeskalowanie
+  odtwarza $\val{p20.conv.same}$-krokowy marsz dokładnie, a brak
+  przeskalowania rozbiega się.}
+\sumitem{20}{Razem z hiperparametrem podróżuje wyrażenie, w którym występuje,
+  nigdy sama liczba.}
+\sumitem{21--24}{Dzielenie przez $\sqrt{v}$ usuwa jednostki, więc krok wynosi
+  około $\eta$ niezależnie od rozmiaru gradientu \dash{} i dlatego też Adam
+  jest niewrażliwy na skalowanie straty. Obie średnie razem to Adam.}
+\sumitem{25}{Zmierzone na dwunastu rzędach wielkości, pierwszy krok wynosi
+  $\eta/(1 + \varepsilon/\lvert g\rvert)$, więc jedyne odchylenie od $\eta$
+  należy do epsilona i jest największe tam, gdzie gradient jest najmniejszy.}
+\sumitem{26--27}{Epsilon idzie \textbf{na zewnątrz} pierwiastka, gdzie jest
+  porównywany z gradientem. W środku jest porównywany z kwadratem gradientu:
+  $\val{p20.eps.short.in}$ procent kroku traconego wobec
+  $\val{p20.eps.short.out}$.}
+\sumitem{28--29}{Przy przeparametryzowaniu Programu~\ref{prog:P17} zwykła
+  metoda gradientu rozbiega się \dash{} $\val{p20.sgd.overshoot}$ razy poza
+  swoje ograniczenie \dash{} a Adam wykonuje te same $\val{p20.adam.plain}$
+  kroków. \textbf{Odpowiedź metody adaptacyjnej nie zależy od tego, jak
+  zapisano parametry.}}
+\sumitem{30--31}{Program~\ref{prog:F04} podaje poprawkę obciążenia jako
+  $1 - \beta^{\,t}$, jedną na współczynnik, a przy
+  $\beta_2 = \num{0.999}$ pracuje ona przez setki kroków, a nie przez trzy.}
+\sumitem{32--33}{Warmup chroni mianownik oszacowany z prawie żadnych danych:
+  oszacowanie skali waha się o $\val{p20.warm.early}$ przez dziesięć kroków i o
+  $\val{p20.warm.late}$ przez trzysta.}
+\sumitem{34--35}{Karę można dodać do gradientu albo odjąć od wagi, a
+  \textbf{dla zwykłej metody gradientu to ten sam wiersz}.}
+\sumitem{36--37}{Dla metody adaptacyjnej już nie: kara w gradiencie jest
+  dzielona przez bieżącą skalę razem ze wszystkim innym, więc jedna $\lambda$
+  zostawia współrzędną stromą na $\val{p20.wd.l2.steep}$, a płaską na
+  $\val{p20.wd.l2.flat}$.}
+\sumitem{38--39}{\code{gamma} \emph{mnoży}: $\val{p20.sched.lr0}$ staje się
+  $\val{p20.sched.after}$ po $\val{p20.sched.boundaries}$ granicach, czyli
+  $\val{p20.sched.factor}$ razy mniej niż przy błędnym odczytaniu.}
+\sumitem{40--42}{Cosinus i prosta wydają ten sam budżet \dash{}
+  $\val{p20.cos.area}$ szczytu \dash{} więc argument za kształtem dotyczy
+  \emph{kiedy} krok jest zużywany, nigdy \emph{ile} go jest.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Funkcja kwadratowa ma krzywizny $8$ i $2$. Jaki jest największy krok,
+  jakiego może użyć zwykła metoda gradientu, i ile wynosi wskaźnik
+  uwarunkowania?
+  \answerto{Ograniczenie to $2/\lambda_{\max} = \num{0.25}$, a wskaźnik
+  uwarunkowania to $8/2 = 4$.}
+\item Implementacja ma \code{v = 0.9*v + grad} i jest przenoszona do takiej,
+  która ma \code{v = 0.9*v + 0.1*grad}. Stary krok wynosił $\num{0.001}$. Ile
+  powinien wynosić nowy i dlaczego?
+  \answerto{$\num{0.01}$. Prędkość drugiej formy jest $1/(1-\beta) = 10$ razy
+  krótsza, więc krok musi być dziesięć razy większy, by dać ten sam marsz.
+  Przeniesienie $\num{0.001}$ zrobiłoby z każdego kroku dziesiątą część
+  zamierzonej długości.}
+\item Adam działa na stracie, która zostaje pomnożona przez $1000$. Co dzieje
+  się z rozmiarem jego kroków i dlaczego?
+  \answerto{Nic, z dokładnością do epsilona. Każdy gradient jest mnożony przez
+  $1000$, więc licznik i $\sqrt{v}$ w mianowniku są mnożone przez $1000$, a
+  iloraz zostaje bez zmian. To ta własność sprawia, że krok jest przenośny
+  między stratami o różnych skalach.}
+\item Dwie współrzędne mają gradienty różniące się rutynowo o czynnik $100$. Do
+  straty dodano karę $L_2$ o współczynniku $\lambda$, a optymalizatorem jest
+  Adam. Która współrzędna jest regularyzowana mocniej i mniej więcej o ile?
+  \answerto{Ta o \emph{mniejszym} gradiencie, mniej więcej o ten sam czynnik
+  $100$: kara przechodzi przez dzielenie $1/\sqrt{v}$, więc jej skuteczna siła
+  to $\lambda/\sqrt{v}$, największa tam, gdzie $\sqrt{v}$ jest najmniejsze.}
+\item Harmonogram zaczyna od $\num{2e-4}$ z \code{gamma=0.5} i mija cztery
+  granice. Ile wynosi tempo końcowe?
+  \answerto{$\num{2e-4} \times \num{0.5}^{4} = \num{1.25e-5}$. Mnoży raz na
+  granicę; nie zbliża się do $\num{0.5}$.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że dla funkcji kwadratowej o krzywiznach $\lambda_{\min}$ i
+  $\lambda_{\max}$ krok $2/(\lambda_{\min} + \lambda_{\max})$ sprawia, że oba
+  skrajne kierunki kurczą się o ten sam czynnik, i że czynnik ten wynosi
+  $(\kappa - 1)/(\kappa + 1)$.
+  \answerto{Kierunek o krzywiźnie $\lambda$ jest w każdym kroku mnożony przez
+  $1 - \eta\lambda$. Przy $\eta = 2/(\lambda_{\min}+\lambda_{\max})$ oba
+  czynniki to
+  \[ 1 - \frac{2\lambda_{\min}}{\lambda_{\min}+\lambda_{\max}}
+     \quad\text{oraz}\quad
+     1 - \frac{2\lambda_{\max}}{\lambda_{\min}+\lambda_{\max}} \]
+  czyli
+  $\pm(\lambda_{\max}-\lambda_{\min})/(\lambda_{\max}+\lambda_{\min})$
+  \dash{} równe co do wielkości i przeciwne co do znaku. Podzielenie licznika i
+  mianownika przez $\lambda_{\min}$ daje $(\kappa-1)/(\kappa+1)$. Każde
+  mniejsze $\eta$ zostawia płaski kierunek wolniejszym, każde większe
+  powiększa stromy czynnik co do wielkości.}
+\item Aktualizacja Adama to $\eta\,\hat m/(\sqrt{\hat v} + \varepsilon)$.
+  Pokaż, że pomnożenie każdego gradientu przez stałą $c > 0$ zostawia
+  aktualizację bez zmian w granicy małego $\varepsilon$, i powiedz, co psuje tę
+  niezmienniczość, gdy $\varepsilon$ małe nie jest.
+  \answerto{$\hat m$ jest liniowe w gradientach, więc skaluje się przez $c$;
+  $\hat v$ jest kwadratowe, więc $\sqrt{\hat v}$ skaluje się przez $c$; iloraz
+  zostaje bez zmian. Epsilon jest jedynym składnikiem, który się nie skaluje,
+  więc aktualizacja staje się
+  $\eta c\hat m/(c\sqrt{\hat v} + \varepsilon)$, co odbiega od wartości
+  nieskalowanej o czynnik $1/(1 + \varepsilon/(c\sqrt{\hat v}))$. Zmniejszanie
+  $c$ sprawia więc, że epsilon zaczyna mieć znaczenie, i to jest pomiar z
+  sekcji 4.}
+\item Kolega proponuje umieścić epsilon w środku pierwiastka \enquote{dla
+  symetrii}. Podaj ilościowy argument przeciw, w jednostkach.
+  \answerto{W środku $\varepsilon$ jest dodawany do $\hat v$, które ma
+  jednostki kwadratu gradientu. Wartość $\num{1e-8}$ jest wtedy podłogą na
+  $g^{2}$, czyli na $\lvert g \rvert$ równą $\num{1e-4}$ \dash{} to ogromny
+  gradient jak na coś traktowanego jako szum. Zmierzone: współrzędna o
+  $\lvert g \rvert = \val{p20.eps.g}$ traci $\val{p20.eps.short.in}$ procent
+  swojego kroku tam, gdzie poprawne umiejscowienie kosztuje
+  $\val{p20.eps.short.out}$.}
+\item Dlaczego marsz z momentum w sekcji 2 oddala się od minimum na pierwszych
+  krokach i dlaczego nie przeczy to tempu?
+  \answerto{Średnia zaczyna od zera i musi zostać zbudowana z gradientów; póki
+  jest budowana, jej kierunek opóźnia się za bieżącym gradientem, więc wynosi
+  marsz za punkt, w który był wycelowany. Tempo jest asymptotycznym
+  stwierdzeniem o ilorazie kolejnych odległości po ustabilizowaniu, a iloraz
+  nie mówi nic o stałej przed nim. Zmierzone: odległość rośnie do
+  $\val{p20.overshoot}$ raza wartości początkowej, a ogon maleje potem o
+  $\val{p20.tail.rate}$ na krok wobec przewidywanego $\val{p20.rate.mom}$.}
+\item Przewidywana liczba kroków zwykłej metody gradientu była dokładna przy
+  każdym sprawdzonym wskaźniku uwarunkowania, a momentum nie. Czym różnią się
+  te dwa przewidywania?
+  \answerto{Iteracja zwykłej metody gradientu ma w każdym kierunku własnym
+  osobne rzeczywiste czynniki $1 - \eta\lambda$, więc odległość jest dokładnie
+  ciągiem geometrycznym od pierwszego kroku, a liczba kroków wynika z samego
+  tempa. Optymalne współczynniki momentum sprawiają, że dwa pierwiastki jego
+  dwuwyrazowej rekurencji pokrywają się, co daje składnik $k\rho^{k}$, więc
+  tempo jest asymptotą, a nie opisem całego marszu.}
+\end{furtherproblems}

@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P19 written, both editions \dash{} Parts I to V entire, and the first of Part VI.** P20–P34 are stubs carrying their briefs | 15 of 47 |
+| Programs | **F1–F13 and P1–P20 written, both editions \dash{} Parts I to V entire, and the first two of Part VI.** P21–P34 are stubs carrying their briefs | 14 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 930 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 944 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 788 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 800 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 956 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 970 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 808 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 818 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,21 +93,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **15 of 47 programs are stubs**, in each language. This is the whole of the
+- **14 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 958 computed values, all referenced, all present, plus the committed console
+- 1016 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 192 Mermaid sources, all rendering
-- 50 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 198 Mermaid sources, all rendering
+- 52 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **84 orphan-tail pages: 21 · 25 · 19 · 19** across `main-en`, `main-pl`,
+- **87 orphan-tail pages: 22 · 26 · 19 · 20** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
-  **P15 none**, P16 one, **P17 none**, P18 one and **P19 none** \dash{} from 15 before F5, 26 before F6, 33 before F7,
+  **P15 none**, P16 one, **P17 none**, P18 one, **P19 none** and P20 three
+  \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
   before P6. **P6 added two and the ten transcripts it turned on added three**,
@@ -141,7 +142,7 @@ what was there before.
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
-  **47% in P19** \dash{} P13, P15 and P17 are the highest outside Part I and
+  **47% in P19** and **47% in P20** \dash{} P13, P15 and P17 are the highest outside Part I and
   the only ones anywhere to reach the book's own rate.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
@@ -6365,6 +6366,17 @@ not be compressed enough \dash{} and stop short of the cliff. The value is
 $\num{5.5}$, which is the top of the locally clean range and a full point
 below the first local failure.
 
+**And one process error, recorded because it will happen again.** The raise to
+$\num{5.5}$ was made, and a background sweep script still running in the tree
+restored $\num{4.5}$ on its way out, so the commit carried the old value and
+CI reported $\num{18.28874}$ pt a second time \dash{} to the ten-thousandth of
+a point. This file already records that an identical measurement after a change
+is the signal that the change did not reach what was measured; the CI vbox
+chased into the answers appendix is the same shape. Here it was simpler still:
+the change had not reached the *file*. **Re-read a constant out of the file
+immediately before committing it**, and do not leave a script that rewrites the
+working tree running behind you.
+
 #### The transcript was about to be a fabricated console block
 
 The listing prints two pairs of perplexities, and the draft's file carried
@@ -6452,6 +6464,219 @@ collapse, applied to the claim everybody repeats about loss landscapes.
   move** \dash{} the seventh time (F13, P07, P09, P12, P15, P17, P19).
 - Frame numbers mapped after writing: sections landed at
   `1--8 / 9--14 / 15--18 / 19--26 / 27--30 / 31--38`.
+
+### Program P20 pass, August 2026
+
+**Forty-two teaching frames, forty-four printed, both editions**, against a
+brief that projected sixty-five \dash{} the largest estimate that was left in
+the manifest. Seven sections: one update and what has to be estimated,
+averaging the direction, the convention that changes the step, scaling each
+coordinate, correcting an average that starts at zero, where the penalty
+enters, and what a schedule does to the step.
+
+Fourteenth program under its brief's estimate, and the reason is the F07/P06
+kind at its strongest: **four written programs had each already delivered one
+of P20's ingredients**, so nothing here had to be derived from scratch.
+Program~\ref{prog:F04} owns the exponential moving average outright, including
+the bias correction and the $(1-\beta)$ convention, and says in as many words
+that P20 supplies the gradient and not the average. Program~\ref{prog:P15}
+owns the zig-zag and hands the fix here by name. Program~\ref{prog:P17} owns
+$\eta < 2/\lambda_{\max}$, the bowl's optimal step size, its rate and its step
+count \dash{} all gated rather than recomputed \dash{} **and, unexpectedly,
+the argument that turns out to be the sharpest thing this program can say
+about Adam**. Program~\ref{prog:P11} owns the condition number.
+
+So the shape of the program is not \emph{what does Adam do} but \emph{what was
+wrong with the thing before it}, which is what its own brief asks for and what
+the reading made possible.
+
+#### Experiment E6, and the asymmetry that made it worth running
+
+The issue names E6 by name: SGD, momentum and Adam on a quadratic of known
+condition number, iterations to tolerance against the predicted count. It is
+free, and it makes Program~\ref{prog:P11}'s condition number pay off as a
+prediction rather than as a definition.
+
+The result is better than a table of three numbers, because **the two
+predictions do not behave alike**:
+
+| | plain descent | momentum |
+|---|---|---|
+| rate | $(\kappa-1)/(\kappa+1)$ | $(\sqrt{\kappa}-1)/(\sqrt{\kappa}+1)$ |
+| predicted count at $\kappa = 20$ | $\val{p20.pred.sgd}$ | $\val{p20.pred.mom}$ |
+| measured | $\val{p20.steps.sgd}$ | $\val{p20.steps.mom}$ |
+| across six $\kappa$ from $4$ to $1000$ | **exact every time** | a floor it approaches |
+
+**Plain descent's prediction is exact at every condition number tried**, and
+momentum's is not, and the second half is the section. The draft asserted the
+two would agree within two steps and it failed at $17$ against $11$ \dash{}
+the eleventh pass running in which writing the assertion at the computation,
+before the prose it supports, caught something.
+
+Two reasons, and both are checkable rather than excuses. A rate describes the
+tail and not the start, and this walk **overshoots**: the distance rises to
+$\val{p20.overshoot}$ times its starting value before it falls. And at the
+optimal coefficients the two roots of the iteration coincide in both
+eigendirections at once \dash{} the discriminant is exactly $0$, which the
+script checks \dash{} so the decay carries a factor of $k$ and the rate is
+approached from above rather than attained. Measured over fifty steps of the
+tail the ratio is $\val{p20.tail.rate}$ against a predicted
+$\val{p20.rate.mom}$.
+
+The sentence worth keeping: **a rate is a limit and a step count is not**, and
+quoting one as the other is how $\sqrt{\kappa}$ becomes folklore. The measured
+advantage is $\val{p20.sweep.ratio.hi}$ at $\kappa = \val{p20.sweep.k.hi}$
+against a $\sqrt{\kappa}$ of $\val{p20.sweep.sqrt.hi}$ \dash{} less than half
+of it.
+
+#### Three more assertions refuted their own drafts, all in the same script
+
+Unusually many for one pass, and each replacement is a better frame than the
+claim it replaced.
+
+- **A threshold chosen so a claim would pass.** The $(1-\beta)$ demonstration
+  asserted that carrying a step size across the convention \enquote{takes more
+  than three times as long}. False at Polyak's $\beta$, where the factor is
+  only $\num{1.67}$. Rewritten at Program~\ref{prog:F04}'s own $\beta =
+  \num{0.9}$, where the factor is ten and the claim needs no tolerance at all:
+  rescaling reproduces a $\val{p20.conv.same}$-step walk **exactly**, and not
+  rescaling **diverges**. Not slower \dash{} gone.
+- **Adam's step is not $\eta$.** The unit-step check asserted $\eta$ to
+  $10^{-6}$ for every gradient and failed at $\lvert g\rvert = 10^{-6}$, where
+  the step is $\num{0.09967}$. The failure is the frame: the first step is
+  exactly $\eta/(1 + \varepsilon/\lvert g\rvert)$, so **the epsilon is where
+  the unit-step property stops**, and it is an identity rather than an
+  approximation.
+- **And that identity produced the epsilon section.** A draft asserted the
+  outside form was scale-free to $10^{-9}$; it is short by
+  $\varepsilon/\lvert g\rvert$. Measuring both shortfalls instead of asserting
+  one away gives the argument: at $\lvert g\rvert = \val{p20.eps.g}$ the
+  epsilon costs $\val{p20.eps.short.out}$ per cent of the step outside the
+  root and $\val{p20.eps.short.in}$ per cent inside it. A later draft then
+  asserted the *ratio* grows as the gradient falls, which is also false \dash{}
+  the inside shortfall saturates below $100$ per cent while the outside one
+  keeps climbing, so the ratio peaks. The ratio was never the claim.
+
+#### And one measurement that was arithmetic dressed as a measurement
+
+The weight-decay section first \enquote{measured} the effective strength by
+computing $\lambda/(\lambda/100)$ and reporting $100$. That cannot fail, which
+is Program~\ref{prog:P05}'s rule about finding nothing, and it was caught by
+reading the script rather than by any gate.
+
+It is now an equilibrium: two coordinates differing only in curvature, by a
+factor of $\val{p20.wd.curvratio}$, run to where the penalty balances the data
+gradient. Under $L_2$ they settle at $\val{p20.wd.l2.steep}$ and
+$\val{p20.wd.l2.flat}$ \dash{} the same $\lambda$ pulling
+$\val{p20.wd.l2.spread}$ times harder on the coordinate with the *smaller*
+gradient \dash{} and under decoupled decay both settle in the same place, to
+better than $\val{p20.wd.gap}$. The $L_2$ equilibrium has a closed form,
+$w = at/(a+\lambda)$, so it is checked rather than reported.
+
+**And the other half of the AdamW argument is measured too**: for plain
+descent the two forms settle identically to better than
+$\val{p20.wd.sgd.gap}$, which is what makes the distinction a fact about
+adaptive methods rather than about penalties.
+
+#### Program P17's rescaling turned out to be the best thing to say about Adam
+
+This was not planned and it cost nothing, because P17 had already done the
+work. That program showed that writing a parameter as $w = c\,u$ leaves the
+function a network computes completely unchanged while multiplying that
+direction's curvature by $c^{2}$ \dash{} one model, two sharpnesses.
+
+It is exactly the transformation a per-coordinate method is invariant to. At
+$c = \val{p20.rescale.c}$ plain descent at its own optimal step size
+**diverges**, $\val{p20.sgd.overshoot}$ times past P17's bound, while Adam
+takes $\val{p20.adam.plain}$ steps in both coordinate systems. That is a
+stronger claim than any speed comparison, because it does not depend on the
+problem \dash{} and the program says in its closing frame that it is *not*
+claiming Adam is better, because that is an empirical question about a class
+of surface nobody has characterised.
+
+#### Rule 2 caught the last node of a three-rank figure, for the fourth pass running
+
+All three figures were read against the frames on either side of them before
+being rendered, and all three needed work \dash{} `p20-one-update`'s middle
+node previewed §4's mechanism, `p20-each-fixes-one`'s last node stated §4's
+answer thirteen frames early, and `p20-penalty-enters`'s last node stated the
+answer to the question the frame it sits in ends with.
+
+That is P17, P18, P19 and now P20, and the reason is structural rather than
+accidental: **a three-node chain naturally ends on its conclusion, and the
+conclusion is usually what the next frame elicits.** Read the last node
+against the next frame before rendering anything.
+
+Measured afterwards in all four builds. `p20-one-update` sits above frame 3's
+question and answers nothing in it, which is the P04/P07 case for the ninth
+time; the other two sit on the page that delivers what they carry, in the order
+question, answer, figure.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P20.1 one-update | 657 / 654 | 5.98 | 6.71 | 6.74 | 7.62 | 7.66 |
+| P20.2 each-fixes-one | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P20.3 penalty-enters | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's wrap cap on the first render, at three ranks.
+
+#### Layout
+
+Two overfull boxes arrived and both are recorded classes, applied after the
+build named them rather than while drafting:
+
+- **$\num{12.1}$ pt in `main-pl`**, from the comparison table's row labels
+  \dash{} *zysk przy $\kappa = \ldots$* against English's *advantage at* \dash{}
+  which is Program~\ref{prog:F05}'s finding that a `\val{}` numeric column
+  leaves almost no room for a long label. The labels are now the bare
+  $\kappa$ values in both editions.
+- **$\num{3.9}$ pt in `main-en-a4` alone**, from a run of four unbreakable
+  maths spans inside a further-problem `\answerto`. Program~\ref{prog:F06}'s
+  rule exactly, and the recorded fix worked without a detour: **put it in a
+  display.**
+
+After both, the multiset is element for element the pre-P20 baseline in all
+four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with no stranded
+openers, no stranded headings and **no orphaned cues at any point in the
+pass**. Three orphan tails added, one each in `main-en`, `main-pl` and
+`main-pl-a4`.
+
+#### The trap catalogue's Optimisation cluster was stale, and it is now the fifth file
+
+Reading the issue's own trap list before writing \dash{} the discipline
+Program~\ref{prog:P17}'s pass earned \dash{} turned up the P7-insertion
+off-by-one again, this time in five places in `notes/02` §3: the section
+heading said `(P18–P21)` where Part VI is P19--P22, item 21 pointed at P16 and
+P18 where P17 delivers it, item 23 pointed at P19 where P20 owns schedules,
+item 24 pointed at P20 where P21's brief undertakes the linear scaling rule by
+name, and item 25 pointed at P19 and P24 where F04 elicits it and P21
+undertakes it.
+
+**Every one was settled against the destination program's own brief rather
+than by assuming the off-by-one**, which is the rule Program~\ref{prog:P10}'s
+pass established and the reason item 24 moved *forward* rather than back. The
+rest of §3 is still not swept, for the reason already recorded: items 74
+onward are correct and items 1--73 are a mix, so a blanket renumber would
+break the ones that are right.
+
+#### Also
+
+- Traps 209 to 215 added, and items 21 to 25 corrected.
+- **Elicitation 47%**, from three conversions that added no frame. The best of
+  them is the one that names Adam: the reader writes the update out of the two
+  averages and is then asked what they have written, so the algorithm arrives
+  as something they assembled rather than as a recipe.
+- Parity took two rounds. One was the recorded `Program~\ref{...}'s <maths>`
+  inversion in a summary item; the other was a genuine editorial slip \dash{}
+  the English said *section 6* and the Polish *sekcja 7* for the same
+  forward pointer, and with seven sections the Polish was right.
+- The listing was extracted from `main-en.pdf` p823 and executed from `code/`:
+  it prints `[0.0997, 0.0999]` and `[0.1, 0.1]`, which is what the page prints
+  and what the frame beside it claims. Note the first row \dash{} the epsilon
+  biting at a tiny gradient \dash{} is the section's own measurement visible in
+  the listing, which is why the listing uses two coordinates rather than one.
+- Frame numbers mapped after writing: sections landed at
+  `1--7 / 8--16 / 17--20 / 21--29 / 30--33 / 34--37 / 38--42`.
 
 ### Stroud layout pass, August 2026
 
@@ -6718,46 +6943,39 @@ clone instead.
 
 ## What is left
 
-1. **Fifteen programs, and Parts I to V are complete, plus the first of
-   Part VI.** F1 to F13 and P1 to P19, both editions.
+1. **Fourteen programs, and Parts I to V are complete, plus the first two of
+   Part VI.** F1 to F13 and P1 to P20, both editions.
 
-   **P20 is next** \dash{} *Gradient descent: from SGD to Adam*, sixty-five
-   frames planned and the largest estimate left in the manifest, deps `P17`,
-   `P18`, `F4` and `P11`. Read what is already spent before estimating a
-   length, which is the discipline sixteen passes have now paid for, and this
-   is the program where that reading matters most, because **four written
-   programs have each already delivered one of its ingredients**:
+   **P21 is next** \dash{} *Stochastic optimisation and differentiating through
+   randomness*, fifty frames planned, deps `P20`, `P24` and `P25`. Its brief is
+   the widest left in Part VI and **two of its four payoffs are already owed by
+   name**, so read those before estimating anything:
 
-   - **F04** owns the exponential moving average, its bias correction *and*
-     the `(1 - beta)` question, which its review pass settled by measuring
-     rather than by naming a library \dash{} the two forms differ by exactly
-     $1/(1-\beta)$, so they give the same direction and a different length,
-     and a step size does not travel between them. F04 explicitly hands the
-     consequence here.
-   - **P15** owns the zig-zag, measured on P10's own bowl, and says in its own
-     rigour box that one step size has to serve both eigendirections.
-   - **P17** owns $\eta < 2/\lambda_{\max}$, derived and then measured, and
-     says the optimisers are P20's.
-   - **P11** owns the condition number, which is the ratio those two
-     eigenvalues form.
+   - **P20 hands over the batch.** Its own trap list sends item 24 (batch size
+     and learning rate) here, because P21's brief undertakes the linear scaling
+     rule and says to present it as *folklore with a limited empirical basis*
+     rather than as a law. P20 deliberately does not touch it.
+   - **F06 and F04 hand over the other two.** F06 owns clipping by norm against
+     clipping by value and has already measured both on
+     $(6, \num{0.5}, -\num{0.25})$; item 26 of the trap catalogue sends the
+     question of *why the enormous step happens at all* here. F04 elicits the
+     average-of-averages error, and item 25 sends the accumulation denominator
+     here \dash{} a cross-entropy averaged per micro-batch and then averaged
+     again is not the mean over the accumulated batch when the micro-batches
+     hold different numbers of real tokens.
 
-   So P20 does not have to derive the failure; it has to derive **each fix
-   against the failure that is already on the page**, which is the shape its
-   own brief asks for. What is genuinely left is the per-coordinate scaling
-   argument \dash{} why dividing by the square root of the second moment makes
-   the update approximately unit-sized whatever the gradient's size, which is
-   also why Adam is insensitive to loss scaling and why the epsilon sits
-   *outside* the root \dash{} and **why weight decay is not $L_2$
-   regularisation once you divide by a running scale**, which is the whole
-   content of AdamW and is one line of algebra.
+   **P21 carries a declared forward reference and it must stay declared.** The
+   variance of an estimator is P24's and the concentration argument is P25's,
+   two parts later, and the rule this file already states is that such a
+   dependency is named in the owning program's Learning outcomes with a
+   pointer. P21 is the original instance of that rule; do not let it revert.
 
-   **The measurement P20 can afford is a comparison on P10's bowl**, which
-   three programs already share: the same quadratic, the same eigenvalues, the
-   same step size, plain descent against momentum against a per-coordinate
-   method, counting steps to a fixed distance. It needs no provider and no
-   model, and it lets the chapter state each fix's benefit as a number rather
-   than as a claim. **Do not name a library's implementation**, on F04's rule
-   that a library's internals are a fact about a version.
+   **The measurement P21 can afford is free.** A minibatch gradient's variance
+   falls like $1/B$, which needs no provider and no model \dash{} draw from a
+   fixed population, average $B$ of them, and measure the spread against $B$.
+   That converts \enquote{the loss curve is noisy} from a complaint into a
+   number, and it is the honest setting for the linear scaling rule, which can
+   then be stated as the folklore it is rather than derived.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -6765,9 +6983,11 @@ clone instead.
    claim is not settled. With P08's rank-collapse warning that is **one debt
    with two entries**, and both need a trained model's real matrices. It is
    the first item in this book that cannot be done from a sandbox at all.
-   **P19 has now added a third entry of the same kind** \dash{} whether the
-   basin a walk lands in matters at the scale people train at \dash{} so the
-   debt is one trained model away from being three answers rather than one.
+   **P19 added a third entry of the same kind** \dash{} whether the basin a
+   walk lands in matters at the scale people train at \dash{} and **P20 a
+   fourth**, since it declines to say whether Adam reaches a better answer than
+   momentum on a real surface. So the debt is one trained model away from being
+   four answers rather than one.
 
    **And there is still a Part II-shaped job that is nobody's program.** The
    elicitation ledger puts P01, P02 and P03 at 29--31% against Part I's
@@ -6787,9 +7007,11 @@ clone instead.
    because P06 had already measured its central result under another name;
    **P17's fifty against thirty-eight**, because P15 and P10 between
    them had left only the model and the inequality; **P18's sixty
-   against thirty-nine**, because it defines no new object at all; and
+   against thirty-nine**, because it defines no new object at all;
    **P19's forty-five against thirty-eight**, because F04 had already worked
-   its headline demonstration and left it only the inequality.
+   its headline demonstration; and **P20's sixty-five against forty-two**,
+   because four written programs had each already delivered one of its
+   ingredients.
    **A brief's frame estimate is a planning figure from before its neighbours
    were written.** It is not a target.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
