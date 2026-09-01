@@ -1,0 +1,4 @@
+flowchart LR
+  A["pulling back needs each layer's own input, so every<br/>one of them has to be kept from the way forward"]
+  A --> B["keeping every one costs memory that grows with the<br/>depth and again with the batch"]
+  B --> C["keeping some and recomputing the rest between them<br/>trades that memory for arithmetic, at a known rate"]

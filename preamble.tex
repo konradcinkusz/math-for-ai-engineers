@@ -1592,13 +1592,23 @@
 % \program{Title} opens a program: it is \chapter plus the bookkeeping that
 % lets the back matter reproduce this program's answers under its own name.
 \makeatletter
-\newcommand{\program}[1]{%
+% The optional argument is a SHORT title, and it exists because the table of
+% contents is a narrow column and this book's titles are getting longer. P16's
+% Polish title overflowed the contents line by 2.2 pt, which is the same class
+% of defect as the diagram manifest's column and as the running head that
+% \mfaheadmark guards -- and the note on \mfaheadmark already said this one
+% was latent and waiting for a long-titled program. It is LaTeX's own
+% \chapter[short]{long}, passed through, rather than anything invented here.
+% USE IT IN BOTH EDITIONS OR IN NEITHER: parity compares the two files'
+% structural tokens, so a short form in one and not the other diverges.
+\newcommand{\program}[2][]{%
   % The previous program's frame total, written now because this is the first
   % moment at which that program is certainly over. \AtEndDocument catches the
   % last one.
   \mfa@flushframetotal
   \mfarangetrue
-  \chapter{#1}%
+  \def\mfa@shorttitle{#1}%
+  \ifx\mfa@shorttitle\@empty \chapter{#2}\else \chapter[#1]{#2}\fi
   \mfarangefalse
   % The key for the program just opened, captured here and not recomputed at
   % the flush: \mainnumbering resets the chapter counter between Part I and
@@ -1607,7 +1617,7 @@
   % which is what lets the opener tell a stub from a first run.
   \xdef\mfa@lastprog{\mfa@progkey}%
   \gdef\mfa@lastcount{0}%
-  \csgdef{mfa@title@\thechapter}{#1}%
+  \csgdef{mfa@title@\thechapter}{#2}%
   % Expanded, for the same reason as the answer keys above.
   \listxadd{\mfaprograms}{\thechapter}%
 }
@@ -2299,7 +2309,7 @@
 %  cleverer fix.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 0.9pt}}{}{%
+  \setlength{\parskip}{0pt plus 0.3pt minus 1.5pt}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex

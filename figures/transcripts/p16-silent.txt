@@ -1,0 +1,12 @@
+>>> from p16_autodiff import V, relu, backward
+>>> x = V(0.0)
+>>> y = relu(x)
+>>> backward(y)
+>>> x.grad
+0.0
+>>> a, b = V(3.0), V(5.0)
+>>> p = a * b
+>>> b.v = 99.0
+>>> backward(p)
+>>> a.grad
+5.0
