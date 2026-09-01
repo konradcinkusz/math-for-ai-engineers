@@ -7627,6 +7627,51 @@ sits in the closing frame with nothing after it.
 | `main-en-a4` | 769 / 769 | 777 / 778 | 786 |
 | `main-pl-a4` | 777 / 777 | 786 / 786 | 794 |
 
+#### CI found a 26-character `\code{}`, and `checklog.py` could not say where
+
+Both A4 builds failed on CI and neither trade build did: an over-budget hbox
+of $\num{25.4}$ pt in `main-en-a4` and $\num{37.7}$ pt in `main-pl-a4`, on
+source this container sets with zero. **Two builds over budget and two clean
+is itself the diagnosis**: a line that is unbreakable in *both* editions and
+only bites at 12 pt, which narrows it to something the two files share
+character for character. That is `\code{code/p24\_distributions.py}`, run into
+the middle of a paragraph \dash{} **26 characters, the longest script name in
+the book**, against F06's $\num{22}$ and F07's $\num{22}$.
+
+It is Program~\ref{prog:F08}'s and Program~\ref{prog:F11}'s recorded class
+(36.9 pt and 67.2 pt, both Polish, both mid-paragraph) and the recorded fix
+applied unchanged: **start the sentence with it**, where a sentence space
+gives TeX the break it needs. The book's other twenty-odd uses already do,
+which is why this is the first one to fail.
+
+**And the tooling gap is the finding worth keeping.** Program~\ref{prog:P12}'s
+pass taught `checklog.py` to name the page or the file and line of every
+overfull **vbox**, for a reason it stated plainly: the two installations
+paginate differently, so the machine that must fix a box is usually not the
+one that saw it. **The hbox reporting was left printing sizes alone**, and
+that is exactly the reporting CI uses. Two boxes, no location, and a cycle
+spent inferring one. `checklog.py` now reports an over-budget hbox the same
+way \dash{} its source line range, the file, and the offending line with the
+font switches stripped out \dash{} which would have ended this in one look.
+
+The generalisable half: **a diagnostic that is only worth having on the other
+machine has to be as complete as the one you use on your own.** The vbox half
+was completed the moment it cost a cycle; the hbox half was not, because it
+had never cost one on this container, where the location is a `grep` away.
+
+One thing found and deliberately not acted on. `main-en-a4` also carried a
+$\num{1.0}$ pt overfull vbox in the index, which is the recorded class after
+`\raggedcolumns` took it from $\num{8.3}$ pt. It is **left for the next
+measurement**, because the `\code{}` fix is three hundred pages upstream of
+the index and re-rolls its pagination, and this file's own rule is that a
+pagination measurement does not survive a change to the material being
+paginated. Tuning two pagination constants in one push is how the next
+reading becomes ambiguous. What the search did turn up is written into
+`preamble.tex` beside the patch: **`\multicolovershoot`**, multicol's own
+per-column allowance, one value per column rather than one per entry \dash{}
+which is the bounded knob Program~\ref{prog:P19}'s pass went looking for and
+did not find.
+
 #### Layout, and the ledgers
 
 The multiset came back element for element to the baseline in all four builds

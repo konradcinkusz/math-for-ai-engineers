@@ -2542,6 +2542,17 @@
   % shrink above that lets the glue go negative and closes two entries up.
   \renewcommand\indexspace{\par \vskip 10pt plus 5pt minus 9pt\relax}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
+% NOT SET, AND WRITTEN DOWN SO THE NEXT PASS DOES NOT HAVE TO FIND IT AGAIN.
+% multicol has its own parameter for how much a balanced column may miss its
+% target height by: \multicolovershoot, a \newdimen defaulting to 0pt, used
+% inside the very \vbox to that produces the complaint (multicol.sty, in
+% \balance@columns, right after the \vfuzz\z@ that makes \vfuzz inert). Unlike
+% \parskip shrink it is ONE value per column rather than one per entry, so it
+% is the bounded knob P19's pass went looking for and did not find. It is left
+% at its default here because the residual it would absorb has never been
+% measured on this container -- only on CI -- and because it is spelt with
+% negative glue components (\@minus-\multicolovershoot), which is worth asking
+% TeX about with a ten-line file before believing any reading of it.
 
 \makeindex
 
