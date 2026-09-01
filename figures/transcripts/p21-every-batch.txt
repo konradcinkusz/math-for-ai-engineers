@@ -1,0 +1,7 @@
+>>> from p21_stochastic_optimisation import POP, POP_MEAN
+>>> from itertools import combinations
+>>> b3 = [sum(s)/3 for s in combinations(POP, 3)]
+>>> sum(b3)/len(b3) == POP_MEAN
+True
+>>> float(min(b3)), float(max(b3))
+(-4.0, 7.333333333333333)

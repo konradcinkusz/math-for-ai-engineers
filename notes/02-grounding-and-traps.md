@@ -572,9 +572,9 @@ learning rate are coupled: the gradient noise scale changes with batch size, and
 the linear-scaling heuristic (scale LR with batch size, with warm-up) exists
 precisely because keeping it fixed is wrong. Whether linear or √-scaling is right
 is model-dependent and contested — this is one to present as *judgement with a
-named disagreement*, not as a rule. → **P21**, whose brief undertakes the
-linear scaling rule in as many words and says to present it as folklore with a
-limited empirical basis. P20 owns the schedules; this is about the batch.
+named disagreement*, not as a rule. → **P21**, which delivers it as two exact
+invariants rather than as a recommendation: see item 220. P20 owns the
+schedules; this is about the batch.
 
 **25. "Gradient accumulation over 4 micro-batches is identical to a 4× batch."**
 It is not, if the loss is a mean over a varying number of tokens. In October 2024
@@ -583,8 +583,10 @@ normalised by the number of non-ignored tokens, and computing that mean *per
 micro-batch* and then summing weights each micro-batch equally regardless of how
 many real tokens it contains. A mean of means is not the mean. The denominator
 must be computed across the whole accumulated batch. → **F04**, which elicits
-the average-of-averages error itself, and **P21**, whose brief undertakes the
-accumulation denominator by name. (This entry said "P19, P24", which predates
+the average-of-averages error itself, and **P21**, which delivers it: three
+micro-batches holding 1000, 10 and 500 real tokens give a pooled loss of 2.3709
+and an accumulated one of 4.3333, and with equal token counts the two are
+identical over fractions — which is exactly why it ships. (This entry said "P19, P24", which predates
 the insertion of P7.) Documented, recent, and expensive — it silently changed
 the objective in production training runs.
 
@@ -2384,3 +2386,66 @@ gradients vary by a factor of 25, the corrected estimate swings by 17.7× over
 the first ten steps and by 1.005× after three hundred. A warmup keeps the step
 small exactly while the quantity it is divided by is least trustworthy, which
 is a statement about the estimator rather than about the model. → **P20**.
+
+**216. "The gradient is unbiased, so I can trust it."** Unbiased is a statement
+about the *ensemble*: average over every batch that could have been drawn and
+the answer is exact. It says nothing about the batch in front of you. Measured
+on a population of ten with batches of three, all 120 of them: the batch means
+average to the population mean exactly over fractions, and they run from −4.0
+to 7.33 around a mean of 2.0, with one of them pointing the opposite way. The
+two words that go together are *unbiased* and *variance*. → **P21**.
+
+**217. "Sixteen times the batch means sixteen times less noise."** Four times
+less. The *variance* of a batch mean falls like `1/B`, so the *spread* — which
+is what you see — falls like `1/sqrt(B)`. That square root is the whole of
+"diminishing returns on batch size" and it is exact rather than a rule of
+thumb: doubling the batch buys a factor of √2 in noise for a factor of 2 in
+compute, at every batch size, for ever, with nothing about the model entering
+the statement. → **P21**.
+
+**218. "An enormous gradient step means something is wrong."** It means a batch
+mean has a spread and this batch was in the tail of it, which is a property the
+method has by construction. Nothing is wrong with the model, the data or the
+optimiser. The frequency is set by the spread and the batch size and by nothing
+else, which is what makes a clipping threshold a decision about a distribution
+rather than a constant. → **P21**, with the two clipping operations in **F06**.
+
+**219. "Clipping is a safety net, so a tighter threshold is safer."** A
+threshold below the typical gradient size is not a net, it is a redesign: the
+optimiser then follows the gradient's *direction* with a length you fixed by
+hand and discards its magnitude, on nearly every step. Measured: a threshold at
+half the typical size clips 77 per cent of steps and one at four times it clips
+1 in 20 000. The question to ask of a threshold is not whether the number looks
+reasonable but what fraction of steps it clips — a guess against a measurement,
+and the measurement is two lines of logging. → **P21**.
+
+**220. "The linear scaling rule is what you do when you change the batch
+size."** It is one of two rules and they hold different things fixed, both
+exactly. The update is `eta * ghat`, so its variance is `eta² σ²/B`: scaling
+`eta` by `sqrt(k)` leaves that exactly unchanged, and scaling it by `k`
+multiplies it by `k` while holding the ground covered per example fixed
+instead. Which invariant matters is an empirical question that is not settled,
+the reported evidence for the linear rule comes with a warm-up and a ceiling,
+and the arithmetic above holds regardless. → **P21**, and it replaces item 24's
+framing with the two invariants written out.
+
+**221. "The loss stopped falling around step 4000."** On a smoothed curve it
+stopped falling around step `4000 − h`, where `h` is the half-life of the
+smoothing. The lag *is* the half-life, by construction: measured, a smoothed
+curve crosses the midpoint of a genuine step change 7 steps later at
+`beta = 0.9`, whose half-life is 6.58, and the lag does not depend on how large
+the change was. Two runs smoothed differently are two different delays, and an
+intervention that appears to take effect late gets credited to whatever came
+next. Read the raw curve when the question is *when*. → **P21**, on **F04**'s
+machinery.
+
+**222. "Both estimators are unbiased, so they are interchangeable."** An
+estimator is used a finite number of times, so what decides usability is the
+variance. Measured on one problem where both apply, at 40 000 samples: the
+reparameterised estimator's variance is 4.0 at *every* dimension, because the
+estimator for one component is a function of that component alone; the
+score-function estimator's goes from 15.9 at one dimension to 12 705 at a
+hundred, and its estimate is still 47 per cent from the true value after all
+40 000 samples. That is the fork between a policy-gradient method and a
+variational auto-encoder, and it is why the first has a literature about
+variance reduction and the second does not. → **P21**.

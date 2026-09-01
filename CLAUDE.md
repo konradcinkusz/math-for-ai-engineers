@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P20 written, both editions \dash{} Parts I to V entire, and the first two of Part VI.** P21–P34 are stubs carrying their briefs | 14 of 47 |
+| Programs | **F1–F13 and P1–P21 written, both editions \dash{} Parts I to V entire, and the first three of Part VI.** P22–P34 are stubs carrying their briefs | 13 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 956 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 970 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 808 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 818 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 978 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 992 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 826 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 836 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,21 +93,21 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **14 of 47 programs are stubs**, in each language. This is the whole of the
+- **13 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1016 computed values, all referenced, all present, plus the committed console
+- 1060 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 198 Mermaid sources, all rendering
-- 52 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 204 Mermaid sources, all rendering
+- 54 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **87 orphan-tail pages: 22 · 26 · 19 · 20** across `main-en`, `main-pl`,
+- **90 orphan-tail pages: 23 · 26 · 20 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
-  **P15 none**, P16 one, **P17 none**, P18 one, **P19 none** and P20 three
+  **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three and P21 three
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -142,7 +142,7 @@ what was there before.
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
-  **47% in P19** and **47% in P20** \dash{} P13, P15 and P17 are the highest outside Part I and
+  **47% in P19**, **47% in P20** and **48% in P21** \dash{} P13, P15 and P17 are the highest outside Part I and
   the only ones anywhere to reach the book's own rate.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
@@ -6723,6 +6723,172 @@ break the ones that are right.
 - Frame numbers mapped after writing: sections landed at
   `1--7 / 8--16 / 17--20 / 21--29 / 30--33 / 34--37 / 38--42`.
 
+### Program P21 pass, August 2026
+
+**Thirty-nine teaching frames, forty-one printed, both editions**, against a
+brief that projected fifty. Seven sections: a gradient you did not ask for, how
+noisy exactly, why the occasional enormous step, two rules that hold different
+things fixed, what a smoothed curve hides, one denominator two answers, and two
+ways through a coin flip.
+
+Fifteenth program under its brief's estimate, and the cause is the F07/P06 kind
+once more: **three written programs had already delivered the pieces this one
+would otherwise have had to build.** Program~\ref{prog:P20} hands over the
+batch by name and leaves the optimiser entirely settled.
+Program~\ref{prog:F06} owns clipping outright \dash{} both operations and the
+measurement \dash{} and says in as many words that P21 owes *why the enormous
+step happens*, never the two operations. Program~\ref{prog:F04} owns the
+average-of-averages error and works it three times, and owns the exponential
+moving average.
+
+So P21's own job is narrower and better: it is the program in which every
+complaint about training turns out to be a statement about a **variance**.
+
+#### The headline is a fork, and it is free
+
+Two estimators of one gradient through a sampling step, both unbiased, measured
+at $\val{p21.grad.samples}$ samples:
+
+| dimension | score function | reparameterised |
+|---|---|---|
+| $\val{p21.grad.d.lo}$ | $\val{p21.grad.score.lo}$ | $\val{p21.grad.repar}$ |
+| $\val{p21.grad.d.hi}$ | $\val{p21.grad.score.hi}$ | $\val{p21.grad.repar}$ |
+
+**The reparameterised variance does not move at all**, and not by luck: the
+estimator for one component is a function of that component's own draw, so the
+other ninety-nine dimensions never enter it, and the script asserts it at every
+dimension. The score function's grows by three orders of magnitude, because it
+multiplies by the value of the *whole* function.
+
+The consequence is the sentence the section exists for. After forty thousand
+samples the reparameterised estimate is $\val{p21.grad.off.repar}$ per cent
+from the truth and **the score-function estimate is still
+$\val{p21.grad.off.score}$ per cent out** \dash{} from an estimator that is
+exactly right on average. *Unbiased is not the same as usable*, and that is why
+the policy-gradient literature is largely a literature about variance reduction
+and the variational one is not.
+
+#### The scaling rules, stated as two exact invariants rather than adjudicated
+
+The brief asks for the linear scaling rule *as folklore, not as a law*, and the
+honest way to do that turned out to be arithmetic rather than hedging. The
+update is $\eta\hat g$, so its variance is $\eta^{2}\sigma^{2}/B$, and:
+
+- scaling $\eta$ by $\sqrt{k}$ leaves that **exactly** unchanged;
+- scaling $\eta$ by $k$ multiplies it by $\val{p21.scale.linear}$, and holds
+  the ground covered per example fixed instead.
+
+Both are one line and both are checked. So the program can state precisely what
+each rule preserves, say that the empirical question of which matters more is
+not settled here, and leave the reader able to ask what a recommendation rests
+on. That is worth more than either picking a side or refusing to discuss it,
+and it turns trap item 24 from a caution into two invariants.
+
+The third choice \dash{} change $B$ and leave $\eta$ \dash{} holds neither
+fixed, which is why it is the one nobody argues for, and it is elicited rather
+than warned about.
+
+#### An assertion refused a threshold, for the twelfth pass running
+
+The unbiasedness section first asserted that the worst batch mean is *more than
+four times the population mean away from it*. It failed at $6$ against $8$
+\dash{} a threshold chosen so a claim would pass, which Programs
+\ref{prog:F11}, \ref{prog:P15} and \ref{prog:P20} have each paid for.
+
+The replacement needs no threshold at all and is a better frame: the
+$\val{p21.pop.subsets}$ batch means average to $\val{p21.pop.mean}$ **exactly**,
+over fractions, and they **straddle** it \dash{} from $\val{p21.pop.lo}$ to
+$\val{p21.pop.hi}$, with one of them pointing the opposite way. Unbiasedness is
+a statement about the ensemble; straddling is what says it is not a statement
+about a draw.
+
+And because every batch is drawn, it is a **proof** for that population rather
+than evidence about it, which is Program~\ref{prog:P14}'s distinction doing a
+second job.
+
+#### A percentage that rounds to zero, which is P05's defect in a mirror
+
+The clipping section reported that a threshold at four times the typical
+gradient size clips $\num{0.0}$ per cent of steps. That reads as *exactly
+none* and it is not \dash{} it is one step in $\val{p21.clip.trials}$.
+Program~\ref{prog:P05} recorded the same failure from the other end, where a
+quantity rounding to $100$ per cent had to be reported as its complement; the
+rule generalises to **any percentage that rounds to a boundary**, and the fix
+is the same: report the count, where every figure means something.
+
+The measurement is then the section's best sentence: **$\val{p21.clip.half}$
+per cent of steps against $\val{p21.clip.four.n}$ in $\val{p21.clip.trials}$**,
+for the same operation with the threshold moved. The first is not a safety net
+but a different algorithm \dash{} the direction of the gradient with a length
+fixed by hand \dash{} and nothing reports the difference.
+
+#### Rule 2 caught the last node of all three figures, for the fifth pass running
+
+`p21-one-draw`'s middle node said the average over every batch is exact, which
+is frame 4's answer, and its last node gave frame 6's trapbox.
+`p21-noise-and-batch`'s last node gave frame 12's answer to a question frame 11
+ends with. `p21-two-estimators`'s last node gave frame 34's.
+
+That is P17, P18, P19, P20 and now P21. The finding is no longer a coincidence
+and is worth stating as a rule in its own right: **write the figure's last node
+against the frame that follows it, before rendering anything.** A three-node
+chain ends on its conclusion, and the conclusion is what the next frame elicits;
+the shape of the diagram and the shape of a frame pair are in conflict by
+construction.
+
+Measured afterwards in all four builds. `p21-one-draw` sits on the same page as
+frame 3's question in every build and answers nothing in it, which is the
+P04/P07 case for the tenth time; `p21-two-estimators` sits a page before frame
+33's question and carries only what frames 32--33 state; `p21-noise-and-batch`
+sits with frame 11's question and frame 12's answer.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P21.1 one-draw | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P21.2 noise-and-batch | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P21.3 two-estimators | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's wrap cap on the first render, at three ranks.
+
+#### The forward prerequisite, discharged as declared
+
+This is the book's one deliberate forward dependency and it has not reverted:
+variance itself is Program~\ref{prog:P24}'s and concentration is
+Program~\ref{prog:P25}'s, two parts later. Section 1 carries a `rigourbox`
+naming both with pointers, giving the one sentence the reader needs, and saying
+that P25 returns to minibatch noise once the machinery exists. The Learning
+outcomes say so too.
+
+**And the issue's own trap list carries the P7-insertion off-by-one, in a fifth
+file.** Issue \#35 names \enquote{Adam with \code{weight\_decay} is $L_2$
+regularisation} as one of P21's three traps; that is item 22, its owner in the
+catalogue is P20, and Program~\ref{prog:P20} delivered it in the previous pass.
+The other two \dash{} the batch-size rule and the accumulation denominator
+\dash{} are P21's and are both delivered here. Recorded rather than edited,
+because the issues are generated from the manifest and the manifest is right.
+
+#### Also
+
+- Traps 216 to 222 added, and items 24 and 25 marked delivered with their
+  numbers.
+- Layout cost nothing: the overfull multiset is element for element the
+  pre-P21 baseline in all four builds \dash{} `[]`, `[]`, `[6.3]`, `[]`
+  \dash{} with no stranded openers, no stranded headings and **no orphaned
+  cues at any point in the pass**. Three orphan tails added.
+- **Parity found one genuine divergence and it was in the English**: an
+  `$\eta/1$` written for \enquote{$\eta$ per example}, which is not a
+  meaningful expression and which the Polish had sensibly not translated. C4,
+  C8, C12 and C14 all fired on it at once. The English now says what it means
+  in words.
+- Elicitation 48%, from four conversions that added no frame. The best of them
+  is the third scaling choice: the reader is asked which quantity keeping
+  $\eta$ holds fixed, and the answer is \enquote{neither}.
+- The listing was extracted from `main-en.pdf` p840 and executed from `code/`:
+  it prints `True` and `(-4.0, 7.333333333333333)`, which is what the page
+  prints and what the frames beside it claim.
+- Frame numbers mapped after writing: sections landed at
+  `1--7 / 8--12 / 13--17 / 18--22 / 23--25 / 26--30 / 31--39`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -6988,39 +7154,43 @@ clone instead.
 
 ## What is left
 
-1. **Fourteen programs, and Parts I to V are complete, plus the first two of
-   Part VI.** F1 to F13 and P1 to P20, both editions.
+1. **Thirteen programs, and Parts I to V are complete, plus the first three of
+   Part VI.** F1 to F13 and P1 to P21, both editions.
 
-   **P21 is next** \dash{} *Stochastic optimisation and differentiating through
-   randomness*, fifty frames planned, deps `P20`, `P24` and `P25`. Its brief is
-   the widest left in Part VI and **two of its four payoffs are already owed by
-   name**, so read those before estimating anything:
+   **P22 is next** \dash{} *Constrained optimisation and Lagrange multipliers*,
+   deps `P15`, `P19` and `P30`, and it **closes Part VI**. Its payoff is one
+   reading carried all the way through: **a multiplier is a price** \dash{} how
+   much objective you buy per unit of constraint relaxed \dash{} which turns
+   the $\beta$ in a KL-penalised objective from a tuning knob into a quantity
+   with units, and makes the equivalence between a hard KL constraint and a KL
+   penalty the reason two named methods are talking about one problem.
 
-   - **P20 hands over the batch.** Its own trap list sends item 24 (batch size
-     and learning rate) here, because P21's brief undertakes the linear scaling
-     rule and says to present it as *folklore with a limited empirical basis*
-     rather than as a law. P20 deliberately does not touch it.
-   - **F06 and F04 hand over the other two.** F06 owns clipping by norm against
-     clipping by value and has already measured both on
-     $(6, \num{0.5}, -\num{0.25})$; item 26 of the trap catalogue sends the
-     question of *why the enormous step happens at all* here. F04 elicits the
-     average-of-averages error, and item 25 sends the accumulation denominator
-     here \dash{} a cross-entropy averaged per micro-batch and then averaged
-     again is not the mean over the accumulated batch when the micro-batches
-     hold different numbers of real tokens.
+   **It carries the book's second declared forward reference and the manifest
+   leaves the choice open.** KL is not defined until Program~\ref{prog:P30},
+   and the brief gives two ways to proceed: state the one fact the payoff needs
+   \dash{} that KL is a non-negative measure of how far one distribution sits
+   from another, zero only when they agree \dash{} in the Learning outcomes
+   with a pointer, exactly as Program~\ref{prog:P18} does for cross-entropy; or
+   carry the payoff with a plain quadratic penalty and have P30 return to it.
+   **It may not be left undeclared**, and Program~\ref{prog:P21} has just shown
+   the first route working, with a `rigourbox` naming both P24 and P25.
 
-   **P21 carries a declared forward reference and it must stay declared.** The
-   variance of an estimator is P24's and the concentration argument is P25's,
-   two parts later, and the rule this file already states is that such a
-   dependency is named in the owning program's Learning outcomes with a
-   pointer. P21 is the original instance of that rule; do not let it revert.
+   Read what is already spent before estimating a length, which is the
+   discipline sixteen passes have now paid for: **P15** owns the gradient and
+   the fact that it is perpendicular to a contour, which is the whole geometric
+   content of \enquote{the two gradients are parallel}; **P19** owns convexity,
+   so \enquote{the constrained optimum is *the* optimum} has its condition
+   already; **P05** owns projection onto a subspace, which is one of the two
+   ways to enforce a constraint and is derived there in full; **P17** owns the
+   second-order picture. What is genuinely left is the multiplier itself, its
+   reading as a price, and the KKT conditions stated for recognition.
 
-   **The measurement P21 can afford is free.** A minibatch gradient's variance
-   falls like $1/B$, which needs no provider and no model \dash{} draw from a
-   fixed population, average $B$ of them, and measure the spread against $B$.
-   That converts \enquote{the loss curve is noisy} from a complaint into a
-   number, and it is the honest setting for the linear scaling rule, which can
-   then be stated as the folklore it is rather than derived.
+   **The measurement P22 can afford is the price itself.** Solve one
+   constrained problem at several constraint levels and check that the
+   multiplier equals the derivative of the optimal value with respect to the
+   level \dash{} which is what \emph{price} means, is exact for a quadratic,
+   and turns the whole reading from an analogy into an identity. It needs no
+   provider and no model.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -7054,9 +7224,10 @@ clone instead.
    them had left only the model and the inequality; **P18's sixty
    against thirty-nine**, because it defines no new object at all;
    **P19's forty-five against thirty-eight**, because F04 had already worked
-   its headline demonstration; and **P20's sixty-five against forty-two**,
+   its headline demonstration; **P20's sixty-five against forty-two**,
    because four written programs had each already delivered one of its
-   ingredients.
+   ingredients; and **P21's fifty against thirty-nine**, because F06, F04 and
+   P20 between them had left it only the noise model.
    **A brief's frame estimate is a planning figure from before its neighbours
    were written.** It is not a target.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
