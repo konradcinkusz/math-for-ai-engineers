@@ -1,0 +1,7 @@
+>>> from p25_clt_monte_carlo import e9
+>>> sd, ent, top = e9(512, scaled=False)
+>>> round(sd, 1), round(512 ** 0.5, 1)
+(22.7, 22.6)
+>>> sd, ent, top = e9(512, scaled=True)
+>>> round(sd, 2)
+1.0

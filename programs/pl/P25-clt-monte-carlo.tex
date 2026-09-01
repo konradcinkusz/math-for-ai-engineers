@@ -1,37 +1,1165 @@
-%% P25 --- Sumy zmiennych losowych: centralne twierdzenie graniczne i metoda Monte Carlo
+%% P25 --- Sumy zmiennych losowych: CTG, koncentracja i Monte Carlo
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Blizniak: programs/en/P25-clt-monte-carlo.tex. Ramka w ramke, makro w
+%% makro, liczba w liczbe; tools/parity.py porownuje oba pliki. Kazda liczba
+%% pochodzi z code/p25_clt_monte_carlo.py.
+%%
+%% UWAGI DLA TLUMACZA, z regul zapisanych w CLAUDE.md:
+%%   * cyfra zostaje cyfra: nigdy "zerem" zamiast $0$ ani "dwukrotnie"
+%%     zamiast $2$ -- C8 i C12 porownuja spany i literaly PO KOLEI;
+%%   * odwolanie prowadzi, a nie idzie za matematyka: angielskie
+%%     "Program~\ref{}'s $x$" musi byc "Program~\ref{} podaje $x$",
+%%     nie "$x$ z Programu~\ref{}";
+%%   * gdzie angielski pisze skrot w rodzaju "P21", polski tez musi;
+%%   * terminy ML zostaja angielskie i odmieniaja sie po polsku.
 
-\program{Sumy zmiennych losowych: centralne twierdzenie graniczne i metoda Monte Carlo}
+\program[Sumy zmiennych losowych]{Sumy zmiennych losowych: centralne
+twierdzenie graniczne, koncentracja i Monte Carlo}
 \label{prog:P25}
+\index{centralne twierdzenie graniczne}
+\index{koncentracja}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{dodać dwie wariancje i powiedzieć, co kupuje w tym miejscu
+  niezależność}
+\outcome{9--14}{wyprowadzić tempo, w jakim średnia się koncentruje, i
+  powiedzieć, co daje czterokrotnie więcej danych}
+\outcome{15--22}{powiedzieć, co centralne twierdzenie graniczne obiecuje, a
+  czego nie}
+\outcome{23--29}{dobrać rozmiar ewaluacji do różnicy, którą trzeba zobaczyć}
+\outcome{30--41}{wyprowadzić $1/\sqrt{d_k}$ w uwadze i powiedzieć, co ono
+  koryguje}
+\outcome{42--54}{powiedzieć, dlaczego trening może się rozbiec, zanim zrobi
+  krok}
+\end{outcomes}
 
-Argument: variances of independent quantities add; averages concentrate; the
-error of an average falls as \code{1/sqrt(n)} and that single rate governs
-an astonishing amount of practice. Payoff: **the derivation of the
-$1/sqrt(d_k)$ in attention.** A dot product of two $d_k$-dimensional vectors
-with independent unit-variance entries has variance $d_k$, so its standard
-deviation grows as $sqrt(d_k)$; feed that into a softmax and it saturates,
-and the gradient dies; divide by $sqrt(d_k)$ and the logits have unit
-variance regardless of head size. The scaling is a variance correction and
-nothing else, and the reader derives it here and measures it in P32. Also:
-Monte Carlo error is the same \code{1/sqrt(n)}, so the number of samples
-needed to halve an error bar is four times as many \dash{} the fact that
-prices every evaluation run in the book.
+\begin{quiz}
+\item Dodajemy dwie niezależne wielkości. Co dzieje się z ich rozrzutami?
+  \teachesat{1--2}
+  \answerto{Nic prostego \dash{} dodają się \emph{wariancje}, a nie rozrzuty,
+  więc rozrzut sumy jest pierwiastkiem z sumy kwadratów. Dodanie dwóch
+  wielkości o rozrzucie $1$ daje rozrzut $\sqrt{2}$, a nie $2$.}
+\item Średnia jest brana po czterokrotnie większej liczbie losowań. Co dzieje
+  się z jej rozrzutem? \teachesat{13--14}
+  \answerto{Zmniejsza się o połowę. Wariancja spada jak $1/n$, a rozrzut jak
+  $1/\sqrt{n}$, więc czynnik dwa kosztuje czynnik cztery.}
+\item Suma wielu niezależnych rzeczy jest bliska rozkładowi Gaussa. Czy to
+  pozwala odczytać z Gaussa jej prawdopodobieństwa ogonowe?
+  \teachesat{17--19}
+  \answerto{Nie. Twierdzenie dotyczy środka, a ogon jest tym jednym pytaniem,
+  na które nie odpowiada \dash{} i to właśnie po to ogon jest zwykle
+  potrzebny.}
+\item Uwaga dzieli swoje wyniki przez $\sqrt{d_k}$. Skąd bierze się ta liczba?
+  \teachesat{30--33}
+  \answerto{Z wariancji iloczynu skalarnego. Przy wpisach o wariancji
+  jednostkowej każdy z $d_k$ składników wnosi $1$, a wariancje się dodają,
+  więc wynik ma wariancję $d_k$ i rozrzut $\sqrt{d_k}$. Dzielenie przez
+  $\sqrt{d_k}$ sprowadza go z powrotem do $1$ przy dowolnym rozmiarze głowicy.}
+\item Głęboka sieć zwraca \code{nan} na pierwszym kroku. Podaj przyczynę,
+  która nie ma nic wspólnego z danymi ani z krokiem uczenia.
+  \teachesat{48--52}
+  \answerto{Skala wag. Każda warstwa mnoży wariancję sygnału przez swój
+  fan-in razy wariancja wag, więc skala błędna o pewien czynnik kumuluje się
+  geometrycznie z głębokością \dash{} do zera albo do przepełnienia.}
+\end{quiz}
 
-ADDITION, from the review: nothing in the book explained why a training run
-diverges at initialisation. Extend this program with signal propagation --
-the variance through a linear layer as fan-in times weight variance, the
-scale that holds it at one, and what a non-linearity does to it, which is
-where the factor of two in He initialisation comes from. It belongs here
-because it is a variance argument, and it is the single most common cause of
-a run that never starts.
+% ============================================================
+\section{Dwie rzeczy dodane}
+\label{sec:P25-adding}
+\index{wariancja!sumy}
+\index{niezależność!a dodawanie wariancji}
 
-\medskip
-\textbf{Planowana długość:} 55 ramek.
-}
+\begin{fr}
+Program~\ref{prog:P24} skończył na tym, czego nie zrobił. Dał ci zmienną
+losową, jej wartość oczekiwaną i jej wariancję, a potem powiedział, że to, co
+dzieje się przy \emph{dodawaniu} zmiennych losowych, jest tematem tego
+programu.
+
+Zacznijmy więc od tego, w najmniejszym przypadku, jaki da się sprawdzić.
+
+Rzucamy dwiema uczciwymi kostkami, niezależnie. Każdy wynik z osobna ma
+wariancję $\frac{\val{p25.die.var.num}}{\val{p25.die.var.den}}$. Ile wynosi
+wariancja ich sumy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\frac{\val{p25.die.var.num}}{\val{p25.die.var.den}} +
+     \frac{\val{p25.die.var.num}}{\val{p25.die.var.den}}$}
+
+Wariancje się dodają. Nie rozrzuty \dash{} wariancje.
+
+\textbf{Dla niezależnych $X$ i $Y$ zachodzi $\Var(X + Y) = \Var(X) +
+\Var(Y)$}, i to jest cała maszyneria tego programu. Wszystko od tego miejsca
+do ostatniej ramki to ta jedna linia zastosowana tam, gdzie zwykle się jej
+nie rozpoznaje.
+
+Skrypt wypisuje wszystkie trzydzieści sześć rzutów i sprawdza to na ułamkach,
+więc nic tutaj nie jest granicą ani przybliżeniem.
+\end{fr}
+
+\begin{fr}
+Teraz pytanie, które mówi, co robi słowo \emph{niezależne}, i większość
+czytelników odpowiada na nie źle, gdy odpowiada szybko.
+
+Zamiast rzucać dwiema kostkami, rzuć jedną i podwój wynik. To też jest suma
+warta dwóch kostek. Czy jej wariancja to ta sama liczba
+$\val{p25.pair.var}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie: to $4 \times \frac{\val{p25.die.var.num}}{\val{p25.die.var.den}}$}
+
+Podwojenie mnoży każdą odległość od średniej przez dwa, a wariancja podnosi
+odległości do kwadratu, więc mnoży wariancję przez \emph{cztery}. Dwie
+niezależne kostki dają dwa razy tyle. Jedna kostka policzona dwa razy daje
+cztery razy tyle.
+
+\begin{trapbox}
+\textbf{\enquote{Dodawanie większej liczby tych samych rzeczy uśrednia szum.}}
+
+Uśrednia, gdy rzeczy są niezależne, i nie uśrednia, gdy są tą samą rzeczą pod
+dwiema etykietami. Te dwa przypadki różnią się tutaj o czynnik dwa, a przy
+$n$ kopiach o czynnik $n$ \dash{} czyli o różnicę między średnią, która się
+koncentruje, a taką, która nie rusza się wcale.
+
+Ta usterka ma w praktyce swoje nazwy: zbiór ewaluacyjny ze zduplikowanymi
+pozycjami, batch złożony z jednego dokumentu, bootstrap po wierszach
+dzielących użytkownika. W każdym z nich licznik mówi $n$, a arytmetyka
+dostaje $1$.
+\end{trapbox}
+
+Jedno wyrażenie obejmuje oba przypadki. Skoro musi się sprowadzać do
+$\Var(X) + \Var(Y)$, gdy wielkości są niezależne, i do $4\Var(X)$, gdy $Y$
+jest $X$, jaki jeden składnik trzeba dodać?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$2\Cov(X, Y)$}
+
+\[ \Var(X + Y) \;=\; \Var(X) + \Var(Y) + 2\Cov(X, Y) \]
+
+Program~\ref{prog:P24} definiuje ten ostatni składnik i mówi, co on mierzy.
+Odczytaj z tej linii oba przypadki szczególne: wielkości niezależne mają
+kowariancję zero, więc składnik mieszany znika; a $\Var(X + X)$ ma składnik
+mieszany równy $2\Var(X)$, co zamienia dwa w cztery.
+
+Na parze zależnej z Programu~\ref{prog:P24} \dash{} kostka i jej własny
+kwadrat \dash{} składnik mieszany wynosi $\val{p25.dep.cross}$, a wariancja
+sumy $\val{p25.dep.var}$ wobec $\val{p25.dep.varsum}$ dla obu osobno. Skrypt
+sprawdza tożsamość, zamiast ją cytować.
+
+To rodzi pytanie, przy którym warto być precyzyjnym. Czytając tę linię: czy
+argument naprawdę wymaga, żeby obie wielkości były \emph{niezależne}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie \dash{} wystarczy zerowa kowariancja}
+
+Składnik mieszany jest jedyną rzeczą, którą usuwa niezależność, więc wystarczy
+cokolwiek, co go zeruje. To słabsze założenie i warto je mieć, bo bywa
+sprawdzalne wtedy, gdy niezależność nie jest.
+
+Jest to też licencja niebezpieczna, a ostrzeżenie dostarczył
+Program~\ref{prog:P24}: pokazał parę o kowariancji dokładnie zero i pełnej
+zależności. Zerowa kowariancja kupuje ci tę tożsamość i nic więcej.
+
+A \enquote{niezależne} to tutaj słowo Programu~\ref{prog:P23} \dash{} warunek
+na wielkości, a nie opis tego, jak je zebrano. Dwa pomiary zrobione w różnych
+pokojach przez różne osoby mogą go nie spełniać, jeśli oba zależą od czegoś,
+czego żadna z nich nie zapisała.
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+\textbf{Nie dowodzimy tu, że kowariancja wielkości niezależnych jest zerowa.}
+
+Wynika to z $\Ex[XY] = \Ex[X]\Ex[Y]$ dla niezależnych $X$ i $Y$, a to z reguły
+iloczynu dla zdarzeń niezależnych, którą Program~\ref{prog:P23} podaje. Zapis
+wartości oczekiwanej jako sumy po parach wyników i wyciągnięcie czynników
+przed nawias to ćwiczenie z pierwszego kursu rachunku prawdopodobieństwa, a
+ten program bierze wynik.
+
+Twierdzenie odwrotne jest fałszywe i książka spotkała już kontrprzykład:
+wielkość i jej własny kwadrat, w sekcji Programu~\ref{prog:P24} o tym, czego
+korelacja nie widzi.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+To cała sekcja. Wariancje wielkości niezależnych się dodają; składnik mieszany
+jest tym, co usuwa niezależność; a wielkość powtórzona nie jest dwiema
+wielkościami.
+
+Wszystko dalej to ta tożsamość zastosowana do czegoś większego. Następna
+sekcja stosuje ją do $n$ kopii jednej rzeczy, czyli do tego, czym jest
+średnia, a tempo, które z tego wypada, program znajduje potem raz po raz w
+nowym przebraniu.
+\end{fr}
+
+% ============================================================
+\section{Średnia z wielu}
+\label{sec:P25-average}
+\index{koncentracja!średniej}
+\index{pomiar!tempo 1/sqrt(n)}
+
+\begin{fr}
+Średnia z $n$ niezależnych losowań to suma podzielona przez $n$, więc
+poprzednia sekcja już rozstrzyga, jaka jest jej wariancja. Wylicz to, zanim
+pójdziesz dalej.
+
+Każde losowanie ma wariancję $\sigma^{2}$. Jaka jest wariancja średniej z $n$
+takich losowań?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\sigma^{2}/n$}
+
+Dwa kroki i oba są w sekcji 1. Suma $n$ niezależnych losowań ma wariancję
+$n\sigma^{2}$, bo wariancje się dodają. Podzielenie wielkości przez $n$ dzieli
+jej wariancję przez $n^{2}$, bo wariancja podnosi odległości do kwadratu.
+Zatem
+\[ \Var\Bigl(\frac{1}{n}\sum_{i=1}^{n} X_i\Bigr)
+   \;=\; \frac{n\sigma^{2}}{n^{2}} \;=\; \frac{\sigma^{2}}{n} \]
+co skrypt sprawdza jako tożsamość dla każdego $n$ od $1$ do $64$, a nie przy
+jednym wygodnym rozmiarze.
+
+Rozrzut jest pierwiastkiem wariancji. Co więc robi rozrzut średniej, gdy $n$
+rośnie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Spada jak $\sigma/\sqrt{n}$}
+
+\textbf{To jest to tempo i na tym polega cały wkład tego programu do
+praktyki.} Średnia koncentruje się wokół wielkości, którą szacuje, a szybkość,
+z jaką to robi, jest ustalona: nie przez tę wielkość, nie przez dziedzinę, nie
+przez to, jak starannie zebrano dane, tylko przez pierwiastek z pewnej
+liczności.
+
+Program~\ref{prog:P21} spotkał to tempo dwie części temu i je \emph{zmierzył}
+\dash{} dwadzieścia tysięcy wartości, cztery tysiące prób przy każdym
+rozmiarze paczki \dash{} pisząc w ramce o rygorze, że powód jest tutaj. To
+jest ten powód i są to cztery wiersze z sekcji 1.
+\end{fr}
+
+\begin{fr}
+Warto nazwać tę bramkę, bo to ona nie pozwala obu programom się rozjechać.
+
+Program~\ref{prog:P21} podaje populację o rozrzucie $\val{p25.p21.sd}$.
+Wyprowadzenie powyżej mówi, że paczki cztery razy większe mają połowę
+rozrzutu, więc paczka cztery razy większa od innej musi wylądować na
+$\val{p25.p21.sd.b4}$ wobec wartości dla populacji \dash{} a skrypt czyta
+zapisaną liczbę tamtego programu z jego własnego pliku wartości i przerywa
+budowanie, jeśli te dwie kiedykolwiek się rozejdą.
+
+Żadnego z tych dwóch programów nie da się teraz poprawić tak, by drugi tego
+nie zauważył. To znaczy więcej, niż brzmi: P21 zmierzył prawo, którego nie
+mógł wyprowadzić, a ten program wyprowadza prawo, którego nie mierzy.
+\end{fr}
+
+\begin{fr}
+Zamień to tempo na zdanie, którego naprawdę będziesz używać.
+
+Masz oszacowanie i chcesz o połowę zmniejszyć jego słupek błędu. Ile więcej
+danych to kosztuje?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p25.halve.factor}$ razy tyle}
+
+Bo liczność siedzi pod pierwiastkiem. Żeby podzielić rozrzut przez dwa,
+trzeba pomnożyć $n$ przez cztery; żeby podzielić go przez dziesięć \dash{}
+przez $\val{p25.tenth.factor}$.
+
+Skrypt sprawdza, że ten czynnik wynosi $\val{p25.halve.factor}$ z czterech
+różnych punktów startowych, i to właśnie czyni z niego regułę, a nie
+arytmetyczny przypadek: nie ma znaczenia, ile danych już masz.
+
+\textbf{Każda pozostała sekcja tego programu to to samo tempo, spotkane tam,
+gdzie zwykle nikt go nie rozpoznaje.}
+\end{fr}
+
+% ============================================================
+\section{Kształt i to, o czym twierdzenie milczy}
+\label{sec:P25-clt}
+\index{centralne twierdzenie graniczne!co obiecuje}
+\index{Gauss!a sumy}
+
+\begin{fr}
+Szerokość średniej jest rozstrzygnięta. Jej \emph{kształt} to inne
+twierdzenie i to właśnie ono ma słynną nazwę.
+
+\textbf{Centralne twierdzenie graniczne}: suma wielu niezależnych wielkości,
+z których żadna nie dominuje, ma rozkład zbiegający do rozkładu Gaussa
+\dash{} niezależnie od tego, jak wyglądały same wielkości.
+
+Dlatego rozkład Gaussa pojawia się tak często. Nie dlatego, że natura go
+woli, tylko dlatego, że bardzo wiele mierzonych rzeczy to sumy czegoś, czego
+nikt nie wyliczał z osobna.
+
+Suma $n$ wartości losowanych jednostajnie z $\intcc{0}{1}$ ma rozkład o
+dokładnym wzorze, więc to daje się pokazać, a nie tylko stwierdzić. Zanim
+zobaczysz tabelę: ilu rozkładów jednostajnych, jak zgadujesz, potrzeba, żeby
+wszędzie mieścić się w procencie od rozkładu Gaussa?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Czterech, a przy dwunastu mieści się w jednej piątej procenta.
+\end{ansblock}
+
+Mierzone jako największa różnica między dokładnym rozkładem a rozkładem
+Gaussa o tej samej średniej i tym samym rozrzucie:
+
+\begin{center}
+\begin{tabular}{rrrr}
+\toprule
+$n = 1$ & $n = 2$ & $n = 4$ & $n = \val{p25.clt.n.hi}$ \\
+\midrule
+$\val{p25.clt.gap.1}$ & $\val{p25.clt.gap.2}$ & $\val{p25.clt.gap.4}$ &
+$\val{p25.clt.gap.12}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Cztery rozkłady jednostajne są już bliżej dzwonu, niż większość ludzi by
+zgadywała, a dwanaście mieści się wszędzie w jednej piątej procenta. Skrypt
+stwierdza \emph{porządek}, a nie te cztery liczby, bo porządek jest
+twierdzeniem, a liczby zależą od siatki.
+\end{fr}
+
+\begin{fr}
+Teraz pytanie, dla którego ta sekcja istnieje, i jest to pytanie, które
+zamienia prawdziwe zdanie w błędną odpowiedź.
+
+Pewna wielkość jest sumą dwunastu niezależnych kawałków, więc według tabeli
+powyżej jest bliska rozkładowi Gaussa. Chcesz wiedzieć, jak często przekracza
+pięć rozrzutów. Czy możesz to odczytać z rozkładu Gaussa?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie, a rozmiar błędu jest tu istotą rzeczy.
+\end{ansblock}
+
+Ten sam dokładny rozkład wobec rozkładu Gaussa, w ogonie:
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+& jeden rozrzut & trzy rozrzuty & pięć rozrzutów \\
+\midrule
+prawdziwe & $\val{p25.tail.true1}$ & $\val{p25.tail.true3}$ &
+      $\val{p25.tail.true5}$ \\
+Gauss & $\val{p25.tail.gauss1}$ & $\val{p25.tail.gauss3}$ &
+      $\val{p25.tail.gauss5}$ \\
+stosunek & $\val{p25.tail.ratio1}$ & $\val{p25.tail.ratio3}$ &
+      $\val{p25.tail.ratio5}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Jeden rozrzut od środka rozkład Gaussa trafia z dokładnością do procenta.
+Pięć rozrzutów od środka myli się o czynnik $\val{p25.tail.ratio5}$.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{To suma wielu rzeczy, więc to rozkład Gaussa.}}
+
+To rozkład Gaussa \emph{w środku}, co jest tym, co twierdzenie mówi, i
+wszystkim, co mówi. Błąd nie siedzi na jakimś stałym niskim poziomie: jest
+poniżej procenta przy jednym rozrzucie i sięga czynnika stu i więcej przy
+pięciu, a rośnie dokładnie w tę stronę, w którą ludzie go biorą.
+
+Ta strona nie jest przypadkiem tego przykładu. Prawdopodobieństwo ogonowe
+jest tym, o co pytasz, gdy chcesz wiedzieć, czy coś było przypadkiem \dash{}
+wartość odstająca, alert, wynik, który pobił baseline. Pytanie, na które
+twierdzenie odpowiada najgorzej, jest więc pytaniem, do którego najczęściej
+się go używa.
+\end{trapbox}
+
+Skrajny przypadek czyni to dokładnym, a nie tylko dużym. Dwanaście rozkładów
+jednostajnych ma średnią sześć i rozrzut dokładnie $1$, a ich suma nie może
+przekroczyć dwunastu. Jakie jest więc prawdziwe prawdopodobieństwo
+przekroczenia sześciu rozrzutów?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Zero}
+
+Nie małe \dash{} zero, bo sześć rozrzutów powyżej średniej to największa
+wartość, jaką ta wielkość w ogóle może przyjąć. Rozkład Gaussa mówi
+$\val{p25.tail.gauss6}$ i żadne $n$ tego nie naprawi, bo Gauss ma ogony
+biegnące do nieskończoności, a ta wielkość ma podłogę i sufit. Większość
+mierzonych wielkości je ma.
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+\textbf{Nie dowodzimy tutaj: centralnego twierdzenia granicznego.}
+
+Sformułowanie jest powyżej, a pokaz jest zmierzony; dowód potrzebuje funkcji
+charakterystycznych, co jest drugim kursem rachunku prawdopodobieństwa, a nie
+dłuższą sekcją tutaj.
+
+Warto natomiast zabrać kształt założenia, bo to ono bywa łamane w praktyce, a
+nie teza. Twierdzenie potrzebuje, żeby kawałki były niezależne, miały
+skończoną wariancję i żeby żaden z nich nie dominował sumy. Wielkości o
+ciężkich ogonach łamią drugie założenie; suma po populacji, w której jeden
+element to większość całości, łamie trzecie. W obu przypadkach teza po prostu
+nie obowiązuje i nic w arytmetyce cię przed tym nie ostrzeże.
+\end{rigourbox}
+
+Program~\ref{prog:P24} zostawił to twierdzenie tutaj z jednym zdaniem
+dołączonym: rozkład Gaussa użyty dlatego, że w grę wchodziła suma, jest użyty
+poprawnie, a użyty dlatego, że dane wyglądały jak dzwon, jest założeniem,
+którego nikt nie sprawdził. Co więc zastępuje patrzenie na histogram?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Trzy pytania o to, jak ta liczba powstała.
+\end{ansblock}
+
+Czego jest sumą; czy te kawałki są niezależne; i czy któryś z nich dominuje
+całość? Na wszystkie trzy odpowiada proces, a nie obrazek, i wszystkie trzy
+są założeniem, a nie tezą.
+
+\textbf{Na tym polega różnica między tymi dwoma zastosowaniami.} Histogram
+ich nie odróżni, bo oba dają dzwon.
+\end{fr}
+
+% ============================================================
+\section{Ile kosztuje przebieg ewaluacji}
+\label{sec:P25-monte-carlo}
+\index{pomiar!dobór rozmiaru ewaluacji}
+\index{ewaluacja!ile pozycji}
+
+\begin{fr}
+To samo tempo, w miejscu, w którym czytelnik tej książki spotyka je najczęściej
+i wycenia najrzadziej.
+
+Zbiór ewaluacyjny to $n$ pozycji, a model ma rację na części z nich. Trafność,
+którą raportujesz, jest średnią z $n$ niezależnych trafień albo pudeł, więc
+sekcja 2 już wie, jak daleko może być od prawdy.
+
+Model, który ma rację $\val{p25.eval.p}$ razy, jest mierzony na
+$\val{p25.eval.n.lo}$ pozycjach. Z dokładnością do mniej więcej ilu punktów
+procentowych znasz odpowiedź?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\pm\val{p25.eval.hw.100}$ punktu}
+
+Czyli o wiele szerzej niż dwa miejsca po przecinku, do których taką liczbę
+zwykle się podaje.
+
+Trafienie albo pudło ma wariancję $p(1-p)$, więc średnia z $n$ takich wyników
+ma rozrzut $\sqrt{p(1-p)/n}$, a przyjęty przedział to mniej więcej dwa takie
+rozrzuty po każdej stronie. Nic tu nie jest próbkowane: to jeden pierwiastek i
+czytelnik może go przeliczyć na odwrocie wiersza z logu przebiegu.
+
+Zauważ, co robi $p(1-p)$, bo to powód, dla którego dwa wyniki benchmarku o tej
+samej wielkości nie są jednakowo wiarygodne. Jest największe przy połowie i
+opada ku obu końcom, więc model z wynikiem bliskim losowemu niesie najszerszy
+przedział, jaki może mieć, a model z wynikiem bliskim sufitowi niesie wąski.
+Ta sama liczba pozycji kupuje więcej precyzji na szczycie benchmarku niż w
+jego środku.
+
+Chcesz zwęzić ten przedział o połowę. Sekcja 2 już na to odpowiedziała; powiedz
+to w pozycjach, a nie w losowaniach.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Cztery razy więcej pozycji}
+
+Za każdym razem, przy każdym rozmiarze startowym:
+
+\begin{center}
+\begin{tabular}{rr}
+\toprule
+pozycje & przedział \\
+\midrule
+$\val{p25.eval.n.lo}$ & $\pm\val{p25.eval.hw.100}$ \\
+$400$ & $\pm\val{p25.eval.hw.400}$ \\
+$1600$ & $\pm\val{p25.eval.hw.1600}$ \\
+$\val{p25.eval.n.hi}$ & $\pm\val{p25.eval.hw.6400}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Skrypt stwierdza podział na pół między kolejnymi wierszami, a nie te cztery
+liczby, bo podział na pół jest tempem, a liczby zależą od wybranej trafności.
+\end{fr}
+
+\begin{fr}
+Teraz pytanie, które rozstrzyga o czyimś tygodniu pracy.
+
+Porównujemy dwa modele i jeden dostaje wynik o punkt procentowy wyższy od
+drugiego. Na ilu pozycjach trzeba ocenić każdy z nich, zanim ta różnica
+cokolwiek znaczy?
+
+Podaj rząd wielkości, zanim pójdziesz dalej \dash{} chodzi o rozmiar, a nie o
+cyfry.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p25.eval.n.needed}$ na model}
+
+Dwanaście tysięcy, żeby zobaczyć jeden punkt.
+
+A w środku tej liczby siedzi czynnik dwa, który jest najczęściej pomijanym
+krokiem całego rachunku. \textbf{Wielkość, o którą pytasz, jest różnicą}, a
+różnica dwóch niezależnych oszacowań ma sumę ich wariancji \dash{} sekcja 1, w
+ostatnim miejscu, w którym ktokolwiek jej szuka. Przedział, który się liczy,
+jest więc $\sqrt{2}$ razy szerszy od przedziału dla każdego modelu z osobna, a
+liczba pozycji jest dwa razy większa, niż sugeruje pojedynczy przedział:
+$\val{p25.eval.n.naive}$ wobec $\val{p25.eval.n.needed}$.
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+\textbf{Gdzie to widać.} Dwa wiersze tego samego raportu z ewaluacji zachowują
+się pod tym względem zupełnie inaczej.
+
+Wynik benchmarku podany jako $\num{74.31}$ procent na
+$\val{p25.eval.n.lo}$ pozycjach niesie przedział rzędu
+$\pm\val{p25.eval.hw.100}$ punktu, więc trzy ostatnie z tych cyfr to szum
+\dash{} a leaderboard i tak po nich sortuje. Tymczasem różnica punktu między
+dwoma wierszami tej samej tabeli przy takiej liczbie pozycji nie jest w ogóle
+różnicą.
+
+Arytmetyka to jeden pierwiastek i nigdy nie jest drukowana obok liczby. Nic nie
+kosztuje, a rozstrzyga, czy przebieg był wart zachodu.
+\end{aibox}
+
+Jeszcze jedna liczba, zanim sekcja się zamknie. Zwężenie słupka błędu o połowę
+kosztuje cztery razy więcej danych. Ile kosztuje zejście z nim do
+\emph{dziesiątej części}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p25.tenth.factor}$ razy tyle}
+
+\textbf{Precyzja kosztuje kwadratowo} i warto to nosić ze sobą na każdy przegląd
+projektu. Dlatego nikt niczego nie mierzy z dowolną dokładnością i dlatego
+\enquote{puśćmy to dłużej} jest propozycją z ceną, a nie planem.
+
+To także powód, dla którego następna sekcja ma znaczenie. Kiedy jedna liczba w
+architekturze rośnie jak $\sqrt{d}$, a druga nie, stosunek między nimi nie jest
+szczegółem strojenia.
+\end{fr}
+
+% ============================================================
+\section{Dlaczego uwaga dzieli przez pierwiastek}
+\label{sec:P25-attention}
+\index{uwaga!skalowanie 1/sqrt(d k)}
+\index{softmax!nasycenie}
+
+\begin{fr}
+To jest sekcja, na którą książka wskazuje od Części~II.
+
+Uwaga ocenia zapytanie względem klucza ich iloczynem skalarnym. Oba są
+wektorami długości $d_k$, czyli wymiaru głowicy, a na początku treningu ich
+wpisy są tym, co zrobiła z nich inicjalizacja \dash{} niezależne, o średniej
+zero i przeskalowane tak, by każdy wpis miał wariancję $1$.
+
+Wynik jest więc sumą $d_k$ iloczynów. Korzystając z sekcji 1 i z niczego
+więcej: jaka jest jego wariancja?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$d_k$}
+
+Każdy składnik $q_i k_i$ jest iloczynem dwóch niezależnych wielkości o średniej
+zero i wariancji jeden, więc sam ma średnią zero i wariancję jeden. Składniki
+są niezależne. Wariancje się dodają. Jest ich $d_k$.
+
+\textbf{Wynik ma więc wariancję $d_k$ i rozrzut $\sqrt{d_k}$}, i nie ma w tym
+wyprowadzeniu nic więcej. Żadnego twierdzenia granicznego, żadnego
+przybliżenia: skrypt wylicza wszystkie wektory znaków dla $d = 1$ do $5$ i
+dostaje odpowiedź dokładnie.
+
+Zanim to wydasz, uruchom tę samą tożsamość przy innym skalowaniu. Wpisy wektora
+\emph{jednostkowego} mają wariancję $1/d$, a nie $1$. Jaki rozrzut ma iloczyn
+skalarny dwóch takich wektorów?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$1/\sqrt{d}$}
+
+Bo $d \times \frac{1}{d} \times \frac{1}{d} = \frac{1}{d}$, a rozrzut jest
+pierwiastkiem z tego.
+
+\textbf{A to książka już zmierzyła}, pod inną nazwą i trzy części wcześniej.
+Program~\ref{prog:P05} pytał, jak zachowuje się cosinus między dwoma losowymi
+kierunkami, gdy wymiar rośnie, i zapisał jego rozrzut przy czterech wymiarach.
+
+\textbf{Te dwie rzeczy to jedno twierdzenie przy dwóch skalowaniach}, a
+wyprowadzenie odtwarza wszystkie cztery zapisane liczby tamtego programu z
+dokładnością do $\val{p25.p05.worst.pct}$ procent \dash{} co skrypt sprawdza,
+więc pomiar z Części~III i to wyprowadzenie nie mogą się rozjechać.
+
+Postaw oba skalowania obok siebie. Wpisy nieznormalizowane dają $\sqrt{d_k}$, a
+znormalizowane $1/\sqrt{d_k}$. Jaki jest iloczyn i co on każe zrobić?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$1$ \dash{} czyli podzielić przez $\sqrt{d_k}$}
+
+Dzielenie surowego wyniku przez $\sqrt{d_k}$ nie jest konwencją ani stałą,
+którą ktoś dostroił. To krok, który przenosi cię z pierwszego skalowania do
+rozrzutu jeden, przy dowolnym rozmiarze głowicy.
+\end{fr}
+
+\begin{fr}
+Teraz to, ile kosztuje jego pominięcie, bo to ta połowa, która czyni z niego
+awarię, a nie niechlujstwo.
+
+Wiersz $\val{p25.e9.keys}$ wyników wchodzi do softmaksu. Przy wymiarze głowicy
+$\val{p25.e9.d.hi}$ wyniki mają rozrzut około
+$\val{p25.e9.raw.sd.512}$ \dash{} dzielą je dziesiątki, a nie jedności.
+
+Co softmax robi z wierszem, którego wpisy dzielą dziesiątki?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Przestaje być ważeniem, a staje się wyborem.
+\end{ansblock}
+
+Zmierzone. To eksperyment E9 tej książki i pierwszy z dziesięciu, który został
+przeprowadzony \dash{} $\val{p25.e9.trials}$ prób przy każdym rozmiarze
+głowicy:
+
+\begin{center}
+\begin{tabular}{rrrrr}
+\toprule
+$d_k$ & rozrzut & entropia & największa waga & \\
+\midrule
+$\val{p25.e9.d.lo}$ & $\val{p25.e9.raw.sd.8}$ & $\val{p25.e9.raw.ent.8}$ &
+  $\val{p25.e9.raw.top.8}\%$ & \\
+$64$ & $\val{p25.e9.raw.sd.64}$ & $\val{p25.e9.raw.ent.64}$ &
+  $\val{p25.e9.raw.top.64}\%$ & \\
+$\val{p25.e9.d.hi}$ & $\val{p25.e9.raw.sd.512}$ &
+  $\val{p25.e9.raw.ent.512}$ & $\val{p25.e9.raw.top.512}\%$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Największa entropia, jaką $\val{p25.e9.keys}$ wag może mieć, to
+$\val{p25.e9.maxent}$. Przy $d_k = \val{p25.e9.d.hi}$ wiersz jest na poziomie
+$\val{p25.e9.raw.ent.512}$ tej wartości, a jeden klucz zabiera
+$\val{p25.e9.raw.top.512}$ procent wagi.
+
+Teraz przewidź te same trzy kolumny \emph{z} dzieleniem, zanim pójdziesz dalej.
+Powiedz, co każda z nich robi, gdy $d_k$ rośnie.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Żadna nie robi nic.
+\end{ansblock}
+
+Przy tych samych rozmiarach głowicy i tej samej liczbie prób:
+
+\begin{center}
+\begin{tabular}{rrrr}
+\toprule
+$d_k$ & rozrzut & entropia & największa waga \\
+\midrule
+$\val{p25.e9.d.lo}$ & $\val{p25.e9.scaled.sd.8}$ &
+  $\val{p25.e9.scaled.ent.8}$ & $\val{p25.e9.scaled.top.8}\%$ \\
+$64$ & $\val{p25.e9.scaled.sd.64}$ & $\val{p25.e9.scaled.ent.64}$ &
+  $\val{p25.e9.scaled.top.64}\%$ \\
+$\val{p25.e9.d.hi}$ & $\val{p25.e9.scaled.sd.512}$ &
+  $\val{p25.e9.scaled.ent.512}$ & $\val{p25.e9.scaled.top.512}\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Nic się nie rusza.} Rozrzut jest równy jeden przy każdym rozmiarze
+głowicy, a entropia nie przesuwa się nawet o dwudziestą część swojego zakresu
+przy sześćdziesięcioczterokrotnej zmianie $d_k$. To jest cała teza, zmierzona:
+dzielenie uniezależnia zachowanie softmaksu od wymiaru głowicy.
+
+Gradient jest drugą połową. Program~\ref{prog:P18} wyprowadził jakobian
+softmaksu, którego wpis na przekątnej to $p(1-p)$ \dash{} czyli o ile rusza się
+waga wyjściowa, gdy rusza się jej własny wynik.
+
+Przekątna jest tym wpisem, na który warto patrzeć, bo o niej czytelnik potrafi
+myśleć bez całej macierzy, a Program~\ref{prog:P16} mówi, że i tak nikt tej
+macierzy nie tworzy. Jest też całą historią w tym miejscu: wpisy poza
+przekątną opisują wagę przenoszoną między kluczami, a wiersz, który już oddał
+wszystko jednemu kluczowi, nie ma czego przenosić.
+
+Policz to przy dwóch największych wagach powyżej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p25.e9.resp.raw}$ wobec $\val{p25.e9.resp.scaled}$}
+
+Wiersz przeskalowany odpowiada na szturchnięcie $\val{p25.e9.resp.ratio}$ razy
+silniej.
+
+\enquote{Gradient umiera} nie jest tu metaforą. To $p(1-p)$ policzone przy
+$p$, które architektura zepchnęła do jedynki.
+\end{fr}
+
+\begin{fr}
+\transcript{p25-scaling}
+
+Zmierzony rozrzut wobec $\sqrt{\val{p25.e9.d.hi}}$, a potem to samo po
+podzieleniu. Dwa wiersze i są całą sekcją 5.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{$1/\sqrt{d_k}$ to stała normalizacyjna, którą ktoś
+wybrał.}}
+
+To jedyna liczba, która działa, i wymusza ją arytmetyka z pierwszych ramek tej
+sekcji. Stała by nie wystarczyła: rzecz, którą się koryguje, \emph{rośnie z
+wymiarem głowicy}, więc dowolny ustalony dzielnik jest dobry przy jednym
+rozmiarze głowicy i zły przy każdym innym. Inny wykładnik też by nie
+wystarczył \dash{} $d_k$ jest wariancją, a rozrzut jest jej pierwiastkiem.
+
+Przekonanie przeżywa dlatego, że ta liczba pojawia się na schemacie
+architektury, obok prawdziwych wyborów w rodzaju liczby głowic i szerokości
+bloku feed-forward. Siedzi wśród decyzji i nią nie jest.
+
+Mówi to jej własna nazwa. To \textbf{korekta wariancji} i ten program jest
+miejscem, w którym książka może to powiedzieć bez machania rękami: wielkość
+podlegająca korekcie została policzona w ramce~31, a korekta jest jej
+pierwiastkiem.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Dwa ograniczenia tego, co właśnie zostało pokazane, oba warte wypowiedzenia,
+bo sekcja jest poza tym nietypowo czysta.
+
+Wyprowadzenie zakłada, że wpisy są niezależne i mają równe wariancje. To jest
+prawda przy inicjalizacji, czyli wtedy, kiedy zdarzyłaby się awaria, której ono
+zapobiega, i staje się coraz mniej prawdą w miarę treningu \dash{} zapytania i
+klucze uczą się struktury, a struktura to zależność. Skalowanie zostaje nie
+dlatego, że hipoteza dalej obowiązuje, tylko dlatego, że nic z tego, co dzieje
+się później, nie czyni ze $\sqrt{d_k}$ złego rzędu wielkości.
+
+A E9 jest tu mierzone na losowych wektorach, a nie na wytrenowanym modelu.
+Program~\ref{prog:P32} składa architekturę i mierzy to tam. Zadaniem tego
+programu było uczynić tę liczbę wyprowadzalną; zadaniem tamtego jest
+sprawdzić, czy przeżywa kontakt.
+\end{fr}
+
+\begin{fr}
+Sekcja zamyka się więc zdaniem, które cała książka składała.
+
+\textbf{$1/\sqrt{d_k}$ w uwadze to $1/\sqrt{n}$ z sekcji 2, spotkane w
+architekturze zamiast w średniej.} Oba biorą się z tego samego wiersza:
+wariancje wielkości niezależnych się dodają, więc suma $d$ z nich ma rozrzut
+rosnący jak $\sqrt{d}$, a dzielenie przez ten pierwiastek jest sposobem powrotu
+do skali, która od $d$ nie zależy.
+
+Jedna tożsamość, trzy nazwy. Ma przed sobą jeszcze jedną.
+\end{fr}
+
+% ============================================================
+\section{Dlaczego przebieg może się rozbiec, zanim wystartuje}
+\label{sec:P25-initialisation}
+\index{inicjalizacja!propagacja sygnału}
+\index{inicjalizacja!He i czynnik dwa}
+
+\begin{fr}
+Czwarta nazwa i ta, która kosztuje ludzi całe popołudnia.
+
+Warstwa liniowa bierze $n_{\text{in}}$ wejść, mnoży każde przez wagę i dodaje
+je do siebie. To znowu iloczyn skalarny, więc tożsamość z sekcji 5 stosuje się
+bez zmian: wejścia są niezależne i mają pewną wariancję, wagi są niezależne i
+mają pewną wariancję, a wyjście jest ich sumą.
+
+Zauważ, jak dzielą się te trzy wielkości. Fan-in jest licznością i należy do
+architektury; obie wariancje należą do inicjalizatora i do tego, co karmi
+warstwę. Tożsamość trzyma je osobno i dlatego pytanie projektowe poniżej ma
+jedną odpowiedź, a nie całą ich rodzinę.
+
+Zapisz wariancję jednego wyjścia w kategoriach fan-in i tych dwóch
+wariancji.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$n_{\text{in}} \times \Var(w) \times \Var(x)$}
+
+Te same trzy kroki po raz trzeci. Skrypt wylicza to dokładnie przy czterech
+wartościach fan-in i trzech skalach wag, więc jest to tożsamość, a nie
+przybliżenie \dash{} dokładnie jak wynik uwagi.
+
+I od razu odpowiada na pytanie projektowe. Jeśli chcesz, żeby warstwa
+przepuszczała sygnał, nie powiększając go ani nie zmniejszając, chcesz, by ten
+iloczyn był równy $1$, co ustala wariancję wag na
+$1/n_{\text{in}}$ i na niczym innym.
+\end{fr}
+
+\begin{fr}
+\mermaidfig{p25-one-rate}{Jedna tożsamość spotkana pod czterema różnymi
+nazwami.}{suma, średnia, wynik, warstwa}
+
+To cały kręgosłup tego programu, a ostatnia sekcja mówi, co się dzieje, gdy
+czwarte wystąpienie zostanie zrobione źle.
+\end{fr}
+
+\begin{fr}
+Tyle że sieć nie jest stosem warstw liniowych, a to, co jest między nimi,
+zmienia arytmetykę.
+
+$\relu$ przepuszcza swoje wejście bez zmian, gdy jest dodatnie, i zwraca zero,
+gdy jest ujemne. Jego wejście przy inicjalizacji jest symetryczne względem
+zera, bo jest sumą rzeczy symetrycznych.
+
+Jaką część kwadratu rozmiaru wejścia $\relu$ przepuszcza dalej?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dokładnie połowę}
+
+Połowa wejść jest ujemna i nie wnosi zupełnie nic; dodatnia połowa wnosi
+dokładnie tyle, ile by wniosła. Drugi moment zmniejsza się więc o połowę, i to
+dokładnie o połowę, z symetrii, a nie z przybliżenia.
+
+Skrypt całkuje to względem standardowego rozkładu normalnego, zamiast
+próbkować, i dostaje $\val{p25.init.relu.keeps}$ \dash{} z dokładnością do
+$\val{p25.init.relu.bound}$ od połowy, co jest własnością całkowania, a nie
+matematyki.
+
+Reguła projektowa musi się więc zmienić. Jaka wariancja wag utrzymuje sygnał
+w ryzach przez warstwę liniową \emph{i} jej $\relu$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\Var(w) = 2/n_{\text{in}}$}
+
+Wariancja wag musi nadrobić to, co usuwa $\relu$:
+\[ n_{\text{in}} \times \Var(w) \times \tfrac{1}{2} \;=\; 1
+   \qquad\text{oraz}\qquad \Var(w) \;=\; \frac{2}{n_{\text{in}}} \]
+
+\textbf{Stąd bierze się dwójka w inicjalizacji He.} Nie z eksperymentu, nie z
+przeszukiwania hiperparametrów: z obserwacji, że $\relu$ odrzuca połowę
+drugiego momentu symetrycznego wejścia.
+\end{fr}
+
+\begin{fr}
+Teraz dołóż do tego głębokość, bo tam niechlujstwo staje się awarią.
+
+Każda warstwa mnoży wariancję sygnału przez ten sam czynnik, więc przez $L$
+warstw wariancja zostaje pomnożona przez ten czynnik do potęgi $L$ \dash{}
+Program~\ref{prog:F04} podaje ciąg geometryczny, zastosowany tu do wariancji
+zamiast do pieniędzy.
+
+Sieć o głębokości $\val{p25.init.depth}$ warstw jest zbudowana z
+$\Var(w) = 1/n_{\text{in}}$, czyli z regułą dla warstwy liniowej, i z $\relu$
+między nimi. Jaka część sygnału dociera na szczyt?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p25.init.deep.xavier}$}
+
+Połowa na warstwę, pięćdziesiąt razy. Sygnał nie kurczy się łagodnie; on
+znika, i znika, zanim przebieg w przód dobiegnie końca, zanim policzono
+jakikolwiek gradient i zanim ktokolwiek zajrzał do kroku uczenia.
+
+Przy $\Var(w) = 2/n_{\text{in}}$ czynnik na warstwę wynosi dokładnie $1$, a
+wynik to $\val{p25.init.deep.he}$. Ta sama głębokość, ta sama aktywacja, jedna
+liczba zmieniona o czynnik dwa.
+\end{fr}
+
+\begin{fr}
+\mermaidfig{p25-signal-depth}{Co czynnik na warstwę robi przez pięćdziesiąt
+warstw.}{wariancja, spotęgowana}
+
+Czynnik na warstwę jest jedną liczbą, a głębokość jest jej wykładnikiem, więc
+tolerancja na tę liczbę zacieśnia się w miarę, jak sieć robi się głębsza.
+Schemat, który wystarczał przy kilkunastu warstwach, przestaje wystarczać w
+chwili, gdy to głębokość jest tym, co się skaluje, i przestaje bez niczyjej
+zmiany.
+
+Druga strona jest gorsza, bo jest głośna, a nie cicha. Ustaw \emph{skalę} wag
+na dwa razy większą, niż powinna być, i powiedz, co dociera na szczyt tych
+samych $\val{p25.init.depth}$ warstw.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p25.init.deep.hot}$}
+
+Dwa razy większa skala to cztery razy większa \emph{wariancja}, więc każda
+warstwa mnoży sygnał przez $\val{p25.init.hot.factor}$ zamiast przez jeden.
+
+Program~\ref{prog:P01} mówi, czym jest liczba tego rozmiaru w \code{fp16}: nie
+jest liczbą. Przebieg raportuje \code{nan} na pierwszym kroku, a pierwszą
+rzeczą, którą wszyscy robią, jest zmniejszenie kroku uczenia o połowę, co nie
+może pomóc, bo żaden gradient w tym nie uczestniczył.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Przebieg się rozbiegł, więc krok uczenia był za duży.}}
+
+Czasem. Ale krok uczenia działa na \emph{aktualizację}, a ta awaria zdarza się
+w przebiegu w przód, zanim aktualizacja w ogóle istnieje. Sygnałem jest numer
+kroku: rozbieżność na kroku pierwszym albo strata równa \code{nan} przed
+pierwszą ewaluacją to prawie nigdy nie jest optymalizator.
+
+Te dwie rzeczy łatwo rozdzielić i prawie nikt tego nie robi. Puść jeden
+przebieg w przód i wypisz wariancję aktywacji warstwa po warstwie. Jeśli mnoży
+się przez stały czynnik na warstwę, to inicjalizacja jest zła, a krok uczenia
+jest niewinny. Jeśli jest płaska, popatrz na optymalizator \dash{} co jest
+tematem Programu~\ref{prog:P20} i miejscem, w którym mieszka ograniczenie na
+rozmiar kroku z Programu~\ref{prog:P17}.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+\textbf{Nie omawiamy tutaj: co nowoczesne sieci naprawdę z tym robią.}
+
+Połączenia rezydualne i warstwy normalizujące zmieniają powyższą arytmetykę i
+to one sprawiają, że bardzo głębokie sieci w ogóle się trenują mimo
+kumulowania. Ścieżka rezydualna dodaje wejście z powrotem, więc wariancja się
+akumuluje, a nie mnoży; warstwa normalizująca resetuje skalę wprost, co czyni
+czynnik na warstwę równym jeden z konstrukcji, a nie przez dobór wariancji
+wag.
+
+Żadnego z nich tu nie dowodzimy i ta książka żadnego nie mierzy. To, co ta
+sekcja zdobywa, jest węższe i wcześniejsze od obu: \textbf{powodem, dla
+którego te mechanizmy istnieją, jest powyższy ciąg geometryczny}, a schemat
+inicjalizacji jest najtańszą z trzech odpowiedzi na niego.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+To cały program.
+
+Wariancje wielkości niezależnych się dodają, a reszta z tego wynikła. Średnia
+z $n$ losowań ma rozrzut spadający jak $1/\sqrt{n}$, co wycenia każdą
+ewaluację, jaką ta książka kiedykolwiek zaleci. Suma wielu niezależnych rzeczy
+jest gaussowska w środku i nie jest gaussowska tam, gdzie właśnie zamierzałeś
+jej użyć. Wynik uwagi jest sumą $d_k$ iloczynów, więc ma rozrzut
+$\sqrt{d_k}$, a dzielenie przez ten pierwiastek jest korektą wariancji, a nie
+wyborem. Wyjście warstwy jest sumą $n_{\text{in}}$ iloczynów, więc jego
+wariancja to $n_{\text{in}}\Var(w)$, a pomyłka w tej liczbie kumuluje się
+geometrycznie z głębokością.
+
+\mermaidfig{p25-tail-is-silent}{Gdzie twierdzenie ma rację i gdzie mimo to się
+je pyta.}{środek i poza nim}
+
+Czego tu nie ma: co robić, gdy kawałki \emph{nie} są niezależne albo gdy ich
+wariancja jest nieskończona. Oba przypadki się zdarzają, oba psują wszystko
+powyżej i żaden nie należy do tej książki.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--4}{\textbf{Dla niezależnych $X$ i $Y$ zachodzi
+  $\Var(X+Y) = \Var(X) + \Var(Y)$} \dash{} dodają się wariancje, a nie
+  rozrzuty. Wyliczone dokładnie po trzydziestu sześciu rzutach.}
+\sumitem{3--4}{Jedna wielkość policzona dwa razy to nie dwie wielkości:
+  $\Var(2X) = 4\Var(X)$, a nie $2\Var(X)$. Różnica jest tym, co kupuje
+  niezależność, a zduplikowane pozycje ewaluacyjne tracą ją po cichu.}
+\sumitem{5--7}{Ogólnie $\Var(X+Y) = \Var(X) + \Var(Y) + 2\Cov(X,Y)$, więc
+  \textbf{zerowa kowariancja} to wszystko, czego argument potrzebuje \dash{}
+  co jest słabsze od niezależności i, według Programu~\ref{prog:P24},
+  niebezpiecznie słabsze.}
+\sumitem{9--11}{Średnia z $n$ niezależnych losowań ma wariancję
+  $\sigma^{2}/n$ i rozrzut $\sigma/\sqrt{n}$, w dwóch krokach z sekcji 1.
+  Program~\ref{prog:P21} zmierzył to tempo; tu jest jego powód.}
+\sumitem{13--14}{\textbf{Zmniejszenie słupka błędu o połowę kosztuje cztery
+  razy więcej danych}; zejście do jednej dziesiątej kosztuje
+  $\val{p25.tenth.factor}$ razy tyle. Precyzja jest kwadratowa, z czterech
+  różnych punktów startowych.}
+\sumitem{15--16}{\textbf{Centralne twierdzenie graniczne} mówi o
+  \emph{kształcie}: suma wielu niezależnych, niedominujących kawałków zbiega
+  do rozkładu Gaussa. Zmierzone dokładnie na sumach rozkładów jednostajnych,
+  największa różnica $\val{p25.clt.gap.1}$ przy $n = 1$ i
+  $\val{p25.clt.gap.12}$ przy $n = \val{p25.clt.n.hi}$.}
+\sumitem{17--19}{\textbf{I milczy w ogonie.} Rozkład Gaussa trafia z
+  dokładnością do procenta jeden rozrzut od środka i myli się
+  $\val{p25.tail.ratio5}$ razy pięć rozrzutów od środka; sześć rozrzutów od
+  środka prawda wynosi dokładnie zero. Pytanie, na które twierdzenie
+  odpowiada najgorzej, jest tym, do którego najczęściej się go używa.}
+\sumitem{20--22}{W praktyce zawodzi założenie: niezależność, skończona
+  wariancja i brak dominującego kawałka. \textbf{Rozkład Gaussa dlatego, że w
+  grę wchodziła suma, jest poprawny; rozkład Gaussa dlatego, że wyglądało to
+  jak dzwon, jest założeniem, którego nikt nie sprawdził.}}
+\sumitem{23--25}{Trafność na $\val{p25.eval.n.lo}$ pozycjach niesie przedział
+  $\pm\val{p25.eval.hw.100}$ punktu, a cztery razy więcej pozycji zmniejsza go
+  o połowę za każdym razem.}
+\sumitem{26--27}{Orzeczenie o różnicy $\val{p25.eval.gap.pct}$ punktu wymaga
+  $\val{p25.eval.n.needed}$ pozycji na model \dash{} \textbf{dwa razy}
+  $\val{p25.eval.n.naive}$, bo wielkością, o którą chodzi, jest
+  \emph{różnica}, a wariancje obu oszacowań się dodają.}
+\sumitem{30--32}{Wynik uwagi jest sumą $d_k$ iloczynów wpisów o wariancji
+  jednostkowej, więc $\Var = d_k$, a rozrzut to $\sqrt{d_k}$ \dash{} wyliczone
+  dokładnie, bez żadnego twierdzenia granicznego w środku.}
+\sumitem{32--33}{Program~\ref{prog:P05} zmierzył to samo twierdzenie przy
+  skalowaniu znormalizowanym, $1/\sqrt{d}$, a wyprowadzenie odtwarza jego
+  cztery zapisane liczby z dokładnością do $\val{p25.p05.worst.pct}$ procent.
+  $\sqrt{d_k} \times 1/\sqrt{d_k} = 1$ \emph{jest} tym dzieleniem.}
+\sumitem{35--37}{\textbf{E9, przeprowadzone.} Bez dzielenia, przy
+  $d_k = \val{p25.e9.d.hi}$, entropia wiersza wynosi
+  $\val{p25.e9.raw.ent.512}$ z możliwych $\val{p25.e9.maxent}$, a jeden klucz
+  zabiera $\val{p25.e9.raw.top.512}$ procent. Z dzieleniem nic się nie rusza
+  przy żadnym rozmiarze głowicy.}
+\sumitem{37}{Program~\ref{prog:P18} podaje przekątną jakobianu $p(1-p)$, która
+  zamienia to w gradient: $\val{p25.e9.resp.raw}$ wobec
+  $\val{p25.e9.resp.scaled}$, więc wiersz przeskalowany jest
+  $\val{p25.e9.resp.ratio}$ razy bardziej wrażliwy.}
+\sumitem{39--41}{\textbf{Skalowanie jest korektą wariancji i niczym więcej.}
+  Ustalona stała nie wykona tego zadania, bo rzecz korygowana rośnie z
+  wymiarem głowicy.}
+\sumitem{42--44}{Wyjście warstwy ma wariancję
+  $n_{\text{in}}\Var(w)\Var(x)$ \dash{} ta sama tożsamość po raz czwarty
+  \dash{} więc warstwa liniowa utrzymuje swoją skalę przy
+  $\Var(w) = 1/n_{\text{in}}$.}
+\sumitem{45--47}{$\relu$ zachowuje \textbf{dokładnie połowę} drugiego momentu
+  symetrycznego wejścia, z symetrii i scałkowane do
+  $\val{p25.init.relu.keeps}$. Nadrobienie tego wymaga
+  $\Var(w) = 2/n_{\text{in}}$, \textbf{i stąd bierze się czynnik dwa u
+  Hego}.}
+\sumitem{48--52}{Głębokość kumuluje to geometrycznie: przez
+  $\val{p25.init.depth}$ warstw połowa na warstwę zostawia
+  $\val{p25.init.deep.xavier}$ sygnału, a cztery na warstwę dają
+  $\val{p25.init.deep.hot}$. \textbf{Rozbieżność na kroku pierwszym to
+  inicjalizacja, a nie krok uczenia}, i jeden przebieg w przód mówi, co z
+  tych dwóch.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Dwa niezależne pomiary mają rozrzut $3$ każdy. Podaj rozrzut ich sumy i
+  ich różnicy.
+  \answerto{Oba wynoszą $\sqrt{9 + 9} = \sqrt{18} \approx \num{4.24}$.
+  Wariancje dodają się w \emph{obu} przypadkach: odejmowanie zmienia znak
+  jednej wielkości, co podnosi się do tego samego kwadratu, więc różnica nie
+  jest dokładniejsza od sumy. To ten krok, którego potrzebuje sekcja 4, i ten,
+  który ludzie pomijają.}
+\item Trafność zmierzona na $1000$ pozycjach wynosi $\num{0.90}$. Jak szeroki
+  jest z grubsza jej przedział $95$ procent i ile pozycji zmniejszyłoby go o
+  połowę?
+  \answerto{Rozrzut to $\sqrt{\num{0.9} \times \num{0.1} / 1000} \approx \num{0.0095}$,
+  więc przedział ma około $\pm\num{1.9}$ punktu. Zmniejszenie go o połowę
+  wymaga $\val{p25.halve.factor}$ razy więcej pozycji, czyli $4000$.}
+\item Pewna wielkość jest sumą $30$ niezależnych kawałków. Ktoś odczytuje jej
+  ogon jeden na milion z rozkładu Gaussa. Podaj zarzut w jednym zdaniu i
+  powiedz, co uczyniłoby to bezpiecznym.
+  \answerto{Twierdzenie opisuje środek, a zgodność zanika, gdy się od niego
+  oddalasz, więc kwantyl jeden na milion leży w obszarze, w którym jest ono
+  najmniej wiarygodne \dash{} a jeśli kawałki są ograniczone, prawdziwy ogon
+  może być dokładnie zerowy tam, gdzie Gauss jest tylko mały. Jest to
+  bezpieczne, gdy odpowiedź jest potrzebna wyłącznie blisko środka albo gdy
+  ogon sprawdzono inną drogą.}
+\item Głowica ma wymiar $d_k = 64$, a surowe wyniki mają rozrzut około $8$.
+  Wymiar głowicy zostaje podwojony do $128$. Przewidź nowy surowy rozrzut i
+  nowy rozrzut po standardowym skalowaniu.
+  \answerto{Surowy rozrzut to $\sqrt{d_k}$, więc staje się
+  $\sqrt{128} \approx \num{11.3}$ \dash{} czynnik $\sqrt{2}$, a nie $2$. Po
+  podzieleniu przez $\sqrt{d_k}$ wynosi $1$, tak jak przy $64$ i tak jak przy
+  każdym rozmiarze głowicy. Ta niezmienniczość jest całym celem dzielenia.}
+\item Sieć o $\num{40}$ warstwach z aktywacjami $\relu$ zwraca \code{nan} na
+  pierwszym kroku treningu. Podaj pierwszą diagnostykę do uruchomienia i
+  powiedz, co znaczą jej dwa wyniki.
+  \answerto{Puść jeden przebieg w przód i wypisz wariancję aktywacji warstwa
+  po warstwie. Stały czynnik na warstwę znaczy, że skala wag jest zła, a
+  optymalizator jest niewinny; płaski profil znaczy, że przebieg w przód jest
+  zdrowy, a problem siedzi w aktualizacji, co należy do
+  Programu~\ref{prog:P20}.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że $\Var(X - Y) = \Var(X) + \Var(Y)$ dla niezależnych $X$ i $Y$,
+  wprost z ogólnego sformułowania z ramki~5.
+  \answerto{$\Cov(X, -Y) = -\Cov(X, Y) = 0$ z niezależności, a
+  $\Var(-Y) = \Var(Y)$, bo definicja podnosi odległości do kwadratu. Składnik
+  mieszany znika i obie wariancje się dodają, dokładnie jak dla sumy.}
+\item Średnia z $n$ losowań ma rozrzut $\sigma/\sqrt{n}$. Ktoś proponuje
+  zmniejszyć rozrzut o połowę, uśredniając te same $n$ losowań dwa razy i
+  uśredniając oba wyniki. Powiedz, co się stanie i dlaczego.
+  \answerto{Nic się nie stanie: oba wyniki są identyczne, więc ich średnia to
+  ta sama liczba, a jej rozrzut się nie zmienia. To pułapka z ramki~4 \dash{}
+  $\Var(X+X) = 4\Var(X)$, a nie $2\Var(X)$ \dash{} w postaci, w której ludzie
+  ją naprawdę spotykają, bo liczenie mówi $2$, a arytmetyka daje $1$.}
+\item Uwagę zapisuje się czasem tak, że skalowanie jest wpisane w
+  inicjalizację rzutowań zapytania i klucza, a nie stosowane do wyników.
+  Powiedz, czy to jest to samo.
+  \answerto{Dla wariancji przy inicjalizacji tak: przeskalowanie obu rzutowań
+  przez $d_k^{-1/4}$ daje wpisy o wariancji $d_k^{-1/2}$ każdy i wariancję
+  wyniku równą $1$. Później to nie jest to samo, bo trening rusza wagi, a
+  tylko jawne dzielenie na pewno wciąż tam jest. Postać jawna przeżywa też
+  zmianę rozmiaru głowicy bez zmiany inicjalizatora.}
+\item Sieć używa aktywacji, która zachowuje ułamek $c$ drugiego momentu
+  symetrycznego wejścia, zamiast połowy jak $\relu$. Podaj wariancję wag
+  utrzymującą sygnał w ryzach i sprawdź ją na dwóch przypadkach z tekstu.
+  \answerto{$\Var(w) = 1/(c\,n_{\text{in}})$. Przy $c = 1$ \dash{} warstwa
+  liniowa \dash{} to $1/n_{\text{in}}$, a przy $c = \frac{1}{2}$ to
+  $2/n_{\text{in}}$, czyli dwa przypadki, które sekcja wyprowadza.}
+\item Harness ewaluacyjny raportuje trafność na $200$ pozycjach, z których
+  $50$ to niemal duplikaty innych pozycji ze zbioru. Powiedz, co to robi z
+  przedziałem, który harness drukuje, i w którą stronę.
+  \answerto{Sprawia, że drukowany przedział jest za wąski. Wzór zakłada
+  $200$ niezależnych trafień albo pudeł; duplikaty niosą dodatnią kowariancję,
+  więc prawdziwa wariancja średniej jest większa niż $\sigma^{2}/n$ o
+  składniki mieszane z ramki~5. Raportowana pewność jest zawyżona, a
+  efektywna liczba pozycji leży gdzieś poniżej $200$.}
+\end{furtherproblems}

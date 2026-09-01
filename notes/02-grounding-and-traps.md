@@ -2648,3 +2648,72 @@ by integration rather than by sampling, deliberately: a sampled check produces
 an estimate with an error bar, and "it agreed within the error bar" is a
 demonstration that the trick is approximately right, which is the reading the
 frame exists to refuse. → **P24**.
+
+**245. "The `1/√d_k` in attention is a normalisation constant someone chose."**
+It is the only number that works, and it is forced in four lines. A score is a
+dot product of two `d_k`-dimensional vectors, so it is a sum of `d_k` products
+of unit-variance entries; variances add; the score has variance `d_k` and
+spread `√d_k`. A *fixed* constant cannot do the job, because the thing being
+corrected grows with the head dimension — right at one head size and wrong at
+every other — and a different exponent cannot either, because `d_k` is a
+variance and the spread is its root. It is a **variance correction** and its
+own name says so. → **P25**.
+
+**246. "It is a sum of many things, so it is Gaussian."** It is Gaussian *in
+the middle*, which is what the central limit theorem says and all it says. On
+sums of twelve uniforms the Gaussian is right to a per cent one spread out,
+wrong by a factor of 137 five spreads out, and at six spreads the true answer
+is *exactly zero* while the Gaussian says 9.9e-10. The error grows in exactly
+the direction people take it, because a tail probability is what you ask for
+when you want to know whether something was a fluke — so the question the
+theorem answers worst is the one it is most used for. → **P25**.
+
+**247. "Adding more of the same thing averages out the noise."** It does when
+the things are independent and it does not when they are the same thing wearing
+two labels: two independent dice give twice a die's variance and one die
+counted twice gives four times, and over `n` copies the gap is a factor of `n`
+— the difference between an average that concentrates and one that does not
+move at all. The failure mode is ordinary: an evaluation set with duplicated
+items, a batch assembled from one document, a bootstrap over rows that share a
+user. In each the count says `n` and the arithmetic gets 1. → **P25**.
+
+**248. "Two spreads add."** The *variances* add, so the spread of a sum is the
+root of the sum of the squares: two quantities of spread 1 give √2, not 2. And
+it is worth knowing which way the error runs for a *difference* — the variances
+add there too, because negating a quantity squares to the same thing, so a
+difference is never more precise than a sum. That step is the one dropped when
+somebody sizes a benchmark comparison. → **P25**.
+
+**249. "Doubling the evaluation set halves the error bar."** It divides it by
+√2. Halving costs *four* times the items, at every starting size, and a tenth
+of it costs a hundred times — precision is quadratic, which is why nobody
+measures anything to arbitrary precision and why "run it for longer" is a
+proposal with a price attached. An accuracy on 100 items carries an interval of
+about ±7.8 points, and the two decimal places such a number is usually quoted
+to are noise. → **P25**.
+
+**250. "One model scored a point above the other, so it is better."** On the
+sizes people actually evaluate at, a one-point gap is inside the interval of
+either number. Calling it needs about 12 300 items per model — and that is
+*twice* what a single interval suggests, because the quantity in question is a
+**difference** and the variances of the two independent estimates add. The
+factor of two is the most commonly dropped step in the whole calculation. →
+**P25**.
+
+**251. "The run diverged, so the learning rate was too high."** Sometimes. But
+a learning rate acts on the *update*, and an initialisation failure happens in
+the forward pass, before an update exists: over 50 layers a per-layer factor of
+a half leaves 8.9e-16 of the signal and a factor of four gives 1.3e+30, which
+in `fp16` is not a number. The tell is the step number, and the diagnostic is
+one forward pass with the activation variance printed layer by layer — a
+constant factor per layer means the weight scale, a flat profile means the
+optimiser. → **P25**.
+
+**252. "He and Xavier are two conventions and it hardly matters which."** They
+differ by exactly the factor a `ReLU` removes. A `ReLU` keeps **exactly half**
+the second moment of a symmetric input — by symmetry, not by approximation — so
+holding the signal steady through a linear layer *and* its activation needs
+`Var(w) = 2/n_in` rather than `1/n_in`. That is where the two comes from, and
+with depth the difference is not a matter of taste: the same 50-layer stack
+passes 1.00 of its signal under one rule and 8.9e-16 under the other. →
+**P25**.
