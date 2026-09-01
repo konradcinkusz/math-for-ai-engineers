@@ -1,33 +1,790 @@
 %% P18 --- Rachunek macierzowy
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak programs/en/P18-matrix-calculus.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; tools/parity.py porównuje oba pliki.
+%%
+%% UWAGA DLA TŁUMACZA: C4, C8 i C12 porównują znaczniki strukturalne, wzory i
+%% literały liczbowe PO KOLEI. Zdanie polskie musi nieść te same wzory i te
+%% same cyfry w tej samej kolejności. Cyfra zostaje cyfrą, odwołanie do
+%% programu prowadzi zdanie zamiast stać za wzorem, a skrót jest częścią
+%% strumienia znaczników: gdzie angielski pisze samo \enquote{P15}, polski też.
 
-\program{Rachunek macierzowy}
+\program[Rachunek macierzowy]{Rachunek macierzowy}
 \label{prog:P18}
+\index{rachunek macierzowy}
+\index{układ zapisu pochodnych}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{powiedzieć, czym jest układ licznikowy i dlaczego wybór układu
+  jest jedyną rzeczą, jaką dokłada pochodna po wektorze}
+\outcome{8--14}{zróżniczkować skalarną stratę po macierzy wag i sprawdzić
+  wynik samym jego kształtem}
+\outcome{15--21}{zapisać pochodną $\softmax$ i powiedzieć, do czego sumują
+  się jej wiersze i dlaczego}
+\outcome{22--31}{wyprowadzić, że gradient entropii krzyżowej przez $\softmax$
+  wynosi $p - y$ \dash{} definicja entropii krzyżowej jest tu \emph{dana}, a
+  uzasadnia ją Program~\ref{prog:P30}}
+\outcome{32--39}{podać dwa powody, dla których obie operacje są łączone, i
+  powiedzieć, który z nich dotyczy szybkości, a który nie}
+\end{outcomes}
 
-Argument: differentiating with respect to a vector or a matrix is
-bookkeeping plus a layout convention, and most of the pain in the literature
-is the convention rather than the mathematics. Payoff: the identities the
-reader actually needs, derived once each: the gradient of \code{Wx} with
-respect to \code{W}; of a squared error; of a softmax; of a log-softmax; of
-layer normalisation. The headline: **the gradient of cross-entropy through a
-softmax is \code{p - y}**, the single most reused fact in applied machine
-learning, derived in full \dash{} and the reason the two operations are
-fused in every serious implementation. Also a versionbox on numerator versus
-denominator layout, because the reader will meet both in the same week.
+\begin{quiz}
+\item Skalarna strata zależy od macierzy wag $W$. Jaki kształt ma
+  $\partial L / \partial W$? \teachesat{8--9}
+  \answerto{Kształt $W$. Jedna pochodna cząstkowa na wpis, ułożona tak, jak
+  ułożone były wpisy, przez co kształt jest sprawdzeniem, które nic nie
+  kosztuje.}
+\item Dwa opisy propagacji wstecznej podają wzory różniące się
+  transpozycją. Który jest błędny? \teachesat{5--6}
+  \answerto{Prawdopodobnie żaden. Są zapisane w dwóch układach, które różnią
+  się dokładnie jedną transpozycją. Błędem jest mieszanie ich w jednym
+  wyprowadzeniu i to właśnie daje błąd kształtu, którego nikt nie umie
+  wytropić.}
+\item Jaki kształt ma pochodna $\softmax$ na $n$ wynikach i do czego sumują
+  się jej wiersze? \teachesat{15--19}
+  \answerto{$n \times n$, jeden wiersz na wyjście i jedna kolumna na wejście,
+  z reguły Programu~\ref{prog:P16}. Każdy wiersz sumuje się do zera, co jest
+  zróżniczkowanym \enquote{prawdopodobieństwa sumują się do jedynki}.}
+\item Entropia krzyżowa przez $\softmax$: jaki jest gradient po wynikach?
+  \teachesat{24--25}
+  \answerto{$p - y$ \dash{} przewidziany rozkład minus cel one-hot. To
+  najczęściej używane wyprowadzenie w stosowanym uczeniu maszynowym i dzielą
+  je cztery linijki od jakobianu $\softmax$.}
+\item Dlaczego ta para jest łączona w każdej poważnej implementacji?
+  \teachesat{32--35}
+  \answerto{Z dwóch powodów różnego rodzaju. Jest około
+  $\val{p18.fuse.ratio}$ razy tańsza i \dash{} co waży więcej \dash{} jest
+  określona w wierszach, w których uczciwa droga dwukrokowa dzieli przez
+  zero, bo prawdopodobieństwo wpada w niedomiar, a $p - y$ nigdy nie tworzy
+  odwrotności.}
+\end{quiz}
 
-FORWARD REFERENCE, declared: the softmax--cross-entropy gradient is this
-program's most reused derivation, and cross-entropy is not defined until
-P30. Give it a definitional frame here -- cross-entropy as minus the sum of
-y log p, stated as a definition to be justified later -- and have P26 and
-P30 each carry a frame returning to it.
+% ============================================================
+\section{Jedna liczba, wiele wejść i wybór}
+\label{sec:P18-layout}
+\index{układ zapisu pochodnych!licznikowy i mianownikowy}
 
-\medskip
-\textbf{Planowana długość:} 60 ramek.
-}
+\begin{fr}
+Program~\ref{prog:P15} dał ci gradient, a Program~\ref{prog:P16} jakobian,
+więc każda pochodna w tym programie już istnieje. Pochodne cząstkowe są tymi
+samymi liczbami, cokolwiek ktoś zapisze.
+
+Została jedna rzecz do rozstrzygnięcia, zanim w ogóle da się je zapisać, i
+prawie cała trudność, jaką czytelnik ma z rachunkiem macierzowym, bierze się
+stąd, że nikt nie powiedział, którą wybrano. Co to takiego?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jak je \emph{ułożyć} \dash{} który wskaźnik biegnie w dół po wierszach, a
+który wzdłuż kolumn.
+\end{ansblock}
+
+To jest \textbf{układ zapisu}, a w użyciu są dwa.
+
+\begin{notationbox}
+\textbf{Ta książka używa układu licznikowego} i mówi to tutaj, zamiast
+milcząco go przyjmować. W układzie licznikowym pochodna $\vect{y}$ po
+$\vect{x}$ ma \textbf{jeden wiersz na wyjście} i jedną kolumnę na wejście, co
+jest dokładnie regułą kształtu z Programu~\ref{prog:P16}. Układ mianownikowy
+to ta tabela transponowana.
+
+Żaden nie jest bardziej poprawny i oba są powszechne: to podział między
+dziedzinami, a nie między krajami. Liczy się to, żeby jedno wyprowadzenie
+wybrało jeden i się go trzymało, bo wzór z jednego układu wstawiony do
+wyprowadzenia w drugim jest przekręcony o transpozycję i nic nie ostrzega.
+\end{notationbox}
+
+\mermaidfig{p18-one-transpose}{Ta sama pochodna, zapisana dwojako.}{dwa układy}
+\end{fr}
+
+\begin{fr}
+Weź najprostszy przypadek, jaki istnieje. $\vect{y} = W\vect{x}$, gdzie $W$
+ma kształt $\val{p18.n.out} \times \val{p18.n.in}$.
+
+Czym jest $\partial \vect{y} / \partial \vect{x}$ w układzie licznikowym?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Samym $W$.
+\end{ansblock}
+
+Bo $y_i = \sum_j W_{ij}x_j$, więc $\partial y_i / \partial x_j = W_{ij}$, a
+układ licznikowy kładzie $i$ w dół po wierszach \dash{} czyli tam, gdzie $W$
+już go miało. Skrypt sprawdza każdy wpis wobec różnicy centralnej, a
+najgorsza rozbieżność jest poniżej $\val{p18.layout.bound}$.
+
+\textbf{I to jest cały argument za tą konwencją.} To ta, w której pochodna
+odwzorowania liniowego jest tym odwzorowaniem, a konwencji, która z
+najłatwiejszego przypadku robi tożsamość, warto się trzymać.
+\end{fr}
+
+\begin{fr}
+Teraz cena tej drugiej, bo spotkasz ją w tym samym tygodniu.
+
+W układzie mianownikowym ta sama pochodna zapisana jest odwrotnie. Podaj oba
+kształty i powiedz, czym wobec tego różnią się oba układy.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p18.n.out} \times \val{p18.n.in}$ wobec $\val{p18.n.in} \times \val{p18.n.out}$ \dash{} jedną transpozycją
+i niczym więcej.
+\end{ansblock}
+
+Wzór zacytowany z pracy pisanej w drugim układzie nie jest więc błędny. Jest
+poprawny w swojej książce i transponowany w tej, a obie biblioteki tożsamości
+są tą samą biblioteką czytaną w lustrze.
+
+Awaria, którą to powoduje, jest konkretna i warto ją nazwać: nie zła
+odpowiedź, tylko błąd \emph{kształtu} w środku wyprowadzenia, w miejscu
+odległym od tego, gdzie oba układy zmieszano.
+\end{fr}
+
+\begin{fr}
+\begin{note}
+Program~\ref{prog:P06} zauważył, że prawdziwe biblioteki układają wsad wzdłuż
+pierwszej osi i liczą $XW\T$, gdzie ta książka pisze $W\vect{x}$. To ten sam
+wybór o poziom wyżej: ułożenie jest konwencją, a arytmetyka nie, i $XW\T$
+jest transpozycją $W X\T$.
+
+Program~\ref{prog:P07} jest tym, w którym mieszkają same kształty. Ten
+program bierze je jako dane i pyta tylko, co robi z nimi pochodna.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Różniczkowanie po macierzy}
+\label{sec:P18-by-a-matrix}
+\index{rachunek macierzowy!gradient skalara}
+
+\begin{fr}
+Teraz przypadek, który czytelnik naprawdę spotyka. Strata $L$ jest
+\emph{jedną liczbą}, a zbudowana jest z macierzy wag $W$ o
+$\val{p18.n.out}$ wierszach i $\val{p18.n.in}$ kolumnach.
+
+Zanim cokolwiek wyprowadzisz: jaki kształt ma $\partial L / \partial W$?
+Powiedz, skąd to wiesz.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Kształt $W$. Jest jedna pochodna cząstkowa na wpis $W$, a układają się one w
+tym samym ułożeniu, jakie miały wpisy.
+\end{ansblock}
+
+\textbf{I to jest sprawdzenie, które nic nie kosztuje.} Gradient skalara ma
+kształt tego, po czym się różniczkuje \dash{} zawsze, w obu układach, bo
+układ rozstrzyga kolejność dwóch wskaźników, a skalarne wyjście nie dostarcza
+żadnego z nich.
+
+\mermaidfig{p18-shape-is-the-check}{Jedna pochodna na wpis, ułożona jak
+wpisy.}{kształt jest sprawdzeniem}
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Jakiś tam kształt; będę transponował, aż ruszy.}} To działa
+i dlatego ten nawyk się utrzymuje: przy dwóch kształtach do wypróbowania
+zgadywanie się kończy.
+
+Przestaje działać w chwili, gdy dwa wymiary są równe, co dla kwadratowej
+macierzy wag, głowy uwagi z tyloma kluczami co zapytaniami albo rozmiaru
+wsadu, który akurat równa się szerokości, jest większością przypadków. Wtedy
+zła transpozycja \emph{też} rusza, a masz program, który uczy się do straty,
+która nie chce spadać, i nic w nim nie zgłasza błędu.
+
+Kształt nie jest rzeczą do zgadywania, aż błąd ustanie. Jest sprawdzeniem i
+jest dostępny, zanim zapiszesz pochodną.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Wyprowadź jedną. Przy $\vect{r} = W\vect{x} - \vect{t}$ i
+$L = \vect{r} \cdot \vect{r}$ zróżniczkuj $L$ po $W_{ij}$.
+
+Bierz po jednym wpisie naraz, bo tym właśnie zawsze jest \enquote{rachunek
+macierzowy}.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \frac{\partial L}{\partial W_{ij}} = 2 r_i x_j \]
+\end{ansblock}
+
+Bo $L = \sum_k r_k^{2}$, więc $\partial L/\partial W_{ij} =
+2 r_i \, \partial r_i/\partial W_{ij}$, a $r_i = \sum_j W_{ij}x_j - t_i$
+wnosi $x_j$. Żaden inny wiersz $r$ nie ma w sobie $W_{ij}$.
+
+Zebrane razem jest to \textbf{iloczyn zewnętrzny}:
+\[ \frac{\partial L}{\partial W} = 2\,\vect{r}\,\vect{x}\T \]
+który ma kształt $W$, jak poprzednia ramka powiedziała, że musi mieć. Skrypt
+sprawdza wszystkie $\val{p18.n.out}\times\val{p18.n.in}$ wpisów wobec różnicy
+centralnej, najgorsza rozbieżność poniżej $\val{p18.sq.bound}$.
+\end{fr}
+
+\begin{fr}
+Ten kształt iloczynu zewnętrznego nie jest przypadkiem tej straty, a
+zauważenie dlaczego warte jest więcej niż sama tożsamość.
+
+Każda macierz wag w sieci używana jest tak samo: mnoży wektor wejściowy.
+Powiedz więc, jak będzie wyglądać $\partial L/\partial W$ dla
+\emph{dowolnej} straty, przy jakimkolwiek gradiencie odesłanym z warstwy
+wyżej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jak iloczyn zewnętrzny nadchodzącego gradientu z własnym wejściem warstwy:
+$\vect{g}\,\vect{x}\T$.
+\end{ansblock}
+
+To jedyna tożsamość w tym programie warta zapamiętania i jest macierzową
+postacią reguły łańcuchowej z Programu~\ref{prog:F12}: gradient docierający
+do wyjścia warstwy razy pochodna wyjścia po wadze, którą jest wejście.
+
+\begin{note}
+Mówi też, gdzie idzie pamięć. Żeby utworzyć $\vect{g}\,\vect{x}\T$,
+potrzebujesz $\vect{x}$, czyli wejścia warstwy \dash{} więc przebieg wstecz
+potrzebuje aktywacji przebiegu w przód, co jest arytmetyką punktów kontrolnych
+z Programu~\ref{prog:P16} przychodzącą z drugiej strony. Tożsamość i rachunek
+za pamięć są tym samym faktem.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Pochodna funkcji softmax}
+\label{sec:P18-softmax-jacobian}
+\index{softmax!jego jakobian}
+
+\begin{fr}
+Program~\ref{prog:F07} zdefiniował
+\[ \softmax(\vect{z})_j = \frac{e^{z_j}}{\sum_k e^{z_k}} \]
+i nigdy tego nie zróżniczkował. Bierze $n$ wyników i daje $n$
+prawdopodobieństw.
+
+Jaki kształt ma jego pochodna i dlaczego nie może być wektorem?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$n \times n$: jeden wiersz na wyjście i jedna kolumna na wejście, z reguły
+Programu~\ref{prog:P16}. Każde wyjście zależy od każdego wejścia, bo dzielą
+mianownik.
+\end{ansblock}
+
+Ten wspólny mianownik jest całą trudnością. Funkcja działająca po
+współrzędnych ma pochodną diagonalną i można udawać, że jest wektorem;
+$\softmax$ nie może, bo podniesienie jednego wyniku obniża każde inne
+prawdopodobieństwo.
+
+Zróżniczkuj to. Weź $\partial p_i / \partial z_j$ w dwóch przypadkach:
+$i = j$ oraz $i \neq j$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \frac{\partial p_i}{\partial z_j} = p_i(\delta_{ij} - p_j) \]
+\end{ansblock}
+
+Reguła ilorazu dwa razy: przy $i = j$ licznik wnosi $p_i$, a mianownik
+odbiera $p_i^{2}$; przy $i \neq j$ rusza się tylko mianownik, dając
+$-p_i p_j$. Jedno wyrażenie obejmuje oba, bo $\delta_{ij}$ daje $1$ na
+przekątnej i $0$ poza nią.
+
+Jako macierz,
+\[ J = \diag(\vect{p}) - \vect{p}\,\vect{p}\T \]
+sprawdzona wpis po wpisie wobec różnicy centralnej, najgorsza rozbieżność
+poniżej $\val{p18.jac.bound}$.
+\end{fr}
+
+\begin{fr}
+Ta macierz ma własność, którą przewidzisz, nic nie licząc, z jednego faktu o
+$\softmax$, który już masz.
+
+Prawdopodobieństwa sumują się do $1$, jakiekolwiek byłyby wyniki. Co to
+wymusza na każdym wierszu $J$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Każdy wiersz sumuje się do $0$.
+\end{ansblock}
+
+Bo wielkość, która dla każdego wejścia wynosi $1$, nie zmienia się, gdy
+wejście się zmienia, więc jej pochodna jest zerem w każdym kierunku.
+Zmierzone poniżej $\val{p18.jac.rowsum}$, co jest zaokrągleniem.
+
+\textbf{Zatem $\softmax$ umie przesuwać prawdopodobieństwo i nigdy nie umie
+zrobić go więcej}, a sumy wierszy są tym zdaniem zapisanym jako arytmetyka.
+Są też najtańszym sprawdzeniem implementacji jakobianu, jakie ktokolwiek
+napisze.
+\end{fr}
+
+\begin{fr}
+I jedna brama, bo dwa programy nie mogą się różnić co do jednej obliczonej
+rzeczy.
+
+Program~\ref{prog:F07} udowodnił, że $\softmax$ na dwóch wynikach jest
+funkcją logistyczną ich różnicy. Zróżniczkowanie obu stron tożsamości daje
+tożsamość \dash{} do czego więc musi się sprowadzić $J$ przy $n = 2$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\sigma'(a - b) = \sigma(a-b)\bigl(1 - \sigma(a-b)\bigr)$.
+\end{ansblock}
+
+Skrypt sprawdza to na $\val{p18.gate.f07.pairs}$ parach, a nie w punkcie,
+najgorsza rozbieżność poniżej $\val{p18.gate.f07.bound}$, i czyta zapisane
+prawdopodobieństwa z Programu~\ref{prog:F07}, by potwierdzić, że oba programy
+liczą jeden $\softmax$.
+
+Warto to mieć z powodu, który podaje Program~\ref{prog:P04}: brama jest warta
+swoich linijek, gdy oba programy cytują \emph{jedną} obliczoną rzecz, a ta
+jest zróżniczkowaną tożsamością z F07, a nie dwiema liczbami podobnymi do
+siebie.
+\end{fr}
+
+% ============================================================
+\section{Entropia krzyżowa i gradient, którego używają wszyscy}
+\label{sec:P18-cross-entropy}
+\index{entropia krzyżowa!gradient przez softmax}
+
+\begin{fr}
+\begin{note}
+\textbf{Definicja podana tutaj, uzasadniona później.} Dla przewidzianego
+rozkładu $\vect{p}$ i celu $\vect{y}$ wielkość
+\[ L = -\sum_j y_j \ln p_j \]
+to \textbf{entropia krzyżowa}. Gdy $\vect{y}$ jest one-hot na klasie $c$,
+każdy składnik poza jednym jest zerem i $L = -\ln p_c$.
+
+\emph{Dlaczego} to jest właściwa rzecz do minimalizowania, należy do
+Programu~\ref{prog:P26} (jest to ujemna logarytmiczna wiarogodność
+zaobserwowanych tokenów), a \emph{co} mierzy, do Programu~\ref{prog:P30}
+(koszt kodowania jednego rozkładu kodem drugiego). Żadne z tego nie jest tu
+potrzebne. Ten program potrzebuje tylko pochodnej, a pochodna jest
+najczęściej używanym wynikiem w stosowanym uczeniu maszynowym.
+\end{note}
+\end{fr}
+
+\begin{fr}
+A zatem: wyniki $\vect{z}$, potem $\vect{p} = \softmax(\vect{z})$, potem
+$L = -\ln p_c$ dla prawdziwej klasy $c$.
+
+Masz wszystkie części. Zróżniczkuj $L$ najpierw po $p_c$ \dash{} tylko ten
+jeden krok.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\partial L/\partial p_c = -1/p_c$, a $\partial L / \partial p_j = 0$ dla
+każdego innego $j$.
+\end{ansblock}
+
+I tu wszystko mogłoby pójść źle, a sekcja 5 jest właśnie o tym $1/p_c$. Na
+razie nieś to dalej.
+
+Teraz przepchnij to przez jakobian. Regułą łańcuchową dla wyników jest
+\[ \frac{\partial L}{\partial z_j}
+   = \sum_i \frac{\partial L}{\partial p_i}\,
+     \frac{\partial p_i}{\partial z_j} \]
+a z tej sumy przeżywa tylko jeden składnik. Wykonaj to.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \frac{\partial L}{\partial z_j}
+   = -\frac{1}{p_c}\,p_c(\delta_{cj} - p_j) = p_j - \delta_{cj} \]
+\end{ansblock}
+
+\textbf{$p_c$ się skraca.} To jest całe wyprowadzenie, a wszystko, co się w
+nim liczy, jest w tym skróceniu: odwrotność wprowadzoną przez pierwszy krok
+usuwa $p_i$, które niosła przekątna jakobianu.
+
+W postaci wektorowej, przy $\vect{y}$ jako celu one-hot,
+\[ \frac{\partial L}{\partial \vect{z}} = \vect{p} - \vect{y} \]
+sprawdzone wobec różnicy centralnej, najgorsza rozbieżność poniżej
+$\val{p18.ce.bound}$.
+\end{fr}
+
+\begin{fr}
+Warto powiedzieć na głos, co to wyrażenie \emph{znaczy}, bo czyta się jak
+kawałek szczęścia, a nim nie jest.
+
+$\vect{p} - \vect{y}$ to przewidziany rozkład minus docelowy. Przeczytaj to
+jako polecenie dla wyników. Co każe zrobić każdemu z nich?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Obniżyć każdy wynik proporcjonalnie do prawdopodobieństwa, które teraz ma, i
+podnieść prawdziwy o tyle prawdopodobieństwa, ile mu brakuje.
+\end{ansblock}
+
+Wielkość poprawki jest więc wielkością pomyłki, w jednostkach tego, co się
+przewiduje, a model, który już ma rację, dostaje gradient prawie dokładnie
+zerowy i nic nie trzeba wyłączać.
+
+\begin{note}
+To samo skrócenie zachodzi przy funkcji logistycznej i dwuklasowej entropii
+krzyżowej i jest tym samym rachunkiem: Program~\ref{prog:F07} pokazał, że
+$\softmax$ na dwóch wynikach \emph{jest} funkcją logistyczną, więc przypadek
+dwuklasowy jest tym samym przy $n = 2$, a nie drugim wynikiem.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Warstwę dalej wstecz, bo tam używa tego pętla treningowa. Wyniki to
+$\vect{z} = W\vect{x}$.
+
+Połącz to, co masz: czym jest $\partial L/\partial W$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \frac{\partial L}{\partial W} = (\vect{p} - \vect{y})\,\vect{x}\T \]
+\end{ansblock}
+
+Iloczyn zewnętrzny z sekcji 2, z gradientem nadchodzącym dostarczonym przez
+sekcję 4. Ma kształt $W$, a skrypt sprawdza go wobec różnicy centralnej,
+najgorzej $\val{p18.cew.bound}$.
+
+\textbf{Dwie tożsamości i reguła kształtu dochodzą do gradientu warstwy
+wyjściowej klasyfikatora}, a żadna z nich nie potrzebowała niczego, czego ta
+książka już nie wyprowadziła.
+\end{fr}
+
+\begin{fr}
+Opis tego programu wymienia piątą tożsamość i jest to ta, którą ludzie robią
+źle: normalizacja warstwowa. Jej wyjściem jest
+\[ \hat{z}_i = \frac{z_i - \mu}{\sqrt{\operatorname{var} + \varepsilon}} \]
+gdzie $\mu$ i wariancja liczone są po tym samym wektorze.
+
+Nie wyprowadzaj jej. Powiedz, dlaczego jej pochodna nie może działać po
+współrzędnych.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo $\mu$ i wariancja zależą od \emph{każdego} $z_i$, więc zmiana jednego
+wejścia rusza każde wyjście \dash{} dokładnie jak przy $\softmax$.
+\end{ansblock}
+
+To jest kształt odpowiedzi i dlatego gradient niesie dwa człony poprawkowe, a
+nie jeden czynnik. Przy $\vect{g}$ nadchodzącym z góry i $s$ jako odchyleniu
+standardowym
+\[ \frac{\partial L}{\partial z_i} = \frac{1}{s}\Bigl(g_i
+   - \overline{g} - \hat{z}_i\,\overline{g\hat{z}}\Bigr) \]
+gdzie obie kreski są średnimi po wektorze. Skrypt sprawdza to najgorzej na
+$\val{p18.ln.bound}$.
+
+\begin{note}
+Wszystkie pięć tożsamości w tym programie sprawdzanych jest tak samo, wobec
+różnicy centralnej z krokiem, który zmierzył Program~\ref{prog:F11}, i każda
+mieści się we własnej granicy pod wspólnym sufitem
+$\val{p18.check.ceiling}$. Sufit jest własnością metody, a nie progiem
+dobranym tak, by sprawdzenia przeszły: opuszczony człon rozjeżdża się o coś
+rzędu jedności, a nie o miejsce dziesiętne.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Dlaczego te dwie są łączone}
+\label{sec:P18-fusion}
+\index{entropia krzyżowa!łączona z softmaksem}
+
+\begin{fr}
+Każda poważna implementacja liczy $\softmax$ i entropię krzyżową jako jedną
+operację, a nie dwie, i daje jej jedną nazwę.
+
+Powody są dwa i są różnego rodzaju. Zacznij od taniego. Słownik o rozmiarze
+$\val{p18.vocab}$: ile pracy jest w uczciwej drodze dwukrokowej, a ile w
+$\vect{p} - \vect{y}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Około $\val{p18.fuse.twostep}$ operacji wobec $\val{p18.fuse.fused}$
+\dash{} czynnik $\val{p18.fuse.ratio}$.
+\end{ansblock}
+
+Droga dwukrokowa tworzy jakobian, który ma jeden wpis na \emph{parę} klas, i
+go stosuje. Droga połączona to $\val{p18.vocab}$ odejmowań i żadnego
+mnożenia.
+
+A jakobian ma $\val{p18.fuse.gib}$ GiB przy dwóch bajtach na liczbę, więc
+jest to \enquote{nikt nie tworzy jakobianu} z Programu~\ref{prog:P16}
+docierające do najczęściej używanego wyprowadzenia w tej dziedzinie. Różnicę
+wobec tamtego przypadku warto zauważyć: tam iloczyn, którego ludzie chcieli,
+był tani, a tu iloczyn zwija się do odejmowania, co jest jeszcze lepsze.
+
+\mermaidfig{p18-two-routes}{Dwie drogi do tego samego gradientu.}{dwie drogi}
+\end{fr}
+
+\begin{fr}
+Teraz powód, który przeżywa, i nie chodzi w nim wcale o szybkość.
+
+Przy zwykłych wynikach obie drogi zgadzają się do $\val{p18.agree.bound}$,
+więc nie jest to twierdzenie, że jedna jest dokładniejsza. Spójrz jeszcze raz
+na pierwszy krok drogi dwukrokowej \dash{} $\partial L/\partial p_c = -1/p_c$
+\dash{} i powiedz, co poda mu w końcu przebieg treningowy.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$p_c$ równe zeru. Wcześnie w przebiegu model kładzie prawie żadnego
+prawdopodobieństwa na właściwą odpowiedź, a \enquote{prawie żadne} wpada w
+niedomiar.
+\end{ansblock}
+
+Oto wynik o $\val{p18.bad.logit}$ poniżej największego, z prawdziwą klasą na
+końcu:
+
+\transcript{p18-fused-or-not}
+
+\textbf{Droga połączona zwraca zwyczajny gradient, a droga dwukrokowa zgłasza
+błąd.} A gradient, który zwraca, jest najbardziej informatywnym z możliwych:
+model nie położył masy na właściwej odpowiedzi, więc poprawka jest tak duża,
+jak tylko może być.
+\end{fr}
+
+\begin{fr}
+Ten próg nie jest własnością $\softmax$. Powiedz, skąd się bierze i co by go
+przesunęło.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Z niedomiaru funkcji wykładniczej: poniżej mniej więcej $\val{p18.cliff}$ pod
+największym wynikiem $e^{z_c - \max z}$ jest dokładnie zerem w binary64, więc
+$p_c$ też. Węższy format przesuwa go znacznie bliżej.
+\end{ansblock}
+
+To jest podłoga z Programu~\ref{prog:P01} docierająca do najczęściej
+używanego wyprowadzenia w dziedzinie, a skrypt znajduje ten próg przez
+bisekcję, zamiast go cytować, więc zmiana formatu zmienia liczbę na stronie.
+
+\begin{trapbox}
+\textbf{\enquote{Wersja połączona to optymalizacja.}} Jest tańsza, a gdyby to
+była cała historia, mógłbyś zostawić drogę dwukrokową dla jasności i za nią
+zapłacić.
+
+Nie możesz, bo obie drogi nie są tą samą funkcją. Jedna jest określona w
+wierszach, w których druga nie jest, a wiersze, w których się różnią, to te,
+które przebieg spotyka \emph{wcześnie}, gdy model jest najgorszy, a gradient
+liczy się najbardziej. \enquote{Stabilna numerycznie} znaczy to, co ustalił
+Program~\ref{prog:P02}: nie dokładniejsza, tylko bezpieczna na wejściach,
+których nie wypróbowałeś.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedno i domyka to pętlę z sekcji 1.
+
+Gradient połączony to $\vect{p} - \vect{y}$, a gradient połączony dla wag to
+$(\vect{p} - \vect{y})\vect{x}\T$. W drugim układzie ten drugi zapisuje się
+odwrotnie.
+
+Czy to zmienia to, co liczy program?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Zmienia to, co trzeba napisać, żeby kształty się zgodziły, i nic w
+arytmetyce.
+\end{ansblock}
+
+Co jest tezą tego programu w jednej linijce: matematyką są pochodne
+cząstkowe, konwencją jest to, jak się je układa, a rachunek macierzowy ma
+swoją reputację dlatego, że jedno bywa mylone z drugim.
+
+\textbf{Trzy rzeczy warte wyniesienia z tego programu to: gradient skalara ma
+kształt tego, po czym się różniczkuje; gradient wagi jest iloczynem
+zewnętrznym; a entropia krzyżowa przez $\softmax$ to $\vect{p} - \vect{y}$.}
+Wszystko inne wyprowadzono tutaj z nich w linijkę albo dwie.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Pochodna po wektorze nie definiuje niczego nowego;
+  potrzebuje układu.} Ta książka używa \textbf{układu licznikowego} \dash{}
+  jeden wiersz na wyjście \dash{} zadeklarowanego, a nie przyjętego
+  milcząco.}
+\sumitem{3--4}{\textbf{W nim $\partial(W\vect{x})/\partial\vect{x}$ jest samym
+  $W$}, sprawdzone do $\val{p18.layout.bound}$. Konwencji, która z
+  najłatwiejszego przypadku robi tożsamość, warto się trzymać.}
+\sumitem{5--6}{\textbf{Oba układy dzieli jedna transpozycja},
+  $\val{p18.n.out} \times \val{p18.n.in}$ wobec $\val{p18.n.in} \times \val{p18.n.out}$. Żaden nie jest błędny;
+  błędem jest mieszanie ich w jednym wyprowadzeniu, a ujawnia się to jako
+  błąd kształtu daleko od miejsca zmieszania.}
+\sumitem{8--9}{\textbf{Gradient skalara ma kształt tego, po czym się
+  różniczkuje}, w obu układach. To sprawdzenie dostępne, zanim pochodna
+  zostanie zapisana.}
+\sumitem{10}{\textbf{Transponowanie, aż ruszy, się kończy}, i dlatego ten
+  nawyk trwa \dash{} a przestaje działać w chwili, gdy dwa wymiary są równe,
+  bo wtedy zła transpozycja też rusza.}
+\sumitem{11--12}{$\partial L/\partial W = 2\vect{r}\vect{x}\T$ dla błędu
+  kwadratowego, sprawdzone do $\val{p18.sq.bound}$.}
+\sumitem{13--14}{\textbf{Gradient wagi jest iloczynem zewnętrznym},
+  $\vect{g}\vect{x}\T$, dla dowolnej straty \dash{} i potrzebuje wejścia
+  warstwy, przez co przebieg wstecz potrzebuje aktywacji przebiegu w przód.}
+\sumitem{15--16}{\textbf{Pochodna $\softmax$ jest $n\times n$}, bo każde
+  wyjście dzieli mianownik z każdym wejściem.}
+\sumitem{16--17}{$J = \diag(\vect{p}) - \vect{p}\vect{p}\T$, sprawdzone do
+  $\val{p18.jac.bound}$.}
+\sumitem{18--19}{\textbf{Każdy wiersz $J$ sumuje się do zera}:
+  prawdopodobieństwa sumują się do $1$, cokolwiek robią wyniki, po
+  zróżniczkowaniu. $\softmax$ przesuwa prawdopodobieństwo i nigdy nie robi go
+  więcej.}
+\sumitem{20--21}{Przy $n = 2$ sprowadza się do $\sigma'(a-b)$, na
+  $\val{p18.gate.f07.pairs}$ parach \dash{} zróżniczkowana tożsamość z
+  Programu~\ref{prog:F07}, brama, a nie podobieństwo.}
+\sumitem{22}{\textbf{Entropia krzyżowa jest tu zdefiniowana, a uzasadniona
+  później}: $-\sum_j y_j \ln p_j$, czyli $-\ln p_c$ dla celu one-hot.
+  Program~\ref{prog:P26} mówi, dlaczego to właściwa rzecz do minimalizowania,
+  a Program~\ref{prog:P30}, co ona mierzy.}
+\sumitem{23--25}{\textbf{Gradient wynosi $\vect{p} - \vect{y}$}, a
+  wyprowadzenie jest jednym skróceniem: $1/p_c$ z pierwszego kroku spotyka
+  $p_c$ na przekątnej jakobianu.}
+\sumitem{26--27}{Czytane jako polecenie: obniż każdy wynik proporcjonalnie do
+  prawdopodobieństwa, które ma, podnieś prawdziwy o to, którego mu brakuje.
+  Poprawka jest wielkością pomyłki.}
+\sumitem{28--29}{Warstwę wstecz, $\partial L/\partial W =
+  (\vect{p}-\vect{y})\vect{x}\T$, sprawdzone do $\val{p18.cew.bound}$.}
+\sumitem{30--31}{\textbf{Normalizacja warstwowa też nie działa po
+  współrzędnych}, bo średnia i wariancja zależą od każdego wejścia; jej
+  gradient niesie dwa człony poprawkowe, sprawdzone do
+  $\val{p18.ln.bound}$.}
+\sumitem{32--33}{\textbf{Łączenie, powód pierwszy: koszt.}
+  $\val{p18.fuse.ratio}$ razy mniej operacji, a jakobian, którego nikt nie
+  tworzy, miałby $\val{p18.fuse.gib}$ GiB.}
+\sumitem{34--35}{\textbf{Powód drugi i nie chodzi w nim o szybkość}: droga
+  dwukrokowa tworzy $-1/p_c$, a $p_c$ wpada w niedomiar do zera, podczas gdy
+  $\vect{p}-\vect{y}$ nigdy nie tworzy odwrotności.}
+\sumitem{36--37}{Urwisko jest mniej więcej $\val{p18.cliff}$ pod największym
+  wynikiem, czyli na podłodze z Programu~\ref{prog:P01}. \textbf{Obie drogi
+  nie są tą samą funkcją} i różnią się dokładnie tam, gdzie przebieg jest
+  najgorszy.}
+\sumitem{38--39}{\textbf{Matematyką są pochodne cząstkowe, a konwencją to,
+  jak się je układa}; rachunek macierzowy ma swoją reputację dlatego, że
+  jedno bywa mylone z drugim.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Warstwa liczy $\vect{z} = W\vect{x}$ przy $W$ o kształcie
+  $256 \times 1024$. Podaj kształt $\partial L/\partial W$ oraz
+  $\partial \vect{z}/\partial\vect{x}$ w układzie licznikowym.
+  \answerto{$\partial L/\partial W$ ma $256 \times 1024$, czyli kształt $W$,
+  bo $L$ jest skalarem. $\partial\vect{z}/\partial\vect{x}$ ma też
+  $256 \times 1024$ \dash{} jeden wiersz na wyjście, jedna kolumna na
+  wejście \dash{} i jest samym $W$. To, że oba się tu zgadzają, jest
+  przypadkiem tej warstwy, a nie regułą.}
+\item Klasyfikator na $10$ klasach przewiduje
+  $\vect{p} = (\num{0.7}, \num{0.2}, \num{0.1}, 0, \ldots)$, a prawdziwa
+  klasa jest druga. Podaj gradient po wynikach.
+  \answerto{$\vect{p} - \vect{y} = (\num{0.7}, -\num{0.8}, \num{0.1}, 0,
+  \ldots)$. Prawdziwa klasa jest pchana w górę o $\num{0.8}$ brakującego
+  prawdopodobieństwa, a każda inna w dół o to, które trzyma; wpisy sumują się
+  do zera, w czym przebijają sumy wierszy jakobianu $\softmax$.}
+\item Dlaczego nie da się sprawdzić jakobianu $\softmax$ przez sprawdzenie,
+  że jest diagonalny?
+  \answerto{Bo nie jest diagonalny i o to w nim chodzi: każde wyjście dzieli
+  mianownik z każdym wejściem, więc podniesienie jednego wyniku obniża każde
+  inne prawdopodobieństwo. Tanim sprawdzeniem są sumy wierszy, które muszą
+  być zerami, bo prawdopodobieństwa sumują się do jedynki dla każdego
+  wejścia.}
+\item Ktoś donosi, że sprawdzenie gradientu przechodzi dla błędu kwadratowego
+  i nie przechodzi dla tej samej sieci z entropią krzyżową, na wsadzie, na
+  którym model jest bardzo w błędzie. Podaj pierwszą rzecz, na jaką byś
+  spojrzał.
+  \answerto{Czy $\softmax$ i entropia krzyżowa liczone są osobno. Droga
+  dwukrokowa tworzy $-1/p_c$, a na wsadzie, na którym model jest bardzo w
+  błędzie, $p_c$ wpada w niedomiar do zera. To nie jest błąd w sprawdzeniu
+  gradientu ani błąd w sieci: to dwie operacje, które muszą być jedną.}
+\item Wypisz, dlaczego $\partial L/\partial W = \vect{g}\,\vect{x}\T$ mówi
+  coś także o pamięci, a nie tylko o arytmetyce.
+  \answerto{Bo utworzenie tego potrzebuje $\vect{x}$, czyli własnego wejścia
+  warstwy, które wyprodukował przebieg w przód, a konsumuje przebieg wstecz.
+  Aktywacje trzeba więc trzymać albo przeliczać, co jest arytmetyką punktów
+  kontrolnych z Programu~\ref{prog:P16} \dash{} tożsamość i rachunek za
+  pamięć to jeden fakt widziany dwa razy.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że $\vect{p} - \vect{y}$ sumuje się do zera dla dowolnego
+  przewidywania i dowolnego celu one-hot, i powiedz, co to znaczy dla wyników.
+  \answerto{Wpisy $\vect{p}$ sumują się do $1$ i wpisy $\vect{y}$ sumują się
+  do $1$, więc różnica sumuje się do $0$. Spadek gradientu przesuwa więc
+  wyniki w kierunkach, które się znoszą: prawdopodobieństwo jest
+  redystrybuowane, a nie tworzone, co jest sumami wierszy $\softmax$
+  pojawiającymi się na poziomie kroku. Znaczy to też, że dodanie stałej do
+  każdego wyniku niczego nie zmienia, co Program~\ref{prog:F07} udowodnił z
+  drugiej strony.}
+\item Wyprowadź gradient \code{log\_softmax} po wynikach i powiedz, dlaczego
+  implementacja woli go od brania logarytmu po fakcie.
+  \answerto{$\partial(\ln p_i)/\partial z_j = \delta_{ij} - p_j$, czyli
+  jakobian $\softmax$ podzielony wierszami przez $p_i$ \dash{} i zauważ, że
+  odwrotność skraca się także tutaj. Implementacja woli go, bo
+  $\ln \softmax$ to $z_j - \logsumexp(\vect{z})$, co nigdy nie tworzy
+  prawdopodobieństwa mogącego wpaść w niedomiar, zanim zobaczy je logarytm.
+  To ten sam argument co w sekcji 5 tego programu, o krok wcześniej.}
+\item Jeśli wzór z pracy na gradient wagi brzmi $\vect{x}\,\vect{g}\T$, a ta
+  książka pisze $\vect{g}\,\vect{x}\T$, co powinieneś stąd wywnioskować?
+  \answerto{Prawie na pewno, że praca używa układu mianownikowego, a wtedy
+  oba są tym samym stwierdzeniem. Sprawdź, patrząc na dowolną \emph{inną}
+  pochodną w tej pracy \dash{} to, czy jej jakobian odwzorowania liniowego
+  jest tą macierzą, czy jej transpozycją, rozstrzyga sprawę w jednej
+  linijce. Czego nie należy robić, to transponować jeden wzór, żeby pasował,
+  i zostawić resztę wyprowadzenia w drugim układzie.}
+\item Jakobian $\softmax$ jest symetryczny. Pokaż to i powiedz, czy jest to
+  ogólna własność jakobianu.
+  \answerto{$p_i(\delta_{ij} - p_j) = p_i\delta_{ij} - p_ip_j$, a oba człony
+  nie zmieniają się przy zamianie $i$ i $j$. Ogólna nie jest wcale \dash{}
+  jakobian nie musi być nawet kwadratowy. Zachodzi tu dlatego, że to
+  odwzorowanie jest gradientem czegoś: $\softmax$ jest gradientem
+  $\logsumexp$, a Program~\ref{prog:P17} pokazał, że pochodna gradientu jest
+  symetryczna.}
+\item Dlaczego ten program wyprowadza pięć tożsamości, zamiast podać ich
+  tabelę?
+  \answerto{Bo tabeli trzeba zaufać, a wyprowadzenie da się sprawdzić, i
+  każda z tych pięciu jest trzy linijki od pochodnej cząstkowej branej po
+  jednym wpisie naraz. Czytelnik, który zrobił to raz, wyprowadzi szóstą;
+  czytelnik z tabelą musi szukać szóstej w cudzej tabeli, zapisanej w
+  układzie, którego nikt nie podał.}
+\end{furtherproblems}

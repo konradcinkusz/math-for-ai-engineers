@@ -2182,3 +2182,73 @@ between the two uses in one sentence: in the step-size bound the curvature
 appears alongside something with the same units and the pair is invariant though
 neither member is; in a sharpness claim it is quoted alone. The right question
 about a curvature is never *is it big* but *compared with what*. → **P17**.
+
+**193. "The gradient of a scalar loss with respect to a weight matrix is some
+shape or other; I'll transpose until it runs."** That works, which is why the
+habit survives: with two shapes to try, guessing terminates. It stops working
+the moment two dimensions are equal — a square weight matrix, an attention head
+with as many keys as queries, a batch size that matches a width — because then
+the *wrong* transpose runs too, and you have a program that trains to a loss
+that will not fall with nothing in it that raises. The gradient of a scalar has
+the shape of the thing it is taken with respect to, in either convention, and
+that check is available before the derivative is written down. → **P18**.
+
+**194. "These two accounts of backpropagation disagree; one of them is
+wrong."** Probably neither. They are written in the two layout conventions,
+which differ by exactly one transpose: numerator layout puts one row per
+output, denominator layout is that table transposed. Neither is more correct
+and both are common — it is a split between disciplines, not between countries.
+What is wrong is mixing them inside one derivation, and it shows up as a shape
+error far from where the mixing happened. → **P18**.
+
+**195. "Matrix calculus is a separate subject with its own rules."** It is
+bookkeeping plus that convention. Every identity in it is a partial derivative
+taken one entry at a time and then arranged: `d(Wx)/dx` is `W` because
+`dy_i/dx_j = W_ij`; a weight's gradient is an outer product `g x^T` because the
+weight multiplies the input. A table of identities has to be trusted and a
+three-line derivation can be checked, which is why the table is the thing to be
+suspicious of — especially since it will be written in a convention nobody
+stated. → **P18**.
+
+**196. "The softmax has a derivative, so I can multiply by it elementwise."**
+Its derivative is a full `n × n` matrix, `diag(p) − p pᵀ`, because every output
+shares a denominator with every input: raise one score and every other
+probability falls. The cheapest check on any implementation of it is that every
+row sums to zero, which is "the probabilities sum to one" differentiated — a
+softmax moves probability around and can never make more of it. → **P18**.
+
+**197. "The p − y in the cross-entropy gradient is a happy coincidence."** It
+is one cancellation, and the cancellation is the content. Differentiating
+`−ln p_c` gives `−1/p_c`; the softmax Jacobian's row carries a factor `p_c`;
+the two meet and the reciprocal disappears. Read as an instruction the result
+is exactly what you would want: lower every score in proportion to the
+probability it holds, raise the true one by the probability it lacks, so the
+size of the correction is the size of the mistake. → **P18**.
+
+**198. "Fusing the softmax and the cross-entropy is an optimisation."** It is
+cheaper — about 50 001 times fewer operations at a vocabulary of 50 000, and
+the Jacobian nobody forms would be 5 GiB — but if that were the whole story you
+could keep the two-step route for clarity and pay for it. You cannot, because
+the two are not the same function. The two-step route forms `−1/p_c`, and once
+a logit falls about 744 below the largest, `p_c` underflows to exactly zero in
+float64 and the route divides by zero. The fused route never forms the
+reciprocal and returns an ordinary, maximally informative gradient. The rows
+where they differ are the rows a run meets *early*, when the model is worst.
+That is Program P01's floor and Program P02's sense of "numerically stable" —
+not more accurate, but safe on inputs you have not tried. → **P18**.
+
+**199. "A gradient check that fails means the gradient is wrong."** Not if it
+fails only on the batches where the model is badly wrong and passes on the
+others, and not if it passes for a squared error on the same network. That
+pattern is the signature of the previous item: a softmax and a cross-entropy
+computed as two operations rather than one. The check is doing its job; what it
+found is not in the network. → **P18**, resting on **P16**'s account of what a
+finite-difference check can and cannot see.
+
+**200. "Layer normalisation scales each input, so its gradient is a scale."**
+The mean and the variance are computed over the whole vector, so every output
+depends on every input and the derivative is no more elementwise than the
+softmax's. Its gradient carries two correction terms, one from the mean and one
+from the variance, and an implementation that applies `1/s` and stops is wrong
+in a way that trains anyway — slowly, and for a reason nobody will find in the
+loss curve. → **P18**.

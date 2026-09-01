@@ -2318,9 +2318,21 @@
 %  column of forty entries and invisible between two index lines. The
 %  prediction two paragraphs up has now been right three times running; treat
 %  the number as a function of the index's length and nothing else.
+%  AND AT P18, the fourth raise in four programs -- 10.6 pt in one column of
+%  `main-pl.ind`, two and a half points to three and a half. Four data points
+%  are enough to see the shape, and it is worth writing down: 0.5, 0.9, 1.5,
+%  2.5, 3.5. The requirement grows with the index, the index grows with the
+%  programs, and twenty-nine programs remain. Extrapolated, this constant
+%  reaches ten points or so by the end of the book, and ten points of shrink
+%  between two index lines is no longer invisible -- it is a visibly tighter
+%  column. So the recorded advice (raise it and do not look for a cleverer
+%  fix) is right for now and has a horizon: somewhere before Part IX this
+%  needs a structural answer instead, most likely letting the index set to a
+%  shorter measure or accepting a short final column explicitly. Recorded
+%  here rather than discovered at P30.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 2.5pt}}{}{%
+  \setlength{\parskip}{0pt plus 0.3pt minus 3.5pt}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex
