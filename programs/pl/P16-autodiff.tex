@@ -1,29 +1,862 @@
-%% P16 --- Jakobian, reguła łańcuchowa i różniczkowanie automatyczne
+%% P16 --- Jakobiany, regula lancuchowa i rozniczkowanie automatyczne
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Kazda liczba w tym programie, ktorej czytelnik nie policzy w pamieci,
+%% pochodzi z code/p16_autodiff.py i trafia na strone przez \val{}. Listing
+%% konsolowy to zatwierdzony transkrypt zapisany przez ten skrypt.
+%%
+%% TEZA: to, ktory tryb jest tanszy, jest pytaniem o KSZTALT i o nic wiecej.
+%% Regula lancuchowa mnozy jakobiany; mnozenie jest laczne, ale jego KOSZT nie
+%% jest, co zmierzyl Program P06; wiec dwa sposoby nawiasowania tego samego
+%% iloczynu to tryb w przod i tryb odwrotny, a skalarna strata przy wielu
+%% parametrach czyni jeden z nich tanszym o czynnik rowny liczbie parametrow.
+%%
+%% CO TEN PROGRAM DOSTAJE, odczytane z plikow, a nie zapamietane:
+%%   F12  daje regule lancuchowa i iloczyn po warstwach, a o sigma'
+%%        wyrazalnej przez sigma mowi, ze "jest zalazkiem tego, co Program P16
+%%        nazywa trybem odwrotnym". Nazywa tez dwie rzeczy, za ktore ten
+%%        program jest winien arytmetyke: aktywacje trzeba przechowac, a
+%%        checkpointing wymienia przeliczanie na pamiec.
+%%   P06  JUZ ZMIERZYL NAWIASOWANIE -- jeden iloczyn potrojny, dwa
+%%        nawiasowania, identyczne odpowiedzi, czynnik 500 w koszcie. To JEST
+%%        wynik tego programu o jeden program wczesniej, wiec stosunek jest
+%%        BRAMKOWANY wzgledem zatwierdzonych wartosci P06.
+%%   P13  daje DAG i twierdzenie, ze kazdy porzadek topologiczny liczy te same
+%%        wartosci, co pozwala trybowi odwrotnemu isc wstecz.
+%%   P15  daje gradient, ktory jest jednowierszowym jakobianem.
+%%   P03  juz NAZYWA aktywacje i checkpointing i mowi, ze wymiana to operacje
+%%        za bajty. Nie robi arytmetyki. Ten program jest winien dokladnie ja
+%%        i nie moze powtarzac pojecia.
+%%
+%% CZEGO NIE RUSZA, sprawdzone wzgledem tools/programs.json:
+%%   hesjan, krzywizna i ograniczenie na krok                     -> P17
+%%   rachunek macierzowy, gradient softmax-cross-entropy          -> P18
+%%   optymalizatory                                               -> P20
+%%   strumien rezydualny                                          -> P32
+%%
+%% ZADNA BIBLIOTEKA NIE JEST NAZWANA, zgodnie z regula z F04, ze wnetrzosci
+%% frameworka sa faktem o wersji. Tutaj jest rozniczkowanie w trybie odwrotnym
+%% w jakichs czterdziestu liniach, ktore pokazuje kazde twierdzenie, w tym
+%% wszystkie trzy ciche awarie -- znacznie bardziej przekonujaco pokazane niz
+%% orzeczone.
+%%
+%% Blizniak: programs/en/P16-autodiff.tex. Ramka w ramke, makro w makro,
+%% liczba w liczbe; tools/parity.py je porownuje.
 
-\program{Jakobian, reguła łańcuchowa i różniczkowanie automatyczne}
+\program[Jakobiany i różniczkowanie automatyczne]{Jakobiany, reguła
+  łańcuchowa i różniczkowanie automatyczne}
 \label{prog:P16}
+\index{autodiff}
+\index{Jacobian}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{powiedzieć, jakiego kształtu jest pochodna funkcji o wartościach
+  wektorowych i dlaczego gradient jest jej przypadkiem szczególnym}
+\outcome{9--15}{powiedzieć, co reguła łańcuchowa robi z tymi macierzami i
+  dlaczego nikt żadnej z nich nie tworzy}
+\outcome{16--22}{powiedzieć, który z dwóch trybów jest tańszy dla danego
+  zadania, z samego jego kształtu}
+\outcome{23--29}{powiedzieć, co tryb odwrotny musi przechować, ile to kosztuje
+  i co kupuje przeliczenie części tego}
+\outcome{30--38}{nazwać trzy sytuacje, w których otrzymana liczba nie jest
+  pochodną, o którą ci chodziło, i nic tego nie mówi}
+\end{outcomes}
 
-Argument: for vector-valued functions the chain rule multiplies Jacobians;
-nobody forms a Jacobian; forward mode computes a Jacobian--vector product
-and reverse mode a vector--Jacobian product, and which is cheaper depends
-only on the shape of the problem. Payoff: **what \code{loss.backward()}
-actually computes**, in full: why a scalar loss with many parameters makes
-reverse mode cheaper by a factor of the parameter count; why reverse mode
-must keep the activations, so memory scales with depth and batch; gradient
-checkpointing as an explicit trade of recomputation for memory, with the
-arithmetic done; why a numerical finite-difference gradient is a testing
-tool and not an implementation; the three places autodiff silently gives you
-something other than the derivative you meant (a non-differentiable point, a
-detached tensor, an in-place write).
+\begin{quiz}
+\item Funkcja bierze $m$ wejść i zwraca $n$ wyjść. Jakiego kształtu jest jej
+  pochodna? \teachesat{1--2}
+  \answerto{Macierzą $n \times m$ \dash{} jeden wiersz na wyjście, jedna
+  kolumna na wejście. Nazywa się jakobianem, a gradient z
+  Programu~\ref{prog:P15} to przypadek $n = 1$.}
+\item Dlaczego framework nie liczy jakobianu sieci? \teachesat{13--14}
+  \answerto{Bo miałby jeden wiersz na wyjście i jedną kolumnę na parametr, co
+  dla prawdziwego modelu jest macierzą, której nikt nie przechowa. Liczony
+  jest \emph{iloczyn} z nim, który ma rozmiar parametrów i nie większy.}
+\item Trening używa trybu odwrotnego, a nie trybu w przód. Jaki fakt o
+  zadaniu o tym decyduje? \teachesat{17--18}
+  \answerto{Jego kształt i nic więcej: wiele wejść, jedno wyjście. Tryb w
+  przód kosztuje jeden przebieg na wejście, a odwrotny jeden na wyjście, więc
+  przy skalarnej stracie odwrotny wygrywa o czynnik równy liczbie parametrów.}
+\item Dlaczego tryb odwrotny potrzebuje więcej pamięci niż sam przebieg w
+  przód? \teachesat{23--24}
+  \answerto{Bo praca wstecz potrzebuje własnego wejścia każdej warstwy, a te
+  policzono w drodze w przód. Trzeba je przechować, więc pamięć rośnie z
+  głębokością i z rozmiarem batcha.}
+\item Twoje sprawdzenie gradientu zgadza się do czterech miejsc po przecinku, a
+  nie do piętnastu. Czy implementacja jest błędna? \teachesat{28--29}
+  \answerto{Prawie na pewno nie. Różnica skończona to przyrząd testowy z
+  własną podłogą błędu \dash{} Program~\ref{prog:F11} ją zmierzył \dash{} więc
+  zgodność do kilku cyfr jest tym, jak wygląda poprawna implementacja.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 65 ramek.
-}
+% ============================================================
+\section{Jakiego kształtu jest pochodna}
+\label{sec:P16-jacobian}
+\index{Jacobian}
+
+\begin{fr}
+Program~\ref{prog:P15} różniczkował funkcję wielu wejść zwracającą jedną
+liczbę i zebrał pochodne cząstkowe w gradient.
+
+Warstwa sieci nie zwraca jednej liczby. Bierze wektor i zwraca wektor. Pytanie,
+od którego zaczyna ten program, jest więc oczywiste: jeśli $f$ bierze $m$ wejść
+i zwraca $n$ wyjść, ile jest pochodnych cząstkowych i jak byś je ułożył?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jest ich $n \times m$ \dash{} po jednej na każdą parę wyjście--wejście
+\dash{} i układają się w macierz o jednym wierszu na wyjście i jednej kolumnie
+na wejście.
+\end{ansblock}
+
+Ta macierz to \textbf{jakobian}, zapisywany $J$ albo
+$\frac{\partial f}{\partial x}$:
+\[ J_{ij} = \frac{\partial f_i}{\partial x_j} \]
+Wiersz $i$ to gradient $i$-tego wyjścia. Kolumna $j$ mówi, co dzieje się ze
+wszystkim, gdy poruszyć wejście $j$.
+
+\mermaidfig{p16-jacobian-shape}{Wiersze to wyjścia, kolumny to
+wejścia.}{kształt pochodnej}
+\end{fr}
+
+\begin{fr}
+Sprawdź to wobec tego, co już masz. Czym jest jakobian funkcji o dokładnie
+jednym wyjściu?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Pojedynczym wierszem \dash{} czyli gradientem z Programu~\ref{prog:P15}.
+\end{ansblock}
+
+Gradient nie jest więc innym obiektem; jest jakobianem przypadku, który liczy
+się najbardziej, a każde zdanie, które P15 o nim udowodnił, jest zdaniem o
+macierzy jednowierszowej.
+
+\begin{note}
+Jest tu konwencja transpozycji kosztująca ludzi popołudnie. Gradient zapisuje
+się zwykle jako wektor \emph{kolumnowy}, a pojedynczy wiersz jakobianu jest
+wektorem \emph{wierszowym}, więc oba różnią się o transpozycję.
+
+Nic matematycznego od tego nie zależy i ta książka nie będzie się tym zajmować,
+ale warto wiedzieć, że tam zwykle mieszka niezgoda między dwoma podręcznikami.
+Program~\ref{prog:P18} musi na to uważać, bo różniczkuje wyrażenia macierzowe;
+tutaj nie zmienia to nic.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Jeszcze jeden, bo to przypadek, którym jest cała warstwa. Czym jest jakobian
+odwzorowania liniowego $f(x) = Ax$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Samym $A$}
+Bo $f_i = \sum_j A_{ij} x_j$, więc $\partial f_i / \partial x_j$ wynosi
+$A_{ij}$, co jest definicją $A$.
+
+\textbf{Odwzorowanie liniowe jest własną pochodną}, co jest dokładnie tym, co
+Program~\ref{prog:F11} powiedział o prostej w jednym wymiarze, tym samym
+zdaniem o jeden wymiar wyżej. Dlatego też jakobian warstwy liniowej sieci nie
+kosztuje myślenia: jest macierzą wag, już w pamięci.
+
+\begin{aibox}
+Ciekawe jakobiany w sieci to te, które nie są macierzami wag. Aktywacja
+działająca po współrzędnych ma jakobian \emph{diagonalny}, bo wyjście $i$
+zależy od wejścia $i$ i od niczego więcej \dash{} więc jej $n^{2}$ wpisów to
+$n$ liczb i $n^{2} - n$ zer.
+
+To pierwsza zapowiedź całego argumentu tego programu: użyteczną rzeczą w
+jakobianie prawie nigdy nie są jego wpisy. Jest nią to, co robi mnożenie przez
+niego, i jak tanio.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Zanim pójdziemy dalej, jedno sprawdzenie rozmiaru. Sieć o
+$\val{p16.params}$ parametrach i skalarnej stracie. Jakich wymiarów jest
+jakobian straty względem parametrów i ile to liczb?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jeden wiersz i $\val{p16.params}$ kolumn \dash{} czyli jest to gradient i ma
+rozmiar modelu.
+\end{ansblock}
+
+Co jest dużo, ale jest dokładnie tym, czego się spodziewałeś, bo to jedna
+liczba na parametr, a to już wiedziałeś, że dostaniesz.
+
+Zatrzymaj tę myśl, bo następna sekcja jest o jakobianie, który \emph{nie} ma
+rozmiaru modelu, i o tym, co robi się zamiast tworzenia go.
+\end{fr}
+
+% ============================================================
+\section{Reguła łańcuchowa je mnoży, a nikt żadnego nie tworzy}
+\label{sec:P16-chain}
+\index{autodiff!chain rule}
+
+\begin{fr}
+Program~\ref{prog:F12} dał regułę łańcuchową dla jednej zmiennej: zróżniczkuj
+zewnętrzną, pomnóż przez pochodną wewnętrznej.
+
+Dla funkcji o wartościach wektorowych to samo zdanie zachodzi z jednym słowem
+zmienionym. Jeśli $y = g(f(x))$, to
+\[ J_{g \circ f}(x) = J_g\bigl(f(x)\bigr)\; J_f(x) \]
+\dash{} jakobiany się \emph{mnożą}, w tej kolejności.
+
+Dlaczego w tej, a nie w odwrotnej? Odpowiedź jest w
+Programie~\ref{prog:P06}.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo Program~\ref{prog:P06} pokazał, że mnożenie macierzy jest składaniem, a
+kształty pasują tylko w jedną stronę.
+\end{ansblock}
+
+$J_f$ odwzorowuje przestrzeń wejść w środkową; $J_g$ środkową w wyjściową; więc
+$J_g J_f$ jest odwzorowaniem z wejścia w wyjście, a $J_f J_g$ zwykle nie jest
+nawet określone. Reguła łańcuchowa jest składaniem odwzorowań liniowych i
+niczym więcej.
+
+\textbf{Sieć o $L$ warstwach ma więc jakobian będący iloczynem $L$ macierzy},
+po jednej na warstwę, i jest to iloczyn po warstwach z
+Programu~\ref{prog:F12} ze słowem \enquote{liczba} zastąpionym wszędzie słowem
+\enquote{macierz}.
+\end{fr}
+
+\begin{fr}
+Teraz pytanie praktyczne i to ono zmienia notację w inżynierię.
+
+Weź warstwę o $\val{p16.width}$ wejściach i $\val{p16.width}$ wyjściach, w
+stosie o głębokości $\val{p16.depth}$. Jak duży jest każdy jakobian i ile
+kosztowałoby utworzenie całego iloczynu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Każdy jest $\val{p16.width} \times \val{p16.width}$, a utworzenie iloczynu
+oznacza przemnożenie $\val{p16.depth}$ z nich.
+\end{ansblock}
+
+Przy tych rozmiarach to nic. Teraz wstaw prawdziwą warstwę: szerokość kilku
+tysięcy zamiast $\val{p16.width}$ i głębokość w dziesiątkach.
+
+\textbf{Każdy jakobian jest wtedy macierzą milionów wpisów, a jest ich po
+jednym na warstwę.} Nikt tego nie przechowuje i nikt nie musi \dash{} bo
+odpowiedź, której naprawdę chcesz, nie jest iloczynem. Jest iloczynem
+\emph{zastosowanym do czegoś}.
+\end{fr}
+
+\begin{fr}
+To zdanie, na którym obraca się reszta programu, więc warto być co do niego
+precyzyjnym.
+
+Nigdy nie chcesz $J$. Chcesz albo $Jv$ dla jakiegoś kierunku $v$, albo
+$u^{\mathsf{T}}J$ dla jakiejś wagi $u$. Oba są wektorami, a nie macierzami.
+
+Mając łańcuch $J_3 J_2 J_1$ i wektor $v$, zapisz dwa różne sposoby
+nawiasowania obliczenia $J_3 J_2 J_1 v$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$J_3(J_2(J_1 v))$, pracując od prawej; albo $(J_3 J_2) J_1$, a potem
+zastosowanie tego do $v$, pracując od lewej.
+\end{ansblock}
+
+Oba dają tę samą odpowiedź, bo mnożenie macierzy jest łączne. Nie kosztują tyle
+samo, a Program~\ref{prog:P06} zmierzył dokładnie to: jedno nawiasowanie
+iloczynu potrójnego kosztowało $\val{p06.cost.left}$ mnożeń, a drugie
+$\val{p06.cost.right}$, czyli czynnik $\val{p06.cost.ratio}$, przy identycznym
+wyniku.
+
+\textbf{Ten pomiar jest całym tematem tego programu, wzięty o jeden program
+przed tym, jak zyskał nazwę.} Nawiasowanie od prawej to tryb w przód.
+Nawiasowanie od lewej to tryb odwrotny. Skrypt bramkuje tutejszy stosunek
+wobec zatwierdzonych liczb P06, więc oba programy nie mogą się rozejść.
+
+\mermaidfig{p16-two-brackets}{Ten sam iloczyn, od któregokolwiek
+końca.}{dwa nawiasowania}
+\end{fr}
+
+\begin{fr}
+\begin{note}
+Zauważ, co nawiasowanie robi z kształtami, bo to cały mechanizm. Pracując od
+prawej, każdy wynik pośredni jest \emph{wektorem}: macierz razy wektor jest
+wektorem, więc nic większego niż warstwa liczb nigdy nie istnieje. Pracując od
+lewej wektorem wierszowym, to samo jest prawdą od drugiego końca.
+
+Praca od środka na zewnątrz utworzyłaby macierz i to jest rzecz, której żaden
+tryb nigdy nie robi. \textbf{Nikt nie tworzy jakobianu} nie jest uproszczeniem;
+jest zdaniem o tym, których nawiasów się używa.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Który koniec i dlaczego decyduje kształt}
+\label{sec:P16-modes}
+\index{autodiff!forward and reverse mode}
+
+\begin{fr}
+Nazwij oba kierunki porządnie, bo nazw używa się bez przerwy i mówią one, co
+robią.
+
+\textbf{Tryb w przód} zaczyna od końca wejściowego. Przepycha jeden kierunek
+$v$ przez cały łańcuch, a wychodzi $Jv$ \dash{} jak porusza się każde wyjście,
+gdy poruszyć wejścia wzdłuż $v$.
+
+\textbf{Tryb odwrotny} zaczyna od końca wyjściowego. Cofa jedną wagę $u$ przez
+cały łańcuch, a wychodzi $u^{\mathsf{T}}J$ \dash{} jak jedna ważona kombinacja
+wyjść zależy od każdego wejścia.
+
+Jeden przebieg trybu w przód daje jedną \emph{kolumnę}. Jeden przebieg
+odwrotnego daje jeden \emph{wiersz}. Gdybyś chciał cały jakobian, ile
+przebiegów potrzebowałby każdy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+W przód: jeden na wejście. Odwrotny: jeden na wyjście.
+\end{ansblock}
+
+I oto cała procedura decyzyjna. Nie ma nic wspólnego z siecią, danymi,
+frameworkiem ani sprzętem. To dwie liczby całkowite.
+
+\textbf{Wiele wejść i mało wyjść: odwrotny. Mało wejść i wiele wyjść: w
+przód.}
+
+Zastosuj to. Trening modelu liczy pochodną jednej skalarnej straty względem
+każdego parametru. Który tryb i o jaki czynnik?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Odwrotny, o czynnik równy liczbie parametrów.
+\end{ansblock}
+
+Jedno wyjście oznacza jeden przebieg odwrotny. $\val{p16.params}$ wejść
+oznaczałoby $\val{p16.params}$ przebiegów w przód. Czynnik nie jest duży, jest
+absurdalny: jest rozmiarem modelu.
+
+\textbf{Dlatego każda pętla treningowa na świecie używa trybu odwrotnego, i
+jest to konsekwencja tego, że strata jest jedną liczbą.} Nic innego z uczenia
+głębokiego nie bierze udziału w tym argumencie.
+
+\begin{aibox}
+Warto zauważyć, co zmieniłoby odpowiedź. Funkcja o jednym wejściu i wielu
+wyjściach \dash{} analiza wrażliwości na jeden parametr, powiedzmy \dash{}
+jest przypadkiem trybu w przód, a użycie tam odwrotnego byłoby tym samym
+absurdem w drugą stronę.
+
+Frameworki dostarczają obu z tego powodu. Powodem, dla którego używałeś tylko
+jednego, jest to, że trening ma dokładnie jeden kształt.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Pomiar, na łańcuchu dość małym, by policzyć dokładnie. Stos o głębokości
+$\val{p16.depth}$ i szerokości $\val{p16.width}$, kończący się jednym
+wyjściem, z każdym jakobianem będącym macierzą wymierną, więc nic się nie
+zaokrągla.
+
+Obie procedury liczą własne mnożenia w trakcie. Przewidź stosunek, zanim
+pójdziesz dalej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p16.mode.ratio}$, czyli liczba wejść}
+$\val{p16.fwd.muls}$ mnożeń w przód wobec $\val{p16.rev.muls}$ odwrotnych, dla
+gradientu \emph{identycznego} \dash{} orzeczonego dokładnie nad liczbami
+wymiernymi, bo różnica między nimi uczyniłaby to porównanie porównaniem czegoś
+innego.
+
+A stosunek nie jest faktem o tej sieci. Skrypt przegląda szerokości $3$, $7$,
+$\val{p16.width}$ i $50$ i orzeka, że stosunek za każdym razem równa się
+szerokości, co jest niezmiennikiem; pojedyncza liczba byłaby faktem o jednym
+stosie.
+
+\begin{trapbox}
+\textbf{\enquote{Tryb odwrotny jest szybszy.}} Jest szybszy \emph{dla tego
+kształtu}, a kształt jest całym powodem. Powiedziane bez zastrzeżenia staje się
+folklorem, a folklor każe ludziom sięgać po niego przy zadaniu o jednym wejściu
+i dziesięciu tysiącach wyjść, gdzie jest dokładnie tak samo marnotrawny, jak
+tryb w przód jest tutaj.
+
+Jest druga połowa, którą ludzie gubią, i o niej jest sekcja 4: tryb odwrotny
+kupuje swoją szybkość pamięcią, a tryb w przód żadnej nie potrzebuje.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Zanim do tego przejdziemy, związek z Programem~\ref{prog:P13}, bo to on czyni
+całość dobrze określoną.
+
+Obliczenie sieci jest grafem skierowanym bez cykli: każda wartość jest
+wyprodukowana, zanim zostanie użyta. Tryb odwrotny idzie po tym grafie
+\emph{wstecz}, akumulując pochodną w każdym węźle od tych, które go zużywają.
+
+Co gwarantuje Program~\ref{prog:P13}, żeby było to legalne?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Że graf ma w ogóle porządek topologiczny i że każdy z nich liczy te same
+wartości.
+\end{ansblock}
+
+Marsz wstecz może więc odwiedzać węzły w dowolnej kolejności respektującej
+zależności i dostanie tę samą odpowiedź. Dlatego implementacja może
+przestawiać, zrównoleglać i łączyć operacje bez ponownego sprawdzania
+arytmetyki przez kogokolwiek.
+
+\begin{note}
+Mówi też, co to psuje: cykl. Program~\ref{prog:P13} pokazał, że cykl nie czyni
+ewaluacji powolną, tylko \emph{nieokreśloną} \dash{} nie ma porządku, w którym
+każdy węzeł idzie po tym, czego potrzebuje.
+
+Sieć rekurencyjna wygląda jak cykl i nim nie jest: jest rozwijana w DAG, zanim
+cokolwiek zostanie zróżniczkowane, i dlatego jej pamięć rośnie z liczbą kroków
+rozwinięcia. To własna obserwacja P13 i powód, dla którego zwrot
+\enquote{propagacja wsteczna przez czas} zawiera słowo \emph{przez}.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Co musi przechować}
+\label{sec:P16-memory}
+\index{autodiff!activations}
+
+\begin{fr}
+Kosztem trybu odwrotnego nie jest arytmetyka i to ta połowa zaskakuje ludzi.
+
+Popatrz na jakobian jednej warstwy w łańcuchu. Żeby pomnożyć przez niego w
+drodze powrotnej, potrzebujesz jego wpisów. Jego wpisy zależą od
+\emph{wejścia} tej warstwy, które policzono w drodze w przód.
+
+Co z tego wynika o pamięci?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wejście każdej warstwy trzeba przechować z przebiegu w przód, aż dojdzie do
+niego przebieg wsteczny. Pamięć rośnie z głębokością i jeszcze raz z rozmiarem
+batcha.
+\end{ansblock}
+
+Te przechowane wartości to \textbf{aktywacje}, a Program~\ref{prog:P03} już je
+policzył w swoim rachunku pamięci: nie skalują się z liczbą parametrów, tylko z
+głębokością razy batch razy szerokość, więc ten sam model ma inny rachunek za
+aktywacje na każdym obciążeniu.
+
+\textbf{Tryb w przód nie potrzebuje z tego nic.} Niesie jeden kierunek obok
+obliczenia i nigdy nie ogląda się za siebie, więc jego pamięć jest stała. To
+druga połowa wymiany, którą nazwała pułapka z poprzedniej sekcji: tryb
+odwrotny kupuje czynnik równy liczbie parametrów w czasie i płaci za to
+pamięcią.
+
+\mermaidfig{p16-keep-or-recompute}{Czego potrzebuje przebieg wsteczny i jak z
+tego wyjść.}{przechować albo przeliczyć}
+\end{fr}
+
+\begin{fr}
+Program~\ref{prog:P03} nazwał też wyjście \dash{} gradient checkpointing, który
+przechowuje tylko część aktywacji i przelicza resztę \dash{} i celowo nie zrobił
+arytmetyki. Oto ona.
+
+Przechowuj co $k$-tą aktywację w stosie o głębokości $L$. Między dwiema
+przechowanymi musisz przeliczyć odcinek, zanim przejdziesz przez niego wstecz.
+Zapisz szczytową liczbę aktywacji trzymanych naraz.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\frac{L}{k} + k$: te $\frac{L}{k}$ punktów kontrolnych plus $k$ aktywacji
+jednego przeliczanego odcinka.
+\end{ansblock}
+
+Jest to funkcja z minimum i warto je znaleźć, a nie zgadywać. Zróżniczkuj:
+$-\frac{L}{k^{2}} + 1$, co jest zerem przy $k = \sqrt{L}$.
+
+\textbf{Najlepszy odstęp punktów kontrolnych to więc pierwiastek z głębokości,
+a szczytowa pamięć to $2\sqrt{L}$.} Przy $L = \val{p16.ckpt.layers}$ to punkt
+kontrolny co $\val{p16.ckpt.bestk}$ warstw i $\val{p16.ckpt.peak}$ aktywacji
+trzymanych naraz, wobec $\val{p16.ckpt.layers}$ \dash{} czynnik
+$\val{p16.ckpt.saving}$.
+
+A koszt to dokładnie $\val{p16.ckpt.passes}$ przebiegi w przód zamiast jednego,
+bo każdy odcinek przeliczany jest dokładnie raz.
+
+\begin{note}
+$\sqrt{L}$, które w tym kontekście się cytuje, nie jest regułą kciuka ani
+wynikiem empirycznym. Jest miejscem, gdzie znika pochodna $\frac{L}{k} + k$,
+czyli punktem stacjonarnym z Programu~\ref{prog:F11} użytym na koszcie, a nie
+na stracie. Skrypt orzeka, że minimum numeryczne zgadza się z $\sqrt{L}$, a nie
+orzeka tolerancji.
+\end{note}
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Ten czynnik jest różnicą między modelem, który mieści się na karcie, a takim,
+który się nie mieści, a cena jest podana dokładnie: jeden dodatkowy przebieg w
+przód, czyli jedna trzecia kroku treningowego, a nie jego podwojenie, bo krok
+to przód i tył, a tył jest droższą połową.
+
+Dlatego też pokrętło jest zwykle włączone albo wyłączone, a nie strojone.
+Optimum to $\sqrt{L}$, a krzywa blisko minimum jest płaska \dash{} co
+Program~\ref{prog:P17} powie porządnie \dash{} więc cokolwiek w granicach
+czynnika dwa od $\sqrt{L}$ kosztuje prawie tyle samo.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedna rzecz, którą ta sekcja jest winna, i jest to narzędzie, po które
+każdy sięga, gdy gradient wygląda źle.
+
+Zawsze możesz oszacować pochodną różnicą skończoną, jak zrobił
+Program~\ref{prog:F11}. Dlaczego jest to test implementacji, a nie sama
+implementacja?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo kosztuje jedną ewaluację na wejście, czyli koszt trybu w przód bez jego
+dokładności \dash{} a Program~\ref{prog:F11} zmierzył, że jej błąd ma podłogę,
+pod którą żaden rozmiar kroku nie zejdzie.
+\end{ansblock}
+
+Dwa osobne zarzuty, a drugi jest tym, o którym ludzie zapominają. Krzywa U z
+F11 pokazała błąd spadający, gdy krok maleje, a potem \emph{rosnący}, gdy
+przejmuje kasowanie, z przypadkiem najlepszym nawet nie blisko precyzji
+maszynowej.
+
+\textbf{Sprawdzenie gradientu zgadzające się do czterech czy pięciu cyfr jest
+więc tym, jak wygląda poprawna implementacja}, a żądanie piętnastu byłoby
+żądaniem, by test był lepszy, niż może być.
+
+Własne różniczkowanie tego programu jest sprawdzone dokładnie tak: wobec
+różnicy centralnej w $\val{p16.check.n}$ wejściach, zgadzając się lepiej niż
+$\val{p16.check.bound}$. To test przechodzący, a nie test słaby.
+\end{fr}
+
+% ============================================================
+\section{Trzy razy, gdy odpowiada na inne pytanie}
+\label{sec:P16-silent}
+\index{autodiff!silent failures}
+
+\begin{fr}
+Wszystko dotąd było o tym, co liczy różniczkowanie automatyczne. Ta sekcja jest
+o trzech sytuacjach, w których liczy coś innego i nic nie mówi, co jest trybem
+awarii kosztującym najwięcej czasu, bo nie ma błędu, którego można szukać.
+
+Wszystkie trzy są pokazane na różniczkowaniu w trybie odwrotnym w jakichś
+czterdziestu liniach, napisanym dla tego programu, więc nic tutaj nie zależy od
+twierdzenia o jakimkolwiek konkretnym frameworku.
+
+Pierwsza. $\relu$ nie jest różniczkowalna w zerze. Co powinno zwracać
+$\frac{\mathrm{d}}{\mathrm{d}x}\relu(x)$ dokładnie w $x = 0$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie ma dobrej odpowiedzi. Granica od dołu wynosi $\val{p16.relu.left}$, a od
+góry $\val{p16.relu.right}$, więc pochodna nie istnieje, a implementacja musi
+\emph{wybrać}.
+\end{ansblock}
+
+I wybiera, nie mówiąc ci o tym. Ta zwraca $\val{p16.relu.chosen}$; inna może
+zwrócić drugą; i w żadnym przypadku nic niczego nie zgłasza.
+
+\transcript{p16-silent}
+
+\begin{trapbox}
+\textbf{\enquote{Gradient jest zły w zerze} to zła skarga.} Nie ma w zerze
+gradientu, który mógłby być zły. Prawdą jest, że otrzymana liczba jest
+konwencją i że dwie implementacje mogą się co do niej nie zgadzać, obie będąc
+uzasadnione.
+
+W praktyce prawie nigdy nie ma to znaczenia, bo trafienie dokładnie w zero w
+zmiennym przecinku jest rzadkie \dash{} a \enquote{prawie nigdy} wykonuje w tym
+zdaniu prawdziwą pracę. Warstwa, której wejścia są wszystkie dokładnie zerem,
+albo maska, albo dopełniony batch trafią tam za każdym razem.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Druga i to ona produkuje model, który trenuje i się nie uczy.
+
+Gdzieś w obliczeniu wartość zostaje odczepiona od grafu \dash{} skopiowana i
+wstawiona z powrotem bez swojej historii. Wszystko w dół liczy się nadal
+poprawnie. Co dzieje się z gradientem?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Ścieżka przez tę wartość nie wnosi nic. Gradient nie jest zły w sensie źle
+policzonego; po prostu \emph{brakuje} składnika.
+\end{ansblock}
+
+Zmierzone na tym samym czterdziestoliniowym różniczkowaniu: odczepienie jednego
+wyniku pośredniego zostawia wartość straty \emph{identyczną co do ostatniego
+bitu} i zmienia jedną składową gradientu o $\val{p16.detach.gap}$.
+
+\textbf{Strata wypisana w logu jest dokładnie tą samą liczbą.} Każda
+diagnostyka patrząca na przebieg w przód zgadza się z przebiegiem poprawnym.
+Jedynym dowodem jest to, że część modelu przestaje się poprawiać, a zwykłym
+pierwszym domysłem jest krok uczenia.
+
+\begin{note}
+Odczepianie bywa zamierzone i poprawne \dash{} cel, przez który nie należy
+trenować, wartość używana do logowania, stop-gradient w algorytmie, który go
+wymaga. Zagrożeniem nie jest operacja, tylko to, że jej efekt jest niewidoczny
+we wszystkich miejscach, w które ludzie patrzą.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Trzecia. Wartość, do której taśma nadal się odwołuje, zostaje nadpisana w
+miejscu po tym, jak została użyta.
+
+Powiedz, czym liczy przebieg wsteczny, zanim pójdziesz dalej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Tą wartością, którą taśma zapisała w swoim czasie \dash{} może to być stara
+albo nowa, zależnie od tego, czy zapisano lokalną pochodną, czy tensor.
+\end{ansblock}
+
+W listingu powyżej iloczyn $\val{p16.inplace.a}$ i
+$\val{p16.inplace.used}$ zapisał drugą z nich jako lokalną pochodną
+pierwszej. Nadpisanie tej drugiej wartości później zostawia gradient policzony
+z $\val{p16.inplace.used}$, podczas gdy wartość trzyma teraz
+$\val{p16.inplace.now}$.
+
+\textbf{Gradient jest więc zgodny z obliczeniem, które już nie istnieje.} Nie
+jest śmieciem, i to czyni go niebezpiecznym \dash{} jest doskonale rozsądną
+liczbą dla innego zadania.
+
+\begin{note}
+To ta z trzech, którą prawdziwe frameworki zwykle łapią, bo wersjonują swoje
+bufory i potrafią stwierdzić, że coś zmieniło się po zapisaniu. Czy konkretny
+łapie konkretny przypadek, jest faktem o wersji, i dlatego w tym programie nie
+jest nazwany żaden framework.
+
+Trwałe jest to, jakiego kształtu jest zagrożenie: \textbf{taśma zapisuje to, co
+zobaczyła, a wartość zmieniona później czyni z taśmy zapis czegoś, co się nie
+wydarzyło.}
+\end{note}
+\end{fr}
+
+\begin{fr}
+Te trzy mają jedną rzecz wspólną i nazwanie jej jest bardziej użyteczne niż
+same te trzy. Co to takiego?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+We wszystkich trzech przebieg w przód jest poprawny, a strata dokładnie
+właściwa. Tylko pochodna nie jest tą, o którą chodziło, a na pochodną nikt nie
+patrzy.
+\end{ansblock}
+
+Dlatego nawykiem debugowania, który działa, nie jest czytanie krzywej
+treningowej. Jest nim różnica skończona z Programu~\ref{prog:F11}, użyta jako
+test, którym ten program powiedział, że jest: weź kilka parametrów, poruszaj
+nimi i sprawdź liczbę, którą dał framework, wobec liczby, którą daje definicja.
+
+\textbf{To jedyny przyrząd patrzący na pochodną wprost}, a zajmuje kilka linii.
+Wszystkie trzy awarie z tej sekcji pokazują się w nim natychmiast i żadna nie
+pokazuje się nigdzie indziej.
+\end{fr}
+
+\begin{fr}
+Jedno zdanie na koniec, bo program był o mechanizmie i warto powiedzieć, czym
+ten mechanizm nie jest.
+
+Różniczkowanie automatyczne nie jest numeryczne i nie jest symboliczne. Niczego
+nie przybliża, więc nie ma żadnej podłogi błędu różnicy skończonej; i nigdy nie
+buduje wyrażenia na pochodną, więc nie ma eksplozji, którą dałoby symboliczne
+różniczkowanie głębokiego wyrażenia.
+
+\textbf{Wylicza regułę łańcuchową na grafie, który program faktycznie
+wykonał}, po jednej krawędzi naraz, z tą samą precyzją co przebieg w przód. Tym
+właśnie jest $\code{backward()}$ i nie ma w nim nic więcej.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Pochodna funkcji z $m$ wejść w $n$ wyjść jest macierzą
+  $n \times m$} \dash{} jakobianem, o jednym wierszu na wyjście i jednej
+  kolumnie na wejście.}
+\sumitem{3--4}{\textbf{Gradient z Programu~\ref{prog:P15} to przypadek jednego
+  wyjścia}, pojedynczy wiersz, więc nic nowego nie zostało tu zdefiniowane.}
+\sumitem{5--6}{\textbf{Odwzorowanie liniowe jest własnym jakobianem}, co jest
+  zdaniem Programu~\ref{prog:F11} o prostej o jeden wymiar wyżej. Jakobian
+  aktywacji po współrzędnych jest diagonalny.}
+\sumitem{9--10}{\textbf{Reguła łańcuchowa mnoży jakobiany}, w kolejności, na
+  którą pozwalają kształty, co jest składaniem z Programu~\ref{prog:P06}.}
+\sumitem{11--14}{\textbf{Nikt nie tworzy jakobianu.} Liczony jest iloczyn z
+  nim, a wyniki pośrednie są wtedy wektorami, a nie macierzami.}
+\sumitem{14--15}{Ten sam iloczyn nawiasowany od różnych końców kosztuje różnie
+  \dash{} Program~\ref{prog:P06} zmierzył $\val{p06.cost.left}$ wobec
+  $\val{p06.cost.right}$ przy identycznej odpowiedzi. \textbf{Te dwa
+  nawiasowania to dwa tryby.}}
+\sumitem{16--17}{\textbf{Tryb w przód kosztuje jeden przebieg na wejście, a
+  odwrotny jeden na wyjście.} To cała procedura decyzyjna i są to dwie liczby
+  całkowite.}
+\sumitem{17--18}{\textbf{Skalarna strata czyni tryb odwrotny tańszym o czynnik
+  równy liczbie parametrów.} Nic innego z uczenia głębokiego nie wchodzi do
+  argumentu.}
+\sumitem{19--20}{Zmierzone dokładnie nad liczbami wymiernymi:
+  $\val{p16.fwd.muls}$ mnożeń w przód wobec $\val{p16.rev.muls}$ odwrotnych
+  przy identycznym gradiencie, a \textbf{stosunek jest liczbą wejść},
+  przejrzany na czterech szerokościach.}
+\sumitem{21--22}{Program~\ref{prog:P13} czyni marsz wsteczny dobrze
+  określonym: graf ma porządek topologiczny i \textbf{każdy z nich liczy te
+  same wartości}.}
+\sumitem{23--24}{\textbf{Tryb odwrotny musi przechować wejście każdej
+  warstwy}, bo od niego zależą wpisy jakobianu. Pamięć rośnie z głębokością i
+  z rozmiarem batcha; tryb w przód nie potrzebuje z tego nic.}
+\sumitem{25--26}{\textbf{Checkpointing co $k$-tą warstwę trzyma
+  $\frac{L}{k} + k$ aktywacji}, z minimum w $k = \sqrt{L}$ \dash{} tam, gdzie
+  znika pochodna, a nie w regule kciuka.}
+\sumitem{26--27}{Przy $L = \val{p16.ckpt.layers}$ to $\val{p16.ckpt.peak}$
+  trzymanych zamiast $\val{p16.ckpt.layers}$, czynnik
+  $\val{p16.ckpt.saving}$, za dokładnie $\val{p16.ckpt.passes}$ przebiegi w
+  przód zamiast jednego.}
+\sumitem{28--29}{\textbf{Różnica skończona to test, a nie implementacja}:
+  kosztuje jedną ewaluację na wejście, a Program~\ref{prog:F11} zmierzył jej
+  podłogę błędu, więc zgodność do kilku cyfr jest tym, jak wygląda poprawność.}
+\sumitem{30--31}{\textbf{$\relu$ dokładnie w zerze nie ma pochodnej}, więc
+  implementacja wybiera \dash{} granice to $\val{p16.relu.left}$ i
+  $\val{p16.relu.right}$, a ta zwraca $\val{p16.relu.chosen}$, nie mówiąc o
+  tym.}
+\sumitem{32--33}{\textbf{Odczepiona wartość zostawia stratę identyczną co do
+  ostatniego bitu} i składową gradientu różną o $\val{p16.detach.gap}$.
+  Brakuje składnika, a nie jest on źle policzony.}
+\sumitem{34--35}{\textbf{Nadpisanie w miejscu czyni z taśmy zapis obliczenia,
+  które się nie wydarzyło}: gradient używa tu $\val{p16.inplace.used}$,
+  podczas gdy wartość trzyma $\val{p16.inplace.now}$.}
+\sumitem{36--37}{\textbf{Wszystkie trzy zostawiają przebieg w przód dokładnie
+  poprawny}, więc znajduje je tylko bezpośrednie sprawdzenie pochodnej
+  \dash{} po to jest różnica skończona.}
+\sumitem{38}{Różniczkowanie automatyczne nie jest ani numeryczne, ani
+  symboliczne. \textbf{Wylicza regułę łańcuchową na grafie, który program
+  faktycznie wykonał}, z tą samą precyzją co przebieg w przód.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Funkcja bierze $4$ wejścia i zwraca $7$ wyjść. Podaj kształt jej
+  jakobianu i powiedz, ile przebiegów trybu w przód, a ile trybu odwrotnego
+  zajęłoby wypełnienie całości.
+  \answerto{$7 \times 4$. Tryb w przód potrzebuje $4$ przebiegów, po jednym na
+  wejście; odwrotny $7$, po jednym na wyjście. Tutaj tańszy jest tryb w przód,
+  co jest przeciwieństwem treningu i z dokładnie tego samego powodu \dash{}
+  kształtu.}
+\item Dlaczego jakobian aktywacji po współrzędnych jest diagonalny i co to
+  kupuje?
+  \answerto{Bo wyjście $i$ zależy od samego wejścia $i$, więc każda pochodna
+  cząstkowa poza przekątną jest zerem. Kupuje wszystko: mnożenie przez macierz
+  diagonalną to jedno mnożenie na wpis zamiast $n$, więc wkład aktywacji do
+  przebiegu wstecznego kosztuje tyle, co sama aktywacja.}
+\item Stos ma głębokość $L = 400$ warstw. Podaj najlepszy odstęp punktów
+  kontrolnych, szczytową liczbę trzymanych aktywacji i koszt obliczeniowy.
+  \answerto{$k = \sqrt{400} = 20$, więc $20$ punktów kontrolnych plus odcinek
+  $20$ daje $40$ trzymanych wobec $400$ \dash{} czynnik dziesięć \dash{} za
+  dokładnie dwa przebiegi w przód zamiast jednego. Czynnik to ogólnie
+  $\sqrt{L}/2$, więc poprawia się, im głębszy stos, i dlatego technika jest
+  używana tam, gdzie jest.}
+\item Twoje sprawdzenie gradientu zgadza się do sześciu cyfr dla każdego
+  parametru poza jednym, gdzie nie zgadza się na pierwszej cyfrze. Jakie są
+  trzy kandydatury z sekcji 5 i jak byś je odróżnił?
+  \answerto{Punkt nieróżniczkowalny, odczepiona ścieżka albo nadpisanie w
+  miejscu. Porusz tym jednym parametrem i patrz: jeśli niezgodność znika, gdy
+  odsuniesz się od punktu, to pierwsze; jeśli gradient analityczny jest
+  dokładnie zerem tam, gdzie numeryczny nie jest, to brakująca ścieżka; jeśli
+  wartość w przód zmienia się, gdy przestawisz niezwiązane operacje, to
+  trzecie.}
+\item Dlaczego argument za trybem odwrotnym nie wspomina o głębokości sieci?
+  \answerto{Bo głębokość wpływa na oba tryby identycznie \dash{} każdy jest
+  jednym marszem wzdłuż łańcucha, od któregokolwiek końca zaczyna. Różni się
+  to, ile marszów trzeba, a to ustala liczba wejść wobec liczby wyjść.
+  Głębokość zmienia koszt przebiegu; kształt zmienia liczbę przebiegów.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że jeśli $f$ jest liniowa, to tryb w przód i odwrotny liczą to
+  samo w tej samej liczbie operacji, gdy jest jedno wejście i jedno wyjście.
+  \answerto{Przy jednym wejściu i jednym wyjściu jakobian jest pojedynczą
+  liczbą, łańcuch jest iloczynem skalarów, a oba nawiasowania są tym samym
+  iloczynem w innej kolejności \dash{} ta sama liczba operacji w obie strony.
+  Tryby rozchodzą się dopiero, gdy któryś wymiar jest większy od jedynki, co
+  jest innym sposobem powiedzenia, że kształt jest całym argumentem.}
+\item Model ma $P$ parametrów, a strata jest wektorem $C$ strat na klasę, a
+  nie skalarem. Co to robi z kosztem wyliczenia każdej pochodnej?
+  \answerto{Mnoży koszt trybu odwrotnego przez $C$, bo odwrotny potrzebuje
+  jednego przebiegu na wyjście. Dlatego pętla treningowa redukuje do skalara
+  przed różniczkowaniem: zsumowanie albo uśrednienie strat na klasę zamienia
+  $C$ przebiegów w jeden, i jest to ta sama redukcja, która sprawia, że cały
+  argument z sekcji 3 działa.}
+\item Tryb w przód nie potrzebuje przechowanych aktywacji. Dlaczego nie jest
+  to argument za używaniem go w treningu?
+  \answerto{Bo potrzebowałby jednego przebiegu na parametr, a liczba parametrów
+  jest największą liczbą w zadaniu. Wymiana kosztu pamięci rosnącego z
+  głębokością na koszt obliczeń rosnący z rozmiarem modelu nie jest wymianą,
+  którą ktokolwiek by przyjął. Czyni to za to tryb w przód właściwym
+  narzędziem do pochodnej względem jednej czy dwóch rzeczy, i tam jest
+  używany.}
+\item Sekcja 4 mówi, że checkpointing kosztuje dokładnie dwa przebiegi w przód.
+  Przy jakim schemacie przeliczania kosztowałby więcej i dlaczego taki schemat
+  bywa mimo to wybierany?
+  \answerto{Przeliczanie rekurencyjne \dash{} z punktami kontrolnymi także
+  wewnątrz odcinków \dash{} kosztuje więcej przebiegów i jeszcze mniej pamięci,
+  z grubsza $O(\mfalogplain L)$ przebiegów na $O(\mfalogplain L)$
+  pamięci. Wybiera się je, gdy to
+  pamięć jest ograniczeniem wiążącym, a obliczenia nie, i jest to ta sama
+  wymiana o poziom dalej, a arytmetyka to ta sama minimalizacja zrobiona dwa
+  razy.}
+\item Dlaczego gradient może być dokładnie zerem z uzasadnionego powodu i z
+  powodu błędu, który wygląda identycznie?
+  \answerto{Uzasadnienie: w punkcie stacjonarnym, za wyłączoną $\relu$ albo
+  tam, gdzie parametr naprawdę nie wpływa na stratę. Błąd: odczepiona ścieżka,
+  która z konstrukcji nie wnosi nic. Z samego gradientu są nie do odróżnienia,
+  a sposobem na sprawdzenie jest poruszyć parametrem i zobaczyć, czy strata
+  się rusza: jeśli się rusza, a gradient jest zerem, ścieżka jest zerwana, a
+  nie płaska.}
+\end{furtherproblems}

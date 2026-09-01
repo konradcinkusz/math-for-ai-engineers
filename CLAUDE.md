@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P15 written, both editions \dash{} the whole Foundation part, the whole of Part II, the whole of Part III, the whole of Part IV, and the first of Part V.** P16–P34 are stubs carrying their briefs | 19 of 47 |
+| Programs | **F1–F13 and P1–P16 written, both editions \dash{} Parts I to IV entire, and the first two of Part V.** P17–P34 are stubs carrying their briefs | 18 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 850 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 862 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 722 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 730 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 870 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 884 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 738 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 748 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,21 +93,21 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **19 of 47 programs are stubs**, in each language. This is the whole of the
+- **18 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 865 computed values, all referenced, all present, plus the committed console
+- 885 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 168 Mermaid sources, all rendering
-- 42 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 174 Mermaid sources, all rendering
+- 44 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **82 orphan-tail pages: 19 · 25 · 19 · 19** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two and
-  **P15 none** \dash{} from 15 before F5, 26 before F6, 33 before F7,
+- **83 orphan-tail pages: 20 · 25 · 19 · 19** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
+  **P15 none** and P16 one \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
   before P6. **P6 added two and the ten transcripts it turned on added three**,
@@ -140,8 +140,8 @@ what was there before.
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
-  **50% in P15** \dash{} P13 and P15 are the highest outside Part I and the
-  only ones anywhere to reach the book's own rate.**
+  **50% in P15** and **47% in P16** \dash{} P13 and P15 are the highest
+  outside Part I and the only ones anywhere to reach the book's own rate.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -5855,6 +5855,116 @@ All six at mermaid's wrap cap on the first render, at three ranks.
 - Frame numbers mapped after writing: sections landed at
   `1--7 / 8--13 / 14--19 / 20--28 / 29--38`.
 
+### Program P16 pass, August 2026
+
+**Thirty-eight teaching frames, forty printed, both editions**, against a brief
+that projected sixty-five \dash{} the largest estimate left in the manifest.
+Five sections: what shape a derivative has, the chain rule multiplies them and
+nobody forms one, which end and why the shape decides, what it has to keep, and
+three times it answers a different question.
+
+#### The whole argument was already measured, one program early
+
+P06 bracketed one triple product two ways for identical answers and a factor of
+$\val{p06.cost.ratio}$ in cost. **That is forward mode against reverse mode**,
+measured before either had a name, and P16's job was to notice it rather than
+to derive it again. The ratio here is gated against P06's committed values.
+
+So the decision procedure comes out as two integers and nothing else: forward
+costs one pass per input, reverse one per output. A scalar loss with many
+parameters makes reverse cheaper by **a factor of the parameter count**, and
+nothing about deep learning enters the argument at any point.
+
+Measured exactly over the rationals: $\val{p16.fwd.muls}$ multiplications
+forward against $\val{p16.rev.muls}$ reverse for a gradient asserted
+*identical*, with the ratio swept over four widths and equal to the input count
+every time. The single figure would have been a fact about one stack.
+
+#### The arithmetic P03 named and left
+
+P03 says checkpointing trades operations for bytes and stops. Here it is: keep
+every $k$th activation and you hold $\frac{L}{k} + k$ at once, whose derivative
+vanishes at $k = \sqrt{L}$. **The $\sqrt{L}$ everyone quotes is a stationary
+point, not a rule of thumb** \dash{} F11's own machinery used on a cost rather
+than on a loss. At $\val{p16.ckpt.layers}$ layers that is
+$\val{p16.ckpt.peak}$ held instead of $\val{p16.ckpt.layers}$, a factor of
+$\val{p16.ckpt.saving}$, for exactly $\val{p16.ckpt.passes}$ forward passes.
+
+#### The extract-and-run test caught a defect nothing else could
+
+The transcript printed $-0.4$ for a gradient whose own listing produces
+$\val{p16.inplace.used}$. The script had computed the in-place demonstration on
+one example and written the listing from another, so **the values in the frames
+and the numbers in the listing described two different computations.**
+
+`make verify` cannot see this: the script wrote exactly what it computed, so
+the transcript and its generator agree perfectly. What it does not check is
+whether the listing's own code produces the numbers the *frames* quote. The
+only instrument that catches it is F03's \dash{} extract the listing from the
+finished PDF and run what comes out \dash{} and it did, on the first try.
+
+**So a generated, committed, drift-gated transcript can still disagree with the
+prose beside it**, which is one step beyond P04's finding that such a
+transcript can be un-runnable. The fix was to make the demonstration and the
+listing one computation, which is the only arrangement in which they cannot
+come apart.
+
+#### Rule 2 caught three figure nodes, all by reading
+
+`p16-jacobian-shape`'s third node answered the frame two later that asks it;
+and **both** of `p16-two-brackets`'s later nodes gave the pass counts that the
+frame after them elicits \dash{} and that figure lands a page *before* the
+question in three of the four builds. All three were reworded to state what the
+frames above them deliver.
+
+That is the second pass running in which reading the figures against their
+neighbouring frames caught more than measuring them did. **Read the nodes as
+prose first; the page positions only settle where a genuine answer landed.**
+
+#### The contents is the book's third narrow column
+
+`main-pl` failed on a **2.2 pt overfull hbox in the table of contents**: the
+Polish title is fifty-six characters and the contents line is narrow.
+`preamble.tex`'s note on `\mfaheadmark` already said this class was \enquote{latent
+today only because no long-titled program is written}. One now is.
+
+The fix is LaTeX's own `\chapter[short]{long}`, passed through a new optional
+argument on `\program`, rather than anything invented \dash{} and it discharges
+the same latent defect for the running head that note names. **Use it in both
+editions or in neither**: parity compares structural tokens, so a short title in
+one file and not the other diverges.
+
+#### The index shrink, twice in two programs
+
+P15 raised it from half a point to nine tenths and wrote down that the number is
+a function of index length rather than a constant. P16's entries took the Polish
+index past that too \dash{} $18.8$ pt and $3.4$ pt \dash{} and it went to
+$1.5$ pt. Two raises in two programs is the prediction being right twice; the
+comment above the patch is the thing to read before reaching for a cleverer fix.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P16.1 jacobian-shape | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P16.2 two-brackets | 657 / 657 | 5.18 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P16.3 keep-or-recompute | 657 / 657 | 5.18 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+#### Also
+
+- Traps 177 to 184 added to `notes/02`.
+- **No framework is named anywhere in the program**, on F04's rule that a
+  library's internals are a fact about a version. What carries the three silent
+  failures instead is a reverse-mode differentiator of about forty lines written
+  for the program, which exhibits all three rather than asserting them \dash{}
+  and which is itself checked against a central difference, at the step F11
+  measured, to better than $\val{p16.check.bound}$.
+- A bare `\log` in a further-problem answer fired C10 four times. The resolution
+  is P03's: the base is provably immaterial *inside* an $O$, so the claim is
+  written $O(\mfalogplain L)$ rather than given a base it does not need.
+- Elicitation 47%. One orphan tail added, in `main-en`; no orphaned cues and no
+  stranded openers or headings at any point in the pass.
+- Frame numbers mapped after writing: sections landed at
+  `1--8 / 9--15 / 16--22 / 23--29 / 30--38`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -6120,26 +6230,23 @@ clone instead.
 
 ## What is left
 
-1. **Nineteen programs, and Parts I to IV are complete, plus the first of
-   Part V.** F1 to F13 and P1 to P15, both editions.
+1. **Eighteen programs, and Parts I to IV are complete, plus the first two of
+   Part V.** F1 to F13 and P1 to P16, both editions.
 
-   **P16 is next** \dash{} *Jacobians, the chain rule and automatic
-   differentiation*, sixty-five frames planned, deps `P15`, `P6` and `P13`
-   \dash{} and it is the program that pays off `loss.backward()`. Read what is
-   already spent before estimating a length, which is the discipline twelve
-   passes have now paid for: **F12** owns the chain rule and the product over
-   layers and already calls one observation \enquote{the seed of what P16
-   calls reverse mode}; **P06** owns composition and the cost of bracketing a
-   triple product one way against the other, which is the whole of why one
-   mode is cheaper than the other; **P13** owns the DAG and the fact that
-   every topological order computes the same values, which is what makes a
-   computation graph well defined; and **P15** owns the gradient and has just
-   said the update is componentwise. What is genuinely left is the *shape*
-   argument \dash{} that a scalar loss with many parameters makes reverse mode
-   cheaper by a factor nobody chooses.
-
-   **And Part IV left nothing outstanding.** Both of its open curriculum
-   questions were decided in the passes that wrote their programs.
+   **P17 is next** \dash{} *The Hessian, curvature and the Taylor expansion*,
+   fifty frames planned, deps `P15`, `P10` and `F4`. Read what is already spent
+   before estimating a length, which is the discipline thirteen passes have now
+   paid for: **P10** owns the eigenvalues of a symmetric matrix, the bowl, the
+   saddle and the ridge, and the level ellipse's axis ratio \dash{} and says
+   in as many words that the shape is collected there and the step-size
+   inequality is P17's; **P15** owns the gradient, the zig-zag and the
+   $1 - \eta\lambda$ factor per eigendirection, and its rigour box says
+   explicitly that where the boundary lies is P17's; **F04** owns the sum and
+   the sequence; and **F12** owns the derivatives the Taylor expansion is
+   made of. What is genuinely left is the second-order model itself and the
+   inequality that falls out of it \dash{} and P15 has already put the reader
+   one line from it, since the factor is negative exactly when
+   $\eta > 1/\lambda$.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -6159,11 +6266,11 @@ clone instead.
 
    Before estimating any remaining program's length, read its written
    neighbours. F7's brief projected forty frames and thirty-one were needed;
-   **F8's projected forty-five against thirty**; **F9's forty against
-   thirty-two**; **F12's fifty-five against thirty-one**; **P14's forty-five
-   against thirty-one**, because the subject is genuinely small; and
-   **P15's fifty-five against thirty-eight**, because F11, F12, P05 and P10
-   had each already done a piece of it.
+   **F8's forty-five against thirty**; **F9's forty against thirty-two**;
+   **F12's fifty-five against thirty-one**; **P14's forty-five against
+   thirty-one**, because the subject is genuinely small; **P15's fifty-five
+   against thirty-eight**; and **P16's sixty-five against thirty-eight**,
+   because P06 had already measured its central result under another name.
    **A brief's frame estimate is a planning figure from before its neighbours
    were written.** It is not a target.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and

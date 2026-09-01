@@ -2054,3 +2054,70 @@ ground is in the steepest direction and says nothing about whether that directio
 goes anywhere useful — which is exactly the valley case, where the length is
 large, the progress is slow, and both are true at once for the same reason. The
 length is a local rate; the distance home is not local. → **P15**.
+
+### Jacobians, the chain rule and automatic differentiation, written (P16)
+
+Items 177 to 184 came out of writing P16.
+
+**177. "The framework computes the Jacobian."** It never does. A network's
+Jacobian has one row per output and one column per parameter, which for a real
+model is a matrix nobody can store. What is computed is a *product* with it —
+`Jv` or `uᵀJ` — and every intermediate in that product is a vector the size of a
+layer. "Nobody forms a Jacobian" is not a simplification of what happens; it is
+a statement about which brackets are used. → **P16**.
+
+**178. "Reverse mode is faster."** It is faster *for this shape*, and the shape
+is the whole reason. Forward mode costs one pass per input and reverse one per
+output, so a scalar loss with many parameters makes reverse cheaper by a factor
+of the parameter count — and a function with one input and ten thousand outputs
+makes it exactly as wasteful in the other direction. Measured exactly over the
+rationals: 40 400 multiplications forward against 2 020 reverse for an identical
+gradient, with the ratio equal to the input count over four widths. → **P16**.
+
+**179. "Backpropagation is a deep-learning algorithm."** It is the chain rule
+evaluated on a DAG, bracketed from the output end. Nothing in the argument for
+it mentions networks, layers, losses or gradients descent — only that there are
+many inputs and one output. The name is a name for one bracketing of a matrix
+product, and Program P06 measured the cost difference between the two
+bracketings one program before it had that name. → **P16**.
+
+**180. "Autodiff is numerical differentiation, or symbolic differentiation."**
+Neither. It approximates nothing, so it has none of a finite difference's error
+floor; and it never builds an expression for the derivative, so it has none of
+the blow-up symbolic differentiation of a deep expression would produce. It
+evaluates the chain rule on the graph the program actually ran, one edge at a
+time, to the same precision as the forward pass. → **P16**.
+
+**181. "The gradient check only agrees to five digits, so the gradient is
+wrong."** Five digits is what a correct implementation looks like. A central
+difference has an error floor no step size gets under — Program F11 measured
+that U-curve — so demanding fifteen digits is demanding that the test be better
+than the instrument can be. The finite difference is the *test*, never the
+implementation: it costs one evaluation per input, which is forward mode's price
+without forward mode's accuracy. → **P16**, resting on **F11**.
+
+**182. "ReLU's gradient at zero is wrong."** There is no gradient at zero to be
+wrong about: the one-sided limits are 0 and 1, so the derivative does not exist
+and every implementation must *choose*. The number you get back is a convention,
+two implementations may disagree while both being defensible, and neither says
+so. It rarely matters because hitting exactly zero in floating point is rare —
+and a mask, a padded batch, or a layer whose inputs are all zero hits it every
+time. → **P16**.
+
+**183. "The loss looks right, so the gradient is right."** The three ways
+autodiff silently answers a different question all leave the forward pass exactly
+correct. A detached value leaves the loss *identical to the last bit* and simply
+drops a term from the gradient; an in-place write leaves the tape a record of a
+computation that no longer exists, so the gradient is consistent with a different
+problem; and a non-differentiable point returns a convention. Nothing raises in
+any of the three, every forward-looking diagnostic agrees with a correct run, and
+the only instrument that looks at the derivative directly is a finite-difference
+check. → **P16**.
+
+**184. "Gradient checkpointing is a heuristic and √L is a rule of thumb."**
+Keeping every k-th activation holds L/k + k of them at once, and the minimum of
+that is exactly where its derivative vanishes, at k = √L. At 10 000 layers that
+is a checkpoint every 100, 200 activations held instead of 10 000 — a factor of
+50 — for exactly two forward passes rather than one, because each segment is
+recomputed exactly once. It is a stationary point, not folklore. → **P16**,
+paying the arithmetic **P03** named and left.
