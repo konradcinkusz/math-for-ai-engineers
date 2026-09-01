@@ -1,24 +1,897 @@
 %% P15 --- Funkcje wielu zmiennych i gradient
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Kazda liczba w tym programie, ktorej czytelnik nie policzy w pamieci,
+%% pochodzi z code/p15_gradient.py i trafia na strone przez \val{}. Listing
+%% konsolowy to zatwierdzony transkrypt zapisany przez ten skrypt.
+%%
+%% TEZA: KIERUNEK gradientu jest wyprowadzony, a nie wybrany. Pochodna
+%% kierunkowa to iloczyn skalarny, wiec cosinus z Programu P05 rozstrzyga,
+%% ktory kierunek jest najbardziej stromy, a ktore sa plaskie -- i "najbardziej
+%% stromy" oraz "prostopadly do poziomicy" okazuja sie dwoma odczytami jednego
+%% rownania.
+%%
+%% CO TEN PROGRAM DOSTAJE, odczytane z plikow, a nie zapamietane:
+%%   F11  wyprowadza marsz w jednym wymiarze W CALOSCI -- w dol jest przeciwnie
+%%        do znaku pochodnej, a x <- x - eta f'(x), przy czym minus nazwany
+%%        jest tam "calym mechanizmem sterowania". Ten program NIE MOZE wiec
+%%        wyprowadzac znaku ponownie. Oddaje za to te sama rekurencje na
+%%        kierunek wlasny, co skrypt bramkuje.
+%%   F12  mowi, ze d/dx nazywa, KTORA litera jest zmienna, i ze bedzie to
+%%        "mialo ogromne znaczenie w Programie P15, gdzie jest ich wiecej".
+%%   P05  daje a . b = |a| |b| cos(theta). Sekcja 3 to ta tozsamosc, w ktorej
+%%        jednym z dwoch wektorow jest gradient. Nic wiecej nie jest potrzebne.
+%%   P10  zbiera ksztalt niecki -- wartosci wlasne 20 i 1, elipsa 4,47 raza
+%%        dluzsza niz szersza -- i mowi wprost, ze go nie wydaje. Sekcja 5
+%%        wydaje go, na zatwierdzonych liczbach P10.
+%%
+%% CZEGO NIE RUSZA, sprawdzone wzgledem tools/programs.json:
+%%   jakobiany i tryb odwrotny                                    -> P16
+%%   hesjan, krzywizna i NAJWIEKSZY STABILNY KROK                  -> P17
+%%   rachunek macierzowy, gradient softmax-cross-entropy           -> P18
+%%   wypuklosc                                                     -> P19
+%%   moment pedu, ktory NAPRAWIA zygzak produkowany tutaj          -> P20
+%% Brief P20 mowi wprost, ze naprawia "zygzak z P15", wiec wyprodukowanie go i
+%% zostawienie nienaprawionym jest kontraktem, a nie luka.
+%%
+%% SLOWO SIE ZDERZA i sekcja 2 to nazywa. F06 i F11 uzywaja slowa "gradient"
+%% w znaczeniu WSPOLCZYNNIKA KIERUNKOWEGO prostej, co jest standardowe i bylo
+%% tam potrzebne; tutaj jest to wektor. Takie samo potraktowanie P07 dal
+%% slowu "wymiar" wykonujacemu trzy prace.
+%%
+%% Blizniak: programs/en/P15-gradient.tex. Ramka w ramke, makro w makro,
+%% liczba w liczbe; tools/parity.py je porownuje.
 
 \program{Funkcje wielu zmiennych i gradient}
 \label{prog:P15}
+\index{gradient}
+\index{derivative!partial}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{policzyć pochodną cząstkową, trzymając każde inne wejście w
+  miejscu, i powiedzieć, na jakie pytanie ona odpowiada}
+\outcome{8--13}{zebrać pochodne cząstkowe w gradient i odróżnić ten wektor od
+  współczynnika kierunkowego prostej}
+\outcome{14--19}{zapisać tempo zmiany wzdłuż dowolnego kierunku jako iloczyn
+  skalarny z gradientem}
+\outcome{20--28}{powiedzieć, dlaczego gradient jest kierunkiem najbardziej
+  stromym i dlaczego spotyka poziomicę pod kątem prostym, z tego jednego
+  iloczynu skalarnego}
+\outcome{29--38}{powiedzieć, co marsz robi w długiej wąskiej dolinie i
+  dlaczego}
+\end{outcomes}
 
-Argument: a partial derivative holds everything else still; the gradient
-collects them; the directional derivative is a dot product with the
-gradient, so the gradient is the steepest direction and is perpendicular to
-the level set. Payoff: gradient descent's direction is derived rather than
-asserted; **the zig-zag in a narrow valley is explained by the gradient
-being perpendicular to the contour rather than pointing at the minimum**,
-which is the picture that makes momentum obvious two parts later.
+\begin{quiz}
+\item $f(x, y) = x^{2}y + 3y$. Ile wynosi $\partial f/\partial x$?
+  \teachesat{3--4}
+  \answerto{$2xy$. Potraktuj $y$ jak stałą i różniczkuj tak, jak uczył
+  Program~\ref{prog:F11} \dash{} składnik $3y$ nie ma w sobie $x$, więc nie
+  wnosi nic.}
+\item W którym kierunku, spośród wszystkich, $f$ rośnie najszybciej?
+  \teachesat{20--21}
+  \answerto{We własnym kierunku gradientu. Nie dlatego, że tak go
+  zdefiniowano \dash{} dlatego, że tempo wzdłuż kierunku to gradient
+  pomnożony skalarnie przez ten kierunek, a iloczyn skalarny jest największy,
+  gdy oba wskazują tak samo.}
+\item W którym kierunku porusza się spadek gradientu? \teachesat{29--30}
+  \answerto{W kierunku gradientu \emph{ujemnego}. Gradient wskazuje drogę
+  najszybszego wzrostu $f$, więc krok idzie przeciwnie do niego, a znak jest
+  najczęstszym błędem w ręcznie pisanej pętli treningowej.}
+\item Stoisz na poziomicy $f$ i idziesz wzdłuż niej. Jakie jest tempo zmiany
+  $f$ wzdłuż twojej drogi? \teachesat{23--24}
+  \answerto{Zero, z definicji poziomicy. A skoro to tempo jest gradientem
+  pomnożonym skalarnie przez twój kierunek, gradient musi stać pod kątem
+  prostym do poziomicy.}
+\item Czy w długiej wąskiej dolinie ujemny gradient wskazuje najniższy punkt?
+  \teachesat{31--32}
+  \answerto{Nie, i o tym jest cała sekcja 5. Wskazuje w poprzek doliny, pod
+  kątem prostym do poziomicy, na której stoisz, a to nie jest ten sam
+  kierunek co droga do domu, chyba że niecka jest okrągła.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 55 ramek.
-}
+% ============================================================
+\section{Po jednym wejściu naraz}
+\label{sec:P15-partials}
+\index{derivative!partial}
+
+\begin{fr}
+Wszystko, co robiły Program~\ref{prog:F11} i Program~\ref{prog:F12}, dotyczyło
+funkcji jednego wejścia. Strata taka nie jest. Jest funkcją każdego parametru
+modelu naraz, a dla czegokolwiek wartego trenowania jest to liczba o dziewięciu
+czy dziesięciu cyfrach.
+
+Brzmi to jak inny przedmiot i nim nie jest. Program~\ref{prog:F12} zostawił
+wskazówkę: powiedział, że $\frac{\mathrm{d}}{\mathrm{d}x}$ nazywa,
+\emph{która} litera jest zmienną, i że nazwanie jej będzie miało znaczenie
+tutaj.
+
+Mając $f(x, y)$ i tylko maszynerię rachunku jednej zmiennej, jak w ogóle
+wydobyłbyś z tego pochodną?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Trzymając jedno z nich w miejscu. Ustal $y$ na jakiejś wartości, a $f$ staje
+się funkcją samego $x$, czyli czymś, co już umiesz różniczkować.
+\end{ansblock}
+
+To cała idea i nie ma w niej nic więcej. Zapisuje się to
+$\frac{\partial f}{\partial x}$, z zaokrąglonym $\partial$ zamiast prostego
+$\mathrm{d}$, i czyta \enquote{cząstkowa de $f$ po de $x$}. Zaokrąglona litera
+przypomina, że coś innego jest trzymane w miejscu.
+
+\begin{note}
+Notacja nie niesie nowej matematyki. $\frac{\partial f}{\partial x}$ to zwykła
+pochodna zwykłej funkcji jednej zmiennej \dash{} tej, którą dostajesz z $f$,
+zamrażając każde wejście poza $x$. Każda reguła, którą dał
+Program~\ref{prog:F12}, stosuje się bez zmian, bo nie ma tu nic, pod względem
+czego miałyby być inne.
+\end{note}
+
+\mermaidfig{p15-hold-the-rest-still}{Zamrażanie pozostałych wejść i zbieranie
+tego, co zostaje.}{trzymanie reszty}
+\end{fr}
+
+\begin{fr}
+Spróbuj. $f(x, y) = x^{2}y + 3y$.
+
+Zróżniczkuj względem $x$, traktując $y$ jak stałą.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$2xy$}
+Pierwszy składnik to $y$ razy $x^{2}$, a $y$ jest tu stałą, więc wychodzi
+przed: pochodna wynosi $y \cdot 2x$. Drugi składnik, $3y$, nie ma w sobie $x$
+wcale, więc z punktu widzenia $x$ jest stałą i nie wnosi nic.
+
+Teraz druga. $\frac{\partial f}{\partial y}$, przy $x$ trzymanym w miejscu.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$x^{2} + 3$}
+Tym razem to $x^{2}$ jest stałą mnożącą $y$, więc przeżywa jako ono samo, a $3y$
+różniczkuje się do $3$.
+
+\begin{trapbox}
+Popatrz, co się właśnie stało z dwiema odpowiedziami.
+$\frac{\partial f}{\partial x}$ nadal ma w sobie $y$, a
+$\frac{\partial f}{\partial y}$ nadal ma $x$.
+
+\textbf{Trzymanie wejścia w miejscu nie usuwa go z odpowiedzi.} Jest ono
+trzymane w miejscu \emph{podczas różniczkowania}, a potem wraca do bycia
+zmienną. Pochodna cząstkowa jest funkcją wszystkich tych samych wejść, co
+oryginał \dash{} dlatego trzeba ją wyliczyć w punkcie, zanim będzie liczbą, i
+dlatego \enquote{pochodna} sama w sobie nie jest jeszcze odpowiedzią na nic.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Wylicz je więc. W punkcie $x = \val{p15.pt.x}$, $y = \val{p15.pt.y}$ ile
+wynoszą obie pochodne cząstkowe?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p15.fx.at}$ oraz $\val{p15.fy.at}$}
+Z $2xy = 2 \times \val{p15.pt.x} \times \val{p15.pt.y}$ oraz
+$x^{2} + 3 = \val{p15.pt.x}^{2} + 3$.
+
+Obie zostały sprawdzone wobec różnicy centralnej na siatce punktów, tak jak
+Program~\ref{prog:F12} sprawdzał swoje reguły, i zgadzają się wszędzie na niej
+lepiej niż $\val{p15.partial.bound}$. To sprawdzenie arytmetyki, a nie idei,
+ale właśnie ono łapie znak.
+
+\begin{aibox}
+To właśnie liczy framework dla każdego parametru modelu. Strata jest jedną
+liczbą; każda waga jest jednym wejściem; a pochodna cząstkowa względem jednej
+wagi jest odpowiedzią na \emph{jeśli poruszę tę jedną wagę i nic więcej, o ile
+przesunie się strata}.
+
+Jest ich tyle, ile wag, a ciekawym faktem o nich nie jest żadna pojedyncza
+liczba, tylko to, że jeden przebieg wsteczny produkuje je wszystkie naraz
+\dash{} co jest tematem Programu~\ref{prog:P16} i potrzebuje kształtu
+obliczenia, a nie więcej rachunku różniczkowego.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Zebranie ich w jeden obiekt}
+\label{sec:P15-gradient}
+\index{gradient}
+
+\begin{fr}
+Dwie pochodne cząstkowe w punkcie to dwie liczby. Zapisz je jako wektor, w
+kolejności, w jakiej idą wejścia:
+\[ \nabla f = \left(\frac{\partial f}{\partial x},\
+                    \frac{\partial f}{\partial y}\right) \]
+To jest \textbf{gradient}, a $\nabla$ czyta się \enquote{del} albo
+\enquote{nabla}.
+
+W punkcie z sekcji 1 wynosi on $(\val{p15.fx.at}, \val{p15.fy.at})$.
+Program~\ref{prog:F09} dał wektorowi długość. Ile wynosi ta?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p15.grad.len}$}
+Z $\sqrt{\val{p15.fx.at}^{2} + \val{p15.fy.at}^{2}}$.
+
+Zatrzymaj fakt, że ma on długość oprócz kierunku, bo oba okażą się coś
+znaczyć, a znaczenia są różne.
+
+\begin{notationbox}
+\textbf{Słowo \enquote{gradient} wykonuje w tej książce dwie prace i tutaj się
+one spotykają.}
+
+Program~\ref{prog:F06} i Program~\ref{prog:F11} używają go w zwykłym sensie:
+\emph{współczynnik kierunkowy} prostej, jedna liczba, $m$ w $y = mx + c$. Tam
+było to właściwe słowo i tamte programy nie są w błędzie.
+
+Tutaj jest to \emph{wektor}, po jednej składowej na wejście. Oba są powiązane
+\dash{} w jednym wymiarze gradient ma jedną składową i jest nią współczynnik
+kierunkowy \dash{} ale nie są tym samym rodzajem obiektu, a zdanie w rodzaju
+\enquote{gradient jest duży} znaczy co innego zależnie od tego, o który
+chodzi. Gdy ten program mówi gradient, ma na myśli wektor.
+\end{notationbox}
+\end{fr}
+
+\begin{fr}
+Pytanie, które brzmi trywialnie i nie jest. Po co w ogóle zapisywać dwie
+liczby jako wektor, zamiast trzymać je jako dwie liczby?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo wektor można pomnożyć skalarnie przez inny wektor, a dwóch luźnych liczb
+nie można. Cała reszta tego programu wychodzi z tej jednej operacji.
+\end{ansblock}
+
+Program~\ref{prog:P05} poświęcił cały program temu, co kupuje iloczyn
+skalarny, a odpowiedzią były długości, kąty i prostopadłość z jednej
+definicji. Sekcja 3 wprowadza gradient do tej maszynerii i wydobywa z niej
+najszybszy spadek, nie definiując niczego nowego.
+
+\begin{note}
+Przy więcej niż dwóch wejściach nie zmienia się nic poza długością listy.
+Model z miliardem parametrów ma gradient o miliardzie składowych, nadal jest
+to jeden wektor, a każde zdanie tego programu nadal jest o nim prawdziwe.
+
+Książka zostaje w dwóch wymiarach, bo dwa to tyle, ile widać. Warto przy tym
+pamiętać o ostrzeżeniu Programu~\ref{prog:P05}: dwuwymiarowe obrazy geometrii
+wielowymiarowej mylą w konkretny, mierzalny sposób, a iloczyn skalarny jest
+jedną z niewielu rzeczy, które przenoszą się bez zastrzeżeń.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedna własność, zanim zostanie użyty. Program~\ref{prog:F11}
+powiedział, że pochodna stałej to zero. Ile wynosi gradient w punkcie, w
+którym $f$ ma minimum?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wektor zerowy: każda pochodna cząstkowa jest tam zerem.
+\end{ansblock}
+
+Bo gdyby którakolwiek nie była, mógłbyś przesunąć się kawałek wzdłuż tego
+wejścia i zejść w dół, więc nie byłbyś w minimum.
+
+\begin{trapbox}
+Odwrotne zdanie jest fałszywe i Program~\ref{prog:F11} powiedział to w jednym
+wymiarze: zerowa pochodna to nie minimum. W więcej niż jednym jest gorzej, bo
+istnieje kształt, który nie ma jednowymiarowego odpowiednika w ogóle \dash{}
+punkt będący minimum wzdłuż jednego kierunku i maksimum wzdłuż innego.
+
+Program~\ref{prog:P10} nazwał go i narysował: \emph{siodło}. Jego gradient
+jest wektorem zerowym, więc cokolwiek zatrzymuje się, gdy gradient znika,
+zatrzymuje się tam całkiem chętnie. Odróżnienie tych trzech wymaga drugich
+pochodnych, co należy do Programu~\ref{prog:P17}.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Tempo zmiany wzdłuż dowolnego kierunku}
+\label{sec:P15-directional}
+\index{derivative!directional}
+
+\begin{fr}
+Dwie pochodne cząstkowe odpowiadają na dwa pytania: jak szybko $f$ się zmienia,
+gdy idziesz wzdłuż $x$, i gdy idziesz wzdłuż $y$.
+
+Żadne z nich nie jest pytaniem, które naprawdę masz. Chcesz poruszyć się w
+jakimś wybranym przez siebie kierunku \dash{} powiedzmy na północny wschód albo
+w którymkolwiek z nieskończenie wielu pozostałych \dash{} i wiedzieć, co robi
+$f$.
+
+Zapisz kierunek jako wektor jednostkowy $u$. Jak zdefiniowałbyś tempo zmiany
+$f$ wzdłuż $u$, używając wyłącznie definicji pochodnej z
+Programu~\ref{prog:F11}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dokładnie tak, jak zrobił to F11, tyle że wzdłuż tej prostej: zrób mały krok
+$h$ w kierunku $u$, zobacz, o ile zmieniło się $f$, podziel przez $h$ i
+zmniejszaj $h$.
+\end{ansblock}
+
+\[ D_u f = \lim_{h \to 0} \frac{f(\mathbf{p} + h u) - f(\mathbf{p})}{h} \]
+
+To ta sama granica, na funkcji jednej zmiennej, którą dostajesz, idąc wzdłuż
+prostej przez punkt. Nic nowego nie zostało zdefiniowane; wybrano kierunek i
+zastosowano wzdłuż niego definicję F11.
+
+\textbf{Jednostkowość ma znaczenie.} Gdyby $u$ było dwa razy dłuższe,
+odpowiedź by się podwoiła i mówiłaby o długości twojej linijki, a nie o
+stromości terenu.
+\end{fr}
+
+\begin{fr}
+Teraz krok, dla którego ta sekcja istnieje. Ta granica jest kłopotliwa do
+policzenia dla każdego kierunku, który mógłby cię obchodzić \dash{} i okazuje
+się, że nigdy nie musisz.
+
+Dwie pochodne cząstkowe to odpowiedzi dla $u = (1, 0)$ i $u = (0, 1)$. Ogólne
+$u = (u_1, u_2)$ to $u_1$ pierwszego i $u_2$ drugiego. Ile wynosi więc
+$D_u f$ w terminach gradientu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ D_u f = \nabla f \cdot u \]
+\end{ansblock}
+
+Tempo wzdłuż dowolnego kierunku to gradient pomnożony skalarnie przez ten
+kierunek, a dwie pochodne cząstkowe to przypadki szczególne $u = (1,0)$ i
+$u = (0,1)$.
+
+To cała ta sekcja i warto jasno powiedzieć, jakiego rodzaju jest to zdanie.
+Nie jest definicją i nie jest konwencją: jest konsekwencją tego, że granica
+jest liniowa względem kierunku, i można je sprawdzić. Skrypt bierze
+$\val{p15.dir.steps}$ kierunków dookoła okręgu, liczy granicę numerycznie dla
+każdego i porównuje z iloczynem skalarnym. Najgorsza niezgodność gdziekolwiek
+jest poniżej $\val{p15.dir.bound}$.
+
+\transcript{p15-directional}
+
+\mermaidfig{p15-any-direction}{Jedna liczba na kierunek i skąd ona
+pochodzi.}{dowolny kierunek}
+\end{fr}
+
+\begin{fr}
+Przed konsekwencjami jeden rachunek. W tym samym punkcie, przy gradiencie
+$(\val{p15.fx.at}, \val{p15.fy.at})$, ile wynosi tempo zmiany w kierunku
+$u = (\num{0.6}, \num{0.8})$?
+
+Sprawdź najpierw, czy $u$ jest wektorem jednostkowym, bo jeśli nie jest,
+odpowiedź nic nie znaczy.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p15.fx.at} \times \num{0.6} + \val{p15.fy.at} \times \num{0.8} =
+\num{17.6}$, a $u$ jest wektorem jednostkowym, bo
+$\num{0.6}^{2} + \num{0.8}^{2} = 1$.
+\end{ansblock}
+
+Jest to liczba, którą drukuje listing powyżej, i jest mniejsza niż własna
+długość gradientu, $\val{p15.grad.len}$. To nie przypadek i o tym jest
+następna sekcja.
+
+\begin{note}
+Trójkąt $3$--$4$--$5$ jest powodem, dla którego $(\num{0.6}, \num{0.8})$ jest
+wektorem jednostkowym, a Program~\ref{prog:P09} i Program~\ref{prog:P10}
+budowały z tej samej trójki obroty bez zaokrągleń. To najtańszy dokładny
+wektor jednostkowy, jaki istnieje, i dlatego wciąż się pojawia.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Najbardziej stromo i w poprzek poziomicy}
+\label{sec:P15-steepest}
+\index{gradient!steepest direction}
+
+\begin{fr}
+Przeczytaj teraz $D_u f = \nabla f \cdot u$, mając przed sobą tożsamość z
+Programu~\ref{prog:P05}:
+\[ a \cdot b = \lVert a \rVert \, \lVert b \rVert \cos\theta \]
+Skoro $u$ jest wektorem jednostkowym, $\lVert u \rVert = 1$, więc
+\[ D_u f = \lVert \nabla f \rVert \cos\theta \]
+gdzie $\theta$ to kąt między wybranym przez ciebie kierunkiem a gradientem.
+
+Popatrz, co to zrobiło z pytaniem. Pierwszy czynnik jest ten sam, jakikolwiek
+kierunek wybierzesz \dash{} jest własnością punktu, a nie twojego wyboru
+\dash{} więc jedyne, czym twój wybór steruje, to $\cos\theta$. Całe
+\enquote{który z nieskończenie wielu kierunków} zwinęło się w
+\enquote{który cosinus}, a to jest pytanie o jednosłownej odpowiedzi.
+
+Które $\theta$ czyni tempo największym i ile wynosi to największe tempo?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\theta = 0$, a największe tempo to samo $\lVert \nabla f \rVert$.
+\end{ansblock}
+
+Bo $\cos\theta$ wynosi co najwyżej $1$ i równa się $1$ tylko wtedy, gdy oba
+wskazują tak samo.
+
+\textbf{Gradient jest więc kierunkiem najszybszego wzrostu, i jest to
+wyprowadzone, a nie orzeczone.} Nie jest to definicja i nie jest to fakt do
+przyjęcia na wiarę: wynika z tego, że tempo jest iloczynem skalarnym, i z
+tego, że cosinus jest największy w zerze. To zdanie, na które zapracował cały
+ten program.
+
+A długość też teraz coś znaczy: $\lVert \nabla f \rVert$ mówi, \emph{jak
+szybko} $f$ wspina się w tym najlepszym kierunku. Kierunek i długość, dwa
+znaczenia, jeden wektor.
+\end{fr}
+
+\begin{fr}
+Pomiar, bo \enquote{największe} to twierdzenie o każdym kierunku, a nie o
+jednym. Wśród $\val{p15.dir.steps}$ kierunków największe znalezione tempo jest
+tym pod $\val{p15.grad.deg}$ stopniami, czyli we własnym kierunku gradientu, a
+jego wartość to własna długość gradientu.
+
+Próbkowane maksimum ustępuje $\lVert \nabla f \rVert$ o mniej niż
+$\val{p15.sweep.shortfall.bound}$, a skrypt orzeka, że ten niedobór nie
+przekracza tego, co da się wyjaśnić rozdzielczością siatki \dash{} a nie, że
+jest zerem, co byłoby fałszem dla każdego skończonego przeglądu.
+
+\begin{note}
+Pierwsza wersja tego sprawdzenia orzekała, że próbkowane maksimum
+\emph{równa się} długości, i zawiodła. Zasłużyła na to: maksimum po trzech i
+pół tysiąca kierunków nie może równać się maksimum po wszystkich, więc
+tolerancja była liczbą dobraną tak, by sprawdzenie przeszło, a nie zdaniem o
+matematyce.
+
+Orzekana jest teraz para \dash{} że żaden kierunek nie bije gradientu, co jest
+dokładne i jest nierównością z Programu~\ref{prog:P05}; oraz że próbkowany
+najlepszy ustępuje o nie więcej niż rozdzielczość. Drugie zamienia niedobór z
+zawstydzenia w wyjaśnienie.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Teraz drugi koniec tego samego równania. Które $\theta$ czyni tempo zerem i co
+to znaczy o tym, gdzie możesz iść?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\theta = 90$ stopni. Idź pod kątem prostym do gradientu, a $f$ nie zmienia
+się wcale, w pierwszym rzędzie.
+\end{ansblock}
+
+Droga, wzdłuż której $f$ się nie zmienia, to \textbf{poziomica} \dash{} zbiór
+poziomicowy, linie na mapie, pierścienie wokół dna niecki. Zatem:
+
+\textbf{gradient jest prostopadły do poziomicy przechodzącej przez punkt.}
+
+To to samo równanie odczytane na drugim krańcu i warto zauważyć, że
+\emph{najbardziej stromo pod górę} i \emph{prostopadle do poziomicy} nie są
+dwoma faktami o gradiencie. Są jednym faktem, odczytanym przy
+$\cos\theta = 1$ i przy $\cos\theta = 0$.
+\end{fr}
+
+\begin{fr}
+Twierdzenie to można postawić dokładnie zamiast numerycznie i skrypt to robi.
+Dla $f = ax^{2} + by^{2}$ gradient wynosi $(2ax, 2by)$, a kierunek wzdłuż
+poziomicy to $(-by, ax)$. Pomnóż je skalarnie.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$-2abxy + 2abxy = 0$. Nie w przybliżeniu zero \dash{} tożsamościowo zero, dla
+każdego $a$, $b$, $x$ i $y$.
+\end{ansblock}
+
+Skrypt sprawdza to nad liczbami wymiernymi w $\val{p15.perp.trials}$
+kombinacjach, bez żadnej tolerancji, bo twierdzenie zawierające słowo
+\emph{prostopadły} jest twierdzeniem o dokładnym zerze, a porównanie
+zmiennoprzecinkowe zamieniłoby je w twierdzenie o progu.
+
+\begin{note}
+To ta sama dyscyplina, której Program~\ref{prog:P04} użył dla rzędu, a
+Program~\ref{prog:P13} dla rozkładu stacjonarnego: tam, gdzie matematyka jest
+dokładna, licz dokładnie i orzekaj równość. Tolerancja jest dla pomiaru. To
+nim nie jest.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Oto dlaczego zaraz będzie to miało znaczenie, i warto odpowiedzieć, zanim
+pójdziesz dalej.
+
+Stoisz na powierzchni w kształcie niecki, gdzieś z boku. Gradient pod twoimi
+stopami wskazuje pod kątem prostym do poziomicy, na której stoisz. Czy
+kierunek prosto w dół tego zbocza wskazuje najniższy punkt niecki?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Tylko jeśli poziomice są okręgami. Ogólnie nie.
+\end{ansblock}
+
+Większość ludzi odpowiada tak i powód jest dobry: to prawda dla niecki, którą
+każdy sobie wyobraża. Okrągła niecka ma poziomice będące okręgami, prostopadła
+do okręgu wskazuje jego środek, a oba kierunki pokrywają się dokładnie.
+
+\textbf{Ale prostopadłość do poziomicy jest zdaniem lokalnym, a to, gdzie jest
+minimum, zdaniem globalnym}, i nic nie sprawia, że się zgadzają. Rozciągnij
+nieckę wzdłuż jednej osi, a poziomice stają się elipsami; prostopadła do
+elipsy nie wskazuje jej środka, chyba że akurat stoisz na jednej z jej osi.
+
+Sekcja 5 mówi, co to robi z marszem.
+
+\mermaidfig{p15-across-the-valley}{Gdzie wskazuje prostopadła, w okrągłej i w
+długiej niecce.}{w poprzek doliny}
+\end{fr}
+
+% ============================================================
+\section{Co to robi z marszem}
+\label{sec:P15-zigzag}
+\index{gradient!descent}
+
+\begin{fr}
+Program~\ref{prog:F11} zapisał już marsz, w jednym wymiarze:
+\[ x \;\longleftarrow\; x - \eta\, f'(x) \]
+i nazwał minus całym mechanizmem sterowania. W więcej niż jednym wymiarze
+zmienia się tylko to, że pochodna jest wektorem:
+\[ \mathbf{p} \;\longleftarrow\; \mathbf{p} - \eta\, \nabla f(\mathbf{p}) \]
+
+Zauważ, że aktualizacja jest \emph{po współrzędnych}: każda współrzędna
+przesuwa się o własną pochodną cząstkową i nie radzi się żadnej innej.
+Dlatego framework może zastosować to do miliarda parametrów, nie musząc niczego
+koordynować \dash{} notacja wektorowa jest wygodą przy zapisie, a arytmetyka
+pod spodem to miliard niezależnych odejmowań.
+
+Powiedz, dlaczego jest tam minus, w terminach wyniku tej sekcji, a nie wyniku
+F11.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo gradient jest kierunkiem najszybszego \emph{wzrostu}, a ty chcesz iść w
+dół.
+\end{ansblock}
+
+Jest to zdanie mocniejsze, niż F11 mógł postawić. F11 wiedział, że przeciwnie
+do znaku pochodnej jest w dół; nie wiedział, że ujemny gradient jest
+\emph{najlepszym} dostępnym kierunkiem w dół, bo to wymaga iloczynu skalarnego
+i cosinusa. Teraz nie jest to reguła kciuka, tylko odpowiedź na pytanie,
+\emph{który ze wszystkich kierunków schodzi najszybciej}.
+
+\begin{trapbox}
+\textbf{\enquote{Spadek gradientu porusza się w kierunku gradientu.}} Porusza
+się w kierunku gradientu \emph{ujemnego}, a jest to najczęstszy błąd znaku w
+ręcznie pisanej pętli treningowej.
+
+Warto zobaczyć, ile to kosztuje, zamiast dać sobie to powiedzieć. W punkcie
+$(\val{p15.zig.start.x}, \val{p15.zig.start.y})$ na niecce poniżej wartość
+wynosi $\val{p15.sign.before}$. Jeden mały krok przeciwnie do gradientu
+sprowadza ją do $\val{p15.sign.down}$. Jeden mały krok \emph{zgodnie} z
+gradientem podnosi ją do $\val{p15.sign.up}$.
+
+Nic nie zgłasza błędu. Pętla działa, liczby są skończone, a strata rośnie
+\dash{} co czyta się jako zły krok uczenia albo zła inicjalizacja znacznie
+częściej niż jako brakujący minus.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Teraz niecka. Program~\ref{prog:P10} zbudował jedną i celowo jej nie wydał:
+funkcję kwadratową, której dwie wartości własne to $\val{p15.lam.hi}$ i
+$\val{p15.lam.lo}$, więc jej poziomice są elipsami
+$\val{p10.basin.axisratio}$ raza dłuższymi niż szerszymi. To dolina: stroma w
+poprzek, płytka wzdłuż.
+
+Ten program używa tej samej niecki, zamiast wymyślać kolejną, a skrypt czyta
+zatwierdzone liczby P10 i przerywa budowanie, jeśli się przesunęły.
+
+Zacznij w $(\val{p15.zig.start.x}, \val{p15.zig.start.y})$, czyli poza obiema
+osiami. Zanim cokolwiek policzysz: czy ujemny gradient wskazuje tam minimum?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie \dash{} jest $\val{p15.zig.angle}$ stopni od niego}
+Minimum jest w początku układu, więc droga do domu prowadzi prosto z powrotem
+wzdłuż prostej, na której stoisz. Ujemny gradient stoi za to prostopadle do
+poziomicy, a na elipsie są to dwa różne kierunki.
+
+\textbf{Czterdzieści dwa stopnie to nie błąd zaokrąglenia, to prawie połowa
+kąta prostego.} Sterowanie nie jest lekko nietrafione; wskazuje zupełnie gdzie
+indziej, i robi to z powodu, który jest teraz całkowicie zrozumiały, a nie
+tajemniczy.
+
+\begin{note}
+Okrągła niecka jest próbą kontrolną i jest dokładna, a nie prawie dokładna.
+Ustaw obie wartości własne równe, a gradient staje się wielokrotnością samego
+położenia, więc ujemny gradient wskazuje minimum \emph{dokładnie}, a marsz
+jest prostą linią. Skrypt orzeka to iloczynem wektorowym na floatach, który
+jest dokładnie zerem.
+
+Zapytanie arcus cosinusa o kąt tego nie mówi: raportuje około
+$\val{p15.round.acos.bound}$ stopnia zamiast zera, bo cosinus wraca jako jeden
+minus zaokrąglenie, a arcus cosinus liczby tak bliskiej $1$ to miejsce, gdzie
+mieszka kasowanie z Programu~\ref{prog:P02}. Geometria jest dokładna; arcus
+cosinus jest złym przyrządem do mierzenia zera.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Zrób więc marsz. $\val{p15.zig.steps}$ kroków o rozmiarze
+$\val{p15.zig.eta}$ z tamtego rogu, na tej niecce.
+
+Dwie rzeczy do przewidzenia, zanim pójdziesz dalej. Ile razy marsz przechodzi
+z jednej strony doliny na drugą? I jak dystans, który przebywa, ma się do
+dystansu, który faktycznie pokonuje?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Przechodzi $\val{p15.zig.crossings}$ razy w $\val{p15.zig.steps}$ krokach
+\dash{} co każdy krok \dash{} i przebywa $\val{p15.zig.ratio}$ raza dalej,
+niż pokonuje.
+\end{ansblock}
+
+$\val{p15.zig.pathlen}$ drogi, żeby pokonać $\val{p15.zig.moved}$ terenu.
+Prawie siedem ósmych marszu idzie w bok.
+
+\begin{note}
+Miarą jest dystans przebyty wobec dystansu \emph{pokonanego}, a nie wobec
+dystansu do minimum. Wcześniejszy szkic użył drugiego i podał liczbę poniżej
+jedynki dla marszu będącego prostą linią \dash{} bo po dwudziestu krokach nie
+dotarł on do celu, więc przebył mniej niż całą drogę do domu. To mówi coś o
+rozmiarze kroku, a nic o kierunku.
+
+Droga przez przemieszczenie wynosi $1$ dla każdej prostej drogi, jak daleko by
+nie zaszła, co jest dokładnie tą własnością, o której jest ta sekcja, i wynosi
+$1$ dla okrągłej niecki co do ostatniego bitu.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Mechanizm to jedna linia arytmetyki i jest to własna rekurencja
+Programu~\ref{prog:F11}, po jednym kierunku naraz.
+
+Na tej niecce oba kierunki nie oddziałują: każda współrzędna jest mnożona
+przez $1 - \eta\lambda$ w każdym kroku, z własną $\lambda$. Przy
+$\eta = \val{p15.zig.eta}$ policz ten czynnik dla kierunku stromego
+($\lambda = \val{p15.lam.hi}$) i dla płytkiego
+($\lambda = \val{p15.lam.lo}$).
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p15.fac.hi}$ oraz $\val{p15.fac.lo}$}
+I oto zygzak, w znakach. Stroma współrzędna mnożona jest przez liczbę
+\emph{ujemną}, więc zmienia stronę w każdym kroku, kurcząc się o piątą część.
+Płytka mnożona jest przez liczbę dodatnią tuż poniżej jedynki, więc pełznie ku
+zeru, nigdy nie przechodząc na drugą stronę.
+
+\textbf{Jeden kierunek przestrzeliwuje, a drugi się czołga, i odpowiada za oba
+ten sam rozmiar kroku.} Zrób krok dość mały, by przestrzeliwanie ustało, a
+płytki kierunek będzie szedł wiecznie; zrób go dość duży, by ruszyć płytki
+kierunek, a stromy rozleci się.
+
+\begin{rigourbox}
+Ile faktycznie wynosi największe użyteczne $\eta$ i jak zależy od krzywizny,
+należy do Programu~\ref{prog:P17}: potrzeba do tego porządnie drugiej
+pochodnej, która jest macierzą i nie została zdefiniowana. Ten program może
+powiedzieć, że czynnik staje się ujemny i że marsz przechodzi na drugą stronę;
+nie może powiedzieć, gdzie leży granica.
+
+A naprawa należy do Programu~\ref{prog:P20}. Moment pędu uśrednia ostatnie
+kroki, więc składowe boczne \dash{} które zmieniają znak \dash{} kasują się
+wzajemnie, podczas gdy te do przodu \dash{} które nie zmieniają \dash{}
+sumują się. To zdanie staje się oczywiste dopiero po zobaczeniu tego obrazu i
+dlatego ten program produkuje problem i zostawia go stojącym.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Ostatnia rzecz, bo to powód, dla którego cokolwiek z tego się uogólnia.
+
+Wszystko w tej sekcji zrobiono na dwóch wejściach i niecce, którą da się
+narysować. Prawdziwa strata ma miliard wejść i nie da się jej narysować
+wcale. Które z tych zdań to przeżywa, a które było o obrazku?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wszystkie przeżywają. Ani jeden krok nie skorzystał z tego, że wejść były
+dwa.
+\end{ansblock}
+
+Pochodna kierunkowa jest iloczynem skalarnym w dowolnej liczbie wymiarów;
+cosinus jest największy w zerze w dowolnej; poziomica staje się powierzchnią, a
+gradient nadal stoi do niej prostopadle; a dolina staje się kierunkiem, w
+którym krzywizna jest mała w porównaniu z inną, a takich jest w bród, gdy do
+wyboru jest ich miliard.
+
+\textbf{Nie przeżywa obrazek, a nigdy nie był argumentem.} Rysunek był
+sposobem zobaczenia iloczynu skalarnego. To iloczyn skalarny jest prawdą.
+
+\begin{aibox}
+Dlatego \enquote{krajobraz straty} jest zwrotem użytecznym i niebezpiecznym.
+Sterowanie naprawdę jest tym, co opisał ten program, w dowolnie wielu
+wymiarach. \emph{Kształt} nie: Program~\ref{prog:P05} zmierzył, jak źle
+przenosi się dwuwymiarowa intuicja, a powierzchnia miliardowymiarowa ma
+miejsce na zachowania nieposiadające dwuwymiarowego odpowiednika w ogóle.
+
+Ufaj tu algebrze i nie ufaj obrazowi w głowie, w tej kolejności.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Pochodna cząstkowa trzyma każde inne wejście w miejscu}
+  i jest wtedy zwykłą pochodną jednej zmiennej, więc każda reguła z
+  Programu~\ref{prog:F12} stosuje się bez zmian.}
+\sumitem{3--5}{Dla $f = x^{2}y + 3y$ pochodne cząstkowe to $2xy$ oraz
+  $x^{2}+3$. \textbf{Trzymanie wejścia w miejscu nie usuwa go z odpowiedzi}
+  \dash{} pochodna cząstkowa nadal jest funkcją wszystkiego.}
+\sumitem{6--7}{W $(\val{p15.pt.x}, \val{p15.pt.y})$ wynoszą one
+  $\val{p15.fx.at}$ i $\val{p15.fy.at}$, sprawdzone wobec różnicy centralnej
+  na siatce lepiej niż $\val{p15.partial.bound}$.}
+\sumitem{8--9}{\textbf{Gradient to pochodne cząstkowe zapisane jako wektor},
+  $\nabla f$, mający długość oprócz kierunku \dash{} tutaj
+  $\val{p15.grad.len}$.}
+\sumitem{9}{\textbf{Słowo wykonuje dwie prace.} Programy F06 i F11 używają
+  słowa \enquote{gradient} dla współczynnika kierunkowego prostej, jednej
+  liczby; tutaj jest to wektor po jednej składowej na wejście.}
+\sumitem{10--11}{Zapisuje się go jako wektor \textbf{po to, by dało się go
+  pomnożyć skalarnie}, i stąd bierze się reszta programu.}
+\sumitem{12--13}{W minimum gradient jest wektorem zerowym, a \textbf{odwrotne
+  zdanie zawodzi} \dash{} siodło też ma gradient zerowy, a odróżnienie ich
+  należy do Programu~\ref{prog:P17}.}
+\sumitem{14--17}{\textbf{Tempo zmiany wzdłuż kierunku jednostkowego $u$ to
+  $\nabla f \cdot u$}, czyli granica z Programu~\ref{prog:F11} wzięta wzdłuż
+  prostej. Sprawdzone wobec tej granicy na $\val{p15.dir.steps}$ kierunkach
+  lepiej niż $\val{p15.dir.bound}$.}
+\sumitem{20--21}{Z cosinusem z Programu~\ref{prog:P05}
+  $D_u f = \lVert\nabla f\rVert\cos\theta$, więc \textbf{kierunkiem
+  najbardziej stromym jest własny kierunek gradientu, a najszybszym tempem
+  jego długość}. Wyprowadzone, nie orzeczone.}
+\sumitem{23--24}{Przy $\cos\theta = 0$ tempo jest zerem, więc \textbf{gradient
+  jest prostopadły do poziomicy} \dash{} to samo równanie odczytane na drugim
+  krańcu, dokładnie zero na $\val{p15.perp.trials}$ przypadkach wymiernych.}
+\sumitem{25--26}{Prostopadłość jest sprawdzona \textbf{dokładnie nad liczbami
+  wymiernymi}, bez żadnej tolerancji, bo twierdzenie zawierające słowo
+  \emph{prostopadły} jest twierdzeniem o dokładnym zerze.}
+\sumitem{27--28}{\textbf{Prostopadłość do poziomicy to nie to samo co
+  wskazywanie minimum}, chyba że poziomice są okręgami. Jedno jest lokalne, a
+  drugie globalne.}
+\sumitem{29--30}{Marsz to marsz Programu~\ref{prog:F11} z pochodną
+  wektorową, a minus ma teraz mocniejszy powód: gradient jest najszybszym
+  \emph{wzrostem}.}
+\sumitem{30}{\textbf{Znak jest najczęstszym błędem w ręcznie pisanej pętli.}
+  Jeden krok we właściwą stronę sprowadza $\val{p15.sign.before}$ do
+  $\val{p15.sign.down}$; jeden krok w złą podnosi to do
+  $\val{p15.sign.up}$, bez żadnego zgłoszonego błędu.}
+\sumitem{31--32}{Na niecce Programu~\ref{prog:P10}, o wartościach własnych
+  $\val{p15.lam.hi}$ i $\val{p15.lam.lo}$, ujemny gradient wskazuje
+  $\val{p15.zig.angle}$ stopni od minimum. W okrągłej niecce wskazuje je
+  dokładnie.}
+\sumitem{33--34}{Marsz przechodzi w poprzek doliny $\val{p15.zig.crossings}$
+  razy w $\val{p15.zig.steps}$ krokach i \textbf{przebywa
+  $\val{p15.zig.ratio}$ raza dalej, niż pokonuje}.}
+\sumitem{35--36}{Każda współrzędna mnożona jest przez $1 - \eta\lambda$:
+  czynnik wynosi $\val{p15.fac.hi}$ w kierunku stromym, który zmienia znak w
+  każdym kroku, i $\val{p15.fac.lo}$ w płytkim, który pełznie. \textbf{Jeden
+  rozmiar kroku musi obsłużyć oba.}}
+\sumitem{37--38}{\textbf{Ani jeden krok argumentu nie skorzystał z tego, że
+  wejść były dwa.} Obrazek jest ilustracją iloczynu skalarnego, a nigdy jego
+  przesłanką.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item $g(x, y) = 3x^{2}y - y^{3}$. Zapisz obie pochodne cząstkowe i wylicz
+  gradient w $(1, 2)$.
+  \answerto{$\partial g/\partial x = 6xy$ oraz $\partial g/\partial y =
+  3x^{2} - 3y^{2}$. W $(1, 2)$ daje to
+  \[ \nabla g = (12,\ -9), \qquad \lVert \nabla g \rVert = 15. \]
+  Znowu trójkąt $3$--$4$--$5$, przeskalowany przez trzy.}
+\item W punkcie, w którym $\nabla f = (3, 4)$, ile wynosi tempo zmiany $f$ w
+  kierunku $(\num{0.8}, \num{0.6})$, a ile w kierunku
+  $(-\num{0.8}, -\num{0.6})$?
+  \answerto{$\num{4.8}$ oraz $-\num{4.8}$. Odwrócenie kierunku odwraca znak i
+  nic więcej, bo iloczyn skalarny jest liniowy względem $u$ \dash{} i dlatego
+  też kierunek najszybszego \emph{spadku} jest dokładnie przeciwny do
+  kierunku najszybszego wzrostu, a nie tylko blisko niego.}
+\item Kolega mówi, że jego strata spada, ale bardzo wolno, i że długość
+  gradientu jest duża. Co możesz mu powiedzieć na podstawie samego tego
+  programu?
+  \answerto{Że duży gradient i wolny postęp nie są sprzecznością, a prawdopodobnym
+  powodem jest to, że większość gradientu wskazuje w poprzek doliny, a nie
+  wzdłuż niej. Długość mówi, jak stromy jest teren w kierunku najbardziej
+  stromym; nie mówi nic o tym, czy ten kierunek prowadzi dokądkolwiek. Co z
+  tym zrobić, należy do Programu~\ref{prog:P20}.}
+\item Dlaczego porównywanie $D_u f$ dla dwóch kierunków jest błędne, jeśli
+  jeden z nich nie jest wektorem jednostkowym?
+  \answerto{Bo $D_u f$ skaluje się z długością $u$, więc dłuższe $u$ podaje
+  większą liczbę bez tego, żeby teren był choć trochę bardziej stromy.
+  Porównywałbyś linijki, a nie zbocza. Wymóg jednostkowości jest tym, co czyni
+  tę liczbę własnością powierzchni.}
+\item W niecce o poziomicach będących okręgami ile razy spadek gradientu
+  przechodzi z jednej strony na drugą, zanim dotrze?
+  \answerto{Ani razu, dla dowolnego zbieżnego rozmiaru kroku. Ujemny gradient
+  wskazuje środek dokładnie, więc każdy krok idzie wzdłuż tej samej prostej, a
+  droga wynosi $1$ raza własne przemieszczenie \dash{} co skrypt orzeka
+  dokładnie. Przechodzenie wymaga poziomic nieokrągłych i to cała treść
+  sekcji 5.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że jeśli $u$ jest wektorem jednostkowym, to
+  $D_{-u} f = -D_u f$, i powiedz, co to znaczy o kierunku najszybszego
+  spadku.
+  \answerto{$\nabla f \cdot (-u) = -(\nabla f \cdot u)$, bo iloczyn skalarny
+  jest liniowy względem drugiego argumentu. Kierunkiem najszybszego
+  \emph{spadku} jest więc dokładnie $-\nabla f$: ten sam argument, który
+  uczynił $\cos\theta = 1$ przypadkiem najlepszym, czyni $\cos\theta = -1$
+  najgorszym, a najgorsze tempo wzrostu jest najlepszym tempem spadku.}
+\item Gradient $f(x,y) = ax^{2} + by^{2}$ w $(x, y)$ wynosi $(2ax, 2by)$. Dla
+  których punktów jest on równoległy do kierunku z powrotem do początku
+  układu?
+  \answerto{Tam, gdzie $2ax \cdot y = 2by \cdot x$, czyli $xy(a - b) = 0$.
+  Albo więc $a = b$ \dash{} okrągła niecka, gdzie jest równoległy wszędzie
+  \dash{} albo punkt leży na jednej z dwóch osi. Wszędzie indziej na niecce
+  wydłużonej oba kierunki się różnią, i dlatego marsz zaczynający poza osiami
+  zygzakuje, a zaczynający na osi nie.}
+\item Funkcja trzech wejść ma gradient o trzech składowych. Ile kierunków
+  stoi do niego pod kątem prostym i co to znaczy o poziomicy?
+  \answerto{Cała płaszczyzna ich, a nie dwa odosobnione kierunki: w trzech
+  wymiarach wektory prostopadłe do danego tworzą przestrzeń dwuwymiarową, co
+  jest liczeniem wymiaru z Programu~\ref{prog:P04}. Zbiór poziomicowy przez
+  punkt jest więc \emph{powierzchnią}, a nie krzywą, a gradient stoi
+  prostopadle do całej naraz.}
+\item Dlaczego argument z sekcji 4 nigdy nie wspomina, ile wejść ma $f$?
+  \answerto{Bo używa tylko tego, że $D_u f$ jest iloczynem skalarnym i że
+  iloczyn skalarny to $\lVert a\rVert\lVert b\rVert\cos\theta$, a żadne z tych
+  zdań nie ma w sobie wymiaru. To właśnie czyni wynik użytecznym dla modelu o
+  miliardzie parametrów, gdzie nic nie da się narysować. Obrazek w sekcji 5
+  jest ilustracją algebry i nigdy jej przesłanką.}
+\item Masz nieckę o wartościach własnych $\lambda$ i $1$ i podwajasz
+  $\lambda$. Co dzieje się z kątem między ujemnym gradientem a drogą do domu i
+  jak byś to sprawdził?
+  \answerto{Rośnie: im bardziej wydłużona niecka, tym dalej od środka wskazuje
+  prostopadła. Skrypt sprawdza dokładnie to, przeglądając stosunek i orzekając,
+  że kąt rośnie na każdym kroku \dash{} co jest niezmiennikiem, gdzie
+  pojedynczy kąt byłby faktem o jednej niecce. Nie może urosnąć powyżej kąta
+  prostego, bo krok szedłby wtedy pod górę.}
+\end{furtherproblems}
