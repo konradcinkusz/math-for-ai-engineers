@@ -2121,3 +2121,64 @@ is a checkpoint every 100, 200 activations held instead of 10 000 — a factor o
 50 — for exactly two forward passes rather than one, because each segment is
 recomputed exactly once. It is a stationary point, not folklore. → **P16**,
 paying the arithmetic **P03** named and left.
+
+**185. "The quadratic model is more accurate than the tangent line."** True and
+useless. "More accurate" is a fact about whichever *h* you happened to try; what
+the Taylor model buys is an **order**, so halving *h* divides the linear error by
+about 4 and the quadratic one by about 8 — measured over eight halvings rather
+than quoted as two error figures. A claim about one step and a claim about all of
+them are different claims, and only the second is checkable. → **P17**.
+
+**186. "The second-order model tells you where the minimum is."** It is local, in
+exactly the sense Program P15's gradient was: it describes the surface near the
+point and has no opinion about anywhere else. Adding curvature makes the local
+description *better*, not *wider*. A model fitted at one point cannot locate a
+minimum somewhere it was never evaluated. → **P17**.
+
+**187. "The learning rate was too high" is a judgement.** It is an inequality:
+η > 2/λ_max at the point the run was standing on. That follows from a geometric
+sequence and nothing about networks — each eigendirection is multiplied by
+1 − ηλ every step, so bounded means |1 − ηλ| < 1, which is η < 2/λ. The quantity
+on the right is a property of the *loss surface*, not of the optimiser or the
+data, so a run can be stable for a thousand steps and then not. → **P17**.
+
+**188. "The step size is set by the model, or by the data."** It is set by the
+single fastest-curving direction, and every other direction lives with what it is
+given. On Program P10's bowl the steep direction allows η = 0.10 and the shallow
+one would allow 2.0 — twenty times larger and irrelevant, because taking it would
+blow the other one up. That is the zig-zag Program P15 drew, stated as the
+arithmetic underneath it. → **P17**.
+
+**189. "Second-order methods are better, they are just slow."** They are not
+merely slow; at this scale the matrix does not exist. A Hessian for 7e9
+parameters has 4.9e19 entries — one per *pair* of parameters — and solving with
+it is cubic on top of that. The line worth remembering is not a list of methods
+but where it falls: anything needing n² storage is out and anything needing n is
+in, and the per-parameter scaling several optimisers do is the diagonal idea
+under another name. → **P17**.
+
+**190. "Newton's method finds minima."** It finds *stationary points* and does
+not distinguish between them: the step divides by the curvature in each
+direction, so where a curvature is negative it steps *towards* the saddle. That
+is Program F11's "a zero derivative is not a minimum" in many dimensions — and
+combined with the counting argument (a minimum needs every one of n eigenvalue
+signs positive, while the ways to be a saddle grow with n) it is a real problem
+rather than a curiosity. → **P17**.
+
+**191. "This minimum is flatter, so it will generalise better."** Not a claim you
+can evaluate until somebody says what *flatter* is measured in. Rescale one
+parameter — write w = cu and divide that parameter's input by c — and every
+output is identical while the curvature is multiplied by c², exactly. So one
+model has two sharpnesses. No quantity built from the raw eigenvalues survives it
+either: not the largest, not the trace, not the ratio. This is not exotic — any
+elementwise scaling admits the reparameterisation, and normalisation layers make
+it a symmetry the architecture has by construction. The book does not adjudicate
+the empirical claim; it supplies the filter. → **P17**.
+
+**192. "So the step-size bound is meaningless too, since λ_max rescales."** It
+rescales, and it does not matter, because η rescales with it in the opposite
+direction and the *step actually taken* is unchanged. That is the difference
+between the two uses in one sentence: in the step-size bound the curvature
+appears alongside something with the same units and the pair is invariant though
+neither member is; in a sharpness claim it is quoted alone. The right question
+about a curvature is never *is it big* but *compared with what*. → **P17**.

@@ -1,0 +1,9 @@
+>>> lam_hi, lam_lo = 20, 1
+>>> 2 / lam_hi, 2 / lam_lo
+(0.1, 2.0)
+>>> eta = 0.11
+>>> x = 1.0
+>>> for _ in range(40): x = x - eta * lam_hi * x
+...
+>>> x
+1469.7715679690943
