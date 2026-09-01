@@ -100,11 +100,16 @@ def committed(fname: str, key: str) -> str | None:
     return m.group(1) if m else None
 
 
-def bound(x: float) -> str:
+def bound(x: float, ceiling: float) -> str:
     """A residual is a property of the machine, so commit a CEILING it clears
-    on any of them -- P06's rule, which CI enforced the hard way."""
-    assert x >= 0.0
-    return "0" if x == 0.0 else f"1e{math.ceil(math.log10(x)):d}"
+    on any of them -- P06's rule, which CI enforced the hard way, and which CI
+    enforced again here: bound() used to return the TIGHTEST power of ten,
+    which is itself machine-dependent when the residual is near zero, because
+    one machine can measure 0 where another measures 1e-16. The ceiling is now
+    STATED by the caller and merely checked, so the committed number is a
+    decision rather than an observation."""
+    assert 0.0 <= x < ceiling, (x, ceiling)
+    return f"1e{round(math.log10(ceiling)):d}"
 
 
 # ---------------------------------------------------------------------------
@@ -648,7 +653,7 @@ emit("p20.wd.l2.steep", W_L2[0], 3)
 emit("p20.wd.l2.flat", W_L2[1], 3)
 emit("p20.wd.l2.spread", L2_SPREAD, 1)
 emit("p20.wd.decoupled", W_WD[0], 3)
-emit("p20.wd.gap", bound(abs(W_WD[0] - W_WD[1])))
+emit("p20.wd.gap", bound(abs(W_WD[0] - W_WD[1]), 1e-3))
 NOTES.append(f"with one lambda of {LAMBDA}, L2 settles the steep coordinate "
              f"at {W_L2[0]:.3f} and the flat one at {W_L2[1]:.3f} -- a factor "
              f"of {L2_SPREAD:.1f} in how hard the same penalty pulls -- while "
@@ -672,7 +677,8 @@ def sgd_wd(eta, lam):
 _a = settle(sgd_l2, LAMBDA, steps=50_000)
 _b = settle(sgd_wd, LAMBDA, steps=50_000)
 assert max(abs(x - y) for x, y in zip(_a, _b)) < 1e-12, (_a, _b)
-emit("p20.wd.sgd.gap", bound(max(abs(x - y) for x, y in zip(_a, _b))))
+emit("p20.wd.sgd.gap",
+     bound(max(abs(x - y) for x, y in zip(_a, _b)), 1e-12))
 NOTES.append("for plain descent the two forms are the same update and settle "
              "in identical places, which is why the distinction is a fact "
              "about adaptive methods rather than about penalties")
@@ -717,15 +723,39 @@ assert abs(COS_QUARTER + COS_THREE - 1.0) < 1e-12       # symmetric about half
 # differs is the SHAPE at the two ends, not the area.
 _above = sum(1 for t in range(TOTAL) if cosine(t, TOTAL) > 0.5)
 assert abs(_above - TOTAL // 2) <= 1, (_above, TOTAL)
-_area_cos = sum(cosine(t, TOTAL) for t in range(TOTAL)) / TOTAL
-_area_lin = sum(1.0 - t / TOTAL for t in range(TOTAL)) / TOTAL
-assert abs(_area_cos - _area_lin) < 1e-3, (_area_cos, _area_lin)
+
+# --- CI REJECTED THE FIRST VERSION OF THIS, AND IT WAS RIGHT. Averaging over
+# t = 0..TOTAL-1 misses the last point, so both areas came out at 0.5005 --
+# a value sitting EXACTLY on a rounding boundary at three decimals, whose
+# printed form then depends on the last bit. This container printed 0.501 and
+# CI printed 0.500, because libm's cos is not bit-identical across platforms.
+#
+# It is the P06 residual defect in a new place: an OBSERVATION committed where
+# an INVARIANT was meant. The invariant is that both schedules spend the same
+# budget and that the budget is HALF THE PEAK, which is exact by symmetry --
+# so the sum is taken over the whole interval with its endpoints halved, and
+# the linear case then gives exactly 0.5 on any machine.
+def area(f):
+    """Trapezoid over t = 0..TOTAL inclusive, as a fraction of the peak."""
+    total = 0.5 * (f(0) + f(TOTAL))
+    total += sum(f(t) for t in range(1, TOTAL))
+    return total / TOTAL
+
+
+_area_cos = area(lambda t: cosine(t, TOTAL))
+_area_lin = area(lambda t: 1.0 - t / TOTAL)
+# Both are 1/2 in the mathematics, by symmetry about the midpoint; a sum of a
+# thousand doubles is not, so what is asserted is a ceiling both clear on any
+# machine and what is PRINTED is the exact value the symmetry gives.
+assert abs(_area_lin - 0.5) < 1e-12, _area_lin
+assert abs(_area_cos - 0.5) < 1e-12, _area_cos
 emit("p20.cos.quarter", COS_QUARTER, 3)
-emit("p20.cos.area", _area_cos, 3)
-emit("p20.cos.lin.gap", bound(abs(_area_cos - _area_lin)))
-NOTES.append(f"a cosine schedule and a linear one spend the same total "
-             f"budget -- {_area_cos:.3f} of the peak, agreeing to better than "
-             f"{bound(abs(_area_cos - _area_lin))} -- and differ only in "
+emit("p20.cos.area", 0.5, 3)
+emit("p20.cos.lin.gap",
+     bound(max(abs(_area_cos - 0.5), abs(_area_lin - 0.5)), 1e-12))
+NOTES.append("a cosine schedule and a linear one both spend exactly half the "
+             "peak over the run, agreeing to better than "
+             "1e-12 -- and differ only in "
              "where they spend it")
 
 # Warmup, and what it is for: the first Adam steps have almost no history in

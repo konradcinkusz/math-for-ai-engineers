@@ -6557,6 +6557,31 @@ claim it replaced.
   the inside shortfall saturates below $100$ per cent while the outside one
   keeps climbing, so the ratio peaks. The ratio was never the claim.
 
+#### CI rejected a value on a rounding boundary, and `bound()` itself was unsafe
+
+`p20.cos.area` printed $\num{0.501}$ here and $\num{0.500}$ on CI, and the
+recompute job caught it. The two schedules' budgets were averaged over
+$t = 0 \ldots \text{TOTAL}-1$, which misses the last point and puts the answer
+at $\num{0.5005}$ \dash{} **exactly on a rounding boundary at three decimals**,
+so the printed form depends on the last bit, and `libm`'s cosine is not
+bit-identical across platforms.
+
+That is Program~\ref{prog:P06}'s residual defect in a new place: an
+*observation* committed where an *invariant* was meant. The invariant is that
+both schedules spend half the peak, exactly, by symmetry about the midpoint.
+The sum is now a trapezoid with its endpoints halved, the assertion is a
+ceiling both machines clear, and **the page prints the exact value the
+symmetry gives rather than the sum's**.
+
+**And the same pass found that `bound()` has the defect built in.** The helper
+this book uses to commit a residual returns the *tightest* power of ten above
+it \dash{} which is itself a property of the machine when the residual can be
+exactly zero, because one machine measures $0$ and another $10^{-16}$. It now
+takes the ceiling as an argument and merely checks it, so what is committed is
+a decision rather than an observation. The other scripts' copies are untouched:
+their residuals are genuine and nowhere near zero, and sweeping them is the
+pass this file already lists.
+
 #### And one measurement that was arithmetic dressed as a measurement
 
 The weight-decay section first \enquote{measured} the effective strength by
