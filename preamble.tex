@@ -2358,6 +2358,22 @@
 %  container needs four, so its columns are fuller and demand more shrink --
 %  and a sweep taken on one machine cannot choose a value for the other.
 %
+%  AND THE RAISE WORKED, PARTLY, WHICH SETTLED THE MECHANISM. At 5.5 CI's box
+%  went from 18.29 pt to 9.29 pt -- exactly nine points for one point of extra
+%  shrink per entry -- so the shrink DOES reach it and the direction was right.
+%  What it also showed is that no single \parskip value can serve both
+%  machines: CI wants more than 5.5 and this container's `main-pl-a4` breaks at
+%  6, by 26.3 pt. The two disagree and the knob is one-dimensional.
+%
+%  SO THE REMEDY IS A SECOND SOURCE OF SHRINK, and the point of it is that it
+%  does NOT scale with the page's contents. A column holds some forty-five
+%  entries, so one more point on each is forty-five points of extra capacity
+%  and TeX packs more -- which is exactly why the constant is non-monotonic.
+%  \indexspace appears three or four times a page whatever the entries are, so
+%  six more points of shrink on each is about twenty points, bounded, and it
+%  absorbs a residual without changing how much TeX is willing to cram. That is
+%  the difference between giving a page slack and giving it appetite.
+%
 %  A process note that cost a CI cycle, because it will happen again. The
 %  raise to 5.5 was made, and then a BACKGROUND SWEEP SCRIPT still running in
 %  the tree restored 4.5 on its way out, so the commit carried the old value
@@ -2382,7 +2398,16 @@
 %  else, which is how a gate goes quiet.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 5.5pt}}{}{%
+  \setlength{\parskip}{0pt plus 0.3pt minus 5.5pt}%
+  % And a SECOND source of shrink, deliberately one that does NOT scale with
+  % the number of entries on the page. Raising \parskip's shrink gives a
+  % column 45 entries x 1pt of extra capacity, so TeX packs more and the
+  % constant is non-monotonic -- which is the whole story above. \indexspace
+  % appears three or four times a page whatever the entries are, so six more
+  % points of shrink on each is about twenty points of capacity, bounded, and
+  % it absorbs a residual without changing how much TeX will cram.
+  % book.cls sets it to 10pt plus 5pt minus 3pt.
+  \renewcommand\indexspace{\par \vskip 10pt plus 5pt minus 9pt\relax}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex

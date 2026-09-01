@@ -6366,6 +6366,26 @@ not be compressed enough \dash{} and stop short of the cliff. The value is
 $\num{5.5}$, which is the top of the locally clean range and a full point
 below the first local failure.
 
+**The raise worked, partly, and that settled the mechanism.** At $\num{5.5}$
+CI's box went from $\num{18.29}$ pt to $\num{9.29}$ pt \dash{} exactly nine
+points for one more point of shrink per entry \dash{} so the shrink does reach
+it and the direction was right. What it also showed is that **no single value
+can serve both machines**: CI wants more than $\num{5.5}$ and this container's
+`main-pl-a4` breaks at $6$, by $\num{26.3}$ pt.
+
+**So the remedy is a second source of shrink, and the point of it is that it
+does not scale with the page's contents.** A column holds some forty-five
+entries, so one more point on each is forty-five points of extra capacity and
+TeX packs more \dash{} which is exactly why the constant is non-monotonic.
+`\indexspace` appears three or four times a page whatever the entries are, so
+six more points of shrink on each is about twenty points, bounded, and it
+absorbs a residual without changing how much TeX is willing to cram.
+
+That is the generalisable half: **there is a difference between giving a page
+slack and giving it appetite**, and a knob that scales with the content gives
+both. When a rigid region needs a few points, find a source of shrink whose
+total is fixed.
+
 **And one process error, recorded because it will happen again.** The raise to
 $\num{5.5}$ was made, and a background sweep script still running in the tree
 restored $\num{4.5}$ on its way out, so the commit carried the old value and
