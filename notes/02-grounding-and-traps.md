@@ -1996,3 +1996,61 @@ one. A rigour box withholds the argument and supplies all three parts, so a
 reader may use the result exactly as if they had seen the proof. What they may
 not do is extend it, weaken a hypothesis, or apply it outside its quantifiers,
 because those are the moves the argument would have had to justify. → **P14**.
+
+### Functions of several variables and the gradient, written (P15)
+
+Items 170 to 176 came out of writing P15.
+
+**170. "Holding the other inputs still removes them from the answer."** It does
+not. ∂f/∂x for f = x²y + 3y is 2xy — the y is still there. The other inputs are
+held still *while you differentiate* and then go back to being variables, so a
+partial derivative is a function of everything the original was. That is why it
+has to be evaluated at a point before it is a number, and why "the derivative"
+on its own is not yet an answer to anything. → **P15**.
+
+**171. "The gradient is the slope."** Two different objects wearing one word,
+and this book uses both. Programs F06 and F11 say gradient for the slope of a
+line — one number, the m in y = mx + c, which is standard British usage and was
+right there. P15 says gradient for a vector with one component per input. In one
+dimension the vector has one component and that component is the slope, which is
+why the collision survives; but "the gradient is large" means different things in
+the two senses, and a reader who has only met the first will read the second as a
+number. → **P15**.
+
+**172. "Gradient descent moves in the direction of the gradient."** The
+*negative* gradient, and this is the commonest sign error in a hand-written
+training loop. What makes it survive is that nothing complains: the loop runs,
+the numbers stay finite, and the loss climbs — which reads as a bad learning
+rate or a bad initialisation far more often than as a missing minus. Measured on
+a quadratic, one small step the right way takes the value from 10.50 to 4.08 and
+one step the wrong way takes it to 20.12. → **P15**.
+
+**173. "The gradient points at the minimum."** It points at right angles to the
+contour you are standing on, which is a *local* statement, where the minimum's
+position is a *global* one. The two coincide only when the contours are circles.
+On Program P10's own bowl — eigenvalues 20 and 1 — the negative gradient at
+(1, 1) is 42.1 degrees away from the direction home, which is nearly half a right
+angle rather than a rounding error. → **P15**.
+
+**174. "Steepest descent takes the shortest path."** It takes the locally
+steepest one, which in a valley is mostly sideways. Measured over twenty steps
+on that bowl: the walk crosses from one side to the other every single step and
+travels 6.88 times as far as it actually moves. The mechanism is one line — each
+coordinate is multiplied by (1 − ηλ) with its own λ, so the steep direction's
+factor is negative and flips sign while the shallow one's is positive and creeps
+— and it is Program F11's own recurrence per eigendirection. → **P15** for the
+picture, **P17** for what bounds η, **P20** for momentum, which fixes it.
+
+**175. "A zero gradient means a minimum."** F11 said this fails in one dimension;
+in more than one there is a shape with no one-dimensional analogue at all — a
+point that is a minimum along one direction and a maximum along another, which
+P10 named a saddle. Its gradient is the zero vector, so anything that stops when
+the gradient vanishes stops there quite happily. → **P15**, with the test in
+**P17**.
+
+**176. "A big gradient means you are far from the minimum, or making fast
+progress."** Neither follows. The length of the gradient says how steep the
+ground is in the steepest direction and says nothing about whether that direction
+goes anywhere useful — which is exactly the valley case, where the length is
+large, the progress is slow, and both are true at once for the same reason. The
+length is a local rate; the distance home is not local. → **P15**.

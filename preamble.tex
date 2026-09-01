@@ -2285,9 +2285,21 @@
 %  still half a point between two index lines, which is nothing. The number
 %  scales with the index and the index only grows, so expect to raise it
 %  again; \vfuzz stays rejected for the reason above.
+%
+%  AND IT CAME BACK AGAIN, exactly as the line above said it would, when
+%  Program P15 added its entries: 5.5 pt on the fourth page of `main-pl.ind`,
+%  on THIS container rather than on CI, which is the same defect arriving
+%  from the other machine. Half a point was about twenty a column and the
+%  index is now longer than that covers. Nine tenths of a point is about
+%  thirty-six a column, which leaves room for several more programs, and it
+%  is still under a point between two index lines. The prediction in the
+%  paragraph above is the useful part of this note: THIS NUMBER IS NOT A
+%  CONSTANT, it is a function of how long the index is, and the index only
+%  ever grows. Raise it when a build says so and do not go looking for a
+%  cleverer fix.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 0.5pt}}{}{%
+  \setlength{\parskip}{0pt plus 0.3pt minus 0.9pt}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex
