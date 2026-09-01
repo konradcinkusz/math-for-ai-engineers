@@ -1,0 +1,4 @@
+flowchart LR
+  A["rescale one weight and divide its input by the same<br/>amount, and the network computes the identical function"]
+  A --> B["but the loss as a function of the new weight has a<br/>different curvature, by the square of that amount"]
+  B --> C["so a number that changes while the function does not<br/>is a fact about the coordinates, not about the minimum"]

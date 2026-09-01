@@ -2307,9 +2307,20 @@
 %  CONSTANT, it is a function of how long the index is, and the index only
 %  ever grows. Raise it when a build says so and do not go looking for a
 %  cleverer fix.
+%
+%  AND AGAIN AT P17, with one detail worth keeping: 10.8 pt and 4.8 pt on the
+%  LAST page of `main-pl.ind`, which is the page where the shrink has to do
+%  its work because the material has nowhere else to go. An interior column
+%  that will not fit pushes an entry to the next page; the final one cannot,
+%  so it must shrink or overflow, and it is reliably the fullest page of the
+%  four because \raggedbottom lets every page before it end short. Nine tenths
+%  went to two and a half, which is still two and a half points spread over a
+%  column of forty entries and invisible between two index lines. The
+%  prediction two paragraphs up has now been right three times running; treat
+%  the number as a function of the index's length and nothing else.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 1.5pt}}{}{%
+  \setlength{\parskip}{0pt plus 0.3pt minus 2.5pt}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex

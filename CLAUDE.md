@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P16 written, both editions \dash{} Parts I to IV entire, and the first two of Part V.** P17–P34 are stubs carrying their briefs | 18 of 47 |
+| Programs | **F1–F13 and P1–P17 written, both editions \dash{} Parts I to IV entire, and the first three of Part V.** P18–P34 are stubs carrying their briefs | 17 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 870 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 884 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 738 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 748 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 890 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 906 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 756 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 764 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,21 +93,21 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **18 of 47 programs are stubs**, in each language. This is the whole of the
+- **17 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 885 computed values, all referenced, all present, plus the committed console
+- 911 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 174 Mermaid sources, all rendering
-- 44 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 180 Mermaid sources, all rendering
+- 46 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
 - **83 orphan-tail pages: 20 · 25 · 19 · 19** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
-  **P15 none** and P16 one \dash{} from 15 before F5, 26 before F6, 33 before F7,
+  **P15 none**, P16 one and **P17 none** \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
   before P6. **P6 added two and the ten transcripts it turned on added three**,
@@ -135,13 +135,14 @@ what was there before.
   This is the second ledger that is reported rather than gated, and like the
   first it must not quietly go away. **When the count goes up, that is the
   signal.**
-- **Elicitation rate: 53% of the book's frames put a question to the reader**,
+- **Elicitation rate: 52% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
-  **50% in P15** and **47% in P16** \dash{} P13 and P15 are the highest
-  outside Part I and the only ones anywhere to reach the book's own rate.**
+  **50% in P15**, **47% in P16** and **50% in P17** \dash{} P13, P15 and P17
+  are the highest outside Part I and the only ones anywhere to reach the
+  book's own rate.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -5965,6 +5966,158 @@ comment above the patch is the thing to read before reaching for a cleverer fix.
 - Frame numbers mapped after writing: sections landed at
   `1--8 / 9--15 / 16--22 / 23--29 / 30--38`.
 
+### Program P17 pass, August 2026
+
+**Thirty-eight teaching frames, forty printed, both editions**, against a brief
+that projected fifty. Five sections: the best local model, the matrix of second
+derivatives, why the step size has a ceiling, using the curvature and what it
+costs, and sharp and flat honestly.
+
+Eleventh program under its brief's estimate, and the cause is the P10/P13 kind
+rather than the F07/P06 one: nothing had spent the material, and the neighbours
+supplied the *machinery* instead. **P15 put the reader one line from the
+payoff** and its own rigour box said so \dash{} *this program can say that the
+factor goes negative and that the walk crosses; it may not tell you where the
+boundary is.* **P10** built the bowl and said the inequality was P17's.
+**F04** owns the geometric sequence the derivation actually is. **P16** priced
+a Jacobian, so a Hessian is one dimension worse and the count is gated against
+P16's own parameter figure. What was genuinely left is the second-order model
+and the inequality, and both are short once you already have the pieces.
+
+#### The payoff is a debt another program recorded, and it is paid with a gate
+
+$\lvert 1 - \eta\lambda\rvert < 1$, so $\eta < 2/\lambda$, so with several
+directions $\eta < 2/\lambda_{\max}$: **a statement about a geometric sequence
+with nothing about networks, losses or training in it.** That turns *the
+learning rate was too high* from a judgement into an inequality whose right-hand
+side is a property of the surface rather than of the optimiser.
+
+Derived, and then **measured**: the script sweeps $\eta$ and finds the value at
+which the walk first stops converging, at $\num{0.1000}$ against a derived
+$\num{0.10}$. And it reads P15's committed $\eta = \num{0.09}$ out of
+`figures/values/p15.tex` and asserts it lies strictly under the boundary, so
+two programs describing one walk cannot come apart about it.
+
+**One gate is asserted and deliberately not emitted.** F11's factor at its own
+curvature has the same magnitude as this program's steep-direction factor, and
+printing both would put two numbers that look like one on the page two sections
+apart, which is F08's defect. The gate lives in the script and the frame names
+the shared formula in words.
+
+#### The issue named a trap the draft did not carry, and the fix raised the rate
+
+Issue \#31's *Done when* list names one trap in the reader's own voice \dash{}
+*my loss surface has local minima, and that is what training gets stuck in*
+\dash{} and the draft carried the counting argument as an `aibox` that
+**stated** it. Two of this book's rules point the same way: a trap frame must
+*elicit* the error rather than warn against it, and a box that cannot name a
+specific line of a specific system is prose. So the aibox became a question
+(*what has to be true of $\val{p17.params}$ eigenvalue signs for the point to be
+a minimum, and in how many ways can that be missed by a single sign?*) and a
+trapbox. It cost one frame, took the elicitation rate from 47% to **50%**, and
+shifted every payload from frame 15 onward by one.
+
+**The rule: read the issue's own checklist before the frame remap, not after.**
+The trap it names is a contract exactly like the diagram count, it was the only
+one of nine items the draft had missed, and finding it after the renumber would
+have meant doing the renumber twice.
+
+#### Rule 2 caught two figures, and there is a pattern in where it bit
+
+Both were the **third node of a three-rank figure** stating the next frame's
+answer. `p17-three-models` ended on *an order better, not a size*, which is
+frame 4's answer, in a figure declared in frame 2. `p17-why-the-step-caps` ended
+on *the steepest direction sets the cap for all of them*, which is frame 19's,
+in a figure declared in frame 17.
+
+That is worth naming as a shape rather than as two incidents: **three ranks is
+the sweet spot for width and the third rank is where the spoiler lives**,
+because a three-node chain naturally ends on the conclusion and the conclusion
+is usually what the next frame elicits. Both were reworded to state what the
+frames above them deliver. `three-models`'s caption had to change with its node
+\dash{} P11's *read the caption as a node*, second instance.
+
+Measured afterwards in all four builds, and the result is the P04/P07 case
+again: `p17-why-the-step-caps` sits **above** frame 18's question in all four
+and is not a defect, because the question is *which of several directions
+decides* and the figure never mentions more than one. Answer, figure, question:
+`main-en` 756 y578 / 757 y169 / 757 y293; `main-en-a4` 635 y561 / 635 y719 /
+636 y160; `main-pl` 769 y141 / y308 / y434; `main-pl-a4` 643 y623 / 644 y159 /
+644 y280. `p17-sharp-is-not-a-fact` is below its answer in all four.
+
+#### A wrong exponent that two coincidences were hiding
+
+The draft asserted the error orders as *the linear error divides by about
+$\val{p17.order.lin}^{2}$ each time*. The committed value **is the exponent**,
+so the expression should be $2^{\val{p17.order.lin}}$ \dash{} and both forms
+evaluate to $4$, so the page was right and the formula was not. It would have
+gone wrong silently the day an order changed. Both halves are now written
+$2^{\val{}}$, which is symmetric and is what the script asserts.
+
+**A `\val{}` used as a base where it is an exponent is invisible when the two
+readings agree numerically.** Read a formula containing a `\val{}` as the script
+computes it, not as it prints.
+
+#### The index shrink came back a third time, and the last page is why
+
+CI's recorded lesson \dash{} anchor on what TeX says it had open, never on
+distance from either end \dash{} put $\num{10.8}$ pt and $\num{4.8}$ pt inside
+`main-pl.ind` in one look. The `theindex` `\parskip` shrink went $\num{1.5}$ to
+$\num{2.5}$ pt and all four builds came back clean, which is the third raise in
+three programs and exactly what the comment above the patch predicts.
+
+**What is new is which page.** Both complaints were on the index's **last**
+page, and that is the page where the shrink has to do the work: an interior
+column that will not fit pushes an entry to the next page, and the final one has
+nowhere to push. `\raggedbottom` then makes it reliably the *fullest* of the
+four, because every page before it is allowed to end short. Recorded beside the
+constant.
+
+Also worth not repeating: `checklog.py` reports the location as *PDF page N*
+and the number it prints is TeX's own `\thepage`, which in this book is the
+**printed** folio and lands some twenty sheets earlier in the file. Chasing PDF
+page 884 found the answers appendix; printed page 884 is the index.
+
+#### Two emitted values cut, and one of them is a class
+
+`p17.taylor.x0` is a parameter of a demonstration the page never quotes.
+`p17.rescale.outputs.same` was the integer $1$, standing for *the outputs
+agreed* \dash{} which is **a gate, not a quantity**, and a gate belongs in the
+script's assertion rather than in the value ledger. F11's finding with a name
+attached.
+
+The symmetry check went the other way for the same reason: the two mixed
+partials agree to *exactly zero* here, which is luck of this function, so the
+committed number is a ceiling of $\num{1e-06}$ rather than the measurement.
+P06's rule, applied before CI could apply it.
+
+#### The transcript, extracted from the page and run
+
+Printed listing, extracted from `main-en.pdf` p758 and executed from `code/`:
+it prints `(0.1, 2.0)` and `1469.7715679690943`, which are
+`\val{p17.eta.star}`, `\val{p17.eta.shallow}` and the figure the frame points
+at. That is the P16 test as well as the F03 one \dash{} the listing runs *and*
+it agrees with the prose beside it.
+
+#### Also
+
+- Traps 185 to 192 added to `notes/02`, including the one the issue names.
+- **A new parity class, and it reads as a style choice: the English's own
+  abbreviation is part of the token stream.** Where English writes a bare
+  \enquote{P15} rather than `Program~\ref{}`, the Polish must too, because C4
+  and C14 both count references. Two of the pass's five parity failures were
+  that; the other three were the recorded classes \dash{} a reference behind
+  its maths, a reference behind its noun, and a summary item inverting
+  `\val{p17.steps.99}` and $99$. Noted in the Polish file's own header.
+- Layout cost nothing: the overfull multiset is element for element the
+  pre-P17 baseline in all four builds, no stranded openers, no stranded
+  headings, **no orphaned cues at any point in the pass**, and **the orphan-tail
+  count did not move** \dash{} the sixth time (F13, P07, P09, P12, P15, P17).
+- Three diagrams, all six renders at mermaid's wrap cap of $657$ pt on the
+  first attempt, at three ranks.
+- Frame numbers mapped after writing and then again after the trap frame:
+  sections landed at `1--8 / 9--15 / 16--23 / 24--30 / 31--38`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -6230,23 +6383,25 @@ clone instead.
 
 ## What is left
 
-1. **Eighteen programs, and Parts I to IV are complete, plus the first two of
-   Part V.** F1 to F13 and P1 to P16, both editions.
+1. **Seventeen programs, and Parts I to IV are complete, plus the first three
+   of Part V.** F1 to F13 and P1 to P17, both editions.
 
-   **P17 is next** \dash{} *The Hessian, curvature and the Taylor expansion*,
-   fifty frames planned, deps `P15`, `P10` and `F4`. Read what is already spent
-   before estimating a length, which is the discipline thirteen passes have now
-   paid for: **P10** owns the eigenvalues of a symmetric matrix, the bowl, the
-   saddle and the ridge, and the level ellipse's axis ratio \dash{} and says
-   in as many words that the shape is collected there and the step-size
-   inequality is P17's; **P15** owns the gradient, the zig-zag and the
-   $1 - \eta\lambda$ factor per eigendirection, and its rigour box says
-   explicitly that where the boundary lies is P17's; **F04** owns the sum and
-   the sequence; and **F12** owns the derivatives the Taylor expansion is
-   made of. What is genuinely left is the second-order model itself and the
-   inequality that falls out of it \dash{} and P15 has already put the reader
-   one line from it, since the factor is negative exactly when
-   $\eta > 1/\lambda$.
+   **P18 is next** \dash{} *Matrix calculus*, sixty frames planned, deps `P16`,
+   `P6`, `F7` and `P30`. Read what is already spent before estimating a length,
+   which is the discipline fourteen passes have now paid for: **P16** owns the
+   Jacobian, its shape, the chain rule as a product of them and the fact that
+   nobody forms one; **P06** owns the matrix as a function and the cost of
+   bracketing; **F07** owns the logistic and the two-score softmax identity;
+   **P15** owns the gradient and **P17** the Hessian, so both derivative objects
+   already exist. What is genuinely left is the **layout convention** and the
+   identities derived once each \dash{} and the headline, that the gradient of
+   cross-entropy through a softmax is $p - y$, which is the most reused
+   derivation in the book.
+
+   **P18 carries a declared forward reference and it may not be left
+   undeclared.** Cross-entropy is not defined until P30, so P18 owes it a
+   definitional frame, and P26 and P30 each owe a frame returning to it. That
+   is the manifest's own instruction, not an inference.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -6269,8 +6424,10 @@ clone instead.
    **F8's forty-five against thirty**; **F9's forty against thirty-two**;
    **F12's fifty-five against thirty-one**; **P14's forty-five against
    thirty-one**, because the subject is genuinely small; **P15's fifty-five
-   against thirty-eight**; and **P16's sixty-five against thirty-eight**,
-   because P06 had already measured its central result under another name.
+   against thirty-eight**; **P16's sixty-five against thirty-eight**,
+   because P06 had already measured its central result under another name;
+   and **P17's fifty against thirty-eight**, because P15 and P10 between
+   them had left only the model and the inequality.
    **A brief's frame estimate is a planning figure from before its neighbours
    were written.** It is not a target.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and

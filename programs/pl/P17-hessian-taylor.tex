@@ -1,26 +1,838 @@
 %% P17 --- Hesjan, krzywizna i rozwinięcie Taylora
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak programs/en/P17-hessian-taylor.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; tools/parity.py porównuje oba pliki.
+%%
+%% UWAGA DLA TŁUMACZA: C4, C8 i C12 porównują znaczniki strukturalne, wzory i
+%% literały liczbowe PO KOLEI. Zdanie polskie musi nieść te same wzory i te
+%% same cyfry w tej samej kolejności, a nie tylko te same. Cyfra zostaje
+%% cyfrą: \enquote{dwukrotnie} zamiast $2$ psuje C8 i C12 naraz. I odwołanie
+%% do programu prowadzi zdanie, zamiast stać za wzorem.
+%%
+%% I skrót jest częścią strumienia znaczników: tam, gdzie angielski pisze
+%% samo \enquote{P15} zamiast Program~\ref{}, polski też musi, bo C4 i C14
+%% liczą odwołania. Wygląda to na wybór stylistyczny, a jest strukturalny.
 
-\program{Hesjan, krzywizna i rozwinięcie Taylora}
+\program[Hesjan i krzywizna]{Hesjan, krzywizna i rozwinięcie Taylora}
 \label{prog:P17}
+\index{hesjan}
+\index{krzywizna}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{powiedzieć, czym jest model Taylora drugiego rzędu i w jakim
+  sensie jest najlepszym modelem lokalnym}
+\outcome{9--15}{zapisać macierz drugich pochodnych i powiedzieć, dlaczego
+  Program~\ref{prog:P10} stosuje się do niej bez zmian}
+\outcome{16--23}{wyprowadzić największy rozmiar kroku, jaki toleruje funkcja
+  kwadratowa, i powiedzieć, który kierunek go ustala}
+\outcome{24--30}{powiedzieć, co dałoby użycie krzywizny wprost i ile by to
+  kosztowało}
+\outcome{31--38}{powiedzieć dokładnie, które twierdzenia o ostrych i płaskich
+  minimach mówią o funkcji, a które o układzie współrzędnych}
+\end{outcomes}
 
-Argument: the second-order Taylor expansion is the best local quadratic
-model, and its matrix is the Hessian. Payoff: **why the largest stable
-learning rate is bounded by the inverse of the curvature**, derived on a
-quadratic, which turns \enquote{the loss exploded} into an arithmetic
-statement; the condition number of the Hessian as the ratio of fastest to
-slowest direction, joining P9 and P10 to the optimiser; second-order methods
-explained and then dismissed on cost for this problem size; and an honest
-section on sharp-versus-flat minima \dash{} what is measured, what is
-reparameterisation-dependent, and why the claim is contested.
+\begin{quiz}
+\item Znasz wartość funkcji, nachylenie i krzywiznę w punkcie. Co najlepszego
+  możesz powiedzieć o niej w pobliżu? \teachesat{3--4}
+  \answerto{Parabola \dash{} model Taylora drugiego rzędu. Jej błąd maleje
+  jak sześcian odległości, gdzie błąd stycznej maleje jak kwadrat, i to
+  właśnie znaczy tu \enquote{najlepszy}: rząd, a nie rozmiar.}
+\item Program~\ref{prog:P15} pokazał, że każdy kierunek jest mnożony przez
+  $1 - \eta\lambda$ w każdym kroku. Jaki jest największy użyteczny $\eta$?
+  \teachesat{16--17}
+  \answerto{$2/\lambda$, bo spacer pozostaje ograniczony dokładnie wtedy, gdy
+  $\lvert 1 - \eta\lambda \rvert < 1$. Przy wielu kierunkach wygrywa
+  najmniejsze z tych ograniczeń, czyli $2/\lambda_{\max}$.}
+\item Który kierunek doliny decyduje o rozmiarze kroku, a który musi z tym
+  żyć? \teachesat{18--19}
+  \answerto{Najbardziej stromy ustala pułap, bo to on rozbiega się pierwszy;
+  najbardziej płaski musi z tym żyć, a jego własne ograniczenie jest większe
+  o wskaźnik uwarunkowania.}
+\item Metoda Newtona używa krzywizny i trafia w minimum funkcji kwadratowej w
+  jednym kroku. Dlaczego nie używa się jej do trenowania?
+  \teachesat{26--27}
+  \answerto{Bo hesjan ma jeden wpis na każdą \emph{parę} parametrów, a
+  rozwiązanie układu z nim jest jeszcze gorsze. Przy realnym rozmiarze modelu
+  sama macierz jest większa niż jakakolwiek istniejąca pamięć.}
+\item Czy \enquote{to minimum jest ostrzejsze niż tamto} to fakt o
+  wytrenowanym modelu? \teachesat{31--33}
+  \answerto{Nie samo z siebie. Przeskalowanie parametru zmienia krzywiznę,
+  zostawiając każde wyjście identyczne, więc goła liczba opisująca ostrość
+  jest faktem o układzie współrzędnych. To, co przeżywa reparametryzację,
+  trzeba wypowiedzieć ostrożnie, a sekcja 5 mówi, które części przeżywają.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 50 ramek.
-}
+% ============================================================
+\section{Najlepszy model lokalny}
+\label{sec:P17-taylor}
+\index{rozwinięcie Taylora}
+
+\begin{fr}
+Program~\ref{prog:F11} przybliżał krzywą w pobliżu punktu jej styczną, a
+Program~\ref{prog:P15} zrobił to samo w wielu wymiarach za pomocą gradientu.
+Styczna jest \emph{modelem}: zgadza się z funkcją w punkcie i w nachyleniu, a
+wszędzie indziej się z nią rozmija.
+
+Masz wartość, nachylenie, a teraz i tempo, w jakim zmienia się samo
+nachylenie. Co zbudowałbyś z tych trzech rzeczy i jaki miałoby to kształt?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Parabolę \dash{} wartość plus nachylenie razy odległość plus połowa
+krzywizny razy odległość do kwadratu.
+\end{ansblock}
+
+\[ f(x_0 + h) \;\approx\; f(x_0) + f'(x_0)\,h + \tfrac{1}{2}f''(x_0)\,h^{2} \]
+
+To jest \textbf{model Taylora drugiego rzędu}, a $\tfrac{1}{2}$ nie jest
+sztuczką: to ono sprawia, że druga pochodna modelu równa się drugiej pochodnej
+funkcji, co jest całym powodem dokładania tego składnika.
+
+\mermaidfig{p17-three-models}{Stały, liniowy, kwadratowy \dash{} jedna zgodność
+więcej za każdym razem.}{trzy modele lokalne}
+\end{fr}
+
+\begin{fr}
+Teraz teza, która czyni ten model wartym posiadania, a łatwo ją wypowiedzieć
+niedbale.
+
+Kusi, by powiedzieć, że parabola jest \enquote{dokładniejsza} niż styczna. To
+prawda i to nie jest użyteczne stwierdzenie. Jakie jest użyteczne?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jej błąd maleje szybciej, gdy skracasz odległość \dash{} jak $h^{3}$, gdzie
+błąd prostej maleje jak $h^{2}$. \emph{Rząd}, a nie rozmiar.
+\end{ansblock}
+
+\textbf{To rozróżnienie jest różnicą między twierdzeniem o jednym kroku a
+twierdzeniem o wszystkich.} \enquote{Dokładniejsza} to fakt o tym $h$, które
+akurat wypróbowałeś; \enquote{o rząd lepsza} mówi, co dzieje się w miarę
+zbliżania się, i da się to sprawdzić.
+
+Skrypt sprawdza to właśnie tak: połowi $h$ osiem razy i stwierdza, że błąd
+liniowy dzieli się za każdym razem mniej więcej przez
+$2^{\val{p17.order.lin}}$, a błąd kwadratowy mniej więcej przez
+$2^{\val{p17.order.quad}}$. Przy $h = \val{p17.taylor.h}$ oba błędy wynoszą
+$\val{p17.err.lin}$ i $\val{p17.err.quad}$, ale te dwie liczby są
+ilustracjami; wynikiem są stosunki.
+
+\begin{note}
+To ta sama dyscyplina, której Program~\ref{prog:P05} użył dla swojego
+rozrzutu, a Program~\ref{prog:P15} dla swojego kąta zygzaka:
+\textbf{stwierdzaj niezmiennik, nie obserwację.} Dwie liczby błędu byłyby
+faktem o jednym rozmiarze kroku i jednej funkcji. Rząd przeżywa oba.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Jednej rzeczy ten model nie robi, a powiedzenie tego teraz oszczędza kłopotu
+później.
+
+Model Taylora jest \emph{lokalny}. Zapisz, co cię to kosztuje, w kategoriach
+obrazu, który narysował Program~\ref{prog:P15}.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie mówi nic o tym, gdzie jest minimum. Opisuje powierzchnię w pobliżu punktu
+i nie ma zdania o niczym poza nim.
+\end{ansblock}
+
+Co jest dokładnie odkryciem Programu~\ref{prog:P15} w innym przebraniu:
+gradient jest stwierdzeniem lokalnym, a położenie minimum globalnym. Hesjan
+też jest lokalny i dołożenie go tego nie zmienia \dash{} czyni opis lokalny
+lepszym, a nie szerszym.
+
+\begin{rigourbox}
+Stwierdzenie, że błąd jest $O(h^{3})$, wymaga, by trzecia pochodna istniała i
+była ograniczona w pobliżu punktu, co jest twierdzeniem Taylora z resztą i
+znajduje się w każdym pierwszym kursie analizy. Ten program używa wniosku i
+mierzy go; nie dowodzi go.
+
+Bez dowodu warto wiedzieć, gdzie to zawodzi: w punkcie, w którym funkcja nie
+jest gładka, nie ma modelu kwadratowego i cały argument tego programu nie ma
+się do czego przyczepić. Program~\ref{prog:P16} podaje ten przypadek: $\relu$ dokładnie w zerze.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Przed macierzą jedno pytanie, którego odpowiedź już znasz.
+
+W punkcie stacjonarnym gradient jest zerem, więc składnik liniowy znika i
+model to sama wartość plus składnik z krzywizną. Co mówi ci tam znak
+krzywizny?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dodatni to minimum, ujemny maksimum \dash{} i w jednym wymiarze to cała
+klasyfikacja.
+\end{ansblock}
+
+Program~\ref{prog:F11} powiedział, że zerowa pochodna to nie minimum, i
+zostawił test \enquote{pochodnej pochodnej}. To jest ten test i w jednym
+wymiarze jest zupełny.
+
+W więcej niż jednym nie jest, a Program~\ref{prog:P10} pokazał już dlaczego:
+istnieją kształty bez jednowymiarowego odpowiednika. Przejście od znaku do
+klasyfikacji jest tym, do czego służy macierz z następnej sekcji.
+\end{fr}
+
+% ============================================================
+\section{Macierz drugich pochodnych}
+\label{sec:P17-hessian}
+\index{hesjan}
+
+\begin{fr}
+Przy kilku wejściach jest druga pochodna dla każdej ich \emph{pary}: różniczkuj
+po $x_i$, a potem po $x_j$.
+
+Ułóż je w macierz, a jest to \textbf{hesjan}:
+\[ H_{ij} = \frac{\partial^{2} f}{\partial x_i \, \partial x_j} \]
+
+Program~\ref{prog:P16} powiedział, że pochodna funkcji wektorowej jest
+macierzą z jednym wierszem na wyjście. Powiedz, jaki kształt ma ta i dlaczego
+właśnie taki.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Kwadratowy, jeden wiersz i jedna kolumna na wejście \dash{} bo jest to
+jakobian \emph{gradientu}, który jest funkcją z wejść w tyle samo wyjść.
+\end{ansblock}
+
+Więc i tutaj nie zdefiniowano niczego nowego. Gradient przeprowadza $n$ wejść
+w $n$ wyjść, a reguła Programu~\ref{prog:P16} daje jego pochodnej $n$ wierszy
+i $n$ kolumn.
+
+Model drugiego rzędu w wielu wymiarach jest wtedy tym jednowymiarowym, w
+którym dwa iloczyny zastąpiono dwiema rzeczami, jakich dostarczają
+Program~\ref{prog:P05} i Program~\ref{prog:P10}:
+\[ f(\mathbf{p} + \mathbf{h}) \approx f(\mathbf{p})
+   + \nabla f \cdot \mathbf{h}
+   + \tfrac{1}{2}\, \mathbf{h}^{\mathsf{T}} H \mathbf{h} \]
+iloczynem skalarnym i formą kwadratową.
+\end{fr}
+
+\begin{fr}
+Ta forma kwadratowa jest powodem, dla którego ten program może w ogóle mówić o
+kierunkach, i opiera się na jednej własności $H$. Której?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jest \textbf{symetryczna}: różniczkowanie w obu kolejnościach daje tę samą
+odpowiedź.
+\end{ansblock}
+
+A symetria jest tym, co odblokowuje wszystko, co udowodnił
+Program~\ref{prog:P10}. Macierz symetryczna ma pełny ortogonalny zbiór
+wektorów własnych i rzeczywiste wartości własne, więc powierzchnia w pobliżu
+punktu ma zbiór prostopadłych kierunków, każdy z własną krzywizną, a
+klasyfikacja misa \dash{} siodło \dash{} grzbiet stosuje się bez zmian.
+
+Skrypt sprawdza, że obie pochodne mieszane zgadzają się lepiej niż
+$\val{p17.sym.bound}$ w punkcie funkcji, w którą nie wbudowano żadnej symetrii.
+
+\begin{note}
+To sprawdzenie jest potwierdzeniem, a nie powodem. Symetria jest twierdzeniem
+\dash{} wymaga ciągłości drugich pochodnych cząstkowych w pobliżu punktu i
+znajduje się w każdym pierwszym kursie analizy \dash{} a numeryczna zgodność
+w jednym punkcie byłaby kiepskim dowodem twierdzenia o każdej funkcji.
+
+Zapisany jest sufit, a nie pomiar, z powodu, za który zapłacił
+Program~\ref{prog:P06}: różnica jest szumem zaokrągleń, którego rozmiar jest
+własnością maszyny, a tutaj wychodzi dokładnie zero, co jest szczęściem tej
+funkcji, a nie czymś, co inna kompilacja jest ci winna.
+\end{note}
+\end{fr}
+
+\begin{fr}
+A więc klasyfikacja, którą Program~\ref{prog:P10} dał formom kwadratowym, jest
+teraz stwierdzeniem o \emph{dowolnej} gładkiej funkcji w punkcie stacjonarnym.
+Powiedz je: co mówią ci znaki wartości własnych hesjanu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Same dodatnie to minimum, same ujemne maksimum, znaki mieszane siodło, a
+zerowa wartość własna znaczy, że model drugiego rzędu nie rozstrzyga.
+\end{ansblock}
+
+Co jest misą Programu~\ref{prog:P10}, jego odwróconą misą, jego siodłem i jego
+grzbietem, w tej kolejności, i żadna nowa praca nie była potrzebna, by tu
+dojść \dash{} hesjan jest tą macierzą, o której tamten program już mówił.
+
+Teraz użyj tego na wyjaśnieniu, po które sięgają wszyscy, gdy przebieg
+przestaje się poprawiać. Model ma $\val{p17.params}$ parametrów, więc punkt
+stacjonarny jego straty ma tyle samo znaków wartości własnych. Co musi być o
+nich prawdą, żeby punkt był minimum, i na ile sposobów można to chybić o jeden
+znak?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Każdy pojedynczy musi być dodatni. Chybić o jeden znak można na
+$\val{p17.params}$ sposobów, po jednym na parametr \dash{} a to tylko
+sposoby chybienia o jeden.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{\enquote{Moja powierzchnia straty ma minima lokalne i to w nich
+zacina się trening.}} To obraz dwuwymiarowy przeniesiony tam, gdzie nie
+przeżywa powyższego zliczania: minimum wymaga zgody każdego znaku, a siodło
+jednego odszczepieńca, więc punkt stacjonarny w wysokim wymiarze
+przytłaczająco prawdopodobnie w ogóle nie jest minimum.
+
+To, w czym zwykle siedzi przebieg, który przestał się poprawiać, jest jedną z
+dwóch innych rzeczy. Siodłem, które ma kierunek w dół i gradient zbyt mały, by
+za nim szybko pójść. Albo długą wąską doliną, która ma kierunek w dół i jest
+przecinana, a nie śledzona \dash{} a to drugie jest tematem następnej sekcji,
+a nie żadnym rodzajem minimum.
+
+Uczciwa granica tego argumentu: jest to arytmetyka znaków, a nie pomiar
+jakiejkolwiek wytrenowanej sieci, i tego drugiego ta książka nie mierzyła. Co
+ustala, to że zerowy gradient jest znacznie słabszym świadectwem minimum w
+miliardzie wymiarów niż w dwóch.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Dlaczego rozmiar kroku ma sufit}
+\label{sec:P17-stepsize}
+\index{krzywizna!a rozmiar kroku}
+
+\begin{fr}
+Teraz zapłata, a Program~\ref{prog:P15} zostawił ją dokładnie o jedną linijkę
+stąd.
+
+Na funkcji kwadratowej spadek gradientu mnoży współrzędną każdego kierunku
+własnego przez $1 - \eta\lambda$ w każdym kroku, z własną $\lambda$ tego
+kierunku. P15 zmierzył $\val{p15.fac.hi}$ i
+$\val{p15.fac.lo}$ na swojej misie i powiedział wprost, że to, gdzie leży
+granica, należy do tego programu.
+
+Więc ją znajdź. Co musi spełniać $1 - \eta\lambda$, żeby współrzędna nie
+rosła?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\lvert 1 - \eta\lambda \rvert < 1$, co dla dodatnich $\eta$ i $\lambda$ daje
+$\eta < \dfrac{2}{\lambda}$.
+\end{ansblock}
+
+\textbf{I to jest całe wyprowadzenie.} Wielokrotne mnożenie przez liczbę
+rośnie nieograniczenie dokładnie wtedy, gdy ta liczba przekracza jeden co do
+wielkości; liczbą jest tu $1 - \eta\lambda$; a przekształcenie daje rozmiar
+kroku.
+
+W tym argumencie nie ma nic o sieciach neuronowych, stratach ani trenowaniu.
+To stwierdzenie o ciągu geometrycznym, czyli o tym, co należy do
+Programu~\ref{prog:F04}.
+
+\mermaidfig{p17-why-the-step-caps}{Jeden czynnik na kierunek i to, co go
+ogranicza.}{sufit na krok}
+\end{fr}
+
+\begin{fr}
+Teraz część, która czyni z tego stwierdzenie o całej powierzchni, a nie o
+jednym kierunku.
+
+Misa ma naraz kilka wartości własnych, a spacer musi pozostać ograniczony w
+\emph{każdym} kierunku. Na misie Programu~\ref{prog:P10} obie wynoszą
+$\val{p17.lam.hi}$ i $\val{p17.lam.lo}$. Jakie jest największe $\eta$, które
+działa, i który kierunek o tym zdecydował?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p17.eta.star}$, ustalone przez najbardziej stromy}
+Bo każdy kierunek żąda $\eta < 2/\lambda$, a wygrywa najmniejsze z tych żądań.
+Stromy kierunek pozwala na $\val{p17.eta.star}$; płytki pozwoliłby na
+$\val{p17.eta.shallow}$, co jest $\val{p17.eta.gap}$ razy większe i jest bez
+znaczenia, bo wzięcie tego wysadziłoby tamten drugi.
+
+\textbf{A więc kierunek o najszybszej krzywiźnie ustala rozmiar kroku dla
+całego modelu, a każdy inny kierunek żyje z tym, co dostanie.} To jest zdanie,
+którego obrazem był zygzak z Programu~\ref{prog:P15}.
+
+Skrypt nie tylko to wyprowadza. Przemiata $\eta$ i znajduje wartość, przy
+której spacer przestaje być zbieżny, a wychodzi ona
+$\val{p17.eta.measured}$ \dash{} wyprowadzona granica, zmierzona.
+\end{fr}
+
+\begin{fr}
+I brama, bo dwa programy opisujące jeden spacer nie mogą się co do niego
+różnić. Program~\ref{prog:P15} chodzi po tej misie przy
+$\eta = \val{p17.p15.eta}$. Wobec granicy $\val{p17.eta.star}$ \dash{} czy ten
+spacer jest bezpieczny?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Tak, i to ledwo \dash{} dlatego jego stroma współrzędna zmienia znak w każdym
+kroku zamiast rozbiegać się.
+\end{ansblock}
+
+Skrypt czyta zapisany rozmiar kroku z P15 i stwierdza, że
+leży on ściśle poniżej granicy z tego programu, więc oba nie mogą się
+rozjechać.
+
+\begin{trapbox}
+\textbf{\enquote{Krok uczenia był za duży} mówi się zwykle jako ocenę, a jest
+to nierówność.} Znaczy ona dokładnie $\eta > 2/\lambda_{\max}$, a wielkość po
+prawej jest własnością powierzchni straty w punkcie, w którym stoisz, a nie
+optymalizatora czy danych.
+
+Przekrocz granicę o krok, a nie jest to łagodne pogorszenie. Oto ta sama misa
+przy $\eta = \val{p17.demo.eta}$, o włos powyżej $\val{p17.eta.star}$, przez
+$\val{p17.demo.steps}$ kroków:
+
+\transcript{p17-too-big}
+
+Każdy krok mnoży przez liczbę większą co do wielkości od jedynki, więc wzrost
+jest geometryczny, a znak się zmienia. \emph{Strata poszła w NaN} to ten ciąg
+biegnący dalej, aż skończy się format, co wycenił Program~\ref{prog:P01}.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Z tych samych dwóch liczb wypada jeszcze jedna wielkość, a jest to taka, którą
+ta książka spotkała już dwa razy.
+
+Stosunek największej krzywizny do najmniejszej wynosi tu $\val{p17.kappa}$.
+Jak nazywa się ta liczba i gdzie się pojawiała?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\textbf{Wskaźnik uwarunkowania}, hesjanu \dash{} ta sama wielkość, którą
+Program~\ref{prog:P11} zdefiniował dla macierzy, a Program~\ref{prog:P09}
+uważał, by nie mylić jej z wyznacznikiem.
+\end{ansblock}
+
+Tam mierzył, jak bardzo rozwiązanie układu wzmacnia błąd. Tutaj mierzy, jak
+bardzo rozmiar kroku, na który ci pozwolono, różni się od rozmiaru kroku,
+którego chce wolny kierunek, a oba odczyty są tą samą arytmetyką.
+
+Jego konsekwencją jest tempo. Nawet przy najlepszym kompromisowym kroku
+$\val{p17.best.eta}$ wolny kierunek kurczy się o czynnik $\val{p17.rate}$ na
+krok, więc zamknięcie $99$ procent pozostałej luki zajmuje
+$\val{p17.steps.99}$ kroków \dash{} na misie z tylko dwoma kierunkami i przy
+dokładnej arytmetyce.
+
+\textbf{To jest koszt wąwozu wypowiedziany jako liczba}, a rośnie on ze
+wskaźnikiem uwarunkowania, a nie z rozmiarem zadania.
+\end{fr}
+
+% ============================================================
+\section{Użycie krzywizny i jego koszt}
+\label{sec:P17-newton}
+\index{hesjan!metoda Newtona}
+
+\begin{fr}
+Jeśli kłopotem jest to, że jeden rozmiar kroku musi obsłużyć kierunki o różnych
+krzywiznach, jest oczywista poprawka: dać każdemu kierunkowi własny.
+
+To metoda Newtona \dash{} zamiast kroku przeciw gradientowi rozwiąż
+$H\,\mathbf{s} = -\nabla f$ i zrób krok o $\mathbf{s}$. Ile kroków zajmuje to
+na funkcji kwadratowej?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p17.newton.steps}$}
+Dokładnie jeden i ląduje w minimum. Dzielenie każdego kierunku przez jego
+własną krzywiznę jest właśnie tą poprawką, której zdaniem poprzedniej sekcji
+brakowało, a na funkcji kwadratowej model jest funkcją, więc minimum modelu
+jest tym prawdziwym.
+
+\textbf{A więc metoda, która rozwiązuje cały problem sekcji 3, istnieje i jest
+stroną matematyki z pierwszego roku.} Pytaniem jest tylko, ile kosztuje, a
+odpowiedź jest powodem, dla którego nigdy jej nie użyłeś.
+\end{fr}
+
+\begin{fr}
+Policz. Model ma $\val{p17.params}$ parametrów. Ile wpisów ma jego hesjan i
+ile byłoby to w bajtach przy dwóch bajtach na wpis?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p17.hess.entries}$ wpisów, czyli około $\val{p17.hess.bytes}$ bajtów.
+\end{ansblock}
+
+Program~\ref{prog:F01} zbudował drabinę rzędów wielkości i nie ma na niej
+niczego tak dużego. Liczba parametrów jest liczbą, którą da się utrzymać; liczba
+\emph{par} parametrów nie jest, a robi to podnoszenie do kwadratu.
+
+I przechowanie jej jest tą tanią częścią. Rozwiązanie układu z nią jest
+sześcienne, około $\val{p17.hess.solve}$ operacji, co Program~\ref{prog:P09}
+wycenił we własnych kategoriach: eliminacja buduje $n$ liczb tam, gdzie odwrotność
+buduje $n^{2}$, a tutaj nawet $n$ jest za duże.
+
+\textbf{A więc hesjan jest dokładnie jak jakobian z
+Programu~\ref{prog:P16}: nikt go nie tworzy.} Różnica jest taka, że dla
+jakobianu iloczyny, których ludzie faktycznie chcą, są tanie, a dla hesjanu to,
+czego ludzie chcą \dash{} jego odwrotność zastosowana do gradientu \dash{}
+tanie nie jest.
+\end{fr}
+
+\begin{fr}
+\begin{note}
+To nie koniec tematu i błędem byłoby zostawić wrażenie, że informacja drugiego
+rzędu jest nie do użycia. Istnieje rodzina metod, które nigdy nie tworzą $H$ i
+budują przybliżenie jego działania z gradientów, które już widziały, oraz
+metody używające samej przekątnej.
+
+Nazwanie, gdzie przebiega linia, jest bardziej użyteczne niż lista:
+\textbf{cokolwiek potrzebuje pamięci $n^{2}$, odpada przy tej skali, a
+cokolwiek potrzebuje $n$, wchodzi w grę.} Optymalizatory
+Programu~\ref{prog:P20} mieszczą się wszystkie po właściwej stronie tej linii,
+a skalowanie na parametr, które kilka z nich robi, jest pomysłem przekątnej
+pod inną nazwą.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Jest druga obiekcja wobec metody Newtona, która nie ma nic wspólnego z kosztem,
+a znaczy więcej, niż ludzie się spodziewają. Spójrz jeszcze raz na to, co robi
+krok: dzieli przez krzywiznę w każdym kierunku.
+
+Co dzieje się w siodle?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Niektóre krzywizny są ujemne, więc dzielenie przez nie robi w tych kierunkach
+krok \emph{w stronę} siodła, a nie od niego.
+\end{ansblock}
+
+Metoda Newtona znajduje punkty stacjonarne, a nie minima, i nie odróżnia ich
+\dash{} jest to wielowymiarowa postać faktu, na który
+Program~\ref{prog:F11} wciąż wskazywał, że zerowa pochodna to nie minimum.
+
+\textbf{W połączeniu z argumentem zliczającym z sekcji 2} jest to prawdziwy
+problem, a nie ciekawostka: w wysokim wymiarze większość punktów stacjonarnych
+to siodła, więc metoda zbieżna do punktów stacjonarnych jest zbieżna do
+niewłaściwego rodzaju rzeczy. Każda praktyczna metoda drugiego rzędu musi coś
+z tym zrobić, a to, co robi, jest modyfikacją, a nie samą metodą.
+\end{fr}
+
+% ============================================================
+\section{Ostre i płaskie, uczciwie}
+\label{sec:P17-sharpness}
+\index{krzywizna!ostre i płaskie minima}
+
+\begin{fr}
+Program~\ref{prog:P10} użył słów \emph{wąwóz} i \emph{ostre minimum} dla
+niecek o dużym stosunku wartości własnych. Na tych słowach zbudowane jest
+znane twierdzenie: że płaskie minima uogólniają się lepiej niż ostre.
+
+Ta sekcja jest o tym, które części tego są stwierdzeniami o wytrenowanym
+modelu. Zacznij od arytmetyki. Jeśli przeskalujesz jeden parametr \dash{}
+napisz $w = c\,u$ i podziel wejście tego parametru przez $c$ \dash{} co
+stanie się z funkcją, którą liczy sieć?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nic. Każde wyjście jest identyczne dla każdego wejścia, bo dwa czynniki $c$
+się skracają.
+\end{ansblock}
+
+Model jest tym samym modelem. Jest zapisany w innych współrzędnych, co jest
+zamianą bazy z Programu~\ref{prog:P09} zastosowaną do parametru, a nie do
+wektora.
+
+Teraz strata jako funkcja $u$, a nie $w$. Jej druga pochodna łapie czynnik
+$c^{2}$ z reguły łańcuchowej. Więc przy $c = \val{p17.rescale.c}$ krzywizna
+zmienia się o jaki czynnik?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p17.rescale.factor}$}
+Skrypt sprawdza obie połowy: że wyjścia zgadzają się co do ostatniego bitu przy
+każdym wypróbowanym wejściu i że krzywizna jest mnożona dokładnie przez
+$\val{p17.rescale.factor}$.
+
+\textbf{A więc jeden model ma dwie ostrości i nic ich nie odróżnia poza tym,
+jak ktoś postanowił zapisać parametry.} Liczba, która zmienia się, gdy funkcja
+się nie zmienia, jest faktem o układzie współrzędnych.
+
+\mermaidfig{p17-sharp-is-not-a-fact}{Ta sama funkcja, dwie krzywizny.}{ostrość
+to nie fakt}
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{To minimum jest płaskie, więc uogólni się lepiej}} nie jest
+twierdzeniem, które da się ocenić, dopóki ktoś nie powie, w czym mierzy tę
+\emph{płaskość}.
+
+Goła wartość własna hesjanu nią nie jest, na mocy ramki powyżej. Ani żadna
+wielkość zbudowana z samych gołych wartości własnych \dash{} ślad, największa,
+stosunek \dash{} bo wszystkie one ruszają się przy przeskalowaniu, które nie
+zmienia w modelu niczego.
+
+To nie jest techniczny szczegół dotyczący nietypowych architektur. Sieć z
+dowolnym skalowaniem po współrzędnych \dash{} czyli prawie każda \dash{}
+dopuszcza dokładnie tę reparametryzację, a warstwy normalizujące czynią z niej
+symetrię, którą architektura ma z konstrukcji.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Uczciwe stanowisko warto wypowiedzieć w całości, bo łatwo przesadzić w drugą
+stronę i orzec, że cały pomysł jest pusty.
+
+To, co tu ustalono, jest wąskie: goła liczba opisująca ostrość nie jest
+własnością funkcji. To nie obala twierdzenia empirycznego i nie znaczy, że nic
+nie przeżywa.
+
+Czego trzeba, by twierdzenie oparte na ostrości było o modelu, a nie o układzie
+współrzędnych?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Miary, która przekształca się tak samo jak parametry, tak by przeskalowanie
+zostawiało ją bez zmian.
+\end{ansblock}
+
+Co jest rzeczą, o którą naprawdę można prosić, i rzeczą, którą naprawdę da się
+sprawdzić, a jest to pytanie, na które staranna praca na ten temat odpowiada
+wprost, a niestaranna go nie wspomina.
+
+\begin{warning}
+\textbf{Ta książka nie zmierzyła twierdzenia o uogólnianiu i go nie
+rozstrzyga.} Zrobienie tego wymaga wytrenowanych modeli, definicji płaskości,
+która przeżywa ramkę powyżej, i dość przebiegów, by pokonać wariancję
+\dash{} co jest tematem Programu~\ref{prog:P34}, a nie tego.
+
+Co ten program ustala, to filtr, a nie werdykt: mając twierdzenie o ostrości,
+zapytaj, czy wielkość, którą ono nazywa, zmieniłaby się przy przeskalowaniu
+zostawiającym model identycznym. Jeśli tak, twierdzenie jest o układzie
+współrzędnych. To pytanie, na które odpowiesz w minutę, i załatwia ono dużą
+część tego, co się mówi.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedna obserwacja i domyka ona pętlę z powrotem do sekcji 3.
+
+Ograniczenie na krok $\eta < 2/\lambda_{\max}$ ma ten sam problem, a zauważenie
+tego jest uczciwym sposobem utrzymania obu rzeczy naraz.
+
+Powiedz dlaczego, a potem powiedz, dlaczego dla tamtego użycia to nie ma
+znaczenia.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo $\lambda_{\max}$ też się przeskalowuje. Nie ma to znaczenia, bo $\eta$
+przeskalowuje się razem z nią, w przeciwną stronę, więc \emph{krok faktycznie
+zrobiony} pozostaje bez zmian.
+\end{ansblock}
+
+To jest różnica między tymi dwoma użyciami w jednym zdaniu. W sekcji 3
+krzywizna pojawia się obok rozmiaru kroku i para jest niezmiennicza, choć żaden
+z jej członków nie jest. W sekcji 5 krzywizna jest cytowana sama, a sama nie
+znaczy nic.
+
+\textbf{A więc właściwym pytaniem o każdą liczbę opisującą krzywiznę nigdy nie
+jest \enquote{czy jest duża}, tylko \enquote{względem czego jest duża}}, a
+sekcja 3 ma na to odpowiedź tam, gdzie literatura o ostrości musi ją dopiero
+dostarczyć.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Model Taylora drugiego rzędu to wartość, nachylenie i
+  połowa krzywizny razy kwadrat}, a $\tfrac{1}{2}$ jest tym, co sprawia, że
+  druga pochodna modelu równa się drugiej pochodnej funkcji.}
+\sumitem{3--4}{\textbf{\enquote{Najlepszy} znaczy rząd, a nie rozmiar}: błąd
+  kwadratowego maleje jak $h^{\val{p17.order.quad}}$, gdzie błąd prostej maleje
+  jak $h^{\val{p17.order.lin}}$, co sprawdza się połowieniem $h$, a nie
+  cytowaniem dwóch błędów.}
+\sumitem{5--6}{\textbf{Model jest lokalny.} Czyni opis lokalny lepszym, a nie
+  szerszym, i nie mówi nic o tym, gdzie jest minimum.}
+\sumitem{7--8}{W punkcie stacjonarnym składnik liniowy znika, więc znak
+  krzywizny klasyfikuje \dash{} zupełnie w jednym wymiarze, a w większej
+  liczbie nie.}
+\sumitem{9--10}{\textbf{Hesjan jest jakobianem gradientu}, więc reguła
+  Programu~\ref{prog:P16} czyni go kwadratowym, z jednym wierszem i jedną
+  kolumną na wejście.}
+\sumitem{11--12}{\textbf{Jest symetryczny}, więc Program~\ref{prog:P10} stosuje
+  się bez zmian: rzeczywiste wartości własne, prostopadłe kierunki, każdy z
+  własną krzywizną.}
+\sumitem{13--14}{Znaki wartości własnych dają misę, odwróconą misę, siodło i
+  grzbiet \dash{} klasyfikację z P10, teraz dla dowolnej gładkiej funkcji w
+  punkcie stacjonarnym.}
+\sumitem{15}{\textbf{Punkt stacjonarny w wysokim wymiarze przytłaczająco
+  prawdopodobnie nie jest minimum}: minimum wymaga, by każdy z
+  $\val{p17.params}$ znaków był dodatni, a chybić o jeden znak można na tyle
+  samo sposobów. \enquote{Zacięcie w minimum lokalnym} to obraz dwuwymiarowy
+  przeniesiony tam, gdzie nie przeżywa.}
+\sumitem{16--17}{\textbf{Spacer pozostaje ograniczony dokładnie wtedy, gdy
+  $\lvert 1 - \eta\lambda\rvert < 1$, czyli $\eta < 2/\lambda$}, co jest faktem
+  o ciągu geometrycznym i o niczym więcej.}
+\sumitem{18--19}{\textbf{Najbardziej stromy kierunek ustala krok dla całego
+  modelu.} Tutaj $\val{p17.eta.star}$ wobec $\val{p17.eta.shallow}$ kierunku
+  płytkiego, czyli czynnik $\val{p17.eta.gap}$. Wyprowadzone, a potem zmierzone
+  przemiataniem: $\val{p17.eta.measured}$.}
+\sumitem{20--21}{Spacer z Programu~\ref{prog:P15} przy $\val{p17.p15.eta}$
+  mieści się pod granicą, a skrypt to stwierdza. \textbf{\enquote{Krok uczenia
+  był za duży} to nierówność $\eta > 2/\lambda_{\max}$}, a za nią wzrost jest
+  geometryczny.}
+\sumitem{22--23}{\textbf{Wskaźnik uwarunkowania $\val{p17.kappa}$ to ta sama
+  wielkość, którą zdefiniował Program~\ref{prog:P11}}, odczytana na hesjanie.
+  Przy najlepszym kroku wciąż potrzeba $\val{p17.steps.99}$ kroków, by
+  zamknąć $99$ procent luki wolnego kierunku.}
+\sumitem{24--25}{\textbf{Metoda Newtona ląduje w minimum funkcji kwadratowej w
+  $\val{p17.newton.steps}$ kroku}, dając każdemu kierunkowi własny rozmiar
+  kroku.}
+\sumitem{26--28}{\textbf{A jej hesjan ma $\val{p17.hess.entries}$ wpisów przy
+  realnym rozmiarze modelu}, z sześciennym rozwiązywaniem układu na dokładkę.
+  Hesjanu też nikt nie tworzy \dash{} i w odróżnieniu od jakobianu iloczyn,
+  którego ludzie chcą, nie jest tani.}
+\sumitem{29--30}{\textbf{Metoda Newtona znajduje punkty stacjonarne, a nie
+  minima}, więc w siodle robi krok w złą stronę w kierunkach ujemnych. Wraz z
+  argumentem zliczającym z sekcji 2 jest to prawdziwy problem w wysokim
+  wymiarze.}
+\sumitem{31--33}{\textbf{Przeskalowanie parametru zmienia krzywiznę o
+  $\val{p17.rescale.factor}$ i zostawia każde wyjście identyczne.} Więc jeden
+  model ma dwie ostrości, a goła liczba opisująca ostrość jest faktem o
+  układzie współrzędnych.}
+\sumitem{34}{\textbf{Żadna wielkość zbudowana z gołych wartości własnych tego
+  nie przeżywa} \dash{} ani największa, ani ślad, ani stosunek \dash{} a
+  warstwy normalizujące czynią z przeskalowania symetrię, którą architektura ma
+  z konstrukcji.}
+\sumitem{35--36}{Przeżyłaby miara przekształcająca się tak jak parametry.
+  \textbf{Ta książka nie zmierzyła twierdzenia o uogólnianiu i go nie
+  rozstrzyga}; dostarcza filtru.}
+\sumitem{37--38}{\textbf{Ograniczenie na krok ma ten sam problem i nie cierpi z
+  jego powodu}, bo $\eta$ przeskalowuje się razem z $\lambda$, a krok zrobiony
+  pozostaje bez zmian. Pytaniem o krzywiznę nigdy nie jest \emph{czy jest
+  duża}, tylko \emph{względem czego}.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Funkcja kwadratowa ma krzywiznę $\lambda = 8$ w swoim jedynym kierunku.
+  Podaj największy rozmiar kroku, który jest zbieżny, i powiedz, co dzieje się
+  dokładnie przy tej wartości.
+  \answerto{$\eta < 2/8 = \num{0.25}$. Dokładnie przy $\num{0.25}$ czynnik
+  wynosi $1 - 2 = -1$, więc współrzędna zmienia znak i zachowuje swój rozmiar
+  na zawsze \dash{} ani nie jest zbieżna, ani rozbieżna, co jest granicą będącą
+  granicą, a nie marginesem bezpieczeństwa.}
+\item Strata ma w bieżącym punkcie wartości własne hesjanu $50$, $5$ i
+  $\num{0.5}$. Podaj największy użyteczny krok, wskaźnik uwarunkowania i to,
+  który kierunek jest problemem.
+  \answerto{$\eta < 2/50 = \num{0.04}$, ustalone przez $50$. Wskaźnik
+  uwarunkowania to $50/\num{0.5} = 100$. Problemem jest kierunek
+  $\num{0.5}$: wolno mu na $\eta < 4$, a dostaje $\num{0.04}$, więc porusza się
+  w setnej części tempa, na jakie mógłby.}
+\item Dlaczego wyprowadzenie z sekcji 3 nigdy nie wspomina, ile parametrów ma
+  model?
+  \answerto{Bo jest to stwierdzenie o jednym kierunku własnym naraz, a
+  kierunki nie oddziałują na funkcji kwadratowej. Dołożenie kierunków dokłada
+  żądania tej samej postaci, a wiążącym wciąż jest największa krzywizna. Liczba
+  parametrów zmienia to, jakie $\lambda_{\max}$ jest prawdopodobne; do
+  argumentu nie wchodzi.}
+\item Ktoś donosi, że jego model zbiegł do minimum o największej wartości
+  własnej hesjanu $\num{0.02}$, i wnioskuje, że jest to płaskie minimum, które
+  dobrze się uogólni. Podaj dwa pytania, które byś zadał.
+  \answerto{Pierwsze: w jakich współrzędnych? Przeskalowanie parametru rusza tę
+  liczbę o kwadrat skali, gdy model pozostaje bez zmian, więc samo
+  $\num{0.02}$ nie mówi nic. Drugie: względem czego? Krzywizna ma sens tylko
+  wobec czegoś o tych samych jednostkach, czym w sekcji 3 jest rozmiar kroku.
+  Żadne z pytań nie jest wrogie i oba mają odpowiedzi; twierdzenie, które nie
+  potrafi na nie odpowiedzieć, jest o układzie współrzędnych.}
+\item Twój przebieg treningowy się rozbiega. Podaj stwierdzenie arytmetyczne
+  odpowiadające \enquote{krok uczenia był za duży} i jedną rzecz inną niż
+  obniżenie $\eta$, która by to naprawiła.
+  \answerto{$\eta > 2/\lambda_{\max}$ w punkcie, w którym przebieg był. Inaczej
+  niż obniżając $\eta$: zmniejszyć $\lambda_{\max}$, co robią i normalizacja, i
+  mniejsza inicjalizacja, skoro ograniczenie dotyczy powierzchni tak samo jak
+  optymalizatora. Zauważ, że $\lambda_{\max}$ jest własnością tego, gdzie
+  stoisz, więc przebieg może być stabilny przez tysiąc kroków, a potem nie.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że na funkcji kwadratowej o krzywiźnie $\lambda$ krok
+  $\eta = 1/\lambda$ trafia w minimum jednym ruchem.
+  \answerto{Czynnik wynosi $1 - \eta\lambda = 0$, więc współrzędna idzie do
+  zera w jednym kroku. To metoda Newtona w jednym wymiarze: dzielenie przez
+  krzywiznę jest dokładnie wyborem $\eta = 1/\lambda$, a powodem, dla którego
+  nie uogólnia się tanio, jest to, że w wielu wymiarach dzielenie jest
+  rozwiązywaniem układu.}
+\item Dlaczego $\eta = 2/(\lambda_{\max} + \lambda_{\min})$ jest najlepszym
+  pojedynczym rozmiarem kroku dla funkcji kwadratowej, a nie coś bliższego
+  $1/\lambda_{\max}$?
+  \answerto{Bo najgorszym kierunkiem jest ten ze skrajnych, który ma większe
+  $\lvert 1 - \eta\lambda\rvert$, a ten najgorszy przypadek jest minimalizowany
+  tam, gdzie oba są równe i przeciwne. Rozwiązanie
+  $1 - \eta\lambda_{\min} = \eta\lambda_{\max} - 1$ je daje. Wynikające tempo
+  to $(\kappa - 1)/(\kappa + 1)$, skąd wzięło się $\val{p17.rate}$.}
+\item Hesjan sumy jest sumą hesjanów. Co to mówi o krzywiźnie straty
+  uśrednionej po wsadzie?
+  \answerto{Że jest średnią krzywizn poszczególnych przykładów, więc
+  $\lambda_{\max}$ wsadu jest ograniczone przez największe z pojedynczych i
+  zwykle jest znacznie mniejsze, bo poszczególne hesjany nie dzielą swoich
+  stromych kierunków. To jeden uczciwy powód, dla którego większy wsad toleruje
+  większy krok \dash{} i jest to stwierdzenie o powierzchni, a nie o szumie, co
+  należy do Programu~\ref{prog:P21}.}
+\item Przeskalowanie z sekcji 5 użyło jednego parametru. Co ten sam argument
+  robi z całym hesjanem, jeśli przeskalujesz każdy parametr przez $c$?
+  \answerto{Mnoży go przez $c^{2}$ w całości, więc każda wartość własna się
+  skaluje, a wskaźnik uwarunkowania \dash{} \emph{stosunek} \dash{} nie. Warto
+  to zauważyć: wskaźnik uwarunkowania jest niezmienniczy przy jednolitym
+  przeskalowaniu tam, gdzie pojedyncze wartości własne nie są, co jest jednym z
+  powodów, dla których jest wielkością bardziej cytowalną. Nie jest
+  niezmienniczy przy różnym skalowaniu parametrów, a taki przypadek zbudowała
+  sekcja 5.}
+\item Dlaczego zerowa wartość własna hesjanu zostawia klasyfikację
+  nierozstrzygniętą, zamiast znaczyć, że kierunek jest płaski?
+  \answerto{Bo model drugiego rzędu nic tam nie mówi, a zachowanie funkcji w
+  tym kierunku rozstrzygają składniki, które model porzucił. $x^{4}$ i $-x^{4}$
+  mają w zerze tę samą zerową drugą pochodną, a jedna ma minimum tam, gdzie
+  druga ma maksimum. To granica modelu lokalnego pokazująca się sama i dlatego
+  \enquote{płaski kierunek} i \enquote{zerowa krzywizna} to nie to samo
+  stwierdzenie.}
+\end{furtherproblems}
