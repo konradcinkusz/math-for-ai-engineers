@@ -1,33 +1,736 @@
 %% P22 --- Optymalizacja z ograniczeniami i mnożniki Lagrange'a
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak programs/en/P22-constrained-optimisation.tex. Ramka w ramkę, makro
+%% w makro, liczba w liczbę; tools/parity.py porównuje oba pliki.
+%%
+%% UWAGA DLA TŁUMACZA: C4, C8 i C12 porównują znaczniki strukturalne, wzory i
+%% literały liczbowe PO KOLEI. Cyfra zostaje cyfrą, odwołanie do programu
+%% prowadzi zdanie zamiast stać za wzorem, a skrót jest częścią strumienia
+%% znaczników. \enquote{cena} dla \enquote{price}; \enquote{mnożnik} dla
+%% \enquote{multiplier}; \enquote{dywergencja} zostaje.
 
-\program{Optymalizacja z ograniczeniami i mnożniki Lagrange'a}
+\program[Optymalizacja z ograniczeniami]{Optymalizacja z ograniczeniami i
+mnożniki Lagrange'a}
 \label{prog:P22}
+\index{optymalizacja!z ograniczeniami}
+\index{mnożnik Lagrange'a}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{powiedzieć, co ograniczenie robi z zadaniem minimalizacji i
+  dlaczego rozwiązanie bez ograniczeń przestaje być dostępne}
+\outcome{7--11}{podać warunek zachodzący w optimum z ograniczeniem i
+  powiedzieć, dlaczego jest to stwierdzenie o gradientach}
+\outcome{12--17}{czytać mnożnik jako \textbf{cenę} i powiedzieć, jakie ma
+  jednostki}
+\outcome{18--21}{nazwać drugi sposób egzekwowania ograniczenia i powiedzieć,
+  co rzutowanie daje, a czego nie}
+\outcome{22--28}{czytać współczynnik kary jako kurs wymiany i powiedzieć,
+  dlaczego twarde ograniczenie i kara to to samo zadanie}
+\outcome{29--35}{rozpoznać warunki dla ograniczenia nierównościowego i
+  powiedzieć, co znaczy zerowy mnożnik}
+\end{outcomes}
 
-Argument: at a constrained optimum the gradients of objective and constraint
-are parallel; the multiplier is the exchange rate between them. Payoff: **a
-Lagrange multiplier is a price** \dash{} how much objective you buy per unit
-of constraint relaxed \dash{} and that reading turns the \code{beta} in a
-KL-penalised objective from a tuning knob into a quantity with units; the
-equivalence between a hard KL constraint and a KL penalty, which is why PPO
-and DPO are talking about the same problem; projection onto a set as the
-other way to enforce a constraint; KKT conditions stated for recognition,
-with the inequality case sketched rather than developed.  FORWARD REFERENCE,
-declared: the payoff is stated in terms of a KL-penalised objective, and the
-Kullback--Leibler divergence is not defined until P30. State the one fact it
-needs -- that KL is a non-negative measure of how far one distribution sits
-from another, zero only when they agree -- in the Learning outcomes with the
-pointer, exactly as P18 does for cross-entropy. Alternatively carry the
-payoff with a plain quadratic penalty and have P30 return to it; that is the
-author's call, but it may not be left undeclared.
+\begin{quiz}
+\item Co jest prawdą o gradientach celu i ograniczenia w optimum z
+  ograniczeniem? \teachesat{8--9}
+  \answerto{Są równoległe. Gdyby nie były, istniałby kierunek wzdłuż
+  ograniczenia wciąż poprawiający cel, więc punkt nie byłby optymalny.}
+\item Ograniczenie zostaje poluzowane o jednostkę i najlepsza osiągalna
+  wartość się poprawia. Czym jest mnożnik? \teachesat{13--14}
+  \answerto{Tempem tej poprawy \dash{} ile celu kupujesz za jednostkę
+  poluzowanego ograniczenia. Jest ceną i ma jednostki celu podzielone przez
+  jednostki ograniczenia.}
+\item Rzutowanie każdego kroku z powrotem na zbiór ograniczenia utrzymuje
+  każdy punkt dopuszczalnym. Czy znajduje optimum z ograniczeniem?
+  \teachesat{20--21}
+  \answerto{Samo z siebie nie. Rzutowanie odpowiada na pytanie \emph{który
+  punkt dopuszczalny jest najbliżej}, a to co innego niż \emph{który punkt
+  dopuszczalny jest najlepszy}. Jest sposobem na pozostanie dopuszczalnym i
+  musi zostać połączone z metodą poprawiającą cel.}
+\item Cel zapisano jako nagroda minus $\beta$ razy kara. Jakiego rodzaju
+  wielkością jest $\beta$? \teachesat{22--23}
+  \answerto{Kursem wymiany, z jednostkami: ile nagrody jesteś gotów zapłacić
+  za jednostkę kary. Dlatego $\beta$ dostrojone przy jednym modelu nagrody
+  znaczy co innego przy drugim.}
+\item Ograniczenie nierównościowe jest w optimum spełnione z zapasem. Ile
+  wynosi jego mnożnik? \teachesat{30--31}
+  \answerto{Zero. Ograniczenie, które nie jest aktywne, nic nie kosztuje, więc
+  jego cena wynosi zero \dash{} i to właśnie mówi warunek komplementarności.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 50 ramek.
-}
+% ============================================================
+\section{Najlepszy punkt, który jest niedostępny}
+\label{sec:P22-constraint}
+\index{optymalizacja!zbiór dopuszczalny}
+
+\begin{fr}
+Każda optymalizacja w tej książce była dotąd swobodna: wybierz dowolny punkt, a
+jedynym pytaniem było, jak zejść w dół. Program~\ref{prog:P15} znalazł kierunek,
+Program~\ref{prog:P17} ograniczył krok, a Program~\ref{prog:P20} zbudował
+metody.
+
+Prawdziwe zadania rzadko są swobodne. Budżet jest ustalony, prawdopodobieństwa
+muszą sumować się do jedynki, aktualizacja nie może odejść za daleko od punktu
+wyjścia. Weź najmniejszy możliwy przykład:
+\[ \text{zminimalizuj } f(x,y) = x^{2} + 2y^{2}
+   \quad\text{przy}\quad x + y = \val{p22.c} \]
+Ile wynosi minimum $f$ bez ograniczenia i dlaczego nie możemy go mieć?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Początek układu, gdzie $f = 0$ \dash{} a $0 + 0$ to nie $\val{p22.c}$.
+\end{ansblock}
+
+I to jest całość tego, co robi ograniczenie: usuwa odpowiedź, której chciałeś.
+Punkty, które zostają, to \textbf{zbiór dopuszczalny}, tutaj prosta, a zadaniem
+jest znalezienie najlepszego punktu \emph{na tej prostej}.
+
+\begin{note}
+Gdyby ograniczenie nie wykluczało swobodnego optimum, nic by nie robiło, a cały
+ten program byłby o mnożniku równym zeru. Ten przypadek jest realny i pojawia
+się w sekcji 6; na razie ograniczenie gryzie.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Jest oczywisty pierwszy ruch i warto go wykonać, bo zobaczenie, ile kosztuje,
+jest argumentem za wszystkim, co po nim.
+
+Ograniczenie daje $y = \val{p22.c} - x$. Podstaw, zróżniczkuj, rozwiąż. Co
+otrzymasz?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$x = \val{p22.x}$, $y = \val{p22.y}$ i $f = \val{p22.fstar}$.
+\end{ansblock}
+
+Podstawienie działa, jest dokładne i na tym zadaniu jest właściwym ruchem.
+Dlaczego więc ktokolwiek potrzebuje innej metody?
+
+Bo podstawienie wymaga, żeby ograniczenie dało się rozwiązać względem jednej
+zmiennej przez pozostałe, a większość się nie daje: wektor prawdopodobieństw
+sumujący się do jedynki w pięćdziesięciu tysiącach wymiarów, norma ograniczona
+stałą, dywergencja między dwoma rozkładami trzymana poniżej poziomu.
+\textbf{Metoda, która następuje, nigdy nie rozwiązuje ograniczenia} i tylko
+dlatego warto się jej nauczyć.
+\end{fr}
+
+\begin{fr}
+Spójrz więc na odpowiedź geometrycznie, bo to geometria się uogólnia.
+
+Program~\ref{prog:P15} ustalił coś o gradiencie i poziomicy, czego ten program
+potrzebuje, i wyprowadził to, a nie narysował. Co to było?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Gradient jest \textbf{prostopadły do poziomicy} przechodzącej przez jego punkt.
+\end{ansblock}
+
+Wyszło to z $D_u f = \nabla f \cdot u$ czytanego przy $\cos\theta = 0$:
+kierunki, wzdłuż których $f$ się nie zmienia, to dokładnie te prostopadłe do
+jego gradientu, a te kierunki są poziomicą.
+
+Teraz to samo zdanie, powiedziane o \emph{dwóch} funkcjach naraz, jest całością
+tego programu.
+
+\mermaidfig{p22-two-gradients}{Dwie krzywe i to, co musi zachodzić tam, gdzie
+jest najlepszy punkt.}{dwie krzywe, jeden punkt}
+\end{fr}
+
+% ============================================================
+\section{Tam, gdzie dwie krzywe się stykają}
+\label{sec:P22-stationarity}
+\index{mnożnik Lagrange'a!warunek stacjonarności}
+
+\begin{fr}
+Wyobraź sobie poziomicę $f$ przecinającą prostą ograniczenia pod kątem. Stoisz
+na prostej, w tym przecięciu.
+
+Czy możesz się poprawić?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Tak. Przesuń się wzdłuż prostej, a ponieważ poziomica przecina, a nie styka,
+jeden z dwóch kierunków prowadzi na niższą poziomicę.
+\end{ansblock}
+
+Przecięcie nigdy nie jest więc optymalne, a optimum musi leżeć tam, gdzie
+poziomica \textbf{styka się} z ograniczeniem \dash{} gdzie obie krzywe mają ten
+sam kierunek styczny.
+
+Powiedz, co to czyni prawdą o obu gradientach.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Są \textbf{równoległe}. Każdy jest prostopadły do własnej krzywej, a w punkcie
+styczności obie krzywe mają wspólną styczną, więc obie prostopadłe mają wspólny
+kierunek.
+\end{ansblock}
+
+Równoległość znaczy, że jeden jest wielokrotnością drugiego, a ta wielokrotność
+jest całą metodą:
+\[ \nabla f = \lambda \,\nabla g \]
+Liczba $\lambda$ to \textbf{mnożnik Lagrange'a}. Przybyła jako \emph{ten
+stosunek, który zrównuje dwa równoległe wektory}, co nie jest jeszcze
+interpretacją \dash{} sekcja 3 jest miejscem, gdzie się nią staje.
+\end{fr}
+
+\begin{fr}
+Dwa równania wektorowe plus ograniczenie to trzy równania z trzema niewiadomymi,
+więc zadanie jest teraz algebrą. W naszym $\nabla f = (2x, 4y)$ i
+$\nabla g = (1, 1)$:
+\[ 2x = \lambda, \qquad 4y = \lambda, \qquad x + y = \val{p22.c} \]
+
+Rozwiąż je.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\lambda = \val{p22.lam}$, więc $x = \val{p22.x}$ i $y = \val{p22.y}$ \dash{}
+ten sam punkt, który dało podstawienie.
+\end{ansblock}
+
+Skrypt robi to na ułamkach i sprawdza, że oba gradienty naprawdę są równoległe w
+odpowiedzi, więc słowo \emph{dokładnie} z poprzedniej ramki jest zapracowane, a
+nie założone. Pokazuje też, co zyskano: \textbf{ograniczenie nigdy nie zostało
+rozwiązane}. Zostało użyte, jako jeszcze jedno równanie, i dlatego metoda
+przeżywa ograniczenie, którego nikt nie przekształci.
+
+\begin{note}
+Znak i strona $\lambda$ są konwencją i książki się różnią: spotkasz
+$\nabla f = \lambda\nabla g$ oraz $\nabla f + \lambda\nabla g = 0$, a dają
+mnożniki przeciwnego znaku dla tego samego zadania. Program~\ref{prog:P20}
+zrobił tę samą uwagę o momentum. Czytaj wiersz, a nie literę.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Mnożnik jest ceną}
+\label{sec:P22-price}
+\index{mnożnik Lagrange'a!jako cena}
+
+\begin{fr}
+Jak dotąd $\lambda$ jest stosunkiem, który wypadł z pewnej algebry, i gdyby to
+było wszystko, ten program byłby techniką. Nie jest to wszystko.
+
+Rozwiąż to samo zadanie przy kilku poziomach ograniczenia. Oto wartości
+optymalne:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+$x + y = \val{p22.c.lo}$ & najlepsze $f$ to $\val{p22.fstar.lo}$, $\lambda = \val{p22.lam.lo}$ \\
+$x + y = \val{p22.c}$ & najlepsze $f$ to $\val{p22.fstar}$ \\
+$x + y = \val{p22.c.hi}$ & najlepsze $f$ to $\val{p22.fstar.hi}$, $\lambda = \val{p22.lam.hi}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Najlepsza osiągalna wartość jest funkcją tego, gdzie ustawiono ograniczenie. Co
+chciałbyś wiedzieć o tej funkcji?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jej \emph{tempo zmiany} \dash{} o ile przesuwa się najlepsza wartość, gdy
+przesuwa się ograniczenie.
+\end{ansblock}
+
+Czyli pochodną, $\dfrac{\mathrm{d}f^{*}}{\mathrm{d}c}$, i to jest liczba, której
+człowiek naprawdę chce: mówi, ile warte jest poluzowanie budżetu.
+
+Policz ją przy $c = \val{p22.c.lo}$, $c = \num{2}$ i $c = \val{p22.c}$ i porównaj
+z mnożnikami na tych poziomach.
+
+\transcript{p22-lambda-is-slope}
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{Obie listy są identyczne, wyraz po wyrazie, jako dokładne ułamki.}
+\[ \lambda \;=\; \frac{\mathrm{d}f^{*}}{\mathrm{d}c} \]
+Nie jest to przybliżenie ani analogia. Skrypt sprawdza to na
+$\val{p22.price.levels}$ poziomach na ułamkach, z krokiem $\frac{1}{1000}$, i
+żąda \emph{równości} \dash{} nie ma w tym żadnej tolerancji, bo różnica
+centralna jest dokładna dla funkcji kwadratowej.
+
+\textbf{Mnożnik Lagrange'a jest więc ceną.} Mówi, ile celu kupujesz za jednostkę
+poluzowanego ograniczenia, i ma jednostki: cel podzielony przez ograniczenie.
+Mnożnik nie jest zmienną pomocniczą do wyrugowania; zwykle jest najciekawszą
+liczbą w odpowiedzi.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Czytany jako cena odpowiada na pytania, na które samo optimum nie odpowiada.
+
+Przy $c = \val{p22.relax.from}$ mnożnik wynosi $\val{p22.relax.lam}$. Jeśli więc
+ktoś proponuje podniesienie budżetu do $\val{p22.relax.to}$, o ile mniej więcej
+powinieneś spodziewać się zmiany najlepszej wartości \dash{} i czy prawdziwa
+zmiana będzie większa, czy mniejsza?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Około $\val{p22.relax.lam}$, a prawdziwa zmiana jest \emph{większa}:
+$\val{p22.relax.gain}$.
+\end{ansblock}
+
+\textbf{Mnożnik wycenia pierwszą jednostkę, a nie każdą.} Jest pochodną, więc
+opisuje poluzowanie nieskończenie małe; na całej jednostce resztę dokłada
+krzywizna $f^{*}$. Tutaj $f^{*}$ zakrzywia się w górę, więc kolejna jednostka
+kosztuje więcej niż cena poprzedniej, co jest zwykłym kształtem budżetu.
+
+\mermaidfig{p22-price}{Poziom, najlepsza wartość i tempo między nimi.}{poziom i
+jego cena}
+\end{fr}
+
+\begin{fr}
+\begin{note}
+Jest to ten sam obiekt, który ekonomia nazywa \emph{ceną dualną}, i ten sam,
+który pojawia się w wyniku solvera obok każdego ograniczenia. Jeśli kiedykolwiek
+patrzyłeś na raport z programowania liniowego i zastanawiałeś się, do czego
+służy kolumna liczb obok ograniczeń, to było to, i mówiła, na które ograniczenia
+warto wydać pieniądze.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Drugi sposób egzekwowania ograniczenia}
+\label{sec:P22-projection}
+\index{rzutowanie!jako egzekwowanie ograniczenia}
+
+\begin{fr}
+Wycenienie ograniczenia w celu to jeden sposób egzekwowania, a odpowiedź, którą
+daje, leży na ograniczeniu, bo umieściła ją tam algebra. Jest drugi sposób i to
+on pojawia się w kodzie.
+
+Zrób dowolny krok, dopuszczalny albo nie, a potem wróć na zbiór ograniczenia.
+Jaki jest naturalny sposób powrotu i który program już go zbudował?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Iść do \textbf{najbliższego} punktu zbioru. To rzutowanie z
+Programu~\ref{prog:P05}.
+\end{ansblock}
+
+P05 wyprowadził je dla wektora na prostą przez początek układu i udowodnił
+własność, która się liczy \dash{} odpowiedzią jest najbliższy punkt, a nie
+jedynie jakiś punkt. To samo wyprowadzenie z normalną ograniczenia w miejscu
+wektora rzutuje na naszą prostą.
+
+Z $(\val{p22.proj.from.x}, \val{p22.proj.from.y})$, który nie jest dopuszczalny,
+rzut na $x + y = \val{p22.c}$ to
+$(\val{p22.proj.to.x}, \val{p22.proj.to.y})$, a skrypt sprawdza go wobec
+$\val{p22.proj.tried}$ innych punktów tej samej prostej: każdy jest dalej.
+
+\mermaidfig{p22-two-enforcements}{Wycena i rzutowanie.}{dwa sposoby
+egzekwowania}
+\end{fr}
+
+\begin{fr}
+Teraz rozróżnienie, dla którego istnieje ta sekcja, a które ludzie ze sobą
+mylą.
+
+Ten rzutowany punkt jest dopuszczalny. Czy jest optimum z ograniczeniem?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Jego wartość celu to $\val{p22.proj.f}$ wobec $\val{p22.fstar}$ w optimum.
+\end{ansblock}
+
+\textbf{Rzutowanie odpowiada na pytanie \emph{który punkt dopuszczalny jest
+najbliżej}. Mnożnik odpowiada na pytanie \emph{który jest najlepszy}.} To dwa
+różne pytania o dwóch różnych odpowiedziach, a mówi się to wprost tylko dlatego,
+że metody gradientu rzutowanego zapraszają do pomyłki: robią krok w dół, rzutują,
+krok w dół, rzutują, i to \emph{krok} znajduje optimum, a rzutowanie tylko
+utrzymuje punkt legalnym.
+
+\begin{trapbox}
+\textbf{\enquote{Rzutuję na zbiór ograniczenia, więc moja odpowiedź spełnia
+ograniczenie i jest przez to poprawna.}} Spełnia ograniczenie, co jest połową
+tego, co znaczy \emph{poprawna}. Każdy punkt zbioru spełnia ograniczenie, w tym
+wszystkie złe, a rzutowanie bez schodzenia w dół za nim będzie z zadowoleniem
+siedzieć w najbliższym punkcie dopuszczalnym w nieskończoność.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Cena, którą już ustawiałeś}
+\label{sec:P22-penalty}
+\index{mnożnik Lagrange'a!a cele z karą}
+
+\begin{fr}
+Teraz powód, dla którego ten program jest w książce dla inżynierów AI, bo obiekt
+powyżej jest tym, który ustawiałeś ręcznie, prawdopodobnie bez jednostki w
+głowie.
+
+Cele o tym kształcie są wszędzie:
+\[ \text{zmaksymalizuj } \;\mathbb{E}_{p}[r] \;-\; \beta \, D(p \,\Vert\, q) \]
+nagroda minus współczynnik razy miara tego, jak daleko nowy rozkład odszedł od
+starego. Powiedz, czym wygląda $\beta$ w słowniku tego programu.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Mnożnikiem \dash{} czyli \textbf{ceną}.
+\end{ansblock}
+
+A ceną za co i w jakich jednostkach? $\beta$ mnoży dywergencję i jest odejmowane
+od nagrody, więc jest \textbf{nagrodą na jednostkę dywergencji}: ile nagrody
+jesteś gotów oddać, by odejść o jednostkę dalej od punktu wyjścia.
+
+\begin{rigourbox}
+$D$ powyżej to \textbf{dywergencja Kullbacka--Leiblera}, a ten program jej nie
+definiuje \dash{} robi to Program~\ref{prog:P30}. Jedyny fakt użyty tutaj jest
+taki, że jest to \textbf{nieujemna miara tego, jak daleko jeden rozkład leży od
+drugiego, równa zeru tylko gdy się zgadzają}, co wystarcza, by czytać ją jako
+wielkość, którą się wydaje. Jest to zadeklarowana zależność w przód, dokładnie
+tak jak Program~\ref{prog:P18} deklaruje entropię krzyżową, i jest zapisana jako
+taka.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Ten odczyt da się sprawdzić, więc jest sprawdzony. Rozwiązaniem zadania z karą
+jest przechylony rozkład $p \propto q\,e^{r/\beta}$ \dash{} podany tutaj, a
+wyprowadzony w Programie~\ref{prog:P26} \dash{} więc rodzinę rozwiązań można
+przejść po $\beta$ i zmierzyć kurs wymiany wprost.
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+$\beta$ & wydana dywergencja & kupiona nagroda \\
+\midrule
+$\val{p22.kl.beta.hi}$ & $\val{p22.kl.hi}$ & $\val{p22.kl.r.hi}$ \\
+$\val{p22.kl.beta.lo}$ & $\val{p22.kl.lo}$ & $\val{p22.kl.r.lo}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Przewidz nachylenie nagrody względem dywergencji wzdłuż tej rodziny.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\beta$}
+Zmierzone z dokładnością lepszą niż $\val{p22.kl.slope.bound}$ przy każdym
+sprawdzonym $\beta$, na $\val{p22.kl.betas}$ z nich. \textbf{$\beta$ jest kursem
+wymiany}, dokładnie w sensie ustalonym w sekcji 3, i jest tym samym obiektem co
+$\lambda$ w innej greckiej literze, wobec której ludzie są mniej podejrzliwi.
+
+Zamienia to pokrętło do strojenia w wielkość z jednostkami, a to ma
+konsekwencję: $\beta$ dostrojone przy jednym modelu nagrody nie przenosi się na
+drugi, bo obie nagrody są w innych jednostkach. Jest to uwaga
+Programu~\ref{prog:P21} o hiperparametrach, jedną część później i o poziom
+wyżej.
+\end{fr}
+
+\begin{fr}
+I ostatni element, który tabela już ci pokazała.
+
+Każde $\beta$ dało dokładnie jedną dywergencję: $\val{p22.kl.beta.hi}$ dało
+$\val{p22.kl.hi}$, a $\val{p22.kl.beta.lo}$ dało $\val{p22.kl.lo}$, a skrypt
+sprawdza, że mniejsze $\beta$ zawsze kupuje więcej. Powiedz więc, czym jest
+rozwiązanie zadania z karą przy danym $\beta$.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Rozwiązaniem zadania \emph{z ograniczeniem} na tym poziomie dywergencji.
+\end{ansblock}
+
+\textbf{Twarde ograniczenie i kara to to samo zadanie, inaczej
+sparametryzowane.} Wybierz poziom, a wyjdzie mnożnik; wybierz mnożnik, a wyjdzie
+poziom. Żadne nie jest bardziej podstawowe, a to, które udostępnia
+implementacja, jest kwestią tego, czym wygodnie sterować.
+
+Dlatego metoda, która przycina albo ogranicza aktualizację, i metoda, która karze
+tę samą wielkość, spierają się o parametryzację, a nie o cele, i warto umieć to
+powiedzieć, gdy przedstawia się je jako konkurencyjne pomysły.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{$\beta$ to hiperparametr, więc go dostroję.}} Dostroisz, i
+wciąż warto wiedzieć, co stroisz. $\beta$ jest ceną w nagrodzie na nat, więc
+\dash{} inaczej niż krok \dash{} da się o nim rozumować przed przeszukaniem: ile
+zapłaciłbyś w nagrodzie, żeby odejść o nat dalej od odniesienia?
+
+Zmierzone na powyższym przeglądzie, obniżenie $\beta$ z
+$\val{p22.kl.beta.hi}$ do $\val{p22.kl.beta.lo}$ wydaje $\val{p22.kl.spend}$
+razy więcej dywergencji, by kupić $\val{p22.kl.buy}$ procent więcej nagrody.
+Czy to dobry interes, jest sądem o modelu nagrody, a liczby pozwalają go wydać
+zamiast zgadywać.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Gdy ograniczenie jest nierównością}
+\label{sec:P22-kkt}
+\index{optymalizacja!warunki KKT}
+
+\begin{fr}
+Wszystko dotąd miało równość. Większość prawdziwych ograniczeń to nierówności
+\dash{} budżet, którego nie wolno przekroczyć, dywergencja, pod którą trzeba
+zostać \dash{} a zmiana jest mniejsza, niż wygląda.
+
+Ograniczenie nierównościowe jest w optimum w jednym z dwóch stanów. Nazwij je.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Albo jest \textbf{aktywne} \dash{} optimum leży na brzegu \dash{} albo ma
+\textbf{zapas}, a optimum leży ściśle wewnątrz.
+\end{ansblock}
+
+Jeśli jest aktywne, nic się nie zmienia: brzeg jest równością i poprzednie pięć
+sekcji stosuje się bez zmian.
+
+Jeśli ma zapas, ograniczenie nie powstrzymuje cię przed niczym. Ile wynosi jego
+cena?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Zero}
+Bo poluzowanie ograniczenia, które nie jest aktywne, nic ci nie kupuje, a cena
+czegoś, co nic nie kupuje, jest zerem.
+
+Oba przypadki razem to jeden wiersz:
+\[ \lambda \, g(x) = 0 \]
+zwany \textbf{warunkiem komplementarności} i mówiący dokładnie to, co przed
+chwilą powiedziałeś: albo ograniczenie jest aktywne ($g = 0$), albo jego cena
+jest zerem, a nigdy oba niezerowe naraz.
+\end{fr}
+
+\begin{fr}
+Ten wiersz razem z tymi, które już masz, jest całym zestawem do rozpoznania. Dla
+minimalizacji $f$ przy $g \le 0$:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+$\nabla f + \lambda \nabla g = 0$ & stacjonarność \dash{} sekcja 2 \\
+$g(x) \le 0$ & dopuszczalność \\
+$\lambda \ge 0$ & cena ograniczenia nie jest ujemna \\
+$\lambda\, g(x) = 0$ & komplementarność \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Są to \textbf{warunki KKT} i stoją tu do rozpoznania, a nie do rozwinięcia: ten
+program nie dowodzi, że są konieczne, nie zajmuje się przypadkiem wielu
+ograniczeń i nie mówi, kiedy są dostateczne.
+
+\begin{rigourbox}
+Brakuje warunku regularności ograniczeń \dash{} warunku na zbiór ograniczeń, bez
+którego warunki mogą nie zachodzić w prawdziwym optimum \dash{} oraz argumentu
+o dostateczności, który potrzebuje wypukłości z Programu~\ref{prog:P19}. Oba
+należą do pierwszego kursu optymalizacji. Bez nich przeżywa odczyt: każde
+$\lambda$ jest ceną, a cena zerowa oznacza ograniczenie, które nic nie robi.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Jedna konsekwencja jest warta zapamiętania, bo jest trzecim wierszem tabeli i
+łatwo ją pominąć.
+
+Dlaczego $\lambda$ musi być nieujemne dla ograniczenia zapisanego $g \le 0$?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo poluzowanie ograniczenia może tylko pomóc. Gdyby cena była ujemna, rozluźnienie
+ograniczenia pogorszyłoby optimum, a większy zbiór dopuszczalny nie może
+zawierać gorszego najlepszego punktu.
+\end{ansblock}
+
+Jest to sprawdzian, który da się zastosować do wyniku solvera bez wiedzy o
+zadaniu: \textbf{ujemny mnożnik przy ograniczeniu $\le$ znaczy, że konwencja
+znaku nie jest tą, którą założyłeś}, a uwaga z sekcji 2 mówiła, że konwencje się
+różnią.
+
+To ostatnie praktyczne użycie odczytu w tym programie i jest dla niego typowe:
+interpretacja wyłapuje błąd, którego sama algebra by nie wyłapała.
+\end{fr}
+
+\begin{fr}
+To zamyka część VI i warto powiedzieć, co łączy te cztery programy.
+
+Program~\ref{prog:P19} powiedział, co obiecuje wypukłość i co traci się bez
+niej. Program~\ref{prog:P20} rozłożył optymalizator na jeden wiersz i ciąg
+napraw. Program~\ref{prog:P21} pokazał, że każde zażalenie na szum treningowy
+jest stwierdzeniem o wariancji. Ten program mówi, że każde ograniczenie niesie
+cenę, niezależnie od tego, czy ktoś ją zapisał.
+
+Żaden z czterech nie wprowadził nowego obiektu. Wszystkie cztery wzięły coś, co
+już było w książce \dash{} cięciwę, średnią, rozrzut, gradient \dash{} i
+odczytały to tam, gdzie nie było jeszcze czytane, i po to właśnie jest część o
+optymalizacji.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--2}{Ograniczenie usuwa odpowiedź, której chciałeś. Zostaje
+  \textbf{zbiór dopuszczalny}, a zadaniem jest najlepszy punkt na nim.}
+\sumitem{3--4}{Podstawienie rozwiązuje mały przypadek dokładnie i nie uogólnia
+  się, bo większości ograniczeń nie da się przekształcić. Metoda, która
+  następuje, \textbf{nigdy nie rozwiązuje ograniczenia}.}
+\sumitem{5--6}{Wynik Programu~\ref{prog:P15} \dash{} gradient jest prostopadły
+  do poziomicy \dash{} powiedziany o dwóch funkcjach naraz jest całością tego
+  programu.}
+\sumitem{7--8}{Poziomica \emph{przecinająca} ograniczenie nigdy nie jest
+  optymalna, bo można przesunąć się wzdłuż i poprawić. Optimum jest tam, gdzie
+  się \textbf{stykają}.}
+\sumitem{9}{Styczność znaczy zgodność stycznych, więc oba gradienty są
+  \textbf{równoległe}: $\nabla f = \lambda\nabla g$. Stamtąd bierze się
+  $\lambda$.}
+\sumitem{10--11}{Trzy równania, trzy niewiadome, rozwiązane na ułamkach:
+  $\lambda = \val{p22.lam}$ w $(\val{p22.x}, \val{p22.y})$. Konwencje znaku
+  różnią się między książkami; czytaj wiersz, a nie literę.}
+\sumitem{12--14}{$\lambda = \mathrm{d}f^{*}/\mathrm{d}c$, sprawdzone jako
+  \textbf{równość} na ułamkach na $\val{p22.price.levels}$ poziomach.
+  \textbf{Mnożnik jest ceną}, w jednostkach celu na jednostkę ograniczenia.}
+\sumitem{15--16}{Wycenia \emph{pierwszą} jednostkę: poluzowanie z
+  $\val{p22.relax.from}$ do $\val{p22.relax.to}$ daje $\val{p22.relax.gain}$
+  wobec mnożnika $\val{p22.relax.lam}$, a różnicą jest krzywizna $f^{*}$.}
+\sumitem{17}{Jest tym samym obiektem co cena dualna z solvera i mówi, na które
+  ograniczenia warto wydać pieniądze.}
+\sumitem{18--19}{Drugim sposobem egzekwowania ograniczenia jest
+  \textbf{rzutowanie} na nie, czyli obiekt z Programu~\ref{prog:P05} z normalną
+  ograniczenia w miejscu wektora.}
+\sumitem{20--21}{Rzutowanie odpowiada na pytanie \emph{który punkt dopuszczalny
+  jest najbliżej}, a mnożnik \emph{który jest najlepszy}: $\val{p22.proj.f}$
+  wobec $\val{p22.fstar}$. Rzutowanie utrzymuje punkt legalnym; nie czyni go
+  dobrym.}
+\sumitem{22--23}{Cel zapisany jako nagroda minus $\beta$ razy dywergencja ma w
+  sobie mnożnik, a $\beta$ jest \textbf{ceną w nagrodzie na jednostkę
+  dywergencji}.}
+\sumitem{24--25}{Zmierzone wzdłuż rodziny rozwiązań, nachylenie nagrody
+  względem dywergencji to samo $\beta$, z dokładnością lepszą niż
+  $\val{p22.kl.slope.bound}$. $\beta$ dostrojone przy jednym modelu nagrody nie
+  przenosi się więc na drugi.}
+\sumitem{26--28}{Każde $\beta$ nazywa jeden poziom dywergencji, więc
+  \textbf{twarde ograniczenie i kara to to samo zadanie} inaczej
+  sparametryzowane, i żadne nie jest bardziej podstawowe.}
+\sumitem{29--31}{Nierówność jest aktywna albo ma zapas. Aktywna to równość;
+  zapas znaczy, że ograniczenie nic nie kupuje, więc jego cena wynosi
+  \textbf{zero}. Razem: $\lambda g(x) = 0$, komplementarność.}
+\sumitem{32}{Warunki KKT to stacjonarność, dopuszczalność, $\lambda \ge 0$ i
+  komplementarność \dash{} podane do rozpoznania, z warunkiem regularności i
+  argumentem o dostateczności zostawionymi pierwszemu kursowi.}
+\sumitem{33--35}{Ujemny mnożnik przy ograniczeniu $\le$ znaczy, że konwencja
+  znaku nie jest tą, którą założyłeś, bo większy zbiór dopuszczalny nie może
+  mieć gorszego najlepszego punktu.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Zminimalizuj $x^{2} + y^{2}$ przy $x + 2y = 5$, używając warunku z
+  mnożnikiem. Ile wynoszą $x$, $y$ i $\lambda$?
+  \answerto{$\nabla f = (2x, 2y)$ i $\nabla g = (1, 2)$, więc $2x = \lambda$ i
+  $2y = 2\lambda$, co daje $x = \lambda/2$ i $y = \lambda$. Ograniczenie daje
+  $\lambda/2 + 2\lambda = 5$, więc $\lambda = 2$, $x = 1$ i $y = 2$. Najlepsza
+  wartość to $5$.}
+\item W tym zadaniu ograniczenie zmienia się z $5$ na $\num{5.1}$. Oszacuj nową
+  najlepszą wartość i powiedz, czy twoje oszacowanie jest za wysokie, czy za
+  niskie.
+  \answerto{Mnożnik wynosi $2$, więc najlepsza wartość zmienia się o około
+  $2 \times \num{0.1} = \num{0.2}$, czyli do około $\num{5.2}$. Oszacowanie
+  jest \emph{za niskie}: $f^{*}$ zakrzywia się w górę, więc prawdziwa wartość
+  jest odrobinę większa. (Wynosi $\num{5.202}$.)}
+\item Solver zgłasza mnożnik $0$ przy jednym z twoich ograniczeń. Co ci to mówi
+  i co powinieneś z tym ograniczeniem zrobić?
+  \answerto{Nie jest aktywne w optimum \dash{} odpowiedź leży ściśle wewnątrz
+  niego \dash{} więc lekkie poluzowanie albo zacieśnienie nic nie zmienia. Nie
+  ma sensu nic wydawać na jego rozluźnienie, a jeśli dodano je, by zakodować
+  prawdziwy wymóg, warto sprawdzić, czy robi to, co miałeś na myśli.}
+\item Cel to $\mathbb{E}_p[r] - \beta D(p \Vert q)$, gdzie $r$ jest mierzone w
+  dowolnych jednostkach modelu nagrody. Kolega przenosi $\beta$ z projektu, w
+  którym model nagrody był skalowany dziesięciokrotnie większy. Co się stało?
+  \answerto{Skuteczna cena zmieniła się dziesięciokrotnie. $\beta$ to nagroda
+  na jednostkę dywergencji, więc przeskalowanie nagrody dziesięciokrotnie przy
+  zachowaniu $\beta$ czyni karę dziesięć razy słabszą względem celu \dash{}
+  model odejdzie dziesięć razy dalej od odniesienia, niż zamierzano.}
+\item Dlaczego optimum z ograniczeniem nigdy nie może być lepsze niż bez niego i
+  co to znaczy dla znaku mnożnika przy ograniczeniu zapisanym $g \le 0$?
+  \answerto{Zbiór dopuszczalny jest podzbiorem wszystkiego, więc najlepszy
+  punkt w nim nie może pobić najlepszego punktu w ogóle. Poluzowanie
+  ograniczenia powiększa zbiór, co może tylko poprawić albo zostawić bez zmian
+  najlepszą wartość \dash{} więc tempo tej poprawy, czyli mnożnik, nie może być
+  ujemne.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że dla $f = Ax^{2} + By^{2}$ przy $x + y = c$ mnożnik wynosi
+  $\lambda = 2ABc/(A+B)$, i sprawdź wprost, że
+  $\mathrm{d}f^{*}/\mathrm{d}c = \lambda$.
+  \answerto{Stacjonarność daje $2Ax = \lambda$ i $2By = \lambda$, więc
+  $x = \lambda/2A$ i $y = \lambda/2B$; ograniczenie daje
+  $\lambda(1/2A + 1/2B) = c$, czyli $\lambda = 2ABc/(A+B)$. Wtedy
+  $f^{*} = Ax^{2} + By^{2} = \lambda^{2}(1/4A + 1/4B) = \lambda c/2$, a
+  podstawienie $\lambda$ daje $f^{*} = ABc^{2}/(A+B)$, którego pochodną jest
+  $2ABc/(A+B) = \lambda$.}
+\item Ograniczenie zapisano $g(x) = 0$ w jednej pracy i $-g(x) = 0$ w drugiej.
+  Co dzieje się z mnożnikiem i co to mówi o porównywaniu mnożników między dwoma
+  opracowaniami?
+  \answerto{Zmienia znak, bo $\nabla(-g) = -\nabla g$, a warunek stacjonarności
+  musi wciąż zachodzić. \emph{Wielkość} mnożnika jest więc własnością zadania, a
+  jego znak własnością tego, jak ktoś zapisał ograniczenie. Dwie prace podające
+  mnożniki przeciwnego znaku mogą podawać tę samą cenę.}
+\item Rozwiązaniem zadania z karą jest $p \propto q e^{r/\beta}$. Bez
+  wyprowadzania powiedz, co dzieje się z $p$, gdy $\beta$ rośnie nieograniczenie
+  i gdy spada do zera, i odnieś oba przypadki do odczytu przez ograniczenie.
+  \answerto{Gdy $\beta \to \infty$, wykładnik znika i $p \to q$: nieskończona
+  cena dywergencji znaczy, że nie stać cię na żaden ruch, co jest zadaniem z
+  ograniczeniem na poziomie dywergencji równym zeru. Gdy $\beta \to 0$,
+  eksponenta skupia się na wyniku o największym $r$, więc $p$ dąży do miary
+  punktowej: cena zerowa znaczy, że ograniczenie zostało usunięte, co jest
+  zadaniem bez ograniczenia.}
+\item Podaj przykład ograniczenia równościowego, dla którego podstawienie jest
+  w praktyce niemożliwe, i powiedz, co robi zamiast tego metoda z mnożnikiem.
+  \answerto{Wymóg, by rozkład na słowniku pięćdziesięciu tysięcy tokenów sumował
+  się do jedynki: rozwiązanie względem jednego prawdopodobieństwa przez
+  pozostałe $49\,999$ jest formalnie możliwe i bezużyteczne, bo łamie symetrię
+  zadania i sprawia, że każda pochodna niesie składnik z wyrugowanej zmiennej.
+  Metoda z mnożnikiem dodaje jedną niewiadomą i jedno równanie i zostawia każde
+  prawdopodobieństwo na równej stopie \dash{} i dokładnie tak powstaje
+  normalizacja softmaksu, gdy się ją wyprowadza, a nie postuluje.}
+\item Kolega mówi, że warunki KKT \enquote{dowodzą} optymalności jego punktu.
+  Czego brakuje w tym twierdzeniu?
+  \answerto{Dwóch rzeczy. Warunki są konieczne w optimum tylko przy warunku
+  regularności ograniczeń, więc punkt ich niespełniający może wciąż być
+  optymalny w źle zachowującym się zbiorze dopuszczalnym; a dostateczne są tylko
+  przy wypukłości, o której Program~\ref{prog:P19} mówi, że jest własnością,
+  której większość zadań w tej dziedzinie nie ma. Spełnienie KKT czyni punkt
+  kandydatem, a na zadaniu niewypukłym czyni go jednym z wielu.}
+\end{furtherproblems}

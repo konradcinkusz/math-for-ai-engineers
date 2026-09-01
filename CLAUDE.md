@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P21 written, both editions \dash{} Parts I to V entire, and the first three of Part VI.** P22–P34 are stubs carrying their briefs | 13 of 47 |
+| Programs | **F1–F13 and P1–P22 written, both editions \dash{} Parts I to VI entire.** P23–P34 are stubs carrying their briefs | 12 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 978 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 992 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 826 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 836 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 997 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1016 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 840 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 853 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,21 +93,21 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **13 of 47 programs are stubs**, in each language. This is the whole of the
+- **12 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1060 computed values, all referenced, all present, plus the committed console
+- 1092 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 204 Mermaid sources, all rendering
-- 54 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 210 Mermaid sources, all rendering
+- 56 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **90 orphan-tail pages: 23 · 26 · 20 · 21** across `main-en`, `main-pl`,
+- **91 orphan-tail pages: 23 · 27 · 20 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
-  **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three and P21 three
+  **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three and P22 one
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -142,7 +142,7 @@ what was there before.
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
-  **47% in P19**, **47% in P20** and **48% in P21** \dash{} P13, P15 and P17 are the highest outside Part I and
+  **47% in P19**, **47% in P20**, **48% in P21** and **45% in P22** \dash{} P13, P15 and P17 are the highest outside Part I and
   the only ones anywhere to reach the book's own rate.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
@@ -6889,6 +6889,137 @@ because the issues are generated from the manifest and the manifest is right.
 - Frame numbers mapped after writing: sections landed at
   `1--7 / 8--12 / 13--17 / 18--22 / 23--25 / 26--30 / 31--39`.
 
+### Program P22 pass, August 2026 --- Part VI is complete
+
+**Thirty-five teaching frames, thirty-seven printed, both editions.** Six
+sections: a best point that is not available, where the two curves touch, the
+multiplier is a price, the other way to enforce a constraint, a price you have
+already been setting, and when the constraint is an inequality.
+
+Sixteenth program under its brief's estimate, and again because the neighbours
+had spent the machinery rather than the content. Program~\ref{prog:P15} owns
+the gradient **and** the fact that it is perpendicular to a contour, derived
+from Program~\ref{prog:P05}'s cosine rather than drawn \dash{} which is the
+entire geometric content of \enquote{the two gradients are parallel}, said
+about two functions instead of one. Program~\ref{prog:P05} owns projection in
+full, including that the answer is the closest point rather than merely a
+point. Program~\ref{prog:P19} owns convexity, so the honest hedge about
+sufficiency is written there.
+
+#### The price is an identity, not an analogy, and it is exact
+
+Every book says a multiplier can be interpreted as a rate of change of the
+optimal value. This program **checks it as an equality**, over fractions, with
+no tolerance anywhere:
+
+\[ \lambda \;=\; \frac{\mathrm{d}f^{*}}{\mathrm{d}c} \]
+
+at $\val{p22.price.levels}$ constraint levels. A central difference is exact
+for a quadratic \dash{} its error term carries a third derivative and a
+quadratic has none \dash{} so the two lists come out identical term for term as
+`Fraction`s, and the committed transcript prints them side by side.
+
+That is worth more than the interpretation stated in prose, because it converts
+\enquote{can be interpreted as} into \enquote{is}, and the whole of the rest of
+the program is then a reading rather than a claim.
+
+**And the caveat is measured too.** Relaxing the constraint from
+$\val{p22.relax.from}$ to $\val{p22.relax.to}$ gains $\val{p22.relax.gain}$
+against a multiplier of $\val{p22.relax.lam}$: a multiplier prices the
+\emph{first} unit, and using it for a whole one is the same error as using a
+gradient for a whole step.
+
+#### The payoff, in the setting people actually meet it
+
+$\beta$ in a KL-penalised objective is a multiplier, so it is a price with
+units \dash{} reward per nat. Measured along the family of solutions
+$p \propto q e^{r/\beta}$, the slope of expected reward against divergence is
+$\beta$ itself, to better than $\val{p22.kl.slope.bound}$ at every $\beta$
+tried.
+
+Two consequences fall straight out and both are the kind of thing this book is
+for. A $\beta$ tuned against one reward model does not transfer to a reward
+model on a different scale, because the two rewards are in different units
+\dash{} which is Program~\ref{prog:P21}'s point about hyperparameters one part
+later and one level up. And **each $\beta$ names exactly one divergence level**,
+so a hard constraint and a penalty are the same problem parameterised
+differently: methods presented as rivals on that axis are arguing about
+parameterisation rather than about objectives.
+
+#### The declared forward reference, taken by P18's route
+
+The manifest left the choice open \dash{} state the one fact KL needs with a
+pointer, or carry the payoff with a quadratic penalty \dash{} and said it may
+not be left undeclared. This program takes the first route, on
+Program~\ref{prog:P18}'s precedent and Program~\ref{prog:P21}'s: a `rigourbox`
+in section 5 states that KL is a non-negative measure of how far one
+distribution sits from another, zero only when they agree, names
+Program~\ref{prog:P30} as where it is defined, and uses nothing else about it.
+The Learning outcomes say so too.
+
+That is now three declared forward references discharged the same way (P18's
+cross-entropy, P21's variance, P22's KL), which makes it a settled house
+pattern rather than three separate decisions.
+
+#### Rule 2 caught two figures, and one of them gave away two frames at once
+
+`p22-two-gradients` was declared in frame 6 and its middle node said *where
+they cross at an angle you can slide along the constraint and improve* \dash{}
+frame 8's answer \dash{} while its last node said *at the best feasible point
+they touch, and touching is a statement about gradients*, which is frame 9's.
+**One figure answering the next two elicitations** is the worst instance this
+book has had, and it happened because the figure was written as a summary of
+the section rather than of the frames above it.
+
+`p22-two-enforcements`'s last node reached frame 21's answer, which is the
+familiar case. Both were reworked to state only what the frames above them
+deliver, and the third figure needed nothing.
+
+So the rule stated at P21 holds and gains a clause: **write a figure against
+the frames above it, never against the section it sits in.** A section's
+summary is by construction the answer to the section's questions.
+
+#### Two assets shared a stem, which nothing checks
+
+The transcript and one of the figures were both called `p22-price`, so
+`figures/transcripts/p22-price.txt` and `figures/diagrams/*/p22-price.pdf`
+existed side by side. Nothing in the repository objects: `\transcript{}` and
+`\mermaidfig{}` build their own paths from the stem and neither knows about the
+other, so the collision is silent and would only ever surface as a confusing
+`make` dependency or a wrong file in a manifest.
+
+Renamed to `p22-lambda-is-slope`, which is a better name anyway. **No check was
+added**, because this has never shipped and the fix is to notice it while
+naming; but it is worth knowing that the two namespaces are separate and
+unpoliced.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P22.1 two-gradients | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P22.2 price | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P22.3 two-enforcements | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's wrap cap on the first render, at three ranks.
+
+#### Also
+
+- Traps 223 to 229 added.
+- **Layout cost nothing.** The overfull multiset is element for element the
+  pre-P22 baseline in all four builds \dash{} `[]`, `[]`, `[6.3]`, `[]`
+  \dash{} with no stranded openers, no stranded headings and **no orphaned
+  cues at any point in the pass**. One orphan tail added, in `main-pl`.
+- **Parity came back clean on its ordered checks first time** \dash{} C4, C8,
+  C12 and C16 all passed on the first run, which is the seventh program to
+  manage it. The only failure was C7 on a *text* value, `p22.price.h`, which
+  is the F10/P03/P18 situation: a step size of a thousandth is a parameter of
+  a check rather than a computed quantity, so both editions now write
+  $\frac{1}{1000}$ and the emission is gone.
+- The listing was extracted from `main-en.pdf` p865 and executed from `code/`:
+  it prints the two identical lists of `Fraction`s that the page prints.
+- `main-pl` passed a thousand pages.
+- Frame numbers mapped after writing: sections landed at
+  `1--6 / 7--11 / 12--17 / 18--21 / 22--28 / 29--35`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -7154,43 +7285,35 @@ clone instead.
 
 ## What is left
 
-1. **Thirteen programs, and Parts I to V are complete, plus the first three of
-   Part VI.** F1 to F13 and P1 to P21, both editions.
+1. **Twelve programs, and Parts I to VI are complete.** F1 to F13 and P1 to
+   P22, both editions. Part VII, probability and statistics, is next and is
+   the largest remaining block: six programs, P23 to P28.
 
-   **P22 is next** \dash{} *Constrained optimisation and Lagrange multipliers*,
-   deps `P15`, `P19` and `P30`, and it **closes Part VI**. Its payoff is one
-   reading carried all the way through: **a multiplier is a price** \dash{} how
-   much objective you buy per unit of constraint relaxed \dash{} which turns
-   the $\beta$ in a KL-penalised objective from a tuning knob into a quantity
-   with units, and makes the equivalence between a hard KL constraint and a KL
-   penalty the reason two named methods are talking about one problem.
+   **P23 is next** \dash{} *Probability and Bayes' theorem*, fifty-five frames
+   planned, deps `F10` and `F13`. It is the first program in a while whose
+   ground is genuinely unspent, so the estimate may hold; read the two
+   dependencies before assuming it does not. **F10** owns sets, the mask,
+   and/or/not, the counting rules and \dash{} crucially \dash{} \emph{the
+   numerator and the denominator}, including the observation that choosing the
+   denominator was a decision. **F13** owns the density, the fact that a
+   density's height is not a probability, and the shape of a weighted average.
+   Between them the objects are in place and what P23 owes is the measure, the
+   conditioning and the theorem.
 
-   **It carries the book's second declared forward reference and the manifest
-   leaves the choice open.** KL is not defined until Program~\ref{prog:P30},
-   and the brief gives two ways to proceed: state the one fact the payoff needs
-   \dash{} that KL is a non-negative measure of how far one distribution sits
-   from another, zero only when they agree \dash{} in the Learning outcomes
-   with a pointer, exactly as Program~\ref{prog:P18} does for cross-entropy; or
-   carry the payoff with a plain quadratic penalty and have P30 return to it.
-   **It may not be left undeclared**, and Program~\ref{prog:P21} has just shown
-   the first route working, with a `rigourbox` naming both P24 and P25.
+   **Its payoff is a calculation, and it is free.** A classifier at 99 per cent
+   on a fault occurring once in a thousand requests: what fraction of its
+   alarms are real? That is the base-rate arithmetic an engineer has to be able
+   to do in a meeting, it is trap item 28 in the catalogue, and it needs
+   nothing but two counts and a division \dash{} which is F10's own framing.
+   The brief also asks for **independence and conditional independence
+   distinguished**, because the naive Bayes assumption and most
+   \enquote{these two evals are independent signals} claims live on the
+   difference, and for the **prosecutor's fallacy elicited before it is named**.
 
-   Read what is already spent before estimating a length, which is the
-   discipline sixteen passes have now paid for: **P15** owns the gradient and
-   the fact that it is perpendicular to a contour, which is the whole geometric
-   content of \enquote{the two gradients are parallel}; **P19** owns convexity,
-   so \enquote{the constrained optimum is *the* optimum} has its condition
-   already; **P05** owns projection onto a subspace, which is one of the two
-   ways to enforce a constraint and is derived there in full; **P17** owns the
-   second-order picture. What is genuinely left is the multiplier itself, its
-   reading as a price, and the KKT conditions stated for recognition.
-
-   **The measurement P22 can afford is the price itself.** Solve one
-   constrained problem at several constraint levels and check that the
-   multiplier equals the derivative of the optimal value with respect to the
-   level \dash{} which is what \emph{price} means, is exact for a quadratic,
-   and turns the whole reading from an analogy into an identity. It needs no
-   provider and no model.
+   **Bayes' theorem must be derived, never asserted** \dash{} the brief says so
+   in as many words, and it is one line of algebra from the definition of
+   conditioning, which makes it exactly the kind of thing this book states as
+   a consequence rather than a result.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -7211,7 +7334,10 @@ clone instead.
    and moving the statement into the next frame's answer. P04 did three of
    those and went 26% to 35% without adding a frame, so the move is cheap per
    instance and the cost is measured \dash{} three cues added two pages to one
-   build.
+   build. **This is the largest genuinely parallelisable job in the
+   repository**, because it touches three merged program files and nothing
+   else; the programs themselves are not parallelisable, for the reason the
+   frame estimates below record.
 
    Before estimating any remaining program's length, read its written
    neighbours. F7's brief projected forty frames and thirty-one were needed;
@@ -7226,10 +7352,13 @@ clone instead.
    **P19's forty-five against thirty-eight**, because F04 had already worked
    its headline demonstration; **P20's sixty-five against forty-two**,
    because four written programs had each already delivered one of its
-   ingredients; and **P21's fifty against thirty-nine**, because F06, F04 and
-   P20 between them had left it only the noise model.
+   ingredients; **P21's fifty against thirty-nine**, because F06, F04 and
+   P20 between them had left it only the noise model; and **P22's against
+   thirty-five**, because P15 and P05 had left it only the multiplier.
    **A brief's frame estimate is a planning figure from before its neighbours
-   were written.** It is not a target.
+   were written.** It is not a target \dash{} and the sixteen-for-sixteen
+   record above is also the reason the programs cannot be written in parallel:
+   each one is shaped by what the ones before it turned out to spend.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
    softmax entropy with and without the `1/√d_k` scaling — is the one to run
    first: it costs nothing and it converts the book's central derivation from an
