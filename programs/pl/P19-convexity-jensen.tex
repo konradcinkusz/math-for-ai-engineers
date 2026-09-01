@@ -1,26 +1,776 @@
 %% P19 --- Wypukłość i nierówność Jensena
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak programs/en/P19-convexity-jensen.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; tools/parity.py porównuje oba pliki.
+%%
+%% UWAGA DLA TŁUMACZA: C4, C8 i C12 porównują znaczniki strukturalne, wzory i
+%% literały liczbowe PO KOLEI. Cyfra zostaje cyfrą, odwołanie do programu
+%% prowadzi zdanie zamiast stać za wzorem, a skrót jest częścią strumienia
+%% znaczników: gdzie angielski pisze samo \enquote{P15}, polski też.
+%% \enquote{perplexity} zostaje po angielsku, jak w Programach F03 i F04.
 
-\program{Wypukłość i nierówność Jensena}
+\program[Wypukłość i Jensen]{Wypukłość i nierówność Jensena}
 \label{prog:P19}
+\index{wypukłość}
+\index{nierówność Jensena}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{podać cięciwową definicję wypukłości i stosować ją jako test, a
+  nie jako obrazek}
+\outcome{9--14}{powiedzieć, co obiecuje wypukłość, i powiedzieć dokładnie,
+  czego ta obietnica dotyczy}
+\outcome{15--18}{podać nierówność Jensena i trafić z jej kierunkiem dla
+  funkcji wypukłej i dla wklęsłej}
+\outcome{19--26}{powiedzieć, dlaczego średnia z wartości perplexity jest inną
+  wielkością i co rozstrzyga, jak bardzo inną}
+\outcome{27--30}{rozpoznać tę samą nierówność jako ELBO i jako nieujemność
+  wariancji}
+\outcome{31--38}{powiedzieć, co zostaje, gdy obietnica jest złamana, bez
+  przesady w żadną stronę}
+\end{outcomes}
 
-Argument: a convex function has one basin and every local minimum is global;
-that is a promise about the problem, not about the algorithm. Deep learning
-breaks the promise, and what survives anyway is worth naming precisely.
-Payoff: Jensen's inequality, and **why you cannot average perplexities**
-\dash{} the mean of the exponentials is not the exponential of the mean, so
-a leaderboard that averages per-document perplexity is reporting a different
-quantity from one that exponentiates the mean loss; the same inequality is
-the ELBO in one line, named for recognition; and the honest statement that
-\enquote{non-convex} does not mean \enquote{hopeless}, with the reasons.
+\begin{quiz}
+\item Co wypukłość obiecuje o minimum? \teachesat{9--10}
+  \answerto{Że każde minimum lokalne jest globalne. Jest to obietnica o
+  problemie, a nie o algorytmie: mówi, że miejsce, w którym optymalizator
+  stanął, jest \emph{tą} odpowiedzią, a nie mówi nic o tym, jak długo trwa
+  dojście.}
+\item Funkcja zakrzywiona jest stosowana do średniej. Czy to to samo, co
+  uśrednienie jej wartości? \teachesat{17--18}
+  \answerto{Nie, a nierówność Jensena mówi, w którą stronę: dla funkcji
+  wypukłej średnia z wartości jest większa. Zgadzają się tylko wtedy, gdy
+  każda wartość jest taka sama.}
+\item Tabela wyników uśrednia wartości perplexity na dokument. Co podaje?
+  \teachesat{19--20}
+  \answerto{Inną wielkość niż perplexity, i większą. Perplexity to
+  eksponenta średniej straty; średnia z eksponent leży powyżej niej o
+  czynnik rosnący z tym, jak zróżnicowane są dokumenty.}
+\item Czy $\ln$ jest wypukły, czy wklęsły, i co to robi z nierównością?
+  \teachesat{27--28}
+  \answerto{Wklęsły, więc nierówność się odwraca: logarytm średniej jest co
+  najmniej średnią logarytmów. Ta jedna linijka to ELBO.}
+\item Uczenie głębokie nie jest wypukłe. Co zostaje stracone, a co nie?
+  \teachesat{33--34}
+  \answerto{Stracona zostaje gwarancja, że miejsce zatrzymania jest
+  najlepszym, jakie istnieje. Nie zostaje stracone nic poza tym: gradient
+  wciąż wskazuje w dół, ograniczenie na krok wciąż obowiązuje, a argument
+  zliczający mówi, że większość punktów stacjonarnych to siodła, a nie złe
+  minima, które się ludziom malują.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+% ============================================================
+\section{Definicja, którą da się sprawdzić}
+\label{sec:P19-chord}
+\index{wypukłość!definicja cięciwowa}
+
+\begin{fr}
+Programy \ref{prog:F11}, \ref{prog:P15} i \ref{prog:P17} opierały się na tym
+samym obrazku, nigdy go nie nazywając: misa, z dnem, i spacer, który schodzi w
+dół. Program~\ref{prog:F11} powiedział wprost, że \enquote{wypukłość, minima
+lokalne wobec globalnych} należy tutaj.
+
+Zacznij od tego, co to słowo musi znaczyć, zanim cokolwiek z tego się opłaci.
+Narysuj krzywą w kształcie misy, wybierz na niej dwa punkty i połącz je
+odcinkiem prostej. Gdzie leży ten odcinek?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Powyżej krzywej albo na niej \dash{} nigdy poniżej.
+\end{ansblock}
+
+Ten odcinek to \textbf{cięciwa}, a to, co przed chwilą powiedziałeś, jest
+definicją. Funkcja jest \textbf{wypukła}, gdy dla każdej pary punktów i
+każdego położenia między nimi
+\[ f\bigl(t a + (1-t)b\bigr) \;\le\; t\,f(a) + (1-t)\,f(b) \]
+dla $t$ między $0$ a $1$. Po lewej jest krzywa, po prawej cięciwa.
+
+\mermaidfig{p19-chord-above}{Dwa punkty i odcinek między nimi.}{test cięciwy}
+\end{fr}
+
+\begin{fr}
+Ta nierówność jest warta więcej niż obrazek, z którego się wzięła, a powód
+jest praktyczny, nie estetyczny.
+
+Co da się zrobić z nierównością, czego nie da się zrobić z misą?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Sprawdzić ją. I sprawdzić w liczbie wymiarów, której nikt nie narysuje.
+\end{ansblock}
+
+Obrazek misy jest argumentem o dwóch wymiarach i nadzieją co do reszty.
+Nierówność jest arytmetyką: bierze dwa punkty i liczbę między $0$ a $1$ i albo
+zachodzi, albo nie.
+
+Skrypt robi dokładnie to dla $\val{p19.chord.fns}$ funkcji, po
+$\val{p19.chord.tests}$ trójek każda \dash{} $x^{2}$, $e^{x}$ i
+$\lvert x \rvert$ \dash{} i zachodzi dla każdej.
+
+\begin{note}
+$\lvert x \rvert$ jest na tej liście celowo. Jest wypukła i ma ostrze, więc
+nie jest różniczkowalna w zerze. \textbf{Wypukłość nie jest warunkiem
+gładkości}, co ma znaczenie, bo $\relu$ ma dokładnie ten kształt z jednej
+strony, a powierzchnie strat, o których jest ta książka, są go pełne.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Test, który nie może zawieść, nie jest testem, co jest regułą
+Programu~\ref{prog:P05} o nieznajdowaniu niczego.
+
+Skrypt uruchamia go więc także na $x^{4} - 3x^{2} + \frac{x}{2}$, która nie
+jest wypukła. Co powinien zgłosić przemiatanie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Cięciwę, która gdzieś schodzi \emph{poniżej} krzywej \dash{} tutaj o
+$\val{p19.chord.counterexample}$ przy najgorszej parze.
+\end{ansblock}
+
+Co nie jest porażką zaokrągleń ani otarciem się. Definicja jest naruszona z
+zapasem, bo ta funkcja czwartego stopnia ma dwa zagłębienia z garbem między
+nimi, a cięciwa poprowadzona przez garb przechodzi pod nim.
+
+Ta funkcja wykona resztę pracy tego programu, więc warto raz na nią spojrzeć:
+jest najmniejszą rzeczą, która zachowuje się jak powierzchnia straty.
+\end{fr}
+
+\begin{fr}
+Jest drugi test i jest obiektem, który już masz.
+
+Program~\ref{prog:P17} zbudował drugą pochodną i użył jej do sklasyfikowania
+punktu stacjonarnego. Użyj jej tu inaczej: co musi być prawdą o $f''$, żeby
+cięciwa leżała wszędzie powyżej krzywej?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$f'' \ge 0$ wszędzie \dash{} krzywa nigdy nie wygina się w dół.
+\end{ansblock}
+
+A w więcej niż jednym wymiarze jest to to samo stwierdzenie o macierzy z
+Programu~\ref{prog:P17}: hesjan jest dodatnio półokreślony w każdym punkcie,
+co według Programu~\ref{prog:P10} znaczy, że każda wartość własna jest
+nieujemna w każdym kierunku, wszędzie.
+
+Zmierzone na tej funkcji czwartego stopnia: wygina się w dół w
+$\val{p19.curv.negative}$ z $\val{p19.curv.tested}$ punktów siatki. Jeden by
+wystarczył.
+
+\begin{note}
+Zwróć uwagę na kwantyfikator, bo tam oba testy różnią się w praktyce.
+Program~\ref{prog:P17} pytał o hesjan \emph{w punkcie} i dostawał
+klasyfikację tego punktu. Wypukłość pyta o hesjan \emph{w każdym punkcie} i
+dostaje stwierdzenie o całej funkcji. Ten sam obiekt i znacznie mocniejsze
+żądanie.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Co obiecuje wypukłość}
+\label{sec:P19-promise}
+\index{wypukłość!a minima lokalne}
+
+\begin{fr}
+Teraz zapłata i mieści się w jednym zdaniu.
+
+Optymalizujesz. Twój spacer gdzieś się zatrzymuje, bo grunt przestał opadać.
+Na powierzchni wypukłej co wiesz o tym, gdzie jesteś?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Że jest najlepiej, jak się da. Każde minimum lokalne funkcji wypukłej jest
+globalne.
+\end{ansblock}
+
+Argumentem jest znów cięciwa i mieści się w dwóch linijkach. Przypuśćmy, że
+$a$ jest minimum lokalnym, a jakieś $b$ leży niżej. Każdy punkt cięciwy od $a$
+do $b$ jest co najwyżej na wysokości cięciwy, która opada od $f(a)$ ku $f(b)$
+\dash{} więc punkty dowolnie blisko $a$ leżą ściśle poniżej $f(a)$, a $a$
+jednak nie było minimum lokalnym.
+
+\mermaidfig{p19-one-basin}{Gdzie spacer stanął i ile to warte.}{jedna niecka}
+\end{fr}
+
+\begin{fr}
+Pomiar jest zliczeniem i celowo nie robi wrażenia.
+
+$x^{2}$ ma $\val{p19.basins.convex}$ minimum lokalne na przedziale, który
+przemiata skrypt. Funkcja czwartego stopnia ma $\val{p19.basins.wiggle}$.
+Powiedz, ile kosztuje cię ta druga liczba.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Tyle, że o wyniku decyduje to, gdzie zaczynasz. Oba minima są warte
+$\val{p19.wiggle.lo}$ i $\val{p19.wiggle.hi}$ \dash{} różnica
+$\val{p19.wiggle.gap}$ \dash{} a spacer znajduje to, przy którym był bliżej.
+\end{ansblock}
+
+\textbf{Wypukłość nie jest więc stwierdzeniem o trudności. Jest stwierdzeniem
+o niejednoznaczności.} Problem wypukły może być ogromny i powolny; czym nie
+może być, to problemem, w którym dwa uczciwe przebiegi nie zgadzają się co do
+odpowiedzi i oba mają rację.
+
+\begin{trapbox}
+\textbf{\enquote{Wypukły znaczy łatwy do optymalizowania.}} Znaczy, że
+odpowiedź jest jedyna, co jest inną własnością i żadna nie pociąga drugiej.
+
+Problemy wypukłe bywają powolne: Program~\ref{prog:P17} zmierzył misę, której
+wskaźnik uwarunkowania wymusił $\val{p17.steps.99}$ kroków na zamknięcie
+$99$ procent luki jednego kierunku, a ta misa jest tak wypukła, jak tylko się
+da. A problemy niewypukłe bywają szybkie, co jest całą empiryczną historią
+uczenia głębokiego.
+
+Obietnica dotyczy tego, w \emph{którym} punkcie kończysz, a nie tego, ile
+trwa dojście.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Jeszcze jedna rzecz, którą ta obietnica nie jest, i to ta, którą się
+przekręca.
+
+Wypukłość jest własnością \emph{funkcji}. Powiedz więc, co mówi ci o spadku
+gradientu.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wprost nic. Jest obietnicą o problemie, a nie o algorytmie.
+\end{ansblock}
+
+Optymalizator wciąż może rozbiec się na funkcji wypukłej \dash{} ograniczenie
+z Programu~\ref{prog:P17} to $\eta < 2/\lambda_{\max}$ niezależnie od tego,
+czy powierzchnia jest wypukła \dash{} i wciąż może pełzać. Wypukłość kupuje
+to, że \emph{jeśli} spacer zbiegnie do punktu stacjonarnego, ten punkt jest
+odpowiedzią.
+
+Rozdzielenie tych dwóch rzeczy jest całą tą sekcją i dlatego zdanie
+\enquote{strata jest niewypukła, więc trening jest zawodny} zawiera dwa
+twierdzenia, z których tylko jedno dotyczy wypukłości.
+\end{fr}
+
+% ============================================================
+\section{Nierówność Jensena}
+\label{sec:P19-jensen}
+\index{nierówność Jensena!jej kierunek}
+
+\begin{fr}
+Definicja cięciwowa ma drugie odczytanie i to dla niego napisano ten program.
+
+Przeczytaj $t\,f(a) + (1-t)\,f(b)$ jako \emph{średnią ważoną dwóch wartości
+$f$}, a $t a + (1-t) b$ jako tę samą średnią ważoną $a$ i $b$. Powiedz teraz,
+co porównuje ta definicja.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$f$ ze średniej wobec średniej z $f$. I mówi, że pierwsze jest co najwyżej
+drugim.
+\end{ansblock}
+
+Co jest średnią ważoną z Programu~\ref{prog:F13} z funkcją owiniętą wokół
+niej, a postacią ogólną jest \textbf{nierówność Jensena}: dla wypukłej $f$ i
+dowolnych wag nieujemnych sumujących się do jedynki
+\[ f\Bigl(\sum_i w_i x_i\Bigr) \;\le\; \sum_i w_i\, f(x_i) \]
+
+Dwa punkty były definicją; $n$ punktów to to samo stwierdzenie zastosowane
+wielokrotnie i nie potrzeba niczego nowego.
+\end{fr}
+
+\begin{fr}
+Kierunek jest tym, co wszyscy mylą, i warto go przypiąć, zamiast go pamiętać.
+
+Masz wypukłe $f$. Co jest większe \dash{} najpierw uśrednić, czy najpierw
+zastosować $f$? I kiedy są równe?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Większe jest zastosowanie $f$ najpierw. Są równe dokładnie wtedy, gdy każde
+$x_i$ jest takie samo.
+\end{ansblock}
+
+Przypadek równości jest tą użyteczną połową. Luka Jensena nie jest stałą karą:
+jest zerem, gdy wejścia są identyczne, i rośnie, gdy się rozjeżdżają, co czyni
+ją faktem o \emph{twoich danych}, a nie o funkcji.
+
+\begin{note}
+Dla \textbf{wklęsłej} $f$ każda nierówność tutaj się odwraca, bo funkcja
+wklęsła to $-1$ razy wypukła, a mnożenie przez liczbę ujemną odwraca
+nierówność. Więc $\ln$ ze średniej jest co najmniej średnią z $\ln$, czego
+używa \S\ref{sec:P19-elbo}.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Dlaczego nie wolno uśredniać perplexity}
+\label{sec:P19-perplexity}
+\index{perplexity!uśrednianie}
+
+\begin{fr}
+Program~\ref{prog:F04} to ustawił i przekazał ogólne stwierdzenie tutaj z
+nazwy. Policzył czteroprzykładową entropię krzyżową, wziął eksponentę średniej
+straty, dostając $\val{f04.ce.ppl}$, uśrednił cztery wartości perplexity na
+przykład, dostając $\val{f04.ce.ppl.naive}$, i powiedział, że pierwsza jest
+tym, co powinna podawać tabela wyników.
+
+Masz teraz powód. Powiedz, która z tych dwóch liczb musi być większa i
+dlaczego nie jest to przypadek tamtego przykładu.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Średnia z wartości perplexity, zawsze \dash{} bo $e^{x}$ jest wypukłe, a
+Jensen mówi tak dla każdego zestawu strat.
+\end{ansblock}
+
+Te dwie liczby są więc \textbf{uporządkowane}, a nie tylko różne, i ta błędna
+jest zawsze większa. Harness z tym błędem nigdy niczego nie upiększa i zawsze
+podaje model jako gorszy, niż jest.
+
+Skrypt stwierdza to uporządkowanie, a nie liczby, na
+$\val{p19.ppl.tokens}$ tokenach przy czterech różnych rozrzutach, i czyta dwie
+zapisane wartości z Programu~\ref{prog:F04}, sprawdzając, że są uporządkowane
+tak samo \dash{} więc oba programy nie mogą się rozjechać co do tego, która
+liczba jest która.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Perplexity to średnia z wartości perplexity na token.}}
+Jest eksponentą średniej straty, co nie jest tą samą liczbą, a różnica nie
+jest mała.
+
+Powód, dla którego to przekonanie się trzyma, jest taki, że jest ono
+\emph{prawie} prawdziwe, w ścisłym sensie: obie liczby zgadzają się dokładnie
+wtedy, gdy każdy token kosztuje tyle samo. Implementacja z tym błędem jest
+więc poprawna na jednorodnej podkładce testowej, a zwykle na takiej właśnie
+była testowana.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Co prowadzi do pytania, dla którego jest reszta tej sekcji.
+
+Luka jest zerem, gdy każda strata jest taka sama, i rośnie, gdy się
+rozjeżdżają. Jaka więc własność twojego zbioru ewaluacyjnego rozstrzyga, jak
+bardzo błędna jest ta błędna liczba?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+To, jak jest zróżnicowany \dash{} rozrzut strat na token i nic więcej o
+modelu.
+\end{ansblock}
+
+To jest odkrycie i jest ostrzejsze niż \enquote{te dwie liczby się różnią}. Ta
+sama średnia strata, $\val{p19.ppl.meanloss}$, cztery różne rozrzuty:
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+rozrzut & poprawna & błędna & błędna / poprawna \\
+\midrule
+$0$ & $\val{p19.ppl.right.00}$ & $\val{p19.ppl.wrong.00}$ & $\val{p19.ppl.ratio.00}$ \\
+$\num{0.5}$ & $\val{p19.ppl.right.05}$ & $\val{p19.ppl.wrong.05}$ & $\val{p19.ppl.ratio.05}$ \\
+$\num{1.0}$ & $\val{p19.ppl.right.10}$ & $\val{p19.ppl.wrong.10}$ & $\val{p19.ppl.ratio.10}$ \\
+$\num{2.0}$ & $\val{p19.ppl.right.20}$ & $\val{p19.ppl.wrong.20}$ & $\val{p19.ppl.ratio.20}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Model jest identyczny w dół kolumny: poprawna liczba się nie rusza. Podawana
+idzie od poprawnej do $\val{p19.ppl.ratio.20}$ razy za dużej.
+
+\mermaidfig{p19-order-of-two}{Jedna kolumna, dwie możliwe wielkości.}{kolejność
+dwóch kroków}
+\end{fr}
+
+\begin{fr}
+\textbf{Rozmiar błędu jest więc własnością zbioru ewaluacyjnego, a nie kodu},
+i to czyni tę rzecz wartą sekcji.
+
+Harness z tym błędem jest dokładnie poprawny na jednorodnej podkładce, łagodnie
+błędny na czystym benchmarku i błędny o czynnik na zróżnicowanym korpusie
+\dash{} czyli na tym, na którym komukolwiek zależy. Przechodzi swoje testy i
+podaje źle w produkcji, a to jest \enquote{stabilność numeryczna} z
+Programu~\ref{prog:P02} w nowym miejscu: nie dokładniej, tylko bezpiecznie na
+wejściach, których nie wypróbowałeś.
+
+\begin{note}
+Istnieje postać zamknięta tego ilorazu, gdy straty są bliskie gaussowskim
+\dash{} jest to $e^{\sigma^{2}/2}$ \dash{} a cztery wiersze powyżej zgadzają
+się z nią z dokładnością do $\val{p19.ppl.pred.bound}$ procent. Skrypt to
+\emph{zgłasza} i tego nie stwierdza, bo jest to dokładne dla rozkładu
+logarytmiczno-normalnego, a poza tym tylko drugiego rzędu, a stwierdzanie
+prawa, które zachodzi w jednym przypadku, jest sposobem, w jaki prawdopodobna
+liczba trafia do książki.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Oto to w czterech linijkach, na dwóch zestawach strat o tej samej średniej.
+
+\transcript{p19-two-averages}
+
+Obie kolumny pierwszej pary się zgadzają. Powiedz, co zmieniło się w drugiej,
+a co nie.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Średnia strata się nie zmieniła, więc perplexity też nie. Zmienił się rozrzut,
+a średnia z wartości perplexity prawie się uczwórniła.
+\end{ansblock}
+
+Cztery liczby wystarczą, żeby to pokazać, bo mechanizm nie jest statystyczny.
+Jest nim kształt $e^{x}$: tokeny o wysokiej stracie są eksponentowane przed
+uśrednieniem, więc dominują sumę, do której inaczej tylko by dołożyły.
+
+\begin{note}
+Trzymaj to osobno od porażki, którą Program~\ref{prog:F04} stawia obok. Tam
+średnia makro i średnia mikro nie zgadzają się, bo grupy mają różne rozmiary,
+a każdy krok jest \emph{liniowy}; szkodę robią wagi. Tutaj każda waga jest
+równa, a szkodę robi krzywizna. Ten sam zapach, inny mechanizm, i nie mają tej
+samej naprawy.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Ta sama nierówność, jeszcze raz}
+\label{sec:P19-elbo}
+\index{nierówność Jensena!a ELBO}
+
+\begin{fr}
+Jensen pojawia się jeszcze w jednym miejscu, które czytelnik tej dziedziny
+spotka, a chodzi tu o rozpoznanie, a nie o wyprowadzenie.
+
+$\ln$ jest wklęsły. Zapisz, co Jensen mówi wobec tego o $\ln$ ze średniej.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \ln\Bigl(\sum_i w_i x_i\Bigr) \;\ge\; \sum_i w_i \ln x_i \]
+\end{ansblock}
+
+Sprawdzone na $\val{p19.elbo.trials}$ losowych dodatnich próbkach, a na
+zestawie roboczym w skrypcie luka wynosi $\val{p19.elbo.gap}$.
+
+\textbf{Ta jedna linijka to dolne ograniczenie dowodowe (ELBO).} Zapisane z
+wartością oczekiwaną zamiast sumy ważonej brzmi
+$\ln \Ex[x] \ge \Ex[\ln x]$, a każda metoda wariacyjna w tej dziedzinie jest
+zbudowana na doborze $x$ tak, by prawa strona była czymś, co umiesz policzyć,
+a lewa czymś, czego nie umiesz.
+
+\begin{rigourbox}
+Ten program nazywa to ograniczenie i go nie używa. Czym jest $x$, dlaczego
+ograniczenie bywa ciasne i co jest przybliżane, to kurs wnioskowania
+wariacyjnego, którego ta książka nie podejmuje. To, co tu jest, wystarcza, by
+rozpoznać ten ruch, gdy praca robi go w jednej linijce i oczekuje, że
+nadążysz.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+I jedno, którego zauważenie nic nie kosztuje, bo jest tą samą nierównością z
+$f(x) = x^{2}$.
+
+Jensen mówi, że średnia z kwadratów jest co najmniej kwadratem średniej.
+Powiedz, jak nazywa się różnica między nimi.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wariancja.
+\end{ansblock}
+
+$\Ex[x^{2}] - (\Ex[x])^{2}$ to wariancja, a nierówność Jensena dla $x^{2}$ to
+dokładnie stwierdzenie, że nie może być ujemna. Co nie jest nowym faktem; to
+fakt, który już miałeś, przychodzący ze strony, z której staje się oczywisty.
+
+\textbf{To jest argument za znaniem Jensena z nazwy.} Jedna nierówność
+pojawia się jako błąd z perplexity, jako ELBO i jako nieujemność wariancji, a
+rozpoznanie jej jest tańsze niż spotkanie wszystkich trzech osobno.
+\end{fr}
+
+% ============================================================
+\section{Gdy obietnica jest złamana}
+\label{sec:P19-nonconvex}
+\index{wypukłość!co zostaje bez niej}
+
+\begin{fr}
+Powierzchnia straty sieci neuronowej nie jest wypukła i nie jest temu bliska.
+
+Program~\ref{prog:P06} mówi dlaczego w jednej linijce i warto to odzyskać.
+Sieć jest złożeniem, a złożenie funkcji wypukłych na ogół nie jest wypukłe.
+Podaj najkrótszy powód.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo strata jest funkcją \emph{wag}, a wagi różnych warstw mnożą się przez
+siebie.
+\end{ansblock}
+
+Nawet dwie warstwy bez aktywacji dają stratę zawierającą $w_2 w_1$, a iloczyn
+dwóch zmiennych jest siodłem: wypukły wzdłuż jednej przekątnej, wklęsły wzdłuż
+drugiej. Niewypukłość jest tam przed jakąkolwiek funkcją aktywacji, przed
+jakąkolwiek głębokością, i bierze się z tego, co czyni sieć siecią.
+
+Obietnicy więc nie ma. Reszta tej sekcji jest o tym, czego nie brakuje.
+\end{fr}
+
+\begin{fr}
+Zacznij od tego, co faktycznie zostaje stracone, wypowiedzianego wąsko. Co
+dokładnie przestaje być prawdą?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+To, że miejsce zatrzymania spaceru jest najlepszym, jakie istnieje. Nic poza
+tym.
+\end{ansblock}
+
+Wszystko, co ta książka wyprowadziła o optymalizacji, wyprowadzono bez
+wypukłości w argumencie: najbardziej stromy kierunek z
+Programu~\ref{prog:P15} jest faktem o iloczynie skalarnym,
+Program~\ref{prog:P17} podaje $\eta < 2/\lambda_{\max}$ jako fakt o ciągu
+geometrycznym, a gradienty z Programu~\ref{prog:P18} są tożsamościami. Żadne
+z nich nie pytało, czy powierzchnia ma jedną nieckę.
+
+\textbf{Zdanie \enquote{strata jest niewypukła} nie uprawnia więc do
+pesymizmu co do żadnego z nich.} Uprawnia do dokładnie jednej wątpliwości, co
+do jednego twierdzenia.
+\end{fr}
+
+\begin{fr}
+A teraz część uczciwa, bo obraz, który to wyrażenie wywołuje, jest błędny w
+konkretny sposób.
+
+Większość ludzi słyszy \enquote{niewypukła} i widzi funkcję czwartego stopnia
+z \S\ref{sec:P19-chord} w miliardzie wymiarów: krajobraz złych minimów
+lokalnych i trening jako loteria, w którym się wyląduje.
+Program~\ref{prog:P17} ma argument mówiący, że to nie jest kształt tego
+problemu. Jaki?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Argument zliczający: minimum wymaga, by \emph{każdy} znak wartości własnej był
+dodatni, a siodłu wystarczy jeden inny, więc w wysokim wymiarze punkt
+stacjonarny przytłaczająco prawdopodobnie jest siodłem.
+\end{ansblock}
+
+Siodło ma kierunek w dół. Tym, co spowalnia przebieg, jest więc zwykle
+miejsce z wyjściem, którego gradient nie umie szybko znaleźć, a nie niecka bez
+wyjścia \dash{} co jest innym problemem z innymi środkami zaradczymi.
+
+\begin{warning}
+\textbf{Ta książka nie zmierzyła powierzchni straty żadnej wytrenowanej sieci,
+a powyższy akapit jest arytmetyką znaków, a nie odkryciem o modelach.} Ustala
+tyle, że obraz dwuwymiarowy nie przenosi się, a nie to, jaka jest prawdziwa
+geometria.
+
+To, co podaje literatura \dash{} że minima osiągane w praktyce bywają bliskie
+wartością \dash{} jest twierdzeniem empirycznym o konkretnych architekturach i
+konkretnych danych i nie jest tu rozstrzygane. Stosuje się do niego filtr,
+którego dostarcza Program~\ref{prog:P17}: zapytaj, jaka wielkość jest
+porównywana i czy przeżywa ona reparametryzację.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Ostatnie pytanie, bo to ono jest warte wyniesienia.
+
+Wypukłości nie ma i nie da się jej odzyskać. Po co więc program o niej?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Po to, że nierówność przeżywa obietnicę. Jensen zachodzi dla każdej funkcji
+wypukłej, niezależnie od tego, czy to, co optymalizujesz, jest jedną z nich.
+\end{ansblock}
+
+\textbf{Obietnica dotyczy powierzchni, a nierówność dotyczy średniej}, a ta
+druga używana jest znacznie częściej niż pierwsza. Za każdym razem, gdy ta
+dziedzina coś uśrednia, a potem przekształca \dash{} albo przekształca, a
+potem uśrednia \dash{} kolejność ma znaczenie, a Jensen mówi, w którą stronę.
+
+Błąd z perplexity w \S\ref{sec:P19-perplexity} to ta pomyłka popełniona
+publicznie. ELBO to ta nierówność użyta celowo. Oba są tymi samymi trzema
+linijkami z \S\ref{sec:P19-jensen} i żadne nie potrzebuje, by powierzchnia
+straty była czymkolwiek.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Funkcja jest wypukła, gdy cięciwa nigdy nie schodzi
+  poniżej krzywej}, dla każdej pary punktów i każdego położenia między nimi.
+  To jest definicja, a nie jej obrazek.}
+\sumitem{3--4}{\textbf{Nierówność da się sprawdzić tam, gdzie obrazka nie},
+  i dlatego jest tą użyteczną postacią: $\val{p19.chord.fns}$ funkcji po
+  $\val{p19.chord.tests}$ trójek każda. $\lvert x\rvert$ jest wypukła i ma
+  ostrze, więc \textbf{wypukłość nie jest gładkością}.}
+\sumitem{5--6}{Test, który nie może zawieść, nie jest testem: to samo
+  przemiatanie na funkcji czwartego stopnia zawodzi o
+  $\val{p19.chord.counterexample}$.}
+\sumitem{7--8}{\textbf{Drugim testem jest obiekt z Programu~\ref{prog:P17}}:
+  $f'' \ge 0$ wszędzie albo hesjan dodatnio półokreślony wszędzie. Zwróć uwagę
+  na kwantyfikator \dash{} P17 pytał w punkcie, to pyta w każdym punkcie.}
+\sumitem{9--10}{\textbf{Każde minimum lokalne funkcji wypukłej jest globalne},
+  co daje cięciwa w dwóch linijkach. Tym właśnie jest ta obietnica.}
+\sumitem{11--12}{$\val{p19.basins.convex}$ niecka wobec
+  $\val{p19.basins.wiggle}$, wartych $\val{p19.wiggle.lo}$ i
+  $\val{p19.wiggle.hi}$. \textbf{Wypukłość dotyczy niejednoznaczności, a nie
+  trudności}: problem wypukły bywa powolny, a niewypukły szybki.}
+\sumitem{13--14}{\textbf{To obietnica o problemie, a nie o algorytmie.}
+  Optymalizator wciąż może rozbiec się albo pełzać na funkcji wypukłej;
+  wypukłość kupuje to, że osiągnięty punkt stacjonarny jest odpowiedzią.}
+\sumitem{15--16}{\textbf{Nierówność Jensena} to cięciwa przeczytana jako
+  średnia: $f$ ze średniej ważonej jest co najwyżej ważoną średnią z $f$.}
+\sumitem{17--18}{\textbf{Zastosowanie funkcji wypukłej najpierw daje większą
+  liczbę}, a oba są równe dokładnie wtedy, gdy każde wejście jest takie samo.
+  Dla funkcji wklęsłej każda nierówność się odwraca.}
+\sumitem{19--20}{\textbf{Średnia z wartości perplexity jest zawsze tą większą
+  z dwóch}, bo $e^{x}$ jest wypukłe \dash{} więc obie liczby są uporządkowane,
+  a nie tylko różne, a para z Programu~\ref{prog:F04} jest bramkowana wobec
+  tego uporządkowania.}
+\sumitem{21}{\textbf{Przekonanie trzyma się, bo jest prawie prawdziwe}: obie
+  liczby zgadzają się dokładnie wtedy, gdy każdy token kosztuje tyle samo,
+  czyli tak, jak wygląda podkładka testowa.}
+\sumitem{22--24}{\textbf{Rozmiar błędu ustala rozrzut strat}, a nie model:
+  $\val{p19.ppl.ratio.00}$ przy zerowym rozrzucie i
+  $\val{p19.ppl.ratio.20}$ przy $\num{2.0}$ nata, przy nieruchomej poprawnej
+  liczbie. Harness z tym błędem przechodzi na podkładce i podaje źle na
+  prawdziwym korpusie.}
+\sumitem{25--26}{Trzymaj to osobno od średniej makro i mikro, którą
+  Program~\ref{prog:F04} stawia obok: \textbf{tam szkodę robią wagi, a tu
+  krzywizna}, i nie mają tej samej naprawy.}
+\sumitem{27--28}{\textbf{$\ln$ jest wklęsły, więc nierówność się odwraca}, a
+  $\ln\Ex[x] \ge \Ex[\ln x]$ to ELBO w jednej linijce. Nazwane tu dla
+  rozpoznania; sama metoda nie należy do tej książki.}
+\sumitem{29--30}{\textbf{Jensen dla $x^{2}$ to nieujemność wariancji}, i
+  dlatego warto znać tę nierówność z nazwy: jedno stwierdzenie, trzy miejsca.}
+\sumitem{31--32}{\textbf{Strata sieci jest niewypukła przed jakąkolwiek
+  aktywacją i jakąkolwiek głębokością}, bo wagi różnych warstw się mnożą, a
+  iloczyn dwóch zmiennych jest siodłem.}
+\sumitem{33--38}{\textbf{Stracone zostaje jedno twierdzenie i nic więcej.}
+  Najbardziej stromy kierunek, ograniczenie na krok i tożsamości gradientowe
+  wyprowadzono bez wypukłości. \textbf{A nierówność przeżywa obietnicę}, i to
+  czyni ten program wartym swoich ramek.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Kolega mówi, że jego strata jest wypukła, więc optymalizator zbiegnie
+  szybko. Podaj dwie rzeczy błędne w tym zdaniu.
+  \answerto{Wypukłość nie mówi nic o szybkości \dash{} wypukła misa o dużym
+  wskaźniku uwarunkowania jest powolna, co zmierzył Program~\ref{prog:P17}. I
+  nie mówi nic o tym, czy optymalizator w ogóle zbiegnie: krok powyżej
+  $2/\lambda_{\max}$ rozbiega się na funkcji wypukłej równie chętnie jak na
+  każdej innej. Obiecuje to, że osiągnięty punkt stacjonarny jest minimum
+  globalnym.}
+\item Dwa harnessy podają wartości perplexity $\val{p19.ppl.right.10}$ i
+  $\val{p19.ppl.wrong.10}$ dla tego samego modelu na tym samym korpusie.
+  Która jest bardziej prawdopodobnie poprawna i co by to rozstrzygnęło?
+  \answerto{Mniejsza, bo Jensen kładzie średnią z wartości perplexity powyżej
+  eksponenty średniej straty i nigdy poniżej. Rozstrzyga to uruchomienie obu
+  na korpusie, w którym każdy token kosztuje tyle samo: tam obie się zgadzają,
+  a harness, który wciąż podaje dwie liczby, ma inny błąd.}
+\item Czy $f(x) = x^{3}$ jest wypukła na całej prostej? Podaj użyty test.
+  \answerto{Nie. $f'' = 6x$, co jest ujemne dla każdego $x < 0$, więc test
+  drugiej pochodnej zawodzi na całej lewej połowie. Jest wypukła na
+  $x \ge 0$ \dash{} wypukłość jest własnością funkcji \emph{i dziedziny}, a
+  pominięcie dziedziny jest sposobem, w jaki to słowo bywa nadużywane.}
+\item Twój zbiór ewaluacyjny to dziś jeden typ dokumentu, a jutro pięć. Co
+  dzieje się z błędem uśredniania perplexity i dlaczego jest to najgorsze
+  możliwe zachowanie błędu?
+  \answerto{Pogarsza się, bo rośnie rozrzut strat na token, a iloraz rośnie
+  razem z nim. Jest to najgorsze zachowanie, bo błąd jest najcichszy dokładnie
+  wtedy, gdy zbiór testowy jest najprostszy: przechodzi na podkładce, przeżywa
+  przegląd i podaje źle na korpusie, dla którego całe ćwiczenie robiono.}
+\item Podaj przykład funkcji wypukłej bez żadnego minimum i powiedz, co to
+  mówi o obietnicy.
+  \answerto{$e^{x}$ albo dowolna prosta o niezerowym nachyleniu: wypukła
+  wszędzie, malejąca w nieskończoność, bez minimum. Pokazuje to, że obietnica
+  jest warunkowa \dash{} \emph{jeśli} minimum lokalne istnieje, jest globalne.
+  Wypukłość nie twierdzi, że istnieje, co jest osobnym pytaniem o funkcję i
+  jej dziedzinę.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że suma dwóch funkcji wypukłych jest wypukła i że maksimum dwóch
+  funkcji wypukłych jest wypukłe.
+  \answerto{Dla sumy dodaj obie nierówności cięciwowe: każda mówi, że cięciwa
+  jest co najmniej krzywą, a dodawanie to zachowuje. Dla maksimum w każdym
+  punkcie maksimum jest jedną z dwóch, a jej cięciwa leży nad nią, podczas gdy
+  maksimum obu cięciw leży nad tamtą cięciwą. Oba warto mieć, bo tak właśnie
+  buduje się cele wypukłe: suma strat na przykład i zawias to dokładnie te dwie
+  operacje.}
+\item Straty modelu na token na korpusie są wszystkie równe. Co podaje błąd
+  uśredniania perplexity i co to mówi o testowaniu na jego obecność?
+  \answerto{Dokładnie poprawną odpowiedź, bo luka Jensena jest zerem, gdy
+  każde wejście jest takie samo. Co mówi, że test jednostkowy na jednorodnych
+  danych w ogóle nie wykryje tego błędu: test musi używać strat, które się
+  różnią, i powinien stwierdzać \emph{uporządkowanie}, a nie liczbę, skoro
+  rozmiar zależy od rozrzutu.}
+\item Program~\ref{prog:F04} pokazuje niezgodność średniej makro i mikro. Czy
+  nierówność Jensena mogłaby powiedzieć, która jest większa?
+  \answerto{Nie, i o to chodzi w trzymaniu ich osobno. Jensen potrzebuje
+  funkcji wypukłej zastosowanej do średniej; tam każda operacja jest liniowa,
+  a niezgodność bierze się z nierównych rozmiarów grup, więc większa może być
+  każda, zależnie od tego, które grupy są duże. Obie porażki wyglądają w
+  raporcie podobnie, a mają inne przyczyny i inne naprawy.}
+\item Średnia arytmetyczna jest co najmniej średnią geometryczną. Wyprowadź to
+  z Jensena.
+  \answerto{Zastosuj Jensena do wklęsłego $\ln$: $\ln$ ze średniej
+  arytmetycznej jest co najmniej średnią z $\ln$, czyli $\ln$ ze średniej
+  geometrycznej. Eksponentowanie obu stron zachowuje kierunek, więc średnia
+  arytmetyczna jest co najmniej geometryczną, z równością dokładnie wtedy, gdy
+  każda wartość jest taka sama. Jest to ta sama nierówność co wynik tego
+  programu o perplexity, przeczytana z drugiej strony.}
+\item Dlaczego ten program niczego nie dowodzi o tym, czy minima osiągane
+  przez prawdziwą sieć są bliskie wartością?
+  \answerto{Bo jest to twierdzenie empiryczne o konkretnych architekturach i
+  danych, a nic tutaj nie mierzy wytrenowanej sieci. Program dostarcza
+  arytmetyki znaków \dash{} że punkt stacjonarny w wysokim wymiarze
+  przytłaczająco prawdopodobnie jest siodłem \dash{} co mówi, że obraz
+  dwuwymiarowy się nie przenosi, a nie mówi, jaka jest prawdziwa geometria.
+  Stosuje się filtr z Programu~\ref{prog:P17}: zapytaj, jaka wielkość jest
+  porównywana i czy przeżywa reparametryzację.}
+\end{furtherproblems}

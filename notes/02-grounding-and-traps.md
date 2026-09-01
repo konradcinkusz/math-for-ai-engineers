@@ -2252,3 +2252,61 @@ softmax's. Its gradient carries two correction terms, one from the mean and one
 from the variance, and an implementation that applies `1/s` and stops is wrong
 in a way that trains anyway — slowly, and for a reason nobody will find in the
 loss curve. → **P18**.
+
+**201. "Perplexity is the average of the per-token perplexities."** It is the
+exponential of the average loss, and the two are different numbers. Jensen's
+inequality says which way: `e^x` is convex, so the average of the exponentials
+is always the larger, and a harness with this bug always reports a model as
+worse than it is. The belief survives because it is *almost* true — the two
+agree exactly when every token costs the same, which is what a test fixture
+looks like. → **P19**, spending the demonstration **F04** set up.
+
+**202. "The two perplexity numbers are close enough."** The size of the gap is
+`exp(Var/2)` in the per-token losses, so it is a property of the evaluation set
+rather than of the code: 1.00 at zero spread, 1.65 at one nat, 7.42 at two,
+with the correct number unmoved throughout. Which is the worst possible
+behaviour for a bug — it is quietest on the homogeneous fixture it was tested
+on and largest on the diverse corpus that was the point of the exercise. → **P19**.
+
+**203. "Convex means easy to optimise."** It means the answer is unique, which
+is a different property, and neither implies the other. A convex bowl with a
+large condition number is slow (Program P17 measured 47 steps to close 99 per
+cent of one direction's gap on one), and non-convex problems are routinely
+fast — that is the entire empirical history of deep learning. Convexity is a
+statement about *ambiguity*, not about difficulty. → **P19**.
+
+**204. "The loss is convex, so gradient descent will converge."** Convexity is
+a property of the *function* and says nothing about the algorithm. A step size
+above `2/λ_max` diverges on a convex function exactly as it does on any other.
+What convexity promises is conditional: *if* the walk converges to a stationary
+point, that point is the global minimum. → **P19**, resting on **P17**.
+
+**205. "Convex functions are smooth."** `|x|` is convex and has a corner. That
+matters rather than being a curiosity, because ReLU is exactly that shape on
+one side, and a hinge loss is built from the same operation — the objects this
+field calls convex are frequently not differentiable, and the chord definition
+never asked them to be. → **P19**.
+
+**206. "Non-convex means a landscape of bad local minima you might get stuck
+in."** That is the two-dimensional picture carried somewhere it does not
+survive. A minimum needs *every* eigenvalue sign positive and a saddle needs
+one to differ, so in high dimension a stationary point is overwhelmingly likely
+to be a saddle — which has a downhill direction the gradient is too small to
+follow quickly, a different problem with different remedies. What this book has
+*not* done is measure the loss surface of a trained network; the argument is
+about the arithmetic of signs. → **P19**, resting on **P17**'s counting.
+
+**207. "A network's loss is non-convex because of the activation functions."**
+It is non-convex before any activation and at any depth, because the loss is a
+function of the *weights* and the weights of different layers multiply each
+other. Two linear layers give a loss containing `w₂w₁`, and a product of two
+variables is a saddle. The non-convexity comes from the thing that makes a
+network a network. → **P19**.
+
+**208. "Jensen's inequality is a probability result."** It is the chord
+definition of convexity read as an average, and it turns up three times in this
+field wearing different clothes: as the perplexity-averaging error, as the ELBO
+(`ln E[x] ≥ E[ln x]`, because `ln` is concave and the inequality turns round),
+and as the statement that a variance cannot be negative (`E[x²] ≥ (E[x])²`,
+which is Jensen for `x²`). Recognising one inequality is cheaper than meeting
+three results. → **P19**.

@@ -2319,20 +2319,40 @@
 %  prediction two paragraphs up has now been right three times running; treat
 %  the number as a function of the index's length and nothing else.
 %  AND AT P18, the fourth raise in four programs -- 10.6 pt in one column of
-%  `main-pl.ind`, two and a half points to three and a half. Four data points
-%  are enough to see the shape, and it is worth writing down: 0.5, 0.9, 1.5,
-%  2.5, 3.5. The requirement grows with the index, the index grows with the
-%  programs, and twenty-nine programs remain. Extrapolated, this constant
-%  reaches ten points or so by the end of the book, and ten points of shrink
-%  between two index lines is no longer invisible -- it is a visibly tighter
-%  column. So the recorded advice (raise it and do not look for a cleverer
-%  fix) is right for now and has a horizon: somewhere before Part IX this
-%  needs a structural answer instead, most likely letting the index set to a
-%  shorter measure or accepting a short final column explicitly. Recorded
-%  here rather than discovered at P30.
+%  `main-pl.ind`, two and a half points to three and a half.
+%
+%  AND AT P19 THE ADVICE ABOVE WAS FALSIFIED, WHICH IS WORTH MORE THAN
+%  ANOTHER RAISE. P19's index overflowed by 20.0 pt in `main-pl` and 26.3 pt
+%  in `main-pl-a4` at 3.5 pt of shrink, so the number was raised -- and it
+%  did not behave like a dial. Swept against all four builds:
+%
+%      shrink | main-en | main-pl | main-en-a4 | main-pl-a4
+%      -------+---------+---------+------------+------------
+%       2     | 6.0 pt  |    -    |     -      |  clean
+%       3.5   | clean   | 20.0 pt |  clean     |  26.3 pt
+%       4.5   | clean   | clean   |  clean     |  clean
+%       5     | clean   | clean   |  23.8 pt   |  clean
+%       6     |    -    | clean   |     -      |  26.3 pt
+%      10     |    -    |    -    |     -      |  616.8 + 90.8 pt
+%
+%  Ten points is CATASTROPHIC, not merely insufficient: more shrink lets TeX
+%  believe it can cram another column's worth onto a page, and it then
+%  overflows by a whole column. Two points fails a different build than three
+%  and a half does. The value is not a quantity that has to keep up with the
+%  index -- it is a value that RESHUFFLES BREAKS, and it is non-monotonic in
+%  exactly the way the \begin{fr} reservation's own sweep table above records.
+%
+%  So the earlier advice ("raise it when a build says so, and do not look for
+%  a cleverer fix") is retired, and with it the P18 note's extrapolation that
+%  this would reach ten points by the end of the book: ten points is measured
+%  and it is the worst value tried. THE RULE IS NOW: when a build complains
+%  about the index, SWEEP this constant against all four builds and pick a
+%  value that clears every one, exactly as for the other layout constants.
+%  Do not assume the direction; 4.5 clears all four where both 3.5 and 6 do
+%  not. \vfuzz stays rejected for the reason above.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 3.5pt}}{}{%
+  \setlength{\parskip}{0pt plus 0.3pt minus 4.5pt}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex

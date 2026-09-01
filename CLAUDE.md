@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P18 written, both editions \dash{} Parts I to IV entire, and the first four of Part V.** P19–P34 are stubs carrying their briefs | 16 of 47 |
+| Programs | **F1–F13 and P1–P19 written, both editions \dash{} Parts I to V entire, and the first of Part VI.** P20–P34 are stubs carrying their briefs | 15 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 910 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 926 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 772 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 780 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 930 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 944 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 788 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 800 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,21 +93,21 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **16 of 47 programs are stubs**, in each language. This is the whole of the
+- **15 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 931 computed values, all referenced, all present, plus the committed console
+- 958 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 186 Mermaid sources, all rendering
-- 48 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 192 Mermaid sources, all rendering
+- 50 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
 - **84 orphan-tail pages: 21 · 25 · 19 · 19** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
-  **P15 none**, P16 one, **P17 none** and P18 one \dash{} from 15 before F5, 26 before F6, 33 before F7,
+  **P15 none**, P16 one, **P17 none**, P18 one and **P19 none** \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
   before P6. **P6 added two and the ten transcripts it turned on added three**,
@@ -140,9 +140,9 @@ what was there before.
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
-  **50% in P15**, **47% in P16**, **50% in P17** and **48% in P18** \dash{}
-  P13, P15 and P17 are the highest outside Part I and the only ones anywhere
-  to reach the book's own rate.**
+  **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
+  **47% in P19** \dash{} P13, P15 and P17 are the highest outside Part I and
+  the only ones anywhere to reach the book's own rate.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -6266,6 +6266,175 @@ cues at any point in the pass**. One orphan tail added, in `main-en`.
 - Frame numbers mapped after writing: sections landed at
   `1--7 / 8--14 / 15--21 / 22--31 / 32--39`.
 
+### Program P19 pass, August 2026 --- Part VI begins
+
+**Thirty-eight teaching frames, forty printed, both editions**, against a brief
+that projected forty-five. Six sections: a definition you can check, what
+convexity promises, Jensen's inequality, why you cannot average perplexities,
+the same inequality once more, and when the promise is broken.
+
+Thirteenth program under its brief's estimate, and this one is the F07/P06 kind
+in its purest form: **Program~\ref{prog:F04} had already worked the headline
+demonstration in full** \dash{} the two ways of averaging a perplexity, with
+both numbers computed \dash{} and hands the general statement here by name. So
+what P19 owes is not the demonstration but **the inequality that says the
+demonstration could not have come out the other way**, and the difference makes
+the section better rather than shorter.
+
+#### The headline is the size of the error, and it is a property of the corpus
+
+The ratio of the wrong average to the right one is $\exp(\Var/2)$, so it is
+governed by the **spread** of the per-token losses and by nothing else. Measured
+over $\val{p19.ppl.tokens}$ tokens at a mean loss of $\val{p19.ppl.meanloss}$:
+
+| spread | correct | averaged wrongly | ratio |
+|---|---|---|---|
+| $0$ | $\val{p19.ppl.right.00}$ | $\val{p19.ppl.wrong.00}$ | $\val{p19.ppl.ratio.00}$ |
+| $\num{0.5}$ | $\val{p19.ppl.right.05}$ | $\val{p19.ppl.wrong.05}$ | $\val{p19.ppl.ratio.05}$ |
+| $1$ | $\val{p19.ppl.right.10}$ | $\val{p19.ppl.wrong.10}$ | $\val{p19.ppl.ratio.10}$ |
+| $2$ | $\val{p19.ppl.right.20}$ | $\val{p19.ppl.wrong.20}$ | $\val{p19.ppl.ratio.20}$ |
+
+**The correct number does not move at all across that table**, which is what
+makes the failure mode worth a section: a harness with the bug agrees to four
+figures on a homogeneous fixture and is wrong by a factor of
+$\val{p19.ppl.ratio.20}$ on a diverse corpus. That is
+Program~\ref{prog:P02}'s sense of \enquote{numerically stable} \dash{} safe for
+inputs you have not tried \dash{} arriving in published evaluation code rather
+than in a library, and the test suite that would have caught it is the one
+nobody writes.
+
+The prediction is asserted rather than the four figures: the measured ratio must
+track $\exp(\Var/2)$, at every spread, so a change of seed or of token count
+cannot quietly falsify the section.
+
+#### The index shrink was not a dial, and four consecutive raises had said it was
+
+P15, P16, P17 and P18 each raised `theindex`'s `\parskip` shrink by a step
+\dash{} $\num{0.5}$, $\num{0.9}$, $\num{1.5}$, $\num{2.5}$, $\num{3.5}$ \dash{}
+and the comment above the patch drew the obvious line through those five points:
+the requirement grows with the index, the index only grows, **so raise it when a
+build says so and do not look for a cleverer fix.** The P18 note in this file
+extrapolated that to ten points by the end of the book.
+
+P19's index overflowed by $\num{20.0}$ pt in `main-pl` and $\num{26.3}$ pt in
+`main-pl-a4`, so the number was raised again \dash{} and it did not behave like
+a dial. Swept against all four builds:
+
+| shrink | `main-en` | `main-pl` | `main-en-a4` | `main-pl-a4` |
+|---|---|---|---|---|
+| 2 | $\num{6.0}$ pt | \dash{} | \dash{} | clean |
+| $\num{3.5}$ | clean | $\num{20.0}$ pt | clean | $\num{26.3}$ pt |
+| **$\num{4.5}$** | **clean** | **clean** | **clean** | **clean** |
+| 5 | clean | clean | $\num{23.8}$ pt | clean |
+| 6 | \dash{} | clean | \dash{} | $\num{26.3}$ pt |
+| 10 | \dash{} | \dash{} | \dash{} | $\num{616.8} + \num{90.8}$ pt |
+
+**Ten points is catastrophic rather than merely insufficient**, and two points
+fails a different build than three and a half does. More shrink lets TeX believe
+it can cram another column's worth onto a page, and it then overflows by a whole
+column. So the constant is not a quantity that has to keep up with the index; it
+is a value that **reshuffles breaks, non-monotonically**, which is exactly the
+shape `preamble.tex` already records for the `\begin{fr}` reservation and for
+`\mfasectionreserve`.
+
+The advice is retired and the rule is now the same as for every other layout
+constant in this book: **when a build complains about the index, sweep against
+all four builds and pick a value that clears every one**, and do not assume the
+direction. `\vfuzz` stays rejected for the reason already recorded.
+
+**The generalisable half is about the extrapolation, not the constant.** Five
+points in a row moving one way is not a trend when nobody has tried the other
+direction, and a note in this file said so as though it were measured. It is now
+measured, and it was wrong.
+
+#### The transcript was about to be a fabricated console block
+
+The listing prints two pairs of perplexities, and the draft's file carried
+`(12.18, 12.18)` where the functions return `12.182493960703473`. The file was
+generated by `code/`, committed and inside `make verify`'s drift gate \dash{}
+and it was **still a fabrication**, because the rounding had been applied to the
+script's *output* rather than written into the listing's own code, so the page
+showed Python printing something Python does not print.
+
+Fixed by putting `round(..., 2)` inside the listing, which is the only
+arrangement in which the printed line and the printed result cannot come apart,
+and verified by extraction: pulled out of `main-en.pdf` p801, run from `code/`,
+and it prints `(12.18, 12.18)` and `(12.18, 46.47)`.
+
+That is one step beyond P04's finding that a generated transcript can be
+un-runnable and P16's that it can disagree with the prose beside it. **A
+transcript is a claim about what a session prints, so every transformation
+applied to a value has to be visible in the listing.**
+
+#### An accidental quadratic, found by the script timing out
+
+`make numbers` hit the two-minute mark on a script that does no heavy
+arithmetic. The variance of the per-token losses was written as a generator over
+$\val{p19.ppl.tokens}$ elements with `sum(losses) / len(losses)` **inside** it,
+so the mean was recomputed two hundred thousand times per spread. Hoisting it to
+a local took the whole script to $\num{1.07}$ s.
+
+Worth recording because of what it nearly cost rather than what it was: the
+obvious remedy for a slow measurement is to shrink the sample, and shrinking it
+would have made the Jensen gap noisier and the section weaker for a defect that
+had nothing to do with the sample size.
+
+#### Rule 2 caught two figures, both in the third node again
+
+`p19-chord-above`'s node C said the test is arithmetic rather than a picture and
+works in any dimension, which is frame 4's answer; `p19-one-basin`'s said where
+you end up depends on where the walk began, which is frame 12's. Both were
+reworded to state what the frames above them deliver, re-rendered and rebuilt.
+
+That is now three passes running (P17, P18, P19) in which the spoiler was the
+**last node of a three-rank figure**, and the reason is structural rather than
+accidental: a three-node chain naturally ends on its conclusion, and the
+conclusion is usually what the next frame elicits. **Read the last node against
+the next frame before rendering anything.**
+
+Measured afterwards in all four builds, and the result is the P04/P07 case for
+the eighth time: `p19-chord-above` sits above frame 3's question in `main-en`
+(answer p792 y516, figure p793 y130, question p793 y218, answer p793 y297) and
+answers nothing in it, with question, figure and answer on one page. The other
+two sit below the frame that delivers what they carry.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P19.1 chord-above | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P19.2 one-basin | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P19.3 order-of-two | 657 / 657 | 5.18 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's wrap cap on the first render, at three ranks.
+
+#### What the program refuses to say
+
+The brief asks for the honest statement that non-convex does not mean hopeless,
+and §6 gives it as a measurement rather than as reassurance: on the wiggle
+function the curvature is negative at $\val{p19.curv.negative}$ of
+$\val{p19.curv.tested}$ sampled points and the two basins end
+$\val{p19.wiggle.gap}$ apart, so a walk's answer depends on where it started
+\dash{} and the book says in as many words that it has **not** measured whether
+that matters at the scale people train at, because it would need a real model.
+That is Program~\ref{prog:P08}'s and Program~\ref{prog:P11}'s treatment of rank
+collapse, applied to the claim everybody repeats about loss landscapes.
+
+#### Also
+
+- Traps 201 to 208 added to `notes/02`.
+- **A cross-programme gate on F04's two perplexities**: this program's
+  inequality must order them the way F04's committed values already do, so the
+  demonstration there and the theorem here cannot come apart.
+- Elicitation 47%. Two parity rounds, both recorded classes: a dropped `$f$`
+  span where the Polish attached the adjective to the noun instead
+  (`Dla funkcji \textbf{wklęsłej}` against `Dla \textbf{wklęsłej} $f$`), and the
+  `<maths> z Programu~\ref{...}` inversion.
+- Layout cost nothing: the overfull multiset is element for element the pre-P19
+  baseline in all four builds, no stranded openers, no stranded headings, **no
+  orphaned cues at any point in the pass**, and **the orphan-tail count did not
+  move** \dash{} the seventh time (F13, P07, P09, P12, P15, P17, P19).
+- Frame numbers mapped after writing: sections landed at
+  `1--8 / 9--14 / 15--18 / 19--26 / 27--30 / 31--38`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -6531,26 +6700,46 @@ clone instead.
 
 ## What is left
 
-1. **Sixteen programs, and Parts I to IV are complete, plus the first four of
-   Part V.** F1 to F13 and P1 to P18, both editions.
+1. **Fifteen programs, and Parts I to V are complete, plus the first of
+   Part VI.** F1 to F13 and P1 to P19, both editions.
 
-   **P19 is next** \dash{} *Convexity and Jensen's inequality*, forty-five
-   frames planned, deps `P5`, `F5` and `F13`. Read what is already spent
-   before estimating a length, which is the discipline fifteen passes have now
-   paid for: **F05** owns the function, the graph and the four moves;
-   **F13** owns the weighted average, which is what Jensen's inequality is
-   about; **P05** owns the inner product and the norm; **P17** owns the
-   second derivative and the bowl, so \enquote{one basin} has its object
-   already. What is genuinely left is the promise itself \dash{} every local
-   minimum is global \dash{} and the two payoffs: **why you cannot average
-   perplexities**, and the honest statement that non-convex does not mean
-   hopeless.
+   **P20 is next** \dash{} *Gradient descent: from SGD to Adam*, sixty-five
+   frames planned and the largest estimate left in the manifest, deps `P17`,
+   `P18`, `F4` and `P11`. Read what is already spent before estimating a
+   length, which is the discipline sixteen passes have now paid for, and this
+   is the program where that reading matters most, because **four written
+   programs have each already delivered one of its ingredients**:
 
-   **P19's headline is a measurement the book can afford.** The mean of the
-   exponentials is not the exponential of the mean, so a leaderboard that
-   averages per-document perplexity reports a different quantity from one that
-   exponentiates the mean loss. That is Jensen's inequality with a number
-   attached and it needs no provider, no model and no budget.
+   - **F04** owns the exponential moving average, its bias correction *and*
+     the `(1 - beta)` question, which its review pass settled by measuring
+     rather than by naming a library \dash{} the two forms differ by exactly
+     $1/(1-\beta)$, so they give the same direction and a different length,
+     and a step size does not travel between them. F04 explicitly hands the
+     consequence here.
+   - **P15** owns the zig-zag, measured on P10's own bowl, and says in its own
+     rigour box that one step size has to serve both eigendirections.
+   - **P17** owns $\eta < 2/\lambda_{\max}$, derived and then measured, and
+     says the optimisers are P20's.
+   - **P11** owns the condition number, which is the ratio those two
+     eigenvalues form.
+
+   So P20 does not have to derive the failure; it has to derive **each fix
+   against the failure that is already on the page**, which is the shape its
+   own brief asks for. What is genuinely left is the per-coordinate scaling
+   argument \dash{} why dividing by the square root of the second moment makes
+   the update approximately unit-sized whatever the gradient's size, which is
+   also why Adam is insensitive to loss scaling and why the epsilon sits
+   *outside* the root \dash{} and **why weight decay is not $L_2$
+   regularisation once you divide by a running scale**, which is the whole
+   content of AdamW and is one line of algebra.
+
+   **The measurement P20 can afford is a comparison on P10's bowl**, which
+   three programs already share: the same quadratic, the same eigenvalues, the
+   same step size, plain descent against momentum against a per-coordinate
+   method, counting steps to a fixed distance. It needs no provider and no
+   model, and it lets the chapter state each fix's benefit as a number rather
+   than as a claim. **Do not name a library's implementation**, on F04's rule
+   that a library's internals are a fact about a version.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -6558,6 +6747,9 @@ clone instead.
    claim is not settled. With P08's rank-collapse warning that is **one debt
    with two entries**, and both need a trained model's real matrices. It is
    the first item in this book that cannot be done from a sandbox at all.
+   **P19 has now added a third entry of the same kind** \dash{} whether the
+   basin a walk lands in matters at the scale people train at \dash{} so the
+   debt is one trained model away from being three answers rather than one.
 
    **And there is still a Part II-shaped job that is nobody's program.** The
    elicitation ledger puts P01, P02 and P03 at 29--31% against Part I's
@@ -6576,8 +6768,10 @@ clone instead.
    against thirty-eight**; **P16's sixty-five against thirty-eight**,
    because P06 had already measured its central result under another name;
    **P17's fifty against thirty-eight**, because P15 and P10 between
-   them had left only the model and the inequality; and **P18's sixty
-   against thirty-nine**, because it defines no new object at all.
+   them had left only the model and the inequality; **P18's sixty
+   against thirty-nine**, because it defines no new object at all; and
+   **P19's forty-five against thirty-eight**, because F04 had already worked
+   its headline demonstration and left it only the inequality.
    **A brief's frame estimate is a planning figure from before its neighbours
    were written.** It is not a target.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and

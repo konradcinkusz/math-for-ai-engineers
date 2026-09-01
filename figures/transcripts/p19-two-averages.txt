@@ -1,0 +1,7 @@
+>>> from p19_convexity_jensen import ppl_of_mean, mean_of_ppl
+>>> flat = [2.5, 2.5, 2.5, 2.5]      # every token alike
+>>> round(ppl_of_mean(flat), 2), round(mean_of_ppl(flat), 2)
+(12.18, 12.18)
+>>> mixed = [0.5, 1.0, 3.5, 5.0]    # same mean, spread out
+>>> round(ppl_of_mean(mixed), 2), round(mean_of_ppl(mixed), 2)
+(12.18, 46.47)
