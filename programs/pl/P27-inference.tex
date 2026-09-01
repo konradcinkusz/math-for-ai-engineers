@@ -1,30 +1,1096 @@
 %% P27 --- Wnioskowanie statystyczne dla inżyniera
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak: programs/en/P27-inference.tex. Ramka w ramkę, makro w makro,
+%% liczba w liczbę; tools/parity.py porównuje oba pliki. Każda liczba
+%% pochodzi z code/p27_inference.py.
+%%
+%% CO WYDALI SĄSIEDZI --- przeczytane, zanim powstała pierwsza linijka.
+%% Pełna lista jest w nagłówku skryptu. W skrócie: DWA Z SIEDMIU PUNKTÓW
+%% BRIEFU SĄ JUŻ NA STRONIE:
+%%   P25 sekcja 4 ma błąd standardowy proporcji, regułę czterech razy tyle
+%%       pozycji ORAZ RACHUNEK MOCY -- 12293 pozycje na model, żeby zobaczyć
+%%       jeden punkt. Ten program z tego korzysta i niczego nie powtarza. To,
+%%       czego P25 nie mógł zrobić, to ten sam rachunek dla modeli, które
+%%       widziały TE SAME prompty; jego własna sekcja 1 daje wyraz z
+%%       kowariancją. Sekcja 3 to liczba z P25 zrobiona porządnie i związana
+%%       z nią bramką.
+%%   P25 sekcja 1 NAZYWA też bootstrap po wierszach jednego użytkownika jako
+%%       tryb awarii, zanim książka powie, czym bootstrap jest. Sekcja 2 to
+%%       spłaca.
+%%   P26 sekcja 1 ma obciążenie, wariancję i błąd średniokwadratowy i celowo
+%%       zatrzymuje się przed pytaniem, czy różnica jest prawdziwa.
+%%   P23 odsyła "co p-wartość mówi, a czego nie" TUTAJ z nazwy i ma odwrócenie
+%%       warunkowania, którym błąd p-wartości jest. Sekcja 4 to twierdzenie z
+%%       P23 przeczytane na innej parze zdarzeń.
+%%   P12 ma symbol Newtona. Test dokładny z sekcji 3 to math.comb na liczbach
+%%       całkowitych i nic więcej, dzięki czemu p-wartość pojawia się jako
+%%       liczba rzutów monetą, zanim pojawi się jako słowo.
+%%   F10 ma licznik i mianownik. Sekcja 1 to ta lekcja zastosowana do miejsca
+%%       dziesiętnego w wyniku benchmarku.
+%%
+%% CELOWO NIEWYDANE TUTAJ:
+%%   P28 ma rozkład a posteriori, sprzężoność, przedział wiarygodności i
+%%       "prawdopodobieństwo, że B jest lepszy". Sekcja 4 mówi wprost, że
+%%       p-wartość tym nie jest, i wskazuje P28; nie wolno jej tu liczyć.
+%%   P34 ma projektowanie ewaluacji od początku do końca.
 
-\program{Wnioskowanie statystyczne dla inżyniera}
+\program[Wnioskowanie statystyczne]{Wnioskowanie statystyczne dla inżyniera}
 \label{prog:P27}
+\index{wnioskowanie!statystyczne}
+\index{ewaluacja!czy różnica jest prawdziwa}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{powiedzieć, ile warta jest podawana różnica w benchmarku
+  \dash{} w pozycjach, a nie w punktach}
+\outcome{7--14}{zbudować przedział ufności dla metryki, która nie ma wzoru, i
+  nazwać jednostkę, którą trzeba losować}
+\outcome{15--22}{zaplanować i przeprowadzić porównanie dwóch modeli
+  ewaluowanych na tych samych promptach}
+\outcome{23--30}{powiedzieć, czym p-wartość jest, a czym nie jest}
+\outcome{31--36}{powiedzieć, co czterdzieści porównań w jednym rankingu robi z
+  tym wszystkim}
+\outcome{37--39}{zastosować całość do liczby, którą ktoś opublikował}
+\end{outcomes}
 
-Argument: a measured difference is a random quantity, and the question is
-whether it is larger than the noise in the measurement. Payoff: the program
-that carries this house's first rule into a mathematics book.
-**\enquote{Model B scored 71.4 and model A scored 70.9 on 200 evaluation
-items} \dash{} is that real?** Worked end to end: the standard error of a
-proportion; a bootstrap confidence interval on an evaluation set; the paired
-comparison, because A and B saw the same prompts and a paired test has far
-more statistical power; what a p-value does and does not say, stated flatly;
-the multiple-comparisons problem, which is what a leaderboard with forty
-models is; and a power calculation answering how many evaluation items are
-needed to detect a one-point difference at all. The honest conclusion
-\dash{} that most published leaderboard deltas of this size are not
-distinguishable from noise, and the reader can now check.
+\begin{quiz}
+\item Model ma według raportu $\val{p27.quoted.hi}$ procent na
+  $\val{p27.items}$ pozycjach ewaluacyjnych. Co jest nie tak z tym zdaniem,
+  jeszcze przed jakąkolwiek statystyką? \teachesat{1--2}
+  \answerto{$\val{p27.quoted.hi}$ procent z $\val{p27.items}$ to
+  $\val{p27.k.hi}$ pozycji, a modelowi nie da się zaliczyć
+  $\val{p27.k.hi}$ pozycji. Na $\val{p27.items}$ pozycjach osiągalne wyniki
+  dzieli $\val{p27.grid.pts}$ punktu, więc miejsce dziesiętne jest gęstsze
+  niż siatka.}
+\item Dwa modele ewaluowano na tych samych $\val{p27.items}$ promptach i jeden
+  ma $\val{p27.gap.pts}$ punktu więcej. Z ilu pozycji składa się ta różnica?
+  \teachesat{3--4}
+  \answerto{$\val{p27.gap.items}$. Cała opublikowana różnica to jedna pozycja
+  ewaluacyjna, która poszła w drugą stronę.}
+\item Masz jeden zbiór ewaluacyjny i metrykę bez wzoru na błąd standardowy.
+  Wskaż sposób, żeby mimo to dostać przedział. \teachesat{7--8}
+  \answerto{Bootstrap: losuj pozycje ze zwracaniem, licz metrykę na każdym
+  takim losowaniu i weź środek otrzymanych odpowiedzi.}
+\item Dwa modele ewaluowano na tych samych promptach, a nie na osobnych
+  próbach. Czy to czyni porównanie trudniejszym, czy łatwiejszym?
+  \teachesat{16--17}
+  \answerto{Łatwiejszym, i zwykle znacznie. Oba wyniki są skorelowane, a
+  wariancja różnicy odejmuje podwojoną kowariancję, więc potrzebna liczba
+  pozycji spada o czynnik $1-\rho$.}
+\item Porównanie zwraca $p = \num{0.03}$. Jakie jest prawdopodobieństwo, że
+  oba modele są równie dobre? \teachesat{24--25}
+  \answerto{P-wartość tego nie mówi. To prawdopodobieństwo wyniku równie
+  skrajnego \emph{przy założeniu}, że są równie dobre, a czytanie tego wstecz
+  to odwrócenie, przed którym ostrzega Program~\ref{prog:P23}.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 60 ramek.
-}
+% ============================================================
+\section{Ile wart jest jeden punkt}
+\label{sec:P27-one-point}
+\index{ewaluacja!ziarnistość wyniku}
+\index{pomiar!czytanie miejsca dziesiętnego wobec mianownika}
+
+\begin{fr}
+Oto twierdzenie z gatunku, który czytelnik tej książki spotyka co tydzień, i
+to na nie cały program odpowiada.
+
+\begin{center}
+\emph{Model B dostał $\val{p27.quoted.hi}$, a model A
+$\val{p27.quoted.lo}$ na $\val{p27.items}$ pozycjach ewaluacyjnych.}
+\end{center}
+
+Rozstrzygnięcie, czy to prawdziwa różnica, wymaga narzędzi. Ale jedna rzecz
+nie wymaga żadnej statystyki i warto ją znaleźć jako pierwszą.
+
+Wynik to pewna liczba pozycji zaliczonych z $\val{p27.items}$. Czy model może
+dostać $\val{p27.quoted.hi}$ procent na $\val{p27.items}$ pozycjach?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie}
+
+$\val{p27.quoted.hi}$ procent z $\val{p27.items}$ to $\val{p27.k.hi}$
+pozycji, a nikt nigdy nie zaliczył $\val{p27.k.hi}$ pozycji. Osiągalne wyniki
+to $\val{p27.near.lo}$ i $\val{p27.near.hi}$, i nie ma między nimi niczego,
+ponieważ \textbf{wynik $k$ zaliczonych z $n$ leży na siatce o oczku
+$100/n$ punktu} \dash{} tutaj $\val{p27.grid.pts}$ punktu.
+Druga liczba nie przechodzi tego samego testu.
+
+Zdanie nie jest więc wewnętrznie spójne, a przydatna reakcja pochodzi z
+Programu~\ref{prog:F10}: \textbf{zapytaj, co jest mianownikiem.} Albo
+ewaluacja nie miała $\val{p27.items}$ pozycji, albo wynik nie jest ich
+proporcją \dash{} na przykład jest średnią po podbenchmarkach różnej
+wielkości, a wtedy $\val{p27.items}$ też nie jest liczbą, z której należy
+liczyć przedział.
+
+Żadne z tych odczytań nie jest niezwykłe i żadne nie stoi w rankingu.
+Załóżmy, że benchmark chce podawać dokładność z jednym miejscem po przecinku.
+Ilu pozycji to wymaga, zanim to miejsce w ogóle zaokrągli się poprawnie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Ponad tysiąca: $\val{p27.decimal.floor}$}
+
+Siatka musi być gęstsza niż pół dziesiątej punktu, więc $1/n$ musi być
+poniżej $\num{0.001}$.
+
+To stwierdzenie o arytmetyce, a za nim stoi drugie zastrzeżenie, dużo
+większe. Na $\val{p27.decimal.floor}$ pozycjach \emph{siatka} jest już dość
+gęsta, żeby wydrukować miejsce dziesiętne, a przedział z
+Programu~\ref{prog:P25} na tylu pozycjach to wciąż jakieś trzy punkty w każdą
+stronę. Pierwsze zastrzeżenie mówi, że cyfry nie da się policzyć; drugie, że
+nic by nie znaczyła, gdyby się dało.
+
+Przyjmijmy mimo to twierdzenie na wiarę i zadajmy pytanie, które rozstrzyga,
+czy cokolwiek z tego ma znaczenie. Różnica to $\val{p27.gap.pts}$ punktu. Ile
+to w pozycjach?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p27.gap.items}$}
+
+\textbf{Jedna pozycja.} Na $\val{p27.items}$ pozycjach różnica
+$\val{p27.gap.pts}$ punktu to jedno pytanie, na które B odpowiedział, a A nie,
+i to jest cała zaobserwowana różnica między dwoma modelami.
+
+Warto przy tym usiąść, bo opublikowane zdanie tego nie mówi. Procent ukrywa
+własny mianownik, a dwie liczby oddalone o kilka dziesiątych czytają się jak
+zmierzone rozróżnienie, a nie jak jedno pytanie o stolicę czegoś.
+
+Program~\ref{prog:P25} wycenił szum wokół takiej liczby i ten program tego nie
+wyprowadza od nowa: przy $\val{p27.quoted.hi}$ procent na $\val{p27.items}$
+pozycjach przedział to około $\pm\val{p27.hw.200}$ punktu. Zestaw to z
+różnicą $\val{p27.gap.pts}$ punktu.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Przedział jest ponad $\val{p27.hw.ratio.floor}$ razy większy}
+
+Co nie jest sytuacją graniczną.
+
+\mermaidfig{p27-one-item}{Opublikowana różnica w jednostce, którą ewaluacja
+  naprawdę ma}{różnica w pozycjach}
+
+To wszystko, co ustala sekcja 1, i nie potrzeba do tego żadnego wnioskowania
+\dash{} dwa dzielenia i pierwiastek z Programu~\ref{prog:P25}. Reszta programu
+dotyczy przypadków, w których odpowiedź nie jest tak oczywista, oraz jednego
+odruchu, który zaraz pogorszy następne porównanie czytelnika, zamiast je
+poprawić.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Przedziały się nakładają, więc różnica nie jest prawdziwa.}}
+
+To najczęstszy wniosek wyciągany z pary słupków błędu i nie jest to żaden
+test. Dwa przedziały mogą nakładać się znacznie, podczas gdy różnica między
+wielkościami spokojnie odróżnia się od zera, i mogą się nie nakładać, gdy tak
+nie jest.
+
+Powód należy do sekcji 3 i warto go podać wcześnie: przedział na modelu A i
+przedział na modelu B dotyczą każdy \emph{jednego modelu}, a pytanie dotyczy
+\emph{różnicy}, która jest trzecią wielkością z własnym rozrzutem.
+Program~\ref{prog:P25} pokazał już, że różnica dwóch niezależnych ocen niesie
+sumę ich wariancji. Gdy oba mierzono na tych samych promptach, niesie coś
+jeszcze mniejszego, a porównanie dwóch osobnych przedziałów nie widzi ani
+jednego, ani drugiego.
+
+Nawyk wart nabycia: \textbf{buduj przedział na wielkości, o którą naprawdę
+pytasz}, czyli tutaj na różnicy, a nie na dwóch wynikach.
+\end{trapbox}
+
+Wiesz już, ile warta jest różnica na tym zbiorze ewaluacyjnym. Następne
+pytanie brzmi, co robić, gdy metryka nie jest dokładnością i nie ma
+pierwiastka, po który można sięgnąć.
+\end{fr}
+
+% ============================================================
+\section{Przedział bez wzoru}
+\label{sec:P27-bootstrap}
+\index{bootstrap}
+\index{ewaluacja!przedział ufności}
+
+\begin{fr}
+Przedział z Programu~\ref{prog:P25} działa, bo dokładność jest średnią $n$
+niezależnych trafień lub pudeł, a wariancja jednego z nich to $p(1-p)$.
+Prawie nic innego, co raportujesz, nie jest tak wygodne. Mediana opóźnienia,
+odsetek powodzeń przy $k$ próbach, średnia makro po klasach, odsetek wygranych
+oceniany przez inny model: żadne z nich nie ma błędu standardowego w
+podręczniku leżącym na twoim biurku.
+
+Załóżmy, że pieniądze nie grają roli i możesz przeprowadzić całą ewaluację od
+nowa, tysiąc razy. Co byś zrobił z tysiącem odpowiedzi?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Zobaczył, jak bardzo się różniły \dash{} wziął środkowe $95$ procent z nich i
+to podał.
+\end{ansblock}
+
+To definicja tego, czym przedział próbuje być, i nie wymaga wzoru dla żadnej
+metryki. Przeszkodą jest to, że nie da się tego zrobić: masz jeden zbiór
+ewaluacyjny i jedną odpowiedź.
+
+Ruch bootstrapu to jedno zdanie. \textbf{Próbka, którą masz, jest najlepszym
+dostępnym opisem populacji, z której pochodzi, więc losuj nowe próbki z
+niej.} Wylosuj $n$ pozycji ze swoich $n$ pozycji \emph{ze zwracaniem}, policz
+metrykę i powtórz.
+
+Weź przypadek, w którym wzór jednak masz, żeby dało się porównać. Twoja
+ewaluacja to $\val{p27.boot.n}$ pozycji, a model zaliczył $\val{p27.boot.k}$ z
+nich. Losujesz $\val{p27.boot.n}$ pozycji ze zwracaniem i liczysz poprawne.
+Jaki to rozkład?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dwumianowy}
+
+Dokładnie $\mathrm{Binomial}(\val{p27.boot.n}, \val{p27.boot.k}/\val{p27.boot.n})$,
+bo każde losowanie trafia na poprawną pozycję z prawdopodobieństwem
+$\val{p27.boot.k}/\val{p27.boot.n}$, a losowania są niezależne.
+
+Na proporcji \textbf{rozkład bootstrapowy nie jest więc przybliżeniem
+czegokolwiek} \dash{} jest rozkładem dwumianowym i nie trzeba żadnej symulacji,
+żeby go znaleźć. Przedział to kwantyle tego rozkładu, zsumowane symbolem
+Newtona z Programu~\ref{prog:P12}:
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+& dolny & górny \\
+\midrule
+bootstrap & $\val{p27.boot.lo}$ & $\val{p27.boot.hi}$ \\
+wzór z Programu~\ref{prog:P25} & $\val{p27.closed.lo}$ &
+  $\val{p27.closed.hi}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Oba zgadzają się co do $\val{p27.boot.agree}$ punktu, czyli jednej pozycji
+\dash{} najdrobniejszej rzeczy, jaką którykolwiek z nich rozróżnia, według
+sekcji 1. Skrypt sprawdza właśnie to, a nie miejsce dziesiętne, bo zgodność
+dokładniejsza niż siatka byłaby twierdzeniem, którego żadna z metod nie
+uniesie.
+\end{fr}
+
+\begin{fr}
+Zgodność uspokaja i nie o nią chodzi. Gdyby bootstrap wyłącznie odtwarzał
+wzór, który już masz, byłby ciekawostką.
+
+Oto przypadek, dla którego istnieje. Dwadzieścia zmierzonych opóźnień w
+milisekundach:
+
+\begin{center}
+\code{112 118 121 125 129 131 134 138 141 147}\\
+\code{152 158 163 171 180 195 214 248 310 502}
+\end{center}
+
+Mediana to $\val{p27.med.obs}$ ms. Zanim pójdziesz dalej, wypisz wzór na błąd
+standardowy mediany.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Żadnego znanego nie ma, a ten, który istnieje, potrzebuje gęstości rozkładu w
+medianie \dash{} czyli wielkości, którą trzeba by oszacować z tej samej próbki,
+przyjmując założenie niesprawdzalne.
+\end{ansblock}
+
+Bootstrap nie potrzebuje niczego z tego. Wylosuj dwadzieścia opóźnień z tych
+dwudziestu ze zwracaniem, weź medianę i zrób tak $\val{p27.med.trials}$ razy:
+
+\[ \val{p27.med.obs}\ \text{ms}, \quad
+   \text{przedział } \intcc{\val{p27.med.lo}}{\val{p27.med.hi}} \]
+
+Zwróć uwagę, czym są końce. Mediana wylosowanej próbki jest zawsze wartością z
+pierwotnej listy albo środkiem dwóch takich wartości, więc \textbf{końce
+przedziału to pomiary, które ktoś wykonał}, a nie wyjścia dopasowanego modelu.
+To też powód, dla którego odpowiedź jest stabilna: inny generator liczb
+losowych wybiera inne próbki i trafia na te same wartości z danych.
+
+Procedura nie zmieniła się ani trochę między tymi dwoma przypadkami.
+Podmieniono metrykę i nic poza tym, i to jest własność warta posiadania.
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+\textbf{Nie dowodzimy tutaj: dlaczego bootstrap działa.}
+
+Uzasadnienie brzmi tak, że empiryczny rozkład próbki zbiega do rozkładu, z
+którego ją wylosowano, więc zachowanie statystyki przy losowaniu z próbki
+zbiega do jej zachowania przy losowaniu z populacji. Twierdzenie, jego
+założenia i przypadki, w których zawodzi, to kurs magisterski, a oryginał to
+Efron, 1979.
+
+Przy tym biurku liczy się kształt awarii, a nie dowód. \textbf{Bootstrap nie
+wymyśli pozycji, których nie ewaluowałeś.} Jeśli twoje dwieście promptów nie
+zawiera zadań arytmetycznych, to żadne wylosowanie z nich ich nie zawiera, a
+przedział jest uczciwy wobec błędu losowania i milczy o tym, co naprawdę cię
+ugryzie. Najgorzej radzi sobie też ze skrajnościami \dash{} z maksimum, z
+$99$-tym centylem \dash{} bo próbka może sięgnąć tylko po wartości już obecne.
+\end{rigourbox}
+
+Jeszcze jedna decyzja, zanim technika nadaje się do użytku, i
+Program~\ref{prog:P25} nazwał ją jako tryb awarii, zanim ta książka
+powiedziała, czym bootstrap jest. Twoja ewaluacja ma $\val{p27.clust.n}$
+wierszy, ale pochodzą one od $\val{p27.clust.users}$ użytkowników po
+$\val{p27.clust.rows}$ promptów każdy. Co losujesz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Użytkownika, a nie wiersz}
+
+A pomyłka tutaj nie jest błędem zaokrąglenia. Powodem jest własna tożsamość z
+Programu~\ref{prog:P25}: wariancja sumy rzeczy \emph{niezależnych} rośnie jak
+ich liczba, a wariancja sumy rzeczy \emph{identycznych} jak kwadrat tej
+liczby. Wiersze jednego użytkownika leżą gdzieś pomiędzy, a w skrajności są
+jedną obserwacją noszącą $\val{p27.clust.rows}$ etykiet.
+
+Bootstrap po wierszach uważa, że ma $\val{p27.clust.n}$ niezależnych
+obserwacji. Jeśli wiersze wewnątrz użytkownika zgadzają się całkowicie, ma
+$\val{p27.clust.users}$, a przedział, który podaje, jest za wąski o czynnik
+$\val{p27.clust.factor}$ \dash{} pierwiastek z $\val{p27.clust.rows}$.
+
+\mermaidfig{p27-what-to-resample}{Jednostka losowania to decyzja, której nic
+  nie sprawdza}{jednostka}
+
+Żadna biblioteka ci tego nie powie. Funkcja przyjmuje tablicę, a tablica
+$\val{p27.clust.n}$ wierszy wygląda dokładnie jak $\val{p27.clust.n}$
+obserwacji.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Zrób więcej losowań, a przedział się zawęzi.}}
+
+Nie zawęzi się, a przekonanie warto zabić, bo losowania są tanie i robienie
+ich więcej sprawia wrażenie działania.
+
+W grze są dwa różne błędy. \emph{Szerokość} przedziału wynika z tego, ile
+informacji zawiera zbiór ewaluacyjny, czyli z $n$ pozycji i z niczego innego.
+Liczba losowań rządzi wyłącznie tym, jak dokładnie namierzyłeś końce tego
+przedziału \dash{} błędem Monte Carlo, czyli tym, co Program~\ref{prog:P25} zapisuje jako
+$1/\sqrt{B}$ przy $B$ losowaniach i co możesz zbić dowolnie nisko za cenę
+arytmetyki.
+
+Więcej losowań kupuje więc dokładniej podany przedział \textbf{tej samej
+szerokości}. Węższy kosztuje pozycje, po czterokroć za połowę z
+Programu~\ref{prog:P25}.
+\end{trapbox}
+
+Umiesz już nałożyć przedział na cokolwiek, co potrafisz policzyć. Zostaje
+pytanie, od którego program się zaczął, i okazuje się, że zadanie go wprost
+jest znacznie tańsze niż nakładanie przedziału osobno na każdy model.
+\end{fr}
+
+% ============================================================
+\section{Widziały te same prompty}
+\label{sec:P27-paired}
+\index{ewaluacja!porównanie sparowane}
+\index{pomiar!planowanie porównania}
+
+\begin{fr}
+Program~\ref{prog:P25} odpowiedział na pytanie o rozmiar i odpowiedź była
+zniechęcająca: rozstrzygnięcie różnicy jednego punktu między dwoma modelami
+kosztuje $\val{p27.n.rho00}$ pozycji ewaluacyjnych \emph{na model}, czyli
+czyjś tygodniowy budżet i więcej promptów, niż zawiera większość benchmarków.
+
+Ta liczba jest poprawna i zawiera założenie, które prawie nigdy nie jest
+prawdziwe o tym, co naprawdę robisz. Przeczytaj zdanie jeszcze raz i nazwij
+je.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Że obie ewaluacje są od siebie niezależne.
+\end{ansblock}
+
+Nie są. Oba modele puściłeś na \textbf{tych samych promptach}, bo to jedyny
+rozsądny sposób ich porównania i bo zebranie drugiego zbioru ewaluacyjnego
+kosztowałoby dwa razy tyle.
+
+Sekcja 1 Programu~\ref{prog:P25} ma tożsamość, która to naprawia, i niosła już
+wyraz, którego tu potrzeba:
+
+\[ \Var(X - Y) \;=\; \Var(X) + \Var(Y) - 2\Cov(X, Y) \]
+
+P25 użył przypadku niezależnego, w którym kowariancja jest zerem, a wariancje
+się dodają \dash{} stamtąd wziął się jego czynnik dwa. Tutaj kowariancja nie
+jest zerem. Powiedz, co to robi z liczbą pozycji, i powiedz to jako wzór, a
+nie jako kierunek.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Mnoży ją przez $1 - \rho$, gdzie $\rho$ jest korelacją wyników obu modeli na
+poszczególnych pozycjach.
+\end{ansblock}
+
+Oba modele leżą blisko tej samej dokładności $p$, więc każdy wskaźnik na
+pozycji ma wariancję $p(1-p)$, a ich kowariancja to $\rho\,p(1-p)$. Różnica
+niesie wtedy $2p(1-p)(1-\rho)$ tam, gdzie przypadek niezależny niósł
+$2p(1-p)$, i cały rachunek z Programu~\ref{prog:P25} przechodzi bez zmian z
+tym jednym czynnikiem doczepionym:
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+$\rho$ & pozycji na model & wobec $\rho = 0$ \\
+\midrule
+$0$ & $\val{p27.n.rho00}$ & $1\times$ \\
+$\num{0.5}$ & $\val{p27.n.rho50}$ & $\tfrac{1}{2}\times$ \\
+$\num{0.8}$ & $\val{p27.n.rho80}$ & $\tfrac{1}{5}\times$ \\
+$\num{0.9}$ & $\val{p27.n.rho90}$ & $\tfrac{1}{10}\times$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Skrypt sprawdza czynnik $1-\rho$ przy czterech dokładnościach i trzech
+wielkościach różnicy, a nie cztery liczby z tabeli, bo czynnik jest wynikiem,
+a liczby są jedną jego komórką. A górny wiersz to zatwierdzona liczba samego
+Programu~\ref{prog:P25}: wzór dla par napisano tak, żeby ją zawierał, i build
+pada, gdyby kiedykolwiek przestały się zgadzać.
+\end{fr}
+
+\begin{fr}
+Pytanie brzmi więc, jak duże jest $\rho$ w praktyce, a odpowiedź brzmi, że dla
+dwóch modeli wartych porównania jest zwykle duże. Oba wytrenowano na
+większości internetu, oba zaliczają łatwe pozycje i oba wykładają się na
+pozycji, której pytanie jest niejednoznaczne. Niezgoda jest wyjątkiem, i
+dokładnie to czyni porównanie tanim.
+
+\mermaidfig{p27-same-prompts}{Skąd bierze się oszczędność w porównaniu
+  sparowanym}{parowanie odejmuje}
+
+To zmiana rzędu wielkości w koszcie eksperymentu, z jednej linijki algebry
+samego Programu~\ref{prog:P25}. To także powód, dla którego rada
+\enquote{ewaluuj oba modele na tych samych promptach} nie jest wyłącznie
+schludnością.
+
+Teraz zaostrzmy to. Z twoich $\val{p27.items}$ pozycji część oba modele
+zaliczyły, część oba oblały, a na części dokładnie jeden zaliczył. Która z
+tych trzech grup niesie informację o \emph{różnicy}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tylko trzecia}
+
+Pozycja, na którą oba modele odpowiedziały poprawnie, wnosi tyle samo do obu
+wyników i skraca się z różnicy dokładnie. Tak samo pozycja, którą oba oblały.
+Tylko pozycje \textbf{niezgodne} \dash{} te, na których dokładnie jeden model
+miał rację \dash{} mówią cokolwiek o tym, który model jest lepszy.
+
+Załóżmy, że $\val{p27.disc}$ z $\val{p27.items}$ jest niezgodnych, i tak
+właśnie wygląda wysokie $\rho$: oba modele zgodziły się na
+$\val{p27.concord}$ pozycjach. Sekcja 1 ustaliła, że B prowadzi o
+$\val{p27.net}$ pozycję.
+
+Warto powiedzieć wprost, co znaczy tu \enquote{równie dobre}, bo na tym
+opiera się dokładność tego, co dalej. To nie twierdzenie, że oba modele są tym
+samym modelem. To słabsze twierdzenie, że na pozycji, na której się nie
+zgadzają, każdy z nich mógł być tym, który ją zaliczył \dash{} więc każda
+pozycja niezgodna jest rzutem monetą o to, który akurat nim był.
+
+Teraz pytanie, i nie potrzeba do niego słownictwa statystycznego. Gdyby oba
+modele były równie dobre w tym sensie, pozycje niezgodne rozkładałyby się na
+jeden lub drugi jak uczciwe rzuty monetą. Rzucasz $\val{p27.disc}$ monetami.
+Jak bardzo powinno cię zaskoczyć, że wypadły $\val{p27.net}$ od równego
+podziału?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Ani trochę}
+
+\transcript{p27-thirty-flips}
+
+Równy podział to \emph{najbardziej prawdopodobny pojedynczy} wynik i mimo to
+zdarza się tylko w $\val{p27.p.tie.pct}$ procentach przypadków. Wszystko inne
+leży co najmniej $\val{p27.net}$ od równego, więc wynik co najmniej tak
+przechylony ma prawdopodobieństwo $\val{p27.p.exact}$ \dash{} tak wygląda
+blisko siedem na osiem rzutów trzydziestoma monetami.
+
+To symbol Newtona z Programu~\ref{prog:P12} na liczbach całkowitych i nic
+więcej: żadnego przybliżenia normalnego, żadnej wariancji, żadnego
+pierwiastka. Jest dokładny i identyczny na każdej maszynie.
+
+Opublikowana różnica między modelami jest więc tym, czego spodziewałbyś się,
+gdyby oba modele były takie same.
+
+Co nasuwa pytanie w drugą stronę, a zadanie go nic nie kosztuje, bo to ta sama
+suma policzona w górę zamiast raz. Zamiast sprawdzać, czy twój wynik
+przekracza poprzeczkę, ustal, gdzie ta poprzeczka jest.
+
+Jak duża musiałaby być różnica, żeby przestała być zwyczajna?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p27.net.needed}$ pozycji, czyli $\val{p27.net.needed.pts}$ punktu}
+
+Znalezione przez szukanie w górę od $\val{p27.net}$, a nie zacytowane: na
+$\val{p27.disc}$ pozycjach niezgodnych przewaga musi sięgnąć
+$\val{p27.net.needed}$, zanim uczciwa moneta produkowałaby ją rzadziej niż raz
+na dwadzieścia.
+
+\textbf{Na $\val{p27.items}$ pozycjach, przy tych dwóch modelach, różnica
+poniżej $\val{p27.net.needed.pts}$ punktu nie jest wynikiem.} To liczba, którą
+czytelnik może zabrać na spotkanie, i jest jedenaście razy większa od tej,
+którą opublikowano.
+
+Dwa uczciwe zastrzeżenia i oba wzmacniają argument, zamiast go osłabiać. Próg
+raz na dwadzieścia jest konwencją i następna sekcja mówi, co on znaczy, a
+czego nie. Oraz $\val{p27.disc}$ pozycji niezgodnych zostało założone, a nie
+zmierzone \dash{} to własność twoich dwóch modeli, nie drukuje jej żaden
+harness ewaluacyjny i jest to najbardziej przydatna liczba, jaką mógłbyś do
+niego dodać.
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+\textbf{Gdzie to widać.} Dwie linijki, które twój harness mógłby drukować i
+nie drukuje.
+
+Każdy raport ewaluacyjny w tej dziedzinie drukuje dwie dokładności. Prawie
+żaden nie drukuje \textbf{liczby pozycji niezgodnych} i \textbf{przewagi}, a
+te dwie liczby całkowite są całą treścią porównania \dash{} dokładności są ich
+stratnym podsumowaniem. Mając je, powyższa arytmetyka to jedno wywołanie
+\code{math.comb} i nie potrzeba żadnej biblioteki.
+
+Koszt ich dodania to para liczników w pętli, która i tak porównuje oba modele
+pozycja po pozycji. Koszt ich niedodania jest taki, że porównanie raportuje
+się w postaci, z której nie da się go sprawdzić.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Co mówi p-wartość}
+\label{sec:P27-p-value}
+\index{p-wartość}
+\index{wnioskowanie!czego p-wartość nie mówi}
+
+\begin{fr}
+Liczba $\val{p27.p.exact}$ z poprzedniej sekcji ma nazwę, a ty policzyłeś ją
+już przed poznaniem słowa, i to jest właściwa kolejność.
+
+To \textbf{p-wartość}, a oto definicja podana na tyle płasko, by dało się ją
+zestawić z tym, co zrobiłeś:
+
+\begin{center}
+prawdopodobieństwo wyniku co najmniej tak skrajnego,\\
+\emph{gdyby} oba modele były równie dobre
+\end{center}
+
+Każdy człon coś dźwiga. \enquote{Co najmniej tak skrajnego} to powód, dla
+którego suma biegła po każdym wyniku równie przechylonym co ten, który
+zobaczyłeś, a nie po nim samym. A \emph{gdyby} jest warunkiem, co czyni
+całość prawdopodobieństwem warunkowym \dash{} tematem
+Programu~\ref{prog:P23}.
+
+Zapisz to jako takie, w notacji tamtego programu, a potem powiedz, co jest po
+której stronie kreski.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\Prob(\text{wynik tak skrajny} \mid \text{modele są równie dobre})$
+\dash{} dane są zdarzeniem, a twierdzenie o modelach jest warunkiem.
+\end{ansblock}
+
+Czyli odwrotnie, niż to każdy czyta.
+
+Załóżmy, że porównanie wraca z $p = \num{0.03}$. Czy jest trzyprocentowa
+szansa, że oba modele są równie dobre?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie, a jedno z drugim nie wiąże się bez trzeciej liczby}
+
+\begin{trapbox}
+\textbf{\enquote{$p = \num{0.03}$, więc jest $3$-procentowa szansa, że to
+przypadek.}}
+
+To czyta $\Prob(A \mid B)$ jako $\Prob(B \mid A)$, czyli dokładnie
+odwrócenie, któremu Program~\ref{prog:P23} poświęca sekcję, i jest to ten sam
+błąd co przy częstości bazowej. P-wartość warunkuje na tym, że modele są
+równe; zdanie warunkuje na danych. Własne twierdzenie
+Programu~\ref{prog:P23} mówi, że jednego nie zamienisz w drugie bez rozkładu a
+priori, a p-wartość nie przychodzi z żadnym.
+
+Rozumowanie, które to produkuje, nie jest głupie, i dlatego warto je nazwać, a
+nie skarcić. \enquote{To byłoby mało prawdopodobne, gdyby nic się nie działo,
+więc coś się dzieje} jest poprawne na tyle, na ile sięga, i tak właśnie czyta
+się test medyczny. Brakuje mu \dash{} i p-wartość tego nie dostarcza \dash{}
+informacji, jak często coś się \emph{dzieje}, czyli częstości bazowej z
+przykładu w Programie~\ref{prog:P23}.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Dajmy jej więc tę częstość i zobaczmy, czym staje się liczba. Maszyneria
+Programu~\ref{prog:P23} stosuje się bez zmian: ustaw po jednej stronie
+porównania, które ktoś przeprowadza w ciągu roku, i zapytaj, jaka część tych,
+które wracają jako \enquote{istotne}, jest prawdziwa.
+
+Zarzut wobec wstawiania tam liczby jest taki, że to zgadywanie, i warto na
+niego odpowiedzieć, a nie go przyjąć. To zgadywanie, które i tak robisz w
+domyśle za każdym razem, gdy czytasz wynik, i takie, które twój własny zespół
+umie oszacować: ile ze zmian proponowanych w zeszłym roku faktycznie pomogło?
+To zliczenie, które ktoś mógłby pójść i wykonać, co stawia rozkład a priori w
+tej samej klasie co każdą inną wielkość w tym programie.
+
+Powiedzmy, że $\val{p27.prior.real.pct}$ procent podejmowanych porównań
+dotyczy prawdziwej różnicy i że test znajduje prawdziwą w
+$\val{p27.power.pct}$ procentach przypadków. Jaka część porównań
+raportujących $p < \val{p27.alpha}$ jest błędna?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p27.fdr.pct}$ procent}
+
+Nie $\val{p27.alpha}$ z nich. Prawie połowa.
+
+Arytmetyka to dwa zliczenia i dzielenie, czyli rzecz z
+Programu~\ref{prog:F10}. Na sto porównań $\val{p27.prior.real.pct}$ jest
+prawdziwych i połowa z nich zostaje znaleziona, czyli pięć prawdziwych
+odkryć; dziewięćdziesiąt nie jest prawdziwych i jedno na dwadzieścia z nich
+mimo to raportuje istotność, czyli cztery i pół fałszywych. Cztery i pół z
+dziewięciu i pół.
+
+\textbf{Próg rządzi fałszywymi pozytywami wśród hipotez zerowych. Nie mówi nic
+o fałszywych pozytywach wśród odkryć}, a to drugie jest wielkością, która
+obchodzi kogokolwiek czytającego wynik. Przesunięcie częstości bazowej
+przesuwa odpowiedź, a p-wartość nie drgnie.
+\end{fr}
+
+\begin{fr}
+Jeszcze jedna własność, i to ona nadaje progowi jakikolwiek sens. Jeśli oba
+modele naprawdę są identyczne i przeprowadzasz porównanie, jak często $p$
+wychodzi poniżej $\val{p27.alpha}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{W $\val{p27.null.rate.pct}$ procentach przypadków}
+
+Z konstrukcji, i nie jest to wada \dash{} to definicja progu widziana z drugiej
+strony. \textbf{Jedno na dwadzieścia porównań dwóch identycznych modeli
+zaraportuje istotną różnicę} i nie ma wersji tej procedury, w której jest
+inaczej.
+
+Pomiar daje tu $\val{p27.null.rate.pct}$, a nie dokładnie $\val{p27.alpha}$, i
+powód warto mieć: test na pozycjach niezgodnych jest dyskretny, więc jego
+p-wartość nie może wylądować na progu, a osiągalne wartości przekraczają go
+skokiem. Test dyskretny jest zatem lekko \emph{zachowawczy}, a skrypt wylicza
+wszystkie $\val{p27.disc}$ wyników, zamiast zakładać odpowiedź ciągłą.
+
+P-wartość jest więc twierdzeniem o długofalowym zachowaniu procedury, a nie o
+twoim wyniku. To przydatne twierdzenie. Nie to, którego chciałeś.
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+\textbf{Czego chciałeś i gdzie to mieszka.}
+
+Pytanie w czyjejś głowie brzmi \enquote{jakie jest prawdopodobieństwo, że B
+jest lepszy od A}, i żadna p-wartość na nie nie odpowiada, bo to
+prawdopodobieństwo wymaga rozkładu po twierdzeniu, a nie po danych.
+
+Program~\ref{prog:P28} je liczy. Nałożenie rozkładu na parametr, zwarunkowanie
+na ewaluacji i odczytanie $\Prob(B > A)$ to cała sekcja o rozkładzie
+beta-dwumianowym w tamtym programie, a ponadto zestawia on wychodzący stamtąd
+przedział z tym, który buduje ten program, bo oba odpowiadają na różne pytania
+i rutynowo cytuje się je tak, jakby odpowiadały na to samo.
+
+Ten program zatrzymuje się celowo na odczycie częstościowym: to jest to, co
+raportują narzędzia stojące przed tobą, a zrozumienie, czego nie mówią, jest
+warunkiem chcenia tamtej drugiej rzeczy.
+\end{rigourbox}
+\end{fr}
+
+% ============================================================
+\section{Czterdzieści modeli w jednym rankingu}
+\label{sec:P27-many}
+\index{wnioskowanie!wielokrotne porównania}
+\index{ewaluacja!ranking}
+
+\begin{fr}
+Wszystko do tej pory dotyczyło jednego porównania. Ranking nie jest jednym
+porównaniem.
+
+Umieść $\val{p27.models}$ modeli na tym samym zbiorze ewaluacyjnym, a ciekawe
+wielkości są parami \dash{} weźmy jednak najprostszą wersję: każdy model
+porównywany z odniesieniem, czyli $\val{p27.models}$ porównań. Załóżmy, że
+\textbf{żaden} z $\val{p27.models}$ w ogóle nie różni się od odniesienia.
+
+Jaka jest szansa, że co najmniej jeden zaraportuje
+$p < \val{p27.alpha}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p27.any.false.pct}$ procent}
+
+$1 - \num{0.95}^{\val{p27.models}}$, czyli reguła dopełnienia z
+Programu~\ref{prog:F10} i niezależność z Programu~\ref{prog:P23}, i nic poza
+tym.
+
+\textbf{W rankingu $\val{p27.models}$ modeli, w którym nic się nie dzieje,
+prawie zawsze coś wygląda na istotne.} Próg zbudowano tak, żeby przypadek
+przekraczał go raz na dwadzieścia, a czterdzieści prób to czterdzieści szans
+na bycie tym jednym.
+
+Prostacka naprawa polega na podzieleniu progu przez liczbę porównań \dash{}
+$\val{p27.alpha}$ staje się $\val{p27.alpha}/\val{p27.models}$ \dash{} co
+pochodzi od Bonferroniego i co robi większość dziedzin. Działa w tym sensie, że
+przywraca łączną częstość. Ile kosztuje?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p27.bonf.cost}$ raza tyle pozycji}
+
+Próg przesuwa mnożnik w przedziale z Programu~\ref{prog:P25} na
+$\val{p27.z.bonf}$ zamiast $\num{1.96}$, a wzór z sekcji 3 niesie ten mnożnik
+\emph{do kwadratu}. Ranking, który chce czterdziestu uczciwych porównań,
+potrzebuje więc $\val{p27.bonf.cost}$ raza tylu pozycji ewaluacyjnych co
+jedno, na dokładkę do wszystkiego innego.
+
+Co jest wymianą postawioną otwarcie i tak właśnie należy ją widzieć:
+wielokrotne porównania nie są statystycznym drobiazgiem, tylko pozycją w
+budżecie. Zadaj czterdzieści pytań jednemu zbiorowi ewaluacyjnemu, a albo
+godzisz się, że jedna z odpowiedzi jest błędna, albo kupujesz prawie trzy razy
+tyle pozycji.
+\end{fr}
+
+\begin{fr}
+Prowadzenie wielu porównań ma drugi skutek, innego rodzaju, większy i prawie
+nigdy niewspominany. Przeżywa nawet wtedy, gdy nikt nie liczy żadnej
+p-wartości.
+
+Weź $\val{p27.models}$ modeli o \textbf{dokładnie równych} prawdziwych
+dokładnościach, na poziomie $\val{p27.lb.p.pct}$ procent. Zewaluuj każdy na
+$\val{p27.lb.n}$ pozycjach i posortuj tabelę. Model na szczycie to ten, któremu ewaluacja poszła najlepiej, a jego
+zaobserwowany wynik leży powyżej jego własnej prawdziwej dokładności.
+
+O ile mniej więcej, w punktach? Błąd standardowy jednego wyniku to tutaj
+$\val{p27.lb.se}$ punktu.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{O jakieś $\val{p27.lb.margin}$ punktu}
+
+Zwycięzca $\val{p27.models}$ równych zawodników leży średnio
+$\val{p27.emax}$ błędu standardowego powyżej prawdy, a
+$\val{p27.emax} \times \val{p27.lb.se}$ to $\val{p27.lb.margin}$.
+
+Ta wielkość to wartość oczekiwana maksimum $\val{p27.models}$ standardowych
+zmiennych normalnych i jest \textbf{scałkowana, a nie zasymulowana} \dash{} z
+powodu podanego w Programie~\ref{prog:P24}, że \enquote{zgodziło się w
+granicach słupka błędu} to dokładnie ten odczyt, którego taka sekcja odmawia.
+Dwa przypadki z postacią zamkniętą, $m = 1$ i $m = 2$, sprawdzono wobec niej
+najpierw.
+
+\mermaidfig{p27-winner-is-noise}{Co sortowanie tabeli równych robi z jej
+  szczytem}{przewaga}
+
+W rankingu, w którym różnicę jednego punktu raportuje się jako wynik, model na
+czele stawki czterdziestu wygląda więc na jakieś trzy punkty lepszy, niż jest,
+\textbf{przy zerowych różnicach między modelami}. Zrobiła to selekcja, a nie
+pomiar.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Sprawdziliśmy trzydzieści konfiguracji i wzięliśmy tę, która
+wypadła najlepiej na zbiorze ewaluacyjnym.}}
+
+Czyli ta sama arytmetyka, powiedziana o własnej pracy zamiast o publicznej
+tabeli \dash{} i to jest powód, dla którego istnieje zbiór odłożony, podany
+jako liczba, a nie jako reguła, którą ktoś wręczył.
+
+Wynik wybranej konfiguracji nie jest oceną tego, jak ona wypadnie. Jest
+maksimum trzydziestu zaszumionych ocen, a maksimum $m$ rzeczy jest obciążone w
+górę o wielkość rosnącą z $m$. Raportowanie go jako spodziewanej jakości to
+raportowanie selekcji razem z modelem.
+
+Naprawa nie jest statystyczna. Wybieraj na jednym zbiorze, a \emph{raportuj} z
+drugiego, i liczba, którą podajesz, nie była selekcjonowana na niczym.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Co potrafisz teraz sprawdzić}
+\label{sec:P27-check}
+\index{ewaluacja!o co pytać przy opublikowanej liczbie}
+\index{wnioskowanie!czego ten program nie twierdzi}
+
+\begin{fr}
+Wracamy do zdania, od którego program się zaczął, i da się już na nie
+odpowiedzieć, a nie tylko w nie wątpić.
+
+\begin{center}
+\emph{Model B dostał $\val{p27.quoted.hi}$, a model A
+$\val{p27.quoted.lo}$ na $\val{p27.items}$ pozycjach ewaluacyjnych.}
+\end{center}
+
+Cztery rzeczy i żadna nie wymagała biblioteki.
+
+\textbf{Wynik nie leży na siatce.} $\val{p27.quoted.hi}$ procent z
+$\val{p27.items}$ pozycji to $\val{p27.k.hi}$ pozycji, więc albo mianownikiem
+nie jest $\val{p27.items}$, albo metryka nie jest dokładnością. Zapytaj które.
+
+\textbf{Różnica to $\val{p27.gap.items}$ pozycja}, a procent jest znakomitym
+sposobem, żeby to ukryć.
+
+\textbf{Przedział wokół każdego z wyników jest ponad
+$\val{p27.hw.ratio.floor}$ razy większy od różnicy}, z jednego pierwiastka.
+
+\textbf{A test sparowany, czyli ten właściwy, daje
+$\val{p27.p.exact}$} \dash{} na $\val{p27.disc}$ pozycjach niezgodnych, czyli
+jedynej liczbie, o którą trzeba by poprosić.
+
+Różnica musiałaby wynieść $\val{p27.net.needed.pts}$ punktu, zanim ten zbiór
+ewaluacyjny w ogóle odróżniłby oba modele.
+\end{fr}
+
+\begin{fr}
+Dwie rzeczy, których ten program nie twierdzi, i obie są warte więcej niż
+kolejna technika.
+
+\textbf{Nie zmierzył, ile opublikowanych wyników jest szumem.} Policzył, czego
+trzeba, żeby jeden z nich nim nie był, na jednej przerobionej ewaluacji, a to
+inne twierdzenie. Zrobienie pierwszego porządnie znaczy zebranie liczby
+pozycji niezgodnych stojących za dużą liczbą opublikowanych porównań, a tych
+się nie publikuje \dash{} co samo w sobie jest wynikiem i dlatego aibox z
+sekcji 3 prosi o dwie liczby całkowite, a nie o lepszą statystykę.
+
+\textbf{Ani nic z tego nie jest procedurą decyzyjną.} P-wartość poniżej progu
+nie jest zgodą na wdrożenie, a powyżej nie jest dowodem równoważności:
+arytmetyka z sekcji 4 mówi zwłaszcza to drugie, bo test, który potrzebuje
+$\val{p27.net.needed.pts}$ punktu, żeby cokolwiek zobaczyć, nie powiedział
+niczego o prawdziwej różnicy jednego.
+
+To, co zostaje, gdy porównanie nie rozstrzyga rzeczy, na której ci zależy, jest
+pytaniem o projekt, a nie o arytmetykę. Więcej pozycji, po cenie z
+Programu~\ref{prog:P25}. Te same prompty, ze zniżką z sekcji 3. Albo inny
+pomiar.
+
+Te trzy rzeczy nie kosztują tyle samo i warto znać kolejność. Parowanie jest
+darmowe i zwykle już dostępne. Pozycje kosztują liniowo w pieniądzach i
+kwadratowo w precyzji. A inny pomiar \dash{} taki, w którym rzecz, na której
+ci zależy, daje większy sygnał \dash{} jako jedyny z trzech nie ma sufitu i
+jako jedyny nie stoi w niczyim budżecie.
+
+Jest jeszcze czwarta możliwość i to ona jest najtańsza.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Albo uczciwa odpowiedź, dostępna za darmo: zaraportuj, że na tej ewaluacji obu
+modeli nie dało się odróżnić, i podaj, jak duża musiałaby być różnica.
+\end{ansblock}
+
+Ten ostatni człon zmienia \enquote{brak istotnej różnicy} z niewyniku w pomiar,
+i prawie nikt go nie pisze. To $\val{p27.net.needed.pts}$ punktu z sekcji 3, a
+policzenie go kosztuje pętlę po \code{math.comb}.
+
+Gdzie cię to zostawia. Umiesz przeczytać liczbę z benchmarku wobec jej własnego
+mianownika; umiesz nałożyć przedział na metrykę bez wzoru i nazwać jednostkę do
+losowania; umiesz zaplanować i przeprowadzić porównanie, którego ludzie
+naprawdę chcą, korzystając z tego, że oba modele widziały te same prompty;
+umiesz powiedzieć, co p-wartość mówi, a czego nie, nie czcząc jej ani nie
+odrzucając; i umiesz wycenić rankingową porcję porównań, zanim przeczytasz jego
+górny wiersz.
+
+Program~\ref{prog:P28} bierze pytanie, które ten program musiał oddać \dash{}
+prawdopodobieństwo, że B jest lepszy \dash{} i odpowiada na nie, nakładając
+rozkład na to, czego nie jesteś pewien, a nie na dane, które już masz.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Czytaj wynik najpierw wobec jego własnego mianownika.}
+  Wynik $k$ zaliczonych z $n$ leży na siatce o oczku $100/n$ punktu, więc
+  $\val{p27.quoted.hi}$ procent na $\val{p27.items}$ pozycjach to
+  $\val{p27.k.hi}$ pozycji i jest nieosiągalne. Dokładność z jednym miejscem
+  po przecinku wymaga ponad $\val{p27.decimal.floor}$ pozycji, zanim to
+  miejsce się zaokrągli.}
+\sumitem{3--5}{\textbf{Opublikowana różnica to $\val{p27.gap.items}$ pozycja.}
+  $\val{p27.gap.pts}$ punktu z $\val{p27.items}$ pozycji, wobec przedziału
+  $\pm\val{p27.hw.200}$ punktu \dash{} ponad
+  $\val{p27.hw.ratio.floor}$ razy większego od różnicy.}
+\sumitem{6}{Porównywanie dwóch osobnych przedziałów po tym, czy się nakładają,
+  nie jest testem. Buduj przedział na różnicy, czyli na wielkości, o którą
+  pytasz.}
+\sumitem{7--9}{\textbf{Bootstrap} losuje z próbki ze zwracaniem i nie
+  potrzebuje wzoru dla żadnej metryki. Na proporcji jego rozkład jest
+  \emph{dokładnie} dwumianowy, więc zgadza się ze wzorem z
+  Programu~\ref{prog:P25} co do jednej pozycji z konstrukcji, a nie
+  przypadkiem.}
+\sumitem{10--11}{Jego zastosowaniem jest przypadek bez wzoru \dash{} mediana,
+  której przedział $\intcc{\val{p27.med.lo}}{\val{p27.med.hi}}$ ma końce
+  będące pomiarami, które ktoś wykonał. Nie wymyśli pozycji, których nie
+  ewaluowałeś, i najgorzej radzi sobie ze skrajnościami.}
+\sumitem{12--14}{\textbf{Jednostka losowania to decyzja, której nic nie
+  sprawdza.} $\val{p27.clust.n}$ wierszy od $\val{p27.clust.users}$
+  użytkowników to nie $\val{p27.clust.n}$ obserwacji, a bootstrap po wierszach
+  podaje przedział za wąski o $\val{p27.clust.factor}$. Więcej losowań nigdy
+  nie zwęża przedziału; robią to tylko pozycje.}
+\sumitem{15--17}{\textbf{Parowanie mnoży potrzebne pozycje przez
+  $1-\rho$}, dokładnie, przy każdej dokładności i każdej różnicy.
+  Program~\ref{prog:P25} podaje $\val{p27.n.rho00}$, co staje się
+  $\val{p27.n.rho90}$ przy $\rho = \num{0.9}$ \dash{} rząd wielkości, z wyrazu
+  kowariancji w $\Var(X-Y)$.}
+\sumitem{18--19}{\textbf{Różnicę niosą tylko pozycje niezgodne.} Te
+  $\val{p27.concord}$ pozycji, na których oba modele odpowiedziały tak samo,
+  skracają się dokładnie, a porównanie dotyczy w całości
+  $\val{p27.disc}$ pozostałych.}
+\sumitem{19--20}{Przy \enquote{równie dobre} te pozycje są uczciwymi rzutami
+  monetą, więc testem jest symbol Newtona z Programu~\ref{prog:P12} na
+  liczbach całkowitych \dash{} dokładny, niezależny od maszyny i niepotrzebujący
+  wariancji. Przerobiona różnica daje $\val{p27.p.exact}$.}
+\sumitem{21}{\textbf{Na tej ewaluacji różnica poniżej
+  $\val{p27.net.needed.pts}$ punktu nie jest wynikiem}, znalezione przez
+  szukanie. Opublikowana różnica to $\val{p27.gap.pts}$ punktu.}
+\sumitem{23--25}{\textbf{P-wartość to
+  $\Prob(\text{dane tak skrajne} \mid \text{brak różnicy})$}, a czytanie jej
+  wstecz to odwrócenie z Programu~\ref{prog:P23} \dash{} ten sam błąd co przy
+  częstości bazowej.}
+\sumitem{26--27}{Mając rozkład a priori da się ją odwrócić, a odpowiedź
+  niepokoi: przy $\val{p27.prior.real.pct}$ procentach porównań prawdziwych i
+  mocy $\val{p27.power.pct}$ procent $\val{p27.fdr.pct}$ procent
+  \enquote{istotnych} odkryć jest fałszywych.}
+\sumitem{28--29}{\textbf{Jedno na dwadzieścia porównań identycznych modeli
+  raportuje różnicę}, z konstrukcji. Tutaj $\val{p27.null.rate.pct}$ procent,
+  bo test dyskretny przekracza próg skokiem, zamiast na nim lądować.}
+\sumitem{31--33}{\textbf{$\val{p27.models}$ porównań robi z tego
+  $\val{p27.any.false.pct}$ procent.} Podzielenie progu to przywraca i
+  kosztuje $\val{p27.bonf.cost}$ raza tyle pozycji \dash{} wielokrotne
+  porównania są pozycją w budżecie, a nie drobiazgiem.}
+\sumitem{34--35}{\textbf{A sortowanie tabeli obciąża jej górny wiersz.}
+  Zwycięzca $\val{p27.models}$ \emph{równych} modeli leży $\val{p27.emax}$
+  błędu standardowego powyżej własnej prawdy, czyli $\val{p27.lb.margin}$
+  punktu na $\val{p27.lb.n}$ pozycjach. Selekcja, nie pomiar \dash{} i ta sama
+  arytmetyka jest powodem, dla którego istnieje zbiór odłożony.}
+\sumitem{37--39}{To, co zostaje, gdy porównanie nie rozstrzyga rzeczy, na
+  której ci zależy, jest pytaniem o projekt. \textbf{A \enquote{brak istotnej
+  różnicy} staje się pomiarem w chwili, gdy podasz, jak duża musiałaby być
+  różnica.}}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Model raportuje $\num{83.3}$ procent na $60$ pozycjach ewaluacyjnych.
+  Czy to osiągalne i jakie są dwa najbliższe osiągalne wyniki?
+  \answerto{Tak: $\num{83.3}$ procent z $60$ to dokładnie $50$ pozycji. Siatka
+  ma tu oczko $100/60 = \num{1.67}$ punktu, więc sąsiadami są $49/60 =
+  \num{81.7}$ i $51/60 = \num{85.0}$ procent \dash{} tak gruboziarnisty jest
+  benchmark o $60$ pozycjach.}
+\item Dwa modele zewaluowano na $500$ wspólnych promptach. Nie zgadzają się na
+  $80$ z nich, a z tych $46$ idzie do B i $34$ do A. Ile wynosi przewaga, w
+  pozycjach i w punktach?
+  \answerto{Przewaga to $46 - 34 = 12$ pozycji, czyli
+  $12/500 = \num{2.4}$ punktu. Zwróć uwagę, że obie dokładności różnią się o
+  $\num{2.4}$ punktu niezależnie od tego, ile pozycji oba zaliczyły \dash{}
+  zgodne się skracają.}
+\item Ewaluacja ma $600$ wierszy pochodzących z $50$ rozmów. Kolega robi
+  bootstrap po wierszach i podaje przedział. W którą stronę jest on błędny i
+  mniej więcej o jaki czynnik, jeśli wiersze wewnątrz rozmowy zgadzają się
+  całkowicie?
+  \answerto{Za wąski, nawet o $\sqrt{600/50} = \sqrt{12} \approx
+  \num{3.5}$. Bootstrap sądzi, że ma $600$ niezależnych obserwacji, a w
+  najgorszym razie ma $50$.}
+\item Zespół przeprowadza $20$ porównań z odniesieniem i raportuje dwa, które
+  wróciły z $p < \num{0.05}$. Gdyby żaden z $20$ systemów nie różnił się od
+  odniesienia, ilu takich raportów byś się spodziewał?
+  \answerto{$20 \times \num{0.05} = 1$. Znalezienie dwóch nie jest dowodem
+  niczego; oczekiwana liczba przy zerowej różnicy wynosi jeden, a
+  $\Prob(\text{co najmniej jeden}) = 1 - \num{0.95}^{20} = \num{0.64}$.}
+\item Twoje porównanie potrzebuje $\val{p27.n.rho00}$ pozycji na model, jeśli
+  obie ewaluacje są niezależne. Masz $\val{p27.n.rho80}$ promptów i możesz
+  puścić oba modele na wszystkich. Jakiej korelacji wyników obu modeli na
+  poszczególnych pozycjach potrzebowałbyś, żeby to wystarczyło?
+  \answerto{$\val{p27.n.rho00} \times (1 - \rho) \le \val{p27.n.rho80}$ daje
+  $\rho \ge \num{0.8}$ \dash{} czyli to, co mówi tabela z sekcji 3, czytana
+  wstecz.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Benchmark raportuje $\num{62.48}$ procent. Jaka jest najmniejsza liczba
+  pozycji, na której dałoby się w ogóle policzyć tyle miejsc po przecinku?
+  \answerto{Siatka musi być gęstsza niż pół setnej punktu, więc
+  $1/n < \num{0.00005}$ i $n > 20\,000$. Prawie żaden benchmark nie ma tylu
+  pozycji, więc dwa miejsca po przecinku w publicznym rankingu są ozdobą.}
+\item Pokaż, że rozkład bootstrapowy \emph{średniej} z $n$ wartości ma
+  wariancję $(1 - 1/n)$ razy zwykłe $s^{2}/n$, i powiedz, dlaczego nie ma to
+  znaczenia przy $n = \val{p27.items}$.
+  \answerto{Losowanie idzie z rozkładu empirycznego, którego wariancja jest tą
+  z mianownikiem $n$ \dash{} Program~\ref{prog:P26} nazywa ten czynnik
+  $\frac{n-1}{n}$. Przy $n = \val{p27.items}$ to różnica
+  $\num{0.5}$ procent w wariancji i ćwierć procent w przedziale, czyli
+  głęboko wewnątrz siatki zmierzonej w sekcji 1.}
+\item Dwa modele porównano na $n$ wspólnych pozycjach i nie zgadzają się na
+  ułamku $d$ z nich. Zapisz liczbę pozycji potrzebną do rozstrzygnięcia
+  różnicy $\delta$ przez $d$ zamiast przez $\rho$ i powiedz, którą z tych
+  dwóch wielkości harness ewaluacyjny mógłby faktycznie raportować.
+  \answerto{Ułamek pozycji niezgodnych jest tym, co harness umie zliczyć, i
+  jest wielkością, której test dokładny używa wprost: przewaga musi sięgnąć
+  około $\num{1.96}\sqrt{dn}$ pozycji, żeby uczciwa moneta jej nie
+  produkowała. $\rho$ trzeba oszacować; $d$ to dwa liczniki w pętli, i
+  dlatego aibox z sekcji 3 prosi właśnie o nie.}
+\item Dwa czołowe modele rankingu dzieli $\num{0.3}$ punktu na
+  $\val{p27.lb.n}$ pozycjach. Bez żadnych dalszych informacji, co
+  najpożyteczniejszego da się powiedzieć?
+  \answerto{Że dzieli je $3$ pozycje, że błąd standardowy każdego z wyników to
+  $\val{p27.lb.se}$ punktu i że przy $\val{p27.models}$ modelach w tabeli
+  górny wiersz leży spodziewanie o jakieś $\val{p27.lb.margin}$ punktu powyżej
+  własnej prawdziwej dokładności z samej selekcji \dash{} czyli ponad
+  dziesięć razy więcej niż raportowana różnica.}
+\item Program~\ref{prog:P26} pokazał, że celowo obciążony estymator potrafi
+  pobić nieobciążony. Czy ta sama wymiana dotyczy przedziału ufności i jakie
+  byłyby obie osie?
+  \answerto{Tak, a osiami są \emph{pokrycie} i \emph{szerokość}. Przedział,
+  który zawsze wynosi $\intcc{0}{100}$, ma doskonałe pokrycie i zero pożytku;
+  ten, który zawsze jest punktem, ma zerową szerokość i zero pokrycia.
+  Przedział konwencjonalny ustala pokrycie na $95$ procentach i podaje
+  szerokość, jaką to kosztuje, co jest jednym wyborem na tej wymianie, a nie
+  jedynym.}
+\end{furtherproblems}
