@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P26 written, both editions \dash{} Parts I to VI entire, and four of Part VII's six.** P27–P34 are stubs carrying their briefs | 8 of 47 |
+| Programs | **F1–F13 and P1–P27 written, both editions \dash{} Parts I to VI entire, and five of Part VII's six.** P28–P34 are stubs carrying their briefs | 7 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1116 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1132 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 935 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 945 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1146 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1158 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 955 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 967 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,22 +93,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **8 of 47 programs are stubs**, in each language. This is the whole of the
+- **7 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1266 computed values, all referenced, all present, plus the committed console
+- 1318 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 236 Mermaid sources, all rendering
-- 66 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 244 Mermaid sources, all rendering
+- 68 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **96 orphan-tail pages: 26 · 29 · 20 · 21** across `main-en`, `main-pl`,
+- **98 orphan-tail pages: 28 · 29 · 20 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
-  **P23 none**, P24 one, P25 two and P26 two
+  **P23 none**, P24 one, P25 two, P26 two and P27 two
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -144,9 +144,10 @@ what was there before.
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
   **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22**,
-  **53% in P23**, **46% in P24**, **48% in P25** and **52% in P26** \dash{}
-  P23 is the highest outside Part I and the first anywhere to pass the book's
-  own rate; P26 is the second to pass it, and P13, P15 and P17 reach it.**
+  **53% in P23**, **46% in P24**, **48% in P25**, **52% in P26** and
+  **53% in P27** \dash{} P23 and P27 are the joint highest outside Part I and
+  the only two to pass the book's own rate; P26 is next, and P13, P15 and P17
+  reach it.**
   **P24 is the first program whose rate is visible in its frame count**: nine
   of its sixty-four frames exist because the draft was raised from 36%, which
   is the elicitation ledger's cost measured in frames rather than in pages.
@@ -8134,6 +8135,235 @@ in the closing frame with nothing after it.
 - The issue's *No Quiz (Foundation-only)* checkbox is stale in the way P04,
   P14, P24 and P25 each found it stale.
 
+### Program P27 pass, August 2026
+
+**Thirty-nine teaching frames, forty-one printed, both editions**, against a
+brief that projected sixty. Six sections: what one point is, an interval with
+no formula, they saw the same prompts, what a p-value says, forty models on
+one leaderboard, and what you can now check.
+
+Twentieth program under its brief's estimate, and the shortfall has a cause
+this file has not recorded before. The nineteen previous ones came in short
+because a neighbour had spent the *material*, or supplied the *machinery*, or
+because the subject was small. Here **two of the brief's seven itemised
+deliverables were already on the page, by name**:
+
+- \enquote{the standard error of a proportion} is Program~\ref{prog:P25} §4,
+  with the interval, the four-times rule and $p(1-p)$ widest at a half;
+- \enquote{a power calculation answering how many evaluation items are needed
+  to detect a one-point difference} is the same section's
+  $\val{p27.n.rho00}$ items per model.
+
+So the reading before drafting was not \enquote{what is left of the subject}
+but **\enquote{which lines of the brief have been delivered}**, which is a
+cheaper question and a sharper one. It is worth doing that way for every
+remaining program whose brief lists its contents.
+
+#### The headline is Program P25's own number, done right
+
+P25's $\val{p27.n.rho00}$ assumes the two evaluations are independent. They
+are not: A and B ran on the same prompts. P25's *own* section 1 carries the
+term that fixes it \dash{} $\Var(X-Y) = \Var X + \Var Y - 2\Cov(X,Y)$ \dash{}
+and it used only the plus half. Using the minus half, the item count carries a
+factor of exactly $1-\rho$:
+
+| $\rho$ | items per model |
+|---|---|
+| $0$ | $\val{p27.n.rho00}$ |
+| $\num{0.5}$ | $\val{p27.n.rho50}$ |
+| $\num{0.8}$ | $\val{p27.n.rho80}$ |
+| $\num{0.9}$ | $\val{p27.n.rho90}$ |
+
+**The gate is that at $\rho = 0$ the paired formula must return P25's own
+committed figure**, so the two programs cannot come apart about a comparison
+they jointly describe. The script asserts the factor at four accuracies and
+three gap sizes rather than the four numbers, because the factor is the result.
+
+And the exact form needs no variance at all. Only the **discordant** items
+\dash{} where exactly one model is right \dash{} carry the difference;
+$\val{p27.concord}$ concordant ones cancel exactly. Under \enquote{equally
+good} those items are fair coin flips, so the test is
+Program~\ref{prog:P12}'s binomial coefficient over integers: exact,
+machine-independent, and it lets **the p-value arrive as a coin count two
+sections before it arrives as a word.**
+
+The worked answer is the program's reason for existing. A published gap of
+$\val{p27.gap.pts}$ points on $\val{p27.items}$ items is
+$\val{p27.gap.items}$ item; the exact test gives $\val{p27.p.exact}$; and the
+gap would have to reach $\val{p27.net.needed.pts}$ points \dash{} eleven times
+what was published \dash{} before this evaluation set could distinguish the
+two models at all.
+
+#### Every assertion passed on the first run, and that was the warning
+
+This is the pass's most useful finding and it is new. Fourteen passes have
+recorded that **a failing assertion is the finding**. None had recorded what
+to do when none fails, and the answer is: **read the formulas against the
+numbers anyway, because a script whose assertions all pass has told you only
+that it is self-consistent.** Three defects were sitting in it.
+
+- **A parity trap hid a wrong argument.** The exact test was called with
+  $2 \times \text{net}$ where the net is the statistic itself. It gives the
+  same number, because $2c - m$ has the parity of $m$ so the answers for
+  `net` and `net + 1` coincide at even $m$ \dash{} and it would be wrong at
+  odd $m$. That is Program~\ref{prog:P17}'s shape exactly: a formula whose two
+  readings agree numerically is invisible until the day they do not.
+- **The threshold search inherited the doubling**, and reported
+  $6$ items / $\num{3.0}$ points where the answer is
+  $\val{p27.net.needed}$ items / $\val{p27.net.needed.pts}$ points. Neither
+  number was right, and the corrected one is a far better sentence.
+- **Two ratios did not reproduce from the page**, which is the class F04, F05,
+  P07, P12 and P23 have each paid for.
+
+So the pass added a `reproduces()` helper: it formats the operands exactly as
+the page will, applies the operation to *those*, and compares the printed
+forms. **It fired on its first run** \dash{} the only way to know a new check
+is looking at anything \dash{} and the answer it gave was that no single
+decimal is both true and reproducible for the interval-to-gap ratio: the exact
+value is $\num{12.53}$ and the page's own two numbers divide to $\num{12.6}$.
+Program~\ref{prog:F05}'s recorded fix applied: **state a bound**, and assert
+that both the exact and the printed ratio clear it. The Bonferroni cost needed
+the other half of the same rule \dash{} $z$ is emitted at three decimals
+rather than two, because at two the page prints $\num{3.23}$ and
+$(\num{3.23}/\num{1.96})^{2}$ is $\num{2.72}$ against a true
+$\val{p27.bonf.cost}$.
+
+#### The transcript carried the wrong argument after the script was fixed
+
+`net = 2` survived in the listing, printing the right number for the wrong
+reason, and a reader comparing it against frames that say one item would have
+found the contradiction. Nothing catches this: `make verify` proves the file
+matches the script that wrote it, and the script wrote exactly what it
+computed. It is Program~\ref{prog:P16}'s finding \dash{} a generated,
+committed, drift-gated transcript can still disagree with the prose beside it
+\dash{} and the only instrument is reading the listing against the frames.
+
+The listing was then extracted from `main-en.pdf` p1014 and run: it prints
+`0.8555` and `0.1445`, which is what the page prints.
+
+#### The diagram manifest, seventh recurrence, and a new cause
+
+A $\num{16.5}$ pt box in `main-en`, and it was mine: `\mermaidfig` writes
+`\texttt{<key>.mmd} --- <third argument>` itself, and **all eight calls put
+the key and `.mmd` into the third argument as well**, so the manifest line
+carried the key twice. Every previous instance of this column overflowing was
+long copy; this one was a duplicated key, and the fix is a rule rather than a
+trim:
+
+> **The third argument is manifest copy only.** The macro supplies the key,
+> the extension and the dashes. Keep the copy short \dash{} shorter in Polish
+> \dash{} and check `len(key) + 9 + len(copy) < 48`, which is
+> Program~\ref{prog:P14}'s budget. P27's eight calls were measured against it
+> by hand and land between 33 and 43.
+
+**A book-wide check was attempted and is NOT in the tree**, which is worth
+recording rather than quietly dropping. `\mermaidfig`'s caption argument spans
+lines and contains braces, so a regex that looks like it parses the three
+arguments silently captures the caption as the copy and reports most of the
+book over budget. The measurement it produced was wrong and was discarded.
+A real check needs a brace-matching parser for the macro's arguments \dash{}
+which `check_structure.py` could carry \dash{} and it is a job of its own; a
+check nobody has watched fire is exactly what this file says not to add.
+
+`MAKE_EXIT 2` while the harness reported exit 0, with three page counts
+unmoved: the recorded tell fired for the fourth time and the recorded habit
+caught it.
+
+#### `notes/02` §4 carried three stale pointers, and a sweep is only as wide as its section
+
+The P7-insertion off-by-one again, in the file this document tells everybody
+to re-derive owners from \dash{} but in **§4, the exclusions table**, where
+every previous sweep looked at §3, the trap list. Each was settled against the
+destination brief rather than by assuming the off-by-one:
+
+- \enquote{P26 teaches bootstrap and permutation first} \dash{} P26 is
+  estimation; **P27** owns the bootstrap, and its exact test on discordant
+  pairs is a permutation argument on the one design that matters.
+- \enquote{P25 does maximum likelihood as an objective} \dash{} that is
+  **P26**; P25 is the CLT.
+- \enquote{Inference and Bayes (P26--P27)} \dash{} the block is
+  **P27--P28**.
+
+And one clause pointed at something **nobody has promised**: \enquote{the
+classical tests get a table showing which resampling procedure replaces
+which}. No brief undertakes it. Softened on the F04/F08/P04 precedent, and the
+entry now says in as many words that the table was promised there and nowhere
+else \dash{} rather than naming a program that has not agreed to it.
+
+**The generalisable half: a sweep is as wide as the section somebody thought
+to look at.** Five passes have corrected owners in `notes/02` §3 and not one
+opened §4.
+
+#### Layout, and one round of lengthening cleared five cues
+
+The first clean build came back with **five orphaned cues** \dash{} two in
+`main-en`, two in `main-en-a4`, one in `main-pl-a4` \dash{} across four
+frames. All four were lengthened in both editions in **one round**, and all
+four builds came back clean. Fourteenth confirmation of
+Program~\ref{prog:F06}'s two-sided rule, and it has still never failed.
+
+Every added paragraph earns its place. The best of them says what
+\enquote{equally good} is being taken to mean, because the exactness of the
+test rests on it: not that the two models are the same model, but that on an
+item where they disagree either could have been the one to get it \dash{}
+which is what makes each discordant item a coin flip. The others say that the
+threshold question is the same sum run upwards rather than once, so asking
+where the bar is costs nothing; that the prior in the false-discovery
+calculation is a count somebody could go and make (how many of last year's
+proposed changes helped) rather than a philosophical position; and that of the
+three design routes out of an unresolvable comparison, pairing is free, items
+cost quadratically in precision, and a better measurement is the only one with
+no ceiling and the only one nobody budgets for.
+
+The overfull multiset came back element for element to the baseline in all
+four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with zero overfull
+vboxes, no stranded openers and no stranded headings. **Two orphan tails
+added, both in `main-en`**: 28, 29, 20, 21 against the pre-P27 26, 29, 20, 21.
+
+Pages 1146 / 1158 / 955 / 967, from 1116 / 1132 / 935 / 945.
+
+#### Rule 2, and the figures
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P27.1 one-item | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P27.2 what-to-resample | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P27.3 same-prompts | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P27.4 winner-is-noise | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All eight at mermaid's wrap cap on the first render, at three ranks. Written
+against the frames **above** them before rendering, which is
+Program~\ref{prog:P22}'s rule, and for the fourth pass running the last node
+of a three-rank chain needed no correction afterwards.
+
+The one that needed care is P27.3, which sits in the frame that ends by asking
+which of three groups of items carries the difference. Its nodes carry the
+covariance, the shared prompts and the factor of $1-\rho$, and mention neither
+concordant nor discordant items \dash{} so it is the P04/P07 case for the
+thirteenth time: a figure the reader is meant to *apply* belongs above the
+question.
+
+#### Also
+
+- Traps 261 to 272 added to `notes/02`.
+- **Elicitation 53%**, joint highest outside Part I with
+  Program~\ref{prog:P23} and designed in from the frame plan, so it cost no
+  renumbering \dash{} which is the second pass running that P23's lesson has
+  been applied before the remap rather than after it.
+- Parity took three rounds and every failure was the recorded word-order
+  class: `Program~\ref{...}'s <maths>` against `<maths> z Programu~\ref{...}`,
+  twice in a summary item and once in a further-problem answer. That is where
+  P13, P15, P19 and P26 each hit it too, and it is worth checking summary
+  items first.
+- The one C7 warning was five values the frames do not quote. Four emissions
+  were cut on Program~\ref{prog:F11}'s finding; **one earned a sentence**
+  \dash{} the leaderboard's accuracy, because naming it makes the standard
+  error beside it reproducible from the page.
+- The issue's *No Quiz (Foundation-only)* checkbox is stale in the way P04,
+  P14, P24, P25 and P26 each found it stale.
+- Frame numbers mapped after writing: sections landed at
+  `1--6 / 7--14 / 15--22 / 23--30 / 31--36 / 37--39`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -8405,40 +8635,44 @@ clone instead.
 
 ## What is left
 
-1. **Eight programs, and Parts I to VI plus P23 to P26 are complete.** F1 to
-   F13 and P1 to P26, both editions. Part VII, probability and statistics, is
-   the block in progress: two of its six remain, P27 and P28.
+1. **Seven programs, and Parts I to VI plus P23 to P27 are complete.** F1 to
+   F13 and P1 to P27, both editions. Part VII, probability and statistics, is
+   one program from finished: only P28 remains in it.
 
-   **P27 is next** \dash{} *Statistical inference for the engineer*, sixty
-   frames planned, deps `P25` and `P26`. It is the largest estimate left in
-   Part VII and the reading before it should start with Program~P25's §4 and
-   Program~P26's §1, because between them they have already spent more of it
-   than any other pair of neighbours has spent of a successor.
+   **P28 is next** \dash{} *Bayesian inference*, fifty frames planned, deps
+   `P23`, `P24` and `P26`. Read those three, and read
+   Program~\ref{prog:P27} §4 first, because it hands P28 its opening by name
+   and it is the sharpest hand-over in Part VII.
 
-   **What P25 and P26 have already delivered.** P25 sizes an evaluation from
-   first principles: the interval on a proportion, the four-times-the-items
-   rule, and the factor of two that comes from a *difference* having the sum
-   of two variances \dash{} which is the power calculation's arithmetic
-   already on the page, at $\val{p25.eval.n.needed}$ items per model to call
-   one point. P26 owns bias against variance and what an estimator is. So
-   P27 owes the three things neither of them touched, and its brief names all
-   three: **the bootstrap**, **the paired test** \dash{} because A and B saw
-   the same prompts, and pairing is where the power actually comes from
-   \dash{} and **what a p-value does and does not say**, plus the
-   multiple-comparisons problem, which is what a leaderboard with forty
-   models is.
+   **What P27 has already delivered, and what it deliberately refused.** Its
+   §4 states flatly that a p-value is
+   $\Prob(\text{data} \mid \text{no difference})$, that reading it backwards
+   is Program~\ref{prog:P23}'s inversion, and that **the quantity everybody
+   wanted \dash{} the probability that B is better \dash{} is P28's**. It
+   computes the false-discovery arithmetic with a prior and then stops, in a
+   rigourbox naming P28 for the posterior, for conjugacy and for the credible
+   interval. So P28 does not have to motivate itself: the motivation is on the
+   page, the reader has felt the gap, and P28's first job is to answer a
+   question that has already been asked rather than to introduce one.
 
-   Its payoff is the book's own first rule carried into a mathematics book:
-   \enquote{model B scored $\num{71.4}$ and model A scored $\num{70.9}$ on
-   $200$ evaluation items \dash{} is that real?} P25 can already say the
-   interval is far wider than the gap; P27 is where the reader can check it
-   themselves, and where the honest conclusion lands.
+   P27 also leaves the **contrast** half-built. Its §2 constructs a confidence
+   interval and says what it is; P28's brief asks for a credible interval
+   contrasted against it \enquote{because they answer different questions and
+   are routinely conflated}. One side of that contrast is written, measured
+   and on the page, which is the cheapest possible starting position.
 
-   **A caution before drafting.** P25's evaluation section stops deliberately
-   at the normal-approximation interval and says so, and P26's §1 stops at
-   two ways of being wrong and never asks whether a difference is real. Both
-   stopped *for* P27. Read what they say they left rather than assuming they
-   left the whole subject.
+   And **P26 owns the estimator and the MAP**, saying in as many words that a
+   MAP is a point and cannot say how sure it is, with P28 named as where the
+   posterior-as-a-distribution lives. So P28 owes the distribution, not the
+   arithmetic that finds its mode.
+
+   **A caution before drafting.** P27's brief listed seven things and two were
+   already on the page \dash{} which was found by checking the brief's items
+   against the neighbours one by one, rather than by asking the general
+   question \enquote{what is left of the subject}. **Do that for P28: read its
+   brief as a checklist and tick off what P23, P24, P26 and P27 have
+   delivered.** It is a cheaper question and a sharper one, and it is what made
+   P27 come in at thirty-nine frames against sixty.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -8461,9 +8695,10 @@ clone instead.
    and moving the statement into the next frame's answer. P04 did three of
    those and went 26% to 35% without adding a frame; P23 did ten and went 33%
    to 53% for two frames, which is the measurement to plan against.
-   **P26 is the cheapest demonstration yet that the rate is free when it is
-   designed in**: 52% with no conversions at all, because the frame plan was
-   written that way. **This is the largest genuinely parallelisable job in
+   **P26 and P27 are the cheapest demonstrations yet that the rate is free
+   when it is designed in**: 52% and 53% with no conversions at all, because
+   both frame plans were written that way \dash{} and P27 ties
+   Program~\ref{prog:P23}'s 53% without paying P23's two extra frames. **This is the largest genuinely parallelisable job in
    the repository**, because it touches three merged program files and
    nothing else; the programs themselves are not parallelisable, for the
    reason the frame estimates below record.
@@ -8496,7 +8731,10 @@ clone instead.
    one written after somebody had looked at what its neighbours would spend.
    **P26 went back under, fifty-five against forty-six**, which is consistent
    with that: its brief was not amended, and five written programs had each
-   delivered one of its ingredients.
+   delivered one of its ingredients. **P27 is the largest shortfall in Part VII,
+   sixty against thirty-nine**, and it is the first with a cause that is not
+   about the subject at all: two of the seven things its brief itemised were
+   already on the page, by name, in Program~\ref{prog:P25} §4.
    **A brief's frame estimate is otherwise a planning figure from before its
    neighbours were written**, and the elicitation rate is paid in frames on top
    of it. It is not a target \dash{} and the record above is also the reason

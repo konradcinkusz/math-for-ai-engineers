@@ -1696,8 +1696,8 @@ is cheaper than a program by two orders of magnitude.
 | **ODEs and PDEs as a solution-technique curriculum** | Genuine exception: diffusion models, neural ODEs, and continuous normalising flows. But those readers need SDEs specifically, not the classical solution zoo. | Named as out of scope in the introduction, with a pointer. |
 | **Complex analysis, contour integration, residues** | Complex numbers appear in FFT-based methods and in rotary position embeddings, where all you need is e^{iθ} as a rotation. | F08 covers e^{iθ} as rotation; that is the whole requirement. |
 | **Abstract algebra: groups, rings, fields** | Real for geometric deep learning and for cryptography-adjacent work. Not for the target reader. | Out. Named as out. |
-| **The classical hypothesis-test zoo: t-test tables, χ², ANOVA, F-tests** | You have a computer. Bootstrap and permutation tests answer the same questions with fewer assumptions, are harder to misapply, and generalise to statistics with no closed form — which is most of the ones you care about. | P26 teaches bootstrap and permutation first; the classical tests get a table showing which resampling procedure replaces which. |
-| **Frequentist estimator theory: sufficiency, Cramér–Rao, UMVU** | Beautiful and inert for this reader. | P25 does maximum likelihood as an objective, which is the part that shows up in every loss function. |
+| **The classical hypothesis-test zoo: t-test tables, χ², ANOVA, F-tests** | You have a computer. Bootstrap and permutation tests answer the same questions with fewer assumptions, are harder to misapply, and generalise to statistics with no closed form — which is most of the ones you care about. | P27 teaches the bootstrap, and its exact test on discordant pairs is a permutation argument on the one design that matters — the items are exchangeable under the null and every outcome is enumerated. **No program undertakes the replacement table**; it was promised here and nowhere else, and this entry says so rather than naming a program that has not agreed to it. |
+| **Frequentist estimator theory: sufficiency, Cramér–Rao, UMVU** | Beautiful and inert for this reader. | P26 does maximum likelihood as an objective, which is the part that shows up in every loss function. |
 | **PAC learning, VC dimension, Rademacher complexity** | The bounds are real theorems and are numerically vacuous for over-parameterised networks — they permit error rates above 1. Knowing they exist is worth a paragraph; deriving them is worth nothing here. | One frame in P33 on why generalisation bounds do not predict your validation loss. |
 | **Convergence-rate proofs in convex optimisation** | Deep learning objectives are outside the hypotheses. Knowing convexity as a *recognition problem* transfers; the rate proofs do not. | P18 teaches recognition and Jensen; P19–P20 teach what actually runs. |
 | **Numerical quadrature, spline theory, classical interpolation** | Superseded by sampling for the uses in scope. | Out. |
@@ -1733,7 +1733,7 @@ Stated because the TOC will otherwise look eccentric next to §1:
 - **Discrete structures (P11–P13).** Stroud has none; tokenisation, beam search,
   attention masks, DAG-shaped computation graphs and dependency scheduling are
   all discrete.
-- **Inference and Bayes (P26–P27).** Stroud stops at the normal distribution.
+- **Inference and Bayes (P27–P28).** Stroud stops at the normal distribution.
   Deciding whether an eval improvement is real is the most common mathematical
   act in the job.
 - **Honest measurement (P33).** The house convention as a program: methods,
@@ -2785,3 +2785,62 @@ thing wrong with it is the variance **P21** measured, which is three orders of
 magnitude worse than the reparameterised route on the same problem. Unbiased
 and unusable are compatible, which is trap 253 arriving from the other end.
 → **P26**.
+
+### Statistical inference, written (P27)
+
+261. *“The two models scored 71.4 and 70.9, so B is slightly better.”* On
+     200 items neither number is achievable — 71.4 per cent is 142.8 items —
+     and the achievable scores are half a point apart. **Read a quoted score
+     against its own denominator before reading it against anything else.**
+     Owner: P27 §1.
+262. *“A difference of half a point is small but real.”* On 200 items half a
+     point is **one item**. A percentage hides its denominator, and two numbers
+     a few tenths apart read as a measured distinction rather than as one
+     question. Owner: P27 §1.
+263. *“The error bars overlap, so the difference is not significant.”*
+     Comparing two separate intervals by whether they overlap is not a test:
+     overlapping intervals can hide a clear difference and disjoint ones can
+     fail to establish one. Build the interval on the **difference**, which is
+     a third quantity with its own spread. Owner: P27 §1.
+264. *“More bootstrap resamples give a tighter interval.”* They do not. The
+     width comes from the item count; the number of resamples controls only how
+     precisely the ends of that interval have been located. More resamples buy
+     a more exactly reported interval of the same width. Owner: P27 §2.
+265. *“Bootstrap the rows.”* When rows share a user, a conversation or a
+     document they are not independent observations. Resampling 200 rows from
+     40 users claims five times the evidence there is, and the interval comes
+     out too narrow by the square root of that. **The unit of resampling is a
+     decision and no library checks it.** Named as a failure mode by P25 §1
+     before the book had said what a bootstrap is; owner: P27 §2.
+266. *“Comparing two models needs twice the evaluation data.”* Only if you
+     evaluate them separately. Run both on the same prompts and the variance of
+     the difference subtracts twice the covariance, so the item count falls by
+     exactly a factor of $1-\rho$ — an order of magnitude at the correlations
+     two comparable models actually have. Owner: P27 §3.
+267. *“The comparison rests on all 200 items.”* It rests on the **discordant**
+     ones. Items both models answered the same way cancel out of the difference
+     exactly, and a harness that prints two accuracies has thrown away the two
+     integers the comparison is actually made of. Owner: P27 §3.
+268. *“p = 0.03, so there is a 3 per cent chance it was a fluke.”* That reads
+     $\Prob(A \mid B)$ as $\Prob(B \mid A)$ — the same inversion as the base
+     rate, which P23 owns. A p-value conditions on there being no difference;
+     the sentence conditions on the data, and no prior was supplied to turn one
+     into the other. Owner: P27 §4, with P23 §3.
+269. *“A significant result is probably real.”* At a tenth of comparisons
+     genuinely different and half of those detected, nearly **half** of the
+     results reporting significance are false. The threshold governs false
+     positives among the nulls, not among the findings. Owner: P27 §4.
+270. *“Nothing came out significant, so the two are equivalent.”* A test that
+     would need five and a half points to see anything has said nothing about a
+     real difference of one. **“No significant difference” becomes a
+     measurement only when you say how large a difference would have had to
+     be.** Owner: P27 §6.
+271. *“The model at the top of the leaderboard is the best one.”* Sorting
+     forty models of **identical** true accuracy puts the luckiest error on
+     top, and its observed score sits about 2.16 standard errors above its own
+     truth — three points at a thousand items. Selection, not measurement, and
+     the same arithmetic is why a held-out set exists. Owner: P27 §5.
+272. *“We tried thirty configurations and took the best.”* Item 271 said about
+     your own work. The chosen configuration's score is the maximum of thirty
+     noisy estimates and is biased upwards by an amount growing with the
+     number tried. Choose on one set and report from another. Owner: P27 §5.
