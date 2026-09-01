@@ -372,7 +372,8 @@ distance from the expectation:
 \[ \Var(X) \;=\; \Ex\bigl[(X - \Ex[X])^{2}\bigr] \]
 
 Compute it for the ten numbers. Their mean is $\val{p24.ex.x}$, so the
-distances are $1, 3, 2, 1, 7, 7, 0, 8, 3, 6$.
+distances are
+\[ 1,\; 3,\; 2,\; 1,\; 7,\; 7,\; 0,\; 8,\; 3,\; 6 \]
 \dotline
 \nextframe
 \end{fr}
@@ -465,9 +466,10 @@ readable one. The standard deviation is what you quote; the variance is what
 taken early is a root that has to be undone.
 
 One question before leaving the variance, and most readers get it wrong. The
-ten distances from the mean were $1, 3, 2, 1, 7, 7, 0, 8, 3, 6$, which average
-to $\num{3.8}$. The standard deviation came out $\val{p24.sd.x}$. Are those
-two supposed to be the same number?
+ten distances from the mean were
+\[ 1,\; 3,\; 2,\; 1,\; 7,\; 7,\; 0,\; 8,\; 3,\; 6 \]
+which average to $\num{3.8}$. The standard deviation came out
+$\val{p24.sd.x}$. Are those two supposed to be the same number?
 \dotline
 \nextframe
 \end{fr}
@@ -694,6 +696,12 @@ draws land from there.}{centre, spread, and a pair}
 A handful of shapes account for almost everything a working engineer meets,
 and the useful way to hold them is by the question each one answers rather
 than by its formula. Six is enough.
+
+The ordering is deliberate: each of the six answers a question about how the
+data was \emph{generated}, so the way to pick one is to describe the process
+and see which shape it is, never to fit a curve to a histogram and read off
+the closest match. A count that can only be a whole number does not become
+continuous because a bell fits it tolerably well.
 
 Start with the smallest. A \textbf{Bernoulli} variable is $1$ with probability
 $p$ and $0$ otherwise \dash{} one yes-or-no. It is an indicator, so section 1

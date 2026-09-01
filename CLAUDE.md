@@ -7587,8 +7587,12 @@ a fix for an unrelated defect three hundred lines upstream. **Any edit near the
 top of a program re-rolls every cue in it.**
 
 Round two lengthened all four offending frames \dash{} 6, 24, 28 and 58, in
-both editions \dash{} and all four builds came back clean. Tenth confirmation
-of Program~\ref{prog:F06}'s two-sided rule, and it has still never failed.
+both editions \dash{} and all four builds came back clean. **Round three came
+later and from the same cause**: the two displays that fixed CI's hbox added
+two pages to `main-en` and put a cue back at frame 37, cleared by lengthening
+that frame. Eleventh confirmation of Program~\ref{prog:F06}'s two-sided rule,
+and it has still never failed \dash{} and the third time in one pass that an
+edit made for something else re-rolled the cue ledger.
 Every added paragraph earns its place: that the expectation's sum runs over the
 sample space rather than over the distinct values, so an outcome repeating a
 value counts twice; that the book keeps the variance as well as its root
@@ -7627,50 +7631,76 @@ sits in the closing frame with nothing after it.
 | `main-en-a4` | 769 / 769 | 777 / 778 | 786 |
 | `main-pl-a4` | 777 / 777 | 786 / 786 | 794 |
 
-#### CI found a 26-character `\code{}`, and `checklog.py` could not say where
+#### CI could not say WHERE, an inference filled the gap, and the inference was wrong
+
+This is the pass's most useful finding and it cost a cycle to get.
 
 Both A4 builds failed on CI and neither trade build did: an over-budget hbox
 of $\num{25.4}$ pt in `main-en-a4` and $\num{37.7}$ pt in `main-pl-a4`, on
-source this container sets with zero. **Two builds over budget and two clean
-is itself the diagnosis**: a line that is unbreakable in *both* editions and
-only bites at 12 pt, which narrows it to something the two files share
-character for character. That is `\code{code/p24\_distributions.py}`, run into
-the middle of a paragraph \dash{} **26 characters, the longest script name in
-the book**, against F06's $\num{22}$ and F07's $\num{22}$.
+source this container sets with zero. `checklog.py` reported **the sizes and
+nothing else**, because Program~\ref{prog:P12}'s pass had taught it to name
+the page or the file and line of every overfull **vbox** \dash{} for a reason
+it stated plainly, that the two installations paginate differently so the
+machine that must fix a box is usually not the one that saw it \dash{} and had
+left the **hbox** half printing sizes alone. That is the reporting CI uses.
 
-It is Program~\ref{prog:F08}'s and Program~\ref{prog:F11}'s recorded class
-(36.9 pt and 67.2 pt, both Polish, both mid-paragraph) and the recorded fix
-applied unchanged: **start the sentence with it**, where a sentence space
-gives TeX the break it needs. The book's other twenty-odd uses already do,
-which is why this is the first one to fail.
+**So the gap was filled by inference, and the inference was good and wrong.**
+Two A4 builds over budget and two trade builds clean says a line that is
+unbreakable in *both* editions and only bites at 12 pt, which narrows it to
+something the two files share character for character. That is
+`\code{code/p24\_distributions.py}` run into the middle of a paragraph
+\dash{} 26 characters, the longest script name in the book, and exactly
+Program~\ref{prog:F08}'s and Program~\ref{prog:F11}'s recorded class. It was
+moved to the start of its sentence, which is the recorded fix, and pushed.
 
-**And the tooling gap is the finding worth keeping.** Program~\ref{prog:P12}'s
-pass taught `checklog.py` to name the page or the file and line of every
-overfull **vbox**, for a reason it stated plainly: the two installations
-paginate differently, so the machine that must fix a box is usually not the
-one that saw it. **The hbox reporting was left printing sizes alone**, and
-that is exactly the reporting CI uses. Two boxes, no location, and a cycle
-spent inferring one. `checklog.py` now reports an over-budget hbox the same
-way \dash{} its source line range, the file, and the offending line with the
-font switches stripped out \dash{} which would have ended this in one look.
+**CI came back with $\num{37.7}$ pt again, to the tenth of a point** \dash{}
+which is this file's own signal, arriving for the fourth time in this
+repository, that a change did not reach what was measured. What was different
+is that the same push had closed the reporting gap, so the tool named it:
 
-The generalisable half: **a diagnostic that is only worth having on the other
-machine has to be as complete as the one you use on your own.** The vbox half
-was completed the moment it cost a cycle; the hbox half was not, because it
-had never cost one on this container, where the location is a `grep` away.
+> `37.7 pt too wide, source lines 345--347, in or after ./programs/pl/P24-distributions.tex`
+> `[Policz ja dla dziesieciu liczb. Ich srednia to $20$, wiec]`
+
+It is `$1, 3, 2, 1, 7, 7, 0, 8, 3, 6$` \dash{} **ten numbers inside one inline
+maths span**. TeX does not break at a comma in maths mode, so that is a
+thirty-character unbreakable run, and it is Program~\ref{prog:F05}'s and
+Program~\ref{prog:P04}'s class rather than F08's. The recorded fix applied
+without a detour: **put it in a display.** Both occurrences of the list went
+into one, in both editions, which is also the form the same ten numbers
+already use where the population is first printed \dash{} so the fix makes
+the program internally consistent as well as buildable.
+
+The `\code{}` move is kept. It is a real latent box by the recorded rule and
+it cost nothing; it simply was not this one.
+
+**Three things worth carrying, and the third is the general one.**
+
+- **A diagnostic that is only ever read on the other machine has to be as
+  complete as the one you read on your own.** The vbox half was completed the
+  moment it cost a cycle. The hbox half was not, because on this container the
+  location is a `grep` away and the gap never showed.
+- **An identical measurement after a change means the change missed**, and the
+  second reading of that signal is nearly always the right one: not *the fix
+  was too small* but *the fix did not reach*. Here it was neither the constant
+  nor the scope \dash{} it was the wrong line.
+- **Inference from the shape of the evidence is not measurement, and it reads
+  exactly like it.** The argument from two-failing-two-clean was sound, it
+  named a real defect of the right class in the right file, and it was still
+  not the cause. What settled it was one line of tool output. **Close the
+  reporting gap before spending a cycle on the inference it invites** \dash{}
+  in this pass both happened to go in the same push, which is the only reason
+  it cost one cycle rather than three.
 
 One thing found and deliberately not acted on. `main-en-a4` also carried a
 $\num{1.0}$ pt overfull vbox in the index, which is the recorded class after
 `\raggedcolumns` took it from $\num{8.3}$ pt. It is **left for the next
-measurement**, because the `\code{}` fix is three hundred pages upstream of
-the index and re-rolls its pagination, and this file's own rule is that a
+measurement**, because these fixes are three hundred pages upstream of the
+index and re-roll its pagination, and this file's own rule is that a
 pagination measurement does not survive a change to the material being
-paginated. Tuning two pagination constants in one push is how the next
-reading becomes ambiguous. What the search did turn up is written into
-`preamble.tex` beside the patch: **`\multicolovershoot`**, multicol's own
-per-column allowance, one value per column rather than one per entry \dash{}
-which is the bounded knob Program~\ref{prog:P19}'s pass went looking for and
-did not find.
+paginated. What the search turned up is written into `preamble.tex` beside the
+patch: **`\multicolovershoot`**, multicol's own per-column allowance, one
+value per column rather than one per entry \dash{} which is the bounded knob
+Program~\ref{prog:P19}'s pass went looking for and did not find.
 
 #### Layout, and the ledgers
 
