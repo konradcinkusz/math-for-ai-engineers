@@ -1,34 +1,807 @@
 %% P21 --- Optymalizacja stochastyczna i różniczkowanie losowania
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak programs/en/P21-stochastic-optimisation.tex. Ramka w ramkę, makro
+%% w makro, liczba w liczbę; tools/parity.py porównuje oba pliki.
+%%
+%% UWAGA DLA TŁUMACZA: C4, C8 i C12 porównują znaczniki strukturalne, wzory i
+%% literały liczbowe PO KOLEI. Cyfra zostaje cyfrą, odwołanie do programu
+%% prowadzi zdanie zamiast stać za wzorem, a skrót jest częścią strumienia
+%% znaczników. \enquote{batch} tłumaczy się jako \enquote{partia}, ale
+%% \enquote{estymator}, \enquote{wariancja} i \enquote{gradient} zostają.
 
-\program{Optymalizacja stochastyczna i różniczkowanie losowania}
+\program[Optymalizacja stochastyczna]{Optymalizacja stochastyczna i
+różniczkowanie losowania}
 \label{prog:P21}
+\index{optymalizator!stochastyczny}
+\index{gradient!z partii}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{powiedzieć, co szacuje gradient z partii i co
+  \emph{nieobciążoność} obiecuje, a czego nie}
+\outcome{8--12}{powiedzieć, jak szum zależy od rozmiaru partii i dlaczego jest
+  to zależność pierwiastkowa}
+\outcome{13--17}{powiedzieć, dlaczego w ogóle zdarza się ogromny krok i czego
+  dotyczy decyzja o progu obcinania}
+\outcome{18--22}{podać, co utrzymuje stałym reguła liniowa, a co pierwiastkowa,
+  i powiedzieć, która jest ludową mądrością}
+\outcome{23--25}{powiedzieć, co ukrywa wygładzona krzywa straty i o ile}
+\outcome{26--30}{powiedzieć, kiedy akumulacja mikropartii nie jest jedną dużą
+  partią i dlaczego dzieje się to po cichu}
+\outcome{31--39}{nazwać dwa sposoby na gradient przez krok losowania i
+  powiedzieć, co rozstrzyga między nimi}
+\end{outcomes}
 
-Argument: a minibatch gradient is an unbiased estimator with variance
-proportional to \code{1/B}, and the noise is a property of the algorithm
-rather than a defect in it. Payoff: why the loss curve is noisy and what a
-moving average of it hides; the linear scaling rule for batch size and
-learning rate, presented as **widely repeated folklore with a limited
-empirical basis**, not as a law; gradient clipping as a bound on the update
-rather than on the gradient; and the two ways to get a gradient through a
-sampling step \dash{} the score-function estimator (REINFORCE, unbiased and
-high variance) and the reparameterisation trick (low variance, requires a
-differentiable path) \dash{} which is the fork that separates policy-
-gradient RLHF from a VAE. Also the accumulation denominator: a cross-entropy
-averaged per micro-batch and then averaged across micro-batches is not the
-mean over the accumulated batch when the micro-batches hold different
-numbers of real tokens, so gradient accumulation silently optimises a
-different objective from the large batch it is standing in for \dash{} the
-training instance of the average-of-averages error Program~F4 elicits, and
-item 25 of the trap catalogue.
+\begin{quiz}
+\item Gradient z partii nazywa się \emph{nieobciążonym}. Co to obiecuje?
+  \teachesat{3--4}
+  \answerto{Że uśrednienie po każdej partii, jaka mogła zostać wylosowana, daje
+  dokładnie pełny gradient. Nie obiecuje zupełnie nic o partii, którą
+  wylosowano.}
+\item Zwiększasz rozmiar partii szesnastokrotnie. O jaki czynnik spada szum w
+  gradiencie? \teachesat{10--11}
+  \answerto{O cztery. Wariancja spada jak $1/B$, więc rozrzut \dash{} czyli to,
+  co widać \dash{} spada jak $1/\sqrt{B}$. Ten pierwiastek jest źródłem
+  malejących zysków i jest dokładny, a nie przybliżony.}
+\item Zmniejszasz partię o połowę. Co powinno stać się z krokiem?
+  \teachesat{18--19}
+  \answerto{Zależy, co chcesz utrzymać stałe, a dwie popularne reguły
+  utrzymują różne rzeczy. Zmniejszenie kroku razem z partią zachowuje
+  \emph{stosunek}, w którym reguły są zwykle podawane; podzielenie go przez
+  $\sqrt{2}$ zachowuje szum w aktualizacji. Żadna z nich nie jest prawem.}
+\item Akumulowane są cztery mikropartie. Czy to to samo, co jedna partia
+  czterokrotnie większa? \teachesat{26--27}
+  \answerto{Tylko wtedy, gdy każda mikropartia zawiera tyle samo prawdziwych
+  tokenów. W przeciwnym razie akumulowana strata jest średnią ze średnich, a
+  strata dużej partii jest średnią z puli, i są to dwa różne cele.}
+\item Dwa estymatory gradientu przez krok losowania są oba nieobciążone. Co
+  jeszcze pozostaje do wyboru między nimi? \teachesat{33--34}
+  \answerto{Ich wariancja, a może różnić się o rzędy wielkości. Bycie
+  poprawnym średnio to nie to samo, co bycie użytecznym, i przy stu wymiarach
+  jeden z dwóch jest wciąż widocznie błędny po czterdziestu tysiącach próbek.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 50 ramek.
-}
+% ============================================================
+\section{Gradient, o który nie prosiłeś}
+\label{sec:P21-estimator}
+\index{gradient!jako estymator}
+
+\begin{fr}
+Program~\ref{prog:P20} rozłożył optymalizator na części i ani razu nie zapytał,
+skąd bierze się gradient. Każdy marsz w nim używał gradientu całej straty, a
+żaden przebieg treningowy nigdy tego nie zrobił.
+
+To, co przebieg liczy, to gradient straty na \emph{partii}. Powiedz, czym to
+czyni liczbę, wzdłuż której kroczysz.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\textbf{Oszacowaniem} gradientu, którego chciałeś, zbudowanym z przykładów,
+które akurat zostały wylosowane.
+\end{ansblock}
+
+To cały temat tego programu i warto powiedzieć to wprost, zanim cokolwiek
+zostanie wyprowadzone: \textbf{szum nie jest wadą metody, szum jest metodą}.
+Nikogo nie stać na pełny gradient i nikt go nie chce \dash{} trening robi więc
+zaszumiony krok bardzo wiele razy, a własności tego szumu rozstrzygają niemal
+wszystko, na co ludzie narzekają.
+
+\mermaidfig{p21-one-draw}{Jedno losowanie i zbiór, z którego pochodzi.}{jedno
+losowanie, jeden zbiór}
+\end{fr}
+
+\begin{fr}
+Zacznij od tego, co jest obiecane. Weź populację $\val{p21.pop.n}$ liczb
+oznaczających gradienty na przykład i każdą możliwą partię
+$\val{p21.pop.b}$ z nich \dash{} jest ich $\val{p21.pop.subsets}$.
+
+Uśrednij $\val{p21.pop.subsets}$ średnich z partii. Co otrzymasz?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p21.pop.mean}$}
+Własną średnią populacji, i to \textbf{dokładnie}: skrypt robi całość na
+ułamkach, więc nie ma w tym żadnej tolerancji. Tym właśnie jest
+\emph{nieobciążoność} i na tym opiera się każda metoda z partiami.
+
+\begin{note}
+Każda partia została wylosowana, więc jest to \textbf{dowód} dla tej populacji,
+a nie świadectwo o niej, co jest rozróżnieniem Programu~\ref{prog:P14}. Na
+prawdziwym zbiorze treningowym to samo zdanie jest twierdzeniem o losowaniu, a
+nie eksperymentem, a arytmetyka jest identyczna.
+\end{note}
+
+Teraz połowa, która znaczy więcej. Te $\val{p21.pop.subsets}$ średnich dają w
+średniej dokładnie $\val{p21.pop.mean}$. Zgadnij, jak daleko od niej jest
+najgorsza z nich.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Biegną od $\val{p21.pop.lo}$ do $\val{p21.pop.hi}$.
+\end{ansblock}
+
+\transcript{p21-every-batch}
+
+Rozpiętość $\val{p21.pop.span}$ wokół wielkości $\val{p21.pop.mean}$, a jedna z
+nich ma zły znak.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Gradient jest nieobciążony, więc mogę mu ufać.}}
+Nieobciążoność to stwierdzenie o \emph{zbiorze}: uśrednij po każdej partii,
+jaka mogła zostać wylosowana, a wynik jest dokładny. Nie mówi zupełnie nic o
+partii, którą masz przed sobą, a tutaj partie otaczają odpowiedź z obu stron i
+jedna z nich wskazuje w przeciwną stronę.
+
+Dwa słowa, które chodzą w parze, to \emph{nieobciążony} i \emph{wariancja}, a
+metoda mająca pierwsze bez kontroli nad drugim to metoda, której pojedyncze
+kroki są szumem.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+\textbf{Ten program używa wariancji, zanim książka ją zdefiniowała}, i jest to
+celowe, a nie przeoczenie. Czym jest zmienna losowa, czym wariancja i jak
+średnie się koncentrują, to Programy \ref{prog:P24} i \ref{prog:P25}, dwie
+części później; notatki programowe zapisują, dlaczego kolejność jest taka i
+dlaczego przestawienie części zepsułoby sześć innych zależności.
+
+Potrzebujesz tu jednego zdania i jest to zdanie, które i tak byś zgadł:
+\textbf{wariancja} wielkości to średnia z kwadratu jej odległości od własnej
+średniej, a jej pierwiastek \dash{} \textbf{rozrzut} \dash{} ma te same
+jednostki co wielkość, przez co właśnie jego da się sobie wyobrazić.
+Program~\ref{prog:P25} wraca do szumu z partii jako do przykładu, gdy maszyneria
+już istnieje.
+\end{rigourbox}
+\end{fr}
+
+% ============================================================
+\section{Jak bardzo zaszumiony, dokładnie}
+\label{sec:P21-variance}
+\index{gradient!skala szumu}
+
+\begin{fr}
+Populacja ma tu $\val{p21.noise.pop}$ przykładów i rozrzut
+$\val{p21.noise.sd}$. Losowane są z niej partie po $B$,
+$\val{p21.noise.trials}$ razy przy każdym rozmiarze, i mierzony jest rozrzut
+średnich z partii.
+
+Przed liczbami: partia o rozmiarze $B$ uśrednia $B$ niezależnych losowań. Co
+powinno stać się z rozrzutem, gdy $B$ rośnie, i jak szybko?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Powinien spadać, a \emph{wariancja} powinna spadać jak $1/B$.
+\end{ansblock}
+
+I tak się dzieje. Dla $B$ od $\val{p21.noise.b.lo}$ do $\val{p21.noise.b.hi}$
+mierzona wariancja podąża za $\sigma^{2}/B$ z dokładnością do
+$\val{p21.noise.tol}$ procent, i skrypt sprawdza to zamiast jakiejkolwiek
+pojedynczej liczby \dash{} wariancja zmierzona z czterech tysięcy prób sama
+jest wielkością losową i poruszyłaby się razem z ziarnem.
+
+Rozrzut, który naprawdę widać, jest pierwiastkiem z tego, więc spada z
+$\val{p21.noise.sd1}$ przy $B = \val{p21.noise.b.lo}$ do
+$\val{p21.noise.sd256}$ przy $B = \val{p21.noise.b.hi}$ \dash{} o czynnik
+$\val{p21.noise.drop}$ za $\val{p21.noise.b.hi}$ razy więcej pracy.
+\end{fr}
+
+\begin{fr}
+Ten czynnik jest tym, który ludzie źle odczytują, więc powoli. Przejście z
+$B = 1$ do $B = \val{p21.noise.b16}$ to szesnaście razy więcej pracy na krok.
+
+O jaki czynnik spada \emph{rozrzut}?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p21.noise.spread16}$}
+Cztery, a nie szesnaście, bo rozrzut jest pierwiastkiem z wariancji.
+
+\textbf{Ten pierwiastek jest źródłem \enquote{malejących zysków z rozmiaru
+partii}} i jest dokładny, a nie przybliżony. Podwojenie partii kupuje czynnik
+$\sqrt{2}$ w szumie za czynnik $2$ w obliczeniach, przy każdym rozmiarze
+partii, na zawsze. Nic o modelu nie wchodzi do tego zdania.
+
+\mermaidfig{p21-noise-and-batch}{Dwie liczby opisujące jedną wielkość.}{rozmiar
+partii i rozrzut}
+
+Jeszcze jedno przed następną sekcją, bo ona się na tym opiera. To jest rozrzut
+\emph{oszacowania}. Ile wynosi rozrzut \emph{kroku}, który wykonujesz?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\eta$ razy tyle, bo krok to $\eta$ razy oszacowanie.
+\end{ansblock}
+
+Dwa pokrętła, jedna wielkość \dash{} i żadne z nich nie ma znaczenia bez
+drugiego, co jest dokładnie tym kształtem, który Program~\ref{prog:P20} znalazł
+dla konwencji momentum.
+\end{fr}
+
+% ============================================================
+\section{Dlaczego zdarza się ogromny krok}
+\label{sec:P21-clipping}
+\index{gradient!obcinanie}
+
+\begin{fr}
+Program~\ref{prog:F06} rozłożył obcinanie gradientu na części: obcinanie po
+wartości ucina każdą składową i obraca wektor, obcinanie po normie skaluje go i
+nie obraca, a obie nazwy dzieli jedno słowo w każdym API. Powiedział potem, że
+pytanie, \emph{dlaczego w ogóle zdarza się ogromny krok}, należy tutaj, bo
+potrzebuje modelu szumu.
+
+Model szumu już masz. Powiedz dlaczego.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo średnia z partii ma rozrzut, więc partia będzie od czasu do czasu daleko od
+gradientu populacji \dash{} a \enquote{od czasu do czasu} jest dokładnie tym,
+co rozrzut opisuje.
+\end{ansblock}
+
+Nic nie jest nie tak z modelem, danymi ani optymalizatorem, gdy to się zdarza.
+To ogon rozkładu, który metoda ma z konstrukcji, a jego częstość wyznaczają
+rozrzut i rozmiar partii, i nic więcej.
+
+Czyni to z progu decyzję o rozkładzie, a nie stałą. Zmierzone na tych samych
+partiach: ich typowy rozmiar to $\val{p21.clip.typical}$, a próg ustawiony tam
+obcina $\val{p21.clip.one}$ procent kroków \dash{} co jest tym, co znaczy
+\emph{typowy}, i sprawdzeniem, że arytmetyka się zgadza.
+\end{fr}
+
+\begin{fr}
+Teraz dwa końce, a przepaść między nimi jest sednem sekcji.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+próg na połowie typowego rozmiaru & obcina $\val{p21.clip.half}$ procent kroków \\
+próg na czterokrotności & obcina $\val{p21.clip.four.n}$ z $\val{p21.clip.trials}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+$\val{p21.clip.half}$ procent wobec $\val{p21.clip.four.n}$ z
+$\val{p21.clip.trials}$. Co algorytm robi w pierwszym wierszu?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Podąża za \emph{kierunkiem} gradientu z krokiem ustalonym ręcznie i całkowicie
+odrzuca jego długość.
+\end{ansblock}
+
+Jest to inny algorytm niż ten, który ktokolwiek sądzi, że uruchamia, a nic tej
+różnicy nie zgłasza. Program~\ref{prog:F06} mówi to we własnej ramce; ten
+program dodaje, że \textbf{próg ma znaczenie wyłącznie wobec zmierzonego
+rozkładu rozmiarów gradientu}, a ten rozkład jest własnością rozmiaru partii
+tak samo jak danych.
+
+Pytaniem do progu obcinania nie jest więc \enquote{czy to rozsądna liczba},
+tylko \enquote{jaki ułamek kroków obcina}. Pierwsze jest zgadywaniem, drugie
+pomiarem, a drugie to dwa wiersze logowania.
+
+Który z dwóch powyższych progów jest bezpieczniejszy w użyciu?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Ten, który prawie nigdy nie działa.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{\enquote{Obcinanie to siatka bezpieczeństwa, więc ciaśniejsza jest
+bezpieczniejsza.}} Próg poniżej typowego rozmiaru gradientu nie jest siatką,
+tylko przeprojektowaniem: zamienia optymalizator w taki, który używa kierunku
+gradientu i ignoruje jego długość, i robi to na niemal każdym kroku, a nie od
+czasu do czasu.
+
+Bezpieczne odczytanie jest odwrotnością intuicyjnego. Próg, który działa
+rzadko, wykonuje zadanie, do którego został dodany; taki, który działa ciągle,
+po cichu zastąpił metodę.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Dwie reguły utrzymujące różne rzeczy}
+\label{sec:P21-scaling}
+\index{optymalizator!reguła liniowego skalowania}
+
+\begin{fr}
+Każdy, kto zmieniał rozmiar partii, spotkał to pytanie, a odpowiada się na nie
+zwykle regułą, a nie argumentem. Weź najpierw argument.
+
+Aktualizacja to $\eta$ razy oszacowanie. Sekcja 2 podaje wariancję oszacowania
+jako $\sigma^{2}/B$. Zapisz wariancję \emph{aktualizacji}.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \Var(\eta\,\hat g) \;=\; \frac{\eta^{2}\sigma^{2}}{B} \]
+\end{ansblock}
+
+Jeden wiersz i rozstrzyga pytanie mechanicznie. Pomnóż partię przez $k$ i
+zapytaj, co zrobić z $\eta$, żeby ta wielkość się nie ruszyła: $\eta^{2}/B$ ma
+zostać bez zmian, więc $\eta$ rośnie o $\sqrt{k}$.
+
+Sprawdzone przy $k = \val{p21.scale.k}$: reguła pierwiastkowa zostawia
+wariancję aktualizacji dokładnie na $\val{p21.scale.sqrt}$ raza tym, czym była,
+a \textbf{reguła liniowa mnoży ją przez $\val{p21.scale.linear}$}.
+\end{fr}
+
+\begin{fr}
+Jest to niezręczne, bo regułą faktycznie zalecaną jest liniowa.
+
+Zanim pójdziesz dalej \dash{} nie jest to sprzeczność, a powód mieści się w
+jednym słowie. Co utrzymuje stałym reguła liniowa, jeśli nie szum w
+aktualizacji?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Drogę przebytą na \emph{przykład}, a nie na krok. Przy $k$ razy większej partii
+robisz $k$ razy mniej kroków, a $k$ razy większy krok pokonuje tyle samo
+terenu.
+\end{ansblock}
+
+Obie reguły są więc odpowiedziami na dwa różne pytania i obie są dokładnie
+poprawne co do własnego. Reguła pierwiastkowa utrzymuje szum każdej
+aktualizacji, a liniowa utrzymuje postęp na epokę i pozwala szumowi rosnąć.
+
+\begin{warning}
+\textbf{Twierdzenie empiryczne nie jest rozstrzygnięte i ta książka go nie
+rozstrzyga.} Który niezmiennik znaczy więcej, zależy od modelu, etapu treningu
+i optymalizatora, zgłaszane świadectwa dla reguły liniowej przychodzą z
+rozgrzewką i z sufitem, powyżej którego przestaje działać, a spór trwa.
+
+To, co napisano wyżej, jest arytmetyką i obowiązuje niezależnie: to są te dwie
+wielkości, a reguła utrzymuje jedną z nich. Ktokolwiek mówi ci, której użyć,
+stawia twierdzenie empiryczne, i wolno zapytać, na czym się ono opiera.
+\end{warning}
+
+Jest więc trzeci wybór i to on jest robiony bez zastanowienia. Zmniejsz partię
+o połowę i zostaw $\eta$: którą z dwóch wielkości to utrzymuje stałą?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Żadnej.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{\enquote{Zmniejszyłem partię o połowę, więc zostawię krok.}} Jest to
+trzecia reguła i jedyna z trzech, za którą nikt nie argumentuje: pozwala
+szumowi w każdej aktualizacji urosnąć o $\sqrt{2}$ \emph{i} połowi teren
+pokonany na przykład.
+
+Użytecznym nawykiem nie jest zapamiętanie reguły. Jest nim zauważenie, że
+$\eta$ i $B$ występują razem w jednym wyrażeniu, więc zmiana jednego bez
+drugiego jest zmianą wielkości, na którą nie spojrzałeś.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Co ukrywa wygładzona krzywa}
+\label{sec:P21-smoothing}
+\index{średnia bieżąca!a krzywa straty}
+
+\begin{fr}
+Surową krzywą straty złożoną z zaszumionych oszacowań trudno się czyta, więc
+każdy panel treningowy ją wygładza, a wygładzaczem jest wykładnicza średnia
+bieżąca z Programu~\ref{prog:F04}, tyle że ze stratą, a nie z gradientem.
+
+Przy $\beta = \val{p21.ema.beta}$ jej czas połowicznego zaniku wynosi
+$\val{p21.ema.halflife}$ kroków, co jest zatwierdzoną liczbą z F04 i jest
+wobec niej bramkowane. Załóżmy teraz, że strata naprawdę spada, w jednym kroku,
+i zostaje na dole. Co pokazuje wygładzona krzywa?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Połowę spadku po mniej więcej czasie połowicznego zaniku, a resztę przez kilka
+następnych.
+\end{ansblock}
+
+Zmierzone: wygładzona krzywa przecina punkt środkowy $\val{p21.ema.lag}$ kroków
+po zmianie, wobec czasu połowicznego zaniku $\val{p21.ema.halflife}$.
+Opóźnienie \textbf{jest} czasem połowicznego zaniku \dash{} nie jest własnością
+zmiany i nie zależy od tego, jak duży był spadek.
+
+Wygładzanie nie sprawia więc tylko, że krzywa ładniej wygląda. Przesuwa każde
+zdarzenie później o znaną wielkość, a wielkością tą jest liczba, którą wybrałeś,
+ustawiając wygładzanie.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Strata przestała spadać koło kroku 4000.}} Przy wygładzaniu o
+czasie połowicznego zaniku $h$ przestała spadać koło kroku $4000 - h$, a jeśli
+porównujesz dwa przebiegi wygładzone inaczej, porównujesz dwa różne opóźnienia.
+
+Działa to i w drugą stronę: interwencja zdaje się działać późno, więc zasługę
+przypisuje się temu, co przyszło po niej. Czytaj surową krzywą, gdy pytaniem
+jest \emph{kiedy}, a wygładzoną, gdy pytaniem jest \emph{czy}.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Jeden mianownik, dwie odpowiedzi}
+\label{sec:P21-accumulation}
+\index{gradient!akumulacja}
+
+\begin{fr}
+Akumulacja gradientu przepuszcza kilka mikropartii, dodaje ich gradienty i
+robi jeden krok \dash{} tak trenuje się partię większą niż pamięć. Twierdzenie,
+na którym się opiera, mówi, że jest to identyczne z jedną dużą partią.
+
+Program~\ref{prog:F04} już kazał ci spotkać kształt zarzutu. Trzy mikropartie
+zawierają $1000$, $10$ i $500$ prawdziwych tokenów i wracają ze średnimi
+stratami $2$, $8$ i $3$. Ile wynosi średnia strata na
+$\val{p21.acc.tokens}$ tokenach?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p21.acc.pooled}$}
+A tym, co liczy akumulacja, jeśli każda mikropartia już podzieliła przez własną
+liczbę tokenów, jest średnia z $2$, $8$ i $3$ \dash{}
+$\val{p21.acc.accumulated}$, czyli $\val{p21.acc.ratio}$ raza więcej.
+
+\textbf{Różnica nie jest w raporcie. Jest w gradiencie}, bo strata, którą
+uśredniono źle, jest stratą, którą zróżniczkowano. Przebieg optymalizuje cel, w
+którym mikropartia z dziesięcioma tokenami liczy się tyle samo, co ta z
+tysiącem.
+\end{fr}
+
+\begin{fr}
+Rodzi to pytanie, przez które warto poświęcić na to sekcję, a nie ostrzeżenie:
+dlaczego ktokolwiek to wypuszcza?
+
+Policz te same dwie liczby dla trzech mikropartii zawierających po $500$
+tokenów.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Są równe \dash{} dokładnie, na ułamkach.
+\end{ansblock}
+
+\textbf{Dlatego to się ukrywa.} Przy równych liczbach tokenów oba wyrażenia są
+tym samym wyrażeniem, więc test napisany na dopełnionych danych przechodzi,
+mały przebieg z jednorodnymi partiami przechodzi, a wada pojawia się dopiero
+przy nierównych mikropartiach \dash{} czyli na prawdziwym tekście, przy skali,
+w przebiegu, który się liczy.
+
+Jest to \enquote{bezpieczne dla danych, których nie próbowałeś} z
+Programu~\ref{prog:P02} po raz trzeci w tej książce, i tożsamość rozgłaszania z
+Programu~\ref{prog:P07} po raz drugi: wada niewidoczna na danych testowych i
+rozstrzygająca na korpusie.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Akumulacja po czterech mikropartiach to partia czterokrotnie
+większa.}} Tylko wtedy, gdy cztery zawierają tyle samo prawdziwych tokenów. W
+przeciwnym razie jest to średnia ze średnich tam, gdzie chciano średniej z
+puli, i dzieje się po cichu: żadnego błędu, żadnego ostrzeżenia i krzywa straty
+wyglądająca zupełnie normalnie, bo jest krzywą innego celu.
+
+Naprawą jest ta, którą podaje Program~\ref{prog:F04} \dash{} nieś licznik i
+mianownik osobno i podziel raz, na końcu \dash{} a testem ten, który ta sekcja
+podpowiada: uruchom przypadek z celowo nierównymi mikropartiami i porównaj
+gradient akumulowany z gradientem dużej partii.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Dwa sposoby przez rzut monetą}
+\label{sec:P21-estimators}
+\index{gradient!estymator funkcji wynikowej}
+\index{gradient!reparametryzacja}
+
+\begin{fr}
+Wszystko do tej pory dotyczyło szumu, którego nie chciałeś. Ta sekcja dotyczy
+losowości będącej częścią modelu: kroku losowania \emph{wewnątrz} tego, co jest
+różniczkowane.
+
+Nie jest to nic egzotycznego. Polityka losuje akcję, model wariacyjny losuje
+zmienną ukrytą, dekoder losuje token. W każdym przypadku wielkością do
+maksymalizacji jest średnia po tym, co może zostać wylosowane, i chce się jej
+gradientu.
+
+Powiedz, co czyni to trudnym.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Krok losowania nie ma pochodnej. Nie da się zróżniczkować \enquote{losowania}.
+\end{ansblock}
+
+Są na to dwa sposoby i różnią się całkowicie charakterem. Ta sekcja nie
+wyprowadza żadnego z nich \dash{} oba to wiersz algebry, który Programy
+\ref{prog:P24} i \ref{prog:P26} podadzą lepiej \dash{} i robi zamiast tego to,
+co ta książka potrafi: mierzy, co je dzieli.
+
+\mermaidfig{p21-two-estimators}{Dwie drogi i koszt wyboru.}{dwie drogi przez
+losowanie}
+\end{fr}
+
+\begin{fr}
+\textbf{Estymator funkcji wynikowej}, czyli to, czym jest gradient polityki:
+pomnóż uzyskaną wartość przez pochodną logarytmu prawdopodobieństwa jej
+uzyskania. Potrzebuje \emph{wartości} funkcji i niczego więcej \dash{} funkcja
+może być czarną skrzynką, symulatorem, oceną człowieka.
+
+\textbf{Sztuczka z reparametryzacją}, czyli to, czego używa autoenkoder
+wariacyjny: zapisz losowanie jako ustaloną liczbę losową przepuszczoną przez
+różniczkowalną funkcję parametrów i zróżniczkuj wprost przez nią. Potrzebuje
+różniczkowalnej drogi od parametru do wartości.
+
+Oba są nieobciążone. Powiedz, co zostaje do wyboru między nimi.
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Czy droga w ogóle istnieje \dash{} a gdy istnieje, \textbf{wariancja}.
+\end{ansblock}
+
+Zmierzone na jednym zadaniu, gdzie oba działają, przy
+$\val{p21.grad.samples}$ próbkach i prawdziwym gradiencie
+$\val{p21.grad.true}$:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+wymiar & funkcja wynikowa & reparametryzacja \\
+\midrule
+$\val{p21.grad.d.lo}$ & $\val{p21.grad.score.lo}$ & $\val{p21.grad.repar}$ \\
+$\val{p21.grad.d.hi}$ & $\val{p21.grad.score.hi}$ & $\val{p21.grad.repar}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Przeczytaj najpierw prawą kolumnę. Co ona zrobiła?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nic. Wariancja estymatora reparametryzowanego jest taka sama przy
+$\val{p21.grad.d.hi}$ wymiarach jak przy $\val{p21.grad.d.lo}$.
+\end{ansblock}
+
+Dokładnie taka sama i nie przez przypadek: estymator jednej składowej jest
+funkcją tej składowej i niczego więcej, więc pozostałe $99$ wymiarów do niego
+nie wchodzi. Skrypt sprawdza to przy każdym wymiarze.
+
+Wariancja estymatora funkcji wynikowej idzie tymczasem z
+$\val{p21.grad.score.lo}$ do $\val{p21.grad.score.hi}$, czyli o czynnik
+$\val{p21.grad.ratio.hi}$ przy $\val{p21.grad.d.hi}$ wymiarach \dash{} bo mnoży
+przez wartość \emph{całej} funkcji, a cała funkcja rośnie z wymiarem.
+\end{fr}
+
+\begin{fr}
+Teraz konsekwencja, czyli zdanie, dla którego istnieje ta sekcja. Oba
+estymatory są nieobciążone. Po $\val{p21.grad.samples}$ próbkach przy
+$\val{p21.grad.d.hi}$ wymiarach oszacowanie reparametryzowane jest o
+$\val{p21.grad.off.repar}$ procent od prawdziwej wartości.
+
+O ile odbiega oszacowanie funkcji wynikowej?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p21.grad.off.score}$ procent}
+$\val{p21.grad.score.est}$ wobec prawdziwego $\val{p21.grad.true}$, po
+czterdziestu tysiącach próbek, z estymatora, który jest średnio dokładnie
+poprawny.
+
+\textbf{Nieobciążony to nie to samo, co użyteczny.} To cała rozwidlenie: model
+wariacyjny ma różniczkowalną drogę i z niej korzysta, a metoda gradientu
+polityki jej nie ma i za to płaci \dash{} dlatego literatura o gradientach
+polityki jest w dużej mierze literaturą o redukcji wariancji, a literatura o
+autoenkoderach wariacyjnych nie.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Oba estymatory są nieobciążone, więc są wymienne.}} Szacują tę
+samą wielkość i nie są wymienne, bo estymatora używa się skończenie wiele razy.
+Istotnym porównaniem nie jest to, czy średnia jest poprawna, lecz jak daleko od
+niej zostawia cię realistyczna liczba próbek, a to wyznacza wariancja.
+
+Jest to to samo rozróżnienie, co w sekcji 1, na drugim końcu programu: tam
+nieobciążoność nie mówiła nic o jednej partii, tutaj nie mówi nic o jednym
+przebiegu.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+To zamyka program i warto powiedzieć, co obowiązywało przez cały czas.
+
+Każde zażalenie, którym ten program się zajął \dash{} zaszumiona krzywa,
+ogromny krok, krok, który się nie przeniósł, wygładzona krzywa kłamiąca o tym,
+kiedy, akumulowana partia, która nią nie była, estymator, który nie chciał
+zbiec \dash{} było stwierdzeniem o \emph{wariancji} i żadne nie było
+stwierdzeniem o modelu.
+
+Warto to nieść, bo odruchem w każdym z tych przypadków jest spojrzeć na model.
+Nawykiem, dla którego istnieje ten program, jest zapytać najpierw, jaka wielkość
+jest szacowana, z ilu próbek i z jakim rozrzutem \dash{} a odpowiedzią jest
+zwykle dwuwierszowa arytmetyka, której nikt nie zapisał.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--2}{Gradient z partii jest \textbf{oszacowaniem} gradientu, którego
+  chciałeś. Szum jest metodą, a nie wadą w niej.}
+\sumitem{3--4}{\emph{Nieobciążoność} znaczy, że średnia po każdej partii, jaka
+  mogła zostać wylosowana, jest dokładna \dash{} udowodnione tu na wszystkich
+  $\val{p21.pop.subsets}$ z nich, na ułamkach, co jest dowodem dla tej
+  populacji, a nie świadectwem o niej.}
+\sumitem{5--6}{Nie mówi nic o jednym losowaniu: średnie z partii biegną od
+  $\val{p21.pop.lo}$ do $\val{p21.pop.hi}$ wokół $\val{p21.pop.mean}$, a jedna
+  z nich ma zły znak.}
+\sumitem{7}{Zależność w przód jest zadeklarowana: sama wariancja należy do
+  Programu~\ref{prog:P24}, a koncentracja do Programu~\ref{prog:P25}, dwie
+  części później, i P25 wraca do szumu z partii, gdy maszyneria już istnieje.}
+\sumitem{8--9}{Wariancja średniej z partii spada jak $1/B$, zmierzone z
+  dokładnością do $\val{p21.noise.tol}$ procent dla $B$ od
+  $\val{p21.noise.b.lo}$ do $\val{p21.noise.b.hi}$.}
+\sumitem{10--11}{\textbf{Rozrzut spada jak $1/\sqrt{B}$}, więc
+  $\val{p21.noise.b16}$ razy większa partia kupuje $\val{p21.noise.spread16}$
+  razy mniej szumu. Ten pierwiastek jest całością \enquote{malejących zysków} i
+  jest dokładny, a nie przybliżony.}
+\sumitem{12}{Rozrzut kroku to $\eta$ razy rozrzut oszacowania, więc $\eta$ i
+  $B$ to dwie liczby opisujące jedną wielkość.}
+\sumitem{13--14}{Ogromny krok zdarza się, bo średnia z partii ma rozrzut. Nic
+  nie jest nie tak z modelem, danymi ani optymalizatorem, gdy się zdarza.}
+\sumitem{15--17}{Próg obcinania to decyzja o rozkładzie: na połowie typowego
+  rozmiaru obcina $\val{p21.clip.half}$ procent kroków, a na czterokrotności
+  $\val{p21.clip.four.n}$ z $\val{p21.clip.trials}$. \textbf{Pierwszy jest
+  innym algorytmem}, podążającym za kierunkiem i odrzucającym długość, a
+  bezpieczny próg to ten, który prawie nigdy nie działa.}
+\sumitem{18--19}{Wariancja aktualizacji to $\eta^{2}\sigma^{2}/B$, co
+  rozstrzyga pytanie o skalowanie mechanicznie.}
+\sumitem{20--21}{Skalowanie $\eta$ przez $\sqrt{k}$ utrzymuje tę wariancję
+  \textbf{dokładnie} stałą; skalowanie przez $k$ mnoży ją przez
+  $\val{p21.scale.linear}$ i utrzymuje zamiast tego teren pokonany na przykład.
+  Dwie reguły, dwa niezmienniki, a pytanie empiryczne nie jest tu
+  rozstrzygnięte.}
+\sumitem{22}{Zostawienie $\eta$ przy zmianie $B$ nie utrzymuje żadnej z nich
+  stałej, i dlatego jest jedynym wyborem, za którym nikt nie argumentuje.}
+\sumitem{23--24}{Wygładzona krzywa straty opóźnia się o swój czas połowicznego
+  zaniku: $\val{p21.ema.lag}$ kroków zmierzone wobec $\val{p21.ema.halflife}$
+  zatwierdzonego przez Program~\ref{prog:F04}. Opóźnienie nie zależy od
+  wielkości zmiany.}
+\sumitem{25}{Czytaj surową krzywą, gdy pytaniem jest \emph{kiedy}, a wygładzoną,
+  gdy jest nim \emph{czy}.}
+\sumitem{26--27}{Akumulacja mikropartii o różnych liczbach tokenów daje
+  $\val{p21.acc.accumulated}$ tam, gdzie duża partia daje
+  $\val{p21.acc.pooled}$ \dash{} i jest to \textbf{gradient}, a nie raport, bo
+  strata uśredniona źle jest stratą zróżniczkowaną.}
+\sumitem{28--30}{Przy równych liczbach tokenów oba są identyczne na ułamkach, i
+  dokładnie dlatego to wychodzi na produkcję: jest niewidoczne na dopełnionych
+  danych i rozstrzygające na prawdziwym tekście.}
+\sumitem{31--33}{Krok losowania nie ma pochodnej, a są dwa sposoby, by go
+  obejść: funkcja wynikowa, która potrzebuje samej wartości, i
+  reparametryzacja, która potrzebuje różniczkowalnej drogi.}
+\sumitem{34--35}{Oba są nieobciążone. Wariancja estymatora reparametryzowanego
+  to $\val{p21.grad.repar}$ przy \emph{każdym} wymiarze; funkcji wynikowej
+  dochodzi do $\val{p21.grad.score.hi}$, o czynnik $\val{p21.grad.ratio.hi}$.}
+\sumitem{36--38}{Po $\val{p21.grad.samples}$ próbkach oszacowanie funkcji
+  wynikowej wciąż odbiega o $\val{p21.grad.off.score}$ procent.
+  \textbf{Nieobciążony to nie to samo, co użyteczny}, i to jest rozwidlenie
+  między modelem wariacyjnym a gradientem polityki.}
+\sumitem{39}{Każde zażalenie w tym programie było stwierdzeniem o
+  \textbf{wariancji} i żadne nie było stwierdzeniem o modelu.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Partia o rozmiarze $32$ daje oszacowania gradientu o rozrzucie
+  $\num{0.40}$. Jaki rozmiar partii połowiłby ten rozrzut i ile to kosztuje?
+  \answerto{$128$. Rozrzut spada jak $1/\sqrt{B}$, więc jego połowienie
+  wymaga czterokrotnie większej partii \dash{} i czterokrotnie więcej obliczeń
+  na krok.}
+\item Przebieg przy partii $256$ używa $\eta = \num{3e-4}$. Przechodzisz na
+  partię $1024$. Ile wynosi $\eta$ według reguły liniowej, a ile według
+  pierwiastkowej?
+  \answerto{$k = 4$, więc liniowa daje $\num{1.2e-3}$, a pierwiastkowa
+  $\num{6e-4}$. Pierwsza utrzymuje stały teren pokonany na przykład i mnoży
+  szum każdej aktualizacji przez $4$; druga utrzymuje ten szum dokładnie
+  stały.}
+\item Panel wygładza stratę przy $\beta = \num{0.98}$. Zmiana została
+  wprowadzona w kroku $1000$. Mniej więcej kiedy wygładzona krzywa pokaże
+  połowę jej efektu?
+  \answerto{Około kroku $1034$. Czas połowicznego zaniku to
+  $\ln(\num{0.5})/\ln(\num{0.98}) \approx 34$ kroków, a opóźnienie jest tym
+  czasem niezależnie od wielkości zmiany.}
+\item Dwie mikropartie zawierają $600$ i $200$ prawdziwych tokenów ze średnimi
+  stratami $\num{1.5}$ i $\num{3.5}$. Co zgłasza akumulacja, a co powinna?
+  \answerto{Akumulacja zgłasza średnią ze średnich, $\num{2.5}$. Średnia z puli
+  to $(600 \times \num{1.5} + 200 \times \num{3.5})/800 = \num{2.0}$. Gradient
+  jest błędny o ten sam stosunek, nie tylko liczba na ekranie.}
+\item Trenujesz model, którego wyjście trafia do nieróżniczkowalnego oceniacza.
+  Który z dwóch estymatorów jest dostępny i czego się spodziewać?
+  \answerto{Tylko estymator funkcji wynikowej, bo nie ma różniczkowalnej drogi
+  przez oceniacz. Spodziewaj się gradientu o dużej wariancji i spodziewaj się
+  wysiłku włożonego w redukcję wariancji \dash{} do tego właśnie służą wartości
+  bazowe i oszacowania przewagi.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że jeśli $\hat g$ jest średnią z $B$ niezależnych losowań o
+  wariancji $\sigma^{2}$, to $\Var(\hat g) = \sigma^{2}/B$, i powiedz, które
+  słowo w tym zdaniu wykonuje pracę.
+  \answerto{Wariancja sumy niezależnych wielkości jest sumą ich wariancji, więc
+  suma $B$ losowań ma wariancję $B\sigma^{2}$; dzielenie przez $B$ dzieli
+  wariancję przez $B^{2}$, zostawiając $\sigma^{2}/B$. Pracę wykonuje słowo
+  \emph{niezależnych}: losowania skorelowane tego nie spełniają, i dlatego
+  losowanie partii z posortowanego albo poklastrowanego zbioru łamie model
+  szumu, a nie jest tylko niechlujne.}
+\item Zapisz, co utrzymuje stałym każda z dwóch reguł skalowania, jako
+  wyrażenie, i powiedz, co utrzymuje stałym trzeci częsty wybór \dash{}
+  zostawienie $\eta$.
+  \answerto{Skalowanie pierwiastkowe utrzymuje stałe $\eta^{2}/B$, czyli
+  wariancję jednej aktualizacji. Skalowanie liniowe utrzymuje stały teren
+  pokonany na przykład, bo $k$ razy większa partia oznacza $k$ razy mniej
+  kroków. Zostawienie $\eta$ nie utrzymuje stałego żadnego z nich: wariancja
+  aktualizacji zmienia się o $1/k$, a teren na przykład również o $1/k$, i
+  dlatego jest to wybór, za którym nikt nie argumentuje, a nie trzecia reguła.}
+\item Kolega zgłasza, że obcinanie \enquote{nic nie robi}, bo jego usunięcie
+  prawie nie zmienia krzywej straty. Jaki pomiar rozstrzygnąłby, czy to prawda,
+  i co znaczyłaby każda odpowiedź?
+  \answerto{Zaloguj ułamek kroków, które są obcinane. Jeśli jest bliski zeru,
+  obcinanie faktycznie nic nie robi w tym przebiegu, a próg spełnia swoją rolę
+  zabezpieczenia. Jeśli jest duży, obcinanie działa na większości kroków,
+  optymalizator podąża za kierunkiem gradientu z ręcznie ustaloną długością, a
+  \enquote{usunięcie prawie nic nie zmienia} znaczy, że w długościach było mało
+  informacji \dash{} co jest odkryciem o wiele ciekawszym i zupełnie innym.}
+\item Wariancja estymatora reparametryzowanego nie zmieniła się między jednym a
+  stu wymiarami. Wyjaśnij dlaczego i powiedz, co by to zepsuło.
+  \answerto{Estymator jednej składowej parametru jest funkcją losowania tej
+  składowej i niczego więcej, więc pozostałe wymiary nigdy do niego nie
+  wchodzą. Zepsułoby to sprzężenie składowych przez uśrednianą funkcję w taki
+  sposób, że pochodna po jednej zależałaby od wszystkich \dash{} co jest
+  częste, i dlatego ta płaskość jest własnością tego przykładu, a nie ogólnym
+  prawem. Ogólny jest kontrast: estymator funkcji wynikowej mnoży przez wartość
+  całej funkcji, więc podchwytuje wymiar niezależnie od tego, jaka to funkcja.}
+\item Oba estymatory są nieobciążone, a jeden z nich jest bezużyteczny przy stu
+  wymiarach. Pogódź te dwa zdania w jednym zdaniu i nazwij wielkość, która je
+  godzi.
+  \answerto{Nieobciążoność jest stwierdzeniem o granicy nieskończenie wielu
+  próbek, a estymatora używa się skończenie wiele razy, więc o użyteczności
+  rozstrzyga \emph{wariancja} \dash{} to ona wyznacza, jak daleko realistyczna
+  próba zostawia cię od wartości, którą dałaby granica.}
+\end{furtherproblems}
