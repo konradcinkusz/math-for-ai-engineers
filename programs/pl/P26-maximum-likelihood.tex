@@ -1,27 +1,1110 @@
-%% P26 --- Estymacja i metoda największej wiarogodności
+%% P26 --- Estymacja i metoda najwiekszej wiarogodnosci
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Blizniak: programs/en/P26-maximum-likelihood.tex. Ramka w ramke, makro w
+%% makro, liczba w liczbe; tools/parity.py porownuje oba pliki. Kazda liczba
+%% pochodzi z code/p26_maximum_likelihood.py.
+%%
+%% UWAGI DLA TLUMACZA, z regul zapisanych w CLAUDE.md:
+%%   * cyfra zostaje cyfra ORAZ slowo zostaje slowem -- P25 zlapal ten blad
+%%     w druga strone: polski napisal $2$ i $4$ tam, gdzie angielski pisze
+%%     "two" i "four", i C4, C8 oraz C12 odpalily naraz;
+%%   * odwolanie prowadzi, a nie idzie za matematyka;
+%%   * gdzie angielski pisze skrot, polski tez musi;
+%%   * terminy ML zostaja angielskie i odmieniaja sie po polsku.
 
-\program{Estymacja i metoda największej wiarogodności}
+\program[Estymacja i wiarogodność]{Estymacja i metoda największej
+wiarogodności}
 \label{prog:P26}
+\index{estymator}
+\index{największa wiarogodność}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{nazwać dwa sposoby, na jakie estymator może być zły, i
+  rozłożyć na nie błąd średniokwadratowy}
+\outcome{10--17}{powiedzieć, co poprawia $n-1$, a czego nie poprawia}
+\outcome{18--23}{zapisać wiarogodność i znaleźć parametr, który ją
+  maksymalizuje}
+\outcome{25--33}{wyprowadzić stratę treningową modelu językowego z
+  prawdopodobieństwa jego danych}
+\outcome{34--39}{odczytać weight decay jako stwierdzenie o tym, jak duże
+  według ciebie są wagi}
+\outcome{41--46}{zapisać score i użyć go do różniczkowania przez losowanie}
+\end{outcomes}
 
-Argument: an estimator is a function of the sample; bias and variance are
-two different ways of being wrong; maximum likelihood picks the parameter
-that makes the observed data least surprising. Payoff: **training a language
-model is maximum likelihood**, and the cross-entropy loss is the negative
-log-likelihood of the observed tokens \dash{} one derivation that reframes
-the entire training objective, and from which label smoothing, class
-weighting and the \code{n-1} in a sample variance all fall out. MAP as
-maximum likelihood with a prior, which is exactly weight decay with a
-Gaussian prior \dash{} the cleanest available statement of what
-regularisation *is*.
+\begin{quiz}
+\item Estymator jest nieobciążony. Podaj coś, co i tak czyni go bezużytecznym.
+  \teachesat{1--2}
+  \answerto{Wariancja. Nieobciążoność mówi, że zbiór ocen jest wyśrodkowany
+  na prawdzie; nie mówi nic o tym, jak daleko od niej leży którakolwiek z
+  nich, a to są dwie osobne osie.}
+\item Wariancja z próby dzieli przez $n-1$, a nie przez $n$. Co dokładnie to
+  naprawia? \teachesat{11--12}
+  \answerto{Jedno obciążenie, dokładnie: wersja z mianownikiem $n$ daje
+  średnio $\frac{n-1}{n}$ wariancji populacji, a dzielenie przez $n-1$
+  sprawia, że średnia wychodzi dokładnie taka, jaka być powinna.}
+\item A czy pierwiastek z tej poprawionej wariancji jest nieobciążoną oceną
+  odchylenia standardowego? \teachesat{13--14}
+  \answerto{Nie. Pierwiastek jest wklęsły, więc z nierówności Jensena jego
+  średnia leży poniżej pierwiastka ze średniej \dash{} poprawione odchylenie
+  standardowe z próby zaniża, a \code{ddof=1} tego nie naprawia.}
+\item Model przypisuje prawdopodobieństwa tokenom, które zobaczył. Co robi z
+  tymi prawdopodobieństwami trenowanie go na minimalizację entropii
+  krzyżowej? \teachesat{26--27}
+  \answerto{Maksymalizuje ich iloczyn. Entropia krzyżowa wobec celu one-hot
+  jest ujemnym logarytmem wiarogodności zaobserwowanych tokenów podzielonym
+  przez ich liczbę, więc jej minimalizacja to metoda największej
+  wiarogodności i nic więcej.}
+\item Dodajesz weight decay o sile $\lambda$. Powiedz, co to mówi o wagach, a
+  nie co im robi. \teachesat{37--38}
+  \answerto{Że według ciebie są gaussowskie wokół zera o pewnej szerokości.
+  Kara jest logarytmem rozkładu a priori, a szerokość ustala $\lambda$.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 55 ramek.
-}
+% ============================================================
+\section{Dwa sposoby bycia w błędzie}
+\label{sec:P26-two-ways}
+\index{estymator!obciążenie i wariancja}
+\index{pomiar!błąd średniokwadratowy}
+
+\begin{fr}
+Program~\ref{prog:P21} rozebrał gradient z paczki i ustalił o nim jedną
+rzecz: uśredniony po każdej paczce, jaka mogła zostać wylosowana, jest tym
+gradientem, o który ci chodziło. To znaczy \emph{nieobciążony} i program
+dowiódł tego dokładnie, a nie przez pokaz.
+
+Potem jego własna ramka o pułapce powiedziała, że nieobciążoność nie
+wystarcza. Ten program jest o tym, czego nie wystarcza.
+
+Zanim pójdziesz dalej: ocena jest nieobciążona. Podaj drugi sposób, na jaki
+i tak może być zła.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Może być rozrzucona na wszystkie strony. Nieobciążoność jest stwierdzeniem o
+\emph{zbiorze} ocen i nie mówi nic o żadnej pojedynczej.
+\end{ansblock}
+
+Są więc dwie osie i są od siebie niezależne.
+
+\textbf{Obciążenie} to odległość średniej oceny od prawdy.
+\textbf{Wariancja} to odległość ocen od ich własnej średniej. Estymator może
+być zły na jeden z tych sposobów, na oba albo \dash{} pewnym kosztem \dash{}
+na jeden, żeby kupić drugi.
+
+Wszystko w tej sekcji jest dokładne. Weź populację
+$\val{p26.pop.n}$ liczb $1$, $2$, $3$, $6$, losuj
+$\val{p26.draw.n}$ niezależnie, a możliwych prób jest $\val{p26.samples}$;
+skrypt wylicza je wszystkie po kolei nad ułamkami i nie ma w tym nigdzie
+żadnej tolerancji.
+
+Średnia populacji to $\val{p26.pop.mean}$, a jej wariancja to
+$\val{p26.pop.var}$. Jakie są obciążenie i wariancja średniej z próby?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Obciążenie $0$, wariancja $\val{p26.var.unbiased}$}
+
+Nieobciążona, co jest wynikiem Programu~\ref{prog:P21} na tej populacji, i
+wariancja $\sigma^{2}/n$, co jest tempem Programu~\ref{prog:P25}. Nic tu
+nowego; to punkt odniesienia, względem którego mierzy się reszta sekcji.
+
+Teraz zmień estymator. Zamiast średniej z próby $\bar{x}$ weź
+$c\,\bar{x}$ dla ustalonego $c$ między $0$ a $1$ \dash{} ta sama ocena,
+przyciągnięta ku zeru.
+
+Powiedz, co to robi z każdą z dwóch osi.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wprowadza obciążenie i mnoży wariancję przez $c^{2}$.
+\end{ansblock}
+
+Obciążenie wynosi $(c-1)\mu$, bo średnia ocena to teraz $c\mu$, a nie $\mu$.
+Wariancja niesie kwadrat, bo Program~\ref{prog:P24} podaje
+$\Var(cX) = c^{2}\Var(X)$.
+
+Przyciąganie wymienia więc jedną oś na drugą i oczywiste pytanie brzmi, czy
+ta wymiana kiedykolwiek się opłaca. Żeby je w ogóle zadać, potrzebujesz
+jednej liczby, do której wchodzą obie osie.
+
+Co byś zmierzył?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Średnią kwadratową odległość od prawdy \dash{} \textbf{błąd
+średniokwadratowy}.
+\end{ansblock}
+
+I on się rozkłada, dokładnie:
+\[ \mathrm{MSE} \;=\; \Ex\bigl[(\hat\theta - \theta)^{2}\bigr]
+   \;=\; \text{obciążenie}^{2} + \Var(\hat\theta) \]
+
+Skrypt sprawdza to jako tożsamość przy dwudziestu jeden przyciąganiach, a nie
+przy jednej wygodnej wartości, nad ułamkami \dash{} więc jest to fakt o
+estymatorze, a nie arytmetyczny przypadek.
+
+Kwadrat odległości robi w tym zdaniu robotę i warto powiedzieć dlaczego.
+Średni błąd bezwzględny nie rozkłada się wcale: nie ma tożsamości, która
+rozdzieliłaby go na część o środku i część o rozrzucie. To podniesienie do
+kwadratu sprawia, że obie osie się dodają, zamiast oddziaływać, i z tego
+samego powodu Program~\ref{prog:P24} trzyma wariancję, a nie średnią
+odległość; dlatego właśnie to ta strata, a nie inna, ma rozkład, o którym da
+się mówić.
+
+Przeczytaj to, zanim przewrócisz stronę: czy $c = 1$ \dash{} wybór
+nieobciążony \dash{} minimalizuje ten błąd?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Na tej populacji najlepsze $c$ to $\val{p26.shrink.c}$.
+\end{ansblock}
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+& $c = 1$ & $c = \val{p26.shrink.c}$ \\
+\midrule
+obciążenie & $0$ & $\val{p26.shrink.bias}$ \\
+wariancja & $\val{p26.var.unbiased}$ & $\val{p26.shrink.var}$ \\
+błąd średniokwadratowy & $\val{p26.mse.unbiased}$ & $\val{p26.mse.shrunk}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Celowo obciążony estymator jest bliżej prawdy}, o
+$\val{p26.shrink.gain.pct}$ procent błędu średniokwadratowego, a obie kolumny
+sumują się do własnego dolnego wiersza co do wydrukowanej cyfry.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Nieobciążoność to jest to, o co chodzi.}}
+
+Nieobciążoność jest jedną z dwóch osi i tą, którą łatwo sprawdzić, dlatego
+jest cytowana. Nie jest tą, która mówi, jak daleko twoja odpowiedź leży od
+prawdy. Nieobciążony estymator o dużej wariancji jest gorszy, według każdej
+miary, na jakiej praktykowi zależy, od lekko obciążonego, który stoi
+spokojnie.
+
+Podejrzliwość należy się słowu \emph{najlepszy}. Najlepszy w czym? Nic nie
+jest najlepsze, dopóki nie nazwano straty, a \enquote{nieobciążony} nie jest
+stratą.
+\end{trapbox}
+
+Jedno uczciwe zastrzeżenie, bo to ono nie pozwala z tego zrobić przepisu:
+optymalne $c$ powyżej zależy od $\mu$, czyli od tej wielkości, którą się
+szacuje. Nie da się go policzyć.
+
+Co jest więc warte to spostrzeżenie, skoro najlepsze przyciąganie jest
+niedostępne?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+To, że obciążenie wprowadzone celowo bywa dobrą wymianą \dash{} czym jest
+każda regularyzacja w tej książce.
+\end{ansblock}
+
+Jedną już spotkałeś. Program~\ref{prog:P20} podaje weight decay, które
+przyciąga każdy parametr ku zeru, obciążając każdy z nich, i używa się go
+dlatego, że wariancja, którą usuwa, jest warta więcej niż obciążenie, które
+dodaje.
+
+To ta sama wymiana co w tabeli powyżej, na modelu zamiast na średniej, a
+\S\ref{sec:P26-prior} mówi dokładnie, czym jest w niej $\lambda$.
+\end{fr}
+
+\begin{fr}
+\mermaidfig{p26-two-axes}{Dwie osie i jedna liczba, która je
+dodaje.}{obciazenie, wariancja, blad}
+
+Dwa sposoby bycia w błędzie i strata, która je waży. Reszta programu jest o
+tym, skąd w ogóle bierze się estymator.
+\end{fr}
+
+% ============================================================
+\section{$n-1$ i to, czego ono nie naprawia}
+\label{sec:P26-n-minus-one}
+\index{estymator!poprawka n-1}
+\index{wariancja!z próby}
+
+\begin{fr}
+Najsłynniejsze obciążenie w statystyce i takie, którego prawie nikt nie umie
+wyjaśnić.
+
+Wariancja z próby dzieli przez $n-1$, a nie przez $n$. Każda biblioteka ma na
+to flagę i każdy kurs to podaje. Zanim pójdziesz dalej, powiedz, co idzie
+źle, gdy podzielisz przez $n$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wychodzi za mała, i to nie czasem \dash{} średnio, za każdym razem.
+\end{ansblock}
+
+Powód to jedno zdanie i warto je mieć, a nie pamiętać. Wariancja z próby
+mierzy rozrzut wokół średniej \emph{z próby}, a średnia z próby jest
+dopasowana do tej właśnie próby, więc leży bliżej danych niż prawdziwa
+średnia. Odległości mierzone od niej są zatem za krótkie.
+
+Zauważ, od czego ten argument nie zależy. Nie mówi nic o tym, które liczby
+zostały wylosowane, a tylko o tym, jak zbudowano estymator, więc niedobór
+jest własnością przepisu, a nie twoich danych. Dlatego poprawka może być
+stałym czynnikiem stosowanym raz, a nie czymś szacowanym obok wszystkiego
+innego.
+
+To jest obciążenie, więc ma swój rozmiar. Zgadnij czynnik, zanim przewrócisz
+stronę.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dokładnie $\frac{n-1}{n}$}
+
+Nie w przybliżeniu i nie tylko dla dużych $n$. Wyliczone po każdej próbie
+przy $n = 2$, $3$, $4$ i $5$ na populacji z
+\S\ref{sec:P26-two-ways}, nad ułamkami:
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+wariancja populacji & $\val{p26.pop.var}$ \\
+średnia wariancji z próby z mianownikiem $n$ &
+  $\val{p26.var.n.expected}$ \\
+średnia wariancji z próby z mianownikiem $(n-1)$ &
+  $\val{p26.var.n1.expected}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Przy $n = \val{p26.draw.n}$ naiwna wersja jest za mała o
+$\val{p26.var.understate.pct}$ procent, bo $\frac{n-1}{n}$ wynosi tam połowę.
+Dzielenie przez $n-1$ sprawia, że średnia wychodzi dokładnie taka, jaka
+powinna, i na tym polega całość tego, co ta poprawka poprawia.
+
+To jest więc załatwione. Teraz pytanie, do którego zachęca nazwa flagi: czy
+pierwiastek z poprawionej wariancji jest nieobciążoną oceną odchylenia
+standardowego?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie, i to bardziej, niż byś się spodziewał.
+\end{ansblock}
+
+Ta sama populacja, to samo wyliczenie, poprawione odchylenie standardowe z
+próby uśrednione po każdej próbie:
+
+\begin{center}
+\begin{tabular}{rrr}
+\toprule
+$n$ & średnie poprawione $s$ & za małe o \\
+\midrule
+$2$ & $\val{p26.sd.mean.2}$ & $\val{p26.sd.short.2}\%$ \\
+$3$ & $\val{p26.sd.mean.3}$ & $\val{p26.sd.short.3}\%$ \\
+$5$ & $\val{p26.sd.mean.5}$ & $\val{p26.sd.short.5}\%$ \\
+$10$ & $\val{p26.sd.mean.10}$ & $\val{p26.sd.short.10}\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Odchylenie standardowe populacji wynosi $\val{p26.pop.sd}$. Przy $n = 2$
+poprawiona ocena jest za mała o niemal jedną czwartą.
+
+Program~\ref{prog:P19} podaje powód w jednym wierszu. Powiedz, w którym.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nierówność Jensena, dla funkcji \textbf{wklęsłej}.
+\end{ansblock}
+
+Pierwiastek jest wklęsły, a Program~\ref{prog:P19} podaje przypadek wklęsły w
+tylu właśnie słowach: funkcja średniej jest co najmniej średnią funkcji, więc
+\[ \Ex\bigl[\sqrt{s^{2}}\bigr] \;\le\; \sqrt{\Ex[s^{2}]} \;=\; \sigma \]
+
+Nieobciążona ocena wielkości nie przeżywa nałożenia na nią funkcji
+nieliniowej. \textbf{Poprawienie wariancji nie może poprawić odchylenia
+standardowego, bo poprawka i pierwiastek nie są przemienne.}
+
+A przypadek równości z Programu~\ref{prog:P19} mówi, kiedy luka się domyka:
+tylko wtedy, gdy wariancja z próby jest ta sama dla każdej próby, a nie jest.
+Rozbieżność powyżej maleje z $n$ z tego samego powodu \dash{} oceny mniej się
+rozrzucają.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{\code{ddof=1} daje mi nieobciążone odchylenie standardowe.}}
+
+Daje nieobciążoną \emph{wariancję}. Żadna biblioteka nie daje nieobciążonego
+odchylenia standardowego, bo poprawka zależy od rozkładu i nie ma na nią
+flagi.
+
+Wart wiedzy, a nie pedanterii, czyni to rozmiar. Przy pięciu przebiegach
+eksperymentu \dash{} a to właśnie od tylu ludzie raportują odchylenie
+standardowe \dash{} liczba jest za mała o jakieś
+$\val{p26.sd.short.5}$ procent, i to za mała w tę stronę, która sprawia, że
+wyniki wyglądają na powtarzalniejsze, niż są.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+\transcript{p26-still-short}
+
+Dwa porównania. Pierwsze mówi, że poprawiona wariancja jest dobra, a naiwna
+nie; drugie drukuje poprawione odchylenie standardowe obok tego z populacji.
+\end{fr}
+
+\begin{fr}
+Co więc należy z tym zrobić?
+
+Nic dramatycznego, a uczciwa odpowiedź ma trzy części. Podawaj wariancję,
+skoro czytelnik może sam wyciągnąć pierwiastek, bo to wariancja jest tą
+wielkością, która się dodaje, i to dlatego ta książka ją trzyma. Znaj rozmiar
+obciążenia przy tym $n$, które masz. I traktuj odchylenie standardowe z
+kilku przebiegów jako przybliżoną liczbę, którą ono jest.
+
+Nic z tego nie wymaga czynnika poprawkowego, a sięgnięcie po niego jest
+sposobem, w jaki przemyca się założenie o rozkładzie.
+\end{fr}
+
+% ============================================================
+\section{Parametr, przy którym dane najmniej zaskakują}
+\label{sec:P26-mle}
+\index{największa wiarogodność!definicja}
+\index{wiarogodność!jako funkcja parametru}
+
+\begin{fr}
+Obie dotychczasowe sekcje brały estymator jako dany i pytały, jak bardzo jest
+zły. Teraz pytanie leżące pod spodem: skąd w ogóle bierze się estymator?
+
+Masz dane i rodzinę rozkładów indeksowaną parametrem. Powiedz, co czyniłoby
+jedną wartość tego parametru lepszą od innej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+To, że czyni bardziej prawdopodobnymi te dane, które naprawdę zobaczyłeś.
+\end{ansblock}
+
+Na tym polega cały pomysł i jest to reguła zamiany danych w liczbę, a nie
+fakt o świecie. \textbf{Wiarogodność} to
+$\Prob(\text{dane} \mid \theta)$, czytane jako funkcja $\theta$ przy
+ustalonych danych, a \textbf{metoda największej wiarogodności} wybiera to
+$\theta$, które ją maksymalizuje.
+
+Program~\ref{prog:P23} już ostrzegał przed tym słowem i to ostrzeżenie ma tu
+znaczenie: wiarogodność jest prawdopodobieństwem \emph{danych}, a nie
+parametru. Nie całkuje się do jedynki po $\theta$ i nie jest rozkładem na
+$\theta$. Traktowaniem jej jak rozkładu zajmuje się porządnie
+Program~\ref{prog:P28}, z rozkładem a priori, a ta sekcja nie.
+
+Dane to $n$ niezależnych obserwacji, więc wiarogodność jest iloczynem $n$
+czynników. Podaj dwa powody, by wziąć jej logarytm.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Zamienia iloczyn w sumę i powstrzymuje iloczyn przed niedomiarem.
+\end{ansblock}
+
+Pierwszy należy do Programu~\ref{prog:F03}, czyli do miejsca, w którym ta
+książka zamienia iloczyny w sumy, i to on czyni pochodną wykonalną: suma
+różniczkuje się składnik po składniku, a iloczyn $n$ rzeczy nie. Drugi należy
+do Programu~\ref{prog:P02} \dash{} własne prawdopodobieństwo sekwencji z
+Programu~\ref{prog:F03} wynosiło $\val{f03.seq.prod}$, czyli liczbę, której
+żaden format nie utrzyma.
+
+A logarytm nie może przesunąć maksimum, bo Program~\ref{prog:F05} dowiódł, że
+funkcja ściśle rosnąca zachowuje porządek listy.
+
+Zatem: zapisz logarytm wiarogodności, zróżniczkuj, przyrównaj do zera, co
+jest przepisem Programu~\ref{prog:P15} na maksimum. Spróbuj. Dwadzieścia prób
+daje siedem sukcesów; jaka częstość maksymalizuje wiarogodność?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p26.bern.mle}$}
+
+Oczywista odpowiedź i warto zobaczyć, że jest wyprowadzona, a nie założona.
+Przy $k$ sukcesach w $n$ próbach logarytm wiarogodności to
+$k\ln p + (n-k)\ln(1-p)$ z dokładnością do stałej, a
+\[ \frac{\mathrm{d}}{\mathrm{d}p}
+   \Bigl[k\ln p + (n-k)\ln(1-p)\Bigr]
+   \;=\; \frac{k}{p} - \frac{n-k}{1-p} \]
+zeruje się dokładnie przy $p = k/n$. Skrypt sprawdza to nad ułamkami, a potem
+sprawdza, że każda inna częstość na siatce tysiąca punktów jest ściśle
+gorsza, więc jest to maksimum, a nie punkt stacjonarny.
+
+\textbf{Każda częstość, jaką ktokolwiek policzył, dzieląc sukcesy przez
+próby, była oceną największej wiarogodności}, i książka mówi to po raz
+pierwszy.
+\end{fr}
+
+\begin{fr}
+Teraz ten sam przepis na rozkładzie Gaussa, bo jego odpowiedź zderza się z
+\S\ref{sec:P26-n-minus-one} celowo.
+
+Maksymalizacja logarytmu wiarogodności $\val{p26.gauss.n}$ obserwacji po
+średniej daje średnią z próby, tutaj $\val{p26.gauss.mu}$. Po wariancji daje
+średnią kwadratową odległość od tej średniej \dash{} z $n$ w mianowniku, co
+wychodzi $\val{p26.gauss.mle.var}$ wobec nieobciążonej
+$\val{p26.gauss.unbiased.var}$.
+
+Powiedz, czym to czyni metodę największej wiarogodności.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Obciążoną.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{\enquote{Metoda największej wiarogodności daje właściwą odpowiedź.}}
+
+Daje tę odpowiedź, która czyni twoje dane najbardziej prawdopodobnymi, co
+jest czym innym i nie znaczy nieobciążoną. Wariancja gaussowska jest tu
+przykładem wzorcowym: ocena, którą metoda największej wiarogodności ci wręcza,
+jest za mała dokładnie o $\frac{n-1}{n}$ z poprzedniej sekcji, a poprawka,
+którą wszyscy stosują, jest poprawką \emph{od} odpowiedzi największej
+wiarogodności.
+
+Dwie metody, dwie odpowiedzi, a ta niezgoda nie jest błędem żadnej z nich.
+Optymalizują różne rzeczy.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+\textbf{Nie dowodzimy tutaj: dlaczego w ogóle warto używać metody największej
+wiarogodności.}
+
+Argument za nią jest asymptotyczny. Gdy $n$ rośnie, ocena zbiega do
+prawdziwego parametru, a wśród szerokiej klasy estymatorów jej wariancja
+dąży do najmniejszej osiągalnej. Oba stwierdzenia są twierdzeniami z
+założeniami, oba potrzebują maszynerii spoza tej książki, a drugie ma nazwę
+\dash{} nierówność Craméra--Rao \dash{} którą czytelnik spotka i może
+sprawdzić.
+
+Warto natomiast zabrać kształt tej obietnicy. Jest \emph{asymptotyczna}:
+metoda największej wiarogodności jest dobrym pomysłem w granicy i jest
+obciążona przy każdym skończonym $n$, co dokładnie pokazuje wariancja
+gaussowska. Nic w niej nie mówi, że odpowiedź przy twoim rozmiarze próby jest
+nieobciążona, a poprzednia sekcja mówi, że nie jest.
+\end{rigourbox}
+\end{fr}
+
+% ============================================================
+\section{Trenowanie modelu językowego to metoda największej wiarogodności}
+\label{sec:P26-training}
+\index{entropia krzyżowa!jako ujemny logarytm wiarogodności}
+\index{największa wiarogodność!a modele językowe}
+
+\begin{fr}
+Po to była poprzednia sekcja i to jest ta ramka, którą obiecał
+Program~\ref{prog:P18}.
+
+Model czyta sekwencję i na każdej pozycji produkuje rozkład na słowniku.
+Token, który naprawdę wystąpił jako następny, ma pod tym rozkładem pewne
+prawdopodobieństwo. Nazwij parametry modelu $\theta$, a zaobserwowane tokeny
+$t_1, \dots, t_n$.
+
+Zapisz prawdopodobieństwo, jakie model przypisuje całej zaobserwowanej
+sekwencji.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\prod_{i=1}^{n} p_\theta(t_i \mid t_{<i})$}
+
+Co jest wiarogodnością: prawdopodobieństwem danych czytanym jako funkcja
+parametrów. Metoda największej wiarogodności każe więc maksymalizować to po
+$\theta$.
+
+Zrób teraz te dwie rzeczy, które kazała robić \S\ref{sec:P26-mle}. Weź
+logarytm, który zamienia to w sumę. Potem, skoro optymalizatory minimalizują,
+zmień znak. Potem podziel przez $n$, żeby sekwencje różnej długości były
+porównywalne.
+
+Zmiana znaku jest jedyną z tych trzech rzeczy, która jest czystą konwencją.
+Maksymalizowanie wielkości i minimalizowanie jej wartości przeciwnej to ten
+sam problem, a każdy optymalizator z Programu~\ref{prog:P20} był pisany tak,
+by schodzić w dół, więc znak jest tam dla maszynerii, a nie dla matematyki. W
+zamian kupuje to, że liczba czyta się jak koszt, i dlatego wynik jednego
+przebiegu jest porównywalny z wynikiem innego.
+
+Zapisz, co ci wyszło.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$-\frac{1}{n}\sum_{i=1}^{n} \ln p_\theta(t_i \mid t_{<i})$}
+
+\begin{note}
+\textbf{Definicja, którą Program~\ref{prog:P18} podał i zostawił bez
+uzasadnienia.} Tamten program potrzebował pochodnej entropii krzyżowej
+znacznie wcześniej, niż ta książka mogła powiedzieć, po co ta strata jest,
+więc zdefiniował $L = -\sum_j y_j \ln p_j$, powiedział, że uzasadnienie jest
+tutaj, i zajął się jakobianem.
+
+Oto ono. Przy celu one-hot wszystkie składniki poza jednym są zerowe i
+$L = -\ln p_c$ dla zaobserwowanego tokenu, więc średnia entropia krzyżowa po
+sekwencji \textbf{jest} wyrażeniem powyżej, znak po znaku.
+
+\textbf{Strata krzyżowoentropijna jest ujemnym logarytmem wiarogodności
+zaobserwowanych tokenów, na token, i nie ma w niej nic więcej.} Trenowanie
+modelu językowego to metoda największej wiarogodności. Nigdy nie było niczym
+innym.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Warto prześledzić ten łańcuch wstecz, bo okazuje się, że trzy programy cytują
+jedno obliczenie.
+
+Program~\ref{prog:F02} podaje stratę $\val{p26.f02.loss}$ nata na token.
+Program~\ref{prog:F03} bierze ją, zamienia w prawdopodobieństwo na token i
+podnosi je do potęgi $\val{p26.f03.tokens}$ tokenów, dostając
+prawdopodobieństwo sekwencji, którego logarytm dziesiętny zapisuje.
+
+Odwróć to: weź ten zapisany logarytm, podziel przez liczbę tokenów i zmień
+znak. Skrypt robi dokładnie to i dostaje $\val{p26.back.loss}$ nata, zgodnie z
+Programem~\ref{prog:F02} z dokładnością do tego, co może wyjaśnić
+zaokrąglenie zapisanego wykładnika do dwóch miejsc \dash{} tolerancja
+wyprowadzona, a nie wybrana.
+
+\textbf{Strata i prawdopodobieństwo sekwencji to ta sama liczba zapisana na
+dwa sposoby}, a budowanie przerywa teraz, jeśli któryś z programów się
+ruszy.
+\end{fr}
+
+\begin{fr}
+\mermaidfig{p26-one-quantity}{Jedna wielkość, do której dochodzi się z dwóch
+stron.}{wiarogodnosc i strata}
+
+Z tego przeramowania wypadają trzy konsekwencje i każda dotyczy czegoś, co
+ludzie robią, nie mając pod ręką powodu.
+\end{fr}
+
+\begin{fr}
+Pierwsza. \textbf{Label smoothing} zastępuje cel one-hot wartością
+$1-\varepsilon$ na zaobserwowanym tokenie i $\varepsilon/K$ rozłożonym po
+wszystkich $K$ z nich, i zwykle wprowadza się je jako sztuczkę
+regularyzacyjną.
+
+Przeczytaj je zamiast tego jako metodę największej wiarogodności. Strata
+$-\sum_j t_j \ln p_j$ jest minimalizowana na sympleksie wtedy, gdy $\vect{p}$
+równa się $\vect{t}$, jakiekolwiek $\vect{t}$ by nie było.
+
+Dla jakiego więc celu label smoothing jest metodą największej wiarogodności?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dla rozkładu wygładzonego \dash{} celu, którego nigdy nie zaobserwowano.
+\end{ansblock}
+
+A to jest prawdziwe stwierdzenie o tym, co ono robi. Przy
+$\varepsilon = \val{p26.ls.eps}$ na $\val{p26.ls.classes}$ klasach optimum to
+$\val{p26.ls.true}$ na zaobserwowanym tokenie i $\val{p26.ls.other}$ na
+każdym z pozostałych \dash{} znalezione przez przeszukanie, a nie zacytowane
+\dash{} więc optymalna różnica między zwycięskim logitem a resztą wynosi
+$\val{p26.ls.gap}$.
+
+\textbf{Na tym to polega i jest to liczba.} Wobec celu one-hot optimum chce
+$p_c = 1$, co wymaga nieskończonej różnicy logitów, więc strata popycha bez
+końca i nigdy nie dociera. Wygładzanie nazywa zamiast tego optimum
+osiągalne. To nie jest szum dodany na szczęście; to inny, osiągalny cel.
+\end{fr}
+
+\begin{fr}
+Druga. \textbf{Ważenie klas} mnoży stratę każdego przykładu przez wagę i
+czyta się jako \enquote{bardziej mi zależy na klasie rzadkiej}.
+
+Jako metoda największej wiarogodności jest ostrzejsze: zważenie przykładu
+przez $w$ to logarytm wiarogodności próby, w której ten przykład wystąpił $w$
+razy. Ważenie nie czyni więc modelu lepszym na klasie rzadkiej \dash{} ono
+szacuje parametry \emph{innej populacji}, takiej, w której klasa rzadka jest
+częstsza niż w twojej.
+
+Czy o to ci chodzi, jest pytaniem o wdrożenie, a to przeramowanie pozwala je
+zadać.
+
+Trzecia jest mniejsza i już jest na stronie. Powiedz, dlaczego strata jest
+dzielona przez liczbę tokenów, a nie sumowana.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Żeby długa i krótka sekwencja były porównywalne.
+\end{ansblock}
+
+Logarytm wiarogodności rośnie z liczbą tokenów, więc suma mierzy korpus tak
+samo jak model. Na token jest średnią, a Program~\ref{prog:P19} mówi, co
+uśrednianie straty na token przeżywa, a czego nie \dash{} wolno ci uśredniać
+straty i nie wolno ci uśredniać perplexity.
+
+\begin{trapbox}
+\textbf{\enquote{Entropia krzyżowa mierzy odległość między dwoma
+rozkładami.}}
+
+Nie jest odległością: nie znika, gdy oba się zgadzają, i nie jest
+symetryczna. Znika \emph{nadwyżka} entropii krzyżowej nad własną entropią
+celu, a ta nadwyżka ma nazwę i należy do Programu~\ref{prog:P30}.
+
+Dla tego programu odczyt jest węższy i kompletny: wobec celu one-hot entropia
+krzyżowa jest ujemnym logarytmem wiarogodności, a jej minimum leży tam, gdzie
+wiarogodność jest największa.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Kara jest logarytmem rozkładu a priori}
+\label{sec:P26-prior}
+\index{regularyzacja!jako rozkład a priori}
+\index{weight decay!czym jest jego lambda}
+
+\begin{fr}
+Metoda największej wiarogodności pyta tylko o to, co czyni dane
+prawdopodobnymi. Przypuśćmy, że masz też zdanie o parametrze jeszcze przed
+zobaczeniem danych \dash{} że wagi sieci są raczej małe, powiedzmy.
+
+Program~\ref{prog:P23} daje maszynerię: pomnóż wiarogodność przez rozkład a
+priori, a dostaniesz coś proporcjonalnego do rozkładu a posteriori.
+Maksymalizowanie tego zamiast tamtego to \textbf{maksimum a posteriori},
+czyli MAP.
+
+Weź logarytm iloczynu dwóch rzeczy. Co dzieje się z funkcją celu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Logarytm rozkładu a priori zostaje \emph{dodany} do logarytmu wiarogodności.
+\end{ansblock}
+
+\[ \ln\bigl[\Prob(\text{dane} \mid \theta)\,\Prob(\theta)\bigr]
+   \;=\; \ln \Prob(\text{dane} \mid \theta) + \ln \Prob(\theta) \]
+
+Zmień znak, jak zrobiła to \S\ref{sec:P26-training}, a drugi składnik staje
+się czymś dodanym do straty i minimalizowanym razem z nią.
+
+Taki jest kształt każdej regularyzowanej funkcji celu, jaką ktokolwiek
+zapisał. Nałóż teraz na każdą wagę gaussowski rozkład a priori o szerokości
+$\tau$, wyśrodkowany na zerze, i powiedz, jaki jest dodany składnik.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\dfrac{\lVert \vect{w}\rVert^{2}}{2\tau^{2}}$, plus stała}
+
+Bo logarytm $e^{-w^{2}/2\tau^{2}}$ to $-w^{2}/2\tau^{2}$, a czynnik
+normalizujący nie zależy od $\vect{w}$, więc nie może przesunąć minimum.
+
+\textbf{Kara kwadratowa jest logarytmem gaussowskiego rozkładu a priori.} Na
+tym polega cała ta odpowiedniość i jest to jeden wiersz.
+
+Kara nie jest więc urządzeniem doczepionym do funkcji celu na szczęście. Jest
+tym, co dostajesz, zapisując przekonanie i biorąc logarytm, a siła kary jest
+stwierdzeniem o \emph{szerokości} tego przekonania.
+\end{fr}
+
+\begin{fr}
+Co pozwala odczytać hiperparametr, zamiast go stroić.
+
+Program~\ref{prog:P20} rozstrzygnął weight decay, dodając $\lambda\vect{w}$
+do gradientu, i zmierzył, co to robi. Dopasuj oba gradienty \dash{}
+$\lambda\vect{w}$ wobec $\vect{w}/\tau^{2}$ \dash{} a wyjdzie
+\[ \lambda \;=\; \frac{1}{\tau^{2}}
+   \qquad\text{czyli}\qquad \tau \;=\; \frac{1}{\sqrt{\lambda}} \]
+
+Skrypt dopasowuje je na tych gradientach, które Program~\ref{prog:P20}
+naprawdę dodaje, a nie na wzorze, przy pięciu wartościach $w$ \dash{} bo ta
+odpowiedniość zależy od konwencji, od tego, czy kara niesie połówkę, a
+Program~\ref{prog:F04} zapisał, co się dzieje, gdy konwencję cytuje się z
+pamięci.
+
+Program~\ref{prog:P20} pracował przy $\lambda = \val{p26.p20.lambda}$. Jakie
+to przekonanie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Każda waga gaussowska wokół zera o szerokości $\val{p26.prior.tau}$}
+
+\begin{center}
+\begin{tabular}{rr}
+\toprule
+$\lambda$ & wynikająca szerokość a priori $\tau$ \\
+\midrule
+$\num{0.001}$ & $\val{p26.tau.0001}$ \\
+$\num{0.01}$ & $\val{p26.tau.001}$ \\
+$\val{p26.p20.lambda}$ & $\val{p26.tau.01}$ \\
+$\num{1.0}$ & $\val{p26.tau.10}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Weight decay jest szerokością, a odczytanie go jako szerokości czyni
+go sprawdzalnym.} Jeśli wytrenowane wagi warstwy mają rozrzut zupełnie
+niepodobny do $\tau$, które wynika z twojego $\lambda$, to przekonanie i dane
+się nie zgadzają, a to jest coś, na co można spojrzeć, a nie pokrętło, które
+się kręci.
+
+Nic w tej tabeli nie jest nową arytmetyką. To jeden odwrotny pierwiastek i
+nigdy nie był drukowany obok $\lambda$.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Weight decay to sztuczka, która akurat działa.}}
+
+Jest dokładną konsekwencją jednego przekonania, a przekonanie da się
+wypowiedzieć: wagi są gaussowskie wokół zera. Każdy inny rozkład a priori
+daje inną karę \dash{} rozkład Laplace'a daje wartość bezwzględną zamiast
+kwadratu, i dlatego $L_1$ produkuje zera, a $L_2$ nie, co jest faktem o
+kształcie rozkładu w zerze, a nie faktem o optymalizatorach.
+
+Powodem, dla którego czyta się to jak sztuczkę, jest to, że rozkładu a priori
+nikt nie zapisuje. Jest tam, czy ktokolwiek go zapisze, czy nie, a jego
+szerokość to $1/\sqrt{\lambda}$.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+\begin{warning}
+\textbf{MAP jest punktem i jest to prawdziwe ograniczenie.}
+
+Wszystko powyżej maksymalizuje rozkład a posteriori, a potem go wyrzuca,
+zachowując tylko argument maksimum. Ocena MAP nie umie więc powiedzieć, jak
+bardzo jest pewna, nie umie powiedzieć, czy maksimum było ostre czy niemal
+płaskie, i nie da się jej przenieść do dalszego rachunku.
+
+Zachowanie całego rozkładu a posteriori to inny temat i należy do
+Programu~\ref{prog:P28}: rozkład na parametrze zamiast punktu, z przedziałami
+wiarogodnymi i arytmetyką, która czyni je obliczalnymi. Ten program kończy
+tam, gdzie znaleziono maksimum.
+\end{warning}
+
+\mermaidfig{p26-prior-is-penalty}{Skąd bierze się kara, w jednym
+kroku.}{wiara i logarytm}
+\end{fr}
+
+% ============================================================
+\section{Score i dług z Części~VI}
+\label{sec:P26-score}
+\index{score}
+\index{estymator!oparty na score}
+
+\begin{fr}
+Jedno wyprowadzenie zostało zaległe i nie jest ono własne temu programowi.
+
+Program~\ref{prog:P21} spotkał wielkość będącą średnią po losowaniu i
+potrzebował jej gradientu. Nazwał dwa sposoby jego uzyskania, zmierzył, co je
+różni \dash{} trzy rzędy wielkości wariancji \dash{} a potem powiedział w
+tylu właśnie słowach, że algebra za nimi należy do Programu~\ref{prog:P24}
+albo do tego programu. Program~\ref{prog:P24} jej nie podał.
+
+To cztery wiersze i jest to ten sam obiekt, który \S\ref{sec:P26-mle}
+przyrównała do zera. Spójrz wstecz na tamtą pochodną: co było tą rzeczą,
+której zero wyznaczało maksimum?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Pochodna logarytmu prawdopodobieństwa}
+
+\[ s(x, \theta) \;=\; \frac{\partial}{\partial \theta}
+   \ln p(x \mid \theta) \]
+
+Nazywa się to \textbf{score}, a metoda największej wiarogodności jest
+poleceniem \emph{przyrównaj sumaryczny score swoich danych do zera}. Tylko to
+robiła \S\ref{sec:P26-mle}, pisząc $k/p - (n-k)/(1-p) = 0$.
+
+Teraz pytanie o sam score. Uśrednij go po danych, o których model mówi, że je
+zobaczysz \dash{} czyli weź jego wartość oczekiwaną pod
+$p(x \mid \theta)$, przy tym samym $\theta$. Co wychodzi?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Zero, dokładnie}
+
+Sprawdzone nad ułamkami przy $\val{p26.score.ps}$ różnych częstościach, bez
+żadnej tolerancji.
+
+Powód to jeden wiersz: $\Ex[s] = \sum_x p \cdot \frac{1}{p}
+\frac{\partial p}{\partial \theta} = \frac{\partial}{\partial \theta}
+\sum_x p = \frac{\partial}{\partial \theta} 1 = 0$. Prawdopodobieństwa sumują
+się do jedynki, cokolwiek robi $\theta$, więc ich pochodna sumuje się do
+niczego.
+
+\textbf{Dlatego właśnie przyrównanie score do zera jest właściwym
+poleceniem}, a nie tylko wygodą: przy prawdziwym parametrze score już średnio
+wynosi zero, więc estymator, który zeruje score zaobserwowany, celuje we
+właściwy warunek.
+\end{fr}
+
+\begin{fr}
+Teraz dług. Chcesz gradientu $\Ex_{x \sim p_\theta}[f(x)]$, gdzie $\theta$
+przesuwa rozkład, a $f$ jest czymkolwiek \dash{} nagrodą, symulatorem, oceną
+człowieka.
+
+Przeszkodą, którą nazwał Program~\ref{prog:P21}, jest to, że nie da się
+zróżniczkować losowania. Ale wartość oczekiwana jest sumą po $x$ z
+$p(x \mid \theta) f(x)$, a $p$ jest różniczkowalne, choć losowanie nie.
+
+Zróżniczkuj tę sumę i zobacz, co kupuje ci score.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\nabla_\theta \Ex[f] = \Ex\bigl[f(x)\,s(x,\theta)\bigr]$}
+
+Bo $\nabla p = p \nabla \ln p$, więc
+\[ \nabla_\theta \sum_x p\,f
+   \;=\; \sum_x f\,\nabla_\theta p
+   \;=\; \sum_x p\, f\, \nabla_\theta \ln p \]
+a ostatnie wyrażenie jest wartością oczekiwaną, co znaczy, że da się je
+oszacować przez losowanie.
+
+\textbf{To jest estymator oparty na score z Programu~\ref{prog:P21} i są to
+cztery wiersze metody największej wiarogodności.} Skrypt sprawdza to wobec
+pochodnej wziętej z drugiej strony, dokładnie nad ułamkami, przy każdej
+częstości i $\val{p26.score.cases}$ różnych funkcjach.
+
+Jest to też dokładnie policy gradient. Pomnóż nagrodę, którą dostałeś, przez
+gradient logarytmu prawdopodobieństwa akcji, którą podjąłeś, i uśrednij: to
+wyrażenie nie jest przybliżeniem czegokolwiek, jest tożsamością, a jedyne, co
+z nim nie tak, to wariancja, którą zmierzył Program~\ref{prog:P21}.
+\end{fr}
+
+\begin{fr}
+Program zamyka się więc na jednym obiekcie widzianym cztery razy.
+
+Score jest pochodną logarytmu prawdopodobieństwa. Przyrównanie go do zera to
+metoda największej wiarogodności. Uśrednienie go daje zero, i dlatego jest to
+właściwy warunek. Pomnożenie go przez nagrodę i uśrednienie różniczkuje przez
+losowanie. A dodanie logarytmu rozkładu a priori do logarytmu wiarogodności
+przed tym wszystkim to każda regularyzowana funkcja celu, jaka istnieje.
+
+\mermaidfig{p26-set-it-to-zero}{Jedna pochodna i cztery rzeczy, które o nią
+proszą.}{score, cztery uzycia}
+
+Czego tu nie ma: co robić, gdy maksimum nie jest tym, na czym chcesz
+poprzestać. Program~\ref{prog:P28} zachowuje cały rozkład a posteriori
+zamiast jego szczytu, a Program~\ref{prog:P27} pyta, czy różnica między
+dwoma ocenami jest większa niż szum w nich. Oba pytania ten program dopiero
+uczynił możliwymi do zadania i żadne nie jest jego własne.
+\end{fr}
+
+% ============================================================
+\begin{summarybox}
+\sumitem{1--4}{Estymator ma \textbf{dwa} sposoby bycia w błędzie.
+  \emph{Obciążenie} to odległość średniej oceny od prawdy;
+  \emph{wariancja} to odległość ocen od ich własnej średniej.
+  Program~\ref{prog:P21} dowiódł pierwszego o gradiencie z paczki i
+  powiedział, że to nie wystarcza.}
+\sumitem{5--6}{\textbf{$\mathrm{MSE} = \text{obciążenie}^{2} + \Var$},
+  dokładnie, sprawdzone przy dwudziestu jeden przyciąganiach nad ułamkami. Na
+  omawianej populacji celowo obciążony estymator bije nieobciążony o
+  $\val{p26.shrink.gain.pct}$ procent błędu średniokwadratowego \dash{}
+  $\val{p26.mse.shrunk}$ wobec $\val{p26.mse.unbiased}$.}
+\sumitem{7--9}{Zatem \enquote{nieobciążony} to nie \enquote{najlepszy}, a
+  każda regularyzacja jest obciążeniem wziętym celowo. Optymalne przyciąganie
+  zależy od nieznanej prawdy, i dlatego jest to spostrzeżenie, a nie
+  przepis.}
+\sumitem{10--12}{$n-1$ poprawia \textbf{dokładnie jedno obciążenie}:
+  wariancja z próby z mianownikiem $n$ daje średnio $\frac{n-1}{n}$ wariancji
+  populacji, wyliczone przy $n = 2$ do $5$, a mianownik $(n-1)$ daje ją
+  dokładnie.}
+\sumitem{13--16}{\textbf{Nie poprawia odchylenia standardowego.} Pierwiastek
+  jest wklęsły, więc nierówność Jensena z Programu~\ref{prog:P19} sprawia, że
+  poprawione $s$ zaniża \dash{} o $\val{p26.sd.short.2}$ procent przy
+  $n = 2$ i wciąż o $\val{p26.sd.short.5}$ procent przy $n = 5$, czyli przy
+  tym rozmiarze, od którego ludzie podają rozrzut.}
+\sumitem{18--20}{\textbf{Metoda największej wiarogodności} wybiera parametr,
+  który czyni zaobserwowane dane najbardziej prawdopodobnymi. Weź logarytm,
+  żeby zamienić iloczyn w sumę (Program~\ref{prog:F03}) i uniknąć niedomiaru
+  (Program~\ref{prog:P02}); maksimum się nie przesuwa, bo
+  Program~\ref{prog:F05} mówi, że funkcja ściśle rosnąca zachowuje porządek.}
+\sumitem{21}{Ocena bernoullowska to $k/n = \val{p26.bern.mle}$, wyprowadzona,
+  a nie założona \dash{} \textbf{każda częstość policzona przez podzielenie
+  sukcesów przez próby była oceną największej wiarogodności}.}
+\sumitem{22--23}{A wariancja gaussowska wychodzi z $n$ w mianowniku,
+  $\val{p26.gauss.mle.var}$ wobec $\val{p26.gauss.unbiased.var}$:
+  \textbf{metoda największej wiarogodności jest obciążona}, dokładnie o
+  czynnik z poprzedniej sekcji.}
+\sumitem{25--27}{\textbf{Strata krzyżowoentropijna jest ujemnym logarytmem
+  wiarogodności zaobserwowanych tokenów, na token.} Iloczyn
+  prawdopodobieństw, logarytm, zmiana znaku, podzielenie przez ich liczbę
+  \dash{} czyli definicja Programu~\ref{prog:P18} znak po znaku. Trenowanie
+  modelu językowego to metoda największej wiarogodności.}
+\sumitem{28}{Trzy programy, jedno obliczenie:
+  Program~\ref{prog:F02} podaje $\val{p26.f02.loss}$ nata, a
+  Program~\ref{prog:F03} sekwencję $\val{p26.f03.tokens}$ tokenów;
+  odtwarzają się nawzajem w obie strony, z powrotem do
+  $\val{p26.back.loss}$ nata.}
+\sumitem{30--31}{\textbf{Label smoothing to metoda największej wiarogodności
+  dla innego celu.} Przy $\varepsilon = \val{p26.ls.eps}$ na
+  $\val{p26.ls.classes}$ klasach optimum to $\val{p26.ls.true}$ wobec
+  $\val{p26.ls.other}$, czyli różnica logitów $\val{p26.ls.gap}$ \dash{}
+  skończona, gdzie optimum celu one-hot jest nieosiągalne.}
+\sumitem{32--33}{Ważenie klas szacuje parametry \emph{innej populacji}, a
+  dzielenie przez liczbę tokenów jest tym, co czyni sekwencje różnej długości
+  porównywalnymi.}
+\sumitem{34--36}{\textbf{Kara jest logarytmem rozkładu a priori.} Pomnóż
+  wiarogodność przez rozkład a priori, weź logarytm, zmień znak: logarytm a
+  priori staje się składnikiem dodanym do straty, a gaussowski rozkład a
+  priori o szerokości $\tau$ wnosi
+  $\lVert\vect{w}\rVert^{2}/2\tau^{2}$.}
+\sumitem{37--38}{Zatem $\lambda = 1/\tau^{2}$, dopasowane na gradientach,
+  które dodaje Program~\ref{prog:P20}, a nie na wzorze.
+  \textbf{Jego $\lambda = \val{p26.p20.lambda}$ to twierdzenie, że każda waga
+  jest gaussowska o szerokości $\val{p26.prior.tau}$}, co da się sprawdzić na
+  wytrenowanych wagach.}
+\sumitem{40}{MAP jest punktem i nie umie powiedzieć, jak bardzo jest pewny.
+  Rozkład a posteriori jako rozkład należy do Programu~\ref{prog:P28}.}
+\sumitem{41--43}{\textbf{Score} to $\partial \ln p / \partial\theta$, a jego
+  wartość oczekiwana wynosi dokładnie zero \dash{} bo prawdopodobieństwa
+  sumują się do jedynki, cokolwiek robi $\theta$. Dlatego przyrównanie
+  zaobserwowanego score do zera jest właściwym warunkiem.}
+\sumitem{44--45}{A $\nabla \Ex[f] = \Ex[f\,s]$, dokładnie nad ułamkami przy
+  każdej częstości i $\val{p26.score.cases}$ funkcjach: \textbf{estymator
+  oparty na score, odłożony przez Program~\ref{prog:P21}, to cztery wiersze
+  metody największej wiarogodności}, i jest tym, czym jest policy gradient.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Estymator ma obciążenie $\num{0.4}$ i wariancję $\num{0.09}$. Drugi ma
+  obciążenie $0$ i wariancję $\num{0.30}$. Który jest średnio bliżej prawdy i
+  o ile?
+  \answerto{Błąd średniokwadratowy to $\text{obciążenie}^{2} + \Var$, więc
+  pierwszy daje $\num{0.16} + \num{0.09} = \num{0.25}$, a drugi $\num{0.30}$.
+  Obciążony jest bliżej, o $\num{0.05}$ \dash{} czyli teza sekcji w dwóch
+  wierszach arytmetyki.}
+\item Mierzysz wielkość pięć razy i podajesz średnią oraz odchylenie
+  standardowe z próby z \code{ddof=1}. Podaj jedną rzecz, którą ta liczba nie
+  jest, i powiedz, w którą stronę się myli.
+  \answerto{Nie jest nieobciążoną oceną odchylenia standardowego. Poprawka
+  czyni nieobciążoną \emph{wariancję}, a pierwiastek jest wklęsły, więc z
+  nierówności Jensena podana wartość zaniża rozrzut \dash{} o jakieś
+  $\val{p26.sd.short.5}$ procent przy $n = 5$ na populacji z tego programu, i
+  zawsze w tę stronę, która sprawia, że wyniki wyglądają na powtarzalniejsze,
+  niż są.}
+\item Moneta daje $3$ orły w $10$ rzutach. Zapisz logarytm wiarogodności,
+  znajdź ocenę największej wiarogodności i powiedz, dlaczego odpowiedź nie
+  wymaga żadnego rachunku, gdy ma się poprzednie ramki pod ręką.
+  \answerto{$3\ln p + 7\ln(1-p)$ z dokładnością do stałej, a jego pochodna
+  $3/p - 7/(1-p)$ zeruje się przy $p = \num{0.3}$. Nie wymaga rachunku,
+  bo bernoullowska ocena największej wiarogodności to $k/n$ dla każdego $k$ i
+  $n$, co program wyprowadza raz.}
+\item Przebieg treningowy podaje entropię krzyżową $\num{2.0}$ nata na token
+  po $500$ tokenach. Podaj logarytm prawdopodobieństwa, jakie model
+  przypisuje tej sekwencji, i powiedz, czy warto liczyć samo
+  prawdopodobieństwo.
+  \answerto{$-\num{2.0} \times 500 = -1000$ natów. Prawdopodobieństwo to
+  $e^{-1000}$, czego nie utrzyma żaden format zmiennoprzecinkowy \dash{}
+  czyli powód, dla którego Program~\ref{prog:P02} pracuje w logarytmach, i
+  własny przykład Programu~\ref{prog:F03}, i dlatego raportuje się stratę, a
+  nie wiarogodność.}
+\item Dwa zespoły używają weight decay o sile $\num{0.01}$ i $\num{1.0}$ na
+  tej samej architekturze. Powiedz, co każdy z nich twierdzi o wagach, i
+  które twierdzenie jest mocniejsze.
+  \answerto{Szerokości $\val{p26.tau.001}$ i $\val{p26.tau.10}$ wokół zera.
+  Drugie jest o wiele mocniejsze \dash{} dziesięciokrotnie większe $\lambda$
+  to rozkład a priori węższy o $\sqrt{10}$, więc twierdzi znacznie pewniej,
+  że wagi są małe, i będzie znacznie wyraźniej w błędzie, jeśli nie są.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że dla estymatora przyciągniętego $c\bar{x}$ błąd
+  średniokwadratowy jest minimalizowany przy
+  $c = \mu^{2}/(\mu^{2} + \sigma^{2}/n)$, i powiedz, co się z nim dzieje, gdy
+  $n$ rośnie.
+  \answerto{Błąd to $\mu^{2}(c-1)^{2} + c^{2}\sigma^{2}/n$; zróżniczkuj i
+  przyrównaj do zera. Gdy $n$ rośnie, $\sigma^{2}/n$ dąży do zera, a optimum
+  dąży do $1$, więc przyciąganie jest warte tym mniej, im więcej masz danych
+  \dash{} co jest tym samym stwierdzeniem co \enquote{mały model
+  regularyzuj mocniej}.}
+\item Score ma wartość oczekiwaną zero przy prawdziwym parametrze. Powiedz,
+  czym to czyni sumaryczny score $n$ obserwacji, i użyj
+  Programu~\ref{prog:P25}, by powiedzieć, jak się zachowuje, gdy $n$ rośnie.
+  \answerto{Sumą $n$ niezależnych wielkości o średniej zero, więc ma średnią
+  zero i wariancję $n$ razy większą od wariancji jednego składnika \dash{}
+  pierwsza tożsamość Programu~\ref{prog:P25}. Podzielony przez $n$ koncentruje
+  się na zerze w tempie $1/\sqrt{n}$, i dlatego ocena zerująca zaobserwowany
+  średni score zbiega do prawdy.}
+\item Rozkład a priori Laplace'a na każdej wadze jest proporcjonalny do
+  $e^{-\lvert w\rvert/b}$. Podaj karę, której odpowiada, i powiedz w jednym
+  zdaniu, co odróżnia go od przypadku gaussowskiego.
+  \answerto{$\lVert\vect{w}\rVert_{1}/b$, czyli suma wartości bezwzględnych.
+  Jego pochodna nie znika, gdy $w$ zbliża się do zera, a gaussowska znika,
+  więc popycha do samego końca i produkuje dokładne zera \dash{} fakt o
+  kształcie rozkładu a priori w zerze, a nie o optymalizatorze.}
+\item Label smoothing przy $\varepsilon$ na $K$ klasach daje optymalną
+  różnicę logitów
+  \[ \ln\Bigl(\frac{1 - \varepsilon(K-1)/K}{\varepsilon/K}\Bigr) \]
+  Powiedz, co się z nią dzieje, gdy $\varepsilon$ dąży do zera, i dlaczego
+  takie zachowanie jest właściwe.
+  \answerto{Dąży do nieskończoności, bo mianownik dąży do zera: bez
+  wygładzania cel jest one-hot, a optimum nieosiągalne. Parametr wygładzania
+  jest dokładnie tą rzeczą, która czyni optimum skończonym, więc granica
+  odtwarzająca przypadek bez wygładzania jest sprawdzianem, że wzór jest
+  dobry.}
+\item Kolega zważył klasę rzadką w klasyfikatorze przez $10$ i raportuje, że
+  trafność na tej klasie się poprawiła. Powiedz, co zostało oszacowane, i
+  podaj jeden pomiar, który powiedziałby, czy to była właściwa rzecz do
+  szacowania.
+  \answerto{Parametry populacji, w której klasa rzadka jest dziesięć razy
+  częstsza niż w danych. Czy o to chodzi, zależy od miksu przy wdrożeniu, więc
+  pomiarem są częstości klas tam, gdzie model naprawdę pobiegnie \dash{}
+  jeśli pasują do miksu przeważonego, wybór był uzasadniony, a jeśli pasują do
+  oryginalnego, to wymieniono ogólną skuteczność na liczbę na slajdzie.}
+\end{furtherproblems}

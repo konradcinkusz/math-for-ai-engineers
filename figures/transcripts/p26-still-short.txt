@@ -1,0 +1,7 @@
+>>> from p26_maximum_likelihood import sample_variances, POP_VAR
+>>> en, en1 = sample_variances(2)
+>>> en == POP_VAR, en1 == POP_VAR
+(False, True)
+>>> from p26_maximum_likelihood import mean_sample_sd, POP_SD
+>>> round(mean_sample_sd(2), 4), round(POP_SD, 4)
+(1.4142, 1.8708)

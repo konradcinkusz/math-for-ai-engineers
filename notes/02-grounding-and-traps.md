@@ -2717,3 +2717,71 @@ holding the signal steady through a linear layer *and* its activation needs
 with depth the difference is not a matter of taste: the same 50-layer stack
 passes 1.00 of its signal under one rule and 8.9e-16 under the other. →
 **P25**.
+
+**253. "Unbiased is what you want."** Unbiased is one of *two* axes and it is
+the one that is easy to check, which is why it gets quoted; it says nothing
+about how far any single estimate is from the truth. The mean squared error
+splits exactly into `bias² + variance`, and on **P26**'s worked population a
+deliberately biased estimator — the sample mean shrunk by 0.837 — beats the
+unbiased one by 16.3 per cent of that error. The word to be suspicious of is
+*best*: nothing is best until a loss has been named, and "unbiased" is not a
+loss. → **P26**.
+
+**254. "`ddof=1` gives me an unbiased standard deviation."** It gives an
+unbiased *variance*. A square root is concave, so by **P19**'s Jensen the
+average of the corrected `s` sits below the root of its average: on **P26**'s
+population the corrected estimate is short by 24.4 per cent at n = 2 and still
+5.5 per cent at n = 5 — which is the sample size people actually report a
+spread over. Nothing in any library gives an unbiased standard deviation,
+because the correction depends on the distribution and there is no flag for
+it, and the bias runs in the direction that makes results look more
+reproducible than they are. → **P26**.
+
+**255. "Maximum likelihood gives you the right answer."** It gives the answer
+that makes your data most probable, which is a different thing. The Gaussian
+variance is the standing example: maximum likelihood hands you the
+`n`-denominator version, which is short by exactly the `(n-1)/n` of the
+correction everybody applies — so the correction is a correction *away* from
+the maximum likelihood answer. The case for the method is asymptotic, and
+asymptotic is not a promise about your sample size. → **P26**.
+
+**256. "Label smoothing is a regularisation trick."** It is maximum likelihood
+for a *different target*. The loss `-Σ t_j ln p_j` is minimised over the
+simplex when `p = t`, whatever `t` is, so smoothing names a distribution the
+model is being fitted to — and the consequence is a number: at ε = 0.1 over 8
+classes the optimum is 0.9125 against 0.0125, a finite logit gap of 4.29,
+where a one-hot target's optimum needs an infinite one. Smoothing replaces an
+unattainable optimum with an attainable one; it is not noise added for luck.
+→ **P26**.
+
+**257. "Class weighting makes the model better at the rare class."** Weighting
+an example by `w` is the log-likelihood of a sample in which that example
+appeared `w` times, so it estimates the parameters of a *different
+population* — one in which the rare class is commoner than in your data.
+Whether that is what you want is a question about the deployment mix, and the
+measurement that settles it is the class frequencies where the model will
+actually run. → **P26**.
+
+**258. "Weight decay is a trick that happens to work."** It is the exact
+consequence of one stateable belief: the weights are Gaussian about zero. A
+penalty is the logarithm of a prior, and matching the gradient **P20** adds
+gives `λ = 1/τ²` — so its λ = 0.1 is the claim that every weight has width
+3.162, which is checkable against the trained weights rather than a knob to
+turn. A Laplace prior gives the absolute value instead of the square, which is
+why `L1` produces exact zeros and `L2` does not: a fact about the shape of a
+distribution at the origin, not about optimisers. → **P26**.
+
+**259. "A MAP estimate is a Bayesian answer."** It is the *peak* of a
+posterior with the posterior thrown away, so it cannot say how sure it is,
+cannot say whether the maximum was sharp or nearly flat, and cannot be
+propagated into a later calculation. Keeping the distribution is a different
+subject and a different program. → **P26**, then **P28**.
+
+**260. "The score-function estimator is an approximation to the gradient."**
+It is an identity. `∇E[f] = E[f ∇ log p]` follows in one line from
+`∇p = p ∇ log p`, and **P26** checks it exactly over fractions against the
+derivative taken the other way. Nothing about it is approximate — the only
+thing wrong with it is the variance **P21** measured, which is three orders of
+magnitude worse than the reparameterised route on the same problem. Unbiased
+and unusable are compatible, which is trap 253 arriving from the other end.
+→ **P26**.
