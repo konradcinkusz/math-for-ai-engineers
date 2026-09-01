@@ -2374,6 +2374,26 @@
 %  absorbs a residual without changing how much TeX is willing to cram. That is
 %  the difference between giving a page slack and giving it appetite.
 %
+%  AND AFTER FOUR CI CYCLES THE CONSTANT WAS ABANDONED, WHICH IS THE ACTUAL
+%  ANSWER. The residual grew with the index and the index grows with every
+%  program: 18.29 pt at P19, 9.29 pt after the raise to 5.5, cleared by the
+%  bounded \indexspace shrink, then 33.29 pt the moment P21's entries landed.
+%  No value of a shrink can hold a target that moves every time a program is
+%  written, and the two machines disagree about where the window is anyway.
+%
+%  So the index's columns are simply given LESS ROOM than the text block:
+%  three lines of headroom, which absorbs about forty points of residual by
+%  construction, on any machine. It cannot backfire the way shrink does,
+%  because it REDUCES what TeX will pack onto a column rather than increasing
+%  it -- and an index column ending three lines short of the body's measure is
+%  what every index in print looks like. The \parskip shrink drops back to a
+%  point, which is all it was ever for.
+%
+%  THE GENERALISABLE HALF: when a rigid region keeps needing a few more points
+%  and the requirement grows with the content, stop tuning the slack and take
+%  the room away instead. A knob that has to be re-tuned per program is not a
+%  fix, and this one was re-tuned five times.
+%
 %  A process note that cost a CI cycle, because it will happen again. The
 %  raise to 5.5 was made, and then a BACKGROUND SWEEP SCRIPT still running in
 %  the tree restored 4.5 on its way out, so the commit carried the old value
@@ -2398,7 +2418,15 @@
 %  else, which is how a gate goes quiet.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 5.5pt}%
+  % THE STRUCTURAL FIX, after four CI cycles spent on the constant below.
+  % Give the index's columns LESS ROOM than the text block. Every column then
+  % has three lines in hand, so a residual of up to about forty points is
+  % absorbed by construction, on any machine, and -- unlike shrink -- it
+  % cannot backfire, because it REDUCES what TeX will pack rather than
+  % increasing it. An index column that ends three lines short of the body's
+  % measure is what every index in print looks like.
+  \addtolength{\textheight}{-3\baselineskip}%
+  \setlength{\parskip}{0pt plus 0.3pt minus 1pt}%
   % And a SECOND source of shrink, deliberately one that does NOT scale with
   % the number of entries on the page. Raising \parskip's shrink gives a
   % column 45 entries x 1pt of extra capacity, so TeX packs more and the
