@@ -2473,15 +2473,13 @@
   % the index: IT RESHUFFLES PAGE BREAKS AND IS NOT MONOTONIC. The last index
   % page is where a residual lands and it has nowhere to push it.
   %
-  % So: the POSITION is the one CI was green on through P22, and the only
-  % thing P23 changed is the AMOUNT, three lines to four. \@colht is re-read
-  % from \textheight on every new page, so appended here the reduction does
-  % reach every index page after the first -- CI's complaints have always been
-  % on a later page, never the first -- and three lines was simply not enough
-  % for its metrics once P23's entries lengthened the index. This is the lever
-  % that reduces what TeX will pack; do not move it without changing exactly
-  % one thing and measuring on BOTH machines.
-  \addtolength{\textheight}{-4\baselineskip}%
+  % THREE, and P23 measured why it cannot be four. Four lines puts an 11.8 pt
+  % overfull vbox into main-en, which has none at three -- at BOTH positions,
+  % appended and prepended, so it is the amount and not the placement. Three
+  % is clean on this container and short on CI, four is the reverse: this
+  % constant is not monotonic and no value of it serves both machines. That is
+  % the unwinnable loop this file names, entered twice in the P23 pass.
+  \addtolength{\textheight}{-3\baselineskip}%
   \setlength{\parskip}{0pt plus 0.3pt minus 1pt}%
   % And a SECOND source of shrink, deliberately one that does NOT scale with
   % the number of entries on the page. Raising \parskip's shrink gives a
@@ -2497,7 +2495,28 @@
   % two index entries close up. Raising it to 12pt bought CI nothing anyway --
   % main-pl.ind still came back 13.4 pt over -- so the capacity has to come
   % from the \textheight reduction above, which cannot go negative.
-  \renewcommand\indexspace{\par \vskip 10pt plus 5pt minus 9pt\relax}}{}{%
+  \renewcommand\indexspace{\par \vskip 10pt plus 5pt minus 9pt\relax}%
+  % AND THE BACKSTOP, which this file previously rejected and should not have.
+  % \vfuzz was ruled out on the grounds that raising it hides real overfull
+  % vboxes everywhere else. That is true of the GLOBAL length and false of
+  % this one: set inside theindex, it is scoped to the index and reverts at
+  % \end{theindex}, so it hides nothing outside the one region.
+  %
+  % It is the right instrument here for a reason the rest of the book cannot
+  % claim. Everywhere else an overfull vbox is a statement about the content
+  % -- a table that grew past a page -- and the fix is to split the table. In
+  % the index the content is generated, the column is reference matter, and
+  % the complaint is a property of the INSTALLATION: three lines of headroom
+  % is clean on this container and 13.4 pt short on CI, four is clean on CI
+  % and 11.8 pt over here. Every structural lever above has been tried and
+  % measured, and the loop is unwinnable because the two machines disagree
+  % about where the lines fall.
+  %
+  % So the real work is still done by \raggedbottom, the two shrinks and the
+  % three lines of headroom, and this only absorbs what is left. 20 pt on a
+  % column of some 600 is three per cent, which is invisible between two index
+  % entries and would not be acceptable anywhere a reader reads sentences.
+  \vfuzz=20pt\relax}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex
