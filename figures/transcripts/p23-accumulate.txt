@@ -1,0 +1,3 @@
+>>> from p23_probability_bayes import ppv_after
+>>> [ppv_after(k) for k in (1, 2, 3)]
+[Fraction(11, 122), Fraction(363, 400), Fraction(35937, 35974)]

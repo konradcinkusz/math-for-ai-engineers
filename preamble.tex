@@ -1588,6 +1588,28 @@
 }
 \makeatother
 
+% ---- The contents column, and a four-digit page number ----------------------
+% book.cls reserves \@pnumwidth = 1.55em for a contents entry's page number and
+% \@tocrmarg = 2.55em for the right margin the title wraps against. Both fit
+% three digits and neither fits four: measured, "1001" and "1009" each overflow
+% by 4.93 pt in main-pl, which crossed a thousand pages in the P22 pass and
+% acquired four-digit entries in the P23 one.
+%
+% It is the contents column's THIRD defect of this shape, after P16's long
+% Polish title and the running head \mfaheadmark guards -- and unlike those two
+% it cannot be fixed by shortening anything, because the overflowing token is a
+% page number. Every remaining program pushes more entries past 999, so this is
+% widened once rather than watched.
+%
+% MEASURED, not guessed: 1.55em is 16.97 pt at the contents font's 10.95 pt and
+% the complaint is 4.93 pt, so four digits need 21.90 pt, which is 2.0em. 2.2em
+% clears it at both point sizes with a little headroom and stays narrower than
+% the gap it sits in; \@tocrmarg keeps the same distance from it as before.
+\makeatletter
+\renewcommand{\@pnumwidth}{2.2em}
+\renewcommand{\@tocrmarg}{3.2em}
+\makeatother
+
 % ---- The programs register -------------------------------------------------
 % \program{Title} opens a program: it is \chapter plus the bookkeeping that
 % lets the back matter reproduce this program's answers under its own name.

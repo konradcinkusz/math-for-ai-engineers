@@ -39,7 +39,7 @@ engineer must be able to do in a meeting". A classifier at 99 per cent on a
 fault occurring once in a thousand requests has a positive predictive value of
 11/122 -- NINE PER CENT of its alarms are real. The sweep either side of it is
 the real lesson: the answer is 91.7 per cent at one in ten, EXACTLY a half at
-one in a hundred, 9.0 at one in a thousand and 1.0 at one in ten thousand. The
+one in a hundred, 9.0 at one in a thousand and 0.98 at one in ten thousand. The
 classifier did not change.
 
 Run:  python3 code/p23_probability_bayes.py      (or: make numbers)
@@ -115,8 +115,6 @@ for i in range(len(keys)):
         a, b = keys[i], keys[j]
         assert P(lambda k: k in (a, b)) == SPACE[a] + SPACE[b]
 
-emit("p23.space.outcomes", len(SPACE))
-emit("p23.prev.num", 1)
 emit("p23.prev.den", 1000)
 emit("p23.sens.pct", 99)
 NOTES.append(f"the three rules hold on the {len(SPACE)}-outcome space, checked "
@@ -132,6 +130,26 @@ assert (P(lambda k: fault(k) or alarm(k))
         == P(fault) + P(alarm) - P(lambda k: fault(k) and alarm(k)))
 NOTES.append("adding two overlapping events double-counts the overlap, which "
              "is Program F10's union rule arriving as a probability")
+
+# CROSS-PROGRAMME GATE, of Program P12's third kind: the same worked example
+# CONTINUED rather than a number that merely resembles another. F10 counted two
+# overlapping evaluation sets and F10's closing frame says a fraction of counts
+# is a naive probability. Divide its four committed counts by the population and
+# the union rule IS the addition rule -- so the two programs cannot come apart
+# about it. Nothing is emitted: every fraction below is head arithmetic from
+# numbers F10 already prints.
+_a, _b = committed("f10.tex", "f10.eval.a"), committed("f10.tex", "f10.eval.b")
+_shared = committed("f10.tex", "f10.eval.shared")
+_union = committed("f10.tex", "f10.eval.union")
+if None not in (_a, _b, _shared, _union):
+    A_, B_, S_, U_ = (int(x) for x in (_a, _b, _shared, _union))
+    assert A_ + B_ - S_ == U_, (A_, B_, S_, U_)          # F10's own union rule
+    pa, pb, ps = Fraction(A_, U_), Fraction(B_, U_), Fraction(S_, U_)
+    assert pa + pb - ps == 1, (pa, pb, ps)               # the addition rule
+    assert (pa, pb, ps) == (Fraction(1, 2), Fraction(3, 5), Fraction(1, 10))
+    NOTES.append("Program F10's two evaluation sets, divided through by their "
+                 "union, give 1/2 + 3/5 - 1/10 = 1 -- its counting rule and "
+                 "this program's addition rule are one statement")
 
 
 # ---------------------------------------------------------------------------
@@ -191,6 +209,13 @@ total = cond(alarm, fault) * P(fault) + cond(alarm, clean) * P(clean)
 assert total == P(alarm), (total, P(alarm))
 _real, _false = cond(alarm, fault) * P(fault), cond(alarm, clean) * P(clean)
 assert _real.denominator == _false.denominator, (_real, _false)
+# The fourth cell of the table. Three of the four are small enough to read off
+# the specification; this one is what is left, and asking a reader to subtract
+# three numbers from a hundred thousand in their head is not head arithmetic.
+_quiet_clean = round(cond(lambda k: not alarm(k), clean) * P(clean)
+                     * _real.denominator)
+assert _real.numerator + _false.numerator + _quiet_clean + 1 == _real.denominator
+emit("p23.quiet.clean", _quiet_clean)
 emit("p23.alarm.real", _real.numerator)
 emit("p23.alarm.false", _false.numerator)
 emit("p23.alarm.den.long", _real.denominator)
@@ -218,13 +243,16 @@ sweep = [(r, ppv_at(r)) for r in RATES]
 assert ppv_at(Fraction(1, 100)) == Fraction(1, 2)
 for (_, a), (_, b) in zip(sweep, sweep[1:]):
     assert a > b
-emit("p23.sweep.n", len(RATES))
-emit("p23.ppv.10", float(sweep[0][1]), 3)
-emit("p23.ppv.100", float(sweep[1][1]), 1)
-emit("p23.ppv.1000", float(sweep[2][1]), 3)
-emit("p23.ppv.10000", float(sweep[3][1]), 4)
+# Reported as percentages, on one scale, because a column mixing 0.917 with
+# 0.0098 asks the reader to compare four numbers written four ways. The row at
+# one in a thousand quotes p23.ppv.pct rather than a second name for it: two
+# names for one number is a copy nobody would correct.
+assert sweep[2][1] == PPV
+emit("p23.ppv.10.pct", float(100 * sweep[0][1]), 1)
+emit("p23.ppv.100.pct", float(100 * sweep[1][1]), 1)
+emit("p23.ppv.10000.pct", float(100 * sweep[3][1]), 2)
 NOTES.append("the same classifier is right about 91.7 per cent of its alarms "
-             "at one fault in ten and 1.0 per cent at one in ten thousand; "
+             "at one fault in ten and 0.98 per cent at one in ten thousand; "
              "EXACTLY half at one in a hundred, where the base rate meets the "
              "error rate")
 
@@ -232,6 +260,7 @@ NOTES.append("the same classifier is right about 91.7 per cent of its alarms "
 ACC = P(lambda k: (fault(k) and alarm(k)) or (clean(k) and not alarm(k)))
 NEVER = P(clean)                       # a classifier that never raises an alarm
 assert NEVER > ACC, (NEVER, ACC)
+emit("p23.fpr.pct", float(100 * cond(alarm, clean)), 1)
 emit("p23.acc.pct", float(100 * ACC), 1)
 emit("p23.never.pct", float(100 * NEVER), 1)
 NOTES.append(f"the classifier is {float(100*ACC):.1f} per cent accurate and a "
@@ -266,10 +295,8 @@ ab_c = Q(lambda k: A(k) and B(k) and C(k)) / pc
 assert ab_c != a_c * b_c, (ab_c, a_c, b_c)            # and NOT, given C
 assert ab_c == 0                                      # in fact impossible
 
-emit("p23.ind.pa.den", Q(A).denominator)
-emit("p23.ind.pab.den", Q(lambda k: A(k) and B(k)).denominator)
-emit("p23.ind.pab.c", int(ab_c))
-emit("p23.ind.product.den", (a_c * b_c).denominator)
+assert (Q(A), Q(lambda k: A(k) and B(k)), a_c * b_c) == (
+    Fraction(1, 2), Fraction(1, 4), Fraction(1, 4))
 NOTES.append("two independent coins become perfectly dependent given their "
              "exclusive or: the joint conditional is 0 where the product of "
              "the conditionals is 1/4, so independence survives nothing")
@@ -298,18 +325,85 @@ pz = R(Z)
 assert (R(lambda k: X(k) and Y(k) and Z(k)) / pz
         == (R(lambda k: X(k) and Z(k)) / pz) * (R(lambda k: Y(k) and Z(k)) / pz))
 _pxy, _prod = R(lambda k: X(k) and Y(k)), R(X) * R(Y)
+assert _prod == Fraction(1, 4), _prod          # head arithmetic: both are 1/2
 emit("p23.cause.pxy.num", _pxy.numerator)
 emit("p23.cause.pxy.den", _pxy.denominator)
-emit("p23.cause.prod.num", _prod.numerator)
-emit("p23.cause.prod.den", _prod.denominator)
 NOTES.append("and two dependent readings become conditionally independent "
              "given the cause they share, which is the naive Bayes assumption "
              "stated as the thing it assumes")
 
 
+# ---------------------------------------------------------------------------
+# 7. THE ODDS FORM, and what a SECOND signal is worth.
+#
+# Section 4 is deflating on purpose, and a reader who stops there has learnt
+# that their detector is useless. It is not: the same arithmetic written in
+# ODDS says exactly what to do about it, because in odds Bayes' theorem is a
+# multiplication and evidence therefore ACCUMULATES.
+#
+#     posterior odds = prior odds  x  likelihood ratio
+#
+# and the likelihood ratio of one alarm is P(alarm|fault) / P(alarm|clean).
+# The catch is the whole reason sections 5 and 6 exist: the ratios multiply
+# only if the signals are CONDITIONALLY INDEPENDENT GIVEN THE TRUTH.
+# ---------------------------------------------------------------------------
+LR = cond(alarm, fault) / cond(alarm, clean)
+assert LR == Fraction(99), LR
+
+
+def ppv_after(k: int, prev: Fraction = PREV) -> Fraction:
+    """P(fault | k conditionally independent alarms), by odds."""
+    odds = prev / (1 - prev) * LR ** k
+    return odds / (1 + odds)
+
+
+# The odds route and the direct route are the same computation, so one alarm
+# must reproduce section 2's answer exactly rather than approximately.
+assert ppv_after(1) == PPV, (ppv_after(1), PPV)
+assert ppv_after(0) == PREV, ppv_after(0)
+K = next(k for k in range(1, 20) if ppv_after(k) > Fraction(1, 2))
+assert K == 2, K
+# Two alarms give EXACTLY 363/400, which a reader can check by hand: prior odds
+# 1 to 999, times 99 twice, is 9801 to 999, and 27 divides both. So the page
+# prints the fraction and its percentage at two decimals -- one decimal would
+# print 90.8 where the transcript beside it prints 0.9075, which is this book's
+# recurring defect of a number that does not reproduce from what is next to it.
+_two = ppv_after(2)
+assert _two == Fraction(363, 400), _two
+emit("p23.lr", int(LR))
+emit("p23.k.half", K)
+emit("p23.two.num", _two.numerator)
+emit("p23.two.den", _two.denominator)
+emit("p23.two.pct", float(100 * _two), 2)
+# The third alarm's PPV rounds to 99.9 per cent, which is also the accuracy
+# paradox's figure two sections earlier -- two quantities printing as one is
+# Program F08's defect. Report its COMPLEMENT, where every figure means
+# something, which is Program P05's rule for a number near a boundary.
+emit("p23.three.false.pct", float(100 * (1 - ppv_after(3))), 3)
+NOTES.append(f"in odds the theorem is a multiplication, so a second alarm from "
+             f"an independent detector takes {float(100*PPV):.1f} per cent to "
+             f"{float(100*ppv_after(2)):.2f}, and after a third only "
+             f"{float(100*(1-ppv_after(3))):.3f} per cent of triples are false")
+
+# And the trap that ties this to sections 5 and 6, stated as arithmetic rather
+# than as a caution: a second detector that fires exactly when the first does
+# carries a likelihood ratio of 1, so it moves the answer NOWHERE. The gap
+# between 90.8 and 9.0 per cent is the whole value of the independence
+# assumption, and nothing in the alarm itself tells you which case you are in.
+assert PREV / (1 - PREV) * LR * 1 == PREV / (1 - PREV) * LR
+NOTES.append("a duplicate detector has a likelihood ratio of 1 and moves the "
+             "answer nowhere, so the gap between those two numbers is exactly "
+             "what the independence assumption is worth")
+
+
 def main() -> None:
     TRANSCRIPTS.mkdir(parents=True, exist_ok=True)
-    lines = [
+    # TWO listings, not one, and the split is the point rather than tidiness.
+    # A transcript is under the same rule as a frame: it may not answer a
+    # question the reader has not been asked yet. The accumulation lines print
+    # Fraction(363, 400), which is section 6's elicited answer, so putting them
+    # in the section 4 listing would have spoiled it fourteen frames early.
+    sweep = [
         ">>> from p23_probability_bayes import ppv_at",
         ">>> from fractions import Fraction as F",
         ">>> [ppv_at(F(1, d)) for d in (10, 100, 1000)]",
@@ -317,10 +411,16 @@ def main() -> None:
         ">>> float(ppv_at(F(1, 1000)))",
         f"{float(ppv_at(Fraction(1, 1000)))}",
     ]
-    for line in lines:
-        assert len(line) <= 64, (len(line), line)
-    (TRANSCRIPTS / "p23-base-rate.txt").write_text(
-        "\n".join(lines) + "\n", encoding="utf8")
+    accumulate = [
+        ">>> from p23_probability_bayes import ppv_after",
+        ">>> [ppv_after(k) for k in (1, 2, 3)]",
+        f"{[ppv_after(k) for k in (1, 2, 3)]}",
+    ]
+    for stem, lines in (("p23-base-rate", sweep), ("p23-accumulate", accumulate)):
+        for line in lines:
+            assert len(line) <= 64, (len(line), line)
+        (TRANSCRIPTS / (stem + ".txt")).write_text(
+            "\n".join(lines) + "\n", encoding="utf8")
 
     out = [
         "% Generated by code/p23_probability_bayes.py --- do not edit.",

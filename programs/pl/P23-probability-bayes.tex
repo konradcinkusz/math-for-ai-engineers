@@ -1,27 +1,1132 @@
 %% P23 --- Prawdopodobieństwo i twierdzenie Bayesa
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak: programs/en/P23-probability-bayes.tex. Ramka po ramce, makro po
+%% makrze, liczba po liczbie; tools/parity.py porównuje oba pliki.
+%%
+%% UWAGA DLA TŁUMACZA, zebrana z poprzednich przebiegów. C4, C8 i C12
+%% porównują tokeny strukturalne, wyrażenia matematyczne i literały liczbowe
+%% W KOLEJNOŚCI, więc:
+%%   * cyfra zostaje cyfrą. "dziewięćdziesiąt dziewięć" zamiast $99$ gubi i
+%%     wyrażenie matematyczne, i literał liczbowy;
+%%   * angielski dopełniacz przy odwołaniu ("Program~\ref{}'s $x$") w polskim
+%%     się odwraca. Zdanie trzeba przebudować tak, żeby odwołanie prowadziło;
+%%   * gdzie angielski pisze liczbę słowem (\emph{jeden na milion},
+%%     \emph{trzy razy na cztery}), polski też musi pisać ją słowem.
+%%
+%% Wszystkie liczby pochodzą z code/p23_probability_bayes.py i są wstawiane
+%% przez \val{}. Listing to zatwierdzony zapis konsoli napisany przez ten
+%% skrypt. Wszystko w tym skrypcie jest dokładne, na ułamkach.
 
 \program{Prawdopodobieństwo i twierdzenie Bayesa}
 \label{prog:P23}
+\index{prawdopodobieństwo!jako miara}
+\index{twierdzenie Bayesa}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{powiedzieć, czym są przestrzeń zdarzeń elementarnych, zdarzenie
+  i prawdopodobieństwo, oraz podać trzy reguły, którym prawdopodobieństwo
+  podlega}
+\outcome{9--15}{zapisać, co warunkowanie robi z przestrzenią, i powiedzieć,
+  czego wymaga, żeby było zdefiniowane}
+\outcome{16--21}{wyprowadzić twierdzenie Bayesa z definicji, zamiast je
+  cytować, i rozpisać jego mianownik}
+\outcome{22--30}{wykonać rachunek na częstości bazowej i powiedzieć, którym z
+  dwóch prawdopodobieństw warunkowych jest podana skuteczność}
+\outcome{31--37}{powiedzieć, co znaczy niezależność i dlaczego nie jest
+  własnością, którą dwa zdarzenia zachowują}
+\outcome{38--47}{powiedzieć, co zakłada niezależność warunkowa i ile wart jest
+  drugi dowód, gdy ona zachodzi i gdy nie zachodzi}
+\end{outcomes}
 
-Argument: probability is a measure on a sample space obeying three rules;
-conditioning is restricting the space; Bayes' theorem is one line of algebra
-from the definition and is derived, never asserted. Payoff: **the base-rate
-calculation an engineer must be able to do in a meeting** \dash{} a
-classifier with 99\% accuracy on a fault that occurs once in a thousand
-requests, and what fraction of its alarms are real. Independence and
-conditional independence distinguished, because the naive Bayes assumption
-and most \enquote{these two evals are independent signals} claims live on
-the difference. Trap: the prosecutor's fallacy, elicited from the reader
-before it is named.
+\begin{quiz}
+\item Dwa zdarzenia mają część wspólną. Czy
+  $\Prob(A \cup B) = \Prob(A) + \Prob(B)$?
+  \teachesat{6--7}
+  \answerto{Nie. Takie dodawanie liczy część wspólną dwa razy, więc
+  $\Prob(A \cup B) = \Prob(A) + \Prob(B) - \Prob(A \cap B)$. Reguła dodawania
+  wymaga, żeby zdarzenia były \emph{rozłączne}, i ten warunek jest całą
+  treścią trzeciej reguły.}
+\item Zapisz $\Prob(A \mid B)$ przez wielkości bez kreski i powiedz, czego to
+  wymaga, żeby cokolwiek znaczyło. \teachesat{10--15}
+  \answerto{$\Prob(A \mid B) = \Prob(A \cap B) / \Prob(B)$, a wymaga
+  $\Prob(B) > 0$. To definicja, a nie wynik: nic nie jest dowodzone, tylko
+  wybrany zostaje nowy mianownik.}
+\item Twierdzenie Bayesa wypada z jednej wielkości zapisanej na dwa sposoby. Z
+  której? \teachesat{16--17}
+  \answerto{Z prawdopodobieństwa łącznego $\Prob(A \cap B)$. Definicja
+  warunkowania daje je jako $\Prob(A \mid B)\Prob(B)$ oraz jako
+  $\Prob(B \mid A)\Prob(A)$; przyrównanie i podzielenie to całe wyprowadzenie.}
+\item Znasz $\Prob(B \mid A)$, $\Prob(B \mid \bar{A})$ i $\Prob(A)$. Jak
+  otrzymasz $\Prob(B)$? \teachesat{20--21}
+  \answerto{Rozbij $B$ według tego, czy zaszło $A$ \dash{} to rozbicie
+  rozłączne \dash{} i dodaj:
+  $\Prob(B) = \Prob(B \mid A)\Prob(A) + \Prob(B \mid \bar{A})
+  \Prob(\bar{A})$. To wzór na prawdopodobieństwo całkowite, czyli trzecia
+  reguła zastosowana do rozbicia, które sam wybrałeś.}
+\item W postaci szansowej: przez co mnożysz szanse a priori, żeby dostać
+  szanse a posteriori? \teachesatone{41}
+  \answerto{Przez iloraz wiarygodności dowodu:
+  $\Prob(\text{dowód} \mid A) / \Prob(\text{dowód} \mid \bar{A})$. Zapisane
+  tak twierdzenie Bayesa jest mnożeniem, i właśnie dlatego można kumulować
+  kilka dowodów \dash{} pod warunkiem że ilorazy wolno mnożyć, co jest
+  warunkiem, a nie formalnością.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 55 ramek.
-}
+% ============================================================
+\section{Waga na liście wyników}
+\label{sec:P23-measure}
+\index{prawdopodobieństwo!przestrzeń zdarzeń elementarnych}
+\index{prawdopodobieństwo!zdarzenie}
+
+\begin{fr}
+Program~\ref{prog:F10} kończy się zadaniem przekazanym temu programowi. Daje
+licznik, mianownik i jedną niewygodną obserwację \dash{} że \emph{wybór}
+mianownika był decyzją, którą ktoś podjął \dash{} a potem mówi, że to, czym
+prawdopodobieństwo naprawdę \emph{jest}, należy tutaj.
+
+Zacznij więc tam, gdzie tamten program stanął. Żądanie trafia do usługi, jest
+wadliwe albo czyste, a detektor usterek albo podnosi o nim alarm, albo
+milczy. Ile różnych rzeczy może się stać z jednym żądaniem?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Cztery}
+
+Wadliwe i zgłoszone, wadliwe i przeoczone, czyste i zgłoszone, czyste i
+przemilczane. Wypisz je, bo to właśnie ta lista jest obiektem:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& \textbf{alarm} & \textbf{cisza} \\
+\midrule
+\textbf{wadliwe} & złapane & przeoczone \\
+\textbf{czyste}  & fałszywy alarm & słusznie pominięte \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Ta lista to \textbf{przestrzeń zdarzeń elementarnych}. Czynią ją nią dwie
+własności: wyniki obejmują wszystko, co może się zdarzyć, i zachodzi
+\emph{dokładnie} jeden z nich. Nic innego jeszcze się nie liczy.
+
+\textbf{Zdarzenie} to zbiór wyników \dash{} Program~\ref{prog:F10} pracował na
+dokładnie tym obiekcie, tylko pod inną nazwą. Które wyniki tworzą zdarzenie
+\emph{detektor podniósł alarm}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dwa z nich: \emph{złapane} i \emph{fałszywy alarm}}
+
+Nie jeden. \emph{Alarm} to nie to samo zdarzenie co \emph{usterka}, a cały ten
+program mieszka w luce między tymi dwoma zbiorami.
+
+\textbf{Prawdopodobieństwo} to reguła, która każdemu zdarzeniu przypisuje
+liczbę. Podlega trzem rzeczom i niczemu więcej:
+
+\begin{enumerate}
+\item każde zdarzenie dostaje liczbę nieujemną;
+\item cała przestrzeń dostaje $1$;
+\item jeśli dwa zdarzenia nie mogą zajść naraz, to liczba dla
+  \emph{któregokolwiek} z nich jest sumą ich dwóch liczb.
+\end{enumerate}
+
+To cała definicja. Wszystko w tym programie jest konsekwencją tych trzech
+punktów, a warto zauważyć, jak niewiele one mówią: nic o częstości, nic o
+powtarzaniu, nic o przekonaniach.
+
+\mermaidfig{p23-space-and-measure}{Trzy obiekty: lista, jej ważenie i zbiór jej
+pozycji.}{zdarzenie i waga}
+\end{fr}
+
+\begin{fr}
+Weź pierwszą konsekwencję od razu, bo dostaniesz ją w jednej linijce. Jeśli
+$A$ jest zdarzeniem, jakie jest prawdopodobieństwo, że $A$ \emph{nie} zajdzie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\Prob(\bar{A}) = 1 - \Prob(A)$}
+
+$A$ i $\bar{A}$ nie mogą zajść naraz, więc trzecia reguła pozwala je dodać;
+razem są całą przestrzenią, więc druga reguła mówi, że suma wynosi $1$. Dwie
+reguły, jedna linijka i żadnego rysunku.
+
+Zapamiętaj ten kształt. Każdy wynik w tym programie otrzymuje się tak samo
+\dash{} rozbić coś na kawałki, które nie mogą się nakładać, dodać je i
+skorzystać z tego, że całość jest jednością.
+\end{fr}
+
+\begin{fr}
+Teraz reguła, którą się łamie. Program~\ref{prog:F10} zmierzył dwa zbiory
+ewaluacyjne: $\val{f10.eval.a}$ przypadków w jednym, $\val{f10.eval.b}$ w
+drugim, przy czym $\val{f10.eval.shared}$ występuje w obu, co daje
+$\val{f10.eval.union}$ różnych przypadków łącznie.
+
+Wylosuj jeden z tych $\val{f10.eval.union}$ przypadków tak, żeby każdy był
+jednakowo prawdopodobny. Czy prawdopodobieństwo, że jest on w pierwszym zbiorze
+\emph{lub} w drugim, równa się
+$\Prob(\text{pierwszy}) + \Prob(\text{drugi})$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Te dwa prawdopodobieństwa to $\frac{1}{2}$ i $\frac{3}{5}$, co daje w
+sumie $\frac{11}{10}$, a żadne prawdopodobieństwo nie jest większe od $1$.
+\end{ansblock}
+
+Trzecia reguła miała warunek i ten warunek pracował: zdarzenia muszą nie móc
+zajść razem. Te dwa mogą, w $\val{f10.eval.shared}$ przypadkach na
+$\val{f10.eval.union}$, więc:
+\[ \Prob(A \cup B) = \Prob(A) + \Prob(B) - \Prob(A \cap B) \]
+a tutaj daje to $\frac{1}{2} + \frac{3}{5} - \frac{1}{10} = 1$, co jest
+poprawne, bo każdy przypadek jest w jednym zbiorze albo w drugim.
+
+Program~\ref{prog:F10} podaje dokładnie tę regułę zliczania, tylko z każdą
+liczebnością podzieloną przez $\val{f10.eval.union}$. To nie jest analogia:
+skrypt tego programu czyta cztery zatwierdzone liczebności tamtego i sprawdza
+oba zdania względem siebie, więc nie mogą się rozjechać.
+\end{fr}
+
+\begin{fr}
+Warto powiedzieć wprost, co w tej sekcji się wydarzyło, a co nie.
+
+Masz teraz \textbf{miarę}: coś, co każdemu zbiorowi przypisuje rozmiar,
+nieujemny, addytywny na kawałkach, które się nie nakładają, przy ustalonej
+sumie całości. Program~\ref{prog:F13} zbudował taką z pola powierzchni, a
+warunek, który nałożył na gęstość \dash{} że pole pod nią wynosi dokładnie
+$1$ \dash{} to druga reguła zapisana dla przestrzeni ciągłej.
+
+
+Program~\ref{prog:F13} poświęca całą sekcję temu, że \emph{wysokość} gęstości
+może przekroczyć $1$, a prawdopodobieństwo nie. Która z trzech reguł jest tą,
+która do wysokości się nie stosuje?
+\dotline
+\nextframe
+\end{fr}
+
+% ============================================================
+\section{Warunkowanie to zmiana mianownika}
+\label{sec:P23-conditioning}
+\index{prawdopodobieństwo!warunkowe}
+\index{prawdopodobieństwo!mianownik}
+
+\begin{fr}
+\begin{ansblock}
+Druga. Ogranicza ona miarę \emph{zbioru}, a wysokość nie jest miarą zbioru.
+\end{ansblock}
+
+Wysokość jest tempem \dash{} prawdopodobieństwem na jednostkę $x$ \dash{} i
+nic w trzech regułach jej nie ogranicza. Zwęź przedział, a wysokość rośnie bez
+ograniczeń, podczas gdy zamknięte pod nią pole zostaje dokładnie równe $1$.
+
+Do roboty. Oto cztery wyniki z nałożonymi wagami. Usterka zdarza się raz na
+$\val{p23.prev.den}$ żądań; detektor łapie $\val{p23.sens.pct}$ procent
+usterek i milczy o $\val{p23.sens.pct}$ procentach czystych żądań. Na
+$\val{p23.alarm.den.long}$ żądań:
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+& \textbf{alarm} & \textbf{cisza} \\
+\midrule
+\textbf{wadliwe} & $\val{p23.alarm.real}$ & $1$ \\
+\textbf{czyste}  & $\val{p23.alarm.false}$ & $\val{p23.quiet.clean}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Nic w tej sekcji nie wymaga, żeby te liczby były realistyczne. Wymaga tylko,
+żeby dodawały się do $\val{p23.alarm.den.long}$, co robią, więc jest to
+przestrzeń zdarzeń z miarą.
+
+Teraz ktoś ci mówi, że alarm zadziałał. Co się zmieniło w przestrzeni?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dwa z czterech wyników zniknęły. Dostępna jest tylko kolumna \emph{alarm}, a
+jej dwa wpisy nie dodają się już do całości.
+\end{ansblock}
+
+Tym właśnie jest warunkowanie i warto oprzeć się pokusie, żeby zabrzmiało
+poważniej. Dostałeś mniejszą przestrzeń, więc normujesz na nowo: dzielisz
+przez wagę tego, co zostało.
+
+\[ \Prob(A \mid B) \;=\; \frac{\Prob(A \cap B)}{\Prob(B)} \]
+
+Licznik zatrzymuje tylko tę część $A$, która przetrwała, a mianownik jest nową
+całością.
+\end{fr}
+
+\begin{fr}
+Program~\ref{prog:F10} kończy się dokładnie tą obserwacją, a tutaj staje się
+ona decyzją. Tamten program mówi, że naiwne prawdopodobieństwo to dwie
+liczebności i dzielenie, a wybór tego, co idzie pod kreskę, jest decyzją.
+Warunkowanie to ta decyzja podjęta świadomie: \emph{skoro} powiedziano mi to a
+to, pod kreską nie jest już wszystko.
+
+Jedno pytanie o ten wzór rozstrzyga, jak masz go traktować przez resztę
+programu. Czy to definicja, czy coś, co zostało udowodnione?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Definicja}
+
+\begin{warning}
+Nic powyżej nie jest dowodzone i nie ma za tym żadnego wyprowadzenia, którego
+można by poszukać \dash{} ktoś zdecydował się nadać tej wielkości nazwę i
+kreskę. Ma to znaczenie za dwie sekcje, bo twierdzenie Bayesa \emph{jest}
+twierdzeniem, a wiedza, na które z dwojga patrzysz, mówi ci, które wolno ci
+odbudować od zera, gdy go nie pamiętasz.
+\end{warning}
+
+Sprawdź to na tabeli. Ile z $\val{p23.alarm.den.long}$ żądań wywołuje alarm i
+jaka to część?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p23.alarm.real} + \val{p23.alarm.false}$ z nich, czyli
+$\frac{\val{p23.alarm.num}}{\val{p23.alarm.den}}$, to jest
+$\val{p23.alarm.pct}$ procent.
+\end{ansblock}
+
+Alarm jest zdarzeniem rzadkim, czego byś sobie życzył. Trzymaj się dwóch
+kawałków, z których powstał, a nie sumy: $\val{p23.alarm.real}$ z tych alarmów
+dotyczy prawdziwej usterki, a $\val{p23.alarm.false}$ nie.
+
+\begin{note}
+Zauważ, że żadnej z tych liczb ci nie podano. Specyfikacja detektora opisuje,
+co robi z wadliwym żądaniem i co z czystym, a te dwie liczebności powstają
+dopiero wtedy, gdy powiesz również, ile było jednych i drugich. Sekcja 4 jest
+w całości o konsekwencjach tego zdania.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Definicji używa się częściej przekształconej niż w postaci wyjściowej, a
+przekształcenie warto zrobić samemu, bo to linijka, z której zbudowana jest
+następna sekcja.
+
+Pomnóż obie strony definicji przez $\Prob(B)$. Co dostajesz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\Prob(A \cap B) = \Prob(A \mid B)\,\Prob(B)$}
+
+Co się czyta: żeby dostać oba, dostań $B$, a potem dostań $A$ z tego, co
+zostało. To \textbf{reguła mnożenia}, czyli definicja z przeniesionym
+mianownikiem.
+
+Jeden warunek towarzyszy temu wszystkiemu i jest jedyny w programie.
+$\Prob(B)$ musi być większe od zera \dash{} nie można warunkować czymś, co nie
+może zajść, bo przestrzeń, względem której normowałbyś na nowo, nie ma w sobie
+żadnej wagi.
+
+\begin{trapbox}
+\textbf{$\Prob(A \mid B)$ i $\Prob(B \mid A)$ to różne liczby, i zwykle bardzo
+różne.} Mają różne mianowniki, a na tym polega cała rola kreski.
+
+Pokusa jest realna, bo polszczyzna też ich dobrze nie odróżnia.
+\enquote{Prawdopodobieństwo alarmu przy usterce} i \enquote{prawdopodobieństwo
+usterki przy alarmie} różnią się dwoma słowami, a w mowie te słowa często
+przepadają. Sekcja 4 mierzy, jak daleko od siebie te dwie liczby potrafią być
+przy zupełnie zwyczajnym detektorze.
+\end{trapbox}
+
+\mermaidfig{p23-two-denominators}{Co warunkowanie zmienia, a co zostawia.}{warunkowanie zawęża}
+\end{fr}
+
+% ============================================================
+\section{Bayes, w jednej linijce}
+\label{sec:P23-bayes}
+\index{twierdzenie Bayesa!wyprowadzenie}
+
+\begin{fr}
+Wszystko, czego twierdzenie potrzebuje, jest już na stronie, a wyprowadzenie
+jest na tyle krótkie, żeby je zrobić, a nie przeczytać.
+
+Korzystając z reguły mnożenia z poprzedniej sekcji, zapisz prawdopodobieństwo
+łączne $\Prob(A \cap B)$ na \emph{dwa} różne sposoby.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \Prob(A \cap B) = \Prob(A \mid B)\,\Prob(B)
+   = \Prob(B \mid A)\,\Prob(A) \]
+\end{ansblock}
+
+Zbiór $A \cap B$ nie wie, w którą stronę go rozłożyłeś, więc oba wyrażenia to
+ta sama liczba. Podziel obie strony przez $\Prob(B)$:
+
+\[ \Prob(A \mid B) \;=\; \frac{\Prob(B \mid A)\,\Prob(A)}{\Prob(B)} \]
+
+i to jest twierdzenie Bayesa. Nie ma w nim nic więcej. Jedna symetryczna
+wielkość zapisana na dwa sposoby i jedno dzielenie.
+\end{fr}
+
+\begin{fr}
+Warto powiedzieć bez ogródek, jakie to zwyczajne, bo twierdzenie ma reputację,
+której wyprowadzenie nie potwierdza. Niczego nie założono, nie przeszło się do
+granicy i nie wprowadzono nowego obiektu. To, co ono robi, to
+\textbf{odwrócenie warunkowania}: bierze kierunek, który umiesz zmierzyć, i
+daje ci kierunek, którego chciałeś.
+
+Taki właśnie kształt ma większość problemów pomiarowych w tej dziedzinie.
+Zbiór testowy mówi ci, jak model zachowuje się na przypadkach, które
+oznaczyłeś; chciałeś wiedzieć, jak zachowuje się przypadek przy danym wyjściu
+modelu.
+\end{fr}
+
+\begin{fr}
+Cztery części mają nazwy, a nazwy są w nich najmniej użyteczne. $\Prob(A)$ to
+\textbf{prior}, $\Prob(B \mid A)$ to \textbf{wiarygodność}, $\Prob(B)$ to
+\textbf{dowód}, a $\Prob(A \mid B)$ to \textbf{posterior}.
+
+\begin{note}
+Dwie z tych nazw warto opatrzyć ostrzeżeniem. \emph{Wiarygodność} to
+prawdopodobieństwo warunkowe czytane jako funkcja tego, po czym warunkujemy, a
+nie tego, co sugeruje potoczne słowo. A \emph{dowód} nazywa mianownik, czyli
+kawałek, którego nikt nie liczy wprost \dash{} następna ramka mówi, co robi
+się zamiast tego. Żadna z tych nazw nie pomoże ci odbudować wzoru; pomoże
+wyprowadzenie, które właśnie zrobiłeś.
+\end{note}
+
+Trzy z tych czterech zwykle podaje ci ten, kto wyspecyfikował rzecz, o której
+rozumujesz. Która nie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dowód, $\Prob(B)$}
+
+Nikt go nie publikuje i to na nim ludzie się zacinają. Zwykle znasz natomiast
+dwa prawdopodobieństwa warunkowe skierowane w drugą stronę, a to okazuje się
+wystarczać.
+
+Znasz $\Prob(B \mid A)$, $\Prob(B \mid \bar{A})$ i $\Prob(A)$. Zapisz
+$\Prob(B)$ przez nie.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \Prob(B) = \Prob(B \mid A)\,\Prob(A)
+            + \Prob(B \mid \bar{A})\,\Prob(\bar{A}) \]
+\end{ansblock}
+
+Rozbij $B$ według tego, czy zaszło $A$. Te dwa kawałki nie mogą się nakładać, a
+razem są całym $B$, więc trzecia reguła je dodaje \dash{} a każdy kawałek to
+znów reguła mnożenia. To \textbf{wzór na prawdopodobieństwo całkowite}, czyli
+trzecia reguła zastosowana do rozbicia, które sam wybrałeś.
+
+\textbf{Tu też chowa się kłopot z następnej sekcji.} Ten wzór zawiera
+$\Prob(A)$, więc odpowiedź zależy od tego, jak częste jest $A$, niezależnie od
+tego, czy ktokolwiek o tym wspomniał.
+\end{fr}
+
+% ============================================================
+\section{Jaka część alarmów jest prawdziwa}
+\label{sec:P23-baserate}
+\index{prawdopodobieństwo!częstość bazowa}
+\index{diagnostyka!błąd prokuratora}
+
+\begin{fr}
+Ta sekcja jest powodem, dla którego ten program istnieje, i otwiera ją
+pytanie, na które masz odpowiedzieć szybko. Nic nie licz i nie zaglądaj z
+powrotem do tabeli \dash{} chodzi o to, co powiesz, zanim to wyliczysz.
+
+Detektor usterek jest skuteczny w $\val{p23.sens.pct}$ procentach, w zwykłym
+sensie: łapie $\val{p23.sens.pct}$ procent usterek i milczy o
+$\val{p23.sens.pct}$ procentach czystych żądań. Usterki zdarzają się raz na
+$\val{p23.prev.den}$ żądań. Właśnie podniósł alarm.
+
+Mniej więcej jaka część jego alarmów to prawdziwe usterki? Zapisz liczbę.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\frac{\val{p23.ppv.num}}{\val{p23.ppv.den}}$, czyli $\val{p23.ppv.pct}$
+procent. Dziewięć na dziesięć jego alarmów jest fałszywych.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{\enquote{Jest skuteczny w $\val{p23.sens.pct}$ procentach, więc alarm
+to prawie na pewno prawdziwa usterka.}} Jeśli zapisałeś coś w okolicach
+$\val{p23.sens.pct}$, jesteś w większości, a rozumowanie, które cię tam
+doprowadziło, nie jest głupie \dash{} jest o jedno podstawienie od poprawnego.
+
+$\val{p23.sens.pct}$ procent to $\Prob(\text{alarm} \mid \text{usterka})$:
+zachowanie detektora na wadliwych żądaniach. Pytanie dotyczyło
+$\Prob(\text{usterka} \mid \text{alarm})$: składu jego alarmów. Ramka
+ostrzegawcza z poprzedniej sekcji nazwała je różnymi liczbami; tak bardzo
+różnymi.
+
+Powodem jest mianownik, a wzór na prawdopodobieństwo całkowite z sekcji 3
+wpisał go tam na piśmie. Na $\val{p23.alarm.den.long}$ żądań przypada
+$\val{p23.alarm.real}$ prawdziwych alarmów i $\val{p23.alarm.false}$
+fałszywych \dash{} \textbf{około $\val{p23.alarm.ratio}$ fałszywych alarmów na
+każdy prawdziwy} \dash{} bo poziom błędu $\val{p23.fpr.pct}$ procent na
+ogromnej populacji czystych żądań daje więcej alarmów niż skuteczność
+$\val{p23.sens.pct}$ procent na maleńkiej populacji wadliwych.
+\end{trapbox}
+
+Teraz zrób to drugą drogą, bo obie muszą się zgadzać, a zobaczenie, że tak
+jest, czyni wzór użytecznym, a nie ozdobnym. Zapisz odpowiedź twierdzeniem
+Bayesa, z mianownikiem rozpisanym przez wzór na prawdopodobieństwo całkowite.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \Prob(F \mid A)
+   = \frac{\Prob(A \mid F)\,\Prob(F)}
+          {\Prob(A \mid F)\,\Prob(F) + \Prob(A \mid \bar{F})\,\Prob(\bar{F})}
+   = \frac{\val{p23.ppv.num}}{\val{p23.ppv.den}} \]
+\end{ansblock}
+
+Każda wielkość w tym ułamku była w specyfikacji detektora poza jedną.
+$\Prob(F)$, czyli tempo, w jakim usterki w ogóle się zdarzają, występuje
+dwukrotnie i nikt o nim nie wspomniał, gdy detektor był opisywany.
+
+\begin{aibox}
+\textbf{Precyzja} \dash{} część zgłoszonych przypadków, które okazują się
+prawdziwe \dash{} to $\Prob(\text{prawdziwe} \mid \text{zgłoszone})$, czyli
+dokładnie ta wielkość, o której jest ta sekcja. \textbf{Czułość} to
+$\Prob(\text{zgłoszone} \mid \text{prawdziwe})$, czyli ta druga.
+
+Raport klasyfikacji wypisuje obie, zmierzone na populacji, którą ktoś wybrał, a
+ta populacja jest zwykle zrównoważona, bo zrównoważony zbiór czyni każdą klasę
+widoczną. Ruch produkcyjny nie jest. Czułość warunkuje po samej prawdziwej
+klasie, więc jest własnością modelu i podróżuje; precyzja warunkuje po tym, co
+model zgłosił, więc zależy od tego, ile było przypadków każdej klasy, i nie
+podróżuje. Dwie sąsiednie linijki tego samego raportu zachowują się zupełnie
+inaczej, a nic na karcie tego nie mówi.
+\end{aibox}
+
+\mermaidfig{p23-two-populations}{Skąd biorą się alarmy i po co liczyć obie
+grupy.}{skąd biorą się alarmy}
+\end{fr}
+
+\begin{fr}
+Ten błąd ma nazwę i pochodzi z sali sądowej, a nie z inżynierii. Prokurator
+mówi ławie przysięgłych, że prawdopodobieństwo zgodności śladu przy
+niewinności wynosi jeden na milion, i zaprasza ją do wniosku, że
+prawdopodobieństwo niewinności przy zgodności śladu wynosi jeden na milion.
+
+To są te dwa prawdopodobieństwa warunkowe z ramki ostrzegawczej w sekcji 2.
+Zapisz oba dla tego detektora, w procentach: część \emph{czystych żądań},
+które wywołują alarm, oraz część \emph{alarmów}, które dotyczą czystych żądań.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\Prob(\text{alarm} \mid \text{czyste}) = \val{p23.fpr.pct}$ procent oraz
+$\Prob(\text{czyste} \mid \text{alarm}) = \val{p23.false.pct}$ procent.
+\end{ansblock}
+
+Detektor prawie nigdy nie niepokoi czystego żądania, a prawie każdy alarm,
+który podnosi, dotyczy właśnie takiego. Oba zdania są prawdziwe naraz, o tym
+samym detektorze, tego samego dnia \dash{} pierwsze jest własnością detektora,
+a drugie własnością ruchu.
+
+Teraz zmieniaj tę jedną wielkość, której nikt nie podał. Detektor przez cały
+czas ten sam \dash{} nic się w nim nie zmienia \dash{} a rusza się tylko
+tempo, w jakim zdarzają się usterki.
+
+Zanim pójdziesz dalej, uzupełnij środkowy wiersz. Przy usterkach raz na sto i
+detektorze mylącym się raz na sto: jaka część alarmów jest prawdziwa?
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+\textbf{usterki zdarzają się} & \textbf{alarmy prawdziwe} \\
+\midrule
+1 na 10      & $\val{p23.ppv.10.pct}$\% \\
+1 na 100     & \blank \\
+1 na 1000    & $\val{p23.ppv.pct}$\% \\
+1 na 10\,000 & $\val{p23.ppv.10000.pct}$\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p23.ppv.100.pct}$ procent \dash{} dokładnie połowa.
+\end{ansblock}
+
+Ten wiersz warto zabrać ze sobą, bo jest punktem orientacyjnym, a nie
+przypadkiem. Gdy tempo usterek równa się poziomowi błędu, prawdziwe i fałszywe
+alarmy pochodzą z populacji, których rozmiary dokładnie znoszą te dwa tempa, i
+odpowiedź wynosi $\frac{1}{2}$ co do joty. Jest dokładna na ułamkach, a skrypt
+to sprawdza.
+
+Stąd reguła kciuka, i to jedno zdanie warto zapamiętać: \textbf{porównaj
+częstość bazową z poziomem błędu.} Rzadsza niż poziom błędu \dash{} większość
+alarmów jest fałszywa; częstsza \dash{} większość jest prawdziwa.
+\end{fr}
+
+\begin{fr}
+Listing wykonuje ten sam przegląd. Wypisuje ułamki, a nie liczby dziesiętne,
+bo środkowy wpis to dokładnie jedna druga, a zapis dziesiętny by tego nie
+powiedział.
+
+\transcript{p23-base-rate}
+
+Drugie wywołanie jest tam dlatego, że w raporcie zobaczysz właśnie liczbę
+dziesiętną, a to jest ten wiersz, o którym jest cała ta sekcja.
+\end{fr}
+
+\begin{fr}
+Jeszcze jedna konsekwencja tej samej arytmetyki, czytana od drugiego końca, bo
+pojawia się w raportach ewaluacyjnych bez przerwy.
+
+Nasz detektor jest poprawny na $\val{p23.acc.pct}$ procentach żądań. Rozważ
+rywala, który nie podnosi alarmu nigdy, w żadnych okolicznościach. Jaka jest
+jego skuteczność?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p23.never.pct}$ procent}
+
+Ma rację co do każdego czystego żądania, a czyste żądania to
+$\val{p23.never.pct}$ procent ruchu. \textbf{Model, który nie robi zupełnie
+nic, wypada lepiej niż działający detektor}, co jest paradoksem dokładności i
+tą samą częstością bazową w innym kapeluszu.
+
+\begin{warning}
+Wniosek nie brzmi, że skuteczność jest złą miarą. Brzmi tak, że pojedyncza
+liczba na niezrównoważonej populacji jest średnią ważoną z pominiętymi wagami,
+a tymi wagami jest częstość bazowa. Program~\ref{prog:F10} podaje regułę:
+raportuj dwie liczebności, z których liczba powstała, a paradoks nie ma się z
+czego wziąć.
+\end{warning}
+\end{fr}
+
+% ============================================================
+\section{Niezależność i to, czego nie przetrwa}
+\label{sec:P23-independence}
+\index{prawdopodobieństwo!niezależność}
+
+\begin{fr}
+Sekcja 4 zostawiła detektor wyglądający na bezużyteczny. Nie jest, a wyjście
+prowadzi przez dwie następne sekcje \dash{} potrzebuje jednak słowa, którego
+ten program starannie dotąd nie użył.
+
+Dwa zdarzenia są \textbf{niezależne}, gdy
+\[ \Prob(A \cap B) = \Prob(A)\,\Prob(B) \]
+To jest postać, którą się zapisuje, i nie jest to postać, która mówi, co to
+znaczy.
+
+\begin{notationbox}
+\textbf{Słowo \enquote{niezależny} wykonuje w tej książce dwie prace i te dwie
+prace się nie spotykają.}
+
+Program~\ref{prog:P04} poświęca mu cały program: tam jest to własność
+\emph{zbioru wektorów}, z których żaden nie jest kombinacją pozostałych, i nie
+ma w tym nic probabilistycznego. Tutaj jest to własność \emph{dwóch zdarzeń
+przy pewnej mierze} i jest to iloczyn dwóch liczb.
+
+Oba użycia są w swoich dziedzinach standardowe, więc kolizja nie jest niczyim
+błędem i nie da się jej obejść. Obroną jest zauważenie, do jakiego rodzaju
+obiektu słowo zostało zastosowane.
+\end{notationbox}
+
+Podziel obie strony przez $\Prob(B)$. Co mówi wynik, słowami?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\Prob(A \mid B) = \Prob(A)$: informacja o $B$ nie rusza twojej
+odpowiedzi o $A$}
+
+To jest postać czytelna, a iloczyn nadal jest tą, którą się zapisuje, bo
+iloczyn jest symetryczny w $A$ i $B$ i nie wywraca się, gdy $\Prob(B)$ wynosi
+zero.
+
+Niezależność jest założeniem o \emph{mierze}, a nie faktem o tym, że dwie
+rzeczy nie mają ze sobą nic wspólnego w świecie. Nic nie stoi na przeszkodzie,
+żeby ją zapisać; czy zachodzi, to pytanie o liczby.
+
+Weź dwie uczciwe monety, tak że cztery wyniki mają po $\frac{1}{4}$ wagi.
+Niech $A$ oznacza \emph{pierwsza moneta to orzeł}, a $B$ \emph{druga to
+orzeł}. Czy $A$ i $B$ są niezależne?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak}
+
+$\Prob(A) = \Prob(B) = \frac{1}{2}$ oraz $\Prob(A \cap B) = \frac{1}{4}$, czyli
+iloczyn. Tak właśnie powinny zachowywać się dwie uczciwe monety i dziwny byłby
+model monet, który mówiłby inaczej.
+
+Dodaj teraz trzecie zdarzenie do tej samej przestrzeni. Niech $C$ oznacza
+\emph{dokładnie jedna z dwóch monet to orzeł}, co jest prawdą w dwóch z
+czterech wyników, więc $\Prob(C) = \frac{1}{2}$.
+
+Powiedziano ci, że zaszło $C$. Ile wynosi $\Prob(A \cap B \mid C)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$0$}
+
+Jeśli dokładnie jedna moneta to orzeł, to obie nim być nie mogą. Tymczasem
+$\Prob(A \mid C)$ i $\Prob(B \mid C)$ wynoszą po $\frac{1}{2}$ \dash{} przy
+$C$ każda moneta wciąż jednakowo może być tym orłem \dash{} więc ich iloczyn
+to $\frac{1}{4}$.
+
+\[ 0 \;\ne\; \tfrac{1}{4} \]
+
+\textbf{$A$ i $B$ są niezależne, a przy $C$ są tak zależne, jak dwa zdarzenia
+być mogą:} wiedza o jednym rozstrzyga drugie w całości.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Te dwa sygnały są niezależne, więc mogę je traktować
+osobno.}} Niezależność nie jest własnością, którą dwa zdarzenia noszą ze sobą.
+Jest zdaniem o konkretnej mierze, a warunkowanie zmienia miarę.
+
+Monety to najmniejsza możliwa demonstracja i nie są ciekawostką. Za każdym
+razem, gdy filtrujesz zbiór danych, ograniczasz ewaluację do podgrupy albo
+patrzysz tylko na żądania, które dotarły do modelu, dokonałeś warunkowania
+\dash{} a jakakolwiek niezależność zachodziła wcześniej, jest teraz zdaniem o
+innej przestrzeni, którego nikt nie sprawdził.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Te same trzy zdarzenia dają mniejszy wniosek, który warto mieć osobno, bo
+wychodzi zawsze, gdy w grę wchodzą więcej niż dwie rzeczy.
+
+Sprawdź pozostałe dwie pary: $A$ z $C$ oraz $B$ z $C$. Każda para się mnoży,
+więc wszystkie trzy pary są niezależne. Ile wobec tego wynosi
+$\Prob(A \cap B \cap C)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$0$, przy iloczynie $\frac{1}{8}$}
+
+$A \cap B$ jest już puste, gdy nałożysz $C$, więc dołożenie $C$ tego nie
+uratuje. \textbf{Niezależność parami nie daje niezależności całej rodziny}, a
+żadna liczba sprawdzeń par tego nie wykryje.
+
+Dlatego twierdzenie, że zbiór cech jest niezależny, musi mówić, które z dwojga
+ma na myśli \dash{} i dlatego tabela korelacji parami, którą ludzie zwykle
+produkują, nie może tego rozstrzygnąć.
+\end{fr}
+
+% ============================================================
+\section{Niezależność warunkowa i drugi sygnał}
+\label{sec:P23-conditional}
+\index{prawdopodobieństwo!niezależność warunkowa}
+\index{prawdopodobieństwo!iloraz wiarygodności}
+
+\begin{fr}
+Poprzednia sekcja szła w jedną stronę: niezależne, a potem nie, gdy
+zawarunkujesz. Równie łatwo idzie w drugą, a ten kierunek jest tym, na którym
+zbudowany jest cały rachunek prawdopodobieństwa w zastosowaniach.
+
+Dwa monitory obserwują tę samą usługę. Każdy jest zaszumionym odczytem jednej
+prawdy leżącej pod spodem \dash{} czy usługa faktycznie jest zepsuta \dash{} i
+każdy ma rację trzy razy na cztery. Monitory w ogóle ze sobą nie rozmawiają.
+
+Czy ich dwa odczyty są niezależne?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. $\Prob(X \cap Y) = \frac{\val{p23.cause.pxy.num}}{\val{p23.cause.pxy.den}}$
+przy $\Prob(X)\Prob(Y) = \frac{1}{4} = \frac{4}{16}$.
+\end{ansblock}
+
+Są skorelowane, a nic między nimi nie podłączono. Oba odczytują ten sam stan
+leżący pod spodem, więc gdy usługa naprawdę jest zepsuta, oba zwykle to mówią,
+a gdy jest sprawna, oba zwykle milczą. Wspólna przyczyna sprawia, że dwa
+niezależne przyrządy zgadzają się częściej, niż wynikałoby z przypadku.
+
+Ale zawarunkuj teraz tą przyczyną. Przy założeniu, że usługa naprawdę jest
+zepsuta, oba odczyty \emph{są} niezależne \dash{} dokładnie, i skrypt to
+sprawdza. Szum każdego monitora jest jego własny.
+\end{fr}
+
+\begin{fr}
+To jest \textbf{niezależność warunkowa}, a para z sekcją 5 jest tym, co warto
+zabrać ze sobą:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{niezależne} & i zależne, gdy zawarunkujesz \\
+\textbf{zależne}    & i niezależne, gdy zawarunkujesz \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Oba przypadki zachodzą, w najmniejszych przykładach, jakie ktokolwiek
+zbudowałby. Żadne z tych słów nie implikuje więc drugiego, a zdanie zawierające
+\enquote{niezależne}, które nie mówi \emph{przy czym}, nie powiedziało nic
+sprawdzalnego.
+
+Drugi wiersz nosi nazwę, którą znasz. Które założenie, czynione o kilku
+obserwacjach i o rzeczy, którą próbujesz z nich wywnioskować, to jest?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Założenie \textbf{naiwnego Bayesa}}
+
+Które jest użyteczniejsze postawione tak niż jako algorytm, od którego wzięło
+nazwę, bo mówi dokładnie, co się zakłada \dash{} obserwacje są warunkowo
+niezależne przy danej klasie \dash{} a więc dokładnie, co je łamie. Dwie
+cechy, które dzielą przyczynę inną niż klasa, łamią je, a nic w procedurze
+uczenia tego nie zgłosi.
+
+Teraz spieniężmy to i naprawmy szkody z sekcji 4. Twierdzenie Bayesa ma drugą
+postać, w której kumulowanie dowodów staje się oczywiste, a bierze się ona z
+podzielenia twierdzenia przez siebie samo.
+
+Zapisz je dla $A$ i jeszcze raz dla $\bar{A}$, przy tym samym dowodzie $B$.
+Mianownik $\Prob(B)$ jest w obu ten sam, więc podzielenie jednego przez drugie
+go skraca:
+\[ \underbrace{\frac{\Prob(A \mid B)}{\Prob(\bar{A} \mid B)}}_{\text{szanse a posteriori}}
+   \;=\;
+   \underbrace{\frac{\Prob(A)}{\Prob(\bar{A})}}_{\text{szanse a priori}}
+   \times
+   \underbrace{\frac{\Prob(B \mid A)}{\Prob(B \mid \bar{A})}}_{\text{iloraz wiarygodności}} \]
+
+\textbf{W szansach twierdzenie jest mnożeniem}, a niewygodny mianownik
+zniknął.
+\end{fr}
+
+\begin{fr}
+Przepuść przez to detektor. Usterki chodzą raz na $\val{p23.prev.den}$, więc
+szanse a priori wynoszą $1$ do $999$. Alarm ma iloraz wiarygodności
+\[ \frac{\Prob(\text{alarm} \mid \text{usterka})}
+        {\Prob(\text{alarm} \mid \text{czyste})} = \val{p23.lr} \]
+więc jeden alarm daje szanse a posteriori $\val{p23.lr}$ do $999$ i
+prawdopodobieństwo $\frac{\val{p23.ppv.num}}{\val{p23.ppv.den}}$ \dash{}
+odpowiedź z sekcji 4, otrzymaną przez mnożenie zamiast przez ułamek z dwoma
+składnikami pod kreską.
+
+Drugi, niezależny detektor tej samej jakości też właśnie podnosi alarm. Jakie
+są szanse a posteriori i jakie to prawdopodobieństwo?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Szanse $\val{p23.lr}^{2}$ do $999$, czyli
+$\frac{\val{p23.two.num}}{\val{p23.two.den}}$, to jest $\val{p23.two.pct}$
+procent.
+\end{ansblock}
+
+$9801$ do $999$ dzieli się przez $27$ i daje $363$ do $37$, więc
+prawdopodobieństwo wynosi $\frac{363}{400}$. Dwa alarmy przenoszą cię z
+$\val{p23.ppv.pct}$ procent na $\val{p23.two.pct}$: \textbf{$\val{p23.k.half}$
+niezależne detektory wystarczą, żeby przekroczyć połowę}, a po trzecim
+fałszywych zostaje już tylko $\val{p23.three.false.pct}$ procent trójek.
+
+To jest konstruktywna odpowiedź na sekcję 4. Pojedynczy słaby sygnał przy
+niskiej częstości bazowej jest prawie bezwartościowy i właśnie dlatego
+prawdziwe stosy monitoringu buduje się z kilku tanich detektorów, a nie z
+jednego drogiego.
+
+\transcript{p23-accumulate}
+\end{fr}
+
+\begin{fr}
+Ten ostatni krok coś założył i warto się dowiedzieć co, łamiąc to założenie.
+Przypuśćmy, że drugi detektor wcale nie jest niezależny, tylko jest kopią
+pierwszego, wpiętą w ten sam wzorzec w logach, tak że gdy pierwszy się odezwie,
+drugi na pewno odezwie się też, niezależnie od tego, czy usterka jest.
+
+Ile wynosi iloraz wiarygodności drugiego alarmu i gdzie to zostawia odpowiedź?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jego iloraz wynosi $1$, więc mnoży szanse przez nic, a odpowiedź zostaje na
+$\val{p23.ppv.pct}$ procentach.
+\end{ansblock}
+
+\begin{trapbox}
+\textbf{\enquote{Mamy dwa niezależne sygnały, więc dowody się mnożą.}} Ilorazy
+mnożą się wtedy, gdy oba sygnały są warunkowo niezależne \emph{przy danej
+prawdzie} \dash{} czyli drugi wiersz z sekcji 5, o którym nic w żadnym z
+alarmów ci nie mówi.
+
+Odstęp między $\val{p23.ppv.pct}$ a $\val{p23.two.pct}$ procent \textbf{jest}
+tym, ile warte jest założenie niezależności, i to jest całość tej wartości.
+Dwa detektory dzielące cechę, dwie ewaluacje dzielące prompty, dwoje
+recenzentów czytających nawzajem swoje komentarze: każde z nich to przypadek
+kopii w innym przebraniu i każde zostanie zaraportowane jako potwierdzenie.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+Ten program traktuje prawdopodobieństwo jako wagę na skończonej liście
+wyników, co wystarcza do wszystkiego, co w nim jest, i nie jest definicją
+ogólną. Porządne ujęcie nazywa rodzinę zbiorów mierzalnych i wymaga
+addytywności na przeliczalnie wielu rozłącznych kawałkach, co jest tym, dzięki
+czemu działają przestrzenie ciągłe \dash{} gdzie, jak mówi
+Program~\ref{prog:F13}, wielkość o nieskończenie wielu możliwych wartościach
+nie może nieść prawdopodobieństwa przy każdej z nich, a pracę wykonują pola. Pierwszy kurs teorii miary robi to porządnie; nic w tej książce
+nie zależy od tej różnicy.
+
+Czego ten program również nie robi, to nie mówi, co prawdopodobieństwo
+\emph{znaczy}. Trzy reguły na ten temat milczą, a dwa czytania, które ludzie
+wyznają \dash{} częstość w długiej serii albo stopień przekonania \dash{}
+zgadzają się co do każdego rachunku w tej książce i różnią co do tego, co
+robić, gdy długiej serii nie ma. Ten spór nie jest tu rozstrzygany.
+Program~\ref{prog:P27} mówi wprost, co p-wartość mówi, a czego nie, a
+Program~\ref{prog:P28} zestawia przedział wiarygodności z przedziałem ufności,
+a to jest miejsce, w którym te dwa czytania odpowiadają różnie na to samo
+pytanie.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Gdzie cię to zostawia. Umiesz zbudować przestrzeń zdarzeń, nałożyć na nią
+miarę i sprawdzić, że nią jest; umiesz warunkować, czyli świadomie wybierać
+mianownik; umiesz wyprowadzić twierdzenie Bayesa, zamiast je pamiętać; i
+umiesz powiedzieć, którym z dwóch prawdopodobieństw warunkowych jest podana
+skuteczność, co jest najcenniejszą pojedynczą rzeczą w tym programie.
+
+Czego jeszcze nie masz, to sposobu na podsumowanie rozkładu zamiast liczenia
+na nim. Program~\ref{prog:P24} czyni zmienną losową funkcją na tej właśnie
+przestrzeni zdarzeń i daje jej dwa podsumowania \dash{} a przy okazji jest to
+miejsce, w którym losowanie, które model językowy naprawdę wykonuje, okazuje
+się losowaniem z rozkładu, który cały czas edytowałeś.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Przestrzeń zdarzeń elementarnych} to lista wyników, z
+  których zachodzi dokładnie jeden; \textbf{zdarzenie} to zbiór wyników.
+  Prawdopodobieństwo przypisuje każdemu zdarzeniu liczbę nieujemną, całej
+  przestrzeni daje $1$ i dodaje się na kawałkach, które nie mogą się nakładać.}
+\sumitem{4--5}{$\Prob(\bar{A}) = 1 - \Prob(A)$, z dwóch spośród trzech reguł i
+  bez rysunku. Każdy wynik tutaj otrzymuje się tak samo: rozbić na rozłączne
+  kawałki, dodać, skorzystać z tego, że całość to $1$.}
+\sumitem{6--7}{Addytywność wymaga kawałków \emph{rozłącznych}:
+  $\Prob(A \cup B) = \Prob(A) + \Prob(B) - \Prob(A \cap B)$.
+  Program~\ref{prog:F10} podaje tę samą regułę sumy, tylko z każdą
+  liczebnością podzieloną przez $\val{f10.eval.union}$, a skrypt sprawdza obie
+  względem siebie.}
+\sumitem{8--9}{Prawdopodobieństwo jest \textbf{miarą}, a druga reguła ogranicza
+  miarę \emph{zbioru}. Program~\ref{prog:F13} mierzy wysokość gęstości, która
+  jest tempem, a nie miarą zbioru \dash{} dlatego może przekroczyć $1$ tam,
+  gdzie prawdopodobieństwo nie może.}
+\sumitem{10}{\textbf{Warunkowanie to zmiana mianownika}:
+  $\Prob(A \mid B) = \Prob(A \cap B)/\Prob(B)$. Dwa z czterech wyników po
+  prostu znikają, a to, co zostaje, jest normowane na nowo.}
+\sumitem{11--12}{To \textbf{definicja}, a nie twierdzenie, czyli
+  Program~\ref{prog:F10} podejmuje tu swoją decyzję świadomie. Twierdzenie
+  Bayesa jest tym drugim rodzajem i dlatego da się je odbudować.}
+\sumitem{13}{Na $\val{p23.alarm.den.long}$ żądań
+  $\val{p23.alarm.num}/\val{p23.alarm.den}$ wywołuje alarm \dash{}
+  $\val{p23.alarm.real}$ prawdziwych i $\val{p23.alarm.false}$ fałszywych.
+  Trzymaj dwie liczebności, a nie sumę.}
+\sumitem{14--15}{$\Prob(A \cap B) = \Prob(A \mid B)\Prob(B)$ to definicja z
+  przeniesionym mianownikiem, $\Prob(B) > 0$ to jedyny warunek w całym
+  programie, a $\Prob(A \mid B)$ i $\Prob(B \mid A)$ to różne liczby.}
+\sumitem{16--17}{\textbf{Twierdzenie Bayesa to jedna wielkość zapisana na dwa
+  sposoby i podzielona.} Niczego się nie zakłada i nie pojawia się nowy
+  obiekt; ono odwraca warunkowanie, a taki kształt ma tutaj większość
+  problemów pomiarowych.}
+\sumitem{18--19}{Prior, wiarygodność, dowód, posterior \dash{} nazwy, które nie
+  pomogą ci odbudować wzoru. Wyprowadzenie pomoże.}
+\sumitem{20--21}{$\Prob(B) = \Prob(B \mid A)\Prob(A) +
+  \Prob(B \mid \bar{A})\Prob(\bar{A})$, wzór na prawdopodobieństwo całkowite.
+  Zawiera $\Prob(A)$, więc częstość bazowa jest w odpowiedzi niezależnie od
+  tego, czy ktoś o niej wspomniał.}
+\sumitem{22--23}{Detektor skuteczny w $\val{p23.sens.pct}$ procentach przy
+  usterce raz na $\val{p23.prev.den}$ żądań ma
+  $\frac{\val{p23.ppv.num}}{\val{p23.ppv.den}}$ alarmów prawdziwych \dash{}
+  $\val{p23.ppv.pct}$ procent, około $\val{p23.alarm.ratio}$ fałszywych
+  alarmów na każdy prawdziwy.}
+\sumitem{23--24}{$\val{p23.sens.pct}$ procent to
+  $\Prob(\text{alarm} \mid \text{usterka})$, a pytanie dotyczyło
+  $\Prob(\text{usterka} \mid \text{alarm})$. Liczby podawane dla detektora są
+  własnościami detektora \emph{i} populacji, a tylko jedna z tych dwóch rzeczy
+  podróżuje z modelem.}
+\sumitem{25--26}{\textbf{Błąd prokuratora} to zamiana tych dwóch miejscami:
+  $\val{p23.fpr.pct}$ procent czystych żądań wywołuje alarm, a
+  $\val{p23.false.pct}$ procent alarmów dotyczy czystych żądań \dash{} oba
+  prawdziwe o tym samym detektorze tego samego dnia.}
+\sumitem{26--28}{Ten sam detektor, cztery częstości bazowe:
+  $\val{p23.ppv.10.pct}$\%, $\val{p23.ppv.100.pct}$\%, $\val{p23.ppv.pct}$\%,
+  $\val{p23.ppv.10000.pct}$\%. \textbf{Porównaj częstość bazową z poziomem
+  błędu}: równe dają dokładnie połowę, a listing wypisuje to ułamkiem, żeby to
+  właśnie powiedzieć.}
+\sumitem{29--30}{Detektor, który nigdy się nie odzywa, jest skuteczny w
+  $\val{p23.never.pct}$ procentach wobec $\val{p23.acc.pct}$ prawdziwego.
+  Skuteczność na niezrównoważonej populacji to średnia ważona z pominiętymi
+  wagami.}
+\sumitem{31--32}{$A$ i $B$ są niezależne, gdy
+  $\Prob(A \cap B) = \Prob(A)\Prob(B)$, co po podzieleniu mówi, że informacja
+  o $B$ nie rusza twojej odpowiedzi o $A$.}
+\sumitem{33--35}{Dwie uczciwe monety są niezależne, a przy warunku, że
+  dokładnie jedna to orzeł, doskonale zależne \dash{} \textbf{niezależność
+  jest zdaniem o mierze, a warunkowanie zmienia miarę}. Każdy filtr, każda
+  podgrupa i każde \enquote{żądania, które dotarły do modelu} to warunkowanie.}
+\sumitem{36--37}{Niezależność parami to nie niezależność rodziny: te same trzy
+  zdarzenia są niezależne w każdej parze i mają
+  $\Prob(A \cap B \cap C) = 0$ przy iloczynie $\frac{1}{8}$.}
+\sumitem{38--39}{Dwa zaszumione odczyty jednej przyczyny są \emph{zależne}
+  ($\frac{\val{p23.cause.pxy.num}}{\val{p23.cause.pxy.den}}$ wobec
+  $\frac{4}{16}$), choć nic między nimi nie podłączono, i warunkowo niezależne
+  przy tej przyczynie.}
+\sumitem{40--41}{Oba kierunki zachodzą, więc żadne słowo nie implikuje
+  drugiego. Drugi to założenie \textbf{naiwnego Bayesa}, a w szansach
+  twierdzenie Bayesa jest mnożeniem: szanse a posteriori to szanse a priori
+  razy iloraz wiarygodności.}
+\sumitem{42--43}{Jeden alarm o ilorazie $\val{p23.lr}$ daje
+  $\val{p23.ppv.pct}$ procent; dwa dają
+  $\frac{\val{p23.two.num}}{\val{p23.two.den}} = \val{p23.two.pct}$ procent,
+  więc $\val{p23.k.half}$ niezależne detektory przekraczają połowę, a trzeci
+  zostawia $\val{p23.three.false.pct}$ procent fałszywych trójek.}
+\sumitem{44--45}{Detektor będący kopią ma iloraz wiarygodności $1$ i nie rusza
+  niczego, więc odstęp między $\val{p23.ppv.pct}$ a $\val{p23.two.pct}$
+  procent jest dokładnie tym, ile warte jest założenie niezależności.}
+\sumitem{46--47}{Nie dowodzimy tu: addytywności przeliczalnej ani tego, co
+  prawdopodobieństwo \emph{znaczy}. Żadne z nich nie zmienia w tej książce
+  żadnego rachunku.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Test przesiewowy jest poprawny w $\val{p23.sens.pct}$ procentach
+  przypadków w obie strony, a schorzenie, którego szuka, dotyczy jednej osoby
+  na $\val{p23.prev.den}$. Ktoś ma wynik dodatni. Bez liczenia powiedz, czy
+  prawdopodobieństwo, że ma schorzenie, jest bliższe $\val{p23.sens.pct}$
+  procent czy bliższe $\val{p23.ppv.pct}$ procent, i powiedz w jednym zdaniu
+  dlaczego.
+  \answerto{Bliższe $\val{p23.ppv.pct}$ procent. Schorzenie jest o wiele
+  rzadsze niż poziom błędu testu, więc wyniki fałszywie dodatnie czerpane z
+  ogromnej populacji zdrowych przewyższają liczbą prawdziwie dodatnie czerpane
+  z maleńkiej populacji chorych. Podana liczba to
+  $\Prob(\text{dodatni} \mid \text{schorzenie})$; pytanie dotyczy
+  $\Prob(\text{schorzenie} \mid \text{dodatni})$.}
+\item Dwa zdarzenia spełniają $\Prob(A) = \Prob(B) = \frac{1}{2}$ oraz
+  $\Prob(A \cap B) = \frac{1}{3}$. Czy są niezależne i ile wynosi
+  $\Prob(A \cup B)$?
+  \answerto{Nie są niezależne: iloczyn to $\frac{1}{4}$, a łączne
+  $\frac{1}{3}$, więc wiedza o jednym podnosi szansę drugiego. Suma wynosi
+  $\frac{1}{2} + \frac{1}{2} - \frac{1}{3} = \frac{2}{3}$.}
+\item Twój zespół raportuje, że klasyfikator ma precyzję $\val{p23.sens.pct}$
+  procent na benchmarku i jest bezużyteczny na produkcji. Nazwij wielkość,
+  która różni te dwa ustawienia, i powiedz, o co poprosisz, żeby to
+  potwierdzić.
+  \answerto{Częstość bazową. Benchmark jest zwykle zrównoważony albo bliski
+  temu, a ruch produkcyjny nie, natomiast precyzja to
+  $\Prob(\text{prawdziwe} \mid \text{zgłoszone})$, więc zależy od populacji
+  tak samo jak od modelu. Poproś o dwie liczebności stojące za każdą z liczb
+  \dash{} ile przypadków zgłoszono i ile z nich było prawdziwych \dash{}
+  osobno dla benchmarku i osobno dla produkcji.}
+\item Szanse a priori na hipotezę wynoszą $1$ do $\val{p23.prev.den}$. Dwa
+  niezależne testy mają iloraz wiarygodności $\val{p23.lr}$ każdy i oba
+  wychodzą dodatnio. Jakie są szanse a posteriori i mniej więcej jakie to
+  prawdopodobieństwo?
+  \answerto{Mnóż: $\val{p23.lr}^{2} = 9801$ wobec $\val{p23.prev.den}$, czyli
+  szanse około $9801$ do $\val{p23.prev.den}$, co daje prawdopodobieństwo tuż
+  poniżej $\frac{10}{11}$ \dash{} koło dziewięćdziesięciu procent. Szanse a
+  priori są tu $1$ do $\val{p23.prev.den}$, a nie $1$ do $999$, więc wynik
+  jest odrobinę niższy niż $\val{p23.two.pct}$ procent z tekstu.}
+\item Podaj przykład dwóch zdarzeń niezależnych, które stają się zależne przy
+  trzecim, oraz przykład idący w drugą stronę. Po jednym zdaniu na każdy.
+  \answerto{Dwie uczciwe monety są niezależne, a przy warunku, że dokładnie
+  jedna wypadła orłem, każda wyznacza drugą. Dwa zaszumione odczyty jednego
+  stanu leżącego pod spodem są zależne, a przy tym stanie niezależne, bo szum
+  każdego odczytu jest jego własny.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że jeśli $A$ i $B$ są niezależne, to niezależne są też $A$ i
+  $\bar{B}$.
+  \answerto{$\Prob(A \cap \bar{B}) = \Prob(A) - \Prob(A \cap B)
+  = \Prob(A) - \Prob(A)\Prob(B) = \Prob(A)(1 - \Prob(B))
+  = \Prob(A)\Prob(\bar{B})$. Pierwszy krok rozbija $A$ według tego, czy zaszło
+  $B$, na dwa rozłączne kawałki, więc stosuje się trzecia reguła.}
+\item Przy jakiej częstości usterek detektor o czułości $s$ i poziomie fałszywie
+  dodatnich $f$ ma dokładnie połowę alarmów prawdziwych? Sprawdź odpowiedź
+  względem liczb z tego programu.
+  \answerto{Prawdziwych alarmów jest $ps$, a fałszywych $(1-p)f$; przyrównanie
+  daje $p = f/(s+f)$. Przy $s = \num{0.99}$ i $f = \num{0.01}$ wychodzi
+  $\num{0.01}$, czyli jeden na sto, a to właśnie ten wiersz, który tabela każe
+  uzupełnić. Zauważ, że odpowiedź nie zależy od $s$ i $f$ osobno, tylko od ich
+  stosunku.}
+\item Alarm detektora ma iloraz wiarygodności $L$. Ile niezależnych alarmów
+  potrzeba, zanim szanse a posteriori przekroczą $1$, startując ze szans a
+  priori $1$ do $N$?
+  \answerto{Potrzebujesz $L^{k} > N$, czyli $k > \logb{10} N / \logb{10} L$, a
+  odpowiedzią jest kolejna liczba całkowita powyżej. Dla $N = 999$ i
+  $L = \val{p23.lr}$ daje to $k > \num{1.503}$, więc
+  $k = \val{p23.k.half}$ \dash{} czyli liczba, którą tekst mierzy. Częstość
+  bazowa wchodzi logarytmicznie, więc stukrotnie rzadsza usterka wymaga tylko
+  jednego detektora więcej.}
+\item Trzy zdarzenia są niezależne parami i spełniają
+  $\Prob(A \cap B \cap C) = 0$. Skonstruuj taką trójkę inną niż monety z
+  sekcji 5 albo uzasadnij, że na czterech wynikach monety są w istocie jedyną.
+  \answerto{Na czterech jednakowo ważonych wynikach monety są tą konstrukcją:
+  weź dowolne trzy zdarzenia o prawdopodobieństwie $\frac{1}{2}$, których
+  przecięcia parami zawierają po dokładnie jednym wyniku i które nie mają
+  wyniku wspólnego. Przenumerowanie wyników daje każdą taką trójkę, więc z
+  dokładnością do nazw jest ona jedyna. Na większej liczbie wyników są inne
+  \dash{} na przykład trzy z sześciu ścianek kostki, wybrane tak, żeby żadna
+  ścianka nie leżała we wszystkich trzech.}
+\item Sekcja 6 mówi, że detektor będący kopią ma iloraz wiarygodności $1$.
+  Zapisz, co musiałoby być prawdą o obu detektorach, żeby iloraz drugiego
+  wynosił dokładnie $1$, i powiedz, czy to jest to samo, co bycie identycznymi.
+  \answerto{Drugi alarm musi być jednakowo prawdopodobny niezależnie od tego,
+  czy usterka jest, \emph{przy danym pierwszym alarmie} \dash{} czyli
+  $\Prob(A_2 \mid A_1, F) = \Prob(A_2 \mid A_1, \bar{F})$. Identyczne
+  detektory to jeden ze sposobów, żeby to osiągnąć, i nie jedyny: każdy drugi
+  detektor, którego dodatkowa informacja mieści się w całości w pierwszym, ma
+  tę własność, a dwa detektory mogą wyglądać całkiem różnie i wciąż dzielić tę
+  jedną cechę, na której naprawdę oba są wpięte.}
+\end{furtherproblems}

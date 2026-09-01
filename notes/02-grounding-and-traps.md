@@ -2516,3 +2516,69 @@ differ between `grad f = lambda grad g` and `grad f + lambda grad g = 0`, which
 give multipliers of opposite sign for the same problem, so the *magnitude* of a
 multiplier is a property of the problem and its sign is a property of how
 somebody wrote the constraint. → **P22**.
+
+**230. "The prosecutor said the chance of a match given innocence is one in a
+million, so the chance of innocence is one in a million."** The two conditionals
+have different denominators, and swapping them is the whole of the prosecutor's
+fallacy. In this book's own detector, measured over fractions: `P(alarm |
+clean)` is 1.0 per cent and `P(clean | alarm)` is 91.0 per cent — both true, of
+the same detector, on the same day. The first is a property of the instrument
+and the second is a property of the traffic, and only the first travels when the
+instrument is deployed somewhere else. → **P23**.
+
+**231. "These two signals are independent, so I can treat them separately."**
+Independence is not a property two events carry around with them; it is a
+statement about a particular measure, and conditioning changes the measure. Two
+fair coins are independent, and given that exactly one landed heads they are
+perfectly dependent — `P(A and B | C) = 0` where the product of the conditionals
+is `1/4`. Every filtered dataset, every evaluation restricted to a subgroup and
+every "requests that reached the model" is a conditioning, so whatever
+independence held before is now a claim about a different space that nobody has
+checked. → **P23**.
+
+**232. "All the pairwise correlations are near zero, so the features are
+independent."** Pairwise independence does not give independence of the
+collection, and no amount of checking pairs will find that out. The same three
+coin events are independent in every one of their three pairs and have
+`P(A and B and C) = 0` against a product of `1/8`. A table of pairwise
+correlations — which is what people actually produce — is structurally incapable
+of settling the question it is produced to settle. (Note also **29**: zero
+correlation is not independence either, so the table is weak in two directions
+at once.) → **P23**.
+
+**233. "We have two independent signals, so the evidence multiplies."** The
+likelihood ratios multiply only when the two signals are conditionally
+independent *given the truth*, and nothing in either signal tells you whether
+they are. Measured: two genuinely independent alarms at likelihood ratio 99 take
+a 9.0 per cent posterior to 90.75 per cent, while a second detector keyed on the
+same log pattern as the first has likelihood ratio 1 and leaves it at 9.0. That
+gap **is** what the independence assumption is worth. Two detectors sharing a
+feature, two evaluations sharing prompts, two reviewers who read each other's
+comments: each is the duplicate case in different clothes, and each gets
+reported as corroboration. → **P23**.
+
+**234. "Our model is 99 per cent accurate."** On an unbalanced population that
+is a weighted average with the weights left out, and the weights are the base
+rate. Measured on this book's detector: it is correct on 99.0 per cent of
+requests, and a model that raises no alarm ever, under any circumstances, scores
+99.9 per cent while catching nobody. The accuracy paradox is not a curiosity
+about a contrived metric; it is the same base-rate arithmetic as item **28**,
+read from the other end. Report the two counts the rate came from — **F10**'s
+rule — and it cannot form. → **P23**.
+
+**235. "P(A or B) is P(A) + P(B)."** Only for events that cannot both happen.
+The third rule of probability carries that condition and the condition is doing
+work: **F10**'s two evaluation sets, of 1000 and 1200 cases sharing 200 out of
+2000 distinct, give probabilities of `1/2` and `3/5`, which add to `11/10`. The
+tell is an answer above 1, and it is a tell only when the overlap is large
+enough to push it there — a small overlap gives a wrong answer that looks
+entirely reasonable. → **P23**, on **F10**'s union rule.
+
+**236. "Bayes' theorem is a formula to memorise."** It is one quantity written
+two ways and then divided, and the derivation is shorter than the mnemonic. The
+useful consequence of knowing that is knowing what may be rebuilt and what may
+not: `P(A|B) = P(A and B)/P(B)` is a *definition* with nothing behind it, and
+Bayes' theorem is a *theorem* you can reconstruct at a desk in three lines. The
+memorised version is the one people write upside down, and the names — prior,
+likelihood, evidence, posterior — do not help, because two of them mean
+something other than what the English words suggest. → **P23**.
