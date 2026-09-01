@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P24 written, both editions \dash{} Parts I to VI entire, and Part VII well begun.** P25–P34 are stubs carrying their briefs | 10 of 47 |
+| Programs | **F1–F13 and P1–P25 written, both editions \dash{} Parts I to VI entire, and Part VII past its halfway point.** P26–P34 are stubs carrying their briefs | 9 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1059 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1076 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 893 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 901 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1090 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1104 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 913 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 925 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,22 +93,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **10 of 47 programs are stubs**, in each language. This is the whole of the
+- **9 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1152 computed values, all referenced, all present, plus the committed console
+- 1221 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 222 Mermaid sources, all rendering
-- 62 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 228 Mermaid sources, all rendering
+- 64 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **92 orphan-tail pages: 23 · 28 · 20 · 21** across `main-en`, `main-pl`,
+- **94 orphan-tail pages: 25 · 28 · 20 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
-  **P23 none** and P24 one
+  **P23 none**, P24 one and P25 two, all of P25's in `main-en`
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -143,10 +143,10 @@ what was there before.
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
-  **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22** and
-  **53% in P23** and **46% in P24** \dash{} P23 is the highest outside Part I
-  and the first anywhere to pass the book's own rate, and P13, P15 and P17 are
-  the only others to reach it.**
+  **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22**,
+  **53% in P23**, **46% in P24** and **48% in P25** \dash{} P23 is the highest
+  outside Part I and the first anywhere to pass the book's own rate, and P13,
+  P15 and P17 are the only others to reach it.**
   **P24 is the first program whose rate is visible in its frame count**: nine
   of its sixty-four frames exist because the draft was raised from 36%, which
   is the elicitation ledger's cost measured in frames rather than in pages.
@@ -196,9 +196,18 @@ their head is computed*.
 interpretation a mathematics book needs: a theorem is proved or attributed, not
 measured; the measurements are for the claims that sit *between* the mathematics
 and the practice, which is exactly where folklore lives. Ten experiments are
-specified in `notes/01-curriculum.md`; **none has been run**, and until one is,
-the claim it would support is labelled as judgement and its table stays empty.
-Nine of the ten are free and finish on a laptop in under a minute.
+specified in `notes/01-curriculum.md`, nine of them free and finishing on a
+laptop in under a minute; until one runs, the claim it would support is
+labelled as judgement and its table stays empty.
+
+**This paragraph used to say none had been run, and it had been false since the
+P20 pass** \dash{} which has its own heading in this file, *Experiment E6*,
+reporting measured step counts against predicted ones. E9 has been run too, in
+the P25 pass. So the ledger is now a **Status column** in
+`notes/01-curriculum.md` §17, filled in by the pass that runs the experiment,
+and neither that file nor this one states a total: a count of how many have run
+is exactly the class of claim the paragraphs below forbid, and it decayed in
+the two documents the next author reads first.
 
 **A gate on PAGINATION cannot be hard on two machines that paginate
 differently.** This repository builds on two TeX installations: the container
@@ -7770,6 +7779,186 @@ Frame numbers mapped after writing and again after the elicitation
 conversions: sections landed at
 `1--10 / 11--17 / 18--25 / 26--36 / 37--48 / 49--64`.
 
+### Program P25 pass, August 2026
+
+**Fifty-four teaching frames, fifty-six printed, both editions**, against a
+brief that projected fifty-five. Six sections: two things added, the average of
+many, the shape and where the theorem is silent, what an evaluation run costs,
+why attention divides by a square root, and why a run can diverge before it
+starts.
+
+**It is the first estimate in nineteen programs to hold.** Seventeen came in
+under and Program~\ref{prog:P24} came in over. Worth one hypothesis, labelled
+as one because $n = 1$: P25's brief is among the five the curriculum review
+amended \dash{} it added the initialisation section by name \dash{} so it is
+the only brief in the manifest written after somebody had looked at what its
+neighbours would spend. Every other estimate predates its own neighbours,
+which is the reason this file already gives for the seventeen.
+
+#### The ledger that said no experiment had been run had been false for five programs
+
+This is the pass's most valuable finding and it is not about P25.
+
+`notes/01-curriculum.md` §17 said \enquote{Ten candidate experiments.
+\textbf{None has been run.}} and this file repeated it in *Non-negotiable
+conventions*. **Experiment E6 was run in the P20 pass**, which has its own
+heading a few sections above \dash{} *Experiment E6, and the asymmetry that
+made it worth running* \dash{} reporting measured step counts against predicted
+ones. So the sentence had been false for five programs, in the two documents
+the next author reads first.
+
+It is the recorded class exactly: **a claim about the book that nothing derives
+from anything.** This file forbids stating a count of occurrences because a
+tally decays silently, and the experiment ledger was a tally in prose sitting
+two paragraphs from the rule. The table now carries a **Status column** naming
+the pass that ran each experiment, with the instruction to fill it in that pass
+and never to restate a total.
+
+**Three more rows say \enquote{see the note below} rather than an answer**, and
+that is the honest form. Program~\ref{prog:P02} measured the overflow cliff per
+format and what a non-maximal pivot costs (E1); Program~\ref{prog:P05} swept
+the cosine spread over $d = 2, 3, 10, 100, 768, 4096$ and the concentration
+towards orthogonality (E3, whose specification is that sweep almost word for
+word); Program~\ref{prog:P16} counted forward against reverse multiplications
+exactly and derived the checkpointing peak (E5). Each looks like the experiment
+beside it and **no pass claimed one**, so whether the specification is met is a
+reading job on three merged programs and not an inference to make from a table.
+E5 is the clearest case for \enquote{no}: it asks for time and peak memory
+measured on a machine, and P16 deliberately counted operations instead.
+
+**And E9's owner had moved without the table.** The review put the derivation of
+the scaling in P25 and the table still said P32. E9 as specified \dash{} random
+vectors, head sizes, spread and entropy \dash{} is P25's and was run here; what
+is left for P32 is the same measurement on an assembled architecture, which is
+what this program's own closing frames say. Corrected in the table and in the
+manifest brief, which had said the reader \enquote{derives it here and measures
+it in P32}.
+
+#### E9, run: the headline
+
+Without the division, at $d_k = \val{p25.e9.d.hi}$: spread
+$\val{p25.e9.raw.sd.512}$, softmax entropy $\val{p25.e9.raw.ent.512}$ nats
+against a maximum of $\val{p25.e9.maxent}$, and one key of
+$\val{p25.e9.keys}$ taking $\val{p25.e9.raw.top.512}$ per cent of the weight.
+With it: spread $\val{p25.e9.scaled.sd.512}$ at every head size and the entropy
+between $\val{p25.e9.scaled.ent.8}$ and $\val{p25.e9.scaled.ent.512}$ across a
+sixty-fourfold change in $d_k$.
+
+**Nothing moves** is the whole claim, and it is now measured rather than
+argued. Program~\ref{prog:P18}'s Jacobian diagonal then turns it into a
+gradient: $\val{p25.e9.resp.raw}$ raw against $\val{p25.e9.resp.scaled}$
+scaled, a factor of $\val{p25.e9.resp.ratio}$. \enquote{The gradient dies} is
+$p(1-p)$ evaluated at a $p$ the architecture drove to one.
+
+The derivation costs four lines and no limit theorem: the script enumerates
+every sign vector at $d = 1$ to $5$ and gets $\Var(q \cdot k) = d_k$ exactly.
+And it is **gated against Program~\ref{prog:P05}'s four committed cosine
+spreads**, which measured the same theorem at the normalised scaling three
+parts earlier and reproduces to within $\val{p25.p05.worst.pct}$ per cent
+\dash{} so the attention scaling is a Part III measurement read at the other
+scaling rather than a new claim.
+
+#### Three assertions refuted their own drafts, for the fourteenth pass running
+
+1. `RATIO_3 > 1.5` for how far the Gaussian overstates the tail at three
+   spreads. It is $\val{p25.tail.ratio3}$.
+2. **\enquote{The ratio is above one everywhere}** \dash{} false at one spread,
+   where it is $\val{p25.tail.ratio1}$: the Gaussian slightly *understates*
+   there. **The failure is the section.** The Gaussian is not uniformly wrong in
+   one direction; it is excellent in the middle, crosses, and runs away outside
+   \dash{} $\val{p25.tail.ratio1}$, $\val{p25.tail.ratio3}$ and
+   $\val{p25.tail.ratio5}$ at one, three and five spreads, and at six the truth
+   is exactly zero while the Gaussian still says $\val{p25.tail.gauss6}$.
+3. An eight-decimal format printed the five-spread tail as `0.00000000`, so the
+   reproduce-from-the-page check divided by zero. Three significant figures
+   instead \dash{} which is the recorded rule (divide the two numbers as the
+   page prints them) failing inside the guard written to enforce it.
+
+And `p25.tail.ratio3` was first emitted at zero decimals, printing `1` for a
+value of $\val{p25.tail.ratio3}$. **A ratio table needs its precision chosen
+per row**: these rows span three orders of magnitude and no single format
+serves them, so the script carries a per-$z$ digit map.
+
+#### The translator rule is symmetric, and this is the first time it broke the other way
+
+Every recorded instance of the ordered-token class has been Polish spelling a
+digit as a word. Here it was the reverse, twice: the English quiz answer says
+*a factor of two costs a factor of four* in words and the Polish had `$2$` and
+`$4$`; the English trapbox says *differ by a factor of two here* and the Polish
+had `$2$`. C4, C8 and C12 all fired.
+
+So the rule in *Two editions* is not only \enquote{a digit stays a digit} but
+its mirror: **a word stays a word.** The instinct to reach for the numeral is
+as real as the instinct to reach for the word, and the ordered checks catch
+both.
+
+#### Also
+
+- C10 fired on `0.9` and `0.1` inside a `\sqrt{}` in a test exercise, **in both
+  editions** \dash{} the English owed the wrapping as much as the Polish did,
+  which is the half of C10 that is easy to forget.
+- Seventeen values went unreferenced. Sixteen were cut on
+  Program~\ref{prog:F11}'s finding \dash{} the E9 assertions still sweep all
+  five head sizes and only the three the tables print are emitted \dash{} and
+  **one earned a sentence**: the trial count, because a book's first experiment
+  should be reproducible from its own page.
+- Traps 245 to 252 added, including the one the issue names.
+- The listing was extracted from `main-en.pdf` p957 and run as a REPL would: it
+  prints `(22.7, 22.6)` and `1.0`, which is what the page prints and what the
+  frames beside it claim.
+- The issue's *No Quiz (Foundation-only)* checkbox is stale in the way P04, P14
+  and P24 each found it stale. P25 has one, like all twenty-eight before it.
+
+#### Layout, and one round of lengthening cleared five cues
+
+The first build came back with **five orphaned cues** \dash{} one in `main-en`,
+three in `main-pl`, one in `main-en-a4` \dash{} across four frames. All four
+were lengthened in both editions in **one round**, and all four builds came
+back clean. Twelfth confirmation of Program~\ref{prog:F06}'s two-sided rule,
+and it has still never failed.
+
+Every added paragraph earns its place, and one of them is the best sentence in
+its section: $p(1-p)$ is largest at a half and falls away towards both ends, so
+**a model scoring near chance carries the widest interval it can have and one
+scoring near the ceiling carries a narrow one** \dash{} the same item count
+buys more precision at the top of a benchmark than in the middle of it. The
+other three say why the Jacobian's *diagonal* is the entry to reason about
+(the off-diagonal terms move weight between keys, and a row that has given
+everything to one key has none to move); that the fan-in belongs to the
+architecture while the two variances belong to the initialiser, which is why
+the design question has one answer rather than a family; and that the
+per-layer factor is one number with the depth as its exponent, so the tolerance
+on it tightens as a network gets deeper without anybody changing it.
+
+The overfull multiset came back element for element to the baseline in all four
+builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with zero overfull vboxes, no
+stranded openers and no stranded headings. **Two orphan tails added, both in
+`main-en`**: 25, 28, 20, 21 against the pre-P25 23, 28, 20, 21.
+
+Pages 1090 / 1104 / 913 / 925, from 1059 / 1076 / 893 / 901.
+
+#### Rule 2, written against the frames above and then measured
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P25.1 one-rate | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P25.2 signal-depth | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P25.3 tail-is-silent | 657 / 645 | 5.98 | 6.71 | 6.84 | 7.62 | 7.76 |
+
+All six at mermaid's wrap cap or within twelve points of it on the first
+render, at three ranks. Written against the frames **above** them before
+rendering, which is Program~\ref{prog:P22}'s rule, and for the second pass
+running the last node of a three-rank chain needed no correction afterwards.
+
+Measured on the page: all three sit on the same page as the question that
+follows them, in all four builds \dash{} `main-en` 961, 963, 965; `main-pl`
+976, 978, 980; `main-en-a4` 806, 808, 809; `main-pl-a4` 814, 816, 818 \dash{}
+and none answers it. P25.1 carries the identity three sections have delivered
+and the question below asks what a $\relu$ passes on, which appears nowhere in
+it; P25.2 carries the geometric sequence its own frame states and the question
+below asks for a number at four per layer, which needs the squaring the figure
+never mentions; P25.3 is in the closing frame with nothing after it.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -7887,9 +8076,13 @@ is now that each is stated in the owning program's Learning outcomes with a
 pointer:
 
 - **P21** (stochastic optimisation) needs random variables and variance from
-  **P24–P25**, two parts later. **Half discharged**: P24 returned the
-  definition, on P21's own population and gated against its committed mean, and
-  said in as many words that the $1/B$ rate is P25's. P25 closes the rest.
+  **P24–P25**, two parts later. **Discharged, in two halves, exactly as
+  declared**: P24 returned the definition, on P21's own population and gated
+  against its committed mean, and said in as many words that the $1/B$ rate is
+  P25's; P25 derived the rate in two steps from its own section 1 and gated it
+  against P21's committed population spread, so neither program can now be
+  corrected without the other noticing. It is the book's oldest declared
+  forward reference and it is closed.
 - **P10** and **P11** use the covariance matrix, defined in **P24**. They need
   two facts from it — symmetric, positive semi-definite — and say so, **and
   both prove them where they stand**, so the pointer was always an attribution
@@ -8037,52 +8230,47 @@ clone instead.
 
 ## What is left
 
-1. **Ten programs, and Parts I to VI plus P23 and P24 are complete.** F1 to
-   F13 and P1 to P24, both editions. Part VII, probability and statistics, is
-   the block in progress: four of its six remain, P25 to P28.
+1. **Nine programs, and Parts I to VI plus P23 to P25 are complete.** F1 to
+   F13 and P1 to P25, both editions. Part VII, probability and statistics, is
+   the block in progress: three of its six remain, P26 to P28.
 
-   **P25 is next** \dash{} *Sums of random variables: the central limit
-   theorem, concentration and Monte Carlo*, fifty-five frames planned, deps
-   `P24`, `F4` and `P19`. Read those three before believing the estimate:
-   eighteen programs have now been written and seventeen came in under theirs,
-   the one exception being P24, which exceeded its estimate by four frames and
-   did so because its elicitation rate was raised rather than because it had
-   more content.
+   **P26 is next** \dash{} *Estimation and maximum likelihood*, fifty-five
+   frames planned, deps `P24`, `P25`, `F3` and `P15`. Read those four before
+   believing the estimate: nineteen programs have now been written, seventeen
+   came in under theirs, P24 came in over because its elicitation rate was
+   raised, and P25 landed on its estimate to within a frame.
 
-   **P24 leaves this program more than any predecessor has left one.** It owns
-   the random variable, both summaries, the covariance and the correlation, and
-   it says in three separate places \dash{} section 3's loan-closing frame, the
-   closing frame, and the rigour box in section 1 \dash{} that *adding* random
-   variables is P25's subject and that the $1/B$ and $1/\sqrt{n}$ rates belong
-   there. **Program~P21 has already measured both**, over twenty thousand
-   values and four thousand trials per batch size, and its rigour box points
-   here. So P25 does not have to demonstrate the rate; it has to *derive* it,
-   which is a better possession and a shorter one. **F04** owns the geometric
-   sequence and the sigma; **P19** owns Jensen and convexity.
+   **P25's brief was the first to hold, and there is a hypothesis about why**
+   \dash{} it is one of the five the curriculum review amended, so it is the
+   only brief written after somebody had looked at what its neighbours would
+   spend. P26's was not amended, so the seventeen-programme pattern is the one
+   to expect. Read the neighbours.
 
-   **Its payoff is the $1/\sqrt{d_k}$ in attention, derived rather than
-   quoted**: a dot product of two $d_k$-dimensional vectors with independent
-   unit-variance entries has variance $d_k$, so its spread grows as
-   $\sqrt{d_k}$; feed that into a softmax and it saturates. **Three written
-   programs have already built every piece of that argument and each says so:**
-   F07 measured the saturation and its warning box refuses to state the
-   compounding; P02's §3 names the $1/\sqrt{d_k}$ factor and hands the
-   derivation here by name; P18 owns the softmax Jacobian, so *the gradient
-   dies* is a statement the book can already write down rather than assert. The
-   scaling is a variance correction and nothing else.
+   **Two written programs have already spent pieces of P26.**
+   Program~\ref{prog:P18} gives cross-entropy a definitional frame, derives the
+   $\vect{p} - \vect{y}$ gradient in full and hands the *justification* here by
+   name \dash{} so P26 owes why that loss is the right one rather than what it
+   is or how it differentiates. And Program~\ref{prog:P20} owns weight decay
+   outright, including the measured $L_2$-against-decoupled equilibrium, so
+   the MAP payoff is a *reading* of something already on the page rather than a
+   new mechanism: the same $\lambda$, arrived at from a prior instead of from a
+   penalty.
 
-   The brief also asks for **Monte Carlo error as the same rate** \dash{} four
-   times the samples to halve an error bar, which prices every evaluation run
-   in the book \dash{} and carries the curriculum review's addition:
-   **signal propagation at initialisation**, the variance through a linear
-   layer as fan-in times weight variance, and where He initialisation's factor
-   of two comes from. That last is the single most common cause of a run that
-   never starts and nothing in the book explains it yet.
+   **Its payoff is that training a language model is maximum likelihood**, and
+   the cross-entropy loss is the negative log-likelihood of the observed
+   tokens. `F3` supplies the logarithm that turns the product into a sum and
+   already prints $\ln p(\text{sequence}) = \sum_i \ln p_i$; `P15` supplies the
+   gradient that finds the maximum; `P24` supplies the random variable and
+   `P25` the concentration that says why an average of log-likelihoods is worth
+   estimating at all. So the derivation is short and the work is in what falls
+   out of it \dash{} label smoothing, class weighting and the $n-1$ in a sample
+   variance, all three from one reframing.
 
-   **And it is the program that discharges the book's oldest declared forward
-   reference.** Program~P21's rigour box names P24 for the definition and P25
-   for the rate; P24 returned the definition in this pass and said in as many
-   words that the rate is not its to return. P25 closes it.
+   **And it inherits an obligation from this pass.** P25's evaluation section
+   sizes an accuracy and a difference from first principles and stops at the
+   normal-approximation interval; `P27` owns the bootstrap, the paired test and
+   the power calculation, and its brief says so. P26 sits between them and
+   should not spend either.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -8093,20 +8281,21 @@ clone instead.
    **P19 added a third entry of the same kind** \dash{} whether the basin a
    walk lands in matters at the scale people train at \dash{} and **P20 a
    fourth**, since it declines to say whether Adam reaches a better answer than
-   momentum on a real surface. So the debt is one trained model away from being
-   four answers rather than one.
+   momentum on a real surface. **P25 adds a fifth**: E9 is measured on random
+   vectors, and whether the derivation's independence hypothesis survives
+   training is P32's to check on an assembled architecture. So the debt is one
+   trained model away from being five answers rather than one.
 
    **And there is still a Part II-shaped job that is nobody's program.** The
    elicitation ledger puts P01, P02 and P03 at 29--31% against Part I's
    73--78%, and raising them is a pass of its own: it means finding, in three
    merged programs, the frames that state something the reader could produce,
    and moving the statement into the next frame's answer. P04 did three of
-   those and went 26% to 35% without adding a frame, so the move is cheap per
-   instance and the cost is measured \dash{} three cues added two pages to one
-   build. **This is the largest genuinely parallelisable job in the
-   repository**, because it touches three merged program files and nothing
-   else; the programs themselves are not parallelisable, for the reason the
-   frame estimates below record.
+   those and went 26% to 35% without adding a frame; P23 did ten and went 33%
+   to 53% for two frames, which is the measurement to plan against. **This is
+   the largest genuinely parallelisable job in the repository**, because it
+   touches three merged program files and nothing else; the programs themselves
+   are not parallelisable, for the reason the frame estimates below record.
 
    Before estimating any remaining program's length, read its written
    neighbours. F7's brief projected forty frames and thirty-one were needed;
@@ -8130,15 +8319,31 @@ clone instead.
    against sixty-four**, and for a reason that is not about content at all
    \dash{} its draft came in at fifty-five, in line with the seventeen before
    it, and nine frames were added raising the elicitation rate from 36% to 46%.
-   **A brief's frame estimate is a planning figure from before its neighbours
-   were written**, and the elicitation rate is paid in frames on top of it. It
-   is not a target \dash{} and the record above is also the reason the programs
-   cannot be written in parallel: each one is shaped by what the ones before it
-   turned out to spend.
-2. **The ten measurements.** All specified, nine free. E9 — logit variance and
-   softmax entropy with and without the `1/√d_k` scaling — is the one to run
-   first: it costs nothing and it converts the book's central derivation from an
-   argument into a demonstration.
+   **And P25 landed on its estimate**, fifty-four against fifty-five, which is
+   the first time in nineteen \dash{} and the hypothesis for why is that its
+   brief is one of the five the curriculum review amended, so it is the only
+   one written after somebody had looked at what its neighbours would spend.
+   **A brief's frame estimate is otherwise a planning figure from before its
+   neighbours were written**, and the elicitation rate is paid in frames on top
+   of it. It is not a target \dash{} and the record above is also the reason
+   the programs cannot be written in parallel: each one is shaped by what the
+   ones before it turned out to spend.
+2. **The measurements.** Ten are specified, nine of them free. **E6 was run in
+   the P20 pass and E9 in the P25 pass**, and the ledger in
+   `notes/01-curriculum.md` §17 now carries a Status column naming the pass
+   rather than a total in prose \dash{} it said "none has been run" for five
+   programs after E6 had. Fill the column in the pass that runs one.
+
+   **E4 needs a trained model** and is the same debt as item 1's. Three rows
+   \dash{} E1, E3 and E5 \dash{} say "see the note below" because P02, P05
+   and P16 each measured something that closely resembles the specification
+   beside them and no pass claimed it; deciding those is a reading job on three
+   merged programs and is not an inference to make from the table. The rest are
+   unclaimed and free: E2, E7, E8 and E10.
+
+   Also outstanding: raise the frame estimates' credibility by writing down,
+   in the pass, which neighbour spent what. Nineteen programs now have that
+   record and it is the reason each estimate missed.
 3. **Appendices C–F.** C (formula reference) is the one that fixes Stroud's
    fair criticism that a book of frames is a useless reference.
 4. **The residual sweep.** Fourteen committed values are measured

@@ -939,26 +939,49 @@ or, where this book declines to prove it, stated as quoted and attributed. The
 measurements are for the claims that sit between the mathematics and the
 practice, which is exactly where folklore lives.
 
-Ten candidate experiments. **None has been run.** Nine of the ten are free and
-run on a laptop in under a minute, which is a real advantage over the companion
-volumes, where three measurements are still blocked on a provider budget.
+Ten candidate experiments. Nine of the ten are free and run on a laptop in
+under a minute, which is a real advantage over the companion volumes, where
+three measurements are still blocked on a provider budget.
 
-| # | Program | Experiment | Cost |
-|---|---|---|---|
-| E1 | P2 | The logit at which a naive softmax overflows `fp32` and `fp16`, and the error of naive against stabilised, across magnitudes | Free |
-| E2 | P3 | Hand-counted FLOPs and bytes for one transformer forward pass against measured wall clock; where the model is wrong and by how much | Free (CPU) |
-| E3 | P5 | Angle between random unit vectors as dimension goes 2 -> 4096; the concentration towards orthogonality | Free |
-| E4 | P11 | Singular-value spectrum of a real open-weights embedding matrix; reconstruction error against rank | Free |
-| E5 | P16 | Forward against reverse mode: time and peak memory against depth; the measured cost of gradient checkpointing | Free |
-| E6 | P20 | SGD, momentum and Adam on a quadratic of known condition number; iterations to tolerance against the predicted count | Free |
-| E7 | P27 | Bootstrap confidence-interval width against evaluation-set size on a public benchmark; the size needed to resolve one point | Free |
-| E8 | P30 | Forward against reverse KL fitted to the same bimodal target; mode covering against mode seeking | Free |
-| E9 | P32 | **The headline.** Logit variance and softmax entropy with and without `1/sqrt(d_k)`, across head sizes | Free |
-| E10 | P33 | A scaling-law power fit on published numbers, with the fit's extrapolation uncertainty reported | Cheap |
+**This paragraph used to say “none has been run”, and it had been false for
+five programs.** The Status column below names the pass that ran each one
+instead, because a count of how many have run is a claim about this book that
+nothing derives from anything and that decays silently — which is the failure
+mode CLAUDE.md forbids by name and which this ledger demonstrated twice over.
+Fill the column in the pass that runs the experiment; never restate a total.
 
-E9 is the one to run first: it is the measurement the whole book is arranged
-around, it costs nothing, and it converts the book's central worked derivation
-from an argument into a demonstration.
+| # | Program | Experiment | Cost | Status |
+|---|---|---|---|---|
+| E1 | P2 | The logit at which a naive softmax overflows `fp32` and `fp16`, and the error of naive against stabilised, across magnitudes | Free | see the note below |
+| E2 | P3 | Hand-counted FLOPs and bytes for one transformer forward pass against measured wall clock; where the model is wrong and by how much | Free (CPU) | not run |
+| E3 | P5 | Angle between random unit vectors as dimension goes 2 -> 4096; the concentration towards orthogonality | Free | see the note below |
+| E4 | P11 | Singular-value spectrum of a real open-weights embedding matrix; reconstruction error against rank | Free | not run — needs a trained model |
+| E5 | P16 | Forward against reverse mode: time and peak memory against depth; the measured cost of gradient checkpointing | Free | see the note below |
+| E6 | P20 | SGD, momentum and Adam on a quadratic of known condition number; iterations to tolerance against the predicted count | Free | **run, P20 pass** |
+| E7 | P27 | Bootstrap confidence-interval width against evaluation-set size on a public benchmark; the size needed to resolve one point | Free | not run |
+| E8 | P30 | Forward against reverse KL fitted to the same bimodal target; mode covering against mode seeking | Free | not run |
+| E9 | **P25**, then P32 | **The headline.** Logit variance and softmax entropy with and without `1/sqrt(d_k)`, across head sizes | Free | **run, P25 pass** |
+| E10 | P33 | A scaling-law power fit on published numbers, with the fit's extrapolation uncertainty reported | Cheap | not run |
+
+**E9's owner moved and the table had not.** The curriculum review put the
+derivation of the scaling in P25, so E9 as specified — random vectors, head
+sizes, spread and entropy — is P25's, and it was run there: without the
+division the softmax entropy falls from 0.951 to 0.109 nats against a maximum
+of 2.079 and one key of eight takes 95.5 per cent of the weight, while with it
+nothing moves at any head size. What is left for P32 is the same measurement
+on an assembled architecture rather than on random vectors, and P25's own
+closing frames say so.
+
+**Three rows say “see the note below” because nobody has checked them, and
+that is the honest answer.** P02 measured the overflow cliff per format and
+the cost of a non-maximal pivot; P05 swept the cosine spread over
+`d = 2, 3, 10, 100, 768, 4096` and the concentration towards orthogonality;
+P16 counted forward against reverse multiplications exactly and derived the
+checkpointing peak. Each looks like the experiment beside it and **no pass
+claimed one**, so whether the specification is met is a reading job on three
+merged programs and not an inference to make from this table. E5 is the
+clearest case for “no”: it asks for time and peak memory measured on a
+machine, and P16 deliberately counted operations instead.
 
 Until an experiment runs, the claim it supports is labelled as judgement and its
 table stays empty. **Do not fill them with plausible numbers.**
