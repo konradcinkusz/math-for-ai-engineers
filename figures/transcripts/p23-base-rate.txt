@@ -1,0 +1,6 @@
+>>> from p23_probability_bayes import ppv_at
+>>> from fractions import Fraction as F
+>>> [ppv_at(F(1, d)) for d in (10, 100, 1000)]
+[Fraction(11, 12), Fraction(1, 2), Fraction(11, 122)]
+>>> float(ppv_at(F(1, 1000)))
+0.09016393442622951

@@ -617,7 +617,14 @@ correct."** At 1% prevalence, a test with 99% sensitivity and 99% specificity ha
 a positive predictive value near 50%; make it 0.1% prevalence and PPV falls
 below 10% — a positive is *wrong more often than it is right*. And a model that
 predicts "negative" always scores 99% accuracy while catching nobody (the
-accuracy paradox). The base rate is not a detail; it dominates. → **P22, P26**.
+accuracy paradox). The base rate is not a detail; it dominates. → **P23**,
+whose brief names this as "the base-rate calculation an engineer must be able
+to do in a meeting" and which delivers it exactly, over fractions: the positive
+predictive value is `11/122` at one fault in a thousand, and *exactly* `1/2` at
+one in a hundred, where the base rate meets the error rate. (This entry said
+"P22, P26", which predates the insertion of P7 — P22 is *Constrained
+optimisation* — and see the warning at the head of §3.) **P28** returns to it
+with a prior on the parameter rather than a point estimate.
 
 **29. "Correlation is zero, so they're independent."** Zero correlation means no
 *linear* relationship. y = x² on symmetric x has correlation exactly 0 and
