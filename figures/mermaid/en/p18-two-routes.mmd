@@ -1,0 +1,4 @@
+flowchart LR
+  A["the loss goes through a softmax, so the chain rule<br/>offers a route that follows the two steps literally"]
+  A --> B["that route forms one over a probability, and then a<br/>table with one entry per pair of classes"]
+  B --> C["the other reaches the same gradient with one subtraction<br/>per class and no table at all"]

@@ -1,0 +1,11 @@
+>>> from p18_matrix_calculus import softmax, fused_grad
+>>> from p18_matrix_calculus import two_step_grad
+>>> z, true = [0.0, 0.0, -800.0], 2
+>>> softmax(z)[true]
+0.0
+>>> fused_grad(z, true)
+[0.5, 0.5, -1.0]
+>>> two_step_grad(z, true)
+Traceback (most recent call last):
+  ...
+ZeroDivisionError: float division by zero
