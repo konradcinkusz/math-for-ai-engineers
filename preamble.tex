@@ -2524,6 +2524,14 @@
 %  balancer has somewhere to take a residual from. The \textheight reduction
 %  and the \vfuzz are both gone: the first was a compensator tuned against a
 %  mechanism that was not running, and the second could not have worked.
+%  ONE DEPENDENCY, STATED RATHER THAN GUARDED. \raggedcolumns comes from
+%  multicol, which imakeidx loads only in the branch this book is in. If
+%  `original` is ever passed to imakeidx, theindex becomes book.cls's
+%  \twocolumn index again, multicol is not loaded, and this line is an
+%  undefined control sequence -- at which point the right patch is
+%  \raggedbottom and the whole history above becomes relevant again. No
+%  \ifcsname guard: this book does not pass that option, and a guard would
+%  silently install a setting that has already been measured as inert.
 \apptocmd{\theindex}{%
   \raggedcolumns\raggedright
   \setlength{\parskip}{0pt plus 0.3pt minus 1pt}%
