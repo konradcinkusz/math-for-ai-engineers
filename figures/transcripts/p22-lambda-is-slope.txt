@@ -1,0 +1,8 @@
+>>> from p22_constrained_optimisation import solve
+>>> from fractions import Fraction as F
+>>> h = F(1, 1000)
+>>> [solve(F(c))[2] for c in (1, 2, 3)]      # lambda
+[Fraction(4, 3), Fraction(8, 3), Fraction(4, 1)]
+>>> [(solve(F(c)+h)[3]-solve(F(c)-h)[3])/(2*h)
+...  for c in (1, 2, 3)]                     # d f*/dc
+[Fraction(4, 3), Fraction(8, 3), Fraction(4, 1)]

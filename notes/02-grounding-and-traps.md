@@ -2449,3 +2449,63 @@ hundred, and its estimate is still 47 per cent from the true value after all
 40 000 samples. That is the fork between a policy-gradient method and a
 variational auto-encoder, and it is why the first has a literature about
 variance reduction and the second does not. → **P21**.
+
+**223. "A Lagrange multiplier is a bookkeeping variable you eliminate."** It is
+a *price*: how much objective you buy per unit of constraint relaxed, with
+units of objective divided by constraint. Checked as an equality rather than an
+approximation — for a quadratic under a linear constraint, `lambda` equals
+`d f*/dc` exactly at every level, over fractions, with no tolerance anywhere
+because a central difference is exact for a quadratic. It is the same object a
+solver reports beside each constraint and economics calls a shadow price, and
+it is usually the most interesting number in the answer. → **P22**.
+
+**224. "The multiplier tells me what relaxing the constraint by one unit is
+worth."** It prices the *first* unit. It is a derivative, so it describes an
+infinitesimal relaxation; over a whole unit the curvature of the optimal-value
+function adds the rest. Measured: relaxing from 3 to 4 gains 4.67 against a
+multiplier of 4. Using a multiplier as a price for a large change is the same
+error as using a gradient as a step. → **P22**.
+
+**225. "I project onto the constraint set, so my answer satisfies the
+constraint and is therefore right."** It satisfies the constraint, which is
+half of what *right* means. Projection answers *which feasible point is
+nearest*; the multiplier answers *which feasible point is best*, and they are
+different questions with different answers — measured, the projection of
+`(5, 0)` onto `x + y = 3` has objective value 18 against the constrained
+optimum's 6. Projected gradient methods invite the confusion: it is the
+*stepping* that finds the optimum and the projection only keeps the iterate
+legal. → **P22**, on **P05**'s projection.
+
+**226. "`beta` in a KL-penalised objective is just a hyperparameter."** It is a
+multiplier, which makes it a price with units: reward per nat. Measured along
+the family of solutions, the slope of expected reward against KL is `beta`
+itself, to better than `1e-4`. So — unlike a learning rate — it can be reasoned
+about before it is searched, and a `beta` tuned against one reward model does
+not transfer to a reward model on a different scale, because the two rewards
+are in different units. → **P22**, resting on **P30** for KL itself.
+
+**227. "A hard KL constraint and a KL penalty are different methods."** They
+are the same problem parameterised differently. Each `beta` produces exactly
+one divergence level and a smaller `beta` always buys more, so choosing a level
+determines the multiplier and choosing a multiplier determines the level;
+neither is more fundamental, and which one an implementation exposes is a
+matter of what is convenient to control. Methods presented as rivals on this
+axis are arguing about parameterisation rather than about objectives. →
+**P22**.
+
+**228. "The KKT conditions prove my point is optimal."** They make it a
+candidate. They are necessary at an optimum only when a constraint
+qualification holds, so a point failing them may still be optimal in a badly
+behaved feasible set; and they are sufficient only under convexity, which
+**P19** says is the property most problems in this field do not have. On a
+non-convex problem, satisfying KKT makes a point one candidate among many. →
+**P22**.
+
+**229. "A negative multiplier means the constraint is hurting me."** It means
+the sign convention is not the one you assumed. For a constraint written
+`g <= 0` the multiplier cannot be negative, because relaxing a bound enlarges
+the feasible set and a larger set cannot contain a worse best point. Books
+differ between `grad f = lambda grad g` and `grad f + lambda grad g = 0`, which
+give multipliers of opposite sign for the same problem, so the *magnitude* of a
+multiplier is a property of the problem and its sign is a property of how
+somebody wrote the constraint. → **P22**.
