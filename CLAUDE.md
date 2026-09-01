@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P22 written, both editions \dash{} Parts I to VI entire.** P23–P34 are stubs carrying their briefs | 12 of 47 |
+| Programs | **F1–F13 and P1–P23 written, both editions \dash{} Parts I to VI entire, and Part VII begun.** P24–P34 are stubs carrying their briefs | 11 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 997 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1016 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 840 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 853 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1027 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1043 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 864 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 875 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,21 +93,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **12 of 47 programs are stubs**, in each language. This is the whole of the
+- **11 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1092 computed values, all referenced, all present, plus the committed console
+- 1120 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 210 Mermaid sources, all rendering
-- 56 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 216 Mermaid sources, all rendering
+- 60 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
 - **91 orphan-tail pages: 23 · 27 · 20 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
-  **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three and P22 one
+  **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one and
+  **P23 none**
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -127,7 +128,7 @@ what was there before.
   F12 four, against F5's eleven**, and the reason is worth having — all five
   were written with the two-sided rule from F6 in hand, so a frame whose tail
   lands badly is lengthened rather than trimmed. **P12 added none either**,
-  which is the fourth time. **A fourth structural fix was measured in the F6 pass and
+  which is the fourth time; **P23 made it the eighth**. **A fourth structural fix was measured in the F6 pass and
   reverted**, because it clears the orphaned *cue* by converting it into more
   orphan *tails* — see *Program F6 pass* and the sweep table in
   `preamble.tex`. `checkpdf.py` prints every one of them on
@@ -142,8 +143,10 @@ what was there before.
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
-  **47% in P19**, **47% in P20**, **48% in P21** and **45% in P22** \dash{} P13, P15 and P17 are the highest outside Part I and
-  the only ones anywhere to reach the book's own rate.**
+  **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22** and
+  **53% in P23** \dash{} P23 is the highest outside Part I and the first
+  anywhere to pass the book's own rate, and P13, P15 and P17 are the only
+  others to reach it.**
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -453,7 +456,7 @@ output differs:
 | `\dash` | spaced em dash | spaced półpauza |
 | `\enquote{}` | British single quotes | Polish quotation marks |
 | `\intcc{a}{b}` | `[a,b]` | `[a,b]` — *not* `⟨a,b⟩`; flagged to the reader at the first interval |
-| `\Var` `\Ex` | `Var` `E` | `Var` `E` — with a **mandatory** notation box for `D²(X)` in P23 |
+| `\Var` `\Ex` | `Var` `E` | `Var` `E` — with a **mandatory** notation box for `D²(X)` in P24 |
 
 Three rows are genuine splits rather than clean divergences, and are settled in
 `notes/03-bilingual-and-notation.md` §2.8 so nobody re-litigates them from a
@@ -897,6 +900,50 @@ Each cost time; none is obvious from its error message.
   And the patch block sits **outside** the preamble's `\makeatletter` group,
   so the length is written in plain units; `\z@` and `\@plus` there are an
   undefined control sequence in every build.
+
+  **AND ALL OF THAT WAS MEASURED AGAINST THE WRONG MECHANISM, which the P23
+  pass established and which retires every constant above.** The index in this
+  book is **not** a `\twocolumn` region. `imakeidx` is loaded without its
+  `original` option and in that mode it replaces `theindex` with
+  **`multicols`**. So `\raggedbottom` \dash{} which sets `\@textbottom`, read
+  by `\@makecol` \dash{} had been **inert since the day it was added**, because
+  multicol installs its own output routine and never calls `\@makecol`; and
+  `\vfuzz` is inert too, because multicol sets `\vfuzz\z@` itself immediately
+  before the `\vbox to` that balances the final page. The switch that is
+  actually read is **`\raggedcolumns`**, and multicol's default,
+  `\flushcolumns`, is exactly the rigid setting the paragraphs above diagnose.
+  It also explains the one detail nobody could account for: the complaint was
+  always on the index's **last** page, because that is the only page multicol
+  *balances* rather than splits, and a balanced column under `\flushcolumns`
+  must come out exact.
+
+  **The generalisable rule: a remedy that is correct for the environment you
+  think you are in is INERT in the one you are actually in, and an inert remedy
+  is indistinguishable from one that did not go far enough.** Five passes read
+  the surviving residual as evidence that the constant needed raising. Before
+  sweeping a constant a second time, confirm that the macro you are setting is
+  read by the code that emits the complaint \dash{} here that was one `grep` of
+  `imakeidx.sty` and one of `multicol.sty`. And when the question is about
+  TeX's own semantics rather than about this book, **ask TeX**: the whole
+  mechanism was settled by a ten-line standalone file in seconds, against four
+  CI cycles spent on the constant.
+
+- **`\apptocmd{\tableofcontents}{...}` runs AFTER the contents has been
+  typeset, and the assignment then stands for the rest of the book.**
+  `\tableofcontents` is `\chapter*{\contentsname}` followed by
+  `\@starttoc{toc}`, and it is not inside a group. So anything appended to it
+  reaches nothing in the contents and leaks into every paragraph that follows.
+  An `\emergencystretch` added this way to rescue one over-wide contents line
+  did exactly that \dash{} **and it was invisible because it made the ledger
+  look better**: the 6.3 pt box this file records in `main-en-a4` disappeared,
+  which is a real overfull line silently loosened rather than fixed. `\pretocmd`
+  sets it before the contents is read and `\apptocmd` restores it after, which
+  is the scoping the comment had claimed all along.
+
+  **The generalisable rule, and it cost two diagnoses in one pass: when a fix
+  does not move the number, check WHERE it runs before you check how large it
+  is.** The index's `\raggedbottom` and `\vfuzz` above are the same shape from
+  the other direction, and both looked like fixes that had not gone far enough.
 
 - **You cannot reproduce CI's metrics in this container, and trying breaks
   something worth more.** `texlive-fonts-extra` and `texlive-plain-generic`
@@ -7020,6 +7067,313 @@ All six at mermaid's wrap cap on the first render, at three ranks.
 - Frame numbers mapped after writing: sections landed at
   `1--6 / 7--11 / 12--17 / 18--21 / 22--28 / 29--35`.
 
+### Program P23 pass, August 2026 --- Part VII begins
+
+**Forty-seven teaching frames, forty-nine printed, both editions**, against a
+brief that projected fifty-five. Six sections: a weight on a list of outcomes,
+conditioning is changing the denominator, Bayes in one line, what fraction of
+the alarms are real, independence and what it does not survive, and
+conditional independence and a second signal.
+
+Seventeenth program under its brief's estimate, and the smallest shortfall in a
+long while, because the cause is a fourth kind. The ground was genuinely
+unspent \dash{} a grep for \emph{Bayes}, \emph{conditional}, \emph{prior},
+\emph{independence} and \emph{base rate} across every written program returns
+only file headers deferring here \dash{} and the neighbours supplied
+\emph{objects} rather than machinery or content. Program~\ref{prog:F10} hands
+over the numerator, the denominator and the observation that choosing the
+denominator was a decision; Program~\ref{prog:F13} hands over the density and
+the fact that its height is a rate. So nothing had to be built and nothing had
+been spent, which is why the estimate nearly held.
+
+#### The elicitation rate was measured on the draft and then designed up
+
+**53%, the highest outside Part I and above the book's own rate**, and the
+route there is the finding rather than the number. The finished draft measured
+**33%**. Ten frames that \emph{stated} something the reader could produce were
+converted \dash{} the statement moved into the next frame's answer, the frame
+ended by asking \dash{} and that took it to 53% while adding two frames.
+
+The P04 pass did three of those conversions and reported the move as cheap.
+Doing ten says something stronger: **measure the rate on the draft before the
+frame remap, because a conversion is nearly free and the remap is not.** Nine
+of the ten needed no new frame at all; five produced the P06 pattern, a frame
+opening with `\ans` and ending with `\dotline`.
+
+#### A bare caret in a manifest brief is a fatal build error, and it was mine
+
+Appendix~B's variance pointer had to move to Program~\ref{prog:P24}, so a
+clause was added to P24's brief naming the notation \dash{} written as prose,
+with `D^2(X)` in it. `gen_stubs.py`'s `escape()` turns an exponent into maths
+**only inside backticks**; outside them the caret reaches LaTeX raw, opens
+maths mode and swallows the rest of the paragraph.
+
+Two `Missing $ inserted` errors and a **192.5 pt overfull hbox** \dash{} the
+largest this book has produced since F05's tables \dash{} from one character,
+in a stub file nobody had edited by hand, and `make` died with `Error 12`
+before three of the four formats had run. **One cause, three symptoms**: the
+errors, the box, and three page counts that had not moved.
+
+The recorded habit caught it: `MAKE_EXIT 2` while the harness reported exit 0,
+and an unchanged page count is a failed build. What the generator now does is
+**refuse** such a brief before writing anything, naming the program and saying
+to write backticks instead. Refusing beats escaping it to
+`\textasciicircum{}`, because a caret in a brief always means an exponent, so
+silently producing an unreadable glyph would hide the author's actual mistake.
+Proved by mutation: a probe caret in F1's brief fails `--check` with exit 1 and
+names F1.
+
+**The generalisable half is about where a mechanism's documentation stops.**
+`escape()`'s own docstring describes the backticked case exactly and correctly.
+Nothing said what happens outside it, and nothing checked. That is the third
+time in this repository a graceful mechanism has hidden an authoring error
+\dash{} after `\transcript`'s file-is-absent marker and `\mermaidfig`'s
+fallback \dash{} and the fix has been the same each time: make the wrong form
+impossible or fail on it, rather than degrade.
+
+#### The index's overfull vbox: five cycles against a mechanism that was never running
+
+This is the pass's most valuable finding and it retires an entry this file has
+been extending since Program~\ref{prog:P12}.
+
+`theindex` here is not book.cls's two-column index. **`imakeidx` is loaded
+without its `original` option, and in that mode it replaces the environment
+with `multicols`.** So none of the machinery five passes reasoned about was in
+the room:
+
+- **`\raggedbottom` sets `\@textbottom`, which `\@makecol` reads.** multicol
+  installs its own output routine and never calls `\@makecol`, so the
+  `\raggedbottom` added after the first CI failure had been **inert from the
+  day it was added**. Its analogue inside `multicols` is **`\raggedcolumns`**.
+- **`\vfuzz` is inert too, and provably so**: multicol sets `\vfuzz\z@` itself
+  immediately before the `\vbox to` that balances the final page. A value set
+  in the environment's body cannot survive that assignment \dash{} which is
+  exactly why CI answered `8.28874` pt a second time, to the ten-thousandth of
+  a point, after `\vfuzz` was added.
+- **`\flushcolumns` is multicol's default**, and it is precisely the rigid
+  setting every one of those comments diagnoses: each column held to
+  `\@colroom` with nothing to give.
+
+And it explains the one detail Program~\ref{prog:P17}'s pass recorded and could
+not account for: **the complaint was always on the index's last page**, because
+that is the only page multicol *balances* rather than splits, and a balanced
+column under `\flushcolumns` has to come out exact.
+
+So the `\parskip` shrink swept five times, the `\textheight` reduction that
+replaced it and the `\vfuzz` that replaced that were all compensating for a
+switch nobody had thrown. `\raggedcolumns` is one word, it is multicol's
+documented answer, and it is what every index in print does.
+
+**The generalisable finding, and it is worth more than the fix: a remedy that
+is correct for the environment you think you are in is INERT in the one you are
+actually in, and an inert remedy looks exactly like one that did not go far
+enough.** Every cycle read the surviving residual as evidence that the constant
+needed raising. The check that would have ended it at the first cycle is one
+line: **before sweeping a constant a second time, confirm that the macro you
+are setting is read by the code that emits the complaint.** Here it took one
+`grep` of `imakeidx.sty` and one of `multicol.sty`.
+
+Two smaller things fall out of it. The repository's own rule \dash{} *an
+identical measurement after a change is the signal that the change did not
+reach what was measured* \dash{} fired correctly and was read as
+\enquote{the value is too small} rather than \enquote{the assignment is not
+reaching}; it is the second reading that is nearly always right. And the
+mechanism was settled in seconds by a ten-line standalone file rather than by
+another book build: a `\vbox` overfull inside a group with `\vfuzz` raised,
+shipped inside the group and again outside it. **When a question is about TeX's
+own semantics rather than about this book, ask TeX, not the book.**
+
+#### The contents column, a four-digit page number, and a fix in the wrong place
+
+`main-pl` crossed a thousand pages in the P22 pass and acquired four-digit
+contents entries in this one. book.cls reserves `\@pnumwidth` = 1.55em for the
+page number, which fits three digits and not four: `1001` and `1009` each
+overflowed by $\num{4.93}$ pt. It is the contents column's third defect of this
+shape after P16's long Polish title and the running-head guard, and it is the
+first that **cannot be fixed by shortening anything**, because the token that
+overflows is a page number. Widened once, to 2.05em, rather than watched.
+
+**And the first attempt at the second half of that fix was worse than the
+defect it addressed.** `\l@part` and `\l@chapter` take their title's
+`\rightskip` from `\@pnumwidth` as well, so widening it narrows those two lines
+and tipped the Polish Part V title over on A4. `\emergencystretch` is the right
+instrument \dash{} TeX spends it only on a line it cannot otherwise set. It was
+added with `\apptocmd{\tableofcontents}`, **which runs after `\@starttoc{toc}`
+has already typeset the whole contents.** So it reached nothing it was written
+for, and because `\tableofcontents` is not inside a group it stood for every
+paragraph of the book from the contents page onward.
+
+**It was invisible because it made the ledger look better.** The $\num{6.3}$ pt
+box this file records in `main-en-a4` \dash{} F1's
+$7\,000\,000\,000$, which cannot break \dash{} simply disappeared: a genuine
+overfull line silently loosened rather than fixed, which is precisely the
+objection this book makes to `\vfuzz`. `\pretocmd` sets the stretch before the
+contents is read and `\apptocmd` restores it after, and the 6.3 pt box comes
+back, where it belongs.
+
+**And removing the leak exposed a second line it had been masking**, which is
+the diagram manifest's **sixth** recurrence and the first caused by something
+other than long copy: `\@pnumwidth` is also the right margin `\@dottedtocline`
+wraps against, so widening it for a four-digit page number narrowed the
+manifest column by half an em for every entry in the book. `main-pl-a4`'s
+`p10-bowl-or-saddle.mmd` line went 2.57 pt over. Fixed the recorded way
+\dash{} shorten the Polish copy, from 33 characters to 25 \dash{} rather than
+by widening the stretch, because manifest copy is the one thing in that column
+that *can* be shortened. The Part V contents line cannot, which is why the
+stretch stays there and only there.
+
+**Two remedies in one pass applied where the code that produces the complaint
+could not read them**, and both looked like remedies that had not gone far
+enough. It is worth stating as one rule: **when a fix does not move the number,
+check where it runs before you check how large it is.** The two diagnoses cost
+five CI cycles between them and one `grep` each to settle.
+
+#### The transcript spoiled a frame fourteen frames later
+
+One listing carried the base-rate sweep and the evidence accumulation
+together, and the accumulation prints `Fraction(363, 400)` \dash{} section 6's
+elicited answer \dash{} inside section 4.
+
+That is Program~\ref{prog:P04}'s rule (**a transcript is under the same rule as
+a frame**) biting at a new distance. Every previous instance was a listing
+answering the frame it sits in, which is visible while writing that frame; this
+one answered a question two sections away, which is only visible if you read
+the listing against the whole program. Split into `p23-base-rate` and
+`p23-accumulate`, each placed where its content has just been delivered, and
+both extracted from the finished PDF and run.
+
+**So the rule needs its scope stated: a transcript may not answer any question
+put to the reader anywhere later in the program**, which is the same widening
+rule~2 went through after the F02 review pass.
+
+#### Appendix B's three stale pointers, and P18's estimate was right
+
+Program~\ref{prog:P18}'s pass found four false pointers in Appendix~B, fixed
+the one that was its own, recorded the other three and said the audit was
+\enquote{five greps}. It was five greps.
+
+- **The variance box pointed at P23.** Variance is Program~\ref{prog:P24}'s,
+  whose brief names it in its first sentence, and P23 defines no random
+  variable at all. Corrected \dash{} and the clause was added to P24's brief so
+  the pointer names a program that has promised the thing, which is the
+  F04-to-P21 remedy.
+- **The interval box said Program~F6 says so at the first interval a reader
+  meets.** The first interval in the book is F03's, and neither program carries
+  an interval notation box. Corrected to what is true: the first interval is in
+  Program~F3 and the appendix is where the convention is recorded.
+- **The `tgh` note said Program~F8 records it.** F08 mentions $\tanh$ once in
+  passing and records nothing; F07, which owns it, records nothing either. Same
+  correction.
+
+Fixing them was in scope precisely because P23 is the program one of them
+names, and the other two are a line each in a file already open. The
+P07-covariance precedent (record rather than fix) is for edits that would need
+a merged program rewritten; these needed no program touched.
+
+#### The cross-programme gate is P12's third kind
+
+Not a value gate and not a shared predicate but **the same worked example
+continued**. Program~\ref{prog:F10} counts two overlapping evaluation sets and
+then says a fraction of counts is a naive probability; divide its four
+committed counts by their union and the union rule \emph{is} the addition rule:
+$\frac{1}{2} + \frac{3}{5} - \frac{1}{10} = 1$. The script asserts F10's own
+numbers and emits nothing, because every fraction in that frame is head
+arithmetic from figures F10 already prints.
+
+That is the form to reach for whenever a program extends an example rather than
+inventing one, and it is stronger than a resemblance and cheaper than a
+re-derivation.
+
+#### Rule 2: written against the frames above, before rendering
+
+The P22 rule was applied while designing rather than after a build, and all
+three figures still needed work \dash{} which is the sixth pass running that
+the last node of a three-rank chain has been the spoiler.
+
+**And figure 1 had to move**, which is the milder P02 case. Its third node said
+an event's probability is \emph{the weight of that set}, and the frame it was
+declared in ends by asking which of the three rules does not apply to a
+density's height \dash{} whose answer is \enquote{the second, because it bounds
+the measure of a set}. The node did not state the answer; it supplied its last
+step. Moved to the end of frame 3, where its content is exactly what frames 1
+to 3 deliver and where the following question (the complement rule) is
+untouched by it.
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P23.1 space-and-measure | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P23.2 two-denominators | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P23.3 two-populations | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's wrap cap on the first render, at three ranks. Measured on
+the page afterwards, each figure sits at the end of the frame that delivers
+what it carries, with the following question and its answer immediately after
+it \dash{} `main-en` 883/884/884, 888/889/889, 893/893; `main-en-a4`
+741/741/742, 745/746/746, 749/749. Three Polish anchors could not be extracted
+because `pdftotext` hyphenates them, which is Program~\ref{prog:P10}'s recorded
+extraction limit rather than a defect; the ones that did extract agree
+(`main-pl` 898/898, 903/903/903; `main-pl-a4` 751/751, 756/756/756), and the
+structural argument covers the rest: a float cannot rise above the page its
+declaration point falls on.
+
+#### An aibox that named no specific quantity
+
+The draft's said that an anomaly detector fires constantly and every alert is
+noise, which names a class of complaint rather than a line of a system. Third
+pass in the book to have to fix this, and the replacement is better than a
+demotion to prose: **precision is $\Prob(\text{real} \mid \text{flagged})$ and
+recall is $\Prob(\text{flagged} \mid \text{real})$**, both printed on every
+classification report, and recall conditions on the true class alone so it
+travels with the model while precision conditions on what was flagged so it
+does not. Two adjacent lines of one report behaving completely differently,
+with nothing on the card to say so \dash{} which is specific, checkable and is
+the section's own theorem read on an artefact the reader has in front of them.
+
+#### The trap catalogue's unswept range bit again, exactly as predicted
+
+Item 28 \dash{} the base-rate calculation, which is this program's headline
+\dash{} pointed at \enquote{P22, P26}. P22 is \emph{Constrained optimisation}.
+It is the P7-insertion off-by-one in the range Program~\ref{prog:P10}'s pass
+deliberately left unswept, saying items 1--73 are a mix and a blanket renumber
+would break the ones already corrected. Corrected against the destination
+briefs: P23 delivers it and **P28** returns to it with a prior on the parameter
+rather than a point estimate.
+
+Traps 230 to 236 added.
+
+#### Also
+
+- **Parity came back clean on its ordered checks first time** \dash{} C4, C8,
+  C12 and C16 all passed on the first run, the eighth program to manage it. The
+  two failures were C9 (a diagram renamed under a key too long for the manifest
+  column, on P14's finding) and C7 on two values the frames do not quote.
+- The two transcripts were extracted from the finished PDF and executed: they
+  print the same fractions the page prints, including the exact
+  $\frac{1}{2}$ at one fault in a hundred, which is why the listing prints
+  fractions rather than decimals.
+- **A number that did not reproduce from the page, caught before it shipped.**
+  Two alarms give exactly $\frac{363}{400}$, and at one decimal the page would
+  have said $\num{90.8}$ per cent beside a transcript printing $\num{0.9075}$.
+  The value is emitted at two decimals instead. That is F04's, F05's and P07's
+  defect, avoided by dividing what the page prints before writing the sentence.
+- **A figure that rounds to another figure two sections away.** Three alarms
+  leave a $\num{99.9}$ per cent posterior, which is also the accuracy paradox's
+  number \dash{} F08's defect of two quantities printing as one. Reported as
+  its complement instead, where every digit means something, which is P05's
+  rule for a quantity near a boundary.
+- **Layout cost one line of manifest copy and nothing else.** The overfull
+  multiset came back element for element to the baseline in all four builds
+  \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with **zero overfull vboxes
+  anywhere**, no stranded openers, no stranded headings, **no orphaned cues at
+  any point in the pass**, and **the orphan-tail count did not move**: 23, 27,
+  20, 21, exactly the pre-P23 figures. That is the eighth time (F13, P07, P09,
+  P12, P15, P17, P19, P23), and every time for the same reason \dash{} the
+  recorded rules were applied while drafting rather than after a build named
+  the defect.
+- Pages 1027 / 1043 / 864 / 875, from 997 / 1016 / 840 / 853.
+- Frame numbers mapped after writing and again after the ten conversions:
+  sections landed at `1--8 / 9--15 / 16--21 / 22--30 / 31--37 / 38--47`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -7285,35 +7639,49 @@ clone instead.
 
 ## What is left
 
-1. **Twelve programs, and Parts I to VI are complete.** F1 to F13 and P1 to
-   P22, both editions. Part VII, probability and statistics, is next and is
-   the largest remaining block: six programs, P23 to P28.
+1. **Eleven programs, and Parts I to VI plus P23 are complete.** F1 to F13 and
+   P1 to P23, both editions. Part VII, probability and statistics, is the block
+   in progress: five of its six remain, P24 to P28.
 
-   **P23 is next** \dash{} *Probability and Bayes' theorem*, fifty-five frames
-   planned, deps `F10` and `F13`. It is the first program in a while whose
-   ground is genuinely unspent, so the estimate may hold; read the two
-   dependencies before assuming it does not. **F10** owns sets, the mask,
-   and/or/not, the counting rules and \dash{} crucially \dash{} \emph{the
-   numerator and the denominator}, including the observation that choosing the
-   denominator was a decision. **F13** owns the density, the fact that a
-   density's height is not a probability, and the shape of a weighted average.
-   Between them the objects are in place and what P23 owes is the measure, the
-   conditioning and the theorem.
+   **P24 is next** \dash{} *Random variables and distributions*, sixty frames
+   planned, deps `P23`, `F7` and `F13`. Read those three before believing the
+   estimate, because sixteen of the last seventeen programs came in under
+   theirs. **P23** now owns the measure, conditioning, Bayes and both kinds of
+   independence, so a distribution is a weight function on a space the reader
+   already has; **F13** owns the density, the fact that its height is a rate
+   rather than a probability, and the *shape* of a weighted average \dash{} it
+   writes $\int x\,p(x)\,\mathrm{d}x$, says it has a name and declines to use
+   it, which is exactly the sentence P24 opens by cashing; **P07** owns shapes,
+   which is what makes \enquote{a categorical distribution over the vocabulary}
+   a rank-1 array with a named axis rather than a metaphor.
 
-   **Its payoff is a calculation, and it is free.** A classifier at 99 per cent
-   on a fault occurring once in a thousand requests: what fraction of its
-   alarms are real? That is the base-rate arithmetic an engineer has to be able
-   to do in a meeting, it is trap item 28 in the catalogue, and it needs
-   nothing but two counts and a division \dash{} which is F10's own framing.
-   The brief also asks for **independence and conditional independence
-   distinguished**, because the naive Bayes assumption and most
-   \enquote{these two evals are independent signals} claims live on the
-   difference, and for the **prosecutor's fallacy elicited before it is named**.
+   **Its payoff is that sampling a token is a draw from a categorical
+   distribution**, and that temperature, top-$k$ and top-$p$ are three ways of
+   editing that distribution before drawing \dash{} distribution surgery, with
+   what each destroys. **F05 has already measured the temperature half**: a
+   strictly increasing function cannot move the argmax, so temperature changes
+   how often the others are drawn and never which is most likely. So P24 owes
+   the other two and the frame that says what they have in common.
 
-   **Bayes' theorem must be derived, never asserted** \dash{} the brief says so
-   in as many words, and it is one line of algebra from the definition of
-   conditioning, which makes it exactly the kind of thing this book states as
-   a consequence rather than a result.
+   The brief also asks for the **Gumbel-max trick** \dash{} so the reader can
+   see that `argmax(logits + gumbel)` is exact categorical sampling rather than
+   an approximation \dash{} for the Gaussian introduced **through its role
+   rather than its formula**, and for expectation as the linear operator that
+   makes almost every later derivation short. That last one is the load-bearing
+   piece: three merged programs already lean on it. **P24 also carries the
+   `Var(X)` / `D^2(X)` notation box, and it is mandatory** \dash{} Appendix B
+   points here for the equivalence, and the P23 pass corrected that pointer
+   from P23 on the strength of this brief's promise.
+
+   **And P24 discharges two of the book's declared forward references at once.**
+   Program~P21's variance and Program~P07's undeclared
+   $\operatorname{Cov}(p, t)$ and $\operatorname{Var}(t)$ are both defined here.
+   P07's is still recorded as outstanding rather than fixed, and whoever writes
+   P24 is the right person to close it: the fix is one clause in P07's Learning
+   outcomes on the P21 pattern, and it needs the deciding of *declare anything
+   not yet defined* against *declare anything a payoff depends on*, which P07 is
+   the first case to separate.
+
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -7354,9 +7722,12 @@ clone instead.
    because four written programs had each already delivered one of its
    ingredients; **P21's fifty against thirty-nine**, because F06, F04 and
    P20 between them had left it only the noise model; and **P22's against
-   thirty-five**, because P15 and P05 had left it only the multiplier.
+   thirty-five**, because P15 and P05 had left it only the multiplier; and
+   **P23's fifty-five against forty-seven**, the smallest shortfall in a long
+   while, because its ground was genuinely unspent and its neighbours supplied
+   *objects* rather than machinery or content.
    **A brief's frame estimate is a planning figure from before its neighbours
-   were written.** It is not a target \dash{} and the sixteen-for-sixteen
+   were written.** It is not a target \dash{} and the seventeen-for-seventeen
    record above is also the reason the programs cannot be written in parallel:
    each one is shaped by what the ones before it turned out to spend.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and

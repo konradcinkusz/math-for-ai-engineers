@@ -1588,6 +1588,60 @@
 }
 \makeatother
 
+% ---- The contents column, and a four-digit page number ----------------------
+% book.cls reserves \@pnumwidth = 1.55em for a contents entry's page number and
+% \@tocrmarg = 2.55em for the right margin the title wraps against. Both fit
+% three digits and neither fits four: measured, "1001" and "1009" each overflow
+% by 4.93 pt in main-pl, which crossed a thousand pages in the P22 pass and
+% acquired four-digit entries in the P23 one.
+%
+% It is the contents column's THIRD defect of this shape, after P16's long
+% Polish title and the running head \mfaheadmark guards -- and unlike those two
+% it cannot be fixed by shortening anything, because the overflowing token is a
+% page number. Every remaining program pushes more entries past 999, so this is
+% widened once rather than watched.
+%
+% MEASURED, not guessed: 1.55em is 16.97 pt at the contents font's 10.95 pt and
+% the complaint is 4.93 pt, so four digits need 21.90 pt, which is 2.0em.
+%
+% \@tocrmarg IS DELIBERATELY NOT CHANGED, and that is the whole of what was
+% learnt here. It sets the right margin every \@dottedtocline entry wraps
+% against, and the diagram manifest is such a list -- \mermaidfig writes its
+% description through \addcontentsline{dgm}{subsection} -- so the two share it.
+% Widening it to 3.2em to keep the old gap narrowed that description column by
+% 0.65em and put a box back in ALL FOUR builds, in the one column this book has
+% already overflowed five times. The page-number box grows into the 1em gap
+% between the two lengths instead, which is where the room actually is, and no
+% wrap point moves.
+%
+% \emergencystretch is the second half, and the FIRST attempt at it was worse
+% than the defect. \l@part and \l@chapter take their title's rightskip from
+% \@pnumwidth as well, so widening it narrows those two lines by 0.5em --
+% enough to tip the Polish Part V title over on A4. Last-resort stretch is the
+% right instrument for that: TeX spends it only on a line it cannot otherwise
+% set, and a long part title running to two contents lines is ordinary.
+%
+% BUT IT WAS APPENDED TO \tableofcontents, WHICH IS AFTER \@starttoc{toc} HAS
+% ALREADY TYPESET THE WHOLE CONTENTS. So it reached nothing it was written for
+% and instead leaked into every paragraph of the book from the contents page
+% onward -- \tableofcontents is not inside a group, so the assignment simply
+% stood. It was invisible in the ledgers because it made them look BETTER: the
+% 6.3 pt box this file records in main-en-a4 disappeared, which is a genuine
+% overfull line silently loosened rather than fixed, and is exactly the
+% objection this preamble makes to \vfuzz two thousand lines below.
+%
+% \pretocmd sets it before the contents is read and \apptocmd puts it back
+% after, so it is scoped to the one region that needs it and to nothing else.
+% Restore to 0pt rather than to a saved value: LaTeX's own default is 0pt and
+% nothing else in this preamble sets it.
+\makeatletter
+\renewcommand{\@pnumwidth}{2.05em}
+\makeatother
+\pretocmd{\tableofcontents}{\emergencystretch=12pt\relax}{}{%
+  \PackageWarning{mfabook}{Could not patch tableofcontents for emergencystretch}}
+\apptocmd{\tableofcontents}{\emergencystretch=0pt\relax}{}{%
+  \PackageWarning{mfabook}{Could not restore emergencystretch after contents}}
+
 % ---- The programs register -------------------------------------------------
 % \program{Title} opens a program: it is \chapter plus the bookkeeping that
 % lets the back matter reproduce this program's answers under its own name.
@@ -2245,6 +2299,16 @@
 %  about 29 characters and index longer names by concept instead. Both sibling
 %  books learned this the same way.
 % ============================================================
+%  READ THIS FIRST. EVERYTHING FROM HERE TO THE \apptocmd AT THE BOTTOM OF THE
+%  BLOCK IS A RECORD OF FIVE CI CYCLES SPENT ON THE WRONG MECHANISM, and it is
+%  kept because the reasoning is instructive and because deleting it would
+%  invite the sixth. The index here is not a \twocolumn region -- imakeidx
+%  replaces theindex with multicols -- so \raggedbottom and \vfuzz are both
+%  inert in it and every constant swept below was compensating for a switch
+%  nobody had thrown. The finding, the mechanism and the code that survives it
+%  are at the END of this block. Do not tune anything named here without
+%  reading that first.
+%
 %  And RAGGED BOTTOM, added after CI failed on two OVERFULL VBOXES in the
 %  index -- 3.8 pt and 17.4 pt -- while this container built the same source
 %  clean. That is the metric split this file already records in both its other
@@ -2416,25 +2480,66 @@
 %      compressed enough -- and stop at the cliff rather than past it.
 %  \vfuzz stays rejected: raising it hides real overfull vboxes everywhere
 %  else, which is how a gate goes quiet.
+%  AND EVERY ONE OF THOSE FIVE CYCLES WAS SPENT ON THE WRONG MECHANISM.
+%  P23 read the packages instead of the constant and found it. THE INDEX IS
+%  NOT A \twocolumn REGION AT ALL. `imakeidx` is loaded without its
+%  `original` option, and in that mode it does not merely add the index to
+%  the contents -- it \renewenvironment{theindex} on top of `multicols`
+%  (imakeidx.sty, the \ifimki@original branch). So book.cls's twocolumn index
+%  never runs here, and neither does any of the machinery the comments above
+%  reason about:
+%
+%    * \raggedbottom sets \@textbottom, which \@makecol reads. multicol
+%      installs its own output routine and never calls \@makecol, so the
+%      \raggedbottom above has been INERT since the day it was added. Its
+%      analogue inside multicols is \raggedcolumns, and that is the switch
+%      the last column's balancer actually reads (\ifshr@nking in
+%      \balance@columns, multicol.sty).
+%    * \vfuzz is inert too, and provably so: multicol sets \vfuzz\z@ itself
+%      immediately before the \vbox to that balances the final page. A value
+%      set in this environment's body cannot survive that assignment. THAT is
+%      why CI came back with 8.28874 pt a second time, to the ten-thousandth
+%      of a point, after \vfuzz was added -- which is this file's own signal
+%      that a change did not reach what was measured, arriving for the third
+%      time in one pass.
+%    * \flushcolumns is multicol's default, and it is exactly the rigid
+%      setting the comments above diagnose: every column held to \@colroom
+%      with nothing to give. The overfull vbox was always on the LAST index
+%      page because that is the only page multicol BALANCES rather than
+%      splits, and a balanced column under \flushcolumns must come out exact.
+%
+%  So the constant that was swept five times, the \textheight reduction that
+%  replaced it, and the \vfuzz that replaced that were all compensating for a
+%  switch that was never thrown. THE GENERALISABLE FINDING, and it is worth
+%  more than the fix: A REMEDY THAT IS CORRECT FOR THE ENVIRONMENT YOU THINK
+%  YOU ARE IN IS INERT IN THE ONE YOU ARE ACTUALLY IN, AND AN INERT REMEDY
+%  LOOKS EXACTLY LIKE ONE THAT DID NOT GO FAR ENOUGH. Every cycle above read
+%  the residual as evidence that the number needed raising. Before sweeping a
+%  constant a second time, check that the macro you are setting is read by
+%  the code that produces the complaint.
+%
+%  What is left below is the mechanism and two shrinks that cost nothing:
+%  \raggedcolumns so a balanced column may end short, \raggedright so index
+%  lines do not stretch, and shrink on \parskip and \indexspace so the
+%  balancer has somewhere to take a residual from. The \textheight reduction
+%  and the \vfuzz are both gone: the first was a compensator tuned against a
+%  mechanism that was not running, and the second could not have worked.
+%  ONE DEPENDENCY, STATED RATHER THAN GUARDED. \raggedcolumns comes from
+%  multicol, which imakeidx loads only in the branch this book is in. If
+%  `original` is ever passed to imakeidx, theindex becomes book.cls's
+%  \twocolumn index again, multicol is not loaded, and this line is an
+%  undefined control sequence -- at which point the right patch is
+%  \raggedbottom and the whole history above becomes relevant again. No
+%  \ifcsname guard: this book does not pass that option, and a guard would
+%  silently install a setting that has already been measured as inert.
 \apptocmd{\theindex}{%
-  \raggedbottom\raggedright
-  % THE STRUCTURAL FIX, after four CI cycles spent on the constant below.
-  % Give the index's columns LESS ROOM than the text block. Every column then
-  % has three lines in hand, so a residual of up to about forty points is
-  % absorbed by construction, on any machine, and -- unlike shrink -- it
-  % cannot backfire, because it REDUCES what TeX will pack rather than
-  % increasing it. An index column that ends three lines short of the body's
-  % measure is what every index in print looks like.
-  \addtolength{\textheight}{-3\baselineskip}%
+  \raggedcolumns\raggedright
   \setlength{\parskip}{0pt plus 0.3pt minus 1pt}%
-  % And a SECOND source of shrink, deliberately one that does NOT scale with
-  % the number of entries on the page. Raising \parskip's shrink gives a
-  % column 45 entries x 1pt of extra capacity, so TeX packs more and the
-  % constant is non-monotonic -- which is the whole story above. \indexspace
-  % appears three or four times a page whatever the entries are, so six more
-  % points of shrink on each is about twenty points of capacity, bounded, and
-  % it absorbs a residual without changing how much TeX will cram.
-  % book.cls sets it to 10pt plus 5pt minus 3pt.
+  % book.cls sets \indexspace to 10pt plus 5pt minus 3pt. It appears three or
+  % four times a page whatever the entries are, so extra shrink here is
+  % bounded rather than proportional to the number of entries -- which is
+  % what a balancer wants. 9pt and not more: the natural size is 10pt, and a
+  % shrink above that lets the glue go negative and closes two entries up.
   \renewcommand\indexspace{\par \vskip 10pt plus 5pt minus 9pt\relax}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 

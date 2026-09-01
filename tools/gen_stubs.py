@@ -109,6 +109,32 @@ def latexify(s: str) -> str:
     return s
 
 
+def check_brief(pid: str, brief: str) -> list[str]:
+    """A bare ^ or _ in a brief is a fatal build error, and it is silent here.
+
+    escape() turns an exponent into maths only INSIDE backticks; outside them a
+    caret reaches LaTeX raw, opens maths mode and swallows the rest of the
+    paragraph. That is exactly what happened when a clause was added to P24's
+    brief reading "D^2(X)": two "Missing $ inserted" errors and a 192.5 pt
+    overfull hbox, from one character, in a file nobody had edited by hand.
+
+    Refusing is better than escaping it to \textasciicircum{}, because a caret
+    in a brief always MEANS an exponent -- so the author wants backticks, and
+    silently producing an unreadable glyph would hide that. The check names the
+    program and says what to write instead.
+    """
+    problems = []
+    outside = re.sub(r"`[^`]*`", "", brief)
+    for ch, name in (("^", "caret"), ("_", "underscore")):
+        if ch in outside:
+            problems.append(
+                "%s: bare %s outside backticks (%r). escape() only turns an "
+                "exponent into maths inside backticks, so this reaches LaTeX "
+                "raw and opens maths mode. Write it as `x%s2`." % (
+                    pid, name, ch, ch))
+    return problems
+
+
 def wrap(s: str, width: int = 76) -> str:
     return "\n\n".join(textwrap.fill(p, width) for p in s.split("\n\n"))
 
@@ -127,6 +153,14 @@ def main() -> int:
     progs, parts = m["programs"], m["parts"]
     byid = {p["id"]: p for p in progs}
     wanted = {p["file"] + ".tex" for p in progs}
+
+    # Before anything is written: a brief that will not compile.
+    bad = [msg for p in progs for msg in check_brief(p["id"], p["brief"])]
+    if bad:
+        print("  BRIEF WILL NOT COMPILE:")
+        for msg in bad:
+            print("    " + msg)
+        return 1
 
     changed: list[str] = []
 
