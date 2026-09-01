@@ -629,14 +629,20 @@ with a prior on the parameter rather than a point estimate.
 **29. "Correlation is zero, so they're independent."** Zero correlation means no
 *linear* relationship. y = x² on symmetric x has correlation exactly 0 and
 complete dependence. This is the cleanest motivation for mutual information,
-which does detect it. → **P23, P30**.
+which does detect it. → **P24** (delivered: Z on {−1, 0, 1} with W = Z², exact
+over fractions, elicited before it is named), **P31** (mutual information,
+which does see it). *Was "P23, P30": the P7-insertion off-by-one in the range
+the P10 pass left unswept. P23 defines no random variable and P30 is
+cross-entropy and KL; both destinations were settled against the briefs.*
 
 **30. "Covariance and correlation are the same thing up to a constant, so I'll
 read the covariance matrix."** Correlation is covariance normalised by the two
 standard deviations, so it is unit-free and bounded in [−1, 1]; covariance is
 not, and its entries are dominated by whichever variable has the largest scale.
 Reading a covariance matrix as if it were a correlation matrix means reading
-your units. → **P23**.
+your units. → **P24** (delivered: Cov(aX, bY) = ab·Cov(X, Y) checked at four
+pairs of scale factors, with the correlation's invariance cross-multiplied so
+it stays exact). *Was "P23", same off-by-one as item 29.*
 
 **31. "I ran 200 hyperparameter configurations and the best one beat baseline
 with p < 0.05."** With 200 comparisons at α = 0.05 you expect about 10 spurious
@@ -2582,3 +2588,63 @@ Bayes' theorem is a *theorem* you can reconstruct at a desk in three lines. The
 memorised version is the one people write upside down, and the names — prior,
 likelihood, evidence, posterior — do not help, because two of them mean
 something other than what the English words suggest. → **P23**.
+
+**237. "A random variable is a variable that takes random values."** It is a
+*function* on the sample space, fixed and written down; the randomness is in
+which outcome the space hands it, and neither word in the name is right. The
+practical consequence is that one space carries many random variables at once,
+so the space and the question you are asking of it have to be kept apart —
+which is exactly the step people skip before asking why two quantities computed
+from the same draw are correlated. → **P24**.
+
+**238. "The expected value is the value to expect."** It is a number and need
+not be one the variable can take: a fair die has expectation 3.5. The habit
+worth acquiring is to read `E[X]` as a *summary* rather than as a prediction,
+because the sentence "the expected latency is 400 ms" is routinely acted on as
+though 400 ms were a latency anybody will observe. → **P24**.
+
+**239. "Linearity of expectation needs the variables to be independent."** It
+needs nothing whatever: `E[aX + bY] = aE[X] + bE[Y]` is a rearranged finite sum
+and is checked in **P24** on X and X², where one *is* a function of the other.
+The wrong answer is available because the rule people remember next to it —
+`E[XY] = E[X]E[Y]` — does need independence, and the two get filed together. A
+surprising amount of practice depends on the first: a training loop averaging a
+loss over a batch of correlated examples is still estimating the right
+quantity, and nothing in the code says why. → **P24**.
+
+**240. "The standard deviation is the average distance from the mean."** It is
+the square root of the average *squared* distance, which is a different and
+always larger number — on **P24**'s ten values, 4.712 against 3.8. Squaring
+before averaging weights the far points more heavily and the square root does
+not undo that, so the gap widens exactly when the distribution has a tail,
+which is when the number was being relied on. → **P24**.
+
+**241. "A variance is in the units of the quantity."** It is in the units
+*squared*, which is what the `D²` in the Polish notation records and what
+`Var(aX) = a²Var(X)` says: minutes to seconds multiplies a variance by 3600.
+The quantity that is in the units, and therefore the one to quote and the only
+one that can be compared with the mean, is its square root. → **P24**.
+
+**242. "Temperature, top-k and top-p are three dials for the same thing."**
+Temperature reweights and leaves every token possible, and **F05** proves it
+cannot even move the argmax; top-k and top-p set weights to exactly zero, after
+which "unlikely" and "impossible" are the same thing. They are also *coupled*,
+which nothing in a sampling configuration records: on **P24**'s four tokens the
+same k deletes 3.7 per cent of the distribution at T = 0.5 and 28.1 per cent at
+T = 2, a factor of 7.6, so raising the temperature for variety and then
+truncating spends most of what the temperature bought. → **P24**.
+
+**243. "Top-p keeps a fixed number of tokens, like top-k with a different
+scale."** The count top-p keeps is an *outcome* rather than a setting: on the
+same four tokens the same p keeps between 1 and 4 of them across a sweep of
+temperatures, which is the whole design — few candidates where the model is
+confident and many where it is not. Tuning it as though it were a token count
+is tuning the one thing it does not control. → **P24**.
+
+**244. "`argmax(logits + gumbel)` is a cheap approximation to sampling."** It is
+*exact* categorical sampling, and the two-token case is **F07**'s
+softmax-on-two-scores identity read backwards. **P24** checks the general case
+by integration rather than by sampling, deliberately: a sampled check produces
+an estimate with an error bar, and "it agreed within the error bar" is a
+demonstration that the trick is approximately right, which is the reading the
+frame exists to refuse. → **P24**.

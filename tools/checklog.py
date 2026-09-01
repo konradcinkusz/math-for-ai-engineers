@@ -58,6 +58,11 @@ RE_VBOX_WHERE = re.compile(
 # never be where a typeset box was built, so matching them would report the
 # last package loaded and nothing useful.
 RE_FILE_OPEN = re.compile(r"\((\.{0,2}/[^\s()]*\.(?:tex|ind|toc))")
+# TeX names an overfull hbox by the SOURCE lines of the paragraph it broke,
+# and then prints the offending line itself. Both are wanted: the line range
+# says which paragraph and the text says which run inside it could not break.
+RE_HBOX_WHERE = re.compile(r"in paragraph at lines (\d+)--(\d+)"
+                           r"|detected at line (\d+)")
 RE_PAGES = re.compile(r"Output written on \S+ \((\d+) pages")
 RE_MISSING_VAL = re.compile(r"No computed values found")
 # Warnings that are always worth surfacing. Font substitution noise is not.
@@ -106,6 +111,33 @@ def _vbox_where(text: str, pos: int) -> str:
     return f"on PDF page {page.group(1)}" if page else "at an unknown location"
 
 
+def _hbox_where(text: str, pos: int) -> tuple:
+    """Where an overfull hbox at `pos` happened, and the line TeX could not set.
+
+    This exists because CI and the container that publishes the PDF have
+    different font metrics, so an over-budget hbox is nearly always reported
+    by the machine that cannot see it. Reporting the size alone -- which is
+    what this tool used to do -- costs a whole CI cycle guessing which line it
+    is. The vbox reporting below was given a location for exactly that reason;
+    the hbox reporting was not, and P24 paid for the omission.
+    """
+    head = text[pos:pos + 200]
+    m = RE_HBOX_WHERE.search(head)
+    if m and m.group(1):
+        where = f"source lines {m.group(1)}--{m.group(2)}, {_open_file(text, pos)}"
+    elif m and m.group(3):
+        where = f"source line {m.group(3)}, {_open_file(text, pos)}"
+    else:
+        where = _open_file(text, pos)
+    # The line TeX could not set follows the complaint. Its first font switch
+    # is noise; what is wanted is the words, so they are stripped out.
+    body = text[pos:pos + 700].split("\n")
+    line = " ".join(body[1:3]).strip() if len(body) > 1 else ""
+    line = re.sub(r"\\[A-Za-z@/0-9.]+(?:/[^ ]*)?", " ", line)
+    line = re.sub(r"\s+", " ", line).strip()
+    return where, line[:96]
+
+
 def _open_file(text: str, pos: int) -> str:
     """The last file TeX opened before `pos`.
 
@@ -133,6 +165,10 @@ def analyse(path: Path) -> dict:
     v_pages = [(float(m.group(1)), _vbox_where(text, m.end()))
                for m in RE_VBOX.finditer(text)]
     v_pages.sort(key=lambda t: -t[0])
+    h_where = [(float(m.group(1)), *_hbox_where(text, m.end()))
+               for m in RE_HBOX.finditer(text)
+               if float(m.group(1)) > HBOX_BUDGET]
+    h_where.sort(key=lambda t: -t[0])
     pages = RE_PAGES.search(text)
     return {
         "file": path.name,
@@ -145,6 +181,7 @@ def analyse(path: Path) -> dict:
         "vbox": v,
         "vbox_pages": v_pages,
         "over_budget": [x for x in h if x > HBOX_BUDGET],
+        "over_budget_where": h_where,
         "pages": int(pages.group(1)) if pages else None,
         "no_values": bool(RE_MISSING_VAL.search(text)),
     }
@@ -171,6 +208,13 @@ def report(r: dict) -> bool:
     if r["over_budget"]:
         ok = False
         print(f"  OVER {HBOX_BUDGET:.0f} pt BUDGET : {[round(x, 1) for x in r['over_budget']]}")
+        for size, where, line in r["over_budget_where"][:5]:
+            print(f"      {size:6.1f} pt too wide, {where}")
+            if line:
+                print(f"          [{line}]")
+        print("      An over-budget hbox is an unbreakable run: a long \\code{},")
+        print("      a chain of maths spans, a word-formula. Put it in a display")
+        print("      or start a sentence with it; rewording moves it elsewhere.")
     if r["vbox"]:
         ok = False
         print(f"  OVERFULL VBOX   : {len(r['vbox'])} {[round(x, 1) for x in r['vbox'][:5]]}")
