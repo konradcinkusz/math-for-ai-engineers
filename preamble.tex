@@ -2319,20 +2319,95 @@
 %  prediction two paragraphs up has now been right three times running; treat
 %  the number as a function of the index's length and nothing else.
 %  AND AT P18, the fourth raise in four programs -- 10.6 pt in one column of
-%  `main-pl.ind`, two and a half points to three and a half. Four data points
-%  are enough to see the shape, and it is worth writing down: 0.5, 0.9, 1.5,
-%  2.5, 3.5. The requirement grows with the index, the index grows with the
-%  programs, and twenty-nine programs remain. Extrapolated, this constant
-%  reaches ten points or so by the end of the book, and ten points of shrink
-%  between two index lines is no longer invisible -- it is a visibly tighter
-%  column. So the recorded advice (raise it and do not look for a cleverer
-%  fix) is right for now and has a horizon: somewhere before Part IX this
-%  needs a structural answer instead, most likely letting the index set to a
-%  shorter measure or accepting a short final column explicitly. Recorded
-%  here rather than discovered at P30.
+%  `main-pl.ind`, two and a half points to three and a half.
+%
+%  AND AT P19 THE ADVICE ABOVE WAS FALSIFIED, AND THEN THE MEASUREMENT THAT
+%  FALSIFIED IT WAS FALSIFIED TOO. Both halves are worth keeping, because the
+%  second is this repository's own recurring defect and it was committed.
+%
+%  First: P19's index overflowed at 3.5 pt and the number was raised, and a
+%  sweep taken WHILE THE PROGRAM WAS STILL BEING WRITTEN reported that 2 and
+%  6 both failed builds that 4.5 cleared. That table was quoted here and in
+%  CLAUDE.md as though it described the shipped tree. It did not: it described
+%  a tree that no longer exists, which is exactly what this project's own rule
+%  says about page counts and the overfull multiset -- RE-MEASURE FROM THE
+%  BUILD IN FRONT OF YOU; a pagination measurement does not survive a change
+%  to the material being paginated. Re-swept against the finished tree:
+%
+%      shrink | en | pl | en-a4 | pl-a4
+%      -------+----+----+-------+-------
+%       3.0   | ok | ok |  ok   |  ok
+%       3.5   | ok | ok |  ok   |  ok
+%       4.0   | ok | ok |  ok   |  ok
+%       4.5   | ok | ok |  ok   |  ok
+%       5.0   | ok | ok |  ok   |  ok
+%       5.5   | ok | ok |  ok   |  ok
+%       6     |  - |  - |  ok   |  26.3 pt
+%       7     |  - |  - |  ok   |  26.3 x2
+%      10     |  - |  - |   -   |  616.8 + 90.8
+%
+%  So on THIS machine the constant is not critical anywhere in [3.0, 5.5] and
+%  falls off a cliff at 6. Ten points is CATASTROPHIC rather than merely
+%  insufficient: more shrink lets TeX believe it can cram another column's
+%  worth onto a page, and it then overflows by a whole column.
+%
+%  Second, and this is why the value here is 5.5 rather than anything in the
+%  middle of that range: CI FAILED `en (a4)` AT 4.5 BY 18.29 pt ON SOURCE
+%  THIS CONTAINER BUILDS WITH ZERO. The index is where the two installations
+%  diverge worst -- CI sets the same entries in three pages where this
+%  container needs four, so its columns are fuller and demand more shrink --
+%  and a sweep taken on one machine cannot choose a value for the other.
+%
+%  AND THE RAISE WORKED, PARTLY, WHICH SETTLED THE MECHANISM. At 5.5 CI's box
+%  went from 18.29 pt to 9.29 pt -- exactly nine points for one point of extra
+%  shrink per entry -- so the shrink DOES reach it and the direction was right.
+%  What it also showed is that no single \parskip value can serve both
+%  machines: CI wants more than 5.5 and this container's `main-pl-a4` breaks at
+%  6, by 26.3 pt. The two disagree and the knob is one-dimensional.
+%
+%  SO THE REMEDY IS A SECOND SOURCE OF SHRINK, and the point of it is that it
+%  does NOT scale with the page's contents. A column holds some forty-five
+%  entries, so one more point on each is forty-five points of extra capacity
+%  and TeX packs more -- which is exactly why the constant is non-monotonic.
+%  \indexspace appears three or four times a page whatever the entries are, so
+%  six more points of shrink on each is about twenty points, bounded, and it
+%  absorbs a residual without changing how much TeX is willing to cram. That is
+%  the difference between giving a page slack and giving it appetite.
+%
+%  A process note that cost a CI cycle, because it will happen again. The
+%  raise to 5.5 was made, and then a BACKGROUND SWEEP SCRIPT still running in
+%  the tree restored 4.5 on its way out, so the commit carried the old value
+%  and CI reported 18.28874 pt a second time -- to the ten-thousandth of a
+%  point. An identical measurement after a change is this repository's own
+%  signal that the change did not reach what was measured (see the CI vbox
+%  chased into the answers appendix, above). Here it was even simpler than
+%  that: the change did not reach the FILE. Re-read the constant out of the
+%  file immediately before committing it, not several steps earlier, and do
+%  not leave a script that rewrites the tree running behind you.
+%
+%  THE RULE, and it now has both halves:
+%    * Sweep against all four builds and pick a value that clears every one;
+%      do not assume the direction, and do not carry a sweep across a change
+%      to the material.
+%    * The window is narrow and the two machines disagree about where it is,
+%      so CI is the second measurement and not a formality. When a value
+%      clears here and fails there, move within the locally clean range
+%      TOWARDS more shrink -- the complaint is that a column could not be
+%      compressed enough -- and stop at the cliff rather than past it.
+%  \vfuzz stays rejected: raising it hides real overfull vboxes everywhere
+%  else, which is how a gate goes quiet.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
-  \setlength{\parskip}{0pt plus 0.3pt minus 3.5pt}}{}{%
+  \setlength{\parskip}{0pt plus 0.3pt minus 5.5pt}%
+  % And a SECOND source of shrink, deliberately one that does NOT scale with
+  % the number of entries on the page. Raising \parskip's shrink gives a
+  % column 45 entries x 1pt of extra capacity, so TeX packs more and the
+  % constant is non-monotonic -- which is the whole story above. \indexspace
+  % appears three or four times a page whatever the entries are, so six more
+  % points of shrink on each is about twenty points of capacity, bounded, and
+  % it absorbs a residual without changing how much TeX will cram.
+  % book.cls sets it to 10pt plus 5pt minus 3pt.
+  \renewcommand\indexspace{\par \vskip 10pt plus 5pt minus 9pt\relax}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex

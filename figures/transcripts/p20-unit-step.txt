@@ -1,0 +1,7 @@
+>>> from p20_gradient_descent import adam
+>>> tiny, huge = (3e-6, -7e-6), (3e6, -7e6)
+>>> step = adam(0.1)
+>>> [round(abs(c), 4) for c in step((0,0), tiny, {}, 1)]
+[0.0997, 0.0999]
+>>> [round(abs(c), 4) for c in step((0,0), huge, {}, 1)]
+[0.1, 0.1]
