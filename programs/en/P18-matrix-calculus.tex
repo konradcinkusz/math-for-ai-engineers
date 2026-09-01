@@ -430,9 +430,11 @@ every other $j$.
 Which is where the whole thing could go wrong, and section 5 is about that
 $1/p_c$. For now, carry it.
 
-Now push it through the Jacobian: $\partial L/\partial z_j$ is the sum over
-$i$ of $(\partial L/\partial p_i)(\partial p_i/\partial z_j)$, and only one
-term of that sum survives.
+Now push it through the Jacobian. The chain rule for the scores is
+\[ \frac{\partial L}{\partial z_j}
+   = \sum_i \frac{\partial L}{\partial p_i}\,
+     \frac{\partial p_i}{\partial z_j} \]
+and only one term of that sum survives. Carry it out.
 \dotline
 \nextframe
 \end{fr}

@@ -404,9 +404,11 @@ każdego innego $j$.
 I tu wszystko mogłoby pójść źle, a sekcja 5 jest właśnie o tym $1/p_c$. Na
 razie nieś to dalej.
 
-Teraz przepchnij to przez jakobian: $\partial L/\partial z_j$ jest sumą po
-$i$ z $(\partial L/\partial p_i)(\partial p_i/\partial z_j)$, a z tej sumy
-przeżywa tylko jeden składnik.
+Teraz przepchnij to przez jakobian. Regułą łańcuchową dla wyników jest
+\[ \frac{\partial L}{\partial z_j}
+   = \sum_i \frac{\partial L}{\partial p_i}\,
+     \frac{\partial p_i}{\partial z_j} \]
+a z tej sumy przeżywa tylko jeden składnik. Wykonaj to.
 \dotline
 \nextframe
 \end{fr}
