@@ -1,0 +1,4 @@
+flowchart LR
+  A["a probability the model assigns to<br/>the tokens that were actually observed"]
+  A --> B["its logarithm, negated, and divided<br/>by how many of them there were"]
+  B --> C["which is the cross-entropy loss with<br/>nothing added and nothing left out"]
