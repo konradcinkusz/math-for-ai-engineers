@@ -2321,35 +2321,54 @@
 %  AND AT P18, the fourth raise in four programs -- 10.6 pt in one column of
 %  `main-pl.ind`, two and a half points to three and a half.
 %
-%  AND AT P19 THE ADVICE ABOVE WAS FALSIFIED, WHICH IS WORTH MORE THAN
-%  ANOTHER RAISE. P19's index overflowed by 20.0 pt in `main-pl` and 26.3 pt
-%  in `main-pl-a4` at 3.5 pt of shrink, so the number was raised -- and it
-%  did not behave like a dial. Swept against all four builds:
+%  AND AT P19 THE ADVICE ABOVE WAS FALSIFIED, AND THEN THE MEASUREMENT THAT
+%  FALSIFIED IT WAS FALSIFIED TOO. Both halves are worth keeping, because the
+%  second is this repository's own recurring defect and it was committed.
 %
-%      shrink | main-en | main-pl | main-en-a4 | main-pl-a4
-%      -------+---------+---------+------------+------------
-%       2     | 6.0 pt  |    -    |     -      |  clean
-%       3.5   | clean   | 20.0 pt |  clean     |  26.3 pt
-%       4.5   | clean   | clean   |  clean     |  clean
-%       5     | clean   | clean   |  23.8 pt   |  clean
-%       6     |    -    | clean   |     -      |  26.3 pt
-%      10     |    -    |    -    |     -      |  616.8 + 90.8 pt
+%  First: P19's index overflowed at 3.5 pt and the number was raised, and a
+%  sweep taken WHILE THE PROGRAM WAS STILL BEING WRITTEN reported that 2 and
+%  6 both failed builds that 4.5 cleared. That table was quoted here and in
+%  CLAUDE.md as though it described the shipped tree. It did not: it described
+%  a tree that no longer exists, which is exactly what this project's own rule
+%  says about page counts and the overfull multiset -- RE-MEASURE FROM THE
+%  BUILD IN FRONT OF YOU; a pagination measurement does not survive a change
+%  to the material being paginated. Re-swept against the finished tree:
 %
-%  Ten points is CATASTROPHIC, not merely insufficient: more shrink lets TeX
-%  believe it can cram another column's worth onto a page, and it then
-%  overflows by a whole column. Two points fails a different build than three
-%  and a half does. The value is not a quantity that has to keep up with the
-%  index -- it is a value that RESHUFFLES BREAKS, and it is non-monotonic in
-%  exactly the way the \begin{fr} reservation's own sweep table above records.
+%      shrink | en | pl | en-a4 | pl-a4
+%      -------+----+----+-------+-------
+%       3.0   | ok | ok |  ok   |  ok
+%       3.5   | ok | ok |  ok   |  ok
+%       4.0   | ok | ok |  ok   |  ok
+%       4.5   | ok | ok |  ok   |  ok
+%       5.0   | ok | ok |  ok   |  ok
+%       5.5   | ok | ok |  ok   |  ok
+%       6     |  - |  - |  ok   |  26.3 pt
+%       7     |  - |  - |  ok   |  26.3 x2
+%      10     |  - |  - |   -   |  616.8 + 90.8
 %
-%  So the earlier advice ("raise it when a build says so, and do not look for
-%  a cleverer fix") is retired, and with it the P18 note's extrapolation that
-%  this would reach ten points by the end of the book: ten points is measured
-%  and it is the worst value tried. THE RULE IS NOW: when a build complains
-%  about the index, SWEEP this constant against all four builds and pick a
-%  value that clears every one, exactly as for the other layout constants.
-%  Do not assume the direction; 4.5 clears all four where both 3.5 and 6 do
-%  not. \vfuzz stays rejected for the reason above.
+%  So on THIS machine the constant is not critical anywhere in [3.0, 5.5] and
+%  falls off a cliff at 6. Ten points is CATASTROPHIC rather than merely
+%  insufficient: more shrink lets TeX believe it can cram another column's
+%  worth onto a page, and it then overflows by a whole column.
+%
+%  Second, and this is why the value here is 5.5 rather than anything in the
+%  middle of that range: CI FAILED `en (a4)` AT 4.5 BY 18.29 pt ON SOURCE
+%  THIS CONTAINER BUILDS WITH ZERO. The index is where the two installations
+%  diverge worst -- CI sets the same entries in three pages where this
+%  container needs four, so its columns are fuller and demand more shrink --
+%  and a sweep taken on one machine cannot choose a value for the other.
+%
+%  THE RULE, and it now has both halves:
+%    * Sweep against all four builds and pick a value that clears every one;
+%      do not assume the direction, and do not carry a sweep across a change
+%      to the material.
+%    * The window is narrow and the two machines disagree about where it is,
+%      so CI is the second measurement and not a formality. When a value
+%      clears here and fails there, move within the locally clean range
+%      TOWARDS more shrink -- the complaint is that a column could not be
+%      compressed enough -- and stop at the cliff rather than past it.
+%  \vfuzz stays rejected: raising it hides real overfull vboxes everywhere
+%  else, which is how a gate goes quiet.
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
   \setlength{\parskip}{0pt plus 0.3pt minus 4.5pt}}{}{%

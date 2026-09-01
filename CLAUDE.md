@@ -6307,45 +6307,63 @@ The prediction is asserted rather than the four figures: the measured ratio must
 track $\exp(\Var/2)$, at every spread, so a change of seed or of token count
 cannot quietly falsify the section.
 
-#### The index shrink was not a dial, and four consecutive raises had said it was
+#### The index shrink was not a dial, and the sweep that showed it was wrong too
+
+Both halves belong here, because the second is this repository's own recurring
+defect and it was committed before it was caught.
 
 P15, P16, P17 and P18 each raised `theindex`'s `\parskip` shrink by a step
 \dash{} $\num{0.5}$, $\num{0.9}$, $\num{1.5}$, $\num{2.5}$, $\num{3.5}$ \dash{}
-and the comment above the patch drew the obvious line through those five points:
-the requirement grows with the index, the index only grows, **so raise it when a
-build says so and do not look for a cleverer fix.** The P18 note in this file
+and the note above the patch drew the obvious line through those five points:
+the requirement grows with the index, the index only grows, **so raise it when
+a build says so and do not look for a cleverer fix.** The P18 note in this file
 extrapolated that to ten points by the end of the book.
 
-P19's index overflowed by $\num{20.0}$ pt in `main-pl` and $\num{26.3}$ pt in
-`main-pl-a4`, so the number was raised again \dash{} and it did not behave like
-a dial. Swept against all four builds:
+P19's index overflowed at $\num{3.5}$, the number was raised, and a sweep
+reported that $2$ and $6$ both failed builds that $\num{4.5}$ cleared \dash{}
+so the advice was retired and replaced with *sweep against all four builds*.
+**That sweep was taken while the program was still being written, and it was
+quoted here as though it described the shipped tree.** Re-measured against the
+finished one, every value from $3$ to $\num{5.5}$ clears all four and the
+cliff is at $6$:
 
 | shrink | `main-en` | `main-pl` | `main-en-a4` | `main-pl-a4` |
 |---|---|---|---|---|
-| 2 | $\num{6.0}$ pt | \dash{} | \dash{} | clean |
-| $\num{3.5}$ | clean | $\num{20.0}$ pt | clean | $\num{26.3}$ pt |
-| **$\num{4.5}$** | **clean** | **clean** | **clean** | **clean** |
-| 5 | clean | clean | $\num{23.8}$ pt | clean |
-| 6 | \dash{} | clean | \dash{} | $\num{26.3}$ pt |
-| 10 | \dash{} | \dash{} | \dash{} | $\num{616.8} + \num{90.8}$ pt |
+| $3$ to $\num{5.5}$ | clean | clean | clean | clean |
+| $6$ | \dash{} | \dash{} | clean | $\num{26.3}$ pt |
+| $7$ | \dash{} | \dash{} | clean | $\num{26.3}$ pt, twice |
+| $10$ | \dash{} | \dash{} | \dash{} | $\num{616.8} + \num{90.8}$ pt |
 
-**Ten points is catastrophic rather than merely insufficient**, and two points
-fails a different build than three and a half does. More shrink lets TeX believe
-it can cram another column's worth onto a page, and it then overflows by a whole
-column. So the constant is not a quantity that has to keep up with the index; it
-is a value that **reshuffles breaks, non-monotonically**, which is exactly the
-shape `preamble.tex` already records for the `\begin{fr}` reservation and for
-`\mfasectionreserve`.
+Ten points is catastrophic rather than merely insufficient: more shrink lets
+TeX believe it can cram another column's worth onto a page, and it then
+overflows by a whole column. So the conclusion survives \dash{} the constant
+**reshuffles breaks, non-monotonically**, exactly as `preamble.tex` already
+records for the `\begin{fr}` reservation \dash{} and the table that carried it
+did not.
 
-The advice is retired and the rule is now the same as for every other layout
-constant in this book: **when a build complains about the index, sweep against
-all four builds and pick a value that clears every one**, and do not assume the
-direction. `\vfuzz` stays rejected for the reason already recorded.
+**The generalisable half is the one this file already states about page counts
+and the overfull multiset, and it applies to every pagination measurement:
+re-measure from the build in front of you.** A sweep over a layout constant is
+a pagination measurement, so it does not survive a change to the material
+being paginated, and a sweep taken mid-pass describes a tree that no longer
+exists. Both instances of the wrong table are corrected rather than deleted,
+because the correction is the finding.
 
-**The generalisable half is about the extrapolation, not the constant.** Five
-points in a row moving one way is not a trend when nobody has tried the other
-direction, and a note in this file said so as though it were measured. It is now
-measured, and it was wrong.
+#### And then CI disagreed about where the window is
+
+At $\num{4.5}$ \dash{} clean in all four builds here \dash{} **CI failed
+`en (a4)` on an $\num{18.29}$ pt overfull vbox in the index.** That is the
+recorded two-installations divergence at its worst point: CI sets the same
+entries in three pages where this container needs four, so its columns are
+fuller and demand more shrink than any local sweep will ever ask for.
+
+So the rule gains its second half. A sweep on one machine cannot choose a
+value for the other, and **CI is the second measurement rather than a
+formality**. When a value clears here and fails there, move within the locally
+clean range *towards* more shrink \dash{} the complaint is that a column could
+not be compressed enough \dash{} and stop short of the cliff. The value is
+$\num{5.5}$, which is the top of the locally clean range and a full point
+below the first local failure.
 
 #### The transcript was about to be a fabricated console block
 
