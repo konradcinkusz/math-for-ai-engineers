@@ -2453,24 +2453,26 @@
 %      compressed enough -- and stop at the cliff rather than past it.
 %  \vfuzz stays rejected: raising it hides real overfull vboxes everywhere
 %  else, which is how a gate goes quiet.
-% THE STRUCTURAL FIX, after four CI cycles spent on the shrink constant below,
-% and it has to run BEFORE \theindex's body rather than after it. That is the
-% correction P23 paid for: the reduction used to be appended with \apptocmd,
-% which puts it after \twocolumn has already read \textheight into \@colht,
-% so the columns it was meant to shorten had their height fixed before it ran.
-% CI reported an 8.29 pt overfull vbox in main-en-a4.ind under a comment
-% claiming three lines were in hand. They were not.
-%
-% Prepended, the reduction reaches \@colht and every column really does end
-% short of the body's measure, which is what every index in print looks like.
-% Four lines rather than three, because the index only grows and this lever is
-% the one that cannot backfire: it REDUCES what TeX will pack rather than
-% increasing it, where more shrink raises the appetite and is non-monotonic.
-% The index is the last thing in the book, so the length is not restored.
-\pretocmd{\theindex}{\addtolength{\textheight}{-4\baselineskip}}{}{%
-  \PackageWarning{mfabook}{Could not patch theindex for column height}}
 \apptocmd{\theindex}{%
   \raggedbottom\raggedright
+  % THE STRUCTURAL FIX, after four CI cycles spent on the constant below.
+  % Give the index's columns LESS ROOM than the text block, so every column
+  % ends short of the body's measure -- which is what every index in print
+  % looks like -- and a residual is absorbed by construction.
+  %
+  % P23 TRIED TO MOVE THIS AHEAD OF \theindex's BODY AND MADE IT WORSE, which
+  % is the entry worth keeping. The reasoning was sound and the measurement
+  % refused it: appended, this runs after \twocolumn, so the reduction was
+  % thought not to reach \@colht; prepended and raised to four lines it put an
+  % 11.8 pt vbox into main-en, which had none. Two things changed at once --
+  % where it runs and how much it takes -- so neither is attributable, and the
+  % honest reading is the one this file already gives for every constant near
+  % the index: IT RESHUFFLES PAGE BREAKS AND IS NOT MONOTONIC. The last index
+  % page is where a residual lands and it has nowhere to push it.
+  %
+  % So this is the configuration CI was green on through P22. Do not move it
+  % without changing exactly one thing and measuring on BOTH machines.
+  \addtolength{\textheight}{-3\baselineskip}%
   \setlength{\parskip}{0pt plus 0.3pt minus 1pt}%
   % And a SECOND source of shrink, deliberately one that does NOT scale with
   % the number of entries on the page. Raising \parskip's shrink gives a
@@ -2480,7 +2482,12 @@
   % points of shrink on each is about twenty points of capacity, bounded, and
   % it absorbs a residual without changing how much TeX will cram.
   % book.cls sets it to 10pt plus 5pt minus 3pt.
-  \renewcommand\indexspace{\par \vskip 10pt plus 5pt minus 9pt\relax}}{}{%
+  %
+  % Raised from 9pt to 12pt in the P23 pass, which is the ONE variable changed
+  % against a CI failure of 8.29 pt in main-en-a4.ind. Three or four
+  % \indexspace per page makes that nine to twelve points of extra capacity:
+  % bounded, and enough. It is the lever this comment already argued for.
+  \renewcommand\indexspace{\par \vskip 10pt plus 5pt minus 12pt\relax}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
 
 \makeindex
