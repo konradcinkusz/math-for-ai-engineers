@@ -1,31 +1,1261 @@
 %% P24 --- Zmienne losowe i rozkłady
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak: programs/en/P24-distributions.tex. Ramka w ramkę, makro w makro.
+%%
+%% UWAGA DLA TŁUMACZA, i to jest klasa błędu, która kosztowała F06 trzy rundy,
+%% a F07 sześć: C4, C8 i C12 porównują tokeny strukturalne, wyrażenia
+%% matematyczne i literały liczbowe PO KOLEI. Więc:
+%%   * cyfra zostaje cyfrą. "zerem" zamiast $0$ gubi i span, i literał;
+%%   * odwołanie prowadzi, a nie idzie za matematyką: napisz
+%%     "Program~[odsylacz] podaje $x$", nigdy "$x$ z Programu~[odsylacz]";
+%%   * gdzie angielski pisze skrót w rodzaju "P21", polski też musi.
 
 \program{Zmienne losowe i rozkłady}
 \label{prog:P24}
+\index{zmienna losowa}
+\index{wartość oczekiwana}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--10}{powiedzieć, czym jest zmienna losowa i dlaczego ta sama
+  przestrzeń zdarzeń niesie ich wiele}
+\outcome{11--17}{korzystać z liniowości wartości oczekiwanej i powiedzieć,
+  czego ona wymaga}
+\outcome{18--25}{policzyć wariancję każdą z dwóch dróg i odczytać $D^{2}(X)$,
+  gdy się na nie natkniesz}
+\outcome{26--36}{powiedzieć, co mierzy kowariancja i co dokłada korelacja oraz
+  czego żadna z nich nie widzi}
+\outcome{37--48}{nazwać rozkład, którym rządzi się dana wielkość, po jego roli,
+  a nie po wzorze}
+\outcome{49--64}{powiedzieć, co temperatura, top-$k$ i top-$p$ robią z
+  rozkładem i która z tych trzech rzeczy usuwa tokeny}
+\end{outcomes}
 
-Argument: a random variable is a function on the sample space; expectation
-and variance are its first two summaries; six distributions cover almost
-everything in this field. Payoff: **sampling a token is a draw from a
-categorical distribution**, and temperature, top-k and top-p are three ways
-of editing that distribution before drawing \dash{} described as
-distribution surgery, with what each destroys; the Gumbel-max trick, so the
-reader can see that \code{argmax(logits + gumbel)} is exact categorical
-sampling and not an approximation; the Gaussian introduced through its role
-rather than its formula; expectation as the linear operator that makes
-almost every derivation later in the book short. Carries the notation box
-for variance: this book writes \code{Var(X)} and \code{E[X]}, Polish
-teaching materials still write $D^{2}(X)$ and \code{M(X)} alongside them,
-and Appendix B points here for the equivalence because this is where the
-concept is introduced.
+\begin{quiz}
+\item Zmienną losową zapisujemy $X$, a jej wartości zmieniają się z losowania
+  na losowanie. Jakim obiektem ona jest? \teachesat{2--3}
+  \answerto{Funkcją. Bierze wynik z przestrzeni zdarzeń i zwraca liczbę, a w
+  samej funkcji nie ma nic losowego ani zmiennego: losowość siedzi w tym,
+  który wynik przestrzeń jej poda.}
+\item Czy $\Ex[X + Y] = \Ex[X] + \Ex[Y]$ zachodzi, gdy $X$ i $Y$ są zależne?
+  \teachesat{11--12}
+  \answerto{Tak, zawsze i bez żadnego warunku. To właśnie czyni wartość
+  oczekiwaną wartą posiadania: przechodzi przez sumy i przez mnożenie przez
+  stałą, i przez nic więcej.}
+\item Zapisz wariancję $X$ na dwa sposoby. \teachesat{18--20}
+  \answerto{$\Var(X) = \Ex[(X - \Ex[X])^{2}]$ z definicji oraz
+  $\Var(X) = \Ex[X^{2}] - (\Ex[X])^{2}$ po rozwinięciu kwadratu. To ta sama
+  liczba, a nie przybliżenie jednej przez drugą.}
+\item Dwie wielkości mają korelację dokładnie zero. Czy są niezależne?
+  \teachesat{30--31}
+  \answerto{Nie. Korelacja mierzy prostoliniową część zależności, więc może
+  być zerem, gdy jedna wielkość wyznacza drugą całkowicie.}
+\item Podniesienie temperatury próbkowania czyni model odważniejszym. Która z
+  trzech rzeczy \dash{} temperatura, top-$k$, top-$p$ \dash{} może uczynić
+  token niemożliwym? \teachesat{50--57}
+  \answerto{Te dwa obcięcia. Temperatura przeważa wszystkie tokeny i zostawia
+  je wszystkie możliwymi; top-$k$ i top-$p$ ustawiają część wag na dokładnie
+  zero, a żadna późniejsza temperatura ich nie przywróci.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 60 ramek.
-}
+% ============================================================
+\section{Funkcja na przestrzeni zdarzeń}
+\label{sec:P24-rv}
+\index{zmienna losowa!jako funkcja}
+\index{przestrzeń zdarzeń}
+
+\begin{fr}
+Program~\ref{prog:F13} skończył zdaniem, którego odmówił dokończyć. Zbudował
+wartość razy gęstość, zsumowaną:
+\[ \int x\,p(x)\,\mathrm{d}x \]
+Powiedział, że ta rzecz ma nazwę, i nie użył jej, bo nazwanie wymagałoby
+trzech słów, których książka wtedy nie miała.
+
+Program~\ref{prog:P23} dostarczył dwóch z nich. Jakie jest trzecie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Zmienna losowa}
+
+Program~\ref{prog:P23} dał ci \emph{przestrzeń zdarzeń} i
+\emph{prawdopodobieństwo} na niej. Brakowało tego, co jest uśredniane, i to
+jest tematem tego programu.
+
+\textbf{Zmienna losowa} jest funkcją. Bierze wynik i zwraca liczbę:
+\[ X \colon \Omega \longrightarrow \mathbb{R} \]
+i to cała definicja. Nic więcej się od niej nie wymaga.
+
+Dwa spośród słów w tej nazwie są błędne. Które dwa i co jest z nimi nie tak?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\emph{Losowa} i \emph{zmienna}. Nie jest ani jednym, ani drugim.
+\end{ansblock}
+
+Prawie każde późniejsze nieporozumienie w tej części książki zaczyna się tutaj,
+więc oba zasługują na ramkę.
+
+Nie jest \textbf{losowa}. Funkcja jest ustalona, zapisana i za każdym razem ta
+sama; zmienia się to, który wynik poda jej przestrzeń.
+
+Nie jest też \textbf{zmienną} w tym sensie, w jakim tego słowa używa
+Program~\ref{prog:F06}. Nie jest niewiadomą, którą się wyznacza. $X$ nazywa
+regułę, tak jak $\sin$ nazywa regułę.
+
+\begin{notationbox}
+\textbf{Wielka litera na funkcję, mała na wartość, którą przyjęła.} $X$ to
+reguła; $x$ to liczba, która wyszła w konkretnym losowaniu. Zatem
+$\Prob(X = x)$ czyta się \enquote{prawdopodobieństwo, że reguła zwróci tę
+liczbę}, a $\Prob(X = X)$ nie jest zdaniem. Konwencja jest powszechna i ta
+książka trzyma się jej bez dalszych komentarzy.
+\end{notationbox}
+\end{fr}
+
+\begin{fr}
+Przestrzeń do pracy, i to taka, którą książka już ma.
+Program~\ref{prog:P21} użył jawnej populacji $\val{p24.pop.n}$ liczb:
+\[ 3,\; -1,\; 4,\; 1,\; -5,\; 9,\; 2,\; -6,\; 5,\; 8 \]
+Wylosuj jedną z nich, każdą jednakowo prawdopodobnie. To przestrzeń zdarzeń o
+$\val{p24.pop.n}$ wynikach i prawdopodobieństwie $\frac{1}{10}$ na każdym,
+czyli cała maszyneria Programu~\ref{prog:P23} i nic ponadto.
+
+Niech $X$ będzie wylosowaną liczbą. Zapisz teraz \emph{dwie inne} zmienne
+losowe na tej samej przestrzeni.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Cokolwiek, co zamienia \enquote{którą wylosowano} na liczbę. Na przykład
+$X^{2}$; albo $1$, gdy wylosowana liczba jest dodatnia, i $0$ w przeciwnym
+razie; albo liczbę znaków potrzebnych do jej zapisania.
+\end{ansblock}
+
+\textbf{Jedna przestrzeń niesie tyle zmiennych losowych, ile zechcesz
+zdefiniować}, i wszystkie jadą na tym samym losowaniu. Dlatego przestrzeń i
+zmienną trzeba trzymać osobno w głowie: przestrzeń mówi, co może się zdarzyć i
+z jaką wagą, a zmienna losowa to jedno pytanie, które postanowiłeś jej zadać.
+
+Te dwie powyżej warto nazwać, bo reszta programu ich używa. Napisz $Y = X^{2}$
+oraz $\mathbb{1}$ na tę drugą \dash{} funkcję, która daje $1$ na wynikach,
+gdzie coś zachodzi, i $0$ gdzie indziej, i którą nazywa się
+\textbf{wskaźnikiem}.
+\end{fr}
+
+\begin{fr}
+Teraz podsumowanie, które Program~\ref{prog:F13} zbudował i nie nazwał.
+
+\textbf{Wartość oczekiwana} $X$ to każda wartość, którą może przyjąć,
+ważona tym, jak prawdopodobna jest ta wartość, i zsumowana:
+\[ \Ex[X] \;=\; \sum_{\omega} \Prob(\omega)\, X(\omega) \]
+co na przestrzeni ciągłej jest całką z F13, z sumą zamienioną na całkę i bez
+żadnej innej zmiany.
+
+Suma biegnie po przestrzeni zdarzeń, a nie po różnych wartościach. Zdarzenie
+elementarne niosące wartość, którą niesie też inne, wchodzi dwa razy i tak być
+powinno: wagi, które muszą sumować się do jedynki, są z
+Programu~\ref{prog:P23} i są przypisane zdarzeniom elementarnym.
+
+Policz $\Ex[X]$ dla dziesięciu liczb powyżej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p24.ex.x}$}
+
+Dziesięć liczb sumuje się do $20$, a każda niesie wagę $\frac{1}{10}$.
+
+To jest własna liczba Programu~\ref{prog:P21}, a
+\code{code/p24\_distributions.py} czyta zatwierdzoną wartość P21 i przerywa
+budowanie, jeśli obie kiedykolwiek się rozejdą \dash{} oba programy opisują
+jedną populację, więc nie wolno im się co do niej rozjechać.
+
+Teraz coś, czego arytmetyka nie rozstrzyga. Czy $\Ex[X]$ musi być jedną z
+wartości, które $X$ może przyjąć?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie, i zwykle nie jest}
+
+\begin{notationbox}
+\textbf{Wartość oczekiwana jest liczbą, a nie wynikiem.}
+$\Ex[X] = \val{p24.ex.x}$, choć byłoby tak samo, gdyby $2$ nie było jedną z
+dziesięciu. Wartość oczekiwana rzetelnej kostki to $\num{3.5}$, czego kostka
+pokazać nie może. \enquote{Wartość, której należy się spodziewać} nie jest
+tym, co to słowo znaczy.
+\end{notationbox}
+
+Tutaj akurat jest jedną z dziesięciu, co jest przypadkiem tej populacji, a nie
+własnością wartości oczekiwanych.
+\end{fr}
+
+\begin{fr}
+Wskaźnik zasługuje na własną ramkę, bo jest całym mostem z powrotem do
+Programu~\ref{prog:P23}.
+
+Niech $\mathbb{1}$ daje $1$, gdy wylosowana liczba jest dodatnia, i $0$ w
+przeciwnym razie. Ile wynosi $\Ex[\mathbb{1}]$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\frac{\val{p24.pos.num}}{\val{p24.pop.n}}$}
+
+Siedem z dziesięciu jest dodatnich. Wyrazy zerowe nie wnoszą nic, a siedem
+wyrazów równych jedności wnosi po $\frac{1}{10}$, więc wartość oczekiwana jest
+prawdopodobieństwem.
+
+\textbf{Wartość oczekiwana wskaźnika jest prawdopodobieństwem zdarzenia}, i ta
+jedna linijka sprawia, że oba programy są jednym tematem, a nie dwoma. Każde
+prawdopodobieństwo w Programie~\ref{prog:P23} jest wartością oczekiwaną, a
+każda wartość oczekiwana ważoną sumą prawdopodobieństw. Nic się nie uogólnia;
+ten sam obiekt czyta się z drugiej strony.
+
+\mermaidfig{p24-space-to-number}{Trzy obiekty i to, w którym z nich siedzi
+losowość.}{wynik, funkcja, waga}
+\end{fr}
+
+% ============================================================
+\section{Wartość oczekiwana przechodzi przez sumę}
+\label{sec:P24-linearity}
+\index{wartość oczekiwana!liniowość}
+
+\begin{fr}
+Jedna własność wartości oczekiwanej niesie prawie każde wyprowadzenie w
+dalszej części tej książki i jest powodem, dla którego ten obiekt w ogóle
+warto definiować:
+\[ \Ex[aX + bY] \;=\; a\,\Ex[X] \;+\; b\,\Ex[Y] \]
+dla dowolnych dwóch zmiennych losowych na tej samej przestrzeni i dowolnych
+dwóch stałych.
+
+Zanim jej użyjesz: czy wymaga ona, żeby $X$ i $Y$ były niezależne?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Nie wymaga niczego.
+\end{ansblock}
+
+Większość czytelników odpowiada, że tak, a błędna odpowiedź jest tak łatwo
+dostępna dlatego, że \emph{druga} reguła, którą się pamięta, niezależności
+faktycznie wymaga. Rozdzielenie tych dwóch jest warte następnych czterech
+ramek.
+
+Dowód to jedna linijka i zrobisz go w głowie. Obie strony są sumami po tych
+samych wynikach z tymi samymi wagami, więc
+\[ \sum_{\omega} \Prob(\omega)\,\bigl(aX(\omega) + bY(\omega)\bigr)
+   \;=\; a\sum_{\omega} \Prob(\omega)X(\omega)
+       + b\sum_{\omega} \Prob(\omega)Y(\omega) \]
+co jest wyłącznie przestawieniem skończonej sumy. Nie użyto żadnej własności
+$X$ i $Y$, bo żadna nie była dostępna.
+\end{fr}
+
+\begin{fr}
+Pokaz celowo przeprowadzamy na najbardziej zależnej dostępnej parze. Weź $X$
+oraz $Y = X^{2}$ z sekcji 1: jedna \emph{jest} funkcją drugiej, więc gdyby
+jakakolwiek zależność mogła złamać liniowość, złamałaby ją ta.
+
+$\Ex[X]$ wynosi $\val{p24.ex.x}$, a $\Ex[Y]$ wynosi $\val{p24.ex.y}$. Ile
+wynosi $\Ex[X + Y]$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p24.ex.sum}$}
+
+Czyli $\val{p24.ex.x} + \val{p24.ex.y}$, a skrypt sprawdza to na ułamkach przy
+czterech różnych parach stałych, a nie przy tej jednej.
+
+Nie ma w tym żadnego przybliżenia ani żadnego dołączonego warunku. Kiedy
+później w książce zobaczysz wyprowadzenie, które rozbija wartość oczekiwaną na
+sumę stu składników bez słowa uzasadnienia, opiera się ono na tej ramce.
+\end{fr}
+
+\begin{fr}
+Teraz reguła, która czegoś wymaga. Czy
+\[ \Ex[XY] \;=\; \Ex[X]\,\Ex[Y] \]
+zachodzi dla tych samych $X$ oraz $Y = X^{2}$? Obie liczby to
+$\val{p24.ex.xy}$ i $\val{p24.ex.xtimesy}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie: $\val{p24.ex.xy}$ wobec $\val{p24.ex.xtimesy}$.
+\end{ansblock}
+
+\textbf{Wartość oczekiwana przechodzi przez sumę i przez mnożenie przez stałą,
+i przez nic więcej.} Nie przechodzi przez iloczyn, a Program~\ref{prog:P19}
+poświęcił cały program temu, że nie przechodzi też przez funkcję wypukłą. Tamten
+program musiał powiedzieć to przez \emph{średnie}, bo wartość oczekiwana nie
+była jeszcze zdefiniowana \dash{} średnia kwadratów jest co najmniej kwadratem
+średniej. W notacji tej sekcji jest to $\Ex[f(X)] \ge f(\Ex[X])$ dla wypukłego
+$f$ i jest to to samo zdanie o tym samym obiekcie.
+
+Różnica między tymi dwoma iloczynami nie jest szumem ani błędem. Jest
+wielkością, która ma nazwę i zastosowanie, i o niej jest sekcja 4.
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+\textbf{Trzy wyniki już obecne w tej książce opierają się na powyższej
+liniowości i żaden z nich o niej nie wspomina.}
+
+Tożsamość rozgłaszania z Programu~\ref{prog:P07} rozbija średnią po $n^{2}$
+parach na średnią po $n$ z nich plus wyraz mieszany. Program~\ref{prog:P21}
+pokazuje, że średnia z każdej z jego $\val{p21.pop.subsets}$ partii równa się
+dokładnie średniej populacji. Sekcja 5 poniżej zamienia prawdopodobieństwo na
+liczbę alarmów na milion żądań.
+
+Wszystkie trzy to ten sam krok i wszystkie trzy wymagałyby dołączonego
+warunku, gdyby liniowość jakiś miała. Powodem, dla którego pętla treningowa
+może uśrednić stratę po partii skorelowanych przykładów i wciąż szacować
+właściwą wielkość, jest ta ramka i żadna inna.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Wariancja i to, w czym się ją mierzy}
+\label{sec:P24-variance}
+\index{wariancja!definicja}
+\index{wariancja!dwie drogi do niej}
+
+\begin{fr}
+Wartość oczekiwana mówi, gdzie rozkład siedzi. Nie mówi nic o tym, jak daleko
+od tego miejsca lądują losowania, a dwa rozkłady o tej samej wartości
+oczekiwanej mogą zachowywać się zupełnie inaczej.
+
+Drugie podsumowanie to naprawia. \textbf{Wariancja} to oczekiwany kwadrat
+odległości od wartości oczekiwanej:
+\[ \Var(X) \;=\; \Ex\bigl[(X - \Ex[X])^{2}\bigr] \]
+
+Policz ją dla dziesięciu liczb. Ich średnia to $\val{p24.ex.x}$, więc
+odległości wynoszą $1, 3, 2, 1, 7, 7, 0, 8, 3, 6$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p24.var.x}$}
+
+Kwadraty to $1, 9, 4, 1, 49, 49, 0, 64, 9, 36$, co sumuje się do $222$, a
+każdy niesie $\frac{1}{10}$.
+
+Ta droga potrzebuje średniej, zanim zacznie, więc czyta dane dwa razy, a
+maszyna wolałaby przeczytać je raz. Rozwiń kwadrat w definicji i użyj
+liniowości z sekcji 2: czym staje się $\Var(X)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\[ \Var(X) \;=\; \Ex[X^{2}] - (\Ex[X])^{2}
+   \;=\; \val{p24.ex.y} - \val{p24.ex.x}^{2}
+   \;=\; \val{p24.var.x} \]
+\end{ansblock}
+
+\textbf{To ta sama liczba, a nie przybliżenie jednej przez drugą}, co skrypt
+sprawdza na ułamkach. Program~\ref{prog:P02} zajmuje się tym, co się dzieje,
+gdy maszyna liczy tę drugą w arytmetyce zmiennoprzecinkowej na danych dalekich
+od zera, a odpowiedź brzmiała tam: wariancja wyszła ujemna.
+\end{fr}
+
+\begin{fr}
+\begin{notationbox}
+\textbf{$\Var(X)$ i $D^{2}(X)$ to to samo, podobnie $\Ex[X]$ i $M(X)$.}
+
+Ta książka pisze wszędzie $\Var(X)$ i $\Ex[X]$, bo tak piszą prace i
+biblioteki, które czytelnik faktycznie otworzy. Polskie materiały dydaktyczne
+piszą $D^{2}(X)$ na wariancję i $M(X)$ na wartość oczekiwaną i jest to obecne
+użycie, a nie historyczna ciekawostka: czytelnik, który się ich uczył, spotka
+oba zapisy w jednym tygodniu.
+
+Kwadrat w $D^{2}$ robi tę samą robotę, co kwadrat w
+\enquote{odchyleniu standardowym do kwadratu}: zapisuje, że wielkość jest w
+jednostkach $X$ \emph{do kwadratu}. Dodatek~B niesie tę odpowiedniość i
+wskazuje na tę ramkę.
+\end{notationbox}
+\end{fr}
+
+\begin{fr}
+Jednostki są następne i są powodem, dla którego pierwiastek ma własną nazwę.
+
+Przypuśćmy, że dziesięć liczb było czasami w minutach i ktoś wyraża je w
+sekundach, więc każda zostaje pomnożona przez $\val{p24.var.scale}$. Co dzieje
+się z wariancją?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Zostaje pomnożona przez $\val{p24.var.scale.sq}$}
+
+Bo $\Var(aX) = a^{2}\Var(X)$ \dash{} wszystkie odległości skalują się przez
+$a$, a definicja je podnosi do kwadratu. Skrypt sprawdza to przy czterech
+współczynnikach skali, dokładnie.
+
+Wariancja jest więc w jednostkach \emph{do kwadratu}, czego nikt sobie nie
+wyobrazi. Jej pierwiastek już tak:
+\[ \operatorname{sd}(X) = \sqrt{\Var(X)} = \val{p24.sd.x} \]
+w tych samych jednostkach co $X$, i to jest liczba, którą się podaje. Nazywa
+się ją \textbf{odchyleniem standardowym}, a Programy \ref{prog:P05} i
+\ref{prog:P21} używały już na nią słowa \emph{rozrzut}, z wyprzedzeniem wobec
+tej definicji.
+\end{fr}
+
+\begin{fr}
+To zamyka pożyczkę. Program~\ref{prog:P21} użył słowa \emph{wariancja} dwie
+części przed tą, w ramce o rygorze, która dała czytelnikowi jedno zdanie
+\dash{} średni kwadrat odległości od średniej \dash{} i wskazała tutaj.
+
+Definicją są teraz ramki powyżej, zastosowane do własnej populacji P21 i
+podpięte pod jej własną zatwierdzoną średnią. To, co P21 z nią zrobił
+\dash{} że wariancja średniej z $B$ losowań spada jak $1/B$, więc rozrzut
+spada jak $\sqrt{B}$ \dash{} jest zdaniem o \emph{sumach}, a to jest tematem
+Programu~\ref{prog:P25}, nie tego.
+
+Warto wiedzieć, dlaczego książka trzyma obie liczby, zamiast zostać przy tej
+czytelnej. Odchylenie standardowe podajesz; wariancja się \emph{dodaje}, a
+dodawanie jest własnością, której potrzebuje Program~\ref{prog:P25}.
+Pierwiastek wyciągnięty wcześnie trzeba potem cofnąć.
+
+Jedno pytanie, zanim opuścimy wariancję, i większość czytelników odpowiada
+źle. Dziesięć odległości od średniej wynosiło $1, 3, 2, 1, 7, 7, 0, 8, 3, 6$,
+co daje średnio $\num{3.8}$. Odchylenie standardowe wyszło $\val{p24.sd.x}$.
+Czy te dwie liczby mają być tą samą liczbą?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie, i ta druga jest zawsze większa}
+
+\begin{trapbox}
+\textbf{Odchylenie standardowe nie jest średnią odległością od średniej.}
+Dla dziesięciu liczb średnia odległość wynosi $\num{3.8}$, a odchylenie
+standardowe $\val{p24.sd.x}$, czyli więcej. Podnoszenie do kwadratu przed
+uśrednieniem waży dalekie punkty mocniej, a pierwiastek tego nie cofa.
+
+To dwa różne podsumowania i to drugie raportuje każda biblioteka. Jeśli
+czytałeś je jako \enquote{typową odległość od środka}, czytałeś liczbę
+systematycznie większą od tej, którą miałeś na myśli, a różnica rośnie
+dokładnie wtedy, gdy rozkład ma ogon \dash{} czyli wtedy, gdy na niej
+polegałeś.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Kowariancja, korelacja i to, czego żadna nie widzi}
+\label{sec:P24-covariance}
+\index{kowariancja}
+\index{korelacja!a kowariancja}
+
+\begin{fr}
+Sekcja 2 zostawiła na stronie różnicę: $\Ex[XY]$ wynosiło $\val{p24.ex.xy}$, a
+$\Ex[X]\Ex[Y]$ wynosiło $\val{p24.ex.xtimesy}$. Ta różnica ma nazwę.
+
+\textbf{Kowariancja} dwóch zmiennych losowych to
+\[ \Cov(X, Y) \;=\; \Ex\bigl[(X - \Ex[X])(Y - \Ex[Y])\bigr]
+   \;=\; \Ex[XY] - \Ex[X]\,\Ex[Y] \]
+a obie postacie są równe z tego samego powodu, z którego równe są dwie
+postacie wariancji: rozwiń iloczyn i użyj liniowości.
+
+Podstaw w nią $Y = X$. Co dostajesz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\Var(X)$}
+
+$\Cov(X, X) = \Ex[(X - \Ex[X])^{2}]$, czyli dosłownie definicja wariancji.
+\textbf{Wariancja jest kowariancją czegoś z samym sobą}, więc drugie
+podsumowanie było przez cały czas szczególnym przypadkiem czwartego, a
+cokolwiek jest prawdą o kowariancjach, jest prawdą o wariancjach.
+
+Dla dziesięciu liczb i $Y = X^{2}$ kowariancja wynosi $\val{p24.cov.xy}$,
+dokładnie, i jest dodatnia: duże $X$ chodzi w parze z dużym $X^{2}$ na tym
+odcinku.
+\end{fr}
+
+\begin{fr}
+Samą kowariancję trudno czytać, bo jej rozmiar zależy od rozmiaru obu
+wielkości. Podzielenie przez oba rozrzuty to naprawia:
+\[ \Corr(X, Y) \;=\; \frac{\Cov(X, Y)}
+   {\operatorname{sd}(X)\,\operatorname{sd}(Y)} \]
+i wynik zawsze ląduje w $\intcc{-1}{1}$.
+
+Dzielenie robi więcej, niż tylko porządkuje liczbę. Kowariancja niesie
+jednostki obu wielkości pomnożone przez siebie, więc ta policzona z długości i
+z ceny jest w jednostkach, dla których nikt nie ma nazwy, i nie da się jej z
+niczym porównać; podzielenie przez oba rozrzuty skraca jednostki, a korelacje
+z niezwiązanych par wielkości siedzą wtedy na jednej skali.
+
+Teraz pytanie. $Y$ \emph{jest} $X^{2}$: znajomość $X$ mówi ci $Y$ z pewnością,
+a to jest zależność tak pełna, jak to możliwe. Ile wynosi $\Corr(X, Y)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p24.corr.xy}$}
+
+Około połowy, dla dwóch wielkości, z których jedna wyznacza drugą dokładnie.
+
+\textbf{Korelacja mierzy prostoliniową część zależności i nic poza nią.}
+$X^{2}$ nie jest prostoliniową funkcją $X$, więc większość zależności jest dla
+tej liczby niewidoczna, a przetrwała ta część, która akurat wygląda liniowo na
+tym konkretnym zestawie dziesięciu wartości.
+
+To już jest niewygodne. Następna ramka jest gorsza.
+\end{fr}
+
+\begin{fr}
+Weź najmniejszą przestrzeń, która to pokazuje. $Z$ przyjmuje $-1$, $0$ lub
+$1$, każde z prawdopodobieństwem $\frac{1}{\val{p24.tri.n}}$, a $W = Z^{2}$.
+
+$W$ jest funkcją $Z$, więc znów zależność jest całkowita. Ile wynosi
+$\Cov(Z, W)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dokładnie $0$}
+
+$\Ex[Z] = 0$ z symetrii, więc kowariancja to $\Ex[ZW] = \Ex[Z^{3}]$, a
+sześciany to $-1$, $0$ i $1$, które też uśredniają się do zera. Oba są
+dokładne na ułamkach; nic tu nie jest zaokrąglane.
+
+\begin{trapbox}
+\textbf{\enquote{Korelacja jest zerowa, więc są niezależne} to wnioskowanie,
+dla którego złamania ta ramka istnieje.}
+
+$Z$ i $W$ mają korelację dokładnie zero, a $W$ jest wyznaczone przez $Z$. Test,
+który dał ci Program~\ref{prog:P23}, mówi to wprost: $\Prob(W = 0)$ wynosi
+$\frac{1}{\val{p24.tri.n}}$, a $\Prob(W = 0 \mid Z = 0)$ wynosi $1$.
+Powiedzenie ci, ile wynosi $Z$, przesuwa odpowiedź o $W$ z jednej trzeciej do
+pewności, więc są tak dalekie od niezależności, jak dwie wielkości być mogą.
+
+Niezależność pociąga zerową korelację. Odwrotna implikacja jest fałszywa i
+jest fałszywa w kierunku, który ma znaczenie: macierz korelacji pełna zer nie
+jest dowodem, że zbiór cech nie niesie wspólnej informacji. To właśnie miał na
+myśli Program~\ref{prog:P23}, mówiąc, że tabela korelacji parami nie
+rozstrzyga niezależności, a Program~\ref{prog:P31} buduje wielkość, która to
+widzi.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Druga połowa powodu, dla którego ludzie źle czytają te dwie liczby, to
+jednostki.
+
+Wróć do dziesięciu liczb i przypuśćmy znów, że były minutami, a teraz są
+sekundami, więc $X$ staje się $\val{p24.var.scale}X$, a $Y$ zostaje nietknięte.
+Co dzieje się z $\Cov(X, Y)$, a co z $\Corr(X, Y)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Kowariancja zostaje pomnożona przez $\val{p24.var.scale}$. Korelacja się nie
+rusza.
+\end{ansblock}
+
+$\Cov(aX, bY) = ab\,\Cov(X, Y)$, a oba rozrzuty pod korelacją zbierają
+dokładnie te same czynniki i je skracają. Skrypt sprawdza oba przy czterech
+parach współczynników skali, a niezmienniczość korelacji sprawdza przez
+mnożenie na krzyż, a nie przez porównanie dwóch zaokrąglonych pierwiastków,
+więc twierdzenie pozostaje dokładne.
+
+\begin{trapbox}
+\textbf{Czytanie macierzy kowariancji tak, jakby była macierzą korelacji, to
+czytanie własnych jednostek.}
+
+Kowariancja niesie jednostki obu wielkości, więc macierz z nich jest
+zdominowana przez tę cechę, która akurat jest mierzona w największych
+liczbach. Przeskaluj jedną kolumnę z sekund na milisekundy, a jej wiersz i
+kolumna urosną tysiąckrotnie, choć w danych nic się nie zmieniło. Macierz
+korelacji ma z konstrukcji jedynki na przekątnej i wyrazy w
+$\intcc{-1}{1}$ i to ją się czyta, gdy pytanie dotyczy siły, a nie rozmiaru.
+
+Pułapką nie jest to, że ludzie nie znają definicji. Pułapką jest to, że obie
+macierze wyglądają na ekranie identycznie.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Dwa długi stają się tu wymagalne i oba są jednym zdaniem, gdy definicje już
+istnieją.
+
+Program~\ref{prog:P07} wypisał $2\Cov(p, t)$ jako dokładną nadwyżkę, którą
+błąd kształtu dokłada do raportowanej straty, i nie zadeklarował ani $\Cov$,
+ani $\Var$. To właśnie były te obiekty. Jego wniosek czyta się z nimi lepiej:
+nadwyżka to podwojona kowariancja predykcji z celami, a kowariancja dokładnie
+tej pary jest tym, co trening ma zwiększać \dash{} dlatego raportowana liczba
+pogarsza się w miarę, jak model się poprawia.
+
+Programy \ref{prog:P10} i \ref{prog:P11} używają \textbf{macierzy
+kowariancji} $C = \frac{1}{n}X\T X$, której wyraz $(i, j)$ jest kowariancją
+cechy $i$ z cechą $j$. Zadeklarowały ją jako odwołanie w przód do tego
+programu i powiedziały, że potrzebują o niej dokładnie dwóch faktów. Których
+dwóch?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Że jest symetryczna i że jest dodatnio półokreślona.
+\end{ansblock}
+
+Oba widać w definicji, a nie w tej sekcji: $C = \frac{1}{n}X\T X$ jest
+symetryczna z konstrukcji, a $v\T C v = \frac{1}{n}\lVert Xv \rVert^{2}$ jest
+sumą kwadratów. P10 udowodnił oba na miejscu i dlatego odwołanie w przód nic
+go nie kosztowało.
+
+\textbf{Te programy były winne słowo, a nie fakty}, i warto mieć to jako
+regułę: odwołanie w przód, którego fakty da się udowodnić lokalnie, powinno
+być tak udowodnione.
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+\textbf{Nie dowodzimy tu, że korelacja zawsze leży między $-1$ a $1$.}
+
+To nierówność Cauchy'ego--Schwarza, której ta książka nigdzie nie podaje. Warto
+mieć krok do niej, a nie dowód: kowariancja \emph{jest} iloczynem skalarnym
+\dash{} dwóch list odległości od średniej, z prawdopodobieństwami jako wagami
+\dash{} a Program~\ref{prog:F09} zapisuje iloczyn skalarny jako
+$\lVert a \rVert\, \lVert b \rVert \cos\theta$. Cosinus nigdy nie wychodzi
+poza $\intcc{-1}{1}$, więc korelacja też nie.
+
+Ograniczenie nie jest zatem faktem o statystyce. To geometria z
+Programu~\ref{prog:F09}, czytana na innej przestrzeni.
+\end{rigourbox}
+
+\mermaidfig{p24-two-summaries}{Gdzie rozkład siedzi i jak daleko od tego
+lądują losowania.}{środek i rozrzut}
+\end{fr}
+
+% ============================================================
+\section{Sześć rozkładów, po tym, do czego służą}
+\label{sec:P24-families}
+\index{rozkład!sześć rodzin}
+
+\begin{fr}
+Garstka kształtów odpowiada za prawie wszystko, co spotyka praktykujący
+inżynier, a użytecznie trzyma się je po pytaniu, na które każdy z nich
+odpowiada, a nie po wzorze. Sześć wystarczy.
+
+Zacznij od najmniejszego. Zmienna \textbf{Bernoulliego} przyjmuje $1$ z
+prawdopodobieństwem $p$ i $0$ w przeciwnym razie \dash{} jedno tak-albo-nie.
+Jest wskaźnikiem, więc sekcja 1 daje ci już jej wartość oczekiwaną. Ile ona
+wynosi i ile wynosi jej wariancja?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\Ex = p$ oraz $\Var = p(1-p)$.
+\end{ansblock}
+
+Wartość oczekiwana to ramka o wskaźniku. Dla wariancji: $X^{2} = X$, gdy $X$
+przyjmuje wyłącznie $0$ lub $1$, więc $\Ex[X^{2}] = p$, a druga droga daje
+wprost $p - p^{2}$.
+
+Warto odczytać kształt tego: $p(1-p)$ jest największe przy $p = \num{0.5}$ i
+zerowe na obu końcach. \textbf{Moneta, której nie da się przewidzieć, jest
+najbardziej hałaśliwa}, co po powiedzeniu jest oczywiste i jest powodem, dla
+którego kolumna etykiet z rzadką klasą ma małą wariancję i mówi prawie nic.
+\end{fr}
+
+\begin{fr}
+Policz $n$ takich i masz \textbf{rozkład dwumianowy}: ile sukcesów w $n$
+niezależnych próbach.
+
+Detektor z Programu~\ref{prog:P23} podnosi alarm na
+$\frac{\val{p23.alarm.num}}{\val{p23.alarm.den}}$ żądań. Na
+$\val{p24.binom.n}$ niezależnych żądaniach liczba alarmów jest dwumianowa, a
+jej wartość oczekiwana i wariancja to $nq$ oraz $nq(1-q)$ \dash{} co skrypt
+sprawdza względem wszystkich ośmiu wypisanych wyników, a nie cytuje.
+
+Pożyteczne w wartości oczekiwanej jest to, że zmienia jednostki pytania. Na
+$\val{p24.million}$ żądań ile będzie alarmów i ile z nich będzie prawdziwych?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p24.alarms.million}$ alarmów, z czego $\val{p24.real.million}$
+prawdziwych.
+\end{ansblock}
+
+To dwie wartości oczekiwane, każda to prawdopodobieństwo pomnożone przez
+liczbę, i w takich jednostkach pisze się plan pojemności: jedna to kolejka
+zgłoszeń, a druga to liczba incydentów, które warto było znaleźć.
+
+Podziel je i dostaniesz $\val{p23.ppv.pct}$ procent, czyli nagłówek
+Programu~\ref{prog:P23} przychodzący z drugiej strony. Skrypt podpina to
+dzielenie pod zatwierdzoną liczbę P23. Nic nowego nie policzono \dash{}
+prawdopodobieństwo zamieniono na liczbę sztuk, a liczba sztuk to postać, w
+której ktoś będzie się o nią spierał.
+\end{fr}
+
+\begin{fr}
+Trzeci jest tym, w który ten program celuje, i możesz go nazwać, zanim
+zostanie zdefiniowany. Softmax daje $k$ liczb, które nigdy nie są ujemne i
+sumują się do $1$. Zgodnie z regułami Programu~\ref{prog:P23}, co on wyprodukował?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Rozkład prawdopodobieństwa na $k$ wynikach}
+
+Zmienna \textbf{kategoryczna} przyjmuje jedną z $k$ wartości z
+prawdopodobieństwami $p_1, \ldots, p_k$, które sumują się do $1$, i tym
+właśnie jest warstwa wyjściowa modelu językowego.
+
+Zmienna Bernoulliego to przypadek $k = 2$, a dwumianowy liczy powtórzenia
+jednej z nich.
+\end{fr}
+
+\begin{fr}
+Czwarty i piąty tworzą parę i odpowiadają na przeciwne pytania o ten sam
+strumień zdarzeń: rozkład \textbf{Poissona} i rozkład \textbf{wykładniczy}.
+
+Żądania przychodzą ze stałą średnią częstością, niezależnie od siebie. Jeden z
+tych dwóch odpowiada na pytanie \emph{ile przyszło w tej sekundzie}, a drugi
+na pytanie \emph{ile czasu do następnego}. Który jest który?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Poisson liczy; wykładniczy czeka.
+\end{ansblock}
+
+Poisson jest liczbą sztuk i przyjmuje wartości całkowite; wykładniczy jest
+czasem trwania i przyjmuje dowolną dodatnią. Kolejka jest zbudowana z obu.
+
+Jedna własność warta zabrania: rozkład wykładniczy jest \textbf{bez pamięci}.
+To, że czekałeś już dziesięć sekund, nie mówi nic o tym, ile jeszcze
+poczekasz. Dlatego licznik ponowień losowany z niego nie potrzebuje stanu i
+dlatego \enquote{już się należy} nigdy nie jest prawdą w procesie Poissona.
+\end{fr}
+
+\begin{fr}
+Szósty to rozkład \textbf{Gaussa}, a brief tego programu każe wprowadzić go
+przez rolę, a nie przez wzór, bo wzór przy pierwszym spotkaniu nie wyjaśnia
+niczego.
+
+Jego rola jest taka: to jest to, co dostajesz, gdy bardzo wiele małych
+niezależnych składników się dodaje, niezależnie od tego, jak wyglądał każdy z
+nich. Dlatego pojawia się w błędzie pomiaru, w inicjalizacji i w rozkładzie
+sumy gradientów po partii \dash{} nie dlatego, że ktoś go wybrał, ale dlatego,
+że produkuje go dodawanie.
+
+Dwie liczby ustalają go w całości i są to dwa podsumowania, które ten program
+już zbudował. W obrębie jednego odchylenia standardowego od średniej leży
+$\val{p24.gauss.one}$ wagi; w obrębie dwóch \dash{} $\val{p24.gauss.two}$.
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+\textbf{Nie dowodzimy tu, że sumy niezależnych rzeczy stają się gaussowskie.}
+
+To jest centralne twierdzenie graniczne i należy do
+Programu~\ref{prog:P25}, wraz z dwoma faktami, które czynią je użytecznym
+\dash{} że wariancje wielkości niezależnych się dodają i że rozrzut średniej
+spada wobec tego jak $1/\sqrt{n}$.
+
+Ten program podaje rolę i celowo się na tym zatrzymuje. Rozkład Gaussa użyty
+dlatego, że w grę wchodziła suma, jest użyty poprawnie; rozkład Gaussa użyty
+dlatego, że dane \enquote{wyglądały na dzwonowate}, jest założeniem, którego
+nikt nie sprawdził, a różnicą między jednym a drugim jest to twierdzenie.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Trzy wielkości i jedno pytanie. Która z nich jest bliska gaussowskiej:
+częstości tokenów w korpusie, opóźnienia usługi czy średnia z tysiąca tych
+opóźnień?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tylko ta trzecia}
+
+\begin{trapbox}
+\textbf{\enquote{Dane mają rozkład normalny} jest twierdzeniem o populacji, a
+prawie nic w tej dziedzinie go nie ma.}
+
+Częstości tokenów nie mają; opóźnienia nie mają, a ich ogon jest całym
+powodem, dla którego ktokolwiek patrzy na p99; wartości straty po korpusie nie
+mają, co jest wnioskiem o perplexity z Programu~\ref{prog:P19} w innej
+postaci. Bliska gaussowskiej jest zwykle \emph{średnia} z wielu z nich, a to
+jest inny obiekt o innej wariancji.
+
+Nawykiem wartym nabycia jest pytanie, o który z tych dwóch obiektów chodzi w
+deklarowanej normalności. \enquote{Opóźnienia są normalne} jest prawie zawsze
+fałszem; \enquote{średnia z tysiąca opóźnień jest bliska normalnej} jest
+prawie zawsze prawdą i to na niej opiera się narzędzie.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Chirurgia rozkładu}
+\label{sec:P24-surgery}
+\index{próbkowanie!temperatura}
+\index{próbkowanie!top-k i top-p}
+
+\begin{fr}
+Wszystko w tym programie budowało jedno zdanie i warto je powiedzieć wprost:
+\textbf{próbkowanie tokena jest losowaniem z rozkładu kategorycznego}, a
+temperatura, top-$k$ i top-$p$ to trzy sposoby edytowania tego rozkładu przed
+losowaniem.
+
+Rozkład jest z Programu~\ref{prog:F05}, niezmieniony i podpięty pod jego
+zatwierdzone wartości: cztery tokeny o wynikach $2$, $\num{1.5}$, $\num{0.5}$
+i $-1$. Przy $T = 2$ softmax daje
+\[ \val{f05.sm.t20.p1},\quad \val{f05.sm.t20.p2},\quad
+   \val{f05.sm.t20.p3},\quad \val{f05.sm.t20.p4} \]
+Te cztery liczby są całym edytowanym obiektem.
+\end{fr}
+
+\begin{fr}
+Weź trzy pokrętła po kolei i przy każdym zadaj jedno pytanie: co ono
+\emph{niszczy}?
+
+Program~\ref{prog:F05} rozstrzygnął temperaturę. Podzielenie każdego wyniku
+przez $T$ i przenormowanie nie może ruszyć $\argmax$, przy żadnym $T$, bo
+dzielenie przez liczbę dodatnią zachowuje porządek listy i eksponenta też.
+
+Co zatem temperatura zmienia?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wagi, a ogon najbardziej. Nic nie zostaje zniszczone.
+\end{ansblock}
+
+Każdy token, który miał dodatnie prawdopodobieństwo, wciąż je ma. Ranking
+pozostaje nietknięty. Rusza się to, ile z całości siedzi z dala od czubka: na
+trzech temperaturach z Programu~\ref{prog:F05} najmniej prawdopodobny token
+rośnie ponad $\val{f05.sm.tail.floor}$-krotnie, a najbardziej prawdopodobny
+spada o czynnik $\val{f05.sm.top.ratio}$.
+
+\textbf{Temperatura jest przeważeniem}, a przeważenie jest odwracalne: ustaw
+$T$ z powrotem, a masz dokładnie ten rozkład, od którego zacząłeś. Trzymaj się
+tego, bo pozostałe dwa pokrętła wcale takie nie są.
+\end{fr}
+
+\begin{fr}
+\textbf{Top-$k$} zostawia $k$ najbardziej prawdopodobnych tokenów, resztę
+ustawia na zero i przenormowuje to, co zostało.
+
+Przy $T = 2$ i $k = \val{p24.topk.k}$ dwa ocalałe zostają przeważone do
+$\num{0.5622}$ i $\num{0.4378}$. Co zostało zniszczone?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dwa tokeny i $\val{p24.topk.del.t20}$ procent wagi rozkładu.
+\end{ansblock}
+
+Nie zmniejszone \dash{} usunięte. Ich prawdopodobieństwo jest potem dokładnie
+zerem i nic dalej w łańcuchu nie odróżni \enquote{bardzo mało prawdopodobne}
+od \enquote{niemożliwe}, bo po obcięciu nie ma między nimi różnicy.
+
+\textbf{Temperatura zmienia wagi; obcięcie zmienia to, po czym rozkład jest
+zadany.} To jest różnica rodzaju, a nie stopnia, i dlatego o tych dwóch
+pokrętłach nie da się myśleć tak, jakby oba były suwakami odwagi.
+\end{fr}
+
+\begin{fr}
+Teraz oddziaływanie, i to jest rzecz warta wyniesienia z tej sekcji.
+
+To samo $k = \val{p24.topk.k}$ kasuje $\val{p24.topk.del.t05}$ procent wagi
+przy $T = \num{0.5}$ i $\val{p24.topk.del.t20}$ procent przy $T = 2$. Zanim
+przeczytasz dalej: dlaczego temperatura ma zmieniać to, ile top-$k$
+wyrzuca, skoro $k$ się nie ruszyło?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo podniesienie temperatury jest dokładnie tą operacją, która przenosi wagę do
+ogona, a ogon jest tym, co top-$k$ kasuje.
+\end{ansblock}
+
+Czynnik $\val{p24.topk.del.ratio}$, na jednym rozkładzie, od pokrętła, którego
+nikt nie dotknął.
+
+\textbf{Te dwa ustawienia działają więc przeciw sobie.} Podniesienie
+temperatury dla urozmaicenia, a potem obcięcie przy małym $k$, wydaje większość
+tego, co temperatura kupiła, a arytmetyka mówi ile, zamiast zostawiać to
+gustowi. Para ustawień dostrojona przy jednej temperaturze nie przeżywa zmiany
+drugiej, a nic w konfiguracji próbkowania nie zapisuje, że są sprzężone.
+\end{fr}
+
+\begin{fr}
+\textbf{Top-$p$} jest trzecie i jest zdefiniowane inaczej: zostawiaj najbardziej
+prawdopodobne tokeny, aż ich waga osiągnie $p$, resztę odrzuć, przenormuj.
+
+Wygląda to na pokrętło tego samego rodzaju. Nie jest, a pokazuje to jeden
+pomiar. Przy ustalonym $p = \val{p24.topp.mass}$ ile z czterech tokenów
+przeżywa przy $T = \num{0.5}$, a ile przy $T = 2$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p24.topp.kept.t05}$ oraz $\val{p24.topp.kept.t20}$.
+\end{ansblock}
+
+\textbf{Liczba tokenów, które top-$p$ zostawia, jest wynikiem, a nie
+ustawieniem.} Jest taka, jaką zrobi rozkład, i dokładnie o to chodzi w
+projekcie: na kroku, na którym model jest pewny, zostawia jeden albo dwa, a na
+kroku, na którym model nie jest pewny, zostawia wiele. Top-$k$ zostawia tyle
+samo w obu przypadkach.
+
+Na $\val{p24.topp.sweep.n}$ temperaturach od $\num{0.05}$ do $3$ to samo $p$
+zostawia od $\val{p24.topp.sweep.lo}$ do $\val{p24.topp.sweep.hi}$ z czterech,
+co na prawdziwym słowniku jest różnicą między jednym kandydatem a tysiącami.
+
+\transcript{p24-surgery}
+\end{fr}
+
+\begin{fr}
+Zostaje jedno pytanie i to ono sprawia, że spojrzenie kategoryczne jest warte
+posiadania, a nie tylko schludne.
+
+Losowanie z rozkładu potrzebuje źródła losowości. Jest sposób, żeby zrobić to
+wyłącznie za pomocą $\argmax$: dodaj niezależny szum pewnego kształtu do
+każdego $\ln p_i$ i weź największą.
+
+To, która z dwóch odpowiedzi jest prawdziwa, rozstrzyga, czy sampler napisany
+w ten sposób jest samplerem, czy heurystyką, a histogram, który wygląda mniej
+więcej dobrze, tego nie rozstrzygnie. Zwróć uwagę, gdzie trafia szum: na
+$\ln p_i$, nigdy na $p_i$. To ta połowa, którą ludzie zapamiętują źle, i to na
+niej opiera się odpowiedź.
+
+Czy to przybliżenie próbkowania, czy próbkowanie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{To próbkowanie, dokładnie}
+
+Gdy $G_i$ losujemy niezależnie ze standardowego rozkładu \textbf{Gumbela},
+\[ \argmax_i \bigl(\ln p_i + G_i\bigr) \]
+ma dokładnie rozkład $p$. Nie prawie; dokładnie. Nazywa się to sztuczką
+Gumbel-max, a w bibliotece jest to linia
+\code{argmax(logits + gumbel\_noise)}.
+
+Przypadek dwóch tokenów jest już w tej książce. Różnica dwóch niezależnych
+zmiennych Gumbela ma rozkład logistyczny, więc pierwszy token wygrywa z
+prawdopodobieństwem $\sigma(\ln p_1 - \ln p_2)$ \dash{} a
+Program~\ref{prog:F07} udowodnił, że $\softmax$ na dwóch wynikach \emph{jest}
+$\sigma$ ich różnicy. Przy
+$p_1 = \frac{\val{p24.gumbel.two.num}}{\val{p24.gumbel.two.den}}$ to znów
+$\frac{7}{10}$.
+\end{fr}
+
+\begin{fr}
+Dla czterech tokenów nie ma takiego skrótu na stronie, więc twierdzenie trzeba
+sprawdzić inaczej. Oczywistym sposobem jest wylosować bardzo wiele próbek i
+porównać częstości z $p$.
+
+Powiedz, dlaczego ta książka tego tutaj nie robi.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Bo twierdzenie mówi o \emph{dokładności}, a próbka nie może jej ustalić.
+\end{ansblock}
+
+Sprawdzenie przez próbkowanie daje oszacowanie z własnym przedziałem błędu, a
+\enquote{oszacowanie zgodziło się w granicach błędu} jest pokazem, że sztuczka
+jest w przybliżeniu dobra \dash{} czyli dokładnie tym odczytem, którego ramka
+powyżej ma odmówić. Skrypt zatem całkuje. Całkowanie prawdopodobieństwa, że
+zmienna Gumbela jednego tokena bije każdą inną przesuniętą, odtwarza wszystkie
+cztery prawdopodobieństwa, na wszystkich trzech temperaturach, z dokładnością
+lepszą niż $10^{-11}$.
+
+\begin{aibox}
+\textbf{Gdzie to się faktycznie przydaje.} Sztuczka zamienia losowanie w
+$\argmax$, a $\argmax$ jest bliski różniczkowalności w sposób, w jaki losowanie
+nie jest \dash{} czego potrzebował estymator z reparametryzacją z
+Programu~\ref{prog:P21} i czego przypadkowi kategorycznemu brakowało. Jest to
+także sposób na wylosowanie $k$ tokenów bez zwracania w jednym przebiegu:
+bierze się $k$ największych zaburzonych wyników zamiast największego.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+I obie połowy tej sekcji spotykają się na liczbie, którą umiesz już
+przewidzieć.
+
+Przy $T = 2$ top-$\val{p24.topk.k}$ kasuje $\val{p24.topk.del.t20}$ procent
+wagi. Przypuśćmy zamiast tego, że najpierw dodajesz szum Gumbela i bierzesz
+$\argmax$ z całości, nie obcinając niczego. Jak często wygrywają te same dwa
+tokeny?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p24.topk.del.t20}$ procent czasu}
+
+Ta sama liczba, i jest to twierdzenie, a nie zbieg okoliczności: Gumbel-max
+odtwarza $p$ dokładnie, więc częstość, z jaką token wygrywa, jest jego
+prawdopodobieństwem, a jego prawdopodobieństwo jest tym, co kasuje obcięcie.
+\textbf{Obcięcie nie zniechęca tokena. Ono go usuwa}, a usuwana waga jest
+dokładnie tą częstością, którą inaczej byś zobaczył.
+\end{fr}
+
+\begin{fr}
+To cały program.
+
+Zmienna losowa jest funkcją na przestrzeni zbudowanej przez
+Program~\ref{prog:P23}. Jej wartość oczekiwana jest sumowaniem z
+Programu~\ref{prog:F13} z doczepioną nazwą i przechodzi przez sumy bez żadnych
+warunków, dlatego późniejsze wyprowadzenia są krótkie. Jej wariancja jest
+drugim podsumowaniem, w jednostkach do kwadratu, a jej pierwiastek jest tym,
+co się podaje. Kowariancja jest wariancją pary, korelacja jest kowariancją z
+wydzielonymi jednostkami, a żadna z nich nie widzi zależności, która nie jest
+prosta.
+
+Nie ma tu tego, co się dzieje, gdy zmienne losowe się \emph{dodaje}: wariancje
+niezależnych się dodają, średnie się koncentrują, a tempo wynosi
+$1/\sqrt{n}$. To jest Program~\ref{prog:P25} i stamtąd biorą się zarówno
+arytmetyka rozmiaru partii z Programu~\ref{prog:P21}, jak i $1/\sqrt{d_k}$ w
+uwadze.
+
+\mermaidfig{p24-three-knobs}{Trzy edycje jednego rozkładu i to, która z nich
+jest odwracalna.}{przeważyć czy usunąć}
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Zmienna losowa} jest \emph{funkcją} z przestrzeni
+  zdarzeń w liczby. Nie jest losowa i nie jest zmienną: losowość siedzi w tym,
+  który wynik poda jej przestrzeń. Wielka litera na regułę, mała na wartość,
+  którą przyjęła.}
+\sumitem{4--5}{Jedna przestrzeń niesie tyle zmiennych losowych, ile
+  zdefiniujesz, i wszystkie jadą na tym samym losowaniu. Przestrzeń mówi, co
+  może się zdarzyć; zmienna losowa to jedno pytanie, które postanowiłeś jej
+  zadać.}
+\sumitem{6--8}{$\Ex[X] = \sum_{\omega}\Prob(\omega)X(\omega)$, czyli
+  wartość razy waga z Programu~\ref{prog:F13} z doczepioną nazwą. Jest
+  \emph{liczbą} i nie musi być wartością, którą $X$ może przyjąć.}
+\sumitem{9--10}{\textbf{Wartość oczekiwana wskaźnika jest prawdopodobieństwem
+  zdarzenia.} Każde prawdopodobieństwo jest wartością oczekiwaną, a każda
+  wartość oczekiwana ważoną sumą prawdopodobieństw \dash{} jeden obiekt czytany
+  na dwa sposoby.}
+\sumitem{11--14}{$\Ex[aX + bY] = a\Ex[X] + b\Ex[Y]$ \textbf{bez jakiegokolwiek
+  warunku}, sprawdzone na $X$ i $X^{2}$, które są tak zależne, jak dwie zmienne
+  być mogą. Dowodem jest przestawiona skończona suma.}
+\sumitem{15--17}{Wartość oczekiwana przechodzi przez sumy i mnożenie przez
+  stałą, i przez \emph{nic więcej}: $\Ex[XY] = \val{p24.ex.xy}$ wobec
+  $\val{p24.ex.xtimesy}$, a Program~\ref{prog:P19} zajmuje się tym, że nie
+  przechodzi też przez funkcję wypukłą.}
+\sumitem{18--20}{$\Var(X) = \Ex[(X - \Ex[X])^{2}] = \Ex[X^{2}] - (\Ex[X])^{2}$,
+  ta sama liczba dwiema drogami, tutaj $\val{p24.var.x}$. Druga czyta dane raz
+  i to ją Program~\ref{prog:P02} pokazuje zawodzącą.}
+\sumitem{21}{$\Var(X)$ to $D^{2}(X)$, a $\Ex[X]$ to $M(X)$; kwadrat w $D^{2}$
+  zapisuje, że wariancja jest w jednostkach do kwadratu.}
+\sumitem{22--23}{$\Var(aX) = a^{2}\Var(X)$, więc minuty na sekundy mnożą
+  wariancję przez $\val{p24.var.scale.sq}$, a rozrzut przez
+  $\val{p24.var.scale}$. Podawaj pierwiastek, tutaj $\val{p24.sd.x}$, bo jest
+  w jednostkach wielkości.}
+\sumitem{24--25}{To spłaca Program~\ref{prog:P21}, który pożyczył słowo. To, co
+  P21 z nim zrobił \dash{} wariancja średniej spadająca jak $1/B$ \dash{}
+  dotyczy \emph{sum} i należy do Programu~\ref{prog:P25}. A odchylenie
+  standardowe nie jest średnią odległością od średniej.}
+\sumitem{26--27}{$\Cov(X,Y) = \Ex[XY] - \Ex[X]\Ex[Y]$ oraz
+  $\Cov(X,X) = \Var(X)$ \dash{} \textbf{wariancja jest kowariancją czegoś z
+  samym sobą.}}
+\sumitem{28--29}{$\Corr$ dzieli kowariancję przez oba rozrzuty i ląduje w
+  $\intcc{-1}{1}$. Dla $X$ i $X^{2}$ wynosi $\val{p24.corr.xy}$, dla dwóch
+  wielkości, z których jedna wyznacza drugą: \textbf{korelacja widzi część
+  prostoliniową i nic poza nią.}}
+\sumitem{30--31}{$Z$ na $\{-1,0,1\}$ oraz $W = Z^{2}$ mają kowariancję
+  \emph{dokładnie} zero i pełną zależność:
+  $\Prob(W = 0) = \frac{1}{\val{p24.tri.n}}$ wobec
+  $\Prob(W = 0 \mid Z = 0) = 1$. Niezależność daje zerową korelację;
+  odwrotnie \dash{} nie.}
+\sumitem{32--33}{$\Cov(aX, bY) = ab\Cov(X,Y)$, a korelacja się nie rusza, więc
+  \textbf{czytanie macierzy kowariancji jak macierzy korelacji to czytanie
+  własnych jednostek} \dash{} a obie wyglądają na ekranie identycznie.}
+\sumitem{34--36}{Programowi~\ref{prog:P07} z jego $2\Cov(p,t)$ oraz
+  Programom \ref{prog:P10} i \ref{prog:P11} z ich macierzą kowariancji należało
+  się słowo, a nie fakty: \textbf{odwołanie w przód, którego fakty da się
+  udowodnić lokalnie, powinno być tak udowodnione}. Ograniczenie korelacji to
+  geometria z Programu~\ref{prog:P05} na innej przestrzeni.}
+\sumitem{37--38}{\textbf{Bernoulli}: $\Ex = p$, $\Var = p(1-p)$, największa
+  przy $p = \num{0.5}$. Wskaźnik jest zmienną Bernoulliego, a jego wartość
+  oczekiwana prawdopodobieństwem, więc kolumna z rzadką klasą niesie prawie
+  żadnej wariancji.}
+\sumitem{39--40}{\textbf{Dwumianowy}: $nq$ oraz $nq(1-q)$, sprawdzone względem
+  każdego wypisanego wyniku. Na $\val{p24.million}$ żądań detektor podnosi
+  $\val{p24.alarms.million}$ alarmów, z czego $\val{p24.real.million}$ jest
+  prawdziwych, a ich iloraz Program~\ref{prog:P23} podaje jako
+  $\val{p23.ppv.pct}$ procent \dash{} prawdopodobieństwo zamienione w liczby,
+  o które ludzie się spierają.}
+\sumitem{41--42}{\textbf{Kategoryczny} jest tym, co produkuje softmax, na mocy
+  własnych dwóch reguł Programu~\ref{prog:P23}, i tym, z czego losuje się
+  token.}
+\sumitem{43--44}{\textbf{Poisson} liczy przybycia w oknie, a
+  \textbf{wykładniczy} mierzy czas oczekiwania między nimi; wykładniczy jest
+  bez pamięci, więc \enquote{już się należy} nigdy nie jest prawdą.}
+\sumitem{45--46}{\textbf{Gauss} po roli: to, czym staje się suma wielu małych
+  niezależnych składników. $\val{p24.gauss.one}$ w obrębie jednego rozrzutu i
+  $\val{p24.gauss.two}$ w obrębie dwóch. Twierdzenie należy do
+  Programu~\ref{prog:P25}.}
+\sumitem{47--48}{Prawie nic w tej dziedzinie nie jest normalne \dash{}
+  częstości tokenów nie są, opóźnienia nie są \dash{} a \emph{średnie} z nich
+  są. Pytaj, o który z tych dwóch obiektów chodzi w deklarowanej normalności.}
+\sumitem{49--51}{\textbf{Próbkowanie tokena jest losowaniem z rozkładu
+  kategorycznego.} Temperatura przeważa i nie może ruszyć $\argmax$
+  (Program~\ref{prog:F05}); każdy token pozostaje możliwy, a edycja jest
+  odwracalna.}
+\sumitem{52--53}{\textbf{Top-$k$ usuwa.} Przy $T = 2$ kasuje
+  $\val{p24.topk.del.t20}$ procent wagi, a potem \enquote{mało prawdopodobne} i
+  \enquote{niemożliwe} są tym samym.}
+\sumitem{54--55}{Te dwa pokrętła \textbf{walczą ze sobą}: to samo $k$ kasuje
+  $\val{p24.topk.del.t05}$ procent przy $T = \num{0.5}$ i
+  $\val{p24.topk.del.t20}$ przy $T = 2$, czynnik
+  $\val{p24.topk.del.ratio}$, bo temperatura przenosi wagę do ogona, a ogon
+  jest tym, co $k$ tnie.}
+\sumitem{56--57}{\textbf{Top-$p$ zostawia liczbę, która jest wynikiem}: to samo
+  $p = \val{p24.topp.mass}$ zostawia $\val{p24.topp.kept.t05}$ tokeny przy
+  $T = \num{0.5}$ i $\val{p24.topp.kept.t20}$ przy $T = 2$, a na przemiataniu
+  od $\val{p24.topp.sweep.lo}$ do $\val{p24.topp.sweep.hi}$.}
+\sumitem{58--59}{$\argmax(\ln p + \text{Gumbel})$ jest \emph{dokładnym}
+  próbkowaniem kategorycznym, a przypadek dwóch tokenów to tożsamość z
+  Programu~\ref{prog:F07} czytana wstecz.}
+\sumitem{60--61}{Przypadek czterech tokenów jest \emph{całkowany}, a nie
+  próbkowany, z dokładnością lepszą niż $10^{-11}$, bo próbka
+  może co najwyżej pokazać, że sztuczka jest w przybliżeniu dobra.}
+\sumitem{62--63}{Waga kasowana przez top-$k$ i częstość, z jaką te tokeny by
+  wygrały, to \emph{ta sama liczba}, i to jest twierdzenie. Obcięcie nie
+  zniechęca tokena; ono go usuwa.}
+\sumitem{64}{Nie ma tu tego, co się dzieje, gdy zmienne losowe się
+  \emph{dodaje}. Wariancje niezależnych się dodają, a średnie koncentrują się
+  w tempie $1/\sqrt{n}$ \dash{} Program~\ref{prog:P25}, skąd bierze się
+  arytmetyka partii z Programu~\ref{prog:P21}.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Rzucamy rzetelną kostką. Zapisz dwie różne zmienne losowe na tej
+  przestrzeni zdarzeń i podaj wartość oczekiwaną każdej z nich.
+  \answerto{Na przykład $X$, liczbę oczek, z $\Ex[X] = \num{3.5}$; oraz
+  wskaźnik parzystego rzutu, o wartości oczekiwanej $\frac{1}{2}$. Ten drugi
+  ilustruje most: jego wartość oczekiwana jest prawdopodobieństwem zdarzenia.
+  Zauważ, że $\num{3.5}$ nie jest ścianką, co jest właśnie tym, że wartość
+  oczekiwana jest liczbą, a nie wynikiem.}
+\item $X$ ma wartość oczekiwaną $10$ i wariancję $4$. Podaj wartość oczekiwaną
+  i wariancję $3X + 5$.
+  \answerto{$\Ex[3X + 5] = 35$ z liniowości, bez potrzebnego warunku.
+  Wariancja to $9 \times 4 = 36$: stała przesuwa każdą wartość i każdą
+  odległość od średniej tak samo, więc skraca się w definicji, a mnożnik jest
+  podnoszony do kwadratu.}
+\item Dwie cechy w raporcie mają kowariancję $\num{0.02}$ i mówią ci, że to
+  pomijalne. Powiedz, czego potrzebujesz, zanim się zgodzisz.
+  \answerto{Obu rozrzutów. Kowariancja niesie jednostki obu wielkości, więc jej
+  rozmiar sam z siebie nic nie mówi: jeśli obie cechy mają rozrzut rzędu
+  $\num{0.01}$, to $\num{0.02}$ jest ogromną korelacją, a jeśli są mierzone w
+  tysiącach, to jest niczym. Poproś o korelację, czyli kowariancję z
+  wydzielonymi obiema jednostkami.}
+\item Ktoś raportuje, że dwa wyniki ewaluacji mają korelację $\num{0.00}$, i
+  wnioskuje, że obie ewaluacje badają rzeczy niepowiązane. Podaj najkrótszy
+  kontrprzykład, jaki umiesz, i powiedz, o co poprosisz zamiast tego.
+  \answerto{$Z$ jednostajne na $\{-1, 0, 1\}$ oraz $W = Z^{2}$: korelacja jest
+  dokładnie zerowa, a $W$ jest wyznaczone przez $Z$. Korelacja widzi wyłącznie
+  część prostoliniową. Poproś o rozkłady warunkowe \dash{} czy podanie jednego
+  wyniku przesuwa rozkład drugiego \dash{} czyli o definicję niezależności z
+  Programu~\ref{prog:P23} i o to, co mierzy Program~\ref{prog:P31}.}
+\item Próbnik jest skonfigurowany z temperaturą i z top-$k$. Temperatura
+  zostaje podniesiona, żeby wyjścia były bardziej urozmaicone, i niewiele się
+  zmienia. Podaj najbardziej prawdopodobne wyjaśnienie w jednym zdaniu.
+  \answerto{Top-$k$ kasuje większość tego, co temperatura przeniosła do ogona.
+  Podniesienie $T$ przesuwa wagę z czubka, a top-$k$ tę wagę potem wyrzuca,
+  więc oba ustawienia działają przeciw sobie: na czterech tokenach tego
+  programu $k = \val{p24.topk.k}$ kasuje $\val{p24.topk.del.t05}$ procent
+  rozkładu przy $T = \num{0.5}$ i $\val{p24.topk.del.t20}$ procent przy
+  $T = 2$.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że $\Var(X + c) = \Var(X)$ dla dowolnej stałej $c$, wprost z
+  definicji.
+  \answerto{$\Ex[X + c] = \Ex[X] + c$ z liniowości, więc każda odległość
+  $(X + c) - \Ex[X + c]$ jest niezmienionym $X - \Ex[X]$, a z nią niezmienione
+  są kwadraty i ich średnia. Wariancja jest zdaniem o rozrzucie, a przesunięcie
+  nie zbliża do siebie żadnych dwóch punktów.}
+\item Pokaż, że $\Var(X + Y) = \Var(X) + \Var(Y) + 2\Cov(X, Y)$, i powiedz, co
+  musi zachodzić, żeby wariancje po prostu się dodawały.
+  \answerto{Rozwiń $\Ex[((X - \Ex X) + (Y - \Ex Y))^{2}]$ i użyj liniowości na
+  trzech składnikach; wyraz mieszany to z definicji podwojona kowariancja.
+  Wariancje dodają się dokładnie wtedy, gdy kowariancja jest zerem, co
+  niezależność gwarantuje i co może zajść także bez niej \dash{} jak pokazują
+  $Z$ i $Z^{2}$. Program~\ref{prog:P25} na tym buduje.}
+\item Zmienna Bernoulliego ma wariancję $p(1-p)$. Przy jakim $p$ jest ona
+  największa i co to mówi o kolumnie etykiet, w której jedna klasa jest rzadka?
+  \answerto{Przy $p = \num{0.5}$, gdzie wynosi $\num{0.25}$; na obu końcach
+  spada do zera. Kolumna, która jest w $99$ procentach jedną klasą, ma
+  wariancję $\num{0.0099}$, więc prawie nic w wyjściu modelu nie da się nią
+  wyjaśnić \dash{} co jest tą samą arytmetyką, która stoi za uwagą
+  Programu~\ref{prog:P23}, że dokładność na niezrównoważonej populacji nic nie
+  mówi.}
+\item Program~\ref{prog:F05} pokazuje, że temperatura nie może ruszyć
+  $\argmax$. Czy top-$k$ albo top-$p$ mogą? Powiedz dlaczego, a potem powiedz,
+  dlaczego nie jest to takie uspokajające, na jakie wygląda.
+  \answerto{Żadne nie może: oba z konstrukcji zostawiają najbardziej
+  prawdopodobny token, więc $\argmax$ przeżywa każde z trzech pokręteł. Nie
+  jest to uspokajające, bo $\argmax$ nigdy nie był tym, co się zmienia
+  \dash{} zmienia się zbiór tokenów, które w ogóle da się wylosować, a
+  czytanie czubkowego tokena, żeby sprawdzić ustawienie próbkowania, to
+  czytanie tej jednej wielkości, którą wszystkie trzy zostawiają w spokoju.}
+\item Przypuśćmy, że stosujesz top-$k$ \emph{po} dodaniu szumu Gumbela, a nie
+  przed. Powiedz, z jakiego rozkładu teraz losujesz i czy da się uzgodnić obie
+  kolejności.
+  \answerto{Obcięcie najpierw czyni skasowane tokeny niemożliwymi; dodanie
+  szumu najpierw i obcięcie zaburzonych wyników zostawia je zdolnymi do
+  wygranej, dokładnie tak często, jak mówi ich pierwotne prawdopodobieństwo, bo
+  Gumbel-max odtwarza $p$. Ta druga kolejność nie jest więc wcale próbnikiem z
+  obcięciem \dash{} jest próbnikiem bez obcięcia z dodatkowymi krokami, i żaden
+  wybór $k$ ich nie uzgodni poza $k$ równym rozmiarowi słownika.}
+\end{furtherproblems}

@@ -1,0 +1,4 @@
+flowchart LR
+  A["a softmax hands you k weights<br/>that are not negative and add to one"]
+  A --> B["temperature divides every score by T<br/>and renormalises what comes out"]
+  B --> C["top-k and top-p set some of those<br/>weights to zero and renormalise the rest"]

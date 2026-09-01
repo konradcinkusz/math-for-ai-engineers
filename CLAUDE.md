@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P23 written, both editions \dash{} Parts I to VI entire, and Part VII begun.** P24–P34 are stubs carrying their briefs | 11 of 47 |
+| Programs | **F1–F13 and P1–P24 written, both editions \dash{} Parts I to VI entire, and Part VII well begun.** P25–P34 are stubs carrying their briefs | 10 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1027 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1043 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 864 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 875 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1059 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1076 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 893 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 901 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,22 +93,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **11 of 47 programs are stubs**, in each language. This is the whole of the
+- **10 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1120 computed values, all referenced, all present, plus the committed console
+- 1152 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 216 Mermaid sources, all rendering
-- 60 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 222 Mermaid sources, all rendering
+- 62 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **91 orphan-tail pages: 23 · 27 · 20 · 21** across `main-en`, `main-pl`,
+- **92 orphan-tail pages: 23 · 28 · 20 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
-  **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one and
-  **P23 none**
+  **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
+  **P23 none** and P24 one
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -137,16 +137,19 @@ what was there before.
   This is the second ledger that is reported rather than gated, and like the
   first it must not quietly go away. **When the count goes up, that is the
   signal.**
-- **Elicitation rate: 52% of the book's frames put a question to the reader**,
+- **Elicitation rate: 51% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
   F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
   **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22** and
-  **53% in P23** \dash{} P23 is the highest outside Part I and the first
-  anywhere to pass the book's own rate, and P13, P15 and P17 are the only
-  others to reach it.**
+  **53% in P23** and **46% in P24** \dash{} P23 is the highest outside Part I
+  and the first anywhere to pass the book's own rate, and P13, P15 and P17 are
+  the only others to reach it.**
+  **P24 is the first program whose rate is visible in its frame count**: nine
+  of its sixty-four frames exist because the draft was raised from 36%, which
+  is the elicitation ledger's cost measured in frames rather than in pages.
   Part III is climbing because the rate is now designed in rather than measured
   afterwards. The book's own figure falls as Part III grows, because every
   Part III program sits below Part I's rate \dash{} which is why the per-program
@@ -456,7 +459,7 @@ output differs:
 | `\dash` | spaced em dash | spaced półpauza |
 | `\enquote{}` | British single quotes | Polish quotation marks |
 | `\intcc{a}{b}` | `[a,b]` | `[a,b]` — *not* `⟨a,b⟩`; flagged to the reader at the first interval |
-| `\Var` `\Ex` | `Var` `E` | `Var` `E` — with a **mandatory** notation box for `D²(X)` in P24 |
+| `\Var` `\Ex` | `Var` `E` | `Var` `E` — the mandatory notation box for `D²(X)` and `M(X)` is P24 §3, and Appendix B points at it |
 
 Three rows are genuine splits rather than clean divergences, and are settled in
 `notes/03-bilingual-and-notation.md` §2.8 so nobody re-litigates them from a
@@ -7374,6 +7377,272 @@ Traps 230 to 236 added.
 - Frame numbers mapped after writing and again after the ten conversions:
   sections landed at `1--8 / 9--15 / 16--21 / 22--30 / 31--37 / 38--47`.
 
+### Program P24 pass, August 2026
+
+**Sixty-four teaching frames, sixty-six printed, both editions**, against a
+brief that projected sixty. **It is the first program in eighteen to come in
+over its estimate, and the reason is measurable rather than mysterious**: the
+finished draft was fifty-five frames, in line with the seventeen before it, and
+raising the elicitation rate from 36% to **46%** added nine.
+
+That is the first time the elicitation ledger's cost has been visible in the
+frame count. Program~\ref{prog:P04}'s pass priced three cues at two pages;
+this one prices ten percentage points at nine frames, on a program whose
+sections 2 to 4 are derivations and therefore have fewer places to stop and
+ask. Both halves are worth carrying: **the brief's estimate is a planning
+figure for content, and the rate is paid in frames on top of it.**
+
+#### The issue asked this program to repay a debt that is not its to repay
+
+Issue \#38's \enquote{Done when} list says \emph{minibatch noise revisited,
+repaying P21's forward reference}. Four sources say otherwise and they agree
+with each other: Program~\ref{prog:P21}'s own rigour box names
+Program~\ref{prog:P25}, this file names P25, P25's brief owns
+\enquote{variances of independent quantities add; averages concentrate} in as
+many words \dash{} and **P21 has already measured the $1/B$ law and the
+$\sqrt{B}$ spread itself**, over twenty thousand values and four thousand
+trials per batch size.
+
+So what P21 borrowed was never the rate. It was a **definition**, given in its
+rigour box as one sentence and pointed here. That is what is returned: the
+definition, computed on P21's own ten-number population, by both of its routes,
+exactly over fractions, and gated against P21's committed mean. The rate stays
+Program~\ref{prog:P25}'s, and section 3 says so.
+
+Ninth pass to find a claim about another program that needed fixing, and the
+second \dash{} after Program~\ref{prog:P09}'s own brief \dash{} where the
+wrong claim was in a **contract document** rather than in a frame. The
+manifest brief is right and the issue's checklist is the stale copy, which is
+the same shape as the \emph{No Quiz (Foundation-only)} box that P04 and P14
+each found false.
+
+#### Four claims about other programs, and three of them were wrong
+
+The recurring class, three times in one pass, all caught by opening the files
+rather than by any gate.
+
+- **The book does not state the Cauchy--Schwarz inequality anywhere.** A rigour
+  box said Program~\ref{prog:P05} states it for the dot product. It does not,
+  and neither does anything else. What the book *does* have is
+  Program~\ref{prog:F09}'s $a \cdot b = \lVert a\rVert \lVert b\rVert
+  \cos\theta$, and a cosine is never outside $\intcc{-1}{1}$ \dash{} so the
+  bound on a correlation is F09's geometry read on a different space, which is
+  both true and a better sentence.
+- **Program~\ref{prog:P19} could not have written $\Ex[f(X)] \ge f(\Ex[X])$**,
+  because the expectation was not defined until this program. It states Jensen
+  for \emph{means} \dash{} the mean of the squares is at least the square of
+  the mean. The correction improves the frame rather than merely fixing it: the
+  expectation defined here is the same object, so P19's sentence now reads in
+  the new notation, which is what defining the object bought.
+- **The exponential moving average is Program~\ref{prog:F04}'s, not
+  Program~\ref{prog:P20}'s**, and F04 does no probability at all, so
+  \enquote{its expectation is read term by term} was wrong twice over. Replaced
+  with an example from this program's own section 5.
+- And one **statement of first occurrence** removed \dash{} *this book has
+  been calling it the spread since Program~P05* \dash{} which is the class this
+  file forbids outright, because nothing can check it and it decays silently.
+  It now names P05 and P21 as places the word is used, which is checkable.
+
+#### The transcript was about to be a fabricated console block, again
+
+`[round(v, 4) for v in top_k(PROBS[2.0], 2)]` was written into the file as
+`0.0000` for the two truncated tokens, because the rounding had been applied to
+the script's \emph{output} with a format string rather than written into the
+listing's own code. A session prints `0.0`.
+
+That is Program~\ref{prog:P19}'s finding exactly, one program later, and the
+fix is the same: `repr()` of the rounded list, so the printed line and the
+printed result cannot come apart. Extracted from the finished PDF and run, it
+reproduces to the character.
+
+#### The headline: what each of the three knobs destroys
+
+Program~\ref{prog:F05} settled temperature \dash{} a strictly increasing
+function keeps the order of a list, so it cannot move the $\argmax$ \dash{} and
+committed the same four-token distribution at three temperatures. This program
+continues that worked example rather than inventing one, gated against all
+twelve of F05's committed probabilities, and asks the question F05 could not:
+what does each knob \emph{destroy}?
+
+- **Temperature reweights.** Every token stays possible and the edit is
+  reversible.
+- **Top-$k$ removes.** At $T = 2$ with $k = 2$ it deletes
+  $\val{p24.topk.del.t20}$ per cent of the weight, after which
+  \enquote{unlikely} and \enquote{impossible} are the same thing.
+- **And the two fight, measurably.** The same $k$ deletes
+  $\val{p24.topk.del.t05}$ per cent at $T = \num{0.5}$ and
+  $\val{p24.topk.del.t20}$ at $T = 2$ \dash{} a factor of
+  $\val{p24.topk.del.ratio}$, from a knob nobody touched, because temperature
+  moves weight into the tail and the tail is what $k$ cuts. **Raising the
+  temperature for variety and then truncating at a small $k$ spends most of
+  what the temperature bought**, and nothing in a sampling configuration
+  records that the two are coupled.
+- **Top-$p$ keeps a count that is an outcome rather than a setting.** The same
+  $p$ keeps $\val{p24.topp.kept.t05}$ tokens at $T = \num{0.5}$ and
+  $\val{p24.topp.kept.t20}$ at $T = 2$, and between
+  $\val{p24.topp.sweep.lo}$ and $\val{p24.topp.sweep.hi}$ of the four over a
+  $\val{p24.topp.sweep.n}$-point sweep.
+
+#### The Gumbel-max trick, and why it is integrated rather than sampled
+
+$\argmax(\ln p + G)$ with $G$ standard Gumbel has \emph{exactly} the
+distribution $p$. **The two-token case is already in the book**: the difference
+of two Gumbels is logistic, so the first wins with probability
+$\sigma(\ln p_1 - \ln p_2)$, and Program~\ref{prog:F07} proved that $\softmax$
+on two scores \emph{is} $\sigma$ of their difference. The trick's simplest case
+is F07's frame read backwards, and the script recomputes that identity over an
+$81 \times 81$ grid rather than remembering it.
+
+The four-token case is **integrated, not sampled**, and the frame says why: a
+sampled check produces an estimate with an error bar, and \enquote{it agreed
+within the error bar} demonstrates that the trick is approximately right, which
+is the reading the section exists to refuse. Integration reproduces all four
+probabilities at all three temperatures to $\num{1.1e-13}$, against a committed
+ceiling of $10^{-11}$.
+
+**Two things about that integral are worth keeping.** The range was chosen
+rather than guessed \dash{} the Gumbel tail beyond $g$ is under $e^{-g}$, so a
+first draft's $22$ left $\num{3e-10}$ outside and the four answers summed to
+$\num{0.9999999989}$. And **more steps made it worse**: $\num{2.1e-13}$ at
+200,000 against $\num{1.1e-13}$ at 100,000, because past a point the rounding
+accumulated over the sum grows faster than Simpson's error falls. That is
+Program~\ref{prog:P02}'s subject arriving in a quadrature.
+
+#### The two halves meet on one number, and it is emitted once
+
+At $T = 2$ top-$k$ deletes $\val{p24.topk.del.t20}$ per cent of the weight, and
+those same two tokens win the noisy $\argmax$ $\val{p24.topk.del.t20}$ per cent
+of the time. **The same figure, and the equality is the theorem** rather than a
+coincidence: Gumbel-max reproduces $p$ exactly, so a token's win rate is its
+probability and its probability is what truncation deletes.
+
+So the script asserts the two are equal and the page quotes one value. Printing
+it twice under two names would have been Program~\ref{prog:F08}'s defect
+\dash{} two numbers that look like one \dash{} in the one place where being the
+same number is the point.
+
+#### An assertion refuted its own draft, for the thirteenth pass running
+
+The draft asserted that top-$k$ deletes about the same fraction at every
+temperature. It failed, and the failure is the section: what is asserted now is
+the **ordering**, which is structural, rather than the three figures, which
+move with the logits.
+
+#### P07's undeclared forward reference is closed, and the rule is settled
+
+This file has carried it as outstanding since the P10 pass: P07 prints
+$\operatorname{Cov}(p, t)$ and $\operatorname{Var}(t)$ in its headline identity
+and declares neither, and whoever wrote P24 was nominated to fix it and to
+settle whether the rule is \emph{declare anything not yet defined} or
+\emph{declare anything a payoff depends on}.
+
+**It is neither, quite. The rule is: declare anything the reader must be able
+to check.** P07's identity is *stated in terms of* the two, so a reader who has
+not met them cannot verify the line the whole section rests on \dash{} which is
+the bar Programs \ref{prog:P18} and \ref{prog:P22} were held to, and it is why
+P07 needed the declaration while a merely-unnamed object would not. One clause
+in P07's Learning outcomes, in both editions, on the P21 pattern.
+
+Programs \ref{prog:P10} and \ref{prog:P11} needed the opposite treatment and
+had already taken it: they declared the covariance matrix and then proved its
+two facts where they stood. **A forward reference whose facts can be proved
+locally should be**, and section 4 says so as a rule rather than as an
+anecdote.
+
+#### Also
+
+- Traps 237 to 244 added, and **items 29 and 30 corrected**: both pointed at
+  P23 and both are this program's, which is the P7-insertion off-by-one in the
+  range Program~\ref{prog:P10}'s pass deliberately left unswept. Item 29's
+  second owner was also wrong \dash{} mutual information is
+  Program~\ref{prog:P31}'s, not P30's. Each was settled against the destination
+  brief rather than by assuming the off-by-one.
+- **The mandatory notation box is in section 3**: $\Var(X)$ against $D^{2}(X)$
+  and $\Ex[X]$ against $M(X)$. Appendix~B's pointer was moved here by the P23
+  pass on the strength of this program's brief, so the pointer now closes.
+- Three cross-programme gates, all of Program~\ref{prog:P12}'s third kind
+  \dash{} the same worked example continued: P21's population and its mean,
+  P23's alarm rate and its positive predictive value, and F05's twelve
+  committed probabilities.
+- One value deliberately not emitted twice, and two emitted values cut because
+  the frames quote the two ends of a sweep rather than its middle.
+
+#### An overfull box, and clearing it made the cue ledger worse
+
+Frame~1 quotes Program~\ref{prog:F13}'s unfinished sentence, so it carries
+$\int x\,p(x)\,\mathrm{d}x$ inline \dash{} one unbreakable maths span with a
+dash-bracketed clause either side of it. In Polish that gave a
+$\num{12.0}$ pt hbox and in English nothing, which is
+Program~\ref{prog:F06}'s finding exactly: an inline formula of any length is a
+latent overfull box on a measure or an installation you are not looking at.
+The recorded fix worked without a detour \dash{} **put it in a display** \dash{}
+and it reads better, because the integral is the thing the frame is about.
+
+**And the fix moved the cue ledger against itself.** The display lengthens
+frame~1, so every break in the program after it shifts: the build came back
+with the box gone, `main-pl` two pages longer, and its orphaned cues gone from
+one to **three**. That is this file's random walk with a new cause \dash{}
+previous instances were a trim or a lengthening aimed *at* a cue, and this was
+a fix for an unrelated defect three hundred lines upstream. **Any edit near the
+top of a program re-rolls every cue in it.**
+
+Round two lengthened all four offending frames \dash{} 6, 24, 28 and 58, in
+both editions \dash{} and all four builds came back clean. Tenth confirmation
+of Program~\ref{prog:F06}'s two-sided rule, and it has still never failed.
+Every added paragraph earns its place: that the expectation's sum runs over the
+sample space rather than over the distinct values, so an outcome repeating a
+value counts twice; that the book keeps the variance as well as its root
+because the variance is the one that **adds**, which is
+Program~\ref{prog:P25}'s subject; that dividing a covariance by both spreads
+cancels the units, so two correlations from unrelated pairs sit on one scale;
+and that the Gumbel noise goes onto the $\ln p_i$ and never onto the $p_i$,
+which is the half people misremember.
+
+#### Rule 2, and the figures
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P24.1 space-to-number | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P24.2 two-summaries | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+| P24.3 three-knobs | 657 / 657 | 5.98 | 6.71 | 6.71 | 7.62 | 7.62 |
+
+All six at mermaid's wrap cap on the first render, at three ranks. Written
+against the frames **above** them before rendering, which is
+Program~\ref{prog:P22}'s rule, and this is the first pass in seven where the
+last node of a three-rank chain needed no correction afterwards \dash{} because
+the rule was applied while drawing rather than after a build.
+
+Measured on the page in all four builds. Figures 1 and 2 both sit above the
+question that follows them and neither answers it, which is the P04/P07 case
+for the eleventh time: figure 1 carries what frames 1 to 10 state in full and
+the question below asks whether linearity needs independence, which appears
+nowhere in it; figure 2 carries the units-squared reading that frames 18 to 24
+deliver and the question below asks for a Bernoulli's two summaries. Figure 3
+sits in the closing frame with nothing after it.
+
+| build | fig 1 / next question | fig 2 / next question | fig 3 |
+|---|---|---|---|
+| `main-en` | 914 / 915 | 925 / 925 | 935 |
+| `main-pl` | 928 / 929 | 940 / 940 | 950 |
+| `main-en-a4` | 769 / 769 | 777 / 778 | 786 |
+| `main-pl-a4` | 777 / 777 | 786 / 786 | 794 |
+
+#### Layout, and the ledgers
+
+The multiset came back element for element to the baseline in all four builds
+\dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with zero overfull vboxes, no
+stranded openers, no stranded headings and **no orphaned cues** after the two
+rounds above. **One orphan tail added, in `main-pl`**: 23, 28, 20, 21 against
+the pre-P24 23, 27, 20, 21.
+
+Pages 1059 / 1076 / 893 / 901, from 1027 / 1043 / 864 / 875 \dash{} thirty-two
+and thirty-three in the trade format, which is what a sixty-four-frame program
+costs.
+
+Frame numbers mapped after writing and again after the elicitation
+conversions: sections landed at
+`1--10 / 11--17 / 18--25 / 26--36 / 37--48 / 49--64`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -7491,10 +7760,14 @@ is now that each is stated in the owning program's Learning outcomes with a
 pointer:
 
 - **P21** (stochastic optimisation) needs random variables and variance from
-  **P24–P25**, two parts later. P25 revisits minibatch noise once the machinery
-  exists.
+  **P24–P25**, two parts later. **Half discharged**: P24 returned the
+  definition, on P21's own population and gated against its committed mean, and
+  said in as many words that the $1/B$ rate is P25's. P25 closes the rest.
 - **P10** and **P11** use the covariance matrix, defined in **P24**. They need
-  two facts from it — symmetric, positive semi-definite — and say so.
+  two facts from it — symmetric, positive semi-definite — and say so, **and
+  both prove them where they stand**, so the pointer was always an attribution
+  rather than a debt. P24 records that as the rule: a forward reference whose
+  facts can be proved locally should be.
 - **P18** (matrix calculus) carries the book's most reused derivation, the
   softmax–cross-entropy gradient, and cross-entropy is not defined until
   **P30**. P18 gives it a definitional frame; P26 and P30 each return to it.
@@ -7508,18 +7781,16 @@ pointer:
   call, but it may not be left undeclared** — the brief now says so.
 
 - **P07** (tensors and shapes) prints $\operatorname{Cov}(p, t)$ and
-  $\operatorname{Var}(t)$ in its headline broadcasting identity and declares
+  $\operatorname{Var}(t)$ in its headline broadcasting identity and declared
   neither; both are defined in **P24**. Found by the same check that found the
-  fifth, and **it is in a merged program**, which is why it is recorded here as
-  outstanding rather than fixed inside a pass about something else. It is
-  milder than P18's and P22's \dash{} P07 never asks the reader to know what a
-  covariance *is*, because the sentence it needs is delivered in the frame
-  \dash{} but the identity is stated in terms of the two, so the line the
-  section rests on is not checkable by a reader who has not met them. The fix
-  is one clause in P07's Learning outcomes on the P21 pattern. Whoever takes it
-  should also settle whether the rule is *declare anything not yet defined* or
-  *declare anything a payoff depends on*: P07 is the first case where those two
-  answers differ.
+  fifth, carried as outstanding because it is in a merged program, and
+  **closed in the P24 pass** \dash{} one clause in P07's Learning outcomes, in
+  both editions, on the P21 pattern. It also settled the rule the entry was
+  left open on, and the answer is neither of the two that were offered:
+  **declare anything the reader must be able to check.** P07's identity is
+  *stated in terms of* the two, so a reader who has not met them cannot verify
+  the line the section rests on, which is the bar P18 and P22 were held to; an
+  object merely used and not named would not need it.
 
 Anything else is a dependency error, not a forward reference. **The graph is now
 machine-checkable:** every program in `tools/programs.json` carries `deps`, so a
@@ -7639,49 +7910,52 @@ clone instead.
 
 ## What is left
 
-1. **Eleven programs, and Parts I to VI plus P23 are complete.** F1 to F13 and
-   P1 to P23, both editions. Part VII, probability and statistics, is the block
-   in progress: five of its six remain, P24 to P28.
+1. **Ten programs, and Parts I to VI plus P23 and P24 are complete.** F1 to
+   F13 and P1 to P24, both editions. Part VII, probability and statistics, is
+   the block in progress: four of its six remain, P25 to P28.
 
-   **P24 is next** \dash{} *Random variables and distributions*, sixty frames
-   planned, deps `P23`, `F7` and `F13`. Read those three before believing the
-   estimate, because sixteen of the last seventeen programs came in under
-   theirs. **P23** now owns the measure, conditioning, Bayes and both kinds of
-   independence, so a distribution is a weight function on a space the reader
-   already has; **F13** owns the density, the fact that its height is a rate
-   rather than a probability, and the *shape* of a weighted average \dash{} it
-   writes $\int x\,p(x)\,\mathrm{d}x$, says it has a name and declines to use
-   it, which is exactly the sentence P24 opens by cashing; **P07** owns shapes,
-   which is what makes \enquote{a categorical distribution over the vocabulary}
-   a rank-1 array with a named axis rather than a metaphor.
+   **P25 is next** \dash{} *Sums of random variables: the central limit
+   theorem, concentration and Monte Carlo*, fifty-five frames planned, deps
+   `P24`, `F4` and `P19`. Read those three before believing the estimate:
+   eighteen programs have now been written and seventeen came in under theirs,
+   the one exception being P24, which exceeded its estimate by four frames and
+   did so because its elicitation rate was raised rather than because it had
+   more content.
 
-   **Its payoff is that sampling a token is a draw from a categorical
-   distribution**, and that temperature, top-$k$ and top-$p$ are three ways of
-   editing that distribution before drawing \dash{} distribution surgery, with
-   what each destroys. **F05 has already measured the temperature half**: a
-   strictly increasing function cannot move the argmax, so temperature changes
-   how often the others are drawn and never which is most likely. So P24 owes
-   the other two and the frame that says what they have in common.
+   **P24 leaves this program more than any predecessor has left one.** It owns
+   the random variable, both summaries, the covariance and the correlation, and
+   it says in three separate places \dash{} section 3's loan-closing frame, the
+   closing frame, and the rigour box in section 1 \dash{} that *adding* random
+   variables is P25's subject and that the $1/B$ and $1/\sqrt{n}$ rates belong
+   there. **Program~P21 has already measured both**, over twenty thousand
+   values and four thousand trials per batch size, and its rigour box points
+   here. So P25 does not have to demonstrate the rate; it has to *derive* it,
+   which is a better possession and a shorter one. **F04** owns the geometric
+   sequence and the sigma; **P19** owns Jensen and convexity.
 
-   The brief also asks for the **Gumbel-max trick** \dash{} so the reader can
-   see that `argmax(logits + gumbel)` is exact categorical sampling rather than
-   an approximation \dash{} for the Gaussian introduced **through its role
-   rather than its formula**, and for expectation as the linear operator that
-   makes almost every later derivation short. That last one is the load-bearing
-   piece: three merged programs already lean on it. **P24 also carries the
-   `Var(X)` / `D^2(X)` notation box, and it is mandatory** \dash{} Appendix B
-   points here for the equivalence, and the P23 pass corrected that pointer
-   from P23 on the strength of this brief's promise.
+   **Its payoff is the $1/\sqrt{d_k}$ in attention, derived rather than
+   quoted**: a dot product of two $d_k$-dimensional vectors with independent
+   unit-variance entries has variance $d_k$, so its spread grows as
+   $\sqrt{d_k}$; feed that into a softmax and it saturates. **Three written
+   programs have already built every piece of that argument and each says so:**
+   F07 measured the saturation and its warning box refuses to state the
+   compounding; P02's §3 names the $1/\sqrt{d_k}$ factor and hands the
+   derivation here by name; P18 owns the softmax Jacobian, so *the gradient
+   dies* is a statement the book can already write down rather than assert. The
+   scaling is a variance correction and nothing else.
 
-   **And P24 discharges two of the book's declared forward references at once.**
-   Program~P21's variance and Program~P07's undeclared
-   $\operatorname{Cov}(p, t)$ and $\operatorname{Var}(t)$ are both defined here.
-   P07's is still recorded as outstanding rather than fixed, and whoever writes
-   P24 is the right person to close it: the fix is one clause in P07's Learning
-   outcomes on the P21 pattern, and it needs the deciding of *declare anything
-   not yet defined* against *declare anything a payoff depends on*, which P07 is
-   the first case to separate.
+   The brief also asks for **Monte Carlo error as the same rate** \dash{} four
+   times the samples to halve an error bar, which prices every evaluation run
+   in the book \dash{} and carries the curriculum review's addition:
+   **signal propagation at initialisation**, the variance through a linear
+   layer as fan-in times weight variance, and where He initialisation's factor
+   of two comes from. That last is the single most common cause of a run that
+   never starts and nothing in the book explains it yet.
 
+   **And it is the program that discharges the book's oldest declared forward
+   reference.** Program~P21's rigour box names P24 for the definition and P25
+   for the rate; P24 returned the definition in this pass and said in as many
+   words that the rate is not its to return. P25 closes it.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -7725,11 +7999,15 @@ clone instead.
    thirty-five**, because P15 and P05 had left it only the multiplier; and
    **P23's fifty-five against forty-seven**, the smallest shortfall in a long
    while, because its ground was genuinely unspent and its neighbours supplied
-   *objects* rather than machinery or content.
+   *objects* rather than machinery or content. **P24 broke the run: sixty
+   against sixty-four**, and for a reason that is not about content at all
+   \dash{} its draft came in at fifty-five, in line with the seventeen before
+   it, and nine frames were added raising the elicitation rate from 36% to 46%.
    **A brief's frame estimate is a planning figure from before its neighbours
-   were written.** It is not a target \dash{} and the seventeen-for-seventeen
-   record above is also the reason the programs cannot be written in parallel:
-   each one is shaped by what the ones before it turned out to spend.
+   were written**, and the elicitation rate is paid in frames on top of it. It
+   is not a target \dash{} and the record above is also the reason the programs
+   cannot be written in parallel: each one is shaped by what the ones before it
+   turned out to spend.
 2. **The ten measurements.** All specified, nine free. E9 — logit variance and
    softmax entropy with and without the `1/√d_k` scaling — is the one to run
    first: it costs nothing and it converts the book's central derivation from an

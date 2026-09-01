@@ -1,0 +1,4 @@
+flowchart LR
+  A["softmax daje k wag, ktore nie sa<br/>ujemne i sumuja sie do jednego"]
+  A --> B["temperatura dzieli kazdy wynik przez T<br/>i normalizuje to, co wychodzi"]
+  B --> C["top-k i top-p zeruja czesc tych wag<br/>i normalizuja reszte"]
