@@ -915,6 +915,10 @@ Each cost time; none is obvious from its error message.
   before the `\vbox to` that balances the final page. The switch that is
   actually read is **`\raggedcolumns`**, and multicol's default,
   `\flushcolumns`, is exactly the rigid setting the paragraphs above diagnose.
+  **Retired outright in the P24 pass**: the index's last page is no longer
+  balanced at all, which is what `multicols*` does and what an index does in
+  print, so the `\vbox to` that emitted every one of these complaints does not
+  run. See that pass note; the constants above are history.
   It also explains the one detail nobody could account for: the complaint was
   always on the index's **last** page, because that is the only page multicol
   *balances* rather than splits, and a balanced column under `\flushcolumns`
@@ -7691,16 +7695,64 @@ it cost nothing; it simply was not this one.
   in this pass both happened to go in the same push, which is the only reason
   it cost one cycle rather than three.
 
-One thing found and deliberately not acted on. `main-en-a4` also carried a
-$\num{1.0}$ pt overfull vbox in the index, which is the recorded class after
-`\raggedcolumns` took it from $\num{8.3}$ pt. It is **left for the next
-measurement**, because these fixes are three hundred pages upstream of the
-index and re-roll its pagination, and this file's own rule is that a
-pagination measurement does not survive a change to the material being
-paginated. What the search turned up is written into `preamble.tex` beside the
-patch: **`\multicolovershoot`**, multicol's own per-column allowance, one
-value per column rather than one per entry \dash{} which is the bounded knob
-Program~\ref{prog:P19}'s pass went looking for and did not find.
+#### The index's overfull vbox, retired at the mechanism rather than tuned
+
+`main-en-a4` also carried a $\num{1.0}$ pt overfull vbox in the index, and it
+survived every fix above \dash{} **reported as $\num{0.98073}$ pt on three
+consecutive heads**, to the ten-thousandth of a point, across edits that added
+and then removed two pages of body text. That invariance is the first useful
+half: the index starts on a fresh page and its entries did not change, so its
+residual does not move when the body does. It was the one pagination number in
+this book that could be swept as a single variable, and every earlier pass
+that tried had been fighting body-text noise as well.
+
+**Swept once, it failed in the recorded direction.** Raising `theindex`'s
+`\parskip` shrink from $1$ to $\num{1.5}$ pt \dash{} the knob five passes had
+used \dash{} took this container from **no complaint at all to
+$\num{2.28874}$ pt**, because the extra shrink let the balancer target a
+smaller height, fit the index into one page fewer, and hand the last page
+more. That is Program~\ref{prog:P19}'s non-monotonicity arriving from the
+other machine, and it is the fifth demonstration that **no single value of
+that constant serves both installations.**
+
+**And the knob recorded for it one commit earlier does not exist.** The note
+called `\multicolovershoot` \enquote{the bounded knob P19's pass went looking
+for}. Asked properly \dash{} which is what that same note said to do \dash{}
+it is a compensating pair: multicol adds it to `\splittopskip` while
+*splitting* and subtracts exactly the same amount while *balancing*, so its
+net effect on the balanced last page is zero. Its sign is the opposite of its
+name, too. pdftex, asked in five lines: a `\vbox to 20pt` round a 25 pt rule
+is $\num{5.0}$ pt overfull with no shrink, $\num{2.0}$ pt with `minus 3pt`,
+and $\num{8.0}$ pt with `minus -3pt`. Negative shrink makes an overfull box
+worse.
+
+**So the fix is structural, it is three tokens, and it retires the whole
+class.** Reading multicol's own `\@namedef{multicols*}`, the starred form is
+the unstarred one with `\balance@columns@out` redefined to ship the final page
+through the **ordinary** column output routine. The balancing `\vbox to` never
+happens, so the complaint has no mechanism left rather than a wider tolerance
+\dash{} which matters, because that box is the one multicol pins `\vfuzz\z@`
+for, and `\maxbalancingoverflow` runs afterwards and only decides whether to
+log \enquote{Balanced column too large}. `imakeidx` opens the environment
+itself and offers no hook, but `\balance@columns@out` is read at
+`\end{multicols}`, so setting it in the body is enough and it is local.
+
+It is also what an index looks like in print: the last page's first column
+runs to the foot and the second ends where the entries end. `\raggedcolumns`
+stays, because `\ifshr@nking` is read by `\multi@column@out` as well as by the
+balancer, so it still governs the page that is now doing the work. Locally the
+change costs nothing \dash{} same page counts, same multiset, same ledgers.
+
+**The rule this earns is one this file already had, paid for twice in one
+pass.** The `\code{}` inference was written from the shape of the evidence and
+was wrong; the `\multicolovershoot` note was written from the shape of the
+source and was wrong. Both were corrected by an instrument costing
+seconds \dash{} one line of tool output, and a five-line file put to TeX.
+**A reading of a mechanism is a hypothesis, and this book's own rule is that a
+hypothesis stays labelled as judgement until it is run.** That applies to the
+comments in `preamble.tex` exactly as it applies to the frames \dash{} and it
+is worth noticing that both wrong readings were confident, specific, and of
+the right general class.
 
 #### Layout, and the ledgers
 

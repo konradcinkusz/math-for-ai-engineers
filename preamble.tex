@@ -2532,8 +2532,44 @@
 %  \raggedbottom and the whole history above becomes relevant again. No
 %  \ifcsname guard: this book does not pass that option, and a guard would
 %  silently install a setting that has already been measured as inert.
+\makeatletter
+% DO NOT BALANCE THE INDEX'S LAST PAGE, which is the only page that has ever
+% complained. Every overfull vbox this book has seen in an index came from one
+% \vbox to\dimen@ inside multicol's \balance@columns, and multicol pins
+% \vfuzz\z@ immediately before it, so nothing settable can widen its
+% tolerance; \maxbalancingoverflow runs afterwards and only decides whether to
+% log "Balanced column too large". Five passes tuned constants against that box
+% -- \parskip shrink swept 0.5 to 5.5, a \textheight reduction, \vfuzz,
+% \raggedbottom -- and no single value serves both of this project's TeX
+% installations, because the response is not monotonic: more shrink lets the
+% balancer pack a page fewer and hands the last page more.
+%
+% multicols* is the answer and it is three tokens. Reading multicol.sty's own
+% \@namedef{multicols*}, the starred form is the unstarred one with
+% \balance@columns@out redefined to ship the final page through the ORDINARY
+% column output routine. So the balancing \vbox to never happens, and the
+% complaint has no mechanism left rather than a wider tolerance. imakeidx opens
+% the environment itself and offers no hook, but \balance@columns@out is read
+% at \end{multicols}, so setting it inside the body is enough and it is local.
+%
+% This is also what an index looks like in print: the last page's first column
+% runs to the foot and the second ends where the entries end. \raggedcolumns
+% stays -- \ifshr@nking is read by \multi@column@out as well as by the
+% balancer, so it still governs the page that is now doing the work.
+\newcommand\mfanobalancelastindexcolumn{%
+  \@ifundefined{multi@column@out}{}{%
+    \def\balance@columns@out{\multi@column@out \penalty-\@Mvi}}}
+\makeatother
+
 \apptocmd{\theindex}{%
   \raggedcolumns\raggedright
+  \mfanobalancelastindexcolumn
+  % Left at 1pt. Raising it to 1.5 was tried in the P24 pass against a CI
+  % residual of 0.98073pt and measured WORSE here: this container went from no
+  % complaint at all to 2.28874pt, because the extra shrink let the balancer
+  % target a smaller height, fit the index into one page fewer, and hand the
+  % last page more. That is the non-monotonicity P19 recorded, arriving from
+  % the other machine, and it is why the fix above is structural instead.
   \setlength{\parskip}{0pt plus 0.3pt minus 1pt}%
   % book.cls sets \indexspace to 10pt plus 5pt minus 3pt. It appears three or
   % four times a page whatever the entries are, so extra shrink here is
@@ -2542,17 +2578,31 @@
   % shrink above that lets the glue go negative and closes two entries up.
   \renewcommand\indexspace{\par \vskip 10pt plus 5pt minus 9pt\relax}}{}{%
   \PackageWarning{mfabook}{Could not patch theindex for ragged setting}}
-% NOT SET, AND WRITTEN DOWN SO THE NEXT PASS DOES NOT HAVE TO FIND IT AGAIN.
-% multicol has its own parameter for how much a balanced column may miss its
-% target height by: \multicolovershoot, a \newdimen defaulting to 0pt, used
-% inside the very \vbox to that produces the complaint (multicol.sty, in
-% \balance@columns, right after the \vfuzz\z@ that makes \vfuzz inert). Unlike
-% \parskip shrink it is ONE value per column rather than one per entry, so it
-% is the bounded knob P19's pass went looking for and did not find. It is left
-% at its default here because the residual it would absorb has never been
-% measured on this container -- only on CI -- and because it is spelt with
-% negative glue components (\@minus-\multicolovershoot), which is worth asking
-% TeX about with a ten-line file before believing any reading of it.
+% \multicolovershoot IS NOT A KNOB HERE, AND THIS IS THE MEASUREMENT THAT SAYS
+% SO -- written down because the name is inviting and the next pass will find
+% it too. multicol.sty uses it TWICE, with opposite signs:
+%
+%   \splittopskip \topskip \@plus\multicolundershoot \@minus\multicolovershoot
+%   ... \vbox to\dimen@{\vskip \z@ \@plus-\multicolundershoot
+%                                  \@minus-\multicolovershoot ...}
+%
+% The first adds shrink at the top of each column while SPLITTING; the second
+% subtracts exactly the same amount while BALANCING, to cancel it. So it is a
+% compensating pair and its net effect on the balanced last page -- the only
+% page that ever complains -- is zero. Raising it cannot help and its sign is
+% the opposite of what the name suggests: asked directly, pdftex answers that
+% `\vbox to 20pt' round a 25pt rule is 5.0pt overfull with no shrink, 2.0pt
+% with `minus 3pt', and 8.0pt with `minus -3pt'. Negative shrink makes an
+% overfull box WORSE.
+%
+% \maxbalancingoverflow (12pt) is not the escape either. Read the loop: the
+% warning is emitted by the FIRST \setbox, which multicol precedes with
+% \vfuzz\z@; the \maxbalancingoverflow retry runs afterwards and only decides
+% whether to set \too@bad and log "Balanced column too large". It never
+% suppresses the warning that has already been issued.
+%
+% So the only lever on a balanced column that is a hair too tall is real
+% shrink inside it, which is the \parskip above. That is the whole of it.
 
 \makeindex
 
