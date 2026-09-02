@@ -32,11 +32,12 @@ Also in the 17 × 24 cm trade format that matches the companion volumes —
 One source, four PDFs: A4 at 12pt is the one to read on a screen or print at
 home, and it is what the download links above point at.
 
-> **Full draft.** All forty-seven programs are written in both languages, and
-> four of the six appendices with them; E (further reading) and F (the
-> manifest) are still stubs carrying the brief they must satisfy. What remains
-> is finishing rather than drafting. Every ledger below is printed on every CI
-> build, so the debt is visible rather than quietly carried.
+> **Complete draft.** All forty-seven programs and all six appendices are
+> written, in both languages. There are no stubs left anywhere in the book, so
+> what remains is finishing rather than drafting. Every ledger below is printed
+> on every CI build **and in Appendix F**, computed from the tree rather than
+> typed, so the debt is visible to a reader holding the paper rather than only
+> to somebody who can run `make debt`.
 
 ---
 
