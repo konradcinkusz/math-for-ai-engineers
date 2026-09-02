@@ -243,25 +243,32 @@ miliard & $\val{p01.gap.billion}$ \\
 Powód jest ten z sekcji 1 i nie ma w nim nic ponadto. Budżet mantysy ustala
 liczbę \emph{cyfr znaczących}, a stała liczba cyfr znaczących to stała
 precyzja \emph{względna}. Odstęp bezwzględny musi więc rosnąć razem z liczbą i
-tak właśnie robi. Sprawdzian jest w następnej ramce: podziel każdy odstęp
-przez liczbę, przy której stoi, i zobacz, co wróci.
+tak właśnie robi.
 
 Kto rozumuje o liczbach zmiennoprzecinkowych tak, jakby miały stałą dokładność
 bezwzględną \dash{} tolerancję $10^{-9}$, powiedzmy, przyłożoną do każdego
 porównania w kodzie \dash{} ma zły model, a ten model zawodzi dokładnie przy
 tych wielkościach, przy których to ma znaczenie.
 \end{trapbox}
+
+Przyjmij to na wiarę, a niczego się nie nauczysz, więc wykonaj dzielenie. Wróć
+do tabeli powyżej, podziel każdy z trzech odstępów przez liczbę, przy której
+stoi, i powiedz, co mają wspólnego te trzy odpowiedzi.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Tę samą liczbę, z dokładnością do czynnika dwa: około $2^{-52}$.}
+
 Względna wersja odstępu jest jedną liczbą zamiast tabeli i ma nazwę.
 
 \textbf{Epsilon maszynowy} to odstęp między $1$ a następną reprezentowalną
 liczbą powyżej. Dla podwójnej precyzji wynosi $\val{p01.fp64.eps}$, czyli
-$2^{-52}$, a zatem po prostu budżet mantysy zapisany jako liczba. Podziel
-dowolny odstęp z tabeli powyżej przez liczbę, przy której stoi, a dostaniesz
-z powrotem epsilon, z dokładnością do czynnika dwa zależnego od tego, gdzie
-liczba wypada między potęgami dwójki.
+$2^{-52}$, a zatem po prostu budżet mantysy zapisany jako liczba. Czynnik dwa
+w jedną lub drugą stronę bierze się z tego, gdzie liczba wypada między jedną
+potęgą dwójki a następną; liczy się to, że dzielenie przez wielkość zostawia
+stałą, i dlatego jedna liczba może zastąpić tabelę.
 
 \begin{center}
 \begin{tabular}{lrrrr}
@@ -307,9 +314,17 @@ $\val{p01.tenth.stored}$.
 dokładnie jeden odstęp \emph{przy $\num{0.3}$}, czyli najmniejszy błąd, na
 jaki format tam stać \dash{} i ćwierć odstępu przy $1$, co jest pointą
 następnej sekcji przychodzącą wcześniej.
+
+\code{0.1 + 0.2 == 0.3} było więc złym pytaniem. Zapisz pytanie, które
+zadałbyś na jego miejscu.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Czy te dwie liczby są dostatecznie blisko \dash{} przy czym dostatecznie
+blisko mierzone jako ułamek ich wielkości, a nie jako stała wartość.}
+
 \textbf{Równość nie jest pytaniem, które warto zadawać.} \code{a == b} na
 dwóch policzonych liczbach zmiennoprzecinkowych pyta, czy dwa łańcuchy
 zaokrągleń trafiły na ten sam element skończonego zbioru, a to nie jest to, co
@@ -326,10 +341,10 @@ jest własnością modelu; jest własnością kolejności, w jakiej akurat zredu
 batcha. Ranking sortowany po nim sortuje po sprzęcie.
 \end{aibox}
 
-Użyteczne pytanie brzmi, czy dwie liczby mieszczą się w tolerancji, a
-tolerancja musi być względna \dash{} pewną wielokrotnością epsilona razy
-rozmiar liczb \dash{} dokładnie z powodu, który podaje tabela dwie ramki
-wcześniej.
+Wielokrotność dotyczy epsilona, a rozmiar to rozmiar porównywanych liczb, i to
+jest tabela odstępów wykonująca swoje drugie zadanie. Tolerancja, która się
+nie skaluje, jest przy miliardzie o wiele za ciasna, bo mniejsza niż jeden
+odstęp, a przy tysiącznej o wiele za luźna, bo obejmuje ich miliardy.
 \end{fr}
 
 % ============================================================
@@ -457,16 +472,26 @@ kolejności, sumowanie z kompensacją, szerszy akumulator \dash{} to
 Program~\ref{prog:P02}, którego to jest tematem. Ramka ostrzeżenia
 Programu~\ref{prog:F04} dzieli te dwie rzeczy tak samo.
 \end{rigourbox}
+
+Na wierszu \code{fp32} warto zatrzymać się wcześniej, niż zrobi to za ciebie
+następna ramka. To połowa odstępu przy $1$ w tym formacie. Tabela z sekcji 2
+podaje odstęp podwójnej precyzji przy trzech wielkościach: przy której z tych
+trzech połowa tego odstępu daje tę samą liczbę?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Przy miliardzie. Połowa odstępu podwójnej precyzji wynosi tam
+$\val{p01.swamp.at.billion}$, czyli dokładnie tyle, ile wiersz \code{fp32}.}
+
 Jedna liczba z sekcji 2 zasługuje na drugie spojrzenie, bo łączy dwa formaty,
 między którymi naprawdę wybierasz.
 
 Połowa odstępu przy $1$ w podwójnej precyzji to $\val{p01.swamp.at.one}$.
 Połowa odstępu przy miliardzie w podwójnej precyzji to
 $\val{p01.swamp.at.billion}$ \dash{} a połowa odstępu przy $1$ w \code{fp32}
-to $\val{p01.swamp.fp32}$, czyli ta sama liczba.
+to $\val{p01.swamp.fp32}$, czyli właśnie ta sama liczba.
 
 To równość dokładna, a nie przybliżona, i jest własnością tej konkretnej
 wielkości, a nie prawem: miliard wypada w zakresie wykładników zaczynającym
@@ -604,9 +629,18 @@ To obejście $\val{p01.fp16.ebits}$ bitów wykładnika i powód, dla którego
 trening w \code{bf16} nie potrzebuje takiej maszynerii: przy
 $\val{p01.bf16.ebits}$ bitach gradienty nigdy nie były blisko podłogi.
 \end{aibox}
+
+To rozstrzyga wagi i gradienty. Zostają sumy bieżące, o których sekcja 3
+pokazała, że połykają małe wkłady w całości. Którego z dwóch budżetów
+potrzebuje akumulator i jaki format z tego wynika?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Precyzji, czyli \code{fp32} \dash{} akumulator nie jest blisko żadnego
+końca zakresu, a jest cały czas blisko progu połknięcia.}
+
 Jedna konsekwencja do zabrania do każdej decyzji o mieszanej precyzji.
 
 Wybór formatu jest wyborem tego, \emph{którego} z dwóch budżetów ci brakuje, a
@@ -740,11 +774,20 @@ To pointa Programu~\ref{prog:F03} przychodząca z dołączoną maszynerią: bud�
 wykładnika jest twardym sufitem na to, jak długą sekwencję da się ocenić przez
 mnożenie, a praca na logarytmach nie jest udoskonaleniem, tylko jedynym
 sposobem, żeby ta wielkość w ogóle istniała.
+
+Podaj liczbę, zanim zrobi to następna ramka. Model, który przypisuje
+$\num{0.5}$ każdemu tokenowi, oceniany w \code{fp16} przez mnożenie: po ilu
+tokenach iloczyn jest dokładnie zerem \dash{} po tysiącach, po setkach, czy
+mniej?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Sufit w tokenach dla modelu rzucającego monetą, który przypisuje
-$\num{0.5}$ każdemu tokenowi \dash{} czyli
+\ans{Mniej. Po $\val{p01.coin.fp16}$ tokenach, czyli po jednym zdaniu.}
+
+Sufit w tokenach dla modelu rzucającego monetą, który przypisuje $\num{0.5}$
+każdemu tokenowi \dash{} czyli
 \enquote{krótsza niż strona} Programu~\ref{prog:F03} podana dokładnie:
 
 \begin{center}
@@ -763,18 +806,26 @@ w tym formacie & iloczyn jest dokładnie zerem po \\
 Arytmetyka jest tu dokładna aż do niedomiaru, bo $\num{0.5}^{n}$ to dokładnie
 $2^{-n}$, a każda z tych liczb jest reprezentowalna aż do najmniejszej
 subnormalnej \dash{} więc urwisko leży o krok za podłogą, w każdym formacie.
-Na wiersz \code{fp16} warto spojrzeć dwa razy: dwadzieścia pięć tokenów to
-jedno zdanie.
+Postaw obok niego wiersz \code{bf16}: $\val{p01.coin.bf16}$ tokenów z tych
+samych szesnastu bitów. Prawie całość tego bierze się z trzech dodatkowych
+bitów wykładnika, a trzy bity mantysy, które \code{bf16} oddał, żeby je kupić,
+zabierają trochę z powrotem, bo płytsza mantysa to płytszy zakres
+subnormalny.
+
+Jeszcze jedna liczba do postawienia obok tych podłóg, i nie jest ona tego
+programu. Program~\ref{prog:F12} pomnożył przez siebie czterdzieści czynników
+warstwowych i doszedł do $\val{p01.f12.prod}$ dla nasyconego łańcucha
+logistycznego. Który z czterech formatów jeszcze ją mieści?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-I Program~\ref{prog:F12}, który jest drugą połową tej samej pointy.
+\ans{Tylko podwójna precyzja. Liczba leży poniżej najmniejszej subnormalnej
+\code{fp32}, równej $\val{p01.fp32.minsub}$, i daleko poniżej subnormalnych
+\code{bf16} i \code{fp16}, więc we wszystkich trzech jest dokładnie zerem.}
 
-Ten program pomnożył przez siebie czterdzieści czynników warstwowych i doszedł
-do $\val{p01.f12.prod}$ dla nasyconego łańcucha logistycznego. Postaw to obok
-dwóch podłóg z tabeli na początku tej sekcji: liczba siedzi wygodnie powyżej
-podłogi podwójnej precyzji i wygodnie \emph{poniżej} najmniejszej subnormalnej
-\code{fp32}, równej $\val{p01.fp32.minsub}$.
+I to jest Program~\ref{prog:F12}, który jest drugą połową tej samej pointy.
 
 Ta sama arytmetyka daje więc małą liczbę w jednym formacie i \textbf{dokładnie
 zero} w drugim, a ten drugi jest formatem treningowym.

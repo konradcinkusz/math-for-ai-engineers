@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1397 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1423 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1160 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1182 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1401 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1427 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1164 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1184 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -124,8 +124,15 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **103 orphan-tail pages: 29 · 30 · 22 · 22** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
+- **99 orphan-tail pages: 28 · 29 · 21 · 21** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`. **The Part II elicitation pass is the first thing
+  in this book's record to take the count DOWN**, by one in every one of the
+  four builds, and it did it in two measurable movements: the twenty-one
+  conversions went 29/30/22/22 to 31/31/21/21, and the three lengthenings that
+  cleared their cues then went to 28/29/21/21. So the cues cost the trade
+  builds two tails each and the lengthenings returned three each \dash{} which
+  is the clearest evidence in the file that lengthening a frame acts on this
+  ledger and not only on the cue's. Before that: P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
   **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one, **P30 one**, **P31 none**, **P32 none**, P33 one and P34 one
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
@@ -158,9 +165,10 @@ what was there before.
   This is the second ledger that is reported rather than gated, and like the
   first it must not quietly go away. **When the count goes up, that is the
   signal.**
-- **Elicitation rate: 51% of the book's frames put a question to the reader**,
+- **Elicitation rate: 53% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
-  F01--F06, 50--66% through F08--F13, 29--31% across the whole of Part II,
+  F01--F06, 50--66% through F08--F13, **48% in P01**, **48% in P02** and
+  **52% in P03**,
   35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
   39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
@@ -174,9 +182,12 @@ what was there before.
   **P24 is the first program whose rate is visible in its frame count**: nine
   of its sixty-four frames exist because the draft was raised from 36%, which
   is the elicitation ledger's cost measured in frames rather than in pages.
-  Part III is climbing because the rate is now designed in rather than measured
-  afterwards. The book's own figure falls as Part III grows, because every
-  Part III program sits below Part I's rate \dash{} which is why the per-program
+  **Part II was 29--31% and is now 48--52%**, raised in a pass of its own after
+  the book was drafted, at a cost of twenty-one conversions and **no frames at
+  all** \dash{} see *The Part II elicitation pass* below. That moves the trough:
+  **Part III, at 35--40%, is now the lowest run in the book**, and the appendix
+  that names the trough had to be corrected with it. Which is why the
+  per-program
   column is the ledger and the single number is not. A frame carries `\nextframe` if and only if the
   next frame opens
   with an answer, so the cue rate *is* the elicitation rate. It halved over
@@ -9892,10 +9903,12 @@ estimating the book at **460--540 pages** for its 2,418 planned frames, and this
 file repeated it as 470--550. Neither number had been looked at since
 scaffolding.
 
-**Measured: 1,863 teaching frames are written and they set 1,397 pages in the
+**Measured: 1,863 teaching frames are written and they set 1,401 pages in the
 trade format.** That is $\num{0.75}$ pages a frame against the estimate's
 $\num{0.21}$, and **that is the finished book** \dash{} every program and
-every appendix. (It was 1,321 before
+every appendix. (1,397 until the Part~II elicitation pass, which is a revision
+rather than new writing and which added four pages without adding a frame; the
+ratio did not move.) (It was 1,321 before
 Appendix~C, which is the one of the six that is generated rather than
 written and which costs 62 pages of back matter on its own, 1,383 before
 Appendix~D, which occupies six pages where its stub occupied two, 1,387
@@ -11543,6 +11556,366 @@ of an appendix that were already generated cost nothing to finish**, which is
 the whole argument for generating them.
 
 
+### The Part II elicitation pass, September 2026
+
+*What is left* item 2 named this as \enquote{the largest genuinely
+parallelisable job in the repository}, and it was the only one of the six that
+needed neither a trained model nor a budget nor a reader. **P01, P02 and P03
+went 31/29/29 per cent to 48/48/52, for twenty-one conversions and no frames
+at all**, so all three programs still carry exactly 35, 37 and 34 teaching
+frames. The book's own rate went 51 to 53.
+
+Nothing was invented: every conversion took a frame that **stated** something
+the reader could produce, moved the statement into the next frame's answer,
+and ended the first frame by asking. That is Program~\ref{prog:P33}'s method,
+and its price held \dash{} ten conversions there cost nothing, twenty-one here
+cost nothing, and Program~\ref{prog:P24}'s nine frames for ten points remains
+the one expensive instance, because it was inventing questions rather than
+converting statements.
+
+#### Two structural constraints decide which pairs are available
+
+Both were found by a refusal rather than by reading, and both are cheap to
+check before writing:
+
+- **The next frame must not already open with an answer.** If it did, the
+  first frame would already carry a cue, because C16 enforces exactly that
+  correspondence. So the candidate pairs are the ones the ledger is already
+  pointing at.
+- **No `\section` and no `\mermaidfig` may sit between the two frames.** P02's
+  best candidate \dash{} frame 21's \enquote{a probability is a bad
+  intermediate at both ends} \dash{} was dropped for this: §4 opens between
+  the two, so the reader would have turned the page onto a section heading
+  looking for an answer. A figure between them is Program~\ref{prog:F02}'s
+  rule from the other side, and Program~\ref{prog:P06}'s pass had to move one
+  for it.
+
+**Map the sections and the figures against the frame numbers before drafting a
+single question.** It is one pass over the file with a regular expression and
+it is the difference between eight conversions and eight conversions minus the
+two that cannot be built.
+
+#### What the conversions actually are, and why they are not padding
+
+The test each had to pass is that the reader can produce the answer from what
+is already on the page. Four are worth naming because they change what the
+frame teaches rather than merely how it is laid out:
+
+- **P01's epsilon.** The gap table was followed by a frame that *said*
+  dividing each gap by its magnitude returns a constant. The trapbox above it
+  even said \enquote{the check is in the next frame} and then no check was put
+  to the reader. Now the reader divides four rows and the answer names what
+  they all have in common, so machine epsilon arrives as something they found.
+- **P01's coincidence.** Half the gap at a billion in a double and half the
+  gap at $1$ in an \code{fp32} are the same number, exactly. The frame stated
+  it; both figures were already on the page two sections apart, so the reader
+  can put them side by side and be surprised.
+- **P02's `-inf` on a correct answer.** The trapbox called this
+  \enquote{the half people miss} and then told them. It is now elicited: the
+  reader has Program~\ref{prog:F07}'s saturation measurement, so
+  \enquote{what does the loss do there} is answerable, and the answer
+  \dash{} a confident and \emph{right} prediction produces the same
+  \code{-inf} as a confident wrong one \dash{} lands as a finding.
+- **P03's fusion.** The reader is asked whether the fused chain is
+  compute-bound, with both numbers on the page. Everyone says yes. It is not,
+  and \enquote{fusion helps and does not rescue} is the section's whole point.
+
+#### A number written twice, found by editing the frame that held it
+
+`p01.coin.fp16` is $25$ and both editions' prose wrote \emph{twenty-five} as a
+word beside it. That is Program~\ref{prog:F02}'s recorded defect \dash{} a
+number written twice is a number only one of which will ever be corrected
+\dash{} and Program~\ref{prog:P03}'s pass fixed two instances of it in its own
+program. It was in scope because the conversion was rewriting that sentence
+anyway, and the page now reads $\val{p01.coin.fp16}$.
+
+#### A question that asks the reader to divide has to survive the division
+
+P03's new frame tells the reader to divide the device's ratio by the
+elementwise intensity. The page prints that intensity twice, as
+$\frac{1}{6}$ and as its rounding $\val{p03.ai.elementwise}$, and
+$\val{p03.dev.ratio}$ over the rounding is about two per cent short of the
+committed $\val{p03.ai.short}$.
+
+The shortfall was there before this pass and nothing had walked into it,
+because nothing had asked the reader to do the arithmetic. **A conversion that
+turns a statement into an instruction converts a latent reproduce-from-the-page
+defect into one a reader meets**, so the answer box names which of the two
+forms to divide by and says why the other gives a slightly smaller number.
+That is Programs~\ref{prog:F04}, \ref{prog:F05}, \ref{prog:P07},
+\ref{prog:P12}, \ref{prog:P23} and \ref{prog:P27}'s rule arriving from a new
+direction: not \emph{does the page reproduce its own ratio} but \emph{will the
+reader I have just instructed reproduce it}.
+
+**And a second instance, in P01, whose fix is different in kind.** Frame 18
+first asked the reader to halve $\val{p01.gap.billion}$ \dash{} printed to
+three significant figures \dash{} and set the result against the \code{fp32}
+row at $\val{p01.swamp.fp32}$. Halving the printed value gives
+$\num{5.95e-08}$, so the reader's own arithmetic disagrees with the answer box
+in the second figure, while the underlying quantities are equal **to the bit**,
+both being $2^{-24}$. Nothing on the page was wrong; the question made a
+rounding visible that no prose had ever asked anybody to look through.
+
+**The fix is not more decimals. It is to ask the reader to identify rather
+than to compute.** The question now names the \code{fp32} row, says it is half
+the gap at $1$ in that format, and asks at which of section 2's three
+magnitudes half a double's gap comes to the same number. Those magnitudes are
+eight orders apart, so recognition needs no precision at all, and the answer
+box still delivers the exactness. **Where a conversion's arithmetic cannot
+reproduce from the page, change the question from a computation to a
+recognition** \dash{} the finding survives and the rounding stops mattering.
+
+The same reword fixed a false pointer nobody had noticed. The question had
+said \enquote{one number in the table above}, and the table above frame 18
+holds swamping \emph{fractions}: the gap at a billion is in section 2's table,
+two sections back.
+
+#### A new question is a new claim about the book, and two of mine were false
+
+A conversion does not only move a sentence \dash{} it writes a fresh
+instruction, and an instruction that tells the reader where to look is a claim
+about the book of exactly the kind this file names as the one class nothing
+can check. Two of the twenty-one were wrong, and both were caught by opening
+the thing they pointed at rather than by any gate.
+
+- **\enquote{Go back to the table two frames above \dots say what the four
+  answers have in common.}** The gap table is in the \emph{same} frame, above
+  the trapbox's closing brace, and it has **three** rows, not four. Two false
+  claims in one sentence, in both editions. It now says \emph{the table above}
+  and \emph{its three gaps}, and the three quotients \dash{}
+  $\num{2.22e-16}$, $\num{1.14e-16}$ and $\num{1.19e-16}$ \dash{} do have the
+  stated property, all three sitting between half of $2^{-52}$ and $2^{-52}$
+  itself. **Those figures are the second draft.** The first quoted the middle
+  one as $\num{2.3e-16}$, written from the feel of a table whose gap at
+  $1000$ is $\val{p01.gap.thousand}$ and not the $\num{2.27e-13}$ I had
+  supplied from memory \dash{} a remembered number inside the note about
+  remembered numbers, caught by dividing rather than by reading.
+- **\enquote{A model card reports GB and the table above reports GiB.}** The
+  table above reports **GB**; the GiB figures are the cache values in prose,
+  in that frame's own answer box. The question now names the two quantities
+  \dash{} the memory bill in GB, the cache in GiB \dash{} and makes no
+  positional claim at all.
+
+**The generalisable half: a positional claim is the cheapest kind of sentence
+to write and the most expensive to leave wrong**, because a reader who follows
+it and finds nothing there stops trusting the rest. The remedy that worked was
+to grep every added line for the words that carry such claims \dash{}
+\emph{frames above}, \emph{table above}, \emph{section N}, \emph{the two}, the
+three, the four \dash{} and then open each target. Twenty-three such claims
+across the six files; twenty-one were right and two were not, and nothing
+short of opening them would have separated the two groups.
+
+And the rule the second fix earns is narrower and better than a correction:
+**a question that needs no positional claim should not carry one.** Naming the
+two units outright is shorter than naming where they are printed, and it
+cannot go stale when a table moves.
+
+#### The scripted edit joined words and dropped paragraph breaks, and nothing here reads prose
+
+This is the pass's most valuable finding and it is not about elicitation.
+
+The twenty-one conversions were applied by exact-string substitution, and the
+replacement strings were written as single lines where the text they replaced
+had wrapped. So the substitutions carried **eleven word joins** \dash{}
+\emph{twocomputed}, \emph{exactlyzero}, \emph{thesubtraction},
+\emph{passover}, \emph{passbecause}, \emph{nadwóch}, \emph{dokładniezero},
+\emph{odwyniku}, and three where a letter was glued straight onto a maths span
+\dash{} together with **sixteen lost paragraph breaks** and four macros glued
+to the end of a prose line.
+
+**Every one of them was invisible to every gate in this repository.** C4
+compares structural tokens, C8 the per-frame maths digest, C12 numeric
+literals, C14 the macro histogram; none of the four changes when
+\emph{two computed} becomes \emph{twocomputed} or when a blank line
+disappears, and the Polish twin carried its own joins so nothing diverged.
+`check_structure` reads frames and payloads, `checklog` reads the log,
+`checkpdf` reads the finished layout. **Nothing in this repository reads
+prose**, and a joined word produces no error anywhere.
+
+**Two detectors found them, three lines each, and they agreed element for
+element.** The first takes the word set of the file at `HEAD` and reports any
+word of five letters or more in the working copy that is absent from it and
+splits into two words the original has. The second reports any source line
+over eighty characters that is not in `HEAD`'s own set of long lines. Both
+returned exactly the same eleven and nothing else.
+
+That agreement is what made either of them believable, and it is
+Program~\ref{prog:P34}'s rule reached by a second route: instead of watching
+one instrument produce an answer you already know, **run two instruments built
+on different principles and require them to name the same set.** It also
+mattered concretely, because the first detector's threshold was wrong: at
+eight letters it missed \emph{nadwóch}, which is seven, and the line-length
+detector caught it. **Set such a threshold below the shortest defect you can
+imagine, and never run only one.**
+
+**A third detector found the paragraph breaks, and its limit is the useful
+part.** It reports every adjacent pair of non-blank lines `A`, `B` in the
+working copy for which `HEAD` contains `A`, a blank line, then `B`. That found
+ten of the sixteen exactly. The other six sat in regions where `A` or `B` had
+itself been rewritten, so no comparison against `HEAD` could see them and they
+came out of reading the diff. **A mechanical check on a diff can only see the
+lines that survived it**, which is why the reading is not optional.
+
+**And the tool written to clear the class had the class in it.** The
+maths-safe rewrapper stashed each `$...$` span behind a placeholder
+\emph{shorter than the span it stood for}, so `textwrap` measured a stand-in
+and returned lines of ninety-five and ninety-eight characters \dash{} while
+the function's own comment said it re-wrapped after restoring, which it did
+not do. Padding the placeholder to the span's exact source width fixed it.
+That is this file's oldest class, arriving inside the fix for the class, and
+it was caught only because the detectors were re-run after every edit rather
+than once at the end.
+
+**The build was stopped twice**, on Program~\ref{prog:P32}'s rule: once when
+the join sweep was queued and once when the rewrap was, because both move
+pagination from P01 and P03 onward and a build that measures a tree about to
+stop existing is ten minutes spent on a number to be discarded. The aux tree
+was cleared with `make clean` each time, `.idx` included, which is P32's other
+finding.
+
+#### The appendix that prints the ledger went stale in the pass that moved it
+
+Appendix~F prints the elicitation rate from `figures/values/appf.tex`, so
+`make verify` refused the tree until `code/appf_ledgers.py` was re-run. That
+is the whole argument for computing it, demonstrated one pass after it was
+built, and it cost one command.
+
+**The prose around the number is not gated and it was wrong.** §F.4 said the
+rate runs \enquote{around three in ten across Part~II}, which this pass
+falsified; the trough is now Part~III at 35--40 per cent, and both editions
+say so. It is the class this file names as its oldest \dash{} a claim about
+the book that nothing derives from anything \dash{} and it is worth recording
+that **the gate caught the number and could not catch the sentence beside
+it**, which is Appendix~D's finding (*a gate is as wide as the construct it
+parses*) arriving in the appendix built to be gated.
+
+So the standing instruction gains a clause: **a pass that moves a ledger has
+to grep the appendices for prose about that ledger**, not merely re-run the
+script that prints it.
+
+#### Every added question is a new claim about the book, and four of mine were false
+
+The pass note above records two, both caught by opening what they pointed at.
+Reading all seventeen questions end to end afterwards \dash{} rather than
+waiting for the next one to bite, which is Program~\ref{prog:P28}'s finding
+\dash{} turned up a third, and the three paragraphs written to clear the
+orphaned cues produced a fourth and a fifth.
+
+- **\enquote{Two of the units in this section differ by less than they look.}**
+  GB and GiB are one letter apart and differ by seven per cent, so they differ
+  by *more* than they look. Backwards in both editions.
+- **A lengthening paragraph said a long sum drifting is something \enquote{this
+  program has shown you}.** Summation is Program~\ref{prog:P02}'s section 5 and
+  the frame is in section 3, so the sentence both misattributed and previewed.
+- **Another attributed a negative to Program~\ref{prog:P01}**: that an
+  epsilon-sized relative error is what it \enquote{licenses for a freshly
+  rounded number and for nothing else}. P01 establishes machine epsilon as the
+  relative gap and says nothing about what a value arrives carrying. The
+  limitation is real and it is mine, so it is now stated in my own voice.
+
+**The generalisable half is a scope statement, and it is wider than the rule it
+sharpens.** This file already says *before writing a sentence about another
+program, open that program*, and it has been paid for a dozen times about
+prose. An **elicitation pass writes nothing but new sentences**, and every one
+of them is either a claim about where something is or a claim about what a
+neighbour established. So the exposure is not incidental to this kind of pass;
+it is the whole surface of it, and the audit has to be a sweep of every added
+question rather than a check of the ones that look risky. Twenty-three
+positional claims across the six files, twenty-one right, two wrong, and
+nothing short of opening each target separated the two groups.
+
+#### The word-join detector's false positives are the two-instrument rule working
+
+Re-run after the lengthenings, the detector reported `długich`, `pokazała`,
+`zarazem`, `choćby` and `napisany` as joins. All five are ordinary Polish words
+in the new sentences, correctly spaced. The heuristic reports any new word of
+five letters or more that splits into two words the file already contains, and
+**an inflected language makes that fire on ordinary prose** \dash{} which the
+substitution pass never saw, because it *replaced* text rather than adding it.
+
+The line-length detector reported zero every time, and reading each of the five
+confirmed it. That disagreement is the point: it is Program~\ref{prog:P34}'s
+rule reached by the second route this pass already recorded, and the remedy is
+**not** to raise the threshold \dash{} eight letters was already shown to miss
+`nadwóch` at seven. Report them as candidates, read them, and require the two
+instruments to agree before believing either.
+
+#### Layout: the first pass in this book's record to take the tail ledger DOWN
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1401 | 1397 | `[]` | 0 |
+| `main-pl` | 1427 | 1423 | `[]` | 0 |
+| `main-en-a4` | 1164 | 1160 | `[6.3]` | 0 |
+| `main-pl-a4` | 1184 | 1182 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and, after the three lengthenings, no orphaned cues.
+
+**And the orphan tails went 103 to 99**, one down in every build, which has not
+happened before. The two movements are worth separating because together they
+are the clearest evidence in this file that lengthening acts on the tail ledger
+and not only on the cue's:
+
+| | en | pl | en-a4 | pl-a4 |
+|---|---|---|---|---|
+| before the pass | 29 | 30 | 22 | 22 |
+| after twenty-one conversions | 31 | 31 | 21 | 21 |
+| after three lengthenings | **28** | **29** | **21** | **21** |
+
+The conversions cost the trade builds two tails each and took one off each A4
+build; the lengthenings then returned three to each trade build. Every previous
+pass that added cues added tails \dash{} Program~\ref{prog:P04}'s three cues
+put one back in `main-pl-a4` \dash{} so the expectation going into Part III's
+pass should be that the cues cost tails and the lengthening that follows them
+pays the cost back, rather than that either is free.
+
+Three orphaned cues arrived, all in `main-en`, all of them the tail of a frame
+whose question this pass had just added: the amplification factor and the
+overflow score in Program~\ref{prog:P02}, and the FLOPs shortcut in
+Program~\ref{prog:P03}. Cleared in **one round** by lengthening in both
+editions, which is Program~\ref{prog:F06}'s two-sided rule and its
+twenty-third confirmation. And the three A4 builds were clean throughout,
+which is unusual: every earlier cue chase in this book found at least one in an
+A4 build, and this one found none.
+
+**The build was stopped three times on purpose**, which is
+Program~\ref{prog:P32}'s rule and the reason the measurement above is of one
+tree rather than of three. Each stop was a queued edit that would move
+pagination \dash{} the two corrected claims and the GB/GiB reword \dash{} and
+a build measuring a tree about to stop existing produces a number to be
+discarded. `make clean` each time, `.idx` included.
+
+#### The part-page table nearly took a false alarm, and the instrument was the units
+
+`notes/01-curriculum.md` §20 carries the per-part page ranges, and this pass
+moves them, so they had to be re-measured. `main-en.toc` says Part II starts at
+**361** where the table says **389** \dash{} a twenty-eight page gap that four
+paragraphs cannot explain.
+
+**The table is in PDF pages and the toc is in printed folios**, and the front
+matter is twenty-eight sheets. The two agree exactly. Confirmed by extraction
+rather than by adding twenty-eight to anything, which is that section's own
+rule about a number obtained by arithmetic on two measurements: PDF page 389 is
+the Part~II title page, 887 is Part~VII and 1217 is the Appendices.
+
+| | pages | count |
+|---|---|---|
+| front matter + Part I | 1--388 | 388 |
+| Parts II--VI | 389--886 | **498** |
+| Parts VII--IX | 887--1216 | 330 |
+| back matter | 1217--1401 | 185 |
+
+The four rows add to 1401 exactly, and **the pass's four pages fall entirely
+inside Parts II--VI**, where P01 to P03 live, with the other three rows
+unmoved. That is a consistency check on the whole table rather than only on
+this change, and it is the reason the first-volume figure moves 882 to 886 and
+nothing else does.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -11863,28 +12236,48 @@ look first when one of them next goes stale.
    model away from being five answers, and one of the five is already half
    given.
 
-2. **Part II's elicitation rate, which is nobody's program.** The ledger puts
-   P01, P02 and P03 at 29--31% against Part I's 73--78%. Raising them means
-   finding, in three merged programs, the frames that state something the
-   reader could produce, and moving the statement into the next frame's
-   answer.
+2. **Part III's elicitation rate, which is nobody's program.** Part II's was
+   this item and is **done** \dash{} P01, P02 and P03 went 31/29/29% to
+   48/48/52% for twenty-one conversions and no frames at all; the pass note is
+   below. What that moved is the trough rather than the problem: **P04 to P11
+   now run at 35--40%**, the lowest run left in the book, against Part I's
+   73--78%.
+
+   The method is the one the Part II pass used and is worth copying exactly:
+   find the frames that *state* something the reader could produce, move the
+   statement into the next frame's answer, and end the first frame by asking.
+   Two constraints decide which pairs are available, and both cost a build to
+   discover the hard way: **the next frame must not already open with an
+   answer**, and **no `\section` or `\mermaidfig` may sit between the two**
+   \dash{} a question whose answer is overleaf from a section heading, or from
+   a figure, is a defect rather than a conversion. Map them before writing.
 
    **The price has been measured several times and it is not the same price
    everywhere.** P04 did three conversions and went 26% to 35% with no frame
    added; P23 did ten and went 33% to 53% for two frames; P24 paid nine
-   frames for ten points; P30 paid two for eleven; P31 paid two for six; and
-   **P33 did ten conversions for 33% to 51% and added nothing at all**. The
+   frames for ten points; P30 paid two for eleven; P31 paid two for six;
+   **P33 did ten conversions for 33% to 51% and added nothing at all**; and
+   the Part II pass did twenty-one across three programs, also for nothing.
+   The
    variable is not the number of points but what is being converted: a
    *statement* the reader could have produced converts for nothing, and a
-   *question* that has to be invented costs a frame. Part II is full of the
-   first kind, which is why P33 is the instance to plan against rather than
-   P24.
+   *question* that has to be invented costs a frame. Part III is full of the
+   first kind, which is why P33 and the Part II pass are the instances to plan
+   against rather than P24.
 
    Designing the rate in is free, which P26 to P29 and P34 each demonstrate
    \dash{} written that way from the frame plan, no conversions, and P29 and
    P34 the highest outside Part I. **This is the largest genuinely
-   parallelisable job in the repository**, because it touches three merged
-   program files and nothing else.
+   parallelisable job left in the repository**, because it touches eight
+   merged program files and nothing else.
+
+   **Budget for two builds rather than one, and expect the tail ledger to move
+   twice.** Part II's twenty-one conversions produced three orphaned cues and
+   two more orphan tails in each trade build; the three lengthenings that
+   cleared the cues then returned three tails to each, leaving the ledger one
+   *below* where it started in all four builds. So the cues are not free and
+   the lengthening is not merely a repair \dash{} and the pass is not finished
+   at the first clean parity run, which is where it will feel finished.
 
 3. **The measurements.** Ten are specified, nine of them free. The ledger in
    `notes/01-curriculum.md` §17 carries a **Status column naming the pass**
@@ -12002,15 +12395,16 @@ one is shaped by what the ones before it turned out to spend.
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
 for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.75**
-\dash{} 1,863 teaching frames in 1,397 trade pages, and the book is now
+\dash{} 1,863 teaching frames in 1,401 trade pages, and the book is now
 complete: every program and every appendix is written. (This sentence said **0.71** until the Appendix~E pass, which
 is $1{,}321/1{,}863$ \dash{} the figure from before Appendix~C, left behind
 when the page count above it was updated and the ratio was not. It is the
 class this file keeps recording, in the paragraph that states the class.) §20 item 1 carries the measurement and the per-part page ranges, so
 the decision has numbers in front of it rather than an estimate; **every
-program and every appendix is now written, so those numbers will not move
-again except by revision**, which is as settled as the question is going to
-get before somebody answers it. The other two that
+program and every appendix is now written, so those numbers move only by
+revision** \dash{} and the Part~II elicitation pass is the first revision to
+move them, adding four pages to Parts~II--VI and none to any other row, which
+is as settled as the question is going to get before somebody answers it. The other two that
 stood beside it are now settled in the passes that wrote their programs
 \dash{} P12's placement, and whether P14 is enough of a fix for the rigour gap
 \dash{} and each entry records the argument the written book falsified rather

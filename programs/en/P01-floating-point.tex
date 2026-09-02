@@ -248,25 +248,33 @@ a billion & $\val{p01.gap.billion}$ \\
 The reason is section 1's, and there is nothing else in it. The significand
 budget fixes the number of \emph{significant figures}, and a fixed number of
 significant figures is a fixed \emph{relative} precision. So the absolute gap
-has to grow in step with the number, and it does. The check is in the next
-frame: divide each gap by the number beside it and see what comes back.
+has to grow in step with the number, and it does.
 
 Anybody who reasons about floating point as though it had a fixed absolute
 accuracy \dash{} a tolerance of $10^{-9}$, say, applied to every comparison in
 a codebase \dash{} has the wrong model, and it fails at exactly the magnitudes
 where it matters.
 \end{trapbox}
+
+Take that on trust and you have learnt nothing, so do the division. Go back to
+the table above, divide each of its three gaps by the number it sits beside,
+and say what the three answers have in common.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{The same number, give or take a factor of two: about $2^{-52}$.}
+
 The relative version of the gap is one number rather than a table, and it has
 a name.
 
 \textbf{Machine epsilon} is the gap between $1$ and the next representable
 number up. For a double that is $\val{p01.fp64.eps}$, which is $2^{-52}$ and
-therefore just the significand budget written as a number. Divide any gap in
-the table above by the number it sits at and you get epsilon back, give or
-take a factor of two for where the number falls between powers of two.
+therefore just the significand budget written as a number. The factor of two
+either side is where the number falls between one power of two and the next;
+what matters is that dividing by the magnitude leaves a constant behind, and
+that is why one number can replace a table.
 
 \begin{center}
 \begin{tabular}{lrrrr}
@@ -311,9 +319,17 @@ So \code{0.1} was already wrong before any arithmetic happened, and so was
 is exactly one gap \emph{at $\num{0.3}$}, which is the smallest error the
 format can have there \dash{} and a quarter of the gap at $1$, which is the
 next section's point arriving early.
+
+So \code{0.1 + 0.2 == 0.3} is the wrong question to have asked. Write down the
+question you would ask in its place.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Whether the two are close enough \dash{} with close enough measured as a
+fraction of their size rather than as a fixed amount.}
+
 \textbf{Equality is not a question you should ask.} \code{a == b} on two
 computed floats asks whether two chains of rounding landed on the identical
 member of a finite set, which is not what you wanted to know and is not stable
@@ -329,9 +345,10 @@ model; it is a property of the order in which the batch happened to be reduced.
 A leaderboard sorted on it is sorting on the hardware.
 \end{aibox}
 
-The useful question is whether two numbers are within a tolerance, and the
-tolerance has to be relative \dash{} some multiple of epsilon times the size of
-the numbers \dash{} for exactly the reason the table two frames back gives.
+The multiple is of epsilon and the size is the size of the numbers being
+compared, which is the gap table doing its second job. A tolerance that does
+not scale is far too tight at a billion, where it is smaller than a single
+gap, and far too loose at a thousandth, where it spans billions of them.
 \end{fr}
 
 % ============================================================
@@ -459,15 +476,25 @@ reordering, compensated summation, a wider accumulator \dash{} is
 Program~\ref{prog:P02}, whose subject it is. Program~\ref{prog:F04}'s warning
 box divides the two the same way.
 \end{rigourbox}
+
+The \code{fp32} row is worth stopping at before the next frame stops at it for
+you. It is half the gap at $1$ in that format. Section 2's table gives a
+double's gap at three magnitudes: at which of the three is half that gap the
+same number?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{At a billion. Half a double's gap there is
+$\val{p01.swamp.at.billion}$, which is the \code{fp32} row exactly.}
+
 One number from section 2 is worth a second look, because it connects the two
 formats you actually choose between.
 
 Half the gap at $1$ in a double is $\val{p01.swamp.at.one}$. Half the gap at a
 billion in a double is $\val{p01.swamp.at.billion}$ \dash{} and half the gap
-at $1$ in an \code{fp32} is $\val{p01.swamp.fp32}$, which is the same number.
+at $1$ in an \code{fp32} is $\val{p01.swamp.fp32}$, which is that same number.
 
 That is exact rather than approximate, and it is a property of that particular
 magnitude rather than a law: a billion falls in the range of exponents
@@ -607,9 +634,18 @@ It is a workaround for $\val{p01.fp16.ebits}$ exponent bits, and it is the
 reason \code{bf16} training needs no such machinery: with
 $\val{p01.bf16.ebits}$ bits the gradients were never near the floor.
 \end{aibox}
+
+That settles the weights and the gradients. It leaves the running sums that
+section 3 showed swallowing small contributions whole. Which of the two
+budgets does an accumulator need, and therefore which format?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Precision, so \code{fp32} \dash{} an accumulator is nowhere near either
+end of the range and everywhere near the swamping threshold.}
+
 One consequence to carry into every mixed-precision decision you make.
 
 The choice of format is a choice about \emph{which} of the two budgets you
@@ -744,11 +780,20 @@ That is Program~\ref{prog:F03}'s point arriving with its machinery attached:
 the exponent budget is a hard ceiling on how long a sequence can be scored by
 multiplying, and working in logarithms is not a refinement, it is the only way
 the quantity exists at all.
+
+Put a number on it before the next frame does. A model that assigns
+$\num{0.5}$ to every token, scored in \code{fp16} by multiplying: how many
+tokens before the product is exactly zero \dash{} thousands, hundreds, or
+fewer?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-The ceiling in tokens, for a coin-flipping model that assigns
-$\num{0.5}$ to every token \dash{} which is
+\ans{Fewer. $\val{p01.coin.fp16}$ tokens, which is one sentence.}
+
+The ceiling in tokens, for a coin-flipping model that assigns $\num{0.5}$ to
+every token \dash{} which is
 Program~\ref{prog:F03}'s \enquote{shorter than a page} made exact:
 
 \begin{center}
@@ -767,20 +812,29 @@ in this format & the product is exactly zero after \\
 The arithmetic here is exact until it underflows, because $\num{0.5}^{n}$ is
 exactly $2^{-n}$ and every one of those is representable down to the smallest
 subnormal \dash{} so the cliff is one step past the floor, in every format.
-The \code{fp16} row is the one to look at twice: twenty-five tokens is a
-sentence.
+Set the \code{bf16} row against it: $\val{p01.coin.bf16}$ tokens out of the
+same sixteen bits. Almost all of that is the three extra exponent bits, and
+the three significand bits \code{bf16} gave up to buy them take a little of it
+back, because a shallower significand is a shallower subnormal range.
+
+One more number to place against those floors, and it is not this program's.
+Program~\ref{prog:F12} multiplied forty layer factors together and reached
+$\val{p01.f12.prod}$ for a saturated logistic chain. Which of the four formats
+still holds it?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-And Program~\ref{prog:F12}, which is the other half of the same point.
+\ans{Only a double. It is below \code{fp32}'s smallest subnormal of
+$\val{p01.fp32.minsub}$, and far below \code{bf16}'s and \code{fp16}'s, so in
+all three it is exactly zero.}
 
-That program multiplied forty layer factors together and reached
-$\val{p01.f12.prod}$ for a saturated logistic chain. Set it against the two
-floors tabulated at the start of this section: it sits comfortably above a double's floor, and comfortably
-\emph{below} \code{fp32}'s smallest subnormal of $\val{p01.fp32.minsub}$.
+And that is Program~\ref{prog:F12}, which is the other half of the same point.
 
 So the same arithmetic gives a small number in one format and \textbf{exactly
-zero} in another, and the second is the training format. Program~\ref{prog:F12}
+zero} in another, and the second is the training format.
+Program~\ref{prog:F12}
 said the first layers receive exactly nothing rather than very little; this is
 the frame that makes \enquote{exactly} literal.
 
