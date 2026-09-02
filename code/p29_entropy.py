@@ -156,8 +156,9 @@ emit("p29.add.bound", bound(_worst_add, ADD_CEIL))
 # And the two ends, which are what make the function the right shape: a
 # certainty surprises you by nothing, exactly, and the surprise of an
 # impossibility is unbounded.  Both are stated as the identities they are.
+# Not emitted: the frame writes "exactly nothing" in words, and a zero behind
+# a \val{} would be a figure standing in for a sentence.
 assert surprise_nats(Fraction(1)) == 0.0
-emit("p29.certain", 0)
 
 # A worked pair the reader can check on the page: one token in a thousand.
 RARE = Fraction(1, 1000)
@@ -273,7 +274,8 @@ CAP = 7
 _best, _arg = best_code(DYADIC, cap=CAP)
 assert _best == _h_dyadic, (_best, _h_dyadic)
 assert sorted(_arg) == [1, 2, 3, 3], _arg
-emit("p29.code.n", len(DYADIC))
+# Not emitted: the frames say "four symbols" in words, which is this book's
+# stated exception for arithmetic the reader does in their head.
 emit("p29.code.best", float(_best), 2)
 emit("p29.code.h", float(_h_dyadic), 2)
 emit("p29.code.assignments",
@@ -348,10 +350,15 @@ _maxent = float(committed("p25.tex", "p25.e9.maxent") or 2.079)
 assert abs(math.log(_keys) - _maxent) < 5e-4, (math.log(_keys), _maxent)
 emit("p29.att.keys", _keys)
 emit("p29.att.maxent", _maxent, 3)
+# All four of P25's rows are ASSERTED; only the three the frames quote are
+# emitted.  Program F11's finding: a value nothing references is a second copy
+# nobody would correct.
 for tag, key in (("raw", "p25.e9.raw.ent.512"), ("scaled", "p25.e9.scaled.ent.512"),
                  ("raw8", "p25.e9.raw.ent.8"), ("scaled8", "p25.e9.scaled.ent.8")):
     ent = float(committed("p25.tex", key) or 0.0)
     assert ent > 0, key
+    if tag == "scaled8":
+        continue
     emit(f"p29.att.{tag}.ent", ent, 3)
     emit(f"p29.att.{tag}.eff", math.exp(ent), 2)
 # The claim the frames make, asserted rather than eyeballed: without the
@@ -441,6 +448,14 @@ emit("p29.bpc.ratio",
 # reports two different bits-per-character figures under two tokenisers, and
 # the ratio is the tokenisers' ratio and nothing about the model.
 assert abs((BPT * TPC_B) / (BPT * TPC_A) - TPC_B / TPC_A) < 1e-12
+# AND the route the reader will actually take, which the reproduces() calls
+# above do NOT cover: they each check one value against ITS OWN operands, and
+# a reader dividing the two bits-per-character figures printed side by side is
+# doing a third sum nothing had checked.  That is Program P28's finding -- a
+# helper is only as wide as the comparison it was pointed at -- so the page's
+# own row is divided here, as the page prints it.
+_shown = round(float(f"{BPT * TPC_B:.3f}") / float(f"{BPT * TPC_A:.3f}"), 2)
+assert f"{_shown:.2f}" == f"{TPC_B / TPC_A:.2f}", (_shown, TPC_B / TPC_A)
 
 
 # ======================================================================

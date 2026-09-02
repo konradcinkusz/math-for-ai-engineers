@@ -1,25 +1,937 @@
 %% P29 --- Entropia i miara zaskoczenia
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Blizniak: programs/en/P29-entropy.tex. Ramka w ramke, makro w makro, liczba
+%% w liczbe; tools/parity.py porownuje oba pliki. Kazda liczba pochodzi z
+%% code/p29_entropy.py, ktorego naglowek niesie pelne odczytanie sasiadow.
+%%
+%% REGULY TLUMACZA (C4, C8, C12 czytaja KOLEJNOSC):
+%%   * cyfra zostaje cyfra, a slowo zostaje slowem -- P25 zlapal oba kierunki;
+%%   * odwolanie prowadzi zdanie, nigdy nie stoi za swoja matematyka;
+%%   * w matematyce \text{} dla przetlumaczonego slowa, nigdy \mathrm{};
+%%   * angielski zwrot, ktory po polsku wymaga symbolu, poprawia sie po
+%%     STRONIE ANGIELSKIEJ -- P28 zaplacil za to piecioma ramkami.
 
-\program{Entropia i miara zaskoczenia}
+\program[Entropia i zaskoczenie]{Entropia i miara zaskoczenia}
 \label{prog:P29}
+\index{entropia}
+\index{zaskoczenie}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--4}{zapisać, jak zaskakujący jest wynik, i powiedzieć, dlaczego ta
+  miara musi być logarytmem}
+\outcome{5--10}{policzyć entropię i powiedzieć, który rozkład na zadanej
+  liczbie wyników ma największą}
+\outcome{11--18}{powiedzieć, czym jest bit \dash{} w kategoriach kodu, a nie
+  jednostki}
+\outcome{19--25}{odczytać entropię jako efektywną liczbę jednakowo
+  prawdopodobnych wyborów, a perpleksję jako to samo}
+\outcome{26--30}{używać entropii rozkładu, który podaje model, jako sygnału w
+  czasie działania i powiedzieć, czego ona nie mówi}
+\outcome{31--34}{powiedzieć, czego brakuje liczbie bitów na token, zanim
+  poprze ona tezę o kompresji}
+\end{outcomes}
 
-Argument: surprise is the negative log of a probability; entropy is average
-surprise; it is the shortest average code length, and that is why the units
-are bits. Payoff: **perplexity is the exponential of the cross-entropy, and
-it is the effective number of equally likely choices at each step** \dash{}
-so a perplexity of 7 is a concrete statement about a model and not a
-leaderboard number; entropy of the next-token distribution as a usable
-runtime signal for when a model is guessing; the entropy of a tokeniser's
-output as a bound on how much a compression-style argument can claim.
+\begin{quiz}
+\item Model przypisuje prawdopodobieństwo $\frac{1}{\val{p29.rare.den}}$
+  tokenowi, który potem widzi. Jak bardzo powinieneś być zaskoczony, w
+  natach? \teachesat{2--3}
+  \answerto{$\val{p29.rare.nats}$ nata, czyli
+  $\ln \val{p29.rare.den}$. Zaskoczenie to ujemny logarytm
+  prawdopodobieństwa, więc rzadszy wynik zaskakuje bardziej, a pewność nie
+  zaskakuje wcale.}
+\item Dlaczego zaskoczenie jest logarytmem, a nie na przykład $1 - p$?
+  \teachesat{1--2}
+  \answerto{Bo zaskoczenia niezależne muszą się dodawać, podczas gdy ich
+  prawdopodobieństwa się mnożą, a logarytm jest funkcją, która zamienia jedno
+  w drugie.}
+\item Spośród wszystkich rozkładów na $\val{p29.seven.n}$ wynikach, który ma
+  największą entropię? \teachesat{8--9}
+  \answerto{Jednostajny, a jego entropia wynosi
+  $\ln \val{p29.seven.n} = \val{p29.seven.nats}$ nata.}
+\item Perpleksja modelu wynosi $\val{p29.f03.ppl}$. Powiedz, co to twierdzi o
+  modelu, w zdaniu bez logarytmu. \teachesat{21--22}
+  \answerto{Na każdej pozycji jest on tak niepewny jak ktoś wybierający
+  jednostajnie spośród $\val{p29.f03.ppl}$ tokenów \dash{} ze słownika o
+  $\val{p29.vocab}$ tokenach.}
+\item Dwa modele podają rozkłady następnego tokena. Jeden ma entropię
+  $\val{p29.wrong.ent}$ nata, drugi $\val{p29.spread.ent}$. Który prędzej ma
+  rację? \teachesat{28--29}
+  \answerto{To pytanie nie ma odpowiedzi. Entropia mierzy, jak pewny jest
+  rozkład, a nie czy jest trafny; model pewny i błędny ma niską.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 45 ramek.
-}
+% ============================================================
+\section{Jak bardzo powinieneś być zaskoczony}
+\label{sec:P29-surprise}
+\index{zaskoczenie!jako ujemny logarytm prawdopodobieństwa}
+
+\begin{fr}
+Program~\ref{prog:P28} zakończył się stwierdzeniem, że następne pytanie nie
+brzmi, jak bardzo jesteś pewien, lecz ile wart jest komunikat. Zacznij od
+mniejszego, bo wszystko w tym programie jest z niego zbudowane.
+
+Model kładzie prawdopodobieństwo $p$ na tokenie, który potem widzi. Chcesz
+jednej liczby mówiącej, jak zaskakujące to było: dużej, gdy $p$ jest małe,
+zerowej, gdy model był pewien, i \dash{} to jest wymaganie, które pracuje
+\dash{} \textbf{addytywnej po zdarzeniach niezależnych}, bo poznanie dwóch
+niepowiązanych rzeczy powinno zaskoczyć o sumę tego, co każda robi sama.
+
+Prawdopodobieństwa niezależne się \emph{mnożą}. Program~\ref{prog:F03} podaje
+jedyną funkcję, która zamienia iloczyn w sumę. Jaka jest więc ta miara?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Ujemny logarytm prawdopodobieństwa}
+
+\[ \text{zaskoczenie}(p) \;=\; -\ln p \]
+
+a znak minus jest tam tylko dlatego, że prawdopodobieństwo wynosi co najwyżej
+jeden, więc jego logarytm jest co najwyżej zerem. Nic nie zostało wybrane:
+wymaganie addytywności plus prawo iloczynu z Programu~\ref{prog:F03} wymuszają
+logarytm, a podstawa decyduje o jednostce, nie o funkcji.
+
+Sprawdź oba końce. Pewność, $p = 1$: logarytm jedynki to zero, więc pewność
+zaskakuje \textbf{dokładnie o nic}. A gdy $p$ spada ku zeru, zaskoczenie rośnie
+bez ograniczenia, czego właśnie chcesz po zdarzeniu, o którym model mówił, że
+zajść nie może.
+
+Model kładzie $\frac{1}{\val{p29.rare.den}}$ na tokenie, który przychodzi. Jak
+bardzo jesteś zaskoczony?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p29.rare.nats}$ nata, czyli $\val{p29.rare.bits}$ bita}
+
+$\ln \val{p29.rare.den}$ oraz $\logb{2} \val{p29.rare.den}$, ten sam pomiar w
+dwóch jednostkach, które podaje Program~\ref{prog:F03}.
+
+\begin{note}
+$\val{p29.rare.bits}$, a nie dziesięć. Tysiąc nie jest potęgą dwójki \dash{}
+$2^{10}$ to $1024$ \dash{} więc liczba bitów jest nieco poniżej dziesięciu, a
+Program~\ref{prog:F01} podaje $2^{10} \approx 10^{3}$, czyli dokładnie to
+przybliżenie, przez które jest jej niemal tyle. Warto wypisać cyfry zamiast
+okrągłej liczby, bo cała sekcja 3 opiera się na tym, że bit jest czymś
+policzalnym.
+\end{note}
+
+Addytywność była wymaganiem, więc jest sprawdzana, a nie zakładana: na
+$\val{p29.add.pairs}$ parach zdarzeń niezależnych zaskoczenie pary i suma obu
+zaskoczeń zgadzają się lepiej niż $\val{p29.add.bound}$, co jest
+zaokrągleniem.
+
+\mermaidfig{p29-surprise-adds}{Dlaczego ta miara musi być
+  logarytmem}{zaskoczenia się dodają}
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Czyli zaskoczenie to inne słowo na nieprawdopodobieństwo.}}
+
+Jest \emph{funkcją} nieprawdopodobieństwa, a nie jego synonimem, i ta różnica
+jest całym powodem, dla którego stoi tam logarytm.
+
+Weź dwa niezależne zdarzenia po $p = \frac{1}{2}$. Ich prawdopodobieństwa
+mnożą się do $\frac{1}{4}$; ich zaskoczenia dodają się do dwóch bitów. Weź
+teraz jedno zdarzenie o $p = \frac{1}{4}$: to samo prawdopodobieństwo, to samo
+zaskoczenie. To jest ta własność i to ona sprawia, że zaskoczenie
+\textbf{kumuluje się po sekwencji} tak, jak prawdopodobieństwo nie potrafi
+\dash{} dlatego Program~\ref{prog:F03} liczy wiarygodność sekwencji w
+logarytmach, nigdy jako iloczyn, i dlatego Program~\ref{prog:P01} pokazał, że
+iloczyn schodzi do zera, a suma nie.
+
+\enquote{Nieprawdopodobieństwo} nie ma takiej arytmetyki. Nic sensownego nie
+dodaje dwóch nieprawdopodobieństw.
+\end{trapbox}
+\end{fr}
+
+\section{Entropia to średnie zaskoczenie}
+\label{sec:P29-entropy}
+\index{entropia!jako średnie zaskoczenie}
+
+\begin{fr}
+Jeden wynik ma zaskoczenie. \emph{Rozkład} ma ich cały zbiór, po jednym na
+wynik, a każde przychodzi ze swoim prawdopodobieństwem.
+
+Program~\ref{prog:P24} daje operację, która zamienia zbiór wartości i ich
+prawdopodobieństwa w jedną liczbę, więc nie ma tu czego definiować od nowa.
+Zapisz średnie zaskoczenie rozkładu $p$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$H(p) = \Ex[-\ln p(X)] = -\sum_i p_i \ln p_i$}
+
+To \textbf{entropia}, czyli wartość oczekiwana z Programu~\ref{prog:P24}
+nałożona na funkcję z sekcji 1 i na nic więcej. Każda jej własność pochodzi z
+jednego z tych dwóch miejsc.
+
+Dwa odczytania, żeby ją utrwalić, i oba warto powiedzieć na głos:
+
+\begin{itemize}
+\item \textbf{jak bardzo powinieneś spodziewać się zaskoczenia} przez
+  losowanie z tego rozkładu;
+\item \textbf{ile niepewności niesie rozkład} \dash{} co jest tym samym
+  zdaniem czytanym od drugiego końca, bo rozkład, który rzadko cię zaskakuje,
+  to taki, którego odpowiedź już znałeś.
+\end{itemize}
+
+Weź najuczciwszą monetę, jaka istnieje. Jaka jest jej entropia w bitach?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dokładnie $\val{p29.coin.bits}$}
+
+Oba wyniki po połowie, każdy zaskakuje o jeden bit, więc średnia to jeden bit.
+\textbf{To jest definicja tej jednostki}: bit to entropia jednej uczciwej
+monety, a sekcja 3 mówi, co czyni z tego rzecz wartą mierzenia, a nie dowolny
+wybór skali.
+
+Zauważ, że jednostka to wybór podstawy logarytmu i nic więcej. Ta sama moneta
+to $\val{p29.coin.bits}$ bit albo $\ln 2$ nata, a Program~\ref{prog:F03}
+przelicza między nimi; żadna nie jest bardziej podstawowa. Bit wygrywa w
+reszcie tego programu z jednego tylko powodu \dash{} sekcja 3 wysyła drutem
+cyfry dwójkowe, a cyfra jest wyborem dwustronnym.
+
+Teraz obciąż monetę do $\val{p29.bias.p}$. Zanim policzysz: entropia będzie
+większa czy mniejsza?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Mniejsza \dash{} $\val{p29.bias.bits}$ bita}
+
+Poniżej połowy, i to sporo. Większość losowań zaskakuje teraz bardzo mało, a
+te rzadkie zaskakują ogromnie, ale przychodzą zbyt rzadko, by to nadrobić.
+Moneta obciążona niesie więc mniej niepewności niż uczciwa, co jest tym, co to
+słowo powinno znaczyć.
+
+Zwróć uwagę na kształt, bo książka już go spotkała:
+$-p\ln p - (1-p)\ln(1-p)$ jest największe przy połowie i opada w obie strony,
+dokładnie tak, jak Program~\ref{prog:P25} pokazuje dla $p(1-p)$. Dwie różne
+funkcje z tą samą
+jakościową historią \dash{} połowa jest tam, gdzie wybór dwustronny jest
+najtrudniejszy.
+
+To sugeruje ogólne twierdzenie. Przy ustalonej liczbie wyników który rozkład
+ma \emph{największą} entropię?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Jednostajny}
+
+Odpowiedź, którą daje niemal każdy, i jest trafna \dash{} zauważ jednak, że
+mieć rację to nie to samo co sprawdzić. Skrypt więc sprawdza, na
+$\val{p29.max.tested}$ rozkładach na trzech wynikach rozłożonych na siatce o
+$\val{p29.max.grid}$, i żaden nie bije $\val{p29.max.nats}$ nata rozkładu
+jednostajnego.
+
+\begin{note}
+Siatka \textbf{zawiera} punkt jednostajny, bo $\val{p29.max.grid}$ dzieli się
+przez trzy, więc maksimum jest osiągane, a nie przybliżane, i porównanie jest
+równością. Siatka, która by go minęła, podałaby maksimum, które nim nie jest
+\dash{} czyli wniosek Programu~\ref{prog:P10} o kierunku płaskim przychodzący
+z drugiej strony: nie da się znaleźć punktu wyróżnionego losowaniem, jeśli nie
+zadbałeś, by w niego trafić.
+\end{note}
+
+Dla $\val{p29.seven.n}$ wyników daje to
+$\ln \val{p29.seven.n} = \val{p29.seven.nats}$ nata, czyli
+$\val{p29.seven.bits}$ bita \dash{} a tę parę Program~\ref{prog:F03} już
+zatwierdził i sekcja 4 zaraz jej potrzebuje.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Entropia mierzy, ile informacji jest w komunikacie.}}
+
+Mierzy, ile nie wiedziałeś wcześniej, co nie jest tym samym i jest własnością
+\emph{rozkładu}, a nie jakiegokolwiek komunikatu.
+
+Rozkład, który zawsze emituje ten sam token, ma entropię zero. Token wciąż
+przychodzi, wciąż zajmuje miejsce, wciąż kosztuje przebieg w przód \dash{} i
+nic nie niesie, bo mogłeś go zapisać wcześniej. Nic w komunikacie się nie
+zmieniło; zmieniło się to, co wiedziałeś.
+
+Dlatego ten sam tekst ma różne entropie pod różnymi modelami i dlatego teza
+postaci \enquote{ten tekst zawiera $N$ bitów} jest niepełna, dopóki nie nazwie
+rozkładu, względem którego ją zmierzono. Sekcja 6 mówi, co się dzieje, gdy
+ktoś o tym zapomni.
+\end{trapbox}
+\end{fr}
+
+\section{Czym jest bit}
+\label{sec:P29-code}
+\index{entropia!jako długość kodu}
+\index{bit}
+
+\begin{fr}
+Sekcja 2 powiedziała, że bit to entropia uczciwej monety, co ustala skalę i
+nie wyjaśnia nic. Program~\ref{prog:F03} przelicza między bitami a natami i
+nigdy nie mówi, czym jedno albo drugie \emph{jest}.
+
+Oto pytanie, które to rozstrzyga. Musisz przesłać drutem jeden symbol z małego
+alfabetu, jako cyfry dwójkowe, i wolno ci wybrać słowa kodowe. Chcesz, by
+\textbf{średnia} liczba cyfr była jak najmniejsza, po wielu symbolach
+losowanych ze znanego rozkładu.
+
+Jedna zasada: kod musi być \textbf{prefiksowy}, więc żadne słowo kodowe nie
+jest początkiem innego. Inaczej odbiorca nie pozna, gdzie kończy się jeden
+symbol, a zaczyna następny.
+
+Przy tej zasadzie, co nie pozwala dać każdemu symbolowi jednocyfrowego słowa
+kodowego?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Jednocyfrowe słowa kodowe są tylko dwa, a krótkie słowo zużywa całą gałąź
+możliwości}
+
+Wydaj `0' na jeden symbol i przepada każde słowo kodowe zaczynające się od
+`0'. To jest to ograniczenie i ma ono dokładną postać: kod prefiksowy o
+długościach $l_1, \ldots, l_n$ istnieje wtedy i tylko wtedy, gdy
+
+\[ \sum_i 2^{-l_i} \;\le\; 1 \]
+
+Każde słowo kodowe długości $l$ zużywa część $2^{-l}$ dostępnej przestrzeni, a
+nie da się wydać więcej niż całość. Nic tu jeszcze nie dotyczy
+prawdopodobieństwa: to twierdzenie o tym, ile napisów istnieje.
+
+Zadanie projektowe jest więc już całkiem konkretne. Wybierz długości mieszczące
+się w budżecie i zminimalizuj $\sum_i p_i l_i$.
+
+\mermaidfig{p29-code-budget}{Co wydaje krótkie słowo kodowe}{budżet kodu}
+
+Wypróbuj budżet na przykładzie. Trzy symbole, długości $1$, $1$ i $2$ \dash{}
+dopuszczalne?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie \dash{} $\frac12 + \frac12 + \frac14$ to więcej niż jeden}
+
+Jednocyfrowe słowa kodowe to `0' i `1', a razem zajmują całą przestrzeń; nie
+zostaje miejsca na trzecie słowo kodowe żadnej długości. Budżet nie jest
+wskazówką, jest licznikiem istniejących napisów.
+
+Weź cztery symbole po $\frac{1}{2}$, $\frac{1}{4}$, $\frac{1}{8}$,
+$\frac{1}{8}$. Jego entropia to $\val{p29.code.h}$ bita, co skrypt liczy na
+ułamkach bez żadnego zaokrąglania, bo każde prawdopodobieństwo jest potęgą
+dwójki, a każde zaskoczenie jest wobec tego całkowitą liczbą bitów.
+
+Zaprojektuj teraz kod. Które cztery długości byś wybrał?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$1$, $2$, $3$, $3$}
+
+$\frac12 + \frac14 + \frac18 + \frac18 = 1$, więc budżet jest wydany dokładnie,
+a oczekiwana długość wynosi
+
+\[ \tfrac12(1) + \tfrac14(2) + \tfrac18(3) + \tfrac18(3)
+   \;=\; \val{p29.code.best}\ \text{bita} \]
+
+czyli \textbf{entropię}, co do cyfry. Każdy symbol dostał słowo kodowe o
+długości równej własnemu zaskoczeniu w bitach, a średnia długości jest wobec
+tego średnią zaskoczeń.
+
+To sugestywne i to jeden przykład. Czy to najlepszy kod, czy tylko dobry?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Najlepszy, i to jest sprawdzone, a nie wyargumentowane}
+
+Skrypt wylicza \textbf{każde} przypisanie długości do
+$\val{p29.code.cap}$ mieszczące się w budżecie \dash{}
+$\val{p29.code.assignments}$ z nich \dash{} i żadne nie wypada lepiej niż
+$\val{p29.code.best}$.
+
+\begin{center}
+\emph{To dowód dla tego alfabetu, a nie świadectwo o nim,\\
+bo przeszukanie niczego nie pominęło.}
+\end{center}
+
+Program~\ref{prog:P14} podaje to rozróżnienie, a Program~\ref{prog:P13} użył
+go do porządków topologicznych; to ten sam ruch i jest dostępny z tego samego
+powodu \dash{} rzecz, po której się kwantyfikuje, jest skończona, i
+skwantyfikowano po całej.
+
+Ogólne twierdzenie jest Shannona i ta książka go nie dowodzi.
+
+\begin{rigourbox}
+\textbf{Żaden kod prefiksowy nie ma oczekiwanej długości poniżej entropii},
+dla żadnego rozkładu, a istnieje taki, który mieści się w granicy jednego bita
+od niej. Dowód to nierówność Jensena nałożona na budżet Krafta \dash{} czyli
+nierówność z Programu~\ref{prog:P19} robiąca trzecią robotę \dash{} i mieszka
+w każdym kursie teorii informacji. Sprawdzone są tu oba jej końce: dolne
+ograniczenie przez wyliczenie na dwóch alfabetach, a górne przez konstrukcję
+na jednym.
+\end{rigourbox}
+\end{fr}
+
+\begin{fr}
+Przykład dobrano tak, by ograniczenie było ciasne, i warto zobaczyć, co się
+dzieje, gdy nie jest.
+
+Cztery symbole po $\frac{2}{5}$, $\frac{1}{5}$, $\frac{1}{5}$, $\frac{1}{5}$
+mają entropię $\val{p29.nondy.h}$ bita. To nie są potęgi dwójki, więc
+zaskoczenie żadnego symbolu nie jest całkowitą liczbą bitów \dash{} a długość
+słowa kodowego jest liczbą całkowitą, cokolwiek zrobisz.
+
+Jaka jest najlepsza osiągalna oczekiwana długość i dokąd idzie różnica?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p29.nondy.best}$ bita, a różnica to zaokrąglenie}
+
+Dokładnie dwa, z czterech dwucyfrowych słów kodowych; nadwyżka nad entropią to
+$\val{p29.nondy.gap}$ bita. Nie ma dokąd indziej pójść: entropia mówi, ile
+średnia \emph{mogłaby} wynosić, gdyby długość mogła wynosić
+$\logb{2} \frac{5}{2} = \num{1.32}$ cyfry, a nie może.
+
+Uczciwe sformułowanie sekcji 3 brzmi więc tak i to ono czyni z bita wielkość,
+a nie skalę:
+
+\begin{center}
+\emph{Entropia rozkładu to najmniejsza średnia liczba cyfr dwójkowych,\\
+w których da się zakodować jego wyniki, i jest osiągalna z dokładnością do
+jednej cyfry.}
+\end{center}
+
+Bit nie jest jednostką, którą ktoś sobie wybrał. Jest \textbf{cyfrą, którą
+naprawdę trzeba by wysłać}, a entropia je liczy.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Czyli entropia dotyczy kompresji, a strata mojego modelu mówi
+mi, jak dobrze by kompresował.}}
+
+Pierwsza połowa jest trafna, a druga jest tezą z brakującą wielkością.
+
+Wszystko powyżej jest na \emph{symbol} znanego alfabetu, a strata modelu jest
+na \emph{token}. Teza o kompresji dotyczy pliku, który mierzy się w znakach
+albo bajtach \dash{} więc obie wielkości są tą samą dopiero po przemnożeniu
+przez to, ile tokenów kosztuje znak, co jest własnością tokenizera i nie
+występuje w stracie nigdzie. Sekcja 6 wykonuje to mnożenie i pokazuje, co ze
+zmianą tokenizera dzieje się z odpowiedzią.
+
+A kody powyżej zakładają, że rozkład jest \textbf{znany odbiorcy}. Rozkład
+modelu zmienia się na każdej pozycji i zależy od wszystkiego, co było
+wcześniej, więc prawdziwy schemat musi go przesłać albo uzgodnić z góry. To nie
+łamie ograniczenia \dash{} to dlatego ograniczenie jest ograniczeniem.
+\end{trapbox}
+\end{fr}
+
+\section{Efektywna liczba wyborów}
+\label{sec:P29-effective}
+\index{perpleksja!jako efektywna liczba wyborów}
+
+\begin{fr}
+Program~\ref{prog:P19} wyprowadza, dlaczego nie wolno uśredniać perpleksji, z
+pomiarem, i przekazuje tutaj po imieniu jedną rzecz: \textbf{co ta liczba
+znaczy}. To jest ta rzecz.
+
+Entropia w natach jest liczbą rzeczywistą i nikt nie ma dla niej intuicji. Ale
+sekcja 2 dała rozkład, którego entropia czyta się łatwo: jednostajny na $n$
+wynikach ma entropię dokładnie $\ln n$.
+
+Puść to więc wstecz. Mając entropię $H$ w natach, co mówi ci $e^{H}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Ile jednakowo prawdopodobnych wyborów niosłoby tę samą niepewność}
+
+\[ \text{efektywne wybory} \;=\; e^{H} \]
+
+Dla rozkładu jednostajnego na $n$ zwraca to $n$, dokładnie \dash{} sprawdzone
+przy każdym $n$ od $2$ do $\val{p29.eff.checked}+1$, bo twierdzenie postaci
+\enquote{zawsze} nie powinno opierać się na jednym przypadku. Dla wszystkiego
+innego zwraca liczbę między jednym a $n$, i ta liczba jest uczciwą odpowiedzią
+na pytanie \enquote{ile opcji ten rozkład naprawdę waży?}
+
+\mermaidfig{p29-nats-to-count}{Entropia odczytana jako licznik}{entropia jako
+  licznik}
+
+Rozkład na czterech tokenach z jednym na $\num{0.97}$ ma entropię
+$\val{p29.wrong.ent}$ nata. Ile opcji efektywnie waży?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nieco ponad jedną \dash{} ma cztery opcje i używa jednej z nich}
+
+$e^{\val{p29.wrong.ent}}$, a sekcja 5 wraca do tego rozkładu, bo jest to
+kształt modelu, który jest pewien i może się mylić.
+
+Teraz liczba, którą czytelnik naprawdę spotyka. Program~\ref{prog:F02} ma
+model o średniej stracie $\val{p29.f02.loss}$ nata na token, a
+Program~\ref{prog:F03} podniósł to do \textbf{perpleksji}
+$\val{p29.f03.ppl}$, nie mówiąc, czego ta odpowiedź jest liczbą.
+
+Złóż jedno z drugim. Co perpleksja $\val{p29.f03.ppl}$ twierdzi o tym modelu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Na każdej pozycji jest tak niepewny jak ktoś wybierający jednostajnie
+spośród $\val{p29.f03.ppl}$ tokenów}
+
+\begin{center}
+\emph{Perpleksja to efektywna liczba jednakowo prawdopodobnych wyborów,\\
+które model waży na każdym kroku, i nic więcej.}
+\end{center}
+
+To twierdzenie o modelu, a nie pozycja w rankingu, i da się je zestawić ze
+słownikiem. Przy $\val{p29.vocab}$ tokenach ten model zawęził pole do
+$\val{p29.ppl.frac}$ procent słownika \dash{} co jest albo imponujące, albo
+fatalne, zależnie od tekstu, i jest pytaniem, które umiesz już zadać.
+
+\begin{note}
+Program~\ref{prog:P26} pokazuje, że średnia strata \emph{jest} entropią
+krzyżową, więc perpleksja jest eksponentą entropii krzyżowej, a nie entropii.
+To rozróżnienie należy do Programu~\ref{prog:P30} i ma znaczenie: ten program
+liczy entropię \textbf{jednego} rozkładu i nigdy wielkości między dwoma. To,
+co eksponenta robi z liczbą, jest w obu przypadkach takie samo, i dlatego
+odczytanie się przenosi.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Odczytanie nie dotyczy modeli językowych, a najjaśniejszym dowodem jest pomiar,
+który ta książka już wydrukowała w innym celu.
+
+Program~\ref{prog:P25} przeprowadził eksperyment E9 na wierszu uwagi po
+$\val{p29.att.keys}$ kluczach i podał jego entropię w natach: z dzieleniem
+przez $\frac{1}{\sqrt{d_k}}$ \dash{} $\val{p29.att.scaled.ent}$ przy
+największym rozmiarze głowicy; bez niego \dash{} $\val{p29.att.raw.ent}$. Jego
+wniosek brzmiał, że skalowanie utrzymuje entropię w miejscu, co jest prawdą i
+trudno to sobie wyobrazić.
+
+Wiersz uwagi jest rozkładem \dash{} to softmax sprawia, że sumuje się do
+jedynki \dash{} więc definicja z sekcji 2 stosuje się do niego bez żadnej
+zmiany. Warto się przy tym zatrzymać, bo nic w tym programie nie było budowane
+pod modele językowe: entropia jest określona dla dowolnego rozkładu na zbiorze
+skończonym, a wiersz uwagi i rozkład następnego tokena są dokładnie tym.
+
+Odczytaj oba jako liczniki. Na ile kluczy patrzy ta głowica w każdym z
+przypadków?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p29.att.scaled.eff}$ z $\val{p29.att.keys}$ z dzieleniem i
+$\val{p29.att.raw.eff}$ bez niego}
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ & entropia, naty & efektywne klucze & z \\
+\midrule
+bez $\frac{1}{\sqrt{d_k}}$ & $\val{p29.att.raw.ent}$
+  & $\val{p29.att.raw.eff}$ & $\val{p29.att.keys}$ \\
+z nim & $\val{p29.att.scaled.ent}$
+  & $\val{p29.att.scaled.eff}$ & $\val{p29.att.keys}$ \\
+\midrule
+jednostajny, sufit & $\val{p29.att.maxent}$
+  & $\val{p29.att.keys}$ & $\val{p29.att.keys}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Bez skalowania głowica zapadła się na jeden klucz i dziesiątą część
+drugiego.} Program~\ref{prog:P25} mógł powiedzieć, że entropia jest mała;
+licznik mówi, że architektura wyrzuciła siedem ósmych tego, do czego głowica
+została zbudowana, zanim jeszcze cokolwiek się nauczyła.
+
+A wiersz sufitu to tożsamość sprzed dwóch ramek, a nie czwarty pomiar:
+$\val{p29.att.maxent}$ nata to $\ln \val{p29.att.keys}$, więc jego eksponenta
+to równe $\val{p29.att.keys}$.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Perpleksja siedem znaczy, że model rozważał siedem
+tokenów.}}
+
+Na jednej pozycji, na jednym rozkładzie, to odczytanie jest dokładnie trafne i
+jest tym, co sekcja 4 właśnie zbudowała: przypadek jednostajny na siedmiu z
+Programu~\ref{prog:F03} ma entropię $\val{p29.seven.nats}$ nata i efektywny
+licznik $\val{p29.seven.n}$.
+
+Kłopot w tym, że raportowana perpleksja niemal nigdy nie jest jedną pozycją.
+Jest eksponentą \textbf{średniej} straty po korpusie, a
+Program~\ref{prog:P19} zmierzył, co to ukrywa: przy rozrzucie dwóch natów
+efektywne liczniki na token rozciągają się na rzędy wielkości, podczas gdy
+raportowana liczba siedzi pośrodku, i \emph{żadna pozycja} nie musi ważyć
+siedmiu tokenów.
+
+Zdanie do użycia jest więc tym z zastrzeżeniem. Perpleksja siedem mówi, że
+model jest średnio tak niepewny jak jednostajny wybór spośród siedmiu; nie
+mówi, że którykolwiek krok tak wyglądał. Program~\ref{prog:P19} podaje,
+dlaczego średnia jest eksponentą średniej straty, a nigdy średnią eksponent, i
+to jest cena tamtego wniosku, gdy czytasz tę liczbę na głos.
+\end{trapbox}
+\end{fr}
+
+\section{Entropia w czasie działania}
+\label{sec:P29-runtime}
+\index{entropia!jako sygnał w czasie działania}
+
+\begin{fr}
+Wszystko dotąd dotyczyło liczby wyliczanej po fakcie. Rozkład, który model
+podaje przy wnioskowaniu, masz tuż przed sobą, po jednym na pozycję, a jego
+entropia kosztuje sumę po słowniku.
+
+Program~\ref{prog:F05} zatwierdził rozkład na czterech tokenach w trzech
+temperaturach, a Program~\ref{prog:P24} wycenił nim pokrętła próbkowania.
+Odczytaj jego trzy wiersze jako liczniki.
+
+Zanim spojrzysz: w którą stronę podniesienie temperatury przesuwa efektywną
+liczbę wyborów?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{W górę \dash{} $\val{p29.tok.t05.eff}$, $\val{p29.tok.t10.eff}$,
+$\val{p29.tok.t20.eff}$ z $\val{p29.tok.n}$}
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+$T$ & $\num{0.5}$ & $\num{1.0}$ & $\num{2.0}$ \\
+\midrule
+entropia, naty & $\val{p29.tok.t05.ent}$ & $\val{p29.tok.t10.ent}$
+  & $\val{p29.tok.t20.ent}$ \\
+efektywne wybory & $\val{p29.tok.t05.eff}$ & $\val{p29.tok.t10.eff}$
+  & $\val{p29.tok.t20.eff}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Program~\ref{prog:F05} dowiódł, że temperatura nie może ruszyć $\argmax$, a
+Program~\ref{prog:P24} zmierzył, co niszczy każde pokrętło próbkowania. To
+trzecie odczytanie tych samych dwunastu liczb i to ono nadaje się na
+dashboard: przy $T = \num{0.5}$ model waży około dwóch ze swoich czterech
+opcji, a przy $T = 2$ około trzech i pół.
+
+Twierdzeniem jest kolejność, a nie trzy liczby \dash{} zmiana logitów je
+przesuwa i nie może przesunąć kierunku.
+\end{fr}
+
+\begin{fr}
+To sygnał użyteczny i niezwykle tani. Entropia rozkładu, który model już
+policzył, nie potrzebuje drugiego modelu, odpowiedzi wzorcowej ani etykiety;
+to jedno przejście po logitach, z których i tak zamierzałeś losować.
+
+Kupuje ona sposób zapytania w czasie działania, \textbf{czy model wybiera, czy
+zgaduje} \dash{} odpowiedź bliska $1$ mówi, że następny token jest niemal
+wymuszony, a bliska rozmiarowi słownika, że model nie ma pojęcia. Skieruj ten
+drugi rodzaj do większego modelu, do człowieka albo do odmowy.
+
+Teraz pytanie rozstrzygające, czy cokolwiek z tego jest solidne. Dwa modele
+podają rozkłady na tych samych czterech tokenach: jeden o entropii
+$\val{p29.wrong.ent}$ nata, drugi o $\val{p29.spread.ent}$. Który prędzej ma
+\emph{rację}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{To pytanie nie ma odpowiedzi i o to właśnie chodzi}
+
+\transcript{p29-effective-choices}
+
+Listing wypisuje oba efektywne liczniki: cztery, dokładnie, dla rozkładu
+rozłożonego, bo efektywny licznik rozkładu jednostajnego to jego rozmiar; i
+nieco ponad jeden dla pewnego siebie.
+
+\textbf{Entropia mierzy, jak pewny jest rozkład, a nie czy jest trafny.} Model
+pewny i błędny ma niską entropię i wygląda z zewnątrz dokładnie jak model
+pewny i trafny. Nic w tym programie nie umie ich rozróżnić, bo nic w tym
+programie nie widziało odpowiedzi.
+
+To sędzia z sekcji 6 Programu~\ref{prog:P28} od drugiej strony. Tam model
+deklarował $\val{p28.judge.says.pct}$ procent i miał rację w
+$\val{p28.judge.means.pct}$ procentach przypadków; niska entropia jest
+dokładnie kształtem tamtej wady, a naprawa jest ta sama \dash{} policz, co
+powiedział, wobec tego, co się stało.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Niska entropia znaczy, że model jest pewien, więc mogę ufać
+odpowiedzi.}}
+
+Pierwsze zdanie jest definicją, a drugie z niego nie wynika. Z niskiej entropii
+możesz wywnioskować dokładnie jedno: \emph{ten model dałby niemal tę samą
+odpowiedź, gdybyś zapytał ponownie}. To powtarzalność i nie jest to trafność.
+
+Ten nawyk warto nazwać, bo tak dashboard staje się gorszy niż nic. Próg na
+entropii łapie przypadek, w którym model wie, że zgaduje, i jest to prawdziwe,
+użyteczne i tanie. Milczy o przypadku, który kosztuje najwięcej \dash{} o
+pewnej siebie halucynacji \dash{} a dashboard świecący na zielono przez
+dokładnie ten incydent, który cię obchodzi, będzie darzony zaufaniem aż do
+chwili, gdy przestanie.
+
+\textbf{Używaj jej jako filtra, a nigdy jako gwarancji.} Wysoka entropia jest
+świadectwem kłopotu; niska nie jest świadectwem niczego.
+\end{trapbox}
+\end{fr}
+
+\section{Czego brakuje liczbie bitów na token}
+\label{sec:P29-tokeniser}
+\index{entropia!bity na znak}
+
+\begin{fr}
+Sekcja 3 uczyniła z bita cyfrę, którą ktoś musiałby wysłać, co zaprasza tezę,
+którą ludzie stawiają często: model językowy jest kompresorem, a jego strata
+mówi, jak dobrym.
+
+Program~\ref{prog:F03} przeliczył $\val{p29.f02.loss}$ nata tego modelu na
+$\val{f03.nats.to.bits}$ bita. To bity na \textbf{token}.
+
+Liczbę kompresji podaje się w bitach na \textbf{znak}. Czego jeszcze
+potrzebujesz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Ile tokenów kosztuje znak}
+
+\[ \frac{\text{bity}}{\text{znak}}
+   \;=\; \frac{\text{bity}}{\text{token}}
+   \times \frac{\text{tokeny}}{\text{znak}} \]
+
+a drugi czynnik jest własnością \textbf{tokenizera}, który w stracie nie
+występuje nigdzie. Dwa tokenizery na tym samym tekście po
+$\val{p29.tpc.a}$ i $\val{p29.tpc.b}$ tokena na znak dają
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+tokeny na znak & $\val{p29.tpc.a}$ & $\val{p29.tpc.b}$ \\
+bity na znak & $\val{p29.bpc.a}$ & $\val{p29.bpc.b}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Ten sam model i ten sam tekst. O jaki czynnik różnią się obie odpowiedzi i
+czego ten czynnik jest własnością?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p29.bpc.ratio}$, i jest własnością tokenizerów}
+
+$\val{p29.tpc.b} / \val{p29.tpc.a}$, dokładnie \dash{} czynnik bitów na token
+się skraca, więc iloraz nie mówi o modelu zupełnie nic. Skrypt to potwierdza,
+bo jest to całe twierdzenie tej sekcji.
+
+Liczba bitów na token jest więc ilorazem podanym bez jednej ze swoich dwóch
+wielkości, czyli powracającą pretensją tej książki docierającą tam, gdzie robi
+największą szkodę: dwa modele porównuje się rutynowo po stracie, a porównanie
+strat jest porównaniem modeli tylko wtedy, gdy tokenizer jest trzymany na
+stałe.
+
+\begin{center}
+\emph{Strata jest na token. Teza o kompresji jest na znak.\\
+Między nimi siedzi liczba, której nikt nie umieszcza na karcie modelu.}
+\end{center}
+
+Trzy konsekwencje warte wyniesienia, a każda jest sprawdzalna, a nie tylko
+przestrogą.
+
+\begin{itemize}
+\item \textbf{Model może obniżyć swoją stratę, zmieniając tokenizer}, nie
+  ruszając wag. Grubsze tokeny to mniej trudniejszych predykcji; strata na
+  token rośnie, a strata na znak wcale nie musi.
+\item \textbf{Dwie straty są porównywalne tylko przy jednym tokenizerze.} To
+  jest ten warunek, zwykle się go nie wypowiada, a wypowiedzenie kosztuje
+  zdanie.
+\item \textbf{Teza o kompresji jest sprawdzalna, a strata nie.} Bity na znak
+  to rozmiar pliku, który ktoś może wyprodukować, więc teza ma dołączony
+  eksperyment \dash{} i dlatego warto na nią przeliczać.
+\end{itemize}
+
+\mermaidfig{p29-two-tokenisers}{Czynnik między stratą a liczbą
+  kompresji}{dwa tokenizery}
+\end{fr}
+
+\begin{fr}
+Spójrz wstecz na to, co ten program zrobił i czego nie zrobił.
+
+Zdefiniował jedną funkcję, $-\ln p$, i wziął jej średnią. Wszystko inne było
+odczytaniem: entropia jest długością kodu, eksponenta entropii jest licznikiem,
+a perpleksja jest tym licznikiem dla modelu. Nie zbudowano nowego obiektu, a
+jedynym naprawdę nowym faktem jest ten z sekcji 3 \dash{} że średnia długość
+kodu nie może zejść poniżej entropii, co czyni z bita rzecz, którą się wysyła,
+a nie skalę, którą ktoś wybrał.
+
+Czego celowo nie zrobił, to porównania dwóch rozkładów. Każda entropia tutaj
+jest entropią \textbf{jednego} rozkładu wobec siebie samego. W chwili, gdy
+zapytasz, ile kosztuje użycie kodu jednego rozkładu na wynikach drugiego,
+odpowiedź rozpada się na entropię własną celu plus nadwyżkę \dash{} a ta
+nadwyżka jest obiektem, który Program~\ref{prog:P26} nazwał, nie definiując, i
+o którym Program~\ref{prog:P22} zadeklarował jeden fakt.
+
+Program~\ref{prog:P30} go definiuje i pokazuje, że nie jest symetryczny.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--2}{\textbf{Zaskoczenie to $-\ln p$}, a logarytm jest wymuszony, a
+  nie wybrany: zaskoczenia niezależne muszą się dodawać, podczas gdy ich
+  prawdopodobieństwa się mnożą. Pewność zaskakuje dokładnie o nic.}
+\sumitem{3}{Prawdopodobieństwo $\frac{1}{\val{p29.rare.den}}$ to
+  $\val{p29.rare.nats}$ nata albo $\val{p29.rare.bits}$ bita zaskoczenia
+  \dash{} nie dziesięć, bo tysiąc nie jest potęgą dwójki.}
+\sumitem{5--7}{\textbf{Entropia to średnie zaskoczenie}, czyli wartość
+  oczekiwana z Programu~\ref{prog:P24} nałożona na tę funkcję:
+  $H(p) = -\sum_i p_i \ln p_i$. Uczciwa moneta to dokładnie
+  $\val{p29.coin.bits}$ bit, a moneta na $\val{p29.bias.p}$ to
+  $\val{p29.bias.bits}$.}
+\sumitem{8--9}{Rozkład jednostajny ma największą entropię przy ustalonej
+  liczbie wyników \dash{} sprawdzone na $\val{p29.max.tested}$ rozkładach na
+  siatce zawierającej punkt jednostajny, więc maksimum jest osiągane, a nie
+  przybliżane.}
+\sumitem{11--13}{Kod prefiksowy o długościach $l_i$ istnieje dokładnie wtedy,
+  gdy $\sum_i 2^{-l_i} \le 1$. Krótkie słowo kodowe jest drogie, bo wydaje
+  całą gałąź.}
+\sumitem{14--15}{\textbf{Entropia to najmniejsza średnia długość kodu} i tym
+  właśnie jest bit. Na alfabecie diadycznym najlepszy z
+  $\val{p29.code.assignments}$ dopuszczalnych kodów to
+  $\val{p29.code.best}$ bita, a entropia to $\val{p29.code.h}$ \dash{}
+  wyczerpująco, więc jest to dowód dla tego alfabetu, a nie świadectwo o nim.}
+\sumitem{16--17}{Tam, gdzie prawdopodobieństwa nie są potęgami dwójki,
+  ograniczenia nie da się osiągnąć: $\val{p29.nondy.best}$ wobec
+  $\val{p29.nondy.h}$, nadwyżka $\val{p29.nondy.gap}$, a różnica to
+  zaokrąglenie długości do liczby całkowitej.}
+\sumitem{19--21}{\textbf{$e^{H}$ to efektywna liczba jednakowo
+  prawdopodobnych wyborów}, zwracająca dokładnie $n$ dla rozkładu
+  jednostajnego na $n$.}
+\sumitem{22}{\textbf{Perpleksja to ten licznik dla modelu.}
+  Program~\ref{prog:F02} podaje $\val{p29.f02.loss}$ nata, a
+  Program~\ref{prog:F03} \dash{} $\val{p29.f03.ppl}$, czyli
+  $\val{p29.ppl.frac}$ procent słownika o $\val{p29.vocab}$ tokenach.}
+\sumitem{23--24}{Entropie uwagi z Programu~\ref{prog:P25} czytane jako
+  liczniki: $\val{p29.att.raw.eff}$ efektywnego klucza z
+  $\val{p29.att.keys}$ bez dzielenia przez $\frac{1}{\sqrt{d_k}}$ i
+  $\val{p29.att.scaled.eff}$ z nim.}
+\sumitem{25}{Raportowana perpleksja jest eksponentą \emph{średniej}, więc żadna
+  konkretna pozycja nie musi tak wyglądać \dash{} i to jest cena wniosku
+  Programu~\ref{prog:P19}, gdy czytasz tę liczbę na głos.}
+\sumitem{26--27}{Temperatura odczytana jako licznik na rozkładzie, który
+  podaje Program~\ref{prog:F05}: $\val{p29.tok.t05.eff}$,
+  $\val{p29.tok.t10.eff}$, $\val{p29.tok.t20.eff}$ z
+  $\val{p29.tok.n}$, gdy $T$ rośnie.}
+\sumitem{28--30}{\textbf{Entropia mierzy pewność, a nie trafność.} Model pewny
+  i błędny ma niską. Używaj jej jako filtra na własne zgadywanie modelu, a
+  nigdy jako gwarancji odpowiedzi.}
+\sumitem{31--33}{\textbf{Bity na token to nie bity na znak.} Przemnóż przez
+  tokeny na znak, które należą do tokenizera: $\val{p29.tpc.a}$ i
+  $\val{p29.tpc.b}$ dają $\val{p29.bpc.a}$ i $\val{p29.bpc.b}$ na tym samym
+  modelu i tym samym tekście, czyli czynnik $\val{p29.bpc.ratio}$, który jest
+  ilorazem tokenizerów i niczym o modelu.}
+\sumitem{34}{Dwie straty są porównywalne tylko przy jednym tokenizerze, a teza
+  o kompresji jest sprawdzalna tam, gdzie strata nie jest.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Model kładzie prawdopodobieństwo $\num{0.02}$ na tokenie, który
+  przychodzi. Podaj zaskoczenie w natach i w bitach.
+  \answerto{$-\ln \num{0.02} = \num{3.912}$ nata;
+  $\num{3.912} \times \val{f03.inv.ln.two} = \num{5.644}$ bita. Zauważ, że
+  liczba bitów jest zawsze większa z dwóch, bo bit jest mniejszą jednostką
+  \dash{} ostrzeżenie z Programu~\ref{prog:F03}.}
+\item Co ma większą entropię: uczciwa kostka sześcienna czy moneta obciążona
+  do $\num{0.99}$? Odpowiedz przed policzeniem, potem policz.
+  \answerto{Kostka, i to z dużym zapasem: $\ln 6 = \num{1.792}$ nata wobec
+  $\num{0.056}$. Kierunek trafia niemal każdy; zaskoczeniem jest rozmiar, a
+  bierze się stąd, że moneta na $\num{0.99}$ jest niemal stałą.}
+\item Powiedziano ci, że rozkład na $16$ wynikach ma entropię $2$ bitów. Ile
+  wyników efektywnie waży i ile najwięcej mógłby?
+  \answerto{$2^{2} = 4$ efektywnie, wobec sufitu $\logb{2} 16 = 4$ bitów i
+  $16$ wyników. Używa więc jednej czwartej dostępnych mu wyborów.}
+\item Twoja ewaluacja podaje perpleksję $\num{30.0}$, a kolega mówi, że model
+  \enquote{zawęził to do trzydziestu tokenów}. Powiedz, co jest w tym trafne, a
+  co nie.
+  \answerto{Trafne, że model jest średnio tak niepewny jak jednostajny wybór
+  spośród trzydziestu. Nietrafne, że którakolwiek pozycja tak wyglądała: ta
+  liczba jest eksponentą średniej straty, a Program~\ref{prog:P19} zmierzył,
+  jak daleko liczniki na pozycję rozchodzą się wokół niej.}
+\item Dwa zespoły podają straty $\num{2.1}$ i $\num{2.3}$ nata na token na tym
+  samym korpusie i model drugiego zespołu zostaje uznany za gorszy. Co musisz
+  sprawdzić najpierw?
+  \answerto{Czy oba użyły tego samego tokenizera. Bity na token razy tokeny na
+  znak to bity na znak, a tylko to drugie jest własnością modelu i tekstu, a
+  nie tokenizera \dash{} grubszy tokenizer podnosi stratę na token przy
+  niezmienionym modelu.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że rozkład z jednym wynikiem o prawdopodobieństwie $1$ ma
+  entropię dokładnie zero, i powiedz, co dzieje się ze składnikami dla wyników
+  o prawdopodobieństwie zero.
+  \answerto{Wynik pewny wnosi $1 \times \ln 1 = 0$. Każdy inny wnosi $p\ln p$
+  przy $p = 0$, co tak zapisane nie jest określone; przyjmuje się, że jest to
+  $0$, i jest to właściwe, bo $p \ln p \to 0$, gdy $p \to 0$. Wynik niemożliwy
+  nie niesie wagi, choćby był nie wiadomo jak zaskakujący.}
+\item Kod prefiksowy przypisuje długości $2, 2, 2, 3, 3$. Czy jest
+  dopuszczalny, a jeśli zostaje luz, to co on oznacza?
+  \answerto{$3 \times \frac14 + 2 \times \frac18 = 1$, więc jest dopuszczalny i
+  nic nie zostaje. Gdyby wyszło mniej niż jeden, byłaby nieużyta gałąź i jakieś
+  słowo kodowe dałoby się skrócić \dash{} dlatego kod optymalny zawsze wydaje
+  budżet dokładnie, gdy prawdopodobieństwa na to pozwalają.}
+\item Dwa niezależne rozkłady mają entropie $H_1$ i $H_2$. Jaka jest entropia
+  pary i jaka efektywna liczba wyborów?
+  \answerto{$H_1 + H_2$, bo zaskoczenia się dodają, a wartość oczekiwana jest
+  liniowa; więc efektywny licznik to $e^{H_1 + H_2} = e^{H_1}e^{H_2}$, iloczyn
+  obu liczników. To jest powód, dla którego eksponenta jest właściwym
+  odczytaniem entropii: liczniki wyborów niezależnych mnożą się, tak jak każe
+  reguła iloczynu z Programu~\ref{prog:F10}.}
+\item Program~\ref{prog:P25} podaje entropię uwagi $\val{p29.att.raw8.ent}$
+  nata przy najmniejszym rozmiarze głowicy bez dzielenia. Odczytaj ją jako
+  licznik i powiedz, dlaczego jest większa niż $\val{p29.att.raw.ent}$ przy
+  największym.
+  \answerto{$\val{p29.att.raw8.eff}$ klucza z $\val{p29.att.keys}$. Jest
+  większa, bo nieskalowane wyniki rosną z $d_k$, więc przy małym rozmiarze
+  głowicy nie rozeszły się jeszcze dość daleko, by nasycić softmax \dash{}
+  czyli całe to, do czego służy dzielenie przez $\frac{1}{\sqrt{d_k}}$,
+  powiedziane jako licznik zamiast jako wariancja.}
+\item Kolega proponuje monitorować entropię rozkładu następnego tokena i
+  wzywać dyżurnego, gdy przekroczy próg. Podaj jedną awarię, którą to łapie, i
+  jedną, której nie może, i powiedz, która jest droższa.
+  \answerto{Łapie model, który nie ma pojęcia i o tym wie \dash{} zapytanie
+  spoza rozkładu treningowego, uszkodzony prompt, ucięty kontekst. Nie łapie
+  pewnej siebie halucynacji, której entropia jest niska z definicji. Ta druga
+  jest droższa, bo pierwsza produkuje widocznie kiepską odpowiedź, a druga
+  płynną i błędną.}
+\end{furtherproblems}
