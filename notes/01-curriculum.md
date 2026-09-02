@@ -48,7 +48,7 @@ Nine parts. **13 Foundation programs (F1--F13)** and **33 main programs
 Planned **2,418 frames**. The estimate that stood here — 460--540 pages at
 this page geometry — **is falsified by the written book and is wrong by a
 factor of about three**; see §20 item 1, which now carries the measurement.
-Forty-five of the forty-seven programs are written, and they set 1,267 pages in
+Forty-six of the forty-seven programs are written, and they set 1,295 pages in
 the trade format. The split into Parts I--VI and Parts VII--IX is still the
 clean one, and it is still an open question rather than a decision — but it is
 now a question with a number in front of it.
@@ -607,9 +607,10 @@ Appendices:
 1. **One volume or two — still open, and the estimate it rested on is now
    measured and was wrong by a factor of about three.** The figure recorded
    here was 460--540 pages for ~2,418 frames, which is 0.21 pages a frame.
-   **Measured, August 2026: 1,757 teaching frames set 1,267 pages in the trade
-   format**, which is 0.72 — and that is with two programs and four appendices
-   still to write.
+   **Measured, August 2026: 1,811 teaching frames set 1,295 pages in the trade
+   format**, which is 0.72 — and that is with one program and four appendices
+   still to write.  (It was 1,757 frames in 1,267 pages when first taken,
+   before P33; the ratio has not moved.)
 
    The estimate is not mysteriously wrong. It was made before the Stroud layout
    pass existed, so a *frame* in it was a paragraph. A frame as built is a rule
@@ -626,7 +627,7 @@ Appendices:
    |---|---|
    | front matter + Part I (F1--F13) | 1--388 |
    | Parts II--VI (P1--P22) | 389--882 |
-   | Parts VII--IX as written (P23--P32) + back matter | 883--1267 |
+   | Parts VII--IX as written (P23--P33) + back matter | 883--1295 |
 
    So the proposed cut gives an 882-page first volume, which does not settle
    it: at this geometry the book is nearer three volumes than two, or the

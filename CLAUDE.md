@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1267 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1287 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1058 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1070 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1295 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1313 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1080 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1094 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -98,18 +98,18 @@ what was there before.
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1518 computed values, all referenced, all present, plus the committed console
+- 1570 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 284 Mermaid sources, all rendering
-- 78 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 292 Mermaid sources, all rendering
+- 80 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **100 orphan-tail pages: 29 · 29 · 21 · 21** across `main-en`, `main-pl`,
+- **101 orphan-tail pages: 29 · 29 · 22 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
-  **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one, **P30 one**, **P31 none** and **P32 none**
+  **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one, **P30 one**, **P31 none**, **P32 none** and P33 one
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -149,9 +149,9 @@ what was there before.
   **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22**,
   **53% in P23**, **46% in P24**, **48% in P25**, **52% in P26** and
   **53% in P27**, **54% in P28**, **55% in P29**, **52% in P30**, **50% in
-  P31**, **51% in P32** and **52% in P33** \dash{} P29 is the highest outside
-  Part I, with P28 next and then P23 and P27; P26, P30 and P33 follow, and
-  P13, P15, P17, P31 and P32 reach or pass the book's own rate.**
+  P31**, **51% in P32** and **51% in P33** \dash{} P29 is the highest outside
+  Part I, with P28 next and then P23 and P27; P26 and P30 follow, and P13,
+  P15, P17, P31, P32 and P33 reach or pass the book's own rate.**
   **P24 is the first program whose rate is visible in its frame count**: nine
   of its sixty-four frames exist because the draft was raised from 36%, which
   is the elicitation ledger's cost measured in frames rather than in pages.
@@ -9872,9 +9872,11 @@ estimating the book at **460--540 pages** for its 2,418 planned frames, and this
 file repeated it as 470--550. Neither number had been looked at since
 scaffolding.
 
-**Measured: 1,757 teaching frames are written and they set 1,267 pages in the
+**Measured: 1,811 teaching frames are written and they set 1,295 pages in the
 trade format.** That is $\num{0.72}$ pages a frame against the estimate's
-$\num{0.21}$, with two programs and four appendices still to come.
+$\num{0.21}$, with one program and four appendices still to come. (The
+measurement was 1,757 frames in 1,267 pages when it was first taken, before
+P33; the ratio has not moved.)
 
 And the reason is knowable rather than mysterious, which is what makes it worth
 recording rather than merely correcting. **The estimate predates the Stroud
@@ -9889,7 +9891,7 @@ F01's cues; nobody went back and re-multiplied.
 It matters because it is the premise of **the one decision this book still
 records as open**. §20 item 1 now carries the measurement and the per-part page
 ranges read out of the trade build's own running heads \dash{} front matter and
-Part I at 388 pages, Parts II--VI at 494, Parts VII--IX as written at 385
+Part I at 388 pages, Parts II--VI at 494, Parts VII--IX as written at 413
 \dash{} so the proposed Parts I--VI cut gives an **882-page first volume**,
 which does not settle it either. At this geometry the book is nearer three
 volumes than two, or the geometry has to change. The decision stays the
@@ -9932,6 +9934,397 @@ while **P14 already delivers it**, eliciting what happens to a bound holding
 \enquote{with probability at least 95 per cent} when a paper applies it once per
 experiment. So the entry records a debt discharged rather than one owed, which
 is the better sentence and was one `grep` away the whole time.
+
+### Program P33 pass, August 2026
+
+**Fifty-four teaching frames, fifty-six printed, both editions**, against a
+brief that projected sixty. Eight sections: one step and six programs, which
+of the six fail silently, a plateau, a spike, a suspiciously smooth descent,
+the one shape that is diagnostic, the other curve, and what this program has
+not checked.
+
+Twenty-sixth program under its brief's estimate, and Part IX's contract is
+again the reason rather than a shortfall \dash{} the program introduces no new
+mathematics, so everything is spent by construction and the pass's whole job
+was to find what was not.
+
+#### The cleanest handover position any program in this book has had
+
+`grep -rn 'prog:P33' programs/en/*.tex` was the first thing run, and it
+returns **F03 and nothing else, twice** \dash{} and both deferrals are word
+for word the two halves the brief calls this program's own:
+
+- *\enquote{Program P33 reads a loss curve as evidence \dash{} what a plateau,
+  a spike and a suspiciously smooth descent each imply, and which of them are
+  distinguishable from noise.}*
+- *\enquote{Program P33 treats such a fit as an empirical fit with a stated
+  extrapolation error rather than as a law of nature.}*
+
+Program~\ref{prog:P30} had eight programs pointing at it and had to sort the
+machinery from the content; here there was nothing to sort. F03 owns the log
+axis and the fact that a power law is a straight line on log-log axes with the
+exponent as its gradient, and it never fits one \dash{} which is exactly the
+P30 split, arriving pre-sorted because the deferring program wrote down both
+halves when it made them.
+
+**The six bracketed items are spent by construction**, each by a program whose
+own header says so: P26 the loss as maximum likelihood, P18 its gradient as
+$\vect{p} - \vect{y}$, P20 the optimiser with F04's average inside it, P01 the
+arithmetic, P17 the boundary, F06 clipping outright with P21's noise model
+behind it. None is re-taught.
+
+#### So the assembly's own question is the one no owner could ask
+
+Put the six in the order they execute and ask **which of them, got wrong,
+raises nothing**. Two raise \dash{} P18's two-step route divides by zero, and
+a step size above P17's boundary leaves \dash{} and four do not:
+
+| piece | what being wrong costs | owner |
+|---|---|---|
+| the loss | $\val{p33.fail.ppl}$ times the true perplexity | P19 |
+| the average | $\val{p33.conv.fold}$ times as long, or divergence | F04, P20 |
+| the arithmetic | a gradient under $\val{p33.fail.swamp}$ per cent of the total moves nothing | P01 |
+| the sample | a gradient of a different objective, by $\val{p33.fail.acc}$ | F04, P21 |
+
+**Every one of the four is a correct computation of the wrong quantity**: a
+mean of means is a mean, a rounded sum is a sum, a rescaled step is a step.
+There is no invalid operation anywhere in them for anything to catch \dash{}
+which is why the four silent ones are exactly the four that have to be
+detected from outside, and there is one instrument for that. That sentence is
+the bridge from §2 to §3 and it is the program's spine.
+
+#### An assertion caught a self-comparison, inside the gate written to prevent one
+
+The first draft of the step-size gate read
+`assert ETA_STAR < 2 / LAM_HI`. **`p17.eta.star` IS $2/\lambda_{\max}$**
+\dash{} the boundary, not the optimum \dash{} so that is a quantity compared
+with itself, and it failed on the first run with `(0.1, 0.1)`.
+
+Nothing else would have said so. The two print identically at two decimals,
+which is Program~\ref{prog:P17}'s own recorded defect \dash{} a formula whose
+two readings agree numerically stays invisible until the day they do not
+\dash{} appearing inside a cross-programme gate written in that program's
+honour. The gate now recomputes the boundary and asserts it reproduces P17's
+committed figure, which is what a gate is for.
+
+And the corrected reading produced §1's number: the optimum on that bowl is
+$\val{p33.eta.best}$ and the boundary is $\val{p33.eta.bound}$, so
+**a schedule spends its whole life inside a band $\val{p33.eta.margin}$ per
+cent wide.** Reported at zero decimals because that is the only precision at
+which the exact margin and the margin a reader computes from the two printed
+figures agree \dash{} $\num{4.76}$ against $\num{5.00}$ at two \dash{} and
+the `reproduces` guard was proved to fire on it by mutation.
+
+#### A threshold chosen so a claim would pass, refuted for the fifth time
+
+§7 first asserted `OUT_ERR > 20 * RESID`: the fit's error three decades out
+against its residual inside the span. It failed at $\num{13.6}$, and the
+failure is the better statement, because **what is true has no constant in
+it.** The error outside the span grows with distance, monotonically, and is
+unbounded; the error inside is bounded by the residual. Both are asserted now
+and neither carries a number somebody chose.
+
+The same correction went through the fit's own uncertainty. The claim is not
+that its band is small \dash{} it is that **the truth lies outside it**, which
+is checkable without a threshold and is what \enquote{an empirical fit with a
+stated extrapolation error} turns out to be worth.
+
+Programs~\ref{prog:F11}, \ref{prog:P15}, \ref{prog:P20} and \ref{prog:P21}
+each paid for this rule. It has now been paid for five times, and the pattern
+in all five is identical: the threshold is written to make a sentence the
+author has already drafted come out true.
+
+#### The plateau, which is the program's headline
+
+Nothing is sampled anywhere in this program. Every answer in §§3--6 is a
+statement about a normal distribution evaluated with `math.erf`, and the
+noise model is not invented: a minibatch loss is a mean over $B$ examples of a
+per-example loss whose spread Program~\ref{prog:P19} committed, so its spread
+is Program~\ref{prog:P25}'s $\sigma/\sqrt{B}$ and nothing else.
+
+| | |
+|---|---|
+| spread of one step's reported loss | $\val{p33.sigma.step}$ |
+| chance a healthy run looks flat for $\val{p33.watch}$ steps | $\val{p33.p.flat}$ per cent |
+| steps of flatness before it is evidence at $\val{p33.alpha}$ | about $\val{p33.plateau.k}$ |
+
+**The run in the scenario is $\val{p33.drop.steps}$ steps long, so the flat
+stretch would have to be three times the whole run before it meant anything.**
+The frames say which half of that is measured and which is chosen \dash{} the
+spread is Program~\ref{prog:P19}'s, the fall is a choice made to have
+something to divide by \dash{} and then say that what the arithmetic delivers
+is a *ratio*, so everything follows from the progress per step being far
+smaller than the noise per step.
+
+The figure is reported to two significant figures because five do not survive
+the page: a reader multiplying the three printed operands gets $29\,080$ where
+the exact answer is $29\,078$, and the script asserts both that the rounding
+agrees and that the unrounded forms disagree \dash{} so the guard cannot go
+quiet by accident.
+
+#### The spike, gated to P27's own arithmetic
+
+A long run contains large single-step deviations by construction:
+$\val{p33.spike.expected}$ four-spread steps are expected in a
+$\val{p33.steps}$-step run, and correcting for the run length puts the
+surprising size at $\val{p33.spike.z}$ spreads.
+
+That is Program~\ref{prog:P27}'s multiple-comparison arithmetic with steps in
+place of models, so it is **gated rather than resembled**: the same routine
+with forty in place of $\val{p33.steps}$ must return P27's committed
+Bonferroni figure to the digit. Two programs that describe one correction
+cannot come apart about it.
+
+#### The smoother: P21 owns the lag and its own trapbox names the split
+
+Program~\ref{prog:P21} §5 measures what smoothing does to *when* \dash{} it
+moves every event later by exactly the half-life \dash{} and its trapbox ends
+\enquote{read the raw curve when the question is \emph{when}, and the smoothed
+one when the question is \emph{whether}}.
+
+So this program owes the *whether*, and the answer is exact: an exponential
+moving average of independent noise has variance $\frac{1-\beta}{1+\beta}$
+times the raw variance, which is Program~\ref{prog:F04}'s geometric series, so
+the picture shows $\val{p33.smooth.pct}$ per cent of the real spread at P21's
+own $\beta$ and understates it by a factor of
+$\val{p33.smooth.dash.times}$ at a dashboard's $\val{p33.beta.dash}$.
+
+**The handover was written down in the program that owed it, for the fourth
+pass running** (P29, P30, P31, P33), and the closed form is checked against
+the series itself rather than against the same formula twice.
+
+#### E10, run, and split the way Program P32 split E9
+
+The ledger specifies E10 on \enquote{published numbers}. P32's question asked
+of it: does the claim need external data, or is it a statement about the fit?
+
+**The half that carries the argument needs nothing external.** How far a
+power-law fit can be trusted past its last point is a property of the fit and
+of the span, and it is exactly computable when the truth is known because the
+script chose it. What a paper would add is one specific exponent, and the
+frames say so rather than pretending the general claim needs it.
+
+The truth is the form the literature itself uses \dash{} an irreducible loss
+plus a power law \dash{} and a *pure* power law is fitted to it, which is what
+everybody fits:
+
+| | |
+|---|---|
+| largest miss over the fitted $\val{p33.fit.decades}$ decades | $\val{p33.fit.resid}$ per cent |
+| true exponent against fitted exponent | $\val{p33.fit.alpha}$ against $\val{p33.fit.b}$ |
+| prediction $\val{p33.fit.decades}$ decades out, truth $\val{p33.out.truth}$ | $\val{p33.out.fitted}$ |
+| the fit's own two-standard-error band there | $\val{p33.fit.band.lo}$ to $\val{p33.fit.band.hi}$ |
+| where the fit predicts a loss below the floor | $10^{\val{p33.absurd.dec}}$ |
+
+Four findings, and the last two are the ones worth carrying. **The fit is
+confident precisely because it is wrong**: a least-squares standard error is
+built from the residuals, the data lie on a smooth curve, so the reported
+uncertainty is tiny and the truth is outside the band it gives. And
+**$\val{p33.absurd.past}$ decades past the last measured point the fitted line
+predicts a loss below the irreducible floor** \dash{} not merely inaccurate
+but impossible, from a fit whose residual is half of one per cent.
+
+The least-squares routine is gated of Program~\ref{prog:P09}'s third kind:
+two programs must not be able to disagree about what a least-squares line is,
+so it has to return Program~\ref{prog:P08}'s committed slope, intercept and
+sum of squares on P08's own three hand-checkable points.
+
+#### The extract-and-run harness was the defect again
+
+The transcript is a REPL session defining `phi` on one line, so it carries a
+`...` continuation. The first replay harness fed only the `>>> ` lines, so
+`phi` was never defined and it reported `NameError` \dash{} **against a
+listing that runs perfectly**.
+
+That is Program~\ref{prog:P32}'s finding recurring one program later, and in
+the same medium: an instrument that accepts the input and returns a plausible
+answer. The rule it earned there is the one that settles it here \dash{} what
+comes out of a transcript is REPL input, so run it in a REPL, and feed the
+continuation lines too. Replayed correctly it prints $\num{0.489}$ and
+$\num{0.05}$, which is what the page prints.
+
+**And the listing moved for Program~\ref{prog:P23}'s rule.** It was first
+placed after the frame that answers the $\val{p33.watch}$-step question
+\dash{} and its second line prints $\num{0.05}$ at $29\,000$, which is the
+answer to a question two frames later. A transcript may not answer a question
+put to the reader anywhere later in the program. Moved below that answer,
+where it is the reader's own check rather than the reveal.
+
+#### A markdown-only pull request runs no CI, and \enquote{pending} reads as a queue
+
+Recorded because it cost twelve minutes of the wrong kind of waiting, and
+because it is this file's own instrument-misread class arriving through a new
+door.
+
+The notes sweep that preceded this pass touched three `.md` files and nothing
+else. `build.yml` carries `paths-ignore: ['docs/**', '**.md']`, so **no
+workflow was triggered at all** \dash{} and the API's answer to \enquote{what
+is the status} is `state: pending, total_count: 0`, which is exactly what it
+answers while a check is queued.
+
+The two states are indistinguishable from that call. What distinguishes them
+is one look at the workflow's own `on:` block, and the rule is the one
+Program~\ref{prog:P23} stated about `\raggedbottom`: **before waiting for a
+mechanism, confirm the mechanism is running.** An unchanged reading is
+evidence that nothing is happening, not that something is happening slowly.
+
+#### Rule 2, and the figures
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P33.1 six-pieces | 592 / 642 | 2.98 | 7.45 | 6.87 | 8.46 | 7.80 |
+| P33.2 flat-or-stuck | 592 / 571 | 3.23 | 7.45 | 7.73 | 8.46 | 8.77 |
+| P33.3 smooth-hides | 609 / 606 | 3.06 | 7.24 | 7.28 | 8.22 | 8.26 |
+| P33.4 inside-outside | 624 / 636 | 2.89 | 7.07 | 6.94 | 8.03 | 7.87 |
+
+All eight at three ranks and all well above the aspect-ratio crossover on the
+first render, because the width was measured before the prose was written
+\dash{} which is Program~\ref{prog:P32}'s explicit lesson and cost one
+`pdfinfo` per file.
+
+**And the fourth figure had to be reworded twice, in two of the four places
+Program~\ref{prog:P18} says to read.** Its middle node ended
+\enquote{\dots and nothing in the fit bounds it}, which is a claim about the
+*fit's own uncertainty* \dash{} and the frame two later asks what that
+uncertainty is about. Its **caption** then said \enquote{only the first is
+supported by the residual}, which hands the reader the answer's noun outright.
+Neither is the last node of a three-rank chain, which is where the previous
+five passes found the spoiler; both are one rank and one line away from it.
+
+So the node now says what frames 44 to 46 deliver \dash{} the miss grows with
+every decade until the line predicts a loss below the floor \dash{} and the
+caption says *inside the span it is measured; outside it, guessed*, which is
+the section's thesis without its evidence. The generalisable half is
+Program~\ref{prog:P11}'s, restated: **the caption is a node, and it is the one
+you have already stopped reading as one.**
+
+The other three needed nothing. All four close by restating what the frames
+above them deliver, and each sits above a question it does not answer: the
+step-size margin, the probability of a flat stretch, which program owns
+divergence, and what the reported uncertainty is about. That is the P04/P07
+case for the sixteenth time \dash{} a figure the reader is meant to *apply*
+belongs above the question.
+
+#### Half of a two-edition edit did not land, and the build found it forty minutes later
+
+Round 3 of the cue walk lengthened frame 52 \dash{} in both editions, as every
+recorded lengthening must be. **Only the English reached the file.** Round 4
+then rebuilt all four formats, and `main-pl-a4` reported the cue on
+**exactly the page it had reported in round 3**, because the Polish file had
+not changed and the Polish A4 build was therefore the same book.
+
+An identical measurement after a change is this file's own signal that the
+change did not reach what was measured, and its second reading \dash{} *the
+fix did not reach* rather than *the fix was too small* \dash{} is again the
+right one. But nothing needed inferring, because **the gate had already named
+it**: `FAIL [C14-macros] P33-training-run.tex: \S: en=2 pl=1; \ref: en=51
+pl=50`. One `\S\ref{}` in one edition and not the other is a paragraph in one
+edition and not the other, stated in six characters.
+
+**The finding is where that line was.** `make all-formats` runs the gates
+*after* it has built four PDFs, so a parity failure introduced by the very
+edit that triggered the build is not reported until the build ends. The whole
+of round 4 \dash{} four formats, four thousand pages \dash{} was spent on a
+tree with a known-failing gate in it, and the gate's own output was sitting
+inside the log the build was still writing.
+
+The remedy is the *order* this file's own \enquote{After each pass} list
+already gives: **the source-level gates before the build, not inside it.**
+They run in seconds against a build that runs in tens of minutes, and they
+read the source rather than the artefact \dash{} so they are the only ones
+that can be run before there is an artefact. Every previous pass happened to
+do it that way and none had recorded why it matters.
+
+**And the same shape cost a CI cycle in the same pass, which is what makes it
+a finding rather than an anecdote.** `make debt` failed on the pushed head
+with `quiz has 6 items and 0 answers`, in both editions: P33's six Quiz items
+carried their `\teachesat{}` routes and no `\answerto{}`, so a reader taking
+the entry Quiz had nothing to check against. It is a real defect, it is
+mechanically detectable, `check\_structure.py --answers` detects it in under a
+second \dash{} and it was found by a CI job rather than by the author,
+because `make debt` had not been run since the Quiz was written.
+
+So the two instances are one instance: **a check that reads the source was
+run at artefact time.** One sat inside a forty-minute local build; the other
+sat in CI, on a job this file's own Build section describes as
+\enquote{advisory}, which is exactly the word that stops somebody running it.
+Neither needed a PDF. The habit worth keeping is narrower than
+\enquote{run the gates}: **before launching a build, run every gate that
+would not need the build**, which here is `parity.py`, both halves of
+`check\_structure.py`, and `make debt`.
+
+#### Layout, and a cue walk whose fourth round measured nothing
+
+| round | edit | result |
+|---|---|---|
+| 1 | lengthened frame 52, both editions | `main-pl` cleared |
+| 2 | lengthened frame 31, both editions | `main-en-a4` cleared |
+| 3 | lengthened frame 52 again \dash{} **English only, unnoticed** | \dash{} |
+| 4 | none that reached a file | `main-pl-a4` reported its cue on **the same page as round 3** |
+| 5 | the Polish half of round 3, plus the two rule-2 rewords | all four clean |
+
+**Round 4 is the one worth keeping, and it is not the random walk this file
+keeps recording.** Every previous wasted round moved the defect somewhere
+else; this one moved nothing, because the edit it was measuring did not
+exist. The two are distinguishable in one look \dash{} a defect that has
+moved is on a different page, and a defect that was never touched is on the
+same one to the digit.
+
+Every edit that landed was a **lengthening**, in both editions: twentieth and
+twenty-first confirmations of Program~\ref{prog:F06}'s two-sided rule, which
+has still never failed. The paragraph frame 52 gained says the thing the
+section most needs and had not said: **a run's own logged losses \emph{are}
+the sample.** Fit the trend, take the residuals, and ask how often they exceed
+three and four spreads against what a normal distribution predicts. Nobody
+does it, the data is already on disk, and the answer would turn every number
+in \S3 from a model into a measurement.
+
+The overfull multiset came back element for element to the baseline in all
+four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with zero overfull
+vboxes, zero errors, zero unresolved references, no stranded openers, no
+stranded headings and no orphaned cues. **One orphan tail added, in
+`main-en-a4`**: 29, 29, 22, 21 against the pre-P33 29, 29, 21, 21.
+
+Pages 1295 / 1313 / 1080 / 1094, from 1267 / 1287 / 1058 / 1070 \dash{}
+twenty-eight and twenty-six in the trade format, which is what a fifty-four
+frame program with four figures and six new back-matter answers costs.
+
+#### Also
+
+- Traps 313 to 320 added to `notes/02`, under one shape: every one is a
+  question asked of the loss curve that the loss curve cannot answer.
+- **Elicitation 51%**, level with the book's own rate, from **ten**
+  P06-pattern conversions that added **no
+  frames at all** \dash{} the draft measured 33%. Every conversion took a
+  frame that stated something the reader could produce, moved the statement
+  into the next frame's answer, and ended the first frame by asking. That
+  makes the retrofit free here where Program~\ref{prog:P24} paid nine frames
+  for ten points, and the difference is that these were conversions of
+  *statements* rather than additions of *questions*.
+- **Diagram widths measured before the prose**, which is P32's explicit
+  lesson, and all eight renders landed in the band on the first attempt
+  \dash{} 571 to 642 pt, ratios 2.98 to 3.23, node text 6.87 to 8.77 pt. No
+  redesign, and the rule cost one `pdfinfo` per file.
+- **Five parity divergences and every one was the same recorded class**: an
+  English possessive attached to a reference, which inverts in Polish. Four
+  were in prose and one in a table cell. It is still the single most reliable
+  thing to check for while translating.
+- The four Polish shape names are **taken from F03's own Polish twin**, which
+  defers here by name \dash{} `plateau`, `skok`, `podejrzanie gładki spadek`
+  \dash{} so the cross-reference lands in the reader's own vocabulary.
+- The listing was extracted from the finished `main-en.pdf` and replayed
+  through `code.InteractiveInterpreter`: it prints $\num{0.489}$ and
+  $\num{0.05}$, which is what the page prints.
+- Frame numbers mapped after writing: sections landed at
+  `1--8 / 9--14 / 15--21 / 22--27 / 28--33 / 34--37 / 38--50 / 51--54`.
+- **The Quiz's six back-matter answers were missing** and CI's ledger job
+  found them, which is written up above. They add nothing to the body
+  \dash{} `\answerto` typesets at the back \dash{} so no frame, no cue and
+  no body page moved, and CI compiled all four formats green with them in.
+- C7 reported five unused values and all five emissions were cut on
+  Program~\ref{prog:F11}'s finding: two were gate inputs, two were superseded
+  by figures the page expresses another way, and one was a count the page
+  writes in words.
 
 ### Stroud layout pass, August 2026
 
@@ -10403,7 +10796,7 @@ clone instead.
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
 for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.72**
-\dash{} 1,757 teaching frames in 1,267 trade pages, with two programs and four
+\dash{} 1,811 teaching frames in 1,295 trade pages, with one program and four
 appendices still to come. §20 item 1 now carries the measurement and the
 per-part page ranges, so the decision has a number rather than an estimate. The
 other two that
