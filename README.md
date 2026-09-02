@@ -32,10 +32,11 @@ Also in the 17 × 24 cm trade format that matches the companion volumes —
 One source, four PDFs: A4 at 12pt is the one to read on a screen or print at
 home, and it is what the download links above point at.
 
-> **Early draft.** The structure, the build, the bilingual tooling and
-> **Program F1 in both languages** are done. Forty-six of forty-seven programs
-> are stubs carrying the brief they must satisfy. Every ledger below is printed
-> on every CI build, so the debt is visible rather than quietly carried.
+> **Full draft.** All forty-seven programs are written in both languages, and
+> four of the six appendices with them; E (further reading) and F (the
+> manifest) are still stubs carrying the brief they must satisfy. What remains
+> is finishing rather than drafting. Every ledger below is printed on every CI
+> build, so the debt is visible rather than quietly carried.
 
 ---
 
@@ -102,7 +103,10 @@ references, not digits.** `figures/values/` is committed, so a changed number
 shows up in review as a diff, and CI fails the build when a script no longer
 produces what the book prints.
 
-Program F1 alone pulls in twenty-nine of them. A few, so you can see the shape:
+Program F1 alone pulls in dozens of them, and the exact tally is
+deliberately not stated here, because a count of occurrences is the one
+class of claim about the book that nothing in the repository can check.
+A few, so you can see the shape:
 
 | | |
 |---|---|

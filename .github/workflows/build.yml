@@ -106,6 +106,15 @@ jobs:
       - name: Every transcript is on the page
         run: python3 tools/check_structure.py --scripts
 
+      # Appendix D names a Polish rendering for every English term it lists,
+      # and a row naming a word the book does not use is a claim about the
+      # body that is false. It reads the PROSE of programs/pl, because a
+      # substring count over raw LaTeX counts a \label and a \val key as
+      # usage -- which is how an audit of this appendix twice licensed a row
+      # for a word the prose never writes.
+      - name: Every glossary rendering is used in the prose
+        run: python3 tools/check_structure.py --terms
+
   diagrams:
     name: Render diagrams
     runs-on: ubuntu-latest

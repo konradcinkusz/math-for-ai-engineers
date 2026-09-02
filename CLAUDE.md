@@ -13,7 +13,7 @@ Read this before touching a program.
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
 | Programs | **All forty-seven written, both editions \dash{} F1–F13 and P1–P34, Parts I to IX entire.** There are no stubs | — |
-| Appendices | A (answers, generated), B (notation) and **C (formulae, generated from 721 `\result{}` marks)** drafted; D–F are stubs | D, E, F |
+| Appendices | A (answers, generated), B (notation), **C (formulae, from 721 `\result{}` marks)** and **D (terminology, 27 `\plterm{}` rows gated against the Polish prose)** drafted; E and F are stubs | E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
 the format the book is read in; 17 x 24 cm is the trade format shared with the
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1383 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1407 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1152 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1168 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1387 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1411 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1154 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1172 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -53,7 +53,7 @@ free**: its first build added an 11.2 pt box to `main-en-a4` alone, from a
 32-character `\code{}` in a test exercise, and the fix was to set the loop as a
 displayed three-line block instead of running it into the sentence. Parity
 reports **0 failures and 0 warnings** across 56 file pairs; `reflist.py`
-confirms 97 labels resolve to the same numbers in both editions.
+confirms 484 labels resolve to the same numbers in both editions.
 
 **The only page count that moved in the second F3 review pass was `main-pl-a4`,
 231 to 229**, and both of those pages were defects rather than content: a page
@@ -105,6 +105,11 @@ what was there before.
 - 82 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
+- **27 Polish renderings named in Appendix~D, every one used in the prose of
+  `programs/pl`** \dash{} `make debt` reports it and `make check` and CI both
+  gate on it. A glossary row naming a word the book does not use is a claim
+  about the body that is false, and `notes/03`'s suggested table has two of
+  them
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
 - **102 orphan-tail pages: 29 · 30 · 22 · 21** across `main-en`, `main-pl`,
@@ -9874,13 +9879,14 @@ estimating the book at **460--540 pages** for its 2,418 planned frames, and this
 file repeated it as 470--550. Neither number had been looked at since
 scaffolding.
 
-**Measured: 1,863 teaching frames are written and they set 1,383 pages in the
+**Measured: 1,863 teaching frames are written and they set 1,387 pages in the
 trade format.** That is $\num{0.74}$ pages a frame against the estimate's
-$\num{0.21}$, with three appendices still to come. (It was 1,321 before
+$\num{0.21}$, with two appendices still to come. (It was 1,321 before
 Appendix~C, which is the one of the four that is generated rather than
-written and which costs 62 pages of back matter on its own.) (The measurement was 1,757
+written and which costs 62 pages of back matter on its own, and 1,383 before
+Appendix~D, which occupies six pages where its stub occupied two.) (The measurement was 1,757
 frames in 1,267 pages when it was first taken, before P33, and 1,811 in 1,295
-after it; the ratio has not moved across three re-measurements.)
+after it; the ratio has not moved across four re-measurements.)
 
 And the reason is knowable rather than mysterious, which is what makes it worth
 recording rather than merely correcting. **The estimate predates the Stroud
@@ -9896,7 +9902,9 @@ It matters because it is the premise of **the one decision this book still
 records as open**. §20 item 1 now carries the measurement and the per-part page
 ranges, read out of the trade build's own part-title folios rather than
 estimated \dash{} front matter and Part I at 388 pages, Parts II--VI at 494,
-Parts VII--IX at 330, back matter at 109 \dash{} so the proposed Parts I--VI
+Parts VII--IX at 330, back matter at 109 as it stood then and **175 now**, the
+appendices since written being the whole of the difference \dash{} so the
+proposed Parts I--VI
 cut gives an **882-page first volume** before any back matter, which does not
 settle it either. At this geometry the book is nearer three volumes than two,
 or the geometry has to change. The decision stays the author's; what changed is
@@ -10737,6 +10745,274 @@ than subtracted, which is this file's own rule about a number that looks like
 a measurement and is not; `notes/01-curriculum.md` §20's table carries them.
 
 
+### Appendix D pass, September 2026 --- the glossary, and a run of misread instruments
+
+Appendix~D is the Polish--English terminology, and the *What is left* entry
+above says plainly that D does **not** get Appendix~C's protection for free:
+a terminology table is not derived from anything a program already carries,
+so the older instruction stands \dash{} read the brief as a checklist, and
+grep the destination before writing the sentence rather than after.
+
+It turns out half of it can be protected anyway, and the half that cannot is
+where the pass's defects were.
+
+#### The rows are gated; the prose around them is not
+
+Every row of §D.3 and §D.4 is `\plterm{english}{polish}{note}`, and
+`check_structure.py --terms` reads argument 2 of every one and requires each
+rendering to occur in the **prose** of `programs/pl`. A glossary row naming a
+word the book does not use is a claim about the body that is false, and it is
+not hypothetical: `notes/03`'s suggested table carries rows for `dropout` and
+`ground truth`, and **neither appears anywhere in either edition**. That pair
+is the gate's known answer, and it was watched producing it \dash{}
+Program~\ref{prog:P34}'s rule \dash{} before the gate was believed on the
+real rows.
+
+**And then the prose between the tables made exactly the failure the rows are
+gated against.** §D.3's own introduction named \emph{embeddingu} as an example
+of the book's practice of inflecting a borrowing. The Polish prose uses that
+form **zero** times: it writes \emph{embedding}, \emph{embeddingów},
+\emph{embeddingach} and \emph{embeddingiem}. Corrected to a form the book
+writes.
+
+So the finding is narrower and more useful than \enquote{write a gate}:
+**a gate is as wide as the construct it parses**, and an appendix whose rows
+are machine-checkable still carries prose that is not. The rows and the
+sentences around them make the same kind of claim and only one of them is
+covered.
+
+#### The instruments lied repeatedly, all in the recorded shape
+
+Programs~\ref{prog:P32}, \ref{prog:P33} and \ref{prog:P34} met this class
+repeatedly and named the rule: **a measurement is not evidence until the
+instrument has been watched producing an answer you already knew.** This pass
+met it again, several times in one afternoon, and every one of them accepted
+the input and returned a plausible answer. No tally is stated, because a tally
+is the thing this file keeps telling itself not to write; the list is the
+record.
+
+- `grep -oh '.\{45\}zanurzeni.\{25\}'` reported **one** occurrence. The
+  pattern demands forty-five characters of preceding context **on the same
+  line**, so it sees only the occurrences that happen to sit far enough into
+  a wrapped line. Re-counted in Python: fifty-one, across eight programs.
+- `parti*` reported 106 matches that were **`\partial`** \dash{} the Polish
+  files carry 107 of them.
+- `uwag*` reported 127, of which 108 survive stripping and most of those are
+  the ordinary Polish \emph{zwróć uwagę} rather than the attention mechanism.
+- The four Polish hits for `feature` are all `\val{f10.features}` \dash{} a
+  **value key**, not prose.
+- The one Polish hit for `attention` is `\label{sec:P25-attention}` \dash{} a
+  **label**, not prose.
+
+The last two are the reason `--terms` strips `\label`, `\val`, `\index`,
+`\ref`, `\code` and maths spans before it counts anything, and each of them
+would have licensed a glossary row for a word the prose never writes.
+
+**Every count in this note is therefore re-derived from cleaned prose with an
+inflection-aware pattern**, rather than carried over from the audit that found
+the terms. The audit's own figures came from raw LaTeX and a stem substring,
+which is both of the defects above at once, and none of them is quoted here.
+
+**And one more arrived while this note was being checked, which is the
+sharpest of the set.** Verifying the `\partial` bullet with
+`grep -oh '\\\\partial' programs/pl/*.tex` returned **zero**, because in a
+basic regular expression that pattern is a literal backslash *pair*. On that
+evidence the bullet was false and a true finding was one keystroke from being
+deleted; `grep -oh 'partial'` returns 107.
+
+The tell was available without any tooling at all: **zero occurrences of
+`\partial` in a book with four calculus programs is not a plausible answer**,
+and Program~\ref{prog:P34}'s rule covers exactly that \dash{} watch the
+instrument produce an answer you already know. What generalises is one clause
+wider than the rule it restates: **a verification that contradicts a prior
+measurement is itself a new instrument, and it gets the same scepticism as
+the measurement it is arriving to overturn.**
+
+#### Three terms are genuinely unsettled, and §D.4 says so rather than sweeping
+
+Measured on cleaned prose:
+
+| English | Polish edition | count | programs |
+|---|---|---|---|
+| batch | \emph{partia} / \emph{mikropartia} | 145 | 13 |
+| | \emph{wsad} | 34 | 8 |
+| | \emph{batch} / \emph{mikrobatch} | 31 | 5 |
+| embedding | \emph{zanurzenie} | 51 | 8 |
+| | \emph{embedding} | 8 | 5 |
+| learning rate | \emph{krok uczenia} | 16 | 6 |
+| | \emph{współczynnik uczenia} | 11 | 5 |
+
+**The proof that the first three are one object is a cross-reference that
+renames its own referent.** Program~\ref{prog:P18}'s Polish writes
+\emph{Program~\ref{prog:P06} zauważył, że prawdziwe biblioteki układają
+\textbf{wsad} wzdłuż...} where Program~\ref{prog:P06}'s Polish, in the
+sentence being cited, writes \emph{układają \textbf{partię} wzdłuż pierwszej
+osi}. Same sentence, two nouns, and a reader following the pointer finds a
+different word waiting. That is the note box in §D.4.
+
+And \emph{zanurzenie} is worth its own line, because **the book's own
+translation rule names it as the thing not to do**. `notes/03`'s rule 3 and
+this file both say to keep the English word where the Polish form is a calque
+nobody will search for, and both give \emph{zanurzenie} as *the* example. The
+Polish edition then uses it fifty-one times against the borrowing's eight.
+§D.4 says that, and says why: the verb has no borrowed form \dash{} nobody
+says \emph{embedduje} \dash{} so the noun followed it.
+
+**And rule 3's own example list carries two more entries the written book does
+not bear out.** It names \emph{attention} and \emph{dropout} among the terms
+Polish practitioners keep in English. The book renders the first as
+\emph{uwaga} throughout \dash{} correctly, because \emph{mechanizm uwagi} and
+\emph{wynik uwagi} are real usage rather than a coinage, so the calque test
+does not reach it \dash{} and it never uses the second at all. That is this
+file's oldest class in a new place: **a rule's example list is a claim about
+the book, and nothing checks it.** The rule is sound; two of its five examples
+are not evidence for anything.
+
+**Not swept, deliberately, and the reasoning is the entry.** Making the Polish
+edition consistent is about a hundred and ninety replacements across twenty
+files, in a language with three genders and real agreement work; it re-rolls
+Polish pagination in twenty programs, and Program~\ref{prog:P32} priced one
+such walk at seven rounds; and overruling a native speaker's word choice
+across a whole book is a decision, not a side effect of writing an appendix.
+The stub's own brief asks for exactly what was done \dash{} *tam, gdzie polski
+uzus się nie ustalił, jest to zaznaczone, a nie po cichu rozstrzygnięte*.
+It is on the *What is left* list instead.
+
+#### The house lint bans the tokens §D.1's table has to print
+
+`parity.py`'s C10 forbids `\tan`, `\cot`, `\arctan`, `\gcd` and
+`\operatorname{lcm}` outright, and it is right to: prose must never hard-code
+a form the other edition sets differently. §D.1's whole **subject** is that
+divergence, so its table is the one place in the book where both columns have
+to be literal and language-independent \dash{} writing the contract macro
+there would print the *current edition's* form in both columns and say
+nothing at all.
+
+Set as `\emph{}` text in both columns, which satisfies the lint and is the
+better presentation anyway, because the Polish column was already literal. The
+table's third column names the macro instead, which is the fact that was
+actually worth carrying. That is Program~\ref{prog:P03}'s resolution shape:
+when a house rule and a real requirement collide, ask whether the rule has a
+reason and whether this case is inside it.
+
+**And the first draft would not have compiled.** `\tg`, `\gcdop`, `\lcmop`,
+`\spanof` and `\intcc` are `\DeclareMathOperator` and a `\newcommand` using
+`\,`, so every one of them needs maths mode, and the draft called all five
+bare. Program~\ref{prog:P09}'s rule in a new place: **grep the preamble for
+the macro before using one you have not used before.**
+
+#### And the file header claimed the section was generated, after the rewrite made it not
+
+Both editions' `appD-terminology.tex` opened with \enquote{Section D.1 is not
+written either. It is read out of `lang/{en,pl}.tex` \dash{} and parity's C3
+gates the pair.} That was true of the first draft, which used the contract
+macros. The C10 collision above forced the table to literal text, so by the
+time the file was finished **neither half was true**: nothing reads the table
+out of anything, and C3 gates that both language files define the same macro
+*set* while saying nothing about whether the table describes them correctly.
+
+Program~\ref{prog:F06} recorded the class \dash{} **a file header is a claim
+about the file and nothing checks it** \dash{} and this is its sharpest form:
+the header did not go stale over time, it was falsified **by the same pass's
+own rewrite**, two hundred lines below it. Both headers now say what is true
+and what follows from it: read §D.1's table against `lang/en.tex` and
+`lang/pl.tex` whenever either changes, because nothing else will.
+
+#### Two things the build did, and only one of them was a build
+
+**The first \enquote{build} compiled nothing.** `make all-formats` was
+launched with `( ... ) &` inside a `Bash` call, and the harness reaped the
+subshell about twenty seconds in, part-way through `make numbers`. The
+harness reported **exit 0**; the log carried no `MAKE_EXIT` line at all; and
+all four page counts were exactly their pre-appendix figures.
+
+Both halves of the recorded habit fired and the *second* is what settled it:
+`main-en.pdf`'s mtime was forty minutes older than the appendix file. So the
+rule gains a clause \dash{} **an unchanged page count is a failed build, and
+an artefact older than its source is a build that never ran.** The remedy is
+to launch a long build as a background *task*, not with `&` inside a
+foreground command, so the harness owns it and can be asked to stop it.
+
+**And the second build was stopped on purpose**, which is
+Program~\ref{prog:P32}'s rule: an edit landed while it was running (the
+`spadek gradientowy` clause below), so the build would have measured a tree
+about to stop existing. Killed, aux tree cleared with `make clean` \dash{}
+which removes `.idx`, `.ind` and `.ilg` as P32's finding requires \dash{} and
+restarted.
+
+#### Also
+
+- **A fourth divergence, found by checking a row rather than by any gate.**
+  The book writes both \emph{spadek gradientu} (7) and \emph{spadek
+  gradientowy} (4). That is one name in two grammatical forms rather than two
+  words, so it does not belong in §D.4 with the three above; the §D.3 row
+  says it in a clause.
+- §D.2 tabulates the ten notation boxes, verified against the boxes
+  themselves \dash{} `grep -c 'begin{notationbox}'` gives F02, F03, F04, P01,
+  P03, P12, P15, P18 and P23 one each and P24 **three**, which the table
+  collapses into one row because all three are about the same reader.
+- `\plterm` is defined **outside** `\makeatletter` on purpose, because it uses
+  no `@` macro \dash{} the trap Appendix~C's pass hit on `\resultsbody` and
+  this preamble already warns about twice. Its comment carries the gate's one
+  constraint: **keep argument 2 plain text**, several renderings separated by
+  a comma.
+- **C14 gates the new macro's count for free**, because the macro histogram
+  counts every macro generically. Arguments 1 and 2 are identical in both
+  editions by design \dash{} the head is English because that is what the
+  reader searches for \dash{} so only the note is translated, and the ordered
+  checks have nothing to diverge on.
+- **The README was two drafts stale, and it is the first thing anybody reads.**
+  It said the structure, the build, the tooling and \enquote{Program F1 in
+  both languages} were done and that *forty-six of forty-seven programs are
+  stubs*, which stopped being true around F02 and has been false for thirty
+  programs. Fixed on Program~\ref{prog:P04}'s precedent, which took the same
+  call for the same reason when the front matter's *Quiz \dash{} Foundation
+  programs only* turned out false on page one.
+
+  The same paragraph's neighbour said Program~F1 *pulls in twenty-nine*
+  computed values; `figures/values/f01.tex` emits twenty-eight and the program
+  references all twenty-eight. The fix is not twenty-eight \dash{} it is the
+  rule this file already carries, so the README now says the tally is
+  deliberately not stated and why.
+
+- **Parity came back clean on its first run**, and so did `--terms`,
+  `--frames`, `--answers`, `--scripts` and `gen_stubs --check`. The source
+  gates were run **before** the build rather than inside it, which is
+  Program~\ref{prog:P33}'s finding applied rather than restated.
+
+- **Two more stale tallies, both in `CLAUDE.md` itself and both corrected.**
+  The header paragraph said `reflist.py` confirms **97** labels resolve to the
+  same numbers in both editions; it reports **484**. And the one-volume
+  decision's back-matter row said 109 pages, which was the figure before
+  Appendix~C. Neither had been looked at since it was written, which is the
+  same shape as the README above and the same shape this file names as its
+  oldest class.
+
+#### Layout: what a back-matter addition should cost, for the second time
+
+**Nothing.** The overfull multiset came back element for element to the
+baseline in all four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with
+zero overfull vboxes, zero errors, zero unresolved references, no stranded
+frame openers, no stranded section headings and no orphaned cues. **And the
+orphan-tail count did not move at all**: 29, 30, 22, 21, exactly the
+pre-appendix figures.
+
+That is the same result Appendix~C's pass measured and for the same reason:
+the appendix is appended, so it moves no page boundary in the body, and the
+only class of defect available to it is one of its own lines overflowing.
+Appendix~C had one (the `\KL` box, retired for every entry at once with
+`before=\raggedright`); Appendix~D had none, because §D.1's table is short
+literal text and §§D.3--D.4 are `tabularx` with an `X` column that wraps.
+
+Pages 1387 / 1411 / 1154 / 1172, from 1383 / 1407 / 1152 / 1168.
+**Appendix~D occupies six pages in the trade format** \dash{} 1367 to 1372,
+printed folios 1339 to 1344 \dash{} where its stub occupied two, so the net is
+four. The back matter is now 175 pages against the body's 1212, read off the
+part-title pages rather than subtracted, which is this file's own rule about a
+number that looks like a measurement and is not; `notes/01-curriculum.md`
+§20's table carries them.
+
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -11008,13 +11284,12 @@ clone instead.
 
 ## What is left
 
-1. **Appendices D, E and F.** C is written; these three are the whole of the
-   remaining writing, and there is no longer a program behind them to hide
-   the fact. D is the Polish--English terminology, E is where to go next, F
-   is the manifest. **The appendices are not in `tools/programs.json`**, so
-   there is nothing to re-derive an owner from: each brief lives only in its
-   own `\programstub{}`, in `appendices/{en,pl}/`, and that is the whole
-   contract.
+1. **Appendices E and F.** C and D are written; these two are the whole of
+   the remaining writing, and there is no longer a program behind them to
+   hide the fact. E is where to go next, F is the manifest. **The appendices
+   are not in `tools/programs.json`**, so there is nothing to re-derive an
+   owner from: each brief lives only in its own `\programstub{}`, in
+   `appendices/{en,pl}/`, and that is the whole contract.
 
    **C is done and its exposure was retired structurally rather than
    policed**, which is the thing to copy if D or E turns out to make claims
@@ -11032,11 +11307,18 @@ clone instead.
    audit makes that defect detectable. Marking at the point of use makes it
    impossible.
 
-   **D and E do not get the same protection for free.** A terminology table
-   and a further-reading list are not derived from anything a program
-   already carries, so for those two the older instruction stands and is the
-   only one available: read the brief as a checklist, and grep the
-   destination before writing the sentence rather than after.
+   **D took half of that protection and E cannot take any of it.** D's rows
+   are `\plterm{}{}{}` and `check_structure.py --terms` requires every Polish
+   rendering they name to occur in the prose of `programs/pl`, so the row
+   that names a word the book does not use is now impossible rather than
+   merely detectable \dash{} and `notes/03`'s suggested table had two of
+   them. But **a gate is as wide as the construct it parses**: the prose
+   between D's tables made the same failure in the same pass, naming an
+   inflection the Polish edition never writes, and nothing would have caught
+   it. E is a further-reading list, derived from nothing a program carries,
+   so for E the older instruction is the only one available: read the brief
+   as a checklist, and grep the destination before writing the sentence
+   rather than after.
 
 2. **The trained-model debt: five entries, one of them half answered.** It is
    the first thing in this book that cannot be done from a sandbox at all.
@@ -11203,7 +11485,7 @@ one is shaped by what the ones before it turned out to spend.
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
 for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.71**
-\dash{} 1,863 teaching frames in 1,383 trade pages, with three appendices
+\dash{} 1,863 teaching frames in 1,387 trade pages, with two appendices
 still to come. §20 item 1 carries the measurement and the per-part page ranges, so
 the decision has numbers in front of it rather than an estimate; **every
 program is now written, so those numbers will not move again except by the

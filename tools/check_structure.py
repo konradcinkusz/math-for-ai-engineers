@@ -14,6 +14,8 @@ can be trusted to remember:
   --values    Is every \\val{} reference backed by a computed value, and is
               every computed value used?
   --scripts   Does every \\transcript{} name a file that exists?
+  --terms     Does every Polish rendering Appendix D names actually occur
+              in the prose of programs/pl?
 
 Exit code is 0 when the ledger is clean and 1 when it is not, so any of these
 can be turned into a hard CI gate by dropping the --soft flag.
@@ -368,6 +370,76 @@ def check_scripts(soft: bool) -> int:
     return 0 if (bad == 0 or soft) else 1
 
 
+# ---------------------------------------------------------------------------
+# --terms: Appendix D is a claim about the body on every line.
+#
+# A glossary row naming a word the book does not use is the failure that
+# matters, and it is not hypothetical: the suggested table in notes/03 carries
+# rows for `dropout` and `ground truth`, neither of which appears anywhere in
+# either edition. Nothing else in this repository would have said so.
+#
+# TWO THINGS THIS CHECK LEARNED FROM BEING WRONG FIRST.
+#
+# It reads PROSE, not source. A substring count over raw LaTeX counts a label
+# and a value key as usage: an audit of this appendix reported `feature` used
+# four times in the Polish edition (all four were \val{f10.features}) and
+# `attention` used once (it was \label{sec:P25-attention}). Both would have
+# licensed a row for a word the prose never writes. Maths spans go too, because
+# \partial contains `parti` and would vouch for `partia` on its own.
+#
+# And it matches on a STEM rather than the whole word, because Polish inflects
+# every one of these -- uwaga/uwagi/uwage, warstwa/warstwie. The stem is crude
+# on purpose. The gate's job is to catch a word that occurs ZERO times in any
+# inflection, which is a gross failure; a stem loose enough to over-match is
+# the safe direction, and a word-boundary match would fail on nearly every row.
+RE_PLTERM = re.compile(r"\\plterm\{[^{}]*\}\{([^{}]*)\}")
+RE_TEX_COMMENT = re.compile(r"(?<!\\)%.*")
+RE_TEX_ARGS = re.compile(
+    r"\\(?:label|index|ref|val|rawval|cite|code|api|pkg)\{[^{}]*\}")
+RE_MATHS = re.compile(r"\$[^$]*\$")
+
+
+def _stem(word: str) -> str:
+    w = word.lower()
+    return w[:-2] if len(w) > 6 else (w[:-1] if len(w) > 4 else w)
+
+
+def check_terms(soft: bool) -> int:
+    prose = []
+    for f in program_files("pl"):
+        t = RE_TEX_COMMENT.sub("", f.read_text(encoding="utf8"))
+        t = RE_TEX_ARGS.sub(" ", t)
+        t = RE_MATHS.sub(" ", t)
+        prose.append(t.lower())
+    body = "\n".join(prose)
+
+    bad = 0
+    total = 0
+    for lang in LANGS:
+        f = ROOT / "appendices" / lang / "appD-terminology.tex"
+        if not f.exists():
+            continue
+        src = f.read_text(encoding="utf8")
+        for arg in RE_PLTERM.findall(src):
+            for rendering in (r.strip() for r in arg.split(",")):
+                if not rendering:
+                    continue
+                total += 1
+                missing = [w for w in rendering.split()
+                           if _stem(w) not in body]
+                if missing:
+                    print(f"  {f.relative_to(ROOT)}: \\plterm names "
+                          f"{rendering!r}, which the prose of programs/pl does "
+                          f"not use ({', '.join(missing)} absent). A glossary "
+                          f"row for a word the book does not write is a claim "
+                          f"about the body that is false.")
+                    bad += 1
+    if bad == 0:
+        print(f"  {total} Polish renderings named in Appendix D, "
+              f"every one used in the prose.")
+    return 0 if (bad == 0 or soft) else 1
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--frames", action="store_true")
@@ -376,12 +448,13 @@ def main() -> int:
     p.add_argument("--values", action="store_true")
     p.add_argument("--elicit", action="store_true")
     p.add_argument("--scripts", action="store_true")
+    p.add_argument("--terms", action="store_true")
     p.add_argument("--all", action="store_true")
     p.add_argument("--soft", action="store_true",
                    help="report but always exit 0 (the default for a draft)")
     a = p.parse_args()
     if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit,
-                a.scripts, a.all)):
+                a.scripts, a.terms, a.all)):
         a.all = True
     rc = 0
     if a.all or a.frames:
@@ -396,6 +469,8 @@ def main() -> int:
         rc |= check_elicitation(a.soft)
     if a.all or a.scripts:
         rc |= check_scripts(a.soft)
+    if a.all or a.terms:
+        rc |= check_terms(a.soft)
     return rc
 
 
