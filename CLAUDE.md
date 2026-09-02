@@ -11487,6 +11487,18 @@ reports the same $1626$.
 - The Polish twin is a structural mirror \dash{} the same `\val{}` calls, the
   same `\ref{}`s, the same table rows in the same order \dash{} because C4, C8,
   C12 and C14 compare token streams in order and only the prose is translated.
+- **And this pass's own summary of the back matter was wrong before it was
+  committed.** The *What is left* header first said each of the six appendices
+  is \enquote{either accumulated at the point of use or computed from the tree}
+  \dash{} and then, in the same sentence, named Appendix~B as the one that is
+  neither. It was also false about D, which is gated rather than accumulated,
+  and about E, which is neither. Written from the feel of the back matter
+  rather than from it, in the paragraph naming that exact class, and corrected
+  by listing the six one at a time. **A sentence of the form \enquote{each of
+  these is either X or Y} is a claim about every member, so it has to be
+  checked against every member** \dash{} which is Program~\ref{prog:P14}'s
+  finding about replacing a tally with a universal, arriving in the file that
+  records it.
 - **The README was stale again, one appendix after the pass that fixed it.**
   Appendix~D's pass rewrote it on Program~\ref{prog:P04}'s precedent \dash{}
   it is the first thing anybody reads \dash{} and the Appendix~E pass then
@@ -11807,14 +11819,23 @@ clone instead.
 ## What is left
 
 **Every program and every appendix is written. Nothing in this book is left to
-draft**, and the six items below are all finishing rather than writing. The one
-that closed last was Appendix~F, whose pass note is above; the standing warning
-it leaves behind is that **an appendix describing the book is the one class
-nothing can check**, so each of the six back-matter collections is now either
-accumulated at the point of use (`\canyou`, the diagram manifest, `\answerto`,
-`\result{}`) or computed from the tree and drift-gated (Appendix~F's ledgers)
-\dash{} and Appendix~B, the one that is neither, is the one that shipped four
-false pointers and needed two passes to find them by reading.
+draft**, and the six items below are all finishing rather than writing.
+
+The standing warning the back matter leaves behind is that **an appendix
+describing the book is the one class nothing can check**, and the six
+appendices are not equally exposed to it. Two are **accumulated at the point of
+use**, so their coordinates cannot be wrong: A's `\answerto` and C's
+`\result{}`, alongside `\canyou` and the diagram manifest in the body. One is
+**computed from the tree and drift-gated**: F's ledgers, which `make verify`
+now fails on. One is **half gated**: D's rows are checked against the Polish
+prose by `--terms`, and the prose between its tables is not \dash{} which is
+where that pass's own defect was. And **two are neither**: E, which says so in
+a warning box and marks which of its entries are verdicts and which are bare
+names, and **B, which does not \dash{} and B is the one that shipped four
+false pointers and needed two passes to find them by reading.**
+
+That is the whole ordering, and it is worth keeping because it says where to
+look first when one of them next goes stale.
 
 1. **The trained-model debt: five entries, one of them half answered.** It is
    the first thing in this book that cannot be done from a sandbox at all.
