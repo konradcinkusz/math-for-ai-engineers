@@ -256,11 +256,16 @@ Read the denominator. When $a$ and $b$ are far apart it is comparable to the
 numerator and nothing much happens. When they are close it goes to zero while
 the numerator does not.
 
-\textbf{The amplification factor is $\frac{|a| + |b|}{|a - b|}$}, and for the
-variance above it is of the order of $10^{\val{p02.var.shared}}$.
+So write the amplification factor down, and then put a size on it for the
+variance above.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{$\frac{|a| + |b|}{|a - b|}$, and for the variance above it is of the
+order of $10^{\val{p02.var.shared}}$.}
+
 That ratio is worth recognising because it is not confined to subtraction.
 
 Program~\ref{prog:F06} asked, in a further problem, what happens when one
@@ -377,9 +382,17 @@ The failure is not a rare event at the edge of the format's range; it is a
 value the architecture has a correction built in to avoid, and what it produces
 is \code{inf} and then \code{nan} rather than an error anybody would call an
 error.
+
+The next frame tabulates that score for all four formats. Before it does: two
+of the four overflow at the same score. Say which two, and say why.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\code{bf16} and \code{fp32}, because they share an exponent budget and
+the range of the exponential is set by that budget alone.}
+
 Both cliffs, in all four formats \dash{} the score at which the exponential
 leaves at the top, and the score at which it leaves at the bottom:
 
@@ -396,10 +409,9 @@ leaves at the top, and the score at which it leaves at the bottom:
 \end{tabular}
 \end{center}
 
-The \code{bf16} row equals the \code{fp32} row at the top, which is
-Program~\ref{prog:P01}'s point restated: the two share an exponent budget, and
-\textbf{the range of the exponential is set by that budget alone}. The
-significand does not appear in this table anywhere.
+That is Program~\ref{prog:P01}'s point restated, and the table says the rest
+of it too: \textbf{the significand does not appear anywhere in it.} Neither
+column moves when the significand does, at either end.
 \end{fr}
 
 \mermaidfig{p02-two-cliffs}{The two ways a number leaves its format, and what
@@ -514,14 +526,20 @@ below $1$.
 
 So a probability is a bad intermediate at both ends, and a log-probability is a
 good one at both. \textbf{The rule is that the probability should not exist.}
+
+For a softmax the two steps compose into one operation, and the algebra that
+does it is three lines. Write $\ln \softmax(z)_j$ out and simplify it.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-For a softmax the two steps compose into one operation, and the algebra is
-worth seeing because it is three lines and it removes the division as well.
+\ans{$z_j - \logsumexp(z)$: no exponential of a raw score, no division and no
+probability anywhere in it.}
+
 \[ \ln \softmax(z)_j = \ln \frac{e^{z_j}}{\sum_k e^{z_k}}
    = z_j - \ln \sum_k e^{z_k} = z_j - \logsumexp(z) \]
-No exponential of a raw score, no division, no probability. A log-softmax is a
+A log-softmax is a
 subtraction of the previous section's quantity from the score, and the
 subtraction is between numbers of the same size, which is what
 \S\ref{sec:P02-correct} said to look for.
@@ -556,11 +574,21 @@ which for negative $x$ is rearranged to $x - \ln(1 + e^{x})$ so that the
 exponential's argument is never positive. At $x = \val{p02.logsig.under}$ it
 returns $\val{p02.logsig.stable}$, which is the right answer and is barely
 distinguishable from $x$ itself.
+
+That was the bottom end. The top end fails too, and it is the half people
+miss: a binary cross-entropy needs $\ln p$ and $\ln(1 - p)$, and
+Program~\ref{prog:F07} measured where $\sigma$ rounds to exactly $\num{1.0}$.
+Say what the loss does there.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{$1 - p$ is exactly zero, so $\ln(1 - p)$ is \code{-inf} \dash{} on a
+prediction that was confident and \emph{right}.}
+
 \begin{trapbox}
-\textbf{And the other end fails too, which is the half people miss.}
+\textbf{And that is the half people miss.}
 
 Program~\ref{prog:F07} measured that $\sigma$ rounds to exactly
 $\num{1.0}$ from about $\val{f07.sig.saturates}$ upwards; the first whole
@@ -668,12 +696,20 @@ share a sign, and over $\val{p02.sum.n}$ of them that drift is visible.
 \textbf{Sorting fixes the catastrophe and leaves the drift}, which is the
 honest description and is worth having, because sorting is the fix people reach
 for and stop at.
+
+The drift is there because each addition rounds and the rounding is thrown
+away. What would you have to keep, alongside the total, to stop throwing it
+away?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{The part of the last addition that was lost: one extra variable, added
+back into the next term before it is used.}
+
 The second entry attacks the drift directly. \emph{Compensated summation}
-\dash{} Kahan's \dash{} keeps a second variable holding the part of the last
-addition that was lost, and adds it back to the next term before it is used:
+\dash{} Kahan's \dash{} keeps exactly that variable:
 \begin{align*}
   y &= x_i - c \\
   t &= s + y \\
@@ -688,16 +724,21 @@ numbers.
 \textbf{Cancellation is the mechanism, used deliberately.} The same operation
 that destroyed the variance in \S\ref{sec:P02-correct} is here the only one
 that can see the lost bits at all.
+
+The third entry needs no extra variable at all. Add in a balanced tree rather
+than in a line: pair the values, add the pairs, pair those, and so on. The
+number of additions does not change. Say what does, and by how much, for a
+million values.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-The third is what a library actually does, and it needs no extra variable.
-\textbf{Add in a balanced tree} rather than a line: pair the values, add the
-pairs, pair those, and so on. The number of additions is unchanged \dash{} it
-is still about a million \dash{} but the \emph{depth} is not: each value now
-reaches the total through about twenty of them rather than through a million,
-so the drift has twenty chances to accumulate along any path instead of a
-million.
+\ans{The \emph{depth}. Each value now reaches the total through about twenty
+additions rather than through a million.}
+
+\textbf{Add in a balanced tree} rather than a line, and the drift has twenty
+chances to accumulate along any path instead of a million.
 
 Pairwise summation is what an array library's reduction does, which is why a
 naive Python loop over an array is often \emph{less} accurate than the library
@@ -709,9 +750,17 @@ The fourth needs no cleverness at all: \textbf{accumulate in a wider format
 than the values.} Sixteen-bit values summed into a \code{float32} accumulator,
 or \code{float32} values into \code{float64}. It costs a little memory and no
 thought, and it is what mixed-precision training does.
+
+Four fixes, and the next frame scores all of them on the same million values.
+Before it does: which of the four do you expect to come out worst?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Sorting \dash{} the cheapest of the four and the one most often described
+as sufficient.}
+
 All five, on the same million values:
 
 \begin{center}
@@ -733,9 +782,10 @@ row is scored against is not itself a floating-point result.
 
 Two things in that table are worth more than the ranking. The first is the gap
 between row one and every other row, which is the difference between an answer
-and no answer. The second is that \textbf{sorting is an order of magnitude
-worse than the other three} \dash{} it is the cheapest fix and the weakest one,
-and it is the one most often described as sufficient.
+and no answer. The second is the size of the shortfall you predicted:
+\textbf{sorting is an order of magnitude worse than the other three}, so the
+cheapest fix is not merely the weakest of the four, it is not in the same
+class as the other three.
 \end{fr}
 
 \begin{fr}

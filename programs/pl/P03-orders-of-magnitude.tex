@@ -318,19 +318,24 @@ elementów algorytm kwadratowy jest szybszy, a sortowanie miliona elementów
 składa się głównie z sortowań kilkudziesięciu. Nikt nie uważa tego za
 kompromis.
 \end{trapbox}
+
+Jest druga rzecz, której notacja nie mówi, i to przez nią przebieg $O(n)$ po
+liście wiązanej potrafi przegrać z przebiegiem $O(n \mfalogplain n)$ po tablicy.
+Nazwij ją.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Druga rzecz, której notacja nie mówi, to czym jest operacja.
+\ans{To, czym operacja \emph{jest}. Tempo wzrostu liczy kroki i traktuje każdy
+krok jako kosztujący tyle samo; maszyna tak nie robi.}
 
-Tempo wzrostu liczy \emph{kroki} i traktuje każdy krok jako kosztujący tyle
-samo. Na maszynie nie kosztują: dodawanie na wartości już w rejestrze i odczyt
-chybiający każdy poziom cache'u różnią się czynnikiem rzędu setek, a żaden z
-nich nie pojawia się w $O(n)$.
+Dodawanie na wartości już w rejestrze i odczyt chybiający każdy poziom cache'u
+różnią się czynnikiem rzędu setek, a żaden z nich nie pojawia się w $O(n)$.
 
 Dlatego przebieg $O(n)$ po liście wiązanej potrafi przegrać z przebiegiem
-$O(n \mfalogplain n)$ po tablicy i dlatego dwie listy z poprzedniej sekcji \dash{} obie
-$O(n)$ \dash{} to wcale nie ten sam program.
+$O(n \mfalogplain n)$ po tablicy i dlatego dwie listy z poprzedniej sekcji
+\dash{} obie $O(n)$ \dash{} to wcale nie ten sam program.
 
 \medskip
 \noindent
@@ -373,17 +378,22 @@ instrukcję i część producentów liczy ją z tego powodu jako jeden FLOP, wi�
 czynnik dwa między liczbami dwóch osób to zwykle to, a nie spór o model.
 Powiedz, której konwencji używasz, a spór się kończy.
 \end{note}
+
+Dla całego przebiegu treningu liczenie ma skrót, którego Program~\ref{prog:F01}
+już użył: około $6$ FLOP-ów na parametr na token. Ta $6$ to trzy osobne
+dwójki. Powiedz, skąd bierze się każda z nich.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Dla całego przebiegu treningu liczenie ma skrót, którego Program~\ref{prog:F01}
-już użył: około $6$ FLOP-ów na parametr na token.
+\ans{Dwa za przejście w przód i po dwa za każdy z dwóch gradientów przejścia
+wstecz. Dwa w przód, cztery wstecz, sześć razem.}
 
-Tę $6$ warto rozpakować, bo to trzy osobne dwójki. Przejście w przód kosztuje
-około $2$ na parametr na token \dash{} jedno mnożenie i jedno dodawanie, czyli
-powyższy iloczyn skalarny. Przejście wstecz liczy dwa gradienty, jeden względem
-wejścia i jeden względem wagi, a każdy kosztuje mniej więcej tyle co przejście
-w przód. Dwa w przód, cztery wstecz, sześć razem.
+Przejście w przód kosztuje około $2$ na parametr na token \dash{} jedno
+mnożenie i jedno dodawanie, czyli powyższy iloczyn skalarny. Przejście wstecz
+liczy dwa gradienty, jeden względem wejścia i jeden względem wagi, a każdy
+kosztuje mniej więcej tyle co przejście w przód.
 
 Dla $\val{f01.params}$ parametrów na $\val{f01.tokens}$ tokenach daje to
 $\val{p03.train.flops}$, czyli liczbę, którą policzył Program~\ref{prog:F01}, a
@@ -509,11 +519,17 @@ je usuwać. Wiedza o tym, który wiersz atakuje dana technika, pozwala
 przewidzieć, czy to wystarczy, a powyższa arytmetyka to wszystko, czego do tego
 trzeba.
 \end{aibox}
+
+Jednego składnika w tej tabeli celowo brakuje, a jest to składnik, który
+poznałeś pod inną nazwą. Którego i co go dyskwalifikuje z miejsca obok
+pozostałych?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Jednego składnika w tej tabeli celowo brakuje, bo w ogóle nie skaluje się z
-parametrami.
+\ans{Aktywacji. Każdy inny wiersz skaluje się z liczbą parametrów, a one
+nie.}
 
 \textbf{Aktywacje} to wartości pośrednie zachowane z przejścia w przód,
 ponieważ potrzebuje ich przejście wstecz \dash{} czyli wynik
@@ -567,14 +583,20 @@ każdy token w locie, przy tych kształtach. Pomnóż przez tokeny i przez
 równoczesne rozmowy, a masz plan pojemności. Zwykle jest większy od wag i to on
 decyduje, ilu użytkowników obsłuży karta.
 \end{trapbox}
+
+Dwie jednostki w tej sekcji różnią się mniej, niż wygląda: rachunek za
+pamięć podany jest w GB, a cache w GiB. Która jest większa i o ile?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Jedna linijka porządkowa, bo odpowiada za większość rozbieżności między
+\ans{GiB, o jakieś siedem procent \dash{} $2^{30}$ przeciw $10^{9}$.}
+
+To jedna linijka porządkowa i odpowiada za większość rozbieżności między
 oszacowaniem a panelem monitoringu.
 
-Program~\ref{prog:F01} to rozstrzygnął: GB to $10^{9}$ bajtów, a GiB to
-$2^{30}$, i drugie jest większe o jakieś siedem procent. Każda liczba w tej
+Program~\ref{prog:F01} to rozstrzygnął. Każda liczba w tej
 sekcji jest w jednym albo w drugim i mówi, w którym. Plan pojemności mylący się
 o siedem procent to prawie zawsze to, a lekarstwem jest zapisanie jednostki, a
 nie przeliczenie arytmetyki.
@@ -632,16 +654,17 @@ sprzętu, i powinieneś podstawić własne. Znaczenie ma to, że ta liczba jest
 rzędu \emph{setek} i że rośnie od dwóch dekad: arytmetyka staniała znacznie
 szybciej, niż pamięć przyspieszyła, i dlatego spór, który kiedyś był o
 operacje, jest dziś prawie zawsze o bajty.
+
+Teraz pierwsza z dwóch prac. Dodawanie elementowe dwóch tablic czyta dwie
+wartości i zapisuje jedną na każdą wykonaną operację, po dwa bajty każda.
+Zapisz jego intensywność arytmetyczną i powiedz, czy występuje w niej $n$.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Teraz obie prace.
-
-Dodawanie elementowe dwóch tablic czyta dwie wartości i zapisuje jedną na
-każdą wykonaną operację. Po dwa bajty każda daje to sześć bajtów na operację,
-więc intensywność wynosi $\frac{1}{6} = \val{p03.ai.elementwise}$ \dash{} a $n$
-nie pojawia się nigdzie, więc \textbf{jest ona ta sama, jak duże by nie były
-tablice.}
+\ans{$\frac{1}{6} = \val{p03.ai.elementwise}$, i nie: $n$ nie pojawia się
+nigdzie, więc \textbf{jest ona ta sama, jak duże by nie były tablice.}}
 
 Mnożenie dwóch tablic o boku $n$ wykonuje około $2n^{3}$ operacji, bo jest to
 $n^{2}$ iloczynów skalarnych długości $n$, i przenosi około $3n^{2}$ wartości.
@@ -649,9 +672,19 @@ Jego intensywność to
 \[ \frac{2n^{3}}{3n^{2} \times 2} = \frac{n}{3} \]
 co \emph{rośnie z $n$}. Przy $n = \val{p03.ai.matmul.n}$ wynosi
 $\val{p03.ai.matmul}$.
+
+Na stronie są teraz trzy liczby: te dwie intensywności i własny stosunek
+urządzenia. Podziel i powiedz, jakiej części arytmetyki maszyny używa operacja
+elementowa, kiedy biegnie.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Mniej więcej jednej części na $\val{p03.ai.short}$ \dash{} stosunek
+urządzenia podzielony przez $\frac{1}{6}$, i dlatego zaokrąglona intensywność
+obok daje odrobinę mniej.}
+
 Postaw te trzy liczby obok siebie.
 
 \begin{center}
@@ -665,11 +698,10 @@ elementowo, dowolne $n$ & $\val{p03.ai.elementwise}$ & pamięć \\
 \end{tabular}
 \end{center}
 
-Przepaść między wierszami to czynnik $\val{p03.ai.gap}$, a między drugim
-wierszem a urządzeniem $\val{p03.ai.short}$. \textbf{Operacja elementowa
-wykorzystuje mniej więcej jedną część na $\val{p03.ai.short}$ arytmetyki,
-którą maszyna umie wykonać w tym czasie}, a reszta maszyny stoi bezczynnie,
-czekając na pamięć.
+Liczba, której nie policzyłeś, to przepaść między wierszami, czyli czynnik
+$\val{p03.ai.gap}$: \textbf{te dwie prace różnią się od siebie o wiele
+bardziej, niż każda z nich różni się od urządzenia.} Kiedy biegnie ta
+elementowa, reszta maszyny stoi bezczynnie, czekając na pamięć.
 
 To jest uzasadnienie fuzji jąder, trzymania aktywacji w szybkiej pamięci i
 każdej optymalizacji, która wygląda na dotyczącą ruchu danych, a nie
@@ -700,27 +732,35 @@ niskiego rzędu albo mieszanka ekspertów o wąskich ekspertach \dash{} leży po
 złej stronie tej granicy, a jego wydajnością rządzi układ danych, a nie liczba
 potrzebnych operacji.
 \end{warning}
+
+Fuzja, jako liczba, a nie jako argument. Trzy operacje elementowe biegną jedna
+po drugiej, każda czytając dwie tablice i zapisując jedną; zlane w jedno
+przejście dane są czytane raz, wszystkie trzy są stosowane, a wynik zapisany
+raz. Operacje się nie zmieniają. Co dzieje się z intensywnością?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Fuzja, jako liczba, a nie jako argument.
+\ans{Mnoży się przez $\val{p03.fuse.factor}$, bo bajty dzielą się przez ten
+sam czynnik.}
 
-Trzy operacje elementowe biegną jedna po drugiej, każda czytając dwie tablice i
-zapisując jedną. Bez zlania to $\val{p03.fuse.chain}$ podróży do pamięci na
-$\val{p03.fuse.chain}$ operacji na element. Zlane w jedno przejście, dane są
-czytane raz, wszystkie trzy operacje są stosowane, a wynik zapisany raz.
+Bez zlania łańcuch robi $\val{p03.fuse.chain}$ podróży do pamięci na
+$\val{p03.fuse.chain}$ operacji na element, a zlany robi jedną. Intensywność
+idzie więc z $\val{p03.ai.elementwise}$ na $\val{p03.fuse.after}$.
 
-Operacje się nie zmieniają. Bajty dzielą się przez
-$\val{p03.fuse.factor}$, więc intensywność mnoży się przez
-$\val{p03.fuse.factor}$, z $\val{p03.ai.elementwise}$ na
-$\val{p03.fuse.after}$.
+Postaw to obok $\val{p03.dev.ratio}$. Czy zlany łańcuch jest ograniczony
+obliczeniami?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-I uczciwy odczyt tej liczby, czyli ten, który warto zabrać.
+\ans{Nie. $\val{p03.fuse.after}$ wciąż leży daleko poniżej
+$\val{p03.dev.ratio}$, więc zlany łańcuch jest ograniczony przez pamięć
+dokładnie tak jak niezlany.}
 
-$\val{p03.fuse.after}$ wciąż leży daleko poniżej $\val{p03.dev.ratio}$. Zlany
-łańcuch jest ograniczony przez pamięć, dokładnie jak niezlany, i pozostanie
+I pozostanie
 taki, ile operacji by w niego nie złożyć, bo bajty mają podłogę: wejście trzeba
 przeczytać raz, a wyjście zapisać raz, cokolwiek dzieje się pomiędzy.
 

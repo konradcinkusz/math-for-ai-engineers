@@ -314,19 +314,24 @@ quicksort, because below a threshold of a few dozen elements the quadratic
 algorithm is faster, and a sort of a million elements is mostly sorts of a few
 dozen elements. Nobody regards that as a compromise.
 \end{trapbox}
+
+There is a second thing the notation does not say, and it is why an $O(n)$
+pass over a linked list can lose to an $O(n \mfalogplain n)$ pass over an array.
+Name it.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-The second thing the notation does not say is what an operation is.
+\ans{What an operation \emph{is}. A growth rate counts steps and treats every
+step as costing the same; a machine does not.}
 
-A growth rate counts \emph{steps}, and treats every step as costing the same.
-On a machine they do not: an addition on a value already in a register and a
-read that misses every cache differ by a factor in the hundreds, and neither
-appears in $O(n)$.
+An addition on a value already in a register and a read that misses every
+cache differ by a factor in the hundreds, and neither appears in $O(n)$.
 
-That is why an $O(n)$ pass over a linked list can lose to an $O(n \mfalogplain n)$ pass
-over an array, and why the two lists in the last section \dash{} both $O(n)$
-\dash{} are not the same program at all.
+That is why an $O(n)$ pass over a linked list can lose to an
+$O(n \mfalogplain n)$ pass over an array, and why the two lists in the last
+section \dash{} both $O(n)$ \dash{} are not the same program at all.
 
 \medskip
 \noindent
@@ -369,17 +374,22 @@ instruction and some vendors count it as one FLOP for that reason, so a factor
 of two between two people's figures is usually this and not a disagreement
 about the model. Say which convention you are using and the argument stops.
 \end{note}
+
+For a whole training run the count has a shortcut, and Program~\ref{prog:F01}
+already used it: about $6$ FLOPs per parameter per token. That $6$ is three
+separate twos. Say where each of them comes from.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-For a whole training run the count has a shortcut, and Program~\ref{prog:F01}
-already used it: about $6$ FLOPs per parameter per token.
+\ans{Two for the forward pass, and two more for each of the backward pass's
+two gradients. Two forward, four backward, six in total.}
 
-The $6$ is worth unpacking, because it is three separate twos. A forward pass
-costs about $2$ per parameter per token \dash{} one multiply and one add, which
-is the dot product above. The backward pass computes two gradients, one with
-respect to the input and one with respect to the weight, and each costs about
-as much as the forward pass. Two forward, four backward, six in total.
+A forward pass costs about $2$ per parameter per token \dash{} one multiply
+and one add, which is the dot product above. The backward pass computes two
+gradients, one with respect to the input and one with respect to the weight,
+and each costs about as much as the forward pass.
 
 For $\val{f01.params}$ parameters over $\val{f01.tokens}$ tokens that is
 $\val{p03.train.flops}$, which is the number Program~\ref{prog:F01} computed
@@ -504,11 +514,17 @@ halves the two moment rows. Sharding across devices divides the rows rather
 than removing them. Knowing which row a technique attacks is what lets you
 predict whether it will be enough, and the arithmetic above is all it takes.
 \end{aibox}
+
+One term is missing from that table on purpose, and it is a term you have met
+under another name. Which, and what disqualifies it from sitting beside the
+others?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-One term is missing from that table on purpose, because it does not scale with
-the parameters at all.
+\ans{The activations. Every other row scales with the parameter count and they
+do not.}
 
 \textbf{Activations} are the intermediate values kept from the forward pass
 because the backward pass needs them \dash{} which is Program~\ref{prog:F12}'s
@@ -562,14 +578,21 @@ concurrent conversations, and you have the capacity plan. It is usually larger
 than the weights, and it is the term that decides how many users a card
 serves.
 \end{trapbox}
+
+Two of the units in this section differ by less than they look: the memory
+bill is quoted in GB and the cache in GiB. Which is the larger, and by how
+much?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-One line of housekeeping, because it accounts for most of the disagreements
-between an estimate and a monitoring dashboard.
+\ans{The GiB, by about seven per cent \dash{} $2^{30}$ against $10^{9}$.}
 
-Program~\ref{prog:F01} settled it: a GB is $10^{9}$ bytes and a GiB is
-$2^{30}$, and the second is about seven per cent larger. Every number in this
+That is one line of housekeeping, and it accounts for most of the
+disagreements between an estimate and a monitoring dashboard.
+
+Program~\ref{prog:F01} settled it. Every number in this
 section is in one or the other and says which. A capacity plan that is seven
 per cent out is nearly always this, and the fix is to write the unit rather
 than to re-do the arithmetic.
@@ -627,15 +650,17 @@ you should substitute your own. What matters is that the number is in the
 \emph{hundreds}, and that it has been climbing for two decades: arithmetic has
 got cheaper far faster than memory has got quicker, which is why an argument
 that used to be about operations is now nearly always about bytes.
+
+Now the first of the two pieces of work. An elementwise add of two arrays
+reads two values and writes one for every operation it performs, at two bytes
+each. Write down its arithmetic intensity, and say whether $n$ appears in it.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Now the two pieces of work.
-
-An elementwise add of two arrays reads two values and writes one for every
-operation it performs. At two bytes each that is six bytes per operation, so
-its intensity is $\frac{1}{6} = \val{p03.ai.elementwise}$ \dash{} and $n$ does
-not appear anywhere, so \textbf{it is the same however large the arrays are.}
+\ans{$\frac{1}{6} = \val{p03.ai.elementwise}$, and no: $n$ does not appear
+anywhere, so \textbf{it is the same however large the arrays are.}}
 
 A multiply of two $n$-square arrays does about $2n^{3}$ operations, because it
 is $n^{2}$ dot products of length $n$, and moves about $3n^{2}$ values. Its
@@ -643,9 +668,19 @@ intensity is
 \[ \frac{2n^{3}}{3n^{2} \times 2} = \frac{n}{3} \]
 which \emph{grows with $n$}. At $n = \val{p03.ai.matmul.n}$ it is
 $\val{p03.ai.matmul}$.
+
+Three numbers are now on the page: those two intensities and the device's own
+ratio. Divide, and say what fraction of the machine's arithmetic an
+elementwise operation is using while it runs.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{About one part in $\val{p03.ai.short}$ \dash{} the device's ratio
+divided by $\frac{1}{6}$, which is why the rounded intensity beside it gives a
+slightly smaller answer.}
+
 Set the three numbers side by side.
 
 \begin{center}
@@ -659,11 +694,10 @@ elementwise, any $n$ & $\val{p03.ai.elementwise}$ & memory-bound \\
 \end{tabular}
 \end{center}
 
-The gap between the two rows is a factor of $\val{p03.ai.gap}$, and the gap
-between the second row and the device is $\val{p03.ai.short}$. \textbf{An
-elementwise operation uses about one part in $\val{p03.ai.short}$ of the
-arithmetic the machine can do while it runs}, and the rest of the machine is idle waiting
-for memory.
+The number you did not compute is the gap between the two rows, which is a
+factor of $\val{p03.ai.gap}$: \textbf{the two pieces of work differ from each
+other by far more than either differs from the device.} While the elementwise
+one runs, the rest of the machine is idle waiting for memory.
 
 That is the justification for kernel fusion, for keeping activations in fast
 memory, and for every optimisation that looks like it is about data movement
@@ -693,29 +727,34 @@ low-rank adapters, or a mixture of experts with narrow experts produces
 \dash{} sits on the wrong side of that line, and its performance is governed by
 how the data is laid out rather than by how many operations it needs.
 \end{warning}
+
+Fusion, as a number rather than as an argument. Three elementwise operations
+run one after another, each reading two arrays and writing one; fused into a
+single pass, the data is read once, all three are applied, and the result is
+written once. The operations are unchanged. What happens to the intensity?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Fusion, as a number rather than as an argument.
+\ans{It is multiplied by $\val{p03.fuse.factor}$, because the bytes are
+divided by it.}
 
-Three elementwise operations run one after another, each reading two arrays and
-writing one. Unfused, that is $\val{p03.fuse.chain}$ round trips to memory for
-$\val{p03.fuse.chain}$ operations per element. Fused into a single pass, the
-data is read once, all three operations are applied, and the result is written
-once.
+Unfused, the chain makes $\val{p03.fuse.chain}$ round trips to memory for
+$\val{p03.fuse.chain}$ operations per element, and fused it makes one. So the
+intensity goes from $\val{p03.ai.elementwise}$ to $\val{p03.fuse.after}$.
 
-The operations are unchanged. The bytes are divided by
-$\val{p03.fuse.factor}$, so the intensity is multiplied by
-$\val{p03.fuse.factor}$, from $\val{p03.ai.elementwise}$ to
-$\val{p03.fuse.after}$.
+Set that against $\val{p03.dev.ratio}$. Is the fused chain compute-bound?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-And the honest reading of that number, which is the one worth carrying.
+\ans{No. $\val{p03.fuse.after}$ is still far below $\val{p03.dev.ratio}$, so
+the fused chain is memory-bound exactly as the unfused one was.}
 
-$\val{p03.fuse.after}$ is still far below $\val{p03.dev.ratio}$. The fused
-chain is memory-bound, exactly as the unfused one was, and it will stay
-memory-bound however many operations are folded into it, because the bytes have
+And it will stay memory-bound however many operations are folded into it,
+because the bytes have
 a floor: the input has to be read once and the output written once, whatever
 happens in between.
 

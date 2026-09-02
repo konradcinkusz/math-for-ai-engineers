@@ -250,11 +250,16 @@ Przeczytaj mianownik. Gdy $a$ i $b$ są daleko od siebie, jest porównywalny z
 licznikiem i nic szczególnego się nie dzieje. Gdy są blisko, dąży do zera, a
 licznik nie.
 
-\textbf{Współczynnik wzmocnienia to $\frac{|a| + |b|}{|a - b|}$}, a dla
-powyższej wariancji jest rzędu $10^{\val{p02.var.shared}}$.
+Zapisz więc współczynnik wzmocnienia, a potem podaj jego rząd wielkości dla
+powyższej wariancji.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{$\frac{|a| + |b|}{|a - b|}$, a dla powyższej wariancji jest rzędu
+$10^{\val{p02.var.shared}}$.}
+
 Ten iloraz warto rozpoznawać, bo nie ogranicza się do odejmowania.
 
 Program~\ref{prog:F06} pytał w zadaniu dodatkowym, co się dzieje, gdy jedno
@@ -371,9 +376,18 @@ Program~\ref{prog:P25}. Awaria nie jest rzadkim zdarzeniem na skraju zakresu
 formatu; jest wartością, przed którą architektura ma wbudowaną poprawkę, a
 produkuje \code{inf}, a potem \code{nan}, a nie błąd, który ktokolwiek nazwałby
 błędem.
+
+Następna ramka podaje ten wynik dla wszystkich czterech formatów. Zanim to
+zrobi: dwa z czterech przepełniają się przy tym samym wyniku. Powiedz które i
+powiedz dlaczego.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\code{bf16} i \code{fp32}, bo dzielą budżet wykładnika, a zasięg
+eksponenty wyznacza sam ten budżet.}
+
 Oba urwiska we wszystkich czterech formatach \dash{} wynik, przy którym
 eksponenta wychodzi górą, i wynik, przy którym wychodzi dołem:
 
@@ -390,9 +404,9 @@ eksponenta wychodzi górą, i wynik, przy którym wychodzi dołem:
 \end{tabular}
 \end{center}
 
-Wiersz \code{bf16} równa się wierszowi \code{fp32} u góry, co jest powtórzeniem
-pointy Programu~\ref{prog:P01}: oba dzielą budżet wykładnika, a \textbf{zakres
-eksponenty ustala sam ten budżet}. Mantysa nie pojawia się w tej tabeli nigdzie.
+To powtórzenie pointy Programu~\ref{prog:P01}, a tabela mówi też resztę:
+\textbf{mantysa nie pojawia się w niej nigdzie.} Żadna z kolumn nie drgnie,
+gdy mantysa się zmieni, po żadnej ze stron.
 \end{fr}
 
 \mermaidfig{p02-two-cliffs}{Dwa sposoby, na jakie liczba opuszcza format, i co
@@ -509,16 +523,21 @@ przy $1$ jest największym odstępem poniżej $1$.
 Prawdopodobieństwo jest więc złą wartością pośrednią na obu końcach, a jego
 logarytm dobrą na obu. \textbf{Reguła brzmi: prawdopodobieństwo nie powinno
 istnieć.}
+
+Dla softmaksu oba kroki składają się w jedną operację, a algebra, która to
+robi, ma trzy linijki. Rozpisz $\ln \softmax(z)_j$ i uprość.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Dla softmaksu oba kroki składają się w jedną operację, a algebrę warto
-zobaczyć, bo ma trzy linijki i usuwa również dzielenie.
+\ans{$z_j - \logsumexp(z)$: żadnej eksponenty surowego wyniku, żadnego
+dzielenia i nigdzie żadnego prawdopodobieństwa.}
+
 \[ \ln \softmax(z)_j = \ln \frac{e^{z_j}}{\sum_k e^{z_k}}
    = z_j - \ln \sum_k e^{z_k} = z_j - \logsumexp(z) \]
-Żadnej eksponenty surowego wyniku, żadnego dzielenia, żadnego
-prawdopodobieństwa. Log-softmax to odjęcie wielkości z poprzedniej sekcji od
-wyniku, a odejmowanie odbywa się między liczbami tego samego rzędu, czyli tak,
+Log-softmax to odjęcie wielkości z poprzedniej sekcji od wyniku, a odejmowanie
+odbywa się między liczbami tego samego rzędu, czyli tak,
 jak kazała szukać \S\ref{sec:P02-correct}.
 
 To właśnie ma na myśli biblioteka, gdy mówi o funkcji przyjmującej
@@ -553,11 +572,21 @@ co dla ujemnych $x$ przekształca się do $x - \ln(1 + e^{x})$, żeby argument
 eksponenty nigdy nie był dodatni. Przy $x = \val{p02.logsig.under}$ zwraca
 $\val{p02.logsig.stable}$, co jest poprawną odpowiedzią i ledwie odróżnialne od
 samego $x$.
+
+To był dolny koniec. Górny też zawodzi i to jest ta połowa, którą się pomija:
+dwuklasowa entropia krzyżowa potrzebuje $\ln p$ i $\ln(1 - p)$, a
+Program~\ref{prog:F07} zmierzył, gdzie $\sigma$ zaokrągla się do dokładnego
+$\num{1.0}$. Powiedz, co robi tam strata.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{$1 - p$ jest dokładnie zerem, więc $\ln(1 - p)$ to \code{-inf} \dash{}
+przy predykcji pewnej i \emph{trafnej}.}
+
 \begin{trapbox}
-\textbf{A drugi koniec też zawodzi, i to jest ta połowa, którą się pomija.}
+\textbf{I to jest ta połowa, którą się pomija.}
 
 Program~\ref{prog:F07} zmierzył, że $\sigma$ zaokrągla się do dokładnego
 $\num{1.0}$ mniej więcej od $\val{f07.sig.saturates}$ w górę; pierwszą liczbą
@@ -667,12 +696,19 @@ się widoczny.
 \textbf{Sortowanie usuwa katastrofę i zostawia dryf}, co jest uczciwym opisem i
 warto go mieć, bo sortowanie to poprawka, po którą ludzie sięgają i na której
 poprzestają.
+
+Dryf bierze się stąd, że każde dodawanie zaokrągla, a zaokrąglenie jest
+wyrzucane. Co trzeba by trzymać obok sumy, żeby przestać je wyrzucać?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Tę część ostatniego dodawania, która przepadła: jedną dodatkową zmienną,
+dodawaną z powrotem do następnego składnika przed jego użyciem.}
+
 Druga pozycja atakuje dryf wprost. \emph{Sumowanie z kompensacją} \dash{}
-Kahana \dash{} trzyma drugą zmienną z tą częścią ostatniego dodawania, która
-przepadła, i dodaje ją z powrotem do następnego składnika przed jego użyciem:
+Kahana \dash{} trzyma dokładnie taką zmienną:
 \begin{align*}
   y &= x_i - c \\
   t &= s + y \\
@@ -687,16 +723,21 @@ liczb.
 \textbf{Skracanie jest tu mechanizmem, użytym celowo.} Ta sama operacja, która
 zniszczyła wariancję w \S\ref{sec:P02-correct}, jest tutaj jedyną, która w
 ogóle widzi utracone bity.
+
+Trzecia pozycja nie potrzebuje żadnej dodatkowej zmiennej. Dodawaj w
+zrównoważonym drzewie, a nie w linii: sparuj wartości, dodaj pary, sparuj te
+wyniki i tak dalej. Liczba dodawań się nie zmienia. Powiedz, co się zmienia i
+o ile, dla miliona wartości.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Trzecia to to, co robi biblioteka, i nie potrzebuje dodatkowej zmiennej.
-\textbf{Dodawaj w zrównoważonym drzewie}, a nie w linii: sparuj wartości, dodaj
-pary, sparuj te wyniki i tak dalej. Liczba dodawań się nie zmienia \dash{}
-wciąż jest ich mniej więcej milion \dash{} ale \emph{głębokość} owszem: każda
-wartość dociera teraz do sumy przez mniej więcej dwadzieścia z nich, a nie przez
-milion, więc dryf ma dwadzieścia okazji do nagromadzenia wzdłuż dowolnej ścieżki
-zamiast miliona.
+\ans{\emph{Głębokość}. Każda wartość dociera teraz do sumy przez mniej więcej
+dwadzieścia dodawań, a nie przez milion.}
+
+\textbf{Dodawaj w zrównoważonym drzewie}, a nie w linii, a dryf ma dwadzieścia
+okazji do nagromadzenia wzdłuż dowolnej ścieżki zamiast miliona.
 
 Sumowanie parami to właśnie to, co robi redukcja biblioteki tablicowej, i
 dlatego naiwna pętla Pythona po tablicy bywa \emph{mniej} dokładna niż wywołanie
@@ -708,9 +749,17 @@ Czwarta nie wymaga żadnego sprytu: \textbf{akumuluj w formacie szerszym niż
 wartości.} Wartości szesnastobitowe sumowane do akumulatora \code{float32} albo
 wartości \code{float32} do \code{float64}. Kosztuje odrobinę pamięci i zero
 myślenia, i tak właśnie robi trening w mieszanej precyzji.
+
+Cztery poprawki, a następna ramka ocenia je wszystkie na tym samym milionie
+wartości. Zanim to zrobi: która z czterech wypadnie twoim zdaniem najgorzej?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Sortowanie \dash{} najtańsza z czterech i ta, którą najczęściej opisuje
+się jako wystarczającą.}
+
 Wszystkie pięć, na tym samym milionie wartości:
 
 \begin{center}
@@ -733,9 +782,10 @@ zmiennoprzecinkowym.
 
 Dwie rzeczy w tej tabeli są warte więcej niż sam ranking. Pierwsza to przepaść
 między pierwszym wierszem a każdym innym, czyli różnica między odpowiedzią a
-brakiem odpowiedzi. Druga to fakt, że \textbf{sortowanie wypada o rząd
-wielkości gorzej niż pozostałe trzy} \dash{} jest najtańszą poprawką i
-najsłabszą, a to właśnie ją najczęściej opisuje się jako wystarczającą.
+brakiem odpowiedzi. Druga to rozmiar niedoboru, który przewidziałeś:
+\textbf{sortowanie wypada o rząd wielkości gorzej niż pozostałe trzy}, więc
+najtańsza poprawka nie jest po prostu najsłabszą z czterech \dash{} nie jest w
+tej samej klasie co pozostałe trzy.
 \end{fr}
 
 \begin{fr}
