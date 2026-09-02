@@ -1285,74 +1285,74 @@ liczby, którą ten program nauczył cię liczyć.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{Logarytm jest \emph{wykładnikiem}: $\logb{b} x$ to potęga, która
+\sumitem{1--3}{\result{Logarytm jest \emph{wykładnikiem}: $\logb{b} x$ to potęga, która
   zamienia $b$ w $x$, a $b^{y} = x$ mówi to samo z drugiej strony.
   $\logb{b} 1 = 0$ dla każdej podstawy, wymuszone przez $b^{0} = 1$, oraz
-  $\logb{b} b = 1$.}
-\sumitem{4--5}{Argument musi być ściśle dodatni, bo żadna potęga dodatniej
+  $\logb{b} b = 1$}.}
+\sumitem{4--5}{\result{Argument musi być ściśle dodatni, bo żadna potęga dodatniej
   podstawy nie jest zerem ani liczbą ujemną. Twoje biblioteki nie zgadzają się
   co do tego, co robić w zamian: \code{math.log} zgłasza błąd, a \code{np.log}
-  zwraca \code{-inf} albo \code{nan} wraz z ostrzeżeniem.}
-\sumitem{6--7}{Logarytm ściska zakres, którego nie umiesz pomieścić, do
+  zwraca \code{-inf} albo \code{nan} wraz z ostrzeżeniem}.}
+\sumitem{6--7}{\result{Logarytm ściska zakres, którego nie umiesz pomieścić, do
   takiego, który umiesz. Liczba cyfr $2^{80}$ wymaga jednego mnożenia,
   $80 \times \val{f03.log10.two} = \val{f03.two.eighty.exp}$, tam gdzie
   Program~\ref{prog:F01} potrzebował wszystkich
-  $\val{f03.two.eighty.digits}$ cyfr.}
-\sumitem{8--9}{Sam logarytm oznacza podstawę dziesięć dla jednej grupy
+  $\val{f03.two.eighty.digits}$ cyfr}.}
+\sumitem{8--9}{\result{Sam logarytm oznacza podstawę dziesięć dla jednej grupy
   czytelników i podstawę $e$ dla drugiej, a obie stosują konwencję poprawnie.
   Zapisuj podstawę za każdym razem; budowanie tej książki nie przyjmie niczego
-  innego.}
-\sumitem{10--11}{Zmiana podstawy to
+  innego}.}
+\sumitem{10--11}{\result{Zmiana podstawy to
   $\logb{b} x = \logb{c} x / \logb{c} b$, z podstawą, której chcesz, na dole.
   Mnoży ona każdą wartość przez jedną stałą, więc kształt narysowanego
-  logarytmu nigdy nie zdradza jego podstawy.}
-\sumitem{12--14}{$\ln 2 = \val{f03.ln.two}$ oraz
+  logarytmu nigdy nie zdradza jego podstawy}.}
+\sumitem{12--14}{\result{$\ln 2 = \val{f03.ln.two}$ oraz
   $1 / \ln 2 = \val{f03.inv.ln.two}$ przeliczają między natami a bitami. Bit
-  jest jednostką mniejszą, więc liczba bitów jest większa.}
-\sumitem{15--19}{Trzy prawa to prawa działań na potęgach z
+  jest jednostką mniejszą, więc liczba bitów jest większa}.}
+\sumitem{15--19}{\result{Trzy prawa to prawa działań na potęgach z
   Programu~\ref{prog:F01} przeczytane wstecz: $\ln(xy) = \ln x + \ln y$,
-  $\ln(x/y) = \ln x - \ln y$, $\ln(x^{n}) = n\ln x$.}
-\sumitem{20--21}{\textbf{Nie ma reguły na logarytm sumy.} $\ln a + \ln b$ to
+  $\ln(x/y) = \ln x - \ln y$, $\ln(x^{n}) = n\ln x$}.}
+\sumitem{20--21}{\result{\textbf{Nie ma reguły na logarytm sumy.} $\ln a + \ln b$ to
   logarytm \emph{iloczynu} \dash{} już trzeci raz w trzech programach reguła
-  prawdziwa dla iloczynu została przeniesiona na sumę.}
-\sumitem{22--23}{Tam, gdzie musisz mieć $\ln(e^{u} + e^{v})$, wyłącz większy
+  prawdziwa dla iloczynu została przeniesiona na sumę}.}
+\sumitem{22--23}{\result{Tam, gdzie musisz mieć $\ln(e^{u} + e^{v})$, wyłącz większy
   przed nawias: $v + \ln(1 + e^{u-v})$. \code{np.exp(1000.)} to \code{inf}; a
-  \code{np.logaddexp} to $\val{f03.logsumexp.pair}$.}
-\sumitem{25--27}{$e^{\ln x} = x$ dla $x > 0$, a $\ln(e^{x}) = x$ zawsze, więc
-  $b^{x} = c$ rozwiązuje się jednym ruchem, a $L = -\ln p$ daje $p = e^{-L}$.}
-\sumitem{28--29}{Prawdopodobieństwo i strata to jedna wielkość w dwóch skalach,
+  \code{np.logaddexp} to $\val{f03.logsumexp.pair}$}.}
+\sumitem{25--27}{\result{$e^{\ln x} = x$ dla $x > 0$, a $\ln(e^{x}) = x$ zawsze, więc
+  $b^{x} = c$ rozwiązuje się jednym ruchem, a $L = -\ln p$ daje $p = e^{-L}$}.}
+\sumitem{28--29}{\result{Prawdopodobieństwo i strata to jedna wielkość w dwóch skalach,
   a \textbf{logarytm zamienia stosunki na różnice}: czynnik dziesięć od
-  $p = \num{0.1}$ do $p = \num{0.01}$ to odstęp $\val{f03.ln.ten}$ w stracie.}
-\sumitem{30--32}{Sekwencja $\val{f03.seq.tokens}$ tokenów po
+  $p = \num{0.1}$ do $p = \num{0.01}$ to odstęp $\val{f03.ln.ten}$ w stracie}.}
+\sumitem{30--32}{\result{Sekwencja $\val{f03.seq.tokens}$ tokenów po
   $\val{f02.prob.from.loss}$ na token ma prawdopodobieństwo około
   $\val{f03.seq.prod}$. float32 sprowadza bieżący iloczyn do dokładnego zera po
   $\val{f03.f32.zero.at}$ tokenach, a float64 po
-  $\val{f03.f64.zero.at}$, i za każdym razem nic nie zgłasza.}
-\sumitem{33--34}{Zsumuj zamiast tego logarytmy, a suma będzie mała i ujemna.
+  $\val{f03.f64.zero.at}$, i za każdym razem nic nie zgłasza}.}
+\sumitem{33--34}{\result{Zsumuj zamiast tego logarytmy, a suma będzie mała i ujemna.
   Podziel przez liczbę tokenów, a ta średnia ze zmienionym znakiem jest stratą
-  \dash{} czyli linią w pętli uczenia.}
-\sumitem{35--36}{\textbf{Budżet tokenów jest budżetem wykładnika.} Przy
+  \dash{} czyli linią w pętli uczenia}.}
+\sumitem{35--36}{\result{\textbf{Budżet tokenów jest budżetem wykładnika.} Przy
   $p = \num{0.5}$ iloczyn osiąga zero przy $\val{f03.half.f32.zero}$ tokenach w
-  float32 i przy $\val{f03.half.f64.zero}$ w float64.}
-\sumitem{37--38}{Perplexity to eksponenta średniej ujemnej log-wiarogodności i
+  float32 i przy $\val{f03.half.f64.zero}$ w float64}.}
+\sumitem{37--38}{\result{Perplexity to eksponenta średniej ujemnej log-wiarogodności i
   odwrotność średniego geometrycznego prawdopodobieństwa tokenu. Perplexity
   równe $7$ jest tak niepewne jak uczciwa kostka siedmiościenna; nie jest
-  odsetkiem trafień.}
-\sumitem{39--40}{Strata podana bez podstawy nie jest pomiarem:
+  odsetkiem trafień}.}
+\sumitem{39--40}{\result{Strata podana bez podstawy nie jest pomiarem:
   $\val{f02.loss.nats}$ nata i $\val{f03.nats.to.bits}$ bita to ten sam model,
-  odległy o $\val{f03.bits.over.nats.pct}$\%, w stronę, która pochlebia.}
-\sumitem{41--42}{Porządkowanie po \emph{zsumowanym} logarytmie
+  odległy o $\val{f03.bits.over.nats.pct}$\%, w stronę, która pochlebia}.}
+\sumitem{41--42}{\result{Porządkowanie po \emph{zsumowanym} logarytmie
   prawdopodobieństwa woli kandydatkę krótszą, cokolwiek uważa model; średnia
   nie. A średnia geometryczna $\val{f03.gm}$ nie jest średnią arytmetyczną
-  $\val{f03.am}$, więc średnia z perplexity nie jest perplexity.}
-\sumitem{43--46}{Połowa drogi między dwiema podziałkami osi logarytmicznej to
+  $\val{f03.am}$, więc średnia z perplexity nie jest perplexity}.}
+\sumitem{43--46}{\result{Połowa drogi między dwiema podziałkami osi logarytmicznej to
   średnia \emph{geometryczna} \dash{} $\val{f03.axis.mid}$ między $10$ a $100$,
   a nie $55$. Odstęp jest stosunkiem, a podwojenie zajmuje
-  $\val{f03.log10.two}$ dekady, gdziekolwiek wypadnie.}
-\sumitem{46--48}{Oś liniowa odpowiada na \emph{ile usunąłem}, a logarytmiczna
+  $\val{f03.log10.two}$ dekady, gdziekolwiek wypadnie}.}
+\sumitem{46--48}{\result{Oś liniowa odpowiada na \emph{ile usunąłem}, a logarytmiczna
   na \emph{jaką część tego, co zostało}. $y = ax^{b}$ jest linią prostą na
   osiach log-log o współczynniku kierunkowym $b$, a współczynnik uczenia
-  przeszukuje się na siatce logarytmicznej z tego samego powodu.}
+  przeszukuje się na siatce logarytmicznej z tego samego powodu}.}
 \end{summarybox}
 
 \canyou

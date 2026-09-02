@@ -1204,80 +1204,80 @@ kupuje kolejny tysiąc?
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Sigma to pętla zapisana krótko.} Jej cztery części to
+\sumitem{1--2}{\result{\textbf{Sigma to pętla zapisana krótko.} Jej cztery części to
   indeks, miejsce, w którym indeks się zaczyna, miejsce, w którym się kończy, i
   treść \dash{} a treść jest wyrażeniem zależnym od indeksu, liczonym raz na
-  każdą wartość, którą indeks przyjmuje.}
-\sumitem{3--4}{$\sum_{i=1}^{n} w_i x_i$ to \emph{suma ważona}: jedna jednostka
+  każdą wartość, którą indeks przyjmuje}.}
+\sumitem{3--4}{\result{$\sum_{i=1}^{n} w_i x_i$ to \emph{suma ważona}: jedna jednostka
   warstwy liniowej i kształt, na którym zbudowany jest
   Program~\ref{prog:P05}. Sigma rozdziela się na sumie, a stały czynnik
-  wychodzi przed znak. Obie reguły są tylko przestawioną pętlą.}
-\sumitem{5--6}{\textbf{$\sum a_i b_i$ to nie $(\sum a_i)(\sum b_i)$}, a dla
+  wychodzi przed znak. Obie reguły są tylko przestawioną pętlą}.}
+\sumitem{5--6}{\result{\textbf{$\sum a_i b_i$ to nie $(\sum a_i)(\sum b_i)$}, a dla
   $a = (1, 2)$, $b = (3, 4)$ wychodzi $11$ i $21$. To reguła o sumie wewnątrz
   sigmy przeniesiona na iloczyn, czyli rozumowanie, które
   Programy~\ref{prog:F01}, \ref{prog:F02} i~\ref{prog:F03} złapały każdy pod
-  innym znakiem.}
-\sumitem{7--8}{Liczba wyrazów to $\text{koniec} - \text{początek} + 1$, bo obie
+  innym znakiem}.}
+\sumitem{7--8}{\result{Liczba wyrazów to $\text{koniec} - \text{początek} + 1$, bo obie
   granice są włączone. $\sum_{i=0}^{n}$ ma $n+1$ wyrazów, a
-  $\sum_{i=0}^{n-1}$ ma $n$, czyli tyle, po ilu chodzi \code{range(n)}.}
-\sumitem{9}{Przeindeksowanie przesuwa granice w jedną stronę, a indeks dolny w
+  $\sum_{i=0}^{n-1}$ ma $n$, czyli tyle, po ilu chodzi \code{range(n)}}.}
+\sumitem{9}{\result{Przeindeksowanie przesuwa granice w jedną stronę, a indeks dolny w
   drugą: $\sum_{i=1}^{n} x_i = \sum_{j=0}^{n-1} x_{j+1}$. Zwróć uwagę, że
   angielszczyzna nazywa \emph{index} i liczbę podniesioną, i opuszczoną, a
-  polszczyzna nie.}
-\sumitem{10--11}{Maska przyczynowa liczy $\frac{n(n+1)}{2}$ par
+  polszczyzna nie}.}
+\sumitem{10--11}{\result{Maska przyczynowa liczy $\frac{n(n+1)}{2}$ par
   zapytanie--klucz \dash{} $\val{f04.causal.pairs}$ przy $n = 2048$ wobec
   $\val{f04.causal.sq}$ dla pełnego kwadratu. Stosunek $\frac{n+1}{2n}$ opada
   do połowy z góry i nigdy jej nie osiąga: $\val{f04.causal.ratio.eight}$ przy
-  $n = 8$.}
-\sumitem{12--13}{$\prod$ to ta sama maszyna z mnożeniem w środku, a silnia to
-  pi z indeksem w treści: $n! = \prod_{i=1}^{n} i$.}
-\sumitem{14--15}{\textbf{Suma pusta wynosi $0$, a iloczyn pusty $1$}, bo każde z
+  $n = 8$}.}
+\sumitem{12--13}{\result{$\prod$ to ta sama maszyna z mnożeniem w środku, a silnia to
+  pi z indeksem w treści: $n! = \prod_{i=1}^{n} i$}.}
+\sumitem{14--15}{\result{\textbf{Suma pusta wynosi $0$, a iloczyn pusty $1$}, bo każde z
   nich jest elementem neutralnym swojego działania i żadna inna wartość nie
   utrzymuje spójności pętli. $a^{0} = 1$ jest iloczynem pustym, co potwierdza
   drugą drogą wywód z prawa dzielenia z Programu~\ref{prog:F01}, a
-  $\ln 1 = 0$ przenosi jedną konwencję na drugą.}
-\sumitem{16}{Pusta \emph{suma} jest bezpieczna, a pusta \emph{średnia} nie.
+  $\ln 1 = 0$ przenosi jedną konwencję na drugą}.}
+\sumitem{16}{\result{Pusta \emph{suma} jest bezpieczna, a pusta \emph{średnia} nie.
   \code{0.0 / 0.0} zgłasza błąd w czystym Pythonie; numpy zwraca \code{nan},
-  ostrzega i idzie dalej. Zabezpieczenie należy się mianownikowi.}
-\sumitem{17--19}{\textbf{Każda strata tutaj to $\frac{1}{n}\sum$ po wyrazie na
+  ostrzega i idzie dalej. Zabezpieczenie należy się mianownikowi}.}
+\sumitem{17--19}{\result{\textbf{Każda strata tutaj to $\frac{1}{n}\sum$ po wyrazie na
   przykład} i rusza się tylko ten wyraz: kwadrat reszty, jej wielkość albo
   $-\ln p_i$. Na czterech punktach błąd średniokwadratowy wynosi
-  $\val{f04.mse}$, a średni błąd bezwzględny $\val{f04.mae}$.}
-\sumitem{20--21}{Perplexity to eksponenta średniej straty, na tym batchu
+  $\val{f04.mse}$, a średni błąd bezwzględny $\val{f04.mae}$}.}
+\sumitem{20--21}{\result{Perplexity to eksponenta średniej straty, na tym batchu
   $\val{f04.ce.ppl}$. Średnia z wartości perplexity na przykład wynosi
   $\val{f04.ce.ppl.naive}$ i jest inną wielkością;
-  Program~\ref{prog:P19} ma stojącą za tym nierówność.}
-\sumitem{22}{W arytmetyce dokładnej suma nie ma kolejności, a w
-  zmiennoprzecinkowej ma. Ten program nie podaje na to żadnej liczby, bo byłaby
+  Program~\ref{prog:P19} ma stojącą za tym nierówność}.}
+\sumitem{22}{\result{W arytmetyce dokładnej suma nie ma kolejności, a w
+  zmiennoprzecinkowej ma.} Ten program nie podaje na to żadnej liczby, bo byłaby
   to liczba o jednej maszynie; należy to do Programów~\ref{prog:P01}
   i~\ref{prog:P02}.}
-\sumitem{23--26}{\textbf{Średnia z ilorazów to nie iloraz sum.} Dwa batche po
+\sumitem{23--26}{\result{\textbf{Średnia z ilorazów to nie iloraz sum.} Dwa batche po
   $\num{2.0}$ i $\num{8.0}$ dają razem $\val{f04.batch.pooled}$, a nie
   $\num{5.0}$; dwa fragmenty po $\num{0.90}$ i $\num{0.10}$ dają razem
   $\val{f04.acc.micro}$, a nie $\num{0.50}$; dwa przebiegi po $100$ i $1$
-  token na sekundę dają razem $\val{f04.rate.micro}$, a nie $\num{50.5}$.}
-\sumitem{27--28}{Średnia makro waży równo grupy, średnia mikro waży równo
+  token na sekundę dają razem $\val{f04.rate.micro}$, a nie $\num{50.5}$}.}
+\sumitem{27--28}{\result{Średnia makro waży równo grupy, średnia mikro waży równo
   elementy, a zgadzają się dokładnie wtedy, gdy wszystkie mianowniki są równe.
-  Obie są prawomocne; błędem jest podanie jednej jako drugiej.}
-\sumitem{29--32}{Rekurencja robi jeden krok, a wzór ogólny pomija je wszystkie.
+  Obie są prawomocne; błędem jest podanie jednej jako drugiej}.}
+\sumitem{29--32}{\result{Rekurencja robi jeden krok, a wzór ogólny pomija je wszystkie.
   $\sum_{k=0}^{n-1} r^{k} = \frac{1-r^{n}}{1-r}$, co wynosi
   $\val{f04.geom.ten}$ przy $r = \num{0.9}$ i $n = 10$, a dąży do
-  $\frac{1}{1-r} = \val{f04.geom.inf}$.}
-\sumitem{33--34}{$\ln \prod_i x_i = \sum_i \ln x_i$, czyli pierwsze prawo z
+  $\frac{1}{1-r} = \val{f04.geom.inf}$}.}
+\sumitem{33--34}{\result{$\ln \prod_i x_i = \sum_i \ln x_i$, czyli pierwsze prawo z
   Programu~\ref{prog:F03} zapisane nad pi. Pięćdziesiąt warstw po $\num{0.9}$
   daje $\val{f04.decay.fifty}$, a po $\num{1.1}$ daje $\val{f04.grow.fifty}$:
   dwa czynniki odległe o $\num{0.2}$ są na drugim końcu odległe o mniej więcej
-  $\val{f04.decay.ratio}$.}
-\sumitem{35--38}{Wykładnicza średnia ruchoma to
+  $\val{f04.decay.ratio}$}.}
+\sumitem{35--38}{\result{Wykładnicza średnia ruchoma to
   $m \leftarrow \beta m + (1-\beta) g$, a rozwinięta jest sumą ważoną
   wszystkiego, co zobaczyła, z wagami $(1-\beta)\beta^{k}$.
   \textbf{$\beta$ waży wartość starą.} Przy $\beta = \num{0.9}$ ostatnie
   dziesięć niesie $\val{f04.ema.w10}$ wagi, a jej połowa siedzi w ostatnich
-  $\val{f04.ema.halflife.steps}$.}
-\sumitem{39--42}{Start od $0$ obciąża ją: po $t$ krokach pokazuje
+  $\val{f04.ema.halflife.steps}$}.}
+\sumitem{39--42}{\result{Start od $0$ obciąża ją: po $t$ krokach pokazuje
   $1 - \beta^{\,t}$ prawdy, a podzielenie przez to usuwa obciążenie dokładnie.
   \textbf{To jest momentum, a przy rekurencji puszczonej dwa razy jest to
-  Adam}, i nic z tego nie potrzebowało rachunku różniczkowego.}
+  Adam}, i nic z tego nie potrzebowało rachunku różniczkowego}.}
 \end{summarybox}
 
 \canyou

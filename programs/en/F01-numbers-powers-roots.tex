@@ -804,40 +804,40 @@ claim.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--5}{$\N \subset \Z \subset \Q \subset \R$. This book takes
+\sumitem{1--5}{\result{$\N \subset \Z \subset \Q \subset \R$. This book takes
   $0 \in \N$. A rational's decimal expansion stops or repeats; nothing else
   does. What repeats depends on the \emph{base}, which is why $\num{0.1}$ is
-  exact in base ten and is not exact in your machine.}
-\sumitem{9--11}{$a^{m}a^{n} = a^{m+n}$, \quad $a^{m}/a^{n} = a^{m-n}$, \quad
-  $(a^{m})^{n} = a^{mn}$. All three require a \emph{common base}.}
-\sumitem{12--13}{$a^{0} = 1$ and $a^{-n} = 1/a^{n}$, both forced by the
-  division law rather than defined for convenience.}
-\sumitem{17--18}{$a^{1/n} = \sqrt[n]{a}$ and $a^{m/n} =
-  (\sqrt[n]{a})^{m}$. Take the root first; the arithmetic is smaller.}
-\sumitem{22}{$\sqrt{a+b} \ne \sqrt{a} + \sqrt{b}$. Roots distribute over a
-  product, never over a sum.}
-\sumitem{23--24}{Scientific notation is $m \times 10^{e}$ with
-  $1 \le m < 10$.}
-\sumitem{25--26}{Multiplying adds the exponents; dividing subtracts them; then
-  renormalise the mantissa.}
-\sumitem{27}{Adding requires a \emph{common exponent} first. This is also why a
-  floating-point sum loses a small addend.}
-\sumitem{30--31}{$2^{10}$ exceeds $10^{3}$ by
+  exact in base ten and is not exact in your machine}.}
+\sumitem{9--11}{\result{$a^{m}a^{n} = a^{m+n}$, \quad $a^{m}/a^{n} = a^{m-n}$, \quad
+  $(a^{m})^{n} = a^{mn}$. All three require a \emph{common base}}.}
+\sumitem{12--13}{\result{$a^{0} = 1$ and $a^{-n} = 1/a^{n}$, both forced by the
+  division law rather than defined for convenience}.}
+\sumitem{17--18}{\result{$a^{1/n} = \sqrt[n]{a}$ and $a^{m/n} =
+  (\sqrt[n]{a})^{m}$. Take the root first; the arithmetic is smaller}.}
+\sumitem{22}{\result{$\sqrt{a+b} \ne \sqrt{a} + \sqrt{b}$. Roots distribute over a
+  product, never over a sum}.}
+\sumitem{23--24}{\result{Scientific notation is $m \times 10^{e}$ with
+  $1 \le m < 10$}.}
+\sumitem{25--26}{\result{Multiplying adds the exponents; dividing subtracts them; then
+  renormalise the mantissa}.}
+\sumitem{27}{\result{Adding requires a \emph{common exponent} first. This is also why a
+  floating-point sum loses a small addend}.}
+\sumitem{30--31}{\result{$2^{10}$ exceeds $10^{3}$ by
   \val{f01.kib.over.si.pct}\% \dash{} and state it that way round, because
   the other denominator is a different number. Repeated, the error compounds:
-  $2^{80}$ is \val{f01.two.eighty.err.pct}\% above $10^{24}$.}
-\sumitem{34--36}{Weight memory $=$ parameters $\times$ bytes per parameter.
-  \val{f01.params} parameters at two bytes is \val{f01.weights.gb}~GB.}
-\sumitem{36}{That is a \emph{floor}. Optimiser state, activations and the
-  key--value cache are counted in Program~\ref{prog:P03}.}
-\sumitem{38--39}{GB $= 10^{9}$; GiB $= 2^{30}$, larger by
+  $2^{80}$ is \val{f01.two.eighty.err.pct}\% above $10^{24}$}.}
+\sumitem{34--36}{\result{Weight memory $=$ parameters $\times$ bytes per parameter.
+  \val{f01.params} parameters at two bytes is \val{f01.weights.gb}~GB}.}
+\sumitem{36}{\result{That is a \emph{floor}. Optimiser state, activations and the
+  key--value cache are counted in Program~\ref{prog:P03}}.}
+\sumitem{38--39}{\result{GB $= 10^{9}$; GiB $= 2^{30}$, larger by
   \val{f01.gib.over.si.pct}\%. A seven per cent disagreement between your
-  arithmetic and your tooling is almost always this.}
-\sumitem{42--43}{\enquote{Fifty per cent faster} is ambiguous by
+  arithmetic and your tooling is almost always this}.}
+\sumitem{42--43}{\result{\enquote{Fifty per cent faster} is ambiguous by
   \val{f01.speedup.discrepancy.ms}~ms on a
-  \val{f01.base.ms}~ms baseline. Quote the two numbers instead.}
-\sumitem{44}{Percentage \emph{points} for a difference between percentages;
-  \emph{per cent} for the ratio.}
+  \val{f01.base.ms}~ms baseline. Quote the two numbers instead}.}
+\sumitem{44}{\result{Percentage \emph{points} for a difference between percentages;
+  \emph{per cent} for the ratio}.}
 \end{summarybox}
 
 \canyou
