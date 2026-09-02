@@ -133,6 +133,12 @@ items. They report it because the items are meant to stand in for a job.
 That makes the set a \textbf{sample} and the score an \textbf{estimator},
 and it puts the whole of Program~\ref{prog:P26} in the room.
 
+Notice what calling it a sample costs. Nobody drew those two hundred items at
+random from anything; somebody wrote them, for a purpose, on an afternoon.
+Treating the set as a sample is therefore a modelling decision rather than an
+observation \dash{} and it is the decision that licenses every formula this
+program is about to borrow.
+
 Program~\ref{prog:P26} split an estimator's error into two pieces and proved
 the split exactly. Name them.
 \dotline
@@ -434,9 +440,10 @@ marked by another model.
 
 A judge is an instrument, and an instrument has two error rates rather than
 one. Write
-\[ a = \Prob(\text{judge marks correct} \mid \text{actually correct}),
-   \qquad
-   b = \Prob(\text{judge marks correct} \mid \text{actually wrong}). \]
+\begin{align*}
+  a &= \Prob(\text{judge marks correct} \mid \text{actually correct}), \\
+  b &= \Prob(\text{judge marks correct} \mid \text{actually wrong}).
+\end{align*}
 
 A model's true accuracy is $p$. What accuracy does the judge report for it?
 \dotline
@@ -926,7 +933,6 @@ would I know if it were wrong?}
 \end{fr}
 
 \begin{summarybox}
-\begin{sumlist}
 \sumitem{2--3}{An evaluation set is a sample and a score is an estimator, so
   Program~\ref{prog:P26}'s two errors both apply: the sampling of items, and
   the distance between the benchmark and your task.}
@@ -970,7 +976,6 @@ would I know if it were wrong?}
   run, not transferable, or measured and marked indicative.}
 \sumitem{51--52}{A claim needs a method and a number, or it is labelled
   judgement \dash{} and the method is the design as much as the arithmetic.}
-\end{sumlist}
 \end{summarybox}
 
 \begin{testexercises}

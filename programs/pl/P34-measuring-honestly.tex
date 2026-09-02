@@ -113,6 +113,12 @@ pozycjach. Raportuje go dlatego, że pozycje mają zastąpić pewną pracę. To
 czyni ze zbioru \textbf{próbę}, a z wyniku \textbf{estymator}, i wprowadza do
 pokoju cały Program~\ref{prog:P26}.
 
+Zauważ, ile kosztuje nazwanie tego próbą. Nikt nie wylosował tych dwustu
+pozycji z niczego; ktoś je napisał, w jakimś celu, pewnego popołudnia.
+Traktowanie zbioru jako próby jest więc decyzją modelową, a nie obserwacją
+\dash{} i jest to decyzja, która uprawnia każdy wzór, jaki ten program zaraz
+pożyczy.
+
 Program~\ref{prog:P26} rozdzielił błąd estymatora na dwie części i dowiódł
 tego rozdziału dokładnie. Nazwij je.
 \dotline
@@ -410,9 +416,10 @@ Dziesięć tysięcy pozycji to nie jest budżet na oznaczanie, który ktokolwiek
 ma, więc pozycje ocenia inny model.
 
 Sędzia jest przyrządem, a przyrząd ma dwie stopy błędu, nie jedną. Zapisz
-\[ a = \Prob(\text{sędzia uznaje za dobrą} \mid \text{naprawdę dobra}),
-   \qquad
-   b = \Prob(\text{sędzia uznaje za dobrą} \mid \text{naprawdę błędna}). \]
+\begin{align*}
+  a &= \Prob(\text{sędzia uznaje za dobrą} \mid \text{naprawdę dobra}), \\
+  b &= \Prob(\text{sędzia uznaje za dobrą} \mid \text{naprawdę błędna}).
+\end{align*}
 
 Prawdziwa skuteczność modelu to $p$. Jaką skuteczność raportuje dla niego
 sędzia?
@@ -899,7 +906,6 @@ wiedziałbym, gdyby było błędne?}
 \end{fr}
 
 \begin{summarybox}
-\begin{sumlist}
 \sumitem{2--3}{Zbiór ewaluacyjny jest próbą, a wynik estymatorem, więc oba
   błędy z Programu~\ref{prog:P26} stosują się do niego: losowanie pozycji i
   dystans między benchmarkiem a twoim zadaniem.}
@@ -943,7 +949,6 @@ wiedziałbym, gdyby było błędne?}
   orientacyjna.}
 \sumitem{51--52}{Teza potrzebuje metody i liczby, albo jest oznaczona jako
   osąd \dash{} a metoda jest projektem tak samo jak arytmetyka.}
-\end{sumlist}
 \end{summarybox}
 
 \begin{testexercises}
