@@ -119,12 +119,21 @@ def not_on_a_boundary(x: float, digits: int) -> float:
     Program P20's `p20.cos.area` printed 0.501 here and 0.500 on CI because
     the quantity sat exactly on a rounding boundary and libm is not
     bit-identical across platforms.  Anything in this file that comes out of
-    a transcendental goes through here."""
+    a transcendental goes through here.
+
+    THE FIRST VERSION OF THIS MEASURED THE WRONG DISTANCE, and Program P34's
+    pass found it: it took |frac - round(frac)|, which is ZERO on an exactly
+    representable value and ONE HALF on the boundary -- so it refused the
+    safe case and passed the very number the docstring names.  Fed 0.5005 at
+    three decimals it returned it without complaint.  A rounding boundary is
+    a HALF-step, so that is the distance to measure, and the two directions
+    are visible in one line: 3.15 prints 3.1 and 92.15 prints 92.2, from the
+    binary representation alone."""
     step = 10.0 ** -digits
     frac = abs(x) / step
-    dist = abs(frac - round(frac))
-    assert dist > 0.02, (
-        f"{x!r} is {dist:.4f} of a step from the {digits}-decimal rounding "
+    half = abs((frac % 1.0) - 0.5)
+    assert half > 0.02, (
+        f"{x!r} is {half:.4f} of a step from the {digits}-decimal rounding "
         f"boundary; a different libm will print it differently.")
     return x
 

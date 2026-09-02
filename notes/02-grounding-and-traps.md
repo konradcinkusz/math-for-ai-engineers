@@ -3215,3 +3215,76 @@ and about models rather than steps.
      out the fitted power law predicts a loss **below the irreducible floor**,
      which is not merely inaccurate but impossible. The honest form of a
      scaling claim names its span. Owner: P33 §7.
+
+### Measuring a model honestly, written (P34)
+
+The last program's own, and the shape they share is the one P33's four
+silent failures had one level down: **a quantity computed correctly from the
+wrong thing.** A wrong answer announces itself; a right answer to the wrong
+question does not.
+
+321. *“Our benchmark has two thousand items, so the number is solid.”*
+     Solid is two claims and the item count reaches one of them. A score is
+     an estimator, so its error is P26's bias squared plus variance: the
+     variance is the sampling of items and falls as `1/n`, and the bias is
+     the distance between the benchmark and your task and does not fall at
+     all. Past about five hundred items on a benchmark two points off your
+     task, the half nobody reports is the larger one. More items buy
+     precision and never buy validity. Owner: P34 §1.
+322. *“Both models ran the same evaluation set, so the comparison is fair.”*
+     Fair to the mix somebody chose. A score is a weighted average over the
+     kinds of item in the set, so it moves with the weights — and in P34's
+     worked case, re-labelling ten items out of two hundred reverses the
+     ordering of the top two models with neither model touched. One model's
+     own score ranges over seventeen points across the possible mixes,
+     against a gap of half a point. The mix is not a hyperparameter, is not
+     in the interval, and is usually not reported. Owner: P34 §2.
+323. *“The interval is ±3 points, so we will run more items until it is
+     ±1.”*
+     That is a budget decision and it is a factor of ten, not a factor of
+     three: precision goes as `1/sqrt(n)`, so a margin scales as the square
+     root of the count and the count as the square of the margin. Halving an
+     interval is four times the items to write, to label and to score.
+     Owner: P34 §3.
+324. *“The judge agrees with our human labels 92 per cent of the time, so it
+     is good enough to compare models.”*
+     Agreement is the wrong statistic for that question, and this is
+     provable rather than a caution. A judge with rates `a` and `b` reports
+     `(a - b)` times the true gap between any two models — one constant,
+     independent of either accuracy — so the usable item count is divided by
+     `(a - b)^2`. Agreement pins a *different* combination of the two rates:
+     at 92.15 per cent it leaves `a - b` anywhere from 0.725 to 0.890, half
+     again apart in the items they demand. It pins the attenuation only at
+     an accuracy of one half, which is the one accuracy nobody is reporting
+     a leaderboard about. Owner: P34 §4.
+325. *“We calibrated the judge's confidence, so its scores are trustworthy
+     now.”*
+     Two different failures of one instrument. P28 corrects the probability
+     a judge *states* about itself; P34 corrects what its *verdict* does to
+     a measured difference. Fixing the first leaves the second exactly where
+     it was. Owner: P34 §4, against P28 §6.
+326. *“Model B is 50 per cent dearer per token, so it costs more to run.”*
+     A price per token is half a ratio. The bill is that price times the
+     tokens a task takes, and in P34's worked case the dearer model is 13
+     per cent cheaper per task and serves 1.73 times the concurrent
+     conversations, because the cache is held per token in flight. Neither
+     factor decides alone, and the break-even verbosity is a property of the
+     pair rather than of either model. This is F01's opening complaint —
+     a ratio quoted without its two quantities — priced. Owner: P34 §5.
+327. *“Model X gets 0.87 bits per character and model Y 1.11, so X is the
+     better model.”*
+     Under different tokenisers that comparison measures the tokenisers: bits
+     per character is bits per token times tokens per character, and the
+     model's contribution cancels out of the ratio exactly. Two losses are
+     comparable under one tokeniser and under no other condition. Owner:
+     P34 §6, from P29 §6.
+328. *“The probe found 0.05 nats between the layer and the label, so the
+     layer carries the feature.”*
+     Some of that is the estimator. The plug-in mutual information is
+     positive in expectation on data with no dependence at all — P31 summed
+     it exactly over every table — so at fifty items a fifth of the reported
+     figure is an artefact, and the bias falls only as `1/N`. And the number
+     is a **lower bound** on both sides: a weak probe is not evidence of
+     little information, and a better probe cannot mean more, because the
+     ceiling was fixed before anybody trained one. Owner: P34 §6, from
+     P31 §§4--5.

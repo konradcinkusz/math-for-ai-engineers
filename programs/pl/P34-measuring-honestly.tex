@@ -1,24 +1,1031 @@
-%% P34 --- Uczciwy pomiar modelu
+%% P34 --- Uczciwy pomiar modelu.  OSTATNI PROGRAM W KSIĄŻCE.
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak: programs/en/P34-measuring-honestly.tex.  Nagłówek angielski
+%% niesie cały odczyt briefu i listę programów, które odsyłają tutaj z
+%% nazwy (F01, F04, F08, P17) --- nie powtarzam go, bo kopia to następna
+%% rzecz, która się zdezaktualizuje.
+%%
+%% TŁUMACZENIE, decyzje zapisane tutaj, żeby nikt ich nie relitygował:
+%%   benchmark        -> benchmark, odmieniany po polsku (reguła CLAUDE.md
+%%                       o angielskich terminach ML bez polskiej formy)
+%%   judge model      -> model sędziujący, dalej krótko sędzia
+%%   attenuation      -> tłumienie
+%%   agreement        -> zgodność
+%%   probe            -> sonda, za Programem P31, który tę decyzję zapisał
+%%   prompt           -> prompt, odmieniany
+%%   leaderboard      -> tablica wyników
+%%
+%% UWAGA DLA TŁUMACZA: C4, C8 i C12 porównują znaczniki strukturalne, wzory i
+%% literały liczbowe PO KOLEI. Cyfra zostaje cyfrą, a słowo zostaje słowem;
+%% odwołanie do programu prowadzi zdanie zamiast stać za wzorem.
 
 \program{Uczciwy pomiar modelu}
 \label{prog:P34}
+\index{ewaluacja}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--7}{powiedzieć, czego oszacowaniem jest wynik benchmarku i którą
+  połowę jego błędu da się zmniejszyć liczbą pozycji}
+\outcome{8--15}{przeważyć jeden zbiór ewaluacyjny i powiedzieć, co to robi z
+  uporządkowaniem, którego nikt nie uważał za sporne}
+\outcome{16--19}{powiedzieć, ile pozycji kosztuje zwężenie raportowanego
+  przedziału}
+\outcome{20--28}{powiedzieć, co niedoskonały sędzia robi ze zmierzoną różnicą
+  i dlaczego jego zgodność tego nie zdradza}
+\outcome{29--35}{wycenić model za zadanie, a nie za token, i powiedzieć,
+  której drugiej wielkości brakuje w cenie za token}
+\outcome{36--43}{wymienić trzy publikowane miary policzone poprawnie z
+  niewłaściwej wielkości}
+\outcome{44--47}{powiedzieć, które tezy tego programu nie zostały sprawdzone
+  na wytrenowanym modelu i dlaczego powiedzenie tego nie jest asekuracją}
+\outcome{48--52}{wymienić trzy powody, dla których tabela w książce jest
+  pusta, i powiedzieć, który z nich jest długiem}
+\end{outcomes}
 
-Evaluation design as an estimation problem [P26]; the confidence interval
-and the bootstrap [P27]; the paired comparison; the judge model as a
-miscalibrated instrument [P28]; the arithmetic of cost per token and per
-conversation [P3]; and information-theoretic evaluation measures and their
-limits [P29--P31]. Closes with the discipline both companion volumes are
-built on, now with the mathematics behind it: **a claim needs a method and a
-number, or it is labelled judgement.**
+\begin{quiz}
+\item Twój zbiór ewaluacyjny ma $\val{p27.items}$ pozycji, a model dostaje na
+  nim $\val{p27.near.hi}$ procent. O czym jest ta liczba?
+  \teachesat{1--2}
+  \answerto{To oszacowanie skuteczności na populacji zadań, na której ci
+  zależy. Zbiór jest próbą, a wynik estymatorem, więc obie osie z
+  Programu~\ref{prog:P26} i przedział z Programu~\ref{prog:P27} stosują się
+  do niego bez zmian.}
+\item Którą połowę błędu benchmarku zmniejsza większa liczba pozycji?
+  \teachesat{3--5}
+  \answerto{Wyłącznie połowę losową. Dystans między tym, co mierzy benchmark,
+  a zadaniem, na którym ci zależy, nie maleje z liczbą pozycji wcale, a
+  powyżej około $\val{p34.mis.n}$ pozycji jest większy z tych dwóch.}
+\item Dwa modele dzieli $\val{p27.gap.pts}$ punktu na jednym zbiorze
+  ewaluacyjnym. Oba zostają bez zmian, a proporcja krótkich i długich promptów
+  w zbiorze zmienia się o $\val{p34.mix.shift}$ pozycji. Co się dzieje?
+  \teachesat{11--14}
+  \answerto{Uporządkowanie się odwraca. Wyniki stają się
+  $\val{p34.mix.alt.b}$ i $\val{p34.mix.alt.a}$, a własny wynik jednego
+  modelu przebiega $\val{p34.mix.swing}$ punktów po wszystkich mieszankach.}
+\item Model sędziujący ocenia odpowiedzi niedoskonale. Co to robi z różnicą,
+  którą raportuje między dwoma modelami?
+  \teachesat{21--23}
+  \answerto{Mnoży ją przez jedną stałą, tę samą dla każdej pary. Jeśli sędzia
+  uznaje dobrą odpowiedź za dobrą w $\val{p34.judge.a}$ procentach przypadków,
+  a błędną w $\val{p34.judge.b}$, każda zmierzona różnica wynosi
+  $\val{p34.judge.atten}$ prawdziwej.}
+\item Model B kosztuje $\val{p34.bill.price.times}$ raza tyle za token co
+  model A. Który jest droższy?
+  \teachesat{30--31}
+  \answerto{Z tego nie da się odpowiedzieć. Cena za token to połowa ilorazu:
+  rachunek to cena razy liczba tokenów, które pochłania zadanie, a przy
+  $\val{p34.bill.tok.b}$ tokenach wobec $\val{p34.bill.tok.a}$ model B jest o
+  $\val{p34.bill.saving.pct}$ procent tańszy na zadanie.}
+\item Sonda raportuje $\val{p34.probe.i}$ nata informacji wzajemnej między
+  warstwą a etykietą, na $50$ pozycjach. Ile z tego jest estymatorem?
+  \teachesat{38--39}
+  \answerto{$\val{p34.probe.share.pct}$ procent.
+  Program~\ref{prog:P31} zmierzył, że estymator wtykowy zwraca
+  $\val{p31.bias.n50}$ nata, w wartości oczekiwanej, na danych bez żadnej
+  zależności.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 55 ramek.
-}
+% ============================================================
+\section{Zbiór ewaluacyjny jest próbą}
+\label{sec:P34-a-sample}
+\index{ewaluacja!jako zagadnienie estymacji}
+
+\begin{fr}
+Program~\ref{prog:P27} zostawił ci tablicę wyników: $\val{p27.items}$ pozycji,
+najlepszy model na $\val{p27.near.hi}$ procentach, następny na
+$\val{p27.near.lo}$, i dokładny test mówiący, że różnica między nimi jest
+najmniej informatywnym wynikiem, na jaki arytmetyka pozwala.
+
+Ten program jest o wszystkim innym na tamtej stronie. Zacznij od samego
+wyniku. Uruchomiłeś ustalony zbiór pozycji, policzyłeś i podzieliłeś. Liczba
+wynosi $\val{p27.near.hi}$ i jest dokładną arytmetyką na tym, co uruchomiłeś.
+
+Czego więc dokładnie jest \emph{oszacowaniem}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Skuteczności na populacji zadań, na której naprawdę ci zależy.}
+
+Nikt nie raportuje wyniku benchmarku dlatego, że zależy mu na tych dwustu
+pozycjach. Raportuje go dlatego, że pozycje mają zastąpić pewną pracę. To
+czyni ze zbioru \textbf{próbę}, a z wyniku \textbf{estymator}, i wprowadza do
+pokoju cały Program~\ref{prog:P26}.
+
+Zauważ, ile kosztuje nazwanie tego próbą. Nikt nie wylosował tych dwustu
+pozycji z niczego; ktoś je napisał, w jakimś celu, pewnego popołudnia.
+Traktowanie zbioru jako próby jest więc decyzją modelową, a nie obserwacją
+\dash{} i jest to decyzja, która uprawnia każdy wzór, jaki ten program zaraz
+pożyczy.
+
+Program~\ref{prog:P26} rozdzielił błąd estymatora na dwie części i dowiódł
+tego rozdziału dokładnie. Nazwij je.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Kwadrat obciążenia plus wariancja.}
+
+Odczytane na zbiorze ewaluacyjnym obie części mają nazwy, których inżynier
+już używa.
+
+\textbf{Wariancja} to losowanie pozycji: uruchom inne dwieście, a dostaniesz
+inną liczbę. Program~\ref{prog:P27} posiada ją w całości i to właśnie ona jest
+opisana przez przedział w raporcie.
+
+\textbf{Obciążenie} to dystans między tym, co mierzy benchmark, a pracą, do
+której zatrudniasz model. Jego pozycje napisał ktoś inny, dla cudzego ruchu.
+
+Jedna z tych dwóch maleje, gdy dokładasz pozycji. Która?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Wyłącznie wariancja.}
+
+Wariancja proporcji wynosi $p(1-p)/n$, więc maleje jak $1/n$ i da się ją
+zbić tak nisko, jak pozwoli budżet. Obciążenie jest własnością \emph{zbioru},
+nie jego rozmiaru: dziesięć tysięcy pozycji napisanych z tego samego
+błędnego założenia jest błędne dokładnie tak samo jak dwieście.
+
+Weź model o prawdziwej skuteczności $\num{0.715}$, na benchmarku odległym o
+$\val{p34.mis.pts}$ punkty od twojego zadania. Przy jakiej liczbie pozycji
+obie części wnoszą tyle samo do błędu tego, co raportujesz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Przyrównaj obie i rozwiąż względem $n$:
+\[ \frac{p(1-p)}{n} = \text{obciążenie}^{2}
+   \qquad\Longrightarrow\qquad
+   n = \frac{p(1-p)}{\text{obciążenie}^{2}}
+     = \frac{\num{0.715} \times \num{0.285}}{\num{0.02}^{2}} , \]
+co przechyla się po raz pierwszy przy $n = \val{p34.mis.n}$.
+\end{ansblock}
+
+To nie jest duża liczba. To około dwa i pół raza tyle, co zbiór, o który
+spierał się Program~\ref{prog:P27}.
+
+Program~\ref{prog:P27} uruchomił własną tablicę na $\val{p27.lb.n}$
+pozycjach. Która z dwóch części wnosi tam więcej i o ile?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Niedopasowanie, mniej więcej $\val{p34.mis.ratio}$ raza.}
+
+Przy tysiącu pozycji dystans benchmarku od twojego zadania wnosi z grubsza
+dwa razy tyle, co losowanie \dash{} i \textbf{tylko połowa losowa pojawia się
+w przedziale w raporcie}. Druga połowa nie jest mała, nie jest raportowana i
+nie rusza się, gdy dokupujesz pozycje.
+
+Stąd zdanie, dla którego istnieje ta sekcja: \textbf{więcej pozycji kupuje
+precyzję i nigdy nie kupuje trafności.}
+
+Zostaje pytanie, które przekazał tu z nazwy Program~\ref{prog:F08}. Skoro
+przedział nie powie ci, czy wynik cokolwiek znaczy na twoich danych, co
+powie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wyłącznie porównanie pozycji benchmarku z twoim własnym ruchem. To praca
+czytelnicza i praca losująca, nie arytmetyczna: pobierz próbę z tego, co
+twój system naprawdę dostaje, i zapytaj, czy pozycje benchmarku wyglądają
+jak próba z tego samego źródła.
+\end{ansblock}
+
+Warto powiedzieć to wprost, bo to jedyna część ewaluacji, której nie da się
+kupić. Pod każdym innym pytaniem w tym programie leży wzór. Pod tym leży
+decyzja projektowa, a decyzja projektowa, której nikt nie zapisał, jest
+obciążeniem, którego nikt nie oszacuje.
+
+\mermaidfig{p34-two-errors}{Dwa błędy raportowanego wyniku i ten, który
+  opisuje przedział}{dwa błędy, jeden przedział}
+\end{fr}
+
+% ============================================================
+\section{Te same pozycje, inaczej ważone}
+\label{sec:P34-remix}
+\index{ewaluacja!mieszanka jako wybór}
+
+\begin{fr}
+Teraz zostaw wszystko w obu modelach bez zmian i nie ruszaj niczego w tym, co
+odpowiedziały. Poruszy się wyłącznie \emph{zbiór}.
+
+Program~\ref{prog:P27} dostarcza $\val{p27.items}$ pozycji; podziel je na dwa
+rodzaje: $\val{p34.mix.short}$ krótkich promptów i $\val{p34.mix.short}$
+długich. Każdy benchmark ma podział tego kształtu, niezależnie od tego, czy
+go raportuje.
+
+Model B trafia $\val{p34.mix.b.short}$ procent krótkich pozycji i
+$\val{p34.mix.b.long}$ procent długich. Model A trafia
+$\val{p34.mix.a.short}$ i $\val{p34.mix.a.long}$ \dash{} lepiej na długich
+promptach, gorzej na krótkich. Policz oba na całym zbiorze.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Połowa pozycji jest każdego rodzaju, więc każdy wynik to zwykła średnia:
+\[ B = \tfrac{1}{2}(\num{0.80}) + \tfrac{1}{2}(\num{0.63}) = \val{p27.near.hi}\%,
+   \qquad
+   A = \tfrac{1}{2}(\num{0.74}) + \tfrac{1}{2}(\num{0.68}) = \val{p27.near.lo}\% . \]
+\end{ansblock}
+
+To są dwie zapisane liczby z Programu~\ref{prog:P27}, co do cyfry. To ta sama
+tablica wyników, z jedną rzeczą o niej zapisaną, która była tam od początku.
+
+Równy podział był wyborem, którego ktoś dokonał. Załóż, że zamiast tego
+przeważyliby krótkie prompty wagą $w$. Co dzieje się z różnicą?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Porusza się po prostej, bo wynik to średnia ważona.}
+
+Wynik każdego modelu jest liniowy w $w$, więc różnica między nimi też:
+\[ B - A = (\num{0.63} - \num{0.68}) + w\bigl[(\num{0.80}-\num{0.74}) -
+   (\num{0.63}-\num{0.68})\bigr] = -\num{0.05} + \num{0.11}\,w . \]
+
+Przy $w = \frac{1}{2}$ daje to $+\num{0.005}$, czyli tę różnicę, którą
+Program~\ref{prog:P27} podaje jako $\val{p27.gap.pts}$ punktu.
+
+Gdzie się zeruje?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Przy $w = \frac{5}{11}$, czyli $\val{p34.mix.tie.w}$ procentach krótkich
+  promptów.}
+
+To nie jest dziwna mieszanka. To zbiór z odrobinę większą liczbą długich
+promptów niż krótkich, czyli to, co wyszłoby z pisania pozycji innego
+popołudnia.
+
+Równy podział daje $\val{p34.mix.short}$ krótkich pozycji w zbiorze. Ile z
+$\val{p27.items}$ musi zmienić rodzaj, zanim czołowa dwójka tablicy zamieni
+się miejscami?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Dziesięć. Przy $\val{p34.mix.shift}$ krótkich pozycji mniej wyniki wynoszą
+\[ B = \val{p34.mix.alt.b}\% , \qquad A = \val{p34.mix.alt.a}\% , \]
+więc A prowadzi teraz o $\val{p34.mix.alt.gap}$ punktu.
+\end{ansblock}
+
+Żaden z modeli nie został dotrenowany, przestrojony ani inaczej
+promptowany. Każda odpowiedź, której którykolwiek z nich udzielił, jest ta
+sama co przedtem. Dziesięć pozycji na dwieście przeszło z jednego kubełka do
+drugiego i uporządkowanie, które raportuje tablica, jest odwrotne.
+
+\transcript{p34-remix}
+\end{fr}
+
+\begin{fr}
+Różnica jest tu małą wielkością, warto więc zapytać, jak duża jest ta
+\emph{druga}.
+
+Sam model B, po wszystkich mieszankach od samych długich do samych krótkich:
+jaki jest zakres wyników, które można mu przypisać?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Od $\val{p34.mix.b.long}$ do $\val{p34.mix.b.short}$ procent \dash{}
+  $\val{p34.mix.swing}$ punktów.}
+
+Postaw to obok dwóch liczb, o które tablica naprawdę się spiera. Omawiana
+różnica to $\val{p27.gap.pts}$ punktu. Program~\ref{prog:P27} policzył, że ten
+zbiór ewaluacyjny nie odróżni obu modeli, dopóki różnica nie sięgnie
+$\val{p27.net.needed.pts}$ punktu.
+
+\begin{trapbox}
+Wynik jednego modelu porusza się po mieszankach $\val{p34.mix.swing.times}$
+raza dalej niż różnica, która według Programu~\ref{prog:P27} byłaby cokolwiek
+warta.
+
+Mieszanka nie jest hiperparametrem, nie ma jej w przedziale, a na większości
+tablic wyników nie jest raportowana. Wielkość, która rusza wynikiem bardziej
+niż jakakolwiek różnica między modelami i której nikt nie zapisuje, to
+definicja zmiennej niekontrolowanej.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Nic z tego nie jest zarzutem wobec benchmarku. Zbiór pozycji \emph{musi} mieć
+jakąś mieszankę; neutralnej nie ma, a odmowa wyboru nie jest dostępna.
+
+Znaczy to coś węższego i jest to zdanie z Programu~\ref{prog:F01}, które
+właśnie przychodzi. Wynik nie jest \enquote{tym, jak dobry jest model}. Jest
+\emph{tym, jak dobry na tej mieszance}, a mieszanka jest tą drugą wielkością.
+Podaj pierwszą bez drugiej, a podałeś iloraz bez jednej z jego dwóch liczb
+\dash{} czyli kształt, który ta książka nazywa od swojego pierwszego programu.
+
+\mermaidfig{p34-same-items}{Jeden zbiór ewaluacyjny, dwie mieszanki i oba
+  modele nietknięte}{średnia ważona rusza się z wagami}
+\end{fr}
+
+% ============================================================
+\section{Ile kosztuje węższy przedział}
+\label{sec:P34-interval}
+\index{ewaluacja!koszt precyzji}
+
+\begin{fr}
+Program~\ref{prog:P27} zapisał jeden przedział, a ta sekcja go wycenia. Pozycja
+tablicy na $\val{p27.lb.p.pct}$ procentach przy $\val{p27.lb.n}$ pozycjach ma
+błąd standardowy $\val{p27.lb.se}$ punktu, a przy tamtejszej poprawce na
+czytanie czterdziestu pozycji margines wynosi $\val{p27.lb.margin}$ punktu.
+
+Załóż, że to za szeroko, żeby działać, i chcesz połowy. Ile pozycji?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p34.halve.times}$ raza tyle \dash{} $\val{p34.halve.n}$.}
+
+Precyzja idzie jak $1/\sqrt{n}$, więc połowienie przedziału to podniesienie
+czynnika do kwadratu. Warto powiedzieć to w walucie, w której się za to
+naprawdę płaci: cztery razy tyle pozycji do napisania, cztery razy tyle do
+oznaczenia i czterokrotny rachunek za wnioskowanie, które je oceni.
+
+Pociągnij o krok dalej. Ile pozycji, żeby podać skuteczność jednego modelu z
+dokładnością do punktu, przy tej samej poprawce?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Liczba skaluje się jak kwadrat marginesu, który kupuje:
+\[ n = \val{p27.lb.n} \times
+   \left(\frac{\val{p27.lb.margin}}{\num{1.0}}\right)^{2}
+   \approx \val{p34.one.pt.n} . \]
+\end{ansblock}
+
+Blisko dziesięciu tysięcy pozycji, żeby podać jedną liczbę z dokładnością do
+punktu.
+
+Program~\ref{prog:P27} policzył z tej samej maszynerii inną liczbę: ile
+pozycji potrzeba, żeby \emph{odróżnić dwa modele} o punkt, gdy oba biegną na
+tych samych promptach. Jak się te dwie mają do siebie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p27.n.rho00}$ wobec $\val{p34.one.pt.n}$ \dash{} czynnik
+  $\val{p34.detect.ratio}$.}
+
+Podanie skuteczności jednego modelu z dokładnością do punktu i oddzielenie
+dwóch modeli o punkt kosztują mniej więcej tyle samo, a oba są dwa rzędy
+wielkości za zbiorem, który masz przed sobą.
+
+\begin{note}
+To jest uczciwy odczyt przedziału: jest \textbf{deklaracją budżetu}. Mówi,
+co jest w stanie rozstrzygnąć ewaluacja, za którą już zapłaciłeś, a
+odpowiedź brzmi zwykle \enquote{mniej niż omawiana różnica}. Nikt nie ma
+dziesięciu tysięcy pozycji na model, dlatego niemal każde publikowane
+porównanie jest raczej niedomocowane niż błędne.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Sędzia i to, co robi z różnicą}
+\label{sec:P34-judge}
+\index{ewaluacja!model sędziujący}
+
+\begin{fr}
+Dziesięć tysięcy pozycji to nie jest budżet na oznaczanie, który ktokolwiek
+ma, więc pozycje ocenia inny model.
+
+Sędzia jest przyrządem, a przyrząd ma dwie stopy błędu, nie jedną. Zapisz
+\begin{align*}
+  a &= \Prob(\text{sędzia uznaje za dobrą} \mid \text{naprawdę dobra}), \\
+  b &= \Prob(\text{sędzia uznaje za dobrą} \mid \text{naprawdę błędna}).
+\end{align*}
+
+Prawdziwa skuteczność modelu to $p$. Jaką skuteczność raportuje dla niego
+sędzia?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$p\,a + (1-p)\,b$.}
+
+Sędzia uznaje za dobrą ułamek $a$ dobrych odpowiedzi i błędnie uznaje za
+dobrą ułamek $b$ błędnych. Wnoszą obie.
+
+Nikt jednak nie raportuje jednej skuteczności samej. Dwa modele o prawdziwych
+skutecznościach $p_{1}$ i $p_{2}$ przechodzą przez tego samego sędziego. Co
+raportuje dla \emph{różnicy} między nimi?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Odejmij jedno od drugiego, a wszystko, co nie niesie $p$, się skraca:
+\[ \bigl[p_{1}a + (1-p_{1})b\bigr] - \bigl[p_{2}a + (1-p_{2})b\bigr]
+   = (a - b)(p_{1} - p_{2}) . \]
+\end{ansblock}
+
+To jest dokładne i warto zatrzymać się na dwóch rzeczach.
+
+Raportowana różnica to prawdziwa różnica pomnożona przez \textbf{jedną
+stałą}, więc niedoskonały sędzia nie dodaje szumu do siły efektu \dash{} on
+ją \emph{kurczy}, systematycznie, w jedną stronę. A stała $a - b$ \textbf{nie
+zależy od $p$ wcale}, więc to samo kurczenie stosuje się do porównania na
+szczycie tablicy i do porównania na jej dole.
+\end{fr}
+
+\begin{fr}
+Podstaw liczby. Sędzia uznaje dobrą odpowiedź za dobrą w
+$\val{p34.judge.a}$ procentach przypadków, a błędną odpowiedź za dobrą w
+$\val{p34.judge.b}$, więc $a - b = \val{p34.judge.atten}$. Dwa modele dzieli
+naprawdę $\val{p34.judge.true.gap}$ punktu, a sędzia raportuje
+$\val{p34.judge.seen.gap}$.
+
+Prawdziwej różnicy nie zobaczysz, musisz więc wykryć raportowaną. Co kurczenie
+robi z liczbą pozycji, której potrzebujesz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Mnoży ją przez $\val{p34.judge.items.times}$.}
+
+Efekt kurczy się o $a - b$, a szum losowy nie, więc iloraz obu kurczy się
+również o $a - b$; a arytmetyka z Sekcji~\ref{sec:P34-interval} mówi, że
+liczba skaluje się jak kwadrat rozdzielczości, którą kupuje. Liczba pozycji
+dzieli się więc przez $(a-b)^{2}$ \dash{} o połowę więcej pozycji z okładem,
+przy dokładnie tej samej mocy, kupione niczym innym niż ocenianiem.
+
+To nie jest mała poprawka do budżetu. Nie ma jej też w niczyim raporcie.
+\end{fr}
+
+\begin{fr}
+Chciałbyś więc znać $a - b$ dla sędziego, którego używasz. To, co podaje
+karta sędziego, to \textbf{zgodność} z etykietami człowieka: ułamek pozycji,
+na których sędzia i człowiek mówią to samo, co dla modelu o skuteczności $p$
+wynosi
+\[ \text{zgodność} = p\,a + (1-p)(1-b) . \]
+
+Przy skuteczności z tego programu i tych dwóch stopach daje to
+$\val{p34.judge.agree.pct}$ procent, czyli przyzwoitą kartę.
+
+Czy znajomość zgodności zdradza tłumienie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Zgodność wiąże kombinację $p\,a - (1-p)\,b$ i nic więcej, więc przy
+$\val{p34.judge.agree.pct}$ procentach z kartą zgodny jest każdy sędzia o
+\[ \val{p34.judge.atten.lo} \;\le\; a - b \;\le\;
+   \val{p34.judge.atten.hi} . \]
+\end{ansblock}
+
+Oba końce różnią się na tyle, żeby to miało znaczenie: przez $(a-b)^{2}$
+dzieli je $\val{p34.judge.spread.pct}$ procent w liczbie pozycji, której
+żądają. Dwaj sędziowie o \emph{identycznej} zgodności na tej samej
+oznaczonej próbie, a między nimi połowa budżetu na oznaczanie z okładem.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+Istnieje dokładnie jedna skuteczność, przy której zgodność wiąże tłumienie,
+i warto wiedzieć która.
+
+Obie stopy wchodzą do zgodności ze współczynnikami $p$ i $-(1-p)$, więc
+równoważą się \dash{} a kombinacja zwija się do $a - b$ \dash{} tylko przy
+$p = \frac{1}{2}$. Wtedy zgodność wyznacza tłumienie dokładnie, jako
+$2\times\text{zgodność} - 1$.
+
+Jedyny przypadek, w którym karta sędziego wystarcza, to więc przypadek, w
+którym model trafia połowę czasu, czyli jedyna skuteczność, o której nikt nie
+raportuje tablicy wyników.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Program~\ref{prog:P28} też wycenił sędziego i warto być precyzyjnym co do
+różnicy, bo te dwie poprawki nie zastępują się nawzajem.
+
+Tamten program bierze prawdopodobieństwo, które sędzia \emph{podaje} \dash{}
+mówi $\val{p28.judge.says.pct}$ procent, a znaczy $\val{p28.judge.means.pct}$
+\dash{} i poprawia je w szansach. Ta sekcja bierze \emph{werdykt} sędziego i
+poprawia to, co robi on ze zmierzoną różnicą. Jedno jest stwierdzeniem o
+liczbie, którą sędzia podaje o sobie; drugie stwierdzeniem o wpływie przyrządu
+na twój eksperyment.
+
+Skalibrowanie pierwszego zostawia drugie dokładnie tam, gdzie było.
+
+\mermaidfig{p34-judge-shrinks}{Niedoskonały sędzia mnoży każdą siłę efektu
+  przez jedną stałą}{werdykt, nie podane prawdopodobieństwo}
+\end{fr}
+
+% ============================================================
+\section{Rachunek, który jest iloczynem}
+\label{sec:P34-bill}
+\index{koszt!na zadanie wobec na token}
+
+\begin{fr}
+Program~\ref{prog:F01} otworzył tę książkę stwierdzeniem, że niemal każda
+teza, którą przeczytasz o modelu \dash{} szybszy, tańszy, lepszy \dash{} jest
+ilorazem podanym bez jego dwóch wielkości, i odłożył czytanie takich tez
+tutaj.
+
+Koszt za token ma dokładnie ten kształt. To jedna wielkość, a to, za co
+ktokolwiek naprawdę płaci, jest iloczynem dwóch.
+
+Jaka jest ta druga?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Liczba tokenów, które pochłania zadanie.}
+
+\[ \text{koszt na zadanie} \;=\; \text{cena za token} \times
+   \text{tokeny na zadanie} . \]
+
+Nikt nie kupuje tokenów. Kupuje odpowiedziane pytania, zamknięte zgłoszenia,
+przejrzane diffy \dash{} a model, który mówi więcej, żeby dojść do tej samej
+odpowiedzi, wydaje różnicę.
+
+Model B kosztuje $\val{p34.bill.price.times}$ raza tyle za token co model A i
+zużywa średnio $\val{p34.bill.tok.b}$ tokenów na zadanie wobec
+$\val{p34.bill.tok.a}$ u A. Który jest droższy w utrzymaniu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Pomnóż oba ilorazy:
+\[ \frac{\text{B na zadanie}}{\text{A na zadanie}}
+   = \val{p34.bill.price.times} \times \val{p34.bill.tok.times}
+   = \val{p34.bill.task.times} , \]
+więc B jest o $\val{p34.bill.saving.pct}$ procent \emph{tańszy} na zadanie,
+będąc o połowę droższym za token.
+\end{ansblock}
+
+Oba ilorazy ciągną w przeciwne strony i rozliczany jest wyłącznie ich
+iloczyn.
+
+Przy jakiej rozwlekłości odpowiedź by się odwróciła \dash{} ile tokenów na
+zadanie mógłby B sobie pozwolić, zanim tańszy stałby się A?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p34.bill.breakeven}$ tokenów.}
+
+B musi być co najmniej o trzecią bardziej zwięzły od A, żeby spłacić swoją
+cenę, i przy $\val{p34.bill.tok.b}$ tokenach jest. Przesuń go do
+$\val{p34.bill.breakeven}$, a oba stają dokładnie równo; przesuń dalej, a
+liczba za token znowu ma rację.
+
+Żadna z liczb nie rozstrzyga więc niczego sama, a próg opłacalności jest
+własnością pary, nie któregokolwiek z modeli.
+\end{fr}
+
+\begin{fr}
+Za tymi samymi dwiema wielkościami stoi trzecia i ma ją
+Program~\ref{prog:P03}. Obsługa rozmowy trzyma bufor
+$\val{p03.kv.per.token.mib}$ MiB na token w locie, więc długość zadania
+kosztuje pamięć tak samo jak pieniądze \dash{} $\val{p34.bill.cache.a}$ MiB
+dla A i $\val{p34.bill.cache.b}$ dla B.
+
+Cena za token nie pojawia się w tym wcale. O czym to decyduje?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{O tym, ile rozmów mieści się naraz na jednej karcie \dash{} B obsługuje
+  $\val{p34.bill.conc.times}$ raza tyle.}
+
+Bufor na token jest ten sam dla obu modeli, więc skraca się z ilorazu w
+całości, a zostaje długość zadania. Zwięźlejszy model jest tańszy na zadanie
+\emph{i} niesie więcej równoczesnych użytkowników na tym samym sprzęcie, a
+karta mówiąca, że jest $\val{p34.bill.price.times}$ raza droższy, nie wspomina
+o żadnym z tych dwóch.
+\end{fr}
+
+\begin{fr}
+Program~\ref{prog:P29} spotkał tę tożsamość w innej walucie i warto postawić
+obie obok siebie, bo zachowują się inaczej.
+
+Tam bity na znak to bity na token razy tokeny na znak i \textbf{wkład modelu
+się skraca}: ten sam model na tym samym tekście raportuje $\val{p29.bpc.a}$ i
+$\val{p29.bpc.b}$ bita na znak przy $\val{p29.tpc.a}$ i $\val{p29.tpc.b}$
+tokena na znak, czyli czynnik $\val{p29.bpc.ratio}$, który jest faktem o
+tokenizatorze i o niczym innym.
+
+Tutaj nie skraca się żaden z czynników. I cena, i długość należą do modelu,
+dlatego właśnie podanie jednej z nich niczego nie załatwia.
+
+\mermaidfig{p34-two-quantities}{Cena za token to połowa tego, co kosztuje
+  zadanie}{rozliczany jest tylko iloczyn}
+\end{fr}
+
+% ============================================================
+\section{Miary, które wyglądają na pomiary}
+\label{sec:P34-measures}
+\index{ewaluacja!miary, które mylą}
+
+\begin{fr}
+Trzy publikowane wielkości są policzone poprawnie i odpowiadają na pytanie,
+którego nikt nie zadał. Dwie z nich ta książka już zmierzyła i warto zebrać
+je tutaj, bo kształt, który dzielą, jest sednem.
+
+Program~\ref{prog:P29} wziął straty dwóch modeli przeliczone na bity na znak.
+Przy różnych tokenizatorach co skraca się z tego porównania?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Model.}
+
+Bity na znak to bity na token razy tokeny na znak, a drugi czynnik należy do
+tokenizatora. Porównaj dwa systemy, które tokenizują inaczej, a różnica,
+którą zmierzysz, należy do tokenizatorów. Dwie straty są porównywalne przy
+jednym tokenizatorze i pod żadnym innym warunkiem, a podanie tego warunku
+kosztuje zdanie.
+\end{fr}
+
+\begin{fr}
+Ta z Programu~\ref{prog:P31} jest ostrzejsza, bo liczba nie jest tam jedynie
+niejednoznaczna \dash{} jest dodatnia, kiedy prawda wynosi zero.
+
+Sonda raportuje $\val{p34.probe.i}$ nata informacji wzajemnej między
+aktywacjami warstwy a etykietą, na tablicy zbudowanej z $50$ pozycji. Zanim
+cokolwiek z tego odczytasz: co ten estymator raportuje na danych bez żadnej
+zależności?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$\val{p31.bias.n50}$ nata \dash{} w wartości oczekiwanej, dokładnie, przy tej
+liczbie pozycji. Program~\ref{prog:P31} zsumował to po każdej tablicy,
+zamiast losować.
+\end{ansblock}
+
+Zatem $\val{p34.probe.share.pct}$ procent raportowanej liczby to estymator, a
+nie warstwa. Efekt może być prawdziwy; jedna piąta z niego nie jest.
+
+Obciążenie maleje jak $1/N$. Ile pozycji, zanim spadnie poniżej jednej
+dwudziestej tamtej raportowanej liczby?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Około $\val{p34.probe.n}$.}
+
+Cztery razy tyle pozycji, żeby zbić artefakt do jednej dwudziestej tezy, na
+pomiarze, który rutynowo raportuje się z kilkudziesięciu. I w
+przeciwieństwie do błędu losowego ten nie okrąża prawdy \dash{} idzie w
+jedną stronę, więc nigdy nie uśrednia się po warstwach jednego artykułu.
+\end{fr}
+
+\begin{fr}
+Program~\ref{prog:P31} niesie też trzecią i jest to jedna nierówność czytana
+na dwa końce.
+
+Sonda wypada słabo na warstwie. Czy to znaczy, że warstwa niesie mało o
+etykiecie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie. Wynik sondy to ograniczenie dolne, i to luźne.}
+
+Program~\ref{prog:P31} zmierzył najlepszy kanał w rodzinie sięgający
+$\val{p31.dpi.best}$ nata wobec $\val{p31.dpi.ixy}$, które tam były, czyli z
+ponad ćwiercią zostawioną. Ta sama nierówność czytana w drugą stronę mówi, że
+\emph{lepsza} sonda nie może oznaczać więcej informacji, bo sufit był ustalony,
+zanim ktokolwiek jakąkolwiek wytrenował.
+
+Jedna liczba jest więc rutynowo nadinterpretowana w obie strony, przez tych
+samych ludzi, w tym samym artykule.
+\end{fr}
+
+\begin{fr}
+Trzy miary, trzy różne sposoby na to, by nie być pomiarem tego, do czego się
+je przywołuje, i jeden kształt między nimi: \textbf{wielkość policzona
+poprawnie z niewłaściwej rzeczy.}
+
+To są cztery ciche awarie z Programu~\ref{prog:P33} przybywające o poziom
+wyżej. Tam krok treningowy mógł policzyć średnią ze średnich albo zaokrągloną
+sumę i nie podnieść niczego, bo średnia ze średnich jest średnią. Tutaj
+benchmark może raportować bity na znak, albo estymatę wtykową sondy, albo
+skuteczność na niezapisanej mieszance, a każde z nich jest arytmetyką, której
+nikt nie zarzuci błędu.
+
+Błędna odpowiedź sama się ogłasza. Poprawna odpowiedź na niewłaściwe pytanie
+nie, i to właśnie czyni z projektu całą robotę.
+\end{fr}
+
+% ============================================================
+\section{Czego ta książka nie sprawdziła}
+\label{sec:P34-not-checked}
+\index{pomiar!czego się nie twierdzi}
+
+\begin{fr}
+Program~\ref{prog:P17} odłożył tu z nazwy jedną tezę: czy płaskie minimum
+generalizuje lepiej niż ostre. To najczęściej powtarzana teza empiryczna w
+optymalizacji, a ta książka nie powiedziała o niej nic.
+
+Zadaj jej pytanie z Programu~\ref{prog:P32}. Która połowa rozstrzygnięcia
+wymaga wytrenowanego modelu, a która jest stwierdzeniem o projekcie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Całość wymaga wytrenowanych modeli i to jest nietypowa odpowiedź.
+
+Teza porównuje dwa \emph{wytrenowane} minima, więc nie ma czego wyprowadzać:
+potrzeba wielu modeli, definicji płaskości, która przeżyje przeskalowanie z
+Programu~\ref{prog:P17}, i tylu przebiegów na warunek, ile zażądałby
+Program~\ref{prog:P27}.
+\end{ansblock}
+
+Jest więc podana jako zaległa, a nie zasekurowana.
+Programy~\ref{prog:P08}, \ref{prog:P11}, \ref{prog:P19}, \ref{prog:P20},
+\ref{prog:P25}, \ref{prog:P31} i \ref{prog:P32} niosą po jednej takiej i
+każdy mówi, co by ją rozstrzygnęło.
+\end{fr}
+
+\begin{fr}
+To samo pytanie ten program jest winien o swoich własnych trzech wynikach.
+Który z przeważenia, tłumienia sędziego i rachunku wymaga wytrenowanego
+modelu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Żaden.}
+
+Każdy jest stwierdzeniem o \emph{projekcie}, a nie o modelu. Przeważenie to
+arytmetyka na średniej ważonej; tłumienie to tożsamość na dwóch
+prawdopodobieństwach warunkowych; rachunek to iloczyn dwóch ilorazów. Każde
+jest dokładne i żadne nie byłoby prawdziwsze z modelem za sobą.
+
+\begin{warning}
+Wytrenowanego modelu wymagałaby połowa empiryczna: czy prawdziwe zbiory
+ewaluacyjne mają mieszanki tak wpływowe jak ta skonstruowana w
+Sekcji~\ref{sec:P34-remix} i jak daleko od siebie leżą tłumienia prawdziwych
+sędziów przy równej zgodności.
+
+Obie są mierzalne i żadnej tu nie zmierzono. Pierwszą rozstrzygnąłby
+publikowany benchmark z pozycjami skategoryzowanymi i przeważonymi; druga
+wymaga oznaczonej próby ocenionej przez dwóch sędziów.
+\end{warning}
+\end{fr}
+
+% ============================================================
+\section{Standard}
+\label{sec:P34-standard}
+\index{pomiar!standard, który liczba musi spełnić}
+
+\begin{fr}
+Oba tomy towarzyszące tej książce niosą tabelę, w której nic nie ma, i ta
+książka również. Jest to zamierzone we wszystkich trzech i nie jest jedną
+decyzją powtórzoną.
+
+Zanim przeczytasz dalej: tabela w książce technicznej jest pusta. Wymień
+powody, dla których może być, i powiedz, który z nich jest długiem, który ktoś
+jest ci winien.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Trzy, i tylko pierwszy jest długiem.
+
+\begin{enumerate}
+\item \textbf{Eksperymentu nie przeprowadzono.} Dług \dash{} a książka jest ci
+  winna to, co by go rozstrzygnęło, i ile to kosztuje.
+\item \textbf{Liczba jest własnością twojej maszyny.} Nie dług. Tabela
+  wypełniona przez kogoś innego byłaby czynnie myląca, a to, co tam należy,
+  to metoda.
+\item \textbf{Zmierzono ją i oznaczono jako orientacyjną}, bo rusza się z
+  wyborem, którego nikt nie ustandaryzował.
+\end{enumerate}
+\end{ansblock}
+
+Tomy towarzyszące niosą po jednym z każdego. Tabela dostawców w tomie o Agent
+Framework jest tym drugim: jej własna nota mówi, że liczby zależą od twojego
+sprzętu i twojego regionu, więc metodologia jest ustalona, a liczby są twoje.
+Tom o LangChain drukuje pierwszy i trzeci na jednej stronie \dash{}
+wypełnioną tabelę, której kolumna kontekstu jest zatytułowana
+\emph{orientacyjna}, obok trzech pustych wierszy mówiących, że wypełnienie ich
+prawdopodobnymi liczbami byłoby gorsze niż zostawienie ich pustymi.
+\end{fr}
+
+\begin{fr}
+Warto obchodzić się z tymi dwiema książkami ostrożnie, zamiast je zlewać, bo
+obie drukują liczbę $\num{2.8}$ raza, a te liczby nie są tym samym pomiarem.
+
+Jedna to wielokrotność kontekstu zmierzona na skryptowanych odpowiedziach i
+oznaczona jako orientacyjna dokładnie z tego powodu. Druga to stosunek
+tokenów, którego druga książka \emph{odmawia podania} bez zmierzenia,
+mówiąc, że książka twierdząca to bez pomiaru byłaby gorsza niż taka, która
+przyznaje, że nie zmierzyła.
+
+Żadna nie traktuje tej liczby jako ustalonej, i to jest jedyne, co obie mają
+wspólnego. Dwie książki, jedna liczba, dwa zupełnie różne powody, by jej nie
+ufać \dash{} a odczytanie ich jako zgody byłoby popełnieniem na własnych
+źródłach defektu z Sekcji~\ref{sec:P34-measures} tego programu.
+\end{fr}
+
+\begin{fr}
+Oto więc standard, na którym zbudowane są oba tomy towarzyszące, wreszcie z
+matematyką tej książki za sobą.
+
+\begin{center}
+\emph{Teza potrzebuje metody i liczby, albo jest oznaczona jako osąd.}
+\end{center}
+
+Za każde słowo z tego już zapłacono. \textbf{Liczba} jest oszacowaniem, więc
+Program~\ref{prog:P26} mówi, jakie są jej dwa błędy, a
+Program~\ref{prog:P27}, jak jest szeroka. \textbf{Metoda} jest projektem
+\dash{} która populacja, która mieszanka, który przyrząd, który mianownik
+\dash{} a ten program pokazał, że każde z tych czterech rusza raportowaną
+liczbą dalej niż różnice, o które ludzie się spierają. A \textbf{osąd} jest
+uczciwą etykietą dla tezy bez obu, co Program~\ref{prog:F04} miał na myśli,
+czyniąc z tego standard, który raportowana liczba musi spełnić.
+\end{fr}
+
+\begin{fr}
+To koniec matematyki.
+
+Zacząłeś przy Programie~\ref{prog:F01}, wyliczając, ile waży model, bez
+słownictwa na to, gdzie są jego parametry. Program~\ref{prog:P32} wyprowadził
+tę liczbę z kształtów; Program~\ref{prog:P33} odczytał krzywą, którą rysuje
+jego trening; a ten program mówi, co wolno o wyniku twierdzić.
+
+Książka przez cały czas dowodziła, że matematyka nie jest w tej pracy częścią
+trudną i nie jest też opcjonalna \dash{} że różnica między inżynierem, który
+umie sprawdzić tezę, a takim, który ją powtarza, to kilkaset stron dokładnie
+tego. Masz teraz te strony.
+
+Zostaje nawyk, a jest nim jedno pytanie zadawane każdej liczbie, którą
+ktokolwiek ci podaje, własnej także: \textbf{co zostało zmierzone i skąd
+wiedziałbym, gdyby było błędne?}
+\end{fr}
+
+\begin{summarybox}
+\sumitem{2--3}{Zbiór ewaluacyjny jest próbą, a wynik estymatorem, więc oba
+  błędy z Programu~\ref{prog:P26} stosują się do niego: losowanie pozycji i
+  dystans między benchmarkiem a twoim zadaniem.}
+\sumitem{4--6}{Tylko pierwszy maleje z liczbą pozycji. Powyżej około
+  $\val{p34.mis.n}$ pozycji drugi jest większy i nie ma go w przedziale:
+  więcej pozycji kupuje precyzję i nigdy nie kupuje trafności.}
+\sumitem{11--12}{Przeważenie jednego ustalonego zbioru ewaluacyjnego o
+  $\val{p34.mix.shift}$ pozycji z $\val{p27.items}$ odwraca uporządkowanie
+  jego czołowej dwójki, bez tknięcia któregokolwiek z modeli.}
+\sumitem{13--14}{Wynik jednego modelu przebiega $\val{p34.mix.swing}$ punktów
+  po możliwych mieszankach \dash{} $\val{p34.mix.swing.times}$ raza więcej niż
+  różnica, która według Programu~\ref{prog:P27} byłaby cokolwiek warta.}
+\sumitem{17--18}{Precyzja idzie jak $1/\sqrt{n}$, więc połowienie przedziału
+  to $\val{p34.halve.times}$ raza tyle pozycji, a podanie jednej skuteczności
+  z dokładnością do punktu około $\val{p34.one.pt.n}$ z nich.}
+\sumitem{21--22}{Niedoskonały sędzia raportuje $(a-b)$ raza prawdziwą różnicę
+  między dowolnymi dwoma modelami, dokładnie, a stała nie zależy od
+  skuteczności żadnego z nich.}
+\sumitem{24--26}{Dzieli to użyteczną liczbę pozycji przez $(a-b)^{2}$, a
+  zgodność sędziego nie wyznacza $a-b$: przy
+  $\val{p34.judge.agree.pct}$ procentach biegnie ono od
+  $\val{p34.judge.atten.lo}$ do $\val{p34.judge.atten.hi}$.}
+\sumitem{27--28}{Zgodność wiąże tłumienie tylko przy skuteczności połowy, a
+  poprawka z Programu~\ref{prog:P28} do podanego przez sędziego
+  prawdopodobieństwa zostawia tłumienie nietknięte.}
+\sumitem{30--31}{Koszt na zadanie to cena za token razy tokeny na zadanie,
+  więc model $\val{p34.bill.price.times}$ raza droższy za token może być o
+  $\val{p34.bill.saving.pct}$ procent tańszy w utrzymaniu.}
+\sumitem{33--34}{Bufor jest na token w locie, więc zwięźlejszy model obsługuje
+  też $\val{p34.bill.conc.times}$ raza tyle rozmów na jednej karcie.}
+\sumitem{37--39}{Bity na znak mierzą tokenizator, gdy tokenizatory się
+  różnią, a wtykowa informacja wzajemna jest dodatnia na danych niezależnych
+  \dash{} $\val{p31.bias.n50}$ nata przy $50$ pozycjach.}
+\sumitem{41--42}{Wynik sondy to luźne ograniczenie dolne, więc słaba sonda nie
+  jest dowodem małej informacji, a lepsza nie jest dowodem większej.}
+\sumitem{44--47}{Teza o ostrości z Programu~\ref{prog:P17} wymaga
+  wytrenowanych modeli i jest podana jako zaległa; własne trzy wyniki tego
+  programu nie wymagają żadnego, bo każdy jest stwierdzeniem o projekcie.}
+\sumitem{48--49}{Pusta tabela ma trzy powody i tylko jeden jest długiem: nie
+  przeprowadzono, nieprzenoszalna, albo zmierzona i oznaczona jako
+  orientacyjna.}
+\sumitem{51--52}{Teza potrzebuje metody i liczby, albo jest oznaczona jako
+  osąd \dash{} a metoda jest projektem tak samo jak arytmetyka.}
+\end{summarybox}
+
+\begin{testexercises}
+\item Benchmark jest odległy o $3$ punkty od twojego zadania, a twój model
+  dostaje na nim $\num{0.60}$. Przy jakiej liczbie pozycji niedopasowanie
+  wnosi tyle samo co losowanie?
+  \answerto{Około $267$. Punkt przecięcia to $p(1-p)/\text{obciążenie}^{2} =
+  \num{0.60} \times \num{0.40} / \num{0.03}^{2}$, a większe obciążenie
+  przesuwa go w dół: im gorzej benchmark pasuje do twojego zadania, tym
+  wcześniej więcej pozycji przestaje pomagać.}
+\item Dwa modele dostają $\num{0.70}$ i $\num{0.66}$ na krótkiej połowie
+  zbioru oraz $\num{0.62}$ i $\num{0.70}$ na długiej. Przy jakiej mieszance
+  remisują?
+  \answerto{Przy $\frac{2}{3}$ krótkich. Różnica wynosi
+  $(\num{0.62}-\num{0.70}) + w[(\num{0.70}-\num{0.66}) -
+  (\num{0.62}-\num{0.70})] = -\num{0.08} + \num{0.12}\,w$, co zeruje się przy
+  $w = \frac{2}{3}$.}
+\item Twój przedział to $\pm 4$ punkty przy $500$ pozycjach. Ile pozycji na
+  $\pm 1$?
+  \answerto{$8000$. Liczba skaluje się jak kwadrat stosunku marginesów, więc
+  $500 \times 4^{2}$ \dash{} szesnaście razy tyle pozycji na czterokrotną
+  rozdzielczość.}
+\item Sędzia uznaje dobrą odpowiedź za dobrą w $\num{0.90}$ przypadków, a
+  błędną w $\num{0.20}$. Dwa modele dzieli naprawdę $6$ punktów. Co jest
+  raportowane i o jaki czynnik rośnie twój budżet na pozycje?
+  \answerto{$\num{4.2}$ punktu, a budżet rośnie o
+  $1/\num{0.70}^{2} \approx \num{2.04}$ \dash{} tłumienie wynosi
+  $a - b = \num{0.70}$, a liczba idzie jak jego kwadrat.}
+\item Model C ma $\num{0.80}$ ceny modelu D za token i zużywa $\num{1.30}$
+  raza tyle tokenów na zadanie. Który jest tańszy na zadanie?
+  \answerto{D, o około $4$ procent: $\num{0.80} \times \num{1.30} =
+  \num{1.04}$. Tańszy token przegrywa z dłuższą odpowiedzią, dlatego żadna z
+  tych liczb nie rozstrzyga sama.}
+\item Tabela w książce jest pusta, a książka mówi, że liczba zależy od twojego
+  sprzętu. Czy to dług?
+  \answerto{Nie. To drugi z trzech powodów: liczby, która jest własnością
+  maszyny czytelnika, nie da się dostarczyć, a tabela wypełniona przez kogoś
+  innego byłaby czynnie myląca. To, co jest tam winne, to metoda, a nie
+  liczba.}
+\end{testexercises}
+
+\canyou
+
+\begin{furtherproblems}
+\item Pokaż, że jeśli obciążenie benchmarku wynosi $\beta$, a jego pozycje
+  pochodzą z ustalonej populacji, to żadna liczba pozycji nie zbije błędu
+  średniokwadratowego raportowanej liczby poniżej $\beta^{2}$.
+  \answerto{Błąd wynosi $\beta^{2} + p(1-p)/n$, a drugi składnik jest ściśle
+  dodatni dla każdego skończonego $n$, więc całość leży ściśle powyżej
+  $\beta^{2}$ i dąży do niego z góry. Podłogę ustala zbiór, a nie jego
+  rozmiar.}
+\item Zbiór ma $k$ rodzajów pozycji zamiast dwóch. Pokaż, że wynik nadal jest
+  liniowy w wagach, i powiedz, co zastępuje pojedynczy punkt remisu.
+  \answerto{Wynik to $\sum_{i} w_{i} s_{i}$ przy $\sum_{i} w_{i} = 1$, więc
+  różnica to $\sum_{i} w_{i}(s_{i} - t_{i})$ \dash{} liniowa w $w$. Zbiór
+  remisów to przecięcie tej hiperpłaszczyzny z sympleksem, więc przy więcej
+  niż dwóch rodzajach remisy są całą ścianą, a nie punktem, i mieszanek
+  odwracających uporządkowanie jest na ogół wiele.}
+\item Dwaj sędziowie mają tłumienia $a_{1}-b_{1}$ i $a_{2}-b_{2}$, a jeden
+  ocenia wyjście drugiego. Jakie jest tłumienie pary?
+  \answerto{Iloczyn. Każdy etap mnoży ocalały efekt przez własną stałą, więc
+  łańcuchowanie sędziów kumuluje kurczenie geometrycznie \dash{} dlatego
+  zautomatyzowany potok oceniający jednym modelem i filtrujący drugim
+  potrzebuje więcej pozycji, niż sugeruje którykolwiek etap.}
+\item Model E ma $r$ raza cenę modelu F za token. Pokaż, że zbiór stosunków
+  rozwlekłości, przy których E jest tańszy na zadanie, jest przedziałem, i
+  powiedz, jaki jest jego koniec.
+  \answerto{E jest tańszy, gdy $r \times (\text{tokeny}_{E}/\text{tokeny}_{F})
+  < 1$, więc stosunek musi leżeć w $\intco{0}{1/r}$. Koniec to dokładnie
+  $1/r$: model dwa razy droższy musi być co najmniej dwa razy zwięźlejszy i
+  żadna jakość tej arytmetyki nie zmienia.}
+\item Obciążenie wtykowe z Programu~\ref{prog:P31} maleje jak $1/N$, a
+  raportowany efekt nie maleje wcale. Pokaż, że liczba pozycji, przy której
+  obciążenie jest ustalonym ułamkiem $f$ efektu $I$, jest odwrotnie
+  proporcjonalna do obu.
+  \answerto{Obciążenie wynosi około $c/N$ dla stałej $c$ ustalonej przez
+  kształt tablicy, więc $c/N \le fI$ daje $N \ge c/(fI)$. Połowienie efektu,
+  który zgłaszasz, albo połowienie ułamka, który tolerujesz, każde podwaja
+  liczbę pozycji \dash{} im mniejszy wynik, tym drożej go ustalić.}
+\end{furtherproblems}

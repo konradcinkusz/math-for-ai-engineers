@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P33 written, both editions \dash{} Parts I to VIII entire, and Part IX all but its last program.** P34 is a stub carrying its brief | 1 of 47 |
+| Programs | **All forty-seven written, both editions \dash{} F1–F13 and P1–P34, Parts I to IX entire.** There are no stubs | — |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1295 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1313 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1080 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1094 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1321 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1343 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1102 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1116 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -94,22 +94,23 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **1 of 47 programs is a stub**, in each language. This is the whole of the
-  remaining work and it dwarfs everything else.
+- **0 of 47 programs are stubs**, in each language. Every program in the book
+  is written; what remains is Appendices C to F and the finishing work listed
+  under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1570 computed values, all referenced, all present, plus the committed console
+- 1612 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 292 Mermaid sources, all rendering
-- 80 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 300 Mermaid sources, all rendering
+- 82 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **101 orphan-tail pages: 29 · 29 · 22 · 21** across `main-en`, `main-pl`,
+- **102 orphan-tail pages: 29 · 30 · 22 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
-  **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one, **P30 one**, **P31 none**, **P32 none** and P33 one
+  **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one, **P30 one**, **P31 none**, **P32 none**, P33 one and P34 one
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -149,9 +150,10 @@ what was there before.
   **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22**,
   **53% in P23**, **46% in P24**, **48% in P25**, **52% in P26** and
   **53% in P27**, **54% in P28**, **55% in P29**, **52% in P30**, **50% in
-  P31**, **51% in P32** and **51% in P33** \dash{} P29 is the highest outside
-  Part I, with P28 next and then P23 and P27; P26 and P30 follow, and P13,
-  P15, P17, P31, P32 and P33 reach or pass the book's own rate.**
+  P31**, **51% in P32**, **51% in P33** and **55% in P34** \dash{} P29 and P34
+  are joint highest outside Part I, with P28 next and then P23 and P27; P26 and
+  P30 follow, and P13, P15, P17, P31, P32 and P33 reach or pass the book's own
+  rate.**
   **P24 is the first program whose rate is visible in its frame count**: nine
   of its sixty-four frames exist because the draft was raised from 36%, which
   is the elicitation ledger's cost measured in frames rather than in pages.
@@ -9872,11 +9874,11 @@ estimating the book at **460--540 pages** for its 2,418 planned frames, and this
 file repeated it as 470--550. Neither number had been looked at since
 scaffolding.
 
-**Measured: 1,811 teaching frames are written and they set 1,295 pages in the
-trade format.** That is $\num{0.72}$ pages a frame against the estimate's
-$\num{0.21}$, with one program and four appendices still to come. (The
-measurement was 1,757 frames in 1,267 pages when it was first taken, before
-P33; the ratio has not moved.)
+**Measured: 1,863 teaching frames are written and they set 1,321 pages in the
+trade format.** That is $\num{0.71}$ pages a frame against the estimate's
+$\num{0.21}$, with four appendices still to come. (The measurement was 1,757
+frames in 1,267 pages when it was first taken, before P33, and 1,811 in 1,295
+after it; the ratio has not moved across three re-measurements.)
 
 And the reason is knowable rather than mysterious, which is what makes it worth
 recording rather than merely correcting. **The estimate predates the Stroud
@@ -9890,12 +9892,23 @@ F01's cues; nobody went back and re-multiplied.
 
 It matters because it is the premise of **the one decision this book still
 records as open**. §20 item 1 now carries the measurement and the per-part page
-ranges read out of the trade build's own running heads \dash{} front matter and
-Part I at 388 pages, Parts II--VI at 494, Parts VII--IX as written at 413
-\dash{} so the proposed Parts I--VI cut gives an **882-page first volume**,
-which does not settle it either. At this geometry the book is nearer three
-volumes than two, or the geometry has to change. The decision stays the
-author's; what changed is that it now has numbers in front of it.
+ranges, read out of the trade build's own part-title folios rather than
+estimated \dash{} front matter and Part I at 388 pages, Parts II--VI at 494,
+Parts VII--IX at 330, back matter at 109 \dash{} so the proposed Parts I--VI
+cut gives an **882-page first volume** before any back matter, which does not
+settle it either. At this geometry the book is nearer three volumes than two,
+or the geometry has to change. The decision stays the author's; what changed is
+that it now has numbers in front of it.
+
+**And the third of those four figures is a correction rather than an update.**
+The P33 sweep reported \enquote{Parts VII--IX as written at 413}, which is
+$1295 - 388 - 494$ \dash{} so it was Parts VII to IX **plus the whole of the
+back matter**, arrived at by subtraction rather than by measurement. Read off
+the part-title pages instead, Parts VII--IX are 330 pages and the back matter
+is 109, and the four figures add to the total exactly. The 882 is unaffected,
+because it never depended on the third. It is this file's own recurring class
+at its smallest: **a number obtained by subtracting two measurements is not a
+third measurement**, and the tell was that nothing said what it excluded.
 
 **The class is this file's oldest: a claim about the book that nothing derives
 from anything.** It survived thirty-two program passes in the two documents the
@@ -10344,6 +10357,243 @@ frame program with four figures and six new back-matter answers costs.
   by figures the page expresses another way, and one was a count the page
   writes in words.
 
+### Program P34 pass, August 2026 --- the last program, and the book is drafted
+
+**Fifty-two teaching frames, fifty-four printed, both editions**, against a
+brief that projected fifty-five. Eight sections: an evaluation set is a
+sample, the same items weighed differently, what a narrower interval costs,
+the judge and what it does to a difference, the bill which is a product,
+measures that look like measurements, what this book has not checked, and the
+standard.
+
+Twenty-seventh program under its brief's estimate, and Part IX's contract is
+the reason for the third time running rather than a shortfall. Read as a
+checklist, **five of the brief's six bracketed handovers were already on the
+page**: P27 owns the interval, the bootstrap and the paired comparison; P28
+owns the judge's stated probability; P03 owns cost per token; P29 and P31 own
+the information measures and their limits.
+
+#### The sixth bracket is the whole program, and it is a framing
+
+`[P26] evaluation design as an estimation problem`. Program~\ref{prog:P26}
+owns bias, variance and maximum likelihood and **never uses the word
+evaluation**, so nothing was spent and nothing had to be derived: an
+evaluation set is a sample, a score is an estimator, and every question about
+a benchmark is then a question Programs~\ref{prog:P26} and \ref{prog:P27}
+already answer.
+
+That is what Programs~\ref{prog:P27} and \ref{prog:P28} both mean when their
+headers close their NOT-SPENT lists with the same line, *P34 owns evaluation
+design end to end*.
+
+**And four programs defer here by name, each handing over something
+different** \dash{} which is the opposite of Program~\ref{prog:P33}, where a
+single program handed over both halves at once and there was nothing to sort:
+
+- **F01** \dash{} a claim about a model is *a ratio quoted without its two
+  quantities*, and P34 is about reading those claims properly. Section 5.
+- **F04** \dash{} P27 asks whether a gap beats the noise, *and P34 makes that
+  the standard a reported number has to meet*. Section 8.
+- **F08** \dash{} P34 says *how to find out whether a score means anything on
+  your data*. Sections 1 and 2.
+- **P17** \dash{} the sharpness claim needs trained models, *which is P34's
+  subject and not this one's*. Section 7.
+
+#### The headline: the same items, weighed differently
+
+Program~\ref{prog:P27} committed a leaderboard's top two at $\num{71.5}$ and
+$\num{71.0}$ per cent on $200$ items and asked whether the gap beats the
+noise. This program asks what P27 could not, because P27 holds the set fixed:
+**what else about the set was a choice?**
+
+Split the same items into short and long prompts, hold both models completely
+fixed, and re-weight. The even-mix scores reproduce P27's two committed
+figures to the digit \dash{} that is the gate, and it is
+Program~\ref{prog:P12}'s third kind, the same worked example continued.
+
+| | |
+|---|---|
+| gap at the even mix | $\num{0.5}$ points |
+| the mix at which they tie | $\num{45.5}$ per cent short |
+| items that must change kind | $10$ of $200$ |
+| the scores then | $\num{70.65}$ against $\num{70.70}$ |
+| one model's own range over every mix | $\num{17.0}$ points |
+| against P27's own threshold of $\num{6.5}$ | $\num{2.6}$ times |
+
+**Neither model was retrained, retuned or re-prompted**, and the ordering the
+leaderboard reports is the other way round. The quantity that moves the score
+further than any model difference is the one nobody records.
+
+The rest follows the same shape and each piece is exact over `Fraction`:
+precision goes as $1/\sqrt{n}$ so a margin costs its square in items; an
+imperfect judge multiplies **every** effect size by $a-b$; and a bill is a
+price times a length, of which neither factor decides alone.
+
+#### THE PASS'S MOST VALUABLE FINDING: a guard that was inert against the
+#### defect its own docstring names
+
+Program~\ref{prog:P27} wrote `not_on_a_boundary` after
+Program~\ref{prog:P20}'s `p20.cos.area` printed $\num{0.501}$ here and
+$\num{0.500}$ on CI. Its docstring says so in as many words and names that
+value.
+
+**It measured the wrong distance.** It took `|frac - round(frac)|`, which is
+**zero** on an exactly representable value and **one half** on a rounding
+boundary \dash{} so it refused the safe case and passed the dangerous one.
+Fed `0.5005` at three decimals, which *is* `p20.cos.area`, it returned it
+without complaint.
+
+A rounding boundary is a **half-step**, so that is the distance to measure.
+Corrected in `p27_inference.py`; P27's committed output is **byte-identical**,
+so the fix moves no printed digit and is in scope on Program~\ref{prog:P32}'s
+precedent for the MiB key. Proved by feeding it the five cases before and
+after.
+
+Adopted here with every emitted float routed through it, and **it fired**: the
+judge's agreement is exactly $\num{92.15}$ per cent, which at one decimal is
+on the boundary \dash{} and the two directions are visible in one line, since
+$\num{3.15}$ prints $\num{3.1}$ and $\num{92.15}$ prints $\num{92.2}$ from the
+binary representation alone. Emitted at two decimals instead, and the guard
+was proved to fire by mutation.
+
+**The generalisable half is this file's oldest class, in a new place: a remedy
+that reads correctly and does nothing.** The index's `\raggedbottom`
+(P23), `\multicolovershoot` (P24) and now this one. All three were written
+confidently, were specific, were of the right general kind, and were inert.
+The check that catches it is the one this book already applies to its frames:
+**watch the instrument produce a KNOWN answer before believing a clean one.**
+
+#### An assertion refused a threshold, for the fifth time
+
+The draft asserted `ONE_PT_N > 10 * LB_N` for the items needed to state one
+accuracy to a point. It fails at $9798$ against $10000$ \dash{} and the
+invariant it was reaching for **needs no constant at all**: the count scales
+as the square of the margin it buys, exactly. Programs~\ref{prog:F11},
+\ref{prog:P15}, \ref{prog:P20} and \ref{prog:P21} each paid for this, and the
+pattern in all five is identical: the threshold is written to make a sentence
+the author has already drafted come out true.
+
+#### The build error whose message named neither the cause nor its line
+
+`LaTeX Error: Too deeply nested`, reported at the first `\sumitem`.
+
+**`summarybox` already opens `sumlist`**, and `sumlist` is
+`\newlist{sumlist}{enumerate}{1}` \dash{} maximum depth one \dash{} so writing
+`\begin{sumlist}` inside it opens a second and the first item cannot be
+placed. Every other program in the book puts `\sumitem` straight inside
+`summarybox`; **P34 was the only one that wrote the list by hand**, and the
+error names the item rather than the two lines above it.
+
+The rule is narrow and worth having: **an environment that opens a list for
+you is one you may not open again**, and `grep -c 'begin{sumlist}'` over the
+written programs settles it in one command. That grep is what ended the
+bisect, after the bisect had already produced the pass's other finding.
+
+#### FOUR VACUOUS PROBES IN ONE BISECT, and a fifth instrument defect
+
+The bisect that found it produced, on the way, the clearest run of misread
+instruments this repository has recorded.
+
+- **Three probe builds run from `/tmp`** died at `preamble.tex:236` on a
+  relative `\input{lang/\booklang}` \dash{} before reaching the program at
+  all \dash{} and `grep -c 'Too deeply nested'` dutifully answered **0**. On
+  that evidence *P34 alone is fine* and *the last twelve programs are fine*
+  were both concluded, and both were void. Run a probe **from the repo root**
+  with `-output-directory`, and make it print a known marker (`PROBE DONE`)
+  that you check before believing a zero.
+- **A fourth probe's `\typeout` of `\@listdepth` printed nothing**, which was
+  read as *the depths are fine* rather than as *the instrument said nothing*.
+- **And `str.splitlines()` splits on the form feed**, so a slice taken from
+  `pdftotext` output by line number silently addressed a different page than
+  `sed -n` did on the same file. Use `.split('\n')` on extracted PDF text.
+
+With Program~\ref{prog:P32}'s comment-swallowing wrapper, its
+`grep -c $'\x00'` empty pattern and Program~\ref{prog:P33}'s dropped
+continuation lines, that is **five instrument defects across three passes, and
+every one of them accepted the input and returned a plausible answer.** None
+errored. It is worth stating as its own rule, because it is now better
+attested than most of the layout ones: **a measurement is not evidence until
+the instrument has been watched producing an answer you already knew.**
+
+#### Layout, and one round of lengthening
+
+The second build named an **$\num{83.9}$ pt** overfull hbox: the judge's two
+definitions set as one display. That is Program~\ref{prog:P30}'s recorded
+finding \dash{} *a display gets its own line but not an unlimited one, so a
+display that is itself one long chain still has to be broken by hand* \dash{}
+and the recorded fix worked without a detour: `align*`, in both editions.
+
+Then **one orphaned cue in each A4 build**, both the tail of frame 2, cleared
+in one round by **lengthening** in both editions. Twenty-second confirmation
+of Program~\ref{prog:F06}'s two-sided rule, which has still never failed.
+
+The added paragraph earns its place and is the honest caveat the whole framing
+rests on: nobody drew those two hundred items at random from anything,
+somebody wrote them, so **treating the set as a sample is a modelling decision
+rather than an observation** \dash{} and it is the decision that licenses
+every formula the program is about to borrow. Note that frame 2 is at the very
+top, which is Program~\ref{prog:P24}'s finding: an edit there re-rolls every
+cue in the program, and this one happened to land clean.
+
+The overfull multiset came back element for element to the baseline in all
+four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with zero overfull
+vboxes, zero errors, zero unresolved references, no stranded openers, no
+stranded headings and no orphaned cues. **One orphan tail added, in
+`main-pl`**: 29, 30, 22, 21 against the pre-P34 29, 29, 22, 21.
+
+Pages 1321 / 1343 / 1102 / 1116, from 1295 / 1313 / 1080 / 1094.
+
+#### Rule 2, and the figures
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P34.1 two-errors | 647 / 624 | 5.10 | 6.82 | 7.07 | 7.74 | 8.03 |
+| P34.2 same-items | 648 / 638 | 4.50 | 6.81 | 6.91 | 7.73 | 7.85 |
+| P34.3 judge-shrinks | 655 / 651 | 5.96 | 6.73 | 6.77 | 7.65 | 7.69 |
+| P34.4 two-quantities | 657 / 625 | 4.56 | 6.71 | 7.06 | 7.62 | 8.01 |
+
+**The first render was four ranks and every one of the eight came out between
+830 and 864 pt, setting $\num{5.11}$ to $\num{5.31}$ pt** \dash{} below the
+book's band. Cut to three ranks, all eight land between 624 and 657 pt. That
+is Program~\ref{prog:F12}'s rule confirmed from the wide side for the third
+time, after Programs~\ref{prog:P12} and \ref{prog:P32}: **three ranks is the
+sweet spot; two is too narrow and four is too wide.** The width was measured
+before the prose was written, which is P32's explicit lesson and cost one
+`pdfinfo` per file.
+
+**All four figures close their section**, with the next section's heading
+below them \dash{} measured on the page in both English builds. So the
+P04/P07 case does not arise in this program at all, exactly as
+Program~\ref{prog:P32}'s pass predicted for Part IX: a program that assembles
+ends every section on a result, so the summary placement is available
+throughout. For the tenth pass running the last node of a three-rank chain
+needed no correction afterwards.
+
+#### Also
+
+- Traps 321 to 328 added to `notes/02`, under one shape: **a quantity computed
+  correctly from the wrong thing**, which is Program~\ref{prog:P33}'s four
+  silent failures one level up.
+- **Elicitation 55%**, level with Program~\ref{prog:P29} for the highest
+  outside Part I, and again with **no conversions at all** because the frame
+  plan was written that way. That is five programs now (P26 to P29 and P34)
+  demonstrating the same thing: designing the rate in is free.
+- **Parity took one correction round** and both failures were recorded
+  classes: an English possessive attached to a reference, which inverts in
+  Polish, and a display whose full stop sat inside the maths in one edition
+  and outside it in the other. The whole Polish file was then swept for every
+  `Programu~\ref` rather than waiting for the next failure, which is
+  Program~\ref{prog:P28}'s finding applied; the sweep found no second
+  instance.
+- Cross-programme gates to F01, P03, P26, P27, P28, P29 and P31. Three are
+  P12's third kind \dash{} the same worked example continued.
+- The listing was extracted from the finished `main-en.pdf` and replayed
+  through `code.InteractiveConsole`: it prints `[71.5, 71.0]` and
+  `[70.65, 70.7]`, which is what the page prints, with the rounding **inside**
+  the listing on Program~\ref{prog:P19}'s rule.
+- Frame numbers mapped after writing: sections landed at
+  `1--7 / 8--15 / 16--19 / 20--28 / 29--35 / 36--43 / 44--47 / 48--52`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -10615,209 +10865,216 @@ clone instead.
 
 ## What is left
 
-1. **One program.** F1 to F13 and P1 to P33, both editions. What remains is
-   P34 and the appendices.
+1. **Appendices C to F.** They are the whole of the remaining writing, and
+   there is no longer a program behind them to hide the fact. C is the
+   formula reference and is the one that answers Stroud's fair criticism
+   that a book of frames is a useless reference \dash{} a reader who wants
+   $\Var(aX+b)$ six months later should not have to remember which program
+   proved it. D is the Polish--English terminology, E is where to go next,
+   F is the manifest. **The appendices are not in `tools/programs.json`**, so
+   there is nothing to re-derive an owner from: each brief lives only in its
+   own `\programstub{}`, in `appendices/{en,pl}/`, and that is the whole
+   contract.
 
-   **P34 is next** \dash{} *Measuring a model honestly* \dash{} and Part IX's
-   contract still holds: it introduces **no new mathematics**. Read
-   `tools/programs.json` for its brief and then do what the last seven passes
-   did: **read the brief as a checklist and read the neighbours' file headers
-   with it.** That question has been cheaper than \enquote{what is left of
-   the subject} eight times running, and P33 is the cleanest case yet
-   \dash{} the only program that defers to it is F03, which wrote down both
-   halves of what it was leaving when it left them, so there was nothing to
-   sort.
+   **An appendix collecting what the book proved is a claim about the book on
+   every line**, which is the one class nothing in this repository can check
+   and the class that has had to be corrected in pass after pass above.
+   Appendix~B is the standing warning rather than an anecdote:
+   Program~\ref{prog:P18}'s pass found four false pointers in it and fixed
+   the one that was its own, Program~\ref{prog:P23}'s fixed the rest, and the
+   audit that settled all four was five greps nobody had run since the
+   appendix was written. **So every entry in C has to be opened against the
+   program it names**, and the cheapest form of that is the discipline the
+   later program passes converged on \dash{} read the brief as a checklist,
+   and grep the destination before writing the sentence rather than after.
 
-   **P34's brief brackets six handovers and at least four are visibly
-   spent**, which is worth knowing before estimating it: the bootstrap, the
-   paired comparison and the power calculation are Program~\ref{prog:P27} in
-   full, the judge model's stated probability is Program~\ref{prog:P28}'s
-   §6, cost per token is Program~\ref{prog:P03}'s, and the limits of the
-   information-theoretic measures are Programs~\ref{prog:P29} to
-   \ref{prog:P31}'s. What is left is the **design** \dash{} an evaluation
-   read as an estimation problem rather than as a score \dash{} and the
-   closing discipline both companion volumes are built on. Its estimate is
-   fifty-five and Part IX's two written programs came in at thirty-nine and
-   fifty-four against seventy and sixty.
+   **And there is a structural alternative that would retire the exposure
+   rather than police it**, which the next pass should settle before writing
+   a line. The book already accumulates three back-matter collections at the
+   point of use rather than by hand: `\outcome{}` builds `\canyou`,
+   `\mermaidfig` writes its own manifest line, and `\answerto` carries an
+   answer to Appendix~A through a global macro store \dash{} and none of the
+   three can name the wrong program, because the numbers are the ones LaTeX
+   is on when it reads the macro. A `\result{}` marked in the frame that
+   establishes a result, replayed by Appendix~C, is the same move a fourth
+   time, and it makes the tag **impossible to get wrong** where an audit only
+   makes it detectable. The cost is a mechanical edit across forty-seven
+   written programs in two editions, gated by C14's histogram and C4's
+   ordered signature, which is a better check than a hand-authored appendix
+   could ever carry. The reading is in the scratchpad; the decision is the
+   author's.
 
-   **Part IX is a different job from the eight parts before it**, and the
-   estimates should not be read the same way. Every program so far came in
-   under its brief because a neighbour had spent the machinery or the
-   content; a program that assembles what the book already has is made
-   entirely of that, so the question is not what is left but **what order the
-   pieces go in**. P32 bears that out: it came in at thirty-nine against
-   seventy, and the shortfall is the contract working rather than a thin
-   program.
+2. **The trained-model debt: five entries, one of them half answered.** It is
+   the first thing in this book that cannot be done from a sandbox at all.
 
-   **P32 settled the real-architecture question, and the answer generalises to
-   P33 and P34.** Three programs had pointed here asking for a hypothesis
-   checked on a trained model. What P32 found is that the question splits:
-   the **assembly** half of Program~\ref{prog:P25}'s scaling needs no model
-   at all \dash{} $q \cdot k = x\T M y$ has variance exactly
-   $\lVert M\rVert_F^{2}$, so one weight draw settles it in closed form
-   \dash{} while the **training** half does. So the assembly half was
-   derived and the training half is stated as outstanding, on
-   Programs~\ref{prog:P08}, \ref{prog:P11}, \ref{prog:P19},
-   \ref{prog:P20}, \ref{prog:P25} and \ref{prog:P31}'s precedent.
-   **Ask that split of every claim P33 and P34 inherit**: a surprising
-   amount of what looks as though it needs a model turns out to be a
-   statement about shapes, and the part of it that genuinely needs one is
-   then worth stating plainly rather than hedging the whole claim.
+   - **P11** asks for the singular-value spectrum of a real embedding matrix,
+     measured; the program constructs one, labels it as constructed, and says
+     the empirical claim is not settled. **P08**'s rank-collapse warning is
+     the same debt from the other side.
+   - **P19** \dash{} whether the basin a walk lands in matters at the scale
+     people actually train at.
+   - **P20** \dash{} whether Adam reaches a better answer than momentum on a
+     real surface, which it declines to claim.
+   - **P25** \dash{} whether the independence hypothesis under the
+     $1/\sqrt{d_k}$ scaling survives training.
 
+   **P32 halved the last of those rather than adding to it, and the method
+   generalises.** The question splits: the *assembly* half needed no model,
+   because through a block the score is a bilinear form whose variance is
+   exactly $\lVert M\rVert_F^{2}$ and one weight draw settles it in closed
+   form; only the *training* half still needs one. **Ask that split of every
+   claim before accepting that it needs a model** \dash{} a surprising amount
+   of what looks as though it needs one turns out to be a statement about
+   shapes, and the part that genuinely needs one is then worth stating
+   plainly rather than hedging the whole claim. So the debt is one trained
+   model away from being five answers, and one of the five is already half
+   given.
 
-   **Part III still leaves one measurement outstanding, deliberately.** P11's
-   brief asks for the singular-value spectrum of a real embedding matrix,
-   measured; the program constructs one, labels it, and says the empirical
-   claim is not settled. With P08's rank-collapse warning that is **one debt
-   with two entries**, and both need a trained model's real matrices. It is
-   the first item in this book that cannot be done from a sandbox at all.
-   **P19 added a third entry of the same kind** \dash{} whether the basin a
-   walk lands in matters at the scale people train at \dash{} and **P20 a
-   fourth**, since it declines to say whether Adam reaches a better answer
-   than momentum on a real surface. **P25 added a fifth**: E9 is measured on
-   random vectors, and whether the derivation's independence hypothesis
-   survives training was P32's to check on an assembled architecture.
+3. **Part II's elicitation rate, which is nobody's program.** The ledger puts
+   P01, P02 and P03 at 29--31% against Part I's 73--78%. Raising them means
+   finding, in three merged programs, the frames that state something the
+   reader could produce, and moving the statement into the next frame's
+   answer.
 
-   **P32 halved that fifth entry rather than adding to it**, and the way it
-   did so is the thing to carry into P33 and P34. The question split: the
-   *assembly* half needed no model, because through a block the score is a
-   bilinear form whose variance is exactly $\lVert M\rVert_F^{2}$ and one
-   weight draw settles it in closed form; only the *training* half \dash{}
-   whether the independence assumption survives a run \dash{} still needs
-   one. **Ask that split of every remaining claim before accepting that it
-   needs a model.** So the debt is one trained model away from being five
-   answers rather than one, and one of the five is now half answered.
+   **The price has been measured several times and it is not the same price
+   everywhere.** P04 did three conversions and went 26% to 35% with no frame
+   added; P23 did ten and went 33% to 53% for two frames; P24 paid nine
+   frames for ten points; P30 paid two for eleven; P31 paid two for six; and
+   **P33 did ten conversions for 33% to 51% and added nothing at all**. The
+   variable is not the number of points but what is being converted: a
+   *statement* the reader could have produced converts for nothing, and a
+   *question* that has to be invented costs a frame. Part II is full of the
+   first kind, which is why P33 is the instance to plan against rather than
+   P24.
 
-   **And there is still a Part II-shaped job that is nobody's program.** The
-   elicitation ledger puts P01, P02 and P03 at 29--31% against Part I's
-   73--78%, and raising them is a pass of its own: it means finding, in three
-   merged programs, the frames that state something the reader could produce,
-   and moving the statement into the next frame's answer. P04 did three of
-   those and went 26% to 35% without adding a frame; P23 did ten and went 33%
-   to 53% for two frames, which is the measurement to plan against.
-   **P26, P27, P28 and P29 were four consecutive demonstrations that the rate
-   is free when it is designed in**: 52%, 53%, 54% and **55%** with no
-   conversions at all, because all four frame plans were written that way
-   \dash{} and P29 is the highest outside Part I. **P30 broke the run and
-   priced the alternative a third time**: its plan came in at 41%, and six
-   conversions took it to 52% for two frames. So the three data points now
-   read P23 two frames for twenty points, P24 nine for ten, P30 two for
-   eleven \dash{} retrofitting is cheap when the frames are short and dear
-   when they are long, and designing it in is still free. **P31 paid two
-   frames for six points**, applying the conversions to the draft before the
-   frame remap, which is P23's lesson and is why it cost one renumbering
-   rather than two. **This is the largest genuinely
+   Designing the rate in is free, which P26 to P29 and P34 each demonstrate
+   \dash{} written that way from the frame plan, no conversions, and P29 and
+   P34 the highest outside Part I. **This is the largest genuinely
    parallelisable job in the repository**, because it touches three merged
-   program files and nothing else; the programs themselves are not
-   parallelisable, for the reason the frame estimates below record.
+   program files and nothing else.
 
-   Before estimating any remaining program's length, read its written
-   neighbours. F7's brief projected forty frames and thirty-one were needed;
-   **F8's forty-five against thirty**; **F9's forty against thirty-two**;
-   **F12's fifty-five against thirty-one**; **P14's forty-five against
-   thirty-one**, because the subject is genuinely small; **P15's fifty-five
-   against thirty-eight**; **P16's sixty-five against thirty-eight**,
-   because P06 had already measured its central result under another name;
-   **P17's fifty against thirty-eight**, because P15 and P10 between
-   them had left only the model and the inequality; **P18's sixty
-   against thirty-nine**, because it defines no new object at all;
-   **P19's forty-five against thirty-eight**, because F04 had already worked
-   its headline demonstration; **P20's sixty-five against forty-two**,
-   because four written programs had each already delivered one of its
-   ingredients; **P21's fifty against thirty-nine**, because F06, F04 and
-   P20 between them had left it only the noise model; and **P22's against
-   thirty-five**, because P15 and P05 had left it only the multiplier; and
-   **P23's fifty-five against forty-seven**, the smallest shortfall in a long
-   while, because its ground was genuinely unspent and its neighbours supplied
-   *objects* rather than machinery or content. **P24 broke the run: sixty
-   against sixty-four**, and for a reason that is not about content at all
-   \dash{} its draft came in at fifty-five, in line with the seventeen before
-   it, and nine frames were added raising the elicitation rate from 36% to 46%.
-   **And P25 landed on its estimate**, fifty-four against fifty-five, which is
-   the first time in nineteen \dash{} and the hypothesis for why is that its
-   brief is one of the five the curriculum review amended, so it is the only
-   one written after somebody had looked at what its neighbours would spend.
-   **P26 went back under, fifty-five against forty-six**, which is consistent
-   with that: its brief was not amended, and five written programs had each
-   delivered one of its ingredients. **P27 is the largest shortfall in Part VII,
-   sixty against thirty-nine**, and it is the first with a cause that is not
-   about the subject at all: two of the seven things its brief itemised were
-   already on the page, by name, in Program~\ref{prog:P25} §4. **P28 came in
-   at thirty-seven against fifty** with every one of its brief's five payoffs
-   still owed \dash{} the neighbours had supplied only the machinery, and the
-   program defines no new object at all. **P29 came in at thirty-four against
-   forty-five**, for P27's reason rather than any of the other three: read as
-   a checklist, two of its three payoffs turned out to be handed here **by
-   name**, in the headers of Programs~\ref{prog:P19} and \ref{prog:P25},
-   which had written down what they were leaving. **P30 came in at forty-six
-   against fifty-five**, for the same reason once more \dash{} but with its
-   two halves separated, which is worth having: its *machinery* was entirely
-   spent (P29's coding argument, P26's likelihood, P18's derivative, P19's
-   Jensen, F09's triangle inequality with its equality condition) while its
-   *content* was untouched, since no written program mentions mode-covering,
-   mode-seeking or Jensen--Shannon at all. So four of its eight sections were
-   short because the tools were already there and four were full length
-   because nobody had been there. **P31 came in at thirty-eight against
-   fifty**, the same shape once more and at its most extreme: mutual
-   information IS Program~\ref{prog:P30}'s divergence applied to one pair of
-   arguments, so the program defines exactly one new object in six sections
-   and its first three are short by construction. P30's own closing frame had
-   already said where the length goes, and two thirds of the program is where
-   it said. **P32 came in at thirty-nine against seventy**, the largest
-   shortfall in the book, and it is the only one that is not a shortfall at
-   all: Part IX's contract is that it introduces no new mathematics, so
-   \emph{everything} was spent by construction and the pass's whole job was
-   to find the three things that were not. A Part IX estimate measures the
-   assembly rather than the subject, and should not be read against the
-   twenty-four before it. **P33 came in at fifty-four against sixty**, which
-   is the smallest shortfall Part IX will produce and is the same contract
-   read from the other end: its brief bracketed six pieces and all six were
-   spent, so what remained was the *order* they go in and the one question
-   no owner could ask \dash{} which of the six, got wrong, raises nothing.
-   That question is the program, and it is long because the answer is four.
-   **A brief's frame estimate is otherwise a planning figure from before its
-   neighbours were written**, and the elicitation rate is paid in frames on top
-   of it. It is not a target \dash{} and the record above is also the reason
-   the programs cannot be written in parallel: each one is shaped by what the
-   ones before it turned out to spend.
-2. **The measurements.** Ten are specified, nine of them free. **E6 was run in
-   the P20 pass and E9 in the P25 pass**, and the ledger in
-   `notes/01-curriculum.md` §17 now carries a Status column naming the pass
-   rather than a total in prose \dash{} it said "none has been run" for five
-   programs after E6 had. Fill the column in the pass that runs one.
+4. **The measurements.** Ten are specified, nine of them free. The ledger in
+   `notes/01-curriculum.md` §17 carries a **Status column naming the pass**
+   that ran each one, rather than a total in prose \dash{} it said "none has
+   been run" for five programs after E6 had, which is the class this file
+   forbids. Read the column; never restate a total, here or there.
 
-   **E4 needs a trained model** and is the same debt as item 1's. Three rows
-   \dash{} E1, E3 and E5 \dash{} say "see the note below" because P02, P05
-   and P16 each measured something that closely resembles the specification
-   beside them and no pass claimed it; deciding those is a reading job on three
-   merged programs and is not an inference to make from the table. The rest are
-   unclaimed and free: E2, E7, E8 and E10.
-
-   Also outstanding: raise the frame estimates' credibility by writing down,
-   in the pass, which neighbour spent what. Nineteen programs now have that
-   record and it is the reason each estimate missed.
-3. **Appendices C–F.** C (formula reference) is the one that fixes Stroud's
-   fair criticism that a book of frames is a useless reference.
-4. **The residual sweep.** Fourteen committed values are measured
+   **E2 and E7 are unclaimed and free**, and are the whole of what a pass
+   could pick up tomorrow. **E4 needs a trained model** and is item 2's debt
+   under another name. Three rows \dash{} E1, E3 and E5 \dash{} say "see the
+   note below" because P02, P05 and P16 each measured something that closely
+   resembles the specification beside them and no pass claimed it; deciding
+   those is a reading job on three merged programs and is not an inference to
+   make from the table.
+5. **The residual sweep.** Fourteen committed values are measured
    floating-point residuals rather than invariants — every key ending `.err`
    across F05, F07, F08, F09, F12 and P05, plus the figures quoted beside them.
    CI rejected two of P06's for exactly this and they are now emitted as
    bounds; the rest have survived so far, which is not the same as being
    reproducible. See the build trap. It is a pass of its own, because each is
    quoted in prose in two editions.
-5. **`odzera`, the companion library.** One stage per part, every gradient
+6. **`odzera`, the companion library.** One stage per part, every gradient
    checked against finite differences in CI, no GPU, the whole suite under a
    minute. Specified in `notes/01-curriculum.md` §18; nothing built.
-6. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
+7. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
    ledger stays open and the book may not claim it.
+
+---
+
+### The frame estimates, a closed record
+
+Every one of the forty-seven programs is written, so the record below is
+complete rather than advice. It is kept because it is the evidence for one
+claim: **a brief's frame estimate is a planning figure written before its
+neighbours existed**, and the elicitation rate is paid in frames on top of it.
+
+F7's brief projected forty frames and thirty-one were needed;
+**F8's forty-five against thirty**; **F9's forty against thirty-two**;
+**F12's fifty-five against thirty-one**; **P14's forty-five against
+thirty-one**, because the subject is genuinely small; **P15's fifty-five
+against thirty-eight**; **P16's sixty-five against thirty-eight**,
+because P06 had already measured its central result under another name;
+**P17's fifty against thirty-eight**, because P15 and P10 between
+them had left only the model and the inequality; **P18's sixty
+against thirty-nine**, because it defines no new object at all;
+**P19's forty-five against thirty-eight**, because F04 had already worked
+its headline demonstration; **P20's sixty-five against forty-two**,
+because four written programs had each already delivered one of its
+ingredients; **P21's fifty against thirty-nine**, because F06, F04 and
+P20 between them had left it only the noise model; and **P22's against
+thirty-five**, because P15 and P05 had left it only the multiplier; and
+**P23's fifty-five against forty-seven**, the smallest shortfall in a long
+while, because its ground was genuinely unspent and its neighbours supplied
+*objects* rather than machinery or content. **P24 broke the run: sixty
+against sixty-four**, and for a reason that is not about content at all
+\dash{} its draft came in at fifty-five, in line with the seventeen before
+it, and nine frames were added raising the elicitation rate from 36% to 46%.
+**And P25 landed on its estimate**, fifty-four against fifty-five, which is
+the first time in nineteen \dash{} and the hypothesis for why is that its
+brief is one of the five the curriculum review amended, so it is the only
+one written after somebody had looked at what its neighbours would spend.
+**P26 went back under, fifty-five against forty-six**, which is consistent
+with that: its brief was not amended, and five written programs had each
+delivered one of its ingredients. **P27 is the largest shortfall in Part VII,
+sixty against thirty-nine**, and it is the first with a cause that is not
+about the subject at all: two of the seven things its brief itemised were
+already on the page, by name, in Program~\ref{prog:P25} §4. **P28 came in
+at thirty-seven against fifty** with every one of its brief's five payoffs
+still owed \dash{} the neighbours had supplied only the machinery, and the
+program defines no new object at all. **P29 came in at thirty-four against
+forty-five**, for P27's reason rather than any of the other three: read as
+a checklist, two of its three payoffs turned out to be handed here **by
+name**, in the headers of Programs~\ref{prog:P19} and \ref{prog:P25},
+which had written down what they were leaving. **P30 came in at forty-six
+against fifty-five**, for the same reason once more \dash{} but with its
+two halves separated, which is worth having: its *machinery* was entirely
+spent (P29's coding argument, P26's likelihood, P18's derivative, P19's
+Jensen, F09's triangle inequality with its equality condition) while its
+*content* was untouched, since no written program mentions mode-covering,
+mode-seeking or Jensen--Shannon at all. So four of its eight sections were
+short because the tools were already there and four were full length
+because nobody had been there. **P31 came in at thirty-eight against
+fifty**, the same shape once more and at its most extreme: mutual
+information IS Program~\ref{prog:P30}'s divergence applied to one pair of
+arguments, so the program defines exactly one new object in six sections
+and its first three are short by construction. P30's own closing frame had
+already said where the length goes, and two thirds of the program is where
+it said. **P32 came in at thirty-nine against seventy**, the largest
+shortfall in the book, and it is the only one that is not a shortfall at
+all: Part IX's contract is that it introduces no new mathematics, so
+\emph{everything} was spent by construction and the pass's whole job was
+to find the three things that were not. A Part IX estimate measures the
+assembly rather than the subject, and should not be read against the
+twenty-four before it. **P33 came in at fifty-four against sixty**, which
+is the smallest shortfall Part IX will produce and is the same contract
+read from the other end: its brief bracketed six pieces and all six were
+spent, so what remained was the *order* they go in and the one question
+no owner could ask \dash{} which of the six, got wrong, raises nothing.
+That question is the program, and it is long because the answer is four.
+**And P34 closed the book at fifty-two against fifty-five**, the smallest
+shortfall of the three, because five of its six bracketed handovers were
+already on the page and the sixth \dash{} an evaluation read as an estimation
+problem \dash{} was a *framing* rather than a derivation, which is the one
+thing a neighbour cannot spend.
+
+**So an estimate never once came in over except where the elicitation rate was
+retrofitted** (P24, nine frames for ten points), and it landed exactly once
+(P25), whose brief is the only one in the manifest amended after somebody had
+looked at what its neighbours would spend. That is the whole finding, and it
+is also the reason the programs could not have been written in parallel: each
+one is shaped by what the ones before it turned out to spend.
+
+---
 
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
-for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.72**
-\dash{} 1,811 teaching frames in 1,295 trade pages, with one program and four
-appendices still to come. §20 item 1 now carries the measurement and the
-per-part page ranges, so the decision has a number rather than an estimate. The
-other two that
+for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.71**
+\dash{} 1,863 teaching frames in 1,321 trade pages, with four appendices still
+to come. §20 item 1 carries the measurement and the per-part page ranges, so
+the decision has numbers in front of it rather than an estimate; **every
+program is now written, so those numbers will not move again except by the
+appendices**, which is as settled as the question is going to get before
+somebody answers it. The other two that
 stood beside it are now settled in the passes that wrote their programs
 \dash{} P12's placement, and whether P14 is enough of a fix for the rigour gap
 \dash{} and each entry records the argument the written book falsified rather
