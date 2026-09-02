@@ -959,8 +959,8 @@ Fill the column in the pass that runs the experiment; never restate a total.
 | E5 | P16 | Forward against reverse mode: time and peak memory against depth; the measured cost of gradient checkpointing | Free | see the note below |
 | E6 | P20 | SGD, momentum and Adam on a quadratic of known condition number; iterations to tolerance against the predicted count | Free | **run, P20 pass** |
 | E7 | P27 | Bootstrap confidence-interval width against evaluation-set size on a public benchmark; the size needed to resolve one point | Free | not run |
-| E8 | P30 | Forward against reverse KL fitted to the same bimodal target; mode covering against mode seeking | Free | not run |
-| E9 | **P25**, then P32 | **The headline.** Logit variance and softmax entropy with and without `1/sqrt(d_k)`, across head sizes | Free | **run, P25 pass** |
+| E8 | P30 | Forward against reverse KL fitted to the same bimodal target; mode covering against mode seeking | Free | **run, P30 pass** — see the note |
+| E9 | **P25**, then P32 | **The headline.** Logit variance and softmax entropy with and without `1/sqrt(d_k)`, across head sizes | Free | **run: P25 pass on random vectors, P32 pass through the assembly** |
 | E10 | P33 | A scaling-law power fit on published numbers, with the fit's extrapolation uncertainty reported | Cheap | not run |
 
 **E9's owner moved and the table had not.** The curriculum review put the
@@ -968,9 +968,34 @@ derivation of the scaling in P25, so E9 as specified — random vectors, head
 sizes, spread and entropy — is P25's, and it was run there: without the
 division the softmax entropy falls from 0.951 to 0.109 nats against a maximum
 of 2.079 and one key of eight takes 95.5 per cent of the weight, while with it
-nothing moves at any head size. What is left for P32 is the same measurement
+nothing moves at any head size. What was left for P32 was the same measurement
 on an assembled architecture rather than on random vectors, and P25's own
-closing frames say so.
+closing frames said so.
+
+**P32 ran that half, and it needed no sampling at all.** Through a block the
+score is $q \cdot k = (W_Q^{\mathsf T} x) \cdot (W_K^{\mathsf T} y)
+= x^{\mathsf T} M y$ with $M = W_Q W_K^{\mathsf T}$, and for independent
+standard-normal inputs that bilinear form has variance **exactly**
+$\lVert M \rVert_F^2$ — so one weight draw settles the whole question in
+closed form, and $\mathbb{E}\lVert M\rVert_F^2 = d_k$ exactly. Measured at
+`d_model = 64` the spreads are 2.86, 3.96, 5.63 and 8.02 against
+`sqrt(d_k)`, gated against P25's own committed 2.83 and 7.99. What the closed
+form also shows, and P25's method could not, is that a **trained model has one
+weight draw rather than an average**, so its own scores sit a few per cent off
+the nominal before training starts. The remaining half — whether the
+independence the derivation assumes survives training — still needs a trained
+model and is stated as outstanding.
+
+**E8 was run in the P30 pass and nobody had claimed it**, which is the fifth
+instance of exactly the decay this Status column exists to stop.
+`code/p30_cross_entropy_kl.py` fits forward and reverse KL to the same bimodal
+targets and reports mode covering against mode seeking, which is the
+specification. It differs from the wording in one way and the difference is an
+improvement rather than a shortfall: it **enumerates** a finite candidate
+family and evaluates every member, so the answer is a proof over that family,
+where an optimiser's answer would have depended on where the search started
+and stopped. P30's pass note gives that reasoning in full; it simply never
+came back to the table.
 
 **Three rows say “see the note below” because nobody has checked them, and
 that is the honest answer.** P02 measured the overflow cliff per format and

@@ -220,7 +220,7 @@ emit("p03.kv.layers", LAYERS)
 emit("p03.kv.dmodel", D_MODEL)
 emit("p03.kv.seq", SEQ)
 emit("p03.kv.gib", f"{kv_bytes(SEQ) / 2 ** 30:.0f}")
-emit("p03.kv.per.token.mb", f"{kv_bytes(1) / 2 ** 20:.1f}")
+emit("p03.kv.per.token.mib", f"{kv_bytes(1) / 2 ** 20:.1f}")
 emit("p03.kv.double.gib", f"{kv_bytes(2 * SEQ) / 2 ** 30:.0f}")
 assert kv_bytes(SEQ) == 4 * 2 ** 30, "the cache is no longer exactly 4 GiB at these shapes"
 assert kv_bytes(2 * SEQ) == 2 * kv_bytes(SEQ), "the cache is no longer linear in the sequence"

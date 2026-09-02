@@ -1187,7 +1187,7 @@ floor" twice over.
 is quadratic in the sequence and the **cache is linear**. It holds one key and
 one value per *position*, not per pair — the pairs are formed and consumed
 inside the computation and never stored. Two quantities, two exponents, one
-layer: 4 GiB at 8192 tokens and 8 at twice that, or about 0.5 MB per token in
+layer: 4 GiB at 8192 tokens and 8 at twice that, or about 0.5 MiB per token in
 flight. It is usually larger than the weights and it decides how many users a
 card serves. → **P03**.
 
@@ -3091,3 +3091,56 @@ and unusable are compatible, which is trap 253 arriving from the other end.
      with depth. What a deep layer can be is *easier to read*, which is a
      statement about what a small probe extracts rather than about what is
      there — and running the two together is the mistake. Owner: P31 §5.
+305. *“Attention is where a transformer's parameters are.”*
+     Attention is four `d`-by-`d` projections, `4d^2`. The feed-forward block
+     is `d -> 4d` and back, `8d^2` — **twice as many, at every width**, since
+     the ratio does not depend on `d`. Almost everything written about the
+     architecture is about the half that holds a third of it. Owner: P32 §7.
+306. *“The `1/sqrt(d_k)` is derived for drawn vectors, so a real block, whose
+     queries and keys are computed, is a different case.”*
+     It is a different computation and the answer is unchanged. The assembled
+     score is a bilinear form `x^T M y` with `M = W_Q W_K^T`, its variance is
+     exactly the squared Frobenius norm of `M`, and that has expectation `d_k`
+     — so the two projections between the stream and the score change nothing
+     at all. Owner: P32 §2.
+307. *“The scaling is exact in expectation, so a trained model's scores have
+     variance `d_k`.”*
+     Exact in expectation is a statement about the ensemble of models you
+     might have trained. A deployment has one weight draw, and one draw's
+     score variance is a few per cent off before training starts. It is P21's
+     unbiased-is-not-usable, in an architecture rather than an estimator.
+     Owner: P32 §2.
+308. *“Residual connections fix vanishing gradients by making the factors
+     bigger.”*
+     They change what the gradient **is**. `prod(1 + f'_k)` expands to a sum
+     over `2^n` paths, one per subset of layers, and the empty subset — around
+     every layer — contributes exactly `1`. A plain chain's gradient is one
+     product that `n` small factors kill; a residual stack's is a sum with a
+     term no factor multiplies. Owner: P32 §5.
+309. *“So a residual stack's gradient is at least 1.”*
+     It is not. One *term* of the sum is `1`; the other `2^n - 1` can cancel
+     it exactly — set every `f'_k` to `-1` and the whole product is zero. The
+     identity path guarantees arrival, not size, and it says nothing about
+     exploding, which is why normalisation appears in the same block.
+     Owner: P32 §5.
+310. *“More heads means more capacity.”*
+     More heads at fixed width would. Every architecture instead holds the
+     *total* width fixed, so `h` heads of width `d/h` hold exactly the
+     parameters of one head of width `d`. What changes is the rank of each
+     head's `W_Q W_K^T`, which falls. It is a trade, not a gain.
+     Owner: P32 §4.
+311. *“The cache and the arithmetic both grow quadratically with the
+     sequence.”*
+     The cache holds one key and one value per *position* per layer, so it is
+     linear; the scores are one per *pair*, so they are quadratic. Two
+     exponents in one layer, and they point opposite ways when a deployment
+     runs out: the cache is fixed by serving fewer conversations, the score
+     matrix by serving shorter ones. Owner: P32 §7.
+312. *“Per-token cache in MB.”*
+     Check which the code divided by. A quantity computed as `bytes / 2**20`
+     is **mebibytes**, and `0.5 MiB` is `0.524 MB` — both of which print as
+     `0.5` at one decimal, so the mislabel survives until the shape changes.
+     Found in this book's own P03 and corrected there — **and in item 90 of
+     this list, which quoted the same figure with the same unit and was
+     corrected with it**. The catalogue has no general entry for the binary
+     prefixes; this is it. Owner: P32 §7.
