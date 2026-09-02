@@ -1,14 +1,296 @@
 %% appE-further-reading \dash{} Where to Go Next
+%
+% NOTHING HERE IS WRITTEN FROM MEMORY, and that constraint shaped the appendix
+% more than anything else. Sections E.1 and E.2 are the competitive survey in
+% notes/02-grounding-and-traps.md section 1, which was run before the book was
+% planned and which cites a review for every quotation it carries -- see that
+% file's own Sources section. Section E.3 is notes/01-curriculum.md section 13.
+%
+% Section E.4 carries NAMES WITHOUT VERDICTS on purpose. The repository records
+% those titles as pointers and nothing more, so writing a characterisation for
+% them would be inventing one -- which is the class this book spends
+% forty-seven programs telling the reader not to accept. The appendix says so
+% rather than filling the gap.
+%
+% Every claim this appendix makes about a PROGRAM was checked against the
+% written program before it was imported, which is the discipline Appendix D's
+% pass earned. That is not gated by anything; nothing here can be.
+%
+% NO WEB ADDRESSES. The body of this book prints none, and a printed address
+% rots faster than a title does.
 
 \chapter{Where to Go Next}
 \label{app:E}
 
-\programstub{%
-What this book does not teach, why not, and what to read instead \dash{} and for
-the subjects it does teach, what each recommended source is good at and what
-it is bad at.
+\noindent
+This appendix is in two halves, and the difference between them is stated
+rather than hidden.
 
-A list of titles is not useful. A list that says \emph{this one is the best
-written book in its subject and will take you a term}, or \emph{this one is a
-reference and a poor first reading}, is.
-}
+Sections~\ref{sec:E-survey} and~\ref{sec:E-positions} carry a verdict on every
+entry, because those works were read and compared before this book was
+planned: the survey behind them exists to answer \emph{what already exists, and
+what does each do well and badly for this reader}, and it cites a published
+review for every quotation. Section~\ref{sec:E-not} says what this book does
+not teach, why not, and where the subject is done properly.
+
+Section~\ref{sec:E-depth} is a list of names with no verdicts attached, and it
+says so. This book has not held those works to the standard the first half is
+held to, and a one-line characterisation invented to fill the column would be
+exactly the thing forty-seven programs have been asking you not to accept.
+
+No web addresses appear here. A title and an author outlive a URL.
+
+\section{The books this one was measured against}
+\label{sec:E-survey}
+\index{further reading!competitive survey}
+
+Ordered by how close each work sits to the reader this book was written for: a
+working engineer, competent in code, whose school mathematics has decayed, and
+who is now shipping models.
+
+\medskip
+\textbf{Deisenroth, Faisal and Ong, \emph{Mathematics for Machine Learning}.}
+The closest competitor, and it names the same gap this book does \dash{} its
+authors write that the distance between school mathematics and the level needed
+to read a machine-learning textbook is too big for many people. \textbf{Does well:}
+the single best-organised map of the territory, free as a PDF, with a coherent
+narrative from vector spaces to four worked methods, and the best short
+treatment of matrix decompositions available. \textbf{Does badly, for this
+reader:} it states the school-to-machine-learning gap as its target and then
+starts above it \dash{} chapter 2 opens on systems of linear equations, and
+nothing in it teaches you to rearrange an inequality or shift a summation
+index. Its four target methods are pre-deep-learning, there is not one page on
+overflow or conditioning, and most exercises have no worked solution.
+\textbf{Verdict:} the best reference to point at, and not a path from zero
+despite its preface.
+
+\medskip
+\textbf{Goodfellow, Bengio and Courville, \emph{Deep Learning}, Part~I.}
+\textbf{Does well:} chapter 4, \emph{Numerical Computation}, is the most
+valuable sixty pages in this whole survey and the one nobody imitates
+\dash{} overflow and underflow, the log-sum-exp stabilisation, conditioning,
+the Jacobian and the Hessian. It is the only work here that treats the machine
+as a finite-precision object. \textbf{Does badly:} Part~I is a refresher rather
+than a teacher, four chapters standing in for two years of undergraduate
+mathematics, with no exercises and no worked examples; and it is frozen in
+2016, so there is no transformer and no modern mixed-precision practice.
+\textbf{Verdict:} that chapter is the ancestor of this book's Part~II, and this
+book goes an order of magnitude deeper with numbers.
+
+\medskip
+\textbf{Strang, \emph{Linear Algebra and Learning from Data}.}
+\textbf{Does well:} Strang is the finest expositor of linear algebra alive, and
+this is where he connects the four subspaces, the SVD and low-rank
+approximation to data. Putting the SVD at the centre of gravity is exactly
+right, and this book made that framing mainstream. \textbf{Does badly:}
+reviewers are blunt about the density \dash{} the MAA review says he has tried
+to cram far too much material into 432 pages, so each topic gets a very quick
+presentation and results are stated without proof or citation. It also assumes
+a completed first course; it is a second one.
+\textbf{Verdict:} a source of framing rather than a model of construction.
+
+\medskip
+\textbf{Boyd and Vandenberghe, \emph{Introduction to Applied Linear Algebra}.}
+\textbf{Does well:} the best-designed applied linear algebra text there is, and
+the closest to this book in temperament. It is aggressively narrow \dash{}
+built on linear independence and the QR factorisation and almost nothing else
+\dash{} and it proves that a book can omit most of its subject and be better
+for it. Free PDF, with Python and Julia companions.
+\textbf{Does badly, for this reader:} by design it omits eigenvalues, the SVD
+and determinants, which are precisely the parts needed for conditioning,
+attention and covariance, and it still assumes you can do the algebra.
+\textbf{Verdict:} the scoping discipline to imitate. Its omissions are not this
+book's omissions.
+
+\medskip
+\textbf{Boyd and Vandenberghe, \emph{Convex Optimization}.}
+\textbf{Does well:} the reference. Convexity, duality, and above all the
+recognition problem \dash{} \emph{is my problem convex?} \dash{} are
+permanently useful vocabulary. Free PDF, extensive exercises.
+\textbf{Does badly, for this reader:} it wants good linear algebra up front by
+its own statement, and deep learning is not in its class of problems.
+Non-convex, stochastic, over-parameterised objectives sit outside the theory,
+and its convergence-rate proofs do not transfer.
+\textbf{Verdict:} take the vocabulary into Programs~\ref{prog:P19}
+and~\ref{prog:P22}; do not take the curriculum.
+
+\medskip
+\textbf{Bishop, \emph{Pattern Recognition and Machine Learning}, and Bishop and
+Bishop, \emph{Deep Learning: Foundations and Concepts}.}
+\textbf{Does well:} the organisation, the figures and the probabilistic-model
+material are among the best written anywhere, and the 2024 volume brings the
+same treatment to transformers and diffusion. \textbf{Does badly:} both are
+more advanced than most other introductions and assume multivariable calculus,
+linear algebra and probability as working tools; the maths is always in service
+of a model and is never taught from the floor.
+\textbf{Verdict:} a destination rather than a route \dash{} and this book's own
+success condition is that you can now open it.
+
+\medskip
+\textbf{Murphy, \emph{Probabilistic Machine Learning}.}
+\textbf{Does well:} the most complete and most current single treatment, unified
+by probabilistic modelling, with a good mathematical-background section and open
+code. \textbf{Does badly:} graduate-level by its own statement, assuming
+calculus, statistics and linear algebra; a reviewer's description of it as an
+encyclopedic reference is both praise and the problem, at over a thousand pages.
+\textbf{Verdict:} the reference to route to per topic, once you can read it.
+
+\medskip
+\textbf{Blum, Hopcroft and Kannan, \emph{Foundations of Data Science}.}
+\textbf{Does well:} the only book in this list that takes seriously the thing
+engineers most reliably get wrong \dash{} how data behaves in high dimensions.
+Concentration of measure, random projection, the SVD, random walks.
+\textbf{Does badly, for this reader:} it is a theory course, proof-driven and
+aimed at computer-science theory students, and its progression does not
+resemble a practitioner's need.
+\textbf{Verdict:} the source for Program~\ref{prog:P05}'s content, and this book
+translates it out of theorem-and-proof form into something you can act on.
+
+\section{Two positions, and one method}
+\label{sec:E-positions}
+\index{further reading!positions}
+
+\medskip
+\textbf{3Blue1Brown.} \emph{Essence of Linear Algebra} and \emph{Essence of
+Calculus} do something no book does: they make the geometric content of a
+determinant or a derivative visible in seconds.
+
+And the strongest argument for reading a book like this one instead is made by
+their author. Sanderson has said publicly that he worries his work is
+intellectual candy, offering the feeling of understanding, and that unless the
+viewer actively engages \dash{} reinvents it, does problems \dash{} it is not
+going to stick; he extends the point to Feynman's lectures, saying that how
+satisfying content is to consume does not correlate with long-term learning.
+
+That is a concession by the person with the most to lose from it, and it is
+this book's own thesis in one sentence. The right relationship is complementary:
+watch the video for the picture, work the program for the retention.
+
+\medskip
+\textbf{fast.ai, and the position that you need less mathematics than you
+think.} It is right about \emph{entry}, and this book concedes the point
+without reservation: requiring two years of mathematics before anyone may train
+a classifier gatekept the field, produced nothing, and is empirically false.
+
+What the position answers is \emph{can I ship something?} What it does not
+answer is why the loss went to \code{nan} at step four thousand and only in
+half precision; whether a three-point evaluation gain is real or one draw from
+a noisy distribution; or whether a gradient-accumulation setting quietly changed
+the objective. Those questions arrive \emph{after} you ship, and they are
+mathematics questions.
+
+So: do not learn the mathematics first. This book is what you reach for second,
+when something is wrong and you cannot see why.
+
+\medskip
+\textbf{Stroud, \emph{Engineering Mathematics} \dash{} the method, not a
+competitor.} The frame, the answer overleaf, the Quiz, the Summary and the
+\emph{Can you?} checklist are all his. Its own limitations are this book's
+obligations, and they are named in the introduction rather than hidden:
+no rigour; recipe-level linear algebra with no vector spaces and no
+decompositions; descriptive statistics with no inference; no discrete
+mathematics; no optimisation in the first volume; and \dash{} the complaint
+readers make most \dash{} useless as a reference once read. Part~III answers
+the linear algebra, Part~IV the discrete mathematics and the rigour, Part~VI
+the optimisation and Part~VII the inference; Appendices~B, C and D exist for
+the last.
+
+\section{What this book does not teach, and where to go instead}
+\label{sec:E-not}
+\index{further reading!exclusions}
+
+The house rule is that the book may say a topic is not worth its cost to this
+reader. It may not pretend the topic does not exist.
+
+First the rigorous foundations underneath what this book teaches \dash{} the
+places it borrows a result and does not prove it.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}XXl@{}}
+\toprule
+\textbf{Not taught} & \textbf{Why not} & \textbf{Where to go} \\
+\midrule
+Measure-theoretic probability & Nothing this book pays off needs a
+  sigma-algebra, and the machinery costs a semester & Williams; Durrett \\
+Real analysis and proof at the epsilon--delta level & Program~\ref{prog:P14}
+  teaches you to \emph{read} a theorem and deliberately not to write one & Abbott;
+  Tao \\
+Partial differential equations & The audience meets them in
+  physics-informed work, which a shallow treatment does not serve & Strauss;
+  Evans \\
+Stochastic differential equations, and so the full mathematics of diffusion
+  models & The book gives the Gaussian and the fact that variances add, which
+  is the whole of a discrete-time chain of Gaussians, and never applies them to
+  one & Särkkä and Solin \\
+Complex analysis, and the Fourier transform beyond a mention &
+  Program~\ref{prog:F08} gives the unit circle; convolution theorems are a book
+  of their own & Bracewell \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+And the specialisms that begin where a working depth ends. Each of these is a
+field, and the book stops at the point where an engineer stops needing to
+argue about it.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}XXl@{}}
+\toprule
+\textbf{Not taught} & \textbf{Why not} & \textbf{Where to go} \\
+\midrule
+Numerical linear algebra at implementation level & Program~\ref{prog:P09} says
+  why not to invert and Program~\ref{prog:P11} why the normal equations square
+  the condition number; neither teaches you to implement a QR factorisation &
+  Trefethen and Bau; Higham \\
+Convex optimisation theory, duality in full & Programs~\ref{prog:P19}
+  and~\ref{prog:P22} give the working subset, and there is no case for
+  paraphrasing one of the best-written books in mathematics & Boyd and
+  Vandenberghe \\
+Statistical learning theory: VC dimension, generalisation bounds &
+  Program~\ref{prog:P14} names them as claims to read carefully; the bounds are
+  almost always vacuous at realistic scale & Shalev-Shwartz and Ben-David \\
+Reinforcement learning theory and convergence results &
+  Programs~\ref{prog:P21} and~\ref{prog:P22} give the gradient estimators and
+  the KL constraint, which is what an engineer touching alignment work actually
+  manipulates & Sutton and Barto \\
+Category theory, differential geometry, manifolds & Occasionally invoked in
+  interpretability writing; not load-bearing for the work & Lee \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{The subjects it does teach, but only to working depth}
+\label{sec:E-depth}
+\index{further reading!working depth}
+
+\begin{warning}
+\textbf{These are names, not verdicts, and the difference is deliberate.}
+Section~\ref{sec:E-survey} says what each work does well and badly because
+those works were read and compared against each other before this book was
+planned. The list below was not. Writing a characterisation for it anyway is
+precisely the move this book has spent forty-seven programs asking you to
+refuse, so what follows is a pointer and nothing more.
+\end{warning}
+
+\medskip
+For \textbf{linear algebra} beyond the working depth of Part~III: Strang, and Axler
+for the abstract treatment. For the same ground with a machine-learning slant,
+Deisenroth, Faisal and Ong.
+
+For \textbf{probability}, Blitzstein and Hwang. For \textbf{inference}, Wasserman,
+\emph{All of Statistics}. For \textbf{Bayesian methods} past
+Program~\ref{prog:P28}, Gelman and colleagues, \emph{Bayesian Data
+Analysis}.
+
+For \textbf{information theory} past Part~VIII, Cover and Thomas. For
+\textbf{numerical optimisation} as a subject in its own right rather than as
+the update rules Program~\ref{prog:P20} derives, Nocedal and Wright.
+
+And for the machine learning that consumes all of it: Goodfellow, Bengio and
+Courville for the 2016 picture, Murphy and Bishop for the current one.
+
+\medskip
+That last sentence is the point of the whole appendix. This book teaches none
+of those subjects to the depth its own sources do, and it was never meant to.
+What it claims is narrower and checkable: that you can now open them.

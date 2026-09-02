@@ -13,7 +13,7 @@ Read this before touching a program.
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
 | Programs | **All forty-seven written, both editions \dash{} F1–F13 and P1–P34, Parts I to IX entire.** There are no stubs | — |
-| Appendices | A (answers, generated), B (notation), **C (formulae, from 721 `\result{}` marks)** and **D (terminology, 27 `\plterm{}` rows gated against the Polish prose)** drafted; E and F are stubs | E, F |
+| Appendices | A (answers, generated), B (notation), **C (formulae, from 721 `\result{}` marks)**, **D (terminology, 24 `\plterm{}` rows gated against the Polish prose)** and **E (further reading)** drafted; F is a stub | F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
 the format the book is read in; 17 x 24 cm is the trade format shared with the
@@ -105,11 +105,19 @@ what was there before.
 - 82 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
-- **27 Polish renderings named in Appendix~D, every one used in the prose of
+- **54 Polish renderings named in Appendix~D, every one used in the prose of
   `programs/pl`** \dash{} `make debt` reports it and `make check` and CI both
   gate on it. A glossary row naming a word the book does not use is a claim
   about the body that is false, and `notes/03`'s suggested table has two of
-  them
+  them. **The number the tool prints is renderings across BOTH editions**:
+  24 `\plterm` rows per edition, 27 renderings, because three rows carry
+  several comma-separated words for one object. This entry said 27 for a
+  week, which is the per-edition figure and not what `make debt` puts on the
+  page \dash{} quote the instrument's own number, or say which of the three
+  quantities you mean
+- **9 part ranges in each introduction, every one matching the manifest**
+  \dash{} the same three places gate it. Seven of the nine were wrong in
+  both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
 - **102 orphan-tail pages: 29 · 30 · 22 · 21** across `main-en`, `main-pl`,
@@ -434,6 +442,7 @@ gates on it.
 | **C16 next-frame cues** | A `\nextframe` where the next frame answers nothing, or missing where the next frame answers. C4 and C14 are both blind to a cue dropped in *both* editions at once |
 | `check_structure.py --frames` (payloads) | A Quiz route, outcome range or Summary bracket naming a frame the program does not have, or a range that runs backwards. `\teachesat`, `\teachesatone`, `\outcome` and `\sumitem` are the whole of the book's return index, and they were compared *between the editions* and never against the program: a probe routing a Quiz question to frames 91--93 of a 48-frame program was green on `parity.py`, `check_structure.py`, `gen_stubs.py --check` and `make verify` alike, and stays green on parity even now, because the Polish edition says 91--93 too. **It closes the existence half only.** Whether frame 20 answers the question routed to it is a reading job, and the tool says so in its own comment rather than letting a green ledger imply otherwise |
 | **`check_structure.py --scripts`** | A `\transcript{}` naming a file that is not there, or written as a path rather than a stem. The macro's own fallback prints a grey marker and builds, which is what let ten of the book's twelve transcripts go nine programs without reaching a page. Hard gate in `make check`, because on a tree where `make numbers` has run it is always a typo |
+| **`check_structure.py --parts`** | A part range in the introduction that does not match `tools/programs.json`. This is the one class the parity checks are structurally blind to: C4, C8, C12 and C14 all compare the two **editions**, so a range stale in both stays green \dash{} and seven of the introduction's nine were wrong in both, on page one, for the whole of the book. Compares against the manifest, positionally and in order, because the part names differ between the editions by design |
 | `check_structure.py --frames` | A cue that is not the **last thing** in its frame. C16 counts cues and cannot see position, so a cue misplaced identically in both editions is invisible to C4, C14 and C16 alike. It is a *line* test on purpose: a cue hoisted above a frame's closing prose tokenises to nothing after it and reads as correctly placed |
 | `reflist.py` | `\label{prog:F08}` resolving to F8 in one edition and F9 in the other. Both builds stay internally consistent and neither warns |
 | **`checkpdf.py`** (openers) | A frame's rule and margin badge stranded at the foot of a page with the frame's body overleaf. It reads the finished PDF, because that defect produces no error, no warning and no overfull box — no log can see it, and the badge it strands is the book's navigation device |
@@ -11266,8 +11275,12 @@ summary on every build.
 4. `python3 tools/parity.py` — zero failures before you commit
 5. `python3 tools/check_structure.py --frames` — every frame number the program
    quotes exists, and every cue is the last thing in its frame. And
-   `--scripts`, which `make check` runs: every `\transcript{}` names a file
-   that is there
+   `--scripts`, `--terms` and `--parts`, which `make check` runs: every
+   `\transcript{}` names a file that is there, every glossary rendering is a
+   word the Polish prose writes, and the introduction's map of the book
+   matches the manifest. **Run all of these BEFORE the build**, not after —
+   they read the source, none of them needs a PDF, and they cost seconds
+   against a build that costs tens of minutes
 6. `make debt` and `make verify` — confirm the ledgers moved the way you
    expected, and that no computed value or transcript has drifted from its
    script
@@ -11284,41 +11297,51 @@ clone instead.
 
 ## What is left
 
-1. **Appendices E and F.** C and D are written; these two are the whole of
-   the remaining writing, and there is no longer a program behind them to
-   hide the fact. E is where to go next, F is the manifest. **The appendices
-   are not in `tools/programs.json`**, so there is nothing to re-derive an
-   owner from: each brief lives only in its own `\programstub{}`, in
+1. **Appendix F, and it is the last thing left to write.** C, D and E are
+   done. **Its brief is three things, not one** \dash{} the diagram manifest,
+   the measurement table, and the outstanding-work ledgers, *printed rather
+   than merely counted by the build*, because \emph{a reader is entitled to
+   know what the book still owes them}. This entry called it \enquote{the
+   diagram manifest} in its first draft, which is the class this whole file
+   keeps recording: written from the feel of the file rather than from the
+   file, and corrected by opening it. **The appendices are not in
+   `tools/programs.json`**, so there is nothing to re-derive an owner from:
+   F's brief lives only in its own `\programstub{}`, in
    `appendices/{en,pl}/`, and that is the whole contract.
 
-   **C is done and its exposure was retired structurally rather than
-   policed**, which is the thing to copy if D or E turns out to make claims
-   about the book. The decision this entry used to leave to the author is
-   taken: nothing in Appendix~C is transcribed, every line of it is a
-   `\result{}` mark in the Summary of the program that establishes it, and
-   the coordinate therefore cannot be wrong. The full pass note is above; the
-   part that matters here is why it was worth the mechanical edit across
-   forty-seven programs in two editions. **An appendix collecting what the
-   book proved is a claim about the book on every line**, which is the one
-   class nothing in this repository can check, and Appendix~B is the standing
-   warning: Program~\ref{prog:P18}'s pass found four false pointers in it,
-   Program~\ref{prog:P23}'s fixed the rest, and the audit that settled all
-   four was five greps nobody had run since the appendix was written. An
-   audit makes that defect detectable. Marking at the point of use makes it
-   impossible.
+   **Read the three that are finished as a gradient of protection, because F
+   sits at the top of it and can take the most.** C is marked at the point of
+   use, so its coordinates cannot be wrong. D's rows are gated against the
+   Polish prose, but the prose *between* its tables is not, and it made
+   exactly the failure the rows are gated against \dash{} **a gate is as wide
+   as the construct it parses**. E could take neither, being derived from
+   nothing a program carries, so it was held to the older instruction: read
+   the brief as a checklist, grep the destination before writing the
+   sentence, and say plainly which of its claims are verdicts and which are
+   bare pointers.
 
-   **D took half of that protection and E cannot take any of it.** D's rows
-   are `\plterm{}{}{}` and `check_structure.py --terms` requires every Polish
-   rendering they name to occur in the prose of `programs/pl`, so the row
-   that names a word the book does not use is now impossible rather than
-   merely detectable \dash{} and `notes/03`'s suggested table had two of
-   them. But **a gate is as wide as the construct it parses**: the prose
-   between D's tables made the same failure in the same pass, naming an
-   inflection the Polish edition never writes, and nothing would have caught
-   it. E is a further-reading list, derived from nothing a program carries,
-   so for E the older instruction is the only one available: read the brief
-   as a checklist, and grep the destination before writing the sentence
-   rather than after.
+   **F's first third needs almost none of that**, and that is the point of
+   leaving it last: `\mermaidfig` already accumulates the manifest at the
+   point of use, exactly as `\answerto`, `\canyou` and `\result{}` do, so
+   that coordinate cannot be wrong either, and `\listofdiagrams` is already
+   in the stub. **The other two thirds get none of it.** The measurement
+   table is `notes/01` §17's Status column, which is prose maintained by hand
+   and which sat wrong for five programs; the ledgers are the ones at the top
+   of this file, which is where the 27-against-54 above came from. So the
+   part of F that looks hardest is the part that is already done, and the
+   part that looks like transcription is the part that will be wrong \dash{}
+   write both against their instruments rather than from memory of them, and
+   quote the number the instrument prints.
+
+   **And the standing warning for any appendix that describes the book is
+   Appendix~B**, which was hand-authored, shipped four false pointers, and
+   needed two separate passes to find them by reading. An audit makes that
+   class detectable. Accumulating at the point of use makes it impossible.
+   **E's pass found the same class in the front matter** \dash{} seven of the
+   introduction's nine part ranges wrong, in both editions, on page one, with
+   every gate green because the gates compare the editions to each other.
+   `check_structure.py --parts` closes that one; nothing closes the general
+   case except opening the file you are describing.
 
 2. **The trained-model debt: five entries, one of them half answered.** It is
    the first thing in this book that cannot be done from a sandbox at all.

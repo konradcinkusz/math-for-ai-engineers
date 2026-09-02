@@ -1,4 +1,4 @@
-.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 scripts terms \
+.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 scripts terms parts \
         text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames elicit outcomes values translate shots debt
 
@@ -40,6 +40,7 @@ check:
 	@python3 tools/gen_stubs.py --check
 	@python3 tools/check_structure.py --scripts
 	@python3 tools/check_structure.py --terms
+	@python3 tools/check_structure.py --parts
 	@python3 tools/checklog.py main-en.log main-pl.log
 	@python3 tools/checkpdf.py main-en.pdf main-pl.pdf
 	@python3 tools/parity.py | tail -n 3
@@ -252,6 +253,17 @@ scripts:
 terms:
 	@python3 tools/check_structure.py --terms
 
+# 5b. The introduction's own map of the book, against the manifest.
+#     This is the one class the parity checks are structurally blind to:
+#     C4, C8, C12 and C14 all compare the two EDITIONS, so a part range
+#     that is stale in both stays green. Seven of the nine ranges were
+#     wrong in both introductions for the whole of the book -- the P7
+#     insertion, never swept out of the prose -- on page one, with every
+#     gate passing. Compare against tools/programs.json, never between
+#     the editions.
+parts:
+	@python3 tools/check_structure.py --parts
+
 # 6. The two editions out of step. tools/parity.py is the single parity tool;
 #    it compares an ORDERED structural signature rather than counts, because a
 #    histogram cannot see \yourturn moving from frame 2 to frame 3, and every
@@ -279,6 +291,7 @@ debt:
 	@echo; echo "== Computed values =="           ; $(MAKE) -s values
 	@echo; echo "== Transcripts on the page =="   ; $(MAKE) -s scripts
 	@echo; echo "== Appendix D terminology =="   ; $(MAKE) -s terms
+	@echo; echo "== The introduction's map =="    ; $(MAKE) -s parts
 	@echo; echo "== Polish/English parity =="     ; $(MAKE) -s translate
 	@echo; echo "== Unverified claims, diagrams ="; $(MAKE) -s shots
 	@echo
