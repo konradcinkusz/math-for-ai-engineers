@@ -940,80 +940,80 @@ before writing the loop.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Two questions decide which rule applies}: does the
+\sumitem{1--2}{\result{\textbf{Two questions decide which rule applies}: does the
   order matter, and may anything repeat? \enquote{Pick $\val{p12.four.k}$ of
   $\val{p12.four.n}$} sounds complete and has three defensible answers until
-  both are settled.}
-\sumitem{3--4}{Two of the four counts, of $\val{p12.four.k}$ from
+  both are settled}.}
+\sumitem{3--4}{\result{Two of the four counts, of $\val{p12.four.k}$ from
   $\val{p12.four.n}$: $n^{k} = \val{p12.four.ordrep}$ ordered with repeats,
   and $\frac{n!}{(n-k)!} = \val{p12.four.ordnorep}$ ordered without, where the
-  pool shrinks by one at each step.}
-\sumitem{4--5}{The product rule needs \textbf{the number of options at each
+  pool shrinks by one at each step}.}
+\sumitem{4--5}{\result{The product rule needs \textbf{the number of options at each
   step to be fixed, not the options themselves}, which is why a shrinking pool
   multiplies anyway. Program~\ref{prog:F10}'s stronger statement is the one
   for checking a grid; this weaker one is what lets an arrangement count be a
-  product at all.}
-\sumitem{6}{$\binom{n}{k} = \val{p12.four.unordnorep}$ is the arrangements
+  product at all}.}
+\sumitem{6}{\result{$\binom{n}{k} = \val{p12.four.unordnorep}$ is the arrangements
   divided by the $k! = \val{p12.kfact}$ orders each selection was counted in,
   and \textbf{that division is Program~\ref{prog:F10}'s \enquote{halve it}
-  generalised} \dash{} it halved because $2! = 2$.}
-\sumitem{7--8}{The fourth cell, unordered with repeats, is
+  generalised} \dash{} it halved because $2! = 2$}.}
+\sumitem{7--8}{\result{The fourth cell, unordered with repeats, is
   $\binom{n+k-1}{k} = \val{p12.four.unordrep}$, stated and not derived. The
   four counts of the same ten things taken three at a time span a factor of
-  more than eight.}
-\sumitem{9--10}{$\val{p12.four.n}!$ is $\val{p12.fact.n}$ orderings, and
+  more than eight}.}
+\sumitem{9--10}{\result{$\val{p12.four.n}!$ is $\val{p12.fact.n}$ orderings, and
   $n! = \frac{n!}{(n-k)!} \times (n-k)!$ is the shrinking pool read backwards
   \dash{} which is why an arrangement count is written as a quotient and
-  computed as a product.}
-\sumitem{11--12}{$\binom{n}{k} = \frac{n!}{k!(n-k)!}$, \emph{symbol Newtona} in
+  computed as a product}.}
+\sumitem{11--12}{\result{$\binom{n}{k} = \frac{n!}{k!(n-k)!}$, \emph{symbol Newtona} in
   Polish. $\binom{n}{2} = \frac{n(n-1)}{2}$ is Program~\ref{prog:F10}'s pair
-  count, and the build fails if the two disagree.}
-\sumitem{13--14}{\textbf{$\binom{n}{k} = \binom{n}{n-k}$, because choosing what
+  count, and the build fails if the two disagree}.}
+\sumitem{13--14}{\result{\textbf{$\binom{n}{k} = \binom{n}{n-k}$, because choosing what
   to keep is choosing what to drop.} Both are $\val{p12.sym.val}$ at
   $\val{p12.sym.n}$ taken $\val{p12.sym.k}$ or $\val{p12.sym.rest}$ at a
-  time.}
-\sumitem{15--16}{An ablation over every subset of $\val{p12.abl.n}$ features
+  time}.}
+\sumitem{15--16}{\result{An ablation over every subset of $\val{p12.abl.n}$ features
   is $\val{p12.abl.all}$ runs; capped at $\val{p12.abl.k}$ features it is
-  $\val{p12.abl.upto}$, a factor of $\val{p12.abl.frac}$.}
-\sumitem{17--20}{\textbf{Pascal's rule
+  $\val{p12.abl.upto}$, a factor of $\val{p12.abl.frac}$}.}
+\sumitem{17--20}{\result{\textbf{Pascal's rule
   $\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}$} is a recurrence and is
   how the coefficient is computed; summing a row gives
   $\val{p12.abl.all} = 2^{\val{p12.abl.n}}$, because choosing a size and then
-  which is the same act as deciding in-or-out per element.}
-\sumitem{21--23}{\textbf{Inclusion--exclusion: the signs alternate because each
+  which is the same act as deciding in-or-out per element}.}
+\sumitem{21--23}{\result{\textbf{Inclusion--exclusion: the signs alternate because each
   round of correction overshoots the last.} Three sets of
   $\val{p12.ie.a}$, $\val{p12.ie.b}$ and $\val{p12.ie.c}$ hold
   $\val{p12.ie.union}$ distinct examples, not $\val{p12.ie.naive}$. It has
-  $2^{n}-1$ terms, so past three sets build the union instead.}
-\sumitem{24--26}{\textbf{Pigeonhole: $m$ items in $n$ boxes put at least
+  $2^{n}-1$ terms, so past three sets build the union instead}.}
+\sumitem{24--26}{\result{\textbf{Pigeonhole: $m$ items in $n$ boxes put at least
   $\lceil m/n \rceil$ somewhere}, whatever the hash does. It makes collisions
   \emph{certain} at $\val{p12.pig.certain64}$ items, which is not the number
-  that decides anything.}
-\sumitem{27--28}{\textbf{The birthday count is over pairs, not items.}
+  that decides anything}.}
+\sumitem{27--28}{\result{\textbf{The birthday count is over pairs, not items.}
   $\val{p12.bday.m}$ people make $\val{p12.bday.pairs}$ pairs and share a
   birthday with probability $\val{p12.bday.p}$ per cent, against the
-  $\val{p12.bday.naive}$ per cent that answers a different question.}
-\sumitem{29--31}{Two formulas, each right where the other fails: the exact
+  $\val{p12.bday.naive}$ per cent that answers a different question}.}
+\sumitem{29--31}{\result{Two formulas, each right where the other fails: the exact
   product is exact on the birthday case and returns \textbf{exactly zero} at
   $\val{p12.bits128}$ bits, while the exponential is
   $\val{p12.reg.bday.closed}$ out there and right to fifteen figures at hash
-  scale. Program~\ref{prog:P02}'s rule, in a hash.}
-\sumitem{32--35}{\textbf{A hash's safe capacity is about the square root of its
+  scale. Program~\ref{prog:P02}'s rule, in a hash}.}
+\sumitem{32--35}{\result{\textbf{A hash's safe capacity is about the square root of its
   number of values.} $\val{p12.hash.m}$ documents in $\val{p12.bits64}$ bits
   collide with probability $\val{p12.hash.p64}$ per cent \dash{}
   $\val{p12.hash.ratio}$ times the figure the naive reading gives \dash{} and
   the coin flip is at $\val{p12.hash.half64}$ documents against
-  $\val{p12.hash.half128}$ for $\val{p12.bits128}$ bits.}
-\sumitem{36--38}{$\val{p12.beam.vocab}^{\val{p12.beam.len}}$ is
+  $\val{p12.hash.half128}$ for $\val{p12.bits128}$ bits}.}
+\sumitem{36--38}{\result{$\val{p12.beam.vocab}^{\val{p12.beam.len}}$ is
   $\val{p12.beam.space}$ sequences and a beam of $\val{p12.beam.a}$ scores
   $\val{p12.beam.scored.a}$ of them. \textbf{Doubling the beam doubles a
   fraction of $\val{p12.beam.frac.a}$}, so coverage cannot be why a wider beam
-  helps.}
-\sumitem{39--43}{\textbf{A Shapley value averages over every ordering, and the
+  helps}.}
+\sumitem{39--43}{\result{\textbf{A Shapley value averages over every ordering, and the
   orderings collapse to $2^{n}$ subsets} because only which features came
   before matters. $\val{p12.shap.big.coal}$ at $\val{p12.shap.big}$ features
   and $\val{p12.shap.huge.coal}$ at $\val{p12.shap.huge}$, so every
-  implementation samples \dash{} and the bars carry an error nobody plots.}
+  implementation samples \dash{} and the bars carry an error nobody plots}.}
 \end{summarybox}
 
 \canyou

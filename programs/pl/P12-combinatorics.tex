@@ -935,86 +935,86 @@ napiszesz pętlę.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Dwa pytania rozstrzygają, która reguła obowiązuje}: czy
+\sumitem{1--2}{\result{\textbf{Dwa pytania rozstrzygają, która reguła obowiązuje}: czy
   kolejność ma znaczenie i czy coś może się powtórzyć?
   \enquote{Wybierz $\val{p12.four.k}$ z $\val{p12.four.n}$} brzmi jak pełne
   polecenie i ma trzy dające się obronić odpowiedzi, dopóki obie nie zostaną
-  ustalone.}
-\sumitem{3--4}{Dwie z czterech liczb, dla $\val{p12.four.k}$ z
+  ustalone}.}
+\sumitem{3--4}{\result{Dwie z czterech liczb, dla $\val{p12.four.k}$ z
   $\val{p12.four.n}$: $n^{k} = \val{p12.four.ordrep}$ z kolejnością i
   powtórzeniami oraz $\frac{n!}{(n-k)!} = \val{p12.four.ordnorep}$ z
-  kolejnością bez powtórzeń, gdzie pula kurczy się o jeden na każdym kroku.}
-\sumitem{4--5}{Reguła iloczynu potrzebuje \textbf{ustalonej liczby możliwości
+  kolejnością bez powtórzeń, gdzie pula kurczy się o jeden na każdym kroku}.}
+\sumitem{4--5}{\result{Reguła iloczynu potrzebuje \textbf{ustalonej liczby możliwości
   na każdym kroku, a nie ustalonych możliwości}, i dlatego kurcząca się pula
   i tak się mnoży. Mocniejsze sformułowanie z~Programu~\ref{prog:F10} jest do
   sprawdzania siatki; to słabsze pozwala liczbie wariacji w ogóle być
-  iloczynem.}
-\sumitem{6}{$\binom{n}{k} = \val{p12.four.unordnorep}$ to wariacje podzielone
+  iloczynem}.}
+\sumitem{6}{\result{$\binom{n}{k} = \val{p12.four.unordnorep}$ to wariacje podzielone
   przez $k! = \val{p12.kfact}$ kolejności, w których każdy wybór został
   policzony, a \textbf{to dzielenie jest krokiem \enquote{podziel przez dwa}
   z~Programu~\ref{prog:F10} w wersji ogólnej} \dash{} dzielił przez dwa, bo
-  $2! = 2$.}
-\sumitem{7--8}{Czwarta komórka, bez kolejności i z powtórzeniami, to
+  $2! = 2$}.}
+\sumitem{7--8}{\result{Czwarta komórka, bez kolejności i z powtórzeniami, to
   $\binom{n+k-1}{k} = \val{p12.four.unordrep}$, podana i niewyprowadzona.
   Cztery liczby opisujące te same dziesięć rzeczy branych po trzy rozpinają
-  współczynnik ponad ośmiu.}
-\sumitem{9--10}{$\val{p12.four.n}!$ to $\val{p12.fact.n}$ ustawień, a
+  współczynnik ponad ośmiu}.}
+\sumitem{9--10}{\result{$\val{p12.four.n}!$ to $\val{p12.fact.n}$ ustawień, a
   $n! = \frac{n!}{(n-k)!} \times (n-k)!$ to kurcząca się pula czytana od tyłu
   \dash{} i dlatego liczbę wariacji zapisuje się jako iloraz, a liczy jako
-  iloczyn.}
-\sumitem{11--12}{$\binom{n}{k} = \frac{n!}{k!(n-k)!}$, po polsku \emph{symbol
+  iloczyn}.}
+\sumitem{11--12}{\result{$\binom{n}{k} = \frac{n!}{k!(n-k)!}$, po polsku \emph{symbol
   Newtona}. $\binom{n}{2} = \frac{n(n-1)}{2}$ to liczba par
   z~Programu~\ref{prog:F10}, a budowanie przerywa się, gdy te dwie się nie
-  zgadzają.}
-\sumitem{13--14}{\textbf{$\binom{n}{k} = \binom{n}{n-k}$, bo wybór tego, co
+  zgadzają}.}
+\sumitem{13--14}{\result{\textbf{$\binom{n}{k} = \binom{n}{n-k}$, bo wybór tego, co
   zostaje, jest wyborem tego, co odpada.} Oba to $\val{p12.sym.val}$ przy
   $\val{p12.sym.n}$ branych po $\val{p12.sym.k}$ albo po
-  $\val{p12.sym.rest}$.}
-\sumitem{15--16}{Ablacja po każdym podzbiorze $\val{p12.abl.n}$ cech to
+  $\val{p12.sym.rest}$}.}
+\sumitem{15--16}{\result{Ablacja po każdym podzbiorze $\val{p12.abl.n}$ cech to
   $\val{p12.abl.all}$ przebiegów; ograniczona do $\val{p12.abl.k}$ cech to
-  $\val{p12.abl.upto}$, czyli współczynnik $\val{p12.abl.frac}$.}
-\sumitem{17--20}{\textbf{Rekurencja Pascala
+  $\val{p12.abl.upto}$, czyli współczynnik $\val{p12.abl.frac}$}.}
+\sumitem{17--20}{\result{\textbf{Rekurencja Pascala
   $\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}$} to rekurencja i tak
   właśnie symbol się liczy; suma wiersza daje
   $\val{p12.abl.all} = 2^{\val{p12.abl.n}}$, bo wskazanie rozmiaru, a potem
   elementów, to to samo działanie co decyzja w-środku-czy-poza dla każdego
-  elementu.}
-\sumitem{21--23}{\textbf{Włączenia i wyłączenia: znaki zmieniają się na
+  elementu}.}
+\sumitem{21--23}{\result{\textbf{Włączenia i wyłączenia: znaki zmieniają się na
   przemian, bo każda runda poprawek przestrzeliwa poprzednią.} Trzy zbiory o
   $\val{p12.ie.a}$, $\val{p12.ie.b}$ i $\val{p12.ie.c}$ mieszczą
   $\val{p12.ie.union}$ różnych przykładów, a nie $\val{p12.ie.naive}$. Reguła
-  ma $2^{n}-1$ składników, więc powyżej trzech zbiorów buduj sumę.}
-\sumitem{24--26}{\textbf{Szufladki: $m$ elementów w $n$ szufladach wkłada co
+  ma $2^{n}-1$ składników, więc powyżej trzech zbiorów buduj sumę}.}
+\sumitem{24--26}{\result{\textbf{Szufladki: $m$ elementów w $n$ szufladach wkłada co
   najmniej $\lceil m/n \rceil$ do którejś}, cokolwiek robi funkcja skrótu.
   Czyni kolizje \emph{pewnymi} przy $\val{p12.pig.certain64}$ elementach, a to
-  nie jest liczba rozstrzygająca cokolwiek.}
-\sumitem{27--28}{\textbf{Rachunek urodzinowy liczy pary, a nie elementy.}
+  nie jest liczba rozstrzygająca cokolwiek}.}
+\sumitem{27--28}{\result{\textbf{Rachunek urodzinowy liczy pary, a nie elementy.}
   $\val{p12.bday.m}$ osób daje $\val{p12.bday.pairs}$ par i dzieli urodziny z
   prawdopodobieństwem $\val{p12.bday.p}$ procent, wobec
-  $\val{p12.bday.naive}$ procent odpowiadających na inne pytanie.}
-\sumitem{29--31}{Dwa wzory, każdy dobry tam, gdzie drugi zawodzi: iloczyn
+  $\val{p12.bday.naive}$ procent odpowiadających na inne pytanie}.}
+\sumitem{29--31}{\result{Dwa wzory, każdy dobry tam, gdzie drugi zawodzi: iloczyn
   dokładny jest dokładny w przypadku urodzinowym i zwraca \textbf{dokładnie
   zero} przy $\val{p12.bits128}$ bitach, a eksponenta myli się tam o
   $\val{p12.reg.bday.closed}$ i jest dobra do piętnastu cyfr przy skali
-  skrótów. Reguła Programu~\ref{prog:P02}, w funkcji skrótu.}
-\sumitem{32--35}{\textbf{Bezpieczna pojemność skrótu to mniej więcej
+  skrótów. Reguła Programu~\ref{prog:P02}, w funkcji skrótu}.}
+\sumitem{32--35}{\result{\textbf{Bezpieczna pojemność skrótu to mniej więcej
   pierwiastek z liczby jego wartości.} $\val{p12.hash.m}$ dokumentów przy
   $\val{p12.bits64}$ bitach zderza się z prawdopodobieństwem
   $\val{p12.hash.p64}$ procent \dash{} $\val{p12.hash.ratio}$ razy więcej niż
   daje naiwne czytanie \dash{} a rzut monetą wypada przy
   $\val{p12.hash.half64}$ dokumentach wobec $\val{p12.hash.half128}$ dla
-  $\val{p12.bits128}$ bitów.}
-\sumitem{36--38}{$\val{p12.beam.vocab}^{\val{p12.beam.len}}$ to
+  $\val{p12.bits128}$ bitów}.}
+\sumitem{36--38}{\result{$\val{p12.beam.vocab}^{\val{p12.beam.len}}$ to
   $\val{p12.beam.space}$ ciągów, a wiązka o $\val{p12.beam.a}$ ocenia
   $\val{p12.beam.scored.a}$ z nich. \textbf{Podwojenie wiązki podwaja ułamek
   $\val{p12.beam.frac.a}$}, więc pokrycie nie może być powodem, dla którego
-  szersza wiązka pomaga.}
-\sumitem{39--43}{\textbf{Wartość Shapleya uśrednia po każdej kolejności, a
+  szersza wiązka pomaga}.}
+\sumitem{39--43}{\result{\textbf{Wartość Shapleya uśrednia po każdej kolejności, a
   kolejności zwijają się w $2^{n}$ podzbiorów}, bo liczy się tylko to, które
   cechy były wcześniej. $\val{p12.shap.big.coal}$ przy
   $\val{p12.shap.big}$ cechach i $\val{p12.shap.huge.coal}$ przy
   $\val{p12.shap.huge}$, więc każda implementacja próbkuje \dash{} a słupki
-  niosą błąd, którego nikt nie rysuje.}
+  niosą błąd, którego nikt nie rysuje}.}
 \end{summarybox}
 
 \canyou
