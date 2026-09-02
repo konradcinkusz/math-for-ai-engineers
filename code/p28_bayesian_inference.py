@@ -237,8 +237,9 @@ if _p23_lr and _p23_den:
     _num = committed("p23.tex", "p23.ppv.num")
     _den2 = committed("p23.tex", "p23.ppv.den")
     assert ppv == Fraction(int(_num), int(_den2)), (ppv, _num, _den2)
-    emit("p28.p23.lr", lr)
-    emit("p28.p23.den", den)
+    # Nothing emitted: this is a GATE, not a quantity the page quotes.
+    # Program P17's pass named the class -- a gate belongs in the assertion
+    # and never in the value ledger, or C7 reports it as unused for ever.
     NOTES.append(f"P23's odds form reproduces: prior odds 1 to {den-1}, "
                  f"likelihood ratio {lr}, posterior {_num}/{_den2}.")
 
@@ -257,9 +258,10 @@ N = int(committed("p27.tex", "p27.boot.n") or 200)
 emit("p28.k", K)
 emit("p28.n", N)
 
+# Not emitted either: 1 + 143 and 1 + 57 are arithmetic the reader does in
+# their head from two numbers the page already prints, which is this book's
+# stated exception to computing everything.
 POST_A, POST_B = PRIOR_A + K, PRIOR_B + N - K
-emit("p28.post.a", POST_A)
-emit("p28.post.b", POST_B)
 
 # The posterior mean is a weighted average of the prior mean and the data
 # mean, with weights (a+b) and n.  So a Beta(a,b) prior is worth EXACTLY
@@ -327,8 +329,20 @@ GAP_HI = abs(CRED_HI - _conf_hi)
 # boundary, and Program F05's fix applies: state the bound the claim actually
 # is.  Both intervals are printed, so a reader can do the two subtractions.
 assert max(GAP_LO, GAP_HI) < _grid, (GAP_LO, GAP_HI, _grid)
+# AND THE CLAIM HAS TO SURVIVE THE PAGE, which is a second check and it is the
+# one that bit.  The true worst gap is 0.4978, strictly under the grid -- but
+# the page prints 77.3 and 77.8, which subtract to exactly 0.5, so a frame
+# saying "under the grid" does not reproduce from its own numbers.  This
+# asserts the weaker claim the printed figures actually support, and the
+# frames say "no larger than" rather than "under".  Programs F04, F05, P07,
+# P12, P23 and P27 each paid for the general rule; this is the first time it
+# has bitten an INEQUALITY rather than a ratio.
+_shown = max(abs(float(f"{CRED_LO:.1f}") - float(f"{_conf_lo:.1f}")),
+             abs(float(f"{CRED_HI:.1f}") - float(f"{_conf_hi:.1f}")))
+assert _shown <= _grid + 1e-9, (_shown, _grid)
 NOTES.append(f"credible and confidence intervals differ by at most "
-             f"{max(GAP_LO, GAP_HI):.2f} points, under P27's {_grid}-point grid")
+             f"{max(GAP_LO, GAP_HI):.2f} points exactly and {_shown:.1f} as "
+             f"printed, neither above P27's {_grid}-point grid")
 
 # Where the prior DOES matter: the same two priors at n = 5.
 S_POST = (PRIOR_A + SMALL_K, PRIOR_B + SMALL_N - SMALL_K)
