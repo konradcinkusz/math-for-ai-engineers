@@ -1,0 +1,5 @@
+graph LR
+  S["the loss has not gone below<br/>where it was 500 steps ago"] --> A["the run has stopped<br/>learning anything"]
+  S --> B["the run is learning,<br/>and the noise on a batch<br/>is larger than the progress"]
+  A --> C["one of these needs<br/>an intervention and the<br/>other needs patience"]
+  B --> C

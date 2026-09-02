@@ -481,7 +481,7 @@ Fill the column in the pass that runs the experiment; never restate a total.
 | E7 | P27 | Bootstrap confidence-interval width against evaluation-set size on a public benchmark; the size needed to resolve one point | Free | not run |
 | E8 | P30 | Forward against reverse KL fitted to the same bimodal target; mode covering against mode seeking | Free | **run, P30 pass** — see the note |
 | E9 | **P25**, then P32 | **The headline.** Logit variance and softmax entropy with and without `1/sqrt(d_k)`, across head sizes | Free | **run: P25 pass on random vectors, P32 pass through the assembly** |
-| E10 | P33 | A scaling-law power fit on published numbers, with the fit's extrapolation uncertainty reported | Cheap | not run |
+| E10 | P33 | A scaling-law power fit on published numbers, with the fit's extrapolation uncertainty reported | Cheap | **run, P33 pass — split, see the note** |
 
 **E9's owner moved and the table had not.** The curriculum review put the
 derivation of the scaling in P25, so E9 as specified — random vectors, head
@@ -505,6 +505,22 @@ weight draw rather than an average**, so its own scores sit a few per cent off
 the nominal before training starts. The remaining half — whether the
 independence the derivation assumes survives training — still needs a trained
 model and is stated as outstanding.
+
+**E10 was run in the P33 pass, and P32's question split it.** The
+specification says “on published numbers”, and the P32 pass established the
+habit of asking whether a claim needs external data or is a statement about
+the object itself. Here the half that carries the argument needs nothing
+external: **how far a power-law fit can be trusted past its last point is a
+property of the fit and of the span**, and it is exactly computable when the
+truth is known, because the script chose it. So the truth is the form the
+literature itself uses — an irreducible loss plus a power law — and a *pure*
+power law is fitted to it, which is what everybody fits. Over three decades
+the fit misses by half of one per cent; three decades further out it is six
+per cent wrong, the truth lies **outside** its own two-standard-error band,
+and about six decades past the last measured point the fitted line predicts a
+loss below the irreducible floor. What a published paper would add is one
+specific exponent, and the frames say so rather than pretending the general
+claim needs it.
 
 **E8 was run in the P30 pass and nobody had claimed it**, which is the fifth
 instance of exactly the decay this Status column exists to stop.

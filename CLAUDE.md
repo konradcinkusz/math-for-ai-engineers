@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P32 written, both editions \dash{} Parts I to VIII entire, and Part IX begun.** P33–P34 are stubs carrying their briefs | 2 of 47 |
+| Programs | **F1–F13 and P1–P33 written, both editions \dash{} Parts I to VIII entire, and Part IX all but its last program.** P34 is a stub carrying its brief | 1 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -94,7 +94,7 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **2 of 47 programs are stubs**, in each language. This is the whole of the
+- **1 of 47 programs is a stub**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
@@ -149,9 +149,9 @@ what was there before.
   **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22**,
   **53% in P23**, **46% in P24**, **48% in P25**, **52% in P26** and
   **53% in P27**, **54% in P28**, **55% in P29**, **52% in P30**, **50% in
-  P31** and **51% in P32** \dash{} P29 is the highest outside Part I, with P28
-  next and then P23 and P27; P26 and P30 follow, and P13, P15, P17, P31 and
-  P32 reach or pass the book's own rate.**
+  P31**, **51% in P32** and **52% in P33** \dash{} P29 is the highest outside
+  Part I, with P28 next and then P23 and P27; P26, P30 and P33 follow, and
+  P13, P15, P17, P31 and P32 reach or pass the book's own rate.**
   **P24 is the first program whose rate is visible in its frame count**: nine
   of its sixty-four frames exist because the draft was raised from 36%, which
   is the elicitation ledger's cost measured in frames rather than in pages.
@@ -10204,17 +10204,30 @@ clone instead.
 
 ## What is left
 
-1. **Two programs, and Part IX has begun.** F1 to F13 and P1 to P32, both
-   editions. What remains is P33, P34 and the appendices.
+1. **One program.** F1 to F13 and P1 to P33, both editions. What remains is
+   P34 and the appendices.
 
-   **P33 is next** \dash{} *Anatomy of a training run* \dash{} and Part IX's
+   **P34 is next** \dash{} *Measuring a model honestly* \dash{} and Part IX's
    contract still holds: it introduces **no new mathematics**. Read
-   `tools/programs.json` for its brief and then do what the last six passes
+   `tools/programs.json` for its brief and then do what the last seven passes
    did: **read the brief as a checklist and read the neighbours' file headers
    with it.** That question has been cheaper than \enquote{what is left of
-   the subject} seven times running, and P32 is the strongest case yet
-   \dash{} eight of the eleven handovers its brief brackets were already
-   spent, and naming the three that were not is what shaped the program.
+   the subject} eight times running, and P33 is the cleanest case yet
+   \dash{} the only program that defers to it is F03, which wrote down both
+   halves of what it was leaving when it left them, so there was nothing to
+   sort.
+
+   **P34's brief brackets six handovers and at least four are visibly
+   spent**, which is worth knowing before estimating it: the bootstrap, the
+   paired comparison and the power calculation are Program~\ref{prog:P27} in
+   full, the judge model's stated probability is Program~\ref{prog:P28}'s
+   §6, cost per token is Program~\ref{prog:P03}'s, and the limits of the
+   information-theoretic measures are Programs~\ref{prog:P29} to
+   \ref{prog:P31}'s. What is left is the **design** \dash{} an evaluation
+   read as an estimation problem rather than as a score \dash{} and the
+   closing discipline both companion volumes are built on. Its estimate is
+   fifty-five and Part IX's two written programs came in at thirty-nine and
+   fifty-four against seventy and sixty.
 
    **Part IX is a different job from the eight parts before it**, and the
    estimates should not be read the same way. Every program so far came in
@@ -10345,7 +10358,12 @@ clone instead.
    \emph{everything} was spent by construction and the pass's whole job was
    to find the three things that were not. A Part IX estimate measures the
    assembly rather than the subject, and should not be read against the
-   twenty-four before it.
+   twenty-four before it. **P33 came in at fifty-four against sixty**, which
+   is the smallest shortfall Part IX will produce and is the same contract
+   read from the other end: its brief bracketed six pieces and all six were
+   spent, so what remained was the *order* they go in and the one question
+   no owner could ask \dash{} which of the six, got wrong, raises nothing.
+   That question is the program, and it is long because the answer is four.
    **A brief's frame estimate is otherwise a planning figure from before its
    neighbours were written**, and the elicitation rate is paid in frames on top
    of it. It is not a target \dash{} and the record above is also the reason
