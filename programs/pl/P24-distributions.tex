@@ -1075,109 +1075,109 @@ jest odwracalna.}{przeważyć czy usunąć}
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Zmienna losowa} jest \emph{funkcją} z przestrzeni
+\sumitem{1--3}{\result{\textbf{Zmienna losowa} jest \emph{funkcją} z przestrzeni
   zdarzeń w liczby. Nie jest losowa i nie jest zmienną: losowość siedzi w tym,
   który wynik poda jej przestrzeń. Wielka litera na regułę, mała na wartość,
-  którą przyjęła.}
-\sumitem{4--5}{Jedna przestrzeń niesie tyle zmiennych losowych, ile
+  którą przyjęła}.}
+\sumitem{4--5}{\result{Jedna przestrzeń niesie tyle zmiennych losowych, ile
   zdefiniujesz, i wszystkie jadą na tym samym losowaniu. Przestrzeń mówi, co
   może się zdarzyć; zmienna losowa to jedno pytanie, które postanowiłeś jej
-  zadać.}
-\sumitem{6--8}{$\Ex[X] = \sum_{\omega}\Prob(\omega)X(\omega)$, czyli
+  zadać}.}
+\sumitem{6--8}{\result{$\Ex[X] = \sum_{\omega}\Prob(\omega)X(\omega)$, czyli
   wartość razy waga z Programu~\ref{prog:F13} z doczepioną nazwą. Jest
-  \emph{liczbą} i nie musi być wartością, którą $X$ może przyjąć.}
-\sumitem{9--10}{\textbf{Wartość oczekiwana wskaźnika jest prawdopodobieństwem
+  \emph{liczbą} i nie musi być wartością, którą $X$ może przyjąć}.}
+\sumitem{9--10}{\result{\textbf{Wartość oczekiwana wskaźnika jest prawdopodobieństwem
   zdarzenia.} Każde prawdopodobieństwo jest wartością oczekiwaną, a każda
   wartość oczekiwana ważoną sumą prawdopodobieństw \dash{} jeden obiekt czytany
-  na dwa sposoby.}
-\sumitem{11--14}{$\Ex[aX + bY] = a\Ex[X] + b\Ex[Y]$ \textbf{bez jakiegokolwiek
+  na dwa sposoby}.}
+\sumitem{11--14}{\result{$\Ex[aX + bY] = a\Ex[X] + b\Ex[Y]$ \textbf{bez jakiegokolwiek
   warunku}, sprawdzone na $X$ i $X^{2}$, które są tak zależne, jak dwie zmienne
-  być mogą. Dowodem jest przestawiona skończona suma.}
-\sumitem{15--17}{Wartość oczekiwana przechodzi przez sumy i mnożenie przez
+  być mogą. Dowodem jest przestawiona skończona suma}.}
+\sumitem{15--17}{\result{Wartość oczekiwana przechodzi przez sumy i mnożenie przez
   stałą, i przez \emph{nic więcej}: $\Ex[XY] = \val{p24.ex.xy}$ wobec
-  $\val{p24.ex.xtimesy}$, a Program~\ref{prog:P19} zajmuje się tym, że nie
+  $\val{p24.ex.xtimesy}$}, a Program~\ref{prog:P19} zajmuje się tym, że nie
   przechodzi też przez funkcję wypukłą.}
-\sumitem{18--20}{$\Var(X) = \Ex[(X - \Ex[X])^{2}] = \Ex[X^{2}] - (\Ex[X])^{2}$,
+\sumitem{18--20}{\result{$\Var(X) = \Ex[(X - \Ex[X])^{2}] = \Ex[X^{2}] - (\Ex[X])^{2}$,
   ta sama liczba dwiema drogami, tutaj $\val{p24.var.x}$. Druga czyta dane raz
-  i to ją Program~\ref{prog:P02} pokazuje zawodzącą.}
+  i to ją Program~\ref{prog:P02} pokazuje zawodzącą}.}
 \sumitem{21}{$\Var(X)$ to $D^{2}(X)$, a $\Ex[X]$ to $M(X)$; kwadrat w $D^{2}$
   zapisuje, że wariancja jest w jednostkach do kwadratu.}
-\sumitem{22--23}{$\Var(aX) = a^{2}\Var(X)$, więc minuty na sekundy mnożą
+\sumitem{22--23}{\result{$\Var(aX) = a^{2}\Var(X)$, więc minuty na sekundy mnożą
   wariancję przez $\val{p24.var.scale.sq}$, a rozrzut przez
   $\val{p24.var.scale}$. Podawaj pierwiastek, tutaj $\val{p24.sd.x}$, bo jest
-  w jednostkach wielkości.}
+  w jednostkach wielkości}.}
 \sumitem{24--25}{To spłaca Program~\ref{prog:P21}, który pożyczył słowo. To, co
   P21 z nim zrobił \dash{} wariancja średniej spadająca jak $1/B$ \dash{}
   dotyczy \emph{sum} i należy do Programu~\ref{prog:P25}. A odchylenie
   standardowe nie jest średnią odległością od średniej.}
-\sumitem{26--27}{$\Cov(X,Y) = \Ex[XY] - \Ex[X]\Ex[Y]$ oraz
+\sumitem{26--27}{\result{$\Cov(X,Y) = \Ex[XY] - \Ex[X]\Ex[Y]$ oraz
   $\Cov(X,X) = \Var(X)$ \dash{} \textbf{wariancja jest kowariancją czegoś z
-  samym sobą.}}
-\sumitem{28--29}{$\Corr$ dzieli kowariancję przez oba rozrzuty i ląduje w
+  samym sobą.}}}
+\sumitem{28--29}{\result{$\Corr$ dzieli kowariancję przez oba rozrzuty i ląduje w
   $\intcc{-1}{1}$. Dla $X$ i $X^{2}$ wynosi $\val{p24.corr.xy}$, dla dwóch
   wielkości, z których jedna wyznacza drugą: \textbf{korelacja widzi część
-  prostoliniową i nic poza nią.}}
-\sumitem{30--31}{$Z$ na $\{-1,0,1\}$ oraz $W = Z^{2}$ mają kowariancję
+  prostoliniową i nic poza nią.}}}
+\sumitem{30--31}{\result{$Z$ na $\{-1,0,1\}$ oraz $W = Z^{2}$ mają kowariancję
   \emph{dokładnie} zero i pełną zależność:
   $\Prob(W = 0) = \frac{1}{\val{p24.tri.n}}$ wobec
   $\Prob(W = 0 \mid Z = 0) = 1$. Niezależność daje zerową korelację;
-  odwrotnie \dash{} nie.}
-\sumitem{32--33}{$\Cov(aX, bY) = ab\Cov(X,Y)$, a korelacja się nie rusza, więc
+  odwrotnie \dash{} nie}.}
+\sumitem{32--33}{\result{$\Cov(aX, bY) = ab\Cov(X,Y)$, a korelacja się nie rusza, więc
   \textbf{czytanie macierzy kowariancji jak macierzy korelacji to czytanie
-  własnych jednostek} \dash{} a obie wyglądają na ekranie identycznie.}
+  własnych jednostek} \dash{} a obie wyglądają na ekranie identycznie}.}
 \sumitem{34--36}{Programowi~\ref{prog:P07} z jego $2\Cov(p,t)$ oraz
   Programom \ref{prog:P10} i \ref{prog:P11} z ich macierzą kowariancji należało
   się słowo, a nie fakty: \textbf{odwołanie w przód, którego fakty da się
   udowodnić lokalnie, powinno być tak udowodnione}. Ograniczenie korelacji to
   geometria z Programu~\ref{prog:P05} na innej przestrzeni.}
-\sumitem{37--38}{\textbf{Bernoulli}: $\Ex = p$, $\Var = p(1-p)$, największa
+\sumitem{37--38}{\result{\textbf{Bernoulli}: $\Ex = p$, $\Var = p(1-p)$, największa
   przy $p = \num{0.5}$. Wskaźnik jest zmienną Bernoulliego, a jego wartość
   oczekiwana prawdopodobieństwem, więc kolumna z rzadką klasą niesie prawie
-  żadnej wariancji.}
-\sumitem{39--40}{\textbf{Dwumianowy}: $nq$ oraz $nq(1-q)$, sprawdzone względem
-  każdego wypisanego wyniku. Na $\val{p24.million}$ żądań detektor podnosi
+  żadnej wariancji}.}
+\sumitem{39--40}{\result{\textbf{Dwumianowy}: $nq$ oraz $nq(1-q)$, sprawdzone względem
+  każdego wypisanego wyniku.} Na $\val{p24.million}$ żądań detektor podnosi
   $\val{p24.alarms.million}$ alarmów, z czego $\val{p24.real.million}$ jest
   prawdziwych, a ich iloraz Program~\ref{prog:P23} podaje jako
   $\val{p23.ppv.pct}$ procent \dash{} prawdopodobieństwo zamienione w liczby,
   o które ludzie się spierają.}
-\sumitem{41--42}{\textbf{Kategoryczny} jest tym, co produkuje softmax, na mocy
+\sumitem{41--42}{\result{\textbf{Kategoryczny} jest tym, co produkuje softmax, na mocy
   własnych dwóch reguł Programu~\ref{prog:P23}, i tym, z czego losuje się
-  token.}
-\sumitem{43--44}{\textbf{Poisson} liczy przybycia w oknie, a
+  token}.}
+\sumitem{43--44}{\result{\textbf{Poisson} liczy przybycia w oknie, a
   \textbf{wykładniczy} mierzy czas oczekiwania między nimi; wykładniczy jest
-  bez pamięci, więc \enquote{już się należy} nigdy nie jest prawdą.}
-\sumitem{45--46}{\textbf{Gauss} po roli: to, czym staje się suma wielu małych
+  bez pamięci, więc \enquote{już się należy} nigdy nie jest prawdą}.}
+\sumitem{45--46}{\result{\textbf{Gauss} po roli: to, czym staje się suma wielu małych
   niezależnych składników. $\val{p24.gauss.one}$ w obrębie jednego rozrzutu i
-  $\val{p24.gauss.two}$ w obrębie dwóch. Twierdzenie należy do
+  $\val{p24.gauss.two}$ w obrębie dwóch.} Twierdzenie należy do
   Programu~\ref{prog:P25}.}
-\sumitem{47--48}{Prawie nic w tej dziedzinie nie jest normalne \dash{}
+\sumitem{47--48}{\result{Prawie nic w tej dziedzinie nie jest normalne \dash{}
   częstości tokenów nie są, opóźnienia nie są \dash{} a \emph{średnie} z nich
-  są. Pytaj, o który z tych dwóch obiektów chodzi w deklarowanej normalności.}
-\sumitem{49--51}{\textbf{Próbkowanie tokena jest losowaniem z rozkładu
+  są. Pytaj, o który z tych dwóch obiektów chodzi w deklarowanej normalności}.}
+\sumitem{49--51}{\result{\textbf{Próbkowanie tokena jest losowaniem z rozkładu
   kategorycznego.} Temperatura przeważa i nie może ruszyć $\argmax$
   (Program~\ref{prog:F05}); każdy token pozostaje możliwy, a edycja jest
-  odwracalna.}
-\sumitem{52--53}{\textbf{Top-$k$ usuwa.} Przy $T = 2$ kasuje
+  odwracalna}.}
+\sumitem{52--53}{\result{\textbf{Top-$k$ usuwa.} Przy $T = 2$ kasuje
   $\val{p24.topk.del.t20}$ procent wagi, a potem \enquote{mało prawdopodobne} i
-  \enquote{niemożliwe} są tym samym.}
-\sumitem{54--55}{Te dwa pokrętła \textbf{walczą ze sobą}: to samo $k$ kasuje
+  \enquote{niemożliwe} są tym samym}.}
+\sumitem{54--55}{\result{Te dwa pokrętła \textbf{walczą ze sobą}: to samo $k$ kasuje
   $\val{p24.topk.del.t05}$ procent przy $T = \num{0.5}$ i
   $\val{p24.topk.del.t20}$ przy $T = 2$, czynnik
   $\val{p24.topk.del.ratio}$, bo temperatura przenosi wagę do ogona, a ogon
-  jest tym, co $k$ tnie.}
-\sumitem{56--57}{\textbf{Top-$p$ zostawia liczbę, która jest wynikiem}: to samo
+  jest tym, co $k$ tnie}.}
+\sumitem{56--57}{\result{\textbf{Top-$p$ zostawia liczbę, która jest wynikiem}: to samo
   $p = \val{p24.topp.mass}$ zostawia $\val{p24.topp.kept.t05}$ tokeny przy
   $T = \num{0.5}$ i $\val{p24.topp.kept.t20}$ przy $T = 2$, a na przemiataniu
-  od $\val{p24.topp.sweep.lo}$ do $\val{p24.topp.sweep.hi}$.}
-\sumitem{58--59}{$\argmax(\ln p + \text{Gumbel})$ jest \emph{dokładnym}
+  od $\val{p24.topp.sweep.lo}$ do $\val{p24.topp.sweep.hi}$}.}
+\sumitem{58--59}{\result{$\argmax(\ln p + \text{Gumbel})$ jest \emph{dokładnym}
   próbkowaniem kategorycznym, a przypadek dwóch tokenów to tożsamość z
-  Programu~\ref{prog:F07} czytana wstecz.}
+  Programu~\ref{prog:F07} czytana wstecz}.}
 \sumitem{60--61}{Przypadek czterech tokenów jest \emph{całkowany}, a nie
   próbkowany, z dokładnością lepszą niż $10^{-11}$, bo próbka
   może co najwyżej pokazać, że sztuczka jest w przybliżeniu dobra.}
-\sumitem{62--63}{Waga kasowana przez top-$k$ i częstość, z jaką te tokeny by
+\sumitem{62--63}{\result{Waga kasowana przez top-$k$ i częstość, z jaką te tokeny by
   wygrały, to \emph{ta sama liczba}, i to jest twierdzenie. Obcięcie nie
-  zniechęca tokena; ono go usuwa.}
+  zniechęca tokena; ono go usuwa}.}
 \sumitem{64}{Nie ma tu tego, co się dzieje, gdy zmienne losowe się
   \emph{dodaje}. Wariancje niezależnych się dodają, a średnie koncentrują się
   w tempie $1/\sqrt{n}$ \dash{} Program~\ref{prog:P25}, skąd bierze się

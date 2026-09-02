@@ -1011,78 +1011,77 @@ powyżej i żaden nie należy do tej książki.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--4}{\textbf{Dla niezależnych $X$ i $Y$ zachodzi
+\sumitem{1--4}{\result{\textbf{Dla niezależnych $X$ i $Y$ zachodzi
   $\Var(X+Y) = \Var(X) + \Var(Y)$} \dash{} dodają się wariancje, a nie
-  rozrzuty. Wyliczone dokładnie po trzydziestu sześciu rzutach.}
-\sumitem{3--4}{Jedna wielkość policzona dwa razy to nie dwie wielkości:
+  rozrzuty. Wyliczone dokładnie po trzydziestu sześciu rzutach}.}
+\sumitem{3--4}{\result{Jedna wielkość policzona dwa razy to nie dwie wielkości:
   $\Var(2X) = 4\Var(X)$, a nie $2\Var(X)$. Różnica jest tym, co kupuje
-  niezależność, a zduplikowane pozycje ewaluacyjne tracą ją po cichu.}
-\sumitem{5--7}{Ogólnie $\Var(X+Y) = \Var(X) + \Var(Y) + 2\Cov(X,Y)$, więc
+  niezależność, a zduplikowane pozycje ewaluacyjne tracą ją po cichu}.}
+\sumitem{5--7}{\result{Ogólnie $\Var(X+Y) = \Var(X) + \Var(Y) + 2\Cov(X,Y)$, więc
   \textbf{zerowa kowariancja} to wszystko, czego argument potrzebuje \dash{}
   co jest słabsze od niezależności i, według Programu~\ref{prog:P24},
-  niebezpiecznie słabsze.}
-\sumitem{9--11}{Średnia z $n$ niezależnych losowań ma wariancję
-  $\sigma^{2}/n$ i rozrzut $\sigma/\sqrt{n}$, w dwóch krokach z sekcji 1.
-  Program~\ref{prog:P21} zmierzył to tempo; tu jest jego powód.}
-\sumitem{13--14}{\textbf{Zmniejszenie słupka błędu o połowę kosztuje cztery
+  niebezpiecznie słabsze}.}
+\sumitem{9--11}{\result{Średnia z $n$ niezależnych losowań ma wariancję
+  $\sigma^{2}/n$ i rozrzut $\sigma/\sqrt{n}$, w dwóch krokach z sekcji 1.} Program~\ref{prog:P21} zmierzył to tempo; tu jest jego powód.}
+\sumitem{13--14}{\result{\textbf{Zmniejszenie słupka błędu o połowę kosztuje cztery
   razy więcej danych}; zejście do jednej dziesiątej kosztuje
   $\val{p25.tenth.factor}$ razy tyle. Precyzja jest kwadratowa, z czterech
-  różnych punktów startowych.}
-\sumitem{15--16}{\textbf{Centralne twierdzenie graniczne} mówi o
+  różnych punktów startowych}.}
+\sumitem{15--16}{\result{\textbf{Centralne twierdzenie graniczne} mówi o
   \emph{kształcie}: suma wielu niezależnych, niedominujących kawałków zbiega
   do rozkładu Gaussa. Zmierzone dokładnie na sumach rozkładów jednostajnych,
   największa różnica $\val{p25.clt.gap.1}$ przy $n = 1$ i
-  $\val{p25.clt.gap.12}$ przy $n = \val{p25.clt.n.hi}$.}
-\sumitem{17--19}{\textbf{I milczy w ogonie.} Rozkład Gaussa trafia z
+  $\val{p25.clt.gap.12}$ przy $n = \val{p25.clt.n.hi}$}.}
+\sumitem{17--19}{\result{\textbf{I milczy w ogonie.} Rozkład Gaussa trafia z
   dokładnością do procenta jeden rozrzut od środka i myli się
   $\val{p25.tail.ratio5}$ razy pięć rozrzutów od środka; sześć rozrzutów od
   środka prawda wynosi dokładnie zero. Pytanie, na które twierdzenie
-  odpowiada najgorzej, jest tym, do którego najczęściej się go używa.}
-\sumitem{20--22}{W praktyce zawodzi założenie: niezależność, skończona
+  odpowiada najgorzej, jest tym, do którego najczęściej się go używa}.}
+\sumitem{20--22}{\result{W praktyce zawodzi założenie: niezależność, skończona
   wariancja i brak dominującego kawałka. \textbf{Rozkład Gaussa dlatego, że w
   grę wchodziła suma, jest poprawny; rozkład Gaussa dlatego, że wyglądało to
-  jak dzwon, jest założeniem, którego nikt nie sprawdził.}}
-\sumitem{23--25}{Trafność na $\val{p25.eval.n.lo}$ pozycjach niesie przedział
+  jak dzwon, jest założeniem, którego nikt nie sprawdził.}}}
+\sumitem{23--25}{\result{Trafność na $\val{p25.eval.n.lo}$ pozycjach niesie przedział
   $\pm\val{p25.eval.hw.100}$ punktu, a cztery razy więcej pozycji zmniejsza go
-  o połowę za każdym razem.}
-\sumitem{26--27}{Orzeczenie o różnicy $\val{p25.eval.gap.pct}$ punktu wymaga
+  o połowę za każdym razem}.}
+\sumitem{26--27}{\result{Orzeczenie o różnicy $\val{p25.eval.gap.pct}$ punktu wymaga
   $\val{p25.eval.n.needed}$ pozycji na model \dash{} \textbf{dwa razy}
   $\val{p25.eval.n.naive}$, bo wielkością, o którą chodzi, jest
-  \emph{różnica}, a wariancje obu oszacowań się dodają.}
-\sumitem{30--32}{Wynik uwagi jest sumą $d_k$ iloczynów wpisów o wariancji
+  \emph{różnica}, a wariancje obu oszacowań się dodają}.}
+\sumitem{30--32}{\result{Wynik uwagi jest sumą $d_k$ iloczynów wpisów o wariancji
   jednostkowej, więc $\Var = d_k$, a rozrzut to $\sqrt{d_k}$ \dash{} wyliczone
-  dokładnie, bez żadnego twierdzenia granicznego w środku.}
+  dokładnie, bez żadnego twierdzenia granicznego w środku}.}
 \sumitem{32--33}{Program~\ref{prog:P05} zmierzył to samo twierdzenie przy
   skalowaniu znormalizowanym, $1/\sqrt{d}$, a wyprowadzenie odtwarza jego
   cztery zapisane liczby z dokładnością do $\val{p25.p05.worst.pct}$ procent.
   $\sqrt{d_k} \times 1/\sqrt{d_k} = 1$ \emph{jest} tym dzieleniem.}
-\sumitem{35--37}{\textbf{E9, przeprowadzone.} Bez dzielenia, przy
+\sumitem{35--37}{\result{\textbf{E9, przeprowadzone.} Bez dzielenia, przy
   $d_k = \val{p25.e9.d.hi}$, entropia wiersza wynosi
   $\val{p25.e9.raw.ent.512}$ z możliwych $\val{p25.e9.maxent}$, a jeden klucz
   zabiera $\val{p25.e9.raw.top.512}$ procent. Z dzieleniem nic się nie rusza
-  przy żadnym rozmiarze głowicy.}
-\sumitem{37}{Program~\ref{prog:P18} podaje przekątną jakobianu $p(1-p)$, która
+  przy żadnym rozmiarze głowicy}.}
+\sumitem{37}{\result{Program~\ref{prog:P18} podaje przekątną jakobianu $p(1-p)$, która
   zamienia to w gradient: $\val{p25.e9.resp.raw}$ wobec
   $\val{p25.e9.resp.scaled}$, więc wiersz przeskalowany jest
-  $\val{p25.e9.resp.ratio}$ razy bardziej wrażliwy.}
-\sumitem{39--41}{\textbf{Skalowanie jest korektą wariancji i niczym więcej.}
+  $\val{p25.e9.resp.ratio}$ razy bardziej wrażliwy}.}
+\sumitem{39--41}{\result{\textbf{Skalowanie jest korektą wariancji i niczym więcej.}
   Ustalona stała nie wykona tego zadania, bo rzecz korygowana rośnie z
-  wymiarem głowicy.}
-\sumitem{42--44}{Wyjście warstwy ma wariancję
+  wymiarem głowicy}.}
+\sumitem{42--44}{\result{Wyjście warstwy ma wariancję
   $n_{\text{in}}\Var(w)\Var(x)$ \dash{} ta sama tożsamość po raz czwarty
   \dash{} więc warstwa liniowa utrzymuje swoją skalę przy
-  $\Var(w) = 1/n_{\text{in}}$.}
-\sumitem{45--47}{$\relu$ zachowuje \textbf{dokładnie połowę} drugiego momentu
+  $\Var(w) = 1/n_{\text{in}}$}.}
+\sumitem{45--47}{\result{$\relu$ zachowuje \textbf{dokładnie połowę} drugiego momentu
   symetrycznego wejścia, z symetrii i scałkowane do
   $\val{p25.init.relu.keeps}$. Nadrobienie tego wymaga
   $\Var(w) = 2/n_{\text{in}}$, \textbf{i stąd bierze się czynnik dwa u
-  Hego}.}
-\sumitem{48--52}{Głębokość kumuluje to geometrycznie: przez
+  Hego}}.}
+\sumitem{48--52}{\result{Głębokość kumuluje to geometrycznie: przez
   $\val{p25.init.depth}$ warstw połowa na warstwę zostawia
   $\val{p25.init.deep.xavier}$ sygnału, a cztery na warstwę dają
   $\val{p25.init.deep.hot}$. \textbf{Rozbieżność na kroku pierwszym to
   inicjalizacja, a nie krok uczenia}, i jeden przebieg w przód mówi, co z
-  tych dwóch.}
+  tych dwóch}.}
 \end{summarybox}
 
 \canyou

@@ -944,79 +944,77 @@ uczynił możliwymi do zadania i żadne nie jest jego własne.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--4}{Estymator ma \textbf{dwa} sposoby bycia w błędzie.
+\sumitem{1--4}{\result{Estymator ma \textbf{dwa} sposoby bycia w błędzie.
   \emph{Obciążenie} to odległość średniej oceny od prawdy;
-  \emph{wariancja} to odległość ocen od ich własnej średniej.
-  Program~\ref{prog:P21} dowiódł pierwszego o gradiencie z paczki i
+  \emph{wariancja} to odległość ocen od ich własnej średniej.} Program~\ref{prog:P21} dowiódł pierwszego o gradiencie z paczki i
   powiedział, że to nie wystarcza.}
-\sumitem{5--6}{\textbf{$\mathrm{MSE} = \text{obciążenie}^{2} + \Var$},
+\sumitem{5--6}{\result{\textbf{$\mathrm{MSE} = \text{obciążenie}^{2} + \Var$},
   dokładnie, sprawdzone przy dwudziestu jeden przyciąganiach nad ułamkami. Na
   omawianej populacji celowo obciążony estymator bije nieobciążony o
   $\val{p26.shrink.gain.pct}$ procent błędu średniokwadratowego \dash{}
-  $\val{p26.mse.shrunk}$ wobec $\val{p26.mse.unbiased}$.}
-\sumitem{7--9}{Zatem \enquote{nieobciążony} to nie \enquote{najlepszy}, a
+  $\val{p26.mse.shrunk}$ wobec $\val{p26.mse.unbiased}$}.}
+\sumitem{7--9}{\result{Zatem \enquote{nieobciążony} to nie \enquote{najlepszy}, a
   każda regularyzacja jest obciążeniem wziętym celowo. Optymalne przyciąganie
   zależy od nieznanej prawdy, i dlatego jest to spostrzeżenie, a nie
-  przepis.}
-\sumitem{10--12}{$n-1$ poprawia \textbf{dokładnie jedno obciążenie}:
+  przepis}.}
+\sumitem{10--12}{\result{$n-1$ poprawia \textbf{dokładnie jedno obciążenie}:
   wariancja z próby z mianownikiem $n$ daje średnio $\frac{n-1}{n}$ wariancji
   populacji, wyliczone przy $n = 2$ do $5$, a mianownik $(n-1)$ daje ją
-  dokładnie.}
-\sumitem{13--16}{\textbf{Nie poprawia odchylenia standardowego.} Pierwiastek
+  dokładnie}.}
+\sumitem{13--16}{\result{\textbf{Nie poprawia odchylenia standardowego.} Pierwiastek
   jest wklęsły, więc nierówność Jensena z Programu~\ref{prog:P19} sprawia, że
   poprawione $s$ zaniża \dash{} o $\val{p26.sd.short.2}$ procent przy
   $n = 2$ i wciąż o $\val{p26.sd.short.5}$ procent przy $n = 5$, czyli przy
-  tym rozmiarze, od którego ludzie podają rozrzut.}
-\sumitem{18--20}{\textbf{Metoda największej wiarogodności} wybiera parametr,
+  tym rozmiarze, od którego ludzie podają rozrzut}.}
+\sumitem{18--20}{\result{\textbf{Metoda największej wiarogodności} wybiera parametr,
   który czyni zaobserwowane dane najbardziej prawdopodobnymi. Weź logarytm,
   żeby zamienić iloczyn w sumę (Program~\ref{prog:F03}) i uniknąć niedomiaru
   (Program~\ref{prog:P02}); maksimum się nie przesuwa, bo
-  Program~\ref{prog:F05} mówi, że funkcja ściśle rosnąca zachowuje porządek.}
-\sumitem{21}{Ocena bernoullowska to $k/n = \val{p26.bern.mle}$, wyprowadzona,
+  Program~\ref{prog:F05} mówi, że funkcja ściśle rosnąca zachowuje porządek}.}
+\sumitem{21}{\result{Ocena bernoullowska to $k/n = \val{p26.bern.mle}$, wyprowadzona,
   a nie założona \dash{} \textbf{każda częstość policzona przez podzielenie
-  sukcesów przez próby była oceną największej wiarogodności}.}
-\sumitem{22--23}{A wariancja gaussowska wychodzi z $n$ w mianowniku,
+  sukcesów przez próby była oceną największej wiarogodności}}.}
+\sumitem{22--23}{\result{A wariancja gaussowska wychodzi z $n$ w mianowniku,
   $\val{p26.gauss.mle.var}$ wobec $\val{p26.gauss.unbiased.var}$:
   \textbf{metoda największej wiarogodności jest obciążona}, dokładnie o
-  czynnik z poprzedniej sekcji.}
-\sumitem{25--27}{\textbf{Strata krzyżowoentropijna jest ujemnym logarytmem
+  czynnik z poprzedniej sekcji}.}
+\sumitem{25--27}{\result{\textbf{Strata krzyżowoentropijna jest ujemnym logarytmem
   wiarogodności zaobserwowanych tokenów, na token.} Iloczyn
   prawdopodobieństw, logarytm, zmiana znaku, podzielenie przez ich liczbę
   \dash{} czyli definicja Programu~\ref{prog:P18} znak po znaku. Trenowanie
-  modelu językowego to metoda największej wiarogodności.}
+  modelu językowego to metoda największej wiarogodności}.}
 \sumitem{28}{Trzy programy, jedno obliczenie:
   Program~\ref{prog:F02} podaje $\val{p26.f02.loss}$ nata, a
   Program~\ref{prog:F03} sekwencję $\val{p26.f03.tokens}$ tokenów;
   odtwarzają się nawzajem w obie strony, z powrotem do
   $\val{p26.back.loss}$ nata.}
-\sumitem{30--31}{\textbf{Label smoothing to metoda największej wiarogodności
+\sumitem{30--31}{\result{\textbf{Label smoothing to metoda największej wiarogodności
   dla innego celu.} Przy $\varepsilon = \val{p26.ls.eps}$ na
   $\val{p26.ls.classes}$ klasach optimum to $\val{p26.ls.true}$ wobec
   $\val{p26.ls.other}$, czyli różnica logitów $\val{p26.ls.gap}$ \dash{}
-  skończona, gdzie optimum celu one-hot jest nieosiągalne.}
-\sumitem{32--33}{Ważenie klas szacuje parametry \emph{innej populacji}, a
+  skończona, gdzie optimum celu one-hot jest nieosiągalne}.}
+\sumitem{32--33}{\result{Ważenie klas szacuje parametry \emph{innej populacji}, a
   dzielenie przez liczbę tokenów jest tym, co czyni sekwencje różnej długości
-  porównywalnymi.}
-\sumitem{34--36}{\textbf{Kara jest logarytmem rozkładu a priori.} Pomnóż
+  porównywalnymi}.}
+\sumitem{34--36}{\result{\textbf{Kara jest logarytmem rozkładu a priori.} Pomnóż
   wiarogodność przez rozkład a priori, weź logarytm, zmień znak: logarytm a
   priori staje się składnikiem dodanym do straty, a gaussowski rozkład a
   priori o szerokości $\tau$ wnosi
-  $\lVert\vect{w}\rVert^{2}/2\tau^{2}$.}
-\sumitem{37--38}{Zatem $\lambda = 1/\tau^{2}$, dopasowane na gradientach,
+  $\lVert\vect{w}\rVert^{2}/2\tau^{2}$}.}
+\sumitem{37--38}{\result{Zatem $\lambda = 1/\tau^{2}$, dopasowane na gradientach,
   które dodaje Program~\ref{prog:P20}, a nie na wzorze.
   \textbf{Jego $\lambda = \val{p26.p20.lambda}$ to twierdzenie, że każda waga
   jest gaussowska o szerokości $\val{p26.prior.tau}$}, co da się sprawdzić na
-  wytrenowanych wagach.}
-\sumitem{40}{MAP jest punktem i nie umie powiedzieć, jak bardzo jest pewny.
-  Rozkład a posteriori jako rozkład należy do Programu~\ref{prog:P28}.}
-\sumitem{41--43}{\textbf{Score} to $\partial \ln p / \partial\theta$, a jego
+  wytrenowanych wagach}.}
+\sumitem{40}{\result{MAP jest punktem i nie umie powiedzieć, jak bardzo jest pewny.} Rozkład a posteriori jako rozkład należy do Programu~\ref{prog:P28}.}
+\sumitem{41--43}{\result{\textbf{Score} to $\partial \ln p / \partial\theta$, a jego
   wartość oczekiwana wynosi dokładnie zero \dash{} bo prawdopodobieństwa
   sumują się do jedynki, cokolwiek robi $\theta$. Dlatego przyrównanie
-  zaobserwowanego score do zera jest właściwym warunkiem.}
-\sumitem{44--45}{A $\nabla \Ex[f] = \Ex[f\,s]$, dokładnie nad ułamkami przy
+  zaobserwowanego score do zera jest właściwym warunkiem}.}
+\sumitem{44--45}{\result{A $\nabla \Ex[f] = \Ex[f\,s]$, dokładnie nad ułamkami przy
   każdej częstości i $\val{p26.score.cases}$ funkcjach: \textbf{estymator
   oparty na score, odłożony przez Program~\ref{prog:P21}, to cztery wiersze
-  metody największej wiarogodności}, i jest tym, czym jest policy gradient.}
+  metody największej wiarogodności}, i jest tym, czym jest policy gradient}.}
 \end{summarybox}
 
 \canyou

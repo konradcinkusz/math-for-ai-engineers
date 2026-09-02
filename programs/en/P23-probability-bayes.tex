@@ -965,24 +965,24 @@ distribution you have been editing all along.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--3}{A \textbf{sample space} is the list of outcomes, exactly one of
+\sumitem{1--3}{\result{A \textbf{sample space} is the list of outcomes, exactly one of
   which happens; an \textbf{event} is a set of them. A probability hands each
   event a number that is never negative, gives the whole space $1$, and adds
-  over pieces that cannot overlap.}
-\sumitem{4--5}{$\Prob(\bar{A}) = 1 - \Prob(A)$, from two of the three rules and
-  no picture. Every result here is got the same way: split into disjoint
+  over pieces that cannot overlap}.}
+\sumitem{4--5}{\result{$\Prob(\bar{A}) = 1 - \Prob(A)$, from two of the three rules and
+  no picture.} Every result here is got the same way: split into disjoint
   pieces, add, use that the whole is $1$.}
-\sumitem{6--7}{Additivity needs \emph{disjoint} pieces:
-  $\Prob(A \cup B) = \Prob(A) + \Prob(B) - \Prob(A \cap B)$. That is
+\sumitem{6--7}{\result{Additivity needs \emph{disjoint} pieces:
+  $\Prob(A \cup B) = \Prob(A) + \Prob(B) - \Prob(A \cap B)$.} That is
   Program~\ref{prog:F10}'s union rule with every count divided by
   $\val{f10.eval.union}$, and the script gates the two against each other.}
-\sumitem{8--9}{A probability is a \textbf{measure}, and rule two bounds the
+\sumitem{8--9}{\result{A probability is a \textbf{measure}, and rule two bounds the
   measure of a \emph{set}. Program~\ref{prog:F13}'s density height is a rate
   rather than the measure of a set, which is why it may exceed $1$ where a
-  probability may not.}
-\sumitem{10}{\textbf{Conditioning is changing the denominator}:
+  probability may not}.}
+\sumitem{10}{\result{\textbf{Conditioning is changing the denominator}:
   $\Prob(A \mid B) = \Prob(A \cap B)/\Prob(B)$. Two of the four outcomes are
-  simply gone, and what is left is renormalised.}
+  simply gone, and what is left is renormalised}.}
 \sumitem{11--12}{It is a \textbf{definition} and not a theorem, which is
   Program~\ref{prog:F10}'s decision made on purpose. Bayes' theorem is the
   other kind, and that is what makes it rebuildable.}
@@ -990,66 +990,66 @@ distribution you have been editing all along.
   $\val{p23.alarm.num}/\val{p23.alarm.den}$ produce an alarm \dash{}
   $\val{p23.alarm.real}$ real and $\val{p23.alarm.false}$ false. Keep the two
   counts, not the total.}
-\sumitem{14--15}{$\Prob(A \cap B) = \Prob(A \mid B)\Prob(B)$ is the definition
+\sumitem{14--15}{\result{$\Prob(A \cap B) = \Prob(A \mid B)\Prob(B)$ is the definition
   with the denominator moved, $\Prob(B) > 0$ is the only condition anywhere in
   the program, and $\Prob(A \mid B)$ and $\Prob(B \mid A)$ are different
-  numbers.}
-\sumitem{16--17}{\textbf{Bayes' theorem is one quantity written two ways and
+  numbers}.}
+\sumitem{16--17}{\result{\textbf{Bayes' theorem is one quantity written two ways and
   then divided.} Nothing is assumed and no new object appears; it reverses a
-  conditional, which is the shape of most measurement problems here.}
+  conditional, which is the shape of most measurement problems here}.}
 \sumitem{18--19}{Prior, likelihood, evidence, posterior \dash{} names that will
   not help you rebuild the formula. The derivation will.}
-\sumitem{20--21}{$\Prob(B) = \Prob(B \mid A)\Prob(A) +
+\sumitem{20--21}{\result{$\Prob(B) = \Prob(B \mid A)\Prob(A) +
   \Prob(B \mid \bar{A})\Prob(\bar{A})$, the law of total probability. It
   contains $\Prob(A)$, so the base rate is in the answer whether or not
-  anybody mentioned it.}
-\sumitem{22--23}{A detector $\val{p23.sens.pct}$ per cent accurate on a fault
+  anybody mentioned it}.}
+\sumitem{22--23}{\result{A detector $\val{p23.sens.pct}$ per cent accurate on a fault
   once in $\val{p23.prev.den}$ requests has
   $\frac{\val{p23.ppv.num}}{\val{p23.ppv.den}}$ of its alarms real \dash{}
   $\val{p23.ppv.pct}$ per cent, about $\val{p23.alarm.ratio}$ false alarms for
-  every real one.}
-\sumitem{23--24}{$\val{p23.sens.pct}$ per cent is
+  every real one}.}
+\sumitem{23--24}{\result{$\val{p23.sens.pct}$ per cent is
   $\Prob(\text{alarm} \mid \text{fault})$ and the question was
   $\Prob(\text{fault} \mid \text{alarm})$. A detector's quoted numbers are
   properties of the detector \emph{and} the population, and only one of the
-  two travels with the model.}
-\sumitem{25--26}{The \textbf{prosecutor's fallacy} is swapping those two:
+  two travels with the model}.}
+\sumitem{25--26}{\result{The \textbf{prosecutor's fallacy} is swapping those two:
   $\val{p23.fpr.pct}$ per cent of clean requests raise an alarm and
   $\val{p23.false.pct}$ per cent of alarms are about clean requests, both true
-  of the same detector on the same day.}
-\sumitem{26--28}{Same detector, four base rates:
+  of the same detector on the same day}.}
+\sumitem{26--28}{\result{Same detector, four base rates:
   $\val{p23.ppv.10.pct}$\%, $\val{p23.ppv.100.pct}$\%, $\val{p23.ppv.pct}$\%,
   $\val{p23.ppv.10000.pct}$\%. \textbf{Compare the base rate with the error
-  rate}: equal gives exactly half, and the transcript prints it as a fraction
+  rate}: equal gives exactly half}, and the transcript prints it as a fraction
   so that it says so.}
-\sumitem{29--30}{A detector that never fires is $\val{p23.never.pct}$ per cent
+\sumitem{29--30}{\result{A detector that never fires is $\val{p23.never.pct}$ per cent
   accurate against the real one's $\val{p23.acc.pct}$. Accuracy on an
-  unbalanced population is a weighted average with the weights left out.}
-\sumitem{31--32}{$A$ and $B$ are independent when
+  unbalanced population is a weighted average with the weights left out}.}
+\sumitem{31--32}{\result{$A$ and $B$ are independent when
   $\Prob(A \cap B) = \Prob(A)\Prob(B)$, which divided through says being told
-  $B$ does not move your answer about $A$.}
-\sumitem{33--35}{Two fair coins are independent and, given that exactly one is
+  $B$ does not move your answer about $A$}.}
+\sumitem{33--35}{\result{Two fair coins are independent and, given that exactly one is
   heads, perfectly dependent \dash{} \textbf{independence is a statement about
   a measure, and conditioning changes the measure}. Every filter, subgroup and
-  \enquote{requests that reached the model} is a conditioning.}
-\sumitem{36--37}{Pairwise independence is not independence of the collection:
+  \enquote{requests that reached the model} is a conditioning}.}
+\sumitem{36--37}{\result{Pairwise independence is not independence of the collection:
   those same three events are independent in every pair and have
-  $\Prob(A \cap B \cap C) = 0$ against a product of $\frac{1}{8}$.}
-\sumitem{38--39}{Two noisy readings of one cause are \emph{dependent}
+  $\Prob(A \cap B \cap C) = 0$ against a product of $\frac{1}{8}$}.}
+\sumitem{38--39}{\result{Two noisy readings of one cause are \emph{dependent}
   ($\frac{\val{p23.cause.pxy.num}}{\val{p23.cause.pxy.den}}$ against
   $\frac{4}{16}$) with nothing wired between them, and conditionally
-  independent given the cause.}
-\sumitem{40--41}{Both directions happen, so neither word implies the other. The
+  independent given the cause}.}
+\sumitem{40--41}{\result{Both directions happen, so neither word implies the other. The
   second is the \textbf{naive Bayes} assumption, and in odds Bayes' theorem is
-  a multiplication: posterior odds are prior odds times the likelihood ratio.}
-\sumitem{42--43}{One alarm at ratio $\val{p23.lr}$ gives
+  a multiplication: posterior odds are prior odds times the likelihood ratio}.}
+\sumitem{42--43}{\result{One alarm at ratio $\val{p23.lr}$ gives
   $\val{p23.ppv.pct}$ per cent; two give
   $\frac{\val{p23.two.num}}{\val{p23.two.den}} = \val{p23.two.pct}$ per cent,
   so $\val{p23.k.half}$ independent detectors cross a half and a third leaves
-  $\val{p23.three.false.pct}$ per cent of triples false.}
-\sumitem{44--45}{A duplicate detector has likelihood ratio $1$ and moves
+  $\val{p23.three.false.pct}$ per cent of triples false}.}
+\sumitem{44--45}{\result{A duplicate detector has likelihood ratio $1$ and moves
   nothing, so the gap between $\val{p23.ppv.pct}$ and $\val{p23.two.pct}$ per
-  cent is exactly what the independence assumption is worth.}
+  cent is exactly what the independence assumption is worth}.}
 \sumitem{46--47}{Not proved here: countable additivity, and what a probability
   \emph{means}. Neither changes a calculation in this book.}
 \end{summarybox}

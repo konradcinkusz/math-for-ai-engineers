@@ -953,25 +953,24 @@ się losowaniem z rozkładu, który cały czas edytowałeś.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Przestrzeń zdarzeń elementarnych} to lista wyników, z
+\sumitem{1--3}{\result{\textbf{Przestrzeń zdarzeń elementarnych} to lista wyników, z
   których zachodzi dokładnie jeden; \textbf{zdarzenie} to zbiór wyników.
   Prawdopodobieństwo przypisuje każdemu zdarzeniu liczbę nieujemną, całej
-  przestrzeni daje $1$ i dodaje się na kawałkach, które nie mogą się nakładać.}
-\sumitem{4--5}{$\Prob(\bar{A}) = 1 - \Prob(A)$, z dwóch spośród trzech reguł i
-  bez rysunku. Każdy wynik tutaj otrzymuje się tak samo: rozbić na rozłączne
+  przestrzeni daje $1$ i dodaje się na kawałkach, które nie mogą się nakładać}.}
+\sumitem{4--5}{\result{$\Prob(\bar{A}) = 1 - \Prob(A)$, z dwóch spośród trzech reguł i
+  bez rysunku.} Każdy wynik tutaj otrzymuje się tak samo: rozbić na rozłączne
   kawałki, dodać, skorzystać z tego, że całość to $1$.}
-\sumitem{6--7}{Addytywność wymaga kawałków \emph{rozłącznych}:
-  $\Prob(A \cup B) = \Prob(A) + \Prob(B) - \Prob(A \cap B)$.
-  Program~\ref{prog:F10} podaje tę samą regułę sumy, tylko z każdą
+\sumitem{6--7}{\result{Addytywność wymaga kawałków \emph{rozłącznych}:
+  $\Prob(A \cup B) = \Prob(A) + \Prob(B) - \Prob(A \cap B)$.} Program~\ref{prog:F10} podaje tę samą regułę sumy, tylko z każdą
   liczebnością podzieloną przez $\val{f10.eval.union}$, a skrypt sprawdza obie
   względem siebie.}
-\sumitem{8--9}{Prawdopodobieństwo jest \textbf{miarą}, a druga reguła ogranicza
+\sumitem{8--9}{\result{Prawdopodobieństwo jest \textbf{miarą}, a druga reguła ogranicza
   miarę \emph{zbioru}. Program~\ref{prog:F13} mierzy wysokość gęstości, która
   jest tempem, a nie miarą zbioru \dash{} dlatego może przekroczyć $1$ tam,
-  gdzie prawdopodobieństwo nie może.}
-\sumitem{10}{\textbf{Warunkowanie to zmiana mianownika}:
+  gdzie prawdopodobieństwo nie może}.}
+\sumitem{10}{\result{\textbf{Warunkowanie to zmiana mianownika}:
   $\Prob(A \mid B) = \Prob(A \cap B)/\Prob(B)$. Dwa z czterech wyników po
-  prostu znikają, a to, co zostaje, jest normowane na nowo.}
+  prostu znikają, a to, co zostaje, jest normowane na nowo}.}
 \sumitem{11--12}{To \textbf{definicja}, a nie twierdzenie, czyli
   Program~\ref{prog:F10} podejmuje tu swoją decyzję świadomie. Twierdzenie
   Bayesa jest tym drugim rodzajem i dlatego da się je odbudować.}
@@ -979,68 +978,68 @@ się losowaniem z rozkładu, który cały czas edytowałeś.
   $\val{p23.alarm.num}/\val{p23.alarm.den}$ wywołuje alarm \dash{}
   $\val{p23.alarm.real}$ prawdziwych i $\val{p23.alarm.false}$ fałszywych.
   Trzymaj dwie liczebności, a nie sumę.}
-\sumitem{14--15}{$\Prob(A \cap B) = \Prob(A \mid B)\Prob(B)$ to definicja z
+\sumitem{14--15}{\result{$\Prob(A \cap B) = \Prob(A \mid B)\Prob(B)$ to definicja z
   przeniesionym mianownikiem, $\Prob(B) > 0$ to jedyny warunek w całym
-  programie, a $\Prob(A \mid B)$ i $\Prob(B \mid A)$ to różne liczby.}
-\sumitem{16--17}{\textbf{Twierdzenie Bayesa to jedna wielkość zapisana na dwa
+  programie, a $\Prob(A \mid B)$ i $\Prob(B \mid A)$ to różne liczby}.}
+\sumitem{16--17}{\result{\textbf{Twierdzenie Bayesa to jedna wielkość zapisana na dwa
   sposoby i podzielona.} Niczego się nie zakłada i nie pojawia się nowy
   obiekt; ono odwraca warunkowanie, a taki kształt ma tutaj większość
-  problemów pomiarowych.}
+  problemów pomiarowych}.}
 \sumitem{18--19}{Prior, wiarygodność, dowód, posterior \dash{} nazwy, które nie
   pomogą ci odbudować wzoru. Wyprowadzenie pomoże.}
-\sumitem{20--21}{$\Prob(B) = \Prob(B \mid A)\Prob(A) +
+\sumitem{20--21}{\result{$\Prob(B) = \Prob(B \mid A)\Prob(A) +
   \Prob(B \mid \bar{A})\Prob(\bar{A})$, wzór na prawdopodobieństwo całkowite.
   Zawiera $\Prob(A)$, więc częstość bazowa jest w odpowiedzi niezależnie od
-  tego, czy ktoś o niej wspomniał.}
-\sumitem{22--23}{Detektor skuteczny w $\val{p23.sens.pct}$ procentach przy
+  tego, czy ktoś o niej wspomniał}.}
+\sumitem{22--23}{\result{Detektor skuteczny w $\val{p23.sens.pct}$ procentach przy
   usterce raz na $\val{p23.prev.den}$ żądań ma
   $\frac{\val{p23.ppv.num}}{\val{p23.ppv.den}}$ alarmów prawdziwych \dash{}
   $\val{p23.ppv.pct}$ procent, około $\val{p23.alarm.ratio}$ fałszywych
-  alarmów na każdy prawdziwy.}
-\sumitem{23--24}{$\val{p23.sens.pct}$ procent to
+  alarmów na każdy prawdziwy}.}
+\sumitem{23--24}{\result{$\val{p23.sens.pct}$ procent to
   $\Prob(\text{alarm} \mid \text{usterka})$, a pytanie dotyczyło
   $\Prob(\text{usterka} \mid \text{alarm})$. Liczby podawane dla detektora są
   własnościami detektora \emph{i} populacji, a tylko jedna z tych dwóch rzeczy
-  podróżuje z modelem.}
-\sumitem{25--26}{\textbf{Błąd prokuratora} to zamiana tych dwóch miejscami:
+  podróżuje z modelem}.}
+\sumitem{25--26}{\result{\textbf{Błąd prokuratora} to zamiana tych dwóch miejscami:
   $\val{p23.fpr.pct}$ procent czystych żądań wywołuje alarm, a
   $\val{p23.false.pct}$ procent alarmów dotyczy czystych żądań \dash{} oba
-  prawdziwe o tym samym detektorze tego samego dnia.}
-\sumitem{26--28}{Ten sam detektor, cztery częstości bazowe:
+  prawdziwe o tym samym detektorze tego samego dnia}.}
+\sumitem{26--28}{\result{Ten sam detektor, cztery częstości bazowe:
   $\val{p23.ppv.10.pct}$\%, $\val{p23.ppv.100.pct}$\%, $\val{p23.ppv.pct}$\%,
   $\val{p23.ppv.10000.pct}$\%. \textbf{Porównaj częstość bazową z poziomem
-  błędu}: równe dają dokładnie połowę, a listing wypisuje to ułamkiem, żeby to
+  błędu}: równe dają dokładnie połowę}, a listing wypisuje to ułamkiem, żeby to
   właśnie powiedzieć.}
-\sumitem{29--30}{Detektor, który nigdy się nie odzywa, jest skuteczny w
+\sumitem{29--30}{\result{Detektor, który nigdy się nie odzywa, jest skuteczny w
   $\val{p23.never.pct}$ procentach wobec $\val{p23.acc.pct}$ prawdziwego.
   Skuteczność na niezrównoważonej populacji to średnia ważona z pominiętymi
-  wagami.}
-\sumitem{31--32}{$A$ i $B$ są niezależne, gdy
+  wagami}.}
+\sumitem{31--32}{\result{$A$ i $B$ są niezależne, gdy
   $\Prob(A \cap B) = \Prob(A)\Prob(B)$, co po podzieleniu mówi, że informacja
-  o $B$ nie rusza twojej odpowiedzi o $A$.}
-\sumitem{33--35}{Dwie uczciwe monety są niezależne, a przy warunku, że
+  o $B$ nie rusza twojej odpowiedzi o $A$}.}
+\sumitem{33--35}{\result{Dwie uczciwe monety są niezależne, a przy warunku, że
   dokładnie jedna to orzeł, doskonale zależne \dash{} \textbf{niezależność
   jest zdaniem o mierze, a warunkowanie zmienia miarę}. Każdy filtr, każda
-  podgrupa i każde \enquote{żądania, które dotarły do modelu} to warunkowanie.}
-\sumitem{36--37}{Niezależność parami to nie niezależność rodziny: te same trzy
+  podgrupa i każde \enquote{żądania, które dotarły do modelu} to warunkowanie}.}
+\sumitem{36--37}{\result{Niezależność parami to nie niezależność rodziny: te same trzy
   zdarzenia są niezależne w każdej parze i mają
-  $\Prob(A \cap B \cap C) = 0$ przy iloczynie $\frac{1}{8}$.}
-\sumitem{38--39}{Dwa zaszumione odczyty jednej przyczyny są \emph{zależne}
+  $\Prob(A \cap B \cap C) = 0$ przy iloczynie $\frac{1}{8}$}.}
+\sumitem{38--39}{\result{Dwa zaszumione odczyty jednej przyczyny są \emph{zależne}
   ($\frac{\val{p23.cause.pxy.num}}{\val{p23.cause.pxy.den}}$ wobec
   $\frac{4}{16}$), choć nic między nimi nie podłączono, i warunkowo niezależne
-  przy tej przyczynie.}
-\sumitem{40--41}{Oba kierunki zachodzą, więc żadne słowo nie implikuje
+  przy tej przyczynie}.}
+\sumitem{40--41}{\result{Oba kierunki zachodzą, więc żadne słowo nie implikuje
   drugiego. Drugi to założenie \textbf{naiwnego Bayesa}, a w szansach
   twierdzenie Bayesa jest mnożeniem: szanse a posteriori to szanse a priori
-  razy iloraz wiarygodności.}
-\sumitem{42--43}{Jeden alarm o ilorazie $\val{p23.lr}$ daje
+  razy iloraz wiarygodności}.}
+\sumitem{42--43}{\result{Jeden alarm o ilorazie $\val{p23.lr}$ daje
   $\val{p23.ppv.pct}$ procent; dwa dają
   $\frac{\val{p23.two.num}}{\val{p23.two.den}} = \val{p23.two.pct}$ procent,
   więc $\val{p23.k.half}$ niezależne detektory przekraczają połowę, a trzeci
-  zostawia $\val{p23.three.false.pct}$ procent fałszywych trójek.}
-\sumitem{44--45}{Detektor będący kopią ma iloraz wiarygodności $1$ i nie rusza
+  zostawia $\val{p23.three.false.pct}$ procent fałszywych trójek}.}
+\sumitem{44--45}{\result{Detektor będący kopią ma iloraz wiarygodności $1$ i nie rusza
   niczego, więc odstęp między $\val{p23.ppv.pct}$ a $\val{p23.two.pct}$
-  procent jest dokładnie tym, ile warte jest założenie niezależności.}
+  procent jest dokładnie tym, ile warte jest założenie niezależności}.}
 \sumitem{46--47}{Nie dowodzimy tu: addytywności przeliczalnej ani tego, co
   prawdopodobieństwo \emph{znaczy}. Żadne z nich nie zmienia w tej książce
   żadnego rachunku.}
