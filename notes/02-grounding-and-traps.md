@@ -3033,3 +3033,61 @@ and unusable are compatible, which is trap 253 arriving from the other end.
      it was trained by an objective that pays an unbounded price for putting
      no mass where the data had some, and nothing at all for spreading.
      Owner: P30 §8.
+
+### Mutual information, written (P31)
+
+297. *“The correlations are all near zero, so these features carry no shared
+     information.”*
+     A correlation measures the straight-line part of a relationship and
+     nothing else. P24's own pair has correlation **exactly** zero and mutual
+     information equal to the entire entropy of one of the two, because one is
+     a function of the other. The correlation is not broken — it answers a
+     question nobody asked when they wanted independence, and P23's definition
+     is the one that has to be answered instead. Owner: P31 §1.
+298. *“Mutual information is symmetric, so the relationship it measures is.”*
+     The quantity is symmetric; the relationship need not be, and the pieces
+     the quantity is built from are not. On P24's pair `H(W|Z) = 0` exactly
+     while `H(Z|W)` is not — Z determines W and W does not determine Z — and
+     the mutual information cannot see the difference. Symmetry is a property
+     of the number, not of the dependence. Owner: P31 §3.
+299. *“I computed the mutual information and it came out positive, so there is
+     a relationship.”*
+     A plug-in estimate on genuinely independent data is positive in
+     expectation at **every** sample size — exactly enumerated here, so it is
+     the expectation and not a sample of it. To return zero the observed table
+     must sit in exact proportion to its own margins, which a finite sample
+     essentially never does. The positive number is what you get either way,
+     which is why it is not evidence on its own. Owner: P31 §4.
+300. *“I applied the standard bias correction, so the number is sound.”*
+     The correction is asymptotic, so it is least accurate exactly where the
+     bias is largest: at the smallest sample it leaves nearly a third of the
+     bias behind, and by the time it is accurate the bias it removes did not
+     need removing. A remedy that works where you do not need it and fails
+     where you do is worse than none, because it removes the reason to be
+     careful. Owner: P31 §4.
+301. *“More bins will resolve more structure.”*
+     They will also multiply the bias, which grows with cells and shrinks with
+     items. Doubling the bins each way quadruples the cells, so it quadruples
+     the items needed to hold the bias where it was. Finer bins buy resolution
+     and pay in sample size, and the payment is almost never made — the cell
+     count is the number nobody reports. Owner: P31 §4.
+302. *“Our stronger probe recovers more, so the representation encodes it more
+     richly than we thought.”*
+     A probe is post-processing, so the data-processing inequality bounded its
+     score by what the layer carried before anyone trained it. A better probe
+     has moved towards a ceiling that was always there; it has not moved the
+     ceiling. Those are different sentences about different objects and only
+     one of them was measured. Owner: P31 §5.
+303. *“The probe scores badly, so the layer does not encode it.”*
+     The same inequality read from its other end, and it fails the same way.
+     A score is a **lower** bound and the bound is loose: even the best probe
+     in an exhaustively enumerated family leaves more than a quarter of what
+     the layer carries behind. Nothing in a probing result says whether you
+     are looking at a ceiling being approached or a bound being loose, because
+     the gap is not measured. Owner: P31 §5.
+304. *“Deeper layers carry more information about the input.”*
+     They cannot. Layer `k+1` is computed from layer `k`, so
+     `X -> layer k -> layer k+1` and information about the input can only fall
+     with depth. What a deep layer can be is *easier to read*, which is a
+     statement about what a small probe extracts rather than about what is
+     there — and running the two together is the mistake. Owner: P31 §5.

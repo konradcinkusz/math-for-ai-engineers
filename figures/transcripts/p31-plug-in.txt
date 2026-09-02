@@ -1,0 +1,13 @@
+>>> from math import log
+>>> def plug_in(t):    # a 2x2 count table, MI in nats
+...     N = sum(t)
+...     px = ((t[0]+t[1])/N, (t[2]+t[3])/N)
+...     py = ((t[0]+t[2])/N, (t[1]+t[3])/N)
+...     ij = ((0,0), (0,1), (1,0), (1,1))
+...     s = sum((k/N) * log((k/N)/(px[i]*py[j]))
+...             for k, (i, j) in zip(t, ij) if k)
+...     return round(s, 4)
+>>> plug_in([5, 5, 5, 5])      # dead flat: nothing to see
+0.0
+>>> plug_in([6, 4, 4, 6])      # two fair coins, 20 tosses
+0.0201
