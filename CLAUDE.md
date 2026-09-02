@@ -13,7 +13,7 @@ Read this before touching a program.
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
 | Programs | **All forty-seven written, both editions \dash{} F1–F13 and P1–P34, Parts I to IX entire.** There are no stubs | — |
-| Appendices | A (answers, generated), B (notation), **C (formulae, from 721 `\result{}` marks)**, **D (terminology, 24 `\plterm{}` rows gated against the Polish prose)** and **E (further reading)** drafted; F is a stub | F |
+| Appendices | **All six drafted \dash{} A (answers, generated), B (notation), C (formulae, from 721 `\result{}` marks), D (terminology, 24 `\plterm{}` rows gated against the Polish prose), E (further reading) and F (manifest, every ledger computed by `code/appf_ledgers.py`).** There are no stubs anywhere in the book | — |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
 the format the book is read in; 17 x 24 cm is the trade format shared with the
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1393 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1417 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1158 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1178 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1397 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1423 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1160 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1182 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -53,7 +53,7 @@ free**: its first build added an 11.2 pt box to `main-en-a4` alone, from a
 32-character `\code{}` in a test exercise, and the fix was to set the loop as a
 displayed three-line block instead of running it into the sentence. Parity
 reports **0 failures and 0 warnings** across 56 file pairs; `reflist.py`
-confirms 488 labels resolve to the same numbers in both editions.
+confirms 492 labels resolve to the same numbers in both editions.
 
 **The only page count that moved in the second F3 review pass was `main-pl-a4`,
 231 to 229**, and both of those pages were defects rather than content: a page
@@ -95,12 +95,16 @@ what was there before.
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
 - **0 of 47 programs are stubs**, in each language. Every program in the book
-  is written; what remains is Appendices D, E and F and the finishing work listed
-  under *What is left*.
+  is written, and so is every appendix; what remains is the finishing work
+  listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1612 computed values, all referenced, all present, plus the committed console
-  transcripts, which are inside the same drift gate as of the F3 pass
+- 1626 computed values, all referenced, all present, plus the committed console
+  transcripts, which are inside the same drift gate as of the F3 pass. **Every
+  ledger in this list is now also printed in Appendix~F**, and printed from
+  `figures/values/appf.tex` rather than typed, so `make verify` fails when one
+  moves and the appendix does not \dash{} which is why the appendix's own
+  fourteen values are inside this count
 - 0 `verifybox` blocks · 300 Mermaid sources, all rendering
 - 82 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
@@ -9888,13 +9892,15 @@ estimating the book at **460--540 pages** for its 2,418 planned frames, and this
 file repeated it as 470--550. Neither number had been looked at since
 scaffolding.
 
-**Measured: 1,863 teaching frames are written and they set 1,393 pages in the
+**Measured: 1,863 teaching frames are written and they set 1,397 pages in the
 trade format.** That is $\num{0.75}$ pages a frame against the estimate's
-$\num{0.21}$, with one appendix still to come. (It was 1,321 before
-Appendix~C, which is the one of the four that is generated rather than
+$\num{0.21}$, and **that is the finished book** \dash{} every program and
+every appendix. (It was 1,321 before
+Appendix~C, which is the one of the six that is generated rather than
 written and which costs 62 pages of back matter on its own, 1,383 before
-Appendix~D, which occupies six pages where its stub occupied two, and 1,387
-before Appendix~E, which costs six.) (The measurement was 1,757
+Appendix~D, which occupies six pages where its stub occupied two, 1,387
+before Appendix~E, which costs six, and 1,393 before Appendix~F, which costs
+four because its own manifest was already printing.) (The measurement was 1,757
 frames in 1,267 pages when it was first taken, before P33, and 1,811 in 1,295
 after it; the ratio has not moved across four re-measurements.)
 
@@ -9912,7 +9918,7 @@ It matters because it is the premise of **the one decision this book still
 records as open**. §20 item 1 now carries the measurement and the per-part page
 ranges, read out of the trade build's own part-title folios rather than
 estimated \dash{} front matter and Part I at 388 pages, Parts II--VI at 494,
-Parts VII--IX at 330, back matter at 109 as it stood then and **181 now**, the
+Parts VII--IX at 330, back matter at 109 as it stood then and **185 now**, the
 appendices since written being the whole of the difference \dash{} so the
 proposed Parts I--VI
 cut gives an **882-page first volume** before any back matter, which does not
@@ -11342,6 +11348,189 @@ written to measure the book.** Prefer the checked-in tool over a fresh
 one-liner whenever the checked-in tool already answers the question.
 
 
+### Appendix F pass, September 2026 --- the book is written
+
+Appendix~F is the last piece of writing in the book, and the *What is left*
+entry above had it wrong in a way worth repeating rather than quietly fixing:
+it called F \enquote{the diagram manifest}, and **the brief is three things**.
+The stub asks for the diagram manifest, the measurement table **and** the
+outstanding-work ledgers, *printed rather than merely counted by the build*,
+because \emph{a reader is entitled to know what the book still owes them}. The
+entry was written from the feel of the file rather than from the file, which is
+the class this document keeps recording; it was corrected by opening the stub,
+which is the only thing that ever corrects it.
+
+**And the three thirds have completely different exposure**, which is the
+finding the pass was designed around.
+
+#### The part that looks hardest was already done, and the part that looks like transcription is the part that would have been wrong
+
+`\mermaidfig` accumulates the manifest at the point where each figure is
+placed, exactly as `\answerto`, `\canyou` and Appendix~\ref{app:C}'s
+`\result{}` do. So §F.1 is `\listofdiagrams` and a paragraph, its coordinates
+cannot be wrong, and it needed no work at all.
+
+The measurement table is `notes/01` §17's Status column, which is prose
+maintained by hand and which **sat wrong for five programs**. The ledgers are
+the ones at the top of this file, which is where the 27-against-54 came from.
+Neither is derived from anything, and both are precisely the kind of number
+this appendix exists to print.
+
+#### So every ledger in the appendix is computed, and this is the fifth collection to stop being typed
+
+`code/appf_ledgers.py` counts them out of the tree, writes
+`figures/values/appf.tex`, and the page reads them with `\val{}` like every
+other number in the book. **`make verify` therefore fails when a ledger moves
+and the appendix does not.**
+
+That is the same move as `\canyou`, the diagram manifest, `\answerto` and
+`\result{}`, and it is the first of the five done in **Python rather than in
+LaTeX**: the other four accumulate at the point of use inside the document, and
+this one cannot, because the quantities it prints are properties of the *tree*
+rather than of any point in the text.
+
+**The case for it is measured rather than argued, and the evidence is this
+file.** Inside one week it carried a debt ledger saying 27 where its own tool
+prints 54, a pages-per-frame ratio left at a superseded figure, a label count
+left at 97 where `reflist.py` printed 484, and seven wrong part ranges on page
+one of both editions. **Those are exactly the quantities Appendix~F prints.**
+An appendix of hand-typed counts is not a hypothetical failure mode here; it is
+the observed one, four times over, in the two documents the next author reads
+first.
+
+#### Two things are deliberately not numbers, and the reasons are different
+
+- **How many of the ten experiments have run.** A count of how many is a claim
+  about this book that nothing derives from anything \dash{} the class this
+  file forbids by name \dash{} and `notes/01` §17's own
+  \enquote{none has been run} stayed on the page for five programs after E6
+  had. §F.2 prints the ten rows in three groups with each row's status and
+  **no total**, and says in the section itself that the omission is the point.
+- **The page-level ledgers**: stranded openers, stranded headings, orphaned
+  cues, orphan tails. Those are properties of the **typesetting**, and this
+  book's two TeX installations paginate differently, so a printed count would
+  be a fact about one machine dressed as a fact about the book. §F.3 says what
+  the build checks and prints no number.
+
+The second is worth separating from the first, because they look alike and are
+not: the experiment total is unknowable-by-derivation, and the orphan-tail
+count is perfectly knowable and **true of one machine only**.
+
+#### The appendix and `make debt` disagree by a factor of two, and the appendix says so
+
+`make debt` prints $82$ transcripts and $300$ diagrams; a reader holds one
+edition and has $41$ and $150$. That is the three-quantities trap the terms
+ledger at the top of this file already records \dash{} 24 rows, 27 renderings,
+54 across both editions \dash{} arriving in two more rows.
+
+So the appendix states its counting convention in a `note` box before the first
+number (*every figure here describes the copy you are holding*), and gives both
+figures in the two rows where the factor of two would otherwise read as a
+disagreement. **Quote the instrument's own number, or say which of the
+quantities you mean** \dash{} which is what this file's own ledger entry had to
+learn, one page at a time.
+
+#### My own script carried three defects, all of recorded classes, all caught before the prose
+
+Fifteen program passes recorded that writing the assertion at the computation,
+before the sentence it supports, catches something. This one is the same
+discipline pointed at a **ledger** rather than at a measurement, and it caught
+two things by comparing the script's output against what the tools print rather
+than against what it seemed it should print.
+
+- **Transcripts were counted for one edition where the ledger counts both.**
+  $41$ against $82$: the same two-quantities trap, in the script written to
+  stop it. `per_edition()` and a second key are what the appendix now uses to
+  give both.
+- **`round()` gave 52 per cent where the book's own ledger prints 51.**
+  $968/1863$ is $51.96$, so rounding and flooring differ by a whole point, and
+  `check_structure.py` floors. Both numbers are defensible and **only one of
+  them is what the reader will see printed by `make debt`.**
+
+**And a third instance was found by reading the script rather than its
+output**, which is Program~\ref{prog:P27}'s warning applied to a ledger: the
+verifybox count summed the two editions where every other quantity in the same
+dictionary is per-edition. It was invisible **because the answer is zero**, and
+zero is the one value at which the two quantities agree. A convention that only
+holds where you happen to look at the number is not a convention, so it is now
+enforced in the code \dash{} counted per edition and asserted equal, which
+costs nothing because a verifybox in one edition and not the other is a defect
+C14 already fails on.
+
+The second earns a rule this file did not have: **when a script re-derives a
+number another tool prints, copy that tool's arithmetic rather than its
+definition.** Two implementations of one quantity that agree on the definition
+and differ on the rounding is exactly how a ledger starts lying, and the
+disagreement is invisible except at the boundary \dash{} which is where a
+reader compares. `RE_DEMANDS` in the new script is copied from
+`check_structure.py` verbatim for the same reason, with a comment saying so.
+
+**And the self-count needed care of the same kind.** `appf.values` is the count
+of every `\mfaval` in `figures/values/`, and that directory contains the file
+this script is about to overwrite \dash{} so reading it would be a measurement
+of the **previous run**, which is the stale-by-construction shape this whole
+appendix exists to retire. It counts the other files, adds its own emissions
+and one for the key itself, and the check is that `make debt` independently
+reports the same $1626$.
+
+#### Also
+
+- **Parity came back clean on its first run**, and so did `--parts`,
+  `--terms`, `--frames`, `--answers`, `--scripts` and `gen_stubs --check`. The
+  source gates were run **before** the build rather than inside it, which is
+  Program~\ref{prog:P33}'s finding applied for the fourth pass running.
+- Every figure the appendix prints was checked against the tool that produces
+  it rather than against the script: $47$ programs, $1863$ frames, $2418$
+  planned, $1626$ values, $41$ transcripts of $82$, $150$ diagrams of $300$,
+  $0$ verifyboxes, $968$ frames eliciting at $51$ per cent, $27$ renderings in
+  $24$ rows, $9$ part ranges.
+- The Polish twin is a structural mirror \dash{} the same `\val{}` calls, the
+  same `\ref{}`s, the same table rows in the same order \dash{} because C4, C8,
+  C12 and C14 compare token streams in order and only the prose is translated.
+- **The README was stale again, one appendix after the pass that fixed it.**
+  Appendix~D's pass rewrote it on Program~\ref{prog:P04}'s precedent \dash{}
+  it is the first thing anybody reads \dash{} and the Appendix~E pass then
+  wrote E without touching it, so it said \enquote{E and F are still stubs}
+  with E merged. That is the same class one level out: **a document describing
+  the book goes stale in the pass that changes the book, not in some later
+  one**, and the only remedy is to open it in every pass that could falsify
+  it. It now says the draft is complete and names Appendix~F as the place the
+  ledgers are printed.
+
+#### Layout: the third back-matter addition to cost nothing on the page ledgers
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1397 | 1393 | `[]` | 0 |
+| `main-pl` | 1423 | 1417 | `[]` | 0 |
+| `main-en-a4` | 1160 | 1154 | `[6.3]` | 0 |
+| `main-pl-a4` | 1182 | 1172 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with no stranded frame openers, no stranded section headings and no
+orphaned cues, which an appendix cannot produce anyway, having no frames.
+
+**And the orphan-tail count did not move at all**: 29, 30, 22, 22, exactly the
+pre-appendix figures. That is the third of the four appendices written in this
+run to cost nothing on that ledger (C, D and F; E added one, its own §E.2
+Stroud paragraph), and the reason is the one Appendix~C's pass gave: an
+appendix is *appended*, so it moves no page boundary in the body and the only
+class of defect available to it is one of its own lines overflowing.
+
+**The four deltas are not equal and the reason is worth having.** The stub
+already carried `\listofdiagrams`, so the trade builds gained only the four to
+six pages of new prose and tables, where `main-pl-a4` gained ten \dash{} the
+Polish prose is longer and A4 at 12pt sets it in more lines, which is the same
+asymmetry every Polish pass has measured. In `main-en` the finished appendix
+runs from printed page 1353 to 1362, of which §F.1's manifest is 1353--1358 and
+the three written sections are the four pages the count moved by. **The parts
+of an appendix that were already generated cost nothing to finish**, which is
+the whole argument for generating them.
+
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -11617,53 +11806,17 @@ clone instead.
 
 ## What is left
 
-1. **Appendix F, and it is the last thing left to write.** C, D and E are
-   done. **Its brief is three things, not one** \dash{} the diagram manifest,
-   the measurement table, and the outstanding-work ledgers, *printed rather
-   than merely counted by the build*, because \emph{a reader is entitled to
-   know what the book still owes them}. This entry called it \enquote{the
-   diagram manifest} in its first draft, which is the class this whole file
-   keeps recording: written from the feel of the file rather than from the
-   file, and corrected by opening it. **The appendices are not in
-   `tools/programs.json`**, so there is nothing to re-derive an owner from:
-   F's brief lives only in its own `\programstub{}`, in
-   `appendices/{en,pl}/`, and that is the whole contract.
+**Every program and every appendix is written. Nothing in this book is left to
+draft**, and the six items below are all finishing rather than writing. The one
+that closed last was Appendix~F, whose pass note is above; the standing warning
+it leaves behind is that **an appendix describing the book is the one class
+nothing can check**, so each of the six back-matter collections is now either
+accumulated at the point of use (`\canyou`, the diagram manifest, `\answerto`,
+`\result{}`) or computed from the tree and drift-gated (Appendix~F's ledgers)
+\dash{} and Appendix~B, the one that is neither, is the one that shipped four
+false pointers and needed two passes to find them by reading.
 
-   **Read the three that are finished as a gradient of protection, because F
-   sits at the top of it and can take the most.** C is marked at the point of
-   use, so its coordinates cannot be wrong. D's rows are gated against the
-   Polish prose, but the prose *between* its tables is not, and it made
-   exactly the failure the rows are gated against \dash{} **a gate is as wide
-   as the construct it parses**. E could take neither, being derived from
-   nothing a program carries, so it was held to the older instruction: read
-   the brief as a checklist, grep the destination before writing the
-   sentence, and say plainly which of its claims are verdicts and which are
-   bare pointers.
-
-   **F's first third needs almost none of that**, and that is the point of
-   leaving it last: `\mermaidfig` already accumulates the manifest at the
-   point of use, exactly as `\answerto`, `\canyou` and `\result{}` do, so
-   that coordinate cannot be wrong either, and `\listofdiagrams` is already
-   in the stub. **The other two thirds get none of it.** The measurement
-   table is `notes/01` §17's Status column, which is prose maintained by hand
-   and which sat wrong for five programs; the ledgers are the ones at the top
-   of this file, which is where the 27-against-54 above came from. So the
-   part of F that looks hardest is the part that is already done, and the
-   part that looks like transcription is the part that will be wrong \dash{}
-   write both against their instruments rather than from memory of them, and
-   quote the number the instrument prints.
-
-   **And the standing warning for any appendix that describes the book is
-   Appendix~B**, which was hand-authored, shipped four false pointers, and
-   needed two separate passes to find them by reading. An audit makes that
-   class detectable. Accumulating at the point of use makes it impossible.
-   **E's pass found the same class in the front matter** \dash{} seven of the
-   introduction's nine part ranges wrong, in both editions, on page one, with
-   every gate green because the gates compare the editions to each other.
-   `check_structure.py --parts` closes that one; nothing closes the general
-   case except opening the file you are describing.
-
-2. **The trained-model debt: five entries, one of them half answered.** It is
+1. **The trained-model debt: five entries, one of them half answered.** It is
    the first thing in this book that cannot be done from a sandbox at all.
 
    - **P11** asks for the singular-value spectrum of a real embedding matrix,
@@ -11689,7 +11842,7 @@ clone instead.
    model away from being five answers, and one of the five is already half
    given.
 
-3. **Part II's elicitation rate, which is nobody's program.** The ledger puts
+2. **Part II's elicitation rate, which is nobody's program.** The ledger puts
    P01, P02 and P03 at 29--31% against Part I's 73--78%. Raising them means
    finding, in three merged programs, the frames that state something the
    reader could produce, and moving the statement into the next frame's
@@ -11712,7 +11865,7 @@ clone instead.
    parallelisable job in the repository**, because it touches three merged
    program files and nothing else.
 
-4. **The measurements.** Ten are specified, nine of them free. The ledger in
+3. **The measurements.** Ten are specified, nine of them free. The ledger in
    `notes/01-curriculum.md` §17 carries a **Status column naming the pass**
    that ran each one, rather than a total in prose \dash{} it said "none has
    been run" for five programs after E6 had, which is the class this file
@@ -11725,17 +11878,17 @@ clone instead.
    resembles the specification beside them and no pass claimed it; deciding
    those is a reading job on three merged programs and is not an inference to
    make from the table.
-5. **The residual sweep.** Fourteen committed values are measured
+4. **The residual sweep.** Fourteen committed values are measured
    floating-point residuals rather than invariants — every key ending `.err`
    across F05, F07, F08, F09, F12 and P05, plus the figures quoted beside them.
    CI rejected two of P06's for exactly this and they are now emitted as
    bounds; the rest have survived so far, which is not the same as being
    reproducible. See the build trap. It is a pass of its own, because each is
    quoted in prose in two editions.
-6. **`odzera`, the companion library.** One stage per part, every gradient
+5. **`odzera`, the companion library.** One stage per part, every gradient
    checked against finite differences in CI, no GPU, the whole suite under a
    minute. Specified in `notes/01-curriculum.md` §18; nothing built.
-7. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
+6. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
    ledger stays open and the book may not claim it.
 
 ---
@@ -11828,15 +11981,15 @@ one is shaped by what the ones before it turned out to spend.
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
 for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.75**
-\dash{} 1,863 teaching frames in 1,393 trade pages, with one appendix
-still to come. (This sentence said **0.71** until the Appendix~E pass, which
+\dash{} 1,863 teaching frames in 1,397 trade pages, and the book is now
+complete: every program and every appendix is written. (This sentence said **0.71** until the Appendix~E pass, which
 is $1{,}321/1{,}863$ \dash{} the figure from before Appendix~C, left behind
 when the page count above it was updated and the ratio was not. It is the
 class this file keeps recording, in the paragraph that states the class.) §20 item 1 carries the measurement and the per-part page ranges, so
 the decision has numbers in front of it rather than an estimate; **every
-program is now written, so those numbers will not move again except by the
-appendices**, which is as settled as the question is going to get before
-somebody answers it. The other two that
+program and every appendix is now written, so those numbers will not move
+again except by revision**, which is as settled as the question is going to
+get before somebody answers it. The other two that
 stood beside it are now settled in the passes that wrote their programs
 \dash{} P12's placement, and whether P14 is enough of a fix for the rigour gap
 \dash{} and each entry records the argument the written book falsified rather

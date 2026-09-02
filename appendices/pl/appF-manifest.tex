@@ -1,13 +1,254 @@
 %% appF-manifest \dash{} Wykaz
-
+%
+% Trzy rzeczy, nie jedna: spis diagramów, tabela pomiarów i rejestry zaległości
+% -- WYDRUKOWANE, a nie tylko zliczone przez build, bo czytelnik trzymający
+% papier nie uruchomi `make debt`.
+%
+% KAŻDA LICZBA NA TYCH STRONACH JEST OBLICZANA. code/appf_ledgers.py zlicza je
+% z drzewa i zapisuje figures/values/appf.tex, więc `make verify` psuje się,
+% gdy rejestr się ruszy, a ten dodatek nie. To celowe i to jest cały projekt:
+% dodatek z ręcznie wpisanych liczb jest dokładnie tym, co poszło źle gdzie
+% indziej -- rejestr długu mówiący 27 tam, gdzie jego własne narzędzie drukuje
+% 54; stosunek stron do ramek zostawiony na nieaktualnej wartości; siedem złych
+% zakresów części na pierwszej stronie -- wszystko w jednym tygodniu i nic z
+% tego widoczne dla żadnej bramki.
+%
+% DWIE RZECZY CELOWO NIE SĄ TU LICZBAMI, a powody są także w docstringu skryptu:
+%
+%   * ile z dziesięciu eksperymentów zostało wykonanych. Liczba "ile" to
+%     twierdzenie o tej książce, którego nic z niczego nie wyprowadza, a
+%     notes/01 sekcja 17 odnotowuje, że zdanie "żaden nie został wykonany"
+%     stało na stronie przez pięć programów po tym, jak jeden został. Wiersze
+%     niosą własny status; nie ma sumy.
+%
+%   * rejestry poziomu strony (osierocone otwarcia ramek, osierocone wskazówki,
+%     osierocone ogony). To właściwości SKŁADU, a dwie instalacje TeX-a tej
+%     książki łamią strony inaczej, więc wydrukowana liczba byłaby faktem o
+%     jednej maszynie w przebraniu faktu o książce.
+%
+% Konwencja liczenia: każda liczba w tym dodatku opisuje EGZEMPLARZ, KTÓRY
+% TRZYMASZ, czyli jedno wydanie. `make debt` liczy oba i dlatego drukuje
+% dwukrotność kilku z nich. Tam, gdzie ta różnica ma znaczenie, dodatek podaje
+% obie liczby, zamiast zostawiać czytelnikowi zgadywanie.
 \chapter{Wykaz}
 \label{app:F}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia \dash{} patrz wydanie angielskie.]}
+\noindent
+Dodatki~\ref{app:B}, \ref{app:C} i~\ref{app:D} odpowiadaja na uczciwy zarzut
+wobec książki zbudowanej z ramek: że uczy dobrze, a potem nie da się w niej
+niczego sprawdzić. Ten odpowiada na inne pytanie, i jest to pytanie, które
+książka najmniej chętnie zadaje sama sobie.
 
-Spis diagramów, tabela pomiarów i rejestry zaległości \dash{} wydrukowane, a nie
-tylko zliczone przez build.
-}
+\emph{Co ta książka jest ci jeszcze winna?}
+
+Każda liczba poniżej jest zliczana ze źródeł przez skrypt i wciągana na stronę
+mechanicznie, dokładnie tak jak każda inna liczba w tej książce. To nie jest
+schludność. Dodatek z ręcznie wpisanych liczb dezaktualizuje się w tygodnie i
+nic nie widzi, jak to się dzieje \dash{} a jest to twierdzenie, które ta
+książka może wypowiedzieć z pewnym autorytetem, bo sama tak zrobiła.
+
+\medskip
+\begin{note}
+Każda liczba tutaj opisuje egzemplarz, który trzymasz, czyli jedno wydanie.
+Rejestry samego buildu liczą oba wydania naraz i dlatego drukują dwukrotność
+kilku z nich; tam, gdzie to ma znaczenie, podane są obie liczby.
+\end{note}
+
+\section{Diagramy}
+\label{sec:F-diagrams}
+\index{manifest!diagrams}
+
+W tym wydaniu jest $\val{appf.diagrams}$ diagramów, a w obu
+$\val{appf.diagrams.both}$, bo każdy jest rysowany osobno w każdym języku:
+diagram z angielskimi etykietami w wydaniu polskim to ten rodzaj półtłumaczenia,
+przez który dwujęzyczna książka sprawia wrażenie zrobionej maszynowo.
+
+Źródłem prawdy jest plik tekstowy, w repozytorium, więc zmiana diagramu
+recenzuje się jak zmiana tekstu, a nie jak nowy obrazek. Gotowy obrazek jest
+wynikiem buildu i nie jest przechowywany.
+
+\textbf{Poniższa lista nie jest utrzymywana.} Każdą pozycję zapisuje samo
+makro rysunku w miejscu, w którym rysunek stoi, więc diagram nie może być w
+książce i zniknąć z tej listy ani stać na niej i nie istnieć w książce. To ten
+sam mechanizm co w Dodatku~\ref{app:C} i jest użyty z tego samego powodu:
+ręcznie prowadzony spis własnej zawartości książki jest twierdzeniem o książce
+w każdym wierszu, a to jest ta jedna klasa twierdzeń, której nic tutaj nie
+sprawdzi.
 
 \listofdiagrams
+
+\section{Pomiary}
+\label{sec:F-measurements}
+\index{manifest!measurements}
+
+Zasada tej książki brzmi: twierdzenie o zachowaniu \dash{} nie o twierdzeniu
+matematycznym \dash{} pokazuje się przebiegiem, a nie deklaracją. W tym celu
+zaplanowano dziesięć eksperymentów. Każdy wiersz poniżej niesie własny status.
+
+\textbf{Nie ma tu żadnej sumy i ten brak jest sednem.} Liczba \enquote{ile
+wykonano} to twierdzenie o tej książce, którego nic z niczego nie wyprowadza,
+i taka liczba psuje się po cichu: zdanie \enquote{żaden nie został wykonany}
+stało na stronie, w pliku czytanym przez następnego autora jako pierwszy,
+przez pięć programów po tym, jak jeden został.
+
+\medskip
+\textbf{Wykonane i opisane w programie, który je wykonał.}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+\textbf{\#} & \textbf{Co mierzy} & \textbf{Gdzie} \\
+\midrule
+E6 & Spadek zwykły, pęd i Adam na formie kwadratowej o znanym wskaźniku
+  uwarunkowania; kroki do tolerancji wobec przewidzianej liczby &
+  \ref{prog:P20} \\
+E8 & Dywergencja w przód i wstecz dopasowana do jednego celu dwumodalnego;
+  pokrywanie modów wobec ich wybierania & \ref{prog:P30} \\
+E9 & Rozrzut wyników i entropia uwagi z dzielnikiem pierwiastkowym i bez
+  niego, dla różnych rozmiarów głowicy & \ref{prog:P25}, \ref{prog:P32} \\
+E10 & Dopasowanie prawa potęgowego do kształtu używanego w literaturze, z
+  podanym błędem ekstrapolacji & \ref{prog:P33} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\textbf{Zmierzone, ale niezadeklarowane.} Każdy z tych programów zmierzył coś,
+co blisko przypomina stojącą obok specyfikację, i żaden pass nie zadeklarował
+eksperymentu. To, czy specyfikacja jest spełniona, jest zadaniem do
+przeczytania w napisanym programie, a nie wnioskiem do wyciągnięcia z tabeli
+\dash{} i dlatego tabela mówi to, zamiast mówić \enquote{wykonane}.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+\textbf{\#} & \textbf{Co specyfikuje} & \textbf{Gdzie} \\
+\midrule
+E1 & Wynik, przy którym naiwny $\softmax$ przepełnia każdy format, i ile
+  kosztuje niemaksymalny punkt odniesienia & \ref{prog:P02} \\
+E3 & Kąt między losowymi wektorami jednostkowymi w miarę wzrostu wymiaru i
+  koncentracja wokół kąta prostego & \ref{prog:P05} \\
+E5 & Tryb w przód wobec trybu wstecz: czas i szczyt pamięci wobec głębokości
+  oraz zmierzony koszt punktów kontrolnych & \ref{prog:P16} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\textbf{Niewykonane.}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+\textbf{\#} & \textbf{Co by rozstrzygnął} & \textbf{Gdzie} \\
+\midrule
+E2 & Ręcznie policzone operacje i bajty jednego przebiegu w przód wobec
+  zmierzonego czasu zegara; gdzie model się myli i o ile &
+  \ref{prog:P03} \\
+E4 & Widmo wartości szczególnych prawdziwej macierzy zanurzeń i błąd
+  rekonstrukcji wobec rzędu \dash{} ten wymaga wytrenowanego modelu &
+  \ref{prog:P11} \\
+E7 & Szerokość przedziału wobec rozmiaru zbioru ewaluacyjnego na publicznym
+  benchmarku; rozmiar potrzebny do rozstrzygnięcia jednego punktu &
+  \ref{prog:P27} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Co liczy build}
+\label{sec:F-ledgers}
+\index{manifest!ledgers}
+
+Każda z tych pozycji jest sprawdzana przy każdym buildzie i każda jest liczbą,
+którą ta książka woli ci pokazać, niż kazać brać na słowo.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xl@{}}
+\toprule
+\textbf{Rejestr} & \textbf{Liczba} \\
+\midrule
+Napisane programy, z $\val{appf.programs}$ & $\val{appf.programs}$ \\
+Ramki nauczające & $\val{appf.frames}$ \\
+Ramki zaplanowane & $\val{appf.frames.planned}$ \\
+Wartości obliczone, każda użyta i obecna & $\val{appf.values}$ \\
+Zapisy konsoli, każdy wytworzony przez skrypt &
+  $\val{appf.transcripts}$ \\
+Diagramy & $\val{appf.diagrams}$ \\
+Twierdzenia oznaczone jako niezweryfikowane & $\val{appf.verifybox}$ \\
+Ramki, które zadają ci pytanie &
+  $\val{appf.elicit}$, czyli $\val{appf.elicit.pct}$ procent \\
+Polskie odpowiedniki wymienione w Dodatku~\ref{app:D} & $\val{appf.terms.rend}$
+  w $\val{appf.terms.rows}$ wierszach \\
+Zakresy części we wstępie, wobec manifestu & $\val{appf.parts}$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+Dwie z nich opisują jedno wydanie tam, gdzie rejestr samego buildu opisuje oba,
+a różnica jest czynnikiem dwa, a nie sprzecznością: w obu wydaniach razem jest
+$\val{appf.transcripts.both}$ zapisów konsoli i
+$\val{appf.diagrams.both}$ diagramów, bo każdy powstaje osobno w każdym
+języku. Cytuj tę liczbę, którą masz na myśli, i powiedz, która to.
+
+\medskip
+Trzy dalsze są sprawdzane na gotowej stronie, a nie w źródle, i celowo nie
+dostają tu liczby: czy kreska ramki i numer na marginesie bywają zostawione u
+dołu strony z ramką na następnej, czy zdarza się to nagłówkowi sekcji i jak
+często ogon ramki ląduje niemal sam na stronie. To są własności składu, a dwie
+instalacje składu, na których ta książka jest budowana, łamią wiersze inaczej,
+więc wydrukowana tu liczba byłaby faktem o jednej maszynie przebranym za fakt
+o książce.
+
+\section{Czego ta książka nie twierdzi}
+\label{sec:F-owed}
+\index{manifest!outstanding}
+
+\begin{warning}
+\textbf{Standard 80/80 nie jest ustalony i ta książka nie może się na niego
+powoływać.} Metoda, którą pożycza, została do tego standardu zwalidowana
+\dash{} osiemdziesiąt procent czytelników osiąga osiemdziesiąt procent celów
+\dash{} przed swoją publikacją. To jest fakt o metodzie i nie jest
+przenaszalny. Nikt nie był testowany na \emph{tej} książce. Dopóki ktoś nie
+będzie, rejestr zostaje otwarty, a instrumentem będą punktowane Zadania
+sprawdzające, a nie Quiz: Quiz działa tylko na programach Podstaw, a jego
+pozycje służą tak samo na wejściu, jak na wyjściu, więc różnica wyników mierzy
+pamięć pytań.
+\end{warning}
+
+\medskip
+Trzy inne rzeczy są zaległe i warto nazwać każdą osobno, bo każda jest innym
+rodzajem długu.
+
+\medskip
+\textbf{Pomiary, które wymagają wytrenowanego modelu.} Cztery twierdzenia w tej
+książce są podane jako mechanizm i oznaczone jako osąd, a nie zmierzone, bo ich
+rozstrzygnięcie wymaga wag, których ta książka nie dostarcza i nie pobiera: czy
+widmo prawdziwej macierzy zanurzeń opada tak, jak zakładają metody niskiego
+rzędu; czy rząd głębokiego stosu uwagi spada bez żadnej wąskiej warstwy, która
+by go do tego zmusiła; czy dolina, w której ląduje przebieg uczenia, ma
+znaczenie w skali, w jakiej ludzie trenują; i czy niezależność zakładana przez
+dzielnik pierwiastkowy przeżywa trening. Każde jest oznaczone tam, gdzie się
+pojawia.
+
+\medskip
+\textbf{Tempo, w jakim ta książka zadaje ci pytania, nie jest równe.} Biegnie
+mniej więcej trzy czwarte przez wczesne programy Podstaw i około trzech na
+dziesięć przez całą część~II, a własna liczba książki to
+$\val{appf.elicit.pct}$ procent. To jest realna nierówność nauczania, a nie
+statystyka: program, który mówi ci więcej, niż cię pyta, jest programem, z
+którego zapamiętasz mniej, cokolwiek by o sobie twierdził.
+
+\medskip
+\textbf{A towarzysząca biblioteka jest zaprojektowana i niezbudowana.} Jeden
+etap na część, każdy gradient sprawdzany różnicą skończoną, bez akceleratora.
+Istnieje jako projekt i jako nic więcej.
+
+\medskip
+To jest całość tego, co zostaje zaległe, o ile ktokolwiek wie. To zastrzeżenie
+nie jest skromnością: ten dodatek sam jest twierdzeniem o książce, dokładnie
+tej klasy, której nieufności poprzednie strony poświęcają całą swoją długość, a
+jedynym powodem, by dać mu więcej wiary niż innym, jest to, że jego liczby są
+zliczane maszynowo, a jego osądy są oznaczone jako osądy.
+
+Czyli wszystko, o co ta książka kiedykolwiek prosiła cię wobec kogokolwiek.

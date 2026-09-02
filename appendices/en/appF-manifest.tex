@@ -1,13 +1,253 @@
 %% appF-manifest \dash{} Manifest
+%
+% Three things, not one: the diagram manifest, the measurement table, and the
+% outstanding-work ledgers -- printed rather than merely counted by the build,
+% because a reader holding the paper cannot run `make debt`.
+%
+% EVERY NUMBER ON THESE PAGES IS COMPUTED. code/appf_ledgers.py counts them
+% out of the tree and writes figures/values/appf.tex, so `make verify` fails
+% when a ledger moves and this appendix does not. That is deliberate and it is
+% the whole design: an appendix of hand-typed counts is precisely what went
+% wrong elsewhere -- a debt ledger that said 27 where its own tool printed 54,
+% a pages-per-frame ratio left at a superseded figure, seven wrong part ranges
+% on page one -- all inside one week, and none of it visible to any gate.
+%
+% TWO THINGS ARE DELIBERATELY NOT NUMBERS HERE, and the reasons are in the
+% script's docstring as well:
+%
+%   * how many of the ten experiments have run. A count of how many is a claim
+%     about this book that nothing derives from anything, and notes/01 s17
+%     records that "none has been run" sat on the page for five programs after
+%     one had. The rows carry their own status; there is no total.
+%
+%   * the page-level ledgers (stranded openers, orphaned cues, orphan tails).
+%     Those are properties of the TYPESETTING, and this book's two TeX
+%     installations paginate differently, so a printed count would be a fact
+%     about one machine wearing the clothes of a fact about the book.
+%
+% Counting convention: every figure in this appendix describes THE COPY YOU
+% ARE HOLDING, which is one edition. `make debt` counts both and therefore
+% prints twice several of these. Where the difference matters the appendix
+% gives both numbers rather than leaving the reader to guess which they have.
 
 \chapter{Manifest}
 \label{app:F}
 
-\programstub{%
-The diagram manifest, the measurement table, and the outstanding-work ledgers,
-printed rather than merely counted by the build.
+\noindent
+Appendices~\ref{app:B}, \ref{app:C} and~\ref{app:D} answer the fair criticism
+of a book made of frames: that it teaches well and is useless to look
+something up in afterwards. This one answers a different question, and it is
+the one a book is least inclined to ask itself.
 
-A reader is entitled to know what the book still owes them.
-}
+\emph{What does this book still owe you?}
+
+Every number below is counted out of the source by a script and pulled onto
+the page mechanically, exactly as every other number in this book is. That is
+not tidiness. An appendix of hand-typed counts goes stale in weeks and nothing
+can see it happen \dash{} which is a claim this book can make with some
+authority, having done it.
+
+\medskip
+\begin{note}
+Every figure here describes the copy you are holding, which is one edition.
+The build's own ledgers count both editions at once and so print twice several
+of these; where that matters, both numbers are given.
+\end{note}
+
+\section{The diagrams}
+\label{sec:F-diagrams}
+\index{manifest!diagrams}
+
+There are $\val{appf.diagrams}$ diagrams in this edition and
+$\val{appf.diagrams.both}$ across the two, because each is drawn separately in
+each language: a diagram with English labels in the Polish edition is the kind
+of half-translation that makes a bilingual book feel machine-made.
+
+The source of truth is a text file, committed, so a change to a diagram
+reviews as a diff rather than as a new picture. The rendered image is build
+output and is not kept.
+
+\textbf{The list below is not maintained.} Each entry is written by the figure macro
+itself at the point where the figure is placed, so a diagram cannot be in the
+book and missing from this list, nor listed here and absent from the book. It
+is the same mechanism as Appendix~\ref{app:C}, and it is used for the same
+reason: a hand-kept index of a book's own contents is a claim about the book on
+every line, and that is the one class of claim nothing here can check.
 
 \listofdiagrams
+
+\section{The measurements}
+\label{sec:F-measurements}
+\index{manifest!measurements}
+
+This book's house rule is that a claim about behaviour \dash{} not about a
+theorem \dash{} is demonstrated by a run rather than asserted. Ten experiments
+were specified for that purpose. Each row below carries its own status.
+
+\textbf{No total appears here, and the omission is the point.} A count of how
+many have been run is a claim about this book that nothing derives from
+anything, and it decays silently: the sentence \enquote{none has been run}
+stayed on the page, and in the file the next author reads first, for five
+programs after one had been.
+
+\medskip
+\textbf{Run, and reported in the program that ran them.}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+\textbf{\#} & \textbf{What it measures} & \textbf{Where} \\
+\midrule
+E6 & Plain descent, momentum and Adam on a quadratic of known condition
+  number; steps to tolerance against the predicted count &
+  \ref{prog:P20} \\
+E8 & Forward against reverse divergence fitted to one bimodal target;
+  mode-covering against mode-seeking & \ref{prog:P30} \\
+E9 & Score spread and attention entropy with and without the square-root
+  divisor, across head sizes & \ref{prog:P25}, \ref{prog:P32} \\
+E10 & A power-law fit on the shape the literature uses, with the fit's own
+  extrapolation error reported & \ref{prog:P33} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\textbf{Measured, but not claimed.} Each of these programs measured something
+that closely resembles the specification beside it, and no pass ever claimed
+the experiment. Whether the specification is met is a reading job on a written
+program, and it is not an inference to draw from a table \dash{} which is why
+the table says this rather than saying \enquote{run}.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+\textbf{\#} & \textbf{What it specifies} & \textbf{Where} \\
+\midrule
+E1 & The score at which a naive $\softmax$ overflows each format, and what a
+  non-maximal pivot costs & \ref{prog:P02} \\
+E3 & The angle between random unit vectors as the dimension climbs, and the
+  concentration towards a right angle & \ref{prog:P05} \\
+E5 & Forward against reverse mode: time and peak memory against depth, and
+  the measured cost of checkpointing & \ref{prog:P16} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\textbf{Not run.}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+\textbf{\#} & \textbf{What it would settle} & \textbf{Where} \\
+\midrule
+E2 & Hand-counted operations and bytes for one forward pass against a
+  measured wall clock; where the model is wrong and by how much &
+  \ref{prog:P03} \\
+E4 & The singular-value spectrum of a real embedding matrix, and
+  reconstruction error against rank \dash{} this one needs a trained model &
+  \ref{prog:P11} \\
+E7 & Interval width against evaluation-set size on a public benchmark; the
+  size needed to resolve one point & \ref{prog:P27} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{What the build counts}
+\label{sec:F-ledgers}
+\index{manifest!ledgers}
+
+Each of these is checked on every build, and each of them is a number this
+book would rather you saw than took on trust.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xl@{}}
+\toprule
+\textbf{Ledger} & \textbf{Count} \\
+\midrule
+Programs written, of $\val{appf.programs}$ & $\val{appf.programs}$ \\
+Teaching frames & $\val{appf.frames}$ \\
+Frames the plan projected & $\val{appf.frames.planned}$ \\
+Computed values, every one referenced and present & $\val{appf.values}$ \\
+Console transcripts, every one produced by a script &
+  $\val{appf.transcripts}$ \\
+Diagrams & $\val{appf.diagrams}$ \\
+Claims marked as unverified & $\val{appf.verifybox}$ \\
+Frames that put a question to you &
+  $\val{appf.elicit}$, or $\val{appf.elicit.pct}$ per cent \\
+Polish renderings named in Appendix~\ref{app:D} & $\val{appf.terms.rend}$
+  in $\val{appf.terms.rows}$ rows \\
+Part ranges in the introduction, against the manifest & $\val{appf.parts}$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+Two of those describe one edition where the build's own ledger describes both,
+and the difference is a factor of two rather than a disagreement: there are
+$\val{appf.transcripts.both}$ transcripts across the two editions and
+$\val{appf.diagrams.both}$ diagrams, because each is produced separately in
+each language. Quote whichever you mean and say which it is.
+
+\medskip
+Three more are checked on the finished page rather than in the source, and
+they are deliberately not given a number here: whether a frame's rule and
+margin number are ever stranded at the foot of a page with the frame overleaf,
+whether a section heading is, and how often a frame's tail lands nearly alone
+on a page. Those are properties of the typesetting, and the two typesetting
+installations this book is built on break lines differently, so a count
+printed here would be a fact about one machine dressed as a fact about the
+book.
+
+\section{What this book does not claim}
+\label{sec:F-owed}
+\index{manifest!outstanding}
+
+\begin{warning}
+\textbf{The 80/80 standard is not established, and this book may not claim
+it.} The method it borrows was validated to that standard \dash{} eighty per
+cent of readers reaching eighty per cent of the objectives \dash{} before its
+own publication. That is a fact about the method and it is not transferable.
+Nobody has been trialled on \emph{this} book. Until somebody has, the ledger
+stays open, and the instrument when it happens is the scored Test exercises
+rather than the Quiz: the Quiz runs on the Foundation programs only, and its
+items serve on entry and on exit alike, so a score difference across it
+measures memory of the questions.
+\end{warning}
+
+\medskip
+Three other things are owed, and they are worth naming individually because
+each is a different kind of debt.
+
+\medskip
+\textbf{The measurements that need a trained model.} Four claims in this book
+are stated as mechanism and labelled as judgement rather than measured,
+because settling them needs weights this book does not ship and does not
+download: whether a real embedding matrix's spectrum falls the way low-rank
+methods assume; whether the rank of a deep attention stack falls without any
+narrow layer to force it; whether the basin a training walk lands in matters
+at the scale people train at; and whether the independence the square-root
+divisor assumes survives training. Each is marked where it appears.
+
+\medskip
+\textbf{The rate at which this book asks you questions is not even.} It runs
+at roughly three quarters through the early Foundation programs and around
+three in ten across Part~II, and the book's own figure is
+$\val{appf.elicit.pct}$ per cent. That is a real unevenness in the teaching
+rather than a statistic: a program that tells you more than it asks you is a
+program you will retain less from, whatever it says about itself.
+
+\medskip
+\textbf{And the companion library is specified and unbuilt.} One stage per
+part, every gradient checked against a finite difference, no accelerator
+required. It exists as a design and as nothing else.
+
+\medskip
+That is the whole of what is outstanding, as far as anybody knows. The
+qualification is not modesty: this appendix is itself a claim about the book,
+of exactly the kind the preceding pages spend their length teaching you to
+distrust, and the only reason to give it more weight than the others is that
+its numbers are counted by a machine and its judgements are labelled as
+judgements.
+
+Which is all this book has ever asked you to require of anybody.
