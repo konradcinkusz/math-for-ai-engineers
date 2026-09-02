@@ -10168,6 +10168,24 @@ Program~\ref{prog:P23} stated about `\raggedbottom`: **before waiting for a
 mechanism, confirm the mechanism is running.** An unchanged reading is
 evidence that nothing is happening, not that something is happening slowly.
 
+> **And the first draft of this very note got the mechanism wrong, which is
+> why it is worth reading twice.** It said a markdown-only *push* runs
+> nothing. It does not: on a `pull_request` event GitHub evaluates
+> `paths-ignore` against **the PR's whole diff**, base to head, not against
+> the newest commit. So a markdown-only *PR* runs nothing \dash{} which is
+> what the notes sweep was, three `.md` files and no others \dash{} while a
+> markdown-only *push to a PR that already touches code* runs the full
+> matrix. This pass's own last push was two `.md` files onto a PR full of
+> `.tex`, and all four jobs queued immediately, which is how the error was
+> caught.
+>
+> It is the pass's own theme arriving one level up: the claim was written
+> from the feel of the mechanism rather than from the mechanism, and what
+> settled it was reading `build.yml` \dash{} eight lines, four seconds. The
+> corrected rule is more useful than the wrong one, because it tells you
+> *which* PRs are exposed: **check the shape of the whole diff, not of the
+> push.**
+
 #### Rule 2, and the figures
 
 | | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
