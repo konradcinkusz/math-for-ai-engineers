@@ -250,6 +250,13 @@ Przeczytaj mianownik. Gdy $a$ i $b$ są daleko od siebie, jest porównywalny z
 licznikiem i nic szczególnego się nie dzieje. Gdy są blisko, dąży do zera, a
 licznik nie.
 
+Jedno założenie tego wyprowadzenia warto nazwać, bo czyni ono to wyrażenie
+dolnym ograniczeniem, a nie oszacowaniem. Przyjmuje ono, że błąd względny
+każdego argumentu wynosi około $\eps$, co Program~\ref{prog:P01} dopuszcza dla
+liczby świeżo zaokrąglonej do formatu i dla niczego więcej. Jeśli $a$ i $b$ są
+same wynikami długich obliczeń, przychodzą z większym błędem, a ten sam
+współczynnik mnoży to, z czym przyszły.
+
 Zapisz więc współczynnik wzmocnienia, a potem podaj jego rząd wielkości dla
 powyższej wariancji.
 \dotline
@@ -376,6 +383,15 @@ Program~\ref{prog:P25}. Awaria nie jest rzadkim zdarzeniem na skraju zakresu
 formatu; jest wartością, przed którą architektura ma wbudowaną poprawkę, a
 produkuje \code{inf}, a potem \code{nan}, a nie błąd, który ktokolwiek nazwałby
 błędem.
+
+I zawodzi jako skok, a nie jako zbocze, co jest przeciwieństwem tego, co
+pokazała poprzednia sekcja. Kasowanie degraduje się stopniowo: współczynnik
+wzmocnienia rośnie, gdy argumenty zbliżają się do siebie, więc tracisz cyfry,
+potem kolejne cyfry, zanim stracisz wszystkie. Eksponenta poniżej progu jest
+dokładna z dokładnością formatu, a jedną jednostkę powyżej daje \code{inf}, i
+nie ma nic pomiędzy. Test, który przechodzi zakres i sprawdza błąd, przejdzie
+więc czysto aż do ostatniego bezpiecznego wyniku i nie powie nic o
+następnym.
 
 Następna ramka podaje ten wynik dla wszystkich czterech formatów. Zanim to
 zrobi: dwa z czterech przepełniają się przy tym samym wyniku. Powiedz które i

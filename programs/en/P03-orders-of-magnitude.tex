@@ -375,6 +375,14 @@ of two between two people's figures is usually this and not a disagreement
 about the model. Say which convention you are using and the argument stops.
 \end{note}
 
+Notice what \enquote{per parameter} does and does not charge for. It counts the
+multiplies and adds a parameter takes part in, and there is nothing in it for
+work whose cost is set by the width or the sequence length instead \dash{} the
+normalisations, the activations, and the score computation you have just
+counted, which has no parameter anywhere in it. So the shortcut prices the
+weights rather than the run, which is what makes it quotable and also what
+makes it a floor.
+
 For a whole training run the count has a shortcut, and Program~\ref{prog:F01}
 already used it: about $6$ FLOPs per parameter per token. That $6$ is three
 separate twos. Say where each of them comes from.
