@@ -851,100 +851,100 @@ podać.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Wektor własny to kierunek, który macierz tylko
+\sumitem{1--3}{\result{\textbf{Wektor własny to kierunek, który macierz tylko
   rozciąga}, $Av = \lambda v$ przy $v \ne 0$, a jego sens jest taki, że wzdłuż
   niego macierz z $n^{2}$ liczbami w środku zachowuje się jak pojedyncza
   liczba. Wszystko, co trudne w macierzy, bierze się z mieszania współrzędnych;
-  wzdłuż wektora własnego nie miesza.}
-\sumitem{4--5}{Przykładowa macierz ma dwa, w $(1,1)$ i $(1,-1)$, o wartościach
+  wzdłuż wektora własnego nie miesza}.}
+\sumitem{4--5}{\result{Przykładowa macierz ma dwa, w $(1,1)$ i $(1,-1)$, o wartościach
   własnych $\val{p10.sym.hi}$ i $\val{p10.sym.lo}$ \dash{} i są
   \textbf{prostopadłe}, a jest ich \textbf{dwa w dwóch wymiarach}, co na mocy
   Programu~\ref{prog:P04} czyni je bazą. Żadne z tego nie jest przypadkiem, a
-  dwie następne sekcje mówią dlaczego.}
-\sumitem{6--8}{$Av = \lambda v$ znaczy, że $A - \lambda I$ posyła coś
+  dwie następne sekcje mówią dlaczego}.}
+\sumitem{6--8}{\result{$Av = \lambda v$ znaczy, że $A - \lambda I$ posyła coś
   niezerowego na zero, więc \textbf{wartości własne to pierwiastki
   $\det(A - \lambda I) = 0$}, czyli
   $\lambda^{2} - (\operatorname{tr}A)\lambda + \det A$ dla $2 \times 2$. Nic
   nowego nie było potrzebne: Program~\ref{prog:P08} dał jądro, a
-  Program~\ref{prog:P09} wyznacznik.}
-\sumitem{9}{\textbf{Wyznacznik jest iloczynem wartości własnych, a ślad ich
+  Program~\ref{prog:P09} wyznacznik}.}
+\sumitem{9}{\result{\textbf{Wyznacznik jest iloczynem wartości własnych, a ślad ich
   sumą}, wprost z tego równania kwadratowego. Pierwsze to obietnica, którą
   Program~\ref{prog:P09} złożył w imieniu tego programu, i jest dotrzymana jako
   bramka: skrypt liczy wyznacznik procedurą z tamtego programu i wymaga
-  równości z iloczynem.}
-\sumitem{10}{Zatem \textbf{osobliwość, zerowa wartość własna i nietrywialne
+  równości z iloczynem}.}
+\sumitem{10}{\result{Zatem \textbf{osobliwość, zerowa wartość własna i nietrywialne
   jądro to jeden warunek}, bo iloczyn jest zerem dokładnie wtedy, gdy zerem
   jest czynnik. Trzy programy, trzy drogi \dash{} liczenie kierunków, mierzenie
-  objętości, mnożenie listy.}
-\sumitem{11--12}{\textbf{Wektory własne są prostopadłe tylko dla macierzy
+  objętości, mnożenie listy}.}
+\sumitem{11--12}{\result{\textbf{Wektory własne są prostopadłe tylko dla macierzy
   symetrycznej.} $\begin{pmatrix} 2 & 1 \\ 0 & 3 \end{pmatrix}$ ma wektory
   własne pod kątem $\val{p10.nonsym.angle}$ stopni, a macierze uwagi, macierze
   przejścia i jakobiany nie są symetryczne. Nawyk pochodzi z obciążonej próby:
-  ładne przykłady liczone ręcznie to te symetryczne.}
-\sumitem{13--17}{Dwie dalsze porażki. \textbf{Ćwierć obrotu nie ma żadnej
+  ładne przykłady liczone ręcznie to te symetryczne}.}
+\sumitem{13--17}{\result{Dwie dalsze porażki. \textbf{Ćwierć obrotu nie ma żadnej
   rzeczywistej wartości własnej}, bo nic nie przeżywa obrotu o kąt prosty
   \dash{} zespolona wartość własna to algebra mówiąca \emph{to obraca}. A
   \textbf{ścinanie ma jedną wartość własną dwa razy, ale tylko jeden kierunek},
-  i to znaczy \emph{defektywna}.}
-\sumitem{18--19}{\textbf{Twierdzenie spektralne}: macierz symetryczna ma
+  i to znaczy \emph{defektywna}}.}
+\sumitem{18--19}{\result{\textbf{Twierdzenie spektralne}: macierz symetryczna ma
   rzeczywiste wartości własne i prostopadłe wektory własne. Sformułowane, nie
   dowodzone \dash{} ale prostopadłość to jedna linijka, i używa $A\T = A$
   dokładnie raz, by przenieść macierz przez iloczyn skalarny.
-  \textbf{Symetria nie jest wygodą; jest tym, z czego zrobiony jest wniosek.}}
+  \textbf{Symetria nie jest wygodą; jest tym, z czego zrobiony jest wniosek.}}}
 \sumitem{20--22}{Sprawdzone \emph{dokładnie} na $\val{p10.spectral.trials}$
   macierzach zbudowanych jako $QDQ\T$ z wymiernego obrotu
   Programu~\ref{prog:P09}, więc odpowiedzi są znane z konstrukcji, a nie
   znalezione przez solwer. Jak w Programie~\ref{prog:P04},
   \textbf{próby testują kod} \dash{} a test zmiennoprzecinkowy potrzebowałby
   tolerancji, czego słowo \emph{dokładnie} odmawia.}
-\sumitem{23}{Zapłata: pełny prostopadły zestaw wektorów własnych to baza i
+\sumitem{23}{\result{Zapłata: pełny prostopadły zestaw wektorów własnych to baza i
   ortogonalna zmiana bazy, więc \textbf{macierz symetryczna jest diagonalna w
-  odpowiednich współrzędnych}, a wektory własne są tymi współrzędnymi.}
-\sumitem{24--25}{\textbf{Forma kwadratowa} to $x\T Ax$, a \textbf{wpłynąć na
+  odpowiednich współrzędnych}, a wektory własne są tymi współrzędnymi}.}
+\sumitem{24--25}{\result{\textbf{Forma kwadratowa} to $x\T Ax$, a \textbf{wpłynąć na
   nią może tylko symetryczna część $A$} \dash{} dlatego hesjan, kowariancja i
   macierz Grama są symetryczne i dlatego twierdzenie spektralne zawsze się do
-  formy stosuje.}
-\sumitem{26--27}{W bazie wektorów własnych forma zwija się do
+  formy stosuje}.}
+\sumitem{26--27}{\result{W bazie wektorów własnych forma zwija się do
   $\lambda_1c_1^{2} + \lambda_2c_2^{2}$, więc dwie dodatnie wartości własne
   czynią ją dodatnią w każdym kierunku. To jest \textbf{dodatnia
   określoność}: teza o nieskończenie wielu kierunkach, rozstrzygnięta
-  spojrzeniem na dwie liczby.}
-\sumitem{28--29}{$+,-$ to siodło, a $+,0$ to grzbiet, potwierdzone w
+  spojrzeniem na dwie liczby}.}
+\sumitem{28--29}{\result{$+,-$ to siodło, a $+,0$ to grzbiet, potwierdzone w
   $\val{p10.form.dirs}$ kierunkach każde. \textbf{Znaki wartości własnych
-  rozstrzygają cały kształt bez próbowania choćby jednego kierunku.}}
-\sumitem{30}{\textbf{Kierunku płaskiego nie da się znaleźć próbkowaniem.}
+  rozstrzygają cały kształt bez próbowania choćby jednego kierunku.}}}
+\sumitem{30}{\result{\textbf{Kierunku płaskiego nie da się znaleźć próbkowaniem.}
   Twierdzenie, że najmniejsza spróbkowana wartość formy półokreślonej jest
   zerem, padło natychmiast, bo kierunek płaski jest jednym kierunkiem z
   nieskończenie wielu. To jest argument za liczeniem wektorów własnych zamiast
-  próbowania kierunków.}
-\sumitem{31--32}{\enquote{Zerowa wartość własna}, \enquote{osobliwa},
+  próbowania kierunków}.}
+\sumitem{31--32}{\result{\enquote{Zerowa wartość własna}, \enquote{osobliwa},
   \enquote{jądro} i \enquote{płaski kierunek} to \textbf{jeden warunek
   powiedziany czterokrotnie}. A \emph{pół}określona dopuszcza zero, więc
   macierz dodatnio określona jest odwracalna, a półokreślona nie musi być
-  \dash{} i słowo \emph{pół} niesie całą tę różnicę.}
-\sumitem{33--34}{\textbf{Norma spektralna to największe $\lvert\lambda\rvert$}
+  \dash{} i słowo \emph{pół} niesie całą tę różnicę}.}
+\sumitem{33--34}{\result{\textbf{Norma spektralna to największe $\lvert\lambda\rvert$}
   i jest czynnikiem, którym warstwa może wzmocnić w najgorszym przypadku po
   wszystkich wejściach, także tych nieprzetestowanych. Na
   $\val{p10.norm.dirs}$ kierunkach: największe $\val{p10.norm.max}$,
-  najmniejsze $\val{p10.norm.min}$, osiągane w górnym wektorze własnym.}
-\sumitem{35--37}{Poziomica formy dodatnio określonej to elipsa o osiach wzdłuż
+  najmniejsze $\val{p10.norm.min}$, osiągane w górnym wektorze własnym}.}
+\sumitem{35--37}{\result{Poziomica formy dodatnio określonej to elipsa o osiach wzdłuż
   wektorów własnych, a \textbf{stosunek osi jest PIERWIASTKIEM ze stosunku
   wartości własnych} \dash{} $\val{p10.basin.axisratio}$ przy stosunku
   $\val{p10.basin.eigratio}$, gdzie większość ludzi odpowiada
-  $\val{p10.basin.eigratio}$.}
-\sumitem{38}{\enquote{Wąwóz}, \enquote{ostre minimum} i \enquote{za wysoki
-  learning rate} to \textbf{trzy liczby odczytane z jednej macierzy}. Kształt
+  $\val{p10.basin.eigratio}$}.}
+\sumitem{38}{\result{\enquote{Wąwóz}, \enquote{ostre minimum} i \enquote{za wysoki
+  learning rate} to \textbf{trzy liczby odczytane z jednej macierzy}.} Kształt
   jest zbierany tutaj; nierówność należy do Programu~\ref{prog:P17}, a
   optymalizatory do Programu~\ref{prog:P20}.}
-\sumitem{39--40}{$C = \frac{1}{n}X\T X$ jest \textbf{symetryczna i dodatnio
+\sumitem{39--40}{\result{$C = \frac{1}{n}X\T X$ jest \textbf{symetryczna i dodatnio
   półokreślona}, oba dowiedzione z tamtej jednej linijki, a nie pożyczone, więc
   twierdzenie spektralne stosuje się do macierzy, której \emph{znaczenie}
-  należy do Programu~\ref{prog:P24} i nie zostało jeszcze podane.}
-\sumitem{41--43}{$v\T Cv$ to rozrzut danych wzdłuż $v$, więc \textbf{kierunek
+  należy do Programu~\ref{prog:P24} i nie zostało jeszcze podane}.}
+\sumitem{41--43}{\result{$v\T Cv$ to rozrzut danych wzdłuż $v$, więc \textbf{kierunek
   największego rozrzutu to górny wektor własny}. To jest PCA, spostrzeżenie
   raczej niż algorytm: $\val{p10.pca.top.pct}\%$ rozrzutu na jednym kierunku,
   znalezione dwiema drogami, które się zgadzają, a z których tylko jedna
-  przeżywa siedemset wymiarów.}
+  przeżywa siedemset wymiarów}.}
 \end{summarybox}
 
 \canyou

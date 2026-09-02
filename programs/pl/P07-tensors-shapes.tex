@@ -719,58 +719,58 @@ kształt.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Oś jest pozycją w krotce indeksów, a nie kierunkiem w
+\sumitem{1--3}{\result{\textbf{Oś jest pozycją w krotce indeksów, a nie kierunkiem w
   przestrzeni.} Kształt to krotka długości, a obie konwencje partii \dash{}
   $k \times n$ i $n \times k$ \dash{} są jednym przekształceniem zapisanym na
-  dwa sposoby, bo $XW\T$ jest transpozycją $WX$.}
-\sumitem{4--5}{\textbf{Trzy rzeczy nazywają się wymiarem} i odpowiadają na
+  dwa sposoby, bo $XW\T$ jest transpozycją $WX$}.}
+\sumitem{4--5}{\result{\textbf{Trzy rzeczy nazywają się wymiarem} i odpowiadają na
   różne pytania: liczba osi ($\val{p07.emb.rank}$ dla kształtu
   $(\val{p07.emb.b}, \val{p07.emb.s}, \val{p07.emb.d})$), długość jednej osi
   oraz wymiar przestrzeni, w której żyje zapisany wektor, czyli
-  $\val{p07.emb.d}$, będący faktem o jednej osi, a nie o tablicy.}
-\sumitem{6--8}{\emph{Rząd} tablicy to liczba jej osi, czyli inne słowo niż to z
+  $\val{p07.emb.d}$, będący faktem o jednej osi, a nie o tablicy}.}
+\sumitem{6--8}{\result{\emph{Rząd} tablicy to liczba jej osi, czyli inne słowo niż to z
   Programu~\ref{prog:P08}. Pod spodem jest jeden bufor
   $\val{p07.emb.total}$ liczb plus \textbf{reguła zamieniająca krotkę indeksów
-  na pozycję}, i bez niej sekcji 5 nie da się postawić.}
-\sumitem{9--12}{\textbf{Wskaźnik, który pojawia się dwa razy, jest sumowany, a
+  na pozycję}, i bez niej sekcji 5 nie da się postawić}.}
+\sumitem{9--12}{\result{\textbf{Wskaźnik, który pojawia się dwa razy, jest sumowany, a
   ten, który pojawia się raz, przeżywa}, więc kształt wyniku odczytuje się z
   liter bez żadnej arytmetyki. $\sum_k A_{ik}B_{jk}$ to $AB\T$, a transpozycja
-  nigdy nie musi się zdarzyć.}
-\sumitem{13--15}{$S_{bhqk} = \sum_d Q_{bhqd}K_{bhkd}$ to wsadowy wielogłowicowy
+  nigdy nie musi się zdarzyć}.}
+\sumitem{13--15}{\result{$S_{bhqk} = \sum_d Q_{bhqd}K_{bhkd}$ to wsadowy wielogłowicowy
   wynik uwagi, czytelny z reguły, zanim padnie którekolwiek z tych słów.
   \textbf{Rozstrzyga lewa strona}: wskaźnik z niej nieobecny jest sumowany, a
-  obecny jest wskaźnikiem wsadowym, choćby powtarzał się wielokrotnie.}
-\sumitem{16--18}{\textbf{Napis \code{einsum} to tamta suma z pominiętą sigmą.}
+  obecny jest wskaźnikiem wsadowym, choćby powtarzał się wielokrotnie}.}
+\sumitem{16--18}{\result{\textbf{Napis \code{einsum} to tamta suma z pominiętą sigmą.}
   \code{'ik,kj->ij'} to $\sum_k A_{ik}B_{kj}$; strzałka nazywa tych, co
   przeżywają, a wszystko na lewo od niej, czego nie ma na prawo, jest sumowane.
   Zatem \code{'ij->ji'} transponuje, \code{'ii->'} to ślad, a
-  \code{'ij,j->i'} to macierz na wektorze.}
-\sumitem{21--22}{\textbf{\enquote{Powtórzony znaczy sumowany} to reguła dla
+  \code{'ij,j->i'} to macierz na wektorze}.}
+\sumitem{21--22}{\result{\textbf{\enquote{Powtórzony znaczy sumowany} to reguła dla
   sumy, a nie dla napisu.} W \code{'bij,bjk->bik'} sumowane jest tylko $j$;
   $b$ jest wskaźnikiem wsadowym, bo jest też po prawej. Usunięcie go z prawej
   jest legalne, zwraca właściwy kształt i dodaje do siebie wyniki należące do
-  różnych przykładów.}
-\sumitem{23--25}{\textbf{Rozgłaszanie ma dokładną regułę}: zestaw kształty od
+  różnych przykładów}.}
+\sumitem{23--25}{\result{\textbf{Rozgłaszanie ma dokładną regułę}: zestaw kształty od
   prawej, uzupełnij krótszy wartościami $1$, a para zgadza się, gdy długości są
   równe albo gdy jedna wynosi $1$. $(3)$ dodane do $(3,3)$ idzie wzdłuż wierszy, a
-  $(3,1)$ w dół kolumn; oba są legalne i tylko jedno jest zamierzone.}
-\sumitem{25--29}{\textbf{$(n)$ przeciwko $(n,1)$ daje $(n,n)$}, więc strata
+  $(3,1)$ w dół kolumn; oba są legalne i tylko jedno jest zamierzone}.}
+\sumitem{25--29}{\result{\textbf{$(n)$ przeciwko $(n,1)$ daje $(n,n)$}, więc strata
   jest uśredniana po wszystkich parach, a nadwyżka jest dokładna:
   $2\operatorname{Cov}(p,t)$. Przy doskonałym dopasowaniu raportowana strata
   wynosi $2\operatorname{Var}(t)$ i niżej nie zejdzie. Zmierzone: raportowana
   liczba jest $\val{p07.mse.ratio.hi}$ razy większa od prawdziwej przy słabym
   dopasowaniu i $\val{p07.mse.ratio.lo}$ razy przy dobrym \dash{} \textbf{im
-  lepszy model, tym bardziej kłamie}.}
-\sumitem{30--32}{\code{keepdims} zostawia oś długości $1$ na miejscu, żeby
+  lepszy model, tym bardziej kłamie}}.}
+\sumitem{30--32}{\result{\code{keepdims} zostawia oś długości $1$ na miejscu, żeby
   następne zestawienie było wypowiedziane, a nie wywnioskowane. A
   \textbf{żadne z reshape, transpozycji i permute nie przesuwa liczby}: każde
   oddaje ten sam bufor z inną regułą czytania, a dane przesuwa dopiero żądanie
-  wyniku spójnego w pamięci.}
-\sumitem{33--36}{\textbf{Ten sam kształt to nie ta sama tablica.}
+  wyniku spójnego w pamięci}.}
+\sumitem{33--36}{\result{\textbf{Ten sam kształt to nie ta sama tablica.}
   \code{x.reshape(b, s, h, d).transpose(1, 2)} i \code{x.reshape(b, h, s, d)}
   dają oba $(b, h, s, d)$ i różnią się na $\val{p07.split.differ}$ z
   $\val{p07.split.entries}$ wpisów. Reshape jest bezpieczny dokładnie tam,
-  gdzie rozbijane albo scalane osie sąsiadują i są już w kolejności bufora.}
+  gdzie rozbijane albo scalane osie sąsiadują i są już w kolejności bufora}.}
 \end{summarybox}
 
 % ============================================================

@@ -663,90 +663,90 @@ rozkładu}, i to jest najmocniejszy powód, by wiedzieć, że ten rozkład istni
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Równania wektora własnego nie da się w ogóle zapisać dla
+\sumitem{1--2}{\result{\textbf{Równania wektora własnego nie da się w ogóle zapisać dla
   macierzy prostokątnej}, bo $Av$ i $v$ żyją w przestrzeniach różnych rozmiarów.
   Program~\ref{prog:P10} stosuje się więc do macierzy kwadratowych, a większość
-  macierzy w sieci kwadratowa nie jest.}
-\sumitem{3--4}{Naprawa żąda \textbf{dwóch} zestawów prostopadłych kierunków
+  macierzy w sieci kwadratowa nie jest}.}
+\sumitem{3--4}{\result{Naprawa żąda \textbf{dwóch} zestawów prostopadłych kierunków
   zamiast jednego \dash{} $Av_i = \sigma_i u_i$ \dash{} i ma je każda macierz
   każdego kształtu. Zapisane jako $A = U\Sigma V\T$ jest to \textbf{obrót,
   rozciągnięcie, obrót}, czytane od prawej do lewej, bez wyjątków i bez
-  warunków.}
-\sumitem{5--6}{Sprawdzone dokładnie na macierzy zbudowanej z \emph{dwóch}
+  warunków}.}
+\sumitem{5--6}{\result{Sprawdzone dokładnie na macierzy zbudowanej z \emph{dwóch}
   różnych obrotów wymiernych, czyli konstrukcją z Programu~\ref{prog:P10} ze
   zniesionym warunkiem $U = V$. A $\lvert\det A\rvert$ jest iloczynem wartości
   osobliwych, bo obroty nie wnoszą nic \dash{} czyli objętość z
-  Programu~\ref{prog:P09} w języku tego programu.}
-\sumitem{7--8}{$A\T A = V\Sigma^{2}V\T$, więc \textbf{wartości osobliwe są
+  Programu~\ref{prog:P09} w języku tego programu}.}
+\sumitem{7--8}{\result{$A\T A = V\Sigma^{2}V\T$, więc \textbf{wartości osobliwe są
   pierwiastkami z wartości własnych $A\T A$}. Dlatego istnieją dla każdej
   macierzy: są pożyczone z macierzy symetrycznej, którą zawsze da się zbudować,
-  i twierdzenie spektralne zawsze się do niej stosuje.}
-\sumitem{9--10}{\textbf{Wartości osobliwe to nie wartości własne}, a przykład
+  i twierdzenie spektralne zawsze się do niej stosuje}.}
+\sumitem{9--10}{\result{\textbf{Wartości osobliwe to nie wartości własne}, a przykład
   dobrano tak, by pomyłka była zrozumiała: $\val{p11.lam.hi}$ i
   $\val{p11.lam.lo}$ wobec $\val{p11.sig.hi}$ i $\val{p11.sig.lo}$, różnica
   $5\%$, której żaden wykres nie pokaże. Różnią się też rodzajem \dash{}
   wartości osobliwe istnieją dla każdego kształtu, są zawsze rzeczywiste i
-  nieujemne i nigdy nie brakuje im kierunków.}
-\sumitem{11}{Macierz prostokątna ma \textbf{dwie} macierze Grama różnych
+  nieujemne i nigdy nie brakuje im kierunków}.}
+\sumitem{11}{\result{Macierz prostokątna ma \textbf{dwie} macierze Grama różnych
   rozmiarów, których ślady zgadzają się na $\val{p11.rect.energy}$. Większa
   niesie po prostu dodatkowe zera, po jednym na każdy wymiar, do którego
-  macierz nie sięga.}
-\sumitem{12--13}{$A$ jest \textbf{sumą kawałków rzędu jeden}, po jednym na
+  macierz nie sięga}.}
+\sumitem{12--13}{\result{$A$ jest \textbf{sumą kawałków rzędu jeden}, po jednym na
   wartość osobliwą, i one nie oddziałują \dash{} całkowity rozmiar rozkłada się
   więc na $\sigma_i^{2}$, co jest twierdzeniem Pitagorasa z
-  Programu~\ref{prog:F09} z macierzami w miejsce strzałek.}
-\sumitem{14--15}{Obcięcie do rzędu $r$ zostawia zatem \textbf{dokładnie}
+  Programu~\ref{prog:F09} z macierzami w miejsce strzałek}.}
+\sumitem{14--15}{\result{Obcięcie do rzędu $r$ zostawia zatem \textbf{dokładnie}
   wyrzucone kawałki: $\val{p11.ey.err}$ dla przykładowej macierzy, czyli
-  $\sigma_2$. Nie mniej więcej $\sigma_2$, nie ograniczone przez nią.}
-\sumitem{16--17}{\textbf{Eckart--Young}: ze wszystkich macierzy rzędu $r$
-  obcięcie jest najbliższe. Podane, nie dowodzone, i sprawdzone wobec
+  $\sigma_2$. Nie mniej więcej $\sigma_2$, nie ograniczone przez nią}.}
+\sumitem{16--17}{\result{\textbf{Eckart--Young}: ze wszystkich macierzy rzędu $r$
+  obcięcie jest najbliższe.} Podane, nie dowodzone, i sprawdzone wobec
   $\val{p11.ey.trials}$ alternatyw \dash{} nie jako dowód twierdzenia, tylko
   dlatego, że \textbf{tę tezę łatwo zapamiętać jako słabszą, niż jest}, a
   patrzenie, jak tysiące alternatyw przegrywa, ustala, którą wersję czytelnik
   wyniesie.}
-\sumitem{18--19}{Dwie z sześciu wartości osobliwych niosące $\val{p11.spec.pct}\%$
+\sumitem{18--19}{\result{Dwie z sześciu wartości osobliwych niosące $\val{p11.spec.pct}\%$
   to cały argument za przechowywaniem obcięcia i za adapterem niskiego rzędu. A
   warunek dotyczy \textbf{tego, jak szybko widmo zanika}, a nie rozmiaru
-  macierzy: płaskie widmo nie zyskuje nic.}
-\sumitem{20--21}{Błąd przychodzi z wejściem i jest rozciągany jak wszystko inne,
+  macierzy: płaskie widmo nie zyskuje nic}.}
+\sumitem{20--21}{\result{Błąd przychodzi z wejściem i jest rozciągany jak wszystko inne,
   więc w najgorszym przypadku błąd \emph{względny} zostaje pomnożony przez
   $\sigma_{\max}/\sigma_{\min}$. To \textbf{wskaźnik uwarunkowania}, a dla
-  przykładowej macierzy wynosi $\val{p11.kappa}$.}
-\sumitem{22--23}{\textbf{Tracisz mniej więcej $\logb{10}\kappa$ cyfr
+  przykładowej macierzy wynosi $\val{p11.kappa}$}.}
+\sumitem{22--23}{\result{\textbf{Tracisz mniej więcej $\logb{10}\kappa$ cyfr
   dziesiętnych} z szesnastu, od których zaczyna podwójna precyzja. Nie jest to
   własność algorytmu \dash{} doskonała metoda nadal daje kiepską odpowiedź na
-  źle uwarunkowanym zadaniu \dash{} i nie jest to zgłoszenie błędu.}
-\sumitem{24}{Dla macierzy symetrycznej dodatnio określonej $\kappa$ jest
+  źle uwarunkowanym zadaniu \dash{} i nie jest to zgłoszenie błędu}.}
+\sumitem{24}{\result{Dla macierzy symetrycznej dodatnio określonej $\kappa$ jest
   stosunkiem wartości własnych, który zmierzył Program~\ref{prog:P10}, więc
   \textbf{wąwóz, utrata cyfr i wolny optymalizator to jedna liczba czytana na
-  trzy sposoby}. Ta środkowa należy do tego programu.}
-\sumitem{25--26}{$A\T A$ ma \emph{kwadraty} wartości osobliwych, więc
+  trzy sposoby}. Ta środkowa należy do tego programu}.}
+\sumitem{25--26}{\result{$A\T A$ ma \emph{kwadraty} wartości osobliwych, więc
   \textbf{$\kappa(A\T A) = \kappa(A)^{2}$} \dash{} $\val{p11.kappa.sq}$ wobec
   $\val{p11.kappa}$. Podniesienie $\kappa$ do kwadratu podwaja tracone cyfry,
   za krok zrobiony tylko dlatego, że postać zamknięta z
-  Programu~\ref{prog:P08} tak została zapisana.}
-\sumitem{27--29}{Zmierzone na dopasowaniu stopnia $\val{p11.ls.deg}$ przez
+  Programu~\ref{prog:P08} tak została zapisana}.}
+\sumitem{27--29}{\result{Zmierzone na dopasowaniu stopnia $\val{p11.ls.deg}$ przez
   $\val{p11.ls.points}$ punktów: rozkład schodzi poniżej
   $\val{p11.ls.qr.bound}$, równania normalne nie schodzą poniżej
   $\val{p11.ls.ne.floor}$, \textbf{co najmniej $\val{p11.ls.digits}$ cyfr
   oddanych}. Zapisane jako ograniczenia, bo reszta należy do maszyny. I nic się
   nie podnosi: błędne współczynniki wyglądają jak współczynniki, co jest gorsze
-  niż awaria.}
-\sumitem{30}{Rada \enquote{nie twórz równań normalnych} to więc dwie tezy z
+  niż awaria}.}
+\sumitem{30}{\result{Rada \enquote{nie twórz równań normalnych} to więc dwie tezy z
   dwoma właścicielami. Program~\ref{prog:P09} zmierzył arytmetykę, ten program
   dokładność \dash{} a \textbf{dokładność rozstrzyga}, bo czynnik w szybkości
-  wchłonie szybsza maszyna, a cyfr nie odzyskuje się przy żadnej szybkości.}
-\sumitem{31--32}{\textbf{Pseudoodwrotność} $A^{+}$ to obróć, podziel przez każdą
+  wchłonie szybsza maszyna, a cyfr nie odzyskuje się przy żadnej szybkości}.}
+\sumitem{31--32}{\result{\textbf{Pseudoodwrotność} $A^{+}$ to obróć, podziel przez każdą
   wartość osobliwą, obróć \dash{} zgodna z $A^{-1}$ tam, gdzie ta istnieje, i
   dająca odpowiedź najmniejszych kwadratów tam, gdzie nie. Dzielenie przez
   najmniejszą $\sigma$ jest miejscem, w którym wskaźnik uwarunkowania staje się
   dzieleniem, które da się wskazać palcem, a wcześniejsze obcięcie jest
-  kompromisem, który je ogranicza.}
-\sumitem{33}{\textbf{Jeden rozkład odpowiada na pytania sześciu programów}: rząd
+  kompromisem, który je ogranicza}.}
+\sumitem{33}{\result{\textbf{Jeden rozkład odpowiada na pytania sześciu programów}: rząd
   to liczba niezerowych $\sigma$, wyznacznik to ich iloczyn, jądro rozpinają te
   $v$, których $\sigma$ jest zerem, najlepsza aproksymacja niskiego rzędu to
   kilka pierwszych składników, a $\kappa$ to pierwsza podzielona przez
-  ostatnią.}
+  ostatnią}.}
 \end{summarybox}
 
 \canyou

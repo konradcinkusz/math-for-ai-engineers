@@ -679,88 +679,88 @@ factorisation}, which is the strongest reason to know it exists.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{An eigenvector equation cannot be written for a
+\sumitem{1--2}{\result{\textbf{An eigenvector equation cannot be written for a
   rectangular matrix at all}, because $Av$ and $v$ live in spaces of different
   sizes. Program~\ref{prog:P10} therefore applies to square matrices, and most
-  of the matrices in a network are not square.}
-\sumitem{3--4}{The repair asks for \textbf{two} sets of perpendicular
+  of the matrices in a network are not square}.}
+\sumitem{3--4}{\result{The repair asks for \textbf{two} sets of perpendicular
   directions rather than one \dash{} $Av_i = \sigma_i u_i$ \dash{} and every
   matrix of every shape has them. Written as $A = U\Sigma V\T$ that is
   \textbf{rotate, stretch, rotate}, read right to left, with no exceptions and
-  no conditions.}
-\sumitem{5--6}{Checked exactly on a matrix built from \emph{two} different
+  no conditions}.}
+\sumitem{5--6}{\result{Checked exactly on a matrix built from \emph{two} different
   rational rotations, which is Program~\ref{prog:P10}'s construction with the
   constraint that $U = V$ lifted. And $\lvert\det A\rvert$ is the product of
   the singular values, because the rotations contribute nothing \dash{} which
-  is Program~\ref{prog:P09}'s volume in this program's vocabulary.}
-\sumitem{7--8}{$A\T A = V\Sigma^{2}V\T$, so \textbf{the singular values are the
+  is Program~\ref{prog:P09}'s volume in this program's vocabulary}.}
+\sumitem{7--8}{\result{$A\T A = V\Sigma^{2}V\T$, so \textbf{the singular values are the
   square roots of the eigenvalues of $A\T A$}. That is why they exist for every
   matrix: they are borrowed from a symmetric matrix you can always build, and
-  the spectral theorem always applies to it.}
-\sumitem{9--10}{\textbf{Singular values are not eigenvalues}, and the example
+  the spectral theorem always applies to it}.}
+\sumitem{9--10}{\result{\textbf{Singular values are not eigenvalues}, and the example
   is chosen to make the confusion understandable: $\val{p11.lam.hi}$ and
   $\val{p11.lam.lo}$ against $\val{p11.sig.hi}$ and $\val{p11.sig.lo}$, a
   $5\%$ difference that no plot would show. They differ in kind too \dash{}
   singular values exist for every shape, are always real and non-negative, and
-  never run short of directions.}
-\sumitem{11}{A rectangular matrix has \textbf{two} Gram matrices of different
+  never run short of directions}.}
+\sumitem{11}{\result{A rectangular matrix has \textbf{two} Gram matrices of different
   sizes, whose traces agree at $\val{p11.rect.energy}$. The larger simply
-  carries extra zeros, one for each dimension the matrix cannot reach.}
-\sumitem{12--13}{$A$ is a \textbf{sum of rank-one pieces}, one per singular
+  carries extra zeros, one for each dimension the matrix cannot reach}.}
+\sumitem{12--13}{\result{$A$ is a \textbf{sum of rank-one pieces}, one per singular
   value, and they do not interact \dash{} so the total size decomposes into
   $\sigma_i^{2}$, which is Program~\ref{prog:F09}'s Pythagoras with matrices in
-  place of arrows.}
-\sumitem{14--15}{Truncating to rank $r$ therefore leaves \textbf{exactly} the
+  place of arrows}.}
+\sumitem{14--15}{\result{Truncating to rank $r$ therefore leaves \textbf{exactly} the
   pieces discarded: $\val{p11.ey.err}$ for the worked matrix, which is
-  $\sigma_2$. Not about $\sigma_2$, not bounded by it.}
-\sumitem{16--17}{\textbf{Eckart--Young}: of all matrices of rank $r$ the
-  truncation is the closest. Stated, not proved, and checked against
+  $\sigma_2$. Not about $\sigma_2$, not bounded by it}.}
+\sumitem{16--17}{\result{\textbf{Eckart--Young}: of all matrices of rank $r$ the
+  truncation is the closest.} Stated, not proved, and checked against
   $\val{p11.ey.trials}$ alternatives \dash{} not as evidence for the theorem
   but because \textbf{the claim is easy to misremember as weaker than it is},
   and watching thousands of alternatives lose fixes which version the reader
   carries away.}
-\sumitem{18--19}{Two of six singular values carrying $\val{p11.spec.pct}\%$ is
+\sumitem{18--19}{\result{Two of six singular values carrying $\val{p11.spec.pct}\%$ is
   the entire argument for storing a truncation and for a low-rank adapter. And
   the condition is about \textbf{how fast the spectrum decays}, not about the
-  size of the matrix: a flat spectrum gets no benefit at all.}
-\sumitem{20--21}{Error arrives with the input and is stretched like everything
+  size of the matrix: a flat spectrum gets no benefit at all}.}
+\sumitem{20--21}{\result{Error arrives with the input and is stretched like everything
   else, so worst case the \emph{relative} error is multiplied by
   $\sigma_{\max}/\sigma_{\min}$. That is the \textbf{condition number}, and for
-  the worked matrix it is $\val{p11.kappa}$.}
-\sumitem{22--23}{\textbf{You lose about $\logb{10}\kappa$ decimal digits}, out
+  the worked matrix it is $\val{p11.kappa}$}.}
+\sumitem{22--23}{\result{\textbf{You lose about $\logb{10}\kappa$ decimal digits}, out
   of the sixteen a double starts with. It is not a property of the algorithm
   \dash{} a perfect method still gives a poor answer on a badly conditioned
-  problem \dash{} and it is not a bug report.}
-\sumitem{24}{For a symmetric positive definite matrix $\kappa$ is the
+  problem \dash{} and it is not a bug report}.}
+\sumitem{24}{\result{For a symmetric positive definite matrix $\kappa$ is the
   eigenvalue ratio Program~\ref{prog:P10} measured, so \textbf{a ravine, a loss
   of digits and a slow optimiser are one number read three ways}. The middle
-  one is this program's.}
-\sumitem{25--26}{$A\T A$ has the \emph{squared} singular values, so
+  one is this program's}.}
+\sumitem{25--26}{\result{$A\T A$ has the \emph{squared} singular values, so
   \textbf{$\kappa(A\T A) = \kappa(A)^{2}$} \dash{} $\val{p11.kappa.sq}$ against
   $\val{p11.kappa}$. Squaring $\kappa$ doubles the digits lost, for a step
   taken only because Program~\ref{prog:P08}'s closed form was written that
-  way.}
-\sumitem{27--29}{Measured on a degree-$\val{p11.ls.deg}$ fit through
+  way}.}
+\sumitem{27--29}{\result{Measured on a degree-$\val{p11.ls.deg}$ fit through
   $\val{p11.ls.points}$ points: the factorisation clears
   $\val{p11.ls.qr.bound}$, the normal equations fail $\val{p11.ls.ne.floor}$,
   \textbf{at least $\val{p11.ls.digits}$ digits given away}. Committed as
   bounds, because a residual belongs to the machine. And nothing raises: the
-  wrong coefficients look like coefficients, which is worse than a crash.}
-\sumitem{30}{So \enquote{do not form the normal equations} is two claims with
+  wrong coefficients look like coefficients, which is worse than a crash}.}
+\sumitem{30}{\result{So \enquote{do not form the normal equations} is two claims with
   two owners. Program~\ref{prog:P09} measured the arithmetic, this program the
   accuracy \dash{} and \textbf{the accuracy is the half that decides it},
   because a factor in speed is absorbed by a faster machine and digits are not
-  recoverable at any speed.}
-\sumitem{31--32}{The \textbf{pseudoinverse} $A^{+}$ is turn, divide by each
+  recoverable at any speed}.}
+\sumitem{31--32}{\result{The \textbf{pseudoinverse} $A^{+}$ is turn, divide by each
   singular value, turn \dash{} agreeing with $A^{-1}$ where that exists and
   giving the least-squares answer where it does not. Dividing by the smallest
   $\sigma$ is where the condition number becomes a division you can point at,
-  and truncating first is the trade that bounds it.}
-\sumitem{33}{\textbf{One factorisation answers six programs' questions}: rank
+  and truncating first is the trade that bounds it}.}
+\sumitem{33}{\result{\textbf{One factorisation answers six programs' questions}: rank
   is how many $\sigma$ are non-zero, the determinant is their product, the null
   space is spanned by the $v$'s whose $\sigma$ is zero, the best low-rank
   approximation is the first few terms, and $\kappa$ is the first divided by
-  the last.}
+  the last}.}
 \end{summarybox}
 
 \canyou

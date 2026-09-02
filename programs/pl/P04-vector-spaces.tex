@@ -670,86 +670,86 @@ liczba.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Przestrzeń liniowa ma dwa działania i jeden warunek,
+\sumitem{1--3}{\result{\textbf{Przestrzeń liniowa ma dwa działania i jeden warunek,
   który kiedykolwiek zawodzi}: dodaj dowolne dwa elementy albo przeskaluj
   dowolny, a odpowiedź musi wylądować z powrotem w zbiorze. Wektory w
   $\R^{3}$ z pierwszą współrzędną $0$ są przestrzenią; te z pierwszą
   współrzędną $1$ nie, a najszybszym testem jest to, że \textbf{każda
-  przestrzeń zawiera wektor zerowy}.}
-\sumitem{4--5}{Zanurzenia, które model \emph{produkuje}, są podzbiorem
+  przestrzeń zawiera wektor zerowy}}.}
+\sumitem{4--5}{\result{Zanurzenia, które model \emph{produkuje}, są podzbiorem
   przestrzeni, a nie przestrzenią \dash{} i dlatego \enquote{jest kierunek dla
   X} jest dwuznaczne: kierunek istnieje z konstrukcji, a czy model go używa,
   to jest pytanie. I \textbf{\enquote{wektor} jest rolą, a nie kształtem}:
   wielomiany i funkcje są wektorami, więc wszystko dowiedzione z domknięcia
-  stosuje się do nich bez zmian.}
-\sumitem{6--8}{\textbf{Podprzestrzeń} to podzbiór będący przestrzenią sam w
+  stosuje się do nich bez zmian}.}
+\sumitem{6--8}{\result{\textbf{Podprzestrzeń} to podzbiór będący przestrzenią sam w
   sobie. Domknięcie musi zachodzić dla \emph{każdej} pary: suma trzech osi jest
   domknięta na skalowanie i zawodzi na dodawaniu, co jest kształtem prawie
   każdego chybionego rozumowania. Zliczanie elementów nie powie, która
-  podprzestrzeń jest większa, bo obie mają ich nieskończenie wiele.}
-\sumitem{9--11}{\textbf{Powłoka} to wszystko, co oba działania osiągają z
+  podprzestrzeń jest większa, bo obie mają ich nieskończenie wiele}.}
+\sumitem{9--11}{\result{\textbf{Powłoka} to wszystko, co oba działania osiągają z
   początkowej garstki, i zawsze jest podprzestrzenią. Dwa wektory w $\R^{3}$
   rozpinają płaszczyznę przez początek \dash{} \emph{chyba że} jeden jest
   wielokrotnością drugiego, czyli zależność przybywająca przed nazwaniem.
-  \textbf{Dwa wektory nie zawsze dają dwa kierunki.}}
-\sumitem{12--14}{\textbf{Trzy liczby, a wymiarem jest tylko ostatnia}: ile
+  \textbf{Dwa wektory nie zawsze dają dwa kierunki.}}}
+\sumitem{12--14}{\result{\textbf{Trzy liczby, a wymiarem jest tylko ostatnia}: ile
   wektorów jest na liście ($\val{p04.family.count}$), jak długi jest każdy
   ($\val{p04.family.ambient}$) i ile niezależnych kierunków osiągają
   ($\val{p04.family.dim}$). Dwie pierwsze opisują, jak dane zapisano; trzecia
-  opisuje dane.}
-\sumitem{15}{Lista jest \textbf{zależna}, gdy jeden element jest kombinacją
+  opisuje dane}.}
+\sumitem{15}{\result{Lista jest \textbf{zależna}, gdy jeden element jest kombinacją
   pozostałych, równoważnie gdy wektor zerowy ma nietrywialną kombinację;
   \textbf{niezależna}, gdy ani jedno, ani drugie. Obie postacie to to samo
-  stwierdzenie podzielone przez współczynnik.}
-\sumitem{16--18}{\textbf{Rząd się nasyca.} Losowe wektory w
+  stwierdzenie podzielone przez współczynnik}.}
+\sumitem{16--18}{\result{\textbf{Rząd się nasyca.} Losowe wektory w
   $\val{p04.sat.dim}$ wymiarach osiągają $\val{p04.sat.rank.2}$,
   $\val{p04.sat.rank.4}$, $\val{p04.sat.rank.8}$ kierunków \dash{} a potem
   $\val{p04.sat.rank.12}$, $\val{p04.sat.rank.20}$ i
   $\val{p04.sat.rank.40}$, bo każdy nowy wektor albo dokłada wymiar, albo nie
   dokłada nic, a przestrzeń ma ich tylko tyle do dania.
-  $\val{p04.sat.trials}$ losowań testuje kod: kontrprzykład obaliłby dowód.}
-\sumitem{19--20}{\textbf{W $d$ wymiarach co najwyżej $d$ wektorów jest
+  $\val{p04.sat.trials}$ losowań testuje kod: kontrprzykład obaliłby dowód}.}
+\sumitem{19--20}{\result{\textbf{W $d$ wymiarach co najwyżej $d$ wektorów jest
   niezależnych}, jakiekolwiek by nie były i na czym by nie były trenowane
   \dash{} i nie potrzeba do tego iloczynu skalarnego, kąta ani odległości, i
   dlatego przeżywa to każdy późniejszy wybór sposobu mierzenia. \emph{Zależna}
-  nie jest usterką: mówi coś o liście, a nie o elementach.}
-\sumitem{21--23}{\textbf{Baza} jest niezależna i rozpinająca \dash{} dokładnie
+  nie jest usterką: mówi coś o liście, a nie o elementach}.}
+\sumitem{21--23}{\result{\textbf{Baza} jest niezależna i rozpinająca \dash{} dokładnie
   ten rozmiar, przy którym wyrzucenie jednego psuje rozpinanie, a dodanie
   jednego psuje niezależność. \textbf{Każda baza przestrzeni ma ten sam
   rozmiar}, co jest twierdzeniem i to ono pozwala \emph{wymiarowi} cokolwiek
   nazywać. Powłoka, niezależność, baza i wymiar to jedna myśl widziana na
-  cztery sposoby.}
-\sumitem{24--25}{\textbf{Baza nie jest jedyna.}
+  cztery sposoby}.}
+\sumitem{24--25}{\result{\textbf{Baza nie jest jedyna.}
   $(\val{p04.basis.x}, \val{p04.basis.y})$ względem osi obróconych o
   $\val{p04.basis.angle}$ stopni staje się
   $(\val{p04.basis.c1}, \val{p04.basis.c2})$, a jego długość wynosi
   $\val{p04.basis.len}$ tak czy tak. \textbf{Współrzędne należą do bazy;
-  wektor należy do przestrzeni.}}
-\sumitem{26--27}{Więc \enquote{wymiar zanurzenia $\val{p04.embed}$} obiecuje
+  wektor należy do przestrzeni.}}}
+\sumitem{26--27}{\result{Więc \enquote{wymiar zanurzenia $\val{p04.embed}$} obiecuje
   przestrzeń i ograniczenie, a nie obiecuje niczego o tym, że współrzędna coś
   znaczy sama z siebie \dash{} inny przebieg ląduje na innej bazie. Test
   roboczy: \textbf{metoda działająca w dowolnej bazie mierzy coś prawdziwego;
-  ta, która potrzebuje konkretnej bazy, mierzy twój wybór osi.}}
-\sumitem{28--29}{\textbf{Fakt zliczeniowy.} $\val{p04.vocab}$ tokenów w
+  ta, która potrzebuje konkretnej bazy, mierzy twój wybór osi.}}}
+\sumitem{28--29}{\result{\textbf{Fakt zliczeniowy.} $\val{p04.vocab}$ tokenów w
   $\val{p04.embed}$ wymiarach zostawia co najmniej $\val{p04.dependent}$
   zanurzeń \dash{} $\val{p04.dependent.pct}\%$ \dash{} jako kombinacje
   pozostałych; w Programie~\ref{prog:F09}, gdzie wymiarów jest
   $\val{f09.dim}$, wychodzi $\val{p04.f09.dependent}$. \textbf{Żaden trening tego nie zmienia i żadna
   architektura tego nie omija}, co czyni to nietypowym: większość twierdzeń o
-  modelu jest tymczasowa, a to nie jest.}
-\sumitem{30--31}{To \emph{nie} mówi, że model nie może rozróżnić tylu rzeczy
+  modelu jest tymczasowa, a to nie jest}.}
+\sumitem{30--31}{\result{To \emph{nie} mówi, że model nie może rozróżnić tylu rzeczy
   \dash{} tylko że nie może dać każdej własnego \textbf{niezależnego}
   kierunku. Przestrzeń o $\val{p04.embed}$ wymiarach mieści dokładnie tyle
   wzajemnie niezależnych kierunków i zdecydowanie więcej \emph{prawie}
   niezależnych, a \textbf{rozluźnienie z dokładnie na prawie jest całym
-  tematem}.}
-\sumitem{32--34}{Opowieści o \textbf{reprezentacji liniowej} i
+  tematem}}.}
+\sumitem{32--34}{\result{Opowieści o \textbf{reprezentacji liniowej} i
   \textbf{superpozycji} są \emph{hipotezami o strukturze}, przedstawionymi jako
   hipotezy: ograniczenie zliczeniowe jest twierdzeniem i często używa się go
   tak, jakby je ustanawiało, gdy ustanawia jedynie, że jakaś taka opowieść jest
   potrzebna. Rozstrzygnąłby między nimi pomiar \enquote{prawie}, który
   potrzebuje kąta \dash{} tej jednej rzeczy, którą ten program świadomie
-  zatrzymał, i pierwszego ruchu Programu~\ref{prog:P05}.}
+  zatrzymał, i pierwszego ruchu Programu~\ref{prog:P05}}.}
 \end{summarybox}
 
 \canyou

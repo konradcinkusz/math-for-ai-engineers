@@ -644,59 +644,59 @@ array stops being a picture and has to become notation.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{A matrix is a function, not a rectangle.} It takes a
+\sumitem{1--3}{\result{\textbf{A matrix is a function, not a rectangle.} It takes a
   vector and returns one, and it is \emph{linear}: $A(u+v) = Au + Av$ and
   $A(cv) = c\,(Av)$. Everything else in the program is a consequence of those
   two lines, and every finite-dimensional linear map can be written as a
-  matrix.}
-\sumitem{4--6}{\textbf{\enquote{Linear} means those two properties, not
+  matrix}.}
+\sumitem{4--6}{\result{\textbf{\enquote{Linear} means those two properties, not
   \enquote{a straight line}.} $f(x) = x + 3$ is not linear, because a linear
   map must send zero to zero. A layer is \emph{affine} \dash{} linear plus the
   bias \dash{} and Program~\ref{prog:F06}'s $y = wx + b$ is the same object one
-  dimension down.}
-\sumitem{7--8}{\textbf{A linear map is determined by what it does to a basis},
+  dimension down}.}
+\sumitem{7--8}{\result{\textbf{A linear map is determined by what it does to a basis},
   which is why a rectangle of numbers suffices to specify one: the columns are
-  the images of the basis vectors and everything else is a linear combination.}
-\sumitem{9--11}{\textbf{The product $AB$ is the composition} \dash{} do $B$,
+  the images of the basis vectors and everything else is a linear combination}.}
+\sumitem{9--11}{\result{\textbf{The product $AB$ is the composition} \dash{} do $B$,
   then $A$. The rows-into-columns procedure is a consequence of that, not the
   definition, and it can be rebuilt from the sentence whenever it is
-  forgotten.}
-\sumitem{12--14}{\textbf{Associativity is free}, because composing functions
+  forgotten}.}
+\sumitem{12--14}{\result{\textbf{Associativity is free}, because composing functions
   never had a bracketing: $A(B(C(x)))$ has one reading. Confirmed to better
   than $\val{p06.assoc.err}$, which is worth doing once because an identity
-  agreeing with itself is not evidence.}
-\sumitem{15--17}{\textbf{The order matters, and one dimension cannot show it},
+  agreeing with itself is not evidence}.}
+\sumitem{15--17}{\result{\textbf{The order matters, and one dimension cannot show it},
   because numbers commute. A quarter turn and a flattening onto the horizontal
   axis send $(1, 0)$ to $(\val{p06.order.rp.x}, \val{p06.order.rp.y})$ one way
   and $(\val{p06.order.pr.x}, \val{p06.order.pr.y})$ the other \dash{} one
-  order loses the point entirely.}
-\sumitem{17--19}{Of $\val{p06.commute.trials}$ random $3 \times 3$ pairs,
+  order loses the point entirely}.}
+\sumitem{17--19}{\result{Of $\val{p06.commute.trials}$ random $3 \times 3$ pairs,
   $\val{p06.commute.found}$ commute, and it could not be otherwise: commuting
   is a measure-zero condition. Some pairs do \dash{} rotations of the plane
   about one centre \dash{} and \textbf{rotations in three dimensions do not},
-  which is why two dimensions is the misleading case.}
-\sumitem{20--22}{\textbf{Shape is the domain and the codomain written down}, so
+  which is why two dimensions is the misleading case}.}
+\sumitem{20--22}{\result{\textbf{Shape is the domain and the codomain written down}, so
   $(m \times n)(n \times p) \to (m \times p)$: the inner dimensions meet where
   one function's output is the next one's input. A shape error is a type error,
-  and the shapes say which of the two plausible bugs it is.}
-\sumitem{23--25}{A vector is an $n \times 1$ matrix, so $Ax$ needs no second
+  and the shapes say which of the two plausible bugs it is}.}
+\sumitem{23--25}{\result{A vector is an $n \times 1$ matrix, so $Ax$ needs no second
   rule, and a batch of $k$ of them is $n \times k$ \dash{} \textbf{linearity
   never had anything to say about the other columns}. The axis conventions and
-  the rank-4 case are Program~\ref{prog:P07}'s.}
-\sumitem{26--29}{\textbf{Two affine layers are one}: $W_2(W_1x + b_1) + b_2 =
+  the rank-4 case are Program~\ref{prog:P07}'s}.}
+\sumitem{26--29}{\result{\textbf{Two affine layers are one}: $W_2(W_1x + b_1) + b_2 =
   (W_2W_1)x + (W_2b_1 + b_2)$, checked over $\val{p06.collapse.trials}$ inputs
   to better than $\val{p06.collapse.err}$. $k$ layers waste $(k-1)/k$ of their parameters
   whatever their width \dash{} $\val{p06.stack.wasted.pct}\%$ at eight layers
-  \dash{} which is exactly the depth you thought you were buying.}
-\sumitem{30--32}{\textbf{An affine map cannot bend a straight line}, so three
+  \dash{} which is exactly the depth you thought you were buying}.}
+\sumitem{30--32}{\result{\textbf{An affine map cannot bend a straight line}, so three
   collinear inputs come out collinear (under $\val{p06.bend.affine}$) through
   the collapsed matrix and bent ($\val{p06.bend}$) through the
   $\relu$-separated pair. That rules out every single affine map at once, and it is why the
-  requirement on an activation is only \enquote{not affine}.}
-\sumitem{33--34}{\textbf{Associativity is free and bracketing is not}: the same
+  requirement on an activation is only \enquote{not affine}}.}
+\sumitem{33--34}{\result{\textbf{Associativity is free and bracketing is not}: the same
   triple product costs $\val{p06.cost.left}$ multiplications one way and
   $\val{p06.cost.right}$ the other, a factor of $\val{p06.cost.ratio}$. Keeping
-  a thin factor in the middle is that saving spent deliberately.}
+  a thin factor in the middle is that saving spent deliberately}.}
 \end{summarybox}
 
 % ============================================================

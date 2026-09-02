@@ -651,63 +651,63 @@ większości ludzi przestaje być obrazkiem i musi stać się notacją.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Macierz jest funkcją, a nie prostokątem.} Bierze wektor
+\sumitem{1--3}{\result{\textbf{Macierz jest funkcją, a nie prostokątem.} Bierze wektor
   i zwraca wektor, i jest \emph{liniowa}: $A(u+v) = Au + Av$ oraz
   $A(cv) = c\,(Av)$. Wszystko inne w programie jest konsekwencją tych dwóch
   wierszy, a każde przekształcenie liniowe skończonego wymiaru da się zapisać
-  jako macierz.}
-\sumitem{4--6}{\textbf{\enquote{Liniowy} znaczy te dwie własności, a nie
+  jako macierz}.}
+\sumitem{4--6}{\result{\textbf{\enquote{Liniowy} znaczy te dwie własności, a nie
   \enquote{prostą}.} $f(x) = x + 3$ nie jest liniowa, bo przekształcenie
   liniowe musi przeprowadzać zero na zero. Warstwa jest \emph{afiniczna}
   \dash{} liniowa plus obciążenie \dash{} a Program~\ref{prog:F06} pokazuje
-  ten sam obiekt jeden wymiar niżej jako $y = wx + b$.}
-\sumitem{7--8}{\textbf{Przekształcenie liniowe jest wyznaczone przez to, co
+  ten sam obiekt jeden wymiar niżej jako $y = wx + b$}.}
+\sumitem{7--8}{\result{\textbf{Przekształcenie liniowe jest wyznaczone przez to, co
   robi z bazą}, i dlatego prostokąt liczb wystarcza, żeby je zadać: kolumny są
-  obrazami wektorów bazy, a cała reszta jest kombinacją liniową.}
-\sumitem{9--11}{\textbf{Iloczyn $AB$ jest złożeniem} \dash{} najpierw $B$,
+  obrazami wektorów bazy, a cała reszta jest kombinacją liniową}.}
+\sumitem{9--11}{\result{\textbf{Iloczyn $AB$ jest złożeniem} \dash{} najpierw $B$,
   potem $A$. Procedura mnożenia wierszy przez kolumny jest tego konsekwencją, a
   nie definicją, i da się ją odbudować z tego zdania, ilekroć się ją
-  zapomni.}
-\sumitem{12--14}{\textbf{Łączność jest darmowa}, bo składanie funkcji nigdy nie
+  zapomni}.}
+\sumitem{12--14}{\result{\textbf{Łączność jest darmowa}, bo składanie funkcji nigdy nie
   miało nawiasowania: $A(B(C(x)))$ ma jedno odczytanie. Potwierdzone z
   dokładnością lepszą niż $\val{p06.assoc.err}$, co warto zrobić raz, bo tożsamość
-  zgadzająca się sama ze sobą nie jest dowodem.}
-\sumitem{15--17}{\textbf{Kolejność ma znaczenie, a jeden wymiar nie może tego
+  zgadzająca się sama ze sobą nie jest dowodem}.}
+\sumitem{15--17}{\result{\textbf{Kolejność ma znaczenie, a jeden wymiar nie może tego
   pokazać}, bo liczby są przemienne. Ćwierć obrotu i spłaszczenie na oś poziomą
   przeprowadzają $(1, 0)$ na $(\val{p06.order.rp.x}, \val{p06.order.rp.y})$ w
   jedną stronę i na $(\val{p06.order.pr.x}, \val{p06.order.pr.y})$ w drugą
-  \dash{} jedna kolejność gubi punkt zupełnie.}
-\sumitem{17--19}{Wśród $\val{p06.commute.trials}$ losowych par $3 \times 3$
+  \dash{} jedna kolejność gubi punkt zupełnie}.}
+\sumitem{17--19}{\result{Wśród $\val{p06.commute.trials}$ losowych par $3 \times 3$
   przemiennych jest $\val{p06.commute.found}$ i inaczej być nie mogło:
   przemienność jest warunkiem miary zero. Niektóre pary są przemienne \dash{}
   obroty płaszczyzny wokół jednego środka \dash{} a \textbf{obroty w trzech
-  wymiarach nie są}, i dlatego dwa wymiary są przypadkiem mylącym.}
-\sumitem{20--22}{\textbf{Kształt to zapisana dziedzina i przeciwdziedzina},
+  wymiarach nie są}, i dlatego dwa wymiary są przypadkiem mylącym}.}
+\sumitem{20--22}{\result{\textbf{Kształt to zapisana dziedzina i przeciwdziedzina},
   więc $(m \times n)(n \times p) \to (m \times p)$: wewnętrzne wymiary spotykają
   się tam, gdzie wyjście jednej funkcji jest wejściem następnej. Błąd kształtu
   jest błędem typu, a kształty mówią, który z dwóch prawdopodobnych błędów to
-  jest.}
-\sumitem{23--25}{Wektor jest macierzą $n \times 1$, więc $Ax$ nie potrzebuje
+  jest}.}
+\sumitem{23--25}{\result{Wektor jest macierzą $n \times 1$, więc $Ax$ nie potrzebuje
   drugiej reguły, a partia $k$ wektorów to $n \times k$ \dash{}
   \textbf{liniowość nigdy nie miała nic do powiedzenia o pozostałych
   kolumnach}. Konwencje osi i przypadek rzędu 4 należą do
-  Programu~\ref{prog:P07}.}
-\sumitem{26--29}{\textbf{Dwie warstwy afiniczne są jedną}: $W_2(W_1x + b_1) +
+  Programu~\ref{prog:P07}}.}
+\sumitem{26--29}{\result{\textbf{Dwie warstwy afiniczne są jedną}: $W_2(W_1x + b_1) +
   b_2 = (W_2W_1)x + (W_2b_1 + b_2)$, sprawdzone na $\val{p06.collapse.trials}$
   wejściach z dokładnością lepszą niż $\val{p06.collapse.err}$. $k$ warstw marnuje
   $(k-1)/k$ swoich parametrów bez względu na szerokość \dash{}
   $\val{p06.stack.wasted.pct}\%$ przy ośmiu warstwach \dash{} czyli dokładnie
-  tę głębokość, którą myślałeś, że kupujesz.}
-\sumitem{30--32}{\textbf{Przekształcenie afiniczne nie potrafi zagiąć
+  tę głębokość, którą myślałeś, że kupujesz}.}
+\sumitem{30--32}{\result{\textbf{Przekształcenie afiniczne nie potrafi zagiąć
   prostej}, więc trzy współliniowe wejścia wychodzą współliniowo
   (poniżej $\val{p06.bend.affine}$) przez zwiniętą macierz i zagięte
   ($\val{p06.bend}$) przez parę rozdzieloną przez $\relu$. To wyklucza naraz
   każde przekształcenie afiniczne i dlatego wymaganiem wobec aktywacji jest
-  tylko \enquote{nie afiniczna}.}
-\sumitem{33--34}{\textbf{Łączność jest darmowa, a nawiasowanie nie}: ten sam
+  tylko \enquote{nie afiniczna}}.}
+\sumitem{33--34}{\result{\textbf{Łączność jest darmowa, a nawiasowanie nie}: ten sam
   potrójny iloczyn kosztuje $\val{p06.cost.left}$ mnożeń w jedną stronę i
   $\val{p06.cost.right}$ w drugą, czyli czynnik $\val{p06.cost.ratio}$.
-  Trzymanie chudego czynnika w środku to ta oszczędność wydana świadomie.}
+  Trzymanie chudego czynnika w środku to ta oszczędność wydana świadomie}.}
 \end{summarybox}
 
 % ============================================================

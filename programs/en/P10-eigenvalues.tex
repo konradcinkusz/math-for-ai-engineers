@@ -874,99 +874,98 @@ program's non-symmetric examples had no eigenvalues to give.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{An eigenvector is a direction the matrix only
+\sumitem{1--3}{\result{\textbf{An eigenvector is a direction the matrix only
   stretches}, $Av = \lambda v$ with $v \ne 0$, and the point of one is that
   along it a matrix with $n^{2}$ numbers in it behaves like a single number.
   Everything hard about a matrix is that it mixes the coordinates together;
-  along an eigenvector it does not.}
-\sumitem{4--5}{The worked matrix has two, at $(1,1)$ and $(1,-1)$ with
+  along an eigenvector it does not}.}
+\sumitem{4--5}{\result{The worked matrix has two, at $(1,1)$ and $(1,-1)$ with
   eigenvalues $\val{p10.sym.hi}$ and $\val{p10.sym.lo}$ \dash{} and they are
   \textbf{perpendicular}, and there are \textbf{two of them in two
   dimensions}, which by Program~\ref{prog:P04} makes them a basis. Neither is
-  a coincidence and the next two sections are why.}
-\sumitem{6--8}{$Av = \lambda v$ means $A - \lambda I$ sends something non-zero
+  a coincidence and the next two sections are why}.}
+\sumitem{6--8}{\result{$Av = \lambda v$ means $A - \lambda I$ sends something non-zero
   to zero, so \textbf{the eigenvalues are the roots of
   $\det(A - \lambda I) = 0$}, which is
   $\lambda^{2} - (\operatorname{tr}A)\lambda + \det A$ for a $2 \times 2$.
   Nothing new was needed: Program~\ref{prog:P08} supplied the null space and
-  Program~\ref{prog:P09} the determinant.}
-\sumitem{9}{\textbf{The determinant is the product of the eigenvalues and the
+  Program~\ref{prog:P09} the determinant}.}
+\sumitem{9}{\result{\textbf{The determinant is the product of the eigenvalues and the
   trace is their sum}, straight off that quadratic. The first is the promise
   Program~\ref{prog:P09} made on this program's behalf, and it is kept as a
   gate: the script computes the determinant with that program's own routine
-  and requires it to equal the product.}
-\sumitem{10}{So \textbf{singular, zero eigenvalue and non-trivial null space
+  and requires it to equal the product}.}
+\sumitem{10}{\result{So \textbf{singular, zero eigenvalue and non-trivial null space
   are one condition}, because a product is zero exactly when a factor is.
   Three programs, three routes \dash{} counting directions, measuring volume,
-  multiplying a list.}
-\sumitem{11--12}{\textbf{Eigenvectors are perpendicular only for a symmetric
+  multiplying a list}.}
+\sumitem{11--12}{\result{\textbf{Eigenvectors are perpendicular only for a symmetric
   matrix.} $\begin{pmatrix} 2 & 1 \\ 0 & 3 \end{pmatrix}$ has eigenvectors at
   $\val{p10.nonsym.angle}$ degrees, and attention matrices, transition
   matrices and Jacobians are none of them symmetric. The habit comes from a
-  biased sample: the tidy hand-worked examples are the symmetric ones.}
-\sumitem{13--17}{Two further failures. \textbf{A quarter turn has no real
+  biased sample: the tidy hand-worked examples are the symmetric ones}.}
+\sumitem{13--17}{\result{Two further failures. \textbf{A quarter turn has no real
   eigenvalue at all}, because nothing survives a right-angle turn \dash{} a
   complex eigenvalue is the algebra saying \emph{this rotates}. And
   \textbf{the shear has one eigenvalue twice but only one direction}, which is
-  what \emph{defective} means.}
-\sumitem{18--19}{\textbf{The spectral theorem}: a symmetric matrix has real
+  what \emph{defective} means}.}
+\sumitem{18--19}{\result{\textbf{The spectral theorem}: a symmetric matrix has real
   eigenvalues and perpendicular eigenvectors. Stated, not proved \dash{} but
   the perpendicularity is one line, and it uses $A\T = A$ exactly once, to
   move the matrix across a dot product. \textbf{Symmetry is not a convenience;
-  it is what the conclusion is made of.}}
+  it is what the conclusion is made of.}}}
 \sumitem{20--22}{Checked \emph{exactly} on $\val{p10.spectral.trials}$
   matrices built as $QDQ\T$ from Program~\ref{prog:P09}'s rational rotation,
   so the answers are known by construction rather than found by a solver. As
   in Program~\ref{prog:P04}, \textbf{the trials are testing the code} \dash{}
   and a float test would have needed a tolerance, which is what the word
   \emph{exactly} refuses.}
-\sumitem{23}{The payoff: a full orthogonal set of eigenvectors is a basis and
+\sumitem{23}{\result{The payoff: a full orthogonal set of eigenvectors is a basis and
   an orthogonal change of basis, so \textbf{a symmetric matrix is diagonal in
-  the right coordinates}, and the eigenvectors are the right coordinates.}
-\sumitem{24--25}{A \textbf{quadratic form} is $x\T Ax$, and \textbf{only the
+  the right coordinates}, and the eigenvectors are the right coordinates}.}
+\sumitem{24--25}{\result{A \textbf{quadratic form} is $x\T Ax$, and \textbf{only the
   symmetric part of $A$ can affect it} \dash{} which is why a Hessian, a
   covariance and a Gram matrix are all symmetric, and why the spectral theorem
-  always applies to one.}
-\sumitem{26--27}{In the eigenvector basis the form collapses to
+  always applies to one}.}
+\sumitem{26--27}{\result{In the eigenvector basis the form collapses to
   $\lambda_1c_1^{2} + \lambda_2c_2^{2}$, so two positive eigenvalues make it
   positive in every direction. That is \textbf{positive definite}: a claim
-  about infinitely many directions, settled by looking at two numbers.}
-\sumitem{28--29}{$+,-$ is a saddle and $+,0$ a ridge, confirmed in
+  about infinitely many directions, settled by looking at two numbers}.}
+\sumitem{28--29}{\result{$+,-$ is a saddle and $+,0$ a ridge, confirmed in
   $\val{p10.form.dirs}$ directions each. \textbf{The signs of the eigenvalues
-  settle the whole shape without trying a single direction.}}
-\sumitem{30}{\textbf{You cannot find a flat direction by sampling.} The
+  settle the whole shape without trying a single direction.}}}
+\sumitem{30}{\result{\textbf{You cannot find a flat direction by sampling.} The
   assertion that a semi-definite form's sampled minimum is zero failed at
   once, because the flat direction is one direction out of infinitely many.
   That is the argument for computing eigenvectors rather than trying
-  directions.}
-\sumitem{31--32}{\enquote{Zero eigenvalue}, \enquote{singular}, \enquote{null
+  directions}.}
+\sumitem{31--32}{\result{\enquote{Zero eigenvalue}, \enquote{singular}, \enquote{null
   space} and \enquote{flat direction} are \textbf{one condition said four
   ways}. And \emph{semi}-definite allows a zero, so a positive definite matrix
   is invertible and a positive semi-definite one need not be \dash{} the word
-  \emph{semi} carries that entire difference.}
-\sumitem{33--34}{\textbf{The spectral norm is the largest
+  \emph{semi} carries that entire difference}.}
+\sumitem{33--34}{\result{\textbf{The spectral norm is the largest
   $\lvert\lambda\rvert$}, and it is the factor by which a layer can amplify in
   the worst case over every input including the untried ones. Over
   $\val{p10.norm.dirs}$ directions: largest $\val{p10.norm.max}$, smallest
-  $\val{p10.norm.min}$, attained at the top eigenvector.}
-\sumitem{35--37}{A level set of a positive definite form is an ellipse with
+  $\val{p10.norm.min}$, attained at the top eigenvector}.}
+\sumitem{35--37}{\result{A level set of a positive definite form is an ellipse with
   its axes along the eigenvectors, and \textbf{the ratio of the axes is the
   SQUARE ROOT of the ratio of the eigenvalues} \dash{}
   $\val{p10.basin.axisratio}$ for a ratio of $\val{p10.basin.eigratio}$, where
-  most people answer $\val{p10.basin.eigratio}$.}
-\sumitem{38}{\enquote{Ravine}, \enquote{sharp minimum} and \enquote{the
-  learning rate is too high} are \textbf{three numbers read off one matrix}.
-  The shape is collected here; the inequality is Program~\ref{prog:P17}'s and
+  most people answer $\val{p10.basin.eigratio}$}.}
+\sumitem{38}{\result{\enquote{Ravine}, \enquote{sharp minimum} and \enquote{the
+  learning rate is too high} are \textbf{three numbers read off one matrix}.} The shape is collected here; the inequality is Program~\ref{prog:P17}'s and
   the optimisers are Program~\ref{prog:P20}'s.}
-\sumitem{39--40}{$C = \frac{1}{n}X\T X$ is \textbf{symmetric and positive
+\sumitem{39--40}{\result{$C = \frac{1}{n}X\T X$ is \textbf{symmetric and positive
   semi-definite}, both proved from that one line rather than borrowed, so the
   spectral theorem applies to a matrix whose \emph{meaning} is
-  Program~\ref{prog:P24}'s and has not been given yet.}
-\sumitem{41--43}{$v\T Cv$ is the spread of the data along $v$, so \textbf{the
+  Program~\ref{prog:P24}'s and has not been given yet}.}
+\sumitem{41--43}{\result{$v\T Cv$ is the spread of the data along $v$, so \textbf{the
   direction of greatest spread is the top eigenvector}. That is PCA, an
   observation rather than an algorithm: $\val{p10.pca.top.pct}\%$ of the
   spread on one direction, found two ways that agree, only one of which
-  survives seven hundred dimensions.}
+  survives seven hundred dimensions}.}
 \end{summarybox}
 
 \canyou

@@ -672,85 +672,85 @@ a number back.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{A vector space has two operations and one condition that
+\sumitem{1--3}{\result{\textbf{A vector space has two operations and one condition that
   ever fails}: add any two members or scale any member, and the answer must
   land back in the set. The vectors in $\R^{3}$ with first component $0$ are a
   space; those with first component $1$ are not, and the quickest test is that
-  \textbf{every space contains the zero vector}.}
-\sumitem{4--5}{The embeddings a model \emph{produces} are a subset of a space,
+  \textbf{every space contains the zero vector}}.}
+\sumitem{4--5}{\result{The embeddings a model \emph{produces} are a subset of a space,
   not a space \dash{} which is why \enquote{there is a direction for X} is
   ambiguous: the direction exists by construction, and whether the model uses
   it is the question. And \textbf{\enquote{vector} is a role, not a shape}:
   polynomials and functions are vectors, so everything proved from closure
-  applies to them unchanged.}
-\sumitem{6--8}{A \textbf{subspace} is a subset that is a space in its own right.
+  applies to them unchanged}.}
+\sumitem{6--8}{\result{A \textbf{subspace} is a subset that is a space in its own right.
   Closure must hold for \emph{every} pair: the union of the three axes is
   closed under scaling and fails under addition, which is the shape of nearly
   every failed argument. Counting members cannot say which subspace is bigger,
-  because both hold infinitely many.}
-\sumitem{9--11}{The \textbf{span} is everything the two operations reach from a
+  because both hold infinitely many}.}
+\sumitem{9--11}{\result{The \textbf{span} is everything the two operations reach from a
   starting handful, and it is always a subspace. Two vectors in $\R^{3}$ span a
   plane through the origin \dash{} \emph{unless} one is a multiple of the other,
   which is dependence arriving before it is named. \textbf{Two vectors do not
-  always give two directions.}}
-\sumitem{12--14}{\textbf{Three numbers, and only the last is the dimension}:
+  always give two directions.}}}
+\sumitem{12--14}{\result{\textbf{Three numbers, and only the last is the dimension}:
   how many vectors are in the list ($\val{p04.family.count}$), how long each is
   ($\val{p04.family.ambient}$), and how many independent directions they reach
   ($\val{p04.family.dim}$). The first two describe how the data was written
-  down; the third describes the data.}
-\sumitem{15}{A list is \textbf{dependent} when one member is a combination
+  down; the third describes the data}.}
+\sumitem{15}{\result{A list is \textbf{dependent} when one member is a combination
   of the others, equivalently when the zero vector has a non-trivial
   combination; \textbf{independent} when neither. The two forms are the same
-  statement divided through by a coefficient.}
-\sumitem{16--18}{\textbf{Rank saturates.} Random vectors in
+  statement divided through by a coefficient}.}
+\sumitem{16--18}{\result{\textbf{Rank saturates.} Random vectors in
   $\val{p04.sat.dim}$ dimensions reach $\val{p04.sat.rank.2}$,
   $\val{p04.sat.rank.4}$, $\val{p04.sat.rank.8}$ directions \dash{} and then
   $\val{p04.sat.rank.12}$, $\val{p04.sat.rank.20}$ and
   $\val{p04.sat.rank.40}$, because each new vector either adds a dimension or
   adds nothing, and the space has only so many to give. The
   $\val{p04.sat.trials}$ random draws are testing the code: a counterexample
-  would refute a proof.}
-\sumitem{19--20}{\textbf{In $d$ dimensions at most $d$ vectors are
+  would refute a proof}.}
+\sumitem{19--20}{\result{\textbf{In $d$ dimensions at most $d$ vectors are
   independent}, whatever they are and whatever they were trained on \dash{} and
   it needs no inner product, no angle and no distance, which is why it survives
   every later choice of how to measure. \emph{Dependent} is not a defect: it
-  says something about the list, not the members.}
-\sumitem{21--23}{A \textbf{basis} is independent and spanning \dash{} the exact
+  says something about the list, not the members}.}
+\sumitem{21--23}{\result{A \textbf{basis} is independent and spanning \dash{} the exact
   size at which dropping one stops it spanning and adding one stops it being
   independent. \textbf{Every basis for a space has the same size}, which is a
   theorem and is what lets \emph{dimension} name anything. Span, independence,
-  basis and dimension are one idea seen four ways.}
-\sumitem{24--25}{\textbf{A basis is not unique.}
+  basis and dimension are one idea seen four ways}.}
+\sumitem{24--25}{\result{\textbf{A basis is not unique.}
   $(\val{p04.basis.x}, \val{p04.basis.y})$ against axes turned by
   $\val{p04.basis.angle}$ degrees becomes
   $(\val{p04.basis.c1}, \val{p04.basis.c2})$, and its length is
   $\val{p04.basis.len}$ either way. \textbf{Coordinates belong to the basis;
-  the vector belongs to the space.}}
-\sumitem{26--27}{So \enquote{embedding dimension $\val{p04.embed}$} promises a
+  the vector belongs to the space.}}}
+\sumitem{26--27}{\result{So \enquote{embedding dimension $\val{p04.embed}$} promises a
   space and a bound, and promises nothing about a component meaning anything on
   its own \dash{} another run lands on another basis. The working test:
   \textbf{a method that works in any basis measures something real; one that
-  needs a particular basis measures your choice of axes.}}
-\sumitem{28--29}{\textbf{The counting fact.} $\val{p04.vocab}$ tokens in
+  needs a particular basis measures your choice of axes.}}}
+\sumitem{28--29}{\result{\textbf{The counting fact.} $\val{p04.vocab}$ tokens in
   $\val{p04.embed}$ dimensions leaves at least $\val{p04.dependent}$ of the
   embeddings \dash{} $\val{p04.dependent.pct}\%$ \dash{} as combinations of the
   others; at Program~\ref{prog:F09}'s $\val{f09.dim}$ dimensions it is
   $\val{p04.f09.dependent}$. \textbf{No training changes it and no architecture
   avoids it}, which makes it unusual: most claims about a model are provisional
-  and this one is not.}
-\sumitem{30--31}{It does \emph{not} say the model cannot distinguish that many
+  and this one is not}.}
+\sumitem{30--31}{\result{It does \emph{not} say the model cannot distinguish that many
   things \dash{} only that it cannot give each its own \textbf{independent}
   direction. A space of $\val{p04.embed}$ dimensions holds exactly that many
   mutually independent directions and vastly more \emph{nearly} independent
   ones, and \textbf{the relaxation from exactly to nearly is the entire
-  subject}.}
-\sumitem{32--34}{The \textbf{linear representation} and \textbf{superposition}
+  subject}}.}
+\sumitem{32--34}{\result{The \textbf{linear representation} and \textbf{superposition}
   accounts are \emph{hypotheses about structure}, stated as hypotheses: the
   counting bound is a theorem and is often used as though it established them,
   when it establishes only that some such account is needed. What would
   discriminate between them is a measurement of \enquote{nearly}, which needs
   an angle \dash{} the one thing this program deliberately withheld, and
-  Program~\ref{prog:P05}'s opening move.}
+  Program~\ref{prog:P05}'s opening move}.}
 \end{summarybox}
 
 \canyou
