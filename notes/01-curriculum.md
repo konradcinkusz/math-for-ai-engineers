@@ -31,24 +31,27 @@ It ships in Polish and English from one source tree.
 ## 2. The shape
 
 Nine parts. **13 Foundation programs (F1--F13)** and **33 main programs
-(P1--P33)**.
+(P1--P34)**.
 
 | Part | Programs | Why it exists |
 |---|---|---|
 | I --- Podstawy / Foundation | F1--F13 | Assumes nothing. Triaged by Quiz; a competent reader skips most of it in an afternoon. |
 | II --- Liczba, precyzja i koszt / Number, precision and cost | P1--P3 | What the machine actually computes, and what an operation costs. Placed first because everything after it is arithmetic on a finite machine. |
-| III --- Algebra liniowa / Linear algebra | P4--P10 | Stroud's largest gap. Seven programs, because this is the subject the audience uses daily and understands least. |
-| IV --- Struktury dyskretne i argumentacja / Discrete structures and argument | P11--P13 | Counting, graphs, and how to read a theorem without believing more than it says. Placed before calculus so that "DAG" and "for all epsilon" are defined when they are first needed. |
-| V --- Rachunek różniczkowy i różniczkowanie automatyczne / Calculus and automatic differentiation | P14--P17 | The chain rule, taken all the way to what `loss.backward()` actually does. |
-| VI --- Optymalizacja / Optimisation | P18--P21 | Absent from Stroud's first volume entirely. |
-| VII --- Prawdopodobieństwo i statystyka / Probability and statistics | P22--P27 | Stroud stops at the normal distribution. This part goes to inference, bootstrap and Bayes, because the audience's real job is deciding whether a measured difference is real. |
-| VIII --- Teoria informacji / Information theory | P28--P30 | Absent from Stroud. It is where the loss function comes from. |
-| IX --- Złożenie / Assembling it | P31--P33 | Three capstone programs that spend the whole book on one architecture, one training run and one evaluation. No new mathematics. |
+| III --- Algebra liniowa / Linear algebra | P4--P11 | Stroud's largest gap. Eight programs, because this is the subject the audience uses daily and understands least. |
+| IV --- Struktury dyskretne i argumentacja / Discrete structures and argument | P12--P14 | Counting, graphs, and how to read a theorem without believing more than it says. Placed before calculus so that "DAG" and "for all epsilon" are defined when they are first needed. |
+| V --- Rachunek różniczkowy i różniczkowanie automatyczne / Calculus and automatic differentiation | P15--P18 | The chain rule, taken all the way to what `loss.backward()` actually does. |
+| VI --- Optymalizacja / Optimisation | P19--P22 | Absent from Stroud's first volume entirely. |
+| VII --- Prawdopodobieństwo i statystyka / Probability and statistics | P23--P28 | Stroud stops at the normal distribution. This part goes to inference, bootstrap and Bayes, because the audience's real job is deciding whether a measured difference is real. |
+| VIII --- Teoria informacji / Information theory | P29--P31 | Absent from Stroud. It is where the loss function comes from. |
+| IX --- Złożenie / Assembling it | P32--P34 | Three capstone programs that spend the whole book on one architecture, one training run and one evaluation. No new mathematics. |
 
-Estimated **2,370 frames**, roughly 460--540 pages at this page geometry. That
-is a two-volume book if it is printed; Parts I--VI and Parts VII--IX split
-cleanly, and the split is worth deciding early because it changes the front
-matter. Recorded here as an open question, not a decision.
+Planned **2,418 frames**. The estimate that stood here — 460--540 pages at
+this page geometry — **is falsified by the written book and is wrong by a
+factor of about three**; see §20 item 1, which now carries the measurement.
+Forty-five of the forty-seven programs are written, and they set 1,267 pages in
+the trade format. The split into Parts I--VI and Parts VII--IX is still the
+clean one, and it is still an open question rather than a decision — but it is
+now a question with a number in front of it.
 
 ---
 
@@ -168,538 +171,49 @@ for engineers that waits 400 pages to admit that the machine cannot represent
 arithmetic performed by a finite machine on a budget, and the reader should know
 what both of those mean before they start.
 
-**P1 --- Floating point: what the machine actually computes**
-(*Liczby zmiennoprzecinkowe: co maszyna naprawdę liczy*) --- 45 frames.
+## 5. Part III --- Algebra liniowa / Linear algebra (P4--P11)
 
-Argument: a float is a sign, an exponent and a fixed number of significant bits,
-so the gap between representable numbers grows with magnitude, and equality is
-not a question you should ask.
-
-Payoff: why `bf16` is the training format and `fp16` needs loss scaling --- they
-have the same width and different exponent budgets, and the reader computes the
-overflow threshold rather than being told it; why a sum of gradients is not
-associative and two GPUs therefore disagree in the last bits; what machine
-epsilon is and why comparing two loss values that differ in the eighth decimal
-is measuring the hardware.
-
-**P2 --- Numerical error, stability and computing in log-space**
-(*Błąd numeryczny, stabilność i obliczenia w skali logarytmicznej*) --- 50 frames.
-
-Argument: an algorithm can be correct in exact arithmetic and useless in
-floating point; catastrophic cancellation is the mechanism, and there is a small
-catalogue of fixes.
-
-Payoff: **why log-sum-exp instead of exponentiating.** The reader computes the
-exact logit at which a naive softmax overflows `fp32` and `fp16`, then derives
-the max-subtraction trick and shows it changes nothing mathematically. Also: why
-cross-entropy is computed from logits and never from probabilities; why the
-naive one-pass variance formula gives a negative variance and Welford's does
-not; why summing a million small gradients in the wrong order loses them.
-
-**P3 --- Orders of magnitude: O-notation, FLOPs and memory**
-(*Rzędy wielkości: notacja O, FLOP-y i pamięć*) --- 45 frames.
-
-Argument: asymptotic notation is a statement about growth and says nothing about
-which of two implementations is faster today; both facts matter.
-
-Payoff: count the parameters of a transformer block by hand; count the
-activations; count the KV cache and watch it grow linearly in sequence length
-while attention grows quadratically --- **the reader derives why long context is
-expensive rather than accepting it**. Arithmetic intensity, and why a large
-matrix multiply is compute-bound while an elementwise operation is
-memory-bound, which is the whole justification for kernel fusion.
-
----
-
-## 5. Part III --- Algebra liniowa / Linear algebra (P4--P10)
-
-Seven programs. Stroud teaches matrices as a set of recipes --- determinants by
+Eight programs. Stroud teaches matrices as a set of recipes --- determinants by
 cofactor expansion, an inverse by adjugate, eigenvalues by solving a
 characteristic polynomial --- and never mentions a vector space. That is exactly
 backwards for this audience: the recipes are what a library does for you, and
 the structural facts are what you need to read a model architecture.
 
-**P4 --- Vectors, vector spaces and basis**
-(*Wektory, przestrzenie liniowe i baza*) --- 55 frames.
-
-Argument: a vector space is closed under two operations; span, linear
-independence, basis and dimension are four words for one idea, and dimension is
-the number of independent directions rather than the length of the list.
-
-Payoff: what "embedding dimension 4096" does and does not promise; why a set of
-20,000 token embeddings in 4,096 dimensions cannot be linearly independent, and
-why the linear-representation and superposition stories are therefore
-*hypotheses about structure*, stated here as hypotheses and not as facts.
-
-**P5 --- Inner product, norms and projection**
-(*Iloczyn skalarny, normy i rzutowanie*) --- 60 frames.
-
-Argument: an inner product is the only thing that gives a vector space angles
-and lengths; a projection is the closest point in a subspace; different norms
-measure different things and disagree about which vector is bigger.
-
-Payoff: dot product, cosine and Euclidean distance compared on the same data,
-with the case where they rank differently worked out --- the thing a vector
-database forces you to choose and nobody explains; why normalising embeddings
-makes cosine and dot product the same query and what you lose; L1 against L2 as
-a shape rather than a slogan, and why the L1 ball's corners are the whole of the
-sparsity argument. Also the fact the book cashes in twice later: **in high
-dimension, two random vectors are almost always nearly orthogonal**, measured
-rather than asserted.
-
-**P6 --- Matrices as linear maps** (*Macierze jako przekształcenia liniowe*) --- 60 frames.
-
-Argument: a matrix is a function that respects addition and scaling; matrix
-multiplication is composition of functions, which is why it is associative and
-not commutative; shape is the type signature.
-
-Payoff: a linear layer is a matrix and a batch is one extra index; **two linear
-layers with no non-linearity between them are one linear layer**, derived, which
-is the reason activations exist; every shape error the reader has ever hit,
-explained as a type error in a composition; multi-head attention as a reshape,
-which is where most readers' mental model breaks.
-
-**P7 --- Rank, the four subspaces and least squares**
-(*Rząd, podprzestrzenie i najmniejsze kwadraty*) --- 60 frames.
-
-Argument: a matrix has a column space, a row space and two null spaces; rank is
-the dimension shared by the first two and it is the honest measure of how much a
-matrix does.
-
-Payoff: **LoRA is a rank constraint**, and this is the program that makes that
-sentence carry information --- a `d x d` update replaced by `B A` with inner
-dimension `r`, parameter count `2dr` against `d^2`, and the assumption being
-made about the update stated plainly. Solving `Ax = b` when there is no
-solution: least squares as a projection, which is linear regression's closed
-form. Rank collapse in deep attention stacks, described as the phenomenon it is.
-
-**P8 --- Determinant, inverse and change of basis**
-(*Wyznacznik, macierz odwrotna i zmiana bazy*) --- 45 frames.
-
-Argument: the determinant is a signed volume scale factor and zero means
-information was destroyed; an inverse exists exactly when nothing was destroyed;
-a change of basis is the same vector described in another coordinate system.
-
-Payoff: why production code almost never calls `inv()` and solves a factorised
-system instead --- stated here, measured in P10; a rotation as an
-orthogonal change of basis, which is what rotary position embedding does; the
-log-determinant term in a normalising flow, named so the reader recognises it
-later without the book promising to teach flows.
-
-**P9 --- Eigenvalues, quadratic forms and positive definiteness**
-(*Wartości własne, formy kwadratowe i dodatnia określoność*) --- 65 frames.
-
-Argument: an eigenvector is a direction the matrix only stretches; a symmetric
-matrix has a full orthogonal set of them (the spectral theorem, stated and used,
-not proved); a quadratic form is a bowl, a saddle or a ridge, and its eigenvalues
-say which.
-
-Payoff: a covariance matrix is symmetric and positive semi-definite, so PCA is
-an eigen-decomposition and not a black box; the spectral norm as the largest
-stretch, which is the Lipschitz constant that bounds how much a layer can
-amplify; **the Hessian's eigenvalues are the shape of the loss basin**, which is
-where "ravine", "sharp minimum" and "the learning rate is too high" all become
-one statement --- collected here and spent in P16 and P19.
-
-**P10 --- SVD, low-rank approximation and conditioning**
-(*Rozkład SVD, aproksymacja niskiego rzędu i uwarunkowanie*) --- 60 frames.
-
-Argument: every matrix, square or not, factors into rotate--stretch--rotate.
-Truncating the stretch gives the provably best approximation of a given rank
-(Eckart--Young, stated). The ratio of largest to smallest singular value is the
-condition number, and it is the amplification factor from input error to output
-error.
-
-Payoff: the singular-value spectrum of a real embedding matrix, plotted, showing
-how few directions carry the energy --- the empirical case for LoRA and for
-embedding compression, measured; the pseudoinverse as least squares done
-properly; **why the normal equations square the condition number and a QR
-solve does not**, which is the concrete form of "do not invert"; and the
-condition number as the number that predicts how many iterations an optimiser
-will need, handed forward to P19.
-
----
-
-## 6. Part IV --- Struktury dyskretne i argumentacja / Discrete structures and argument (P11--P13)
+## 6. Part IV --- Struktury dyskretne i argumentacja / Discrete structures and argument (P12--P14)
 
 Three programs, placed here rather than at the end. The placement is the
 argument: a computation graph is a DAG and reverse-mode differentiation is a
-reverse topological traversal, so the reader should have met a DAG *before* P15
+reverse topological traversal, so the reader should have met a DAG *before* P16
 rather than after it. Logic and proof come before the calculus and probability
 parts for the same reason --- the reader is about to start meeting statements of
 the form "for every epsilon there exists an N", and being able to parse one is a
 prerequisite, not a capstone.
 
-**P11 --- Combinatorics and counting** (*Kombinatoryka i zliczanie*) --- 45 frames.
+## 7. Part V --- Rachunek różniczkowy i różniczkowanie automatyczne / Calculus and automatic differentiation (P15--P18)
 
-Argument: four counting rules --- product, permutation, combination,
-inclusion--exclusion --- plus the pigeonhole principle and simple recurrences.
-
-Payoff: the birthday calculation, so the reader can size a hash for dataset
-deduplication and say why 64 bits is not enough and 128 is; the size of a beam
-search's space and why beam width buys so little; **a Shapley value is an
-average over every ordering of the features**, so exact SHAP is exponential by
-construction and every implementation you have used is a sampling
-approximation --- which changes how much you should trust an attribution plot.
-
-**P12 --- Graphs, DAGs and random walks**
-(*Grafy, DAG-i i błądzenie losowe*) --- 50 frames.
-
-Argument: a graph is a set plus a relation; adjacency matrix and adjacency list
-are two encodings with different costs; a DAG has a topological order and that
-order is what makes evaluation well defined.
-
-Payoff: the computation graph, defined properly, one program before autodiff
-needs it; **message passing in a graph neural network is a multiplication by
-the adjacency matrix**, which is where Part III and this part meet; PageRank as
-the stationary distribution of a random walk, which is the same eigenvector
-calculation as P9; an agent workflow, a build system and a neural network as the
-same object.
-
-**P13 --- Logic, proof and reading theorems**
-(*Logika, dowód i czytanie twierdzeń*) --- 45 frames.
-
-Argument: implication is not equivalence, a quantifier's order changes the
-claim, and a proof by induction or contradiction is a shape you can recognise.
-
-Payoff: **the reader can read a paper's theorem and separate its hypotheses from
-its conclusion.** Worked on real examples of the gap: a convergence result that
-assumes convexity being cited about a neural network; a bound that holds "with
-high probability over the draw of the data" quoted as if it held for the dataset
-in hand; "universal approximation" quoted as if it said anything about
-learnability. This program is the honest, bounded fix for Stroud's absent
-rigour: it does not train the reader to *write* proofs, and says so.
-
----
-
-## 7. Part V --- Rachunek różniczkowy i różniczkowanie automatyczne / Calculus and automatic differentiation (P14--P17)
-
-**P14 --- Functions of several variables and the gradient**
-(*Funkcje wielu zmiennych i gradient*) --- 55 frames.
-
-Argument: a partial derivative holds everything else still; the gradient
-collects them; the directional derivative is a dot product with the gradient, so
-the gradient is the steepest direction and is perpendicular to the level set.
-
-Payoff: gradient descent's direction is derived rather than asserted; **the
-zig-zag in a narrow valley is explained by the gradient being perpendicular to
-the contour rather than pointing at the minimum**, which is the picture that
-makes momentum obvious two parts later.
-
-**P15 --- Jacobians, the chain rule and automatic differentiation**
-(*Jakobian, reguła łańcuchowa i różniczkowanie automatyczne*) --- 65 frames.
-
-Argument: for vector-valued functions the chain rule multiplies Jacobians;
-nobody forms a Jacobian; forward mode computes a Jacobian--vector product and
-reverse mode a vector--Jacobian product, and which is cheaper depends only on
-the shape of the problem.
-
-Payoff: **what `loss.backward()` actually computes**, in full: why a scalar loss
-with many parameters makes reverse mode cheaper by a factor of the parameter
-count; why reverse mode must keep the activations, so memory scales with depth
-and batch; gradient checkpointing as an explicit trade of recomputation for
-memory, with the arithmetic done; why a numerical finite-difference gradient is
-a testing tool and not an implementation; the three places autodiff silently
-gives you something other than the derivative you meant (a non-differentiable
-point, a detached tensor, an in-place write).
-
-**P16 --- The Hessian, curvature and the Taylor expansion**
-(*Hesjan, krzywizna i rozwinięcie Taylora*) --- 50 frames.
-
-Argument: the second-order Taylor expansion is the best local quadratic model,
-and its matrix is the Hessian.
-
-Payoff: **why the largest stable learning rate is bounded by the inverse of the
-curvature**, derived on a quadratic, which turns "the loss exploded" into an
-arithmetic statement; the condition number of the Hessian as the ratio of
-fastest to slowest direction, joining P9 and P10 to the optimiser; second-order
-methods explained and then dismissed on cost for this problem size; and an
-honest section on sharp-versus-flat minima --- what is measured, what is
-reparameterisation-dependent, and why the claim is contested.
-
-**P17 --- Matrix calculus** (*Rachunek macierzowy*) --- 60 frames.
-
-Argument: differentiating with respect to a vector or a matrix is bookkeeping
-plus a layout convention, and most of the pain in the literature is the
-convention rather than the mathematics.
-
-Payoff: the identities the reader actually needs, derived once each: the
-gradient of `Wx` with respect to `W`; of a squared error; of a softmax; of a
-log-softmax; of layer normalisation. The headline: **the gradient of
-cross-entropy through a softmax is `p - y`**, the single most reused fact in
-applied machine learning, derived in full --- and the reason the two operations
-are fused in every serious implementation. Also a versionbox on numerator versus
-denominator layout, because the reader will meet both in the same week.
-
----
-
-## 8. Part VI --- Optymalizacja / Optimisation (P18--P21)
+## 8. Part VI --- Optymalizacja / Optimisation (P19--P22)
 
 Stroud has no optimisation in the first volume at all. For this audience it is
 the subject the job actually consists of.
 
-**P18 --- Convexity and Jensen's inequality**
-(*Wypukłość i nierówność Jensena*) --- 45 frames.
-
-Argument: a convex function has one basin and every local minimum is global;
-that is a promise about the problem, not about the algorithm. Deep learning
-breaks the promise, and what survives anyway is worth naming precisely.
-
-Payoff: Jensen's inequality, and **why you cannot average perplexities** ---
-the mean of the exponentials is not the exponential of the mean, so a
-leaderboard that averages per-document perplexity is reporting a different
-quantity from one that exponentiates the mean loss; the same inequality is the
-ELBO in one line, named for recognition; and the honest statement that
-"non-convex" does not mean "hopeless", with the reasons.
-
-**P19 --- Gradient descent: from SGD to Adam**
-(*Metoda gradientu prostego: od SGD do Adama*) --- 65 frames.
-
-Argument: every optimiser in common use is the same update with a different
-estimate of "how far and in which direction", and each addition fixes a specific
-named failure of the one before it.
-
-Payoff: the step-size bound from P16; momentum as the exponential moving average
-met in F4, fixing the zig-zag from P14; per-coordinate scaling fixing badly
-scaled features; **why Adam divides by the square root of the second moment ---
-it is a per-coordinate estimate of the gradient's scale, so the update becomes
-approximately unit-sized regardless of how large the gradient is**, which is
-also precisely why Adam is insensitive to loss scaling and why the epsilon must
-sit outside the square root; bias correction derived from the initialisation at
-zero; **weight decay is not L2 regularisation once you divide by a running
-scale**, which is the entire content of AdamW; warmup and cosine schedules
-described as what they do to the effective step rather than as ritual.
-
-**P20 --- Stochastic optimisation and differentiating through randomness**
-(*Optymalizacja stochastyczna i różniczkowanie losowania*) --- 50 frames.
-
-Argument: a minibatch gradient is an unbiased estimator with variance
-proportional to `1/B`, and the noise is a property of the algorithm rather than
-a defect in it.
-
-Payoff: why the loss curve is noisy and what a moving average of it hides; the
-linear scaling rule for batch size and learning rate, presented as **widely
-repeated folklore with a limited empirical basis**, not as a law; gradient
-clipping as a bound on the update rather than on the gradient; and the two ways
-to get a gradient through a sampling step --- the score-function estimator
-(REINFORCE, unbiased and high variance) and the reparameterisation trick
-(low variance, requires a differentiable path) --- which is the fork that
-separates policy-gradient RLHF from a VAE.
-
-**P21 --- Constrained optimisation and Lagrange multipliers**
-(*Optymalizacja z ograniczeniami i mnożniki Lagrange'a*) --- 50 frames.
-
-Argument: at a constrained optimum the gradients of objective and constraint are
-parallel; the multiplier is the exchange rate between them.
-
-Payoff: **a Lagrange multiplier is a price** --- how much objective you buy per
-unit of constraint relaxed --- and that reading turns the `beta` in a
-KL-penalised objective from a tuning knob into a quantity with units; the
-equivalence between a hard KL constraint and a KL penalty, which is why PPO and
-DPO are talking about the same problem; projection onto a set as the other way
-to enforce a constraint; KKT conditions stated for recognition, with the
-inequality case sketched rather than developed.
-
----
-
-## 9. Part VII --- Prawdopodobieństwo i statystyka / Probability and statistics (P22--P27)
+## 9. Part VII --- Prawdopodobieństwo i statystyka / Probability and statistics (P23--P28)
 
 Stroud's statistics is descriptive plus the normal distribution: no estimation,
 no inference, no Bayes. That is the difference between describing a sample and
 deciding whether a difference is real, and deciding whether a difference is real
 is what this audience is paid for.
 
-**P22 --- Probability and Bayes' theorem**
-(*Prawdopodobieństwo i twierdzenie Bayesa*) --- 55 frames.
-
-Argument: probability is a measure on a sample space obeying three rules;
-conditioning is restricting the space; Bayes' theorem is one line of algebra
-from the definition and is derived, never asserted.
-
-Payoff: **the base-rate calculation an engineer must be able to do in a
-meeting** --- a classifier with 99% accuracy on a fault that occurs once in a
-thousand requests, and what fraction of its alarms are real. Independence and
-conditional independence distinguished, because the naive Bayes assumption and
-most "these two evals are independent signals" claims live on the difference.
-Trap: the prosecutor's fallacy, elicited from the reader before it is named.
-
-**P23 --- Random variables and distributions**
-(*Zmienne losowe i rozkłady*) --- 60 frames.
-
-Argument: a random variable is a function on the sample space; expectation and
-variance are its first two summaries; six distributions cover almost everything
-in this field.
-
-Payoff: **sampling a token is a draw from a categorical distribution**, and
-temperature, top-k and top-p are three ways of editing that distribution before
-drawing --- described as distribution surgery, with what each destroys; the
-Gumbel-max trick, so the reader can see that `argmax(logits + gumbel)` is exact
-categorical sampling and not an approximation; the Gaussian introduced through
-its role rather than its formula; expectation as the linear operator that makes
-almost every derivation later in the book short.
-
-**P24 --- Sums of random variables: the central limit theorem, concentration and Monte Carlo**
-(*Sumy zmiennych losowych: centralne twierdzenie graniczne i metoda Monte Carlo*) --- 55 frames.
-
-Argument: variances of independent quantities add; averages concentrate; the
-error of an average falls as `1/sqrt(n)` and that single rate governs an
-astonishing amount of practice.
-
-Payoff: **the derivation of the `1/sqrt(d_k)` in attention.** A dot product of
-two `d_k`-dimensional vectors with independent unit-variance entries has
-variance `d_k`, so its standard deviation grows as `sqrt(d_k)`; feed that into a
-softmax and it saturates, and the gradient dies; divide by `sqrt(d_k)` and the
-logits have unit variance regardless of head size. The scaling is a variance
-correction and nothing else, and the reader derives it here and measures it in
-P31. Also: Monte Carlo error is the same `1/sqrt(n)`, so the number of samples
-needed to halve an error bar is four times as many --- the fact that prices
-every evaluation run in the book.
-
-**P25 --- Estimation and maximum likelihood**
-(*Estymacja i metoda największej wiarogodności*) --- 55 frames.
-
-Argument: an estimator is a function of the sample; bias and variance are two
-different ways of being wrong; maximum likelihood picks the parameter that makes
-the observed data least surprising.
-
-Payoff: **training a language model is maximum likelihood**, and the
-cross-entropy loss is the negative log-likelihood of the observed tokens ---
-one derivation that reframes the entire training objective, and from which label
-smoothing, class weighting and the `n-1` in a sample variance all fall out. MAP
-as maximum likelihood with a prior, which is exactly weight decay with a
-Gaussian prior --- the cleanest available statement of what regularisation *is*.
-
-**P26 --- Statistical inference for the engineer**
-(*Wnioskowanie statystyczne dla inżyniera*) --- 60 frames.
-
-Argument: a measured difference is a random quantity, and the question is
-whether it is larger than the noise in the measurement.
-
-Payoff: the program that carries this house's first rule into a mathematics
-book. **"Model B scored 71.4 and model A scored 70.9 on 200 evaluation items"
---- is that real?** Worked end to end: the standard error of a proportion; a
-bootstrap confidence interval on an evaluation set; the paired comparison,
-because A and B saw the same prompts and a paired test has far more statistical power;
-what a p-value does and does not say, stated flatly; the multiple-comparisons
-problem, which is what a leaderboard with forty models is; and a power
-calculation answering how many evaluation items are needed to detect a
-one-point difference at all. The honest conclusion --- that most published
-leaderboard deltas of this size are not distinguishable from noise, and the
-reader can now check.
-
-**P27 --- Bayesian inference** (*Wnioskowanie bayesowskie*) --- 50 frames.
-
-Argument: put a distribution on the parameter, condition on the data, report the
-posterior. Conjugacy makes the arithmetic closed-form in the one case that
-matters most.
-
-Payoff: Beta--Binomial worked fully, which covers "what is this model's success
-rate and how sure am I"; a credible interval and a confidence interval
-contrasted, because they answer different questions and are routinely conflated;
-Bayesian A/B testing on evaluation results, giving "the probability that B is
-better" which is the quantity people wanted from a p-value; Thompson sampling
-as model routing under uncertainty; calibration of a judge model's stated
-probability, and what it costs downstream when the judge is confidently wrong.
-
----
-
-## 10. Part VIII --- Teoria informacji / Information theory (P28--P30)
+## 10. Part VIII --- Teoria informacji / Information theory (P29--P31)
 
 Entirely absent from Stroud. It is where the loss function comes from, so it
 cannot be absent here.
 
-**P28 --- Entropy and the measure of surprise**
-(*Entropia i miara zaskoczenia*) --- 45 frames.
-
-Argument: surprise is the negative log of a probability; entropy is average
-surprise; it is the shortest average code length, and that is why the units are
-bits.
-
-Payoff: **perplexity is the exponential of the cross-entropy, and it is the
-effective number of equally likely choices at each step** --- so a perplexity of
-7 is a concrete statement about a model and not a leaderboard number; entropy of
-the next-token distribution as a usable runtime signal for when a model is
-guessing; the entropy of a tokeniser's output as a bound on how much a
-compression-style argument can claim.
-
-**P29 --- Cross-entropy and the Kullback--Leibler divergence**
-(*Entropia krzyżowa i dywergencja Kullbacka--Leiblera*) --- 55 frames.
-
-Argument: cross-entropy is the cost of coding one distribution with another's
-code; KL is the excess; it is non-negative, zero only when the distributions
-agree, **and it is not symmetric**.
-
-Payoff: the question the brief asks for --- **what the asymmetry costs you when
-you pick a loss.** Forward KL is mode-covering: it pays an unbounded price for
-putting no mass where the target has some, so it spreads. Reverse KL is
-mode-seeking: it pays for putting mass where the target has none, so it
-collapses onto one mode. Distillation minimises one, a variational objective and
-a KL-regularised policy the other, and the difference is visible in the output.
-Measured on a bimodal target, not asserted. Also: "KL distance" is a misnomer
-and the triangle inequality fails; Jensen--Shannon as the symmetric alternative
-and what it costs; and the observation that minimising cross-entropy against a
-fixed dataset is minimising forward KL to the empirical distribution, which
-closes the loop with P25.
-
-**P30 --- Mutual information** (*Informacja wzajemna*) --- 50 frames.
-
-Argument: mutual information is the reduction in uncertainty about one quantity
-given another; it is symmetric, non-negative, and zero exactly under
-independence.
-
-Payoff: the vocabulary behind a large class of claims the reader will meet ---
-"layer 12 contains information about syntax", "this feature is informative about
-the label" --- together with the reason to discount most of them:
-**mutual information in high dimension is extremely hard to estimate, and the
-common estimators are biased in the direction that flatters the claim.** The
-data-processing inequality, which says post-processing cannot create
-information, and is the clean argument against several popular interpretability
-claims. A folklore-puncturing program by design.
-
----
-
-## 11. Part IX --- Złożenie / Assembling it (P31--P33)
+## 11. Part IX --- Złożenie / Assembling it (P32--P34)
 
 Three capstone programs. **No new mathematics.** Everything is a withdrawal from
 an account opened earlier, and each frame that uses a result names the program
 it came from. This is the part that makes the book's promise concrete, and it is
 the analogue of the capstone chapter in both companion volumes.
-
-**P31 --- The transformer, derived** (*Transformer wyprowadzony od podstaw*) --- 70 frames.
-
-The whole book spent on one architecture. Embeddings as vectors in a space
-[P4]; the query--key dot product as an inner product and its high-dimensional
-behaviour [P5]; **the `1/sqrt(d_k)` as a variance correction** [P24], with the
-measurement; softmax and its stable implementation [P2]; the value-weighted sum
-as a convex combination [P18]; multi-head as a reshape and a block-diagonal map
-[P6]; the residual stream as repeated addition and why that keeps gradients
-alive [P15]; layer normalisation and its gradient [P17]; positional information
-as rotation [F8, P8]; the parameter count, the FLOP count and the KV cache
-arithmetic [P3]; and attention's quadratic cost stated as the thing every
-long-context method is trying to avoid.
-
-**P32 --- Anatomy of a training run** (*Anatomia treningu*) --- 60 frames.
-
-The loss as maximum likelihood [P25]; its gradient as `p - y` [P17]; the
-optimiser and its bias correction [P19]; precision and loss scaling [P1]; the
-schedule and the curvature bound [P16]; gradient clipping and minibatch noise
-[P20]. Then the diagnostic half: **a loss curve read as evidence** --- what a
-plateau, a spike, a divergence and a suspiciously smooth descent each imply, and
-which of them are distinguishable from noise [P26]. Scaling laws presented as
-**an empirical power-law fit with reported uncertainty**, plotted on log-log
-axes [F3], with the fit's extrapolation error stated --- not as a law of nature.
-
-**P33 --- Measuring a model honestly** (*Uczciwy pomiar modelu*) --- 55 frames.
-
-Evaluation design as an estimation problem [P25]; the confidence interval and
-the bootstrap [P26]; the paired comparison; the judge model as a
-miscalibrated instrument [P27]; the arithmetic of cost per token and per
-conversation [P3]; and information-theoretic evaluation measures and their
-limits [P28--P30]. Closes with the discipline both companion volumes are built
-on, now with the mathematics behind it: **a claim needs a method and a number,
-or it is labelled judgement.**
-
----
 
 ## 12. Dependencies
 
@@ -749,20 +263,26 @@ python3 -c "import json;[print(f\"{p['key']:4s}<- {', '.join(p['deps'])}\")
   for p in json.load(open('tools/programs.json'))['programs']]"
 ```
 
-**The one ordering conflict, and how it is resolved.** P20 (stochastic
-optimisation) needs random variables and variance from P23--P24, which sit in
+**The one ordering conflict, and how it is resolved.** P21 (stochastic
+optimisation) needs random variables and variance from P24--P25, which sit in
 Part VII, two parts later. Three options were considered: move the whole
-probability part before optimisation; split P20; or let P20 carry a forward
-reference. The resolution is the first one *locally* --- **P20 states its two
-probability prerequisites in its Learning outcomes and points at P23 and P24 for
-a reader who does not already have them**, and P24 revisits minibatch noise as a
-worked example once the machinery exists. It is the only place in the book where
-a program's prerequisite comes after it, it is deliberate, and it is recorded
-here so that nobody "fixes" it by reordering the parts and breaking six other
-dependencies.
+probability part before optimisation; split P21; or let P21 carry a forward
+reference. The resolution is the first one *locally* --- **P21 states its two
+probability prerequisites in its Learning outcomes and points at P24 and P25 for
+a reader who does not already have them**, and P24 and P25 revisit minibatch
+noise as a worked example once the machinery exists. It is the only place in the
+book where a program's prerequisite comes after it, it is deliberate, and it is
+recorded here so that nobody "fixes" it by reordering the parts and breaking six
+other dependencies.
 
-A second, milder case: P21 reads better after P29's KL material, and P19 reads
-better after P10's conditioning. Both are marked soft and both are written to
+**Discharged, August 2026, in the passes that wrote P24 and P25**, and in two
+halves: P24 returned the definition on P21's own population, gated against its
+committed mean, and said in as many words that the `1/B` rate is P25's; P25
+derived that rate and gated it against P21's committed population spread. It is
+the book's oldest declared forward reference and it is closed.
+
+A second, milder case: P22 reads better after P30's KL material, and P20 reads
+better after P11's conditioning. Both are marked soft and both are written to
 stand alone.
 
 ---
@@ -776,14 +296,14 @@ may not pretend the topic does not exist.
 | Not taught | Why not | Where to go |
 |---|---|---|
 | Measure-theoretic probability | Nothing in this book's payoff requires a sigma-algebra, and the machinery costs a semester. | Williams, *Probability with Martingales*; Durrett. |
-| Real analysis and proof technique at epsilon-delta level | P13 teaches you to *read* a theorem, deliberately not to write one. This is Stroud's largest gap and the book fixes only half of it, on purpose. | Abbott, *Understanding Analysis*; Tao, *Analysis I*. |
+| Real analysis and proof technique at epsilon-delta level | P14 teaches you to *read* a theorem, deliberately not to write one. This is Stroud's largest gap and the book fixes only half of it, on purpose. | Abbott, *Understanding Analysis*; Tao, *Analysis I*. |
 | Partial differential equations | The audience meets them in physics-informed and diffusion work, and neither is served by a shallow treatment. | Strauss; Evans. |
-| Stochastic differential equations, and therefore the full mathematics of diffusion models | P23 gives the discrete-time forward process as a Markov chain of Gaussians and stops there. The continuous-time formulation needs Itô calculus. | Särkkä and Solin, *Applied SDEs*. |
+| Stochastic differential equations, and therefore the full mathematics of diffusion models | **No program works a forward process, and this entry used to claim one did.** What the book gives is the Gaussian (P24) and the fact that variances of independent quantities add (P25), which is the whole of a discrete-time chain of Gaussians; it never applies them to one. The continuous-time formulation needs Itô calculus. | Särkkä and Solin, *Applied SDEs*. |
 | Complex analysis and the Fourier transform beyond a mention | F8 gives the unit circle; convolution theorems and spectral methods are a book of their own. | Bracewell; Osgood's lecture notes. |
-| Numerical linear algebra at implementation level | P10 tells you why not to invert a matrix; it does not teach you to implement a QR factorisation. | Trefethen and Bau; Higham, *Accuracy and Stability*. |
-| Convex optimisation theory, duality in full | P18 and P21 give the working subset. The full theory is one of the best-written books in mathematics and there is no case for paraphrasing it. | Boyd and Vandenberghe. |
-| Statistical learning theory: VC dimension, PAC bounds, generalisation bounds | Named in P13 as claims to read carefully; the bounds are almost always vacuous at realistic scale, and treating them as engineering guidance would be dishonest. | Shalev-Shwartz and Ben-David. |
-| Reinforcement learning theory, MDPs, convergence results | P20 and P21 give the gradient estimators and the KL constraint, which is what an engineer touching RLHF actually manipulates. | Sutton and Barto. |
+| Numerical linear algebra at implementation level | P09 tells you why not to invert a matrix and P11 why the normal equations square the condition number; it does not teach you to implement a QR factorisation. | Trefethen and Bau; Higham, *Accuracy and Stability*. |
+| Convex optimisation theory, duality in full | P19 and P22 give the working subset. The full theory is one of the best-written books in mathematics and there is no case for paraphrasing it. | Boyd and Vandenberghe. |
+| Statistical learning theory: VC dimension, PAC bounds, generalisation bounds | Named in P14 as claims to read carefully; the bounds are almost always vacuous at realistic scale, and treating them as engineering guidance would be dishonest. | Shalev-Shwartz and Ben-David. |
+| Reinforcement learning theory, MDPs, convergence results | P21 and P22 give the gradient estimators and the KL constraint, which is what an engineer touching RLHF actually manipulates. | Sutton and Barto. |
 | Category theory, differential geometry, manifolds | Occasionally invoked in interpretability writing; not load-bearing for the work. | Lee, *Introduction to Smooth Manifolds*, if you must. |
 
 Positive pointers for the parts this book does cover but only to working depth:
@@ -835,17 +355,17 @@ it diverges. A partial catalogue of the traps this book has already identified:
 - `0.1 + 0.2 == 0.3` [P1]
 - more dimensions means more independent directions [P4]
 - cosine and Euclidean must rank neighbours the same way [P5]
-- a matrix with no zero entries has full rank [P7]
-- the determinant tells you whether a matrix is well conditioned [P8, P10]
-- a low training loss means the gradient is small [P14]
-- reverse-mode autodiff is free [P15]
-- a bigger batch is always a better gradient [P20]
+- a matrix with no zero entries has full rank [P8]
+- the determinant tells you whether a matrix is well conditioned [P9, P11]
+- a low training loss means the gradient is small [P15]
+- reverse-mode autodiff is free [P16]
+- a bigger batch is always a better gradient [P21]
 - the probability of the evidence given the hypothesis is the probability of the
-  hypothesis given the evidence [P22]
-- an unbiased estimator is a good estimator [P25]
-- p = 0.04 means a 96% chance the effect is real [P26]
-- KL divergence is a distance [P29]
-- a high mutual-information estimate means the information is there [P30]
+  hypothesis given the evidence [P23]
+- an unbiased estimator is a good estimator [P26]
+- p = 0.04 means a 96% chance the effect is real [P27]
+- KL divergence is a distance [P30]
+- a high mutual-information estimate means the information is there [P31]
 
 ---
 
@@ -1068,9 +588,34 @@ Appendices:
 
 ## 20. Open questions for the author
 
-1. **One volume or two.** ~2,370 frames is 460--540 pages at this geometry.
-   Parts I--VI and VII--IX split cleanly. Decide before the front matter is
-   written.
+1. **One volume or two — still open, and the estimate it rested on is now
+   measured and was wrong by a factor of about three.** The figure recorded
+   here was 460--540 pages for ~2,418 frames, which is 0.21 pages a frame.
+   **Measured, August 2026: 1,757 teaching frames set 1,267 pages in the trade
+   format**, which is 0.72 — and that is with two programs and four appendices
+   still to write.
+
+   The estimate is not mysteriously wrong. It was made before the Stroud layout
+   pass existed, so a *frame* in it was a paragraph. A frame as built is a rule
+   across the measure, a margin badge, 17 pt above and 12 pt below, usually an
+   answer box, often a row of dots and a cue — and each program also carries a
+   Quiz, an outcomes panel, figures, transcripts, a Summary, Test exercises and
+   Further problems, with an answers appendix and a six-page index behind them
+   all.
+
+   Measured from the trade build's own running heads, so the split can be
+   priced rather than guessed:
+
+   | | pages |
+   |---|---|
+   | front matter + Part I (F1--F13) | 1--388 |
+   | Parts II--VI (P1--P22) | 389--882 |
+   | Parts VII--IX as written (P23--P32) + back matter | 883--1267 |
+
+   So the proposed cut gives an 882-page first volume, which does not settle
+   it: at this geometry the book is nearer three volumes than two, or the
+   geometry has to change. **Decide before the front matter is written**, and
+   decide against these numbers rather than against the estimate.
 2. **`dotnetbox` or `codebox`** --- section 15(c).
 3. **Whether the mathematics packages may be hard requirements**, breaking the
    graceful degradation both companion preambles maintain --- section 15(a).
