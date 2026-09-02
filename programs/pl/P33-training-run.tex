@@ -38,23 +38,43 @@
 \item Krok treningu liczy stratę, różniczkuje ją i zmienia wagi. Wymień sześć
   programów tej książki, które są właścicielami tych elementów.
   \teachesat{3--4}
+  \answerto{Strata należy do Programu~\ref{prog:P26}, jej gradient do
+  Programu~\ref{prog:P18}, aktualizacja do Programu~\ref{prog:P20},
+  arytmetyka do Programu~\ref{prog:P01}, granica rozmiaru kroku do
+  Programu~\ref{prog:P17}, a próbka do Programu~\ref{prog:P21}.}
 \item Ile z tych sześciu elementów zgłasza błąd, ostrzeżenie albo wyjątek,
   gdy jest zrobione źle?
   \teachesat{9--10}
+  \answerto{$\val{p33.loud}$ z $\val{p33.pieces}$. Pozostałe cztery to
+  poprawne obliczenie niewłaściwej wielkości, więc nie ma w nich żadnej
+  niedozwolonej operacji, którą cokolwiek mogłoby wychwycić.}
 \item Obserwujesz od $\val{p33.watch}$ kroków i strata nie zeszła poniżej
   wartości początkowej. Czy trening utknął?
   \teachesat{15--16}
+  \answerto{Nie. Zdrowy trening wygląda dokładnie tak w około
+  $\val{p33.p.flat}$ procent przypadków, a płaski odcinek staje się dowodem
+  dopiero po mniej więcej $\val{p33.plateau.k}$ krokach.}
 \item Trening liczący $\val{p33.steps}$ kroków zawiera jeden krok, którego
   strata leży cztery rozrzuty powyżej trendu. Ilu takich kroków się
   spodziewałeś?
   \teachesat{22--23}
+  \answerto{Około $\val{p33.spike.expected}$ z nich. Długi trening zawiera
+  duże odchylenia pojedynczych kroków z samej swojej konstrukcji, więc jedno
+  z nich nie jest dowodem niczego.}
 \item Panel wygładza krzywą straty przy $\beta = \val{p33.beta.dash}$. Jaką
   część prawdziwego rozrzutu krok po kroku pokazuje ten obraz?
   \teachesat{30--31}
+  \answerto{$\val{p33.smooth.pct}$ procent. Wariancja po wygładzeniu to
+  $\frac{1-\beta}{1+\beta}$ surowej, więc o obrazie decyduje ustawienie tak
+  samo jak trening.}
 \item Siedem punktów na $\val{p33.fit.decades}$ dekadach leży na prostej na
   osiach log-log, z dokładnością lepszą niż $\val{p33.fit.resid}$ procent. Co
   to wiąże w przewidywaniu dopasowania trzy dekady dalej?
   \teachesat{44--45}
+  \answerto{Zupełnie nic. Reszta wiąże wewnątrz dopasowanego zakresu i nie
+  mówi nic poza nim: trzy dekady dalej to samo dopasowanie myli się o
+  $\val{p33.out.err}$ procent, a prawda leży poza jego własnym pasmem dwóch
+  błędów standardowych.}
 \end{quiz}
 
 % ============================================================

@@ -57,22 +57,42 @@
 \item A training step computes a loss, differentiates it, and changes the
   weights. Name the six programs in this book that own the pieces.
   \teachesat{3--4}
+  \answerto{The loss belongs to Program~\ref{prog:P26}, its gradient to
+  Program~\ref{prog:P18}, the update to Program~\ref{prog:P20}, the
+  arithmetic to Program~\ref{prog:P01}, the step-size boundary to
+  Program~\ref{prog:P17} and the sample to Program~\ref{prog:P21}.}
 \item Of those six pieces, how many raise an error, a warning or an exception
   when they are got wrong?
   \teachesat{9--10}
+  \answerto{$\val{p33.loud}$ of $\val{p33.pieces}$. The other four are each a
+  correct computation of the wrong quantity, so there is no invalid operation
+  anywhere in them for anything to catch.}
 \item You have watched $\val{p33.watch}$ steps and the loss has not gone
   below where it started. Is the run stuck?
   \teachesat{15--16}
+  \answerto{No. A healthy run looks exactly like that about
+  $\val{p33.p.flat}$ per cent of the time, and a flat stretch becomes
+  evidence only after about $\val{p33.plateau.k}$ steps.}
 \item A run of $\val{p33.steps}$ steps contains one step whose loss sits four
   spreads above the trend. How many such steps did you expect?
   \teachesat{22--23}
+  \answerto{About $\val{p33.spike.expected}$ of them. A long run contains
+  large single-step deviations by construction, so one of them is not
+  evidence of anything.}
 \item A dashboard smooths a loss curve at $\beta = \val{p33.beta.dash}$. What
   fraction of the run's real step-to-step spread does the picture show?
   \teachesat{30--31}
+  \answerto{$\val{p33.smooth.pct}$ per cent of it. The smoothed variance is
+  $\frac{1-\beta}{1+\beta}$ of the raw one, so the setting decides the
+  picture as much as the run does.}
 \item Seven points over $\val{p33.fit.decades}$ decades lie on a straight
   line on log-log axes, to better than $\val{p33.fit.resid}$ per cent. What
   does that bound about the fit's prediction three decades further on?
   \teachesat{44--45}
+  \answerto{Nothing at all. The residual binds inside the fitted span and
+  says nothing outside it: three decades out the same fit is
+  $\val{p33.out.err}$ per cent wrong, and the truth lies outside its own
+  two-standard-error band.}
 \end{quiz}
 
 % ============================================================
