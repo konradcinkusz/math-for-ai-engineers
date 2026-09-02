@@ -13,7 +13,7 @@ Read this before touching a program.
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
 | Programs | **All forty-seven written, both editions \dash{} F1–F13 and P1–P34, Parts I to IX entire.** There are no stubs | — |
-| Appendices | A (answers, generated), B (notation) and **C (formulae, generated from 721 `\result{}` marks)** drafted; D–F are stubs | D, E, F |
+| Appendices | A (answers, generated), B (notation), **C (formulae, from 721 `\result{}` marks)** and **D (terminology, 27 `\plterm{}` rows gated against the Polish prose)** drafted; E and F are stubs | E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
 the format the book is read in; 17 x 24 cm is the trade format shared with the
@@ -105,6 +105,11 @@ what was there before.
 - 82 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
+- **27 Polish renderings named in Appendix~D, every one used in the prose of
+  `programs/pl`** \dash{} `make debt` reports it and `make check` and CI both
+  gate on it. A glossary row naming a word the book does not use is a claim
+  about the body that is false, and `notes/03`'s suggested table has two of
+  them
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
 - **102 orphan-tail pages: 29 · 30 · 22 · 21** across `main-en`, `main-pl`,
@@ -11008,13 +11013,12 @@ clone instead.
 
 ## What is left
 
-1. **Appendices D, E and F.** C is written; these three are the whole of the
-   remaining writing, and there is no longer a program behind them to hide
-   the fact. D is the Polish--English terminology, E is where to go next, F
-   is the manifest. **The appendices are not in `tools/programs.json`**, so
-   there is nothing to re-derive an owner from: each brief lives only in its
-   own `\programstub{}`, in `appendices/{en,pl}/`, and that is the whole
-   contract.
+1. **Appendices E and F.** C and D are written; these two are the whole of
+   the remaining writing, and there is no longer a program behind them to
+   hide the fact. E is where to go next, F is the manifest. **The appendices
+   are not in `tools/programs.json`**, so there is nothing to re-derive an
+   owner from: each brief lives only in its own `\programstub{}`, in
+   `appendices/{en,pl}/`, and that is the whole contract.
 
    **C is done and its exposure was retired structurally rather than
    policed**, which is the thing to copy if D or E turns out to make claims
@@ -11032,11 +11036,18 @@ clone instead.
    audit makes that defect detectable. Marking at the point of use makes it
    impossible.
 
-   **D and E do not get the same protection for free.** A terminology table
-   and a further-reading list are not derived from anything a program
-   already carries, so for those two the older instruction stands and is the
-   only one available: read the brief as a checklist, and grep the
-   destination before writing the sentence rather than after.
+   **D took half of that protection and E cannot take any of it.** D's rows
+   are `\plterm{}{}{}` and `check_structure.py --terms` requires every Polish
+   rendering they name to occur in the prose of `programs/pl`, so the row
+   that names a word the book does not use is now impossible rather than
+   merely detectable \dash{} and `notes/03`'s suggested table had two of
+   them. But **a gate is as wide as the construct it parses**: the prose
+   between D's tables made the same failure in the same pass, naming an
+   inflection the Polish edition never writes, and nothing would have caught
+   it. E is a further-reading list, derived from nothing a program carries,
+   so for E the older instruction is the only one available: read the brief
+   as a checklist, and grep the destination before writing the sentence
+   rather than after.
 
 2. **The trained-model debt: five entries, one of them half answered.** It is
    the first thing in this book that cannot be done from a sandbox at all.

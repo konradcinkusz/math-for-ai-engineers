@@ -1,11 +1,212 @@
 %% appD-terminology \dash{} Słownik terminów
+%
+% Wiersze sekcji D.3 i D.4 to \plterm{}{}{}, co jest celowo greppowalne:
+% `check_structure.py --terms` wymaga, by każde polskie tłumaczenie wymienione
+% tutaj występowało w prozie programs/pl. Słownik to na każdej linii twierdzenie
+% o treści książki, a usterka, która naprawdę boli, to wiersz nazywający słowo,
+% którego książka nie używa \dash{} a proponowana tabela w notes/03 miała takie
+% dwa.
+%
+% Argumenty 1 i 2 są identyczne w obu wydaniach: hasłem jest termin angielski,
+% bo to jego czytelnik będzie szukał. Tłumaczona jest wyłącznie notatka.
+%
+% Tabela w sekcji D.1 NIE jest bramkowana i jest pisana ręcznie celowo. Obie
+% jej kolumny to dosłowny tekst, bo wpisanie tam makra kontraktu wypisałoby
+% formę bieżącego wydania w OBU kolumnach i nie powiedziałoby niczego -- a poza
+% tym C10 zakazuje \tan, \cot, \arctan, \gcd i \operatorname{lcm} wprost i
+% słusznie, bo proza nigdy nie może zaszywać formy, którą drugie wydanie składa
+% inaczej. Parytet C3 pilnuje, by oba pliki językowe definiowały ten sam ZBIÓR
+% makr; nic nie sprawdza, czy ta tabela opisuje je poprawnie. Czytaj ją więc
+% razem z lang/en.tex i lang/pl.tex, ilekroć któryś się zmieni.
 
 \chapter{Słownik terminów}
 \label{app:D}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia \dash{} patrz wydanie angielskie.]}
+\noindent
+Dwa języki, jedna książka i jedna strona, na której spisano wybory. Ten dodatek
+jest dla czytelnika obu wydań: polskiego, który musi wiedzieć, za jakie
+angielskie słowo stoi dany polski termin, i angielskiego, który może czytać
+polski artykuł albo siedzieć na polskim przeglądzie projektu.
 
-Terminy używane w książce w obu językach; tam, gdzie polski uzus się nie
-ustalił, jest to zaznaczone, a nie po cichu rozstrzygnięte.
-}
+Mówi też, gdzie wydanie polskie \emph{nie} ustaliło jednego słowa. To trudniejsza
+połowa i jest tutaj, a nie sprzątnięta pod dywan, bo czytelnik, który napotyka
+dwa słowa na jedną rzecz, musi usłyszeć, że to jedna rzecz.
+
+\section{Symbole, które oba wydania składają inaczej}
+\label{sec:D-notation}
+\index{notation!contract}
+\index{terminology!notation contract}
+
+Reguła to \textbf{test klawiatury}: jeśli czytelnik wpisze token do komputera,
+oba wydania używają zapisu kodu; jeśli będzie go tylko czytał albo pisał
+ręcznie, wydanie polskie używa formy polskiej. Dlatego wydanie polskie pisze
+\emph{tg} na tangens i $\tanh$ \dash{} a nie \emph{tgh} \dash{} na tangens
+hiperboliczny, i ta pozorna niekonsekwencja jest regułą działającą poprawnie,
+a nie przeoczeniem.
+
+Każdy wiersz poniżej to jedno makro w \code{lang/en.tex} i \code{lang/pl.tex},
+więc \emph{źródło} obu wydań jest identyczne i różni się tylko wyjście. Makro
+zdefiniowane w jednym pliku językowym i nie w drugim to niezdefiniowana
+sekwencja sterująca w dokładnie jednej z dwóch kompilacji, i dlatego ta para
+jest bramkowana.
+
+Obie kolumny są złożone jako dosłowny tekst i jest to celowe. Wpisanie tu makra
+kontraktu wypisałoby formę bieżącego wydania w obu kolumnach i nie powiedziałoby
+niczego.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{Wydanie angielskie} & \textbf{Wydanie polskie} & \textbf{makro i co to jest} \\
+\midrule
+\emph{tan}    & \emph{tg}     & \code{\textbackslash tg}, tangens \\
+\emph{cot}    & \emph{ctg}    & \code{\textbackslash ctg}, cotangens \\
+\emph{arctan} & \emph{arc tg} & \code{\textbackslash arctg}, tangens odwrotny \\
+\emph{gcd}    & \emph{NWD}    & \code{\textbackslash gcdop}, największy wspólny dzielnik \\
+\emph{lcm}    & \emph{NWW}    & \code{\textbackslash lcmop}, najmniejsza wspólna wielokrotność \\
+\emph{span}   & \emph{lin}    & \code{\textbackslash spanof}, powłoka liniowa zbioru wektorów \\
+0.5           & 0,5           & \code{\textbackslash num} i \code{\textbackslash val}, znak dziesiętny \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+I cztery, których celowo \emph{nie} ma na tej liście, bo oba wydania składają je
+tak samo. $\Prob$, $\Ex$, $\Var$ i $\Cov$ pisze się tak, jak pisze się je po
+angielsku, a przedział $\intcc{a}{b}$ zachowuje nawiasy kwadratowe w obu. Dwa
+ostatnie najpewniej zaskoczą polskiego czytelnika i oba wracają w
+sekcji~\ref{sec:D-unsettled}.
+
+\section{Gdzie książka zatrzymuje się, by powiedzieć, że symbol znaczy co innego}
+\label{sec:D-boxes}
+\index{notation!collisions}
+
+Ramka z oznaczeniami to książka zatrzymująca się w środku ramki, żeby
+powiedzieć, że symbol albo słowo zaraz będzie znaczyło coś innego niż to, co
+czytelnik ze sobą przynosi. Warto wypisać je w jednym miejscu, bo każda z nich
+znaczy kolizję, w którą ktoś już wszedł.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{gdzie} & \textbf{co rozstrzyga} \\
+\midrule
+\ref{prog:F02} & litera jest nazwą, a nie zagadką \\
+\ref{prog:F03} & nigdy goły logarytm, i dlaczego zakaz ma wyjątki \\
+\ref{prog:F04} & jedno angielskie słowo w dwóch rolach \\
+\ref{prog:P01} & mantysa, i co to słowo ze sobą niesie \\
+\ref{prog:P03} & logarytm bez podstawy, wewnątrz $O$ \\
+\ref{prog:P12} & symbol Newtona, czytany na dwa sposoby \\
+\ref{prog:P15} & \emph{gradient} w dwóch rolach: nachylenie i wektor \\
+\ref{prog:P18} & układ licznikowy, zadeklarowany raz na całą książkę \\
+\ref{prog:P23} & \emph{niezależny} w dwóch rolach \\
+\ref{prog:P24} & wielkie i małe litery; wartość oczekiwana jest liczbą; oraz
+                 $\Var(X)$ wobec $D^{2}(X)$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+Ostatnia z nich znaczy najwięcej dla polskiego czytelnika i nie jest
+opcjonalna: $D^{2}(X)$ i $M(X)$ to \emph{obecny} polski uzus dydaktyczny, a nie
+historyczna ciekawostka, więc czytelnik, który się ich nauczył i napotyka
+niewyjaśnione $\Var$, ma powód, by zwątpić w książkę, a nie w swoją szkołę.
+
+\section{Terminy, hasłem angielskie}
+\label{sec:D-terms}
+\index{terminology!glossary}
+
+Hasłem jest termin angielski, bo to jego czytelnik będzie szukał, czytał w
+artykule i widział w API. Tam, gdzie polska forma jest w realnym użyciu, wydanie
+polskie jej używa. Tam, gdzie żadnej nie ma, wydanie polskie zostawia słowo
+angielskie i odmienia je po polsku \dash{} \emph{embeddingów},
+\emph{tokenizator}, \emph{benchmarku} \dash{} bo tak mówią polscy inżynierowie,
+a kalka wymyślona przez tłumacza jest gorsza niż zapożyczenie, którego wszyscy
+już używają.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{Angielski} & \textbf{Wydanie polskie} & \textbf{notatka} \\
+\midrule
+\plterm{attention}{uwaga}{\emph{mechanizm uwagi}, \emph{warstwa uwagi},
+  \emph{głowica uwagi}. Realny polski uzus; samego terminu angielskiego się
+  nie używa.}
+\plterm{benchmark}{benchmark}{Zapożyczone i odmieniane.}
+\plterm{checkpointing}{checkpointing}{Zapożyczone. Wymiana arytmetyki na bajty,
+  Program~\ref{prog:P16}.}
+\plterm{evaluation set}{zbiór ewaluacyjny}{Ustalone.}
+\plterm{feature}{cecha}{Ustalone i używane wszędzie.}
+\plterm{gradient descent}{spadek gradientu}{Ustalone. Książka pisze i
+  \emph{spadek gradientu}, i \emph{spadek gradientowy}, co jest jedną nazwą
+  w dwóch formach gramatycznych, a nie dwoma słowami.}
+\plterm{harness}{harness}{Zapożyczone i odmieniane; \emph{zestaw} był próbowany
+  i zderzył się ze \emph{zbiorem}.}
+\plterm{head}{głowica}{W uwadze. \emph{Głowa} to ta anatomiczna.}
+\plterm{layer}{warstwa}{Ustalone.}
+\plterm{logit}{logit}{To samo słowo w polskiej statystyce.}
+\plterm{loss}{strata}{Ustalone. \emph{Funkcja straty} na funkcję.}
+\plterm{overfitting}{przeuczenie}{Ustalone.}
+\plterm{probe}{sonda}{Zwykłe polskie słowo, realnie używane w tym znaczeniu,
+  więc nie kalka. Program~\ref{prog:P31}.}
+\plterm{prompt}{prompt}{Zapożyczone i odmieniane.}
+\plterm{sequence}{sekwencja}{Ustalone.}
+\plterm{softmax}{softmax}{Zapożyczone; nigdzie nietłumaczone.}
+\plterm{token}{token}{Zapożyczone i odmieniane. \emph{Tokenizator} na to, co je
+  produkuje.}
+\plterm{transformer}{transformer}{Zapożyczone. Nigdy \emph{transformator}, bo
+  to urządzenie elektryczne.}
+\plterm{vocabulary}{słownik}{Ustalone.}
+\plterm{weight}{waga}{Ustalone.}
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Gdzie polski uzus się nie ustalił}
+\label{sec:D-unsettled}
+\index{terminology!unsettled}
+
+Trzy terminy w tej książce są w wydaniu polskim oddawane więcej niż jednym
+słowem. Są wypisane, a nie po cichu rozstrzygnięte, bo czytelnik, który napotyka
+drugie słowo, musi wiedzieć, że to pierwsze.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{Angielski} & \textbf{Wydanie polskie} & \textbf{notatka} \\
+\midrule
+\plterm{batch}{partia, wsad, batch}{Wszystkie trzy, na jeden obiekt.
+  \emph{Partia} jest najczęstsza; \emph{wsad} niesie przymiotnik
+  \emph{wsadowy}, na który \emph{partia} nie ma formy; \emph{batch} to
+  zapożyczenie. Spodziewaj się wszystkich trzech.}
+\plterm{embedding}{zanurzenie, embedding}{Własna reguła tłumaczeniowa tej
+  książki każe zostawiać słowo angielskie tam, gdzie polska forma jest kalką,
+  której nikt nie wyszuka, a wydanie polskie i tak używa głównie
+  \emph{zanurzenia}. Powodem jest czasownik: \emph{zanurzać} nie ma formy
+  zapożyczonej \dash{} nikt nie mówi \emph{embedduje} \dash{} więc
+  rzeczownik poszedł za nim. \emph{Embedding} to termin, który polski inżynier
+  wpisze w wyszukiwarkę.}
+\plterm{learning rate}{współczynnik uczenia, krok uczenia}{Obie formy są w
+  realnym użyciu. \emph{Krok} to \emph{step}, czyli dokładnie to, co ten
+  współczynnik mnoży.}
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\begin{note}
+Najczystszy przypadek to odsyłacz, który przemianowuje rzecz, na którą wskazuje.
+Program~\ref{prog:P18} odsyła do Programu~\ref{prog:P06} po fakt, że prawdziwe
+biblioteki układają wsad wzdłuż pierwszej osi; wydanie polskie pisze tam
+\emph{partię}, a tutaj \emph{wsad}, więc czytelnik idący za wskazówką zastaje
+inny rzeczownik.
+\end{note}
+
+\medskip
+Dwa dalsze hasła warto nazwać, bo są przypadkiem odwrotnym \dash{} miejscami,
+w których wydanie polskie jest ustalone, a czytelnik może spodziewać się czegoś
+innego. $\intcc{a}{b}$ zachowuje nawiasy kwadratowe zamiast ostrych, których
+uczy polska szkoła, co jest sygnalizowane przy pierwszym przedziale, jaki
+czytelnik napotyka; a tangens hiperboliczny zostaje $\tanh$ zamiast
+\emph{tgh}, co jest testem klawiatury z sekcji~\ref{sec:D-notation}
+rozstrzygającym przeciw formie polskiej, bo tę czytelnik będzie wpisywał.

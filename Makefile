@@ -1,4 +1,4 @@
-.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 scripts \
+.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 scripts terms \
         text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames elicit outcomes values translate shots debt
 
@@ -39,6 +39,7 @@ all-formats: numbers diagrams en pl en-a4 pl-a4 check check-a4
 check:
 	@python3 tools/gen_stubs.py --check
 	@python3 tools/check_structure.py --scripts
+	@python3 tools/check_structure.py --terms
 	@python3 tools/checklog.py main-en.log main-pl.log
 	@python3 tools/checkpdf.py main-en.pdf main-pl.pdf
 	@python3 tools/parity.py | tail -n 3
@@ -240,6 +241,17 @@ values:
 scripts:
 	@python3 tools/check_structure.py --scripts
 
+# 5b. Appendix D is a claim about the body on every line, and a glossary row
+#     naming a word the book does not use is the failure that matters. It is
+#     not hypothetical: the suggested table in notes/03 carries rows for
+#     `dropout` and `ground truth`, and neither appears anywhere in either
+#     edition. Reads the PROSE of programs/pl, because a substring count over
+#     raw LaTeX counts a \label and a \val key as usage -- which is how an
+#     audit of this appendix twice licensed a row for a word the prose never
+#     writes. See the note above check_terms().
+terms:
+	@python3 tools/check_structure.py --terms
+
 # 6. The two editions out of step. tools/parity.py is the single parity tool;
 #    it compares an ORDERED structural signature rather than counts, because a
 #    histogram cannot see \yourturn moving from frame 2 to frame 3, and every
@@ -266,6 +278,7 @@ debt:
 	@echo; echo "== Elicitation rate =="          ; $(MAKE) -s elicit
 	@echo; echo "== Computed values =="           ; $(MAKE) -s values
 	@echo; echo "== Transcripts on the page =="   ; $(MAKE) -s scripts
+	@echo; echo "== Appendix D terminology =="   ; $(MAKE) -s terms
 	@echo; echo "== Polish/English parity =="     ; $(MAKE) -s translate
 	@echo; echo "== Unverified claims, diagrams ="; $(MAKE) -s shots
 	@echo

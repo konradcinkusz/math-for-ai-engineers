@@ -1896,6 +1896,41 @@
 }
 \makeatother
 
+% ---- Terminology rows, for Appendix D --------------------------------------
+%  \plterm{english head}{polish rendering}{note} is one row of Appendix D's
+%  glossary. It exists so the row is GREPPABLE, and the reason is the reason
+%  Appendix C is generated rather than written: a glossary is a claim about the
+%  body on every line, and the one failure mode that matters is a row naming a
+%  Polish word the book does not use.
+%
+%  That failure is not hypothetical. notes/03 §2.5 offers a suggested table,
+%  and two of its rows -- `dropout` and `ground truth` -- name terms this book
+%  never uses in either edition. Both were caught by measuring rather than by
+%  reading, and neither is in the appendix.
+%
+%  `check_structure.py --terms` reads argument 2 of every \plterm and requires
+%  it to occur in the PROSE of programs/pl -- with comments, \label{}, \val{},
+%  \index{}, \ref{}, \code{}, \api{}, \pkg{} and every maths span stripped
+%  first, because a substring count over LaTeX source counts a label and a
+%  value key as prose. That correction is not a detail: it is what turned an
+%  apparent split in `attention` (one hit, a \label) and in `feature` (four
+%  hits, a \val key) into two settled rows -- and stripping maths is what
+%  stops \partial vouching for `partia` on its own.
+%
+%  It matches on a STEM rather than a whole word, because Polish inflects every
+%  one of these. The stem is crude on purpose: the gate's job is to catch a
+%  rendering that occurs ZERO times in any inflection, and a word-boundary
+%  match would fail on nearly every row.
+%
+%  So KEEP ARGUMENT 2 PLAIN TEXT. No macros, no maths. Several renderings go in
+%  it separated by a comma, and the gate checks each one.
+%
+%  And note what it does NOT cover: the prose between the tables. §D.3's own
+%  introduction named an inflection the Polish edition never writes, in the
+%  same pass that built this gate. A gate is as wide as the construct it
+%  parses.
+\newcommand{\plterm}[3]{\textbf{#1} & #2 & #3 \\}
+
 % ============================================================
 %  ADMONITIONS
 %  ---------------------------------------------------------

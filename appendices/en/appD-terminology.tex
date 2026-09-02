@@ -1,14 +1,201 @@
 %% appD-terminology \dash{} Polish--English Terminology
+%
+% The rows of section D.3 and D.4 are \plterm{}{}{}, which is greppable on
+% purpose: `check_structure.py --terms` requires every Polish rendering named
+% here to occur in the prose of programs/pl. A glossary is a claim about the
+% body on every line, and the failure that matters is a row naming a word the
+% book does not use -- which notes/03's suggested table had two of.
+%
+% Section D.1's table is NOT gated and is hand-authored on purpose. Both its
+% columns are literal text, because writing the contract macro there would
+% print the current edition's form in BOTH columns and say nothing -- and
+% because C10 forbids \tan, \cot, \arctan, \gcd and \operatorname{lcm}
+% outright, rightly, since prose may never hard-code a form the other edition
+% sets differently. Parity's C3 gates that both language files define the same
+% macro SET; nothing checks that this table describes them correctly. So read
+% it against lang/en.tex and lang/pl.tex whenever either changes.
 
 \chapter{Polish--English Terminology}
 \label{app:D}
 
-\programstub{%
-The terms this book uses, in both languages, with the cases where Polish usage
-has not settled marked as unsettled rather than quietly decided.
+\noindent
+Two languages, one book, and one page where the choices are written down. This
+appendix is for a reader of either edition: the Polish one, who needs to know
+which English word a Polish term is standing in for, and the English one, who
+may be reading a Polish paper or sitting in a Polish design review.
 
-Follows the precedent of the companion volume's glossary. The rule is the same
-one: where an English term has no established Polish form, the English term is
-kept, italicised, with a Polish gloss on first use \dash{} because inventing a
-Polish word that no Polish engineer says is worse than borrowing one.
-}
+It also says where the Polish edition has \emph{not} settled on one word. That
+is the harder half and it is here rather than tidied away, because a reader who
+meets two words for one thing needs to be told they are one thing.
+
+\section{The symbols the two editions set differently}
+\label{sec:D-notation}
+\index{notation!contract}
+\index{terminology!notation contract}
+
+The rule is the \textbf{keyboard test}: if the reader will type the token into a
+computer, both editions use the code spelling; if they will only ever read it or
+write it by hand, the Polish edition uses the Polish form. So the Polish edition
+writes \emph{tg} for the tangent and $\tanh$ \dash{} not \emph{tgh} \dash{} for
+the hyperbolic tangent, and that apparent inconsistency is the rule working
+rather than an oversight.
+
+Each row below is one macro in \code{lang/en.tex} and \code{lang/pl.tex}, so the
+\emph{source} of both editions is identical and only the output differs. A macro
+defined in one language file and not the other is an undefined control sequence
+in exactly one of the two builds, which is why the pair is gated.
+
+Both columns are set as literal text on purpose. Writing the contract macro here
+would print the current edition's form in both columns and say nothing.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{English sets} & \textbf{Polish sets} & \textbf{the macro, and what it is} \\
+\midrule
+\emph{tan}    & \emph{tg}     & \code{\textbackslash tg}, the tangent \\
+\emph{cot}    & \emph{ctg}    & \code{\textbackslash ctg}, the cotangent \\
+\emph{arctan} & \emph{arc tg} & \code{\textbackslash arctg}, the inverse tangent \\
+\emph{gcd}    & \emph{NWD}    & \code{\textbackslash gcdop}, the greatest common divisor \\
+\emph{lcm}    & \emph{NWW}    & \code{\textbackslash lcmop}, the lowest common multiple \\
+\emph{span}   & \emph{lin}    & \code{\textbackslash spanof}, the span of a set of vectors \\
+0.5           & 0,5           & \code{\textbackslash num} and \code{\textbackslash val}, the decimal marker \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+And four that are deliberately \emph{not} on that list, because both editions
+set them the same way. $\Prob$, $\Ex$, $\Var$ and $\Cov$ are written as they are
+written in English, and the interval $\intcc{a}{b}$ keeps its square brackets in
+both. The last two are the ones a Polish reader is most likely to be surprised
+by, and both are taken up in section~\ref{sec:D-unsettled}.
+
+\section{Where the book stops to say a symbol is not what you expect}
+\label{sec:D-boxes}
+\index{notation!collisions}
+
+A notation box is the book stopping mid-frame to say that a symbol or a word is
+about to mean something other than what the reader brings to it. They are worth
+listing in one place, because each one marks a collision somebody has already
+walked into.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{where} & \textbf{what it settles} \\
+\midrule
+\ref{prog:F02} & a letter is a name, not a mystery \\
+\ref{prog:F03} & never a bare logarithm, and why the ban has exceptions \\
+\ref{prog:F04} & one English word doing two jobs \\
+\ref{prog:P01} & mantissa, and what the word carries \\
+\ref{prog:P03} & a logarithm with no base, inside an $O$ \\
+\ref{prog:P12} & the binomial coefficient, read aloud two ways \\
+\ref{prog:P15} & \emph{gradient} does two jobs, a slope and a vector \\
+\ref{prog:P18} & numerator layout, declared once for the book \\
+\ref{prog:P23} & \emph{independent} does two jobs \\
+\ref{prog:P24} & capitals and lower case; an expectation is a number; and
+                 $\Var(X)$ against $D^{2}(X)$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+The last of those is the one that matters most to a Polish reader and it is not
+optional: $D^{2}(X)$ and $M(X)$ are \emph{current} Polish teaching usage rather
+than a historical curiosity, so a reader who learned them and meets an
+unexplained $\Var$ has reason to doubt the book rather than their schooling.
+
+\section{Terms, English-headed}
+\label{sec:D-terms}
+\index{terminology!glossary}
+
+The English term is the head, because it is what the reader will search for,
+read in a paper and see in an API. Where a Polish form is in real use, the
+Polish edition uses it. Where none is, the Polish edition keeps the English word
+and inflects it Polish \dash{} \emph{embeddingów}, \emph{tokenizator},
+\emph{benchmarku} \dash{} which is what Polish engineers say, and a calque
+invented by a translator is worse than a borrowing everybody already uses.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{English} & \textbf{Polish edition} & \textbf{note} \\
+\midrule
+\plterm{attention}{uwaga}{\emph{mechanizm uwagi}, \emph{warstwa uwagi},
+  \emph{głowica uwagi}. Real Polish usage; the bare English term is not used.}
+\plterm{benchmark}{benchmark}{Borrowed and inflected.}
+\plterm{checkpointing}{checkpointing}{Borrowed. Trading arithmetic for bytes,
+  Program~\ref{prog:P16}.}
+\plterm{evaluation set}{zbiór ewaluacyjny}{Established.}
+\plterm{feature}{cecha}{Established, and used throughout.}
+\plterm{gradient descent}{spadek gradientu}{Established. The book writes
+  both \emph{spadek gradientu} and \emph{spadek gradientowy}, which is one
+  name in two grammatical forms rather than two words.}
+\plterm{harness}{harness}{Borrowed and inflected; \emph{zestaw} was tried and
+  collided with \emph{zbiór}.}
+\plterm{head}{głowica}{Of attention. \emph{Głowa} is the anatomical one.}
+\plterm{layer}{warstwa}{Established.}
+\plterm{logit}{logit}{The same word in Polish statistics.}
+\plterm{loss}{strata}{Established. \emph{Funkcja straty} for the function.}
+\plterm{overfitting}{przeuczenie}{Established.}
+\plterm{probe}{sonda}{An ordinary Polish word with real use in this sense,
+  so not a calque. Program~\ref{prog:P31}.}
+\plterm{prompt}{prompt}{Borrowed and inflected.}
+\plterm{sequence}{sekwencja}{Established.}
+\plterm{softmax}{softmax}{Borrowed; not translated anywhere.}
+\plterm{token}{token}{Borrowed and inflected. \emph{Tokenizator} for the thing
+  that produces them.}
+\plterm{transformer}{transformer}{Borrowed. Never \emph{transformator}, which
+  is an electrical device.}
+\plterm{vocabulary}{słownik}{Established.}
+\plterm{weight}{waga}{Established.}
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Where Polish usage has not settled}
+\label{sec:D-unsettled}
+\index{terminology!unsettled}
+
+Three terms in this book are rendered more than one way in the Polish edition.
+They are listed rather than quietly picked, because a reader who meets the
+second word needs to know it is the first one.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{English} & \textbf{Polish edition} & \textbf{note} \\
+\midrule
+\plterm{batch}{partia, wsad, batch}{All three, for one object. \emph{Partia} is
+  the commonest; \emph{wsad} carries the adjective \emph{wsadowy}, for which
+  \emph{partia} has no form; \emph{batch} is the borrowing. Expect all three.}
+\plterm{embedding}{zanurzenie, embedding}{This book's own translation rule says
+  to keep the English word where the Polish form is a calque nobody searches
+  for, and the Polish edition mostly uses \emph{zanurzenie} anyway. The reason
+  is the verb: \emph{zanurzać} has no borrowed form \dash{} nobody says
+  \emph{embedduje} \dash{} so the noun followed it. \emph{Embedding} is the
+  term a Polish engineer will type into a search box.}
+\plterm{learning rate}{współczynnik uczenia, krok uczenia}{Both are in real
+  use. \emph{Krok} reads as \emph{step}, which is what it multiplies.}
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\begin{note}
+The clearest instance is a cross-reference that renames the thing it is citing.
+Program~\ref{prog:P18} points back at Program~\ref{prog:P06} for the fact that
+real frameworks stack a batch along the first axis; the Polish edition writes
+\emph{partię} there and \emph{wsad} here, so a reader following the pointer
+finds a different noun waiting for them.
+\end{note}
+
+\medskip
+Two more entries are worth naming because they are the opposite case \dash{}
+places where the Polish edition is settled and the reader may expect otherwise.
+$\intcc{a}{b}$ keeps square brackets rather than the angle brackets Polish
+schooling uses, flagged at the first interval a reader meets; and the hyperbolic
+tangent stays $\tanh$ rather than \emph{tgh}, which is the keyboard test of
+section~\ref{sec:D-notation} deciding against the Polish form because the reader
+will type this one.
