@@ -784,8 +784,8 @@ unsupported, and only the second is being asserted here.
 \sumitem{1--6}{\textbf{\result{A zero correlation settles nothing}}:
   Program~\ref{prog:P24}'s pair has correlation exactly $0$ and mutual
   information $\val{p31.zw.mi}$ nats, which is all of $W$'s uncertainty.}
-\sumitem{3--4}{\textbf{\result{Mutual information is a divergence}}:
-  $I(X; Y) = \KL{p(x,y)}{p(x)p(y)}$, the gap between the joint you have and
+\sumitem{3--4}{\result{\textbf{Mutual information is a divergence}:
+  $I(X; Y) = \KL{p(x,y)}{p(x)p(y)}$}, the gap between the joint you have and
   the product of margins you would have had under independence.}
 \sumitem{7--8}{\textbf{\result{So it is never negative and is zero exactly under
   independence}}, both inherited from Program~\ref{prog:P30} with no new
@@ -809,13 +809,13 @@ unsupported, and only the second is being asserted here.
 \sumitem{24--25}{\textbf{\result{The check that settles it is one extra run}}:
   shuffle the labels, re-run the whole pipeline, and report only what sits
   above whatever that returns.}
-\sumitem{26--27}{\textbf{\result{Post-processing cannot create information}}: if
-  $X \to Y \to Z$ then $I(X; Z) \le I(X; Y)$, checked against all
+\sumitem{26--27}{\result{\textbf{Post-processing cannot create information}: if
+  $X \to Y \to Z$ then $I(X; Z) \le I(X; Y)$}, checked against all
   $\val{p31.dpi.channels}$ channels in a family.}
 \sumitem{28--33}{\textbf{\result{So a probe's score is a lower bound}}, and the best
   probe in that family still leaves more than a quarter behind. A better
   probe says nothing about the layer, and neither does a worse one.}
-\sumitem{35--38}{\textbf{\result{Nothing here was measured on a real model}}, and the
+\sumitem{35--38}{\textbf{Nothing here was measured on a real model}, and the
   claim being made is that the usual evidence does not distinguish the claim
   from its absence \dash{} not that it is false.}
 \end{summarybox}

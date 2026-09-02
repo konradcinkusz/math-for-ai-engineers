@@ -1540,6 +1540,25 @@
 %  evidence for it, which is the rest of the item and belongs to Appendix F's
 %  measurement table.
 %
+%  WHERE THE MARK ENDS WAS SETTLED BY PUTTING ONE PROGRAM ON A PAGE, and the
+%  first answer was wrong. Marking the bolded lead alone produces a formula
+%  reference with no formulae in it: the lead NAMES the result and the
+%  identity sits just after the colon, so the appendix printed "Mutual
+%  information is a divergence" and left $I(X;Y) = \KL{p(x,y)}{p(x)p(y)}$ in
+%  what a mechanical pass had read as evidence. A reader looking a result up
+%  six months later needs the identity, not its name.
+%
+%  So the rule is: mark the lead AND its identity, stop before the evidence.
+%  In practice that means the mark usually starts outside the \textbf and runs
+%  past the colon:
+%
+%    \sumitem{3--4}{\result{\textbf{Mutual information is a divergence}:
+%      $I(X; Y) = \KL{p(x,y)}{p(x)p(y)}$}, the gap between the joint ...}
+%
+%  And an item that is a caveat about the book rather than a result -- "nothing
+%  here was measured on a real model" -- is not marked at all. That one is
+%  Appendix F's.
+%
 %  It prints its argument and nothing else, so marking an item moves no page:
 %  where the book already bolds a lead, the bold stays OUTSIDE the mark
 %  (\textbf{\result{...}}) and the swap is invisible. That matters, because
