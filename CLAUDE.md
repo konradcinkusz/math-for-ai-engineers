@@ -10904,6 +10904,26 @@ clone instead.
    could ever carry. The reading is in the scratchpad; the decision is the
    author's.
 
+   **And the obvious shortcut past that cost was measured and does not
+   exist**, which is worth recording before somebody else finds it and stops
+   there. The Summaries carry 756 `\sumitem` between them and 321 of those
+   open with a bolded lead, so the bold looks like a mark that already means
+   *this is the result* \dash{} on the three programs first sampled it read
+   exactly that way. Measured across all forty-seven the rate runs **0 to 100
+   per cent**: ten programs bold nothing at all, including P22, whose
+   $\lambda = \mathrm{d}f^{*}/\mathrm{d}c$ is its headline identity, and P31
+   bolds every item it has. It is each pass's taste in emphasis, and where it
+   is used it is as often the program's **trap** as its result \dash{} F03
+   bolds two of nineteen and both are traps, leaving change of base and
+   $e^{\ln x} = x$ unmarked.
+
+   So there is no existing markup meaning *result*, and one has to be added.
+   The generalisable half is this file's own recurring defect in a new place:
+   **checking whether the thing you want marked is already marked is a good
+   habit, and it only becomes a measurement when you check that the existing
+   mark means what you need across the whole corpus rather than across the
+   files you happened to open.** One loop over 47 files, about a minute.
+
 2. **The trained-model debt: five entries, one of them half answered.** It is
    the first thing in this book that cannot be done from a sandbox at all.
 
