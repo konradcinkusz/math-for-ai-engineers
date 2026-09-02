@@ -696,46 +696,46 @@ book stops assuming nothing and starts building.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{The power rule}:
+\sumitem{1--3}{\result{\textbf{The power rule}:
   $\frac{\mathrm{d}}{\mathrm{d}x}x^{n} = nx^{n-1}$, for every $n$ including
   negative and fractional. It contains all three of
   Program~\ref{prog:F11}'s results as special cases, and the habit that makes
-  it do all the work is \textbf{get everything into the form $x^{n}$ first}.}
-\sumitem{4--6}{$(cf)' = cf'$ and $(f+g)' = f' + g'$. Every rule in this program
+  it do all the work is \textbf{get everything into the form $x^{n}$ first}}.}
+\sumitem{4--6}{\result{$(cf)' = cf'$ and $(f+g)' = f' + g'$. Every rule in this program
   is checked against a derivative computed \emph{without} it, by a central
   difference at $h = 10^{-5}$ \dash{} which is what a finite difference is for,
   and is Program~\ref{prog:F11}'s U-curve put to work rather than merely
-  warned about.}
-\sumitem{7--8}{\textbf{Differentiation does not distribute over a product.} On
+  warned about}.}
+\sumitem{7--8}{\result{\textbf{Differentiation does not distribute over a product.} On
   $x^{2}$ and $x^{3}$ at $x = \val{f12.trap.x}$ the truth is
   $\val{f12.trap.right}$ and the first guess gives $\val{f12.trap.wrong}$, and
   the two expressions agree at exactly $\val{f12.trap.agree}$ points in the
   whole range swept. Same shape as F02's $(a+b)^{2}$ and F09's adding of
-  lengths: a rule carried one step past its hypotheses.}
-\sumitem{9--13}{\textbf{$(fg)' = f'g + fg'$}, because when $x$ moves
+  lengths: a rule carried one step past its hypotheses}.}
+\sumitem{9--13}{\result{\textbf{$(fg)' = f'g + fg'$}, because when $x$ moves
   \emph{both} factors move and the product changes on account of each; and
   $\left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}$, whose minus is there
   because raising the denominator lowers the whole. When a product can also be
   expanded, the two routes must agree \dash{} a free check worth making a
-  habit.}
-\sumitem{14--16}{\textbf{The chain rule: $\bigl(f(g(x))\bigr)' =
+  habit}.}
+\sumitem{14--16}{\result{\textbf{The chain rule: $\bigl(f(g(x))\bigr)' =
   f'(g(x)) \cdot g'(x)$.} The rates multiply, like gears in mesh, and the
   outer derivative is evaluated at the \emph{inner one's value}, which is the
-  part that gets dropped.}
-\sumitem{17--18}{\textbf{$\sigma'(z) = \sigma(z)(1-\sigma(z))$}, checked to
+  part that gets dropped}.}
+\sumitem{17--18}{\result{\textbf{$\sigma'(z) = \sigma(z)(1-\sigma(z))$}, checked to
   $\val{f12.err.sigmoid}$. The derivative is expressible in terms of the
   function itself, which is why a framework can compute a logistic layer's
   gradient from the value it already stored going forward \dash{} the seed of
-  what Program~\ref{prog:P16} calls reverse mode.}
-\sumitem{19--20}{\textbf{$\sigma' \le \val{f12.sig.max}$ everywhere}, at
+  what Program~\ref{prog:P16} calls reverse mode}.}
+\sumitem{19--20}{\result{\textbf{$\sigma' \le \val{f12.sig.max}$ everywhere}, at
   $z = 0$, because $\sigma(1-\sigma)$ is a product of two numbers adding to
   one. And one unit's contribution is $w\,\sigma(wx+b)(1-\sigma(wx+b))$: $w$
   because the layer scales, $\sigma(1-\sigma)$ because it bends, and \emph{no
-  $b$}, because a bias moves where the bend is and not how hard it bends.}
-\sumitem{21--23}{An $n$-layer network's derivative with respect to its input
+  $b$}, because a bias moves where the bend is and not how hard it bends}.}
+\sumitem{21--23}{\result{An $n$-layer network's derivative with respect to its input
   is $\prod_{k=1}^{n} w_k\,\sigma'(z_k)$ \dash{} \textbf{one factor per layer,
-  multiplied together}, each evaluated at that layer's own input.}
-\sumitem{24--25}{\textbf{Backpropagation is the chain rule applied to a
+  multiplied together}, each evaluated at that layer's own input}.}
+\sumitem{24--25}{\result{\textbf{Backpropagation is the chain rule applied to a
   composition of layers, with the intermediate values kept rather than
   recomputed.} There is nothing else in it, and \enquote{backward} names the
   direction the multiplication accumulates in. Two consequences: activations
@@ -743,23 +743,23 @@ book stops assuming nothing and starts building.
   gradient involves every factor between it and the loss, so nothing about
   training one layer is local to it. The vector version, where each factor is
   a Jacobian and the multiplication order decides the cost, is
-  Program~\ref{prog:P16}'s.}
-\sumitem{26--27}{\textbf{$\val{f12.depth}$ layers at their very best give
+  Program~\ref{prog:P16}'s}.}
+\sumitem{26--27}{\result{\textbf{$\val{f12.depth}$ layers at their very best give
   $\val{f12.sig.max}^{\val{f12.depth}} = \val{f12.vanish.bound}$}, and no
   trained network sits at its best. Put the units where
   Program~\ref{prog:F07} measured saturation \dash{}
   $\val{f12.sat.factor}$, a $\val{f12.sat.ratio}$th of the centre response,
   and this program recomputes that figure from scratch and asserts it matches
   F07's \dash{} and the product is $\val{f12.sat.bound}$, which underflows to
-  exactly zero long before layer forty.}
-\sumitem{28--29}{\textbf{A logistic chain cannot amplify unless
+  exactly zero long before layer forty}.}
+\sumitem{28--29}{\result{\textbf{A logistic chain cannot amplify unless
   $\lvert w \rvert > \val{f12.explode.w}$}, because the factor is
   $w\sigma' \le \frac{w}{4}$. The two failure modes are not symmetric:
   vanishing needs nothing but depth, exploding needs a specific weight. At
   $w = \val{f12.explode.big.w}$ the factor is
   $\val{f12.explode.big.factor}$ and $\val{f12.depth}$ layers multiply by
-  $\val{f12.explode.big.depth}$.}
-\sumitem{30--31}{The bound and the product are exact; \textbf{that every layer
+  $\val{f12.explode.big.depth}$}.}
+\sumitem{30--31}{\result{The bound and the product are exact; \textbf{that every layer
   is a logistic in a plain chain is a modelling choice}. A $\relu$ contributes
   a factor of $1$ on its positive side, a residual connection adds a path of
   $1$s (Program~\ref{prog:P32}), and a normalisation changes the $z_k$. \emph{A
@@ -767,7 +767,7 @@ book stops assuming nothing and starts building.
   here; \emph{deep networks have vanishing gradients} is not, and each of
   those three changes was adopted partly because it stops being. Four rules are
   bookkeeping; the fifth produced backpropagation and both of its failure
-  modes, because composition is what a network is.}
+  modes, because composition is what a network is}.}
 \end{summarybox}
 
 \canyou

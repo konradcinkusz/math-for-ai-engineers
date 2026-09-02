@@ -708,67 +708,67 @@ ma.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--4}{\textbf{Wektor to lista liczb.} To cała definicja; strzałka jest
+\sumitem{1--4}{\result{\textbf{Wektor to lista liczb.} To cała definicja; strzałka jest
   udogodnieniem dostępnym przy dwóch i trzech współrzędnych i potem znika.
   Dodawanie, odejmowanie i mnożenie przez skalar robi się po jednej
-  współrzędnej i żadne z nich nie potrzebuje obrazka.}
-\sumitem{5--6}{Dodanie zwykłej liczby do wektora \textbf{nie jest
+  współrzędnej i żadne z nich nie potrzebuje obrazka}.}
+\sumitem{5--6}{\result{Dodanie zwykłej liczby do wektora \textbf{nie jest
   zdefiniowane} w matematyce, cokolwiek zrobi z tym biblioteka tablicowa
   (reguły ma Program~\ref{prog:P07}). A dwa wektory o różnej liczbie
   współrzędnych nie obsługują żadnego z trzech działań, i to jest cała treść
-  błędu kształtu.}
-\sumitem{7--9}{$\lVert a \rVert$ to pierwiastek z sumy kwadratów i jest to
+  błędu kształtu}.}
+\sumitem{7--9}{\result{$\lVert a \rVert$ to pierwiastek z sumy kwadratów i jest to
   Pitagoras zastosowany raz na współrzędną: długość w trzech wymiarach buduje
   się z długości w dwóch, a ten sam argument biegnie przy dowolnej liczbie.
   $\lVert (3,4) \rVert = 5$ oraz
-  $\lVert (2,3,6) \rVert = \val{f09.len3d}$.}
-\sumitem{10--13}{\textbf{Normalizacja dzieli każdą współrzędną przez długość} i
+  $\lVert (2,3,6) \rVert = \val{f09.len3d}$}.}
+\sumitem{10--13}{\result{\textbf{Normalizacja dzieli każdą współrzędną przez długość} i
   daje wektor o długości $1$ wskazujący w tę samą stronę, bo skalowanie zmienia
   rozmiar, a nie kierunek. Każdy wektor da się znormalizować poza zerowym,
   który nie ma kierunku, jaki mógłby mieć wektor jednostkowy \dash{} a to, co
   twoje narzędzia z tym przypadkiem zrobią, jest własnością narzędzi, a nie
-  matematyki.}
-\sumitem{14--16}{$a \cdot b = \sum_i a_i b_i$ bierze dwa wektory i zwraca jedną
+  matematyki}.}
+\sumitem{14--16}{\result{$a \cdot b = \sum_i a_i b_i$ bierze dwa wektory i zwraca jedną
   liczbę. $a \cdot a = \lVert a \rVert^{2}$, więc długość nie jest osobnym
-  pomysłem \dash{} jest iloczynem skalarnym z pierwiastkiem na nim.}
-\sumitem{17--18}{\textbf{$a \cdot b = \lVert a \rVert \lVert b \rVert
+  pomysłem \dash{} jest iloczynem skalarnym z pierwiastkiem na nim}.}
+\sumitem{17--18}{\result{\textbf{$a \cdot b = \lVert a \rVert \lVert b \rVert
   \cos\theta$}, czyli przekształcony wynik Programu~\ref{prog:F08}: iloczyn
   skalarny niesie oba rozmiary i zgodność wmnożone w siebie. Iloczyn skalarny
   równy \emph{zeru} oznacza kąt prosty niezależnie od długości, i to znaczy
-  \emph{ortogonalny}.}
-\sumitem{19--20}{\textbf{Długości się nie dodają.}
+  \emph{ortogonalny}}.}
+\sumitem{19--20}{\result{\textbf{Długości się nie dodają.}
   $\lVert a + b \rVert \le \lVert a \rVert + \lVert b \rVert$, z równością
   tylko wtedy, gdy oba wskazują w tę samą stronę; prostopadle $3$ i $4$ dają
-  $\val{f09.tri.actual}$, a nie $\val{f09.tri.sum}$.}
-\sumitem{21--22}{\textbf{$\lVert a - b \rVert^{2} = \lVert a \rVert^{2} +
+  $\val{f09.tri.actual}$, a nie $\val{f09.tri.sum}$}.}
+\sumitem{21--22}{\result{\textbf{$\lVert a - b \rVert^{2} = \lVert a \rVert^{2} +
   \lVert b \rVert^{2} - 2\,(a \cdot b)$}, sprawdzone do $\val{f09.law.err}$, a
   na sferze jednostkowej zwija się do $2 - 2\cos\theta$, sprawdzone do
-  $\val{f09.unit.err}$.}
-\sumitem{23}{Więc \textbf{na sferze jednostkowej odległość i podobieństwo
+  $\val{f09.unit.err}$}.}
+\sumitem{23}{\result{Więc \textbf{na sferze jednostkowej odległość i podobieństwo
   kosinusowe porządkują identycznie} \dash{} jedno jest ściśle malejącą funkcją
   drugiego i nie może niczego przestawić. Potwierdzone na
   $\val{f09.rank.checked}$ porównaniach. Jeśli twoje wektory są znormalizowane,
-  \enquote{kosinus czy odległość euklidesowa?} nie ma odpowiedzi.}
-\sumitem{24--25}{\textbf{Poza sferą mogą wskazać różnych zwycięzców.} Na jednym
+  \enquote{kosinus czy odległość euklidesowa?} nie ma odpowiedzi}.}
+\sumitem{24--25}{\result{\textbf{Poza sferą mogą wskazać różnych zwycięzców.} Na jednym
   zapytaniu i dwóch kandydatach $A$ jest bardziej podobny
   ($\val{f09.dis.cos.a}$ wobec $\val{f09.dis.cos.b}$), a $B$ jest bliżej
   ($\val{f09.dis.dist.b}$ wobec $\val{f09.dis.dist.a}$). Oba zapytania się
   wykonują, oba zwracają wiarygodne wyniki, a rozbieżność jest w wyniku
   niewidoczna. Pytaniem do indeksu nie jest to, jakiej miary używa, tylko to,
-  czy to, co do niego weszło, było znormalizowane.}
-\sumitem{26--27}{Znormalizowanie tych samych dwóch kandydatów stawia $A$ bliżej
+  czy to, co do niego weszło, było znormalizowane}.}
+\sumitem{26--27}{\result{Znormalizowanie tych samych dwóch kandydatów stawia $A$ bliżej
   ($\val{f09.dis.ndist.a}$ wobec $\val{f09.dis.ndist.b}$), nie zmieniając
   żadnego z kierunków \dash{} i dlatego potok normalizuje przed indeksowaniem,
-  a płaci długościami.}
-\sumitem{28--30}{Każde działanie tutaj jest jednym przejściem po współrzędnych,
+  a płaci długościami}.}
+\sumitem{28--30}{\result{Każde działanie tutaj jest jednym przejściem po współrzędnych,
   więc \textbf{arytmetyka przechodzi do $\val{f09.dim}$ wymiarów bez zmian, a
   obrazek nie}: $\val{f09.drawable}$ współrzędne da się narysować, a
-  $\val{f09.undrawn}$ nie.}
-\sumitem{31--32}{Tożsamości przechodzą dokładnie. Twierdzenia o tym,
+  $\val{f09.undrawn}$ nie}.}
+\sumitem{31--32}{\result{Tożsamości przechodzą dokładnie. Twierdzenia o tym,
   \emph{gdzie rzeczy są} \dash{} co jest blisko czego, jak wygląda typowa para
   \dash{} dotyczą tego, jak wektory są rozłożone, a nie działań, i żadnego z
   nich nie ustala rysunek dwóch strzałek. Program~\ref{prog:P05} je mierzy. Gdy
-  definicja i obrazek się zgadzają, wiedz, które z nich jest nośne.}
+  definicja i obrazek się zgadzają, wiedz, które z nich jest nośne}.}
 \end{summarybox}
 
 \canyou

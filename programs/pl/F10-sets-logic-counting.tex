@@ -770,64 +770,64 @@ myśli.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Zbiór odpowiada na jedno pytanie: czy to jest w nim?}
+\sumitem{1--3}{\result{\textbf{Zbiór odpowiada na jedno pytanie: czy to jest w nim?}
   Więc odrzuca powtórzenia, a \code{len(tokens)} wobec \code{len(set(tokens))}
   to różnica między korpusem a słownikiem \dash{} tutaj $\val{f10.tokens}$
   wobec $\val{f10.vocab}$, czyli czynnik $\val{f10.repeat}$. Gdy w twierdzeniu
-  pojawia się liczba, powiedz, czy policzyła wystąpienia, czy rzeczy różne.}
-\sumitem{4--7}{Odrzuca też \textbf{kolejność}, więc ciąg tokenów źle pasuje do
+  pojawia się liczba, powiedz, czy policzyła wystąpienia, czy rzeczy różne}.}
+\sumitem{4--7}{\result{Odrzuca też \textbf{kolejność}, więc ciąg tokenów źle pasuje do
   zbioru, a słownik pasuje dobrze \dash{} a \emph{identyfikatory} tokenów to
   osobne, dowolne ponumerowanie, które nie podróżuje między tokenizerami.
   $\in$, $\lvert A \rvert$, $\emptyset$, $\subseteq$; dwa zbiory są
-  \emph{rozłączne}, gdy nic nie należy do obu.}
-\sumitem{8--9}{$A \cup B$, $A \cap B$ i $A \setminus B$ to \emph{lub},
+  \emph{rozłączne}, gdy nic nie należy do obu}.}
+\sumitem{8--9}{\result{$A \cup B$, $A \cap B$ i $A \setminus B$ to \emph{lub},
   \emph{i} oraz \emph{i nie}. \textbf{Dodanie dwóch rozmiarów zbiorów liczy
   część wspólną dwa razy}:
   $\lvert A \cup B \rvert = \lvert A \rvert + \lvert B \rvert -
   \lvert A \cap B \rvert$. Dwa zbiory ewaluacyjne o $\val{f10.eval.a}$ i
   $\val{f10.eval.b}$ elementach, dzielące $\val{f10.eval.shared}$, mieszczą
   $\val{f10.eval.union}$ przykładów, a nie $\val{f10.eval.naive}$ \dash{} a te
-  $\val{f10.eval.overcount}$ policzone dwa razy są też dwa razy oceniane.}
-\sumitem{10--15}{\textbf{Maska to ta sama informacja wyrównana z danymi}:
+  $\val{f10.eval.overcount}$ policzone dwa razy są też dwa razy oceniane}.}
+\sumitem{10--15}{\result{\textbf{Maska to ta sama informacja wyrównana z danymi}:
   \code{|} to suma, \code{\&} to przecięcie, \code{\& \textasciitilde} to
   różnica, a \code{.sum()} to rozmiar, bo tak jest jedynką. Więc
   \code{.mean()} na masce to ułamek, który ona wybiera, i odczytanie go jest
-  najtańszym sprawdzeniem, jakie filtr ma.}
-\sumitem{16--18}{\emph{Lub} znaczy \textbf{przynajmniej jedno, być może oba},
+  najtańszym sprawdzeniem, jakie filtr ma}.}
+\sumitem{16--18}{\result{\emph{Lub} znaczy \textbf{przynajmniej jedno, być może oba},
   w logice i w każdym języku, którego użyjesz, cokolwiek znaczy po polsku. A
   \textbf{zaprzeczenie \emph{i} daje \emph{lub}}:
   $\lnot(p \land q) = \lnot p \lor \lnot q$, bo niespełnienie \emph{obu}
-  wymaga niespełnienia tylko jednego.}
-\sumitem{19--22}{\textbf{Złe zaprzeczenie koniunkcji zawsze zatrzymuje za
+  wymaga niespełnienia tylko jednego}.}
+\sumitem{19--22}{\result{\textbf{Złe zaprzeczenie koniunkcji zawsze zatrzymuje za
   mało}, i dlatego się go nie zauważa: z $\val{f10.rec.total}$ rekordów
   właściwy filtr zatrzymuje $\val{f10.rec.right}$, a \code{not spam and not
   short} zatrzymuje $\val{f10.rec.wrong}$, gubiąc $\val{f10.rec.lost}$ bez
   żadnego objawu poza małym zbiorem danych. Każdy filtr jest zbiorem, a każde
-  złożenie filtrów działaniem na zbiorach.}
-\sumitem{23--24}{\textbf{Niezależne wybory się mnożą}, a \emph{niezależne} to
+  złożenie filtrów działaniem na zbiorach}.}
+\sumitem{23--24}{\result{\textbf{Niezależne wybory się mnożą}, a \emph{niezależne} to
   warunek do powiedzenia, a nie do założenia: $\val{f10.grid.a}$ modeli razy
   $\val{f10.grid.b}$ precyzji razy $\val{f10.grid.c}$ rozmiarów wsadu to
-  $\val{f10.grid}$ przebiegów, a jedna zabroniona kombinacja czyni to błędnym.}
-\sumitem{25--28}{\textbf{Zbiór $n$-elementowy ma $2^{n}$ podzbiorów}, jedno
+  $\val{f10.grid}$ przebiegów, a jedna zabroniona kombinacja czyni to błędnym}.}
+\sumitem{25--28}{\result{\textbf{Zbiór $n$-elementowy ma $2^{n}$ podzbiorów}, jedno
   tak-lub-nie na element: $\val{f10.features}$ cech daje $\val{f10.subsets}$, a
   jedna cecha więcej to podwaja. Zapisz liczbę przed napisaniem pętli \dash{}
-  to jedno mnożenie i to różnica między planem a życzeniem.}
-\sumitem{29--30}{\textbf{$n$ rzeczy tworzy $\frac{n(n-1)}{2}$ par}, podzielone
-  na pół, bo zbiór odrzuca kolejność i $\{a,b\}$ to $\{b,a\}$.}
-\sumitem{31--33}{\textbf{Dwa razy więcej danych to odrobinę ponad cztery razy
+  to jedno mnożenie i to różnica między planem a życzeniem}.}
+\sumitem{29--30}{\result{\textbf{$n$ rzeczy tworzy $\frac{n(n-1)}{2}$ par}, podzielone
+  na pół, bo zbiór odrzuca kolejność i $\{a,b\}$ to $\{b,a\}$}.}
+\sumitem{31--33}{\result{\textbf{Dwa razy więcej danych to odrobinę ponad cztery razy
   więcej pracy, gdy praca przypada na parę}: $\val{f10.docs}$ dokumentów daje
   $\val{f10.pairs}$ porównań, a $\val{f10.docs2}$ daje $\val{f10.pairs2}$,
   czyli czynnik $\val{f10.pairs.ratio}$. Współczynnik to $\frac{4n-2}{n-1}$ i
   spada do czterech \emph{od góry} \dash{} skrypt asertował coś przeciwnego i
   padł. Notacja na ten wzrost należy do Programu~\ref{prog:P03}; liczba jest
-  twoja już teraz i jest użyteczniejszą połową na przeglądzie projektu.}
-\sumitem{34--37}{\textbf{Każde naiwne prawdopodobieństwo to dwie liczebności i
+  twoja już teraz i jest użyteczniejszą połową na przeglądzie projektu}.}
+\sumitem{34--37}{\result{\textbf{Każde naiwne prawdopodobieństwo to dwie liczebności i
   dzielenie}, a trudny jest wybór mianownika, bo żądania, użytkownicy i sesje
   dają poprawne odpowiedzi na różne pytania. Podaj obie liczebności, a nie sam
   współczynnik. Czym prawdopodobieństwo \emph{jest}, należy do
   Programu~\ref{prog:P23}. Zbiór, maska, liczba: trzy reprezentacje jednego
   pomysłu, a prawie wszystko, co robi się ze zbiorem danych, jest jedną z nich
-  z innej strony.}
+  z innej strony}.}
 \end{summarybox}
 
 \canyou

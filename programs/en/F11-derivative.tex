@@ -763,66 +763,66 @@ $(x-3)^{2}$ into something that works on a network.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{An average rate of change is a change divided by a
+\sumitem{1--3}{\result{\textbf{An average rate of change is a change divided by a
   change}, and geometrically it is the gradient of a \textbf{chord} \dash{}
   the straight line through two points of a curve. On $y = x^{2}$ between
-  $x = 3$ and $x = 5$ it is $8$.}
-\sumitem{4--6}{Written with a gap $h$ the chord's slope is
+  $x = 3$ and $x = 5$ it is $8$}.}
+\sumitem{4--6}{\result{Written with a gap $h$ the chord's slope is
   $\frac{f(x+h) - f(x)}{h}$. $h$ may be negative and is \textbf{never zero}:
   at $h = 0$ the expression is $\frac{0}{0}$, which is not a number and not a
   small one either, and every difficulty in section 3 comes from wanting to
-  reach a place the expression is not defined at.}
-\sumitem{7--10}{For $x^{2}$ at $x = 3$ the chord slope is \textbf{$6 + h$
+  reach a place the expression is not defined at}.}
+\sumitem{7--10}{\result{For $x^{2}$ at $x = 3$ the chord slope is \textbf{$6 + h$
   exactly}, so the slopes run $\val{f11.chord.1}$, $\val{f11.chord.01}$,
   $\val{f11.chord.001}$, $\val{f11.chord.0001}$ and settle on
   $\val{f11.deriv.at3}$ \dash{} which is the \textbf{derivative} of $x^{2}$
   there. The cancellation of $h$ is allowed precisely because $h$ is not
-  zero.}
-\sumitem{11--12}{\textbf{The derivative is not a chord slope.} Every chord
+  zero}.}
+\sumitem{11--12}{\result{\textbf{The derivative is not a chord slope.} Every chord
   slope here is $6 + h$ and none of them is $6$; the derivative is the number
   they approach, and $\lim_{h \to 0}$ means \emph{as close as you like, by
-  choosing $h$}, never \emph{at $h = 0$}.}
-\sumitem{13--15}{From the definition alone: $x^{2}$ gives $2x$, a constant
+  choosing $h$}, never \emph{at $h = 0$}}.}
+\sumitem{13--15}{\result{From the definition alone: $x^{2}$ gives $2x$, a constant
   gives $0$, and $mx + c$ gives $m$. There is a pattern and
   Program~\ref{prog:F12} states it \dash{} what matters here is that all three
   came out of one definition and a page of algebra, so the rules are
-  consequences rather than facts to be issued.}
-\sumitem{16--18}{\textbf{Smaller $h$ is more accurate in the mathematics and
+  consequences rather than facts to be issued}.}
+\sumitem{16--18}{\result{\textbf{Smaller $h$ is more accurate in the mathematics and
   false on the machine.} The error falls to $\val{f11.fd.best.err}$ at
   $h = \val{f11.fd.best.h}$ and then climbs back to $\val{f11.fd.err.16}$ at
   $h = \val{f11.fd.vanishes}$, where $3 + h$ \emph{is} $3$ and the quotient is
   exactly $\val{f11.fd.approx.16}$. Two errors pull opposite ways and the
   curve between them is a U. Program~\ref{prog:P01} owns the right-hand
-  branch.}
-\sumitem{19--20}{So a gradient check agrees to a handful of digits and not to
+  branch}.}
+\sumitem{19--20}{\result{So a gradient check agrees to a handful of digits and not to
   all of them, and one demanding more fails on correct code. \textbf{The shape
   of the curve transfers and the position of its bottom does not} \dash{} it
-  moves with the size of the numbers being subtracted.}
-\sumitem{21--23}{\textbf{The sign is a direction}: positive rises, negative
+  moves with the size of the numbers being subtracted}.}
+\sumitem{21--23}{\result{\textbf{The sign is a direction}: positive rises, negative
   falls, zero is momentarily level. \textbf{The size is a steepness, just
   here.} A derivative is computed from an arbitrarily small neighbourhood, so
-  it cannot carry information about anywhere else.}
-\sumitem{24}{\textbf{A zero derivative is a \emph{stationary point}, not a
+  it cannot carry information about anywhere else}.}
+\sumitem{24}{\result{\textbf{A zero derivative is a \emph{stationary point}, not a
   minimum}: a maximum is level too, and so is a flat spot on the way up. Which
   kind it is takes more than the first derivative \dash{}
-  Program~\ref{prog:P17} supplies it. Stopping is not the same as arriving.}
-\sumitem{25--26}{\textbf{A big derivative does not mean a long way to go.} On
+  Program~\ref{prog:P17} supplies it. Stopping is not the same as arriving}.}
+\sumitem{25--26}{\result{\textbf{A big derivative does not mean a long way to go.} On
   $x^{4} - 4x^{2}$ the point $x = \val{f11.steep.x}$ has slope
   $\val{f11.steep.slope}$ and is $\val{f11.steep.dist}$ from the minimum,
   while $x = \val{f11.shallow.x}$ has slope $\val{f11.shallow.slope}$ and is
-  $\val{f11.shallow.dist}$ away. The steeper point is the nearer one.}
-\sumitem{27--29}{Downhill is \textbf{against the sign of the derivative}, and
+  $\val{f11.shallow.dist}$ away. The steeper point is the nearer one}.}
+\sumitem{27--29}{\result{Downhill is \textbf{against the sign of the derivative}, and
   the instruction is $x \leftarrow x - \eta f'(x)$. \textbf{That is gradient
   descent and there is nothing else in it}; $\eta$ is a choice, because by the
-  previous section the derivative does not know how far anything is.}
-\sumitem{30--32}{On $(x-3)^{2} + 1$ the update is exactly
+  previous section the derivative does not know how far anything is}.}
+\sumitem{30--32}{\result{On $(x-3)^{2} + 1$ the update is exactly
   $x - 3 \leftarrow (1 - 2\eta)(x-3)$, so \textbf{the distance is multiplied
   by $1 - 2\eta$ every step}. At $\eta = \val{f11.gd.small.eta}$ and
   $\eta = \val{f11.gd.big.eta}$ that factor is
   $\pm\val{f11.gd.factor.small}$, so one walk crawls down and the other jumps
   the minimum every step and both reach $\val{f11.gd.small.end}$ to the digit.
-  The walk arrives when $\lvert 1 - 2\eta \rvert < 1$.}
-\sumitem{33--35}{\textbf{Too large a step overshoots further every time}: at
+  The walk arrives when $\lvert 1 - 2\eta \rvert < 1$}.}
+\sumitem{33--35}{\result{\textbf{Too large a step overshoots further every time}: at
   $\eta = \val{f11.gd.toobig.eta}$ the factor is
   $-\val{f11.gd.factor.toobig}$ and eight steps take the walk from
   $\val{f11.gd.start}$ to $\val{f11.gd.toobig.end}$. The derivative did
@@ -832,7 +832,7 @@ $(x-3)^{2}$ into something that works on a network.
   and never evaluated $f$, which is why a local quantity is enough to steer
   by \dash{} and \textbf{gradient descent is not an algorithm on top of
   calculus, it is what the definition says to do} once you want to go downhill
-  and can only see your feet.}
+  and can only see your feet}.}
 \end{summarybox}
 
 \canyou

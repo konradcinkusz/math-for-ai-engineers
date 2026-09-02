@@ -530,57 +530,57 @@ ostrożnym.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Sumowanie to tempo razy krok, dodane do siebie.} Potnij
+\sumitem{1--3}{\result{\textbf{Sumowanie to tempo razy krok, dodane do siebie.} Potnij
   zakres na paski, pomnóż każdą wysokość przez jej szerokość i zsumuj.
   Narysowane, są to pola. Na $x^{2}$ na $\intcc{0}{1}$ dziesięć prawych pasków
-  daje $\val{f13.rect.10}$, a dziesięć tysięcy $\val{f13.rect.10000}$.}
-\sumitem{4--5}{Sumy zatrzymują się na $\frac{1}{3}$, a \textbf{tempo jest
+  daje $\val{f13.rect.10}$, a dziesięć tysięcy $\val{f13.rect.10000}$}.}
+\sumitem{4--5}{\result{Sumy zatrzymują się na $\frac{1}{3}$, a \textbf{tempo jest
   poznawalne, a nie tylko obserwowalne}: suma prawych pasków wynosi dokładnie
   $\frac{1}{3} + \frac{1}{2n} + \frac{1}{6n^{2}}$, więc błąd maleje o połowę
   za każdym podwojeniem $n$ \dash{} $\val{f13.err.10}$ przy dziesięciu
   paskach, $\val{f13.err.10000}$ przy dziesięciu tysiącach. Ten sam ruch co
-  zmniejszanie cięciwy w Programie~\ref{prog:F11}, w drugą stronę.}
-\sumitem{6--7}{$\int_{a}^{b} f(x)\,\mathrm{d}x$: rozciągnięte S od
+  zmniejszanie cięciwy w Programie~\ref{prog:F11}, w drugą stronę}.}
+\sumitem{6--7}{\result{$\int_{a}^{b} f(x)\,\mathrm{d}x$: rozciągnięte S od
   \emph{sumy}, granice, wysokość i \textbf{$\mathrm{d}x$ jako szerokość
   paska}. Nie jest ozdobą ani mnożeniem \dash{} mówi, po której literze się
   sumuje, i to ono sprawia, że jednostki wychodzą jako ilość. Odczytanie
-  jednostek z całki jest najtańszym sprawdzeniem, jakie istnieje.}
-\sumitem{8--9}{Sumowanie dzieli się w punkcie pośrednim i rozdziela na sumę,
-  czyli reguła sumy z Programu~\ref{prog:F12} z drugiej strony. Oraz
+  jednostek z całki jest najtańszym sprawdzeniem, jakie istnieje}.}
+\sumitem{8--9}{\result{Sumowanie dzieli się w punkcie pośrednim i rozdziela na sumę,
+  czyli reguła sumy z Programu~\ref{prog:F12} z drugiej strony.} Oraz
   \textbf{nie ma w tej książce żadnej techniki całkowania}: podstawienie,
   części i ułamki proste są wykluczone z nazwy, bo nic tutaj ich nie
   potrzebuje, a potrzebne jest to, co całka \emph{znaczy}.}
-\sumitem{10--11}{\textbf{$A'(x) = f(x)$}: zróżniczkowanie zsumowanej całości
+\sumitem{10--11}{\result{\textbf{$A'(x) = f(x)$}: zróżniczkowanie zsumowanej całości
   oddaje z powrotem sumowane tempo. To jest podstawowe twierdzenie rachunku,
   podane i nieudowodnione, a nazwa jest zasłużona \dash{} mówi, że obie połowy
-  przedmiotu są jednym przedmiotem.}
-\sumitem{12}{Jest to też sposób, w jaki liczy się całkę ręcznie: znajdź coś,
+  przedmiotu są jednym przedmiotem}.}
+\sumitem{12}{\result{Jest to też sposób, w jaki liczy się całkę ręcznie: znajdź coś,
   czego pochodną jest funkcja podcałkowa, i weź jej wartość na górze minus
   wartość na dole. Ale \textbf{całka i funkcja pierwotna to nie to samo}
   \dash{} jedno jest całością, drugie funkcją \dash{} a mnóstwo zwykłych
   funkcji ma to pierwsze i nie ma zapisywalnego drugiego, przy czym
-  $e^{-x^{2}}$ jest tą, którą spotkasz.}
-\sumitem{13--14}{\textbf{Gęstość to krzywa, która nigdy nie jest ujemna i
+  $e^{-x^{2}}$ jest tą, którą spotkasz}.}
+\sumitem{13--14}{\result{\textbf{Gęstość to krzywa, która nigdy nie jest ujemna i
   której całkowite pole wynosi dokładnie $1$}, a pola pod nią są
   prawdopodobieństwami. Ten warunek \emph{jest} całką, więc gęstości nie da
-  się zdefiniować bez niej.}
-\sumitem{15}{\textbf{Wysokość gęstości nie jest prawdopodobieństwem i nic nie
+  się zdefiniować bez niej}.}
+\sumitem{15}{\result{\textbf{Wysokość gęstości nie jest prawdopodobieństwem i nic nie
   ogranicza jej do jedynki.} Gęstość jednostajna na przedziale szerokości
   $\val{f13.narrow}$ ma wysokość $\val{f13.narrow.height}$, a dalsze zwężanie
   podnosi wysokość bez granic, przy polu wciąż równym $1$. $p(x)$ jest
   prawdopodobieństwem \emph{na jednostkę $x$} \dash{} tempem, tak jak prędkość
-  nie jest odległością. Wiarygodność powyżej jedynki nie jest błędem.}
-\sumitem{16--17}{Podziel nieujemną krzywą przez jej sumę, a stanie się
+  nie jest odległością. Wiarygodność powyżej jedynki nie jest błędem}.}
+\sumitem{16--17}{\result{Podziel nieujemną krzywą przez jej sumę, a stanie się
   gęstością: $x(1-x)$ na $\intcc{0}{1}$ sumuje się do
   $\val{f13.unnorm.total}$, więc \textbf{stała normalizująca} wynosi
   $\val{f13.unnorm.const}$. To samo działanie co mianownik softmaksu \dash{}
   uczyń nieujemnym, dodaj, podziel przez sumę \dash{} z całką zamiast sumy.
-  Mnóstwo pracy praktycznej nigdy jej nie liczy, bo stosunki ją skracają.}
-\sumitem{18--20}{\textbf{$\int x\,p(x)\,\mathrm{d}x$ jest średnią ważoną}:
+  Mnóstwo pracy praktycznej nigdy jej nie liczy, bo stosunki ją skracają}.}
+\sumitem{18--20}{\result{\textbf{$\int x\,p(x)\,\mathrm{d}x$ jest średnią ważoną}:
   każda wartość pomnożona przez to, ile jej jest, i zsumowana. Na gęstości
   symetrycznej wynosi $\val{f13.centre}$, co symetria daje przed całką; na
   $2x$ na $\intcc{0}{1}$ wynosi $\val{f13.lop.centre}$, a nie środek \dash{}
-  więc sumowanie jest jedynym sposobem, żeby to wiedzieć.}
+  więc sumowanie jest jedynym sposobem, żeby to wiedzieć}.}
 \sumitem{21--22}{Ta całka jest \textbf{wartością oczekiwaną}, a ten program
   celowo zatrzymuje się przed tym słowem: to, czego jest wartością oczekiwaną,
   należy do Programu~\ref{prog:P24} i potrzebuje najpierw wykładu

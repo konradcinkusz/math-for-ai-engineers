@@ -536,58 +536,58 @@ place to start being careful.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Accumulating is rate times step, added up.} Chop the
+\sumitem{1--3}{\result{\textbf{Accumulating is rate times step, added up.} Chop the
   range into strips, multiply each height by its width, and total them. Drawn,
   it is areas. On $x^{2}$ over $\intcc{0}{1}$ ten right-hand strips give
-  $\val{f13.rect.10}$ and ten thousand give $\val{f13.rect.10000}$.}
-\sumitem{4--5}{The sums settle on $\frac{1}{3}$, and \textbf{the rate is
+  $\val{f13.rect.10}$ and ten thousand give $\val{f13.rect.10000}$}.}
+\sumitem{4--5}{\result{The sums settle on $\frac{1}{3}$, and \textbf{the rate is
   knowable rather than merely observable}: the right-hand total is exactly
   $\frac{1}{3} + \frac{1}{2n} + \frac{1}{6n^{2}}$, so the error halves each
   time $n$ doubles \dash{} $\val{f13.err.10}$ at ten strips,
   $\val{f13.err.10000}$ at ten thousand. Same move as
-  Program~\ref{prog:F11}'s shrinking chord, run the other way.}
-\sumitem{6--7}{$\int_{a}^{b} f(x)\,\mathrm{d}x$: a stretched S for
+  Program~\ref{prog:F11}'s shrinking chord, run the other way}.}
+\sumitem{6--7}{\result{$\int_{a}^{b} f(x)\,\mathrm{d}x$: a stretched S for
   \emph{sum}, the limits, the height, and \textbf{$\mathrm{d}x$ for the width
   of the strip}. It is not decoration and not a multiplication \dash{} it says
   which letter is accumulated over, and it is what makes the units come out as
   an amount. Reading the units off an integral is the cheapest check there
-  is.}
-\sumitem{8--9}{Accumulation splits at a midpoint and distributes over a sum,
-  which is Program~\ref{prog:F12}'s sum rule from the other side. And
+  is}.}
+\sumitem{8--9}{\result{Accumulation splits at a midpoint and distributes over a sum,
+  which is Program~\ref{prog:F12}'s sum rule from the other side.} And
   \textbf{there is no technique of integration in this book}: substitution,
   parts and partial fractions are excluded by name, because nothing here needs
   them and what is needed is what an integral \emph{means}.}
-\sumitem{10--11}{\textbf{$A'(x) = f(x)$}: differentiating an accumulated total
+\sumitem{10--11}{\result{\textbf{$A'(x) = f(x)$}: differentiating an accumulated total
   gives back the rate that was accumulated. That is the fundamental theorem of
   calculus, stated and not proved, and the name is earned \dash{} it says the
-  two halves of the subject are one subject.}
-\sumitem{12}{It is also how an integral is computed by hand: find something
+  two halves of the subject are one subject}.}
+\sumitem{12}{\result{It is also how an integral is computed by hand: find something
   whose derivative is the integrand, take its value at the top minus its value
   at the bottom. But \textbf{an integral and an antiderivative are not the
   same thing} \dash{} one is a total, the other a function \dash{} and plenty
   of ordinary functions have the first and no writable second, $e^{-x^{2}}$
-  being the one you will meet.}
-\sumitem{13--14}{\textbf{A density is a curve that is never negative and whose
+  being the one you will meet}.}
+\sumitem{13--14}{\result{\textbf{A density is a curve that is never negative and whose
   total area is exactly $1$}, and areas under it are the probabilities. That
   constraint \emph{is} an integral, so a density cannot be defined without
-  one.}
-\sumitem{15}{\textbf{A height on a density is not a probability and nothing
+  one}.}
+\sumitem{15}{\result{\textbf{A height on a density is not a probability and nothing
   bounds it by one.} The uniform density on an interval of width
   $\val{f13.narrow}$ has height $\val{f13.narrow.height}$, and narrowing it
   further raises the height without limit while the area stays $1$. $p(x)$ is
   probability \emph{per unit of $x$} \dash{} a rate, as a speed is not a
-  distance. A likelihood above one is not a bug.}
-\sumitem{16--17}{Divide a non-negative curve by its total and it becomes a
+  distance. A likelihood above one is not a bug}.}
+\sumitem{16--17}{\result{Divide a non-negative curve by its total and it becomes a
   density: $x(1-x)$ on $\intcc{0}{1}$ accumulates to $\val{f13.unnorm.total}$,
   so the \textbf{normalising constant} is $\val{f13.unnorm.const}$. Same
   operation as a softmax's denominator \dash{} make it non-negative, add it
   up, divide by the sum \dash{} with an integral in place of the sum. Much
-  practical work never computes it, because ratios cancel it.}
-\sumitem{18--20}{\textbf{$\int x\,p(x)\,\mathrm{d}x$ is a weighted average}:
+  practical work never computes it, because ratios cancel it}.}
+\sumitem{18--20}{\result{\textbf{$\int x\,p(x)\,\mathrm{d}x$ is a weighted average}:
   each value multiplied by how much of it there is, accumulated. On the
   symmetric density it is $\val{f13.centre}$, which symmetry gives before the
   integral does; on $2x$ over $\intcc{0}{1}$ it is $\val{f13.lop.centre}$, not
-  the middle \dash{} so the accumulation is the only way to know.}
+  the middle \dash{} so the accumulation is the only way to know}.}
 \sumitem{21--22}{That integral is an \textbf{expectation}, and this program
   deliberately stops before the word: what it is an expectation \emph{of} is
   Program~\ref{prog:P24}'s, and it needs Program~\ref{prog:P23}'s account of
