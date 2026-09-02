@@ -2831,7 +2831,7 @@ and unusable are compatible, which is trap 253 arriving from the other end.
      results reporting significance are false. The threshold governs false
      positives among the nulls, not among the findings. Owner: P27 §4.
 270. *“Nothing came out significant, so the two are equivalent.”* A test that
-     would need five and a half points to see anything has said nothing about a
+     would need six points to see anything has said nothing about a
      real difference of one. **“No significant difference” becomes a
      measurement only when you say how large a difference would have had to
      be.** Owner: P27 §6.
@@ -2844,3 +2844,11 @@ and unusable are compatible, which is trap 253 arriving from the other end.
      your own work. The chosen configuration's score is the maximum of thirty
      noisy estimates and is biased upwards by an amount growing with the
      number tried. Choose on one set and report from another. Owner: P27 §5.
+273. *“Thirty items were discordant and B was ahead by one.”* Impossible: the
+     lead is the difference of two counts that add to the discordant total, so
+     the two have the **same parity**. A lead of one needs an odd number of
+     discordant items — and on an odd number a tie cannot happen, so a lead of
+     one is the smallest available and its p-value is exactly 1. P27 shipped
+     the impossible pair, having recorded the parity as a formula trap two
+     hundred lines above without applying it to its own data; P28's assertion
+     caught it when it continued the example. Owner: P27 §3.

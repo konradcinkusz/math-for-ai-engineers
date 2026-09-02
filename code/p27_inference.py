@@ -374,12 +374,32 @@ assert round(items_needed(0.0) / items_needed(0.9)) == 10
 # say anything about the difference.  Under the hypothesis that the two are
 # equally good those items split like fair coin flips, so the whole question
 # is Program P12's binomial coefficient over integers.
-DISCORDANT = 30                            # of the 200; the rest agree
+# THE PARITY IS A CONSTRAINT ON THE DATA, NOT ONLY ON THE FORMULA, AND A
+# FIRST VERSION OF THIS SECTION VIOLATED IT.  The net is c - b and the
+# discordant count is c + b, so the two have the SAME parity: a net of one
+# item is impossible on an even number of discordant items, because it needs
+# c = 15.5.  This file already recorded the parity as a trap in
+# `two_sided_exact` below and then set DISCORDANT = 30 beside NET = 1, which
+# is a worked example that cannot occur.  It was caught by the assertion
+# Program P28 wrote when it continued this example, which is what a
+# cross-programme gate is for.
+#
+# The corrected version is a better section, not merely a legal one.  On an
+# ODD number of discordant items a tie cannot happen, so somebody must be
+# ahead and the smallest possible lead is one -- which is exactly what was
+# observed.  The p-value is then 1 exactly, and the published gap is the
+# least surprising outcome the arithmetic allows.
 NET = round(GAP_ITEMS)                     # B ahead by this many items
 assert NET == 1, NET
+DISCORDANT = 31                            # of the 200; the rest agree
+assert (DISCORDANT + NET) % 2 == 0, (
+    f"a net of {NET} on {DISCORDANT} discordant items needs "
+    f"c = {(DISCORDANT + NET) / 2}, which is not a whole number of items.")
 emit("p27.disc", DISCORDANT)
 emit("p27.net", NET)
 emit("p27.concord", ITEMS - DISCORDANT)
+emit("p27.to.b", (DISCORDANT + NET) // 2)
+emit("p27.to.a", (DISCORDANT - NET) // 2)
 
 
 def two_sided_exact(m: int, net: int) -> float:
@@ -404,12 +424,19 @@ def two_sided_exact(m: int, net: int) -> float:
 
 P_EXACT = two_sided_exact(DISCORDANT, NET)
 emit("p27.p.exact", P_EXACT, 2)
-assert 0.5 < P_EXACT < 1.0, P_EXACT
-# The complement is the interesting half and it is a coin flip's own
-# arithmetic: the only way to be MORE ordinary than this is to tie exactly.
-P_TIE = math.comb(DISCORDANT, DISCORDANT // 2) / 2 ** DISCORDANT
-emit("p27.p.tie.pct", pct(100.0 * P_TIE), 1)
-assert abs((1 - P_EXACT) - P_TIE) < 1e-12, (P_EXACT, P_TIE)
+# EXACTLY one, and the reason is the parity above rather than a rounding: on
+# an odd number of discordant items every outcome is at least one away from
+# even, so a result at least this lopsided is certain.
+assert P_EXACT == 1.0, P_EXACT
+# What the observed outcome IS, then: the single most likely one, counting
+# both directions.
+P_ONE = 2 * math.comb(DISCORDANT, (DISCORDANT + 1) // 2) / 2 ** DISCORDANT
+emit("p27.p.one.pct", pct(100.0 * P_ONE), 1)
+assert 0.2 < P_ONE < 0.35, P_ONE
+# And it is the most likely: no other net beats it.
+for d in range(3, DISCORDANT + 1, 2):
+    assert 2 * math.comb(DISCORDANT, (DISCORDANT + d) // 2) / 2 ** DISCORDANT \
+        < P_ONE, d
 
 # How big would the net have to be, on these same 30 discordant items, before
 # the conventional threshold is crossed?  Found by search rather than quoted.
@@ -569,11 +596,11 @@ _lines = [
     ">>> sum(comb(m, c) for c in range(m + 1)",
     "...     if abs(2 * c - m) >= net) / 2 ** m",
     repr(round(P_EXACT, 4)),
-    ">>> comb(m, m // 2) / 2 ** m",
-    repr(round(P_TIE, 4)),
+    ">>> 2 * comb(m, (m + 1) // 2) / 2 ** m",
+    repr(round(P_ONE, 4)),
 ]
 assert max(len(line) for line in _lines) <= 64, max(_lines, key=len)
-(TRANSCRIPT / "p27-thirty-flips.txt").write_text(
+(TRANSCRIPT / "p27-odd-count.txt").write_text(
     "\n".join(_lines) + "\n", encoding="utf8")
 
 
