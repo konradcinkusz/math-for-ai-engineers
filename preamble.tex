@@ -1848,10 +1848,24 @@
     \end{reslist}}{}%
 }
 
+% RAGGED RIGHT, and it is load-bearing rather than a style choice. An entry
+% here is a phrase and then an identity, and \KL is \left(...\right) -- one
+% unbreakable box. The only legal breakpoint is the outer-level relation in
+% front of it, and justified TeX will not take a break that leaves a short
+% second line: it preferred a 21.2 pt overfull instead, in a measure already
+% narrowed by the bullet indent. Ragged right makes the short line free, so
+% the break is taken and the identity wraps.
+%
+% That is the same reason reference matter is set ragged right everywhere, and
+% the same reason the chapter titles are: a measure this narrow cannot justify
+% a line containing one long unbreakable run. The book's recorded fix for such
+% a run is a display, and a display is wrong inside a scanned reference list --
+% it would break the one-line-per-result shape the appendix is for.
 \newlist{reslist}{itemize}{1}
 \setlist[reslist]{label=\textcolor{mgrey}{\textbullet}, leftmargin=1.4em,
                   itemsep=3pt plus 0pt minus 1pt, topsep=3pt plus 0pt minus 2pt,
-                  parsep=0pt plus 0pt minus 1pt}
+                  parsep=0pt plus 0pt minus 1pt,
+                  before=\raggedright}
 
 % Scoped exactly as the answers body is, and for the same reason: reference
 % matter has no glue, so \flushbottom on a page of headings is a concertina.
