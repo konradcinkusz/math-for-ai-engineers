@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1397 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1423 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1160 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1182 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1401 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1427 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1164 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1184 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -124,8 +124,15 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **103 orphan-tail pages: 29 · 30 · 22 · 22** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
+- **99 orphan-tail pages: 28 · 29 · 21 · 21** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`. **The Part II elicitation pass is the first thing
+  in this book's record to take the count DOWN**, by one in every one of the
+  four builds, and it did it in two measurable movements: the twenty-one
+  conversions went 29/30/22/22 to 31/31/21/21, and the three lengthenings that
+  cleared their cues then went to 28/29/21/21. So the cues cost the trade
+  builds two tails each and the lengthenings returned three each \dash{} which
+  is the clearest evidence in the file that lengthening a frame acts on this
+  ledger and not only on the cue's. Before that: P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
   **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one, **P30 one**, **P31 none**, **P32 none**, P33 one and P34 one
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
@@ -9896,10 +9903,12 @@ estimating the book at **460--540 pages** for its 2,418 planned frames, and this
 file repeated it as 470--550. Neither number had been looked at since
 scaffolding.
 
-**Measured: 1,863 teaching frames are written and they set 1,397 pages in the
+**Measured: 1,863 teaching frames are written and they set 1,401 pages in the
 trade format.** That is $\num{0.75}$ pages a frame against the estimate's
 $\num{0.21}$, and **that is the finished book** \dash{} every program and
-every appendix. (It was 1,321 before
+every appendix. (1,397 until the Part~II elicitation pass, which is a revision
+rather than new writing and which added four pages without adding a frame; the
+ratio did not move.) (It was 1,321 before
 Appendix~C, which is the one of the six that is generated rather than
 written and which costs 62 pages of back matter on its own, 1,383 before
 Appendix~D, which occupies six pages where its stub occupied two, 1,387
@@ -11784,6 +11793,129 @@ So the standing instruction gains a clause: **a pass that moves a ledger has
 to grep the appendices for prose about that ledger**, not merely re-run the
 script that prints it.
 
+#### Every added question is a new claim about the book, and four of mine were false
+
+The pass note above records two, both caught by opening what they pointed at.
+Reading all seventeen questions end to end afterwards \dash{} rather than
+waiting for the next one to bite, which is Program~\ref{prog:P28}'s finding
+\dash{} turned up a third, and the three paragraphs written to clear the
+orphaned cues produced a fourth and a fifth.
+
+- **\enquote{Two of the units in this section differ by less than they look.}**
+  GB and GiB are one letter apart and differ by seven per cent, so they differ
+  by *more* than they look. Backwards in both editions.
+- **A lengthening paragraph said a long sum drifting is something \enquote{this
+  program has shown you}.** Summation is Program~\ref{prog:P02}'s section 5 and
+  the frame is in section 3, so the sentence both misattributed and previewed.
+- **Another attributed a negative to Program~\ref{prog:P01}**: that an
+  epsilon-sized relative error is what it \enquote{licenses for a freshly
+  rounded number and for nothing else}. P01 establishes machine epsilon as the
+  relative gap and says nothing about what a value arrives carrying. The
+  limitation is real and it is mine, so it is now stated in my own voice.
+
+**The generalisable half is a scope statement, and it is wider than the rule it
+sharpens.** This file already says *before writing a sentence about another
+program, open that program*, and it has been paid for a dozen times about
+prose. An **elicitation pass writes nothing but new sentences**, and every one
+of them is either a claim about where something is or a claim about what a
+neighbour established. So the exposure is not incidental to this kind of pass;
+it is the whole surface of it, and the audit has to be a sweep of every added
+question rather than a check of the ones that look risky. Twenty-three
+positional claims across the six files, twenty-one right, two wrong, and
+nothing short of opening each target separated the two groups.
+
+#### The word-join detector's false positives are the two-instrument rule working
+
+Re-run after the lengthenings, the detector reported `długich`, `pokazała`,
+`zarazem`, `choćby` and `napisany` as joins. All five are ordinary Polish words
+in the new sentences, correctly spaced. The heuristic reports any new word of
+five letters or more that splits into two words the file already contains, and
+**an inflected language makes that fire on ordinary prose** \dash{} which the
+substitution pass never saw, because it *replaced* text rather than adding it.
+
+The line-length detector reported zero every time, and reading each of the five
+confirmed it. That disagreement is the point: it is Program~\ref{prog:P34}'s
+rule reached by the second route this pass already recorded, and the remedy is
+**not** to raise the threshold \dash{} eight letters was already shown to miss
+`nadwóch` at seven. Report them as candidates, read them, and require the two
+instruments to agree before believing either.
+
+#### Layout: the first pass in this book's record to take the tail ledger DOWN
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1401 | 1397 | `[]` | 0 |
+| `main-pl` | 1427 | 1423 | `[]` | 0 |
+| `main-en-a4` | 1164 | 1160 | `[6.3]` | 0 |
+| `main-pl-a4` | 1184 | 1182 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and, after the three lengthenings, no orphaned cues.
+
+**And the orphan tails went 103 to 99**, one down in every build, which has not
+happened before. The two movements are worth separating because together they
+are the clearest evidence in this file that lengthening acts on the tail ledger
+and not only on the cue's:
+
+| | en | pl | en-a4 | pl-a4 |
+|---|---|---|---|---|
+| before the pass | 29 | 30 | 22 | 22 |
+| after twenty-one conversions | 31 | 31 | 21 | 21 |
+| after three lengthenings | **28** | **29** | **21** | **21** |
+
+The conversions cost the trade builds two tails each and took one off each A4
+build; the lengthenings then returned three to each trade build. Every previous
+pass that added cues added tails \dash{} Program~\ref{prog:P04}'s three cues
+put one back in `main-pl-a4` \dash{} so the expectation going into Part III's
+pass should be that the cues cost tails and the lengthening that follows them
+pays the cost back, rather than that either is free.
+
+Three orphaned cues arrived, all in `main-en`, all of them the tail of a frame
+whose question this pass had just added: the amplification factor and the
+overflow score in Program~\ref{prog:P02}, and the FLOPs shortcut in
+Program~\ref{prog:P03}. Cleared in **one round** by lengthening in both
+editions, which is Program~\ref{prog:F06}'s two-sided rule and its
+twenty-third confirmation. And the three A4 builds were clean throughout,
+which is unusual: every earlier cue chase in this book found at least one in an
+A4 build, and this one found none.
+
+**The build was stopped three times on purpose**, which is
+Program~\ref{prog:P32}'s rule and the reason the measurement above is of one
+tree rather than of three. Each stop was a queued edit that would move
+pagination \dash{} the two corrected claims and the GB/GiB reword \dash{} and
+a build measuring a tree about to stop existing produces a number to be
+discarded. `make clean` each time, `.idx` included.
+
+#### The part-page table nearly took a false alarm, and the instrument was the units
+
+`notes/01-curriculum.md` §20 carries the per-part page ranges, and this pass
+moves them, so they had to be re-measured. `main-en.toc` says Part II starts at
+**361** where the table says **389** \dash{} a twenty-eight page gap that four
+paragraphs cannot explain.
+
+**The table is in PDF pages and the toc is in printed folios**, and the front
+matter is twenty-eight sheets. The two agree exactly. Confirmed by extraction
+rather than by adding twenty-eight to anything, which is that section's own
+rule about a number obtained by arithmetic on two measurements: PDF page 389 is
+the Part~II title page, 887 is Part~VII and 1217 is the Appendices.
+
+| | pages | count |
+|---|---|---|
+| front matter + Part I | 1--388 | 388 |
+| Parts II--VI | 389--886 | **498** |
+| Parts VII--IX | 887--1216 | 330 |
+| back matter | 1217--1401 | 185 |
+
+The four rows add to 1401 exactly, and **the pass's four pages fall entirely
+inside Parts II--VI**, where P01 to P03 live, with the other three rows
+unmoved. That is a consistency check on the whole table rather than only on
+this change, and it is the reason the first-volume figure moves 882 to 886 and
+nothing else does.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -12139,6 +12271,14 @@ look first when one of them next goes stale.
    parallelisable job left in the repository**, because it touches eight
    merged program files and nothing else.
 
+   **Budget for two builds rather than one, and expect the tail ledger to move
+   twice.** Part II's twenty-one conversions produced three orphaned cues and
+   two more orphan tails in each trade build; the three lengthenings that
+   cleared the cues then returned three tails to each, leaving the ledger one
+   *below* where it started in all four builds. So the cues are not free and
+   the lengthening is not merely a repair \dash{} and the pass is not finished
+   at the first clean parity run, which is where it will feel finished.
+
 3. **The measurements.** Ten are specified, nine of them free. The ledger in
    `notes/01-curriculum.md` §17 carries a **Status column naming the pass**
    that ran each one, rather than a total in prose \dash{} it said "none has
@@ -12255,15 +12395,16 @@ one is shaped by what the ones before it turned out to spend.
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
 for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.75**
-\dash{} 1,863 teaching frames in 1,397 trade pages, and the book is now
+\dash{} 1,863 teaching frames in 1,401 trade pages, and the book is now
 complete: every program and every appendix is written. (This sentence said **0.71** until the Appendix~E pass, which
 is $1{,}321/1{,}863$ \dash{} the figure from before Appendix~C, left behind
 when the page count above it was updated and the ratio was not. It is the
 class this file keeps recording, in the paragraph that states the class.) §20 item 1 carries the measurement and the per-part page ranges, so
 the decision has numbers in front of it rather than an estimate; **every
-program and every appendix is now written, so those numbers will not move
-again except by revision**, which is as settled as the question is going to
-get before somebody answers it. The other two that
+program and every appendix is now written, so those numbers move only by
+revision** \dash{} and the Part~II elicitation pass is the first revision to
+move them, adding four pages to Parts~II--VI and none to any other row, which
+is as settled as the question is going to get before somebody answers it. The other two that
 stood beside it are now settled in the passes that wrote their programs
 \dash{} P12's placement, and whether P14 is enough of a fix for the rigour gap
 \dash{} and each entry records the argument the written book falsified rather

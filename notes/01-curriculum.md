@@ -608,16 +608,18 @@ Appendices:
 1. **One volume or two — still open, and the estimate it rested on is now
    measured and was wrong by a factor of about three.** The figure recorded
    here was 460--540 pages for ~2,418 frames, which is 0.21 pages a frame.
-   **Measured, September 2026: 1,863 teaching frames set 1,397 pages in the
+   **Measured, September 2026: 1,863 teaching frames set 1,401 pages in the
    trade format**, which is 0.75 — and **that is now the finished book**, with
    every program and every appendix written. (It was 1,757 frames in 1,267
    pages when first taken, before P33, 1,811 in 1,295 after it, 1,321 before
    Appendix C, 1,383 before Appendix D, 1,387 before Appendix E and 1,393
    before Appendix F. The programs' own 1,212 pages account for the ratio; the
    back matter grew from 109 pages to 185, and Appendix C alone is 62 of that,
-   with D adding four, E six and F four.) **Nothing here will move again
-   except by revision**, so this is the number the decision has to be made
-   against.
+   with D adding four, E six and F four.) **Nothing here moves except by
+   revision**, and the Part II elicitation pass is the first revision to move
+   it: four pages, all of them inside Parts II--VI where P1 to P3 live, with
+   the other three rows unchanged. This is the number the decision has to be
+   made against.
 
    The estimate is not mysteriously wrong. It was made before the Stroud layout
    pass existed, so a *frame* in it was a paragraph. A frame as built is a rule
@@ -633,11 +635,19 @@ Appendices:
    | | pages | count |
    |---|---|---|
    | front matter + Part I (F1--F13) | 1--388 | 388 |
-   | Parts II--VI (P1--P22) | 389--882 | 494 |
-   | Parts VII--IX (P23--P34) | 883--1212 | 330 |
-   | back matter (appendices, answers, index) | 1213--1397 | 185 |
+   | Parts II--VI (P1--P22) | 389--886 | 498 |
+   | Parts VII--IX (P23--P34) | 887--1216 | 330 |
+   | back matter (appendices, answers, index) | 1217--1401 | 185 |
 
-   So the proposed cut gives an 882-page first volume before any back matter,
+   These are **PDF pages**, not printed folios, and the difference is
+   twenty-eight — the front matter. `main-en.toc` gives folios, so it puts
+   Part II at 361 against this table's 389, and reading one against the other
+   invites a twenty-eight page false alarm that four paragraphs cannot explain.
+   Each boundary above was confirmed by extracting the page and reading its
+   part title rather than by adding twenty-eight to the toc, which is this
+   entry's own rule about arithmetic on two measurements.
+
+   So the proposed cut gives an 886-page first volume before any back matter,
    which does not settle it: at this geometry the book is nearer three volumes
    than two, or the geometry has to change. **Decide before the front matter is
    written**, and decide against these numbers rather than against the
@@ -647,8 +657,8 @@ Appendices:
    `883--1295` and was labelled "Parts VII--IX as written + back matter",
    which is 1295 minus the two rows above it — a subtraction rather than a
    measurement, and it was not obvious from the table what it excluded. Read
-   off the part-title pages the four rows add to the total exactly. The 882
-   never depended on it.
+   off the part-title pages the four rows add to the total exactly. The
+   first-volume figure never depended on it.
 2. **`dotnetbox` or `codebox`** --- section 15(c).
 3. **Whether the mathematics packages may be hard requirements**, breaking the
    graceful degradation both companion preambles maintain --- section 15(a).
