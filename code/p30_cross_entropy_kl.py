@@ -423,8 +423,16 @@ _models = {
 for _n, _m in _models.items():
     # the identity, exactly, at every model: CE = H(emp) + KL(emp || model)
     assert abs(cross_entropy(EMP, _m) - (H_EMP + kl(EMP, _m))) < 1e-12, _n
-emit("p30.emp.ce.uniform", cross_entropy(EMP, _models["uniform"]), 4)
-emit("p30.emp.kl.uniform", kl(EMP, _models["uniform"]), 4)
+_CE_UNI = cross_entropy(EMP, _models["uniform"])
+_KL_UNI = kl(EMP, _models["uniform"])
+# Section 8 prints all three of these on one page as an instance of the
+# identity, so the reader will ADD the two on the right.  The assertion
+# above is on the underlying floats and says nothing about that -- which is
+# exactly the gap P28 found and P29 found again.  So check the sum in the
+# form the page prints it, which is the only form anybody will check.
+reproduces(_CE_UNI, 4, (H_EMP, 4), (_KL_UNI, 4), op=lambda a, b: a + b)
+emit("p30.emp.ce.uniform", _CE_UNI, 4)
+emit("p30.emp.kl.uniform", _KL_UNI, 4)
 # The perfect model drives the excess to EXACTLY zero, which is a count and
 # not a rounding, so the frame says so rather than printing 0.0000.
 assert kl(EMP, _models["exact"]) == 0.0

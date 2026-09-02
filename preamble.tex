@@ -2227,6 +2227,15 @@
 \DeclareMathOperator{\ulp}{ulp}
 \DeclareMathOperator{\round}{round}
 
+% The two divergences, P30's.  Both spell the same in both editions -- the
+% subscripts are people's initials and are never translated -- so like \logit
+% they need no language file entry.  Written as macros rather than by hand
+% because the double bar is \| and not || (which sets as two ordinary bars
+% with the wrong spacing), and because \mid would be a conditional rather
+% than a separator: three ways to get it wrong, once each.
+\newcommand{\KL}[2]{D_{\mathrm{KL}}\!\left(#1 \,\|\, #2\right)}
+\newcommand{\JS}[2]{D_{\mathrm{JS}}\!\left(#1 \,\|\, #2\right)}
+
 % A bare \log is FORBIDDEN in this book. TWO things enforce that, and neither
 % is the tool this comment used to name -- there is no tools/check_notation.py
 % and there never was. What exists is parity.py's C10, which fails on a bare

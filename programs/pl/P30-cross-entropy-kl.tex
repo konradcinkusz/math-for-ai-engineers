@@ -1,31 +1,1107 @@
-%% P30 --- Entropia krzyżowa i dywergencja Kullbacka--Leiblera
+%% P30 --- Entropia krzyzowa i dywergencja Kullbacka-Leiblera
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Blizniak: programs/en/P30-cross-entropy-kl.tex. Ramka w ramke, makro w
+%% makro, liczba w liczbe; tools/parity.py porownuje oba pliki. Kazda liczba
+%% pochodzi z code/p30_cross_entropy_kl.py, ktorego naglowek niesie pelne
+%% odczytanie sasiadow.
+%%
+%% REGULY TLUMACZA (C4, C8, C12 czytaja KOLEJNOSC):
+%%   * cyfra zostaje cyfra, a slowo zostaje slowem -- P25 zlapal oba kierunki;
+%%   * odwolanie prowadzi zdanie, nigdy nie stoi za swoja matematyka;
+%%   * w matematyce \text{} dla przetlumaczonego slowa, nigdy \mathrm{};
+%%   * angielski zwrot, ktory po polsku wymaga symbolu, poprawia sie po
+%%     STRONIE ANGIELSKIEJ -- P28 zaplacil za to piecioma ramkami;
+%%   * terminy ML zostaja angielskie i odmieniaja sie po polsku.
 
-\program{Entropia krzyżowa i dywergencja Kullbacka--Leiblera}
+\program[Entropia krzyzowa i KL]{Entropia krzyżowa i dywergencja
+  Kullbacka--Leiblera}
 \label{prog:P30}
+\index{entropia krzyżowa}
+\index{dywergencja Kullbacka--Leiblera}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{powiedzieć, ile kosztuje kodowanie jednego rozkładu kodem
+  drugiego, i nazwać dwie części, na które ten koszt się dzieli}
+\outcome{7--12}{powiedzieć, dlaczego nadwyżka nigdy nie jest ujemna i kiedy
+  wynosi zero}
+\outcome{13--18}{policzyć dywergencję w obu kierunkach i powiedzieć, który
+  jest który}
+\outcome{19--23}{powiedzieć, ile kosztuje brak masy tam, gdzie cel ją ma, i
+  ile kosztuje sytuacja odwrotna}
+\outcome{24--33}{przewidzieć, które dopasowanie wybierze każdy kierunek, i
+  powiedzieć, dlaczego jeden się rozlewa, a drugi zapada}
+\outcome{34--38}{powiedzieć, co obiecuje słowo \enquote{odległość} i którą z
+  tych obietnic ta wielkość łamie}
+\outcome{39--42}{powiedzieć, ile kosztuje symetryczna alternatywa}
+\outcome{43--46}{powiedzieć, który kierunek minimalizuje trening na stałym
+  zbiorze danych i dlaczego nikt go nie wybrał}
+\end{outcomes}
 
-Argument: cross-entropy is the cost of coding one distribution with
-another's code; KL is the excess; it is non-negative, zero only when the
-distributions agree, **and it is not symmetric**. Payoff: the question the
-brief asks for \dash{} **what the asymmetry costs you when you pick a
-loss.** Forward KL is mode-covering: it pays an unbounded price for putting
-no mass where the target has some, so it spreads. Reverse KL is mode-
-seeking: it pays for putting mass where the target has none, so it collapses
-onto one mode. Distillation minimises one, a variational objective and a KL-
-regularised policy the other, and the difference is visible in the output.
-Measured on a bimodal target, not asserted. Also: \enquote{KL distance} is a
-misnomer and the triangle inequality fails; Jensen--Shannon as the symmetric
-alternative and what it costs; and the observation that minimising cross-
-entropy against a fixed dataset is minimising forward KL to the empirical
-distribution, which closes the loop with P26.
+\begin{quiz}
+\item Masz kod zbudowany dla jednego rozkładu, a źródło stosuje się do
+  innego. Ile kosztuje średnio jeden symbol? \teachesat{1--2}
+  \answerto{Tyle, ile wynosi entropia krzyżowa źródła względem rozkładu
+  kodu. Jest to własna entropia źródła plus nadwyżka, a o tej nadwyżce jest
+  ten program.}
+\item Czy cudzy kod może kiedykolwiek pobić ten zbudowany dla twojego
+  własnego źródła? \teachesat{7--8}
+  \answerto{Nie. Nadwyżka nigdy nie jest ujemna \dash{} to nierówność
+  Jensena z Programu~\ref{prog:P19} zastosowana do ilorazu \dash{} i wynosi
+  zero dokładnie wtedy, gdy oba rozkłady się zgadzają.}
+\item Czy dywergencja od $p$ do $q$ jest taka sama jak dywergencja od $q$ do
+  $p$? \teachesat{13--14}
+  \answerto{Nie, a na dwóch rozkładach z Programu~\ref{prog:F05} obie
+  odpowiedzi różnią się o czynnik $\val{p30.f05.ratio}$.}
+\item Ile kosztuje brak masy tam, gdzie cel ją ma?
+  \teachesat{19--20}
+  \answerto{W jednym kierunku nieskończoność, a w drugim nic, i ta jedna
+  asymetria sprawia, że jedna strata się rozlewa, a druga zapada.}
+\item Pewną wielkość nazwano odległością. Co ci właśnie obiecano?
+  \teachesat{34--35}
+  \answerto{Między innymi nierówność trójkąta, którą podaje
+  Program~\ref{prog:F09}: żaden objazd nie jest krótszy od drogi wprost.
+  Ta wielkość ją łamie, i to nierzadko.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 55 ramek.
-}
+% ============================================================
+\section{Ile kosztuje użycie niewłaściwego kodu}
+\label{sec:P30-cost}
+\index{entropia krzyżowa!jako koszt kodowania}
+
+\begin{fr}
+Program~\ref{prog:P29} zostawił cię z kodem i tabelą.
+
+Jego kod zbudowano dla alfabetu $(\frac12, \frac14, \frac18, \frac18)$, gdzie
+cztery długości słów kodowych wynoszą $1$, $2$, $3$ i $3$ bity, i daje
+średnio dokładnie $\val{p29.code.h}$ bita na symbol \dash{} entropię, bez
+żadnego marnotrawstwa.
+
+Teraz wyślij tym samym drutem inne źródło. Symbole przychodzą z
+prawdopodobieństwami $(\frac25, \frac15, \frac15, \frac15)$, a kod pozostaje
+bez zmian, bo kod jest tym, co ma odbiorca.
+
+Ile kosztuje teraz średnio jeden symbol?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p30.src.ce}$ bity \dash{} długości ważone nowymi
+prawdopodobieństwami}
+
+\[ \frac25 \times 1 + \frac15 \times 2 + \frac15 \times 3
+   + \frac15 \times 3 \;=\; \val{p30.src.ce} \]
+
+I to jest całość: \textbf{płacisz długość każdego słowa kodowego tyle razy,
+ile razy trafia się jego symbol.} Pisząc $l_i$ na długości, a $p$ na źródło,
+ta średnia to $\sum_i p_i l_i$.
+
+A kod zupełny ma $l_i = \logb{2}\frac{1}{q_i}$ dla rozkładu $q$, dla którego
+go zbudowano, więc ta sama średnia to
+
+\[ H(p, q) \;=\; -\sum_i p_i \logb{2} q_i \]
+
+co nazywa się \textbf{entropią krzyżową} $p$ względem $q$. To strata z
+Programu~\ref{prog:P18}, i to jest właśnie to, co ona mierzy.
+
+A teraz: ile dałby średnio \emph{najlepszy dostępny} kod dla tego drugiego
+źródła i gdzie w Programie~\ref{prog:P29} ta liczba już stoi zapisana?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p30.src.h}$ bita \dash{} własna entropia źródła}
+
+Program~\ref{prog:P29} ją policzył i wydrukował obok długości kodu, bo
+entropia jest najkrótszą średnią, jaką może osiągnąć jakikolwiek kod dla tego
+źródła.
+
+Płacisz więc $\val{p30.src.ce}$, a najlepsze dostępne to
+$\val{p30.src.h}$.
+
+Ile kosztuje cię niewłaściwy kod i gdzie widziałeś \emph{tę} liczbę
+wcześniej?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p30.src.kl}$ bita \dash{} to ta sama luka z
+Programu~\ref{prog:P29}}
+
+Tamten program zmierzył dokładnie to i nazwał to \emph{zaokrągleniem długości
+do liczby całkowitej}, bo słowo kodowe nie może mieć
+$\logb{2}\frac{5}{2}$ bita długości.
+
+Jest tym, i jest jeszcze czymś.
+
+\begin{center}
+\emph{Koszt niewłaściwego kodu minus koszt właściwego\\
+to wielkość sama w sobie.}
+\end{center}
+
+Ma nazwę \dash{} \textbf{dywergencja Kullbacka--Leiblera} rozkładu $p$ od
+$q$, zapisywana $\KL{p}{q}$ \dash{} i o niej jest cała reszta tego programu.
+
+\[ H(p, q) \;=\; H(p) \;+\; \KL{p}{q} \]
+
+Sprawdź na liczbach: $\val{p30.src.h} + \val{p30.src.kl}
+= \val{p30.src.ce}$.
+\end{fr}
+
+\begin{fr}
+W tym dojściu jest szczegół, przy którym warto się zatrzymać, bo to on
+sprawia, że tożsamość jest tożsamością, a nie przybliżeniem.
+
+Najlepszy kod dla drugiego alfabetu z Programu~\ref{prog:P29} ma długości
+$1$, $2$, $3$, $3$, a jego suma Krafta $\sum_i 2^{-l_i}$ wynosi dokładnie
+$1$. Liczby $q_i = 2^{-l_i}$ sumują się więc do jedynki, co czyni z nich
+rozkład.
+
+Który to rozkład?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$(\frac12, \frac14, \frac18, \frac18)$ \dash{} \emph{drugi} wiersz
+tabeli z Programu~\ref{prog:P29}}
+
+Dwa alfabety, które tamten program zestawił, żeby przeciwstawić przypadek
+dyadyczny niedyadycznemu, okazują się \textbf{źródłem i kodem jednej
+dywergencji}. Nic nowego tu nie policzono. Liczba już była wydrukowana; ten
+program dokłada to, czym ona jest.
+
+\begin{note}
+To także powód, dla którego kod i rozkład są tym samym obiektem widzianym
+dwa razy. Kod zupełny \emph{jest} twierdzeniem o tym, jak prawdopodobny jest
+każdy symbol \dash{} daje krótkie słowa symbolom, których się spodziewa
+\dash{} a dywergencja mierzy, jak bardzo to twierdzenie było błędne.
+\end{note}
+
+\mermaidfig{p30-two-pieces}{Na co dzieli się koszt kodu}{koszt w dwóch
+  częściach}
+
+Odejmij dwie sumy, $-\sum_i p_i \logb{2} q_i$ oraz
+$-\sum_i p_i \logb{2} p_i$, i zbierz wyrazy. Czym jest dywergencja, wypisana
+wprost?
+\dotline
+\nextframe
+\end{fr}
+
+% ============================================================
+\section{Nadwyżka nie może być ujemna}
+\label{sec:P30-nonneg}
+\index{dywergencja Kullbacka--Leiblera!nieujemność}
+
+\begin{fr}
+\ans{$\KL{p}{q} = \sum_i p_i \logb{2} \dfrac{p_i}{q_i}$}
+
+Oba logarytmy dzielą wagę $p_i$, więc zbierają się w jeden logarytm ilorazu:
+średnia ważona z $\logb{2}$ ilorazu $p_i / q_i$, i nic poza tym.
+
+Oto pytanie, do którego ta definicja zaprasza, i warto na nie odpowiedzieć,
+zanim pójdziesz dalej, bo większość ludzi się przy nim waha.
+
+Czy cudzy kod mógłby kiedykolwiek \emph{pobić} ten zbudowany dla twojego
+własnego źródła \dash{} czy ta suma mogłaby wyjść ujemna?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie, nigdy. A dowód to dwie linijki twierdzenia, które już masz.
+
+Program~\ref{prog:P19} podaje nierówność Jensena: dla funkcji wklęsłej
+wartość w średniej jest co najmniej średnią wartości. Logarytm jest wklęsły,
+więc
+
+\begin{align*}
+  -\KL{p}{q} &\;=\; \sum_i p_i \logb{2}\frac{q_i}{p_i}
+              \;\le\; \logb{2} \sum_i p_i \frac{q_i}{p_i} \\
+              &\;=\; \logb{2} \sum_i q_i \;=\; \logb{2} 1 \;=\; 0
+\end{align*}
+
+a zatem $\KL{p}{q} \ge 0$, zawsze.
+\end{ansblock}
+
+Nic nowego nie trzeba było definiować. To nierówność z
+Programu~\ref{prog:P19} zastosowana do ilorazu, a ostatni krok mówi tylko
+tyle, że rozkład sumuje się do jedynki.
+\end{fr}
+
+\begin{fr}
+Przypadek równości znaczy tyle samo co nierówność, a Jensen podaje i jego:
+funkcja ściśle wklęsła daje równość tylko wtedy, gdy uśredniana wielkość się
+nie zmienia.
+
+Tutaj uśrednianą wielkością jest $q_i/p_i$.
+
+Pod jakim dokładnie warunkiem na $p$ i $q$ dywergencja wynosi zero?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tylko wtedy, gdy to ten sam rozkład}
+
+Iloraz $q_i/p_i$ nie zmienia się dokładnie wtedy, gdy wszystkie są równe
+\dash{} a dwa rozkłady w stałym stosunku, z których oba sumują się do
+jedynki, są tym samym rozkładem, bo ten stosunek musi wynosić jeden.
+
+\begin{center}
+\emph{$\KL{p}{q} = 0$ dokładnie wtedy, gdy $p$ i $q$ się zgadzają,\\
+a poza tym jest dodatnia.}
+\end{center}
+
+Sprawdzone, a nie zadeklarowane: po wszystkich $\val{p30.simplex.n}$
+rozkładach na trzech wynikach o mianowniku $\val{p30.tri.den}$, a więc po
+każdej ich uporządkowanej parze, dywergencja nigdy nie jest ujemna i wynosi
+zero tylko tam, gdzie oba się zgadzają. Wyczerpująco na tej siatce, co czyni
+z tego dowód, a nie świadectwo \dash{} rozróżnienie z
+Programu~\ref{prog:P14}.
+
+Ta para faktów to dokładnie to, co obiecano i wykorzystano w
+Programie~\ref{prog:P22}.
+
+Cały jego wynik \dash{} że $\beta$ w celu z karą KL jest ceną w nagrodzie na
+nat \dash{} potrzebuje tylko tego, że dywergencja jest nieujemną miarą tego,
+jak daleko jeden rozkład stoi od drugiego, zerową tylko przy zgodzie.
+Powiedziano to w rigour boxie i wskazano ten program.
+
+Ten dług jest teraz spłacony, a wystarczyły do tego definicja i Jensen.
+
+\begin{note}
+Zauważ, czego \emph{nie} ustalono. \enquote{Zero tylko przy zgodzie} i
+\enquote{nigdy nie ujemna} to dwie z rzeczy, które obiecuje słowo
+\emph{odległość}. Nie wszystkie, a §6 jest o tej, która zawodzi.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Jeden wniosek, za darmo, i to ten, który w ogóle czyni z entropii krzyżowej
+stratę.
+
+Skoro $H(p, q) = H(p) + \KL{p}{q}$, a dywergencja nigdy nie jest ujemna:
+
+\[ H(p, q) \;\ge\; H(p), \quad\text{z równością dokładnie wtedy, gdy } q = p \]
+
+Jeśli więc utrzymasz $p$ na stałe i będziesz zmieniać $q$, entropia krzyżowa
+jest najmniejsza dokładnie wtedy, gdy $q$ jest samym $p$, a jej podłogą jest
+własna entropia $p$.
+
+Co to mówi o stracie treningowej, która nie chce zejść poniżej pewnej
+liczby, jakkolwiek długo trenujesz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Podłogą jest własna entropia celu i żaden model nie zejdzie pod nią}
+
+Strata, która się wypłaszcza, nie musi oznaczać modelu, który przestał się
+uczyć. Jeśli przewidywana rzecz jest naprawdę niepewna, najlepszy możliwy
+model wciąż płaci $H(p)$ na symbol, i każdy bieg przeciwko temu celowi
+wypłaszcza się właśnie tam.
+
+\begin{trapbox}
+\textbf{\enquote{Strata przestała spadać, więc model przestał się uczyć.}}
+
+Mógł dojść. Entropia krzyżowa jest ograniczona z dołu entropią celu, która
+jest własnością \emph{danych}, a nie modelu, a tekst z prawdziwą
+wieloznacznością ma podłogę powyżej zera.
+
+Pytanie, które stawia wypłaszczona strata, brzmi: która z dwóch rzeczy
+zaszła \dash{} i to dywergencja je rozdziela. Nadwyżka ponad podłogą jest
+tym, co zostało do nauczenia, i schodzi do zera przy modelu, który ma rację,
+a nie przy modelu, który utknął. Czego nie da się zrobić, to odczytać tego z
+samej straty, bo strata to podłoga plus nadwyżka, a podłogi nie ma na
+ekranie.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Nie jest symetryczna}
+\label{sec:P30-asymmetry}
+\index{dywergencja Kullbacka--Leiblera!asymetria}
+
+\begin{fr}
+Wszystko dotąd byłoby prawdą o odległości. Tu się to kończy.
+
+Program~\ref{prog:F05} zbudował rozkład na czterech tokenach i wydrukował go
+w trzech temperaturach. Przy $T = \num{0.5}$ jest szpiczasty \dash{}
+$\val{f05.sm.t05.p1}$ na wiodącym tokenie i $\val{f05.sm.t05.p4}$ na
+ostatnim. Przy $T = 2$ jest szeroki: $\val{f05.sm.t20.p1}$ i
+$\val{f05.sm.t20.p4}$. Napisz $p$ na szpiczasty, a $q$ na szeroki \dash{} to
+dwa argumenty z §1 z konkretną parą w środku.
+
+Zwróć uwagę, że oba mają ten sam nośnik: każdy token niesie w obu jakąś
+wagę, więc niczego z tego, co nastąpi, nie da się zrzucić na brakujący wynik.
+Jakakolwiek asymetria się tu pojawi, nie jest tą, o której mówi §4.
+
+Zanim cokolwiek policzysz, spójrz na te dwie wielkości:
+
+\[ \KL{p}{q} \qquad\text{oraz}\qquad \KL{q}{p} \]
+
+Czy spodziewasz się, że będą sobie bliskie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie są: $\val{p30.f05.fwd}$ przeciwko $\val{p30.f05.rev}$ nata}
+
+Czynnik $\val{p30.f05.ratio}$, na dwóch rozkładach różniących się tylko
+ustawieniem temperatury, policzony z dwunastu prawdopodobieństw, które
+Program~\ref{prog:F05} zapisał.
+
+\begin{center}
+\emph{$\KL{p}{q}$ i $\KL{q}{p}$ to różne liczby,\\
+a żadna z nich nie jest odległością między $p$ a $q$.}
+\end{center}
+
+Kolejność nie jest konwencją, którą wolno wybrać dla wygody. Nazywa ona to,
+o który rozkład pytasz.
+\end{fr}
+
+\begin{fr}
+Odczytaj oba kierunki z definicji, a powód masz przed sobą.
+
+\[ \KL{p}{q} \;=\; \sum_i p_i \ln\frac{p_i}{q_i} \]
+
+Czynnik $p_i$ poza logarytmem wybiera, \emph{gdzie patrzysz}: wyraz liczy się
+o tyle, o ile $p$ mówi, że ten wynik jest ważny. Iloraz w środku wybiera,
+\emph{ile płacisz}: jest duży tam, gdzie $p$ jest znacznie większe od $q$.
+
+Który więc rozkład wykonuje którą pracę i który z dwóch jest tym, o którym
+należy myśleć jak o \enquote{celu}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\textbf{Pierwszy} argument waży sumę, więc to jego zdanie o tym, gdzie
+patrzeć, jest respektowane. To on jest celem.
+
+\textbf{Drugi} jest tym, który się ocenia, a ocenia się go tylko tam, gdzie
+pierwszy położył jakąś wagę.
+\end{ansblock}
+
+To cała asymetria w jednym zdaniu, a §4 zamienia ją w cenę.
+\end{fr}
+
+\begin{fr}
+Teraz liczby na siebie zarabiają. Większym z dwóch kierunków był
+$\KL{q}{p}$ \dash{} rozkład \emph{szeroki} na pierwszym miejscu.
+
+Spójrz na ostatnią kolumnę z Programu~\ref{prog:F05}. Przy $T = 2$ czwarty
+token niesie $\val{f05.sm.t20.p4}$; przy $T = \num{0.5}$ niesie
+$\val{f05.sm.t05.p4}$, co tamten program zmierzył jako wzrost ponad
+pięćdziesięciokrotny.
+
+Dlaczego postawienie szerokiego na pierwszym miejscu powiększa odpowiedź?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Bo szeroki kładzie wagę na token, którego szpiczasty niemal się wyrzekł}
+
+Czwarty token wnosi do tego kierunku $\val{f05.sm.t20.p4} \times \ln\frac{
+\val{f05.sm.t20.p4}}{\val{f05.sm.t05.p4}}$ \dash{} pokaźną wagę razy
+logarytm dużego ilorazu. Odwróć parę, a ten sam token wnosi
+$\val{f05.sm.t05.p4}$ razy coś, czyli prawie nic, bo szpiczasty rozkład
+ledwie tam zagląda.
+
+\begin{trapbox}
+\textbf{\enquote{Na moich danych wyszły mniej więcej tak samo, więc kierunek
+nie ma znaczenia.}}
+
+Czasem wychodzą. Dwa alfabety z Programu~\ref{prog:P29} dają
+$\val{p30.src.kl}$ w jedną stronę i $\val{p30.src.klrev}$ w drugą \dash{}
+dość blisko, by raport cytujący którąkolwiek wyglądał tak samo.
+
+To nie jest uspokojenie, to jest problem. \textbf{Wielkość jednego kierunku
+nie mówi nic o wielkości drugiego}, więc para, która przypadkiem zgadza się
+na dzisiejszych danych, nie powiedziała ci nic o jutrzejszych. Kierunek
+trzeba wybrać na podstawie tego, co znaczy, czyli §4 i §5, a nigdy na
+podstawie pomiaru, który wypadł blisko.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Ile kosztuje zero, w każdą ze stron}
+\label{sec:P30-zero}
+\index{dywergencja Kullbacka--Leiblera!a zerowe prawdopodobieństwo}
+
+\begin{fr}
+Mechanizm stojący za wszystkim, co dalej, to jeden wyraz tej sumy, i jest to
+wyraz, w którym prawdopodobieństwo wynosi zero.
+
+Weź cel $p$, który kładzie wagę na jakimś wyniku, i kandydata $q$, który nie
+kładzie tam żadnej: $p_i > 0$ oraz $q_i = 0$.
+
+Ile ten wynik wnosi do $\KL{p}{q}$, a ile wnosi do $\KL{q}{p}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Do $\KL{p}{q}$ wnosi $p_i \ln \frac{p_i}{0}$, czyli
+\textbf{nieskończoność}.
+
+Do $\KL{q}{p}$ wnosi $0 \times \ln \frac{0}{p_i}$, czyli
+\textbf{zupełnie nic} \dash{} tego wyniku po prostu nie ma w sumie.
+\end{ansblock}
+
+\begin{center}
+\emph{Pominięcie czegoś, co cel ma, jest niewybaczalne w jedną stronę\\
+i darmowe w drugą.}
+\end{center}
+
+To nie jest różnica zaokrąglenia ani kwestia stopnia. To różnica między
+liczbą skończoną a brakiem liczby, i z niej wynika wszystko w §5.
+
+Obie połowy §3 i §4 mieszczą się w pięciu linijkach sesji. Zwróć uwagę, że
+zaokrąglenie jest wewnątrz funkcji, a nie nałożone na to, co wypisała, więc
+widzisz to, co odda REPL:
+
+\transcript{p30-both-directions}
+
+\mermaidfig{p30-which-is-first}{Co rozstrzyga pierwszy argument}{co jest
+  pierwsze}
+\end{fr}
+
+\begin{fr}
+Implementacja, która napotka ten wyraz, zwykle dołoży małą podłogę do
+każdego wpisu, żeby nic nie dzieliło przez zero, a nieskończoność stanie się
+dużą liczbą skończoną.
+
+Czy to naprawia zachowanie, czy tylko arytmetykę?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tylko arytmetykę}
+
+Wyraz tej wielkości nadal dominuje każdy inny wyraz sumy, więc dopasowanie
+nadal jest napędzane pokrywaniem nośnika celu. Środek zaradczy ukrywa objaw
+i zachowuje zachowanie \dash{} co warto wiedzieć przed §5, bo znaczy to, że
+tamtejszy wynik przeżywa każdą jego implementację.
+
+I warto powiedzieć, czym ta nieskończoność \emph{nie} jest. Nie jest
+przypadkiem numerycznym ani wadą definicji. To zdanie o kodowaniu z §1
+odczytane dosłownie: kod, który nie przypisuje żadnego słowa kodowego
+symbolowi, w ogóle nie może tego symbolu wysłać, więc średni koszt wysłania
+źródła, które go jednak produkuje, jest nieograniczony. Podłoga z
+Programu~\ref{prog:P01} i dyscyplina z Programu~\ref{prog:P02} dotyczą
+arytmetyki; to dotyczy samego schematu.
+\end{fr}
+
+\begin{fr}
+Z tej jednej asymetrii wychodzą dwie nazwy i warto je mieć przed pomiarem, a
+nie po nim.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{W przód}, $\KL{p}{q}$ & cel jest pierwszy, więc luka w jego nośniku
+kosztuje $\infty$ \\
+\textbf{Wstecz}, $\KL{q}{p}$ & kandydat jest pierwszy, więc luka nie
+kosztuje nic, a kosztuje za to masa tam, gdzie cel jej nie ma \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Mając tylko tyle i przed jakimkolwiek dopasowaniem: jeśli masz przybliżyć
+dwugarbny cel czymś, co ma tylko jeden garb, który kierunek spodziewasz się
+zobaczyć rozlany, a który wybierający garb?
+\dotline
+\nextframe
+\end{fr}
+
+% ============================================================
+\section{Pokrywanie garbów i szukanie garbu}
+\label{sec:P30-modes}
+\index{dywergencja Kullbacka--Leiblera!pokrywanie i szukanie garbów}
+
+\begin{fr}
+\ans{W przód się rozlewa, wstecz wybiera garb \dash{} a §5 to mierzy}
+
+Rozumowanie to tabela z poprzedniej ramki i nic ponadto. W przód nie stać na
+lukę nigdzie tam, gdzie cel ma masę, więc musi pokryć oba garby. Wstecz nie
+płaci za lukę nic, a płaci za masę w złym miejscu, więc najtańsze, co może
+zrobić, to usiąść na jednym garbie i zignorować drugi.
+
+Te dwa zachowania mają nazwy \dash{} \textbf{pokrywanie garbów} i
+\textbf{szukanie garbu} \dash{} i to dla nich istnieje ten program. Reszta
+sekcji to pomiar, bo nazwa to nie demonstracja.
+\end{fr}
+
+\begin{fr}
+Oczywisty sposób, żeby to rozstrzygnąć, to dopasować jednogarbnego kandydata
+pod każdym z celów i spojrzeć na dwie odpowiedzi. Program~\ref{prog:P05}
+próbował ustalić fakt geometryczny dokładnie w ten sposób i zmierzył
+poszukiwanie: procedura utknęła długo przed geometrią, a żadne strojenie by
+jej nie uratowało.
+
+Warto powiedzieć dokładnie, co byłoby tu z tym nie tak. Dopasowana odpowiedź
+zależy od tego, gdzie ruszyło poszukiwanie, kiedy się zatrzymało i jak
+sparametryzowano kandydata \dash{} od trzech rzeczy, które nie mają nic
+wspólnego z dwiema porównywanymi dywergencjami. Różnica między dwiema
+odpowiedziami mogłaby więc pochodzić z każdej z czterech, a nic na stronie by
+nie powiedziało, z której.
+
+Jak więc zmierzyć, którego kandydata woli dany cel, tak żeby odpowiedź nie
+była zdaniem o twoim optymalizatorze?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Uczynić zbiór kandydatów skończonym i ocenić każdego z nich}
+
+Nie ma tu żadnego optymalizatora. Kandydaci są skończonym zbiorem i
+\textbf{każdy z nich jest oceniany}: $\val{p30.bins}$ przedziałów, trójkątny
+kandydat dla każdego środka i każdej połówkowej szerokości, razem
+$\val{p30.fam.n}$. Najlepszy jest najlepszym ze wszystkich, co czyni z
+wyniku dowód dla tej rodziny, a nie świadectwo o niej \dash{} rozróżnienie z
+Programu~\ref{prog:P14}, wykonujące dokładnie tę pracę, przed którą
+ostrzega P05.
+\end{fr}
+
+\begin{fr}
+Cel jest dwugarbny: wysoki garb blisko jednego końca, drugi garb blisko
+drugiego i płytka dolina między nimi. Niesie $\val{p30.head.mode2}$ procent
+masy na drugim garbie \dash{} to nie szczegół w ogonie, to blisko połowy
+rozkładu.
+
+Znaczy jeszcze jedna rzecz i łatwo ją pominąć: \textbf{jest ściśle dodatni w
+każdym przedziale.} Nigdzie nie ma dokładnego zera.
+
+Dlaczego to tu znaczy, wobec tego, co właśnie ustaliło §4?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Żeby tylko \emph{jeden} z dwóch kierunków mógł pójść w nieskończoność}
+
+Gdyby cel miał w sobie zera, to kandydat rozlany po nich kładłby masę tam,
+gdzie cel jej nie ma \dash{} i kierunek wstecz też byłby nieskończony. Oba
+kierunki byłyby zmuszone, asymetria byłaby niewidoczna, a pomiar nie
+pokazałby niczego.
+
+\begin{note}
+To nie jest przypuszczenie. Taki był pierwszy tutaj wypróbowany projekt i
+zawiódł dokładnie tak: przy celu z zerami większość kandydatów była
+nieskończona w \emph{obu} kierunkach. Druga próba użyła potem celu, którego
+garby były zbyt łagodne, i dywergencja wstecz jednak wolała kandydata
+szerokiego, bo wyraz $-H(q)$ w $\sum q \ln \frac{q}{p}$ dominuje, gdy nic
+nie jest dość ostre, by warto było na to zapaść.
+
+Obie porażki znaleziono, uruchamiając projekt, a nie rozumując o nim, i
+dlatego są tutaj, a nie w przypisie: każda z nich to ten sam mechanizm
+widziany z boku.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Zanim padnie odpowiedź. Ilu z $\val{p30.fam.n}$ kandydatów spodziewasz się
+mieć \emph{skończoną} dywergencję w przód, a ilu skończoną wstecz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p30.fin.fwd}$ w przód i $\val{p30.fin.rev}$ wstecz \dash{}
+wszyscy}
+
+Każdy kandydat ma skończoną dywergencję wstecz, bo cel jest wszędzie dodatni
+i żaden kandydat nie może położyć masy tam, gdzie cel jej nie ma. Skończoną
+w przód ma tylko $\val{p30.fin.fwd}$: reszta jest dość wąska, by zostawić
+przedział niepokryty, a jeden niepokryty przedział to $\infty$.
+
+\begin{center}
+\emph{Kierunek w przód odrzucił już dwie trzecie kandydatów,\\
+zanim któregokolwiek z nich oceniono.}
+\end{center}
+
+To nie jest preferencja wyrażona niewielkim marginesem. Większość przestrzeni
+poszukiwań jest dla niego po prostu niedostępna, a to, co zostaje, to część
+szeroka.
+\end{fr}
+
+\begin{fr}
+A więc pomiar. Każdy kierunek jest oceniany na każdym z
+$\val{p30.fam.n}$ kandydatów i podaje się najlepszego.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXX@{}}
+\toprule
+& \textbf{w przód} $\KL{p}{q}$ & \textbf{wstecz} $\KL{q}{p}$ \\
+\midrule
+wybrany kandydat & najszerszy dostępny & pojedyncza masa punktowa \\
+pokrywane przedziały & $\val{p30.fwd.width}$ & $\val{p30.rev.width}$ \\
+masa zostawiona na drugim garbie & $\val{p30.fwd.mode2}$ procent & żadna, dokładnie \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Cel niesie tam $\val{p30.head.mode2}$ procent. W przód zachowuje część z
+tego, a wstecz nie zachowuje \emph{nic} \dash{} i to jest zliczenie, a nie
+zaokrąglenie: wybrany kandydat jest zerem w każdym przedziale drugiego
+garbu, więc nie ma tu małej liczby wyświetlanej jako brak.
+\end{fr}
+
+\begin{fr}
+I nie jest to własność tego celu. Tę samą enumerację uruchomiono na
+$\val{p30.targets.n}$ różnych dwugarbnych celach \dash{} garby różnej
+wysokości, różne odstępy, jedna para prawie równa \dash{} i na każdym z nich
+kierunek w przód brał najszerszego dostępnego kandydata, a wstecz brał masę
+punktową.
+
+Skrypt to asertuje, a nie raportuje, więc zmiana celu nie może po cichu
+zafałszować tej sekcji.
+
+\begin{center}
+\emph{Zachowanie należy do tego, który rozkład stoi w liczniku,\\
+a nie do kształtu celu.}
+\end{center}
+
+Powiedz jednym zdaniem, co cel wstecz zrobił z rozkładem, który miał
+modelować, i co jego własna wartość straty o tym mówi.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wyrzucił garb niosący blisko połowy rozkładu, a jego wartość straty nie mówi
+o tym nic: strata jest niska, bo siedzenie na jednym garbie naprawdę jest
+najtańszą rzeczą dostępną pod tym celem.
+
+Nie ma tu porażki do wykrycia. Cel został zminimalizowany poprawnie.
+\end{ansblock}
+
+\begin{aibox}
+Tu dwa kierunki przestają być ciekawostką. Cel wariacyjny i polityka z karą
+KL minimalizują oba kierunek wstecz, bo to ten kierunek, którego wartość
+oczekiwana jest po próbkach, które da się losować z trenowanej rzeczy. Oba
+dziedziczą więc szukanie garbu, a model, który po cichu porzucił garb,
+raportuje dla siebie dobrą liczbę.
+
+Destylacja minimalizuje kierunek w przód względem pełnego rozkładu
+nauczyciela, co dziedziczy pokrywanie garbów: rozleje ucznia po rzeczach,
+które nauczyciel rozważył i odrzucił, zamiast pozwolić mu położyć zero tam,
+gdzie nauczyciel go nie położył.
+
+Żadne z tego nie jest błędem i żadnego nie wybrano ze względu na zachowanie
+wobec garbów. Przyszło z celem, a tabela z §5 mówi, czym jest.
+\end{aibox}
+
+\mermaidfig{p30-two-fits}{Którego kandydata bierze każdy kierunek}{jeden cel,
+  dwa dopasowania}
+\end{fr}
+
+% ============================================================
+\section{To nie jest odległość}
+\label{sec:P30-notadistance}
+\index{dywergencja Kullbacka--Leiblera!nie jest metryką}
+
+\begin{fr}
+Tę wielkość bardzo często nazywa się \enquote{odległością KL}, a §3 złamało
+już połowę tego, co to słowo obiecuje: odległość od $p$ do $q$ jest
+odległością od $q$ do $p$, a ta nie jest.
+
+Program~\ref{prog:F09} dał ci drugą połowę, dla wektorów, i podał ją jako
+twierdzenie z dołączonym warunkiem równości.
+
+Co to było?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nierówność trójkąta \dash{} żaden objazd nie jest krótszy od drogi
+wprost}
+
+$\lVert a - c \rVert \le \lVert a - b \rVert + \lVert b - c \rVert$, z
+równością tylko wtedy, gdy objazd leży na drodze wprost.
+
+To nie ozdoba. To własność, która czyni odległość użyteczną w rozumowaniu:
+mówi, że ograniczenie dwóch odcinków ogranicza całość, a to właśnie pozwala
+w ogóle łańcuchowo składać oszacowania.
+
+Czy dywergencja jej przestrzega?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nie. Oto trójka, dokładna, na trzech wynikach o mianowniku
+$\val{p30.tri.den}$:
+
+\[ \KL{a}{c} = \val{p30.tri.direct}, \qquad
+   \KL{a}{b} + \KL{b}{c} = \val{p30.tri.via} \]
+
+Objazd jest \textbf{krótszy} \dash{} o $\val{p30.tri.gap}$ nata, co nie jest
+marginalnym naruszeniem, tylko mniej więcej połową wartości wprost.
+\end{ansblock}
+\end{fr}
+
+\begin{fr}
+Łatwo byłoby odłożyć to jako patologiczny narożnik, więc to policzono.
+
+Sprawdzono każdą uporządkowaną trójkę rozkładów na tej siatce:
+$\val{p30.tri.total}$ z nich.
+
+Ile spodziewasz się naruszeń nierówności \dash{} garstkę, jakiś procent, czy
+większość?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p30.tri.bad}$ z $\val{p30.tri.total}$ \dash{}
+$\val{p30.tri.pct}$ procent}
+
+Blisko jednej czwartej. Naruszanie nierówności trójkąta nie jest dla tej
+wielkości przypadkiem brzegowym, tylko \textbf{przypadkiem typowym}, a każde
+rozumowanie łańcuchowo składające dwie dywergencje, by ograniczyć trzecią,
+nigdy nie miało prawa zadziałać.
+
+\begin{trapbox}
+\textbf{\enquote{To wielkość odległościopodobna, więc zwykłe intuicje w
+większości się przenoszą.}}
+
+Trzy z nich się nie przenoszą, i to te trzy, z których każdy korzysta. Nie
+jest symetryczna (§3), nie przestrzega nierówności trójkąta (tutaj, w
+jednej czwartej przypadków) i jest nieograniczona \dash{} jeden niepokryty
+wynik posyła ją w nieskończoność, więc żadne przeskalowanie nie zmieści jej
+w ustalonym zakresie.
+
+Czym \emph{jest}, to dwa fakty ustalone w §2: nigdy nieujemna i zerowa
+dokładnie przy zgodzie. Warto je mieć i nie są odległością. Słowa
+\enquote{dywergencja} używa się zamiast \enquote{metryka} właśnie dlatego,
+że komuś trzeba to raz powiedzieć.
+\end{trapbox}
+
+\mermaidfig{p30-three-promises}{Co obiecuje to słowo i co się utrzymuje}{trzy
+  obietnice}
+\end{fr}
+
+% ============================================================
+\section{Dlaczego po prostu jej nie usymetrycznić}
+\label{sec:P30-js}
+\index{dywergencja Jensena--Shannona}
+
+\begin{fr}
+Oczywistą naprawą jest uśrednienie dwóch kierunków względem punktu
+środkowego i ktoś to zrobił. \textbf{Dywergencja Jensena--Shannona} to
+
+\[ \JS{p}{q} \;=\; \tfrac12 \KL{p}{m} + \tfrac12 \KL{q}{m},
+   \qquad m = \tfrac12(p + q) \]
+
+Jest symetryczna z konstrukcji. Jest zawsze skończona, bo $m$ jest dodatnie
+wszędzie tam, gdzie dodatnie jest $p$ albo $q$. Jej pierwiastek jest nawet
+prawdziwą metryką, z nierównością trójkąta włącznie.
+
+Naprawia więc każdą skargę z §3 i §6. Ile to kosztowało?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jest \textbf{ograniczona}, a to ograniczenie jest kosztem.
+
+Dwa rozkłady, które nie dzielą żadnego nośnika, są od siebie oddalone
+dokładnie o $\ln 2 = \val{p30.js.cap}$ nata i o nic więcej, jakkolwiek
+daleko od siebie są.
+\end{ansblock}
+
+Zmierzone na masach punktowych oddalonych o $1$, $2$, $3$ i
+$\val{p30.js.far}$ przedziały: każde z $\val{p30.js.seps}$ oddaleń zwraca
+$\val{p30.js.cap}$, co do ostatniej cyfry, którą niesie arytmetyka, podczas
+gdy dywergencja jest nieskończona dla wszystkich czterech.
+
+Wygląda to na ciekawostkę o masach punktowych. Kiedy w życiu biegu
+treningowego rozkład modelu i cel są na rozłącznych nośnikach?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Na starcie, czyli wtedy, gdy najbardziej potrzeba ci wskazówki, dokąd
+iść}
+
+To nasycenie nie jest dziwactwem na skraju. To reżim, w którym bieg
+treningowy się zaczyna.
+
+Na początku model rozkłada masę mniej więcej gdziekolwiek, co jest właśnie
+przypadkiem rozłącznych nośników. Wielkość symetryczna i ograniczona podaje
+tam tę samą liczbę, cokolwiek model zrobi, więc nie niesie \textbf{żadnej
+informacji o tym, w którą stronę się ruszyć}.
+
+\begin{center}
+\emph{Ograniczoność i użyteczny gradient to ta sama własność\\
+czytana z dwoma różnymi znakami.}
+\end{center}
+
+Rzecz nieograniczona jest nieograniczona dlatego, że wciąż coś ci mówi w
+punkcie, w którym rzecz ograniczona już przestała. Żadna z nich nie jest
+lepszą wielkością; są odpowiedziami na różne pytania, a pytaniem jest, czy
+potrzebujesz porównać dwie liczby, czy podążać za jedną.
+\end{fr}
+
+\begin{fr}
+\begin{rigourbox}
+Trzy rzeczy są tu podane i nieudowodnione: że $\sqrt{\JS{p}{q}}$ przestrzega
+nierówności trójkąta, że dywergencja Jensena--Shannona jest ograniczona z
+góry przez $\ln 2$ i że to ograniczenie jest osiągane dokładnie na
+rozłącznych nośnikach.
+
+Ostatnia z trzech jest sprawdzona w skrypcie tego programu, przy czterech
+oddaleniach, bo to na niej wspiera się rozumowanie. Pierwsze dwie są w
+każdym kursie teorii informacji. Nic dalej w tej książce z nich nie
+korzysta.
+\end{rigourbox}
+\end{fr}
+
+% ============================================================
+\section{Kierunek, który już minimalizujesz}
+\label{sec:P30-empirical}
+\index{entropia krzyżowa!a rozkład empiryczny}
+
+\begin{fr}
+Zostało jedno pytanie i to ono sprawia, że §5 jest czymś więcej niż uwagą o
+dwóch celach, które wybrał ktoś inny.
+
+Trenujesz na stałym zbiorze danych, minimalizując entropię krzyżową. Nic w
+tym zdaniu nie wspomina dywergencji, a nikt, kto to wybierał, nie myślał o
+pokrywaniu garbów.
+
+Zapisz rozkład empiryczny danych jako $\hat p$ \dash{} proporcje w pliku.
+Którą wielkość minimalizuje bieg treningowy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dywergencję w przód do rozkładu empirycznego \dash{} tę pokrywającą
+garby}
+
+\[ H(\hat p, q) \;=\; H(\hat p) \;+\; \KL{\hat p}{q} \]
+
+czyli tożsamość z §1 z $\hat p$ w środku, a $H(\hat p)$ \textbf{nie zależy
+od modelu}. To własność pliku. Minimalizowanie entropii krzyżowej po $q$ i
+minimalizowanie dywergencji po $q$ to więc to samo zadanie, różniące się o
+stałą, której nikt nie ruszy.
+
+Sprawdzone na trzech modelach względem jednego zbioru danych: tożsamość
+zachodzi dokładnie przy każdym z nich, $H(\hat p) = \val{p30.emp.h}$ nata
+przez cały czas, a przy modelu zgodnym z danymi nadwyżka wynosi dokładnie
+zero. Dla modelu jednostajnego czyta się to tak:
+
+\[ \val{p30.emp.ce.uniform} \;=\; \val{p30.emp.h} \;+\; \val{p30.emp.kl.uniform} \]
+
+gdzie pierwszy składnik po prawej ustala plik, a o drugim decyduje wyłącznie
+$q$.
+\end{fr}
+
+\begin{fr}
+Wybór, który zmierzyło §5, został więc dokonany za ciebie, przez kształt
+celu, na długo zanim ktokolwiek go przedyskutował.
+
+\begin{center}
+\emph{Każdy bieg, jaki uruchomiłeś na stałym zbiorze danych,\\
+minimalizował kierunek pokrywający garby.}
+\end{center}
+
+Dlatego model językowy zapytany o coś wieloznacznego raczej asekuruje się
+po wszystkich możliwościach, niż wybiera jedną: trenował go cel, który płaci
+nieograniczoną cenę za brak masy tam, gdzie dane ją miały, a za rozlewanie
+się nie płaci nic.
+
+\begin{note}
+To domyka także pętlę otwartą przez Program~\ref{prog:P26}. Tamten program
+pokazał, że strata treningowa jest ujemną logarytmiczną wiarygodnością, i
+powiedział, że nadwyżka ponad entropią celu \enquote{ma nazwę i należy do
+P30}. To dywergencja w przód do $\hat p$, schodzi do zera dokładnie przy
+dopasowaniu największej wiarygodności, i dlatego dwa opisy tej samej straty
+nigdy się nie kłóciły.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Spójrz wstecz na to, co ten program zrobił z tym, co dostał.
+
+Zdefiniował jedną wielkość, $\sum p \ln \frac{p}{q}$, a wszystko inne było
+konsekwencją: jest kosztem minus podłogą, nie może być ujemna, bo logarytm
+jest wklęsły, i nie jest symetryczna, bo pierwszy argument wybiera, gdzie
+patrzeć.
+
+Jedynym naprawdę nowym faktem jest ten z §4 i jest to pojedynczy wyraz sumy:
+zero w złym miejscu kosztuje nieskończoność w jedną stronę i nic w drugą.
+Obie nazwy z §5, całe §6 i powód, dla którego bieg treningowy się asekuruje,
+wychodzą z tego jednego wyrazu.
+
+Czego \textbf{nie} zrobił, to nie porównał dwóch \emph{zmiennych}. Każda
+dywergencja tutaj jest między dwoma rozkładami wypisanymi z góry. W chwili,
+gdy zapytasz, ile wiedza o jednej wielkości mówi ci o drugiej \dash{} ile z
+etykiety da się przewidzieć z warstwy, powiedzmy \dash{} potrzebujesz
+dywergencji między rozkładem łącznym a iloczynem jego brzegowych, a ta ma
+własną nazwę i własne pułapki.
+
+Program~\ref{prog:P31} ją definiuje i spędza większość swojej długości na
+tym, dlaczego stawiane z jej pomocą tezy zwykle nie są uzasadnione.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Entropia krzyżowa to tyle, ile kosztuje kod}:
+  $H(p, q) = -\sum_i p_i \logb{2} q_i$, czyli długości słów kodowych ważone
+  tym, jak często trafia się każdy symbol. To strata z
+  Programu~\ref{prog:P18} i to jest to, co ona mierzy.}
+\sumitem{4--6}{\textbf{Ten koszt się dzieli}: $H(p, q) = H(p) + \KL{p}{q}$.
+  \enquote{Zaokrąglenie} z Programu~\ref{prog:P29}, wynoszące
+  $\val{p30.src.kl}$ bita, \emph{jest} dywergencją, a jego dwa alfabety są
+  źródłem i kodem \dash{}
+  $\val{p30.src.h} + \val{p30.src.kl} = \val{p30.src.ce}$.}
+\sumitem{7--9}{\textbf{Nadwyżka nigdy nie jest ujemna}, na mocy nierówności
+  Jensena z Programu~\ref{prog:P19} dla wklęsłego logarytmu, i wynosi zero
+  dokładnie wtedy, gdy oba rozkłady się zgadzają. Sprawdzone po każdej
+  uporządkowanej parze z $\val{p30.simplex.n}$ rozkładów na siatce.}
+\sumitem{11--12}{Entropia krzyżowa ma więc podłogę, a tą podłogą jest
+  entropia \emph{celu}. Strata, która przestaje spadać, mogła dojść, a nie
+  utknąć, i sama strata nie powie ci która.}
+\sumitem{13--16}{\textbf{Nie jest symetryczna.} Na rozkładzie z
+  Programu~\ref{prog:F05} oba kierunki to $\val{p30.f05.fwd}$ i
+  $\val{p30.f05.rev}$ nata, czynnik $\val{p30.f05.ratio}$. Pierwszy argument
+  waży sumę, więc to on jest celem; drugi jest tym, co się ocenia.}
+\sumitem{17--18}{A para, która wychodzi prawie równa \dash{}
+  $\val{p30.src.kl}$ przeciwko $\val{p30.src.klrev}$ \dash{} nie dowodzi
+  niczego: wielkość jednego kierunku nie ogranicza drugiego.}
+\sumitem{19--21}{\textbf{Cały mechanizm to jeden wyraz.} Tam, gdzie cel ma
+  masę, a kandydat jej nie ma, w przód płaci się $\infty$, a wstecz nic. To
+  nie różnica zaokrąglenia \dash{} to różnica między liczbą a brakiem
+  liczby.}
+\sumitem{24--30}{\textbf{W przód pokrywa garby, wstecz szuka garbu},
+  wyliczone po $\val{p30.fam.n}$ kandydatach, bez optymalizatora
+  gdziekolwiek. Skończoną wartość w przód ma tylko $\val{p30.fin.fwd}$ z
+  nich, przeciwko wszystkim $\val{p30.fin.rev}$ wstecz.}
+\sumitem{31--33}{Na celu niosącym $\val{p30.head.mode2}$ procent na drugim
+  garbie kierunek w przód zachowuje tam $\val{p30.fwd.mode2}$ procent masy,
+  a wstecz nie zachowuje \emph{nic} \dash{} na wszystkich
+  $\val{p30.targets.n}$ wypróbowanych celach, więc zachowanie należy do
+  kierunku, a nie do celu.}
+\sumitem{34--38}{\textbf{To nie jest odległość.} Nierówność trójkąta, którą
+  dał ci Program~\ref{prog:F09}, zawodzi dla $\val{p30.tri.bad}$ z
+  $\val{p30.tri.total}$ uporządkowanych trójek \dash{}
+  $\val{p30.tri.pct}$ procent, czyli w przypadku typowym \dash{} przy czym
+  najgorszy objazd jest krótszy o $\val{p30.tri.gap}$ nata.}
+\sumitem{39--42}{\textbf{Usymetrycznienie kosztuje sygnał.} Dywergencja
+  Jensena--Shannona jest symetryczna, skończona i ograniczona, a
+  ograniczeniem jest $\ln 2 = \val{p30.js.cap}$: masy punktowe oddalone o
+  $1$ i $\val{p30.js.far}$ przedziały są oddalone dokładnie o tyle, a to
+  reżim, w którym bieg się zaczyna.}
+\sumitem{43--45}{\textbf{Trening na stałym zbiorze danych minimalizuje
+  dywergencję w przód} do rozkładu empirycznego, bo
+  $H(\hat p) = \val{p30.emp.h}$ nata nie zależy od modelu. Nikt nie wybrał
+  kierunku pokrywającego garby; przyszedł on z celem.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Źródło stosuje się do $(\frac12, \frac12)$, a kodujesz je schematem
+  zbudowanym dla $(\frac34, \frac14)$. Podaj entropię krzyżową, entropię i
+  dywergencję, w bitach.
+  \answerto{Długości kodu to $\logb{2}\frac43 = \num{0.415}$ oraz
+  $\logb{2}4 = 2$, więc entropia krzyżowa wynosi
+  $\frac12(\num{0.415}) + \frac12(2) = \num{1.207}$ bita. Entropia to
+  $1$ bit. Dywergencja to różnica, $\num{0.207}$ bita \dash{} tyle kosztuje
+  cię niewłaściwy kod na symbol.}
+\item Nie licząc niczego, powiedz, która z $\KL{p}{q}$ i $\KL{q}{p}$ jest
+  nieskończona, gdy $q$ jest zerem na wyniku, któremu $p$ nadaje wagę, i
+  dlaczego.
+  \answerto{$\KL{p}{q}$. Pierwszy argument waży sumę, więc ten wynik jest w
+  niej z wagą $p_i > 0$, a iloraz $p_i / 0$ jest nieograniczony. W drugim
+  kierunku wynik wchodzi z wagą $q_i = 0$ i wypada z sumy zupełnie.}
+\item Kolega raportuje, że na jego danych oba kierunki zgadzają się do
+  trzech cyfr, i wnioskuje, że dla jego problemu wybór nie ma znaczenia. Co
+  jest złego w tym wniosku?
+  \answerto{Zgodność jest faktem o tej parze rozkładów, a nie o samej
+  wielkości. Dwa alfabety z Programu~\ref{prog:P29} też zgadzają się blisko
+  \dash{} $\val{p30.src.kl}$ przeciwko $\val{p30.src.klrev}$ \dash{}
+  podczas gdy cele z §5 różnią się wszystkim. Gorzej, wybór rządzi
+  \emph{zachowaniem} podczas dopasowywania, więc znaczy najbardziej tam,
+  gdzie tych dwóch liczb jeszcze nie policzono.}
+\item Destylujesz nauczyciela do mniejszego ucznia i minimalizujesz
+  dywergencję z nauczycielem na pierwszym miejscu. Czego spodziewasz się po
+  uczniu wobec opcji, której nauczyciel nadał małe, ale niezerowe
+  prawdopodobieństwo?
+  \answerto{Że zostawi na niej trochę masy. Nauczyciel na pierwszym miejscu
+  to kierunek w przód, więc uczeń płaci nieograniczoną cenę za położenie
+  zera tam, gdzie nauczyciel go nie położył \dash{} czyli pokrywa garby:
+  uczeń rozlewa się po rzeczach, które nauczyciel rozważył i odrzucił,
+  zamiast się zdecydować.}
+\item Podaj jednozdaniowy powód, dla którego ograniczona, symetryczna
+  dywergencja jest kiepskim celem treningowym, mimo że naprawia każdą
+  skargę z §3 i §6.
+  \answerto{Bo się nasyca: na rozłącznym nośniku, od którego bieg startuje,
+  podaje $\ln 2$ cokolwiek model zrobi, więc nie mówi nic o tym, w którą
+  stronę się ruszyć.}
+\item Strata treningowa wypłaszczyła się na liczbie wyraźnie powyżej zera, a
+  zespół spiera się, czy model przestał się uczyć. Która wielkość to
+  rozstrzyga i czy da się ją odczytać ze straty?
+  \answerto{Dywergencja do celu \dash{} entropia krzyżowa minus własna
+  entropia celu. Ze straty jej nie odczytasz, bo strata to podłoga plus
+  nadwyżka, a podłoga jest własnością danych, której nie ma na ekranie.
+  Trzeba ją oszacować osobno albo ograniczyć.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że $H(p, q) \ge H(p)$ dla każdego $q$, z równością tylko przy
+  $q = p$, korzystając wyłącznie z wyniku z §2.
+  \answerto{$H(p, q) = H(p) + \KL{p}{q}$, a dywergencja jest nieujemna, więc
+  $H(p, q) \ge H(p)$; równość wymaga $\KL{p}{q} = 0$, co według §2 zachodzi
+  tylko wtedy, gdy $q = p$.}
+\item Kandydat $q$ jest jednostajny na $n$ wynikach. Pokaż, że $\KL{p}{q}$
+  wynosi $\logb{2} n - H(p)$ w bitach, i powiedz, co to znaczy o tym, który
+  $p$ jest najdalej od jednostajnego.
+  \answerto{Każde $q_i$ wynosi $\frac1n$, więc
+  $\sum_i p_i \logb{2}\frac{p_i}{1/n} = \sum_i p_i \logb{2} p_i
+  + \logb{2} n = \logb{2} n - H(p)$. Dywergencja od jednostajnego to
+  dokładnie niedobór entropii, więc najdalej od jednostajnego jest rozkład o
+  najmniejszej entropii \dash{} masa punktowa, przy $\logb{2} n$ bitach.}
+\item Weź $p = (\num{0.5}, \num{0.5})$ oraz $q = (1, 0)$. Policz oba
+  kierunki i obie wartości Jensena--Shannona.
+  \answerto{$\KL{p}{q}$ jest nieskończona: $q$ jest zerem tam, gdzie $p$ ma
+  wagę. $\KL{q}{p} = 1 \times \ln\frac{1}{\num{0.5}} = \ln 2$. Dywergencja
+  Jensena--Shannona wynosi $\val{p30.js.cap}$ w obu kierunkach, będąc
+  symetryczną \dash{} to ograniczenie, osiągnięte, bo oba nie dzielą
+  nośnika poza tym, co ma punkt środkowy.}
+\item Nierówność trójkąta zawodzi dla $\val{p30.tri.pct}$ procent
+  uporządkowanych trójek na siatce z §6. Wyjaśnij, dlaczego liczenie trójek
+  \emph{uporządkowanych} jest tym, co należy policzyć.
+  \answerto{Bo wielkość nie jest symetryczna, więc $(a, b, c)$ i
+  $(c, b, a)$ to różne twierdzenia i jedno może zawieść, gdy drugie się
+  utrzymuje. Liczenie trójek nieuporządkowanych po cichu zlałoby oba i
+  podało niższy odsetek naruszeń dla wielkości, której asymetria jest tu
+  sednem.}
+\item Załóżmy, że przed policzeniem dywergencji w przód dodajesz małą
+  podłogę $\varepsilon$ do każdego wpisu kandydata, tak by żaden wyraz nie
+  był nigdy nieskończony. Powiedz, co się zmienia, a co nie.
+  \answerto{Zmienia się arytmetyka: niepokryty wynik kosztuje teraz
+  $p_i \ln \frac{p_i}{\varepsilon}$, czyli skończenie. Zachowanie się nie
+  zmienia: ten wyraz nadal rośnie bez ograniczenia, gdy $\varepsilon$
+  maleje, i nadal dominuje sumę, więc dopasowanie nadal jest pchane do
+  pokrycia nośnika celu. Podłoga usuwa objaw i zachowuje pokrywanie garbów.}
+\end{furtherproblems}
