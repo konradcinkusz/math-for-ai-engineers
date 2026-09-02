@@ -1,26 +1,1028 @@
 %% P33 --- Anatomia treningu
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak: programs/en/P33-training-run.tex. Ramka w ramkę, makro w makro;
+%% tools/parity.py porównuje oba pliki.
+%%
+%% UWAGA DLA TŁUMACZA: C4, C8 i C12 porównują znaczniki strukturalne, wzory i
+%% literały liczbowe PO KOLEI. Cyfra zostaje cyfrą, a słowo zostaje słowem;
+%% odwołanie do programu prowadzi zdanie zamiast stać za wzorem. Słownictwo
+%% czterech kształtów jest przejęte z polskiego F03, który przekazuje je tu z
+%% nazwy: \enquote{plateau}, \enquote{skok}, \enquote{podejrzanie gładki
+%% spadek}. \enquote{batch} to \enquote{partia}, jak w P21.
 
 \program{Anatomia treningu}
 \label{prog:P33}
+\index{trening}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--8}{wymienić sześć elementów jednego kroku treningu i powiedzieć,
+  który program tej książki dał ci każdy z nich}
+\outcome{9--14}{powiedzieć, które z tych sześciu zgłaszają cokolwiek, gdy są
+  zrobione źle, a które nie}
+\outcome{15--21}{powiedzieć, jak długo musi trwać płaski odcinek, zanim stanie
+  się dowodem, że trening przestał się uczyć}
+\outcome{22--27}{powiedzieć, dlaczego długi trening zawiera duże odchylenia
+  pojedynczych kroków niezależnie od tego, co jest z nim nie tak, i jaki
+  rozmiar jest zaskakujący}
+\outcome{28--33}{powiedzieć, co wygładzona krzywa mówi o wygładzaniu, a nie
+  tylko o treningu}
+\outcome{34--37}{powiedzieć, który z czterech kształtów nie potrzebuje
+  żadnej statystyki}
+\outcome{38--50}{dopasować prawo potęgowe, powiedzieć, co jego reszta wiąże, a
+  czego nie, i powiedzieć, czego dotyczy zgłaszana przez nie niepewność}
+\outcome{51--54}{powiedzieć, które twierdzenie tego programu nie zostało
+  sprawdzone na prawdziwym treningu}
+\end{outcomes}
 
-The loss as maximum likelihood [P26]; its gradient as \code{p - y} [P18];
-the optimiser and its bias correction [P20]; precision and loss scaling
-[P1]; the schedule and the curvature bound [P17]; gradient clipping and
-minibatch noise [P21]. Then the diagnostic half: **a loss curve read as
-evidence** \dash{} what a plateau, a spike, a divergence and a suspiciously
-smooth descent each imply, and which of them are distinguishable from noise
-[P27]. Scaling laws presented as **an empirical power-law fit with reported
-uncertainty**, plotted on log-log axes [F3], with the fit's extrapolation
-error stated \dash{} not as a law of nature.
+\begin{quiz}
+\item Krok treningu liczy stratę, różniczkuje ją i zmienia wagi. Wymień sześć
+  programów tej książki, które są właścicielami tych elementów.
+  \teachesat{3--4}
+  \answerto{Strata należy do Programu~\ref{prog:P26}, jej gradient do
+  Programu~\ref{prog:P18}, aktualizacja do Programu~\ref{prog:P20},
+  arytmetyka do Programu~\ref{prog:P01}, granica rozmiaru kroku do
+  Programu~\ref{prog:P17}, a próbka do Programu~\ref{prog:P21}.}
+\item Ile z tych sześciu elementów zgłasza błąd, ostrzeżenie albo wyjątek,
+  gdy jest zrobione źle?
+  \teachesat{9--10}
+  \answerto{$\val{p33.loud}$ z $\val{p33.pieces}$. Pozostałe cztery to
+  poprawne obliczenie niewłaściwej wielkości, więc nie ma w nich żadnej
+  niedozwolonej operacji, którą cokolwiek mogłoby wychwycić.}
+\item Obserwujesz od $\val{p33.watch}$ kroków i strata nie zeszła poniżej
+  wartości początkowej. Czy trening utknął?
+  \teachesat{15--16}
+  \answerto{Nie. Zdrowy trening wygląda dokładnie tak w około
+  $\val{p33.p.flat}$ procent przypadków, a płaski odcinek staje się dowodem
+  dopiero po mniej więcej $\val{p33.plateau.k}$ krokach.}
+\item Trening liczący $\val{p33.steps}$ kroków zawiera jeden krok, którego
+  strata leży cztery rozrzuty powyżej trendu. Ilu takich kroków się
+  spodziewałeś?
+  \teachesat{22--23}
+  \answerto{Około $\val{p33.spike.expected}$ z nich. Długi trening zawiera
+  duże odchylenia pojedynczych kroków z samej swojej konstrukcji, więc jedno
+  z nich nie jest dowodem niczego.}
+\item Panel wygładza krzywą straty przy $\beta = \val{p33.beta.dash}$. Jaką
+  część prawdziwego rozrzutu krok po kroku pokazuje ten obraz?
+  \teachesat{30--31}
+  \answerto{$\val{p33.smooth.pct}$ procent. Wariancja po wygładzeniu to
+  $\frac{1-\beta}{1+\beta}$ surowej, więc o obrazie decyduje ustawienie tak
+  samo jak trening.}
+\item Siedem punktów na $\val{p33.fit.decades}$ dekadach leży na prostej na
+  osiach log-log, z dokładnością lepszą niż $\val{p33.fit.resid}$ procent. Co
+  to wiąże w przewidywaniu dopasowania trzy dekady dalej?
+  \teachesat{44--45}
+  \answerto{Zupełnie nic. Reszta wiąże wewnątrz dopasowanego zakresu i nie
+  mówi nic poza nim: trzy dekady dalej to samo dopasowanie myli się o
+  $\val{p33.out.err}$ procent, a prawda leży poza jego własnym pasmem dwóch
+  błędów standardowych.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 60 ramek.
-}
+% ============================================================
+\section{Jeden krok i sześć programów}
+\label{sec:P33-one-step}
+\index{trening!jeden krok}
+
+\begin{fr}
+Wszystko w tym programie zostało wyprowadzone gdzie indziej w tej książce. Taki
+jest kontrakt Części IX i tutaj najłatwiej go sprawdzić, bo krok treningu jest
+dość krótki, żeby go wypisać.
+
+Zanim pójdziesz dalej: krok bierze partię przykładów i zwraca zmieniony zestaw
+wag. Wymień to, co dzieje się pomiędzy \dash{} jest tego sześć i każde z tego
+już spotkałeś.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Policzyć stratę. Zróżniczkować ją. Zamienić gradient w krok. Utrzymać
+arytmetykę w zakresie reprezentowalnym. Zdecydować, jak daleko iść. I zrobić
+to wszystko na \emph{próbce} danych, a nie na danych.
+\end{ansblock}
+
+Sześć elementów i żaden z nich nie jest tutaj nowy.
+\end{fr}
+
+\begin{fr}
+Weź je po kolei i nazwij właściciela każdego.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\begin{itemize}
+\item \textbf{Strata.} Program~\ref{prog:P26}: to ujemna logarytmiczna
+  wiarygodność zaobserwowanych tokenów, więc trening modelu językowego jest
+  metodą największej wiarygodności i nigdy nie był niczym innym. Sama liczba
+  należy do Programu~\ref{prog:F02} i wynosi $\val{p33.loss.nats}$ natów.
+\item \textbf{Jej gradient.} Program~\ref{prog:P18}: przez $\softmax$ i
+  entropię krzyżową razem jest to $\vect{p} - \vect{y}$, a droga
+  dwuetapowa, która liczy je osobno, jest inną funkcją, a nie wolniejszą.
+\item \textbf{Krok.} Program~\ref{prog:P20} daje wzór, a w środku siedzi
+  średnia wykładnicza Programu~\ref{prog:F04} wraz z jej korektą obciążenia.
+\item \textbf{Arytmetyka.} Program~\ref{prog:P01}: odstęp między liczbami
+  reprezentowalnymi rośnie z wielkością, więc wkład mniejszy niż połowa
+  odstępu przy sumie bieżącej nie rusza niczego.
+\item \textbf{Jak daleko.} Program~\ref{prog:P17}:
+  $\eta < 2/\lambda_{\max}$, co jest twierdzeniem o ciągu geometrycznym i nie
+  ma w nim nic o sieciach.
+\item \textbf{Próbka.} Program~\ref{prog:P21}: gradient z jednej partii jest
+  estymatorem, a prawie każda skarga na trening jest twierdzeniem o jego
+  wariancji.
+\end{itemize}
+\end{ansblock}
+\end{fr}
+
+\mermaidfig{p33-six-pieces}{%
+  Jeden krok jednego treningu, a obok każdego elementu program, który jest
+  jego właścicielem. Część IX składa; nie wyprowadza.}{%
+  krok i właściciel każdego elementu}
+
+\begin{fr}
+Dwa z nich niosą liczby, których ten program zaraz użyje, więc trafiają na
+stronę teraz.
+
+Granica Programu~\ref{prog:P17} na misie dzielonej z Programem~\ref{prog:P10}
+to $\eta < \val{p33.eta.bound}$, a rozmiar kroku docierający najszybciej to
+$\val{p33.eta.best}$. O jaką część różnią się najlepszy i zabójczy rozmiar
+kroku?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p33.eta.margin}$ procent}
+Tyle wynosi całe pasmo, w którym żyje harmonogram. Poniżej trening jest
+wolniejszy, niż musi być; powyżej trening nie staje się gorszy, tylko odchodzi.
+
+\begin{aibox}
+To także powód, dla którego istnieje rozgrzewka współczynnika uczenia.
+Wcześnie w treningu krzywizna nie jest tą krzywizną, pod którą strojono
+harmonogram, więc to samo $\eta$ może wylądować po złej stronie granicy, która
+się przesunęła. Program~\ref{prog:P20} zmierzył własny współczynnik rozgrzewki;
+ta ramka dodaje, że chroniony margines ma szerokość kilku procent.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Druga liczba to szum. Program~\ref{prog:P21} zmierzył rozrzut gradientu z
+partii wprost; tutaj wielkością jest \emph{strata}, która jest średnią po
+partii, więc tempo Programu~\ref{prog:P25} stosuje się bez zmian.
+
+Weź stratę na przykład o rozrzucie $\val{p33.sigma.token}$ \dash{} to
+najszerszy zmierzony wiersz Programu~\ref{prog:P19} \dash{} i partię
+$\val{p33.batch}$. Jaki jest rozrzut liczby, którą wypisuje panel?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p33.sigma.step}$}
+$\sigma/\sqrt{B}$, czyli sekcja 1 Programu~\ref{prog:P25} i nic więcej.
+
+Zapamiętaj to. Każde twierdzenie w środku tego programu to ta liczba
+przeciwko rozmiarowi rzeczy, którą próbujesz zobaczyć.
+\end{fr}
+
+% ============================================================
+\section{Które z sześciu zawodzą po cichu}
+\label{sec:P33-silent}
+\index{trening!ciche awarie}
+
+\begin{fr}
+Teraz pytanie, które udostępnia dopiero złożenie i którego żaden z sześciu
+właścicieli nie mógł zadać sam.
+
+Zepsuj każdy z sześciu. Ile z nich zgłasza błąd, ostrzeżenie albo wyjątek?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p33.loud}$ z $\val{p33.pieces}$}
+\begin{ansblock}
+Uczciwa dwuetapowa droga gradientu tworzy $-1/p_c$, a gdy logit spadnie o
+mniej więcej $\val{p33.grad.cliff}$ poniżej największego, $p_c$ znika do
+dokładnego zera i droga dzieli przez zero. To jest głośne i
+Program~\ref{prog:P18} to zmierzył.
+
+Rozmiar kroku powyżej $\val{p33.eta.bound}$ mnoży najbardziej stromy kierunek
+przez więcej niż jeden co krok. To też jest głośne, w końcu, a
+Program~\ref{prog:P17} mówi dokładnie, gdzie leży granica.
+\end{ansblock}
+
+Nazwij pozostałe cztery i powiedz, ile kosztuje każdy z nich, gdy jest zły.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Strata, średnia w optymalizatorze, arytmetyka i próbka. Każde zmierzone przez
+program, który jest jego właścicielem.
+\end{ansblock}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Element} & \textbf{Ile kosztuje pomyłka i co ona mówi} \\
+\midrule
+strata & Uśrednij zakłopotania poszczególnych sekwencji zamiast
+  eksponować średnią stratę, a raportowana liczba jest
+  $\val{p33.fail.ppl}$ razy większa od prawdziwej przy najszerszym rozrzucie
+  Programu~\ref{prog:P19}. \\
+średnia & Przenieś rozmiar kroku między dwiema konwencjami pędu, a
+  spacer Programu~\ref{prog:P20} liczący $\val{p33.conv.same}$ kroków trwa
+  $\val{p33.conv.fold}$ razy dłużej albo rozbiega się. \\
+arytmetyka & W \code{bf16} wkład poniżej $\val{p33.fail.swamp}$ procent sumy
+  bieżącej nie rusza niczego, więc gradient można dodać i nie mieć żadnego
+  efektu. \\
+próbka & Akumuluj mikropartie, z których każda podzieliła już przez własną
+  liczbę tokenów, a gradient dotyczy innego celu, o czynnik
+  $\val{p33.fail.acc}$. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Gdyby cokolwiek z tego się działo, framework by mi
+powiedział.}} Powie ci o $\val{p33.loud}$ z $\val{p33.pieces}$, a tylko o
+jednym z tych dwóch od razu.
+
+Powód nie jest taki, że narzędzia są niedbałe. Każda z czterech cichych awarii
+jest \emph{poprawnym obliczeniem złej wielkości}: średnia średnich jest
+średnią, zaokrąglona suma jest sumą, przeskalowany krok jest krokiem. Nie ma w
+nich nigdzie niedozwolonej operacji, którą cokolwiek mogłoby złapać.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Więc te cztery, które zawodzą po cichu, to te cztery, które trzeba wykryć z
+zewnątrz, a narzędzie do tego jest dokładnie jedno.
+
+Jakie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{krzywa straty}
+Która jest jedną liczbą na krok, a \emph{każda z tych liczb ma rozrzut
+$\val{p33.sigma.step}$ wokół tego, co mierzy}.
+
+To jest cała reszta tego programu. Cztery kształty, które ludzie odczytują z
+krzywej straty, to plateau, skok, podejrzanie gładki spadek i rozbieżność, a
+pytanie zadawane każdemu z nich jest tym samym pytaniem:
+\textbf{czy to jest dowód, czy to jest to, co robi szum?}
+\end{fr}
+
+% ============================================================
+\section{Plateau}
+\label{sec:P33-plateau}
+\index{trening!plateau}
+
+\mermaidfig{p33-flat-or-stuck}{%
+  Ta sama obserwacja i dwie rzeczy, którymi może być. Reszta tej sekcji to
+  jedna arytmetyka, która je rozróżnia \dash{} albo mówi, że w tej skali nie
+  rozróżnia ich nic.}{%
+  płaski odcinek i czym może być}
+
+\begin{fr}
+Obserwujesz od $\val{p33.watch}$ kroków i strata nie zeszła poniżej wartości,
+którą miała, gdy zacząłeś obserwować.
+
+Załóż, że trening jest całkiem zdrowy i strata naprawdę spada o
+$\val{p33.improve}$ na krok. Jak prawdopodobne jest, że zobaczyłbyś dokładnie
+to?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Prawdziwy spadek przez $\val{p33.watch}$ kroków to $\val{p33.watch}$ razy
+$\val{p33.improve}$. Każdy z dwóch odczytów niesie rozrzut
+$\val{p33.sigma.step}$, więc ich różnica niesie
+$\val{p33.sigma.step}\sqrt{2}$, a szansa braku widocznej poprawy to jeden
+minus dystrybuanta rozkładu normalnego w ich ilorazie.
+
+Wynosi $\val{p33.p.flat}$ procent.
+\end{ansblock}
+
+Prawie połowa przypadków. Zdrowy trening wygląda na zablokowany przez
+$\val{p33.watch}$ kroków mniej więcej tak często, jak moneta wypada orłem.
+
+Jedna liczba w tej arytmetyce została zmierzona, a jedna wybrana. Która jest
+która?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Rozrzut zmierzono; spadek wybrano.
+\end{ansblock}
+
+Warto powiedzieć dokładnie, jak daleko sięga każde z nich. Spadek o
+$\val{p33.drop}$ przez $\val{p33.drop.steps}$ kroków to wybór zrobiony tutaj,
+żeby mieć przez co dzielić. Rozrzut wyborem nie jest \dash{} to zmierzony przez
+Program~\ref{prog:P19} rozrzut na token, któremu Program~\ref{prog:P25}
+dokłada swoje $\sqrt{B}$.
+
+To, co mówi arytmetyka, jest \emph{stosunkiem}, i ten stosunek jest sednem:
+postęp na krok jest znacznie mniejszy niż szum na krok, a wszystko poniżej
+wynika z tego samego.
+\end{fr}
+
+\begin{fr}
+Odwróć więc pytanie, bo to jego jedyna użyteczna postać.
+
+Ile kroków musi minąć bez poprawy, zanim płaskość stanie się dowodem \dash{}
+zanim zdrowy trening pokazywałby ją rzadziej niż w $\val{p33.alpha}$
+przypadków?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{około $\val{p33.plateau.k}$ kroków}
+\begin{ansblock}
+Zestaw $k \times \val{p33.improve}$ z
+$\val{p33.z.alpha} \times \val{p33.sigma.step}\sqrt{2}$ i rozwiąż względem
+$k$.
+\end{ansblock}
+
+Trening w tym scenariuszu ma $\val{p33.drop.steps}$ kroków od początku do
+końca. \textbf{Płaski odcinek musiałby być mniej więcej trzy razy dłuższy niż
+cały trening, żeby cokolwiek znaczyć.}
+\end{fr}
+
+\transcript{p33-how-flat}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Strata jest płaska od godziny; coś jest nie tak.}} Przy tym
+stosunku postępu do szumu godzina płaskości jest oczekiwanym zachowaniem
+działającego treningu i żadne wpatrywanie się w krzywą tych dwóch nie
+rozdzieli.
+
+Błędem nie jest niecierpliwość. Błędem jest zadawanie pytania narzędziu, które
+nie może na nie odpowiedzieć \dash{} a lekarstwem nie jest dłuższe patrzenie,
+tylko inny pomiar: rzadsze, większe ewaluacje, gdzie Program~\ref{prog:P25}
+i jego $1/\sqrt{n}$ pracują dla ciebie, a nie przeciwko tobie.
+\end{trapbox}
+
+Ta liczba jest dość duża, żeby warto ją było zaatakować. Podaj dwa powody, dla
+których może być za duża.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wczesny trening, gdzie postęp na krok jest większy; oraz szum dwóch odczytów,
+który nie jest całkiem niezależny.
+\end{ansblock}
+
+Oba warto rozwinąć. Pierwszy: późny trening jest z konstrukcji trudnym
+przypadkiem. Wcześnie strata spada szybko, postęp na krok jest duży przy tym
+samym szumie, a plateau kilkuset kroków naprawdę jest informacją. Krzywa
+przestaje móc powiedzieć cokolwiek dokładnie wtedy, gdy trening stał się
+drogi.
+
+Drugi: arytmetyka zakłada, że szum dwóch odczytów jest niezależny. Nie całkiem
+\dash{} kolejne partie zachodzą na siebie w tym, co mierzą. To czyni rozrzut
+różnicy nieco mniejszym niż $\val{p33.sigma.step}\sqrt{2}$, a odpowiedź nieco
+mniejszą niż $\val{p33.plateau.k}$ \dash{} mniejszą, a nie innego rodzaju.
+\end{fr}
+
+% ============================================================
+\section{Skok}
+\label{sec:P33-spike}
+\index{trening!skok}
+
+\begin{fr}
+Drugi kształt. Strata jednego kroku leży cztery rozrzuty powyżej trendu, a
+wszystko po obu stronach jest zwyczajne.
+
+Zanim uznasz to za zdarzenie: trening ma $\val{p33.steps}$ kroków. Ilu takich
+kroków się spodziewałeś?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{około $\val{p33.spike.expected}$}
+Odchylenie o cztery rozrzuty ma prawdopodobieństwo mniej więcej trzy na sto
+tysięcy, a kroków jest $\val{p33.steps}$. Pomnóż.
+
+\textbf{Trzy z nich to oczekiwana liczba w czystym treningu.} Znalezienie
+jednego nie jest znalezieniem niczego.
+\end{fr}
+
+\begin{fr}
+Spotkałeś dokładnie tę arytmetykę wcześniej, jedną część temu i o modelach
+zamiast o krokach.
+
+Gdzie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Program~\ref{prog:P27}}
+Ten program zmierzył, co się dzieje, gdy czterdzieści modeli porównuje się na
+jednej tablicy wyników i zwycięzcę wybiera się po fakcie: największy z wielu
+losowań jest duży z konstrukcji, a próg trzeba skorygować o to, ile ich
+wzięto.
+
+Trening jest tym samym doświadczeniem z $\val{p33.steps}$ losowaniami zamiast
+czterdziestu. Korekta o to daje rozmiar, który skok musi osiągnąć, zanim
+stanie się zaskakujący:
+\[ z = \val{p33.spike.z} \]
+a skrypt, który to liczy, odtwarza zatwierdzoną liczbę
+Programu~\ref{prog:P27}, gdy w miejsce $\val{p33.steps}$ wstawić czterdzieści,
+więc te dwa są jednym rachunkiem, a nie dwoma podobnymi do siebie.
+
+Dwa skoki tego samego rozmiaru. Jeden zostaje wchłonięty i krzywa idzie dalej
+tam, gdzie była; drugi zostawia poziom wyżej. Który warto zbadać?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{drugi}
+\begin{aibox}
+Skok, \emph{po którym następuje powrót}, jest jako sygnał wart prawie nic, a
+skok bez powrotu jest wart bardzo dużo. Powrót jest informacją: odchylenie,
+które trening wchłonął, było losowaniem z ogona, a odchylenie zmieniające
+potem poziom było zdarzeniem.
+
+Ta sama logika wycenia alarmy. Próg ustawiony na czterech rozrzutach w
+treningu liczącym $\val{p33.steps}$ kroków budzi kogoś mniej więcej trzy razy
+na trening bez powodu, a zespół, który nauczył się go ignorować, nauczył się
+ignorować ten czwarty.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Za ogonem stoi też mechanizm, który dał ci już Program~\ref{prog:F06}. Skok
+\emph{straty} i skok \emph{gradientu} to różne obserwacje, a przycinanie
+działa na drugim.
+
+Program~\ref{prog:P21} zmierzył, ile przycina próg na czterokrotności typowego
+rozmiaru gradientu: jeden krok na $\val{p33.steps}$ w jego własnej próbie, co
+jest tą samą arytmetyką jeszcze raz. To, co robi przycinanie na połowie tego
+progu, nie jest siatką bezpieczeństwa \dash{} to inny algorytm, bo zmienia
+długość większości kroków, a nie kilku.
+\end{fr}
+
+% ============================================================
+\section{Podejrzanie gładki spadek}
+\label{sec:P33-smooth}
+\index{trening!wygładzanie}
+
+\begin{fr}
+Trzeci kształt i to ten, którego nikt nie podejrzewa, bo gładka krzywa wygląda
+na dobrą wiadomość.
+
+Sekcja 5 Programu~\ref{prog:P21} ma połowę tego, co robi wygładzanie:
+przesuwa każde zdarzenie później dokładnie o wybrany czas połowicznego zaniku,
+więc \emph{kiedy} coś się stało nie jest pytaniem, na które wygładzona krzywa
+umie odpowiedzieć. Jej pułapka mówi: czytaj surową krzywą dla \emph{kiedy}, a
+wygładzoną dla \emph{czy}.
+
+To jest ta druga połowa. Co wygładzanie robi z \emph{czy}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Zmniejsza rozrzut, o czynnik wybrany mimochodem.
+
+Średnia wykładnicza niezależnego szumu ma wariancję
+$\frac{1-\beta}{1+\beta}$ razy wariancja surowa \dash{} to suma szeregu
+geometrycznego, czyli własny obiekt Programu~\ref{prog:F04}. Widoczny rozrzut
+to więc
+\[ \sqrt{\frac{1-\beta}{1+\beta}} \]
+rozrzutu, który trening ma.
+\end{ansblock}
+\end{fr}
+
+\begin{fr}
+Program~\ref{prog:P21} ma własne $\beta = \val{p33.beta}$; wstaw je, a
+obraz pokazuje $\val{p33.smooth.pct}$ procent prawdziwego rozrzutu.
+
+Teraz domyślna wartość panelu. Co pokazuje $\beta = \val{p33.beta.dash}$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p33.smooth.dash}$ tego}
+Mniej więcej jedną dziesiątą. \textbf{Krzywa wygładzona przy
+$\val{p33.beta.dash}$ zaniża rozrzut treningu krok po kroku o czynnik
+$\val{p33.smooth.dash.times}$}, a ten czynnik jest własnością ustawienia, a
+nie treningu.
+
+Zauważ, od czego on \emph{nie} zależy. Nie od modelu, nie od rozmiaru partii,
+nie od tego, jak długo trening trwał, nie od wielkości zmniejszanego rozrzutu
+\dash{} tylko od $\beta$. Dwie krzywe wygładzone przy tym samym $\beta$
+pozostają więc porównywalne, jakkolwiek różne byłyby oba treningi, a dwie
+wygładzone przy różnym $\beta$ nie są porównywalne, jakkolwiek podobne byłyby
+treningi.
+
+Zatem: dwa treningi są narysowane obok siebie i jeden jest widocznie
+spokojniejszy. Co musisz wiedzieć, zanim powiesz cokolwiek?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{jak każdy z nich został wygładzony}
+\begin{trapbox}
+\textbf{\enquote{Ten trening jest dużo stabilniejszy niż poprzedni.}} Dwa
+treningi są porównywalne pod względem gładkości tylko wtedy, gdy wygładzono je
+identycznie, a stała wygładzania to jedyna liczba na panelu treningowym,
+której nikt nie zapisuje w raporcie.
+
+Gorzej, zwykle nie jest ona w ogóle wybierana: jest tym, na czym zostawiono
+suwak wykresu, a suwak nie jest pomiarem.
+\end{trapbox}
+
+Czy wygładzanie jest więc błędem?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{nie}
+Nic z powyższego nie jest argumentem przeciwko wygładzaniu i warto powiedzieć,
+do czego ono służy.
+
+Oko źle uśrednia zaszumiony ciąg, a dobrze śledzi linię, więc wygładzona
+krzywa jest właściwym narzędziem do pytania \emph{czy poziom się przesuwa}.
+Nie jest narzędziem do \emph{jak zaszumiony jest ten trening} ani do
+\emph{kiedy to się stało}, a na oba odpowiada pewnie i źle.
+
+Odczytaj ustawienie z wykresu, zanim odczytasz wykres.
+\end{fr}
+
+\mermaidfig{p33-smooth-hides}{%
+  Dwie rzeczy, które robi wygładzanie, a tylko jedna z nich jest gdziekolwiek
+  zapisana. Opóźnienie to pomiar Programu P21; zmniejszenie rozrzutu to ten
+  pomiar, i oba ustawia ta sama liczba.}{%
+  wygładzanie, opóźnienie i rozrzut}
+
+% ============================================================
+\section{Jedyny kształt, który jest diagnozą}
+\label{sec:P33-diverge}
+\index{trening!rozbieżność}
+
+\begin{fr}
+Trzy kształty do tej pory i żaden nie przetrwał pytania. Czwarty przetrwa.
+
+Strata rośnie i rośnie dalej. Który program tej książki mówi już dokładnie,
+kiedy to się dzieje, i dlaczego nie potrzebuje żadnej statystyki?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Program~\ref{prog:P17}}
+\begin{ansblock}
+W modelu kwadratowym każdy kierunek własny jest mnożony przez
+$1 - \eta\lambda$ co krok, więc spacer jest ograniczony dokładnie wtedy, gdy
+$\lvert 1 - \eta\lambda \rvert < 1$ we wszystkich kierunkach naraz. Powyżej
+$\eta = \val{p33.eta.bound}$ najbardziej stromy kierunek ma czynnik większy
+niż jeden, a czynnik większy niż jeden stosowany co krok nie jest szumem.
+\end{ansblock}
+
+Program~\ref{prog:P17} ma własny pokazowy rozmiar kroku
+$\val{p33.eta.over}$; przy nim czynnik wynosi $\val{p33.diverge.factor}$, a
+odległość od minimum rośnie o tyle co krok na zawsze.
+
+Cztery kształty zatem. Jak się dzielą?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{dwa na dwa, i nie tak, jak sugeruje panel}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Kształt} & \textbf{Czym jest} \\
+\midrule
+plateau & Prawie nigdy dowodem w skali, w jakiej obserwuje się trening. \\
+skok & Oczekiwany, w liczbie dyktowanej przez długość treningu. \\
+gładkość & Twierdzenie o wygładzaniu tak samo jak o treningu. \\
+rozbieżność & Dowód, z progiem będącym własnością powierzchni. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Te trzy, które są czytane bez przerwy, mówią najmniej, a ten, który mówi
+najwięcej, jest tym, którego nikt nie potrzebuje wykresu, żeby zauważyć.
+
+Jeśli krzywa jest kiepskim narzędziem, jakie jest lekarstwo?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{lepszy pomiar, a nie lepszy wykres}
+\begin{aibox}
+Krzywa jest kiepskim narzędziem, bo jest jedną zaszumioną liczbą na krok, więc
+lekarstwem jest lepszy pomiar, a nie lepszy wykres, a
+Program~\ref{prog:P27} daje obie jego połowy \dash{} ewaluuj na zbiorze
+odłożonym, raportuj przedział zamiast punktu i paruj porównanie, żeby szum się
+skrócił.
+
+Ewaluacja co tysiąc kroków na ustalonym zbiorze odpowiada na pytania, na które
+krzywa straty nie odpowie w żadnej rozdzielczości.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Druga krzywa: prawo skalowania}
+\label{sec:P33-scaling}
+\index{prawo skalowania}
+
+\begin{fr}
+Drugi wykres w każdym opisie treningu wcale nie jest krzywą straty. To garść
+skończonych treningów na osiach log-log z prostą przez nie i strzałką
+wskazującą w prawo.
+
+Program~\ref{prog:F03} dał ci maszynerię: prawo potęgowe $y = ax^{b}$ jest
+prostą w $\ln x$ i $\ln y$, a nachylenie prostej jest wykładnikiem. Czego
+celowo nie zrobił, to nie dopasował żadnego. Ta sekcja dopasowuje, a potem
+pyta, ile takie dopasowanie jest warte.
+\end{fr}
+
+\begin{fr}
+Oto doświadczenie, a wszystko w nim jest znane, bo ta książka to wybrała.
+Prawdą jest
+\[ L(N) = \val{p33.fit.linf} + a N^{-\val{p33.fit.alpha}} \]
+czyli kształt używany przez samą literaturę: nieredukowalna strata, której
+żadna skala nie usuwa, plus część, która się skaluje.
+
+Bierze się z tego siedem punktów, równo rozłożonych na
+$\val{p33.fit.decades}$ dekadach od $\val{p33.fit.lo}$ do
+$\val{p33.fit.hi}$, a strata biegnie od $\val{p33.fit.loss.lo}$ w dół do
+$\val{p33.fit.loss.hi}$. Do nich dopasowuje się \emph{czyste} prawo potęgowe
+metodą najmniejszych kwadratów w $\ln N$ i $\ln L$, czyli to, co dopasowują
+wszyscy.
+\end{fr}
+
+\begin{fr}
+Pierwsze pytanie i to na nie używa się tego wykresu.
+
+Prawdziwy wykładnik przy części redukowalnej to $\val{p33.fit.alpha}$. Jaki
+wykładnik raportuje dopasowana prosta?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p33.fit.b}$}
+Nie blisko i nie z winy dopasowania. Prosta jest najlepszą prostą przez tych
+siedem punktów, a tych siedem punktów nie leży na prostej \dash{} leżą na
+krzywej wyginanej przez podłogę. Dopasowany wykładnik jest własnością
+\emph{zakresu} i wyszedłby inaczej na innym.
+
+\textbf{Liczba odczytana z wykresu linijką nie jest więc wykładnikiem w tej
+zależności.} To średnie nachylenie na zmierzonych dekadach.
+\end{fr}
+
+\begin{fr}
+Drugie pytanie. Skoro tak, jak bardzo dopasowana prosta mija te siedem
+punktów, do których ją dopasowano?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{najwyżej o $\val{p33.fit.resid}$ procent}
+Co jest niewidoczne. Przy szerokości narysowanej linii na
+$\val{p33.fit.decades}$ dekadach pół procent nie jest rozbieżnością, którą
+czytelnik zobaczy, i żadne wpatrywanie się w wykres nie zasugeruje, że
+zależność jest czymkolwiek innym niż prawem potęgowym.
+
+\textbf{Dopasowanie znakomite wszędzie tam, gdzie je sprawdzono, zwróciło
+właśnie wykładnik zły prawie trzykrotnie.}
+\end{fr}
+
+\begin{fr}
+Trzecie pytanie i to jego dotyczy strzałka na wykresie.
+
+Ekstrapoluj dopasowaną prostą $\val{p33.fit.decades}$ dekady za jej ostatni
+punkt, do $N = 10^{\val{p33.out.dec}}$. Prawda tam wynosi
+$\val{p33.out.truth}$. Co przewiduje dopasowanie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p33.out.fitted}$}
+Za mało o $\val{p33.out.err}$ procent \dash{} przy reszcie wewnątrz zakresu
+wynoszącej $\val{p33.fit.resid}$ procent.
+
+A błąd nie jest ustalonym rozmiarem, który dałoby się podać jako margines.
+Rośnie z każdą dekadą i rośnie bez ograniczenia, bo dopasowane prawo potęgowe
+spada do zera, a prawda nie.
+
+Prawda ma podłogę, a dopasowana prosta nie. Co to każe dopasowaniu przewidywać
+dostatecznie daleko?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{stratę poniżej podłogi}
+I jest to wniosek, który można rozwiązać zamiast się o niego spierać.
+
+Dopasowana prosta osiąga nieredukowalną stratę $\val{p33.fit.linf}$ przy
+$N = 10^{\val{p33.absurd.dec}}$, czyli $\val{p33.absurd.past}$ dekady za
+ostatnim zmierzonym punktem. Dalej przewiduje stratę \emph{poniżej} podłogi
+\dash{} odpowiedź nie tylko niedokładną, ale niemożliwą, wyprodukowaną przez
+dopasowanie o reszcie $\val{p33.fit.resid}$ procent.
+\end{fr}
+
+\mermaidfig{p33-inside-outside}{%
+  Jedna prosta, dopasowana na trzech dekadach, i dwa różne twierdzenia, które
+  ludzie z nią wypowiadają. W zakresie mierzona; poza nim zgadywana.}{%
+  dopasowanie w zakresie i poza nim}
+
+\begin{fr}
+Zostaje ostatnie pytanie i o nie prosi kontrakt: dopasowanie raportuje własną
+niepewność. Czego ta niepewność dotyczy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Reszt \dash{} i niczego więcej.
+
+Błąd standardowy nachylenia najmniejszych kwadratów jest zbudowany z tego, jak
+daleko punkty mijają prostą. Te punkty mijają ją prawie o nic, więc
+raportowany błąd standardowy wynosi $\val{p33.fit.se}$, a dwa takie
+przeniesione przez $\val{p33.fit.decades}$ dekady dają pasmo od
+$\val{p33.fit.band.lo}$ do $\val{p33.fit.band.hi}$.
+\end{ansblock}
+
+Prawda tam wynosi $\val{p33.out.truth}$, czyli leży poza tym pasmem.
+\textbf{Dopasowanie jest pewne i błędne, a pewne jest dokładnie dlatego, że
+jest błędne}: dane leżą na gładkiej krzywej, więc reszty są maleńkie, więc
+raportowana niepewność jest maleńka.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Prawo skalowania mówi, że dojdziemy do tej straty przy tym
+budżecie.}} Dopasowana niepewność dotyczy szumu w pomiarach. Nie mówi nic o
+tym, czy postać funkcyjna jest właściwa, a ekstrapolacja zależy wyłącznie od
+postaci funkcyjnej.
+
+Uczciwa forma twierdzenia nazywa swój zakres: \emph{w zmierzonym przedziale
+strata spadała jak prawo potęgowe z tym wykładnikiem.} Wszystko na prawo od
+ostatniego punktu jest założeniem o kształcie, a wykres nie zawiera o nim
+żadnego dowodu \dash{} i właśnie dlatego rysuje się je z przedłużoną linią i
+zaznaczonymi danymi.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Istnieje praktyczna postać tego, która nic nie kosztuje. Dopasuj prawo dwa
+razy \dash{} raz na wszystkich punktach, raz z odłożonym największym
+treningiem \dash{} i porównaj, co to drugie przewiduje dla treningu, który już
+masz.
+
+To dyscyplina Programu~\ref{prog:P27} zastosowana do dopasowania, a nie do
+tablicy wyników, i mierzy wielkość, która naprawdę się liczy: nie to, jak
+dobrze prosta opisuje punkty, tylko jak dobrze prosta zbudowana z małych
+treningów przewidziała ten duży.
+\end{aibox}
+\end{fr}
+
+% ============================================================
+\section{Czego ten program nie sprawdził}
+\label{sec:P33-unchecked}
+\index{pomiar!czego nie zmierzono}
+
+\begin{fr}
+Wszystko w sekcjach od 3 do 6 opiera się na jednym założeniu i warto
+powiedzieć, na którym, bo reszta arytmetyki jest dokładna.
+
+Nazwij je.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Że odchylenie straty krok po kroku ma rozkład normalny o rozrzucie, który się
+nie zmienia.
+\end{ansblock}
+
+Pierwsza połowa to centralne twierdzenie graniczne Programu~\ref{prog:P25}
+robiące swoje \dash{} średnia z partii wielu przykładów jest bliska normalnej
+w środku, a arytmetyka plateau używa środka. Ale Program~\ref{prog:P25}
+zmierzył też, gdzie to przestaje być prawdą: przy trzech rozrzutach rozkład
+Gaussa już zawyża ogon, a arytmetyka skoku używa \emph{ogona}.
+
+Wynik o plateau stoi więc na twardszym gruncie niż wynik o skoku i dlatego są
+podane w tej kolejności.
+
+Nie ma też obrony w kierunku błędu, bo ten kierunek nie jest jeden.
+Program~\ref{prog:P25} zmierzył stosunek ogona rozkładu Gaussa do prawdy przy
+jednym, trzech i pięciu rozrzutach: $\val{p25.tail.ratio1}$,
+$\val{p25.tail.ratio3}$ i $\val{p25.tail.ratio5}$. Blisko środka
+\emph{zaniża}, potem przecina prawdę i ucieka. Zdanie \enquote{to
+przybliżenie jest ostrożne} nie jest więc czymś, co ktokolwiek może o nim
+powiedzieć bez podania odległości.
+
+A to, co by tę sprawę rozstrzygnęło, nic nie kosztuje i dlatego warto to
+nazwać: zalogowane straty samego treningu \emph{są} próbką. Dopasuj trend,
+weź reszty i zapytaj, jak często przekraczają trzy i cztery rozrzuty, w
+zestawieniu z tym, co przewiduje rozkład normalny. Nikt tego nie robi, dane
+już leżą na dysku, a odpowiedź zamieniłaby każdą liczbę z
+\S\ref{sec:P33-spike} z modelu w pomiar.
+
+To była pierwsza połowa założenia. Która połowa jest słabsza?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{druga}
+Szum prawdziwego treningu nie jest stacjonarny: rozrzut zmienia się wraz z
+modelem, kolejność danych nie jest losowa w sposób, który zakłada arytmetyka,
+a skok jest często własnością konkretnej partii, a nie losowaniem z ustalonego
+rozkładu.
+
+\begin{warning}
+\textbf{Ta książka nie zmierzyła nic z tego i potrzebowałaby do tego
+prawdziwego treningu.} To, co ustalają powyższe sekcje, jest \emph{podłogą}:
+nawet przy założeniach łaskawych dla krzywej plateau jest nieinformatywne
+przez dziesiątki tysięcy kroków, a długi trening zawiera duże odchylenia z
+konstrukcji. Prawdziwy szum, cięższy w ogonach i dryfujący, pogarsza oba, a
+nie poprawia.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+I to jest uczciwe stanowisko Części IX, osiągnięte już trzy razy.
+Program~\ref{prog:P32} podzielił własne zaległe twierdzenie tak samo: połowa o
+złożeniu nie potrzebowała wytrenowanego modelu, a połowa o treningu
+potrzebowała, więc pierwszą wyprowadzono, a drugą podano jako zaległą.
+
+Zadaj ten podział wszystkiemu w tej książce, co wygląda, jakby potrzebowało
+modelu. Zaskakująco dużo z tego okazuje się twierdzeniem o kształtach, o
+rozkładzie normalnym albo o prostej najmniejszych kwadratów \dash{} a ta
+część, która naprawdę potrzebuje treningu, jest warta nazwania zamiast
+osłabiania całego twierdzenia.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--4}{Krok treningu to sześć elementów i ta książka ma każdy z nich:
+  strata (Program~\ref{prog:P26}), jej gradient
+  (Program~\ref{prog:P18}), aktualizacja (Program~\ref{prog:P20}),
+  arytmetyka (Program~\ref{prog:P01}), rozmiar kroku
+  (Program~\ref{prog:P17}) i próbka (Program~\ref{prog:P21}).}
+\sumitem{5--6}{Najlepszy rozmiar kroku na misie Programu~\ref{prog:P17} to
+  $\val{p33.eta.best}$, a zabójczy $\val{p33.eta.bound}$: pasmo szerokie na
+  $\val{p33.eta.margin}$ procent.}
+\sumitem{7--8}{Średnia z partii straty o rozrzucie na przykład
+  $\val{p33.sigma.token}$ po $\val{p33.batch}$ przykładach ma rozrzut
+  $\val{p33.sigma.step}$.}
+\sumitem{9--11}{Z sześciu elementów $\val{p33.loud}$ zgłaszają coś, a
+  $\val{p33.silent}$ nie, bo każdy z tych czterech jest poprawnym
+  obliczeniem złej wielkości.}
+\sumitem{12--14}{Te cztery ciche są wykrywalne tylko z zewnątrz, a narzędziem
+  jest krzywa straty zbudowana z zaszumionych liczb.}
+\sumitem{15--17}{Zdrowy trening, którego strata spada o $\val{p33.improve}$ na
+  krok, nie pokazuje poprawy przez $\val{p33.watch}$ kroków w
+  $\val{p33.p.flat}$ procentach przypadków.}
+\sumitem{18--21}{Płaski odcinek musi trwać około $\val{p33.plateau.k}$ kroków,
+  zanim zdrowy trening produkowałby go rzadziej niż w $\val{p33.alpha}$
+  przypadków.}
+\sumitem{22--23}{Trening liczący $\val{p33.steps}$ kroków zawiera około
+  $\val{p33.spike.expected}$ odchyleń o cztery rozrzuty niezależnie od tego,
+  co jeszcze jest o nim prawdą.}
+\sumitem{24--27}{Po korekcie o długość treningu skok musi przekroczyć
+  $\val{p33.spike.z}$ rozrzutu, żeby zaskakiwał \dash{} arytmetyka
+  Programu~\ref{prog:P27} z krokami w miejsce modeli.}
+\sumitem{28--33}{Średnia wykładnicza pokazuje
+  $\sqrt{(1-\beta)/(1+\beta)}$ prawdziwego rozrzutu:
+  $\val{p33.smooth.pct}$ procent przy $\beta = \val{p33.beta}$ i czynnik
+  $\val{p33.smooth.dash.times}$ przy $\val{p33.beta.dash}$.}
+\sumitem{34--37}{Rozbieżność to jedyny kształt niepotrzebujący statystyki:
+  powyżej $\eta = \val{p33.eta.bound}$ czynnik większy niż jeden jest
+  stosowany co krok.}
+\sumitem{40--43}{Czyste prawo potęgowe dopasowane do prawdy postaci
+  podłoga-plus-prawo-potęgowe mija własne siedem punktów o
+  $\val{p33.fit.resid}$ procent i zwraca wykładnik $\val{p33.fit.b}$, gdzie
+  prawda to $\val{p33.fit.alpha}$.}
+\sumitem{44--47}{To samo dopasowanie jest za małe o $\val{p33.out.err}$
+  procent $\val{p33.fit.decades}$ dekady dalej i przewiduje stratę poniżej
+  nieredukowalnej podłogi przy $10^{\val{p33.absurd.dec}}$.}
+\sumitem{48--50}{Jego własna raportowana niepewność jest zbudowana z reszt,
+  więc jest mała dokładnie wtedy, gdy postać funkcyjna jest zła, a prawda leży
+  poza jego pasmem.}
+\sumitem{51--54}{Nic z tego nie zostało sprawdzone na szumie prawdziwego
+  treningu, który ma cięższe ogony i dryfuje; powyższe wyniki są podłogą, a
+  nie oszacowaniem.}
+\end{summarybox}
+
+\begin{testexercises}
+\item Strata treningu spada o $\num{2e-5}$ na krok, a obserwowana strata ma
+  rozrzut $\num{0.2}$. Mniej więcej ile kroków bez poprawy produkowałby zdrowy
+  trening pięć razy na sto?
+  \answerto{Około $\num{23000}$. Próg to
+  $\val{p33.z.alpha} \times \num{0.2}\sqrt{2}$ podzielone przez $\num{2e-5}$.
+  Zauważ, że podwojenie postępu na krok zmniejszyło go o połowę, a
+  zmniejszenie rozrzutu o połowę zrobiłoby to samo \dash{} odpowiedź zależy od
+  stosunku i od niczego więcej.}
+\item Zespół podnosi rozmiar partii z $\val{p33.batch}$ do $\num{1024}$ i
+  raportuje, że krzywa straty stała się dużo czystsza. O jaki czynnik spadł
+  rozrzut i czy trening się poprawił?
+  \answerto{O $2$, bo rozrzut to $\sigma/\sqrt{B}$, a partia wzrosła
+  czterokrotnie. Trening niekoniecznie poprawił się w ogóle: czystsza krzywa
+  przy większej partii to dokładnie to, co przewiduje tempo
+  Programu~\ref{prog:P25}, cokolwiek model robi.}
+\item Trening liczący $\num{200000}$ kroków jest monitorowany alarmem przy
+  trzech rozrzutach powyżej trendu. Ilu alarmów należy się spodziewać w
+  czystym treningu?
+  \answerto{Około $\num{270}$. Odchylenie o trzy rozrzuty ma
+  prawdopodobieństwo mniej więcej $\num{0.00135}$, a $\num{200000}$ kroków je
+  mnoży. Alarm odzywający się setki razy na trening nie jest alarmem.}
+\item Rysowane są dwa treningi, jeden wygładzony przy $\beta = \num{0.9}$, a
+  drugi przy $\beta = \num{0.99}$. Ich narysowane krzywe mają widoczne
+  rozrzuty w stosunku $3$ do $1$. Jaki jest stosunek rozrzutów leżących pod
+  spodem treningów?
+  \answerto{Policz dwa czynniki zmniejszające i podziel je:
+  \[ \sqrt{\num{0.1}/\num{1.9}} = \num{0.229},
+     \qquad \sqrt{\num{0.01}/\num{1.99}} = \num{0.0709} \]
+  czyli stosunek
+  $\num{3.24}$. Narysowany stosunek $3$ jest więc bardzo bliski temu, co
+  dałyby identyczne treningi, a dowodów na jakąkolwiek różnicę między nimi
+  jest w przybliżeniu tyle co nic.}
+\item Prawo potęgowe dopasowane na dwóch dekadach ma resztę jednego procenta.
+  Co to wiąże w jego przewidywaniu jedną dekadę dalej?
+  \answerto{Zupełnie nic. Reszta wiąże dopasowanie wewnątrz zakresu, na
+  którym je dopasowano. Poza nim błąd zależy od tego, czy postać funkcyjna
+  jest właściwa, a reszta nie niesie o tym żadnej informacji \dash{} co
+  pokazuje własne dopasowanie tego programu przy
+  $\val{p33.fit.resid}$ procent.}
+\end{testexercises}
+
+\canyou
+
+\begin{furtherproblems}
+\item Pokaż, że jeśli obserwowana strata w każdym kroku jest prawdą plus
+  niezależny szum o rozrzucie $\sigma$, to różnica między odczytami odległymi
+  o $k$ kroków ma rozrzut $\sigma\sqrt{2}$ niezależnie od $k$.
+  \answerto{Oba składniki szumu są niezależne, więc ich wariancje się dodają:
+  $\sigma^{2} + \sigma^{2}$. To $k$ wchodzi w \emph{prawdziwy} spadek, a nie w
+  szum, i właśnie dlatego próg plateau jest liniowy w $k$.}
+\item Zespół akumuluje cztery mikropartie o $1000$, $10$, $500$ i $490$
+  prawdziwych tokenach, z których każda podzieliła już przez własną liczbę.
+  Ich średnie straty to $2$, $8$, $3$ i $3$. Czy zakumulowany gradient jest
+  tym z dużej partii?
+  \answerto{Nie. Średnia ważona tokenami daje $\num{2.475}$; zakumulowana
+  uśrednia te cztery i daje $4$. Błąd jest cichy, jest w gradiencie, a nie w
+  raporcie, i jest pułapką Programu~\ref{prog:P21} z jedną mikropartią
+  więcej.}
+\item Średnia wykładnicza jest zastosowana dwa razy, przy tym samym $\beta$.
+  O jaki czynnik zmniejszony jest rozrzut podwójnie wygładzonej krzywej?
+  \answerto{Mniej niż o kwadrat pojedynczego czynnika, bo ciąg raz wygładzony
+  nie jest już niezależny krok po kroku. Wart zabrania jest kierunek: każde
+  przejście czyni obraz spokojniejszym, a trening ani trochę innym, i dwa
+  przejścia nie są dwa razy uczciwsze.}
+\item Dopasowanie z \S\ref{sec:P33-scaling} osiąga nieredukowalną stratę przy
+  $10^{\val{p33.absurd.dec}}$. Rozwiąż to równanie względem tego rozmiaru z
+  dopasowanej prostej.
+  \answerto{Przyrównaj dopasowane $\exp(c) N^{-b}$ do
+  $\val{p33.fit.linf}$ i weź logarytmy:
+  $\ln N = (c - \ln \val{p33.fit.linf})/b$. Arytmetyka jest przez cały czas
+  Programu~\ref{prog:F03} i to jest sedno \dash{} absurd widać przy pomocy
+  niczego więcej niż dwóch praw logarytmów.}
+\item Kolega proponuje wykrywanie plateau przez wcześniejsze mocne wygładzenie
+  krzywej, na tej podstawie, że wygładzona krzywa jest mniej zaszumiona. Co
+  jest z tym nie tak?
+  \answerto{Wygładzona krzywa jest mniej zaszumiona, a oszacowanie, z którego
+  jest zbudowana, nie. Wygładzanie zmniejsza \emph{widoczny} rozrzut o znany
+  czynnik, nie dodając żadnej informacji, więc czyni plateau łatwiejszym do
+  zobaczenia i ani trochę łatwiejszym do uwierzenia \dash{} a moment, w którym
+  je zobaczysz, opóźnia o czas połowicznego zaniku. Zmienić trzeba narzędzie,
+  a nie wykres.}
+\end{furtherproblems}

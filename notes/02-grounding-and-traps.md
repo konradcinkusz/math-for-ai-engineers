@@ -3148,3 +3148,70 @@ and unusable are compatible, which is trap 253 arriving from the other end.
      this list, which quoted the same figure with the same unit and was
      corrected with it**. The catalogue has no general entry for the binary
      prefixes; this is it. Owner: P32 §7.
+
+### Anatomy of a training run, written (P33)
+
+Eight, and the shape they share is worth naming before them: **every one is a
+question asked of the loss curve that the loss curve cannot answer**, and the
+reason is always the same — one noisy number per step against a quantity that
+moves slowly. The book's own instrument for that is P27's, one part earlier
+and about models rather than steps.
+
+313. *“A training step is a lot of machinery, so most of it is framework
+     internals I could not reason about anyway.”*
+     It is six things, and this book owns every one: the loss [P26], its
+     gradient [P18], the update [P20], the arithmetic [P01], the step size
+     [P17] and the sample [P21]. Part IX's contract is that assembling them
+     needs no new mathematics, and P33 is where that is easiest to check
+     because a step is short enough to write out. Owner: P33 §1.
+314. *“If any of the six were wrong the framework would raise something.”*
+     It raises on two of the six, and promptly on one. The other four are
+     each a **correct computation of the wrong quantity** — a mean of means
+     is a mean, a rounded sum is a sum, a rescaled step is a step — so there
+     is no invalid operation anywhere in them for anything to catch. That is
+     the whole reason the loss curve is the instrument. Owner: P33 §2.
+315. *“The loss has been flat for hundreds of steps; the run is stuck.”*
+     At a realistic ratio of progress to noise a **healthy** run shows no
+     improvement over 500 steps about half the time, and a flat stretch has
+     to last of the order of thirty thousand steps before a healthy run would
+     produce it less than five per cent of the time — which is longer than
+     the run. The mistake is not impatience; it is asking a question of an
+     instrument that cannot answer it. Owner: P33 §3.
+316. *“There was a spike at step 40 000; something happened.”*
+     A long run contains large single-step deviations **by construction**: a
+     four-spread step has a probability of about three in a hundred thousand
+     and a hundred-thousand-step run has about three of them. This is P27's
+     multiple-comparison arithmetic with steps in place of models, and the
+     corrected threshold is nearer five spreads. The information is in
+     whether the level recovers, not in the spike. Owner: P33 §4.
+317. *“This run is much smoother than the last one, so it is more stable.”*
+     An exponential moving average shows `sqrt((1-beta)/(1+beta))` of the real
+     spread — about a fifth at `beta = 0.9` and a tenth at `0.98`. Two runs
+     are comparable on smoothness only if they were smoothed identically, and
+     the smoothing constant is the one number on a training dashboard nobody
+     records. It is usually not chosen at all: it is where the slider was
+     left. P21 owns the other half, the **lag**; this is the spread.
+     Owner: P33 §5.
+318. *“Smooth the curve first and the plateau will be easier to detect.”*
+     Easier to see and no easier to believe. Smoothing reduces the *visible*
+     spread by a known factor while adding no information, and it delays the
+     moment you see anything by a half-life. The instrument has to change,
+     not the plot. Owner: P33 §5, and the further problem that closes it.
+319. *“The exponent on the scaling-law plot is the exponent in the
+     relationship.”*
+     It is the average slope over the decades that were measured. Fit a pure
+     power law to a truth of the form `floor + a N^-alpha` — which is the
+     form the literature itself uses — and the fitted exponent comes out
+     wrong by nearly a factor of three while missing its own seven points by
+     under half a per cent. A fit can be excellent everywhere it was tested
+     and be estimating the wrong quantity. Owner: P33 §7.
+320. *“The fit's residual is tiny and it reports a small standard error, so
+     the extrapolation is sound.”*
+     Both numbers are about the **residuals** and neither is about the shape.
+     A least-squares standard error is built from how far the points miss the
+     line, so a fit to data on a smooth curve is confident *precisely
+     because* it is wrong — and in P33's own worked case the truth three
+     decades out lies outside the fit's two-standard-error band. Far enough
+     out the fitted power law predicts a loss **below the irreducible floor**,
+     which is not merely inaccurate but impossible. The honest form of a
+     scaling claim names its span. Owner: P33 §7.

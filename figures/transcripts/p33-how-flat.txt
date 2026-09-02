@@ -1,0 +1,10 @@
+>>> from math import erf, sqrt
+>>> def phi(z): return 0.5 * (1 + erf(z / sqrt(2)))
+...
+>>> sigma = 2 / sqrt(256)   # a batch mean of a spread-2 loss
+>>> improve = 1e-5          # the true fall, per step
+>>> gap = sigma * sqrt(2)
+>>> round(1 - phi(500 * improve / gap), 3)
+0.489
+>>> round(1 - phi(29000 * improve / gap), 3)
+0.05
