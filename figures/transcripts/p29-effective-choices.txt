@@ -1,0 +1,6 @@
+>>> from math import exp, log
+>>> def eff(ps):    # effective number of equally likely choices
+...     h = -sum(p * log(p) for p in ps if p)
+...     return round(exp(h), 2)
+>>> eff([0.25] * 4), eff([0.97, 0.01, 0.01, 0.01])
+(4.0, 1.18)
