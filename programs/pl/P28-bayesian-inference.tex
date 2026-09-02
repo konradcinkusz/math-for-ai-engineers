@@ -1,27 +1,960 @@
 %% P28 --- Wnioskowanie bayesowskie
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Blizniak: programs/en/P28-bayesian-inference.tex. Ramka w ramke, makro w
+%% makro, liczba w liczbe; tools/parity.py porownuje oba pliki. Kazda liczba
+%% pochodzi z code/p28_bayesian_inference.py.
+%%
+%% REGULY TLUMACZA, ktore ten plik lamal najczesciej (C4, C8, C12 czytaja
+%% KOLEJNOSC):
+%%   * cyfra zostaje cyfra, a slowo zostaje slowem -- P25 zlapal oba kierunki;
+%%   * odwolanie prowadzi zdanie, nigdy nie stoi za swoja matematyka:
+%%     "Program~\ref{prog:P27} podaje $x$", nie "$x$ z Programu~\ref{prog:P27}";
+%%   * w matematyce \text{} dla przetlumaczonego slowa, nigdy \mathrm{};
+%%   * skrot wlasny angielskiego ("P27" bez \ref) tez jest tokenem.
 
-\program{Wnioskowanie bayesowskie}
+\program[Wnioskowanie bayesowskie]{Wnioskowanie bayesowskie}
 \label{prog:P28}
+\index{wnioskowanie!bayesowskie}
+\index{rozkład a posteriori}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--5}{nałożyć rozkład na parametr i powiedzieć, co odrzuca estymator
+  punktowy}
+\outcome{6--11}{zaktualizować prior Beta zliczeniami i powiedzieć, ile prior
+  jest wart w obserwacjach}
+\outcome{12--18}{odczytać przedział wiarygodności i powiedzieć, czym różni się
+  od przedziału ufności, gdy oba się zgadzają}
+\outcome{19--26}{policzyć prawdopodobieństwo, że jeden model jest lepszy od
+  drugiego}
+\outcome{27--30}{kierować ruch przy niepewności i powiedzieć, co zakłada stała
+  stopa eksploracji}
+\outcome{31--37}{sprawdzić deklarowane prawdopodobieństwo modelu sędziego i
+  wycenić je, gdy jest błędne}
+\end{outcomes}
 
-Argument: put a distribution on the parameter, condition on the data, report
-the posterior. Conjugacy makes the arithmetic closed-form in the one case
-that matters most. Payoff: Beta--Binomial worked fully, which covers
-\enquote{what is this model's success rate and how sure am I}; a credible
-interval and a confidence interval contrasted, because they answer different
-questions and are routinely conflated; Bayesian A/B testing on evaluation
-results, giving \enquote{the probability that B is better} which is the
-quantity people wanted from a p-value; Thompson sampling as model routing
-under uncertainty; calibration of a judge model's stated probability, and
-what it costs downstream when the judge is confidently wrong.
+\begin{quiz}
+\item Program~\ref{prog:P26} znajduje parametr maksymalizujący rozkład
+  a posteriori i podaje go. Wymień coś, co zostaje odrzucone. \teachesat{2--3}
+  \answerto{Wszystko poza położeniem: jak pewny jest estymator, czy maksimum
+  było ostre czy prawie płaskie, oraz każdy sposób przeniesienia niepewności
+  do dalszych obliczeń.}
+\item Zaczynasz od prioru $\mathrm{Beta}(a, b)$ i obserwujesz $k$ sukcesów
+  w $n$ próbach. Jaki jest rozkład a posteriori? \teachesat{6--7}
+  \answerto{$\mathrm{Beta}(a + k,\ b + n - k)$. Aktualizacja dodaje zliczenia
+  i na tym polega tutaj sprzężoność.}
+\item W jakich jednostkach mierzy się siłę prioru? \teachesat{7--8}
+  \answerto{W obserwacjach. Prior $\mathrm{Beta}(a, b)$ wart jest dokładnie
+  $a + b$ z nich, ponieważ średnia a posteriori to średnia ważona średniej
+  prioru i średniej z danych z wagami $a+b$ oraz $n$.}
+\item Przedział wiarygodności i przedział ufności na tych samych danych
+  wychodzą prawie identycznie. Czy to znaczy, że mówią to samo?
+  \teachesat{14--15}
+  \answerto{Nie. Jeden mówi, że parametr leży w przedziale z
+  prawdopodobieństwem $95$ procent przy tych danych; drugi mówi, że procedura
+  trafia w prawdę w $95$ procentach przypadków. Zgodność jest własnością tego
+  przypadku.}
+\item Model sędzia deklaruje $\val{p28.judge.says.pct}$ procent pewności i ma
+  rację w $\val{p28.judge.means.pct}$ procentach przypadków. Co zrobił z
+  twoimi szansami? \teachesat{31--32}
+  \answerto{Przemnożył je przez około $\val{p28.judge.factor}$ razy za dużo,
+  przy każdym osądzie \dash{} a Program~\ref{prog:P23} zapisuje twierdzenie
+  Bayesa w postaci szans jako mnożenie, więc błąd się kumuluje.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 50 ramek.
-}
+% ============================================================
+\section{Rozkład na parametrze}
+\label{sec:P28-distribution}
+\index{rozkład a posteriori!jako rozkład}
+\index{prior}
+
+\begin{fr}
+Program~\ref{prog:P23} nałożył rozkład a posteriori na dwie hipotezy
+\dash{} maszyna jest wadliwa albo nie \dash{} i zapisał twierdzenie Bayesa w
+postaci, która czyni gromadzenie dowodów mnożeniem:
+
+\[ \underbrace{\frac{\Prob(A \mid B)}{\Prob(\bar{A} \mid B)}}_{\text{szanse a posteriori}}
+   \;=\;
+   \underbrace{\frac{\Prob(A)}{\Prob(\bar{A})}}_{\text{szanse a priori}}
+   \times
+   \underbrace{\frac{\Prob(B \mid A)}{\Prob(B \mid \bar{A})}}_{\text{iloraz wiarygodności}} \]
+
+Nic w tym twierdzeniu nie wymaga, by hipotezy były dwie.
+Program~\ref{prog:P27} zakończył, przekazując dalej pytanie, na które nie
+umiał odpowiedzieć \dash{} prawdopodobieństwo, że model B jest lepszy od
+modelu A \dash{} a przeszkodą było to, że przedmiotem niepewności nie jest
+para hipotez, lecz \emph{współczynnik} gdzieś w $\intcc{0}{1}$.
+
+Co zatem musi się zmienić?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Nałożyć rozkład na współczynnik, zamiast prawdopodobieństwa na każdą z dwóch
+hipotez.
+\end{ansblock}
+
+To cała idea, a wszystko inne w tym programie jest arytmetyką. Twierdzenie
+brzmi tak samo:
+
+\[ \underbrace{p(\theta \mid \text{dane})}_{\text{a posteriori}}
+   \;\propto\;
+   \underbrace{p(\theta)}_{\text{prior}}
+   \times
+   \underbrace{\Prob(\text{dane} \mid \theta)}_{\text{wiarygodność}} \]
+
+z \emph{gęstością} po lewej i po prawej stronie tam, gdzie
+Program~\ref{prog:P23} miał liczby, co jest rozróżnieniem
+Programu~\ref{prog:F13} między prawdopodobieństwem a prawdopodobieństwem na
+jednostkę.
+
+Program~\ref{prog:P26} doszedł już do szczytu tej krzywej: estymator MAP to
+$\theta$ maksymalizujące prawą stronę. Powiedział potem, w ostrzeżeniu, że
+takie postępowanie coś odrzuca. Powiedz co.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wszystko poza położeniem \dash{} jak pewny jest estymator, czy maksimum było
+ostre czy prawie płaskie, oraz każdy sposób przeniesienia niepewności dalej,
+do późniejszych obliczeń.
+\end{ansblock}
+
+\mermaidfig{p28-point-or-shape}{Co maksimum zachowuje, a co
+  odrzuca}{punkt czy kształt}
+
+Ten program zachowuje całą krzywą i na tym polega jego ruch.
+Wszystko, czego czytelnik chce od ewaluacji \dash{} przedział,
+prawdopodobieństwo, że jeden model bije drugi, decyzja o kierowaniu ruchu
+\dash{} staje się wtedy pytaniem zadanym tej krzywej, a nie osobną techniką.
+
+Prior musi być rozkładem na $\intcc{0}{1}$, bo tam żyje współczynnik. Jest ich
+wiele; jeden z nich sprawia, że każde pytanie w tym programie ma odpowiedź w
+postaci zamkniętej. Zanim pójdziesz dalej: czego byś od niego oczekiwał?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Żeby pomnożenie go przez wiarygodność dawało coś tego samego kształtu
+\dash{} tak by odpowiedź dała się aktualizować ponownie bez rozrastania się
+algebry.
+\end{ansblock}
+
+Ta własność ma nazwę, \textbf{sprzężoność}, a dla współczynnika obserwowanego
+przez sukcesy i porażki rodziną, która ją ma, jest \textbf{Beta}:
+
+\[ p(\theta) \;\propto\; \theta^{a-1}\,(1-\theta)^{b-1},
+   \qquad 0 \le \theta \le 1 \]
+
+Dwie liczby, $a$ i $b$, a sekcja 2 mówi, co znaczą w jednostkach problemu.
+Zwróć uwagę na kształt tego wyrażenia, bo to dlatego każda liczba w tym
+programie jest dokładna: przy całkowitych $a$ i $b$ gęstość jest
+\textbf{wielomianem}, więc pole pod nią jest liczbą wymierną, a symbol
+Newtona z Programu~\ref{prog:P12} liczy je bez żadnego zaokrąglania.
+
+Rozkład jednostajny, który mówi, że każdy współczynnik jest tak samo
+prawdopodobny, to $\mathrm{Beta}(\val{p28.prior.a}, \val{p28.prior.b})$
+\dash{} oba wykładniki zerowe, gęstość płaska.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Prior jest arbitralny, więc odpowiedź jest arbitralna.}}
+
+To zarzut, który podnosi każdy, i daje się na niego odpowiedzieć zamiast
+filozofować \dash{} dlatego ten program odpowiada na niego pomiarem, a nie
+argumentem.
+
+Zarzut wydaje się mocny dlatego, że prior jest naprawdę wyborem i nic go nie
+narzuca. Umyka mu to, że wybór ma \emph{wielkość}, a wielkość da się policzyć:
+sekcja 2 pokazuje, że prior wart jest określonej liczby obserwacji, a sekcja 3
+pokazuje, ile to warte wobec prawdziwego zbioru ewaluacyjnego. Na
+$\val{p28.n}$ pozycjach przesuwa odpowiedź o mniej niż jedną pozycję; na
+$\val{p28.small.n}$ przesuwa ją bardzo.
+
+Więc pytanie \enquote{czy prior ma tu znaczenie} ma za każdym razem
+arytmetyczną odpowiedź, a spór, który ludzie toczą zamiast tego, dotyczy
+zwykle przypadku, w którym znaczenia nie ma.
+\end{trapbox}
+\end{fr}
+
+\section{Aktualizacja dodaje zliczenia}
+\label{sec:P28-conjugacy}
+\index{sprzężoność}
+\index{prior!ile jest wart w obserwacjach}
+
+\begin{fr}
+Weź prior $\mathrm{Beta}(a, b)$ i zaobserwuj $k$ sukcesów w $n$ próbach.
+Wiarygodność tych danych przy współczynniku $\theta$ wynosi
+$\theta^{k}(1-\theta)^{n-k}$, razy współczynnik liczbowy, w którym nie ma
+$\theta$, więc nie może on wpłynąć na kształt.
+
+Pomnóż jedno przez drugie i odczytaj, co wychodzi.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\mathrm{Beta}(a + k,\ b + n - k)$}
+
+\[ \theta^{a-1}(1-\theta)^{b-1} \times \theta^{k}(1-\theta)^{n-k}
+   \;=\; \theta^{a+k-1}(1-\theta)^{b+n-k-1} \]
+
+czyli znowu Beta, ze zliczeniami dodanymi. To cała aktualizacja, jedna linijka
+arytmetyki wykładników z Programu~\ref{prog:F01}, i nie ma w niej żadnej
+całki.
+
+Nadaje to też konkretny sens priorowi i to jest zdanie warte wyniesienia z tej
+sekcji. Prior $\mathrm{Beta}(a, b)$ wchodzi do rozkładu a posteriori dokładnie
+tak, jak weszłoby $a$ sukcesów i $b$ porażek.
+
+Powiedz więc, ile wart jest prior w jednostkach, w których naprawdę mierzy się
+problem.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{W obserwacjach \dash{} $a + b$ z nich}
+
+I jest to tożsamość, a nie analogia. Średnia a posteriori to \textbf{średnia
+ważona} średniej prioru i średniej z danych:
+
+\[ \frac{a+k}{a+b+n}
+   \;=\;
+   \frac{(a+b)\cdot\frac{a}{a+b} \;+\; n\cdot\frac{k}{n}}{(a+b) + n} \]
+
+Skrypt sprawdza to przy czterech priorach i czterech rozmiarach próby na
+ułamkach, bo na tym twierdzeniu opiera się cały argument o priorze.
+
+Prior jednostajny wart jest zatem $\val{p28.prior.worth}$ obserwacji. Zestaw
+to z ewaluacją, którą podaje Program~\ref{prog:P27} \dash{}
+$\val{p28.k}$ z $\val{p28.n}$ pozycji \dash{} i powiedz, co to robi z
+odpowiedzią.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Prawie nic: $\val{p28.post.mean.pct}$ wobec
+$\val{p28.mle.pct}$ procent}
+
+Dwie obserwacje wobec dwustu, więc prior dostaje wagę
+$\val{p28.prior.worth}$ części na $\val{p28.n} + \val{p28.prior.worth}$, a obie
+odpowiedzi różnią się o mniej niż siatka $\val{p27.grid.pts}$ punktu, którą
+zmierzył Program~\ref{prog:P27}. \textbf{Na tym zbiorze ewaluacyjnym wybór
+prioru nie może przesunąć odpowiedzi nawet o jedną pozycję.}
+
+\mermaidfig{p28-prior-in-items}{Siła prioru w jednostkach, w których mierzy
+  się problem}{prior w pozycjach}
+
+Teraz zabierz dane. Ten sam prior jednostajny i ewaluacja o
+$\val{p28.small.n}$ pozycjach, na których model zaliczył
+$\val{p28.small.k}$. Co dzieje się z obiema liczbami?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p28.small.post.pct}$ wobec $\val{p28.small.mle.pct}$ procent}
+
+Prior wart jest teraz $\val{p28.prior.worth}$ z
+$\val{p28.small.n} + \val{p28.prior.worth}$ obserwacji w grze i przesuwa
+odpowiedź o blisko trzy punkty. Prior twierdzący więcej \dash{}
+$\mathrm{Beta}(\val{p28.strong}, \val{p28.strong})$, wart
+$\val{p28.strong}+\val{p28.strong}$ obserwacji wyśrodkowanych na połowie
+\dash{} ściąga ją do $\val{p28.strong.post.pct}$ procent.
+
+Uczciwe stwierdzenie nie brzmi więc, że priory mają znaczenie albo że nie mają.
+
+\begin{center}
+\emph{Prior ma znaczenie dokładnie proporcjonalnie do tego, jak mało masz
+danych,\\
+a proporcja to $\frac{a+b}{a+b+n}$, którą umiesz policzyć.}
+\end{center}
+
+Dlatego na zarzut z sekcji 1 da się odpowiedzieć: pyta on o rzecz, w której
+jest liczba, a liczba jest dostępna, zanim spór się zacznie.
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Użyłem prioru jednostajnego, więc niczego nie założyłem.}}
+
+Prior jednostajny jest priorem i wart jest $\val{p28.prior.worth}$
+obserwacji, a nie zera. Twierdzi on, że skuteczność modelu równie
+prawdopodobnie leży między $\num{0.01}$ a $\num{0.02}$, co między
+$\num{0.50}$ a $\num{0.51}$, co jest mocnym twierdzeniem o systemie, który
+ktoś już wytrenował i nieformalnie ocenił.
+
+Zwykle jest to nieszkodliwe, z powodu, który sekcja właśnie zmierzyła: przy
+$\val{p28.n}$ pozycjach dwie obserwacje giną w szumie. Przestaje być
+nieszkodliwe dokładnie tam, gdzie danych jest mało \dash{} rzadki tryb awarii,
+podzbiór benchmarku o dwudziestu pozycjach, pierwsza godzina testu A/B
+\dash{} czyli tam, gdzie ludzie sięgają po odpowiedź bayesowską, bo nic innego
+nie działa.
+
+\textbf{Sprawdzenie nie jest filozoficzne.} Policz $\frac{a+b}{a+b+n}$; jeśli
+wyjdzie mało, przestań spierać się o prior i odczytaj dane.
+\end{trapbox}
+\end{fr}
+
+\section{Przedział wiarygodności}
+\label{sec:P28-credible}
+\index{wnioskowanie!przedział wiarygodności}
+
+\begin{fr}
+Rozkład a posteriori jest rozkładem, więc można go zapytać o wszystko, o co
+można zapytać rozkład. Najbardziej użyteczne jest pytanie, na które
+Program~\ref{prog:P27} nie umiał odpowiedzieć: \emph{gdzie jest współczynnik i
+jak bardzo jestem pewien?}
+
+Utnij rozkład a posteriori na $\num{2.5}$ i $\num{97.5}$ procentach, a środkowe
+$95$ procent biegnie od $\val{p28.cred.lo}$ do $\val{p28.cred.hi}$ procent. To
+jest \textbf{przedział wiarygodności}.
+
+Zapisz jednym zdaniem, co twoim zdaniem on twierdzi.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Współczynnik leży między $\val{p28.cred.lo}$ a $\val{p28.cred.hi}$ procent
+z prawdopodobieństwem $\num{0.95}$, przy tych danych i tym priorze}
+
+To zdanie, którego chce prawie każdy, i tutaj jest ono dostępne, bo rozkład
+a posteriori jest rozkładem na współczynniku, a przedział jest jego obszarem.
+W wyprowadzeniu nie ma nic subtelnego: dwa kwantyle rozkładu Beta.
+
+Program~\ref{prog:P27} §2 zbudował ten drugi rodzaj na tej samej ewaluacji i
+dostał od $\val{p28.conf.lo}$ do $\val{p28.conf.hi}$ procent.
+
+Porównaj obie pary liczb. Jaka jest największa różnica między nimi?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Najwyżej pół punktu \dash{} nie więcej niż siatka, o którą jedna
+pozycja ewaluacji przesuwa wynik}
+
+$\val{p28.cred.lo}$ wobec $\val{p28.conf.lo}$ oraz $\val{p28.cred.hi}$
+wobec $\val{p28.conf.hi}$. Program~\ref{prog:P27} §1 zmierzył, że ta
+ewaluacja nie rozróżnia niczego drobniejszego niż $\val{p27.grid.pts}$ punktu,
+bo tyle warta jest jedna pozycja z $\val{p28.n}$, a \textbf{żadna}
+z różnic nie jest większa.
+
+\textbf{Kontrastu między oboma przedziałami nie da się więc postawić na
+cyfrach.} Zgadzają się lepiej, niż przyrząd potrafi zmierzyć, w przypadku,
+który ludzie zwykle spotykają, i właśnie dlatego się je myli.
+
+Trzeba go postawić na tym, co każdy z nich twierdzi. Zdanie przedziału
+wiarygodności jest powyżej. Co twierdzi przedział ufności?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nic o \emph{tym} przedziale \dash{} to stwierdzenie o
+\emph{procedurze}}
+
+Procedura ufności na poziomie $95$ procent to taka, której przedziały
+zawierają prawdziwy współczynnik w $95$ procentach przypadków, po ewaluacjach,
+których nie uruchomiłeś. Przedział, który masz przed sobą, albo zawiera
+współczynnik, albo nie; nie zostało w nim żadne prawdopodobieństwo, gdy liczby
+są już na stronie, bo w tamtym ujęciu losowe są tylko dane, a dane zostały
+zaobserwowane.
+
+Przedział wiarygodności kładzie prawdopodobieństwo na współczynniku. Przedział
+ufności kładzie je na procedurze. Dwa zdania, dwa obiekty, te same sześć cyfr.
+
+\mermaidfig{p28-two-sentences}{Oba przedziały zgadzają się na tej ewaluacji i
+  twierdzą co innego}{dwa zdania}
+\end{fr}
+
+\begin{fr}
+\begin{trapbox}
+\textbf{\enquote{Przedział ufności na poziomie $95$ procent to $65$ do $78$,
+więc jest $95$ procent szans, że współczynnik tam leży.}}
+
+To zdanie przedziału wiarygodności doczepione do liczb przedziału ufności, a
+na tej ewaluacji akurat jest prawie prawdziwe \dash{} i to je utrzymuje przy
+życiu. Jest prawie prawdziwe, bo oba przedziały zgadzają się tu do pół punktu,
+a zgadzają się, bo $\val{p28.n}$ pozycji przytłacza prior warty
+$\val{p28.prior.worth}$.
+
+Tam, gdzie się nie zgadzają, nawyk jest kosztowny, a sekcja 2 już powiedziała,
+gdzie to jest: przy małej liczbie danych. Sprawdzenie jest to samo i jest
+arytmetyką, a nie filozofią \dash{} $\frac{a+b}{a+b+n}$.
+
+\textbf{I zauważ, czego dowodzi to przeczytanie na opak.} Nikt nie czyta
+przedziału wiarygodności jako przedziału ufności. Ruch idzie wyłącznie w jedną
+stronę, bo zdanie bayesowskie jest tym, którego czytelnik chciał od początku.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Zabierz znowu dane, a oba priory się rozjadą, tak jak każe arytmetyka z
+sekcji 2. Na $\val{p28.small.k}$ z $\val{p28.small.n}$:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+prior & przedział wiarygodności & szerokość \\
+\midrule
+$\mathrm{Beta}(\val{p28.prior.a}, \val{p28.prior.b})$
+  & $\val{p28.small.cred.lo}$ do $\val{p28.small.cred.hi}$
+  & $\val{p28.width.small}$ \\
+$\mathrm{Beta}(\val{p28.strong}, \val{p28.strong})$
+  & $\val{p28.strong.cred.lo}$ do $\val{p28.strong.cred.hi}$ & \\
+\midrule
+$\val{p28.k}$ z $\val{p28.n}$, prior jednostajny
+  & $\val{p28.cred.lo}$ do $\val{p28.cred.hi}$
+  & $\val{p28.width.big}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Pierwszy wiersz obejmuje dwie trzecie wszystkiego, czym współczynnik mógłby
+być. Którą z trzech liczb w tej tabeli wpisać do raportu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Szerokość}
+
+$\val{p28.width.small}$ punktu wobec $\val{p28.width.big}$: przedział z małej
+ewaluacji jest ponad pięć razy szerszy i jest dość szeroki, by zmieścić
+naraz \enquote{ten model ledwie bije monetę} i
+\enquote{ten model jest znakomity}.
+
+Tak szeroki przedział nie jest słabym wynikiem. Jest \textbf{pomiarem
+ewaluacji}, a nie modelu, i mówi, że ewaluacja jest za mała, by mieć zdanie
+\dash{} czyli ten sam wniosek, do którego Program~\ref{prog:P27} doszedł inną
+drogą i podał jako liczbę pozycji.
+
+\begin{note}
+Nic tutaj nie mówi, który prior był słuszny. Oba różnią się o trzy punkty na
+pięciu pozycjach i wcale na dwustu, więc przy chudej ewaluacji prior jest
+argumentem, a przy grubej nie jest. Podanie szerokości na pierwszym miejscu
+czyni to widocznym, zanim ktokolwiek musi to podnieść.
+\end{note}
+\end{fr}
+
+\section{Prawdopodobieństwo, że B jest lepszy}
+\label{sec:P28-better}
+\index{wnioskowanie!porównanie modeli}
+
+\begin{fr}
+Program~\ref{prog:P27} §4 kończy się nazwaniem pewnej wielkości i odmową jej
+policzenia. Dwa modele porównano na tych samych $\val{p28.n}$ promptach;
+$\val{p28.disc}$ pozycji było \textbf{niezgodnych}, czyli dokładnie jeden
+model je zaliczył, a z nich $\val{p28.to.b}$ przypadło B, a
+$\val{p28.to.a}$ modelowi A. Pozycje zgodne znoszą się dokładnie i nie niosą
+żadnej informacji o różnicy.
+
+Wartość $p$ odpowiada na pytanie, \emph{jak zaskakujące jest to przy remisie}.
+Pytanie, które wszyscy naprawdę zadali, brzmi: \emph{jak prawdopodobne jest,
+że B jest lepszy}.
+
+Sekcja 2 zamienia to drugie w arytmetykę, gdy tylko umiesz nazwać parametr.
+Czym on tu jest?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Prawdopodobieństwem, że niezgodna pozycja przypadnie modelowi B}
+
+Nazwij je $\theta$. Model B jest lepszy dokładnie wtedy, gdy
+$\theta > \frac{1}{2}$, bo pozycja niezgodna to taka, co do której oba modele
+się rozeszły, a $\theta$ jest udziałem B w nich. Całe porównanie to więc jeden
+współczynnik, a sekcja 2 już wie, co robić ze współczynnikiem i zliczeniami.
+
+Zauważ, na czym ten parametr jest warunkowany. Jest zdefiniowany \emph{przy
+założeniu}, że oba modele się rozeszły, więc rozmiar ewaluacji wchodzi do
+odpowiedzi tylko przez to, ile niezgód wyprodukował. Dwie ewaluacje bardzo
+różnych rozmiarów, które dały te same zliczenia niezgodne, dają ten sam
+rozkład a posteriori, a większa nie kupuje nic ponadto \dash{} czyli to samo
+stwierdzenie, które podaje Program~\ref{prog:P27} o pozycjach zgodnych,
+osiągnięte z definicji, a nie z arytmetyki.
+
+Zacznij od tego samego prioru jednostajnego. Jaki jest rozkład a posteriori?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\mathrm{Beta}(\val{p28.bpost.a}, \val{p28.bpost.b})$}
+
+$\val{p28.prior.a}+\val{p28.to.b}$ oraz
+$\val{p28.prior.b}+\val{p28.to.a}$, zgodnie z regułą z sekcji 2 i z niczym
+innym. A odpowiedzią jest masa a posteriori powyżej połowy:
+
+\[ \Prob\bigl(\theta > \tfrac{1}{2} \mid \text{dane}\bigr)
+   \;=\; \val{p28.p.better.pct}\ \text{procent} \]
+
+\transcript{p28-how-sure}
+
+To wielkość, o której Program~\ref{prog:P27} powiedział, że żadna wartość $p$
+jej nie dostarczy, policzona na danych, które podaje
+Program~\ref{prog:P27}, i zajęła jedną linijkę.
+\end{fr}
+
+\begin{fr}
+Program~\ref{prog:P27} dostał $p = \val{p28.p27.p}$ na tych samych pozycjach
+\dash{} największą wartość, jaką $p$ może przyjąć, i najmniej informatywny
+wynik, na jaki pozwala jego arytmetyka.
+
+Dwie liczby, jeden zbiór danych: wartość $p$ równa $\val{p28.p27.p}$ oraz
+$\val{p28.p.better.pct}$ procent prawdopodobieństwa, że B jest lepszy. Czy są
+sprzeczne?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie \dash{} to odpowiedzi na różne pytania i obie są niezaskakujące}
+
+\enquote{Dane nie byłyby zaskakujące, gdyby oba modele remisowały} oraz
+\enquote{B jest nieco bardziej prawdopodobnie z przodu} to całkowicie zgodne
+stwierdzenia, a przy dowodzie tak chudym właśnie tego należy się spodziewać
+razem. Przewaga jednej pozycji warta jest szturchnięcia, a szturchnięciem jest
+$\val{p28.p.better.pct}$ procent: bliżej temu do rzutu monetą niż do wyniku.
+
+\begin{trapbox}
+\textbf{\enquote{$p = \val{p28.p27.p}$, więc oba modele są takie same.}}
+
+Wartość $p$ bliska jedności mówi, że dane są nieszczególne przy remisie. Nie
+mówi, że remis jest prawdą, i nie może, bo w ogóle nie warunkuje na danych
+\dash{} czyli odwrócenie, które podaje Program~\ref{prog:P23}, a
+Program~\ref{prog:P27} §4 nazywa je po imieniu.
+
+Rozkład a posteriori warunkuje na danych i mówi, że B prowadzi o włos. Oba
+odczyty są słuszne. Ten, który raportuje \emph{brak różnicy} na spotkaniu
+przeglądowym, nie jest żadnym z nich.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Załóżmy, że ta sama ewaluacja trwa dalej, każda nowa niezgodna pozycja
+przypada B, a ty pytasz dopóty, dopóki prawdopodobieństwo a posteriori nie
+sięgnie $95$ procent.
+
+Ile mniej więcej pozycji to zajmie \dash{} pięć, dziesięć, pięćdziesiąt,
+pięćset?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p28.more.needed}$}
+
+$\val{p28.reach.b}$ z $\val{p28.reach.disc}$ pozycji niezgodnych i rozkład
+a posteriori przekracza $95$ procent. Dziesięć obserwacji więcej, każda
+korzystna, żeby przejść od \enquote{szturchnięcia} do \enquote{warto
+działać}.
+
+Z tej liczby wynikają dwie rzeczy i obie warto wynieść.
+
+\begin{itemize}
+\item \textbf{Jest tego samego rzędu co próg częstościowy i nie jest to
+  przypadek.} Program~\ref{prog:P27} zadał inne pytanie o te same dane
+  \dash{} jak nierówno musiałoby wypaść tych $\val{p28.disc}$ pozycji, żeby
+  uczciwa moneta rzadko dawała taki wynik \dash{} i odpowiedział
+  $\val{p27.net.needed}$. Oba są sumami symboli Newtona przez
+  $2^{m}$, czytanymi na dwa sposoby, więc oba ujęcia różnią się co do tego, co
+  liczba \emph{znaczy}, a niemal wcale co do tego, ile dowodu potrzeba.
+\item \textbf{To pytanie, które możesz zadać, zanim cokolwiek uruchomisz.}
+  Rozkład a posteriori po hipotetycznym wyniku jest policzalny już teraz, więc
+  \enquote{ile jeszcze dowodu zmieniłoby moje zdanie} ma liczbę i jest to
+  liczba do wpisania w plan, a nie w retrospektywę.
+\end{itemize}
+\end{fr}
+
+\begin{fr}
+Porównanie sparowane jest tym, które się uruchamia, gdy oba modele widziały
+te same prompty. Gdy nie widziały, ta sama całka robi swoje z dwoma
+parametrami zamiast jednego \dash{} rozkład a posteriori dla współczynnika
+każdego modelu i prawdopodobieństwo, że jedno losowanie przewyższa drugie.
+
+Przy tej samej różnicy jednej pozycji \dash{} $\val{p28.unp.b.k}$ wobec
+$\val{p28.unp.a.k}$ z $\val{p28.unp.n}$ każdy, bez parowania \dash{} daje ona
+$\val{p28.unp.better.pct}$ procent wobec sparowanych
+$\val{p28.p.better.pct}$.
+
+\begin{center}
+\emph{Ta sama zaobserwowana różnica, a analiza sparowana jest pewniejsza,\\
+bo nigdy nie musiała tłumaczyć $\val{p28.n} - \val{p28.disc}$ pozycji,
+co do których oba modele się zgodziły.}
+\end{center}
+
+To cały argument, który podaje Program~\ref{prog:P27} §3, docierający do
+rozkładu a posteriori zamiast do liczby pozycji, i nie trzeba go było
+wyprowadzać na nowo: parowanie jest coś warte z tego samego powodu w obu
+ujęciach, bo zgodność i tak nie niesie żadnej informacji o różnicy.
+\end{fr}
+
+\section{Kierowanie ruchu przy niepewności}
+\label{sec:P28-routing}
+\index{wnioskowanie!próbkowanie Thompsona}
+
+\begin{fr}
+Sekcja 4 wyprodukowała liczbę i zatrzymała się. Załóżmy, że zamiast zatrzymać
+się musisz dalej obsługiwać ruch, gdy dowody się gromadzą, i wolałbyś nie
+posyłać połowy do tego modelu, który przegrywa.
+
+Oto reguła, która nie potrzebuje ani progu, ani harmonogramu. \textbf{Wylosuj
+po jednej próbce z każdego rozkładu a posteriori i skieruj żądanie tam, gdzie
+próbka wypadła większa.}
+
+Jaki ułamek ruchu posyła to do B?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p28.route.b.pct}$ procent \dash{} prawdopodobieństwo a posteriori,
+że B jest lepszy}
+
+\emph{Z konstrukcji}, i na tym polega cały argument: reguła kieruje do B
+dokładnie wtedy, gdy losowanie B jest większe, a prawdopodobieństwo tego
+zdarzenia to $\Prob(\theta_B > \theta_A)$, czyli liczba, którą sekcja 4 już
+policzyła.
+
+Reguła nie potrzebuje więc eksperymentu, by ją opisać, ani parametru, by ją
+ustawić. \textbf{Eksploruje dokładnie proporcjonalnie do tego, jak
+prawdopodobne jest, że dane ramię jest najlepsze}, a proporcja jest wielkością,
+którą i tak liczyłeś.
+
+\mermaidfig{p28-route-by-belief}{Kierowanie przez losowanie z każdego rozkładu
+  a posteriori}{kierowanie ruchu}
+\end{fr}
+
+\begin{fr}
+I koryguje się sama, bez polecenia. Daj B jeszcze
+$\val{p28.route.more}$ sukcesów, a ruch podąża za dowodem, od
+$\val{p28.route.b.pct}$ do $\val{p28.route.b2.pct}$ procent.
+
+Zwykłą alternatywą jest reguła $\varepsilon$-zachłanna: posyłaj
+$\val{p28.eps.pct}$ procent ruchu do ramienia, które obecnie uważasz za
+gorsze, niezależnie od dowodu, a resztę do lidera.
+
+Ta reguła wymaga drugiej decyzji, o której nikt nie mówi: kto jest liderem.
+Blisko połowy etykieta przeskakuje po jednej obserwacji, więc podział ruchu
+skacze między dwiema stałymi wartościami dokładnie tam, gdzie dowód jest
+najsłabszy. Reguła oparta na rozkładzie a posteriori nie ma takiej
+nieciągłości: rusza się trochę przy odrobinie dowodu, bo udział, który posyła,
+jest prawdopodobieństwem, a nie etykietą.
+
+Zestawiony z regułą powyżej, co zakłada ten stały ułamek?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Że dowód nigdy nie staje się dość mocny, by przestać za to płacić}
+
+Obie reguły zgadzają się, dopóki rozkład a posteriori jest blisko połowy, bo
+$\val{p28.route.b.pct}$ procent i \enquote{połowa ruchu, minus trochę} to to
+samo polecenie. Rozchodzą się, gdy przybywa dowodu, a punkt przecięcia jest
+policzalny, a nie kwestią gustu: po $\val{p28.eps.crossover}$ dalszych
+sukcesach modelu B prawdopodobieństwo a posteriori, że lepszy jest A, spada
+poniżej $\val{p28.eps.pct}$ procent, i od tego momentu stała reguła wydaje na
+gorsze ramię więcej, niż wspiera dowód.
+
+\begin{trapbox}
+\textbf{\enquote{Stopa eksploracji to hiperparametr, więc go dostroję.}}
+
+Jest hiperparametrem w regule $\varepsilon$-zachłannej i \emph{nie jest nim} w
+regule powyżej, która nie ma żadnego wolnego parametru \dash{} eksploracja
+wychodzi z rozkładu a posteriori, a rozkład a posteriori wychodzi z danych.
+
+Warto to zauważyć ze względu na to, czym byłoby dostrajanie. Właściwa stopa
+eksploracji zależy od tego, ile masz dowodu, a ile masz dowodu, zmienia się co
+godzinę. Stała nie potrafi za tym nadążyć, więc dostrajanie
+$\varepsilon$ jest wybraniem jednego punktu na krzywej i życiem z tym, że
+krzywa ucieka spod niego.
+\end{trapbox}
+\end{fr}
+
+\section{Deklarowane prawdopodobieństwo modelu sędziego}
+\label{sec:P28-judge}
+\index{wnioskowanie!kalibracja}
+
+\begin{fr}
+Model sędzia ocenia kandydujące odpowiedzi i podaje przy każdej swoją pewność.
+Na odpowiedziach, przy których mówi $\val{p28.judge.says.pct}$ procent, ma
+rację w $\val{p28.judge.means.pct}$ procentach przypadków.
+
+Dwadzieścia punktów nie jest ewidentnie alarmujące. Postać szans, którą podaje
+Program~\ref{prog:P23}, mówi, jak źle jest, i warto przeliczyć obie, zanim
+pójdziesz dalej.
+
+Jak brzmią oba stwierdzenia w szansach?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p28.judge.odds.says}$ do jednego wobec
+$\val{p28.judge.odds.means}$ do jednego}
+
+$\frac{p}{1-p}$ w każdym przypadku, a iloraz obu wynosi
+$\val{p28.judge.factor}$. \textbf{Sędzia zawyża dowód blisko
+czterokrotnie}, co jest błędem dużo większym, niż brzmi dwadzieścia punktów
+prawdopodobieństwa \dash{} bo prawdopodobieństwo blisko granicy ściska się,
+dokładnie tak, jak Program~\ref{prog:P05} i Program~\ref{prog:P21} stwierdziły
+każdy ze swojej strony.
+
+To pierwszy powód, by pracować w szansach. Oto drugi i to on boli.
+\end{fr}
+
+\begin{fr}
+Program~\ref{prog:P23} zapisuje twierdzenie Bayesa w szansach jako
+\textbf{mnożenie}: szanse a posteriori to szanse a priori razy iloraz
+wiarygodności, a niezależne dowody się mnożą.
+
+Sędzia, którego deklarowane szanse są $\val{p28.judge.factor}$ razy za duże,
+myli się o ten czynnik \emph{przy każdym osądzie}, a potok łączący kilka z
+nich mnoży błędy przez siebie.
+
+Przez $\val{p28.judge.rounds}$ niezależnych osądów, o jaki czynnik zawyżone są
+połączone szanse?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p28.judge.compound}$}
+
+$\val{p28.judge.factor}^{\,\val{p28.judge.rounds}}$. Pięć rund sędziego, który
+jest \enquote{trochę zbyt pewny}, i połączone przekonanie myli się blisko
+trzy rzędy wielkości.
+
+\begin{center}
+\emph{Lekka nadmierna pewność nie jest małym problemem,\\
+bo Bayes mnoży, a małe czynniki się kumulują.}
+\end{center}
+
+To ta sama arytmetyka co zanikający gradient z Programu~\ref{prog:F12} i
+czynnik wariancji na warstwę z Programu~\ref{prog:P25} \dash{} liczba bliska
+jedności podniesiona do głębokości \dash{} docierająca tam, gdzie nikt się jej
+nie spodziewa, czyli do łańcucha zautomatyzowanych osądów, a nie do łańcucha
+warstw.
+\end{fr}
+
+\begin{fr}
+Wersja, którą inżynier faktycznie widzi, jest mniejsza i ostrzejsza. Odfiltruj
+kandydatów po \enquote{sędzia powiedział $\val{p28.judge.says.pct}$ procent} i
+wypuść to, co zostanie.
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+stopa błędu, którą sądzisz, że wypuściłeś & $\val{p28.judge.err.believed.pct}$ procent \\
+stopa błędu, którą wypuściłeś & $\val{p28.judge.err.true.pct}$ procent \\
+\midrule
+iloraz & $\val{p28.judge.err.ratio}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Trzy razy więcej błędów, niż zabudżetowałeś}, od sędziego, którego
+deklarowane prawdopodobieństwo chybiało o dwadzieścia punktów. Nic w potoku
+tego nie raportuje: filtr zrobił, co mu kazano, sędzia odpowiedział na każde
+wywołanie, a jedynym objawem jest odsetek wad, który ktoś przypisuje
+generatorowi.
+
+Jak więc się dowiedzieć? Nie pytając sędziego i nie czytając jego promptu.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Policz. Weź odpowiedzi, przy których powiedział
+$\val{p28.judge.says.pct}$ procent, sprawdź, ile było trafnych, i nałóż
+rozkład a posteriori na współczynnik}
+
+$\val{p28.bucket.right}$ z $\val{p28.bucket.n}$, prior jednostajny, a przedział
+wiarygodności biegnie od $\val{p28.bucket.lo}$ do $\val{p28.bucket.hi}$
+procent. \textbf{Deklarowane $\val{p28.judge.says.pct}$ leży poza nim}, więc
+rozkalibrowanie jest zmierzone, a nie podejrzewane, a szerokość mówi, jak
+pewny jest pomiar.
+
+To maszyneria z sekcji 3 nałożona na jedyną liczbę w potoku, której nikt nie
+audytuje, i potrzebuje dwóch zliczeń, które podaje Program~\ref{prog:F10}, i
+niczego więcej: co powiedział i co się stało.
+
+\begin{note}
+Ta sekcja wycenia złego sędziego w \emph{szansach}, czyli w postaci, którą
+podaje Program~\ref{prog:P23}, i nie potrzebuje niczego nowego. Jest drugi
+odczyt \dash{} błędne deklarowane prawdopodobieństwo kosztuje cię mierzalną
+liczbę natów, a ta liczba jest tym, co minimalizuje strata kalibracyjna
+\dash{} i należy on do Programu~\ref{prog:P30}, który definiuje jednostki.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Spójrz wstecz na to, co się zmieniło. Do tego programu nie weszła żadna nowa
+matematyka: rozkład a posteriori to twierdzenie, które podaje
+Program~\ref{prog:P23}, z kontinuum tam, gdzie miało dwie hipotezy,
+aktualizacja jest liczeniem, a każda liczba jest sumą symboli Newtona albo
+jedną całką z gęstości.
+
+Zmienił się \emph{obiekt}. Program~\ref{prog:P26} kończy parametrem; ten
+program kończy rozkładem na nim, a każde pytanie, które w
+Programie~\ref{prog:P27} wydawało się poza zasięgiem \dash{} jak bardzo jestem
+pewien, czy B jest lepszy, ile jeszcze dowodu potrzebuję, jak kierować ruch,
+gdy się tego dowiaduję \dash{} okazuje się pytaniem o ten rozkład.
+
+Program~\ref{prog:P29} zaczyna inne pytanie: nie jak bardzo jesteś pewien,
+lecz ile wart jest komunikat.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--3}{\textbf{Estymator punktowy jest streszczeniem czegoś
+  większego.} Estymator MAP z Programu~\ref{prog:P26} to położenie szczytu
+  rozkładu a posteriori i odrzuca szerokość, kształt oraz każdy sposób
+  przeniesienia niepewności dalej.}
+\sumitem{4--5}{Prior $\mathrm{Beta}(a, b)$ na współczynniku jest rozkładem na
+  $\intcc{0}{1}$, a na zarzut \enquote{prior jest arbitralny} da się
+  odpowiedzieć liczbą, a nie argumentem.}
+\sumitem{6--7}{\textbf{Aktualizacja dodaje zliczenia.} $k$ sukcesów w $n$
+  próbach przeprowadza $\mathrm{Beta}(a, b)$ w $\mathrm{Beta}(a + k,\ b + n -
+  k)$, i to kupuje sprzężoność, i na tym cała arytmetyka się kończy.}
+\sumitem{8--10}{\textbf{Prior wart jest $a + b$ obserwacji}, więc przesuwa
+  odpowiedź o $\frac{a+b}{a+b+n}$ drogi. Na $\val{p28.n}$ pozycjach prior
+  jednostajny przesuwa ją o mniej niż jedną pozycję; na
+  $\val{p28.small.n}$ przesuwa ją o trzy punkty.}
+\sumitem{12--16}{\textbf{Przedział wiarygodności mówi, że współczynnik jest w
+  nim z prawdopodobieństwem $\num{0.95}$}; przedział ufności mówi, że
+  procedura trafia w $95$ procentach przypadków. Na $\val{p28.n}$ pozycjach
+  oba zgadzają się co do pół punktu, dlatego się je myli, i zawsze jest
+  to zdanie bayesowskie doczepione do liczb częstościowych.}
+\sumitem{17--18}{\textbf{Podawaj szerokość.} $\val{p28.width.small}$ punktu na
+  $\val{p28.small.n}$ pozycjach wobec $\val{p28.width.big}$ na
+  $\val{p28.n}$: tak szeroki przedział mierzy ewaluację, a nie model.}
+\sumitem{19--21}{\textbf{Prawdopodobieństwo, że B jest lepszy, to jedna
+  całka}, a na danych, które podaje Program~\ref{prog:P27} \dash{}
+  $\val{p28.to.b}$ z $\val{p28.disc}$ pozycji niezgodnych \dash{} wynosi ono
+  $\val{p28.p.better.pct}$ procent.}
+\sumitem{22--23}{Jest to zgodne z $p = \val{p28.p27.p}$, a nie z tym
+  sprzeczne. Dwa pytania, dwie odpowiedzi, obie nieszczególne.}
+\sumitem{24--25}{\textbf{Ile jeszcze dowodu zmieniłoby twoje zdanie, jest
+  policzalne już teraz.} $\val{p28.more.needed}$ dalszych pozycji niezgodnych,
+  wszystkie dla B, przenosi rozkład a posteriori powyżej $95$ procent.}
+\sumitem{26}{Bez parowania ta sama różnica jednej pozycji daje
+  $\val{p28.unp.better.pct}$ procent wobec sparowanych
+  $\val{p28.p.better.pct}$: argument o parowaniu, który podaje
+  Program~\ref{prog:P27}, docierający do rozkładu a posteriori.}
+\sumitem{27--29}{\textbf{Kierowanie do tego, czyja próbka a posteriori jest
+  większa, posyła ruch do B z prawdopodobieństwem
+  $\Prob(\theta_B > \theta_A)$}, z konstrukcji. Nie ma wolnego parametru i
+  podąża za dowodem \dash{} od $\val{p28.route.b.pct}$ do
+  $\val{p28.route.b2.pct}$ procent po $\val{p28.route.more}$ dalszych
+  sukcesach.}
+\sumitem{30}{Stałe $\varepsilon$ zakłada, że dowód nigdy nie staje się dość
+  mocny, by przestać płacić za eksplorację. Po
+  $\val{p28.eps.crossover}$ dalszych sukcesach wydaje na gorsze ramię więcej,
+  niż wspierają dane.}
+\sumitem{31--32}{\textbf{Przelicz deklarowaną pewność sędziego na szanse,
+  zanim ją ocenisz.} $\val{p28.judge.says.pct}$ wobec
+  $\val{p28.judge.means.pct}$ procent to
+  $\val{p28.judge.odds.says}$ wobec $\val{p28.judge.odds.means}$ \dash{}
+  czynnik $\val{p28.judge.factor}$, a nie dwadzieścia punktów.}
+\sumitem{33--35}{\textbf{Bayes mnoży, więc błąd się kumuluje}:
+  $\val{p28.judge.compound}$ przez $\val{p28.judge.rounds}$ osądów oraz
+  $\val{p28.judge.err.ratio}$ razy więcej błędów, niż zabudżetowałeś, na
+  zbiorze zaakceptowanym.}
+\sumitem{36}{\textbf{Kalibrację mierzy się liczeniem}, a nie pytaniem. Na
+  $\val{p28.bucket.right}$ z $\val{p28.bucket.n}$ przedział wiarygodności to
+  $\val{p28.bucket.lo}$ do $\val{p28.bucket.hi}$ procent, a deklarowane
+  $\val{p28.judge.says.pct}$ leży poza nim.}
+\end{summarybox}
+
+\canyou
+
+\begin{testexercises}
+\item Filtr wyszukiwania ma rację na $18$ z $20$ wyrywkowo sprawdzonych
+  zapytań. Zacznij od prioru jednostajnego. Jaki jest rozkład a posteriori i
+  jaka jest jego średnia?
+  \answerto{$\mathrm{Beta}(19, 3)$, średnia $\frac{19}{22} = \num{0.8636}$.
+  Zauważ, że to nie $\frac{18}{20} = \num{0.90}$: dwie obserwacje prioru
+  ściągają ją w dół, a na dwudziestu pozycjach warte są dziesiątej części
+  dowodu.}
+\item Kolega podaje przedział ufności $95$ procent równy $\intcc{62}{74}$ i
+  mówi, że jest $95$ procent szans, że dokładność w nim leży. Powiedz, co jest
+  nie tak z tym zdaniem i kiedy to nie ma znaczenia.
+  \answerto{Prawdopodobieństwo należy do procedury, a nie do tego przedziału:
+  gdy liczby są już na stronie, współczynnik albo w nim jest, albo nie. Nie ma
+  to znaczenia, gdy ewaluacja jest dość duża, by prior był pomijalny \dash{}
+  gdy $\frac{a+b}{a+b+n}$ jest małe \dash{} bo wtedy przedział wiarygodności,
+  do którego to zdanie należy, ma prawie te same końce.}
+\item Dwa modele porównano na tych samych $500$ promptach. Rozeszły się na
+  $60$ pozycjach, z których $36$ przypada B. Czy B jest lepszy?
+  \answerto{Rozkład a posteriori to $\mathrm{Beta}(37, 25)$, a
+  $\Prob(\theta > \frac{1}{2})$ wynosi około $\num{0.93}$ \dash{} sugestywnie i
+  poniżej umownej poprzeczki. Pozostałe $440$ zgodnych pozycji nie ma
+  znaczenia dla porównania i nie powinno się w nim pojawiać.}
+\item Sędzia deklaruje $\num{0.8}$ i ma rację w $\num{0.6}$ przypadków na tych
+  odpowiedziach. O jaki czynnik zawyżone są jego szanse i czym to się staje po
+  trzech niezależnych osądach?
+  \answerto{$\frac{4}{1}$ wobec $\frac{3}{2}$, więc $\frac{8}{3} =
+  \num{2.667}$; do sześcianu około $19$. Przelicz najpierw na szanse:
+  prawdopodobieństwa różnią się o dwadzieścia punktów, a szanse o czynnik
+  blisko trzech.}
+\item Poproszono cię o wybranie $\varepsilon$ dla polityki eksploracji. Podaj
+  argument za tym, żeby go nie mieć.
+  \answerto{Kierowanie po losowaniu z każdego rozkładu a posteriori eksploruje
+  z prawdopodobieństwem $\Prob(\theta_B > \theta_A)$, które jest duże, gdy
+  dowód jest chudy, i małe, gdy nie jest. Stała nie potrafi nadążyć za
+  wielkością zmieniającą się przy każdej obserwacji, więc dostrajanie jej to
+  wybranie jednego punktu na ruchomej krzywej.}
+\end{testexercises}
+
+\begin{furtherproblems}
+\item Pokaż, że średnia a posteriori jest średnią ważoną średniej prioru i
+  proporcji z próby, i wskaż wagi.
+  \answerto{$\frac{a+k}{a+b+n} = \frac{a+b}{a+b+n}\cdot\frac{a}{a+b} +
+  \frac{n}{a+b+n}\cdot\frac{k}{n}$. Wagami są $a+b$ oraz $n$ przez ich sumę i
+  dlatego siłę prioru mierzy się w obserwacjach.}
+\item Prior jednostajny to $\mathrm{Beta}(1, 1)$ i wart jest dwóch obserwacji.
+  Który prior wart jest zera i co z nim jest nie tak?
+  \answerto{$\mathrm{Beta}(0, 0)$, który nie jest rozkładem
+  prawdopodobieństwa \dash{} jego gęstość nie jest całkowalna. Przy $k = 0$
+  albo $k = n$ rozkład a posteriori też jest niewłaściwy, więc współczynnik
+  zaobserwowany jako $0$ z $5$ nie ma żadnego rozkładu a posteriori. Chcieć
+  prioru wartego niczego to chcieć odpowiedzi bez założeń.}
+\item Przedział wiarygodności i przedział ufności zgadzają się co do
+  pół punktu na $\val{p28.n}$ pozycjach. Przewidz bez liczenia, czy zgodzą się
+  lepiej czy gorzej przy $n = 20$, i powiedz dlaczego.
+  \answerto{Gorzej. Różnicę napędza waga prioru $\frac{a+b}{a+b+n}$, która
+  wynosi $\frac{2}{202}$ przy $\val{p28.n}$ i $\frac{2}{22}$ przy
+  $20$ \dash{} dziewięć razy więcej. Przybliżenie normalne stojące za
+  przedziałem ufności też pogarsza się, gdy $n$ maleje, więc oba źródła
+  niezgody rosną razem.}
+\item Masz rozkłady a posteriori dla trzech modeli, a nie dla dwóch. Zapisz,
+  do czego próbkowanie Thompsona kieruje każdy, i powiedz, dlaczego żadne
+  porównanie parami nie wystarcza.
+  \answerto{Do prawdopodobieństwa, że losowanie ramienia $i$ jest największe z
+  trzech, czyli do całki po rozkładzie łącznym. Prawdopodobieństwa parami go
+  nie wyznaczają: A może bić B, a B bić C, przy czym C bije A dość często, by
+  prowadzić, i jest to ta sama nieprzechodniość, którą potrafią ukryć komórki
+  rankingu porównywanego parami.}
+\item Program~\ref{prog:P27} mówi, że wartość $p$ równa $\val{p28.p27.p}$ jest
+  najmniej informatywnym wynikiem, na jaki pozwala jego arytmetyka. Podaj
+  odpowiadający mu najmniej informatywny wynik dla rozkładu a posteriori i
+  powiedz, który z obu wolałbyś raportować.
+  \answerto{Rozkład a posteriori równy dokładnie połowie, co zdarza się, gdy
+  pozycje niezgodne dzielą się po równo \dash{} tutaj niemożliwe, bo nieparzysta
+  liczba nie dzieli się po równo. I o to chodzi: rozkład a posteriori zawsze
+  ma kierunek i wielkość, więc degraduje się łagodnie tam, gdzie dwustronna
+  wartość $p$ nasyca się na $1$ i przestaje cokolwiek rozróżniać.}
+\end{furtherproblems}

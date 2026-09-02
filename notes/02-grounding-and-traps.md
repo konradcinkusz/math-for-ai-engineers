@@ -2852,3 +2852,55 @@ and unusable are compatible, which is trap 253 arriving from the other end.
      the impossible pair, having recorded the parity as a formula trap two
      hundred lines above without applying it to its own data; P28's assertion
      caught it when it continued the example. Owner: P27 §3.
+
+### Bayesian inference, written (P28)
+
+274. *“The prior is arbitrary, so the answer is arbitrary.”* The choice has a
+     **magnitude** and it is computable before the argument starts: a
+     Beta(a, b) prior enters the posterior exactly as a successes and b
+     failures would, so it is worth a+b observations and moves the answer by
+     (a+b)/(a+b+n) of the way. On 200 items a uniform prior moves it by less
+     than one evaluation item; on 5 it moves it three points. Owner: P28 §2.
+275. *“I used a uniform prior, so I did not assume anything.”* A uniform prior
+     is worth two observations, not none, and it asserts that a trained
+     model's success rate is as likely to be between 0.01 and 0.02 as between
+     0.50 and 0.51. Harmless where the data is thick and not where it is thin
+     — which is exactly where people reach for a Bayesian answer. There is no
+     prior worth nothing: Beta(0, 0) is not a distribution. Owner: P28 §2, and
+     further problem 2.
+276. *“The 95 per cent confidence interval is 65 to 78, so there is a 95 per
+     cent chance the rate is in there.”* That is the credible interval's
+     sentence attached to the confidence interval's numbers. The confidence
+     statement is about the **procedure**, over evaluations nobody ran; once
+     the numbers are on the page the rate is in the interval or it is not.
+     The habit survives because on a large evaluation the two intervals agree
+     to within the grid one item moves the score by — and note the traffic is
+     all one way, because the Bayesian sentence is the one the reader wanted.
+     Owner: P28 §3.
+277. *“The two intervals came out the same, so the distinction is academic.”*
+     They agree when the prior is negligible, and (a+b)/(a+b+n) says when that
+     is. On five items the same two priors give intervals three points apart
+     and 66 points wide. The distinction is arithmetic, not philosophy.
+     Owner: P28 §3.
+278. *“p was near one, so the two models are the same.”* A p-value near one
+     says the data is unremarkable under a tie; it never conditions on the
+     data, which is P23's inversion. The posterior does condition, and on the
+     same worked example it says B is ahead by a nose — 57 per cent. Both
+     readings are right; “no difference” is neither. Owner: P28 §4.
+279. *“The judge model says 0.9 and is right 70 per cent of the time — twenty
+     points, not serious.”* In odds it is 9.0 against 2.33, a factor of 3.857,
+     and P23 writes Bayes in odds as a **multiplication**, so five independent
+     judgements overstate the combined odds by 854. On the accept set it is
+     three times the error rate you budgeted for, and nothing in the pipeline
+     reports it. Convert to odds before judging a stated confidence.
+     Owner: P28 §6.
+280. *“Calibration is a property of the model, so ask the model.”* It is two
+     counts and a posterior: what it said, and what happened. 140 of 200 in
+     the bucket gives a credible interval of 63.3 to 75.9 per cent, and the
+     stated 90 is outside it — measured rather than suspected. Owner: P28 §6.
+281. *“The exploration rate is a hyperparameter, so I will tune it.”* It is
+     one in the epsilon-greedy rule and there is no such parameter in
+     Thompson sampling, where the share sent to each arm **is** the posterior
+     probability that the arm is best. The right rate depends on how much
+     evidence you have, which changes hourly, so a constant is one point on a
+     moving curve. Owner: P28 §5.
