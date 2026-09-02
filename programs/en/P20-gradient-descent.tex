@@ -816,75 +816,75 @@ means.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--2}{Every optimiser here is $w \leftarrow w - \eta d$ with a
+\sumitem{1--2}{\result{Every optimiser here is $w \leftarrow w - \eta d$ with a
   different $d$. \textbf{The list is one line and a sequence of repairs},
-  not six algorithms.}
-\sumitem{3--4}{The step size is capped by the \emph{steepest} direction,
+  not six algorithms}.}
+\sumitem{3--4}{\result{The step size is capped by the \emph{steepest} direction,
   $\eta < 2/\lambda_{\max}$, so every flatter direction moves more slowly
   than it could. That is Program~\ref{prog:P17}'s bound, and it is what
-  everything after it repairs.}
-\sumitem{5--6}{The wasted effort is a sideways component that reverses every
+  everything after it repairs}.}
+\sumitem{5--6}{\result{The wasted effort is a sideways component that reverses every
   step: $\val{p15.zig.crossings}$ sign changes in $\val{p15.zig.steps}$ steps,
-  which is Program~\ref{prog:P15}'s measurement on the same bowl.}
-\sumitem{7}{On that bowl plain descent needs $\val{p20.steps.sgd}$ steps, and
+  which is Program~\ref{prog:P15}'s measurement on the same bowl}.}
+\sumitem{7}{\result{On that bowl plain descent needs $\val{p20.steps.sgd}$ steps, and
   its predicted count from $(\kappa-1)/(\kappa+1)$ is \textbf{exact at every
-  condition number tried}.}
-\sumitem{8--9}{Momentum is Program~\ref{prog:F04}'s average with a gradient
+  condition number tried}}.}
+\sumitem{8--9}{\result{Momentum is Program~\ref{prog:F04}'s average with a gradient
   in it: it cancels what alternates and keeps what does not, which is exactly
-  the shape of the zig-zag.}
-\sumitem{10--11}{It replaces $\kappa$ by $\sqrt{\kappa}$ \textbf{in the
-  rate} \dash{} $\val{p20.rate.sgd}$ becomes $\val{p20.rate.mom}$.}
-\sumitem{12--14}{The measured count is $\val{p20.steps.mom}$ against a
+  the shape of the zig-zag}.}
+\sumitem{10--11}{\result{It replaces $\kappa$ by $\sqrt{\kappa}$ \textbf{in the
+  rate} \dash{} $\val{p20.rate.sgd}$ becomes $\val{p20.rate.mom}$}.}
+\sumitem{12--14}{\result{The measured count is $\val{p20.steps.mom}$ against a
   predicted $\val{p20.pred.mom}$, because the walk first overshoots to
   $\val{p20.overshoot}$ times its starting distance and because the optimal
   coefficients give a repeated root. \textbf{A rate is a limit and a step
-  count is not.}}
-\sumitem{15--16}{The advantage grows with $\kappa$ and never reaches
+  count is not.}}}
+\sumitem{15--16}{\result{The advantage grows with $\kappa$ and never reaches
   $\sqrt{\kappa}$: $\val{p20.sweep.ratio.lo}\times$ at
   $\kappa = \val{p20.sweep.k.lo}$ and $\val{p20.sweep.ratio.hi}\times$ at
   $\kappa = \val{p20.sweep.k.hi}$, against a ceiling of
-  $\val{p20.sweep.sqrt.hi}$.}
-\sumitem{17--19}{$v \leftarrow \beta v + g$ and
+  $\val{p20.sweep.sqrt.hi}$}.}
+\sumitem{17--19}{\result{$v \leftarrow \beta v + g$ and
   $v \leftarrow \beta v + (1-\beta)g$ point the same way and differ in length
   by $1/(1-\beta)$. \textbf{A step size does not travel between them}:
   rescaling reproduces a $\val{p20.conv.same}$-step walk exactly and not
-  rescaling diverges.}
-\sumitem{20}{What travels with a hyperparameter is the expression it appears
-  in, never the number on its own.}
-\sumitem{21--24}{Dividing by $\sqrt{v}$ removes the units, so the step is
+  rescaling diverges}.}
+\sumitem{20}{\result{What travels with a hyperparameter is the expression it appears
+  in, never the number on its own}.}
+\sumitem{21--24}{\result{Dividing by $\sqrt{v}$ removes the units, so the step is
   about $\eta$ whatever the gradient's size \dash{} which is also why Adam is
-  insensitive to loss scaling. Both averages together are Adam.}
-\sumitem{25}{Measured over twelve decades the first step is
+  insensitive to loss scaling. Both averages together are Adam}.}
+\sumitem{25}{\result{Measured over twelve decades the first step is
   $\eta/(1 + \varepsilon/\lvert g\rvert)$, so the only departure from $\eta$
-  is the epsilon's, and it is largest where the gradient is smallest.}
-\sumitem{26--27}{The epsilon goes \textbf{outside} the root, where it is
+  is the epsilon's, and it is largest where the gradient is smallest}.}
+\sumitem{26--27}{\result{The epsilon goes \textbf{outside} the root, where it is
   compared with a gradient. Inside it is compared with a gradient squared:
   $\val{p20.eps.short.in}$ per cent of the step lost against
-  $\val{p20.eps.short.out}$.}
-\sumitem{28--29}{Under Program~\ref{prog:P17}'s reparameterisation plain
+  $\val{p20.eps.short.out}$}.}
+\sumitem{28--29}{\result{Under Program~\ref{prog:P17}'s reparameterisation plain
   descent diverges \dash{} $\val{p20.sgd.overshoot}$ times past its bound
   \dash{} and Adam takes the same $\val{p20.adam.plain}$ steps.
   \textbf{An adaptive method's answer does not depend on how the parameters
-  were written.}}
-\sumitem{30--31}{Bias correction is Program~\ref{prog:F04}'s
+  were written.}}}
+\sumitem{30--31}{\result{Bias correction is Program~\ref{prog:F04}'s
   $1 - \beta^{\,t}$, one per coefficient, and at $\beta_2 = \num{0.999}$ it is
-  working for hundreds of steps rather than for three.}
-\sumitem{32--33}{A warmup protects a denominator estimated from almost no
+  working for hundreds of steps rather than for three}.}
+\sumitem{32--33}{\result{A warmup protects a denominator estimated from almost no
   data: the scale estimate swings by $\val{p20.warm.early}$ over ten steps and
-  $\val{p20.warm.late}$ over three hundred.}
-\sumitem{34--35}{A penalty can be added to the gradient or subtracted from
-  the weight, and \textbf{for plain descent the two are the same line}.}
-\sumitem{36--37}{For an adaptive method they are not: the penalty in the
+  $\val{p20.warm.late}$ over three hundred}.}
+\sumitem{34--35}{\result{A penalty can be added to the gradient or subtracted from
+  the weight, and \textbf{for plain descent the two are the same line}}.}
+\sumitem{36--37}{\result{For an adaptive method they are not: the penalty in the
   gradient is divided by the running scale with everything else, so one
   $\lambda$ leaves the steep coordinate at $\val{p20.wd.l2.steep}$ and the
-  flat one at $\val{p20.wd.l2.flat}$.}
-\sumitem{38--39}{\code{gamma} \emph{multiplies}:
+  flat one at $\val{p20.wd.l2.flat}$}.}
+\sumitem{38--39}{\result{\code{gamma} \emph{multiplies}:
   $\val{p20.sched.lr0}$ becomes $\val{p20.sched.after}$ over
   $\val{p20.sched.boundaries}$ boundaries, which is
-  $\val{p20.sched.factor}$ times smaller than the misreading.}
-\sumitem{40--42}{A cosine and a line spend the same budget \dash{}
+  $\val{p20.sched.factor}$ times smaller than the misreading}.}
+\sumitem{40--42}{\result{A cosine and a line spend the same budget \dash{}
   $\val{p20.cos.area}$ of the peak \dash{} so the argument for a shape is
-  about \emph{when} the step is spent, never about \emph{how much}.}
+  about \emph{when} the step is spent, never about \emph{how much}}.}
 \end{summarybox}
 
 \canyou

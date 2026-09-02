@@ -638,60 +638,60 @@ straty była czymkolwiek.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Funkcja jest wypukła, gdy cięciwa nigdy nie schodzi
+\sumitem{1--2}{\result{\textbf{Funkcja jest wypukła, gdy cięciwa nigdy nie schodzi
   poniżej krzywej}, dla każdej pary punktów i każdego położenia między nimi.
-  To jest definicja, a nie jej obrazek.}
-\sumitem{3--4}{\textbf{Nierówność da się sprawdzić tam, gdzie obrazka nie},
+  To jest definicja, a nie jej obrazek}.}
+\sumitem{3--4}{\result{\textbf{Nierówność da się sprawdzić tam, gdzie obrazka nie},
   i dlatego jest tą użyteczną postacią: $\val{p19.chord.fns}$ funkcji po
   $\val{p19.chord.tests}$ trójek każda. $\lvert x\rvert$ jest wypukła i ma
-  ostrze, więc \textbf{wypukłość nie jest gładkością}.}
+  ostrze, więc \textbf{wypukłość nie jest gładkością}}.}
 \sumitem{5--6}{Test, który nie może zawieść, nie jest testem: to samo
   przemiatanie na funkcji czwartego stopnia zawodzi o
   $\val{p19.chord.counterexample}$.}
-\sumitem{7--8}{\textbf{Drugim testem jest obiekt z Programu~\ref{prog:P17}}:
+\sumitem{7--8}{\result{\textbf{Drugim testem jest obiekt z Programu~\ref{prog:P17}}:
   $f'' \ge 0$ wszędzie albo hesjan dodatnio półokreślony wszędzie. Zwróć uwagę
-  na kwantyfikator \dash{} P17 pytał w punkcie, to pyta w każdym punkcie.}
-\sumitem{9--10}{\textbf{Każde minimum lokalne funkcji wypukłej jest globalne},
-  co daje cięciwa w dwóch linijkach. Tym właśnie jest ta obietnica.}
-\sumitem{11--12}{$\val{p19.basins.convex}$ niecka wobec
+  na kwantyfikator \dash{} P17 pytał w punkcie, to pyta w każdym punkcie}.}
+\sumitem{9--10}{\result{\textbf{Każde minimum lokalne funkcji wypukłej jest globalne},
+  co daje cięciwa w dwóch linijkach. Tym właśnie jest ta obietnica}.}
+\sumitem{11--12}{\result{$\val{p19.basins.convex}$ niecka wobec
   $\val{p19.basins.wiggle}$, wartych $\val{p19.wiggle.lo}$ i
   $\val{p19.wiggle.hi}$. \textbf{Wypukłość dotyczy niejednoznaczności, a nie
-  trudności}: problem wypukły bywa powolny, a niewypukły szybki.}
-\sumitem{13--14}{\textbf{To obietnica o problemie, a nie o algorytmie.}
+  trudności}: problem wypukły bywa powolny, a niewypukły szybki}.}
+\sumitem{13--14}{\result{\textbf{To obietnica o problemie, a nie o algorytmie.}
   Optymalizator wciąż może rozbiec się albo pełzać na funkcji wypukłej;
-  wypukłość kupuje to, że osiągnięty punkt stacjonarny jest odpowiedzią.}
-\sumitem{15--16}{\textbf{Nierówność Jensena} to cięciwa przeczytana jako
-  średnia: $f$ ze średniej ważonej jest co najwyżej ważoną średnią z $f$.}
-\sumitem{17--18}{\textbf{Zastosowanie funkcji wypukłej najpierw daje większą
+  wypukłość kupuje to, że osiągnięty punkt stacjonarny jest odpowiedzią}.}
+\sumitem{15--16}{\result{\textbf{Nierówność Jensena} to cięciwa przeczytana jako
+  średnia: $f$ ze średniej ważonej jest co najwyżej ważoną średnią z $f$}.}
+\sumitem{17--18}{\result{\textbf{Zastosowanie funkcji wypukłej najpierw daje większą
   liczbę}, a oba są równe dokładnie wtedy, gdy każde wejście jest takie samo.
-  Dla funkcji wklęsłej każda nierówność się odwraca.}
-\sumitem{19--20}{\textbf{Średnia z wartości perplexity jest zawsze tą większą
+  Dla funkcji wklęsłej każda nierówność się odwraca}.}
+\sumitem{19--20}{\result{\textbf{Średnia z wartości perplexity jest zawsze tą większą
   z dwóch}, bo $e^{x}$ jest wypukłe \dash{} więc obie liczby są uporządkowane,
   a nie tylko różne, a para z Programu~\ref{prog:F04} jest bramkowana wobec
-  tego uporządkowania.}
-\sumitem{21}{\textbf{Przekonanie trzyma się, bo jest prawie prawdziwe}: obie
+  tego uporządkowania}.}
+\sumitem{21}{\result{\textbf{Przekonanie trzyma się, bo jest prawie prawdziwe}: obie
   liczby zgadzają się dokładnie wtedy, gdy każdy token kosztuje tyle samo,
-  czyli tak, jak wygląda podkładka testowa.}
-\sumitem{22--24}{\textbf{Rozmiar błędu ustala rozrzut strat}, a nie model:
+  czyli tak, jak wygląda podkładka testowa}.}
+\sumitem{22--24}{\result{\textbf{Rozmiar błędu ustala rozrzut strat}, a nie model:
   $\val{p19.ppl.ratio.00}$ przy zerowym rozrzucie i
   $\val{p19.ppl.ratio.20}$ przy $\num{2.0}$ nata, przy nieruchomej poprawnej
   liczbie. Harness z tym błędem przechodzi na podkładce i podaje źle na
-  prawdziwym korpusie.}
-\sumitem{25--26}{Trzymaj to osobno od średniej makro i mikro, którą
+  prawdziwym korpusie}.}
+\sumitem{25--26}{\result{Trzymaj to osobno od średniej makro i mikro, którą
   Program~\ref{prog:F04} stawia obok: \textbf{tam szkodę robią wagi, a tu
-  krzywizna}, i nie mają tej samej naprawy.}
-\sumitem{27--28}{\textbf{$\ln$ jest wklęsły, więc nierówność się odwraca}, a
-  $\ln\Ex[x] \ge \Ex[\ln x]$ to ELBO w jednej linijce. Nazwane tu dla
+  krzywizna}, i nie mają tej samej naprawy}.}
+\sumitem{27--28}{\result{\textbf{$\ln$ jest wklęsły, więc nierówność się odwraca}, a
+  $\ln\Ex[x] \ge \Ex[\ln x]$ to ELBO w jednej linijce.} Nazwane tu dla
   rozpoznania; sama metoda nie należy do tej książki.}
-\sumitem{29--30}{\textbf{Jensen dla $x^{2}$ to nieujemność wariancji}, i
-  dlatego warto znać tę nierówność z nazwy: jedno stwierdzenie, trzy miejsca.}
-\sumitem{31--32}{\textbf{Strata sieci jest niewypukła przed jakąkolwiek
+\sumitem{29--30}{\result{\textbf{Jensen dla $x^{2}$ to nieujemność wariancji}, i
+  dlatego warto znać tę nierówność z nazwy: jedno stwierdzenie, trzy miejsca}.}
+\sumitem{31--32}{\result{\textbf{Strata sieci jest niewypukła przed jakąkolwiek
   aktywacją i jakąkolwiek głębokością}, bo wagi różnych warstw się mnożą, a
-  iloczyn dwóch zmiennych jest siodłem.}
-\sumitem{33--38}{\textbf{Stracone zostaje jedno twierdzenie i nic więcej.}
+  iloczyn dwóch zmiennych jest siodłem}.}
+\sumitem{33--38}{\result{\textbf{Stracone zostaje jedno twierdzenie i nic więcej.}
   Najbardziej stromy kierunek, ograniczenie na krok i tożsamości gradientowe
   wyprowadzono bez wypukłości. \textbf{A nierówność przeżywa obietnicę}, i to
-  czyni ten program wartym swoich ramek.}
+  czyni ten program wartym swoich ramek}.}
 \end{summarybox}
 
 \canyou

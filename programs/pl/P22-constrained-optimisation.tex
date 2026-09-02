@@ -599,57 +599,57 @@ optymalizacji.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--2}{Ograniczenie usuwa odpowiedź, której chciałeś. Zostaje
-  \textbf{zbiór dopuszczalny}, a zadaniem jest najlepszy punkt na nim.}
-\sumitem{3--4}{Podstawienie rozwiązuje mały przypadek dokładnie i nie uogólnia
+\sumitem{1--2}{\result{Ograniczenie usuwa odpowiedź, której chciałeś. Zostaje
+  \textbf{zbiór dopuszczalny}, a zadaniem jest najlepszy punkt na nim}.}
+\sumitem{3--4}{\result{Podstawienie rozwiązuje mały przypadek dokładnie i nie uogólnia
   się, bo większości ograniczeń nie da się przekształcić. Metoda, która
-  następuje, \textbf{nigdy nie rozwiązuje ograniczenia}.}
-\sumitem{5--6}{Wynik Programu~\ref{prog:P15} \dash{} gradient jest prostopadły
+  następuje, \textbf{nigdy nie rozwiązuje ograniczenia}}.}
+\sumitem{5--6}{\result{Wynik Programu~\ref{prog:P15} \dash{} gradient jest prostopadły
   do poziomicy \dash{} powiedziany o dwóch funkcjach naraz jest całością tego
-  programu.}
-\sumitem{7--8}{Poziomica \emph{przecinająca} ograniczenie nigdy nie jest
+  programu}.}
+\sumitem{7--8}{\result{Poziomica \emph{przecinająca} ograniczenie nigdy nie jest
   optymalna, bo można przesunąć się wzdłuż i poprawić. Optimum jest tam, gdzie
-  się \textbf{stykają}.}
-\sumitem{9}{Styczność znaczy zgodność stycznych, więc oba gradienty są
+  się \textbf{stykają}}.}
+\sumitem{9}{\result{Styczność znaczy zgodność stycznych, więc oba gradienty są
   \textbf{równoległe}: $\nabla f = \lambda\nabla g$. Stamtąd bierze się
-  $\lambda$.}
-\sumitem{10--11}{Trzy równania, trzy niewiadome, rozwiązane na ułamkach:
+  $\lambda$}.}
+\sumitem{10--11}{\result{Trzy równania, trzy niewiadome, rozwiązane na ułamkach:
   $\lambda = \val{p22.lam}$ w $(\val{p22.x}, \val{p22.y})$. Konwencje znaku
-  różnią się między książkami; czytaj wiersz, a nie literę.}
-\sumitem{12--14}{$\lambda = \mathrm{d}f^{*}/\mathrm{d}c$, sprawdzone jako
+  różnią się między książkami; czytaj wiersz, a nie literę}.}
+\sumitem{12--14}{\result{$\lambda = \mathrm{d}f^{*}/\mathrm{d}c$, sprawdzone jako
   \textbf{równość} na ułamkach na $\val{p22.price.levels}$ poziomach.
-  \textbf{Mnożnik jest ceną}, w jednostkach celu na jednostkę ograniczenia.}
-\sumitem{15--16}{Wycenia \emph{pierwszą} jednostkę: poluzowanie z
+  \textbf{Mnożnik jest ceną}, w jednostkach celu na jednostkę ograniczenia}.}
+\sumitem{15--16}{\result{Wycenia \emph{pierwszą} jednostkę: poluzowanie z
   $\val{p22.relax.from}$ do $\val{p22.relax.to}$ daje $\val{p22.relax.gain}$
-  wobec mnożnika $\val{p22.relax.lam}$, a różnicą jest krzywizna $f^{*}$.}
-\sumitem{17}{Jest tym samym obiektem co cena dualna z solvera i mówi, na które
-  ograniczenia warto wydać pieniądze.}
-\sumitem{18--19}{Drugim sposobem egzekwowania ograniczenia jest
+  wobec mnożnika $\val{p22.relax.lam}$, a różnicą jest krzywizna $f^{*}$}.}
+\sumitem{17}{\result{Jest tym samym obiektem co cena dualna z solvera i mówi, na które
+  ograniczenia warto wydać pieniądze}.}
+\sumitem{18--19}{\result{Drugim sposobem egzekwowania ograniczenia jest
   \textbf{rzutowanie} na nie, czyli obiekt z Programu~\ref{prog:P05} z normalną
-  ograniczenia w miejscu wektora.}
-\sumitem{20--21}{Rzutowanie odpowiada na pytanie \emph{który punkt dopuszczalny
+  ograniczenia w miejscu wektora}.}
+\sumitem{20--21}{\result{Rzutowanie odpowiada na pytanie \emph{który punkt dopuszczalny
   jest najbliżej}, a mnożnik \emph{który jest najlepszy}: $\val{p22.proj.f}$
   wobec $\val{p22.fstar}$. Rzutowanie utrzymuje punkt legalnym; nie czyni go
-  dobrym.}
-\sumitem{22--23}{Cel zapisany jako nagroda minus $\beta$ razy dywergencja ma w
+  dobrym}.}
+\sumitem{22--23}{\result{Cel zapisany jako nagroda minus $\beta$ razy dywergencja ma w
   sobie mnożnik, a $\beta$ jest \textbf{ceną w nagrodzie na jednostkę
-  dywergencji}.}
-\sumitem{24--25}{Zmierzone wzdłuż rodziny rozwiązań, nachylenie nagrody
+  dywergencji}}.}
+\sumitem{24--25}{\result{Zmierzone wzdłuż rodziny rozwiązań, nachylenie nagrody
   względem dywergencji to samo $\beta$, z dokładnością lepszą niż
   $\val{p22.kl.slope.bound}$. $\beta$ dostrojone przy jednym modelu nagrody nie
-  przenosi się więc na drugi.}
-\sumitem{26--28}{Każde $\beta$ nazywa jeden poziom dywergencji, więc
+  przenosi się więc na drugi}.}
+\sumitem{26--28}{\result{Każde $\beta$ nazywa jeden poziom dywergencji, więc
   \textbf{twarde ograniczenie i kara to to samo zadanie} inaczej
-  sparametryzowane, i żadne nie jest bardziej podstawowe.}
-\sumitem{29--31}{Nierówność jest aktywna albo ma zapas. Aktywna to równość;
+  sparametryzowane, i żadne nie jest bardziej podstawowe}.}
+\sumitem{29--31}{\result{Nierówność jest aktywna albo ma zapas. Aktywna to równość;
   zapas znaczy, że ograniczenie nic nie kupuje, więc jego cena wynosi
-  \textbf{zero}. Razem: $\lambda g(x) = 0$, komplementarność.}
-\sumitem{32}{Warunki KKT to stacjonarność, dopuszczalność, $\lambda \ge 0$ i
-  komplementarność \dash{} podane do rozpoznania, z warunkiem regularności i
+  \textbf{zero}. Razem: $\lambda g(x) = 0$, komplementarność}.}
+\sumitem{32}{\result{Warunki KKT to stacjonarność, dopuszczalność, $\lambda \ge 0$ i
+  komplementarność} \dash{} podane do rozpoznania, z warunkiem regularności i
   argumentem o dostateczności zostawionymi pierwszemu kursowi.}
-\sumitem{33--35}{Ujemny mnożnik przy ograniczeniu $\le$ znaczy, że konwencja
+\sumitem{33--35}{\result{Ujemny mnożnik przy ograniczeniu $\le$ znaczy, że konwencja
   znaku nie jest tą, którą założyłeś, bo większy zbiór dopuszczalny nie może
-  mieć gorszego najlepszego punktu.}
+  mieć gorszego najlepszego punktu}.}
 \end{summarybox}
 
 \canyou

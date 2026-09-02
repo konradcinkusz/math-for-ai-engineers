@@ -687,68 +687,68 @@ is usually two lines of arithmetic that nobody had written down.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--2}{A minibatch gradient is an \textbf{estimate} of the gradient
-  you wanted. The noise is the method rather than a defect in it.}
-\sumitem{3--4}{\emph{Unbiased} means the average over every batch that could
+\sumitem{1--2}{\result{A minibatch gradient is an \textbf{estimate} of the gradient
+  you wanted. The noise is the method rather than a defect in it}.}
+\sumitem{3--4}{\result{\emph{Unbiased} means the average over every batch that could
   have been drawn is exact \dash{} proved here over all
   $\val{p21.pop.subsets}$ of them, over fractions, which is a proof for this
-  population rather than evidence about it.}
-\sumitem{5--6}{It says nothing about one draw: the batch means run from
+  population rather than evidence about it}.}
+\sumitem{5--6}{\result{It says nothing about one draw: the batch means run from
   $\val{p21.pop.lo}$ to $\val{p21.pop.hi}$ around $\val{p21.pop.mean}$, and
-  one of them has the wrong sign.}
+  one of them has the wrong sign}.}
 \sumitem{7}{The forward prerequisite is declared: variance itself is
   Program~\ref{prog:P24}'s and concentration is Program~\ref{prog:P25}'s, two
   parts later, and P25 returns to minibatch noise once the machinery exists.}
-\sumitem{8--9}{The variance of a batch mean falls like $1/B$, measured to
+\sumitem{8--9}{\result{The variance of a batch mean falls like $1/B$, measured to
   within $\val{p21.noise.tol}$ per cent over $B$ from
-  $\val{p21.noise.b.lo}$ to $\val{p21.noise.b.hi}$.}
-\sumitem{10--11}{\textbf{The spread falls like $1/\sqrt{B}$}, so
+  $\val{p21.noise.b.lo}$ to $\val{p21.noise.b.hi}$}.}
+\sumitem{10--11}{\result{\textbf{The spread falls like $1/\sqrt{B}$}, so
   $\val{p21.noise.b16}$ times the batch buys $\val{p21.noise.spread16}$ times
   less noise. That square root is the whole of \enquote{diminishing returns}
-  and it is exact rather than a rule of thumb.}
-\sumitem{12}{The step's spread is $\eta$ times the estimate's, so $\eta$ and
-  $B$ are two numbers describing one quantity.}
-\sumitem{13--14}{An enormous step happens because a batch mean has a spread.
-  Nothing is wrong with the model, the data or the optimiser when it does.}
-\sumitem{15--17}{A clipping threshold is a decision about a distribution: at
+  and it is exact rather than a rule of thumb}.}
+\sumitem{12}{\result{The step's spread is $\eta$ times the estimate's, so $\eta$ and
+  $B$ are two numbers describing one quantity}.}
+\sumitem{13--14}{\result{An enormous step happens because a batch mean has a spread.
+  Nothing is wrong with the model, the data or the optimiser when it does}.}
+\sumitem{15--17}{\result{A clipping threshold is a decision about a distribution: at
   half the typical size it clips $\val{p21.clip.half}$ per cent of steps and
   at four times it, $\val{p21.clip.four.n}$ of $\val{p21.clip.trials}$.
   \textbf{The first is a different algorithm}, following the direction and
   discarding the magnitude, and the safe threshold is the one that almost
-  never fires.}
-\sumitem{18--19}{The update's variance is $\eta^{2}\sigma^{2}/B$, which
-  settles the scaling question mechanically.}
-\sumitem{20--21}{Scaling $\eta$ by $\sqrt{k}$ holds that variance
+  never fires}.}
+\sumitem{18--19}{\result{The update's variance is $\eta^{2}\sigma^{2}/B$, which
+  settles the scaling question mechanically}.}
+\sumitem{20--21}{\result{Scaling $\eta$ by $\sqrt{k}$ holds that variance
   \textbf{exactly} fixed; scaling it by $k$ multiplies it by
   $\val{p21.scale.linear}$ and holds the ground covered per example fixed
   instead. Two rules, two invariants, and the empirical question is not
-  settled here.}
-\sumitem{22}{Keeping $\eta$ while changing $B$ holds neither fixed, which is
-  why it is the one choice nobody argues for.}
-\sumitem{23--24}{A smoothed loss curve lags by its half-life:
+  settled here}.}
+\sumitem{22}{\result{Keeping $\eta$ while changing $B$ holds neither fixed, which is
+  why it is the one choice nobody argues for}.}
+\sumitem{23--24}{\result{A smoothed loss curve lags by its half-life:
   $\val{p21.ema.lag}$ steps measured against $\val{p21.ema.halflife}$
   committed by Program~\ref{prog:F04}. The lag does not depend on the size of
-  the change.}
-\sumitem{25}{Read the raw curve when the question is \emph{when} and the
-  smoothed one when it is \emph{whether}.}
-\sumitem{26--27}{Accumulating micro-batches with different token counts gives
+  the change}.}
+\sumitem{25}{\result{Read the raw curve when the question is \emph{when} and the
+  smoothed one when it is \emph{whether}}.}
+\sumitem{26--27}{\result{Accumulating micro-batches with different token counts gives
   $\val{p21.acc.accumulated}$ where the large batch gives
   $\val{p21.acc.pooled}$ \dash{} and it is the \textbf{gradient} rather than a
   report, because the loss that was averaged wrongly is the loss that was
-  differentiated.}
-\sumitem{28--30}{With equal token counts the two are identical over fractions,
+  differentiated}.}
+\sumitem{28--30}{\result{With equal token counts the two are identical over fractions,
   which is exactly why it ships: it is invisible on a padded fixture and
-  decisive on real text.}
-\sumitem{31--33}{A sampling step has no derivative, and there are two ways
+  decisive on real text}.}
+\sumitem{31--33}{\result{A sampling step has no derivative, and there are two ways
   round it: the score function, which needs only the value, and
-  reparameterisation, which needs a differentiable path.}
-\sumitem{34--35}{Both are unbiased. The reparameterised estimator's variance
+  reparameterisation, which needs a differentiable path}.}
+\sumitem{34--35}{\result{Both are unbiased. The reparameterised estimator's variance
   is $\val{p21.grad.repar}$ at \emph{every} dimension; the score function's
-  goes to $\val{p21.grad.score.hi}$, a factor of $\val{p21.grad.ratio.hi}$.}
-\sumitem{36--38}{After $\val{p21.grad.samples}$ samples the score-function
+  goes to $\val{p21.grad.score.hi}$, a factor of $\val{p21.grad.ratio.hi}$}.}
+\sumitem{36--38}{\result{After $\val{p21.grad.samples}$ samples the score-function
   estimate is still $\val{p21.grad.off.score}$ per cent out.
   \textbf{Unbiased is not the same as usable}, and that is the fork between a
-  variational model and a policy gradient.}
+  variational model and a policy gradient}.}
 \sumitem{39}{Every complaint in this program was a statement about a
   \textbf{variance} and none was a statement about the model.}
 \end{summarybox}

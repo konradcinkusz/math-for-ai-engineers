@@ -673,60 +673,60 @@ anything at all.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{A function is convex when the chord never dips below
+\sumitem{1--2}{\result{\textbf{A function is convex when the chord never dips below
   the curve}, for every pair of points and every position between them. That
-  is the definition, not a picture of it.}
-\sumitem{3--4}{\textbf{The inequality can be checked where the picture cannot},
+  is the definition, not a picture of it}.}
+\sumitem{3--4}{\result{\textbf{The inequality can be checked where the picture cannot},
   which is why it is the useful form: $\val{p19.chord.fns}$ functions over
   $\val{p19.chord.tests}$ triples each. $\lvert x\rvert$ is convex and has a
-  corner, so \textbf{convexity is not smoothness}.}
+  corner, so \textbf{convexity is not smoothness}}.}
 \sumitem{5--6}{A test that cannot fail is not a test: the same sweep on a
   quartic fails by $\val{p19.chord.counterexample}$.}
-\sumitem{7--8}{\textbf{The second test is Program~\ref{prog:P17}'s object}:
+\sumitem{7--8}{\result{\textbf{The second test is Program~\ref{prog:P17}'s object}:
   $f'' \ge 0$ everywhere, or the Hessian positive semi-definite everywhere.
-  Note the quantifier \dash{} P17 asked at a point, this asks at every point.}
-\sumitem{9--10}{\textbf{Every local minimum of a convex function is global},
-  by the chord in two lines. That is what the promise is.}
-\sumitem{11--12}{$\val{p19.basins.convex}$ basin against
+  Note the quantifier \dash{} P17 asked at a point, this asks at every point}.}
+\sumitem{9--10}{\result{\textbf{Every local minimum of a convex function is global},
+  by the chord in two lines. That is what the promise is}.}
+\sumitem{11--12}{\result{$\val{p19.basins.convex}$ basin against
   $\val{p19.basins.wiggle}$, worth $\val{p19.wiggle.lo}$ and
   $\val{p19.wiggle.hi}$. \textbf{Convexity is about ambiguity, not
-  difficulty}: a convex problem can be slow and a non-convex one fast.}
-\sumitem{13--14}{\textbf{It is a promise about the problem, not the
+  difficulty}: a convex problem can be slow and a non-convex one fast}.}
+\sumitem{13--14}{\result{\textbf{It is a promise about the problem, not the
   algorithm.} An optimiser can still diverge or crawl on a convex function;
-  what convexity buys is that a stationary point it reaches is the answer.}
-\sumitem{15--16}{\textbf{Jensen's inequality} is the chord read as an average:
-  $f$ of a weighted mean is at most the weighted mean of $f$.}
-\sumitem{17--18}{\textbf{Applying the convex function first gives the larger
+  what convexity buys is that a stationary point it reaches is the answer}.}
+\sumitem{15--16}{\result{\textbf{Jensen's inequality} is the chord read as an average:
+  $f$ of a weighted mean is at most the weighted mean of $f$}.}
+\sumitem{17--18}{\result{\textbf{Applying the convex function first gives the larger
   number}, and the two are equal exactly when every input is the same. For a
-  concave function every inequality turns round.}
-\sumitem{19--20}{\textbf{An average of perplexities is always the larger of
+  concave function every inequality turns round}.}
+\sumitem{19--20}{\result{\textbf{An average of perplexities is always the larger of
   the two}, because $e^{x}$ is convex \dash{} so the two numbers are ordered
   and not merely different, and Program~\ref{prog:F04}'s pair is gated
-  against that ordering.}
-\sumitem{21}{\textbf{The belief survives because it is almost true}: the two
+  against that ordering}.}
+\sumitem{21}{\result{\textbf{The belief survives because it is almost true}: the two
   agree exactly when every token costs the same, which is what a test fixture
-  looks like.}
-\sumitem{22--24}{\textbf{The size of the error is set by the spread of the
+  looks like}.}
+\sumitem{22--24}{\result{\textbf{The size of the error is set by the spread of the
   losses}, not by the model: $\val{p19.ppl.ratio.00}$ at zero spread and
   $\val{p19.ppl.ratio.20}$ at $\num{2.0}$ nats, with the right number
   unmoved. A harness with the bug passes on a fixture and misreports on a
-  real corpus.}
-\sumitem{25--26}{Keep it apart from the macro/micro average
+  real corpus}.}
+\sumitem{25--26}{\result{Keep it apart from the macro/micro average
   Program~\ref{prog:F04} sets beside it: \textbf{there the weights do the
-  damage and here the curvature does}, and the two do not have the same fix.}
-\sumitem{27--28}{\textbf{$\ln$ is concave, so the inequality turns round}, and
-  $\ln\Ex[x] \ge \Ex[\ln x]$ is the ELBO in one line. Named here for
+  damage and here the curvature does}, and the two do not have the same fix}.}
+\sumitem{27--28}{\result{\textbf{$\ln$ is concave, so the inequality turns round}, and
+  $\ln\Ex[x] \ge \Ex[\ln x]$ is the ELBO in one line.} Named here for
   recognition; the method is not this book's.}
-\sumitem{29--30}{\textbf{Jensen for $x^{2}$ is the variance being
+\sumitem{29--30}{\result{\textbf{Jensen for $x^{2}$ is the variance being
   non-negative}, which is why the inequality is worth knowing by name: one
-  statement, three places.}
-\sumitem{31--32}{\textbf{A network's loss is non-convex before any activation
+  statement, three places}.}
+\sumitem{31--32}{\result{\textbf{A network's loss is non-convex before any activation
   or any depth}, because the weights of different layers multiply and a
-  product of two variables is a saddle.}
-\sumitem{33--38}{\textbf{What is lost is one claim and nothing else.} The
+  product of two variables is a saddle}.}
+\sumitem{33--38}{\result{\textbf{What is lost is one claim and nothing else.} The
   steepest direction, the step-size bound and the gradient identities were all
   derived without convexity. \textbf{And the inequality survives the promise},
-  which is why this program is worth its frames.}
+  which is why this program is worth its frames}.}
 \end{summarybox}
 
 \canyou
