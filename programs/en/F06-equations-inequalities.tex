@@ -973,85 +973,85 @@ of them keeps the direction.}{clipping by value against by norm}
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Solving is undoing.} Do the same thing to both sides,
+\sumitem{1--3}{\result{\textbf{Solving is undoing.} Do the same thing to both sides,
   and meet the operations in the reverse of the order they were applied \dash{}
-  which is Program~\ref{prog:F05}'s inverse arriving as a procedure.}
-\sumitem{2}{\textbf{Put the answer back into the original equation.} It costs
-  one line and it catches a sign error without your having to find it. Every
+  which is Program~\ref{prog:F05}'s inverse arriving as a procedure}.}
+\sumitem{2}{\result{\textbf{Put the answer back into the original equation.} It costs
+  one line and it catches a sign error without your having to find it.} Every
   solution this program prints is substituted back by
   \code{code/f06\_equations.py}, which fails the build if one does not close.}
-\sumitem{5--6}{\textbf{Dividing both sides by an unknown throws away a
+\sumitem{5--6}{\result{\textbf{Dividing both sides by an unknown throws away a
   solution.} $x^{2} = 4x$ has $x = 0$ as well as $x = 4$, and dividing by $x$
   assumes the answer to the question being asked. Factorise instead, and say
-  out loud what you are assuming is not zero.}
-\sumitem{7}{An equation can have no solution ($x = x + 1$ reduces to $0 = 1$)
+  out loud what you are assuming is not zero}.}
+\sumitem{7}{\result{An equation can have no solution ($x = x + 1$ reduces to $0 = 1$)
   or every solution ($2x = x + x$ reduces to $0 = 0$). Both come back in
-  section 4 with a picture attached.}
-\sumitem{8--9}{Any letter can be made the subject. State the condition every
+  section 4 with a picture attached}.}
+\sumitem{8--9}{\result{Any letter can be made the subject. State the condition every
   time you divide by one: $w = \frac{y-b}{x}$ needs $x \ne 0$, and at $x = 0$
-  the data genuinely cannot tell you the weight.}
-\sumitem{10--12}{A logistic unit is invertible: $x = \frac{\logit(p)-b}{w}$.
+  the data genuinely cannot tell you the weight}.}
+\sumitem{10--12}{\result{A logistic unit is invertible: $x = \frac{\logit(p)-b}{w}$.
   At $w = 2$, $b = -3$ a report of $\num{0.5}$ came from $\num{1.5}$, which is
   $-\frac{b}{w}$ and agrees with Program~\ref{prog:F05}; $\num{0.8}$ came from
   $\val{f06.solve.p8}$ and $\num{0.99}$ from $\val{f06.solve.p99}$. The last
-  step of probability costs the most input.}
-\sumitem{12--13}{\textbf{A square root taken across an equation carries both
+  step of probability costs the most input}.}
+\sumitem{12--13}{\result{\textbf{A square root taken across an equation carries both
   signs.} $x^{2} = 9$ gives $\pm 3$, because $x^{2}$ is not one-to-one and so
-  has no single inverse to apply.}
-\sumitem{14--17}{$y = mx + c$ is a gradient and an intercept, which are
+  has no single inverse to apply}.}
+\sumitem{14--17}{\result{$y = mx + c$ is a gradient and an intercept, which are
   Program~\ref{prog:F05}'s stretch and shift and a paper's $w$ and $b$. The
   gradient through two points is $\frac{y_2-y_1}{x_2-x_1}$, and
-  \emph{lies on the line} and \emph{satisfies the equation} are one statement.}
-\sumitem{17--18}{\textbf{$y = wx + b$ is the entire linear model}: one input,
+  \emph{lies on the line} and \emph{satisfies the equation} are one statement}.}
+\sumitem{17--18}{\result{\textbf{$y = wx + b$ is the entire linear model}: one input,
   one output, two numbers to choose. A wider layer holds $n$ weights and one
-  bias, and nothing about the shape changes.}
-\sumitem{19--20}{Parallel means equal gradients; perpendicular means gradients
+  bias, and nothing about the shape changes}.}
+\sumitem{19--20}{\result{Parallel means equal gradients; perpendicular means gradients
   multiplying to $-1$, which Program~\ref{prog:P05} will restate as a dot
-  product of zero.}
-\sumitem{21}{$y = mx + c$ does not describe a vertical line, whose gradient
+  product of zero}.}
+\sumitem{21}{\result{$y = mx + c$ does not describe a vertical line, whose gradient
   does not exist \dash{} and $x = 3$ is not a function of $x$ either. The two
   facts are one fact, and $ax + by = c$ covers both cases at the price of
-  hiding the gradient.}
-\sumitem{22--24}{Two equations in two unknowns are two lines, solved by
+  hiding the gradient}.}
+\sumitem{22--24}{\result{Two equations in two unknowns are two lines, solved by
   substitution or by elimination. \textbf{Check in both equations}, because a
-  substituted answer satisfies the equation it was substituted into for free.}
-\sumitem{24--27}{\textbf{Three outcomes and no others}: different gradients
+  substituted answer satisfies the equation it was substituted into for free}.}
+\sumitem{24--27}{\result{\textbf{Three outcomes and no others}: different gradients
   give one crossing, equal gradients with different intercepts give none, and
   equal gradients with equal intercepts give every point of the line. Which
   one you have is readable from $a_1 b_2 - a_2 b_1$ before any solving \dash{}
   and that expression is the determinant Program~\ref{prog:P09} gives a
-  meaning to.}
-\sumitem{28--29}{An inequality asks for a range. Adding, subtracting and
+  meaning to}.}
+\sumitem{28--29}{\result{An inequality asks for a range. Adding, subtracting and
   scaling by a \emph{positive} number all carry across from section 1
-  unchanged, and a check needs a value inside the range and one outside it.}
-\sumitem{29--31}{\textbf{Multiplying or dividing an inequality by a negative
+  unchanged, and a check needs a value inside the range and one outside it}.}
+\sumitem{29--31}{\result{\textbf{Multiplying or dividing an inequality by a negative
   number reverses it}, and it is the only step that does not carry across.
   $2 < 5$ but $-2 > -5$: multiplying by a negative reflects the line.
   \textbf{The reliable fix is to avoid the step} \dash{} move the term across
-  instead and you never have to remember to flip.}
-\sumitem{32--33}{$-1 \le x \le 1$ is two inequalities sharing a middle, and
+  instead and you never have to remember to flip}.}
+\sumitem{32--33}{\result{$-1 \le x \le 1$ is two inequalities sharing a middle, and
   every operation applies to all three parts. If the larger number ends up on
-  the left you have negated and forgotten to swap.}
-\sumitem{34--35}{\textbf{A decision threshold is an inequality.}
+  the left you have negated and forgotten to swap}.}
+\sumitem{34--35}{\result{\textbf{A decision threshold is an inequality.}
   $\sigma(z) > \num{0.5}$ is $z > 0$, because $\sigma$ is strictly increasing
   and Program~\ref{prog:F05} showed that such a function preserves order. A
   threshold of $\num{0.9}$ is $z > \val{f05.logit.p9}$, so a threshold can be
-  moved without computing a single probability.}
-\sumitem{36--37}{\textbf{A clipped value is two inequalities enforced}:
+  moved without computing a single probability}.}
+\sumitem{36--37}{\result{\textbf{A clipped value is two inequalities enforced}:
   $\clip(x) = \max(-1, \min(1, x))$, read inside out. $\relu$ is the same
   machine with one bound. Outside the bounds the output is constant, so the
-  input cannot be recovered from it.}
-\sumitem{38--40}{\textbf{Clipping a vector by value and by norm are different
+  input cannot be recovered from it}.}
+\sumitem{38--40}{\result{\textbf{Clipping a vector by value and by norm are different
   operations with names one word apart.} On $g = (6, \num{0.5},
   -\num{0.25})$, of length $\val{f06.grad.norm}$, clipping by value gives a
   vector of length $\val{f06.clip.value.norm}$ \dash{} still above the
   threshold \dash{} turned $\val{f06.clip.value.angle}$ degrees. Clipping by
   norm lands the length on $\val{f06.clip.norm.norm}$ and turns it not at all,
-  because scaling by one positive number changes no comparison.}
-\sumitem{41--42}{When the complaint is the size of a step, clip by norm: it
+  because scaling by one positive number changes no comparison}.}
+\sumitem{41--42}{\result{When the complaint is the size of a step, clip by norm: it
   bounds what went wrong and keeps what the step was carrying. And print the
   fraction of steps that get clipped, because a threshold below the typical
-  norm is a different algorithm reported as the same one.}
+  norm is a different algorithm reported as the same one}.}
 \end{summarybox}
 
 \canyou

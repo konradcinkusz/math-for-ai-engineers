@@ -827,81 +827,81 @@ ruszyć: potęga o dodatnim wykładniku zachowuje porządek.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{$e$ jest liczbą i jest miejscem, w którym zatrzymuje się
+\sumitem{1--3}{\result{\textbf{$e$ jest liczbą i jest miejscem, w którym zatrzymuje się
   kumulowanie.} $\left(1 + \frac{1}{n}\right)^{n}$ wspina się od $2$ ku
   $\val{f07.e}\ldots$ i nigdy tego nie przekracza. $e^{x}$ spełnia wszystkie
-  prawa potęg z Programu~\ref{prog:F01}, a $e^{0} = 1$.}
-\sumitem{4}{$e$ nie jest podstawą rosnącą najszybciej \dash{} $3^{x}$ ją bije.
+  prawa potęg z Programu~\ref{prog:F01}, a $e^{0} = 1$}.}
+\sumitem{4}{\result{$e$ nie jest podstawą rosnącą najszybciej \dash{} $3^{x}$ ją bije.
   Wyjątkowe jest to, że \textbf{stromość $e^{x}$ równa się jego wysokości}, co
-  ten program stwierdza, a dowodzą Programy~\ref{prog:F11} i~\ref{prog:F12}.}
-\sumitem{4--6}{\textbf{\enquote{Wykładniczy} to twierdzenie o mechanizmie, a
+  ten program stwierdza, a dowodzą Programy~\ref{prog:F11} i~\ref{prog:F12}}.}
+\sumitem{4--6}{\result{\textbf{\enquote{Wykładniczy} to twierdzenie o mechanizmie, a
   nie o szybkości.} Dla $x = 5$ wielomian $x^{5}$ jest
   $\val{f07.poly.at5.ratio}$ razy większy od $e^{x}$, a funkcja wykładnicza
   wyprzedza dopiero w $x = \val{f07.poly.crossover}$. Dodanie ustalonej
   wielkości do argumentu mnoży funkcję wykładniczą przez ustaloną liczbę i na
-  tym polega całość.}
-\sumitem{7--8}{$y_0 e^{kt}$ rośnie dla $k > 0$ i zanika dla $k < 0$. Czas
+  tym polega całość}.}
+\sumitem{7--8}{\result{$y_0 e^{kt}$ rośnie dla $k > 0$ i zanika dla $k < 0$. Czas
   połowicznego zaniku to $\frac{\ln 2}{k}$, czyli
   $\val{f07.decay.halflife}$ kroków przy $k = \num{0.05}$, i \textbf{nie zależy
-  od tego, gdzie wielkość zaczęła}.}
-\sumitem{9--10}{\textbf{Dojście do jednej dziesiątej zajmuje
+  od tego, gdzie wielkość zaczęła}}.}
+\sumitem{9--10}{\result{\textbf{Dojście do jednej dziesiątej zajmuje
   $\val{f07.decay.tenth.halflives}$ czasów połowicznego zaniku}, a nie
   dziesięć i nie pięć, bo $m$ połowień dzieli przez $2^{m}$, a ty chcesz
   $2^{m} = 10$. Program~\ref{prog:F01} podaje $2^{10} \approx 10^{3}$, a to
-  jest ten sam fakt w drugą stronę.}
-\sumitem{11--12}{Mnożnik na krok $\gamma$ to tempo $k = -\ln\gamma$. Blisko
+  jest ten sam fakt w drugą stronę}.}
+\sumitem{11--12}{\result{Mnożnik na krok $\gamma$ to tempo $k = -\ln\gamma$. Blisko
   $\gamma = 1$ obie liczby prawie się zgadzają i dlatego się je myli; przy
-  $\gamma = \num{0.5}$ już nie, bo $-\ln(\num{0.5}) = \num{0.693}$.}
-\sumitem{13--14}{\textbf{Funkcja logistyczna bierze się z szansy.} Jeśli
+  $\gamma = \num{0.5}$ już nie, bo $-\ln(\num{0.5}) = \num{0.693}$}.}
+\sumitem{13--14}{\result{\textbf{Funkcja logistyczna bierze się z szansy.} Jeśli
   szansa wynosi $e^{x}$ do jednego, to prawdopodobieństwo wynosi
   $\frac{e^{x}}{1+e^{x}}$, czyli $\frac{1}{1+e^{-x}}$ po podzieleniu przez
-  $e^{x}$. Obie postacie są w użyciu.}
-\sumitem{15--16}{Dąży do $1$ i do $0$ i nie osiąga żadnej z nich, bo $e^{-x}$
+  $e^{x}$. Obie postacie są w użyciu}.}
+\sumitem{15--16}{\result{Dąży do $1$ i do $0$ i nie osiąga żadnej z nich, bo $e^{-x}$
   nigdy nie jest zerem ani nieskończonością. $\sigma(-x) = 1 - \sigma(x)$, bo
   zmiana znaku $x$ zamienia to, na który wynik podana jest szansa. $x$ to
   logarytm szansy, $e^{x}$ to szansa, $\sigma(x)$ to prawdopodobieństwo: jeden
-  obiekt, trzy odczyty.}
-\sumitem{17--18}{Stromość jest największa w środku, gdzie wynosi dokładnie
+  obiekt, trzy odczyty}.}
+\sumitem{17--18}{\result{Stromość jest największa w środku, gdzie wynosi dokładnie
   $\val{f07.slope.0}$, i spada do $\val{f07.slope.6}$ sześć jednostek dalej
   \dash{} mniej więcej jedna $\val{f07.slope.ratio6}$-ta część.
   \textbf{Jednostka jest najbardziej czuła dokładnie wtedy, gdy jest najmniej
-  pewna.}}
-\sumitem{19--20}{\textbf{$\tanh x = 2\sigma(2x) - 1$}, sprawdzone do
+  pewna.}}}
+\sumitem{19--20}{\result{\textbf{$\tanh x = 2\sigma(2x) - 1$}, sprawdzone do
   $\val{f07.tanh.identity.err}$. To funkcja logistyczna ściśnięta poziomo,
   rozciągnięta pionowo i zsunięta w dół \dash{} trzy ruchy z
-  Programu~\ref{prog:F05} \dash{} więc nie jest drugą funkcją do nauczenia.}
-\sumitem{21--22}{\textbf{$\tanh$ nasyca się mocniej, a nie łagodniej.} Jego
+  Programu~\ref{prog:F05} \dash{} więc nie jest drugą funkcją do nauczenia}.}
+\sumitem{21--22}{\result{\textbf{$\tanh$ nasyca się mocniej, a nie łagodniej.} Jego
   stromość biegnie od $\val{f07.tanh.slope0}$ do $\val{f07.tanh.slope2}$ na
   dwóch jednostkach, przeciw $\val{f07.slope.0}$ do $\val{f07.slope.2}$ u
   funkcji logistycznej, a wynika to z tożsamości: dwa ściśnięcia czynią go w
   środku czterokrotnie bardziej stromym. Argument za nim zawsze dotyczył
-  wyśrodkowania na zerze.}
-\sumitem{23--24}{Jednostka nasycona jest cicha, a nie zepsuta: odpowiada na
+  wyśrodkowania na zerze}.}
+\sumitem{23--24}{\result{Jednostka nasycona jest cicha, a nie zepsuta: odpowiada na
   zmianę argumentu mniej więcej $\val{f07.slope.ratio6}$-tą częścią
   odpowiedzi, którą dałaby w środku. \textbf{To jeszcze nie jest problem
   znikającego gradientu} \dash{} jeden taki czynnik da się przeżyć, a iloczynu
-  czterdziestu nie, a mnożenie należy do Programu~\ref{prog:F12}.}
-\sumitem{25--26}{$\relu$ nie ma po dodatniej stronie żadnej części płaskiej,
+  czterdziestu nie, a mnożenie należy do Programu~\ref{prog:F12}}.}
+\sumitem{25--26}{\result{$\relu$ nie ma po dodatniej stronie żadnej części płaskiej,
   więc nie ma się tam co kumulować; poniżej zera jest płaski w całości, co jest
   ostrzejszą wersją problemu, a nie ucieczką. A nasycenie nie jest żadnym
   argumentem przeciw funkcji logistycznej na \emph{wyjściu}, gdzie to płaskość
-  utrzymuje prawdopodobieństwo w jego zakresie.}
-\sumitem{27--28}{$\softmax(z)_j = \frac{e^{z_j}}{\sum_k e^{z_k}}$: potraktuj
+  utrzymuje prawdopodobieństwo w jego zakresie}.}
+\sumitem{27--28}{\result{$\softmax(z)_j = \frac{e^{z_j}}{\sum_k e^{z_k}}$: potraktuj
   funkcją wykładniczą, dodaj, podziel przez sumę. Dla
   $z = (\num{2.0}, \num{0.5})$ daje
-  $(\val{f07.softmax2.a},\ \val{f07.softmax2.b})$.}
-\sumitem{29}{\textbf{Na dwóch wynikach softmax to funkcja logistyczna ich
+  $(\val{f07.softmax2.a},\ \val{f07.softmax2.b})$}.}
+\sumitem{29}{\result{\textbf{Na dwóch wynikach softmax to funkcja logistyczna ich
   różnicy}, $\frac{e^{a}}{e^{a}+e^{b}} = \sigma(a-b)$, sprawdzone do
   $\val{f07.softmax2.err}$. Zatem jedno wyjście logistyczne i dwuwynikowy
-  softmax to ten sam model.}
-\sumitem{30}{\textbf{Odjęcie największego wyniku od każdego wyniku niczego nie
+  softmax to ten sam model}.}
+\sumitem{30}{\result{\textbf{Odjęcie największego wyniku od każdego wyniku niczego nie
   zmienia}, bo wspólny czynnik skraca się nad kreską i pod nią \dash{} a to
   ono powstrzymuje przepełnienie funkcji wykładniczych. To tożsamość, a nie
-  przybliżenie.}
-\sumitem{31}{Softmax nie może przesunąć $\argmax$, na mocy wyniku
+  przybliżenie}.}
+\sumitem{31}{\result{Softmax nie może przesunąć $\argmax$, na mocy wyniku
   Programu~\ref{prog:F05}. Podzielenie wyników przez temperaturę skaluje każdy
   logarytm szansy przez $\frac{1}{T}$, więc podnosi każdy stosunek szans do
-  potęgi \dash{} i dlatego porządek zostaje, a odstępy nie.}
+  potęgi \dash{} i dlatego porządek zostaje, a odstępy nie}.}
 \end{summarybox}
 
 \canyou

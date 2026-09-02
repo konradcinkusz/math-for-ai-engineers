@@ -1123,84 +1123,84 @@ rosnące}
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--4}{\textbf{Funkcja to maszyna dająca jedną wartość na argument.}
+\sumitem{1--4}{\result{\textbf{Funkcja to maszyna dająca jedną wartość na argument.}
   Dwie wartości dla jednego argumentu to nie funkcja \dash{}
   $x^{2} + y^{2} = 18$ oferuje $3$ i $-3$ dla $x = 3$ \dash{} a pionowa
   linijka to ten warunek stosowany okiem. Dwa argumenty dzielące jedną wartość
-  są zupełnie zwyczajne.}
-\sumitem{4--5}{\emph{Dziedzina} to zbiór argumentów, które maszyna przyjmuje, a
+  są zupełnie zwyczajne}.}
+\sumitem{4--5}{\result{\emph{Dziedzina} to zbiór argumentów, które maszyna przyjmuje, a
   podanie jej jest częścią podania funkcji. To ten sam zbiór co argumenty,
   które nie rzucają wyjątkiem: $\frac{1}{x-2}$ wyklucza $2$, $\sqrt{x}$ wymaga
-  $x \ge 0$, $\ln x$ wymaga $x > 0$.}
-\sumitem{6--7}{$f$ to maszyna, a $f(x)$ to jedna liczba, którą wyprodukowała.
+  $x \ge 0$, $\ln x$ wymaga $x > 0$}.}
+\sumitem{6--7}{\result{$f$ to maszyna, a $f(x)$ to jedna liczba, którą wyprodukowała.
   \code{act = relu} i \code{act = relu(x)} różnią się dwoma znakami i
   wszystkim innym, a drugie zawodzi jako strata, która nie chce drgnąć, a nie
-  jako błąd.}
-\sumitem{8--10}{Wykres to zbiór punktów $(x, f(x))$, narysowany, a wartość,
-  miejsce zerowe i kierunek dają się z niego odczytać bez rachunków.}
-\sumitem{10--11}{\textbf{\enquote{Rośnie} jest zdaniem o przedziale.} $x^{2}$
+  jako błąd}.}
+\sumitem{8--10}{\result{Wykres to zbiór punktów $(x, f(x))$, narysowany, a wartość,
+  miejsce zerowe i kierunek dają się z niego odczytać bez rachunków}.}
+\sumitem{10--11}{\result{\textbf{\enquote{Rośnie} jest zdaniem o przedziale.} $x^{2}$
   rośnie dla $x \ge 0$ i maleje dla $x \le 0$, więc zdanie o samym $x^{2}$
-  pominęło część, która o tym rozstrzyga.}
-\sumitem{12--13}{Pięć kształtów, na których opiera się książka: prosta,
+  pominęło część, która o tym rozstrzyga}.}
+\sumitem{12--13}{\result{Pięć kształtów, na których opiera się książka: prosta,
   parabola, V, pół-V funkcji $\relu$ i $\frac{1}{x}$. $\relu$ jest płaska dla
-  $x \le 0$ i spotyka drugą połowę narożnikiem.}
-\sumitem{14--16}{\textbf{Miejsce, w którym stoi liczba, decyduje o kierunku jej
+  $x \le 0$ i spotyka drugą połowę narożnikiem}.}
+\sumitem{14--16}{\result{\textbf{Miejsce, w którym stoi liczba, decyduje o kierunku jej
   działania.} $f(x) + c$ przesuwa wykres w górę o $c$, a $f(x - c)$ przesuwa go
   w \emph{prawo} o $c$. Poza nawiasem liczba poprawia odpowiedź; w nawiasie
-  poprawia pytanie, więc musisz stanąć $c$ dalej, żeby zobaczyć stary obrazek.}
-\sumitem{18--21}{$a f(x)$ rozciąga od osi poziomej $a$-krotnie; $f(ax)$ ściska
+  poprawia pytanie, więc musisz stanąć $c$ dalej, żeby zobaczyć stary obrazek}.}
+\sumitem{18--21}{\result{$a f(x)$ rozciąga od osi poziomej $a$-krotnie; $f(ax)$ ściska
   ku osi pionowej $a$-krotnie; $-f(x)$ obraca górą na dół, a $f(-x)$ lewą na
-  prawą. Para z nawiasu idzie odwrotnie, z tego samego powodu co przesunięcie.}
-\sumitem{22--23}{Ruchy nie są przemienne: $2f(x) + 1$ i
+  prawą. Para z nawiasu idzie odwrotnie, z tego samego powodu co przesunięcie}.}
+\sumitem{22--23}{\result{Ruchy nie są przemienne: $2f(x) + 1$ i
   $2\bigl(f(x)+1\bigr)$ dają $7$ i $8$ tam, gdzie $f(x) = 3$. Zwykła kolejność
-  działań jest całą regułą.}
-\sumitem{24--26}{$y = wx + b$ to rozciągnięcie i przesunięcie zastosowane do
+  działań jest całą regułą}.}
+\sumitem{24--26}{\result{$y = wx + b$ to rozciągnięcie i przesunięcie zastosowane do
   $f(x) = x$. $\sigma(0) = \num{0.5}$ dokładnie, a $\sigma(-x) = 1 - \sigma(x)$,
   więc krzywa ma symetrię obrotu o pół obrotu względem
-  $\bigl(0, \frac{1}{2}\bigr)$.}
-\sumitem{27--28}{W $\sigma(wx + b)$ waga ustawia stromość: pas od $\num{0.1}$
+  $\bigl(0, \frac{1}{2}\bigr)$}.}
+\sumitem{27--28}{\result{W $\sigma(wx + b)$ waga ustawia stromość: pas od $\num{0.1}$
   do $\num{0.9}$ ma szerokość \val{f05.band.w1} dla $w = 1$ i
   \val{f05.band.w5} dla $w = 5$, dzieloną dokładnie przez $w$.
   \textbf{Bias nie jest położeniem} \dash{} przecięcie jest w
   $-\frac{b}{w}$, więc jeden bias ustawia pięć różnych progów przy pięciu
-  różnych wagach.}
-\sumitem{29--30}{Bez biasu każda prosta przechodzi przez początek układu i
+  różnych wagach}.}
+\sumitem{29--30}{\result{Bez biasu każda prosta przechodzi przez początek układu i
   żaden wybór wagi nie sięgnie punktu, którego ta rodzina nie umie wyrazić:
   najlepsze dopasowanie bez biasu do $(1,3)$, $(2,5)$, $(3,7)$ ma współczynnik
   \val{f05.nobias.slope} i myli się o \val{f05.nobias.worst}, podczas gdy
   $y = 2x + 1$ jest dokładne. $\gamma$ i $\beta$ normalizacji warstwy to te
-  same dwa ruchy, wyuczone.}
-\sumitem{31--33}{$f(g(x))$ czyta się od środka na zewnątrz, a kolejność jest
+  same dwa ruchy, wyuczone}.}
+\sumitem{31--33}{\result{$f(g(x))$ czyta się od środka na zewnątrz, a kolejność jest
   częścią funkcji. \textbf{Dwie warstwy liniowe szeregowo to jedna warstwa
   liniowa}, $w_2(w_1x + b_1) + b_2 = (w_2w_1)x + (w_2b_1 + b_2)$, i to jest
-  cały argument za wstawieniem między nie funkcji z narożnikiem.}
-\sumitem{34--35}{Głęboka sieć jest złożeniem i niczym więcej, i dlatego reguła
+  cały argument za wstawieniem między nie funkcji z narożnikiem}.}
+\sumitem{34--35}{\result{Głęboka sieć jest złożeniem i niczym więcej, i dlatego reguła
   łańcuchowa Programu~\ref{prog:F12} jest zawiasem tej książki. Dwie maszyny
-  składają się tylko wtedy, gdy wartości pierwszej leżą w dziedzinie drugiej.}
-\sumitem{36--38}{Funkcja odwrotna puszcza maszynę wstecz i istnieje tylko dla
+  składają się tylko wtedy, gdy wartości pierwszej leżą w dziedzinie drugiej}.}
+\sumitem{36--38}{\result{Funkcja odwrotna puszcza maszynę wstecz i istnieje tylko dla
   funkcji różnowartościowej; $x^{2}$ nie ma jej na wszystkich liczbach
   rzeczywistych, z powodu podanego w ramce $2$. Jej wykres to oryginał odbity w
-  $y = x$.}
-\sumitem{39--40}{Logit $\ln\frac{p}{1-p}$ odwraca funkcję logistyczną \dash{}
+  $y = x$}.}
+\sumitem{39--40}{\result{Logit $\ln\frac{p}{1-p}$ odwraca funkcję logistyczną \dash{}
   jest logarytmem szansy, $\val{f05.logit.p9}$ dla $p = \num{0.9}$, a droga tam
   i z powrotem domyka się do $\val{f05.roundtrip.err}$. \textbf{$-1$ w
-  $f^{-1}$ nie jest wykładnikiem.}}
-\sumitem{41--44}{\textbf{Funkcja ściśle rosnąca zachowuje porządek listy, więc
+  $f^{-1}$ nie jest wykładnikiem.}}}
+\sumitem{41--44}{\result{\textbf{Funkcja ściśle rosnąca zachowuje porządek listy, więc
   nie może przesunąć $\argmax$.} Dzielenie przez dodatnie $T$ się kwalifikuje,
   $e^{x}$ się kwalifikuje i dzielenie każdej pozycji przez jedną dodatnią sumę
   też \dash{} zatem $\argmax \softmax(z/T) = \argmax z$ dla każdego $T > 0$,
-  dokładnie, a nie w przybliżeniu.}
-\sumitem{43}{Temperatura zmienia rozkład bardzo mocno, a jego szczyt
+  dokładnie, a nie w przybliżeniu}.}
+\sumitem{43}{\result{Temperatura zmienia rozkład bardzo mocno, a jego szczyt
   najsłabiej. Przy $T$ od $\num{0.5}$ do $\num{2.0}$ najbardziej
   prawdopodobny token spada \val{f05.sm.top.ratio} raza, a najmniej
   prawdopodobny rośnie ponad \val{f05.sm.tail.floor} razy; szansa wylosowania
   czegoś innego niż token ze szczytu idzie z \val{f05.sm.t05.other} do
   \val{f05.sm.t20.other}. Nie rusza się nigdy to, który token jest na
-  szczycie.}
-\sumitem{46--47}{$\ln$ ściśle rośnie, więc dekoder może porównywać logarytmy
+  szczycie}.}
+\sumitem{46--47}{\result{$\ln$ ściśle rośnie, więc dekoder może porównywać logarytmy
   prawdopodobieństw i nigdy nie policzyć prawdopodobieństwa. Funkcja ściśle
   \emph{malejąca} zamienia $\argmax$ z $\argmin$, i dlatego maksymalizowanie
-  wiarogodności i minimalizowanie jej ujemnego logarytmu to jedno polecenie.}
+  wiarogodności i minimalizowanie jej ujemnego logarytmu to jedno polecenie}.}
 \end{summarybox}
 
 \canyou

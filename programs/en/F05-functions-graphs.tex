@@ -1126,83 +1126,83 @@ survives as the largest.}{order kept by increasing maps}
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--4}{\textbf{A function is a machine with one output per input.} Two
+\sumitem{1--4}{\result{\textbf{A function is a machine with one output per input.} Two
   outputs for one input is not a function \dash{} $x^{2} + y^{2} = 18$ offers
   $3$ and $-3$ at $x = 3$ \dash{} and the vertical ruler is that condition
-  applied by eye. Two inputs sharing one output is perfectly ordinary.}
-\sumitem{4--5}{The \emph{domain} is the set of inputs the machine accepts, and
+  applied by eye. Two inputs sharing one output is perfectly ordinary}.}
+\sumitem{4--5}{\result{The \emph{domain} is the set of inputs the machine accepts, and
   giving it is part of giving the function. It is the same set as the
   arguments that do not raise: $\frac{1}{x-2}$ excludes $2$, $\sqrt{x}$ needs
-  $x \ge 0$, $\ln x$ needs $x > 0$.}
-\sumitem{6--7}{$f$ is the machine and $f(x)$ is one number it produced.
+  $x \ge 0$, $\ln x$ needs $x > 0$}.}
+\sumitem{6--7}{\result{$f$ is the machine and $f(x)$ is one number it produced.
   \code{act = relu} and \code{act = relu(x)} differ by two characters and by
   everything else, and the second fails as a loss that will not move rather
-  than as an error.}
-\sumitem{8--10}{The graph is the set of points $(x, f(x))$ drawn, and a value,
-  a crossing and a direction are all readable off it without arithmetic.}
-\sumitem{10--11}{\textbf{\enquote{Increasing} is a statement about an
+  than as an error}.}
+\sumitem{8--10}{\result{The graph is the set of points $(x, f(x))$ drawn, and a value,
+  a crossing and a direction are all readable off it without arithmetic}.}
+\sumitem{10--11}{\result{\textbf{\enquote{Increasing} is a statement about an
   interval.} $x^{2}$ increases for $x \ge 0$ and decreases for $x \le 0$, so a
-  sentence about $x^{2}$ alone has left out the part that decides it.}
-\sumitem{12--13}{The five shapes the book leans on: line, parabola, V,
+  sentence about $x^{2}$ alone has left out the part that decides it}.}
+\sumitem{12--13}{\result{The five shapes the book leans on: line, parabola, V,
   $\relu$'s half-V and $\frac{1}{x}$. $\relu$ is flat for $x \le 0$ and meets
-  the other half in a corner.}
-\sumitem{14--16}{\textbf{Where the number is written decides which way it
+  the other half in a corner}.}
+\sumitem{14--16}{\result{\textbf{Where the number is written decides which way it
   acts.} $f(x) + c$ slides the graph up by $c$, and $f(x - c)$ slides it
   \emph{right} by $c$. Outside the bracket it adjusts the answer; inside it
   adjusts the question, so you must stand $c$ further along to see the old
-  picture.}
-\sumitem{18--21}{$a f(x)$ stretches away from the horizontal axis by $a$;
+  picture}.}
+\sumitem{18--21}{\result{$a f(x)$ stretches away from the horizontal axis by $a$;
   $f(ax)$ squashes towards the vertical axis by $a$; $-f(x)$ flips top to
   bottom and $f(-x)$ flips left to right. The inside pair go backwards, for
-  the same reason the shift does.}
-\sumitem{22--23}{The moves do not commute: $2f(x) + 1$ and
+  the same reason the shift does}.}
+\sumitem{22--23}{\result{The moves do not commute: $2f(x) + 1$ and
   $2\bigl(f(x)+1\bigr)$ are $7$ and $8$ where $f(x) = 3$. Ordinary precedence
-  is the whole rule.}
-\sumitem{24--26}{$y = wx + b$ is a stretch and a shift applied to $f(x) = x$.
+  is the whole rule}.}
+\sumitem{24--26}{\result{$y = wx + b$ is a stretch and a shift applied to $f(x) = x$.
   $\sigma(0) = \num{0.5}$ exactly, and $\sigma(-x) = 1 - \sigma(x)$, so the
-  curve has a half-turn symmetry about $\bigl(0, \frac{1}{2}\bigr)$.}
-\sumitem{27--28}{In $\sigma(wx + b)$ the weight sets the steepness: the band
+  curve has a half-turn symmetry about $\bigl(0, \frac{1}{2}\bigr)$}.}
+\sumitem{27--28}{\result{In $\sigma(wx + b)$ the weight sets the steepness: the band
   from $\num{0.1}$ to $\num{0.9}$ is \val{f05.band.w1} wide at $w = 1$ and
   \val{f05.band.w5} at $w = 5$, divided by exactly $w$.
   \textbf{The bias is not a position} \dash{} the crossing is at
   $-\frac{b}{w}$, so one bias sets five different thresholds at five different
-  weights.}
-\sumitem{29--30}{Without a bias every line passes through the origin, and no
+  weights}.}
+\sumitem{29--30}{\result{Without a bias every line passes through the origin, and no
   choice of weight reaches a point that family cannot express: the best
   bias-free fit to $(1,3)$, $(2,5)$, $(3,7)$ has slope
   \val{f05.nobias.slope} and misses by \val{f05.nobias.worst}, where
   $y = 2x + 1$ is exact. Layer normalisation's $\gamma$ and $\beta$ are the
-  same two moves, learned.}
-\sumitem{31--33}{$f(g(x))$ is read from the inside out, and the order is part
+  same two moves, learned}.}
+\sumitem{31--33}{\result{$f(g(x))$ is read from the inside out, and the order is part
   of the function. \textbf{Two linear layers in series are one linear layer},
   $w_2(w_1x + b_1) + b_2 = (w_2w_1)x + (w_2b_1 + b_2)$, which is the whole
-  argument for putting a function with a corner in it between them.}
-\sumitem{34--35}{A deep network is a composition and nothing else, which is
+  argument for putting a function with a corner in it between them}.}
+\sumitem{34--35}{\result{A deep network is a composition and nothing else, which is
   why Program~\ref{prog:F12}'s chain rule is this book's hinge. Two machines
-  compose only when the first's outputs lie in the second's domain.}
-\sumitem{36--38}{An inverse runs the machine backwards and exists only for a
+  compose only when the first's outputs lie in the second's domain}.}
+\sumitem{36--38}{\result{An inverse runs the machine backwards and exists only for a
   one-to-one function; $x^{2}$ has none over all the reals, for frame $2$'s
-  reason. Its graph is the original reflected in $y = x$.}
-\sumitem{39--40}{The logit $\ln\frac{p}{1-p}$ inverts the logistic \dash{} it
+  reason. Its graph is the original reflected in $y = x$}.}
+\sumitem{39--40}{\result{The logit $\ln\frac{p}{1-p}$ inverts the logistic \dash{} it
   is the logarithm of the odds, $\val{f05.logit.p9}$ at $p = \num{0.9}$, and
   the round trip closes to $\val{f05.roundtrip.err}$. \textbf{The $-1$ in
-  $f^{-1}$ is not an exponent.}}
-\sumitem{41--44}{\textbf{A strictly increasing function keeps the order of a
+  $f^{-1}$ is not an exponent.}}}
+\sumitem{41--44}{\result{\textbf{A strictly increasing function keeps the order of a
   list, and therefore cannot move the $\argmax$.} Dividing by a positive $T$
   qualifies, $e^{x}$ qualifies, and dividing every entry by one positive total
   qualifies \dash{} so $\argmax \softmax(z/T) = \argmax z$ for every $T > 0$,
-  exactly and not approximately.}
-\sumitem{43}{Temperature changes the distribution a great deal and the top of
+  exactly and not approximately}.}
+\sumitem{43}{\result{Temperature changes the distribution a great deal and the top of
   it least. Over $T$ from $\num{0.5}$ to $\num{2.0}$ the most likely token
   falls by a factor of \val{f05.sm.top.ratio} and the least likely rises more
   than \val{f05.sm.tail.floor}-fold; the chance of drawing something other
   than the top token goes from \val{f05.sm.t05.other} to
-  \val{f05.sm.t20.other}. What never moves is which token is at the top.}
-\sumitem{46--47}{$\ln$ is strictly increasing, so a decoder may compare
+  \val{f05.sm.t20.other}. What never moves is which token is at the top}.}
+\sumitem{46--47}{\result{$\ln$ is strictly increasing, so a decoder may compare
   log-probabilities and never compute a probability. A strictly
   \emph{decreasing} function swaps $\argmax$ and $\argmin$, which is why
   maximising a likelihood and minimising its negative logarithm are one
-  instruction.}
+  instruction}.}
 \end{summarybox}
 
 \canyou
