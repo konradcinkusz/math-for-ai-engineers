@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P31 written, both editions \dash{} Parts I to VIII entire.** P32–P34 are stubs carrying their briefs | 3 of 47 |
+| Programs | **F1–F13 and P1–P32 written, both editions \dash{} Parts I to VIII entire, and Part IX begun.** P33–P34 are stubs carrying their briefs | 2 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1237 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1257 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1034 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1048 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1267 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1287 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1058 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1070 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,14 +93,14 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **3 of 47 programs are stubs**, in each language. This is the whole of the
+- **2 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1480 computed values, all referenced, all present, plus the committed console
+- 1518 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 276 Mermaid sources, all rendering
-- 76 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 284 Mermaid sources, all rendering
+- 78 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
@@ -108,7 +108,7 @@ what was there before.
 - **100 orphan-tail pages: 29 · 29 · 21 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
-  **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one, **P30 one** and **P31 none**
+  **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one, **P30 one**, **P31 none** and **P32 none**
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -128,7 +128,9 @@ what was there before.
   F12 four, against F5's eleven**, and the reason is worth having — all five
   were written with the two-sided rule from F6 in hand, so a frame whose tail
   lands badly is lengthened rather than trimmed. **P12 added none either**,
-  which is the fourth time; **P23 made it the eighth and P28 the ninth**. **A fourth structural fix was measured in the F6 pass and
+  which is the fourth time; **P23 made it the eighth, P28 the ninth and P32
+  the eleventh** \dash{} though P32's cost seven rounds of lengthening rather
+  than coming free from the recorded rules. **A fourth structural fix was measured in the F6 pass and
   reverted**, because it clears the orphaned *cue* by converting it into more
   orphan *tails* — see *Program F6 pass* and the sweep table in
   `preamble.tex`. `checkpdf.py` prints every one of them on
@@ -145,10 +147,10 @@ what was there before.
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
   **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22**,
   **53% in P23**, **46% in P24**, **48% in P25**, **52% in P26** and
-  **53% in P27**, **54% in P28**, **55% in P29**, **52% in P30** and **50% in
-  P31** \dash{} P29 is the highest outside Part I, with P28 next and then P23
-  and P27; P26 and P30 follow, and P13, P15, P17 and P31 reach the book's own
-  rate.**
+  **53% in P27**, **54% in P28**, **55% in P29**, **52% in P30**, **50% in
+  P31** and **51% in P32** \dash{} P29 is the highest outside Part I, with P28
+  next and then P23 and P27; P26 and P30 follow, and P13, P15, P17, P31 and
+  P32 reach or pass the book's own rate.**
   **P24 is the first program whose rate is visible in its frame count**: nine
   of its sixty-four frames exist because the draft was raised from 36%, which
   is the elicitation ledger's cost measured in frames rather than in pages.
@@ -3855,7 +3857,7 @@ from somewhere real, because F04 counted exactly those $n^{2}$ pairs.
 The cache holds one key and one value per *position*, not per pair; the pairs
 are formed and consumed inside the computation and never stored. Measured:
 $\val{p03.kv.gib}$ GiB at $\val{p03.kv.seq}$ tokens, exactly double at twice the
-length, $\val{p03.kv.per.token.mb}$ MB per token in flight. It is usually larger
+length, $\val{p03.kv.per.token.mib}$ MiB per token in flight. It is usually larger
 than the weights and it is the term that decides how many users a card serves.
 
 Two quantities, two exponents, one layer. The script asserts the doubling
@@ -5697,6 +5699,14 @@ a 35-character description. Two things worth having:
 - **The manifest column constrains the key as well as the copy.** Keep a
   diagram key under about 28 characters and the manifest line \dash{} key plus
   four for `.mmd` plus the third argument \dash{} under about 48.
+
+  > **The second half of that is falsified; see the P32 pass.** Measured with
+  > a brace-matching parser, 153 of the book's 284 manifest lines are at or
+  > over 48 and none of them overflows: the column is set with
+  > `\@dottedtocline` and **wraps**, so an entry's total length is not what
+  > overflows it. The key half stands \dash{} a long key is an unbreakable
+  > `\texttt{}` run and that is what P14's own instance was. Keep the key
+  > short and stop counting the copy.
 - **A4 at 12pt is the binding case for that column, not the trade format.**
   Every previous instance was found in the trade build or in Polish; this one
   exists in one format and one language, and the trade build was clean.
@@ -9363,6 +9373,446 @@ Pages 1237 / 1257 / 1034 / 1048, from 1216 / 1233 / 1015 / 1028.
 - Frame numbers mapped after writing and again after the conversions: sections
   landed at `1--6 / 7--10 / 11--15 / 16--25 / 26--34 / 35--38`.
 
+### Program P32 pass, August 2026 --- Part IX begins
+
+**Thirty-nine teaching frames, forty-one printed, both editions**, against a
+brief that projected seventy \dash{} the largest estimate left in the
+manifest. Eight sections: one position through one block, the score and
+whether the derivation survives assembly, from scores to weights, heads, the
+residual stream, normalisation and where a position enters, what it costs, and
+what this book has not checked.
+
+Twenty-fifth program under its brief's estimate, and Part IX's contract is why:
+it introduces **no new mathematics**, so the shortfall is not a shortfall. The
+question was never \enquote{what is left of the subject} but \enquote{which
+lines of the brief have already been delivered}, and eight of the eleven
+bracketed handovers turned out to be spent.
+
+#### Exactly three things were this program's own
+
+`grep -rn 'prog:P32' programs/en/*.tex` was the first thing run, and seven
+programs defer here by name.
+
+- **The block parameter count.** Programs~P03 and P06 both hand it over in as
+  many words \dash{} \enquote{the count itself is Program P32's, where every
+  piece exists} \dash{} and F02 supplies the feed-forward half already.
+- **The residual stream.** F12: \enquote{the architecture's own answer... is
+  the residual connection, which Program P32 derives.} It names the mechanism
+  and does not derive it; greps confirm nothing does.
+- **The score measured through the assembly**, which P25 handed over.
+
+Everything else is assembly and none of it is re-taught. That is the part's
+contract working as designed rather than a thin program.
+
+#### THE ASSEMBLY PAYOFF: F01's headline number, derived
+
+Program~F01 opens the book by having the reader work out what a
+seven-billion-parameter model weighs, and never says where the seven billion
+comes from \dash{} on page three there is no vocabulary for it. P03 commits
+the shape of the same model.
+
+    attention per block     4 d^2  =  67,108,864
+    feed-forward per block  8 d^2  = 134,217,728   (F02 collects this already)
+    per block              12 d^2  = 201,326,592
+    x 32 layers                    = 6,442,450,944 = 92.0% of F01's 7e9
+
+**The blocks are 92 per cent of the headline number and the embedding is about
+two.** It is a cross-programme gate of P12's third kind at the widest span the
+book has \dash{} Program F01 to Program P32 \dash{} and it is the sentence
+Part IX exists to be able to write.
+
+And the elicitation is counter-intuitive and free, because F02 already handed
+the reader the 8d^2: **attention is 4d^2 and the feed-forward block is 8d^2**,
+so the half nobody discusses holds twice the half everybody does.
+
+#### The measurement: two probe designs failed, and dropping the sampling was the finding
+
+P25 measured the score spread on vectors it drew directly and handed over
+\enquote{check it survives contact}.
+
+- **Probe 1 redrew W_Q and W_K inside every trial.** That is not a
+  transformer: a block has FIXED weights and varying inputs, so averaging over
+  weight draws answers an easier question than the one asked. It also did not
+  finish \dash{} 250M pure-Python operations.
+- **Probe 2 fixed the weights and was still too slow** at d_k = 256.
+- **Probe 3: the sampling was unnecessary.** q.k = (W_Q^T x).(W_K^T y) =
+  x^T M y with M = W_Q W_K^T, and for independent standard-normal x, y that
+  bilinear form has variance EXACTLY ||M||_F^2. One weight draw gives the
+  score variance in closed form, and
+  E||M||_F^2 = d^2 * d_k * (1/d)^2 = d_k, exactly.
+
+**So the assembly preserves P25's d_k, provably, and it needs no trained
+model.** Measured at d_model = 64: 2.86, 3.96, 5.63, 8.02 against sqrt(d_k),
+and the script gates the d_k = 8 and 64 rows against P25's own committed 2.83
+and 7.99.
+
+The half P25's method cannot see is the second column: **a trained model has
+one weight draw, not an average**, so its own scores are a few per cent off
+before training starts. Reported as indicative (30 draws estimate a spread to
+about a seventh) and the ordering is the structural part \dash{} M has rank at
+most d_k, so a narrow head has fewer independent directions to average over,
+which is P08 doing a job nobody wrote it for.
+
+#### The residual stream, derived and gated on F12's own chain
+
+F12 commits depth 40, sigma' <= 1/4 and the 8.3e-25 bound. The derivation:
+with y = x + f(x) the Jacobian is prod(1 + f'_k), and expanding gives a SUM
+OVER 2^n PATHS, one per subset of layers. **The empty subset -- around every
+layer -- contributes exactly 1.**
+
+    a plain chain's gradient is one product, which n small factors kill;
+    a residual stack's is a sum, and one term of that sum is 1.
+
+Checked over Fractions, and gated: this program recomputes (1/4)^40 and
+asserts it reproduces F12's committed figure to the printed digit. Same chain,
+same depth, and **the contrast IS the derivation** rather than a separate
+demonstration.
+
+**And a vacuous assertion was caught before it shipped.** The first version
+checked the identity path with `assert Fraction(1) == Fraction(1)`, which
+cannot fail \dash{} the defect P01 and P05 both recorded. Replaced by the
+consequence, which is the claim: turn every layer off and a plain chain's
+gradient is exactly 0 while a residual stack's is exactly 1.
+
+The trapbox states the other half honestly: **one term being 1 does not make
+the sum at least 1.** Set every f' to -1 and the other 2^n - 1 paths cancel it
+exactly. The identity path guarantees arrival, not size.
+
+#### FOUND WHILE GATING: a defect in a merged program
+
+P03 computes the per-token cache as `kv_bytes(1) / 2**20` \dash{} MEBIbytes
+\dash{} under a key named `.mb`, and prints it as \enquote{MB} two lines below
+printing the cache itself in GiB. **P32's own gate fired on it.**
+
+It escaped a whole draft because 0.5 MiB is 0.524 MB and **both round to 0.5
+at one decimal**: P17's shape exactly, two readings of a formula that agree
+numerically and stay invisible until they do not. And P03's own summary warns
+about this confusion by name \dash{} \enquote{GB is 10^9 and GiB is 2^30,
+about seven per cent larger. A capacity plan that is seven per cent out is
+nearly always this.}
+
+Corrected: key to `p03.kv.per.token.mib`, printed unit to MiB, four call sites
+across two editions. **No printed digit changed**, so the page and parity were
+untouched. In scope because P32's gate surfaced it and P32 is the program that
+derives the cache from the block's shapes.
+
+**And it had spread further than P03.** The same figure with the same wrong
+unit is in `notes/02` item 90, and in this file's own P03 pass note. Both are
+corrected \dash{} and the habit that found them is worth more than the fix:
+**when a wrong figure is corrected, grep for the figure, not for the file**,
+which is Program~\ref{prog:P28}'s finding about fixing an instance rather than
+a class, arriving in a unit rather than in a parity constraint. And the new
+catalogue entry written for it originally said
+\enquote{item 24 is the general form}: item 24 is the batch-size and
+learning-rate rule, and **there is no general entry for the binary prefixes at
+all**. That sentence was written from the feel of the catalogue rather than
+from the catalogue, which is the class this file keeps recording, inside the
+entry warning about exactly that kind of unchecked reading. The entry now says
+what is true \dash{} that it *is* the general form, because nothing else was.
+
+#### Parity: three rounds, and the third is the lesson
+
+Every failure was a recorded class, and the useful part is that fixing them one
+at a time was the wrong method.
+
+- **A duplicated paragraph.** English frame 3 carried a paragraph the Polish
+  had put in frame 4, and it duplicated the sentence after it. Aligned to the
+  Polish, which read better.
+- **The reference-before-maths inversion, THREE TIMES** \dash{} in a frame, in
+  a summary item, and in a second summary item. After the second, the file was
+  swept for every `Programu~\ref` rather than waiting for the next failure,
+  which is P28's finding applied.
+- **A number spelled as a word**: \emph{suma z jedynką} for the English's
+  `a sum with a $1$ in it`.
+- **And hand-authored decimals in a table**, `$2.83$` against `$2,83$`, which
+  is precisely what C12's refusal to normalise the decimal comma exists to
+  catch. Both editions now write `\num{2.83}`.
+
+Five emissions were cut on F11's finding rather than the prose padded: the
+four `.var` values are the squares of the `.sd` values the table prints, and
+`with.embed` is arithmetic the reader does from two figures already on the
+page.
+
+#### Also
+
+- Traps 305 to 312 added to `notes/02`.
+- **Elicitation 51%**, designed in from the frame plan. The draft came in at
+  45% and 33 frames; six frames were added in the thin sections with their
+  elicitations written in rather than retrofitted, which is P23's lesson
+  applied before the frame remap rather than after it.
+- Four diagrams, and **the authoring-time check was aimed at the wrong
+  quantity**, which is the pass's sharpest small lesson. P31's finding was
+  applied faithfully: all eight manifest lines were measured against
+  Program~\ref{prog:P14}'s budget before rendering, and all eight passed. The
+  budget turns out not to govern anything (see below), and **the quantity that
+  does \dash{} the rendered width \dash{} was not measured until the figures
+  were on the page.** Two of the four were the recorded two-column hazard:
+
+  | | before | after |
+  |---|---|---|
+  | `paths-not-product` en / pl | 315 / 348 pt | 508 / 518 pt |
+  | `where-parameters-are` en / pl | 294 / 314 pt | 567 / 498 pt |
+
+  At 294 pt `where-parameters-are` set its node text at **17.03 pt on A4**,
+  against a book whose largest is 10.18 and whose typical is under 8. It would
+  have been half again the biggest type in the book. Worse, its aspect ratio
+  was **1.48**, *below* the trade format's 1.53 crossover \dash{} the
+  `f01-magnitudes` hazard \dash{} so in that format the height cap would have
+  bound and the figure could not have shared a page with its own frames.
+
+  The recorded fix applied without a detour and for the fifth time: **add a
+  rank.** A source node in front of the two routes, and a join node after the
+  two halves. Then two chains were widened by making their nodes wordier,
+  which is the other recorded fix, and all eight now land between 7.78 and
+  10.09 pt with every ratio above 2.39.
+
+  **The generalisable half: a check you ran is not the check you needed.**
+  Measuring the manifest line felt like diligence and was aimed at a budget
+  that predicts nothing, while the one number the book has a formula for went
+  unmeasured. Render and measure the width before writing the prose around a
+  figure; it is one `pdfinfo` per file.
+- The transcript is the identity path made concrete: with every layer off,
+  `(0.0, 1.0)`. Nothing is rounded, so there is no transformation for the
+  listing to hide.
+- **And the extract-and-run test needed a better instrument.** Every previous
+  pass ran the extracted listing as a *script*, which works while the listing
+  ends in explicit `print()` calls. This one relies on the REPL echoing an
+  expression's value, so run as a script it prints nothing \dash{} and the
+  first wrapper written for it put each call's trailing comment *inside* a
+  `print(...)`, so the parenthesis closed after the comment and the whole
+  block silently produced empty output. That is a defect in the harness
+  reading exactly like a defect in the listing. Feeding the extracted lines to
+  `code.InteractiveInterpreter` echoes them as a session does, and both
+  printed values then reproduce to the character. **What comes out of a
+  transcript is REPL input, so run it in a REPL.**
+
+#### The orphaned-cue walk took seven rounds, more than twice the previous record
+
+| round | edit | result |
+|---|---|---|
+| 1 | \dash{} | 5 cues: `main-pl` 1, `main-en-a4` 3, `main-pl-a4` 1, over four frames |
+| 2 | lengthened all four, both editions | 3 cues, and **two of them were the frame round 1 had just lengthened**, now in both trade builds |
+| 3 | lengthened that frame again, alone | 1 cue: the residual-Jacobian frame in `main-en-a4` |
+| 4 | lengthened that one | measurement void \dash{} two diagrams had to be widened, so the build was stopped rather than spent |
+| 5 | the two diagrams widened | 1 cue: the empty-subset frame in `main-pl` |
+| 6 | lengthened that one | 1 cue: the parameter-halves frame in `main-pl-a4`, which round 1 had already cleared once |
+| 7 | lengthened that one again | clean |
+
+Program~\ref{prog:P08}'s three rounds were the previous record. Two things
+are worth carrying.
+
+**Round 2 is the clearest instance of the walk this book has.** Lengthening a
+frame moved its own cue *out of* the A4 build and *into both trade builds*
+\dash{} one source, four paginations, and a fix aimed at one of them is a
+re-roll of the other three.
+
+**And a frame cleared in round 1 came back in round 6**, which is the part
+that makes the count seven rather than four. Nothing about that frame changed
+between the two; four hundred pages of other people's line breaks moved
+underneath it. It is the plainest statement available of what this file means
+by a random walk: **a frame is not fixed, only a pagination is**, and the
+pagination is re-rolled by every later edit in the same program.
+
+**And round 4 was abandoned deliberately, which is the cheaper move.** A
+diagram's size moves every break after it, so that build would have measured a
+tree about to stop existing. Ten minutes producing a number to be discarded is
+worse than a kill and a clean restart \dash{} provided the aux tree is then
+cleared properly, which is what the next entry is about. **When an edit is
+queued that will move pagination, stop the build rather than finish it.**
+
+Every edit was made in **both** editions and every added paragraph earns its
+place. What went in: that Program~\ref{prog:P25}'s argument needs the entries
+to be independent and here they are two images of one stream, so
+\enquote{drawn independently} is exactly what the assembly might have
+destroyed; that if the hypothesis fails the divisor is right about P25's model
+and wrong about every trained block, so the question is not a formality; that
+squaring or exponentiating would both give positive weights and neither sums
+to one, so the question is what the *normalisation* buys; that both halves of
+the parameter count are per block, so multiplying by depth leaves their ratio
+where it was; that one number is a model card's figure and the other is what
+the shapes force, so any gap has to be accounted for; and that
+ = x + f(x)$ constrains $ and (x)$ to one shape and introduces no
+operation the book has not got, so a change needing no new rule is exactly the
+kind that reads as cosmetic.
+
+**And round 2's edit had introduced a repetition that the layout work found.**
+The paragraph added in round 1 opened with \emph{That is a different
+computation}, which was already the frame's closing sentence four lines below
+\dash{} so the frame said it twice. Removing the duplicate *shortened* the
+frame, which is the wrong direction for the cue, so the round-3 edit had to
+replace it with something that earns its length rather than merely fill it.
+Worth knowing: **a lengthening pass is an editing pass, and it can introduce
+the defect it is not looking for.**
+
+#### A killed latexmk truncates the INDEX file, and `makeindex` then segfaults
+
+Program~\ref{prog:P13} records that a killed `latexmk` can leave a NUL-filled
+auxiliary file, and that the tell is an error naming an `.out`, `.aux` or
+`.toc` rather than a `.tex`. This pass met the same trap in a second form, and
+the recorded fix was **not wide enough**: the aux tree was cleared of `.aux`
+files and the index files were left, so the next run began
+
+```
+No existing .aux file, so I'll make a simple one, and require run of *latex.
+Latexmk: applying rule 'makeindex main-pl.idx'...
+Scanning input file main-pl.idx....done (380 entries accepted, 0 rejected).
+Segmentation fault
+```
+
+**`latexmk` runs `makeindex` before the first `pdflatex`** when a stale `.idx`
+is newer than its `.ind`, so the leftover file is consumed before anything can
+rewrite it. And the leftover was truncated rather than NUL-filled: `main-pl.idx`
+stopped at exactly $20\,480$ bytes \dash{} a page boundary \dash{} in the middle
+of the token `\index`, which is a half-flushed write buffer. `main-en-a4.idx`
+ended at $8192$ bytes the same way. A partial `\indexentry` is what makeindex
+died on.
+
+So the rule is one clause wider than P13 recorded: **clear the whole aux tree,
+`.idx`, `.ind` and `.ilg` included**, and note that the corruption is a *short*
+file as often as a NUL-filled one.
+
+**And the first measurement of it was wrong, by exactly the instrument defect
+this file already records.** `grep -c $'\x00' main-pl.idx` reported that every
+one of its 380 lines carried a NUL. Bash strings cannot hold a NUL, so
+`$'\x00'` is the **empty string** and the command counts every line in the
+file; re-measured in Python the four `.idx` files carry **zero** NUL bytes
+between them. It is Program~\ref{prog:P14}'s misread-instrument class in a new
+place: a shell quoting rule silently turned a specific test into a vacuous one,
+which is Program~\ref{prog:P01}'s vacuous assertion arriving from the command
+line. **A grep for a byte the shell cannot represent is not a grep for that
+byte.**
+
+#### The issue's own brief carries the P7 off-by-one, and the manifest does not
+
+Reading issue \#46 as a checklist \dash{} Program~\ref{prog:P17}'s discipline
+\dash{} turned up five stale pointers in its contract paragraph: the scaling
+attributed to `[P24]` where the manifest says `[P25]`, the convex combination
+to `[P18]` where the manifest says `[P19]`, the residual stream to `[P15]`
+against `[P16]`, layer normalisation to `[P17]` against `[P18]`, and rotation
+to `[F8, P8]` against `[F8, P9]`.
+
+**The manifest is right in all five**, because the sweep before
+Program~\ref{prog:P10} corrected it and the issues were generated on
+26 August, before that. So this is the P7 insertion surviving in a **sixth**
+file \dash{} after the trap catalogue, the manifest, the curriculum notes,
+Appendix~B and the issues' trap lists \dash{} and for once it is demonstrably
+*downstream* of a fix rather than beside one.
+
+**Recorded rather than edited**, on Program~\ref{prog:P21}'s precedent: the
+issues are generated from the manifest and the manifest is the source of
+truth. The generalisable half is the one Program~\ref{prog:P27} stated about
+`notes/02` §4 \dash{} **a sweep is as wide as the artefact somebody thought to
+open** \dash{} with a clause added: **it is also as wide as the artefacts that
+existed when it ran.** Anything generated from a source of truth before the
+source was corrected still carries the defect, and nothing regenerates it.
+
+And the checkbox saying *No Quiz (Foundation-only)* is stale in exactly the way
+Programs~\ref{prog:P04}, \ref{prog:P14} and \ref{prog:P24} to \ref{prog:P29}
+each found it stale. P32 has one, like all thirty-one before it.
+
+#### The diagram-manifest budget is falsified, and the evidence was already in the book
+
+Program~\ref{prog:P14} recorded a budget for the manifest column \dash{} keep
+`len(key) + 9 + len(copy)` under about $48$ \dash{} and two passes have worked
+against it. Program~\ref{prog:P27} measured its eight lines against it by hand.
+Program~\ref{prog:P31} measured six of its eight at $52$ to $64$, found that
+only one produced a box, and read the other five as latent defects that
+\enquote{would have shipped}.
+
+This pass wrote the brace-matching parser Program~\ref{prog:P27} said the job
+needed, checked it against the macro's own definition \dash{}
+`\mermaidfig` is `[3]` and the manifest line is `\texttt{#1.mmd} --- #3`, so
+the third argument is the copy \dash{} and ran it over the book.
+**153 of 284 manifest lines are at or over $48$, in a book with zero overfull
+boxes.** F01's and F02's copy runs to $106$ and $130$ characters.
+
+Program~\ref{prog:P27}'s note says a loose regex \enquote{silently captures
+the caption as the copy and reports most of the book over budget}, and
+discarded that measurement as wrong. **A correct parser reports the same
+thing.** What is wrong is not the parser but the budget.
+
+And the reason is one look at the finished page. The manifest is set with
+`\@dottedtocline`, so an entry **wraps**: `f01-number-sets.mmd` occupies three
+lines in Appendix~F and is perfectly well set. Ordinary prose in that column
+has break opportunities and takes as many lines as it needs, so its total
+length cannot be what overflows it.
+
+**So the rule is retired rather than restated, and no check was added.** A
+gate enforcing a figure that mispredicts more than half the book is worse than
+no gate \dash{} it is the permanently-red ledger this file already refuses.
+What actually overflows that column is an **unbreakable run**, which is why
+Program~\ref{prog:P14}'s own instance was a 34-character *key* inside a
+`\texttt{}` that cannot hyphenate; the recorded remedy, *rename the key*, was
+right, and the character budget bolted onto it afterwards was a generalisation
+nobody measured. Isolating the exact break-opportunity condition is open, and
+is labelled judgement here rather than guessed at.
+
+The immediate consequence for a drafting pass is smaller and better than the
+rule it replaces: **keep the key short, and stop counting the copy.** P32's
+eight lines were written against the old budget and happen to sit between $36$
+and $47$, which is a fact about them and not evidence for anything.
+
+#### One more instrument defect, and it is the same shape as the other two
+
+Three times in this pass a measurement or an edit was made with a tool that
+was quietly not doing what it looked like it was doing, and the third is the
+plainest: a pass note written through a Python `"""..."""` string containing
+`Program~\ref{...}`. **`\r` inside a non-raw Python string is a carriage
+return**, so every one of those references was written as `Program~` + CR +
+`ef{...}`. It survived because a later edit read the file with universal
+newlines and wrote it back, silently turning the CR into a line break, so the
+damage read as odd line wrapping rather than as a corrupted macro.
+
+With the `grep -c $'\x00'` empty-pattern and the extract-and-run wrapper that
+swallowed a comment, that is three in one pass, and they share a shape worth
+naming: **each tool accepted the input and returned a plausible answer.**
+None errored. The rule that catches all three is the one this book already
+applies to its own frames \dash{} do not trust an instrument you have not
+watched produce a *known* answer \dash{} and the cheap version of it here is
+to write LaTeX through raw strings, `r"""..."""`, always.
+
+Nothing reached the repository: the four programs, `CLAUDE.md` and both notes
+files carry zero carriage returns, because those edits happened to use escaped
+backslashes. That is luck rather than method, which is why it is written down.
+
+#### Rule 2, and the placement that made it easy
+
+Read by content first \dash{} node, caption and manifest copy, which is
+Program~\ref{prog:P18}'s four places \dash{} and **all four figures close
+their section, with the next section's heading below them.** So there is no
+following frame for any of them to answer, and the P04/P07 case does not
+arise in this program at all.
+
+That is worth naming as a placement rather than as luck. A figure that
+summarises a section is by construction the answer to that section's
+questions, which is Program~\ref{prog:P22}'s finding; putting it *after* the
+last of those questions has been answered makes the summary safe, where
+putting it mid-section makes it a spoiler. In a program that assembles rather
+than derives, every section ends on a result, so the summary placement is
+available throughout \dash{} which is a property of Part IX and worth
+expecting again in P33 and P34.
+
+For the ninth pass running the last node of a three-rank chain needed no
+correction afterwards, because Program~\ref{prog:P22}'s rule was applied while
+drawing.
+
+#### Layout
+
+The overfull multiset came back element for element to the baseline in all
+four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with zero overfull
+vboxes, zero errors, zero unresolved references, no stranded openers, no
+stranded headings and, after the seven rounds above, no orphaned cues.
+
+**And the orphan-tail count did not move at all**: 29, 29, 21, 21, exactly the
+pre-P32 figures. That is the eleventh time (F13, P07, P09, P12, P15, P17, P19,
+P23, P28, P31, P32), and it is worth saying that here it was not free \dash{}
+the seven rounds of lengthening are what bought it, against five programs
+where the recorded rules applied while drafting were enough on their own.
+
+Pages 1267 / 1287 / 1058 / 1070, from 1237 / 1257 / 1034 / 1048 \dash{} thirty
+and thirty in the trade format, which is what a thirty-nine-frame program with
+four figures costs.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -9634,35 +10084,41 @@ clone instead.
 
 ## What is left
 
-1. **Three programs, and Part VIII is complete.** F1 to F13 and P1 to P31,
-   both editions \dash{} Parts I to VIII entire. What remains is Part IX
-   (P32--P34) and the appendices.
+1. **Two programs, and Part IX has begun.** F1 to F13 and P1 to P32, both
+   editions. What remains is P33, P34 and the appendices.
 
-   **P32 is next**, and it opens the last part, whose whole contract is that
-   it introduces **no new mathematics**. Read `tools/programs.json` for its
-   brief and then do what the last five passes did: **read the brief as a
-   checklist and read the neighbours' file headers with it.** That question
-   has been cheaper than \enquote{what is left of the subject} six times
-   running.
+   **P33 is next** \dash{} *Anatomy of a training run* \dash{} and Part IX's
+   contract still holds: it introduces **no new mathematics**. Read
+   `tools/programs.json` for its brief and then do what the last six passes
+   did: **read the brief as a checklist and read the neighbours' file headers
+   with it.** That question has been cheaper than \enquote{what is left of
+   the subject} seven times running, and P32 is the strongest case yet
+   \dash{} eight of the eleven handovers its brief brackets were already
+   spent, and naming the three that were not is what shaped the program.
 
    **Part IX is a different job from the eight parts before it**, and the
    estimates should not be read the same way. Every program so far came in
    under its brief because a neighbour had spent the machinery or the
    content; a program that assembles what the book already has is made
    entirely of that, so the question is not what is left but **what order the
-   pieces go in**. Expect the length to be governed by the assembly rather
-   than by the subject.
+   pieces go in**. P32 bears that out: it came in at thirty-nine against
+   seventy, and the shortfall is the contract working rather than a thin
+   program.
 
-   **Three programs point at P32 by name and all three ask it to check a
-   hypothesis on a real architecture** \dash{} Program~\ref{prog:P25} on
-   whether the independence its derivation assumes survives training,
-   Program~\ref{prog:P03} on the transformer parameter count the curriculum
-   review moved there, and Program~\ref{prog:P31}'s header on the same
-   footing. **That runs straight into the debt below**: P32 cannot check any
-   of them from a sandbox either, so decide early whether it states them as
-   outstanding, on Programs~\ref{prog:P08}, \ref{prog:P11},
-   \ref{prog:P19}, \ref{prog:P20}, \ref{prog:P25} and \ref{prog:P31}'s
-   precedent, or whether the book acquires a model.
+   **P32 settled the real-architecture question, and the answer generalises to
+   P33 and P34.** Three programs had pointed here asking for a hypothesis
+   checked on a trained model. What P32 found is that the question splits:
+   the **assembly** half of Program~\ref{prog:P25}'s scaling needs no model
+   at all \dash{} $q \cdot k = x\T M y$ has variance exactly
+   $\lVert M\rVert_F^{2}$, so one weight draw settles it in closed form
+   \dash{} while the **training** half does. So the assembly half was
+   derived and the training half is stated as outstanding, on
+   Programs~\ref{prog:P08}, \ref{prog:P11}, \ref{prog:P19},
+   \ref{prog:P20}, \ref{prog:P25} and \ref{prog:P31}'s precedent.
+   **Ask that split of every claim P33 and P34 inherit**: a surprising
+   amount of what looks as though it needs a model turns out to be a
+   statement about shapes, and the part of it that genuinely needs one is
+   then worth stating plainly rather than hedging the whole claim.
 
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
@@ -9674,10 +10130,19 @@ clone instead.
    **P19 added a third entry of the same kind** \dash{} whether the basin a
    walk lands in matters at the scale people train at \dash{} and **P20 a
    fourth**, since it declines to say whether Adam reaches a better answer
-   than momentum on a real surface. **P25 adds a fifth**: E9 is measured on
+   than momentum on a real surface. **P25 added a fifth**: E9 is measured on
    random vectors, and whether the derivation's independence hypothesis
-   survives training is P32's to check on an assembled architecture. So the
-   debt is one trained model away from being five answers rather than one.
+   survives training was P32's to check on an assembled architecture.
+
+   **P32 halved that fifth entry rather than adding to it**, and the way it
+   did so is the thing to carry into P33 and P34. The question split: the
+   *assembly* half needed no model, because through a block the score is a
+   bilinear form whose variance is exactly $\lVert M\rVert_F^{2}$ and one
+   weight draw settles it in closed form; only the *training* half \dash{}
+   whether the independence assumption survives a run \dash{} still needs
+   one. **Ask that split of every remaining claim before accepting that it
+   needs a model.** So the debt is one trained model away from being five
+   answers rather than one, and one of the five is now half answered.
 
    **And there is still a Part II-shaped job that is nobody's program.** The
    elicitation ledger puts P01, P02 and P03 at 29--31% against Part I's
@@ -9754,7 +10219,13 @@ clone instead.
    arguments, so the program defines exactly one new object in six sections
    and its first three are short by construction. P30's own closing frame had
    already said where the length goes, and two thirds of the program is where
-   it said.
+   it said. **P32 came in at thirty-nine against seventy**, the largest
+   shortfall in the book, and it is the only one that is not a shortfall at
+   all: Part IX's contract is that it introduces no new mathematics, so
+   \emph{everything} was spent by construction and the pass's whole job was
+   to find the three things that were not. A Part IX estimate measures the
+   assembly rather than the subject, and should not be read against the
+   twenty-four before it.
    **A brief's frame estimate is otherwise a planning figure from before its
    neighbours were written**, and the elicitation rate is paid in frames on top
    of it. It is not a target \dash{} and the record above is also the reason

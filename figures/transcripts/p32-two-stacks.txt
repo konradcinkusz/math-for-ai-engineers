@@ -1,0 +1,11 @@
+>>> def stack(fs):        # (plain chain, residual stack)
+...     p = r = 1.0
+...     for f in fs:
+...         p *= f
+...         r *= (1.0 + f)
+...     return p, r
+...
+>>> stack([0.0] * 40)     # every layer contributes nothing
+(0.0, 1.0)
+>>> stack([0.05] * 40)    # every layer contributes a little
+(9.094947017729302e-53, 7.03998871212466)

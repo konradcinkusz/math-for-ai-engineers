@@ -1,0 +1,5 @@
+graph LR
+  S["n layers, and one<br/>gradient travelling<br/>back through all of them"] --> A["a plain layer:<br/>y = f(x)"]
+  S --> C["a residual layer:<br/>y = x + f(x)"]
+  A --> B["n of them give<br/>one product,<br/>one factor per layer"]
+  C --> D["n of them give<br/>a sum over subsets:<br/>through, or around"]

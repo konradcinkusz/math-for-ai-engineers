@@ -1,0 +1,5 @@
+graph LR
+  A["one block of the stack"] --> B["attention:<br/>four projections,<br/>4 d squared"]
+  A --> C["feed-forward:<br/>two layers, d to 4d<br/>and back again, 8 d squared"]
+  B --> D["12 d squared a block,<br/>and every layer of the<br/>stack pays it again"]
+  C --> D

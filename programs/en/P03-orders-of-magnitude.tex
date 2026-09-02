@@ -556,7 +556,7 @@ It is $n$. The cache holds one key and one value \emph{per position}, not per
 pair \dash{} the pairs are formed and consumed inside the computation and never
 stored. Two quantities, two exponents, one layer.
 
-The practical form is per token: $\val{p03.kv.per.token.mb}$~MB of cache for
+The practical form is per token: $\val{p03.kv.per.token.mib}$~MiB of cache for
 every token in flight, at these shapes. Multiply by the tokens and by the
 concurrent conversations, and you have the capacity plan. It is usually larger
 than the weights, and it is the term that decides how many users a card
@@ -805,7 +805,7 @@ book that needs a new \emph{object} rather than a new question.
   quadratic. It holds one key and value per \emph{position}, not per pair:
   $\val{p03.kv.gib}$~GiB at $\val{p03.kv.seq}$ tokens,
   $\val{p03.kv.double.gib}$ at twice that, and
-  $\val{p03.kv.per.token.mb}$~MB per token in flight. It is usually larger than
+  $\val{p03.kv.per.token.mib}$~MiB per token in flight. It is usually larger than
   the weights and it decides how many users a card serves.}
 \sumitem{24}{GB is $10^{9}$ and GiB is $2^{30}$, about seven per cent larger.
   A capacity plan that is seven per cent out is nearly always this.}

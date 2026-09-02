@@ -1,27 +1,1220 @@
 %% P32 --- Transformer wyprowadzony od podstaw
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak: programs/en/P32-transformer-derived.tex. Ramka za ramką, makro za
+%% makrem: parity.py porównuje oba wydania W KOLEJNOŚCI, więc zdanie zbudowane
+%% po polsku musi nieść te same spany matematyczne i te same literały liczbowe
+%% w tej samej kolejności. Cyfra zostaje cyfrą, a słowo zostaje słowem.
+%%
+%% ODNIESIENIE PRZED MATEMATYKĄ. Angielskie \enquote{Program P25's divisor}
+%% musi po polsku zaczynać się od odniesienia, bo C4 czyta kolejność.
+%%
+%% Uwaga tłumaczeniowa: \enquote{strumień} za \enquote{stream}, bo to zwykłe
+%% polskie słowo. \enquote{transformer}, \enquote{softmax} i \enquote{token}
+%% zostają po angielsku i odmieniają się po polsku --- tak mówią polscy
+%% inżynierowie, a kalka byłaby słowem, którego nikt nie wyszuka.
 
 \program{Transformer wyprowadzony od podstaw}
 \label{prog:P32}
+\index{transformer}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{nazwać każdą operację w bloku i powiedzieć, który program tej
+  książki już ci ją dał}
+\outcome{7--12}{powiedzieć, dlaczego wynik dzieli się przez pierwiastek, i
+  czy ten argument przeżywa to, że wyniki są wyliczane, a nie losowane}
+\outcome{13--17}{powiedzieć, co softmax daje warstwie ponad zrobieniem liczb
+  dodatnimi}
+\outcome{18--20}{powiedzieć, dlaczego podział warstwy na głowice nic nie
+  kosztuje}
+\outcome{21--25}{powiedzieć, dlaczego połączenie rezydualne zmienia to, czym
+  gradient jest, a nie tylko powiększa jego czynniki}
+\outcome{26--28}{powiedzieć, gdzie pozycja wchodzi do obliczenia, które poza
+  tym jest ślepe na kolejność}
+\outcome{29--35}{policzyć parametry bloku, powiedzieć, która jego połowa ma
+  ich więcej, i wyprowadzić cache z tych samych kształtów}
+\outcome{36--39}{powiedzieć, które wyprowadzenia tej książki opierają się na
+  hipotezie niesprawdzonej na wytrenowanym modelu}
+\end{outcomes}
 
-The whole book spent on one architecture. Embeddings as vectors in a space
-[P4]; the query--key dot product as an inner product and its high-
-dimensional behaviour [P5]; **the $1/sqrt(d_k)$ as a variance correction**
-[P25], with the measurement; softmax and its stable implementation [P2]; the
-value-weighted sum as a convex combination [P19]; multi-head as a reshape
-and a block-diagonal map [P6]; the residual stream as repeated addition and
-why that keeps gradients alive [P16]; layer normalisation and its gradient
-[P18]; positional information as rotation [F8, P9]; the parameter count, the
-FLOP count and the KV cache arithmetic [P3]; and attention's quadratic cost
-stated as the thing every long-context method is trying to avoid.
+\begin{quiz}
+\item Blok rzutuje strumień cztery razy, a potem uruchamia dwuwarstwową sieć
+  gęstą. Która z tych dwóch połów ma więcej parametrów?
+  \teachesat{29--30}
+  \answerto{Sieć gęsta, i to $2$ razy: uwaga to $4d^{2}$, a warstwa gęsta to
+  $8d^{2}$.}
+\item Uwaga dzieli swoje wyniki przez $\sqrt{d_k}$. W bloku zapytania i
+  klucze nie są losowane, tylko wyliczane ze strumienia. Czy argument za tym
+  dzielnikiem nadal obowiązuje? \teachesat{8--9}
+  \answerto{Tak, i to dokładnie: złożony wynik jest formą dwuliniową, której
+  wariancja wychodzi $d_k$ w wartości oczekiwanej, więc nic się nie zmienia.}
+\item Zwykły łańcuch $\val{p32.depth}$ warstw ma gradient ograniczony przez
+  $\val{p32.plain.bound}$. Co robi z tym dodanie połączenia rezydualnego do
+  każdej warstwy? \teachesat{23--24}
+  \answerto{Sprawia, że gradient przestaje być pojedynczym iloczynem. Staje
+  się sumą po ścieżkach, z których jedna jest identycznością i wnosi $1$.}
+\item Model o $\val{p32.layers}$ warstwach szerokości $\val{p32.d}$ obsługuje
+  rozmowę. Co rośnie szybciej wraz z długością sekwencji: arytmetyka czy
+  cache? \teachesatone{35}
+  \answerto{Arytmetyka, która jest kwadratowa; cache jest liniowy. To dwa
+  wykładniki w jednej warstwie.}
+\item Które z twierdzeń, jakie ta książka wyprowadziła o uwadze, sprawdzono
+  na modelu naprawdę wytrenowanym? \teachesat{36--37}
+  \answerto{Żadnego. Każde jest wyprowadzone przy inicjalizacji, a ten
+  program mówi to wprost, zamiast sugerować coś innego.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 70 ramek.
-}
+% ============================================================
+\section{Jedna pozycja przez jeden blok}
+\label{sec:P32-one-block}
+\index{transformer!jeden blok}
+
+\begin{fr}
+To ostatnia część książki i nie wprowadza ona żadnej nowej matematyki.
+
+Nie jest to skromność wobec materiału. To projekt: trzydzieści jeden
+programów zbudowało po jednym kawałku, a zostało ułożyć je w kolejności i
+zobaczyć, ile ten układ kosztuje.
+
+Oto więc cały blok, jako sześć operacji wykonanych po kolei na wektorze
+jednej pozycji: zrzutuj go na trzy sposoby; weź po jednym iloczynie skalarnym
+na każdą parę pozycji; podziel je przez coś; zamień je na wagi sumujące się
+do jedności; uśrednij trzecie rzutowanie tymi wagami; a potem dodaj wynik z
+powrotem do tego, od czego zacząłeś, i przeskaluj.
+
+Zanim pójdziesz dalej: ile z tych sześciu to operacje, które ta książka już
+zdefiniowała?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Wszystkie sześć}
+
+Każda, wraz z programem, który ci ją dał:
+
+\begin{itemize}
+\item \textbf{Zrzutuj na trzy sposoby.} Macierz jest funkcją
+  (Program~\ref{prog:P06}), a trzy z nich zastosowane do jednego wektora to
+  trzy funkcje zastosowane do jednego argumentu.
+\item \textbf{Po jednym iloczynie skalarnym na parę.} Iloczyn skalarny
+  (Program~\ref{prog:P05}), a Program~\ref{prog:F09} zdefiniował go
+  wcześniej.
+\item \textbf{Podziel przez coś.} Program~\ref{prog:P25} wyprowadza, przez co
+  i dlaczego, a sekcja~\ref{sec:P32-score} jest o tym, czy to wyprowadzenie
+  przeżywa złożenie.
+\item \textbf{Zamień je na wagi sumujące się do jedności.} $\softmax$,
+  którego stabilna postać należy do Programu~\ref{prog:P02}.
+\item \textbf{Uśrednij tymi wagami.} Kombinacja wypukła
+  (Program~\ref{prog:P19}).
+\item \textbf{Dodaj z powrotem i przeskaluj.} Dwie połowy
+  sekcji~\ref{sec:P32-residual} i sekcji~\ref{sec:P32-norm}.
+\end{itemize}
+
+W bloku nie ma nic więcej. Architekturę tworzy kolejność i kształty, a
+kształty warto mieć dokładnie dobre, bo Program~\ref{prog:P07} poświęcił cały
+program temu, co się dzieje, gdy nie są.
+
+Strumień niesie na każdej pozycji wektor szerokości $\val{p32.d}$. Zapytania
+powstają przez macierz $W_Q$. Jakiego kształtu musi być $W_Q$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p32.d}$ na $d_k$}
+
+Czyta strumień, więc bierze $\val{p32.d}$ liczb na wejściu; produkuje
+zapytanie, więc wypuszcza $d_k$. Program~\ref{prog:P06} nazywa to funkcją z
+jednej przestrzeni w drugą, a Program~\ref{prog:P07} nazywa to sygnaturą
+typu; to jedno i to samo stwierdzenie.
+
+$W_K$ ma ten sam kształt, bo klucz musi spotkać zapytanie w iloczynie
+skalarnym, a Program~\ref{prog:F09} wymaga do tego dwóch wektorów tej samej
+długości. $W_V$ prowadzi strumień do takiej szerokości, jaką mają wartości.
+
+Zanim pójdziesz dalej: trzy z czterech rzutowań są już policzone. Po co w
+ogóle istnieje czwarte? Wartości są przecież wektorami \dash{} czemu nie
+dodać ich ważonej średniej wprost z powrotem?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Bo szerokości się nie zgadzają i bo głowice trzeba połączyć}
+
+Wartości żyją na szerokości $d_k$, a strumień ma $\val{p32.d}$, więc coś musi
+przenieść jedno w drugie; to sygnatura typu Programu~\ref{prog:P07}
+odmawiająca dodawania, a nie wybór stylistyczny.
+
+A gdy głowic jest kilka, ich wyjścia stoją obok siebie i trzeba je zmieszać.
+Czwarte rzutowanie robi obie rzeczy naraz i dlatego jest jedną macierzą, a
+nie dwiema.
+
+\textbf{Cztery rzutowania i to całe parametry uwagi.} Zapamiętaj te cztery;
+sekcja~\ref{sec:P32-count} je liczy.
+
+Teraz część, która przesądza o wszystkim dalej. Wyniki powstają między
+\emph{każdą} pozycją zapytania a \emph{każdą} pozycją klucza. Ile to wyników
+na sekwencji $n$ pozycji?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$n^{2}$, i Program~\ref{prog:F10} je policzył}
+
+Po jednym na parę uporządkowaną. Program~\ref{prog:P03} wycenił to i zrobił z
+tego ostrzeżenie: parametrów jest $O(d^{2})$, a pracy $O(d\,n^{2})$, więc
+liczba parametrów nie jest liczbą pracy.
+
+To $n^{2}$ jest najbardziej brzemienną liczbą w tej architekturze. Każda
+metoda z \enquote{długim kontekstem} w nazwie próbuje jej nie zapłacić, a
+sekcja~\ref{sec:P32-count} stawia ją obok jedynej wielkości w bloku, która
+\emph{nie} jest kwadratowa.
+
+\begin{aibox}
+Przeczytaj kartę modelu, a dostaniesz dwie liczby: liczbę parametrów i
+długość kontekstu. Pierwsza wycenia macierze z tej sekcji, druga wycenia
+wyniki. To różne wykładniki w tej samej warstwie, więc karta, która podwaja
+kontekst, nie podwoiła niczego, co odczytasz z liczby parametrów \dash{}
+poczwórnie powiększyła macierz wyników i podwoiła cache. Żadnej z tych liczb
+na karcie nie ma.
+\end{aibox}
+\end{fr}
+
+\mermaidfig{p32-one-block}{Jedna pozycja przez jeden blok}{sześć operacji}
+
+\begin{fr}
+Jeszcze jeden kształt, zanim zacznie się arytmetyka, bo to ten, który czyni
+resztę programu czytelną.
+
+Blok nie zastępuje strumienia. On do niego \emph{dodaje}: wektor, który
+wchodzi, wychodzi z powrotem z dodanym wyjściem bloku. Strumień biegnie więc
+od zanurzenia na dole do straty na górze, a każdy blok go czyta, coś liczy i
+to coś dodaje z powrotem.
+
+Dlatego nazywa się strumieniem, a nie potokiem, i
+sekcja~\ref{sec:P32-residual} pokazuje, że wybór \emph{dodaj} zamiast
+\emph{zastąp} jest powodem, dla którego głęboki stos w ogóle się trenuje.
+\end{fr}
+
+% ============================================================
+\section{Wynik i to, czy wyprowadzenie przeżywa złożenie}
+\label{sec:P32-score}
+\index{uwaga!wynik}
+\index{uwaga!dzielnik pierwiastkowy}
+
+\begin{fr}
+Wynik to jeden iloczyn skalarny: zapytanie z jednej pozycji przeciwko
+kluczowi z innej. Program~\ref{prog:F09} go zdefiniował, a
+Program~\ref{prog:P05} powiedział, co on mierzy.
+
+I dzieli się go przez $\sqrt{d_k}$, zanim stanie się z nim cokolwiek innego.
+Program~\ref{prog:P25} wyprowadził ten dzielnik, zamiast go stwierdzić, w
+sekcji zbudowanej wokół wydobycia go od czytelnika, więc ten argument już raz
+wyprodukowałeś.
+
+Zanim pójdziesz dalej: powiedz, dlaczego dzielnik jest pierwiastkiem i
+dlaczego akurat pierwiastkiem z szerokości głowicy.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Wynik to suma $d_k$ iloczynów. Wariancje wielkości niezależnych się dodają,
+więc suma $d_k$ z nich ma wariancję $d_k$ i rozrzut $\sqrt{d_k}$. Dzielenie
+przez ten pierwiastek zwraca wynik na skalę niezależną od $d_k$.
+\end{ansblock}
+
+Program~\ref{prog:P25} zmierzył, co się dzieje bez tego: przy
+$d_k = \val{p25.e9.d.hi}$ rozrzut sięga $\val{p25.e9.raw.sd.512}$, jeden
+klucz z $\val{p25.e9.keys}$ zabiera $\val{p25.e9.raw.top.512}$ procent wagi, a
+własna pochodna $\softmax$ w tym punkcie wynosi $\val{p25.e9.resp.raw}$
+przeciwko $\val{p25.e9.resp.scaled}$ z dzieleniem na miejscu.
+
+Dzielnik jest więc poprawką wariancji, a nie stałą, którą ktoś dostroił. Nic
+z tego nie jest do udowodnienia jeszcze raz przez ten program.
+
+\textbf{Ale Program~\ref{prog:P25} zmierzył to na wektorach, które sam
+wylosował}, powiedział to i przekazał tutaj jedną rzecz: w bloku zapytania i
+klucze nie są losowane. Są \emph{wyliczane}, oba z tego samego strumienia,
+przez dwie macierze, które wybrał trening.
+
+To inne obliczenie i warto dokładnie powiedzieć, która jego część jest
+podejrzana. Argument Programu~\ref{prog:P25} potrzebuje, żeby wyrazy
+wchodzące do iloczynu skalarnego były od siebie niezależne. Tutaj są dwoma
+liniowymi obrazami \emph{tego samego} strumienia, są więc funkcjami wspólnego
+źródła, a \enquote{wylosowane niezależnie} to dokładnie to założenie, które
+złożenie mogło zniszczyć.
+
+Warto wiedzieć, co od tej odpowiedzi zależy, zanim się jej udzieli. Jeśli
+założenie nie przetrwa, to dzielnik jest poprawny wobec modelu
+Programu~\ref{prog:P25} i błędny wobec każdego bloku, jaki ktokolwiek
+wytrenował, a ta sekcja musiałaby to powiedzieć, a nie powtarzać za nim.
+Pytanie nie jest formalnością i jest jedynym w tym programie, którego
+odpowiedzi książka nie ustaliła już gdzie indziej.
+
+Zanim pójdziesz dalej: czy argument o wariancji nadal stosuje się do wyniku
+policzonego w ten sposób?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Stosuje się i to dokładnie \dash{} ale nie z tego powodu, na jaki
+wygląda}
+
+Rozpisz wynik z rzutowaniami na miejscu. Zapytanie to $W_Q\T x$, a klucz to
+$W_K\T y$, więc
+\[ q \cdot k \;=\; (W_Q\T x) \cdot (W_K\T y) \;=\; x\T M y,
+   \qquad M = W_Q W_K\T. \]
+
+Warto się przy tym zatrzymać. \textbf{Dwie macierze rzutowania nigdy nie
+występują w wyniku osobno.} Występuje tylko ich iloczyn, a ich iloczyn to
+jedna macierz $\val{p32.d}$ na $\val{p32.d}$. Wynik jest formą dwuliniową:
+jeden wektor, jedna macierz, drugi wektor.
+
+A dla dwóch niezależnych strumieni o rozkładzie normalnym standardowym
+wariancja $x\T M y$ wynosi dokładnie $\lVert M\rVert_F^{2}$ \dash{} sumę
+kwadratów wszystkich wyrazów $M$. Do jej znalezienia nie trzeba żadnego
+losowania.
+
+To całe pytanie o złożenie, więc warto nazwać objazd, który ono zastępuje.
+
+\begin{note}
+Przed tym projektem próbowano dwóch innych i oba były złe, a ciekawsza jest
+druga porażka.
+
+Pierwszy losował świeże $W_Q$ i $W_K$ w każdej próbie. \textbf{To nie jest
+transformer.} Blok ma ustalone wagi i zmienne wejścia, więc uśrednianie po
+losowaniach wag odpowiada na łatwiejsze pytanie niż to zadane.
+
+Drugi ustalił wagi i losował wejścia, i był po prostu za wolny. Wtedy
+powyższa tożsamość uczyniła losowanie całkiem zbędnym \dash{} i to jest
+odkrycie, a nie skrót, bo wielkość, którą umiesz zapisać dokładnie, nie
+potrzebuje słupka błędu.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Teraz wartość oczekiwana, i są to cztery linijki.
+
+Reguła wachlarza wejściowego, którą wyprowadza Program~\ref{prog:P25}, kładzie
+wariancję każdego wyrazu macierzy rzutowania na $1/\val{p32.d}$, tak by
+zrzutowany wektor wychodził na tej skali, na jakiej wszedł. Wtedy każdy wyraz
+$M$ jest sumą $d_k$ iloczynów dwóch takich wyrazów i
+
+\[ \Ex\lVert M\rVert_F^{2}
+   \;=\; \val{p32.d}^{2} \times d_k \times
+         \Bigl(\frac{1}{\val{p32.d}}\Bigr)^{2}
+   \;=\; d_k. \]
+
+\textbf{Złożenie zachowuje wariancję dokładnie.} Dwa rzutowania między
+strumieniem a wynikiem nic w odpowiedzi nie zmieniają, więc
+Program~\ref{prog:P25} daje w $\sqrt{d_k}$ właściwy dzielnik dla prawdziwego
+bloku, a nie tylko dla pary wylosowanych wektorów.
+
+Zmierzone, przy $d_{\text{model}} = \val{p32.asm.dmodel}$ na
+$\val{p32.asm.draws}$ losowaniach wag, rozrzut złożony przeciwko przewidywaniu:
+
+\begin{center}
+\begin{tabular}{rrr}
+\toprule
+$d_k$ & rozrzut złożony & $\sqrt{d_k}$ \\
+\midrule
+$8$  & $\val{p32.asm.sd.8}$  & $\num{2.83}$ \\
+$16$ & $\val{p32.asm.sd.16}$ & $\num{4.00}$ \\
+$32$ & $\val{p32.asm.sd.32}$ & $\num{5.66}$ \\
+$64$ & $\val{p32.asm.sd.64}$ & $\num{8.00}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Pierwszy i ostatni wiersz to własne szerokości głowic
+Programu~\ref{prog:P25}, a jego zapisane tam rozrzuty to
+$\val{p25.e9.raw.sd.8}$ i $\val{p25.e9.raw.sd.64}$. Skrypt sprawdza, że
+złożone liczby tego programu je odtwarzają, więc oba programy nie mogą się
+rozejść co do wielkości, którą wspólnie opisują.
+\end{fr}
+
+\begin{fr}
+A teraz połowa, do której metoda Programu~\ref{prog:P25} nie mogła sięgnąć i
+dla której przekazał on to pytanie dalej.
+
+$\Ex\lVert M\rVert_F^{2} = d_k$ mówi o \emph{średniej} po losowaniach wag.
+Wytrenowany model nie ma średniej. Ma jedno losowanie \dash{} jedno $M$
+\dash{} a jego wyniki robią to, co $\lVert M\rVert_F^{2}$ dla tej jednej
+macierzy.
+
+Zmierzony po losowaniach względny rozrzut tej wielkości:
+
+\begin{center}
+\begin{tabular}{rr}
+\toprule
+$d_k$ & rozrzut $\lVert M\rVert_F^{2}$ \\
+\midrule
+$8$  & $\val{p32.asm.spread.8}$\,\% \\
+$16$ & $\val{p32.asm.spread.16}$\,\% \\
+$32$ & $\val{p32.asm.spread.32}$\,\% \\
+$64$ & $\val{p32.asm.spread.64}$\,\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{To liczby orientacyjne, a nie dokładne}, i warto powiedzieć dlaczego:
+$\val{p32.asm.draws}$ losowań szacuje rozrzut z dokładnością do jakiejś jego
+siódmej części, więc ta kolumna jest rzędem wielkości, a nie pomiarem. Co nie
+jest orientacyjne, to kolejność, a kolejność ma powód.
+
+Warto jasno powiedzieć, co rozrzut po losowaniach znaczy dla czegoś, co się
+wdraża. Dwa modele trenowane z różnych ziaren startują od różnych $M$, więc
+ich wyniki siedzą na nieco innych skalach, zanim którykolwiek zobaczy
+dane \dash{} i to jest jedno z miejsc, z których bierze się zmienność między
+ziarnami w treningu, a nie cokolwiek, co zrobił optymalizator.
+
+Zanim pójdziesz dalej: $M$ ma $\val{p32.d}^{2}$ wyrazów niezależnie od $d_k$.
+Dlaczego \emph{wąska} głowica miałaby dawać bardziej zmienne
+$\lVert M\rVert_F^{2}$ niż szeroka?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Bo rząd $M$ jest co najwyżej $d_k$}
+
+$M = W_Q W_K\T$ jest iloczynem przez talię szerokości $d_k$, więc stosuje się
+do niego wprost twierdzenie o wąskim gardle z Programu~\ref{prog:P08}: jego
+rząd nie może przekroczyć $d_k$, jakkolwiek duża by ta macierz była.
+
+Wyrazy $M$ nie są więc $\val{p32.d}^{2}$ niezależnymi liczbami. Są
+$\val{p32.d}^{2}$ liczbami zbudowanymi z $d_k$ niezależnych kierunków, a wąska
+głowica ma ich mniej do uśrednienia. Dlatego rozrzut maleje wraz z
+poszerzaniem głowicy, i jest to Program~\ref{prog:P08} wykonujący zadanie,
+którego nikt mu nie pisał.
+
+\begin{trapbox}
+\textbf{\enquote{Skalowanie jest dokładne, więc wyniki prawdziwego modelu
+mają wariancję $d_k$.}}
+
+Pierwszy człon jest prawdziwy, a drugi z niego nie wynika. Dokładność w
+wartości oczekiwanej mówi o zbiorze modeli, które mogłeś wytrenować;
+wdrożenie ma jeden, a jego wyniki są o kilka procent obok, zanim trening się
+zacznie.
+
+To rozróżnienie Programu~\ref{prog:P21} \dash{} nieobciążony to nie to samo
+co użyteczny \dash{} przybywające do architektury zamiast do estymatora.
+Efekt jest tu mały i warto wiedzieć, że nie jest zerowy, bo pytaniem następnej
+sekcji jest, co się z nim dzieje po treningu, a na to nic w tej książce nie
+odpowiada.
+\end{trapbox}
+\end{fr}
+
+\mermaidfig{p32-score-assembled}{Skąd bierze się wynik}{jedna forma}
+
+% ============================================================
+\section{Od wyników do wag}
+\label{sec:P32-softmax}
+\index{transformer!softmax na wynikach}
+
+\begin{fr}
+Wyniki są teraz rzędem liczb rzeczywistych, po jednej na pozycję klucza, i
+mogą mieć dowolny znak i dowolny rozmiar. Muszą stać się wagami.
+
+Program~\ref{prog:F05} rozstrzygnął, co robi z nimi $\softmax$, a
+Program~\ref{prog:P02} rozstrzygnął, jak go policzyć bez przepełnienia. Oba
+są wydane; żadnego się tu nie powtarza.
+
+Warto natomiast zapytać, co warstwa przez ten wybór \emph{zyskuje}, bo sama
+dodatniość byłaby dużo tańsza. Podniesienie każdego wyniku do kwadratu daje
+liczby dodatnie; samo eksponowanie bez niczego dalej też. Żadne z nich nie
+sumuje się do jedności, a dzielenie na końcu $\softmax$-a jest jedynym
+krokiem, który to zapewnia \dash{} pytanie nie brzmi więc, co daje
+eksponenta, tylko co daje \emph{normalizacja}.
+
+Wagi wychodzą dodatnie i sumują się do jedności. Co wobec tego można
+powiedzieć o tym, gdzie musi leżeć wyjście warstwy względem wektorów
+wartości, które uśrednia?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Wewnątrz ich powłoki wypukłej}
+
+To dokładnie obiekt Programu~\ref{prog:P19}. Wagi nieujemne i sumujące się do
+jedności tworzą kombinację wypukłą, więc wyjście jest ważoną średnią wartości
+i nigdy nie może opuścić obszaru, który one rozpinają.
+
+To prawdziwa gwarancja i warto ją nazwać, bo mówi, czego pojedyncza warstwa
+uwagi strukturalnie \emph{nie potrafi}: nie potrafi wyprodukować kierunku, w
+którym nie wskazuje żadna z jej wartości. Cokolwiek zapisze do strumienia,
+jest zbudowane z tego, co już tam było.
+
+Warstwa gęsta, która potem następuje, jest tym, co się z tego wymyka, bo
+Program~\ref{prog:F05} udowodnił, że złożenie odwzorowań afinicznych jest
+afiniczne, a nieliniowość jest tym, co to łamie. Dwie połowy bloku robią
+różne rzeczy, i to jest zdanie, które mówi która.
+
+\begin{aibox}
+Własność powłoki wypukłej jest powodem, dla którego czysto uwagowy stos nie
+może wymyślić cechy: na każdej warstwie wyjście siedzi wśród własnych wejść.
+Gdy wynik interpretowalnościowy zgłasza kierunek pojawiający się na warstwie
+$k$, a nieobecny na warstwie $k-1$, warstwa gęsta jest tym, skąd on mógł
+przyjść, a Program~\ref{prog:P31} jest programem o tym, na co taki wynik
+pozwala, a na co nie.
+\end{aibox}
+\end{fr}
+
+\begin{fr}
+Istnieje tańszy sposób, żeby liczby sumowały się do jedności, i warto
+zobaczyć, dlaczego się go nie używa: podzielić każdy wynik przez sumę
+wyników.
+
+Zanim pójdziesz dalej: wyniki mogą w tym miejscu mieć dowolny znak. Co to
+robi tej tańszej metodzie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Psuje ją, i to na dwa osobne sposoby}
+
+Ujemny wynik dałby ujemną wagę, a wyjście przestałoby w ogóle być średnią
+wartości \dash{} gwarancja powłoki wypukłej znika. Gorzej, wyniki mogą sumować
+się do zera i wtedy metoda dzieli przez zero z powodów niemających nic
+wspólnego z tym, że dane są nietypowe.
+
+Wcześniejsze potęgowanie naprawia oba: posyła każdy wynik w liczbę dodatnią, a
+suma liczb dodatnich nigdy nie jest zerem. \textbf{Eksponenta jest po to, by
+dzielenie było bezpieczne, a gwarancja prawdziwa}, a to, że przy okazji
+zamienia różnice wyników na ilorazy wag, pokazał Program~\ref{prog:F07} i to
+właśnie czyni dzielnik z sekcji~\ref{sec:P32-score} tak ważnym.
+\end{fr}
+
+\begin{fr}
+Jedna przestroga co do wag, i należy do Programu~\ref{prog:P29}.
+
+Wagę $\num{0.9}$ na jednym kluczu czyta się często jako
+\enquote{skupienie uwagi} warstwy na tym kluczu, a ten odczyt mówi o
+rozkładzie, więc da się go zmierzyć zamiast oceniać na oko:
+Program~\ref{prog:P29} zamienia entropię wiersza uwagi na efektywną liczbę
+kluczy i podaje $\val{p29.att.raw.eff}$ z $\val{p29.att.keys}$ bez dzielnika
+przeciwko $\val{p29.att.scaled.eff}$ z nim.
+
+Dzielnik z sekcji~\ref{sec:P32-score} nie jest więc numerycznym drobiazgiem.
+Jest tym, co powstrzymuje warstwę przed zapadnięciem się na jeden klucz,
+zanim się czegokolwiek nauczy, a jego efekt daje się odczytać w jednostce, w
+której spiera się przegląd projektowy.
+\end{fr}
+
+% ============================================================
+\section{Głowice}
+\label{sec:P32-heads}
+\index{transformer!wiele głowic}
+
+\begin{fr}
+Blok nie uruchamia jednej uwagi, tylko kilka równolegle i skleja wyniki.
+Program~\ref{prog:P07} ma mechanikę \dash{} szeroki wektor dzieli się na $h$
+plastrów, oś głowicy przenosi się przed oś pozycji, a jedno zwężenie robi
+resztę \dash{} i nazywa to przekształceniem kształtu, a nie obliczeniem.
+
+Oto ile to kosztuje. Przy $\val{p32.heads}$ głowicach szerokości
+$\val{p32.d.head}$ szerokości głowic sumują się do
+$\val{p32.heads} \times \val{p32.d.head} = \val{p32.d}$, czyli do własnej
+szerokości strumienia.
+
+Zanim pójdziesz dalej: porównaj parametry w $\val{p32.heads}$ głowicach
+szerokości $\val{p32.d.head}$ z jedną głowicą szerokości $\val{p32.d}$.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Są takie same, dokładnie}
+
+$W_Q$ dla jednej szerokiej głowicy ma wymiar $\val{p32.d}$ na
+$\val{p32.d}$. Dla $\val{p32.heads}$ wąskich głowic jest to
+$\val{p32.heads}$ macierzy $\val{p32.d}$ na $\val{p32.d.head}$ \dash{} a
+$\val{p32.heads} \times \val{p32.d.head} = \val{p32.d}$, więc kolumny składają
+się na tę samą macierz.
+
+\textbf{Uwaga wielogłowicowa jest więc darmowa.} To jedno rzutowanie
+$\val{p32.d}$ na $\val{p32.d}$ czytane jako $\val{p32.heads}$ bloków zamiast
+jednego, i dlatego Program~\ref{prog:P07} mógł nazwać to przekształceniem
+kształtu: nic nie liczy się inaczej, liczby są inaczej pogrupowane.
+
+Zmienia się nie koszt, lecz ograniczenie. Jedna szeroka głowica tworzy jedno
+$M = W_Q W_K\T$ rzędu do $\val{p32.d}$; $\val{p32.heads}$ wąskich głowic
+tworzy $\val{p32.heads}$ osobnych, każde rzędu co najwyżej
+$\val{p32.d.head}$. Blok wymienia jedno bogate porównanie na wiele
+ograniczonych przy identycznym koszcie \dash{} a Program~\ref{prog:P08} jest
+miejscem, gdzie słowo \enquote{ograniczone} zostało uściślone.
+
+Program~\ref{prog:P07} stawia jedną tezę o tym układzie, którą łatwo pominąć.
+Oś głowicy przenosi się \emph{przed} oś pozycji, zanim nastąpi zwężenie.
+
+Zanim pójdziesz dalej: co poszłoby źle, gdyby tak nie było?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Spotkałyby się pozycje z różnych głowic}
+
+Zwężenie biegnie po ostatniej osi i paruje niezależnie wszystko, co stoi
+przed nią. Z osią głowicy z przodu każda głowica porównuje własne zapytania z
+własnymi kluczami i głowice nigdy się nie mieszają. Przy odwrotnej kolejności
+osi to samo zwężenie sparowałoby zapytanie z jednej głowicy z kluczem z
+innej, co nie jest porównaniem czegokolwiek.
+
+Żaden błąd by nie powstał. Kształty wychodzą tak czy inaczej, a
+Program~\ref{prog:P07} jest całym programem o tym, że to jest przypadek
+niebezpieczny \dash{} układ, który działa i liczy coś innego, niż zamierzono.
+
+\begin{trapbox}
+\textbf{\enquote{Więcej głowic to większa pojemność.}}
+
+Więcej głowic przy ustalonej szerokości \dash{} owszem. Więcej głowic przy
+ustalonej szerokości \emph{łącznej} \dash{} czyli to, co robi każda
+architektura \dash{} to te same parametry pokrojone na węższe kawałki
+niższego rzędu. Czy ta wymiana się opłaca, jest pytaniem empirycznym o klasę
+zadań i ta książka na nie nie odpowiada; arytmetyka rozstrzyga tyle, że jest
+to wymiana, a nie zysk.
+\end{trapbox}
+\end{fr}
+
+% ============================================================
+\section{Strumień rezydualny}
+\label{sec:P32-residual}
+\index{transformer!strumień rezydualny}
+\index{gradient!a połączenia rezydualne}
+
+\begin{fr}
+Program~\ref{prog:F12} udowodnił coś o głębokości, a potem odmówił dokończenia
+tego.
+
+Jego argument: gradient przez stos warstw jest \emph{iloczynem}, jeden
+czynnik na warstwę, a jeśli każdy czynnik jest co najwyżej $\frac{1}{4}$, to
+całość jest co najwyżej $\bigl(\frac{1}{4}\bigr)^{n}$.
+
+Zanim pójdziesz dalej: przy $\val{p32.depth}$ warstwach ile wynosi to
+ograniczenie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p32.plain.bound}$, i to w najlepszym przypadku}
+
+Program~\ref{prog:F12} zapisuje dokładnie tę liczbę, a ten program przelicza
+ją na tym samym łańcuchu, więc jeśli któreś się ruszy, budowanie staje.
+
+Warto jasno powiedzieć, jak źle to jest, a także jak niezupełnie źle w ten
+sposób, w jaki się mówi. Przy $\val{p32.plain.bound}$ liczba jest wciąż w
+pełni reprezentowalna: Program~\ref{prog:P01} kładzie najmniejszą liczbę
+normalną $\code{float32}$ na $\val{p01.fp32.minnorm}$, więc w najlepszym
+przypadku nic się nie zapada.
+
+Zapada się przypadek realistyczny. Program~\ref{prog:F12} liczy ten sam
+iloczyn na warstwie \emph{nasyconej}, a nie w jej najlepszym punkcie, i
+dostaje $\val{f12.sat.bound}$ \dash{} poniżej każdej podłogi, jaką ten format
+ma. Wtedy wczesne warstwy dostają dokładnie zero i dostają je po cichu.
+
+Program~\ref{prog:F12} nazywa następnie odpowiedź architektury i przekazuje
+wyprowadzenie tutaj: \emph{ścieżka od straty do wczesnych warstw, która wcale
+nie jest długim iloczynem.}
+
+Oto więc zmiana, i jest to jeden symbol. Zamiast warstwy zastępującej
+strumień, $y = f(x)$, warstwa do niego dodaje:
+\[ y \;=\; x + f(x). \]
+
+Zanim to zróżniczkujesz, warto zauważyć dwie rzeczy. To nakłada na blok
+warunek: $x$ i $f(x)$ muszą mieć ten sam kształt, żeby w ogóle dało się je
+dodać, i dlatego każda szerokość w
+sekcji~\ref{sec:P32-one-block} wracała do $\val{p32.d}$. I nie wprowadza to
+żadnej operacji, której ta książka by nie miała \dash{} to dodawanie, a
+Program~\ref{prog:F11} podaje pochodną sumy.
+
+Nic tu więc nie wymaga nowej reguły, a zmiana, która nie wymaga nowej reguły,
+jest dokładnie tą, którą czyta się jako kosmetyczną. Warto samemu rozstrzygnąć,
+co ona robi, zanim usłyszysz, po co jest.
+
+Zanim pójdziesz dalej: zróżniczkuj to. Ile wynosi jakobian jednej takiej
+warstwy?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$1 + f'(x)$}
+
+Co wygląda na małą zmianę i nią nie jest. Ułóż $n$ takich warstw, a gradient
+wynosi
+\[ \prod_{k=1}^{n} \bigl(1 + f'_k\bigr), \]
+podczas gdy wcześniej był $\prod_k f'_k$. Narzucający się odczyt jest taki, że
+czynniki zrobiły się większe, i ten odczyt jest dostępny oraz błędny.
+
+Wymnóż nawiasy. Każdy składnik bierze z każdego nawiasu albo $1$, albo
+$f'_k$ \dash{} więc rozwinięcie ma jeden składnik na każdy \emph{podzbiór}
+warstw, czyli $2^{n}$ składników, a każdy jest iloczynem $f'$ po warstwach ze
+swojego podzbioru.
+
+\textbf{To jest suma po ścieżkach.} Podzbiór mówi, przez które warstwy
+gradient \emph{przeszedł}, a które \emph{ominął}.
+
+Zauważ, co samo rozwinięcie zrobiło z pytaniem. Iloczyn to jedna wielkość i
+jeden mały czynnik gdziekolwiek w nim rozstrzyga całość. Suma to $2^{n}$
+wielkości i rozstrzyga ją ta największa, więc mały składnik nic nie kosztuje.
+Oba wyrażenia są równe i nie jest jednakowo łatwo o nich myśleć \dash{} i
+dlatego rozpisanie było warte tej linijki.
+
+Zanim pójdziesz dalej: jeden z tych $2^{n}$ podzbiorów jest pusty. Ile wnosi
+jego składnik?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dokładnie $1$}
+
+Pusty podzbiór bierze $1$ z każdego nawiasu. To ścieżka, która omija każdą
+warstwę \dash{} prosto od straty do wejścia, nie dotykając niczego.
+
+I to jest cała rzecz:
+
+\begin{center}
+\textbf{gradient zwykłego łańcucha to jeden iloczyn, który zabija $n$ małych
+czynników.\\
+Gradient stosu rezydualnego to suma, a jednym z jej składników jest $1$.}
+\end{center}
+
+Żaden czynnik go nie zabije, bo nie zawiera on żadnych czynników. Pozostałe
+$2^{n} - 1$ ścieżek może znikać dokładnie tak, jak mówi
+Program~\ref{prog:F12}, a gradient i tak dojdzie.
+
+Skrypt sprawdza to rozwinięcie na ułamkach przy $\val{p32.path.n}$ warstwach
+\dash{} $\val{p32.path.count}$ ścieżek sumujących się dokładnie do iloczynu
+\dash{} a potem sprawdza konsekwencję, która jest tezą, a nie arytmetyką:
+wyłącz każdą warstwę, tak by każde $f'_k$ było zerem, a gradient zwykłego
+łańcucha wynosi dokładnie $0$, gradient stosu rezydualnego zaś dokładnie $1$.
+\end{fr}
+
+\transcript{p32-two-stacks}
+
+\begin{fr}
+Druga linia tego listingu to przypadek uczciwy, w którym warstwy robią coś
+małego, a nie nic.
+
+Na $\val{p32.res.trials}$ losowaniach, przy każdym $f'$ rozmiaru około
+$\val{p32.res.sd}$ i $\val{p32.depth}$ warstwach, mediana gradientu zwykłego
+łańcucha wynosi $\val{p32.res.plain.med}$, a stosu rezydualnego
+$\val{p32.res.resid.med}$, przy czym $\val{p32.res.within}$ procent losowań
+mieści się w granicach dwukrotności $1$.
+
+Te dwie liczby są ilustracją dokładnego wyniku, a nie wynikiem, więc skrypt
+sprawdza kolejność i to, że stos rezydualny zostaje rzędu jedności, a nigdy
+samych liczb.
+
+\begin{trapbox}
+\textbf{\enquote{Połączenia rezydualne naprawiają znikające gradienty.}}
+
+One zmieniają to, czym gradient \emph{jest}. To mocniejsze niż naprawienie i
+zarazem węższe, a obie połowy mają znaczenie.
+
+Mocniejsze: ścieżka identycznościowa nie jest dużym czynnikiem, który wciąż
+może zostać przeważony, tylko składnikiem, którego nic nie mnoży.
+
+Węższe: nic tutaj nie mówi, że pozostałe $2^{n} - 1$ ścieżek się zachowuje.
+Stos rezydualny wciąż może eksplodować \dash{} druga awaria z
+Programu~\ref{prog:F12} pozostaje nietknięta, i po to jest następna sekcja
+\dash{} a dodanie połączeń rezydualnych do źle wyskalowanej sieci daje
+gradient równy $1$ plus bardzo dużo szumu. Ścieżka identycznościowa gwarantuje
+dojście, a nie przydatność.
+\end{trapbox}
+\end{fr}
+
+\mermaidfig{p32-paths-not-product}{Dwa stosy, dwa gradienty}{suma i iloczyn}
+
+% ============================================================
+\section{Normalizacja i miejsce, w którym wchodzi pozycja}
+\label{sec:P32-norm}
+\index{transformer!normalizacja warstwy}
+\index{transformer!informacja o pozycji}
+
+\begin{fr}
+Zostały dwie operacje i obie są wydane, więc ta sekcja mówi, gdzie one siedzą,
+a nie czym są.
+
+\textbf{Normalizacja} odejmuje średnią wektora i dzieli przez jego rozrzut.
+Program~\ref{prog:P18} wyprowadza jej gradient i sprawdza go z różnicą
+centralną z dokładnością lepszą niż $\val{p18.check.ceiling}$, więc nic o niej
+nie jest tu należne.
+
+Złożenie dodaje odpowiedź na to, po co ona w bloku w ogóle jest.
+Sekcja~\ref{sec:P32-residual} zostawiła otwartą drugą awarię: ścieżka
+identycznościowa gwarantuje, że gradient dojdzie, i nie mówi nic o rozmiarze
+tego, co dojdzie razem z nim. Każdy blok dodaje do strumienia, więc skala
+strumienia rośnie z głębokością, o ile coś jej nie trzyma.
+
+Zanim pójdziesz dalej: co normalizacja robi z argumentem z
+sekcji~\ref{sec:P32-score}?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Przywraca warunek, który ten argument zakłada}
+
+Rachunek wariancji zakładał, że wyrazy strumienia mają znaną, ustaloną skalę.
+Trzydzieści dwa bloki dodające do niego nie zostawiłyby tego prawdą.
+Normalizacja odkłada to na miejsce, zanim każdy blok zacznie czytać, więc
+wariancja wyniku trzyma się na warstwie $\val{p32.layers}$ z tego samego
+powodu, z którego trzyma się na pierwszej.
+
+Trzy kawałki są więc jednym mechanizmem, a nie trzema: ścieżka rezydualna
+niesie gradient, normalizacja trzyma ustaloną skalę, na której jest on
+niesiony, a dzielnik trzyma wyniki na tej skali.
+
+\textbf{Informacja o pozycji} jest drugą i naprawia coś, czego blok w
+dotychczasowej postaci po prostu nie ma.
+
+Zanim pójdziesz dalej: weź blok z sekcji~\ref{sec:P32-one-block} i pomieszaj
+pozycje wejściowe. Co się dzieje z jego wyjściami?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Mieszają się razem z nimi i poza tym są identyczne}
+
+Każdy wynik jest iloczynem skalarnym dwóch wektorów, a ważona suma biegnie po
+pozycjach, nie pytając o nie, więc nic w bloku nie odróżni \enquote{kot
+usiadł tu} od \enquote{usiadł tu kot}. Nie jest tak, że kolejność jest
+obsłużona źle; kolejność nie jest w ogóle reprezentowana.
+
+Program~\ref{prog:F08} dostarcza naprawy i dowodzi własności, na której ona
+stoi: obrócenie zapytania i klucza o kąty $\alpha$ i $\beta$ zostawia ich
+iloczyn skalarny zależny tylko od $\beta - \alpha$. Obrócenie wektora każdej
+pozycji o kąt proporcjonalny do jej indeksu czyni więc każdy wynik funkcją
+\emph{odległości} między dwiema pozycjami i niczego więcej o tym, gdzie one
+siedzą.
+
+Obrót jest ortogonalny, więc nie zmienia żadnej długości \dash{}
+Program~\ref{prog:F08} mierzy błąd na $\val{f08.rot.len.err}$, a
+Program~\ref{prog:P09} mówi, dlaczego ortogonalna zmiana bazy nic model nie
+kosztuje. \textbf{Pozycja zostaje dodana bez wydawania pojemności
+strumienia}, i to jest cały powód, dla którego tej metody się używa.
+\end{fr}
+
+% ============================================================
+\section{Ile to kosztuje}
+\label{sec:P32-count}
+\index{transformer!liczba parametrów}
+\index{koszt!jednego bloku}
+
+\begin{fr}
+Program~\ref{prog:F01} otworzył tę książkę, każąc ci policzyć, ile waży model
+o siedmiu miliardach parametrów. Nigdy nie powiedział, skąd bierze się te
+siedem miliardów, a na trzeciej stronie nie było na to słownika.
+
+Teraz jest. Program~\ref{prog:P03} zapisuje kształt tego samego modelu
+\dash{} $\val{p32.layers}$ warstw szerokości $\val{p32.d}$ \dash{} a
+sekcja~\ref{sec:P32-one-block} policzyła macierze.
+
+Uwaga ma cztery rzutowania, każde $\val{p32.d}$ na $\val{p32.d}$, gdy głowice
+są już połączone, więc mieści $4d^{2}$.
+
+Warstwa gęsta to dwie warstwy, $d$ na wejściu i $4d$ na wyjściu, potem $4d$ na
+wejściu i $d$ na wyjściu. Program~\ref{prog:F02} zebrał już te wyrazy
+podobne: $4d^{2} + 4d^{2} = 8d^{2}$.
+
+Oba rachunki są na jeden blok, więc żaden z nich nie zależy od głębokości:
+pomnożenie przez liczbę warstw mnoży oba przez to samo i zostawia ich stosunek
+dokładnie tam, gdzie był. I żaden nie jest nowy \dash{} pierwszy to cztery
+rzutowania jednej szerokości, a drugi to zebrane wyrazy podobne
+Programu~\ref{prog:F02}, porównanie jest więc między dwiema liczbami, które
+ta książka już podała.
+
+Oba liczą też macierze i nic poza nimi. Blok niesie jeszcze obciążenia i dwa
+zestawy parametrów normalizacji, a tych jest po $\val{p32.d}$ liczb wobec
+macierzy o $\val{p32.d}^{2}$ \dash{} mniej o czynnik równy szerokości, i
+dlatego nikt ich nie liczy, i dlatego warto raz powiedzieć, że zostały
+pominięte, a nie przeoczone.
+
+Zanim pójdziesz dalej: która z dwóch połów bloku mieści więcej parametrów i o
+ile?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Warstwa gęsta, i to $2$ razy}
+
+$8d^{2}$ przeciwko $4d^{2}$. \textbf{Połowa, o której nikt nie mówi, mieści
+dwa razy tyle, co połowa, o której mówią wszyscy.}
+
+Warto przy tym posiedzieć, bo prawie każde zdanie napisane o tej
+architekturze dotyczy uwagi, a dwie trzecie parametrów bloku siedzi w części,
+która uwagą wcale nie jest. W liczbach, przy $d = \val{p32.d}$:
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+uwaga, $4d^{2}$ & $\val{p32.attn.block}$ \\
+warstwa gęsta, $8d^{2}$ & $\val{p32.ffn.block}$ \\
+\midrule
+jeden blok, $12d^{2}$ & $\val{p32.per.block}$ \\
+$\times\ \val{p32.layers}$ warstw & $\val{p32.blocks.total}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A teraz arytmetyka, której Program~\ref{prog:F01} nie mógł wykonać.
+
+Zauważ, czym są te dwie liczby. Ta niżej to figura z karty modelu, czyli to,
+co każdy by sprawdził; ta wyżej to, co wymuszają kształty, i nikt jej nie
+wybierał. Cokolwiek dzieli te dwie liczby, musi się więc rozliczyć czymś, co
+ten rachunek pominął, i warto zdecydować, czy spodziewasz się zaokrąglenia,
+czy całego składnika.
+
+Zanim pójdziesz dalej: $\val{p32.blocks.total}$ przeciwko liczbie, którą
+podaje Program~\ref{prog:F01}, czyli $\val{p32.f01.params}$ \dash{} jaką
+część tego modelu stanowią bloki?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p32.blocks.pct}$ procent}
+
+\textbf{Bloki są więc modelem.} Reszta to zanurzenie, które przy słowniku
+$\val{p32.vocab}$ daje $\val{p32.embed}$ parametrów, czyli
+$\val{p32.embed.pct}$ procent \dash{} a dalsza reszta to głowica wyjściowa,
+obciążenia i skale normalizacji, liczone w tysiącach tam, gdzie tamte liczy
+się w miliardach.
+
+Pierwszy program książki kazał ci zważyć liczbę, której nie umiał wyprowadzić.
+Trzydzieści programów później liczba ta wychodzi z dwóch zapisanych kształtów
+i jednego mnożenia.
+\end{fr}
+
+\begin{fr}
+Dwa uczciwe zastrzeżenia do tego rachunku, bo to liczba tego rodzaju, który
+podróżuje.
+
+\begin{warning}
+\textbf{To $12d^{2}$ należy do bloku oryginalnego, a nie do każdego.} Połowa
+gęsta wynosi $8d^{2}$ tylko wtedy, gdy jej szerokość wewnętrzna to $4d$ i
+używa ona dwóch macierzy. Kilka obecnych architektur używa trzech macierzy i
+szerokości wewnętrznej innej niż $4d$, co zmienia $8$, a więc i $12$. Metoda
+przeżywa \dash{} policz macierze, dodaj kwadraty \dash{} a stała nie.
+
+A słownik jest \emph{wyborem projektowym}, a nie pomiarem.
+Program~\ref{prog:F01} nigdy żadnego nie ustalił, więc $\val{p32.vocab}$ jest
+tu nazwany jako założenie, którym jest; model o czterokrotnie większym
+słowniku rusza wiersz zanurzenia, a nie wiersze bloków.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Teraz cache, a wychodzi on z tych samych kształtów.
+
+Obsługa rozmowy oznacza nieprzeliczanie kluczy i wartości każdej wcześniejszej
+pozycji na każdym kroku, więc trzyma się je. Trzymać trzeba jeden klucz i
+jedną wartość na pozycję, na warstwę.
+
+Zauważ, które z czterech rzutowań to są, a które nie. Zapytań się nie trzyma:
+na każdym kroku jest dokładnie jedno nowe zapytanie, używa się go raz
+przeciwko każdemu kluczowi i nigdy więcej nie jest potrzebne. Klucze i
+wartości są tym, czego będzie potrzebował każdy przyszły krok. \textbf{Dwa z
+czterech się przechowuje, a dwóch nie}, a które dwa \dash{} wynika z tego, co
+obliczenie z nimi robi, a nie z czyjegoś wyboru.
+
+Zanim pójdziesz dalej: przy $\val{p32.layers}$ warstwach szerokości
+$\val{p32.d}$, po dwa bajty na liczbę, ile to jest na token?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$2 \times \val{p32.layers} \times \val{p32.d} \times \val{p32.bytes}$
+bajtów, czyli $\val{p32.kv.per.token.mib}$ MiB}
+
+Dwa tensory, po jednym wektorze $d$ każdy, na warstwę, na pozycję. Na
+$\val{p32.seq}$ tokenach daje to $\val{p32.kv.gib}$ GiB \dash{} czyli własną
+zapisaną liczbę Programu~\ref{prog:P03}, a skrypt sprawdza, że wyprowadzenie
+tego programu z kształtów bloku ją odtwarza.
+
+To złożenie zarabiające na siebie. Program~\ref{prog:P03} zmierzył cache; nie
+mógł powiedzieć, dlaczego ma on taki rozmiar, bo powiedzenie tego wymaga
+czterech rzutowań i faktu, że przechowuje się dokładnie dwa z nich. Teraz
+może.
+
+\begin{note}
+Program~\ref{prog:P03} drukował tę liczbę na token jako \enquote{MB}, licząc
+ją w mebibajtach, i przetrwało to cały szkic, bo
+$\val{p32.kv.per.token.mib}$ MiB oraz $\num{0.524}$ MB zaokrąglają się do
+$\val{p32.kv.per.token.mib}$ na jednym miejscu po przecinku. Jednostka jest
+tam teraz poprawiona. To dokładnie ta pomyłka, przed którą ostrzega własne
+podsumowanie Programu~\ref{prog:P03} \dash{} plan pojemności rozjechany o
+siedem procent to prawie zawsze ta jedna \dash{} a powód, dla którego się
+ukryła, należy do Programu~\ref{prog:P17}: dwa odczyty wzoru zgodne liczbowo
+zostają niewidoczne, dopóki nie przestaną być.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Ostatnia arytmetyka w programie jest tą, która rozstrzyga, jak architekturę się
+wdraża.
+
+Na $\val{p32.seq}$ pozycjach przy $\val{p32.heads}$ głowicach wyniki to
+$\val{p32.scores}$ liczb. Cache to $\val{p32.cache.vectors}$ wektorów.
+
+Podwój sekwencję, a pierwsze rośnie \emph{czterokrotnie}, drugie zaś
+\emph{dwukrotnie} \dash{} dwa wykładniki w jednej warstwie, co jest odkryciem
+Programu~\ref{prog:P03}, teraz odczytanym z kształtów, a nie stwierdzonym o
+uwadze w ogólności.
+
+Ten kwadratowy jest tym, którego trzeba się trzymać. \textbf{Każda metoda z
+\enquote{długim kontekstem} w nazwie jest próbą niepłacenia $n^{2}$}:
+liczenia tylko części par, liczenia ich z niższą precyzją, liczenia ich
+blokami mieszczącymi się w szybkiej pamięci albo zastąpienia porównania
+czymś, co nie jest porównaniem każdej pary. Różnią się tym, z czego rezygnują,
+a rezygnują z tego, które pary wolno sobie zobaczyć.
+
+\begin{aibox}
+Dwa wykładniki tłumaczą wzorzec, który spotkał każdy, kto tę architekturę
+obsługiwał. Model odpowiadający wygodnie na krótki prompt i wywracający się na
+długim zwykle nie wyczerpał \emph{parametrów}: wyczerpał jedno z tych dwóch.
+Które \dash{} mówi, co robić, a wskazują one w przeciwne strony: cache naprawia
+się obsługą mniejszej liczby rozmów naraz, macierz wyników \dash{} obsługą
+krótszych. Plan pojemności, który ich nie rozdziela, zgaduje.
+\end{aibox}
+\end{fr}
+
+\mermaidfig{p32-where-parameters-are}{Gdzie siedzą parametry bloku}{cztery i osiem}
+
+% ============================================================
+\section{Czego ta książka nie sprawdziła}
+\label{sec:P32-unchecked}
+\index{pomiar!co pozostaje}
+
+\begin{fr}
+Architektura jest złożona, a każda liczba w niej wzięła się z programu, który
+ją wyprowadził. Ta ostatnia sekcja jest o tych, które wyprowadzono tam, gdzie
+model nie mieszka.
+
+Sekcja~\ref{sec:P32-score} udowodniła, że złożenie zachowuje wariancję wyniku.
+Przeczytaj ten dowód jeszcze raz i zapytaj, co on zakładał o strumieniu.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Że jego wyrazy były niezależne i wszystkie jednej skali}
+
+Co jest prawdą przy inicjalizacji, bo inicjalizator czyni to prawdą.
+Program~\ref{prog:P25} mówi to wprost i dodaje część, która ma znaczenie:
+staje się to coraz mniej prawdą w miarę treningu, bo zapytania i klucze uczą
+się struktury, a struktura to zależność.
+
+Każde więc wyprowadzenie tej książki o uwadze \dash{} $\sqrt{d_k}$, wariancja
+przez rzutowania, reguła wachlarza wejściowego, skala przywracana przez
+normalizację \dash{} jest stwierdzeniem o modelu \textbf{przed jego
+wytrenowaniem}.
+
+\begin{warning}
+\textbf{Ta książka nie zmierzyła żadnego z nich na modelu wytrenowanym i nie
+ma takiego modelu.}
+
+Uczciwe stanowisko jest takie, że wyprowadzenia są dokładne, a ich hipoteza
+jest sprawdzalna tylko tam, dokąd ta książka nie sięga. Rozstrzygnęłoby to coś
+nietrudnego i niemożliwego dla piaskownicy: wziąć wytrenowany model, policzyć
+$\lVert W_Q W_K\T\rVert_F^{2}$ na głowicę i porównać z $d_k$. Jeśli te dwie
+rzeczy się rozeszły, dzielnik nie robi już tego, do czego go wyprowadzono, a
+każde dalsze twierdzenie o entropii wiersza uwagi dotyczy rozkładu, którego
+skali nikt nie sprawdził.
+
+Matematyka przewiduje, że się rozchodzą \emph{i że to nie ma znaczenia}, bo
+$\sqrt{d_k}$ zostaje właściwym rzędem wielkości niezależnie od tego, co robi
+zależność. To przewidywanie jest osądem. Jest tu oznaczone jako osąd, a nie
+podane jako wynik.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Nie jest jedyne, a listę warto mieć w jednym miejscu, bo każda pozycja nazywa
+program, który sam podał swoją granicę, zamiast ją zamalować.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Program & Czego nie zmierzono \\
+\midrule
+\ref{prog:P08}, \ref{prog:P11} & czy widmo prawdziwej macierzy zanurzeń opada
+  tak, jak zakłada argument o niskim rzędzie \\
+\ref{prog:P19} & czy to, do której doliny trafi spacer, ma znaczenie w skali,
+  w jakiej ludzie trenują \\
+\ref{prog:P20} & czy metoda adaptacyjna dochodzi do lepszej odpowiedzi, a nie
+  tylko dochodzi szybciej \\
+\ref{prog:P25}, \ref{prog:P32} & czy niezależność zakładana przez
+  wyprowadzenie wyniku przeżywa trening \\
+\ref{prog:P31} & na co pozwala wynik sondy wobec warstwy, gdy zmierzy się
+  lukę między ograniczeniem a prawdą \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{Pięć pozycji i jedna przyczyna.} Każda potrzebuje prawdziwych macierzy
+wytrenowanego modelu, a ta książka powstała tam, gdzie takiego nie ma. To
+ograniczenie książki, a nie matematyki, a powód, dla którego jest ono tutaj
+wydrukowane, a nie zostawione domyślnie, to dyscyplina, na której stoją oba
+tomy towarzyszące: twierdzenie potrzebuje metody i liczby, albo zostaje
+oznaczone jako osąd.
+\end{fr}
+
+\begin{fr}
+Jedna uwaga na zamknięcie, i dotyczy tego, co pokazało złożenie, a nie samej
+architektury.
+
+Nic w tym programie nie było nowe. Wynik to iloczyn skalarny
+Programu~\ref{prog:P05}; jego dzielnik to argument o wariancji
+Programu~\ref{prog:P25}; wagi to kombinacja wypukła Programu~\ref{prog:P19};
+głowice to przekształcenie kształtu Programu~\ref{prog:P07}; ścieżka
+rezydualna to iloczyn Programu~\ref{prog:F12} przeczytany jako suma; rachunek
+to zbieranie wyrazów podobnych Programu~\ref{prog:F02} wykonane dwanaście
+razy; cache to pomiar Programu~\ref{prog:P03} wyprowadzony z kształtów.
+
+A jednak z ułożenia ich razem wyszły trzy rzeczy, których żaden z tych
+programów nie mógłby powiedzieć sam: że rzutowania zostawiają argument o
+wariancji \emph{dokładnie} nienaruszony, że połączenie rezydualne zmienia to,
+czym gradient \emph{jest}, a nie jak duży jest, i że warstwa gęsta mieści dwa
+razy tyle, co uwaga.
+
+\textbf{Tym właśnie jest architektura.} Nie nowym pomysłem, tylko kolejnością,
+w jakiej stosuje się pomysły znane, dobraną tak, by założenia każdego z nich
+były wciąż prawdziwe, gdy potrzebuje ich następny. Czytanie jej w ten sposób
+było tym, po co ta książka powstała.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--2}{Blok to sześć operacji i ta książka zdefiniowała już wszystkie
+  sześć. Architekturę tworzy kolejność i kształty.}
+\sumitem{3--5}{Parametry uwagi to cztery rzutowania; wynik to jeden iloczyn
+  skalarny; a $n$ pozycji daje $n^{2}$ wyników, co jest najbardziej brzemienną
+  liczbą w tym projekcie.}
+\sumitem{7--8}{Dzielnik wyniku to poprawka wariancji Programu~\ref{prog:P25}.
+  W bloku zapytania i klucze są \emph{wyliczane}, więc pytaniem jest, czy ten
+  argument przeżywa, a Program~\ref{prog:P25} przekazał je tutaj.}
+\sumitem{9--10}{Przeżywa, dokładnie. Wynik jest formą dwuliniową $x\T M y$ z
+  $M = W_Q W_K\T$, jego wariancja to $\lVert M\rVert_F^{2}$, a to ma wartość
+  oczekiwaną $d_k$ \dash{} więc rzutowania nic nie zmieniają i do stwierdzenia
+  tego nie było potrzebne żadne losowanie.}
+\sumitem{11--12}{Ale wytrenowany model ma jedno losowanie wag, a nie średnią,
+  więc jego własne wyniki są o kilka procent obok, zanim trening się zacznie, a
+  rozrzut maleje wraz z poszerzaniem głowicy, bo rząd $M$ jest co najwyżej
+  $d_k$ (Program~\ref{prog:P08}).}
+\sumitem{13--16}{$\softmax$ czyni wyjście kombinacją wypukłą
+  (Program~\ref{prog:P19}), więc warstwa czysto uwagowa nie może wyprodukować
+  kierunku, którego jej wartości już nie rozpinają.}
+\sumitem{18--20}{Uwaga wielogłowicowa jest darmowa: $\val{p32.heads}$ głowic
+  szerokości $\val{p32.d.head}$ mieści dokładnie parametry jednej głowicy
+  szerokości $\val{p32.d}$. Zmienia się rząd, a nie koszt.}
+\sumitem{21--22}{Zwykły łańcuch $\val{p32.depth}$ warstw ma gradient co
+  najwyżej $\val{p32.plain.bound}$, czyli poniżej tego, co pomieści
+  $\code{float32}$.}
+\sumitem{23--25}{$y = x + f(x)$ czyni jakobian $\prod(1 + f'_k)$, którego
+  rozwinięcie jest sumą po $2^{n}$ ścieżkach \dash{} po jednej na podzbiór
+  warstw. \textbf{Pusty podzbiór wnosi dokładnie $1$.} Gradient zwykłego
+  łańcucha to jeden iloczyn; stosu rezydualnego \dash{} suma z $1$ w
+  środku.}
+\sumitem{26--27}{Normalizacja przywraca skalę, którą zakłada argument o
+  wyniku, i dlatego te trzy kawałki są jednym mechanizmem.}
+\sumitem{28}{Obrót czyni wynik zależnym od odległości między dwiema pozycjami
+  i od niczego więcej, a nic model nie kosztuje, bo jest ortogonalny
+  (Programy~\ref{prog:F08} i \ref{prog:P09}).}
+\sumitem{29--32}{Uwaga to $4d^{2}$, a warstwa gęsta to $8d^{2}$: \textbf{połowa,
+  o której nikt nie mówi, mieści dwa razy tyle, co ta, o której mówią
+  wszyscy}. Blok to $12d^{2}$, a $\val{p32.layers}$ takich to
+  $\val{p32.blocks.pct}$ procent tego, co Program~\ref{prog:F01} podaje
+  jako $\val{p32.f01.params}$.}
+\sumitem{33--35}{Cache to jeden klucz i jedna wartość na pozycję na warstwę,
+  czyli $\val{p32.kv.per.token.mib}$ MiB na token, i odtwarza to, co
+  Program~\ref{prog:P03} podaje jako $\val{p32.kv.gib}$ GiB. Podwój
+  sekwencję: wyniki
+  rosną czterokrotnie, cache dwukrotnie.}
+\sumitem{36--39}{Każde wyprowadzenie tej książki o uwadze obowiązuje przy
+  inicjalizacji, a pięć z nich opiera się na hipotezach, o które nie zapytano
+  żadnego wytrenowanego modelu. Lista jest wydrukowana, a nie domyślna.}
+\end{summarybox}
+
+\begin{testexercises}
+\item Blok ma szerokość $d = 1024$. Ile parametrów jest w jego rzutowaniach
+  uwagi, a ile w jego warstwie gęstej?
+  \answerto{$4d^{2} = 4\,194\,304$ oraz $8d^{2} = 8\,388\,608$. Warstwa gęsta
+  mieści dwa razy tyle, przy każdej szerokości \dash{} stosunek nie zależy od
+  $d$.}
+\item Model ma $16$ warstw szerokości $2048$. Oszacuj liczbę jego parametrów z
+  samych bloków.
+  \answerto{$12d^{2}L = 12 \times 2048^{2} \times 16$, czyli około
+  $805$ milionów. Zanurzenie i głowica wyjściowa dochodzą na wierzch.}
+\item Dwa zapytania i dwa klucze powstają przez rzutowania $W_Q$ i $W_K$.
+  Które z $W_Q$, $W_K$ i $W_Q W_K\T$ da się odtworzyć z samych wyników?
+  \answerto{Tylko iloczyn. Wyniki to $x\T W_Q W_K\T y$, więc każda para
+  macierzy o tym samym iloczynie daje identyczne wyniki \dash{} i dlatego te
+  dwie często przechowuje się i analizuje jako jedną macierz.}
+\item Stos rezydualny ma $n$ warstw i każde $f'_k$ wypada dokładnie $-1$. Ile
+  wynosi gradient i czy ścieżka identycznościowa go ratuje?
+  \answerto{$\prod(1 + (-1)) = 0$. Ścieżka identycznościowa wnosi $1$, a
+  pozostałe $2^{n} - 1$ ścieżek znosi to dokładnie. \enquote{Jeden składnik
+  jest równy $1$} nie znaczy \enquote{suma jest co najmniej $1$}, i ten
+  przypadek to pokazuje.}
+\item Budżet obsługi pozwala na $32$ GiB cache'u przy kształtach z
+  sekcji~\ref{sec:P32-count}. Ile rozmów po $\val{p32.seq}$ tokenów się
+  mieści?
+  \answerto{Osiem, bo każda to $\val{p32.kv.gib}$ GiB. Zmniejsz kontekst o
+  połowę, a zmieści się szesnaście \dash{} cache jest liniowy w sekwencji, więc
+  ta wymiana jest jeden do jednego.}
+\item Która wielkość w bloku rośnie kwadratowo wraz z długością sekwencji, a
+  która liniowo?
+  \answerto{Liczba wyników rośnie kwadratowo; cache rośnie liniowo. Obie są
+  własnościami jednej warstwy, i dlatego plan pojemności musi nazwać, której z
+  nich zabrakło.}
+\end{testexercises}
+
+\canyou
+
+\begin{furtherproblems}
+\item Pokaż, że $\Ex\lVert W_Q W_K\T\rVert_F^{2} = d_k$, gdy wyrazy obu
+  macierzy mają wariancję $1/d$, licząc składniki.
+  \answerto{$M$ ma $d^{2}$ wyrazów; każdy jest sumą $d_k$ iloczynów dwóch
+  niezależnych wyrazów, więc każdy ma wariancję $d_k/d^{2}$; a
+  $d^{2} \times d_k/d^{2} = d_k$. Szerokość strumienia się skraca, i dlatego
+  dzielnik zależy od szerokości głowicy, a nie od szerokości modelu.}
+\item Głowicę zwęża się, a liczbę głowic podnosi, by utrzymać stałą szerokość
+  łączną. Co dzieje się z liczbą parametrów, a co z rzędem $M$ każdej głowicy?
+  \answerto{Liczba parametrów się nie zmienia. Każde $M$ ma rząd co najwyżej
+  $d_k$, który maleje, więc te same parametry wyrażają bardziej ograniczony
+  zbiór porównań.}
+\item Weź rozwinięcie $\prod_{k=1}^{n}(1 + f'_k)$ i zapisz sumę składników
+  przechodzących dokładnie przez jedną warstwę.
+  \answerto{$\sum_k f'_k$. Razem z $1$ ze ścieżki identycznościowej daje to
+  przybliżenie pierwszego rzędu $1 + \sum_k f'_k$, i dlatego płytki stos
+  rezydualny zachowuje się jak suma swoich warstw, a nie jak ich iloczyn.}
+\item Wyników jest $n^{2}$, a cache jest liniowy w $n$. Przy jakiej długości
+  sekwencji macierz wyników, po dwa bajty na liczbę i przy jednej głowicy,
+  zrówna się z cache'em z sekcji~\ref{sec:P32-count}?
+  \answerto{Z równania $2n^{2} = 2 \times \val{p32.layers} \times \val{p32.d}
+  \times 2 \times n$ wychodzi $n = 2 \times \val{p32.layers} \times
+  \val{p32.d}$, czyli $262\,144$ \dash{} daleko poza długości kontekstu
+  używane tutaj, i dlatego przy obsługiwanych sekwencjach dominuje cache, a
+  arytmetyce i tak dominują wyniki.}
+\item Program~\ref{prog:F12} pokazuje, że zwykły łańcuch może też
+  \emph{eksplodować}, a sekcja~\ref{sec:P32-residual} mówi, że ścieżka
+  rezydualna tego nie naprawia. Dlaczego nie?
+  \answerto{Ścieżka identycznościowa ogranicza gradient od dołu, a nie od góry.
+  Pozostałe ścieżki są nietknięte, więc stos o dużych czynnikach wciąż je
+  mnoży \dash{} po to jest normalizacja z sekcji~\ref{sec:P32-norm} i dlatego
+  obie pojawiają się razem w każdym bloku.}
+\end{furtherproblems}
