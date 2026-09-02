@@ -258,10 +258,11 @@ the numerator does not.
 
 One assumption of that derivation is worth naming, because it makes the
 expression a floor rather than an estimate. It takes each operand's relative
-error to be about $\eps$, which is what Program~\ref{prog:P01} licenses for a
-number freshly rounded into the format and for nothing else. If $a$ and $b$ are
-themselves the results of long computations they arrive carrying more than
-that, and the same factor multiplies whatever they arrive with.
+error to be about $\eps$, and $\eps$ is what Program~\ref{prog:P01} measured:
+the cost of rounding one number into the format. Nothing in it covers error a
+value arrives with. If $a$ and $b$ are themselves the results of long
+computations they arrive carrying more than that, and the same factor
+multiplies whatever they arrive with.
 
 So write the amplification factor down, and then put a size on it for the
 variance above.
@@ -394,7 +395,8 @@ And it fails as a step rather than as a slope, which is the opposite of what
 the previous section showed you. A cancellation degrades by degrees: the
 amplification factor grows as the operands close on each other, so you lose
 digits, then more digits, before you lose all of them. An exponential below the
-threshold is exact to the format's own precision and one unit above it is
+threshold is an ordinary number carrying the format's own precision, and one
+unit above it is
 \code{inf}, with nothing in between. A test that sweeps a range and checks the
 error therefore passes cleanly right up to the last safe score and says nothing
 whatever about the next one.
