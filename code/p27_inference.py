@@ -438,11 +438,24 @@ for d in range(3, DISCORDANT + 1, 2):
     assert 2 * math.comb(DISCORDANT, (DISCORDANT + d) // 2) / 2 ** DISCORDANT \
         < P_ONE, d
 
-# How big would the net have to be, on these same 30 discordant items, before
-# the conventional threshold is crossed?  Found by search rather than quoted.
-NEED = 1
+# How big would the net have to be, on these same discordant items, before the
+# conventional threshold is crossed?  Found by search rather than quoted.
+#
+# THE SEARCH STEPS BY TWO, and that is not a micro-optimisation.  The net is a
+# difference of two counts adding to DISCORDANT, so it has that number's
+# parity and half the integers are outcomes the data cannot produce.  A search
+# stepping by one reports the first integer whose p-value clears the bar, and
+# on an odd count that integer is an impossible one: at 31 discordant items it
+# answers 12, giving a threshold of 6.0 points that no evaluation can ever
+# land on, where the smallest ACHIEVABLE net clearing the bar is 13 and 6.5.
+#
+# The parity was understood twenty lines above this -- the most-likely check
+# iterates `range(3, DISCORDANT + 1, 2)` -- and this loop ignored it, which is
+# the finding: a constraint recorded at one use is not enforced at the next.
+NEED = NET
 while two_sided_exact(DISCORDANT, NEED) >= ALPHA_LATER:
-    NEED += 1
+    NEED += 2
+assert (DISCORDANT + NEED) % 2 == 0, (DISCORDANT, NEED)
 emit("p27.net.needed", NEED)
 emit("p27.net.needed.pts",
      reproduces(100.0 * NEED / ITEMS, 1, (float(NEED), 0), (float(ITEMS), 0),
