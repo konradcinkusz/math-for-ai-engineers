@@ -9075,18 +9075,21 @@ clone instead.
    an excess**, and that excess is the object P30 defines and shows is not
    symmetric.
 
-   **Four written programs owe P30 something and three say so in a box**,
-   which is the cheapest starting position any program in this book has had.
-   Program~\ref{prog:P18} gives cross-entropy a definitional frame and names
-   P30 for the meaning; Program~\ref{prog:P22} states its whole payoff in
-   terms of a KL-penalised objective and declares the one fact it uses,
-   naming P30; Program~\ref{prog:P28} §6 prices a miscalibrated judge in
-   **odds** deliberately and says the reading in nats is P30's; and
-   Program~\ref{prog:P26} names the excess without defining it. P29 supplies
-   the whole of the machinery \dash{} surprise, entropy, the code-length
-   theorem and the effective-count reading \dash{} and computes the entropy
-   of **one** distribution throughout, saying so where a reader will expect
-   otherwise.
+   **Every debt P30 is owed is already written down in the program that owes
+   it**, which is the cheapest starting position any program in this book has
+   had. Do not count them \dash{} `grep -rn 'prog:P30' programs/en/*.tex`
+   prints the list with its contexts, and reading it is the first thing to do.
+   What it names: Program~\ref{prog:P18} gives cross-entropy a definitional
+   frame and says *what it measures* is P30's; Program~\ref{prog:P22}
+   declares the one KL fact its whole payoff rests on;
+   Program~\ref{prog:P26} says the excess *has a name and is P30's*;
+   Program~\ref{prog:P28} §6 prices a miscalibrated judge in **odds**
+   deliberately and hands the reading in nats over; Program~\ref{prog:P02}
+   says P30 gives cross-entropy its meaning in bits; and Programs~F02 and F03
+   both point here for units and meaning. P29 supplies the whole of the
+   machinery \dash{} surprise, entropy, the code-length theorem and the
+   effective-count reading \dash{} and computes the entropy of **one**
+   distribution throughout, saying so where a reader will expect otherwise.
 
    **Read the brief as a checklist, and read the neighbours' file headers with
    it.** Program~\ref{prog:P27} found two of its seven itemised deliverables
