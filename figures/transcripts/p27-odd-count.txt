@@ -1,7 +1,7 @@
 >>> from math import comb
->>> m, net = 30, 1
+>>> m, net = 31, 1
 >>> sum(comb(m, c) for c in range(m + 1)
 ...     if abs(2 * c - m) >= net) / 2 ** m
-0.8555
->>> comb(m, m // 2) / 2 ** m
-0.1445
+1.0
+>>> 2 * comb(m, (m + 1) // 2) / 2 ** m
+0.2799

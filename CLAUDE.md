@@ -8190,9 +8190,28 @@ sections before it arrives as a word.**
 The worked answer is the program's reason for existing. A published gap of
 $\val{p27.gap.pts}$ points on $\val{p27.items}$ items is
 $\val{p27.gap.items}$ item; the exact test gives $\val{p27.p.exact}$; and the
-gap would have to reach $\val{p27.net.needed.pts}$ points \dash{} eleven times
+gap would have to reach $\val{p27.net.needed.pts}$ points \dash{} twelve times
 what was published \dash{} before this evaluation set could distinguish the
 two models at all.
+
+> **Corrected after merge, by the next program's assertion.** The first
+> version of this section used $30$ discordant items with a lead of $1$, which
+> **cannot happen**: the lead is a difference of two counts adding to the
+> discordant total, so the two have the same parity. It is the same parity
+> fact this program's own script documents as a formula trap two hundred lines
+> above, applied to the formula and not to the data. Program~\ref{prog:P28}
+> asserted it while continuing the example and the build stopped.
+>
+> **The corrected section is better rather than merely legal.** On an odd
+> count a tie is impossible, so somebody must be ahead, the smallest available
+> lead is one, and that is what was observed \dash{} so the p-value is
+> \textbf{exactly 1}, and the published difference is the least informative
+> outcome the arithmetic permits. The threshold moved from $\num{5.5}$ to
+> $\val{p27.net.needed.pts}$ points.
+>
+> The generalisable half is narrow and worth having: **a parity constraint on
+> a formula is usually also a constraint on the data**, and recording it in
+> one place does not enforce it in the other.
 
 #### Every assertion passed on the first run, and that was the warning
 

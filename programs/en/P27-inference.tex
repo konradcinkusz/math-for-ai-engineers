@@ -505,8 +505,12 @@ say anything at all about which model is better.
 
 Suppose $\val{p27.disc}$ of the $\val{p27.items}$ are discordant, which is
 what a high $\rho$ looks like: the two models agreed on
-$\val{p27.concord}$ items. Section 1 established that B is ahead by
-$\val{p27.net}$ item.
+$\val{p27.concord}$ items, so the comparison rests on
+$\val{p27.to.b}$ items for B against $\val{p27.to.a}$ for A. Section 1
+established that B is ahead by $\val{p27.net}$ item, and note that an odd
+number of discordant items is what a lead of one requires: the count and the
+lead have the same parity, because the lead is a difference of two numbers
+adding to the count.
 
 It is worth being explicit about what \enquote{equally good} is being taken
 to mean, because the exactness of what follows rests on it. It is not a claim
@@ -523,15 +527,22 @@ should you be to find them $\val{p27.net}$ away from an even split?
 \end{fr}
 
 \begin{fr}
-\ans{Not at all surprised}
+\ans{You cannot be surprised at all: the probability is
+$\val{p27.p.exact}$}
 
-\transcript{p27-thirty-flips}
+\transcript{p27-odd-count}
 
-An even split is the \emph{single most likely} outcome and it still happens
-only $\val{p27.p.tie.pct}$ per cent of the time. Everything else is at least
-$\val{p27.net}$ away from even, so a result at least this lopsided has
-probability $\val{p27.p.exact}$ \dash{} it is what nearly seven flips in
-eight of thirty coins look like.
+\textbf{Exactly one}, and not as a rounding. $\val{p27.disc}$ coins cannot fall
+evenly, so one side is always ahead and the smallest lead available is
+$\val{p27.net}$ \dash{} which is the lead that was observed. A result at
+least this lopsided is therefore certain, and the test cannot tell this
+outcome apart from any other outcome whatever.
+
+What can be said is which outcome it is: a lead of exactly $\val{p27.net}$,
+one way or the other, is the single most likely result and happens
+$\val{p27.p.one.pct}$ per cent of the time. \textbf{The published difference
+between the two models is the least informative outcome the arithmetic
+permits.}
 
 That is Program~\ref{prog:P12}'s binomial coefficient over integers and
 nothing else: no normal approximation, no variance, no square root. It is
@@ -559,7 +570,7 @@ in twenty.
 
 \textbf{On $\val{p27.items}$ items, with these two models, a gap under
 $\val{p27.net.needed.pts}$ points is not a result.} That is a number the
-reader can carry into a meeting, and it is eleven times the gap that was
+reader can carry into a meeting, and it is twelve times the gap that was
 published.
 
 Two honest qualifications, both of which make the argument stronger rather
@@ -594,8 +605,9 @@ the comparison is reported in a form from which it cannot be checked.
 \index{inference!what a p-value does not say}
 
 \begin{fr}
-The number $\val{p27.p.exact}$ from the last section has a name, and you have
-now computed one before meeting the word, which is the right order.
+The number from the last section has a name, and you have now computed one
+before meeting the word, which is the right order \dash{} and computed it at
+the one value where its meaning is hardest to mistake.
 
 It is a \textbf{p-value}, and here is the definition, stated flatly enough to
 be checked against what you did:
@@ -884,7 +896,8 @@ $\val{p27.hw.ratio.floor}$ times the gap}, from one square root.
 
 \textbf{And the paired test, which is the right one, gives
 $\val{p27.p.exact}$} \dash{} on $\val{p27.disc}$ discordant items, which is
-the one number you would have to ask for.
+the one number you would have to ask for. A lead of one on an odd count is
+the smallest there is, so the test is certain to see at least it.
 
 The gap would have to be $\val{p27.net.needed.pts}$ points before this
 evaluation set could distinguish the two models at all.
@@ -987,8 +1000,10 @@ already have.
   $\val{p27.disc}$ that are left.}
 \sumitem{19--20}{Under \enquote{equally good} those items are fair coin
   flips, so the test is Program~\ref{prog:P12}'s binomial coefficient over
-  integers \dash{} exact, machine-independent, and needing no variance. The
-  worked gap gives $\val{p27.p.exact}$.}
+  integers \dash{} exact, machine-independent, and needing no variance.
+  \textbf{The worked gap gives $\val{p27.p.exact}$}: an odd count cannot fall
+  evenly, so the observed lead of $\val{p27.net}$ is the smallest available
+  and a result at least this lopsided is certain.}
 \sumitem{21}{\textbf{On this evaluation a gap under
   $\val{p27.net.needed.pts}$ points is not a result}, found by search. The
   published gap was $\val{p27.gap.pts}$.}

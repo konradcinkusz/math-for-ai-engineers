@@ -504,8 +504,12 @@ miał rację \dash{} mówią cokolwiek o tym, który model jest lepszy.
 
 Załóżmy, że $\val{p27.disc}$ z $\val{p27.items}$ jest niezgodnych, i tak
 właśnie wygląda wysokie $\rho$: oba modele zgodziły się na
-$\val{p27.concord}$ pozycjach. Sekcja 1 ustaliła, że B prowadzi o
-$\val{p27.net}$ pozycję.
+$\val{p27.concord}$ pozycjach, więc porównanie opiera się na
+$\val{p27.to.b}$ pozycjach dla B wobec $\val{p27.to.a}$ dla A. Sekcja 1
+ustaliła, że B prowadzi o $\val{p27.net}$ pozycję, i zauważ, że nieparzysta
+liczba pozycji niezgodnych jest tym, czego przewaga o jeden wymaga: liczba i
+przewaga mają tę samą parzystość, bo przewaga jest różnicą dwóch liczb, które
+sumują się do tej liczby.
 
 Warto powiedzieć wprost, co znaczy tu \enquote{równie dobre}, bo na tym
 opiera się dokładność tego, co dalej. To nie twierdzenie, że oba modele są tym
@@ -523,15 +527,22 @@ podziału?
 \end{fr}
 
 \begin{fr}
-\ans{Ani trochę}
+\ans{Ani trochę nie może cię zaskoczyć: prawdopodobieństwo wynosi
+$\val{p27.p.exact}$}
 
-\transcript{p27-thirty-flips}
+\transcript{p27-odd-count}
 
-Równy podział to \emph{najbardziej prawdopodobny pojedynczy} wynik i mimo to
-zdarza się tylko w $\val{p27.p.tie.pct}$ procentach przypadków. Wszystko inne
-leży co najmniej $\val{p27.net}$ od równego, więc wynik co najmniej tak
-przechylony ma prawdopodobieństwo $\val{p27.p.exact}$ \dash{} tak wygląda
-blisko siedem na osiem rzutów trzydziestoma monetami.
+\textbf{Dokładnie jeden}, i nie jest to zaokrąglenie. $\val{p27.disc}$ monet
+nie może wypaść po równo, więc jedna strona zawsze prowadzi, a najmniejsza
+dostępna przewaga to $\val{p27.net}$ \dash{} czyli ta, którą
+zaobserwowano. Wynik co najmniej tak przechylony jest zatem pewny, a test nie
+odróżnia tego wyniku od żadnego innego.
+
+Powiedzieć da się to, który to wynik: przewaga dokładnie
+$\val{p27.net}$, w jedną albo w drugą stronę, jest pojedynczym najbardziej
+prawdopodobnym rezultatem i zdarza się w $\val{p27.p.one.pct}$ procentach
+przypadków. \textbf{Opublikowana różnica między modelami jest najmniej
+informatywnym wynikiem, na jaki arytmetyka pozwala.}
 
 To symbol Newtona z Programu~\ref{prog:P12} na liczbach całkowitych i nic
 więcej: żadnego przybliżenia normalnego, żadnej wariancji, żadnego
@@ -559,7 +570,7 @@ na dwadzieścia.
 
 \textbf{Na $\val{p27.items}$ pozycjach, przy tych dwóch modelach, różnica
 poniżej $\val{p27.net.needed.pts}$ punktu nie jest wynikiem.} To liczba, którą
-czytelnik może zabrać na spotkanie, i jest jedenaście razy większa od tej,
+czytelnik może zabrać na spotkanie, i jest dwanaście razy większa od tej,
 którą opublikowano.
 
 Dwa uczciwe zastrzeżenia i oba wzmacniają argument, zamiast go osłabiać. Próg
@@ -594,8 +605,9 @@ się w postaci, z której nie da się go sprawdzić.
 \index{wnioskowanie!czego p-wartość nie mówi}
 
 \begin{fr}
-Liczba $\val{p27.p.exact}$ z poprzedniej sekcji ma nazwę, a ty policzyłeś ją
-już przed poznaniem słowa, i to jest właściwa kolejność.
+Liczba z poprzedniej sekcji ma nazwę, a ty policzyłeś ją już przed poznaniem
+słowa, i to jest właściwa kolejność \dash{} w dodatku przy tej jednej
+wartości, przy której najtrudniej pomylić się co do jej znaczenia.
 
 To \textbf{p-wartość}, a oto definicja podana na tyle płasko, by dało się ją
 zestawić z tym, co zrobiłeś:
@@ -883,7 +895,9 @@ $\val{p27.hw.ratio.floor}$ razy większy od różnicy}, z jednego pierwiastka.
 
 \textbf{A test sparowany, czyli ten właściwy, daje
 $\val{p27.p.exact}$} \dash{} na $\val{p27.disc}$ pozycjach niezgodnych, czyli
-jedynej liczbie, o którą trzeba by poprosić.
+jedynej liczbie, o którą trzeba by poprosić. Przewaga o jeden przy
+nieparzystej liczbie jest najmniejszą, jaka istnieje, więc test na pewno
+zobaczy co najmniej ją.
 
 Różnica musiałaby wynieść $\val{p27.net.needed.pts}$ punktu, zanim ten zbiór
 ewaluacyjny w ogóle odróżniłby oba modele.
@@ -985,7 +999,10 @@ rozkład na to, czego nie jesteś pewien, a nie na dane, które już masz.
 \sumitem{19--20}{Przy \enquote{równie dobre} te pozycje są uczciwymi rzutami
   monetą, więc testem jest symbol Newtona z Programu~\ref{prog:P12} na
   liczbach całkowitych \dash{} dokładny, niezależny od maszyny i niepotrzebujący
-  wariancji. Przerobiona różnica daje $\val{p27.p.exact}$.}
+  wariancji. \textbf{Przerobiona różnica daje $\val{p27.p.exact}$}: nieparzysta
+  liczba nie wypada po równo, więc zaobserwowana przewaga
+  $\val{p27.net}$ jest najmniejszą dostępną, a wynik co najmniej tak
+  przechylony jest pewny.}
 \sumitem{21}{\textbf{Na tej ewaluacji różnica poniżej
   $\val{p27.net.needed.pts}$ punktu nie jest wynikiem}, znalezione przez
   szukanie. Opublikowana różnica to $\val{p27.gap.pts}$ punktu.}
