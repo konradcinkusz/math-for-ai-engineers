@@ -13,7 +13,7 @@ Read this before touching a program.
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
 | Programs | **All forty-seven written, both editions \dash{} F1–F13 and P1–P34, Parts I to IX entire.** There are no stubs | — |
-| Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
+| Appendices | A (answers, generated), B (notation) and **C (formulae, generated from 721 `\result{}` marks)** drafted; D–F are stubs | D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
 the format the book is read in; 17 x 24 cm is the trade format shared with the
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1321 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1343 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1102 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1116 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1383 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1407 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1152 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1168 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -95,7 +95,7 @@ what was there before.
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
 - **0 of 47 programs are stubs**, in each language. Every program in the book
-  is written; what remains is Appendices C to F and the finishing work listed
+  is written; what remains is Appendices D, E and F and the finishing work listed
   under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
@@ -9874,9 +9874,11 @@ estimating the book at **460--540 pages** for its 2,418 planned frames, and this
 file repeated it as 470--550. Neither number had been looked at since
 scaffolding.
 
-**Measured: 1,863 teaching frames are written and they set 1,321 pages in the
-trade format.** That is $\num{0.71}$ pages a frame against the estimate's
-$\num{0.21}$, with four appendices still to come. (The measurement was 1,757
+**Measured: 1,863 teaching frames are written and they set 1,383 pages in the
+trade format.** That is $\num{0.74}$ pages a frame against the estimate's
+$\num{0.21}$, with three appendices still to come. (It was 1,321 before
+Appendix~C, which is the one of the four that is generated rather than
+written and which costs 62 pages of back matter on its own.) (The measurement was 1,757
 frames in 1,267 pages when it was first taken, before P33, and 1,811 in 1,295
 after it; the ratio has not moved across three re-measurements.)
 
@@ -10594,6 +10596,147 @@ needed no correction afterwards.
 - Frame numbers mapped after writing: sections landed at
   `1--7 / 8--15 / 16--19 / 20--28 / 29--35 / 36--43 / 44--47 / 48--52`.
 
+### Appendix C pass, September 2026 --- the marking, and a shortcut that did not exist
+
+Appendix~C is the formula reference, and the decision recorded under *What is
+left* \dash{} police the exposure with an audit, or retire it structurally
+\dash{} was settled in favour of the second. **Nothing in
+`appendices/{en,pl}/appC-formulae.tex` is transcribed.** Every line of the
+appendix is a `\result{}` mark inside the Summary of the program that
+establishes it, replayed by `\resultsbody`, so the program number and the
+frame range are the ones LaTeX was on when it read the mark and **the
+coordinate cannot be wrong**.
+
+That is the fourth back-matter collection in this book accumulated at the
+point of use rather than by hand, after `\canyou`, the diagram manifest and
+`\answerto`, and it is the same move for the same reason: Appendix~B was
+hand-authored, shipped four false pointers, and two separate passes had to go
+and find them by reading. An audit makes that defect detectable; this makes it
+impossible.
+
+**721 marks across the forty-seven programs, equal in both editions in every
+one of them**, out of 756 Summary items.
+
+#### The shortcut everybody would try, measured and dead
+
+The Summaries carry 756 `\sumitem` and 321 of them open with a bolded lead, so
+the bold looks exactly like a mark that already means *this is the result*
+\dash{} and on the three programs first sampled it read that way. Across all
+forty-seven the rate runs **0 to 100 per cent**. Ten programs bold nothing at
+all, including Program~\ref{prog:P22}, whose
+$\lambda = \mathrm{d}f^{*}/\mathrm{d}c$ is its headline identity;
+Program~\ref{prog:P31} bolds every item it has; Program~\ref{prog:F03} bolds
+two of nineteen and **both are traps**, leaving change of base and
+$e^{\ln x} = x$ unmarked. It is each pass's taste in emphasis, and where it is
+used it is as often the program's trap as its result.
+
+**The generalisable half is one clause wider than the habit it corrects.**
+Checking whether the thing you want marked is already marked is a good habit.
+It becomes a *measurement* only when you check that the existing mark means
+what you need **across the whole corpus** rather than across the files you
+happened to open \dash{} which is this file's own recurring defect (a
+mechanism read from a sample's shape and generalised) arriving in a place
+where the sample was three files and the corpus was one loop and a minute.
+
+#### The marking rule was corrected by the page, twice
+
+**A formula reference built from bolded leads has no formulae in it.** The
+lead names the result and the identity sits after the colon, so the first
+draft's marks produced a list of section titles. The rule is therefore
+**mark the lead and its identity, and stop before the evidence**: where an
+item states a result and then prints the number that evidences it, the mark
+ends at the identity and the figure stays outside.
+
+And the split rule was tightened in the middle of the pass. It first cut on
+**any** pointer, which was both brittle \dash{} the anchor kept landing across
+a line break \dash{} and worse to read, because a trailing attributive clause
+like *which is Program~\ref{prog:P15}'s measurement on the same bowl* leaves a
+sentence that reads as though nobody attributed it. **Only a separate sentence
+that is a claim about the book is left outside the mark.**
+
+#### What is filtered is a claim about the book, and there are thirty-five of them
+
+The rate is a property of the Summary rather than of the pass, and it varies
+by a factor the Summaries themselves explain. Programs \ref{prog:P16},
+\ref{prog:P20}, \ref{prog:P27}, \ref{prog:P28}, \ref{prog:P12} and
+\ref{prog:P13} are marked entire, because they carry no meta-item.
+Programs \ref{prog:P23} and \ref{prog:P24} lose four and six, because they do
+\dash{} which program owns a piece, what is not proved here, how the notation
+is written. Part~IX loses the most, because its whole job is to say what the
+book has and has not done.
+
+**So the honest description is a re-sort rather than a sieve: 95 per cent of
+the Summary items are results, and the appendix's value is that 756 items
+scattered across forty-seven Summaries become one list a reader can scan
+without knowing which program taught what.** The commit messages during the
+pass called it filtering throughout, and the measured rate says otherwise;
+this file's own rule is to report the number rather than the impression.
+
+The five clearest members of the filtered set are worth naming, because they
+are what the appendix would have said about itself: Program~\ref{prog:P15}'s
+note that the perpendicularity was checked exactly over the rationals because
+a claim carrying that word is a claim about an exact zero;
+Program~\ref{prog:P10}'s that the spectral trials are testing the code;
+Program~\ref{prog:P14}'s that the program does not teach proof-writing and
+why; Program~\ref{prog:P21}'s declared forward prerequisite; and
+Program~\ref{prog:F13}'s closing item, which stops deliberately before the
+word *expectation*.
+
+#### Two mechanism defects, both recorded elsewhere and both hit again
+
+- **`\resultsbody` was defined outside the `\makeatletter` group** while
+  calling `\mfa@resultprogram`, so it parsed as `\mfa` plus a literal
+  `@resultprogram` and the build produced 47 undefined control sequences and a
+  3627 pt hbox reading `@resultprogramF1@resultprogramF2...`. That is the
+  **third** instance of a trap this preamble already warns about on
+  `\mfa@outframes` and CLAUDE.md already records for the index patch. The
+  warning is now on `\resultsbody` too.
+- **A 21.2 pt hbox in the appendix, and the recorded fix was the wrong one.**
+  `\KL{p}{q}` is `\left(...\right)`, so it is one unbreakable box and the only
+  breakpoint in the line is the outer `=`, which justified TeX refused. This
+  book's standing remedy is *put it in a display* \dash{} and that is wrong in
+  a **scanned reference list**, where a display per entry would turn a list
+  into a sequence of stanzas. `before=\raggedright` on the `reslist` is the
+  fix, and the reasoning sits beside the constant: a list nobody reads in
+  order does not owe its right margin anything.
+
+#### Method
+
+The marks are placed by a plan keyed on the `\sumitem` **frame range**, which
+is identical in both editions, so one plan writes English and Polish and the
+two cannot come apart; parity's C14 histogram gates the count for free,
+because it counts every macro generically. The tool is disposable and is not
+in the tree; the plan and the rule above are what is worth keeping.
+
+**The source gates were run before each build rather than inside it**, which
+is Program~\ref{prog:P33}'s finding applied: `parity.py`, both halves of
+`check_structure.py` and `make debt` all read the source, none of them needs a
+PDF, and running them first costs seconds where running them last costs a
+build.
+
+#### Layout, and what sixty-two pages of new back matter cost
+
+**Nothing.** The overfull multiset came back element for element to the
+baseline in all four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with
+zero overfull vboxes, zero errors, zero unresolved references, no stranded
+frame openers, no stranded section headings and no orphaned cues. **And the
+orphan-tail count did not move at all**: 29, 30, 22, 21, exactly the
+pre-appendix figures.
+
+That is what a back-matter addition should cost and it is worth saying why it
+did: the appendix is appended, so it moves no page boundary in the body, and
+the only class of defect available to it is one of its own lines overflowing
+\dash{} which is the `\KL` box above, and which `\raggedright` retires for
+every entry at once rather than one at a time.
+
+Pages 1383 / 1407 / 1152 / 1168, from 1321 / 1343 / 1102 / 1116. Appendix~C
+is **62 pages** in the trade format, running 1303 to 1365 in `main-en`, and
+the back matter is now 171 pages against the body's 1212. Both figures are
+read off the part-title and running-head pages of the finished build rather
+than subtracted, which is this file's own rule about a number that looks like
+a measurement and is not; `notes/01-curriculum.md` §20's table carries them.
+
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -10865,64 +11008,35 @@ clone instead.
 
 ## What is left
 
-1. **Appendices C to F.** They are the whole of the remaining writing, and
-   there is no longer a program behind them to hide the fact. C is the
-   formula reference and is the one that answers Stroud's fair criticism
-   that a book of frames is a useless reference \dash{} a reader who wants
-   $\Var(aX+b)$ six months later should not have to remember which program
-   proved it. D is the Polish--English terminology, E is where to go next,
-   F is the manifest. **The appendices are not in `tools/programs.json`**, so
+1. **Appendices D, E and F.** C is written; these three are the whole of the
+   remaining writing, and there is no longer a program behind them to hide
+   the fact. D is the Polish--English terminology, E is where to go next, F
+   is the manifest. **The appendices are not in `tools/programs.json`**, so
    there is nothing to re-derive an owner from: each brief lives only in its
    own `\programstub{}`, in `appendices/{en,pl}/`, and that is the whole
    contract.
 
-   **An appendix collecting what the book proved is a claim about the book on
-   every line**, which is the one class nothing in this repository can check
-   and the class that has had to be corrected in pass after pass above.
-   Appendix~B is the standing warning rather than an anecdote:
-   Program~\ref{prog:P18}'s pass found four false pointers in it and fixed
-   the one that was its own, Program~\ref{prog:P23}'s fixed the rest, and the
-   audit that settled all four was five greps nobody had run since the
-   appendix was written. **So every entry in C has to be opened against the
-   program it names**, and the cheapest form of that is the discipline the
-   later program passes converged on \dash{} read the brief as a checklist,
-   and grep the destination before writing the sentence rather than after.
+   **C is done and its exposure was retired structurally rather than
+   policed**, which is the thing to copy if D or E turns out to make claims
+   about the book. The decision this entry used to leave to the author is
+   taken: nothing in Appendix~C is transcribed, every line of it is a
+   `\result{}` mark in the Summary of the program that establishes it, and
+   the coordinate therefore cannot be wrong. The full pass note is above; the
+   part that matters here is why it was worth the mechanical edit across
+   forty-seven programs in two editions. **An appendix collecting what the
+   book proved is a claim about the book on every line**, which is the one
+   class nothing in this repository can check, and Appendix~B is the standing
+   warning: Program~\ref{prog:P18}'s pass found four false pointers in it,
+   Program~\ref{prog:P23}'s fixed the rest, and the audit that settled all
+   four was five greps nobody had run since the appendix was written. An
+   audit makes that defect detectable. Marking at the point of use makes it
+   impossible.
 
-   **And there is a structural alternative that would retire the exposure
-   rather than police it**, which the next pass should settle before writing
-   a line. The book already accumulates three back-matter collections at the
-   point of use rather than by hand: `\outcome{}` builds `\canyou`,
-   `\mermaidfig` writes its own manifest line, and `\answerto` carries an
-   answer to Appendix~A through a global macro store \dash{} and none of the
-   three can name the wrong program, because the numbers are the ones LaTeX
-   is on when it reads the macro. A `\result{}` marked in the frame that
-   establishes a result, replayed by Appendix~C, is the same move a fourth
-   time, and it makes the tag **impossible to get wrong** where an audit only
-   makes it detectable. The cost is a mechanical edit across forty-seven
-   written programs in two editions, gated by C14's histogram and C4's
-   ordered signature, which is a better check than a hand-authored appendix
-   could ever carry. The reading is in the scratchpad; the decision is the
-   author's.
-
-   **And the obvious shortcut past that cost was measured and does not
-   exist**, which is worth recording before somebody else finds it and stops
-   there. The Summaries carry 756 `\sumitem` between them and 321 of those
-   open with a bolded lead, so the bold looks like a mark that already means
-   *this is the result* \dash{} on the three programs first sampled it read
-   exactly that way. Measured across all forty-seven the rate runs **0 to 100
-   per cent**: ten programs bold nothing at all, including P22, whose
-   $\lambda = \mathrm{d}f^{*}/\mathrm{d}c$ is its headline identity, and P31
-   bolds every item it has. It is each pass's taste in emphasis, and where it
-   is used it is as often the program's **trap** as its result \dash{} F03
-   bolds two of nineteen and both are traps, leaving change of base and
-   $e^{\ln x} = x$ unmarked.
-
-   So there is no existing markup meaning *result*, and one has to be added.
-   The generalisable half is this file's own recurring defect in a new place:
-   **checking whether the thing you want marked is already marked is a good
-   habit, and it only becomes a measurement when you check that the existing
-   mark means what you need across the whole corpus rather than across the
-   files you happened to open.** One loop over 47 files, about a minute.
+   **D and E do not get the same protection for free.** A terminology table
+   and a further-reading list are not derived from anything a program
+   already carries, so for those two the older instruction stands and is the
+   only one available: read the brief as a checklist, and grep the
+   destination before writing the sentence rather than after.
 
 2. **The trained-model debt: five entries, one of them half answered.** It is
    the first thing in this book that cannot be done from a sandbox at all.
@@ -11089,8 +11203,8 @@ one is shaped by what the ones before it turned out to spend.
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
 for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.71**
-\dash{} 1,863 teaching frames in 1,321 trade pages, with four appendices still
-to come. §20 item 1 carries the measurement and the per-part page ranges, so
+\dash{} 1,863 teaching frames in 1,383 trade pages, with three appendices
+still to come. §20 item 1 carries the measurement and the per-part page ranges, so
 the decision has numbers in front of it rather than an estimate; **every
 program is now written, so those numbers will not move again except by the
 appendices**, which is as settled as the question is going to get before
