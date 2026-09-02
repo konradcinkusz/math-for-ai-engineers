@@ -1133,46 +1133,46 @@ this book was for.
 \begin{summarybox}
 \sumitem{1--2}{A block is six operations and this book had already defined
   all six. What makes an architecture is the order and the shapes.}
-\sumitem{3--5}{Attention's parameters are four projections; a score is one
-  inner product; and $n$ positions give $n^{2}$ scores, which is the most
+\sumitem{3--5}{\result{Attention's parameters are four projections; a score is one
+  inner product; and $n$ positions give $n^{2}$ scores}, which is the most
   consequential number in the design.}
 \sumitem{7--8}{The score's divisor is Program~\ref{prog:P25}'s variance
   correction. In a block the queries and keys are \emph{produced}, so the
   question is whether that argument survives, and Program~\ref{prog:P25}
   handed it here.}
-\sumitem{9--10}{It does, exactly. A score is a bilinear form
+\sumitem{9--10}{It does, exactly. \result{A score is a bilinear form
   $x\T M y$ with $M = W_Q W_K\T$, its variance is $\lVert M\rVert_F^{2}$,
-  and that has expectation $d_k$ \dash{} so the projections change nothing
+  and that has expectation $d_k$} \dash{} so the projections change nothing
   and no sampling was needed to find out.}
-\sumitem{11--12}{But a trained model has one weight draw and not an average,
-  so its own scores are a few per cent off before training starts, and the
+\sumitem{11--12}{\result{But a trained model has one weight draw and not an average,
+  so its own scores are a few per cent off before training starts}, and the
   spread falls as the head widens because $M$'s rank is at most $d_k$
   (Program~\ref{prog:P08}).}
-\sumitem{13--16}{The $\softmax$ makes the output a convex combination
+\sumitem{13--16}{\result{The $\softmax$ makes the output a convex combination
   (Program~\ref{prog:P19}), so a purely attentional layer cannot produce a
-  direction its values do not already span.}
-\sumitem{18--20}{Multi-head attention is free: $\val{p32.heads}$ heads of
+  direction its values do not already span}.}
+\sumitem{18--20}{\result{Multi-head attention is free: $\val{p32.heads}$ heads of
   width $\val{p32.d.head}$ hold exactly the parameters of one head of width
-  $\val{p32.d}$. What changes is rank, not cost.}
-\sumitem{21--22}{A plain chain of $\val{p32.depth}$ layers has a gradient of
+  $\val{p32.d}$. What changes is rank, not cost}.}
+\sumitem{21--22}{\result{A plain chain of $\val{p32.depth}$ layers has a gradient of
   at most $\val{p32.plain.bound}$, which is below what a $\code{float32}$
-  can hold.}
-\sumitem{23--25}{$y = x + f(x)$ makes the Jacobian $\prod(1 + f'_k)$, whose
+  can hold}.}
+\sumitem{23--25}{\result{$y = x + f(x)$ makes the Jacobian $\prod(1 + f'_k)$, whose
   expansion is a sum over $2^{n}$ paths \dash{} one per subset of layers.
-  \textbf{The empty subset contributes exactly $1$.} A plain chain's
+  \textbf{The empty subset contributes exactly $1$.}} A plain chain's
   gradient is one product; a residual stack's is a sum with a $1$ in it.}
 \sumitem{26--27}{Normalisation restores the scale the score's argument
   assumes, which is why the three pieces are one mechanism.}
-\sumitem{28}{A rotation makes a score depend on the distance between two
+\sumitem{28}{\result{A rotation makes a score depend on the distance between two
   positions and nothing else, and costs the model nothing because it is
-  orthogonal (Programs~\ref{prog:F08} and \ref{prog:P09}).}
-\sumitem{29--32}{Attention is $4d^{2}$ and the feed-forward block is
+  orthogonal} (Programs~\ref{prog:F08} and \ref{prog:P09}).}
+\sumitem{29--32}{\result{Attention is $4d^{2}$ and the feed-forward block is
   $8d^{2}$: \textbf{the half nobody discusses holds twice the half everybody
-  does}. A block is $12d^{2}$, and $\val{p32.layers}$ of them are
+  does}. A block is $12d^{2}$}, and $\val{p32.layers}$ of them are
   $\val{p32.blocks.pct}$ per cent of Program~\ref{prog:F01}'s
   $\val{p32.f01.params}$.}
-\sumitem{33--35}{The cache is one key and one value per position per layer,
-  which is $\val{p32.kv.per.token.mib}$ MiB a token and reproduces
+\sumitem{33--35}{\result{The cache is one key and one value per position per layer,
+  which is $\val{p32.kv.per.token.mib}$ MiB a token} and reproduces
   Program~\ref{prog:P03}'s $\val{p32.kv.gib}$ GiB. Double the sequence: the
   scores quadruple, the cache doubles.}
 \sumitem{36--39}{Every derivation in this book about attention holds at

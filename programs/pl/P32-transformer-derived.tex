@@ -1101,46 +1101,46 @@ było tym, po co ta książka powstała.
 \begin{summarybox}
 \sumitem{1--2}{Blok to sześć operacji i ta książka zdefiniowała już wszystkie
   sześć. Architekturę tworzy kolejność i kształty.}
-\sumitem{3--5}{Parametry uwagi to cztery rzutowania; wynik to jeden iloczyn
-  skalarny; a $n$ pozycji daje $n^{2}$ wyników, co jest najbardziej brzemienną
+\sumitem{3--5}{\result{Parametry uwagi to cztery rzutowania; wynik to jeden iloczyn
+  skalarny; a $n$ pozycji daje $n^{2}$ wyników}, co jest najbardziej brzemienną
   liczbą w tym projekcie.}
 \sumitem{7--8}{Dzielnik wyniku to poprawka wariancji Programu~\ref{prog:P25}.
   W bloku zapytania i klucze są \emph{wyliczane}, więc pytaniem jest, czy ten
   argument przeżywa, a Program~\ref{prog:P25} przekazał je tutaj.}
-\sumitem{9--10}{Przeżywa, dokładnie. Wynik jest formą dwuliniową $x\T M y$ z
+\sumitem{9--10}{Przeżywa, dokładnie. \result{Wynik jest formą dwuliniową $x\T M y$ z
   $M = W_Q W_K\T$, jego wariancja to $\lVert M\rVert_F^{2}$, a to ma wartość
-  oczekiwaną $d_k$ \dash{} więc rzutowania nic nie zmieniają i do stwierdzenia
+  oczekiwaną $d_k$} \dash{} więc rzutowania nic nie zmieniają i do stwierdzenia
   tego nie było potrzebne żadne losowanie.}
-\sumitem{11--12}{Ale wytrenowany model ma jedno losowanie wag, a nie średnią,
-  więc jego własne wyniki są o kilka procent obok, zanim trening się zacznie, a
+\sumitem{11--12}{\result{Ale wytrenowany model ma jedno losowanie wag, a nie średnią,
+  więc jego własne wyniki są o kilka procent obok, zanim trening się zacznie}, a
   rozrzut maleje wraz z poszerzaniem głowicy, bo rząd $M$ jest co najwyżej
   $d_k$ (Program~\ref{prog:P08}).}
-\sumitem{13--16}{$\softmax$ czyni wyjście kombinacją wypukłą
+\sumitem{13--16}{\result{$\softmax$ czyni wyjście kombinacją wypukłą
   (Program~\ref{prog:P19}), więc warstwa czysto uwagowa nie może wyprodukować
-  kierunku, którego jej wartości już nie rozpinają.}
-\sumitem{18--20}{Uwaga wielogłowicowa jest darmowa: $\val{p32.heads}$ głowic
+  kierunku, którego jej wartości już nie rozpinają}.}
+\sumitem{18--20}{\result{Uwaga wielogłowicowa jest darmowa: $\val{p32.heads}$ głowic
   szerokości $\val{p32.d.head}$ mieści dokładnie parametry jednej głowicy
-  szerokości $\val{p32.d}$. Zmienia się rząd, a nie koszt.}
-\sumitem{21--22}{Zwykły łańcuch $\val{p32.depth}$ warstw ma gradient co
+  szerokości $\val{p32.d}$. Zmienia się rząd, a nie koszt}.}
+\sumitem{21--22}{\result{Zwykły łańcuch $\val{p32.depth}$ warstw ma gradient co
   najwyżej $\val{p32.plain.bound}$, czyli poniżej tego, co pomieści
-  $\code{float32}$.}
-\sumitem{23--25}{$y = x + f(x)$ czyni jakobian $\prod(1 + f'_k)$, którego
+  $\code{float32}$}.}
+\sumitem{23--25}{\result{$y = x + f(x)$ czyni jakobian $\prod(1 + f'_k)$, którego
   rozwinięcie jest sumą po $2^{n}$ ścieżkach \dash{} po jednej na podzbiór
-  warstw. \textbf{Pusty podzbiór wnosi dokładnie $1$.} Gradient zwykłego
+  warstw. \textbf{Pusty podzbiór wnosi dokładnie $1$.}} Gradient zwykłego
   łańcucha to jeden iloczyn; stosu rezydualnego \dash{} suma z $1$ w
   środku.}
 \sumitem{26--27}{Normalizacja przywraca skalę, którą zakłada argument o
   wyniku, i dlatego te trzy kawałki są jednym mechanizmem.}
-\sumitem{28}{Obrót czyni wynik zależnym od odległości między dwiema pozycjami
-  i od niczego więcej, a nic model nie kosztuje, bo jest ortogonalny
+\sumitem{28}{\result{Obrót czyni wynik zależnym od odległości między dwiema pozycjami
+  i od niczego więcej, a nic model nie kosztuje, bo jest ortogonalny}
   (Programy~\ref{prog:F08} i \ref{prog:P09}).}
-\sumitem{29--32}{Uwaga to $4d^{2}$, a warstwa gęsta to $8d^{2}$: \textbf{połowa,
+\sumitem{29--32}{\result{Uwaga to $4d^{2}$, a warstwa gęsta to $8d^{2}$: \textbf{połowa,
   o której nikt nie mówi, mieści dwa razy tyle, co ta, o której mówią
-  wszyscy}. Blok to $12d^{2}$, a $\val{p32.layers}$ takich to
+  wszyscy}. Blok to $12d^{2}$}, a $\val{p32.layers}$ takich to
   $\val{p32.blocks.pct}$ procent tego, co Program~\ref{prog:F01} podaje
   jako $\val{p32.f01.params}$.}
-\sumitem{33--35}{Cache to jeden klucz i jedna wartość na pozycję na warstwę,
-  czyli $\val{p32.kv.per.token.mib}$ MiB na token, i odtwarza to, co
+\sumitem{33--35}{\result{Cache to jeden klucz i jedna wartość na pozycję na warstwę,
+  czyli $\val{p32.kv.per.token.mib}$ MiB na token}, i odtwarza to, co
   Program~\ref{prog:P03} podaje jako $\val{p32.kv.gib}$ GiB. Podwój
   sekwencję: wyniki
   rosną czterokrotnie, cache dwukrotnie.}
