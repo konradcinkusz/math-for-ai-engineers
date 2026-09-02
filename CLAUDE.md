@@ -81,9 +81,10 @@ heading being stranded at the foot of a page. The frame
 badge, the outcomes checkboxes, the quiz route boxes, the named end-of-program
 frames and the opener's frame range together cost **zero** — the overfull-hbox
 multiset came back byte-identical to the pre-pass baseline in all four formats.
-At F01's 73% cue rate the cost over 2,415 planned frames is of the order of a
-hundred pages, which belongs in the one-volume/two-volume question in
-`notes/01-curriculum.md` §20.
+At F01's 73% cue rate the cost over the manifest's 2,418 planned frames is of
+the order of a hundred pages, which belongs in the one-volume/two-volume
+question in `notes/01-curriculum.md` §20 \dash{} where the page estimate that
+question rested on is now measured and was wrong by a factor of about three.
 
 **Compare the hbox multiset only against a baseline built on the same
 machine.** CI has newtx and inconsolata; a bare container has neither, and the
@@ -9813,6 +9814,125 @@ Pages 1267 / 1287 / 1058 / 1070, from 1237 / 1257 / 1034 / 1048 \dash{} thirty
 and thirty in the trade format, which is what a thirty-nine-frame program with
 four figures costs.
 
+### The notes sweep, August 2026 --- and a wrong fix of my own
+
+Run before P33 rather than inside it, because the P32 pass found the P7
+insertion's off-by-one surviving in a sixth file and the standing instruction
+was to settle the notes against the destination briefs first. What it found is
+larger than the item it was opened for, and one of its own corrections was
+wrong.
+
+#### The duplicate curriculum was deleted rather than corrected
+
+`notes/01-curriculum.md` §§4--11 carried a **second copy of every program's
+brief**, one per part, written before `tools/programs.json` existed. Thirty-three
+of them, and from P7 onward **every title belonged to the next program**
+\dash{} fourteen were verbatim the manifest's brief one number up.
+
+Deleted, all 489 lines, on Program~\ref{prog:P12}'s precedent for the same
+file's §19 dependency graph: **a corrected copy is the next thing to go stale at
+the next insertion.** Each part keeps its framing prose and the sequence is read
+from the manifest, which is where the rest of this repository already reads it.
+
+Then the arithmetic that survives a deletion: the part ranges in every §§5--11
+heading and in the §4 summary table, \enquote{Seven programs} where there are
+eight, \enquote{(P1--P33)} where the book has thirty-four, and 2,370 frames
+where the manifest sums to 2,418.
+
+#### A sweep is as wide as the SECTION somebody opened, and then as wide as the ROWS
+
+Program~\ref{prog:P27}'s pass found three stale pointers in `notes/02` §4 and
+named the finding: **a sweep is as wide as the section somebody thought to
+open**, because five passes had corrected owners in §3 and not one had opened
+§4. This sweep is that finding one level down. §4 had **eight more** stale
+pointers in rows P27's pass did not read, and §§1--2 and §5 had six between
+them \dash{} a summary table naming four part ranges, all four wrong; the
+verdict on Strang crediting the SVD to the eigenvalue program; the verdict on
+Boyd sending convexity to the matrix-calculus program.
+
+Every one was settled against the destination program's own brief, and **one of
+them the shift would have got wrong**: §5 credits the $1/\sqrt{d_k}$ variance
+argument to the program after the one it named, and the manifest gives it to
+P25 \dash{} two further on. That is Program~\ref{prog:P10}'s rule earning its
+keep for the second time, after item 24.
+
+**The §3 headings are corrected and the §3 items are not**, and the distinction
+is worth stating because the file's own warning did not have it: a part range is
+settled against the manifest by arithmetic and cannot break anything, where an
+item owner is a mix of hand-corrected and stale entries and a blanket renumber
+would break the ones already right. The warning box said so as of this pass, and
+it had itself gone stale \dash{} it named the optimisation heading as an example
+of what to distrust, and Program~\ref{prog:P20}'s pass had corrected that heading
+a month earlier.
+
+#### And the biggest claim in both files was wrong by a factor of three
+
+The sweep's own arithmetic turned it up. `notes/01-curriculum.md` opened by
+estimating the book at **460--540 pages** for its 2,418 planned frames, and this
+file repeated it as 470--550. Neither number had been looked at since
+scaffolding.
+
+**Measured: 1,757 teaching frames are written and they set 1,267 pages in the
+trade format.** That is $\num{0.72}$ pages a frame against the estimate's
+$\num{0.21}$, with two programs and four appendices still to come.
+
+And the reason is knowable rather than mysterious, which is what makes it worth
+recording rather than merely correcting. **The estimate predates the Stroud
+layout pass**, so a *frame* in it was a paragraph. A frame as built is a rule
+across the measure, a margin badge, 17 pt above and 12 pt below, usually an
+answer box, often a row of dots and a cue \dash{} and every program also carries
+a Quiz, an outcomes panel, two to four figures, a Summary, Test exercises and
+Further problems, with an answers appendix and a six-page index behind them.
+The layout pass measured its own cost honestly, at two pages a format for
+F01's cues; nobody went back and re-multiplied.
+
+It matters because it is the premise of **the one decision this book still
+records as open**. §20 item 1 now carries the measurement and the per-part page
+ranges read out of the trade build's own running heads \dash{} front matter and
+Part I at 388 pages, Parts II--VI at 494, Parts VII--IX as written at 385
+\dash{} so the proposed Parts I--VI cut gives an **882-page first volume**,
+which does not settle it either. At this geometry the book is nearer three
+volumes than two, or the geometry has to change. The decision stays the
+author's; what changed is that it now has numbers in front of it.
+
+**The class is this file's oldest: a claim about the book that nothing derives
+from anything.** It survived thirty-two program passes in the two documents the
+next author reads first, and every one of those passes re-measured its page
+counts and its overfull multiset from the build in front of it \dash{} because
+those have a ledger and this did not. **When a number in one of these files is
+derived from another number in the same file, derive it again.**
+
+#### The one that matters: my own fix was the defect
+
+The exclusions table said **P23** gives a diffusion model's forward process as a
+Markov chain of Gaussians. P23 is *Probability and Bayes* and defines no random
+variable, so this sweep moved it to **P24** on the shift.
+
+**Neither program delivers it, and nothing in the book does.** A grep of all
+forty-seven briefs finds no *Markov*, no *diffusion* and no *forward process*,
+and a grep of the written programs finds none either. The corrected pointer was
+as false as the one it replaced and it read better, which is worse.
+
+That is Program~\ref{prog:P14}'s finding generalised: **replacing a wrong claim
+with a plausible one is not automatically safe.** There it was a tally replaced
+by a universal that was also false; here it is a pointer replaced by a pointer
+that is also false. Both drafts were written from the feel of the destination
+rather than from the destination, and the check is the same one either way
+\dash{} open it.
+
+The entry now says what is true on the F04/F08/P04 precedent: the book gives the
+Gaussian and the fact that variances of independent quantities add, which is the
+whole of a discrete-time chain of Gaussians, and **never applies them to one**.
+The row's reason for excluding SDEs was always sound; only its pointer was
+invented.
+
+The same precedent settled the PAC-learning row, in the other direction. It owed
+\enquote{one frame in P33} \dash{} and neither Part IX brief undertakes it,
+while **P14 already delivers it**, eliciting what happens to a bound holding
+\enquote{with probability at least 95 per cent} when a paper applies it once per
+experiment. So the entry records a debt discharged rather than one owed, which
+is the better sentence and was one `grep` away the whole time.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -10263,7 +10383,12 @@ clone instead.
    ledger stays open and the book may not claim it.
 
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
-this is one volume or two (≈2,418 frames is 470–550 pages). The other two that
+this is one volume or two. **Its stated premise is falsified**: 470–550 pages
+for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.72**
+\dash{} 1,757 teaching frames in 1,267 trade pages, with two programs and four
+appendices still to come. §20 item 1 now carries the measurement and the
+per-part page ranges, so the decision has a number rather than an estimate. The
+other two that
 stood beside it are now settled in the passes that wrote their programs
 \dash{} P12's placement, and whether P14 is enough of a fix for the rigour gap
 \dash{} and each entry records the argument the written book falsified rather

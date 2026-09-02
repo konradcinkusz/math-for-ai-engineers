@@ -1,7 +1,7 @@
 # Grounding: *Matematyka od zera dla inżyniera AI* / *Mathematics from Zero for the AI Engineer*
 
 Competitive and pedagogical grounding for the table of contents in `structure.tex`
-(F01–F13 Foundation, P01–P33 main programs). Written August 2026.
+(F01–F13 Foundation, P01–P34 main programs). Written August 2026.
 
 Everything below that is a *claim about the world* carries a source or is labelled
 as judgement. Everything that is a *claim about what readers will do* is labelled
@@ -90,7 +90,7 @@ the front matter before the table of contents with no explanation. It also
 assumes a completed first course in linear algebra; it is a second course.
 
 **Verdict.** A source of framing, not a model of construction. The lesson to
-steal is "SVD is the centre of gravity" (P10). The lesson to avoid is coverage
+steal is "SVD is the centre of gravity" (P11). The lesson to avoid is coverage
 outrunning explanation.
 
 ### 1.4 Boyd & Vandenberghe — *Introduction to Applied Linear Algebra* (VMLS, CUP 2018)
@@ -127,7 +127,7 @@ and the convergence-rate proofs do not transfer. Reading it as an AI engineer is
 a large investment for a small, real, but mostly conceptual return.
 
 **Verdict.** Take the vocabulary (convexity, Jensen, duality, the constrained
-Lagrangian) into P18 and P21. Do not take the curriculum.
+Lagrangian) into P19 and P22. Do not take the curriculum.
 
 ### 1.6 Bishop — *PRML* (2006) and Bishop & Bishop — *Deep Learning: Foundations and Concepts* (2024)
 
@@ -246,8 +246,8 @@ and no SVD; descriptive statistics and the normal distribution with no inference
 and no Bayes; no discrete mathematics, combinatorics, graph theory or logic;
 optimisation only in the advanced volume; low information density; useless as a
 reference; digital extras English-only. The TOC in `structure.tex` fixes every
-one of these — P04–P10 supply the vector spaces and decompositions Stroud omits,
-P11–P13 the discrete mathematics, P18–P21 the optimisation, P22–P27 the
+one of these — P04–P11 supply the vector spaces and decompositions Stroud omits,
+P12–P14 the discrete mathematics, P19–P22 the optimisation, P23–P28 the
 inference and Bayes, and Appendices B/C exist so the book is usable as a
 reference. The Polish/English parity fixes the last one.
 
@@ -265,7 +265,7 @@ reference. The Polish/English parity fixes the last one.
 | Blum et al. | Proof maturity | Exercises only | No | No | Partly |
 | 3Blue1Brown | None | **No** (author concedes) | No | Yes | No |
 | fast.ai | None (by design) | Code, not maths | Practical only | Yes | No |
-| **This book** | **None. Starts at arithmetic** | **Every frame** | **Part II is nothing else** | **Yes (P31–P33)** | **App. B/C by design** |
+| **This book** | **None. Starts at arithmetic** | **Every frame** | **Part II is nothing else** | **Yes (P32–P34)** | **App. B/C by design** |
 
 ---
 
@@ -370,14 +370,18 @@ Format: the **wrong belief in the reader's own voice** (this is the wording that
 goes in the trap frame, because a trap only works if the reader recognises
 themself), the correction, the owning program, and how well documented it is.
 
-> **Some program numbers in this section are one low.** This list
-> was written *before* P7 (tensors, shapes and index notation) was inserted by
-> the curriculum review, and everything after it moved up one. The section
-> headings say "(P18–P21)" for optimisation where the manifest now says
-> P19–P22, and "(P22–P27)" for probability where it says P23–P28. **Do not copy
-> an owner out of this file.** Re-derive it from `tools/programs.json`, which is
-> the single source of the sequence. Found while writing F4, which needed the
-> owner of item 25.
+> **Some item owners in this section are one low.** This list was written
+> *before* P7 (tensors, shapes and index notation) was inserted by the
+> curriculum review, and everything after it moved up one. **The section
+> headings are corrected**, because a part range is settled against
+> `tools/programs.json` by arithmetic; the **item owners** are not swept, and
+> they are a mix — several were corrected by hand in the pass that wrote their
+> program, so a blanket renumber would break the ones that are already right.
+> Each has to be settled against the destination program's own brief, which is
+> why item 24 moved *forward* rather than back. **Do not copy an owner out of
+> this file.** Re-derive it from `tools/programs.json`, which is the single
+> source of the sequence. Found while writing F4, which needed the owner of
+> item 25.
 
 Frames built from these are `trapbox` in `preamble.tex`. Stroud's own model is
 the harmonic series: ask whether it converges, let the reader say yes because the
@@ -439,7 +443,7 @@ input perturbation is amplified; κ ≈ 10⁸ in fp32 means you have no signific
 digits left. Conditioning is a property of the *problem*, not of your code, and
 no amount of careful implementation removes it. → **P02, P10**.
 
-### Linear algebra (P04–P10)
+### Linear algebra (P04–P11)
 
 **8. "My embeddings are 768-dimensional, so nearest neighbours by Euclidean
 distance work like they do in 3-D — just more so."** Under broad conditions the
@@ -509,7 +513,7 @@ largest units. Neither raises an error. → **P10**, delivered: its derivation
 assumes centring outright and its trapbox works the metres-against-millimetres
 case, whose variance differs by a factor of a million.
 
-### Calculus and autodiff (P14–P17)
+### Calculus and autodiff (P15–P18)
 
 **17. "Gradient descent moves in the direction of the gradient."** It moves in
 the *negative* gradient direction. The gradient points uphill — it is the
@@ -603,7 +607,7 @@ else answers it. (This entry said "P19", which predates the insertion of P7 —
 see the warning at the head of §3, and re-derive owners from
 `tools/programs.json`.)
 
-### Probability and statistics (P22–P27)
+### Probability and statistics (P23–P28)
 
 **27. "p = 0.03 means there's a 3% chance the null hypothesis is true."** It is
 P(data at least this extreme | H₀ true), not P(H₀ | data). This is the first and
@@ -667,7 +671,7 @@ SD as an error bar on a mean overstates uncertainty; quoting SE as if it
 described the population understates the spread. And an error bar with no stated
 n is uninterpretable either way. → **P26**.
 
-### Information theory and the transformer (P28–P31)
+### Information theory and the transformer (P29–P32)
 
 **34. "Cross-entropy and KL divergence are the same loss."** H(p,q) = H(p) +
 D_KL(p‖q). They differ by the entropy of the target, which is *constant* when the
@@ -1688,18 +1692,18 @@ is cheaper than a program by two orders of magnitude.
 | Excluded | Why it is safe | What replaces it |
 |---|---|---|
 | **ε–δ limits, Cauchy sequences, completeness, real analysis** | You will never write a proof, and no framework behaviour depends on it. What you *do* need is that a limit is a claim about a process, which fits in one frame. | F11 defines the derivative as a limit informally and moves on. |
-| **Measure theory, σ-algebras, Lebesgue integration** | Reviewers criticise Goodfellow for including it at this level. Nothing you build distinguishes Riemann from Lebesgue. | P22 works with densities and sums directly. |
-| **Cayley–Hamilton, characteristic polynomials, Jordan normal form** | Stroud teaches this and it is the clearest example of his linear algebra being recipe-level rather than useful. Nothing in ML computes eigenvalues from a characteristic polynomial — LAPACK does not. | P09 does eigenvalues as invariant directions; P10 does SVD, which is what you actually use. |
-| **Hand computation of determinants beyond 3×3, cofactor expansion, Cramer's rule** | O(n!) and never used. The determinant matters as a *volume scale factor* (normalising flows, change of variables) and as log-det, not as an arithmetic exercise. | P08 teaches what a determinant means; the arithmetic is one worked 3×3 and then `slogdet`. |
-| **Hand computation of matrix decompositions at scale** (Gram–Schmidt on a 6×6, hand QR, hand SVD) | You must know what QR and SVD *produce* and when they fail. You will never compute one. | P07/P10: one small worked example for mechanism, then properties and failure modes. |
-| **Integration techniques: partial fractions, trigonometric substitution, integration by parts drills** | Nothing in a training loop integrates symbolically. Integrals appear as expectations and are estimated by sampling. | F13 and P24: the integral as an accumulated total, then Monte Carlo. |
+| **Measure theory, σ-algebras, Lebesgue integration** | Reviewers criticise Goodfellow for including it at this level. Nothing you build distinguishes Riemann from Lebesgue. | F13 works with densities and P23 with measures, directly and without a sigma-algebra. |
+| **Cayley–Hamilton, characteristic polynomials, Jordan normal form** | Stroud teaches this and it is the clearest example of his linear algebra being recipe-level rather than useful. Nothing in ML computes eigenvalues from a characteristic polynomial — LAPACK does not. | P10 does eigenvalues as invariant directions; P11 does SVD, which is what you actually use. |
+| **Hand computation of determinants beyond 3×3, cofactor expansion, Cramer's rule** | O(n!) and never used. The determinant matters as a *volume scale factor* (normalising flows, change of variables) and as log-det, not as an arithmetic exercise. | P09 teaches what a determinant means; the arithmetic is one worked 3×3 and then `slogdet`. |
+| **Hand computation of matrix decompositions at scale** (Gram–Schmidt on a 6×6, hand QR, hand SVD) | You must know what QR and SVD *produce* and when they fail. You will never compute one. | P08/P11: one small worked example for mechanism, then properties and failure modes. |
+| **Integration techniques: partial fractions, trigonometric substitution, integration by parts drills** | Nothing in a training loop integrates symbolically. Integrals appear as expectations and are estimated by sampling. | F13 and P25: the integral as an accumulated total, then Monte Carlo. |
 | **ODEs and PDEs as a solution-technique curriculum** | Genuine exception: diffusion models, neural ODEs, and continuous normalising flows. But those readers need SDEs specifically, not the classical solution zoo. | Named as out of scope in the introduction, with a pointer. |
 | **Complex analysis, contour integration, residues** | Complex numbers appear in FFT-based methods and in rotary position embeddings, where all you need is e^{iθ} as a rotation. | F08 covers e^{iθ} as rotation; that is the whole requirement. |
 | **Abstract algebra: groups, rings, fields** | Real for geometric deep learning and for cryptography-adjacent work. Not for the target reader. | Out. Named as out. |
 | **The classical hypothesis-test zoo: t-test tables, χ², ANOVA, F-tests** | You have a computer. Bootstrap and permutation tests answer the same questions with fewer assumptions, are harder to misapply, and generalise to statistics with no closed form — which is most of the ones you care about. | P27 teaches the bootstrap, and its exact test on discordant pairs is a permutation argument on the one design that matters — the items are exchangeable under the null and every outcome is enumerated. **No program undertakes the replacement table**; it was promised here and nowhere else, and this entry says so rather than naming a program that has not agreed to it. |
 | **Frequentist estimator theory: sufficiency, Cramér–Rao, UMVU** | Beautiful and inert for this reader. | P26 does maximum likelihood as an objective, which is the part that shows up in every loss function. |
-| **PAC learning, VC dimension, Rademacher complexity** | The bounds are real theorems and are numerically vacuous for over-parameterised networks — they permit error rates above 1. Knowing they exist is worth a paragraph; deriving them is worth nothing here. | One frame in P33 on why generalisation bounds do not predict your validation loss. |
-| **Convergence-rate proofs in convex optimisation** | Deep learning objectives are outside the hypotheses. Knowing convexity as a *recognition problem* transfers; the rate proofs do not. | P18 teaches recognition and Jensen; P19–P20 teach what actually runs. |
+| **PAC learning, VC dimension, Rademacher complexity** | The bounds are real theorems and are numerically vacuous for over-parameterised networks — they permit error rates above 1. Knowing they exist is worth a paragraph; deriving them is worth nothing here. | **Delivered, in P14**, which elicits what happens to a bound holding “with probability at least 95 per cent” when a paper applies it once per experiment. Neither Part IX brief undertakes it, and this entry used to name one. |
+| **Convergence-rate proofs in convex optimisation** | Deep learning objectives are outside the hypotheses. Knowing convexity as a *recognition problem* transfers; the rate proofs do not. | P19 teaches recognition and Jensen; P20–P21 teach what actually runs. |
 | **Numerical quadrature, spline theory, classical interpolation** | Superseded by sampling for the uses in scope. | Out. |
 
 ### 4.2 The exclusions this book is least sure about
@@ -1709,10 +1713,10 @@ Stating these is cheaper than defending them later.
 - **Convex optimisation theory.** Excluded on the grounds that DL is non-convex.
   Counter-argument: quantisation, calibration, LP/QP-shaped serving and routing
   problems, and constrained decoding *are* convex, and an engineer who cannot
-  recognise one solves it with a for-loop. P18 and P21 keep the recognition
+  recognise one solves it with a for-loop. P19 and P22 keep the recognition
   skill for this reason. If readers report needing more, this is the first
   exclusion to revisit.
-- **Discrete maths depth.** P11–P13 fix Stroud's total omission, but stop well
+- **Discrete maths depth.** P12–P14 fix Stroud's total omission, but stop well
   short of algorithms and complexity. Defensible only because the reader is a
   software engineer who has met graphs before — an assumption the book makes
   nowhere else, and should state.
@@ -1730,13 +1734,13 @@ Stated because the TOC will otherwise look eccentric next to §1:
   has a part on this. Goodfellow has one chapter. It is where the money goes.
 - **Orders of magnitude and cost (P03).** Estimating FLOPs, memory, and spend
   before running anything is a mathematical skill and nobody teaches it.
-- **Discrete structures (P11–P13).** Stroud has none; tokenisation, beam search,
+- **Discrete structures (P12–P14).** Stroud has none; tokenisation, beam search,
   attention masks, DAG-shaped computation graphs and dependency scheduling are
   all discrete.
 - **Inference and Bayes (P27–P28).** Stroud stops at the normal distribution.
   Deciding whether an eval improvement is real is the most common mathematical
   act in the job.
-- **Honest measurement (P33).** The house convention as a program: methods,
+- **Honest measurement (P34).** The house convention as a program: methods,
   distributions rather than best runs, and the discipline of leaving a table
   empty.
 
@@ -1756,13 +1760,13 @@ findings:
 3. **P05 needs the concentration-of-distance material** from Blum–Hopcroft–Kannan
    and Beyer et al., translated out of theorem form — plus the Steck cosine
    result, which is recent enough that no textbook has it.
-4. **P26 should teach resampling before the classical tests**, per §4.1, and
+4. **P27 should teach resampling before the classical tests**, per §4.1, and
    should carry items 27, 28, 31 and 33 as trap frames. This is the program most
    likely to change what a reader does on Monday.
-5. **P31 (transformer derived) should be a payoff program, not a new-material
+5. **P32 (transformer derived) should be a payoff program, not a new-material
    program** — every piece assembled there (softmax stability from P02, the
-   variance argument for 1/√d_k from P23, cross-entropy from P29) must already
-   have been taught. If P31 needs to teach something, that thing is in the wrong
+   variance argument for 1/√d_k from P25, cross-entropy from P30) must already
+   have been taught. If P32 needs to teach something, that thing is in the wrong
    place.
 6. **Register measurement debt now.** Five experiments in §2.3, all unrun,
    reported by `make debt`, with Appendix B's tables empty until they are run.
