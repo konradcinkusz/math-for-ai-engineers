@@ -781,41 +781,41 @@ unsupported, and only the second is being asserted here.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--6}{\textbf{A zero correlation settles nothing}:
+\sumitem{1--6}{\textbf{\result{A zero correlation settles nothing}}:
   Program~\ref{prog:P24}'s pair has correlation exactly $0$ and mutual
   information $\val{p31.zw.mi}$ nats, which is all of $W$'s uncertainty.}
-\sumitem{3--4}{\textbf{Mutual information is a divergence}:
+\sumitem{3--4}{\textbf{\result{Mutual information is a divergence}}:
   $I(X; Y) = \KL{p(x,y)}{p(x)p(y)}$, the gap between the joint you have and
   the product of margins you would have had under independence.}
-\sumitem{7--8}{\textbf{So it is never negative and is zero exactly under
-  independence}, both inherited from Program~\ref{prog:P30} with no new
+\sumitem{7--8}{\textbf{\result{So it is never negative and is zero exactly under
+  independence}}, both inherited from Program~\ref{prog:P30} with no new
   proof.}
-\sumitem{9--10}{\textbf{It is symmetric}, because swapping the two
+\sumitem{9--10}{\textbf{\result{It is symmetric}}, because swapping the two
   quantities leaves both arguments of the divergence unchanged.}
-\sumitem{11--15}{\textbf{The pieces it is built from are not}: on the same
+\sumitem{11--15}{\textbf{\result{The pieces it is built from are not}}: on the same
   pair $H(W \mid Z) = 0$ and $H(Z \mid W) = \val{p31.zw.hzw}$, and both
   routes reach $\val{p31.zw.mi}$.}
-\sumitem{16--19}{\textbf{The plug-in estimate is positive on independent
-  data}, in expectation, at every sample size \dash{} $\val{p31.bias.n10}$
+\sumitem{16--19}{\textbf{\result{The plug-in estimate is positive on independent
+  data}}, in expectation, at every sample size \dash{} $\val{p31.bias.n10}$
   nats at $N = 10$ by exact enumeration of all
   $\val{p31.bias.tables10}$ tables.}
-\sumitem{20--21}{\textbf{The standard correction fails worst where it is
-  needed most}: $\val{p31.bias.ratio10}$ times off at $N = 10$, converging to
+\sumitem{20--21}{\textbf{\result{The standard correction fails worst where it is
+  needed most}}: $\val{p31.bias.ratio10}$ times off at $N = 10$, converging to
   $\val{p31.bias.ratio100}$ by $N = 100$.}
-\sumitem{22--23}{\textbf{Sixteen categories each way needs
-  $\val{p31.big.need}$ items} for the bias to fall under one per cent of the
+\sumitem{22--23}{\textbf{\result{Sixteen categories each way needs
+  $\val{p31.big.need}$ items}} for the bias to fall under one per cent of the
   maximum $\val{p31.big.max}$ nats \dash{} about $\val{p31.big.per}$ per
   cell.}
-\sumitem{24--25}{\textbf{The check that settles it is one extra run}:
+\sumitem{24--25}{\textbf{\result{The check that settles it is one extra run}}:
   shuffle the labels, re-run the whole pipeline, and report only what sits
   above whatever that returns.}
-\sumitem{26--27}{\textbf{Post-processing cannot create information}: if
+\sumitem{26--27}{\textbf{\result{Post-processing cannot create information}}: if
   $X \to Y \to Z$ then $I(X; Z) \le I(X; Y)$, checked against all
   $\val{p31.dpi.channels}$ channels in a family.}
-\sumitem{28--33}{\textbf{So a probe's score is a lower bound}, and the best
+\sumitem{28--33}{\textbf{\result{So a probe's score is a lower bound}}, and the best
   probe in that family still leaves more than a quarter behind. A better
   probe says nothing about the layer, and neither does a worse one.}
-\sumitem{35--38}{\textbf{Nothing here was measured on a real model}, and the
+\sumitem{35--38}{\textbf{\result{Nothing here was measured on a real model}}, and the
   claim being made is that the usual evidence does not distinguish the claim
   from its absence \dash{} not that it is false.}
 \end{summarybox}

@@ -1522,7 +1522,54 @@
 % broken across a line -- "[7--" on one line and "9]" on the next -- reads as
 % damage rather than as a reference. It happened in three of the four builds
 % the first time a Summary item ran long.
-\newcommand{\sumitem}[2]{\item #2~\mbox{\footnotesize\color{mgrey}[#1]}}
+%
+% \sumitem also records its frame range, so that a \result inside its body can
+% pick it up without the author writing the range twice. Writing it twice is
+% the whole defect Appendix C exists to avoid: a coordinate transcribed by
+% hand is a coordinate that can be wrong, and this book has shipped four of
+% those in Appendix B alone.
+\makeatletter
+\newcommand{\sumitem}[2]{%
+  \gdef\mfa@sumfr{#1}%
+  \item #2~\mbox{\footnotesize\color{mgrey}[#1]}}
+\providecommand{\mfa@sumfr}{?}
+
+% ---- Results, collected for Appendix C -------------------------------------
+%  \result{...} marks the span of a Summary item that IS the result -- the
+%  identity, the inequality, the rule with its condition -- as against the
+%  evidence for it, which is the rest of the item and belongs to Appendix F's
+%  measurement table.
+%
+%  It prints its argument and nothing else, so marking an item moves no page:
+%  where the book already bolds a lead, the bold stays OUTSIDE the mark
+%  (\textbf{\result{...}}) and the swap is invisible. That matters, because
+%  the alternative is a pagination change on every item marked in a book
+%  whose orphan-tail ledger is already the one going the wrong way.
+%
+%  The program number and the frame range are the ones LaTeX is on when it
+%  reads the macro, so THE TAG CANNOT BE WRONG. That is the whole point, and
+%  it is the fourth time this preamble accumulates a back-matter collection at
+%  the point of use rather than by hand: \outcome{} builds \canyou,
+%  \mermaidfig writes its own manifest line, \answerto carries an answer to
+%  Appendix A. None of the four can name the wrong program.
+%
+%  The obvious shortcut -- reading the existing bolded leads as the marks --
+%  was measured and does not work: 321 of the book's 756 Summary items are
+%  bolded, but the rate runs from 0 to 100 per cent across the programs and
+%  where it is used it is as often the program's trap as its result. See
+%  CLAUDE.md, What is left, item 1.
+\newcounter{resultno}[chapter]
+\newcommand{\result}[1]{%
+  \stepcounter{resultno}%
+  % \csgdef for the body, which carries \val{} and must NOT expand here;
+  % \csxdef for the range, which is a plain string and MUST, or every stored
+  % range expands at shipout to whichever item was read last. That is the
+  % distinction \mfa@storeanswer records above and it is the same one.
+  \csgdef{mfa@res@\mfa@progkey @\theresultno}{#1}%
+  \csxdef{mfa@resfr@\mfa@progkey @\theresultno}{\mfa@sumfr}%
+  \listcsxadd{mfa@reskeys@\mfa@progkey}{\theresultno}%
+  #1}
+\makeatother
 
 % ---- Answers ---------------------------------------------------------------
 %  Answers are authored at the point of use and printed at the back.
@@ -1756,6 +1803,49 @@
     \noindent{\color{mred}\lblNoAnswers}\par}%
   \clearpage\flushbottom
 }
+% ---- Appendix C: the results, replayed --------------------------------------
+%  The same mechanism as the answers above, one appendix along: \result marks
+%  a span in a Summary, the mark stores itself with the program and frame
+%  range LaTeX is on, and this replays the store in program order.
+%
+%  It is deliberately a LIST rather than a table. A formula reference is
+%  scanned rather than read, so the eye wants one line per result and a
+%  coordinate at the end of it -- which is exactly the shape a Summary item
+%  already has, and is why \mfa@resultone borrows \sumitem's own bracket.
+\makeatletter
+\newcommand{\mfa@resultone}[2]{% #1 program key, #2 result number
+  \item \csuse{mfa@res@#1@#2}~%
+    \mbox{\footnotesize\color{mgrey}[\csuse{mfa@resfr@#1@#2}]}%
+}
+\newcommand{\mfa@resultprogram}[1]{%
+  % Pure shrink before the heading, for the reason the answers appendix
+  % records: a program with no marked results is a heading and one line, and
+  % a run of those is a concertina of rigid blocks with nothing to give.
+  \par\vspace{0pt plus 0pt minus 3pt}%
+  \subsection*{\lblProgram~#1\quad\textmd{\itshape\csuse{mfa@title@#1}}}%
+  \ifcsdef{mfa@reskeys@#1}{%
+    \begin{reslist}%
+      \def\mfa@thisprog{#1}%
+      \forlistcsloop{\mfa@resultone{#1}}{mfa@reskeys@#1}%
+    \end{reslist}}{}%
+}
+\makeatother
+
+\newlist{reslist}{itemize}{1}
+\setlist[reslist]{label=\textcolor{mgrey}{\textbullet}, leftmargin=1.4em,
+                  itemsep=3pt plus 0pt minus 1pt, topsep=3pt plus 0pt minus 2pt,
+                  parsep=0pt plus 0pt minus 1pt}
+
+% Scoped exactly as the answers body is, and for the same reason: reference
+% matter has no glue, so \flushbottom on a page of headings is a concertina.
+\newcommand{\resultsbody}{%
+  \raggedbottom
+  \noindent\lblResultsIntro\par\vspace{8pt}
+  \ifdef{\mfaprograms}{\forlistloop{\mfa@resultprogram}{\mfaprograms}}{%
+    \noindent{\color{mred}\lblNoResults}\par}%
+  \clearpage\flushbottom
+}
+
 % Unnumbered form, for a draft build that has no appendix wiring yet.
 \newcommand{\printanswers}{%
   \chapter*{\lblAnswers}%
