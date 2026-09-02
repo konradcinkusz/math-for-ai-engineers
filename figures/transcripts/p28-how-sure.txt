@@ -1,0 +1,8 @@
+>>> from fractions import Fraction
+>>> from math import comb
+>>> a, b = 17, 16          # 1 + 16, 1 + 15
+>>> n = a + b - 1
+>>> below = sum(Fraction(comb(n, k), 2 ** n)
+...             for k in range(a, n + 1))
+>>> round(float(1 - below), 4)
+0.57
