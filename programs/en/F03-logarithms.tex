@@ -1265,75 +1265,75 @@ number this program taught you to compute.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{A logarithm is an \emph{exponent}: $\logb{b} x$ is the power
+\sumitem{1--3}{\result{A logarithm is an \emph{exponent}: $\logb{b} x$ is the power
   that turns $b$ into $x$, and $b^{y} = x$ says the same thing from the other
   end. $\logb{b} 1 = 0$ for every base, forced by $b^{0} = 1$, and
-  $\logb{b} b = 1$.}
-\sumitem{4--5}{The argument must be strictly positive, because no power of a
+  $\logb{b} b = 1$}.}
+\sumitem{4--5}{\result{The argument must be strictly positive, because no power of a
   positive base is zero or negative. Your libraries disagree about what to do
   instead: \code{math.log} raises, \code{np.log} returns \code{-inf} or
-  \code{nan} with a warning.}
-\sumitem{6--7}{A logarithm compresses a range you cannot hold into one you can.
+  \code{nan} with a warning}.}
+\sumitem{6--7}{\result{A logarithm compresses a range you cannot hold into one you can.
   The digit count of $2^{80}$ takes one multiplication,
   $80 \times \val{f03.log10.two} = \val{f03.two.eighty.exp}$, where
-  Program~\ref{prog:F01} needed all $\val{f03.two.eighty.digits}$ digits.}
-\sumitem{8--9}{A bare logarithm means base ten to one readership and base $e$
+  Program~\ref{prog:F01} needed all $\val{f03.two.eighty.digits}$ digits}.}
+\sumitem{8--9}{\result{A bare logarithm means base ten to one readership and base $e$
   to the other, and both are applying a convention correctly. Write the base
-  every time; this book's build refuses anything else.}
-\sumitem{10--11}{Change of base is
+  every time; this book's build refuses anything else}.}
+\sumitem{10--11}{\result{Change of base is
   $\logb{b} x = \logb{c} x / \logb{c} b$, with the base you want on the bottom.
   It multiplies every value by one constant, so the shape of a plotted
-  logarithm never reveals its base.}
-\sumitem{12--14}{$\ln 2 = \val{f03.ln.two}$ and
+  logarithm never reveals its base}.}
+\sumitem{12--14}{\result{$\ln 2 = \val{f03.ln.two}$ and
   $1 / \ln 2 = \val{f03.inv.ln.two}$ convert between nats and bits. A bit is
-  the smaller unit, so a count in bits is the larger number.}
-\sumitem{15--19}{The three laws are Program~\ref{prog:F01}'s index laws read
+  the smaller unit, so a count in bits is the larger number}.}
+\sumitem{15--19}{\result{The three laws are Program~\ref{prog:F01}'s index laws read
   backwards: $\ln(xy) = \ln x + \ln y$, $\ln(x/y) = \ln x - \ln y$,
-  $\ln(x^{n}) = n\ln x$.}
-\sumitem{20--21}{\textbf{There is no rule for the logarithm of a sum.}
+  $\ln(x^{n}) = n\ln x$}.}
+\sumitem{20--21}{\result{\textbf{There is no rule for the logarithm of a sum.}
   $\ln a + \ln b$ is the logarithm of the \emph{product} \dash{} the third time
   in three programs that a rule true of a product has been carried across a
-  sum.}
-\sumitem{22--23}{Where you must have $\ln(e^{u} + e^{v})$, take the larger
+  sum}.}
+\sumitem{22--23}{\result{Where you must have $\ln(e^{u} + e^{v})$, take the larger
   outside: $v + \ln(1 + e^{u-v})$. \code{np.exp(1000.)} is \code{inf};
-  \code{np.logaddexp} is $\val{f03.logsumexp.pair}$.}
-\sumitem{25--27}{$e^{\ln x} = x$ for $x > 0$ and $\ln(e^{x}) = x$ always, so
-  $b^{x} = c$ is solved in one move and $L = -\ln p$ gives $p = e^{-L}$.}
-\sumitem{28--29}{A probability and a loss are one quantity on two scales, and
+  \code{np.logaddexp} is $\val{f03.logsumexp.pair}$}.}
+\sumitem{25--27}{\result{$e^{\ln x} = x$ for $x > 0$ and $\ln(e^{x}) = x$ always, so
+  $b^{x} = c$ is solved in one move and $L = -\ln p$ gives $p = e^{-L}$}.}
+\sumitem{28--29}{\result{A probability and a loss are one quantity on two scales, and
   \textbf{a logarithm converts ratios into differences}: the factor of ten from
   $p = \num{0.1}$ to $p = \num{0.01}$ is a gap of $\val{f03.ln.ten}$ in the
-  loss.}
-\sumitem{30--32}{A $\val{f03.seq.tokens}$-token sequence at
+  loss}.}
+\sumitem{30--32}{\result{A $\val{f03.seq.tokens}$-token sequence at
   $\val{f02.prob.from.loss}$ per token has probability about
   $\val{f03.seq.prod}$. float32 makes the running product exactly zero after
   $\val{f03.f32.zero.at}$ tokens and float64 after
-  $\val{f03.f64.zero.at}$, raising nothing either time.}
-\sumitem{33--34}{Sum the logarithms instead and the total is small and
+  $\val{f03.f64.zero.at}$, raising nothing either time}.}
+\sumitem{33--34}{\result{Sum the logarithms instead and the total is small and
   negative. Divide by the token count and that mean, negated, is the loss
-  \dash{} which is the line in the training loop.}
-\sumitem{35--36}{\textbf{The token budget is the exponent budget.} At
+  \dash{} which is the line in the training loop}.}
+\sumitem{35--36}{\result{\textbf{The token budget is the exponent budget.} At
   $p = \num{0.5}$ the product reaches zero at $\val{f03.half.f32.zero}$ tokens
-  in float32 and $\val{f03.half.f64.zero}$ in float64.}
-\sumitem{37--38}{Perplexity is the exponential of the mean negative
+  in float32 and $\val{f03.half.f64.zero}$ in float64}.}
+\sumitem{37--38}{\result{Perplexity is the exponential of the mean negative
   log-likelihood, and the reciprocal of the geometric-mean token probability.
   A perplexity of $7$ is as uncertain as a fair seven-sided die; it is not a
-  hit rate.}
-\sumitem{39--40}{A loss reported without its base is not a measurement:
+  hit rate}.}
+\sumitem{39--40}{\result{A loss reported without its base is not a measurement:
   $\val{f02.loss.nats}$ nats and $\val{f03.nats.to.bits}$ bits are the same
   model, $\val{f03.bits.over.nats.pct}$\% apart, in the direction that
-  flatters.}
-\sumitem{41--42}{Ranking by \emph{summed} log-probability prefers the shorter
+  flatters}.}
+\sumitem{41--42}{\result{Ranking by \emph{summed} log-probability prefers the shorter
   candidate whatever the model thinks; the mean does not. And the geometric
   mean $\val{f03.gm}$ is not the arithmetic mean $\val{f03.am}$, so an average
-  of perplexities is not a perplexity.}
-\sumitem{43--46}{Halfway between two ticks of a logarithmic axis is the
+  of perplexities is not a perplexity}.}
+\sumitem{43--46}{\result{Halfway between two ticks of a logarithmic axis is the
   \emph{geometric} mean \dash{} $\val{f03.axis.mid}$ between $10$ and $100$,
   not $55$. A gap is a ratio, and a doubling is $\val{f03.log10.two}$ of a
-  decade wherever it falls.}
-\sumitem{46--48}{A linear axis answers \emph{how much did I remove}, a
+  decade wherever it falls}.}
+\sumitem{46--48}{\result{A linear axis answers \emph{how much did I remove}, a
   logarithmic one \emph{how much of what was left}. $y = ax^{b}$ is a straight
   line on log-log axes with gradient $b$, and a learning rate is swept on a
-  logarithmic grid for the same reason.}
+  logarithmic grid for the same reason}.}
 \end{summarybox}
 
 \canyou

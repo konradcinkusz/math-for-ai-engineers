@@ -830,36 +830,36 @@ Program~\ref{prog:P30} defines it, and shows that it is not symmetric.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Surprise is $-\ln p$}, and the logarithm is forced
+\sumitem{1--2}{\textbf{\result{Surprise is $-\ln p$}}, and the logarithm is forced
   rather than chosen: independent surprises must add while their
   probabilities multiply. A certainty surprises you by exactly nothing.}
 \sumitem{3}{A probability of $\frac{1}{\val{p29.rare.den}}$ is
   $\val{p29.rare.nats}$ nats or $\val{p29.rare.bits}$ bits of surprise
   \dash{} not ten, because a thousand is not a power of two.}
-\sumitem{5--7}{\textbf{Entropy is average surprise}, which is
+\sumitem{5--7}{\result{\textbf{Entropy is average surprise}, which is
   Program~\ref{prog:P24}'s expectation applied to that function:
-  $H(p) = -\sum_i p_i \ln p_i$. A fair coin is exactly
+  $H(p) = -\sum_i p_i \ln p_i$}. A fair coin is exactly
   $\val{p29.coin.bits}$ bit and a coin at $\val{p29.bias.p}$ is
   $\val{p29.bias.bits}$.}
-\sumitem{8--9}{The uniform distribution has the largest entropy over a
-  fixed number of outcomes \dash{} checked over
+\sumitem{8--9}{\result{The uniform distribution has the largest entropy
+  over a fixed number of outcomes} \dash{} checked over
   $\val{p29.max.tested}$ distributions on a grid that contains the uniform
   point, so the maximum is attained and not approached.}
-\sumitem{11--13}{A prefix-free code exists with lengths $l_i$ exactly when
-  $\sum_i 2^{-l_i} \le 1$. A short codeword is expensive because it spends a
+\sumitem{11--13}{\result{A prefix-free code exists with lengths $l_i$
+  exactly when $\sum_i 2^{-l_i} \le 1$}. A short codeword is expensive because it spends a
   whole branch.}
-\sumitem{14--15}{\textbf{Entropy is the shortest average code length}, and
+\sumitem{14--15}{\textbf{\result{Entropy is the shortest average code length}}, and
   that is what a bit is. On a dyadic alphabet the best of
   $\val{p29.code.assignments}$ admissible codes is
   $\val{p29.code.best}$ bits and the entropy is $\val{p29.code.h}$ \dash{}
   exhaustive, so a proof for that alphabet rather than evidence about it.}
-\sumitem{16--17}{Where the probabilities are not powers of two the bound
-  cannot be attained: $\val{p29.nondy.best}$ against
+\sumitem{16--17}{\result{Where the probabilities are not powers of two the
+  bound cannot be attained}: $\val{p29.nondy.best}$ against
   $\val{p29.nondy.h}$, a gap of $\val{p29.nondy.gap}$, and the difference is
   the rounding of a length to a whole number.}
-\sumitem{19--21}{\textbf{$e^{H}$ is the effective number of equally likely
-  choices}, returning $n$ exactly for a uniform distribution over $n$.}
-\sumitem{22}{\textbf{A perplexity is that count for a model.}
+\sumitem{19--21}{\result{\textbf{$e^{H}$ is the effective number of equally likely
+  choices}, returning $n$ exactly for a uniform distribution over $n$}.}
+\sumitem{22}{\result{\textbf{A perplexity is that count for a model.}}
   Program~\ref{prog:F02}'s $\val{p29.f02.loss}$ nats give
   Program~\ref{prog:F03}'s $\val{p29.f03.ppl}$, which is
   $\val{p29.ppl.frac}$ per cent of a $\val{p29.vocab}$-token vocabulary.}
@@ -873,17 +873,17 @@ Program~\ref{prog:P30} defines it, and shows that it is not symmetric.
   Program~\ref{prog:F05}'s own distribution: $\val{p29.tok.t05.eff}$,
   $\val{p29.tok.t10.eff}$, $\val{p29.tok.t20.eff}$ of
   $\val{p29.tok.n}$ as $T$ rises.}
-\sumitem{28--30}{\textbf{Entropy measures confidence and not correctness.} A
+\sumitem{28--30}{\textbf{\result{Entropy measures confidence and not correctness.}} A
   confidently wrong model has a low one. Use it as a filter on the model's own
   guessing and never as a warrant for an answer.}
-\sumitem{31--33}{\textbf{Bits per token is not bits per character.} Multiply
-  by tokens per character, which belongs to the tokeniser:
+\sumitem{31--33}{\result{\textbf{Bits per token is not bits per character.} Multiply
+  by tokens per character, which belongs to the tokeniser}:
   $\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ give
   $\val{p29.bpc.a}$ and $\val{p29.bpc.b}$ on the same model and the same
   text, a factor of $\val{p29.bpc.ratio}$ that is the tokenisers' ratio and
   nothing about the model.}
-\sumitem{34}{Two losses are comparable only under one tokeniser, and a
-  compression claim is checkable where a loss is not.}
+\sumitem{34}{\result{Two losses are comparable only under one tokeniser},
+  and a compression claim is checkable where a loss is not.}
 \end{summarybox}
 
 \canyou

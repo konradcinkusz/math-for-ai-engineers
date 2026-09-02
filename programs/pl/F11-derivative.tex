@@ -758,66 +758,66 @@ $(x-3)^{2}$ w coś, co działa na sieci.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Średnie tempo zmiany to zmiana podzielona przez
+\sumitem{1--3}{\result{\textbf{Średnie tempo zmiany to zmiana podzielona przez
   zmianę}, a geometrycznie jest nachyleniem \textbf{cięciwy} \dash{} prostej
   przez dwa punkty krzywej. Na $y = x^{2}$ między $x = 3$ a $x = 5$ wynosi
-  $8$.}
-\sumitem{4--6}{Zapisane z odległością $h$ nachylenie cięciwy to
+  $8$}.}
+\sumitem{4--6}{\result{Zapisane z odległością $h$ nachylenie cięciwy to
   $\frac{f(x+h) - f(x)}{h}$. $h$ może być ujemne i \textbf{nigdy nie jest
   zerem}: przy $h = 0$ wyrażenie to $\frac{0}{0}$, co nie jest liczbą ani małą
   liczbą, a każda trudność sekcji 3 bierze się z chęci dojścia do miejsca, w
-  którym wyrażenie nie jest określone.}
-\sumitem{7--10}{Dla $x^{2}$ w $x = 3$ nachylenie cięciwy wynosi
+  którym wyrażenie nie jest określone}.}
+\sumitem{7--10}{\result{Dla $x^{2}$ w $x = 3$ nachylenie cięciwy wynosi
   \textbf{dokładnie $6 + h$}, więc nachylenia biegną $\val{f11.chord.1}$,
   $\val{f11.chord.01}$, $\val{f11.chord.001}$, $\val{f11.chord.0001}$ i
   zatrzymują się na $\val{f11.deriv.at3}$ \dash{} co jest \textbf{pochodną}
   $x^{2}$ w tym punkcie. Skrócenie $h$ jest dozwolone właśnie dlatego, że $h$
-  nie jest zerem.}
-\sumitem{11--12}{\textbf{Pochodna nie jest nachyleniem cięciwy.} Każde
+  nie jest zerem}.}
+\sumitem{11--12}{\result{\textbf{Pochodna nie jest nachyleniem cięciwy.} Każde
   nachylenie cięciwy tutaj to $6 + h$ i żadne z nich nie jest $6$; pochodna
   jest liczbą, do której zmierzają, a $\lim_{h \to 0}$ znaczy \emph{tak
-  blisko, jak zechcesz, przez wybór $h$}, a nigdy \emph{przy $h = 0$}.}
-\sumitem{13--15}{Z samej definicji: $x^{2}$ daje $2x$, stała daje $0$, a
+  blisko, jak zechcesz, przez wybór $h$}, a nigdy \emph{przy $h = 0$}}.}
+\sumitem{13--15}{\result{Z samej definicji: $x^{2}$ daje $2x$, stała daje $0$, a
   $mx + c$ daje $m$. Jest tam wzorzec i Program~\ref{prog:F12} go podaje
   \dash{} tutaj liczy się to, że wszystkie trzy wyszły z jednej definicji i
-  strony algebry, więc reguły są wnioskami, a nie faktami do wydania.}
-\sumitem{16--18}{\textbf{Mniejsze $h$ jest dokładniejsze w matematyce i fałsz
+  strony algebry, więc reguły są wnioskami, a nie faktami do wydania}.}
+\sumitem{16--18}{\result{\textbf{Mniejsze $h$ jest dokładniejsze w matematyce i fałsz
   na maszynie.} Błąd spada do $\val{f11.fd.best.err}$ przy
   $h = \val{f11.fd.best.h}$, a potem wraca do $\val{f11.fd.err.16}$ przy
   $h = \val{f11.fd.vanishes}$, gdzie $3 + h$ \emph{jest} równe $3$, a iloraz
   wynosi dokładnie $\val{f11.fd.approx.16}$. Dwa błędy ciągną w przeciwne
   strony, a krzywa między nimi jest literą U. Prawa gałąź należy do
-  Programu~\ref{prog:P01}.}
-\sumitem{19--20}{Więc sprawdzenie gradientu zgadza się do kilku cyfr, a nie do
+  Programu~\ref{prog:P01}}.}
+\sumitem{19--20}{\result{Więc sprawdzenie gradientu zgadza się do kilku cyfr, a nie do
   wszystkich, a takie, które żąda więcej, pada na poprawnym kodzie.
   \textbf{Kształt krzywej przechodzi, a położenie jej dna nie} \dash{}
-  przesuwa się z rozmiarem odejmowanych liczb.}
-\sumitem{21--23}{\textbf{Znak jest kierunkiem}: dodatni rośnie, ujemny opada,
+  przesuwa się z rozmiarem odejmowanych liczb}.}
+\sumitem{21--23}{\result{\textbf{Znak jest kierunkiem}: dodatni rośnie, ujemny opada,
   zero jest chwilowo płaskie. \textbf{Wielkość jest stromością, właśnie tutaj.}
   Pochodną liczy się z dowolnie małego otoczenia, więc nie może nieść
-  informacji o żadnym innym miejscu.}
-\sumitem{24}{\textbf{Zerowa pochodna to \emph{punkt stacjonarny}, a nie
+  informacji o żadnym innym miejscu}.}
+\sumitem{24}{\result{\textbf{Zerowa pochodna to \emph{punkt stacjonarny}, a nie
   minimum}: maksimum też jest płaskie, i tak samo płaskie miejsce w drodze w
   górę. To, którego jest rodzaju, wymaga więcej niż pierwszej pochodnej
   \dash{} dostarcza to Program~\ref{prog:P17}. Zatrzymanie się to nie to samo
-  co dojście.}
-\sumitem{25--26}{\textbf{Duża pochodna nie znaczy, że jest daleko.} Na
+  co dojście}.}
+\sumitem{25--26}{\result{\textbf{Duża pochodna nie znaczy, że jest daleko.} Na
   $x^{4} - 4x^{2}$ punkt $x = \val{f11.steep.x}$ ma nachylenie
   $\val{f11.steep.slope}$ i jest $\val{f11.steep.dist}$ od minimum, a
   $x = \val{f11.shallow.x}$ ma nachylenie $\val{f11.shallow.slope}$ i jest
-  $\val{f11.shallow.dist}$ od niego. Stromszy punkt jest tym bliższym.}
-\sumitem{27--29}{W dół jest \textbf{przeciw znakowi pochodnej}, a instrukcja
+  $\val{f11.shallow.dist}$ od niego. Stromszy punkt jest tym bliższym}.}
+\sumitem{27--29}{\result{W dół jest \textbf{przeciw znakowi pochodnej}, a instrukcja
   brzmi $x \leftarrow x - \eta f'(x)$. \textbf{To jest spadek gradientowy i
   nie ma w nim nic więcej}; $\eta$ jest wyborem, bo na mocy poprzedniej sekcji
-  pochodna nie wie, jak daleko cokolwiek jest.}
-\sumitem{30--32}{Na $(x-3)^{2} + 1$ aktualizacja to dokładnie
+  pochodna nie wie, jak daleko cokolwiek jest}.}
+\sumitem{30--32}{\result{Na $(x-3)^{2} + 1$ aktualizacja to dokładnie
   $x - 3 \leftarrow (1 - 2\eta)(x-3)$, więc \textbf{odległość jest mnożona
   przez $1 - 2\eta$ na każdym kroku}. Przy $\eta = \val{f11.gd.small.eta}$ i
   $\eta = \val{f11.gd.big.eta}$ czynnik ten wynosi
   $\pm\val{f11.gd.factor.small}$, więc jeden marsz pełznie w dół, a drugi
   przeskakuje minimum co krok, i oba dochodzą do $\val{f11.gd.small.end}$ co
-  do cyfry. Marsz dochodzi, gdy $\lvert 1 - 2\eta \rvert < 1$.}
-\sumitem{33--35}{\textbf{Zbyt duży krok przestrzeliwuje za każdym razem
+  do cyfry. Marsz dochodzi, gdy $\lvert 1 - 2\eta \rvert < 1$}.}
+\sumitem{33--35}{\result{\textbf{Zbyt duży krok przestrzeliwuje za każdym razem
   dalej}: przy $\eta = \val{f11.gd.toobig.eta}$ czynnik wynosi
   $-\val{f11.gd.factor.toobig}$, a osiem kroków przenosi marsz z
   $\val{f11.gd.start}$ do $\val{f11.gd.toobig.end}$. Pochodna nie zrobiła nic
@@ -826,7 +826,7 @@ $(x-3)^{2}$ w coś, co działa na sieci.
   potrzebował tylko pochodnej pod stopami i ani razu nie policzył $f$, i
   dlatego wielkość lokalna wystarczy do sterowania \dash{} a \textbf{spadek
   gradientowy nie jest algorytmem na rachunku różniczkowym, jest tym, co
-  definicja każe robić}, gdy chcesz zejść w dół i widzisz tylko swoje stopy.}
+  definicja każe robić}, gdy chcesz zejść w dół i widzisz tylko swoje stopy}.}
 \end{summarybox}
 
 \canyou

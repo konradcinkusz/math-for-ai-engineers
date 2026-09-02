@@ -719,64 +719,64 @@ właśnie jest $\code{backward()}$ i nie ma w nim nic więcej.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Pochodna funkcji z $m$ wejść w $n$ wyjść jest macierzą
+\sumitem{1--2}{\result{\textbf{Pochodna funkcji z $m$ wejść w $n$ wyjść jest macierzą
   $n \times m$} \dash{} jakobianem, o jednym wierszu na wyjście i jednej
-  kolumnie na wejście.}
-\sumitem{3--4}{\textbf{Gradient z Programu~\ref{prog:P15} to przypadek jednego
-  wyjścia}, pojedynczy wiersz, więc nic nowego nie zostało tu zdefiniowane.}
-\sumitem{5--6}{\textbf{Odwzorowanie liniowe jest własnym jakobianem}, co jest
+  kolumnie na wejście}.}
+\sumitem{3--4}{\result{\textbf{Gradient z Programu~\ref{prog:P15} to przypadek jednego
+  wyjścia}, pojedynczy wiersz, więc nic nowego nie zostało tu zdefiniowane}.}
+\sumitem{5--6}{\result{\textbf{Odwzorowanie liniowe jest własnym jakobianem}, co jest
   zdaniem Programu~\ref{prog:F11} o prostej o jeden wymiar wyżej. Jakobian
-  aktywacji po współrzędnych jest diagonalny.}
-\sumitem{9--10}{\textbf{Reguła łańcuchowa mnoży jakobiany}, w kolejności, na
-  którą pozwalają kształty, co jest składaniem z Programu~\ref{prog:P06}.}
-\sumitem{11--14}{\textbf{Nikt nie tworzy jakobianu.} Liczony jest iloczyn z
-  nim, a wyniki pośrednie są wtedy wektorami, a nie macierzami.}
-\sumitem{14--15}{Ten sam iloczyn nawiasowany od różnych końców kosztuje różnie
+  aktywacji po współrzędnych jest diagonalny}.}
+\sumitem{9--10}{\result{\textbf{Reguła łańcuchowa mnoży jakobiany}, w kolejności, na
+  którą pozwalają kształty, co jest składaniem z Programu~\ref{prog:P06}}.}
+\sumitem{11--14}{\result{\textbf{Nikt nie tworzy jakobianu.} Liczony jest iloczyn z
+  nim, a wyniki pośrednie są wtedy wektorami, a nie macierzami}.}
+\sumitem{14--15}{\result{Ten sam iloczyn nawiasowany od różnych końców kosztuje różnie
   \dash{} Program~\ref{prog:P06} zmierzył $\val{p06.cost.left}$ wobec
   $\val{p06.cost.right}$ przy identycznej odpowiedzi. \textbf{Te dwa
-  nawiasowania to dwa tryby.}}
-\sumitem{16--17}{\textbf{Tryb w przód kosztuje jeden przebieg na wejście, a
+  nawiasowania to dwa tryby.}}}
+\sumitem{16--17}{\result{\textbf{Tryb w przód kosztuje jeden przebieg na wejście, a
   odwrotny jeden na wyjście.} To cała procedura decyzyjna i są to dwie liczby
-  całkowite.}
-\sumitem{17--18}{\textbf{Skalarna strata czyni tryb odwrotny tańszym o czynnik
+  całkowite}.}
+\sumitem{17--18}{\result{\textbf{Skalarna strata czyni tryb odwrotny tańszym o czynnik
   równy liczbie parametrów.} Nic innego z uczenia głębokiego nie wchodzi do
-  argumentu.}
-\sumitem{19--20}{Zmierzone dokładnie nad liczbami wymiernymi:
+  argumentu}.}
+\sumitem{19--20}{\result{Zmierzone dokładnie nad liczbami wymiernymi:
   $\val{p16.fwd.muls}$ mnożeń w przód wobec $\val{p16.rev.muls}$ odwrotnych
   przy identycznym gradiencie, a \textbf{stosunek jest liczbą wejść},
-  przejrzany na czterech szerokościach.}
-\sumitem{21--22}{Program~\ref{prog:P13} czyni marsz wsteczny dobrze
+  przejrzany na czterech szerokościach}.}
+\sumitem{21--22}{\result{Program~\ref{prog:P13} czyni marsz wsteczny dobrze
   określonym: graf ma porządek topologiczny i \textbf{każdy z nich liczy te
-  same wartości}.}
-\sumitem{23--24}{\textbf{Tryb odwrotny musi przechować wejście każdej
+  same wartości}}.}
+\sumitem{23--24}{\result{\textbf{Tryb odwrotny musi przechować wejście każdej
   warstwy}, bo od niego zależą wpisy jakobianu. Pamięć rośnie z głębokością i
-  z rozmiarem batcha; tryb w przód nie potrzebuje z tego nic.}
-\sumitem{25--26}{\textbf{Checkpointing co $k$-tą warstwę trzyma
+  z rozmiarem batcha; tryb w przód nie potrzebuje z tego nic}.}
+\sumitem{25--26}{\result{\textbf{Checkpointing co $k$-tą warstwę trzyma
   $\frac{L}{k} + k$ aktywacji}, z minimum w $k = \sqrt{L}$ \dash{} tam, gdzie
-  znika pochodna, a nie w regule kciuka.}
-\sumitem{26--27}{Przy $L = \val{p16.ckpt.layers}$ to $\val{p16.ckpt.peak}$
+  znika pochodna, a nie w regule kciuka}.}
+\sumitem{26--27}{\result{Przy $L = \val{p16.ckpt.layers}$ to $\val{p16.ckpt.peak}$
   trzymanych zamiast $\val{p16.ckpt.layers}$, czynnik
   $\val{p16.ckpt.saving}$, za dokładnie $\val{p16.ckpt.passes}$ przebiegi w
-  przód zamiast jednego.}
-\sumitem{28--29}{\textbf{Różnica skończona to test, a nie implementacja}:
+  przód zamiast jednego}.}
+\sumitem{28--29}{\result{\textbf{Różnica skończona to test, a nie implementacja}:
   kosztuje jedną ewaluację na wejście, a Program~\ref{prog:F11} zmierzył jej
-  podłogę błędu, więc zgodność do kilku cyfr jest tym, jak wygląda poprawność.}
-\sumitem{30--31}{\textbf{$\relu$ dokładnie w zerze nie ma pochodnej}, więc
+  podłogę błędu, więc zgodność do kilku cyfr jest tym, jak wygląda poprawność}.}
+\sumitem{30--31}{\result{\textbf{$\relu$ dokładnie w zerze nie ma pochodnej}, więc
   implementacja wybiera \dash{} granice to $\val{p16.relu.left}$ i
   $\val{p16.relu.right}$, a ta zwraca $\val{p16.relu.chosen}$, nie mówiąc o
-  tym.}
-\sumitem{32--33}{\textbf{Odczepiona wartość zostawia stratę identyczną co do
+  tym}.}
+\sumitem{32--33}{\result{\textbf{Odczepiona wartość zostawia stratę identyczną co do
   ostatniego bitu} i składową gradientu różną o $\val{p16.detach.gap}$.
-  Brakuje składnika, a nie jest on źle policzony.}
-\sumitem{34--35}{\textbf{Nadpisanie w miejscu czyni z taśmy zapis obliczenia,
+  Brakuje składnika, a nie jest on źle policzony}.}
+\sumitem{34--35}{\result{\textbf{Nadpisanie w miejscu czyni z taśmy zapis obliczenia,
   które się nie wydarzyło}: gradient używa tu $\val{p16.inplace.used}$,
-  podczas gdy wartość trzyma $\val{p16.inplace.now}$.}
-\sumitem{36--37}{\textbf{Wszystkie trzy zostawiają przebieg w przód dokładnie
+  podczas gdy wartość trzyma $\val{p16.inplace.now}$}.}
+\sumitem{36--37}{\result{\textbf{Wszystkie trzy zostawiają przebieg w przód dokładnie
   poprawny}, więc znajduje je tylko bezpośrednie sprawdzenie pochodnej
-  \dash{} po to jest różnica skończona.}
-\sumitem{38}{Różniczkowanie automatyczne nie jest ani numeryczne, ani
+  \dash{} po to jest różnica skończona}.}
+\sumitem{38}{\result{Różniczkowanie automatyczne nie jest ani numeryczne, ani
   symboliczne. \textbf{Wylicza regułę łańcuchową na grafie, który program
-  faktycznie wykonał}, z tą samą precyzją co przebieg w przód.}
+  faktycznie wykonał}, z tą samą precyzją co przebieg w przód}.}
 \end{summarybox}
 
 \canyou

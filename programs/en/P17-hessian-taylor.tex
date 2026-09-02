@@ -699,70 +699,70 @@ answer to that where the sharpness literature has to supply one.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{The second-order Taylor model is value, slope and half
+\sumitem{1--2}{\result{\textbf{The second-order Taylor model is value, slope and half
   the curvature times the square}, and the $\tfrac{1}{2}$ is what makes the
-  model's second derivative match the function's.}
-\sumitem{3--4}{\textbf{\enquote{Best} means an order, not a size}: the
+  model's second derivative match the function's}.}
+\sumitem{3--4}{\result{\textbf{\enquote{Best} means an order, not a size}: the
   quadratic's error falls like $h^{\val{p17.order.quad}}$ where the line's
   falls like $h^{\val{p17.order.lin}}$, checked by halving $h$ rather than by
-  quoting two errors.}
-\sumitem{5--6}{\textbf{The model is local.} It makes the local description
-  better, not wider, and says nothing about where the minimum is.}
-\sumitem{7--8}{At a stationary point the linear term vanishes, so the sign of
+  quoting two errors}.}
+\sumitem{5--6}{\result{\textbf{The model is local.} It makes the local description
+  better, not wider, and says nothing about where the minimum is}.}
+\sumitem{7--8}{\result{At a stationary point the linear term vanishes, so the sign of
   the curvature classifies \dash{} completely in one dimension, and not in
-  more.}
-\sumitem{9--10}{\textbf{The Hessian is the Jacobian of the gradient}, so
+  more}.}
+\sumitem{9--10}{\result{\textbf{The Hessian is the Jacobian of the gradient}, so
   Program~\ref{prog:P16}'s rule makes it square with one row and column per
-  input.}
-\sumitem{11--12}{\textbf{It is symmetric}, so Program~\ref{prog:P10} applies
+  input}.}
+\sumitem{11--12}{\result{\textbf{It is symmetric}, so Program~\ref{prog:P10} applies
   unchanged: real eigenvalues, perpendicular directions, each with its own
-  curvature.}
-\sumitem{13--14}{The eigenvalue signs give bowl, inverted bowl, saddle and
+  curvature}.}
+\sumitem{13--14}{\result{The eigenvalue signs give bowl, inverted bowl, saddle and
   ridge \dash{} P10's classification, now for any smooth function at a
-  stationary point.}
-\sumitem{15}{\textbf{A stationary point in high dimension is overwhelmingly
+  stationary point}.}
+\sumitem{15}{\result{\textbf{A stationary point in high dimension is overwhelmingly
   unlikely to be a minimum}: a minimum needs every one of $\val{p17.params}$
   signs positive, and it can be missed by one sign in as many ways.
   \enquote{Stuck in a local minimum} is the two-dimensional picture carried
-  somewhere it does not survive.}
-\sumitem{16--17}{\textbf{The walk stays bounded exactly when
+  somewhere it does not survive}.}
+\sumitem{16--17}{\result{\textbf{The walk stays bounded exactly when
   $\lvert 1 - \eta\lambda\rvert < 1$, that is $\eta < 2/\lambda$}, which is a
-  fact about a geometric sequence and about nothing else.}
-\sumitem{18--19}{\textbf{The steepest direction sets the step for the whole
+  fact about a geometric sequence and about nothing else}.}
+\sumitem{18--19}{\result{\textbf{The steepest direction sets the step for the whole
   model.} Here $\val{p17.eta.star}$ against the shallow direction's
   $\val{p17.eta.shallow}$, a factor of $\val{p17.eta.gap}$. Derived, then
-  measured by sweeping: $\val{p17.eta.measured}$.}
-\sumitem{20--21}{Program~\ref{prog:P15}'s walk at $\val{p17.p15.eta}$ is under
+  measured by sweeping: $\val{p17.eta.measured}$}.}
+\sumitem{20--21}{\result{Program~\ref{prog:P15}'s walk at $\val{p17.p15.eta}$ is under
   the boundary, and the script asserts it. \textbf{\enquote{The learning rate
   was too high} is the inequality $\eta > 2/\lambda_{\max}$}, and past it the
-  growth is geometric.}
-\sumitem{22--23}{\textbf{The condition number $\val{p17.kappa}$ is the same
+  growth is geometric}.}
+\sumitem{22--23}{\result{\textbf{The condition number $\val{p17.kappa}$ is the same
   quantity Program~\ref{prog:P11} defined}, read on the Hessian. At the best
   step it still takes $\val{p17.steps.99}$ steps to close $99$ per cent of the
-  slow direction's gap.}
-\sumitem{24--25}{\textbf{Newton's method lands on a quadratic's minimum in
-  $\val{p17.newton.steps}$ step}, by giving each direction its own step size.}
-\sumitem{26--28}{\textbf{And its Hessian has $\val{p17.hess.entries}$ entries
+  slow direction's gap}.}
+\sumitem{24--25}{\result{\textbf{Newton's method lands on a quadratic's minimum in
+  $\val{p17.newton.steps}$ step}, by giving each direction its own step size}.}
+\sumitem{26--28}{\result{\textbf{And its Hessian has $\val{p17.hess.entries}$ entries
   at a real model size}, with a cubic solve on top. Nobody forms a Hessian
   either \dash{} and unlike the Jacobian, the product people want is not
-  cheap.}
-\sumitem{29--30}{\textbf{Newton finds stationary points, not minima}, so at a
+  cheap}.}
+\sumitem{29--30}{\result{\textbf{Newton finds stationary points, not minima}, so at a
   saddle it steps the wrong way in the negative directions. With section 2's
-  counting argument that is a real problem in high dimension.}
-\sumitem{31--33}{\textbf{Rescaling a parameter changes the curvature by
+  counting argument that is a real problem in high dimension}.}
+\sumitem{31--33}{\result{\textbf{Rescaling a parameter changes the curvature by
   $\val{p17.rescale.factor}$ and leaves every output identical.} So one model
   has two sharpnesses and a bare sharpness number is a fact about the
-  coordinates.}
-\sumitem{34}{\textbf{No quantity built from the raw eigenvalues survives it}
+  coordinates}.}
+\sumitem{34}{\result{\textbf{No quantity built from the raw eigenvalues survives it}
   \dash{} not the largest, the trace or the ratio \dash{} and normalisation
-  layers make the rescaling a symmetry the architecture has by construction.}
-\sumitem{35--36}{What would survive is a measure that transforms as the
-  parameters do. \textbf{This book has not measured the generalisation claim
+  layers make the rescaling a symmetry the architecture has by construction}.}
+\sumitem{35--36}{\result{What would survive is a measure that transforms as the
+  parameters do.} \textbf{This book has not measured the generalisation claim
   and does not adjudicate it}; what it supplies is a filter.}
-\sumitem{37--38}{\textbf{The step-size bound has the same problem and does not
+\sumitem{37--38}{\result{\textbf{The step-size bound has the same problem and does not
   suffer from it}, because $\eta$ rescales with $\lambda$ and the step taken is
   unchanged. The question about a curvature is never \emph{is it big} but
-  \emph{compared with what}.}
+  \emph{compared with what}}.}
 \end{summarybox}
 
 \canyou

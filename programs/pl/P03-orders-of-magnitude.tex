@@ -751,90 +751,89 @@ książce, który potrzebuje nowego \emph{obiektu}, a nie nowego pytania.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Notacja $O$ zachowuje to, jak koszt rośnie, i wyrzuca
+\sumitem{1--2}{\result{\textbf{Notacja $O$ zachowuje to, jak koszt rośnie, i wyrzuca
   stałą.} $\frac{n(n-1)}{2}$ i $3n^{2} + 5n + 100$ różnią się mniej więcej
   sześciokrotnie przy dużym $n$, a notacja nazywa oba $O(n^{2})$: składniki
   niższego rzędu naprawdę przestają mieć znaczenie, a współczynnik wiodący
-  nie.}
-\sumitem{3--4}{$f$ jest $O(g)$, gdy $f(n) \le c\,g(n)$ powyżej pewnego $n_0$
+  nie}.}
+\sumitem{3--4}{\result{$f$ jest $O(g)$, gdy $f(n) \le c\,g(n)$ powyżej pewnego $n_0$
   \dash{} \emph{pewna} stała, \emph{powyżej} pewnego rozmiaru. Więc
   \textbf{$O$ to ograniczenie górne, a nie opis}: algorytm liniowy jest
   uczciwie $O(n^{2})$. $\Theta$ jest notacją na \emph{dokładnie takie tempo} i
-  zwykle to ją miano na myśli.}
-\sumitem{5--7}{Podwojenie wejścia: $O(\mfalogplain n)$ dokłada krok, $O(n)$ podwaja,
+  zwykle to ją miano na myśli}.}
+\sumitem{5--7}{\result{Podwojenie wejścia: $O(\mfalogplain n)$ dokłada krok, $O(n)$ podwaja,
   $O(n^{2})$ zwiększa czterokrotnie, $O(2^{n})$ \emph{podnosi} pracę do
   kwadratu. \textbf{Pętle zagnieżdżone mnożą, następujące po sobie dodają}
   \dash{} $O(nm)$ przeciw $O(n+m)$, czyli różnica, którą ta notacja
-  \emph{potrafi} wypowiedzieć.}
-\sumitem{8--10}{\textbf{Dwa tempa wzrostu nie szeregują dwóch implementacji.}
+  \emph{potrafi} wypowiedzieć}.}
+\sumitem{8--10}{\result{\textbf{Dwa tempa wzrostu nie szeregują dwóch implementacji.}
   $\val{p03.cross.c1}n^{2}$ i $\val{p03.cross.c2}n\logb{2}n$ zamieniają się
   miejscami przy $n = \val{p03.cross.n}$, znalezionym szukaniem, bo wzoru nie
   ma. Przy $n = 100$ ta asymptotycznie lepsza kosztuje
   $\val{p03.cross.ratio.100}$ razy tyle; przy $n = 100\,000$ ta druga kosztuje
-  $\val{p03.cross.ratio.100000}$ razy tyle.}
-\sumitem{11--12}{\enquote{Asymptotycznie lepszy} to twierdzenie o granicy, do
+  $\val{p03.cross.ratio.100000}$ razy tyle}.}
+\sumitem{11--12}{\result{\enquote{Asymptotycznie lepszy} to twierdzenie o granicy, do
   której możesz nigdy nie dojść \dash{} każda biblioteka sortowania uruchamia z
   tego powodu sortowanie przez wstawianie $O(n^{2})$ na krótkich podtablicach.
   I \textbf{notacja nie mówi, czym jest operacja}: dodawanie w rejestrze i
   chybienie cache'u różnią się czynnikiem rzędu setek, a oba liczą się jako
-  jeden krok. Notacja mówi, jak koszt się skaluje; pomiar mówi, ile wynosi.}
-\sumitem{13--14}{Program~\ref{prog:F04} policzył $\val{p03.flop.pairs}$ par, a
+  jeden krok. Notacja mówi, jak koszt się skaluje; pomiar mówi, ile wynosi}.}
+\sumitem{13--14}{\result{Program~\ref{prog:F04} policzył $\val{p03.flop.pairs}$ par, a
   tutaj są one wycenione jako praca: każda to iloczyn skalarny długości $\val{p03.flop.dhead}$, czyli
   $\val{p03.flop.perhead}$ operacji na głowicę i $\val{p03.flop.allheads}$ na
   $\val{p03.flop.heads}$ głowicach \dash{} same wyniki, jedna warstwa, jedna
   sekwencja. Mnożenie z dodawaniem to \textbf{dwa} FLOP-y przez konwencję, a
-  czynnik dwa między liczbami dwóch osób to zwykle właśnie to.}
-\sumitem{15--16}{Trening kosztuje około $6$ FLOP-ów na parametr na token: dwa
+  czynnik dwa między liczbami dwóch osób to zwykle właśnie to}.}
+\sumitem{15--16}{\result{Trening kosztuje około $6$ FLOP-ów na parametr na token: dwa
   w przód i po dwa na oba gradienty przejścia wstecz. Daje to
   $\val{p03.train.flops}$ dla $\val{f01.params}$ parametrów na
   $\val{f01.tokens}$ tokenach, czyli liczbę Programu~\ref{prog:F01}
   wyprowadzoną ponownie. \textbf{Liczba parametrów nie jest liczbą pracy}:
-  uwaga ma $O(d^{2})$ parametrów i $O(d\,n^{2})$ pracy.}
-\sumitem{17}{\textbf{Liczba FLOP-ów jest liczbą, a nie czasem.} Luka do
+  uwaga ma $O(d^{2})$ parametrów i $O(d\,n^{2})$ pracy}.}
+\sumitem{17}{\result{\textbf{Liczba FLOP-ów jest liczbą, a nie czasem.} Luka do
   reklamowanego tempa urządzenia to czas, który arytmetyka spędza, czekając na
   liczby, i to ją przewiduje ostatnia sekcja. Liczba FLOP-ów bez wykorzystania
-  obok niej to najlepszy przypadek podany jako plan.}
-\sumitem{18--20}{\textbf{Wagi są najmniejszym składnikiem.} Dla
+  obok niej to najlepszy przypadek podany jako plan}.}
+\sumitem{18--20}{\result{\textbf{Wagi są najmniejszym składnikiem.} Dla
   $\val{f01.params}$ parametrów: $\val{p03.mem.weights}$~GB wag,
   $\val{p03.mem.grads}$ gradientów i $\val{p03.mem.optimiser}$ stanu
   optymalizatora \dash{} razem $\val{p03.mem.total}$~GB, czyli
   $\val{p03.mem.multiple}$ razy tyle, co liczba z karty modelu, i wagi zostają
   na $\val{p03.mem.weights.pct}\%$. Ten czynnik jest powodem, dla którego model
   serwujący się na karcie nie da się na niej dostroić, a każde lekarstwo usuwa
-  \emph{wiersz}.}
-\sumitem{21}{\textbf{Aktywacje nie skalują się z parametrami} \dash{} skalują
+  \emph{wiersz}}.}
+\sumitem{21}{\result{\textbf{Aktywacje nie skalują się z parametrami} \dash{} skalują
   się z wsadem, sekwencją i głębokością, więc ten sam model ma inny rachunek
   przy każdym obciążeniu. Trzyma się je, bo potrzebuje ich przejście wstecz,
   co jest regułą łańcuchową Programu~\ref{prog:F12} jako rachunkiem za pamięć,
   a checkpointing przelicza je zamiast trzymać: operacje wymienione na bajty
-  celowo.}
-\sumitem{22--23}{\textbf{Cache kluczy i wartości jest liniowy w długości
+  celowo}.}
+\sumitem{22--23}{\result{\textbf{Cache kluczy i wartości jest liniowy w długości
   sekwencji, podczas gdy arytmetyka uwagi jest kwadratowa}, a prawie każdy
   spodziewa się, że oba będą kwadratowe. Trzyma jeden klucz i jedną wartość na
   \emph{pozycję}, a nie na parę: $\val{p03.kv.gib}$~GiB przy
   $\val{p03.kv.seq}$ tokenach, $\val{p03.kv.double.gib}$ przy dwa razy
   większej długości i $\val{p03.kv.per.token.mib}$~MiB na token w locie. Zwykle
-  jest większy od wag i to on decyduje, ilu użytkowników obsłuży karta.}
-\sumitem{24}{GB to $10^{9}$, a GiB to $2^{30}$, większe o jakieś siedem
-  procent. Plan pojemności mylący się o siedem procent to prawie zawsze to.}
-\sumitem{25--29}{\textbf{Intensywność arytmetyczna to operacje podzielone
+  jest większy od wag i to on decyduje, ilu użytkowników obsłuży karta}.}
+\sumitem{24}{\result{GB to $10^{9}$, a GiB to $2^{30}$, większe o jakieś siedem
+  procent. Plan pojemności mylący się o siedem procent to prawie zawsze to}.}
+\sumitem{25--29}{\result{\textbf{Intensywność arytmetyczna to operacje podzielone
   przez przeniesione bajty}, porównane z własnym stosunkiem operacji na bajt
   urządzenia \dash{} $\val{p03.dev.ratio}$ przy przyjętych tu założeniach.
   Dodawanie elementowe ma $\val{p03.ai.elementwise}$ \emph{przy dowolnym $n$};
   mnożenie tablic o boku $n$ ma $\frac{n}{3}$, co \emph{rośnie}, i wynosi
-  $\val{p03.ai.matmul}$ przy $n = \val{p03.ai.matmul.n}$.}
-\sumitem{30--31}{Operacji elementowej brakuje do urządzenia
+  $\val{p03.ai.matmul}$ przy $n = \val{p03.ai.matmul.n}$}.}
+\sumitem{30--31}{\result{Operacji elementowej brakuje do urządzenia
   $\val{p03.ai.short}$, więc taką część dostępnej arytmetyki wykorzystuje. A
   \textbf{mnożenie macierzy jest ograniczone przez obliczenia dopiero powyżej
   $n \approx \val{p03.ai.smalln}$} \dash{} wsad małych mnożeń jest ograniczony
   przez pamięć jak wszystko inne, a to właśnie produkuje stos wąskich głowic
-  albo ekspertów.}
-\sumitem{32--34}{Zlanie $\val{p03.fuse.chain}$ operacji elementowych dzieli
+  albo ekspertów}.}
+\sumitem{32--34}{\result{Zlanie $\val{p03.fuse.chain}$ operacji elementowych dzieli
   bajty przez $\val{p03.fuse.factor}$ przy dokładnie tych samych operacjach,
   podnosząc intensywność do $\val{p03.fuse.after}$ \dash{} wciąż daleko poniżej
   $\val{p03.dev.ratio}$. \textbf{Fuzja pomaga i nie ratuje}, bo wejście trzeba
-  przeczytać raz, a wyjście zapisać raz, cokolwiek dzieje się pomiędzy.
-  \textbf{To zamyka część II}: trzy pytania o jedną arytmetykę, odpowiedziane
+  przeczytać raz, a wyjście zapisać raz, cokolwiek dzieje się pomiędzy.} \textbf{To zamyka część II}: trzy pytania o jedną arytmetykę, odpowiedziane
   bez niczego poza arytmetyką, algebrą i sigmą.}
 \end{summarybox}
 

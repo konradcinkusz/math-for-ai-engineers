@@ -917,46 +917,46 @@ claim.
   (Program~\ref{prog:P18}), the update (Program~\ref{prog:P20}), the
   arithmetic (Program~\ref{prog:P01}), the step size
   (Program~\ref{prog:P17}) and the sample (Program~\ref{prog:P21}).}
-\sumitem{5--6}{The best step size on Program~\ref{prog:P17}'s bowl is
+\sumitem{5--6}{\result{The best step size on Program~\ref{prog:P17}'s bowl is
   $\val{p33.eta.best}$ and the fatal one is $\val{p33.eta.bound}$: a band
-  $\val{p33.eta.margin}$ per cent wide.}
-\sumitem{7--8}{A batch mean of a loss with per-example spread
+  $\val{p33.eta.margin}$ per cent wide}.}
+\sumitem{7--8}{\result{A batch mean of a loss with per-example spread
   $\val{p33.sigma.token}$ over $\val{p33.batch}$ examples has spread
-  $\val{p33.sigma.step}$.}
-\sumitem{9--11}{Of the six pieces, $\val{p33.loud}$ raise something and
+  $\val{p33.sigma.step}$}.}
+\sumitem{9--11}{\result{Of the six pieces, $\val{p33.loud}$ raise something and
   $\val{p33.silent}$ do not, because each of the four is a correct
-  computation of the wrong quantity.}
+  computation of the wrong quantity}.}
 \sumitem{12--14}{The four silent ones are detectable only from outside, and
   the instrument is a loss curve made of noisy numbers.}
-\sumitem{15--17}{A healthy run whose loss falls $\val{p33.improve}$ per step
+\sumitem{15--17}{\result{A healthy run whose loss falls $\val{p33.improve}$ per step
   shows no improvement over $\val{p33.watch}$ steps
-  $\val{p33.p.flat}$ per cent of the time.}
-\sumitem{18--21}{A flat stretch must last about $\val{p33.plateau.k}$ steps
+  $\val{p33.p.flat}$ per cent of the time}.}
+\sumitem{18--21}{\result{A flat stretch must last about $\val{p33.plateau.k}$ steps
   before a healthy run would produce it less than $\val{p33.alpha}$ of the
-  time.}
-\sumitem{22--23}{A $\val{p33.steps}$-step run contains about
+  time}.}
+\sumitem{22--23}{\result{A $\val{p33.steps}$-step run contains about
   $\val{p33.spike.expected}$ four-spread deviations whatever else is true of
-  it.}
-\sumitem{24--27}{Correcting for the run length, a spike must exceed
-  $\val{p33.spike.z}$ spreads to be surprising \dash{}
+  it}.}
+\sumitem{24--27}{\result{Correcting for the run length, a spike must exceed
+  $\val{p33.spike.z}$ spreads to be surprising} \dash{}
   Program~\ref{prog:P27}'s arithmetic with steps in place of models.}
-\sumitem{28--33}{An exponential moving average shows
+\sumitem{28--33}{\result{An exponential moving average shows
   $\sqrt{(1-\beta)/(1+\beta)}$ of the real spread:
   $\val{p33.smooth.pct}$ per cent at $\beta = \val{p33.beta}$ and a factor
-  of $\val{p33.smooth.dash.times}$ at $\val{p33.beta.dash}$.}
-\sumitem{34--37}{Divergence is the one shape needing no statistics:
+  of $\val{p33.smooth.dash.times}$ at $\val{p33.beta.dash}$}.}
+\sumitem{34--37}{\result{Divergence is the one shape needing no statistics:
   above $\eta = \val{p33.eta.bound}$ a factor larger than one is applied
-  every step.}
-\sumitem{40--43}{A pure power law fitted to a floor-plus-power-law truth
+  every step}.}
+\sumitem{40--43}{\result{A pure power law fitted to a floor-plus-power-law truth
   misses its own seven points by $\val{p33.fit.resid}$ per cent and returns
   an exponent of $\val{p33.fit.b}$ where the truth is
-  $\val{p33.fit.alpha}$.}
+  $\val{p33.fit.alpha}$}.}
 \sumitem{44--47}{The same fit is $\val{p33.out.err}$ per cent low
   $\val{p33.fit.decades}$ decades out, and predicts a loss below the
   irreducible floor at $10^{\val{p33.absurd.dec}}$.}
-\sumitem{48--50}{Its own reported uncertainty is built from residuals, so it is
+\sumitem{48--50}{\result{Its own reported uncertainty is built from residuals, so it is
   small exactly when the functional form is wrong, and the truth lies outside
-  its band.}
+  its band}.}
 \sumitem{51--54}{None of this has been checked against a real run's noise,
   which is heavier-tailed and drifts; the results above are a floor rather
   than an estimate.}

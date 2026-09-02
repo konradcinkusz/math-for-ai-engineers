@@ -933,42 +933,42 @@ would I know if it were wrong?}
 \end{fr}
 
 \begin{summarybox}
-\sumitem{2--3}{An evaluation set is a sample and a score is an estimator, so
+\sumitem{2--3}{\result{An evaluation set is a sample and a score is an estimator, so
   Program~\ref{prog:P26}'s two errors both apply: the sampling of items, and
-  the distance between the benchmark and your task.}
-\sumitem{4--6}{Only the first falls with the item count. Past about
+  the distance between the benchmark and your task}.}
+\sumitem{4--6}{\result{Only the first falls with the item count. Past about
   $\val{p34.mis.n}$ items the second is larger, and it is not in the
-  interval: more items buy precision and never buy validity.}
-\sumitem{11--12}{Re-weighting one fixed evaluation set by
+  interval: more items buy precision and never buy validity}.}
+\sumitem{11--12}{\result{Re-weighting one fixed evaluation set by
   $\val{p34.mix.shift}$ items out of $\val{p27.items}$ reverses the ordering
-  of its top two models, with neither model touched.}
-\sumitem{13--14}{One model's score ranges over $\val{p34.mix.swing}$ points
+  of its top two models, with neither model touched}.}
+\sumitem{13--14}{\result{One model's score ranges over $\val{p34.mix.swing}$ points
   across the possible mixes \dash{} $\val{p34.mix.swing.times}$ times the
-  difference Program~\ref{prog:P27} says would be meaningful.}
-\sumitem{17--18}{Precision goes as $1/\sqrt{n}$, so halving an interval is
+  difference Program~\ref{prog:P27} says would be meaningful}.}
+\sumitem{17--18}{\result{Precision goes as $1/\sqrt{n}$, so halving an interval is
   $\val{p34.halve.times}$ times the items, and stating one accuracy to a
-  point takes about $\val{p34.one.pt.n}$ of them.}
-\sumitem{21--22}{An imperfect judge reports $(a-b)$ times the true gap
+  point takes about $\val{p34.one.pt.n}$ of them}.}
+\sumitem{21--22}{\result{An imperfect judge reports $(a-b)$ times the true gap
   between any two models, exactly, and the constant does not depend on either
-  model's accuracy.}
-\sumitem{24--26}{That divides the usable item count by $(a-b)^{2}$, and a
-  judge's agreement figure does not determine $a-b$: at
+  model's accuracy}.}
+\sumitem{24--26}{\result{That divides the usable item count by $(a-b)^{2}$, and a
+  judge's agreement figure does not determine $a-b$}: at
   $\val{p34.judge.agree.pct}$ per cent it ranges from
   $\val{p34.judge.atten.lo}$ to $\val{p34.judge.atten.hi}$.}
-\sumitem{27--28}{Agreement pins the attenuation only at an accuracy of one
+\sumitem{27--28}{\result{Agreement pins the attenuation only at an accuracy of one
   half, and Program~\ref{prog:P28}'s correction to a judge's stated
-  probability leaves the attenuation untouched.}
-\sumitem{30--31}{Cost per task is price per token times tokens per task, so a
+  probability leaves the attenuation untouched}.}
+\sumitem{30--31}{\result{Cost per task is price per token times tokens per task, so a
   model $\val{p34.bill.price.times}$ times dearer per token can be
-  $\val{p34.bill.saving.pct}$ per cent cheaper to run.}
-\sumitem{33--34}{The cache is per token in flight, so the terser model also
-  serves $\val{p34.bill.conc.times}$ times as many conversations on one card.}
-\sumitem{37--39}{Bits per character measures the tokeniser when the
+  $\val{p34.bill.saving.pct}$ per cent cheaper to run}.}
+\sumitem{33--34}{\result{The cache is per token in flight, so the terser model also
+  serves $\val{p34.bill.conc.times}$ times as many conversations on one card}.}
+\sumitem{37--39}{\result{Bits per character measures the tokeniser when the
   tokenisers differ, and the plug-in mutual information is positive on
-  independent data \dash{} $\val{p31.bias.n50}$ nats at $50$ items.}
-\sumitem{41--42}{A probe's score is a loose lower bound, so a weak probe is
+  independent data} \dash{} $\val{p31.bias.n50}$ nats at $50$ items.}
+\sumitem{41--42}{\result{A probe's score is a loose lower bound, so a weak probe is
   not evidence of little information and a better one is not evidence of
-  more.}
+  more}.}
 \sumitem{44--47}{Program~\ref{prog:P17}'s sharpness claim needs trained
   models and is stated as outstanding; this program's own three findings need
   none, because each is a statement about a design.}

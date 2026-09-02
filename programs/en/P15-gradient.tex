@@ -757,64 +757,64 @@ Trust the algebra here and distrust the mental image, in that order.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{A partial derivative holds every other input still}
+\sumitem{1--2}{\result{\textbf{A partial derivative holds every other input still}
   and is then an ordinary one-variable derivative, so every rule from
-  Program~\ref{prog:F12} applies unchanged.}
-\sumitem{3--5}{For $f = x^{2}y + 3y$ the partials are $2xy$ and $x^{2}+3$.
+  Program~\ref{prog:F12} applies unchanged}.}
+\sumitem{3--5}{\result{For $f = x^{2}y + 3y$ the partials are $2xy$ and $x^{2}+3$.
   \textbf{Holding an input still does not remove it from the answer} \dash{}
-  a partial derivative is still a function of everything.}
-\sumitem{6--7}{At $(\val{p15.pt.x}, \val{p15.pt.y})$ they are
+  a partial derivative is still a function of everything}.}
+\sumitem{6--7}{\result{At $(\val{p15.pt.x}, \val{p15.pt.y})$ they are
   $\val{p15.fx.at}$ and $\val{p15.fy.at}$, checked against a central
-  difference over a grid to better than $\val{p15.partial.bound}$.}
-\sumitem{8--9}{\textbf{The gradient is the partials written as a vector},
+  difference over a grid to better than $\val{p15.partial.bound}$}.}
+\sumitem{8--9}{\result{\textbf{The gradient is the partials written as a vector},
   $\nabla f$, with a length as well as a direction \dash{} here
-  $\val{p15.grad.len}$.}
-\sumitem{9}{\textbf{The word does two jobs.} Programs F06 and F11 use
+  $\val{p15.grad.len}$}.}
+\sumitem{9}{\result{\textbf{The word does two jobs.} Programs F06 and F11 use
   \enquote{gradient} for the slope of a line, a single number; here it is a
-  vector with one component per input.}
-\sumitem{10--11}{It is written as a vector \textbf{so that it can be dotted
-  with one}, which is where the rest of the program comes from.}
-\sumitem{12--13}{At a minimum the gradient is the zero vector, and
+  vector with one component per input}.}
+\sumitem{10--11}{\result{It is written as a vector \textbf{so that it can be dotted
+  with one}, which is where the rest of the program comes from}.}
+\sumitem{12--13}{\result{At a minimum the gradient is the zero vector, and
   \textbf{the converse fails} \dash{} a saddle has a zero gradient too, and
-  telling them apart is Program~\ref{prog:P17}'s.}
-\sumitem{14--17}{\textbf{The rate of change along a unit direction $u$ is
+  telling them apart is Program~\ref{prog:P17}'s}.}
+\sumitem{14--17}{\result{\textbf{The rate of change along a unit direction $u$ is
   $\nabla f \cdot u$}, which is Program~\ref{prog:F11}'s limit taken along a
   line. Checked against that limit over $\val{p15.dir.steps}$ directions to
-  better than $\val{p15.dir.bound}$.}
-\sumitem{20--21}{With Program~\ref{prog:P05}'s cosine,
+  better than $\val{p15.dir.bound}$}.}
+\sumitem{20--21}{\result{With Program~\ref{prog:P05}'s cosine,
   $D_u f = \lVert\nabla f\rVert\cos\theta$, so \textbf{the steepest direction
   is the gradient's own and the fastest rate is its length}. Derived, not
-  asserted.}
-\sumitem{23--24}{At $\cos\theta = 0$ the rate is zero, so \textbf{the
+  asserted}.}
+\sumitem{23--24}{\result{At $\cos\theta = 0$ the rate is zero, so \textbf{the
   gradient is perpendicular to the contour} \dash{} the same equation read at
-  its other end, exactly zero over $\val{p15.perp.trials}$ rational cases.}
+  its other end, exactly zero over $\val{p15.perp.trials}$ rational cases}.}
 \sumitem{25--26}{The perpendicularity is checked \textbf{exactly over the
   rationals}, with no tolerance anywhere, because a claim containing the word
   \emph{perpendicular} is a claim about an exact zero.}
-\sumitem{27--28}{\textbf{Perpendicular to the contour is not the same as
+\sumitem{27--28}{\result{\textbf{Perpendicular to the contour is not the same as
   pointing at the minimum}, unless the contours are circles. One is local and
-  one is global.}
-\sumitem{29--30}{The walk is Program~\ref{prog:F11}'s with a vector
+  one is global}.}
+\sumitem{29--30}{\result{The walk is Program~\ref{prog:F11}'s with a vector
   derivative, and the minus sign now has a stronger reason: the gradient is
-  steepest \emph{increase}.}
-\sumitem{30}{\textbf{The sign is the commonest error in a hand-written
+  steepest \emph{increase}}.}
+\sumitem{30}{\result{\textbf{The sign is the commonest error in a hand-written
   loop.} One step the right way takes $\val{p15.sign.before}$ to
   $\val{p15.sign.down}$; one step the wrong way takes it to
-  $\val{p15.sign.up}$, with no error raised.}
-\sumitem{31--32}{On Program~\ref{prog:P10}'s bowl, eigenvalues
+  $\val{p15.sign.up}$, with no error raised}.}
+\sumitem{31--32}{\result{On Program~\ref{prog:P10}'s bowl, eigenvalues
   $\val{p15.lam.hi}$ and $\val{p15.lam.lo}$, the negative gradient points
   $\val{p15.zig.angle}$ degrees away from the minimum. On a round bowl it
-  points exactly at it.}
-\sumitem{33--34}{The walk crosses the valley $\val{p15.zig.crossings}$ times
+  points exactly at it}.}
+\sumitem{33--34}{\result{The walk crosses the valley $\val{p15.zig.crossings}$ times
   in $\val{p15.zig.steps}$ steps and \textbf{travels $\val{p15.zig.ratio}$
-  times as far as it moves}.}
-\sumitem{35--36}{Each coordinate is multiplied by $1 - \eta\lambda$: the
+  times as far as it moves}}.}
+\sumitem{35--36}{\result{Each coordinate is multiplied by $1 - \eta\lambda$: the
   factor is $\val{p15.fac.hi}$ in the steep direction, which flips its sign
   every step, and $\val{p15.fac.lo}$ in the shallow one, which creeps.
-  \textbf{One step size has to serve both.}}
-\sumitem{37--38}{\textbf{Not one step of the argument used the fact that
+  \textbf{One step size has to serve both.}}}
+\sumitem{37--38}{\result{\textbf{Not one step of the argument used the fact that
   there were two inputs.} The picture is an illustration of the dot product
-  and never a premise of it.}
+  and never a premise of it}.}
 \end{summarybox}
 
 \canyou

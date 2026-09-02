@@ -815,79 +815,79 @@ power with a positive exponent preserves order.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{$e$ is a number, and it is where compounding stops.}
+\sumitem{1--3}{\result{\textbf{$e$ is a number, and it is where compounding stops.}
   $\left(1 + \frac{1}{n}\right)^{n}$ climbs from $2$ towards
   $\val{f07.e}\ldots$ and never passes it. $e^{x}$ obeys every index law of
-  Program~\ref{prog:F01}, and $e^{0} = 1$.}
-\sumitem{4}{$e$ is not the base that grows fastest \dash{} $3^{x}$ beats it.
+  Program~\ref{prog:F01}, and $e^{0} = 1$}.}
+\sumitem{4}{\result{$e$ is not the base that grows fastest \dash{} $3^{x}$ beats it.
   What is special is that \textbf{the steepness of $e^{x}$ equals its height},
   which this program states and Programs~\ref{prog:F11} and~\ref{prog:F12}
-  prove.}
-\sumitem{4--6}{\textbf{\enquote{Exponential} is a claim about the mechanism,
+  prove}.}
+\sumitem{4--6}{\result{\textbf{\enquote{Exponential} is a claim about the mechanism,
   not the speed.} At $x = 5$, $x^{5}$ is $\val{f07.poly.at5.ratio}$ times
   larger than $e^{x}$, and the exponential does not overtake until
   $x = \val{f07.poly.crossover}$. Adding a fixed amount to the input
-  multiplies an exponential by a fixed amount; that is the whole of it.}
-\sumitem{7--8}{$y_0 e^{kt}$ grows for $k > 0$ and decays for $k < 0$. The
+  multiplies an exponential by a fixed amount; that is the whole of it}.}
+\sumitem{7--8}{\result{$y_0 e^{kt}$ grows for $k > 0$ and decays for $k < 0$. The
   half-life is $\frac{\ln 2}{k}$, which is $\val{f07.decay.halflife}$ steps at
   $k = \num{0.05}$, and \textbf{it does not depend on where the quantity
-  started}.}
-\sumitem{9--10}{\textbf{Reaching a tenth takes
+  started}}.}
+\sumitem{9--10}{\result{\textbf{Reaching a tenth takes
   $\val{f07.decay.tenth.halflives}$ half-lives}, not ten and not five, because
   $m$ halvings divide by $2^{m}$ and you want $2^{m} = 10$. It is
-  Program~\ref{prog:F01}'s $2^{10} \approx 10^{3}$ read the other way.}
-\sumitem{11--12}{A per-step multiplier $\gamma$ is a rate $k = -\ln\gamma$.
+  Program~\ref{prog:F01}'s $2^{10} \approx 10^{3}$ read the other way}.}
+\sumitem{11--12}{\result{A per-step multiplier $\gamma$ is a rate $k = -\ln\gamma$.
   Near $\gamma = 1$ the two nearly agree, which is why they are confused; at
-  $\gamma = \num{0.5}$ they do not, since $-\ln(\num{0.5}) = \num{0.693}$.}
-\sumitem{13--14}{\textbf{The logistic comes from odds.} If the odds are
+  $\gamma = \num{0.5}$ they do not, since $-\ln(\num{0.5}) = \num{0.693}$}.}
+\sumitem{13--14}{\result{\textbf{The logistic comes from odds.} If the odds are
   $e^{x}$ to one then the probability is $\frac{e^{x}}{1+e^{x}}$, which is
   $\frac{1}{1+e^{-x}}$ after dividing through by $e^{x}$. Both forms are in
-  use.}
-\sumitem{15--16}{It approaches $1$ and $0$ and reaches neither, because
+  use}.}
+\sumitem{15--16}{\result{It approaches $1$ and $0$ and reaches neither, because
   $e^{-x}$ is never zero and never infinite. $\sigma(-x) = 1 - \sigma(x)$
   because negating $x$ swaps which outcome the odds are quoted on. $x$ is a
   log-odds, $e^{x}$ is odds, $\sigma(x)$ is a probability: one object, three
-  readings.}
-\sumitem{17--18}{The steepness is largest at the centre, where it is exactly
+  readings}.}
+\sumitem{17--18}{\result{The steepness is largest at the centre, where it is exactly
   $\val{f07.slope.0}$, and falls to $\val{f07.slope.6}$ six units out \dash{}
   about one part in $\val{f07.slope.ratio6}$. \textbf{A unit is most
-  responsive exactly when it is least certain.}}
-\sumitem{19--20}{\textbf{$\tanh x = 2\sigma(2x) - 1$}, checked to
+  responsive exactly when it is least certain.}}}
+\sumitem{19--20}{\result{\textbf{$\tanh x = 2\sigma(2x) - 1$}, checked to
   $\val{f07.tanh.identity.err}$. It is the logistic squashed horizontally,
   stretched vertically and slid down \dash{} three of
   Program~\ref{prog:F05}'s moves \dash{} so it is not a second function to
-  learn.}
-\sumitem{21--22}{\textbf{$\tanh$ saturates harder, not more gently.} Its
+  learn}.}
+\sumitem{21--22}{\result{\textbf{$\tanh$ saturates harder, not more gently.} Its
   steepness runs $\val{f07.tanh.slope0}$ to $\val{f07.tanh.slope2}$ over two
   units against the logistic's $\val{f07.slope.0}$ to $\val{f07.slope.2}$, and
   that follows from the identity: two squashes make it four times as steep at
-  the centre. The case for it was always that it is centred on zero.}
-\sumitem{23--24}{A saturated unit is quiet rather than broken: it answers a
+  the centre. The case for it was always that it is centred on zero}.}
+\sumitem{23--24}{\result{A saturated unit is quiet rather than broken: it answers a
   change in its input with about a $\val{f07.slope.ratio6}$th of the response
   it would give at the centre. \textbf{This is not yet the vanishing-gradient
   problem} \dash{} one such factor is survivable and the product of forty is
-  not, and the multiplying is Program~\ref{prog:F12}'s.}
-\sumitem{25--26}{$\relu$ has no flat part on its positive side at all, so
+  not, and the multiplying is Program~\ref{prog:F12}'s}.}
+\sumitem{25--26}{\result{$\relu$ has no flat part on its positive side at all, so
   there is nothing there to compound; below zero it is flat entirely, which is
   a harder version of the problem rather than an escape. And saturation is no
   argument against a logistic at an \emph{output}, where the flatness is what
-  keeps a probability inside its range.}
-\sumitem{27--28}{$\softmax(z)_j = \frac{e^{z_j}}{\sum_k e^{z_k}}$:
+  keeps a probability inside its range}.}
+\sumitem{27--28}{\result{$\softmax(z)_j = \frac{e^{z_j}}{\sum_k e^{z_k}}$:
   exponentiate, add up, divide by the total. On
   $z = (\num{2.0}, \num{0.5})$ it gives
-  $(\val{f07.softmax2.a},\ \val{f07.softmax2.b})$.}
-\sumitem{29}{\textbf{On two scores softmax is the logistic of their
+  $(\val{f07.softmax2.a},\ \val{f07.softmax2.b})$}.}
+\sumitem{29}{\result{\textbf{On two scores softmax is the logistic of their
   difference}, $\frac{e^{a}}{e^{a}+e^{b}} = \sigma(a-b)$, checked to
   $\val{f07.softmax2.err}$. So one logistic output and a two-way softmax are
-  the same model.}
-\sumitem{30}{\textbf{Subtracting the largest score from every score changes
+  the same model}.}
+\sumitem{30}{\result{\textbf{Subtracting the largest score from every score changes
   nothing}, because the common factor cancels above and below \dash{} and it
   is what stops the exponentials overflowing. It is an identity, not an
-  approximation.}
-\sumitem{31}{Softmax cannot move the $\argmax$, by
+  approximation}.}
+\sumitem{31}{\result{Softmax cannot move the $\argmax$, by
   Program~\ref{prog:F05}'s result. Dividing the scores by a temperature scales
   every log-odds by $\frac{1}{T}$, so it raises every odds ratio to a power
-  \dash{} which is why the ordering survives and the gaps do not.}
+  \dash{} which is why the ordering survives and the gaps do not}.}
 \end{summarybox}
 
 \canyou

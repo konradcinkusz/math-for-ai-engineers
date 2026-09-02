@@ -608,11 +608,12 @@ Appendices:
 1. **One volume or two — still open, and the estimate it rested on is now
    measured and was wrong by a factor of about three.** The figure recorded
    here was 460--540 pages for ~2,418 frames, which is 0.21 pages a frame.
-   **Measured, August 2026: 1,863 teaching frames set 1,321 pages in the trade
-   format**, which is 0.71 — and that is with four appendices still to write.
-   (It was 1,757 frames in 1,267 pages when first taken, before P33, and 1,811
-   in 1,295 after it; the ratio has not moved across three re-measurements,
-   and every program is now written, so it will not move again.)
+   **Measured, September 2026: 1,863 teaching frames set 1,383 pages in the
+   trade format**, which is 0.74 — and that is with three appendices still to
+   write. (It was 1,757 frames in 1,267 pages when first taken, before P33,
+   1,811 in 1,295 after it, and 1,321 before Appendix C. Every program is
+   written, so the programs' own 1,212 pages will not move again; what is
+   still open is the back matter, and Appendix C alone cost 62 pages of it.)
 
    The estimate is not mysteriously wrong. It was made before the Stroud layout
    pass existed, so a *frame* in it was a paragraph. A frame as built is a rule
@@ -630,7 +631,7 @@ Appendices:
    | front matter + Part I (F1--F13) | 1--388 | 388 |
    | Parts II--VI (P1--P22) | 389--882 | 494 |
    | Parts VII--IX (P23--P34) | 883--1212 | 330 |
-   | back matter (appendices, answers, index) | 1213--1321 | 109 |
+   | back matter (appendices, answers, index) | 1213--1383 | 171 |
 
    So the proposed cut gives an 882-page first volume before any back matter,
    which does not settle it: at this geometry the book is nearer three volumes

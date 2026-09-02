@@ -691,47 +691,47 @@ zakładać i zaczyna budować.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Reguła potęgowa}:
+\sumitem{1--3}{\result{\textbf{Reguła potęgowa}:
   $\frac{\mathrm{d}}{\mathrm{d}x}x^{n} = nx^{n-1}$, dla każdego $n$, w tym
   ujemnego i ułamkowego. Zawiera wszystkie trzy wyniki
   Programu~\ref{prog:F11} jako przypadki szczególne, a nawykiem, który każe
   jej wykonać całą pracę, jest \textbf{sprowadzenie wszystkiego najpierw do
-  postaci $x^{n}$}.}
-\sumitem{4--6}{$(cf)' = cf'$ oraz $(f+g)' = f' + g'$. Każda reguła w tym
+  postaci $x^{n}$}}.}
+\sumitem{4--6}{\result{$(cf)' = cf'$ oraz $(f+g)' = f' + g'$. Każda reguła w tym
   programie jest sprawdzona wobec pochodnej policzonej \emph{bez} niej,
   różnicą centralną przy $h = 10^{-5}$ \dash{} i po to właśnie różnica
   skończona jest, czyli krzywa U z Programu~\ref{prog:F11} zaprzęgnięta do
-  pracy, a nie tylko przestrzegająca.}
-\sumitem{7--8}{\textbf{Różniczkowanie nie rozdziela się na iloczyn.} Na
+  pracy, a nie tylko przestrzegająca}.}
+\sumitem{7--8}{\result{\textbf{Różniczkowanie nie rozdziela się na iloczyn.} Na
   $x^{2}$ i $x^{3}$ w $x = \val{f12.trap.x}$ prawdą jest
   $\val{f12.trap.right}$, a pierwszy odruch daje $\val{f12.trap.wrong}$, a oba
   wyrażenia zgadzają się w dokładnie $\val{f12.trap.agree}$ punktach całego
   przebiegu. Ten sam kształt co $(a+b)^{2}$ z F02 i dodawanie długości z F09:
-  reguła przeniesiona o krok poza swoje założenia.}
-\sumitem{9--13}{\textbf{$(fg)' = f'g + fg'$}, bo gdy $x$ się przesuwa,
+  reguła przeniesiona o krok poza swoje założenia}.}
+\sumitem{9--13}{\result{\textbf{$(fg)' = f'g + fg'$}, bo gdy $x$ się przesuwa,
   przesuwają się \emph{oba} czynniki i iloczyn zmienia się z powodu każdego z
   nich; oraz $\left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}$, którego
   minus jest tam, bo podniesienie mianownika obniża całość. Gdy iloczyn da się
   też rozwinąć, obie drogi muszą się zgodzić \dash{} darmowe sprawdzenie warte
-  zamienienia w nawyk.}
-\sumitem{14--16}{\textbf{Reguła łańcuchowa: $\bigl(f(g(x))\bigr)' =
+  zamienienia w nawyk}.}
+\sumitem{14--16}{\result{\textbf{Reguła łańcuchowa: $\bigl(f(g(x))\bigr)' =
   f'(g(x)) \cdot g'(x)$.} Tempa się mnożą, jak koła zębate w zazębieniu, a
   pochodna zewnętrzna liczy się w \emph{wartości tej wewnętrznej}, i to jest
-  ta część, którą się gubi.}
-\sumitem{17--18}{\textbf{$\sigma'(z) = \sigma(z)(1-\sigma(z))$}, sprawdzone do
+  ta część, którą się gubi}.}
+\sumitem{17--18}{\result{\textbf{$\sigma'(z) = \sigma(z)(1-\sigma(z))$}, sprawdzone do
   $\val{f12.err.sigmoid}$. Pochodna da się wyrazić przez samą funkcję, i
   dlatego framework potrafi policzyć gradient warstwy logistycznej z wartości,
   którą już zapisał, idąc w przód \dash{} zalążek tego, co
-  Program~\ref{prog:P16} nazywa trybem wstecznym.}
-\sumitem{19--20}{\textbf{$\sigma' \le \val{f12.sig.max}$ wszędzie}, w
+  Program~\ref{prog:P16} nazywa trybem wstecznym}.}
+\sumitem{19--20}{\result{\textbf{$\sigma' \le \val{f12.sig.max}$ wszędzie}, w
   $z = 0$, bo $\sigma(1-\sigma)$ to iloczyn dwóch liczb sumujących się do
   jedynki. A wkład jednej jednostki to $w\,\sigma(wx+b)(1-\sigma(wx+b))$: $w$,
   bo warstwa skaluje, $\sigma(1-\sigma)$, bo zagina, i \emph{żadnego $b$}, bo
-  obciążenie przesuwa miejsce zagięcia, a nie to, jak mocno się zagina.}
-\sumitem{21--23}{Pochodna sieci o $n$ warstwach po jej wejściu to
+  obciążenie przesuwa miejsce zagięcia, a nie to, jak mocno się zagina}.}
+\sumitem{21--23}{\result{Pochodna sieci o $n$ warstwach po jej wejściu to
   $\prod_{k=1}^{n} w_k\,\sigma'(z_k)$ \dash{} \textbf{po jednym czynniku na
-  warstwę, wymnożone razem}, każdy policzony we własnym wejściu tej warstwy.}
-\sumitem{24--25}{\textbf{Propagacja wsteczna to reguła łańcuchowa zastosowana
+  warstwę, wymnożone razem}, każdy policzony we własnym wejściu tej warstwy}.}
+\sumitem{24--25}{\result{\textbf{Propagacja wsteczna to reguła łańcuchowa zastosowana
   do złożenia warstw, z wartościami pośrednimi zapamiętanymi, a nie liczonymi
   od nowa.} Nie ma w niej nic więcej, a \enquote{wstecz} nazywa kierunek, w
   którym akumuluje się mnożenie. Dwa wnioski: aktywacje trzeba przechowywać,
@@ -739,23 +739,23 @@ zakładać i zaczyna budować.
   zawiera każdy czynnik między nią a stratą, więc nic w trenowaniu jednej
   warstwy nie jest dla niej lokalne. Wersja wektorowa, gdzie każdy czynnik
   jest jakobianem, a kolejność mnożenia rozstrzyga koszt, należy do
-  Programu~\ref{prog:P16}.}
-\sumitem{26--27}{\textbf{$\val{f12.depth}$ warstw w najlepszym razie daje
+  Programu~\ref{prog:P16}}.}
+\sumitem{26--27}{\result{\textbf{$\val{f12.depth}$ warstw w najlepszym razie daje
   $\val{f12.sig.max}^{\val{f12.depth}} = \val{f12.vanish.bound}$}, a żadna
   wytrenowana sieć nie siedzi w swoim najlepszym razie. Postaw jednostki tam,
   gdzie Program~\ref{prog:F07} zmierzył nasycenie \dash{}
   $\val{f12.sat.factor}$, czyli $\val{f12.sat.ratio}$-ta część odpowiedzi ze
   środka, a ten program przelicza tę wartość od zera i asertuje zgodność z
   F07 \dash{} a iloczyn wynosi $\val{f12.sat.bound}$, co znika do dokładnie
-  zera na długo przed czterdziestą warstwą.}
-\sumitem{28--29}{\textbf{Łańcuch logistyczny nie może wzmacniać, chyba że
+  zera na długo przed czterdziestą warstwą}.}
+\sumitem{28--29}{\result{\textbf{Łańcuch logistyczny nie może wzmacniać, chyba że
   $\lvert w \rvert > \val{f12.explode.w}$}, bo czynnikiem jest
   $w\sigma' \le \frac{w}{4}$. Oba tryby porażki nie są symetryczne: zanikanie
   potrzebuje tylko głębokości, eksplozja konkretnej wagi. Przy
   $w = \val{f12.explode.big.w}$ czynnik wynosi
   $\val{f12.explode.big.factor}$, a $\val{f12.depth}$ warstw mnoży przez
-  $\val{f12.explode.big.depth}$.}
-\sumitem{30--31}{Ograniczenie i iloczyn są dokładne; \textbf{to, że każda
+  $\val{f12.explode.big.depth}$}.}
+\sumitem{30--31}{\result{Ograniczenie i iloczyn są dokładne; \textbf{to, że każda
   warstwa jest logistyczna w zwykłym łańcuchu, jest wyborem modelowym}.
   $\relu$ wnosi czynnik $1$ po swojej dodatniej stronie, połączenie
   rezydualne dodaje drogę z samych $1$ (Program~\ref{prog:P32}), a
@@ -764,7 +764,7 @@ zakładać i zaczyna budować.
   gradienty} nie jest, a każdą z tych trzech zmian przyjęto po części dlatego,
   że przestaje nim być. Cztery reguły są księgowością; piąta wyprodukowała
   propagację wsteczną i oba jej tryby porażki, bo złożenie jest tym, czym
-  sieć jest.}
+  sieć jest}.}
 \end{summarybox}
 
 \canyou

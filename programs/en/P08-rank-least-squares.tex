@@ -664,65 +664,65 @@ space does, in one number that is zero exactly when something was destroyed
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{The column space is everything $A$ can reach} \dash{}
+\sumitem{1--3}{\result{\textbf{The column space is everything $A$ can reach} \dash{}
   the span of its columns, because $Ax$ is a combination of them with $x$ as
   the coefficients. Four subspaces come with a matrix: column space, row space,
   null space and left null space, two about what comes out and two about what
-  goes in.}
-\sumitem{4--6}{\textbf{Rank plus nullity is the number of COLUMNS}, not the
+  goes in}.}
+\sumitem{4--6}{\result{\textbf{Rank plus nullity is the number of COLUMNS}, not the
   size of the matrix: every input either survives into the column space or is
   sent to zero. So a wide matrix must discard something and a tall one cannot
-  reach everything, both readable off the shape before an entry is chosen.}
-\sumitem{7--8}{A bottleneck layer is that fact rather than a training effect:
+  reach everything, both readable off the shape before an entry is chosen}.}
+\sumitem{7--8}{\result{A bottleneck layer is that fact rather than a training effect:
   \textbf{choosing a width is choosing how much to throw away}, and training
   only chooses which directions go. And a tall $A$ makes $Ax = b$ unsolvable
-  for most $b$, which is every fitting problem there is.}
-\sumitem{9--12}{\textbf{The column space and the row space always have the same
+  for most $b$, which is every fitting problem there is}.}
+\sumitem{9--12}{\result{\textbf{The column space and the row space always have the same
   dimension}, though they are different sets in rooms of different sizes. That
   shared number is the \emph{rank}, checked on $\val{p08.rank.trials}$
   matrices exactly \dash{} where, as in Program~\ref{prog:P04}, the draws are
   testing the code, because a search that succeeded would have refuted a
-  proof.}
-\sumitem{12--14}{$\operatorname{rank}(A) \le \min(\text{rows}, \text{columns})$,
+  proof}.}
+\sumitem{12--14}{\result{$\operatorname{rank}(A) \le \min(\text{rows}, \text{columns})$,
   so \textbf{the rank is a number smaller than the shape and the gap is how
   much of the shape does nothing}. Program~\ref{prog:P07}'s \emph{rank} is the
   number of axes and is unrelated; this book writes \emph{number of axes} for
-  that one.}
-\sumitem{15--17}{A right-hand side that \textbf{raises the rank when added as a
+  that one}.}
+\sumitem{15--17}{\result{A right-hand side that \textbf{raises the rank when added as a
   column} is one the columns cannot build, which is what \enquote{no solution}
   means without attempting one. The move is then to change the question:
   the closest point of the column space, which Program~\ref{prog:P05} already
-  derived for a line and said would generalise.}
-\sumitem{18--20}{\textbf{The residual of the best fit is perpendicular to every
+  derived for a line and said would generalise}.}
+\sumitem{18--20}{\result{\textbf{The residual of the best fit is perpendicular to every
   column of $A$}, and that is the whole of least squares \dash{} if it leaned
   on a column you could move along that column and get closer. Worked exactly:
   $y = \val{p08.ls.slope}x + \val{p08.ls.intercept}$, residuals
   $-\frac{1}{2}$, $1$, $-\frac{1}{2}$, both dot products zero, sum of squares
-  $\val{p08.ls.sse}$.}
-\sumitem{21}{The normal equations $A\T A\,\hat{x} = A\T b$ are those dot
+  $\val{p08.ls.sse}$}.}
+\sumitem{21}{\result{The normal equations $A\T A\,\hat{x} = A\T b$ are those dot
   products written once, which is linear regression's closed form.
   \textbf{The fit can only land in the column space}, so a relationship outside
   it will show in the residual rather than the coefficients \dash{} and
   Program~\ref{prog:P11} owns why forming $A\T A$ is the wrong way to solve it
-  on a machine.}
-\sumitem{22--24}{Writing an update as $BA$ with $r$ between the factors caps
+  on a machine}.}
+\sumitem{22--24}{\result{Writing an update as $BA$ with $r$ between the factors caps
   its rank at $r$. At $\val{p08.lora.d}$ wide and $r = \val{p08.lora.r}$ that
   is $\val{p08.lora.lowrank}$ parameters against $\val{p08.lora.dense}$, a
   factor of $\val{p08.lora.factor}$ and $\val{p08.lora.pct}\%$ \dash{} and the
-  ratio is $2r/d$, which depends on nothing about the model.}
-\sumitem{25--29}{\textbf{The saving stops at $r = \val{p08.lora.cross}$}, half
+  ratio is $2r/d$, which depends on nothing about the model}.}
+\sumitem{25--29}{\result{\textbf{The saving stops at $r = \val{p08.lora.cross}$}, half
   the width, above which the adapter costs more than the dense update while
   still constraining it. And the constraint is an \textbf{assumption} \dash{}
   that the needed change lies in a few directions \dash{} which
-  Program~\ref{prog:P11} can test and this program cannot.}
-\sumitem{30--32}{\textbf{Rank is lost forwards only.} A product cannot exceed
+  Program~\ref{prog:P11} can test and this program cannot}.}
+\sumitem{30--32}{\result{\textbf{Rank is lost forwards only.} A product cannot exceed
   either factor's rank, so a rank-$\val{p08.chain.r}$ bottleneck survives
   $\val{p08.chain.len}$ full-rank factors stacked on top. Two inputs sent to
   one place arrive everywhere later as one vector, and a function cannot return
-  two answers for one argument.}
-\sumitem{32--34}{Program~\ref{prog:P06}'s collapse and this one are mirror
+  two answers for one argument}.}
+\sumitem{32--34}{\result{Program~\ref{prog:P06}'s collapse and this one are mirror
   images: there depth without a non-linearity was \textbf{waste} and had a fix;
-  here a narrow layer is \textbf{loss} and has none. Rank collapse in deep
+  here a narrow layer is \textbf{loss} and has none.} Rank collapse in deep
   attention stacks is a different and unmeasured claim, and this book says so.}
 \end{summarybox}
 

@@ -960,76 +960,76 @@ rozkład na to, czego nie jesteś pewien, a nie na dane, które już masz.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Czytaj wynik najpierw wobec jego własnego mianownika.}
+\sumitem{1--3}{\result{\textbf{Czytaj wynik najpierw wobec jego własnego mianownika.}
   Wynik $k$ zaliczonych z $n$ leży na siatce o oczku $100/n$ punktu, więc
   $\val{p27.quoted.hi}$ procent na $\val{p27.items}$ pozycjach to
   $\val{p27.k.hi}$ pozycji i jest nieosiągalne. Dokładność z jednym miejscem
   po przecinku wymaga ponad $\val{p27.decimal.floor}$ pozycji, zanim to
-  miejsce się zaokrągli.}
-\sumitem{3--5}{\textbf{Opublikowana różnica to $\val{p27.gap.items}$ pozycja.}
+  miejsce się zaokrągli}.}
+\sumitem{3--5}{\result{\textbf{Opublikowana różnica to $\val{p27.gap.items}$ pozycja.}
   $\val{p27.gap.pts}$ punktu z $\val{p27.items}$ pozycji, wobec przedziału
   $\pm\val{p27.hw.200}$ punktu \dash{} ponad
-  $\val{p27.hw.ratio.floor}$ razy większego od różnicy.}
-\sumitem{6}{Porównywanie dwóch osobnych przedziałów po tym, czy się nakładają,
+  $\val{p27.hw.ratio.floor}$ razy większego od różnicy}.}
+\sumitem{6}{\result{Porównywanie dwóch osobnych przedziałów po tym, czy się nakładają,
   nie jest testem. Buduj przedział na różnicy, czyli na wielkości, o którą
-  pytasz.}
-\sumitem{7--9}{\textbf{Bootstrap} losuje z próbki ze zwracaniem i nie
+  pytasz}.}
+\sumitem{7--9}{\result{\textbf{Bootstrap} losuje z próbki ze zwracaniem i nie
   potrzebuje wzoru dla żadnej metryki. Na proporcji jego rozkład jest
   \emph{dokładnie} dwumianowy, więc zgadza się ze wzorem z
   Programu~\ref{prog:P25} co do jednej pozycji z konstrukcji, a nie
-  przypadkiem.}
-\sumitem{10--11}{Jego zastosowaniem jest przypadek bez wzoru \dash{} mediana,
+  przypadkiem}.}
+\sumitem{10--11}{\result{Jego zastosowaniem jest przypadek bez wzoru \dash{} mediana,
   której przedział $\intcc{\val{p27.med.lo}}{\val{p27.med.hi}}$ ma końce
   będące pomiarami, które ktoś wykonał. Nie wymyśli pozycji, których nie
-  ewaluowałeś, i najgorzej radzi sobie ze skrajnościami.}
-\sumitem{12--14}{\textbf{Jednostka losowania to decyzja, której nic nie
+  ewaluowałeś, i najgorzej radzi sobie ze skrajnościami}.}
+\sumitem{12--14}{\result{\textbf{Jednostka losowania to decyzja, której nic nie
   sprawdza.} $\val{p27.clust.n}$ wierszy od $\val{p27.clust.users}$
   użytkowników to nie $\val{p27.clust.n}$ obserwacji, a bootstrap po wierszach
   podaje przedział za wąski o $\val{p27.clust.factor}$. Więcej losowań nigdy
-  nie zwęża przedziału; robią to tylko pozycje.}
-\sumitem{15--17}{\textbf{Parowanie mnoży potrzebne pozycje przez
+  nie zwęża przedziału; robią to tylko pozycje}.}
+\sumitem{15--17}{\result{\textbf{Parowanie mnoży potrzebne pozycje przez
   $1-\rho$}, dokładnie, przy każdej dokładności i każdej różnicy.
   Program~\ref{prog:P25} podaje $\val{p27.n.rho00}$, co staje się
   $\val{p27.n.rho90}$ przy $\rho = \num{0.9}$ \dash{} rząd wielkości, z wyrazu
-  kowariancji w $\Var(X-Y)$.}
-\sumitem{18--19}{\textbf{Różnicę niosą tylko pozycje niezgodne.} Te
+  kowariancji w $\Var(X-Y)$}.}
+\sumitem{18--19}{\result{\textbf{Różnicę niosą tylko pozycje niezgodne.} Te
   $\val{p27.concord}$ pozycji, na których oba modele odpowiedziały tak samo,
   skracają się dokładnie, a porównanie dotyczy w całości
-  $\val{p27.disc}$ pozostałych.}
-\sumitem{19--20}{Przy \enquote{równie dobre} te pozycje są uczciwymi rzutami
+  $\val{p27.disc}$ pozostałych}.}
+\sumitem{19--20}{\result{Przy \enquote{równie dobre} te pozycje są uczciwymi rzutami
   monetą, więc testem jest symbol Newtona z Programu~\ref{prog:P12} na
   liczbach całkowitych \dash{} dokładny, niezależny od maszyny i niepotrzebujący
   wariancji. \textbf{Przerobiona różnica daje $\val{p27.p.exact}$}: nieparzysta
   liczba nie wypada po równo, więc zaobserwowana przewaga
   $\val{p27.net}$ jest najmniejszą dostępną, a wynik co najmniej tak
-  przechylony jest pewny.}
-\sumitem{21}{\textbf{Na tej ewaluacji różnica poniżej
+  przechylony jest pewny}.}
+\sumitem{21}{\result{\textbf{Na tej ewaluacji różnica poniżej
   $\val{p27.net.needed.pts}$ punktu nie jest wynikiem}, znalezione przez
-  szukanie. Opublikowana różnica to $\val{p27.gap.pts}$ punktu.}
-\sumitem{23--25}{\textbf{P-wartość to
+  szukanie. Opublikowana różnica to $\val{p27.gap.pts}$ punktu}.}
+\sumitem{23--25}{\result{\textbf{P-wartość to
   $\Prob(\text{dane tak skrajne} \mid \text{brak różnicy})$}, a czytanie jej
   wstecz to odwrócenie z Programu~\ref{prog:P23} \dash{} ten sam błąd co przy
-  częstości bazowej.}
-\sumitem{26--27}{Mając rozkład a priori da się ją odwrócić, a odpowiedź
+  częstości bazowej}.}
+\sumitem{26--27}{\result{Mając rozkład a priori da się ją odwrócić, a odpowiedź
   niepokoi: przy $\val{p27.prior.real.pct}$ procentach porównań prawdziwych i
   mocy $\val{p27.power.pct}$ procent $\val{p27.fdr.pct}$ procent
-  \enquote{istotnych} odkryć jest fałszywych.}
-\sumitem{28--29}{\textbf{Jedno na dwadzieścia porównań identycznych modeli
+  \enquote{istotnych} odkryć jest fałszywych}.}
+\sumitem{28--29}{\result{\textbf{Jedno na dwadzieścia porównań identycznych modeli
   raportuje różnicę}, z konstrukcji. Tutaj $\val{p27.null.rate.pct}$ procent,
-  bo test dyskretny przekracza próg skokiem, zamiast na nim lądować.}
-\sumitem{31--33}{\textbf{$\val{p27.models}$ porównań robi z tego
+  bo test dyskretny przekracza próg skokiem, zamiast na nim lądować}.}
+\sumitem{31--33}{\result{\textbf{$\val{p27.models}$ porównań robi z tego
   $\val{p27.any.false.pct}$ procent.} Podzielenie progu to przywraca i
   kosztuje $\val{p27.bonf.cost}$ raza tyle pozycji \dash{} wielokrotne
-  porównania są pozycją w budżecie, a nie drobiazgiem.}
-\sumitem{34--35}{\textbf{A sortowanie tabeli obciąża jej górny wiersz.}
+  porównania są pozycją w budżecie, a nie drobiazgiem}.}
+\sumitem{34--35}{\result{\textbf{A sortowanie tabeli obciąża jej górny wiersz.}
   Zwycięzca $\val{p27.models}$ \emph{równych} modeli leży $\val{p27.emax}$
   błędu standardowego powyżej własnej prawdy, czyli $\val{p27.lb.margin}$
   punktu na $\val{p27.lb.n}$ pozycjach. Selekcja, nie pomiar \dash{} i ta sama
-  arytmetyka jest powodem, dla którego istnieje zbiór odłożony.}
-\sumitem{37--39}{To, co zostaje, gdy porównanie nie rozstrzyga rzeczy, na
+  arytmetyka jest powodem, dla którego istnieje zbiór odłożony}.}
+\sumitem{37--39}{\result{To, co zostaje, gdy porównanie nie rozstrzyga rzeczy, na
   której ci zależy, jest pytaniem o projekt. \textbf{A \enquote{brak istotnej
   różnicy} staje się pomiarem w chwili, gdy podasz, jak duża musiałaby być
-  różnica.}}
+  różnica.}}}
 \end{summarybox}
 
 \canyou

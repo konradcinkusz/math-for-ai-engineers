@@ -682,73 +682,72 @@ dostarczyć.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Model Taylora drugiego rzędu to wartość, nachylenie i
+\sumitem{1--2}{\result{\textbf{Model Taylora drugiego rzędu to wartość, nachylenie i
   połowa krzywizny razy kwadrat}, a $\tfrac{1}{2}$ jest tym, co sprawia, że
-  druga pochodna modelu równa się drugiej pochodnej funkcji.}
-\sumitem{3--4}{\textbf{\enquote{Najlepszy} znaczy rząd, a nie rozmiar}: błąd
+  druga pochodna modelu równa się drugiej pochodnej funkcji}.}
+\sumitem{3--4}{\result{\textbf{\enquote{Najlepszy} znaczy rząd, a nie rozmiar}: błąd
   kwadratowego maleje jak $h^{\val{p17.order.quad}}$, gdzie błąd prostej maleje
   jak $h^{\val{p17.order.lin}}$, co sprawdza się połowieniem $h$, a nie
-  cytowaniem dwóch błędów.}
-\sumitem{5--6}{\textbf{Model jest lokalny.} Czyni opis lokalny lepszym, a nie
-  szerszym, i nie mówi nic o tym, gdzie jest minimum.}
-\sumitem{7--8}{W punkcie stacjonarnym składnik liniowy znika, więc znak
+  cytowaniem dwóch błędów}.}
+\sumitem{5--6}{\result{\textbf{Model jest lokalny.} Czyni opis lokalny lepszym, a nie
+  szerszym, i nie mówi nic o tym, gdzie jest minimum}.}
+\sumitem{7--8}{\result{W punkcie stacjonarnym składnik liniowy znika, więc znak
   krzywizny klasyfikuje \dash{} zupełnie w jednym wymiarze, a w większej
-  liczbie nie.}
-\sumitem{9--10}{\textbf{Hesjan jest jakobianem gradientu}, więc reguła
+  liczbie nie}.}
+\sumitem{9--10}{\result{\textbf{Hesjan jest jakobianem gradientu}, więc reguła
   Programu~\ref{prog:P16} czyni go kwadratowym, z jednym wierszem i jedną
-  kolumną na wejście.}
-\sumitem{11--12}{\textbf{Jest symetryczny}, więc Program~\ref{prog:P10} stosuje
+  kolumną na wejście}.}
+\sumitem{11--12}{\result{\textbf{Jest symetryczny}, więc Program~\ref{prog:P10} stosuje
   się bez zmian: rzeczywiste wartości własne, prostopadłe kierunki, każdy z
-  własną krzywizną.}
-\sumitem{13--14}{Znaki wartości własnych dają misę, odwróconą misę, siodło i
+  własną krzywizną}.}
+\sumitem{13--14}{\result{Znaki wartości własnych dają misę, odwróconą misę, siodło i
   grzbiet \dash{} klasyfikację z P10, teraz dla dowolnej gładkiej funkcji w
-  punkcie stacjonarnym.}
-\sumitem{15}{\textbf{Punkt stacjonarny w wysokim wymiarze przytłaczająco
+  punkcie stacjonarnym}.}
+\sumitem{15}{\result{\textbf{Punkt stacjonarny w wysokim wymiarze przytłaczająco
   prawdopodobnie nie jest minimum}: minimum wymaga, by każdy z
   $\val{p17.params}$ znaków był dodatni, a chybić o jeden znak można na tyle
   samo sposobów. \enquote{Zacięcie w minimum lokalnym} to obraz dwuwymiarowy
-  przeniesiony tam, gdzie nie przeżywa.}
-\sumitem{16--17}{\textbf{Spacer pozostaje ograniczony dokładnie wtedy, gdy
+  przeniesiony tam, gdzie nie przeżywa}.}
+\sumitem{16--17}{\result{\textbf{Spacer pozostaje ograniczony dokładnie wtedy, gdy
   $\lvert 1 - \eta\lambda\rvert < 1$, czyli $\eta < 2/\lambda$}, co jest faktem
-  o ciągu geometrycznym i o niczym więcej.}
-\sumitem{18--19}{\textbf{Najbardziej stromy kierunek ustala krok dla całego
+  o ciągu geometrycznym i o niczym więcej}.}
+\sumitem{18--19}{\result{\textbf{Najbardziej stromy kierunek ustala krok dla całego
   modelu.} Tutaj $\val{p17.eta.star}$ wobec $\val{p17.eta.shallow}$ kierunku
   płytkiego, czyli czynnik $\val{p17.eta.gap}$. Wyprowadzone, a potem zmierzone
-  przemiataniem: $\val{p17.eta.measured}$.}
-\sumitem{20--21}{Spacer z Programu~\ref{prog:P15} przy $\val{p17.p15.eta}$
+  przemiataniem: $\val{p17.eta.measured}$}.}
+\sumitem{20--21}{\result{Spacer z Programu~\ref{prog:P15} przy $\val{p17.p15.eta}$
   mieści się pod granicą, a skrypt to stwierdza. \textbf{\enquote{Krok uczenia
   był za duży} to nierówność $\eta > 2/\lambda_{\max}$}, a za nią wzrost jest
-  geometryczny.}
-\sumitem{22--23}{\textbf{Wskaźnik uwarunkowania $\val{p17.kappa}$ to ta sama
+  geometryczny}.}
+\sumitem{22--23}{\result{\textbf{Wskaźnik uwarunkowania $\val{p17.kappa}$ to ta sama
   wielkość, którą zdefiniował Program~\ref{prog:P11}}, odczytana na hesjanie.
   Przy najlepszym kroku wciąż potrzeba $\val{p17.steps.99}$ kroków, by
-  zamknąć $99$ procent luki wolnego kierunku.}
-\sumitem{24--25}{\textbf{Metoda Newtona ląduje w minimum funkcji kwadratowej w
+  zamknąć $99$ procent luki wolnego kierunku}.}
+\sumitem{24--25}{\result{\textbf{Metoda Newtona ląduje w minimum funkcji kwadratowej w
   $\val{p17.newton.steps}$ kroku}, dając każdemu kierunkowi własny rozmiar
-  kroku.}
-\sumitem{26--28}{\textbf{A jej hesjan ma $\val{p17.hess.entries}$ wpisów przy
+  kroku}.}
+\sumitem{26--28}{\result{\textbf{A jej hesjan ma $\val{p17.hess.entries}$ wpisów przy
   realnym rozmiarze modelu}, z sześciennym rozwiązywaniem układu na dokładkę.
   Hesjanu też nikt nie tworzy \dash{} i w odróżnieniu od jakobianu iloczyn,
-  którego ludzie chcą, nie jest tani.}
-\sumitem{29--30}{\textbf{Metoda Newtona znajduje punkty stacjonarne, a nie
+  którego ludzie chcą, nie jest tani}.}
+\sumitem{29--30}{\result{\textbf{Metoda Newtona znajduje punkty stacjonarne, a nie
   minima}, więc w siodle robi krok w złą stronę w kierunkach ujemnych. Wraz z
   argumentem zliczającym z sekcji 2 jest to prawdziwy problem w wysokim
-  wymiarze.}
-\sumitem{31--33}{\textbf{Przeskalowanie parametru zmienia krzywiznę o
+  wymiarze}.}
+\sumitem{31--33}{\result{\textbf{Przeskalowanie parametru zmienia krzywiznę o
   $\val{p17.rescale.factor}$ i zostawia każde wyjście identyczne.} Więc jeden
   model ma dwie ostrości, a goła liczba opisująca ostrość jest faktem o
-  układzie współrzędnych.}
-\sumitem{34}{\textbf{Żadna wielkość zbudowana z gołych wartości własnych tego
+  układzie współrzędnych}.}
+\sumitem{34}{\result{\textbf{Żadna wielkość zbudowana z gołych wartości własnych tego
   nie przeżywa} \dash{} ani największa, ani ślad, ani stosunek \dash{} a
   warstwy normalizujące czynią z przeskalowania symetrię, którą architektura ma
-  z konstrukcji.}
-\sumitem{35--36}{Przeżyłaby miara przekształcająca się tak jak parametry.
-  \textbf{Ta książka nie zmierzyła twierdzenia o uogólnianiu i go nie
+  z konstrukcji}.}
+\sumitem{35--36}{\result{Przeżyłaby miara przekształcająca się tak jak parametry.} \textbf{Ta książka nie zmierzyła twierdzenia o uogólnianiu i go nie
   rozstrzyga}; dostarcza filtru.}
-\sumitem{37--38}{\textbf{Ograniczenie na krok ma ten sam problem i nie cierpi z
+\sumitem{37--38}{\result{\textbf{Ograniczenie na krok ma ten sam problem i nie cierpi z
   jego powodu}, bo $\eta$ przeskalowuje się razem z $\lambda$, a krok zrobiony
   pozostaje bez zmian. Pytaniem o krzywiznę nigdy nie jest \emph{czy jest
-  duża}, tylko \emph{względem czego}.}
+  duża}, tylko \emph{względem czego}}.}
 \end{summarybox}
 
 \canyou

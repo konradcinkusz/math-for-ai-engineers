@@ -780,66 +780,66 @@ z niej wynika.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Przestrzeń liniowa z dwoma działaniami nie wyrazi
+\sumitem{1--2}{\result{\textbf{Przestrzeń liniowa z dwoma działaniami nie wyrazi
   rozmiaru ani kierunku.} Prostopadły, najbliższy, jednostkowej długości, baza
-  ortogonalna \dash{} nic z tego. Dlatego Program~\ref{prog:P04} nigdy nie
+  ortogonalna \dash{} nic z tego.} Dlatego Program~\ref{prog:P04} nigdy nie
   używał tych słów, a Program~\ref{prog:F09} używał ich swobodnie: F09 był w
   $\R^{n}$ z założoną arytmetyką, P04 dowodził rzeczy o przestrzeniach w
   ogóle.}
-\sumitem{3--5}{\textbf{Iloczyn skalarny} zwraca jedną liczbę z dwóch wektorów,
+\sumitem{3--5}{\result{\textbf{Iloczyn skalarny} zwraca jedną liczbę z dwóch wektorów,
   jest symetryczny, liniowy w każdym argumencie i ma $a \cdot a > 0$ dla
   każdego niezerowego $a$. \textbf{Długość jest z niego zdefiniowana},
   $\lVert a \rVert = \sqrt{a \cdot a}$, a nie odwrotnie \dash{} inny iloczyn
-  skalarny daje przestrzeni inne długości.}
-\sumitem{6--9}{Dwa wektory są \textbf{ortogonalne}, gdy ich iloczyn skalarny
+  skalarny daje przestrzeni inne długości}.}
+\sumitem{6--9}{\result{Dwa wektory są \textbf{ortogonalne}, gdy ich iloczyn skalarny
   wynosi zero, a ta definicja nigdy nie wspomina obrazka, więc jest jedynym
   kawałkiem geometrii przenoszącym się do każdego wymiaru bez zmian.
   Wyznaczenie $\cos\theta$ z tożsamości F08 zmienia ją z raportu w
-  \textbf{definicję} kąta.}
-\sumitem{10--11}{\textbf{Trzy normy, trzy pytania.} L1 to ile wzdłuż osi, L2
+  \textbf{definicję} kąta}.}
+\sumitem{10--11}{\result{\textbf{Trzy normy, trzy pytania.} L1 to ile wzdłuż osi, L2
   ile w linii prostej, L-nieskończoność jak zła jest najgorsza składowa; dla
   $(3, -4)$ jest to $7$, $5$ i $4$. Tylko L2 pochodzi z iloczynu skalarnego i
-  dlatego tylko L2 ma kąty.}
-\sumitem{12--14}{\textbf{Kula L1 jest rombem, a jej rogi są całym argumentem o
+  dlatego tylko L2 ma kąty}.}
+\sumitem{12--14}{\result{\textbf{Kula L1 jest rombem, a jej rogi są całym argumentem o
   rzadkości}: róg to punkt, w którym wszystkie współrzędne poza jedną są zerowe,
   a warstwica nadchodząca z ogólnego kierunku spotyka romb właśnie tam. To
-  stwierdzenie o kształcie, a nie o wielkości kary.}
-\sumitem{15--16}{Trzy normy \textbf{nie porządkują wektorów tak samo}:
+  stwierdzenie o kształcie, a nie o wielkości kary}.}
+\sumitem{15--16}{\result{Trzy normy \textbf{nie porządkują wektorów tak samo}:
   $(3,-4)$ i $(5,0)$ są równe przy L2, a każdy jest większy od drugiego przy
   jednej z pozostałych. \enquote{Większy} nie jest własnością pary wektorów,
-  dopóki nie zostanie nazwana norma.}
-\sumitem{17--21}{\textbf{Rzut} wektora $a$ na $b$ to $t\,b$ z $t = (a \cdot
+  dopóki nie zostanie nazwana norma}.}
+\sumitem{17--21}{\result{\textbf{Rzut} wektora $a$ na $b$ to $t\,b$ z $t = (a \cdot
   b)/(b \cdot b)$, uzyskane przez zażądanie, by reszta była ortogonalna do $b$
   \dash{} i jest to \emph{najbliższy} punkt, bo Pitagoras czyni
   przeciwprostokątną dłuższą od przyprostokątnej. Wyprowadzenie używa tylko
   trzech własności iloczynu skalarnego, więc działa w każdym wymiarze i na
-  każdej podprzestrzeni.}
-\sumitem{24--26}{\textbf{Iloczyn skalarny to kosinus z obiema długościami w
+  każdej podprzestrzeni}.}
+\sumitem{24--26}{\result{\textbf{Iloczyn skalarny to kosinus z obiema długościami w
   środku.} Nie zgadzają się tylko wtedy, gdy długości się różnią, a wybór
   między nimi jest pytaniem o to, co twoje zanurzenia kodują w swojej
-  wielkości, na co wzory nie odpowiedzą.}
-\sumitem{27--30}{\textbf{Normalizacja czyni z obu zapytań jedno zapytanie}, z
+  wielkości, na co wzory nie odpowiedzą}.}
+\sumitem{27--30}{\result{\textbf{Normalizacja czyni z obu zapytań jedno zapytanie}, z
   dokładnością do $\val{p05.norm.identity.err}$ na
   $\val{p05.norm.identity.trials}$ parach. Nie jest więc krokiem przygotowania
-  danych \dash{} jest podjętą po cichu decyzją o wyrzuceniu długości.}
-\sumitem{31--37}{\textbf{Kosinus między dwoma losowymi kierunkami skupia się
+  danych \dash{} jest podjętą po cichu decyzją o wyrzuceniu długości}.}
+\sumitem{31--37}{\result{\textbf{Kosinus między dwoma losowymi kierunkami skupia się
   wokół zera z rozrzutem $1/\sqrt{d}$}, zmierzone z dokładnością do
   $\val{p05.sd.err.pct}\%$ w trzech rzędach wielkości. Przy $\val{f09.dim}$
   wymiarach $\val{p05.deg.within.768}\%$ par mieści się w pięciu stopniach od
   kąta prostego, wobec $\val{p05.deg.within.2}\%$ na płaszczyźnie \dash{} więc
-  kosinus $\num{0.3}$ leży jakieś osiem rozrzutów od środka i jest ogromny.}
-\sumitem{38--40}{\textbf{Zasadniczo cała kula w wysokim wymiarze jest w swojej
+  kosinus $\num{0.3}$ leży jakieś osiem rozrzutów od środka i jest ogromny}.}
+\sumitem{38--40}{\result{\textbf{Zasadniczo cała kula w wysokim wymiarze jest w swojej
   skórze}: ułamek wewnątrz promienia $r$ to $r^{d}$, więc wewnętrzne dziewięć
   dziesiątych promienia mieści $\val{p05.shell.inner.768}$ kuli o
   $\val{f09.dim}$ wymiarach. Policzone, a nie wylosowane, bo żadna próbka nigdy
-  by tam nie trafiła.}
-\sumitem{41--45}{\textbf{\enquote{Prawie ortogonalny} nie jest automatycznie
+  by tam nie trafiła}.}
+\sumitem{41--45}{\result{\textbf{\enquote{Prawie ortogonalny} nie jest automatycznie
   tańszy niż ortogonalny.} Przy $d = 64$ i tolerancji $\val{p05.near.tol}$
   pojemność to $\val{p05.near.n.64}$, poniżej $64$ dokładnych, bo tolerancja
   leży ledwie półtora rozrzutu od środka. Próg jest przy
   $d = \val{p05.near.cross}$; powyżej pojemność ucieka, do jakichś
   $\val{p05.near.n.4096}$ przy $4096$ wymiarach. \textbf{Hasło jest prawdziwe
-  powyżej progu i zawsze cytowane bez niego.}}
+  powyżej progu i zawsze cytowane bez niego.}}}
 \end{summarybox}
 
 % ============================================================

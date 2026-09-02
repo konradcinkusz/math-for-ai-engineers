@@ -944,76 +944,75 @@ askable and neither is its own.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--4}{An estimator has \textbf{two} ways of being wrong.
+\sumitem{1--4}{\result{An estimator has \textbf{two} ways of being wrong.
   \emph{Bias} is how far the average estimate sits from the truth;
-  \emph{variance} is how far the estimates sit from their own average.
-  Program~\ref{prog:P21} proved the first about a batch gradient and said it
+  \emph{variance} is how far the estimates sit from their own average.} Program~\ref{prog:P21} proved the first about a batch gradient and said it
   was not enough.}
-\sumitem{5--6}{\textbf{$\mathrm{MSE} = \text{bias}^{2} + \Var$}, exactly,
+\sumitem{5--6}{\result{\textbf{$\mathrm{MSE} = \text{bias}^{2} + \Var$}, exactly,
   checked at twenty-one shrinkages over fractions. On the worked population a
   deliberately biased estimator beats the unbiased one by
   $\val{p26.shrink.gain.pct}$ per cent of the mean squared error \dash{}
-  $\val{p26.mse.shrunk}$ against $\val{p26.mse.unbiased}$.}
-\sumitem{7--9}{So \enquote{unbiased} is not \enquote{best}, and every
+  $\val{p26.mse.shrunk}$ against $\val{p26.mse.unbiased}$}.}
+\sumitem{7--9}{\result{So \enquote{unbiased} is not \enquote{best}, and every
   regulariser is a bias taken on purpose. The optimal shrinkage depends on
-  the unknown truth, which is why it is a finding rather than a recipe.}
-\sumitem{10--12}{The $n-1$ corrects \textbf{exactly one bias}: the
+  the unknown truth, which is why it is a finding rather than a recipe}.}
+\sumitem{10--12}{\result{The $n-1$ corrects \textbf{exactly one bias}: the
   $n$-denominator sample variance averages $\frac{n-1}{n}$ of the population
   variance, enumerated at $n = 2$ to $5$, and the $(n-1)$ denominator
-  averages it exactly.}
-\sumitem{13--16}{\textbf{It does not correct the standard deviation.} A
+  averages it exactly}.}
+\sumitem{13--16}{\result{\textbf{It does not correct the standard deviation.} A
   square root is concave, so Program~\ref{prog:P19}'s Jensen makes the
   corrected $s$ understate \dash{} by $\val{p26.sd.short.2}$ per cent at
   $n = 2$ and still $\val{p26.sd.short.5}$ per cent at $n = 5$, which is the
-  size people report a spread over.}
-\sumitem{18--20}{\textbf{Maximum likelihood} picks the parameter that makes
+  size people report a spread over}.}
+\sumitem{18--20}{\result{\textbf{Maximum likelihood} picks the parameter that makes
   the observed data most probable. Take the logarithm to turn the product
   into a sum (Program~\ref{prog:F03}) and to avoid underflow
   (Program~\ref{prog:P02}); the maximum does not move, because
-  Program~\ref{prog:F05} says a strictly increasing function keeps order.}
-\sumitem{21}{The Bernoulli estimate is $k/n = \val{p26.bern.mle}$, derived
+  Program~\ref{prog:F05} says a strictly increasing function keeps order}.}
+\sumitem{21}{\result{The Bernoulli estimate is $k/n = \val{p26.bern.mle}$, derived
   rather than assumed \dash{} \textbf{every rate computed by dividing
-  successes by trials was a maximum likelihood estimate}.}
-\sumitem{22--23}{And the Gaussian's variance comes out with $n$ in the
+  successes by trials was a maximum likelihood estimate}}.}
+\sumitem{22--23}{\result{And the Gaussian's variance comes out with $n$ in the
   denominator, $\val{p26.gauss.mle.var}$ against
   $\val{p26.gauss.unbiased.var}$: \textbf{maximum likelihood is biased},
-  by exactly the factor of the section before it.}
-\sumitem{25--27}{\textbf{The cross-entropy loss is the negative
+  by exactly the factor of the section before it}.}
+\sumitem{25--27}{\result{\textbf{The cross-entropy loss is the negative
   log-likelihood of the observed tokens, per token.} Product of
   probabilities, logarithm, negate, divide by the count \dash{} which is
   Program~\ref{prog:P18}'s definition character for character. Training a
-  language model is maximum likelihood.}
+  language model is maximum likelihood}.}
 \sumitem{28}{Three programs, one computation:
   Program~\ref{prog:F02}'s $\val{p26.f02.loss}$ nats and
   Program~\ref{prog:F03}'s $\val{p26.f03.tokens}$-token sequence reconstruct
   each other in both directions, back to $\val{p26.back.loss}$ nats.}
-\sumitem{30--31}{\textbf{Label smoothing is maximum likelihood for a
+\sumitem{30--31}{\result{\textbf{Label smoothing is maximum likelihood for a
   different target.} At $\varepsilon = \val{p26.ls.eps}$ over
   $\val{p26.ls.classes}$ classes the optimum is $\val{p26.ls.true}$ against
   $\val{p26.ls.other}$, a logit gap of $\val{p26.ls.gap}$ \dash{} finite,
-  where a one-hot target's optimum is unattainable.}
-\sumitem{32--33}{Class weighting estimates the parameters of a
+  where a one-hot target's optimum is unattainable}.}
+\sumitem{32--33}{\result{Class weighting estimates the parameters of a
   \emph{different population}, and dividing by the token count is what makes
-  sequences of different lengths comparable.}
-\sumitem{34--36}{\textbf{A penalty is the logarithm of a prior.} Multiply the
+  sequences of different lengths comparable}.}
+\sumitem{34--36}{\result{\textbf{A penalty is the logarithm of a prior.} Multiply the
   likelihood by a prior, take logs, negate: the log-prior becomes a term
   added to the loss, and a Gaussian prior of width $\tau$ contributes
-  $\lVert\vect{w}\rVert^{2}/2\tau^{2}$.}
-\sumitem{37--38}{So $\lambda = 1/\tau^{2}$, matched on the gradients
+  $\lVert\vect{w}\rVert^{2}/2\tau^{2}$}.}
+\sumitem{37--38}{\result{So $\lambda = 1/\tau^{2}$, matched on the gradients
   Program~\ref{prog:P20} adds rather than on a formula.
   \textbf{Its $\lambda = \val{p26.p20.lambda}$ is the claim that every weight
   is Gaussian of width $\val{p26.prior.tau}$}, which is checkable against the
-  trained weights.}
-\sumitem{40}{A MAP is a point and cannot say how sure it is. The posterior
+  trained weights}.}
+\sumitem{40}{\result{A MAP is a point and cannot say how sure it is.} The posterior
   as a distribution is Program~\ref{prog:P28}'s.}
-\sumitem{41--43}{\textbf{The score} is $\partial \ln p / \partial\theta$, and
+\sumitem{41--43}{\result{\textbf{The score} is $\partial \ln p / \partial\theta$, and
   its expectation is exactly zero \dash{} because the probabilities sum to
   one whatever $\theta$ does. That is why setting the observed score to zero
-  is the right condition.}
-\sumitem{44--45}{And $\nabla \Ex[f] = \Ex[f\,s]$, exact over fractions at
+  is the right condition}.}
+\sumitem{44--45}{\result{And $\nabla \Ex[f] = \Ex[f\,s]$, exact over fractions at
   every rate and $\val{p26.score.cases}$ functions: \textbf{the
   score-function estimator Program~\ref{prog:P21} deferred is four lines of
-  maximum likelihood}, and it is what a policy gradient is.}
+  maximum likelihood}, and it is what a policy gradient is}.}
 \end{summarybox}
 
 \canyou

@@ -741,57 +741,57 @@ part that survives being a million vertices wide.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{A graph is a set of vertices and a set of pairs of
+\sumitem{1--3}{\result{\textbf{A graph is a set of vertices and a set of pairs of
   them}, and nothing else \dash{} no position, no drawing.
   \textbf{Ordered pairs make it directed}, which is what a call graph, an
   import graph and a dependency graph have and a whiteboard sketch usually
-  loses.}
-\sumitem{4--5}{\textbf{The degrees sum to twice the edges}, because every edge
+  loses}.}
+\sumitem{4--5}{\result{\textbf{The degrees sum to twice the edges}, because every edge
   is counted at each of its two ends: $\val{p13.g.degsum}$ for
-  $\val{p13.g.ne}$ edges. So the number of odd-degree vertices is even.}
-\sumitem{6--8}{A complete graph on $\val{p13.complete.n}$ vertices has
+  $\val{p13.g.ne}$ edges. So the number of odd-degree vertices is even}.}
+\sumitem{6--8}{\result{A complete graph on $\val{p13.complete.n}$ vertices has
   $\val{p13.complete.e}$ edges, which is Programs~\ref{prog:F10}
   and~\ref{prog:P12}'s pair count \dash{} an undirected edge \emph{is} an
-  unordered pair. Deduplication is finding connected components.}
-\sumitem{9--10}{\textbf{Matrix or list is a question about density and about
+  unordered pair. Deduplication is finding connected components}.}
+\sumitem{9--10}{\result{\textbf{Matrix or list is a question about density and about
   which operation you repeat.} At $\val{p13.big.n}$ vertices and
   $\val{p13.big.m}$ edges the matrix is $\val{p13.big.cells}$ cells against
   $\val{p13.big.slots}$ slots, and the density is
-  $\val{p13.big.density}$.}
-\sumitem{11--13}{The matrix answers \emph{is there an edge} in one step and
+  $\val{p13.big.density}$}.}
+\sumitem{11--13}{\result{The matrix answers \emph{is there an edge} in one step and
   the list answers \emph{who are the neighbours} in as many steps as there are
   neighbours. \textbf{The matrix earns its place by being multipliable}, not
-  by being lookupable.}
-\sumitem{14--15}{\textbf{$(A^{k})_{ij}$ counts the walks of length $k$ from $i$
+  by being lookupable}.}
+\sumitem{14--15}{\result{\textbf{$(A^{k})_{ij}$ counts the walks of length $k$ from $i$
   to $j$}, because each term of $\sum_k A_{ik}A_{kj}$ is $1$ exactly when the
   two steps both exist \dash{} Program~\ref{prog:P06}'s composition doing
-  arithmetic.}
-\sumitem{16--18}{\textbf{A walk is not a path}: $(A^{2})_{ii}$ is the degree of
+  arithmetic}.}
+\sumitem{16--18}{\result{\textbf{A walk is not a path}: $(A^{2})_{ii}$ is the degree of
   $i$, counting \enquote{out and back}. Counting paths is a harder problem and
-  matrix powers do not do it.}
-\sumitem{19--20}{\textbf{Message passing is a multiplication by the adjacency
+  matrix powers do not do it}.}
+\sumitem{19--20}{\result{\textbf{Message passing is a multiplication by the adjacency
   matrix}, so $k$ layers reach exactly $k$ hops: $\val{p13.reach.one}$
   vertices at one hop here and all $\val{p13.reach}$ at $\val{p13.hops}$.
-  \textbf{Depth is reach, not capacity.}}
-\sumitem{21--23}{\textbf{A directed graph has a topological order if and only
+  \textbf{Depth is reach, not capacity.}}}
+\sumitem{21--23}{\result{\textbf{A directed graph has a topological order if and only
   if it is acyclic}, and there is usually more than one:
-  $\val{p13.topo.count}$ here out of $\val{p13.topo.total}$.}
-\sumitem{24--25}{\textbf{Every topological order computes the same values},
+  $\val{p13.topo.count}$ here out of $\val{p13.topo.total}$}.}
+\sumitem{24--25}{\result{\textbf{Every topological order computes the same values},
   because each vertex depends only on parents that all of them compute first.
   That is why a build system, an agent workflow, a query plan and a forward
-  pass are one object, and why a scheduler may parallelise freely.}
-\sumitem{26}{\textbf{A cycle makes evaluation undefined rather than hard.}
+  pass are one object, and why a scheduler may parallelise freely}.}
+\sumitem{26}{\result{\textbf{A cycle makes evaluation undefined rather than hard.}
   Break it, or unroll it \dash{} which is what a recurrent network is, and why
-  its memory grows with the steps unrolled.}
-\sumitem{27--30}{A random walk's step is $P\T p$, and
+  its memory grows with the steps unrolled}.}
+\sumitem{27--30}{\result{A random walk's step is $P\T p$, and
   \textbf{a stationary distribution is an eigenvector for eigenvalue $1$}
   \dash{} Program~\ref{prog:P10} under another name. That is PageRank, and it
-  is checked here as an exact equality rather than a tolerance.}
-\sumitem{31--34}{\textbf{A vertex with no outgoing edge drains the walk}:
+  is checked here as an exact equality rather than a tolerance}.}
+\sumitem{31--34}{\result{\textbf{A vertex with no outgoing edge drains the walk}:
   exactly no mass is left after $\val{p13.drain.zeroat}$ steps. Damping at
   $\val{p13.damp}$ makes every entry positive and every row sum to one, which
   is what buys a unique fixed point \dash{} the constant is conventional, the
-  need for it is not.}
+  need for it is not}.}
 \end{summarybox}
 
 \canyou

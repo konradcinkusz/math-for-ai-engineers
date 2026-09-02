@@ -722,70 +722,70 @@ subject you will use every week.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{A theorem is hypotheses, a conclusion and the
+\sumitem{1--2}{\result{\textbf{A theorem is hypotheses, a conclusion and the
   quantifiers binding them.} A proof is none of the three, which is why a
   result can be used correctly without ever seeing one \dash{} and why a
-  rigour box is not an evasion.}
-\sumitem{3--4}{\enquote{If and only if} is \textbf{two} theorems travelling
+  rigour box is not an evasion}.}
+\sumitem{3--4}{\result{\enquote{If and only if} is \textbf{two} theorems travelling
   together, each the other's converse. In Program~\ref{prog:P13}'s
   topological-order theorem the load-bearing hypothesis is
-  \emph{directed}, and it is the word a reader skips.}
-\sumitem{5--6}{\textbf{The commonest misuse is to keep the conclusion and drop
+  \emph{directed}, and it is the word a reader skips}.}
+\sumitem{5--6}{\result{\textbf{The commonest misuse is to keep the conclusion and drop
   a hypothesis}, because the conclusion is the part anybody wanted. When a
-  result is quoted at you, ask what it assumed.}
+  result is quoted at you, ask what it assumed}.}
 \sumitem{7}{This program does not teach proof-writing, deliberately: the
   three options were to omit rigour, to teach writing, or to teach
   \emph{reading}, and reading is the skill this audience needs.}
-\sumitem{8--9}{\textbf{$P \Rightarrow Q$ is false in exactly one of the
+\sumitem{8--9}{\result{\textbf{$P \Rightarrow Q$ is false in exactly one of the
   $\val{p14.rows}$ rows} \dash{} $P$ true and $Q$ false. It says nothing about
-  cause and nothing about the case where $P$ fails.}
-\sumitem{9--10}{\textbf{The converse is a different claim}, disagreeing in
+  cause and nothing about the case where $P$ fails}.}
+\sumitem{9--10}{\result{\textbf{The converse is a different claim}, disagreeing in
   $\val{p14.differ}$ rows. Observing $Q$ and concluding $P$ is affirming the
-  consequent: \enquote{the training loss is down, so we are overfitting}.}
-\sumitem{10--11}{\textbf{And $\lnot P$ tells you nothing about $Q$.}
+  consequent: \enquote{the training loss is down, so we are overfitting}}.}
+\sumitem{10--11}{\result{\textbf{And $\lnot P$ tells you nothing about $Q$.}
   Concluding $\lnot Q$ from $\lnot P$ is denying the antecedent, which is the
   converse's error from the other side \dash{} it reads as reassurance, which
-  is what lets it through.}
-\sumitem{11--12}{\textbf{The contrapositive is the same claim}, in all
-  $\val{p14.rows}$ rows, which is why proving it proves the original.}
-\sumitem{13--14}{\textbf{A counterexample is one case with the hypothesis
+  is what lets it through}.}
+\sumitem{11--12}{\result{\textbf{The contrapositive is the same claim}, in all
+  $\val{p14.rows}$ rows, which is why proving it proves the original}.}
+\sumitem{13--14}{\result{\textbf{A counterexample is one case with the hypothesis
   holding and the conclusion failing}, because
   $\lnot(P \Rightarrow Q) = P \wedge \lnot Q$. Establishing may need every
-  case; refuting needs one.}
-\sumitem{15--16}{\textbf{Quantifier order changes the claim.} There-is-a-$y$-
+  case; refuting needs one}.}
+\sumitem{15--16}{\result{\textbf{Quantifier order changes the claim.} There-is-a-$y$-
   for-all-$x$ is the stronger, and implies the other; the reverse fails, as a
   relation on $\val{p14.dom}$ elements shows and all
-  $\val{p14.qchecked}$ relations on three confirm.}
-\sumitem{17--18}{\textbf{Universal approximation is for-all-then-there-exists},
+  $\val{p14.qchecked}$ relations on three confirm}.}
+\sumitem{17--18}{\result{\textbf{Universal approximation is for-all-then-there-exists},
   so the network may depend on the function and the tolerance. It is silent on
   $\val{p14.silent}$ things, including how large the network must be and
-  whether training finds it.}
-\sumitem{19}{\enquote{Networks can approximate any function} treats an
+  whether training finds it}.}
+\sumitem{19}{\result{\enquote{Networks can approximate any function} treats an
   existence claim as a construction. A high-degree polynomial does the same
-  and nobody argues from it.}
-\sumitem{20--21}{Three shapes to recognise: direct, contradiction, induction.
+  and nobody argues from it}.}
+\sumitem{20--21}{\result{Three shapes to recognise: direct, contradiction, induction.
   \textbf{The negation of an implication is $P \wedge \lnot Q$}, which is why
-  a proof by contradiction of one always starts there.}
-\sumitem{22--23}{\textbf{Checking every case is a proof; checking many cases is
+  a proof by contradiction of one always starts there}.}
+\sumitem{22--23}{\result{\textbf{Checking every case is a proof; checking many cases is
   evidence.} $n^{2}+n+41$ is prime for $\val{p14.euler.first}$ consecutive
   values and composite at $\val{p14.euler.first}$, where it is
-  $\val{p14.euler.factor}$ squared.}
-\sumitem{24--25}{\textbf{Each shape fails in its own place}: a direct proof
+  $\val{p14.euler.factor}$ squared}.}
+\sumitem{24--25}{\result{\textbf{Each shape fails in its own place}: a direct proof
   at a step using something nobody assumed, a contradiction at the negation, an
   induction at the step and almost never at the base case. Three questions, and
-  none needs the argument followed in detail.}
-\sumitem{26--27}{\textbf{A convergence theorem assuming convexity says nothing
+  none needs the argument followed in detail}.}
+\sumitem{26--27}{\result{\textbf{A convergence theorem assuming convexity says nothing
   about a neural network.} What is lost is the guarantee, not the method
   \dash{} which is this book's own rule about measurement applied to a
-  sentence.}
-\sumitem{28--29}{\textbf{A $\val{p14.conf}$ per cent bound used
+  sentence}.}
+\sumitem{28--29}{\result{\textbf{A $\val{p14.conf}$ per cent bound used
   $\val{p14.uses}$ times holds throughout only $\val{p14.allhold}$ per cent of
   the time}, is a coin flip after $\val{p14.flip}$ uses, and would need
-  $\val{p14.needed}$ per cent each to give $95\%$ across twenty.}
-\sumitem{30--31}{The three misquotations are one of each part: a dropped
+  $\val{p14.needed}$ per cent each to give $95\%$ across twenty}.}
+\sumitem{30--31}{\result{The three misquotations are one of each part: a dropped
   hypothesis, a dropped quantifier, and the gap between existence and
   construction. \textbf{There is no fourth kind of mistake because there is no
-  fourth part.}}
+  fourth part.}}}
 \end{summarybox}
 
 \canyou

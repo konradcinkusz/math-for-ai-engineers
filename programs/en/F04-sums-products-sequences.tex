@@ -1216,77 +1216,77 @@ thousand of them buy you?
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{A sigma is a loop written short.} Its four parts are the
+\sumitem{1--2}{\result{\textbf{A sigma is a loop written short.} Its four parts are the
   index, where the index starts, where it stops, and the body \dash{} and the
   body is an expression in the index, worked once for each value the index
-  takes.}
-\sumitem{3--4}{$\sum_{i=1}^{n} w_i x_i$ is a \emph{weighted sum}: one unit of a
+  takes}.}
+\sumitem{3--4}{\result{$\sum_{i=1}^{n} w_i x_i$ is a \emph{weighted sum}: one unit of a
   linear layer, and the shape Program~\ref{prog:P05} is built on. A sigma
   splits over a sum, and a constant factor comes out of the front. Both are the
-  loop rearranged.}
-\sumitem{5--6}{\textbf{$\sum a_i b_i$ is not $(\sum a_i)(\sum b_i)$}, and at
+  loop rearranged}.}
+\sumitem{5--6}{\result{\textbf{$\sum a_i b_i$ is not $(\sum a_i)(\sum b_i)$}, and at
   $a = (1, 2)$, $b = (3, 4)$ the two are $11$ and $21$. It is a rule about a
   sum inside the sigma being carried across a product, which is the reasoning
   Programs~\ref{prog:F01}, \ref{prog:F02} and~\ref{prog:F03} each caught under
-  a different sign.}
-\sumitem{7--8}{The number of terms is $\text{stop} - \text{start} + 1$, because
+  a different sign}.}
+\sumitem{7--8}{\result{The number of terms is $\text{stop} - \text{start} + 1$, because
   both limits are included. $\sum_{i=0}^{n}$ has $n+1$ terms and
-  $\sum_{i=0}^{n-1}$ has $n$, which is what \code{range(n)} walks.}
-\sumitem{9}{Re-indexing moves the limits one way and the subscript the other:
+  $\sum_{i=0}^{n-1}$ has $n$, which is what \code{range(n)} walks}.}
+\sumitem{9}{\result{Re-indexing moves the limits one way and the subscript the other:
   $\sum_{i=1}^{n} x_i = \sum_{j=0}^{n-1} x_{j+1}$. Note that English calls both
-  the raised number and the lowered one the \emph{index}, and Polish does not.}
-\sumitem{10--11}{A causal mask computes $\frac{n(n+1)}{2}$ query--key pairs
+  the raised number and the lowered one the \emph{index}, and Polish does not}.}
+\sumitem{10--11}{\result{A causal mask computes $\frac{n(n+1)}{2}$ query--key pairs
   \dash{} $\val{f04.causal.pairs}$ at $n = 2048$ against $\val{f04.causal.sq}$
   for the full square. The ratio $\frac{n+1}{2n}$ falls towards a half from
-  above and never reaches it: $\val{f04.causal.ratio.eight}$ at $n = 8$.}
-\sumitem{12--13}{$\prod$ is the same machine with multiplication in it, and a
-  factorial is a pi with the index in the body: $n! = \prod_{i=1}^{n} i$.}
-\sumitem{14--15}{\textbf{The empty sum is $0$ and the empty product is $1$},
+  above and never reaches it: $\val{f04.causal.ratio.eight}$ at $n = 8$}.}
+\sumitem{12--13}{\result{$\prod$ is the same machine with multiplication in it, and a
+  factorial is a pi with the index in the body: $n! = \prod_{i=1}^{n} i$}.}
+\sumitem{14--15}{\result{\textbf{The empty sum is $0$ and the empty product is $1$},
   because each is the identity element of its operation and no other value
   keeps the loop consistent. $a^{0} = 1$ is the empty product, which
   corroborates Program~\ref{prog:F01}'s division-law argument by a second
-  route, and $\ln 1 = 0$ carries one convention onto the other.}
-\sumitem{16}{An empty \emph{sum} is safe and an empty \emph{mean} is not.
+  route, and $\ln 1 = 0$ carries one convention onto the other}.}
+\sumitem{16}{\result{An empty \emph{sum} is safe and an empty \emph{mean} is not.
   \code{0.0 / 0.0} raises in plain Python; numpy returns \code{nan}, warns, and
-  carries on. The guard belongs on the denominator.}
-\sumitem{17--19}{\textbf{Every loss here is $\frac{1}{n}\sum$ over a
+  carries on. The guard belongs on the denominator}.}
+\sumitem{17--19}{\result{\textbf{Every loss here is $\frac{1}{n}\sum$ over a
   per-example term}, and only the term moves: a squared residual, its size, or
   $-\ln p_i$. On four points, mean squared error is $\val{f04.mse}$ and mean
-  absolute error is $\val{f04.mae}$.}
-\sumitem{20--21}{Perplexity is the exponential of the mean loss,
+  absolute error is $\val{f04.mae}$}.}
+\sumitem{20--21}{\result{Perplexity is the exponential of the mean loss,
   $\val{f04.ce.ppl}$ on that batch. The mean of the per-example perplexities is
   $\val{f04.ce.ppl.naive}$, which is a different quantity;
-  Program~\ref{prog:P19} has the inequality behind it.}
-\sumitem{22}{In exact arithmetic a sum has no order and in floating point it
-  has one. This program prints no number for it, because the number would be
+  Program~\ref{prog:P19} has the inequality behind it}.}
+\sumitem{22}{\result{In exact arithmetic a sum has no order and in floating point it
+  has one.} This program prints no number for it, because the number would be
   about one machine; Programs~\ref{prog:P01} and~\ref{prog:P02} own it.}
-\sumitem{23--26}{\textbf{A mean of ratios is not the ratio of the sums.} Two
+\sumitem{23--26}{\result{\textbf{A mean of ratios is not the ratio of the sums.} Two
   batches at $\num{2.0}$ and $\num{8.0}$ pool to $\val{f04.batch.pooled}$ and
   not $\num{5.0}$; two shards at $\num{0.90}$ and $\num{0.10}$ pool to
   $\val{f04.acc.micro}$ and not $\num{0.50}$; two runs at $100$ and $1$ token
-  per second pool to $\val{f04.rate.micro}$ and not $\num{50.5}$.}
-\sumitem{27--28}{The macro average weights groups equally, the micro average
+  per second pool to $\val{f04.rate.micro}$ and not $\num{50.5}$}.}
+\sumitem{27--28}{\result{The macro average weights groups equally, the micro average
   weights items equally, and they agree exactly when every denominator is
-  equal. Both are legitimate; the fault is reporting one as the other.}
-\sumitem{29--32}{A recurrence takes one step and a general formula skips them
+  equal. Both are legitimate; the fault is reporting one as the other}.}
+\sumitem{29--32}{\result{A recurrence takes one step and a general formula skips them
   all. $\sum_{k=0}^{n-1} r^{k} = \frac{1-r^{n}}{1-r}$, which is
   $\val{f04.geom.ten}$ at $r = \num{0.9}$ and $n = 10$ and tends to
-  $\frac{1}{1-r} = \val{f04.geom.inf}$.}
-\sumitem{33--34}{$\ln \prod_i x_i = \sum_i \ln x_i$, which is
+  $\frac{1}{1-r} = \val{f04.geom.inf}$}.}
+\sumitem{33--34}{\result{$\ln \prod_i x_i = \sum_i \ln x_i$, which is
   Program~\ref{prog:F03}'s first law written over a pi. Fifty layers at
   $\num{0.9}$ give $\val{f04.decay.fifty}$ and at $\num{1.1}$ give
   $\val{f04.grow.fifty}$: two factors $\num{0.2}$ apart are about
-  $\val{f04.decay.ratio}$ apart at the far end.}
-\sumitem{35--38}{An exponential moving average is
+  $\val{f04.decay.ratio}$ apart at the far end}.}
+\sumitem{35--38}{\result{An exponential moving average is
   $m \leftarrow \beta m + (1-\beta) g$, and unrolled it is a weighted sum of
   everything it has seen, with weights $(1-\beta)\beta^{k}$.
   \textbf{$\beta$ weights the old value.} At $\beta = \num{0.9}$ the last ten
   carry $\val{f04.ema.w10}$ of the weight and half of it sits in the last
-  $\val{f04.ema.halflife.steps}$.}
-\sumitem{39--42}{Starting at $0$ biases it: after $t$ steps it reads
+  $\val{f04.ema.halflife.steps}$}.}
+\sumitem{39--42}{\result{Starting at $0$ biases it: after $t$ steps it reads
   $1 - \beta^{\,t}$ of the truth, and dividing by that removes the bias
   exactly. \textbf{That is momentum, and with the recurrence run twice it is
-  Adam}, and none of it needed calculus.}
+  Adam}, and none of it needed calculus}.}
 \end{summarybox}
 
 \canyou

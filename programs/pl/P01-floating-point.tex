@@ -826,85 +826,85 @@ inżynierskie: skoro tyle masz, które algorytmy to przeżyją, a które nie.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Liczba zmiennoprzecinkowa to notacja naukowa
+\sumitem{1--3}{\result{\textbf{Liczba zmiennoprzecinkowa to notacja naukowa
   Programu~\ref{prog:F01} ze zmienioną dziesiątką na dwójkę i ograniczonymi
   cyframi mantysy}: $\pm\, m \times 2^{e}$ przy $1 \le m < 2$. Podwójna
   precyzja ma $\val{p01.fp64.width}$ bitów, więc mieści najwyżej $2^{64}$
   liczb \dash{} skończenie wiele. Trzyma wybór i zaokrągla wszystko pozostałe
-  do najbliższego elementu, a to jedno zdanie generuje resztę.}
-\sumitem{4--6}{\textbf{Trzy pola}: bit znaku, wykładnik niosący rozmiar i
+  do najbliższego elementu, a to jedno zdanie generuje resztę}.}
+\sumitem{4--6}{\result{\textbf{Trzy pola}: bit znaku, wykładnik niosący rozmiar i
   mantysa niosąca precyzję, w podziale
   $1 + \val{p01.fp64.ebits} + \val{p01.fp64.mbits}$ w podwójnej precyzji.
   Można je odczytać przez \code{struct}, a nie przyjmować na wiarę \dash{}
   $\num{1.0}$ i $\num{2.0}$ różnią się tylko wykładnikiem, $\num{1.0}$ i $\num{1.5}$ tylko mantysą.
   Wiodąca $1$ liczby $m$ nigdy nie jest przechowywana, co kupuje bit, a
-  sekcja 5 mówi o rezygnowaniu z niej.}
-\sumitem{7--8}{\textbf{Odstęp rośnie z liczbą}: $\val{p01.gap.one}$ przy $1$,
+  sekcja 5 mówi o rezygnowaniu z niej}.}
+\sumitem{7--8}{\result{\textbf{Odstęp rośnie z liczbą}: $\val{p01.gap.one}$ przy $1$,
   $\val{p01.gap.thousand}$ przy $1000$, $\val{p01.gap.billion}$ przy
   miliardzie. Stały budżet bitów znaczących to stała precyzja \emph{względna},
   więc odstęp bezwzględny musi się skalować. Jedna tolerancja bezwzględna
-  przyłożona do całego kodu ma zły model i zawodzi tam, gdzie to ma znaczenie.}
-\sumitem{9}{\textbf{Epsilon maszynowy} to odstęp przy $1$, czyli budżet
+  przyłożona do całego kodu ma zły model i zawodzi tam, gdzie to ma znaczenie}.}
+\sumitem{9}{\result{\textbf{Epsilon maszynowy} to odstęp przy $1$, czyli budżet
   mantysy jako liczba: $\val{p01.fp64.eps}$, $\val{p01.fp32.eps}$,
   $\val{p01.fp16.eps}$, $\val{p01.bf16.eps}$ \dash{} około
   $\val{p01.fp64.digits}$, $\val{p01.fp32.digits}$, $\val{p01.fp16.digits}$
-  i $\val{p01.bf16.digits}$ cyfr dziesiętnych.}
-\sumitem{10--12}{\code{0.1 + 0.2} daje $\val{p01.sum.shown}$, bo \code{0.1}
+  i $\val{p01.bf16.digits}$ cyfr dziesiętnych}.}
+\sumitem{10--12}{\result{\code{0.1 + 0.2} daje $\val{p01.sum.shown}$, bo \code{0.1}
   jest przechowywane jako $\val{p01.tenth.stored}$ i było błędne, zanim
   wydarzyła się jakakolwiek arytmetyka. \textbf{Równość nie jest pytaniem,
   które warto zadawać}; tolerancje muszą być względne. Dwie straty w
   \code{fp32} różniące się na siódmym miejscu po przecinku różnią się o mniej
   niż epsilon przy tej wielkości, więc różnicą jest kolejność redukcji, a nie
-  model.}
-\sumitem{13--15}{\textbf{Dodawanie nie jest łączne.} Przy dwóch wartościach
+  model}.}
+\sumitem{13--15}{\result{\textbf{Dodawanie nie jest łączne.} Przy dwóch wartościach
   $\val{p01.assoc.small}$ wyrażenie $(a+b)+c$ daje $\val{p01.assoc.left}$, a
   $a+(b+c)$ daje $\val{p01.assoc.right}$: zaokrąglenie następuje po każdym
   działaniu, więc mała wartość dodana do dużej może przepaść, podczas gdy dwie
   małe dodane do siebie przetrwają. Dwa akceleratory dzielące redukcję inaczej
-  różnią się zatem na ostatnich bitach i żaden się nie myli.}
-\sumitem{16--18}{\textbf{Poniżej połowy odstępu wkład nie jest mały, tylko
+  różnią się zatem na ostatnich bitach i żaden się nie myli}.}
+\sumitem{16--18}{\result{\textbf{Poniżej połowy odstępu wkład nie jest mały, tylko
   zerowy} \dash{} \code{1.0 + 1e-17} zwraca $\val{p01.swamp.sum}$ dokładnie.
   Progiem jest połowa epsilona bieżącej sumy: $\val{p01.swamp.fp32}$ w
   \code{fp32}, $\val{p01.swamp.bf16}$ w \code{bf16}, i dlatego akumulatory
   trzyma się szersze niż wchodzące do nich wartości. Ile kosztuje milion
-  takich strat, należy do Programu~\ref{prog:P02}.}
-\sumitem{19}{Połowa odstępu podwójnej precyzji przy miliardzie to dokładnie
+  takich strat, należy do Programu~\ref{prog:P02}}.}
+\sumitem{19}{\result{Połowa odstępu podwójnej precyzji przy miliardzie to dokładnie
   połowa epsilona \code{fp32}, bo $29$ to różnica dwóch budżetów mantysy.
   \textbf{Precyzja jest własnością formatu i wielkości razem}, nigdy samego
-  formatu.}
-\sumitem{20--21}{\code{fp16} i \code{bf16} mają po szesnaście bitów i różnią
+  formatu}.}
+\sumitem{20--21}{\result{\code{fp16} i \code{bf16} mają po szesnaście bitów i różnią
   się tylko miejscem cięcia: $\val{p01.fp16.ebits}$ bitów wykładnika przeciw
   $\val{p01.bf16.ebits}$. Szerokość jest ustalona, więc \textbf{bit dodany
-  jednemu polu jest bitem zabranym drugiemu}.}
-\sumitem{22--23}{Sufit \code{fp16} to $\val{p01.fp16.max.exact}$, policzony z
+  jednemu polu jest bitem zabranym drugiemu}}.}
+\sumitem{22--23}{\result{Sufit \code{fp16} to $\val{p01.fp16.max.exact}$, policzony z
   budżetu wykładnika, a nie odszukany. Sufit \code{bf16} to
   $\val{p01.bf16.max}$, czyli $\val{p01.fp32.max}$ formatu \code{fp32} \dash{}
   ten sam budżet wykładnika. \textbf{\code{bf16} to \code{fp32} z usuniętym
-  dołem mantysy}, więc konwersja między nimi nie może się przepełnić.}
-\sumitem{24--26}{\textbf{\code{bf16} jest formatem \emph{mniej} dokładnym}
+  dołem mantysy}, więc konwersja między nimi nie może się przepełnić}.}
+\sumitem{24--26}{\result{\textbf{\code{bf16} jest formatem \emph{mniej} dokładnym}
   \dash{} $\val{p01.bf16.eps}$ przeciw $\val{p01.fp16.eps}$ \dash{} kupionym
   za $\val{p01.bf16.over.fp16}$ razy większy zasięg. Zasięg zawodzi pierwszy,
   bo wartość poza zakresem przestaje istnieć, a precyzja tylko grubieje; to
   właśnie obchodzi loss scaling w \code{fp16} i dlatego \code{bf16} go nie
-  potrzebuje. Wybór formatu to pytanie o to, którego budżetu ci brakuje.}
-\sumitem{27--29}{\textbf{Format ma dwie podłogi.} Poniżej najmniejszej
+  potrzebuje. Wybór formatu to pytanie o to, którego budżetu ci brakuje}.}
+\sumitem{27--29}{\result{\textbf{Format ma dwie podłogi.} Poniżej najmniejszej
   normalnej ($\val{p01.fp64.minnorm}$ dla podwójnej precyzji) domyślna wiodąca
   $1$ jest oddawana bit po bicie, co daje \textbf{liczby subnormalne} aż do
   drugiej podłogi przy $\val{p01.fp64.minsub}$. Zakres subnormalny formatu
   jest tak głęboki, jak szeroka jest jego mantysa, więc w \code{bf16} jest
   płytki. Tryby flush-to-zero istnieją, więc podłogą, przeciw której liczysz,
-  może być ta wyższa.}
-\sumitem{30--32}{Program~\ref{prog:F03} doszedł do $\val{p01.f03.prob}$, a
+  może być ta wyższa}.}
+\sumitem{30--32}{\result{Program~\ref{prog:F03} doszedł do $\val{p01.f03.prob}$, a
   ta liczba odczytuje się jako $\val{p01.f03.readback}$ \dash{} \textbf{liczba, którą ta książka liczy
   i której nie da się wpisać}, i dlatego liczono ją jako logarytm. Iloczyn
   modelu rzucającego monetą jest dokładnie zerem po $\val{p01.coin.fp64}$
-  tokenach w \code{fp64} i po $\val{p01.coin.fp16}$ w \code{fp16}.}
-\sumitem{33--35}{Program~\ref{prog:F12} doszedł do $\val{p01.f12.prod}$, co
+  tokenach w \code{fp64} i po $\val{p01.coin.fp16}$ w \code{fp16}}.}
+\sumitem{33--35}{\result{Program~\ref{prog:F12} doszedł do $\val{p01.f12.prod}$, co
   jest małą liczbą w \code{fp64} i \textbf{dokładnie zerem w \code{fp32}}, więc zanikający
   gradient nie zawsze jest gradientem, który zrobił się mały \dash{} często
   jest tym, który wyszedł z systemu liczbowego. A prawa gałąź
   Programu~\ref{prog:F11} to odejmowanie zostawiające zaokrąglenie. Oba
-  mechanizmy stają się dyscypliną w Programie~\ref{prog:P02}.}
+  mechanizmy stają się dyscypliną w Programie~\ref{prog:P02}}.}
 \end{summarybox}
 
 \canyou

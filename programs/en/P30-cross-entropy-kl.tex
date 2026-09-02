@@ -989,52 +989,52 @@ claims people make with it are usually not supported.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Cross-entropy is what a code costs}:
-  $H(p, q) = -\sum_i p_i \logb{2} q_i$, which is the codeword lengths
+\sumitem{1--3}{\result{\textbf{Cross-entropy is what a code costs}:
+  $H(p, q) = -\sum_i p_i \logb{2} q_i$}, which is the codeword lengths
   weighted by how often each symbol turns up. It is
   Program~\ref{prog:P18}'s loss, and this is what it measures.}
-\sumitem{4--6}{\textbf{That cost splits}: $H(p, q) = H(p) + \KL{p}{q}$.
+\sumitem{4--6}{\result{\textbf{That cost splits}: $H(p, q) = H(p) + \KL{p}{q}$}.
   Program~\ref{prog:P29}'s \enquote{rounding} gap of $\val{p30.src.kl}$ bits
   \emph{is} the divergence, and its two alphabets are the source and the code
   \dash{} $\val{p30.src.h} + \val{p30.src.kl} = \val{p30.src.ce}$.}
-\sumitem{7--9}{\textbf{The excess is never negative}, by
+\sumitem{7--9}{\textbf{\result{The excess is never negative}}, by
   Program~\ref{prog:P19}'s Jensen on a concave logarithm, and it is zero
   exactly when the two distributions agree. Checked over every ordered pair
   of the $\val{p30.simplex.n}$ distributions on a grid.}
-\sumitem{11--12}{A cross-entropy therefore has a floor, and the floor is the
-  \emph{target's} entropy. A loss that stops falling may have arrived rather
+\sumitem{11--12}{\result{A cross-entropy therefore has a floor, and the floor
+  is the \emph{target's} entropy}. A loss that stops falling may have arrived rather
   than stalled, and the loss alone cannot tell you which.}
-\sumitem{13--16}{\textbf{It is not symmetric.} On
+\sumitem{13--16}{\textbf{\result{It is not symmetric.}} On
   Program~\ref{prog:F05}'s own distribution the two directions are
   $\val{p30.f05.fwd}$ and $\val{p30.f05.rev}$ nats, a factor of
   $\val{p30.f05.ratio}$. The first argument weights the sum, so it is the
   target; the second is what is being judged.}
 \sumitem{17--18}{And a pair that comes out nearly equal \dash{}
   $\val{p30.src.kl}$ against $\val{p30.src.klrev}$ \dash{} proves nothing:
-  the size of one direction does not bound the other.}
-\sumitem{19--21}{\textbf{The whole mechanism is one term.} Where the target
+  \result{the size of one direction does not bound the other}.}
+\sumitem{19--21}{\result{\textbf{The whole mechanism is one term.} Where the target
   has mass and the candidate has none, forward pays $\infty$ and reverse pays
-  nothing. Not a rounding difference \dash{} the difference between a number
+  nothing}. Not a rounding difference \dash{} the difference between a number
   and no number.}
-\sumitem{24--30}{\textbf{Forward is mode-covering, reverse is
-  mode-seeking}, enumerated over $\val{p30.fam.n}$ candidates with no
+\sumitem{24--30}{\textbf{\result{Forward is mode-covering, reverse is
+  mode-seeking}}, enumerated over $\val{p30.fam.n}$ candidates with no
   optimiser anywhere. Only $\val{p30.fin.fwd}$ of them have a finite forward
   value against all $\val{p30.fin.rev}$ reverse.}
 \sumitem{31--33}{On a target carrying $\val{p30.head.mode2}$ per cent on its
   second hump, forward keeps $\val{p30.fwd.mode2}$ per cent of the mass there
   and reverse keeps \emph{none} \dash{} on all $\val{p30.targets.n}$ targets
   tried, so the behaviour belongs to the direction and not to the target.}
-\sumitem{34--38}{\textbf{It is not a distance.} The triangle inequality
+\sumitem{34--38}{\textbf{\result{It is not a distance.}} The triangle inequality
   Program~\ref{prog:F09} gave you fails for $\val{p30.tri.bad}$ of
   $\val{p30.tri.total}$ ordered triples \dash{} $\val{p30.tri.pct}$ per cent,
   so the common case \dash{} the worst detour being shorter by
   $\val{p30.tri.gap}$ nats.}
-\sumitem{39--42}{\textbf{Symmetrising costs the signal.}
+\sumitem{39--42}{\result{\textbf{Symmetrising costs the signal.}
   Jensen--Shannon is symmetric, finite and bounded, and the bound is
-  $\ln 2 = \val{p30.js.cap}$: point masses $1$ and $\val{p30.js.far}$ bins
+  $\ln 2 = \val{p30.js.cap}$}: point masses $1$ and $\val{p30.js.far}$ bins
   apart are exactly that far apart, which is the regime a run starts in.}
-\sumitem{43--45}{\textbf{Training on a fixed dataset minimises forward KL}
-  to the empirical distribution, because $H(\hat p) = \val{p30.emp.h}$ nats
+\sumitem{43--45}{\result{\textbf{Training on a fixed dataset minimises forward KL}
+  to the empirical distribution}, because $H(\hat p) = \val{p30.emp.h}$ nats
   does not depend on the model. Nobody chose the mode-covering direction; it
   came with the objective.}
 \end{summarybox}

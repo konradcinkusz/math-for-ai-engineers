@@ -831,84 +831,84 @@ which do not.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{A float is Program~\ref{prog:F01}'s scientific notation
+\sumitem{1--3}{\result{\textbf{A float is Program~\ref{prog:F01}'s scientific notation
   with the ten changed to a two and the mantissa's digits capped}:
   $\pm\, m \times 2^{e}$ with $1 \le m < 2$. A double has
   $\val{p01.fp64.width}$ bits, so it holds at most $2^{64}$ numbers \dash{}
   finitely many. It keeps a selection and rounds everything else to the
-  nearest member of it, and that one sentence generates the rest.}
-\sumitem{4--6}{\textbf{Three fields}: a sign bit, an exponent carrying the
+  nearest member of it, and that one sentence generates the rest}.}
+\sumitem{4--6}{\result{\textbf{Three fields}: a sign bit, an exponent carrying the
   size, and a significand carrying the precision, split
   $1 + \val{p01.fp64.ebits} + \val{p01.fp64.mbits}$ in a double. They can be
   read with \code{struct} rather than taken on trust \dash{} $\num{1.0}$ and $\num{2.0}$
   differ only in the exponent, $\num{1.0}$ and $\num{1.5}$ only in the significand. The
   leading $1$ of $m$ is never stored, which buys a bit and is what section 5
-  is about giving up.}
-\sumitem{7--8}{\textbf{The gap grows with the number}:
+  is about giving up}.}
+\sumitem{7--8}{\result{\textbf{The gap grows with the number}:
   $\val{p01.gap.one}$ at $1$, $\val{p01.gap.thousand}$ at $1000$,
   $\val{p01.gap.billion}$ at a billion. A fixed budget of significant bits is a
   fixed \emph{relative} precision, so the absolute spacing has to scale. A
   single absolute tolerance applied across a codebase has the wrong model and
-  fails where it matters.}
-\sumitem{9}{\textbf{Machine epsilon} is the gap at $1$, which is the
+  fails where it matters}.}
+\sumitem{9}{\result{\textbf{Machine epsilon} is the gap at $1$, which is the
   significand budget as a number: $\val{p01.fp64.eps}$, $\val{p01.fp32.eps}$,
   $\val{p01.fp16.eps}$, $\val{p01.bf16.eps}$ \dash{} about
   $\val{p01.fp64.digits}$, $\val{p01.fp32.digits}$, $\val{p01.fp16.digits}$
-  and $\val{p01.bf16.digits}$ decimal digits.}
-\sumitem{10--12}{\code{0.1 + 0.2} gives $\val{p01.sum.shown}$ because
+  and $\val{p01.bf16.digits}$ decimal digits}.}
+\sumitem{10--12}{\result{\code{0.1 + 0.2} gives $\val{p01.sum.shown}$ because
   \code{0.1} is stored as $\val{p01.tenth.stored}$ and was wrong before any
   arithmetic happened. \textbf{Equality is not a question you should ask};
   tolerances must be relative. Two \code{fp32} losses differing in the seventh
   decimal differ by less than epsilon at that magnitude, so the difference is
-  the reduction order rather than the model.}
-\sumitem{13--15}{\textbf{Addition is not associative.} With
+  the reduction order rather than the model}.}
+\sumitem{13--15}{\result{\textbf{Addition is not associative.} With
   $\val{p01.assoc.small}$ twice, $(a+b)+c$ gives $\val{p01.assoc.left}$ and
   $a+(b+c)$ gives $\val{p01.assoc.right}$: rounding happens after every
   operation, so a small value added to a large one can be lost while two small
   ones added together survive. Two accelerators partitioning a reduction
-  differently therefore disagree in the last bits, and neither is wrong.}
-\sumitem{16--18}{\textbf{Below half a gap, a contribution is not small, it is
+  differently therefore disagree in the last bits, and neither is wrong}.}
+\sumitem{16--18}{\result{\textbf{Below half a gap, a contribution is not small, it is
   zero} \dash{} \code{1.0 + 1e-17} returns $\val{p01.swamp.sum}$ exactly. The
   threshold is half an epsilon of the running total: $\val{p01.swamp.fp32}$ in
   \code{fp32}, $\val{p01.swamp.bf16}$ in \code{bf16}, which is why accumulators
   are kept wider than the values entering them. What a million such losses cost
-  is Program~\ref{prog:P02}'s.}
-\sumitem{19}{Half a double's gap at a billion is exactly half an \code{fp32}
+  is Program~\ref{prog:P02}'s}.}
+\sumitem{19}{\result{Half a double's gap at a billion is exactly half an \code{fp32}
   epsilon, because $29$ is the difference of the two significand budgets.
   \textbf{Precision is a property of a format and a magnitude together}, never
-  of a format alone.}
-\sumitem{20--21}{\code{fp16} and \code{bf16} are both sixteen bits and differ
+  of a format alone}.}
+\sumitem{20--21}{\result{\code{fp16} and \code{bf16} are both sixteen bits and differ
   only in where they cut: $\val{p01.fp16.ebits}$ exponent bits against
   $\val{p01.bf16.ebits}$. The width is fixed, so \textbf{a bit added to one
-  field is a bit taken from the other}.}
-\sumitem{22--23}{\code{fp16}'s ceiling is $\val{p01.fp16.max.exact}$, computed from
+  field is a bit taken from the other}}.}
+\sumitem{22--23}{\result{\code{fp16}'s ceiling is $\val{p01.fp16.max.exact}$, computed from
   its exponent budget rather than looked up. \code{bf16}'s is
   $\val{p01.bf16.max}$, which is \code{fp32}'s $\val{p01.fp32.max}$ \dash{} the
   same exponent budget. \textbf{\code{bf16} is \code{fp32} with the bottom of
-  the significand removed}, so converting between them cannot overflow.}
-\sumitem{24--26}{\textbf{\code{bf16} is the \emph{less} precise format} \dash{}
+  the significand removed}, so converting between them cannot overflow}.}
+\sumitem{24--26}{\result{\textbf{\code{bf16} is the \emph{less} precise format} \dash{}
   $\val{p01.bf16.eps}$ against $\val{p01.fp16.eps}$ \dash{} bought
   $\val{p01.bf16.over.fp16}$ times the reach. Range fails first because a value
   outside the range stops existing while precision only coarsens, which is what
   loss scaling works around in \code{fp16} and why \code{bf16} needs none. The
-  format choice is a question about which budget you are short of.}
-\sumitem{27--29}{\textbf{A format has two floors.} Below the smallest normal
+  format choice is a question about which budget you are short of}.}
+\sumitem{27--29}{\result{\textbf{A format has two floors.} Below the smallest normal
   ($\val{p01.fp64.minnorm}$ for a double) the implicit leading $1$ is given up
   one bit at a time, giving the \textbf{subnormals} down to a second floor at
   $\val{p01.fp64.minsub}$. A format's subnormal range is as deep as its
   significand is wide, so \code{bf16}'s is shallow. Flush-to-zero modes exist,
-  so the floor you compute against may be the higher one.}
-\sumitem{30--32}{Program~\ref{prog:F03}'s $\val{p01.f03.prob}$ reads back as
+  so the floor you compute against may be the higher one}.}
+\sumitem{30--32}{\result{Program~\ref{prog:F03}'s $\val{p01.f03.prob}$ reads back as
   $\val{p01.f03.readback}$ \dash{} \textbf{a number this book computes and
   cannot type in}, which is why it was computed as a logarithm. A coin-flipping
   model's product is exactly zero after $\val{p01.coin.fp64}$ tokens in
-  \code{fp64} and $\val{p01.coin.fp16}$ in \code{fp16}.}
-\sumitem{33--35}{Program~\ref{prog:F12}'s $\val{p01.f12.prod}$ is a small
+  \code{fp64} and $\val{p01.coin.fp16}$ in \code{fp16}}.}
+\sumitem{33--35}{\result{Program~\ref{prog:F12}'s $\val{p01.f12.prod}$ is a small
   number in \code{fp64} and \textbf{exactly zero in \code{fp32}}, so a
   vanishing gradient is not always a gradient that became small \dash{} often
   it is one that left the number system. And Program~\ref{prog:F11}'s
   right-hand branch is subtraction leaving the rounding behind. Both mechanisms
-  become a discipline in Program~\ref{prog:P02}.}
+  become a discipline in Program~\ref{prog:P02}}.}
 \end{summarybox}
 
 \canyou

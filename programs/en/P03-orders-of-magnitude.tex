@@ -746,87 +746,86 @@ book that needs a new \emph{object} rather than a new question.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{$O$-notation keeps how the cost grows and throws away
+\sumitem{1--2}{\result{\textbf{$O$-notation keeps how the cost grows and throws away
   the constant.} $\frac{n(n-1)}{2}$ and $3n^{2} + 5n + 100$ differ by about
   six at large $n$, and the notation calls both $O(n^{2})$: the lower-order
-  terms genuinely stop mattering, and the leading coefficient does not.}
-\sumitem{3--4}{$f$ is $O(g)$ when $f(n) \le c\,g(n)$ beyond some $n_0$
+  terms genuinely stop mattering, and the leading coefficient does not}.}
+\sumitem{3--4}{\result{$f$ is $O(g)$ when $f(n) \le c\,g(n)$ beyond some $n_0$
   \dash{} \emph{some} constant, \emph{beyond} some size. So \textbf{$O$ is an
   upper bound, not a description}: a linear algorithm is honestly $O(n^{2})$.
   $\Theta$ is the notation for \emph{exactly this growth}, and it is usually
-  what was meant.}
-\sumitem{5--7}{Doubling the input: $O(\mfalogplain n)$ adds a step, $O(n)$ doubles,
+  what was meant}.}
+\sumitem{5--7}{\result{Doubling the input: $O(\mfalogplain n)$ adds a step, $O(n)$ doubles,
   $O(n^{2})$ quadruples, $O(2^{n})$ \emph{squares} the work.
   \textbf{Nested loops multiply, sequential loops add} \dash{} $O(nm)$ against
-  $O(n+m)$, which is a difference the notation \emph{can} state.}
-\sumitem{8--10}{\textbf{Two growth rates do not rank two implementations.}
+  $O(n+m)$, which is a difference the notation \emph{can} state}.}
+\sumitem{8--10}{\result{\textbf{Two growth rates do not rank two implementations.}
   $\val{p03.cross.c1}n^{2}$ against $\val{p03.cross.c2}n\logb{2}n$ trade places
   at $n = \val{p03.cross.n}$, found by search because there is no formula. At
   $n = 100$ the asymptotically better one costs
   $\val{p03.cross.ratio.100}$ times as much; at $n = 100\,000$ the other one
-  costs $\val{p03.cross.ratio.100000}$ times as much.}
-\sumitem{11--12}{\enquote{Asymptotically better} is a claim about a limit you
+  costs $\val{p03.cross.ratio.100000}$ times as much}.}
+\sumitem{11--12}{\result{\enquote{Asymptotically better} is a claim about a limit you
   may never reach \dash{} every sorting library runs an $O(n^{2})$ insertion
   sort on short subarrays for exactly this reason. And \textbf{the notation
   does not say what an operation is}: a register add and a cache miss differ
   by a factor in the hundreds and both count as one step. The notation says how
-  the cost scales; a measurement says what it is.}
-\sumitem{13--14}{Program~\ref{prog:F04}'s $\val{p03.flop.pairs}$ pairs priced
+  the cost scales; a measurement says what it is}.}
+\sumitem{13--14}{\result{Program~\ref{prog:F04}'s $\val{p03.flop.pairs}$ pairs priced
   as work: each is a dot product of length $\val{p03.flop.dhead}$, so
   $\val{p03.flop.perhead}$ operations per head and
   $\val{p03.flop.allheads}$ across $\val{p03.flop.heads}$ heads \dash{} scores
   alone, one layer, one sequence. A multiply-and-add is \textbf{two} FLOPs by
-  convention, and a factor of two between two people's counts is usually that.}
-\sumitem{15--16}{Training costs about $6$ FLOPs per parameter per token: two
+  convention, and a factor of two between two people's counts is usually that}.}
+\sumitem{15--16}{\result{Training costs about $6$ FLOPs per parameter per token: two
   forward, and two each for the backward pass's two gradients. That gives
   $\val{p03.train.flops}$ for $\val{f01.params}$ parameters over
   $\val{f01.tokens}$ tokens, which is Program~\ref{prog:F01}'s number
   re-derived. \textbf{A count of parameters is not a count of work}: attention
-  has $O(d^{2})$ parameters and $O(d\,n^{2})$ work.}
-\sumitem{17}{\textbf{A FLOP count is a count, not a time.} The gap to the
+  has $O(d^{2})$ parameters and $O(d\,n^{2})$ work}.}
+\sumitem{17}{\result{\textbf{A FLOP count is a count, not a time.} The gap to the
   device's advertised rate is the time the arithmetic spends waiting for
   numbers, and it is what the last section predicts. A FLOP count with no
-  utilisation beside it is a best case quoted as a plan.}
-\sumitem{18--20}{\textbf{The weights are the smallest term.} For
+  utilisation beside it is a best case quoted as a plan}.}
+\sumitem{18--20}{\result{\textbf{The weights are the smallest term.} For
   $\val{f01.params}$ parameters: $\val{p03.mem.weights}$~GB of weights,
   $\val{p03.mem.grads}$ of gradients and $\val{p03.mem.optimiser}$ of optimiser
   state \dash{} $\val{p03.mem.total}$~GB in all, which is
   $\val{p03.mem.multiple}$ times the model card's number and leaves the weights
   at $\val{p03.mem.weights.pct}\%$. That factor is why a model that serves on a
-  card will not fine-tune on it, and each remedy removes a \emph{row}.}
-\sumitem{21}{\textbf{Activations do not scale with the parameters} \dash{}
+  card will not fine-tune on it, and each remedy removes a \emph{row}}.}
+\sumitem{21}{\result{\textbf{Activations do not scale with the parameters} \dash{}
   they scale with batch, sequence and depth, so the same model has a different
   bill on every workload. They are kept because the backward pass needs them,
   which is Program~\ref{prog:F12}'s chain rule as a memory bill, and
   checkpointing recomputes them instead: operations traded for bytes on
-  purpose.}
-\sumitem{22--23}{\textbf{The key--value cache is linear in the sequence while
+  purpose}.}
+\sumitem{22--23}{\result{\textbf{The key--value cache is linear in the sequence while
   attention's arithmetic is quadratic}, and nearly everybody expects both to be
   quadratic. It holds one key and value per \emph{position}, not per pair:
   $\val{p03.kv.gib}$~GiB at $\val{p03.kv.seq}$ tokens,
   $\val{p03.kv.double.gib}$ at twice that, and
   $\val{p03.kv.per.token.mib}$~MiB per token in flight. It is usually larger than
-  the weights and it decides how many users a card serves.}
-\sumitem{24}{GB is $10^{9}$ and GiB is $2^{30}$, about seven per cent larger.
-  A capacity plan that is seven per cent out is nearly always this.}
-\sumitem{25--29}{\textbf{Arithmetic intensity is operations divided by bytes
+  the weights and it decides how many users a card serves}.}
+\sumitem{24}{\result{GB is $10^{9}$ and GiB is $2^{30}$, about seven per cent larger.
+  A capacity plan that is seven per cent out is nearly always this}.}
+\sumitem{25--29}{\result{\textbf{Arithmetic intensity is operations divided by bytes
   moved}, compared against the device's own operations-per-byte \dash{}
   $\val{p03.dev.ratio}$ under this program's stated assumptions. An elementwise
   add is $\val{p03.ai.elementwise}$ \emph{whatever $n$ is}; an $n$-square
   multiply is $\frac{n}{3}$, which \emph{grows}, and is
-  $\val{p03.ai.matmul}$ at $n = \val{p03.ai.matmul.n}$.}
-\sumitem{30--31}{The elementwise operation is short of the device by
+  $\val{p03.ai.matmul}$ at $n = \val{p03.ai.matmul.n}$}.}
+\sumitem{30--31}{\result{The elementwise operation is short of the device by
   $\val{p03.ai.short}$, so that is the fraction of the available arithmetic it
   uses. And \textbf{a matrix multiply is compute-bound only
   above $n \approx \val{p03.ai.smalln}$} \dash{} a batch of small multiplies is
   memory-bound like anything else, which is what a stack of narrow heads or
-  experts produces.}
-\sumitem{32--34}{Fusing $\val{p03.fuse.chain}$ elementwise operations divides
+  experts produces}.}
+\sumitem{32--34}{\result{Fusing $\val{p03.fuse.chain}$ elementwise operations divides
   the bytes by $\val{p03.fuse.factor}$ for exactly the same operations, taking
   the intensity to $\val{p03.fuse.after}$ \dash{} still far below
   $\val{p03.dev.ratio}$. \textbf{Fusion helps and does not rescue}, because the
-  input must be read once and the output written once whatever happens between.
-  \textbf{This closes Part II}: three questions about one arithmetic, answered
+  input must be read once and the output written once whatever happens between.} \textbf{This closes Part II}: three questions about one arithmetic, answered
   with nothing beyond arithmetic, algebra and a sigma.}
 \end{summarybox}
 

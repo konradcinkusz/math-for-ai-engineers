@@ -773,65 +773,65 @@ meant.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{A set answers one question: is this one in it?} So it
+\sumitem{1--3}{\result{\textbf{A set answers one question: is this one in it?} So it
   discards repeats, and \code{len(tokens)} against \code{len(set(tokens))} is
   the difference between a corpus and a vocabulary \dash{} $\val{f10.tokens}$
   against $\val{f10.vocab}$ here, a factor of $\val{f10.repeat}$. When a count
-  appears in a claim, say whether it counted occurrences or distinct things.}
-\sumitem{4--7}{It discards \textbf{order} too, so a sequence of tokens is a bad
+  appears in a claim, say whether it counted occurrences or distinct things}.}
+\sumitem{4--7}{\result{It discards \textbf{order} too, so a sequence of tokens is a bad
   fit for a set and a vocabulary is a good one \dash{} and token \emph{ids} are
   a separate, arbitrary numbering that does not travel between tokenisers.
   $\in$, $\lvert A \rvert$, $\emptyset$, $\subseteq$; two sets are
-  \emph{disjoint} when nothing is in both.}
-\sumitem{8--9}{$A \cup B$, $A \cap B$ and $A \setminus B$ are \emph{or},
+  \emph{disjoint} when nothing is in both}.}
+\sumitem{8--9}{\result{$A \cup B$, $A \cap B$ and $A \setminus B$ are \emph{or},
   \emph{and} and \emph{and not}. \textbf{Adding two set sizes counts the
   overlap twice}: $\lvert A \cup B \rvert = \lvert A \rvert + \lvert B \rvert -
   \lvert A \cap B \rvert$. Two eval sets of $\val{f10.eval.a}$ and
   $\val{f10.eval.b}$ sharing $\val{f10.eval.shared}$ hold
   $\val{f10.eval.union}$ examples, not $\val{f10.eval.naive}$ \dash{} and the
-  $\val{f10.eval.overcount}$ counted twice are also scored twice.}
-\sumitem{10--15}{\textbf{A mask is the same information lined up with the
+  $\val{f10.eval.overcount}$ counted twice are also scored twice}.}
+\sumitem{10--15}{\result{\textbf{A mask is the same information lined up with the
   data}: \code{|} is union, \code{\&} is intersection, \code{\& \textasciitilde}
   is difference, and \code{.sum()} is the size, because a yes is a one. So
   \code{.mean()} on a mask is the fraction it selects, and reading it is the
-  cheapest check a filter has.}
-\sumitem{16--18}{\emph{Or} means \textbf{at least one, possibly both}, in logic
+  cheapest check a filter has}.}
+\sumitem{16--18}{\result{\emph{Or} means \textbf{at least one, possibly both}, in logic
   and in every language you will use, whatever it means in English. And
   \textbf{negating \emph{and} gives \emph{or}}:
   $\lnot(p \land q) = \lnot p \lor \lnot q$, because failing \emph{both} only
-  requires failing one.}
-\sumitem{19--22}{\textbf{The wrong negation of a conjunction always keeps too
+  requires failing one}.}
+\sumitem{19--22}{\result{\textbf{The wrong negation of a conjunction always keeps too
   little}, which is why it is not noticed: of $\val{f10.rec.total}$ records the
   right filter keeps $\val{f10.rec.right}$ and \code{not spam and not short}
   keeps $\val{f10.rec.wrong}$, dropping $\val{f10.rec.lost}$ with no symptom
   but a small dataset. Every filter is a set and every combination of filters
-  is a set operation.}
-\sumitem{23--24}{\textbf{Independent choices multiply}, and \emph{independent}
+  is a set operation}.}
+\sumitem{23--24}{\result{\textbf{Independent choices multiply}, and \emph{independent}
   is a condition to state rather than assume: $\val{f10.grid.a}$ models times
   $\val{f10.grid.b}$ precisions times $\val{f10.grid.c}$ batch sizes is
-  $\val{f10.grid}$ runs, and one forbidden combination makes it wrong.}
-\sumitem{25--28}{\textbf{A set of $n$ elements has $2^{n}$ subsets}, one
+  $\val{f10.grid}$ runs, and one forbidden combination makes it wrong}.}
+\sumitem{25--28}{\result{\textbf{A set of $n$ elements has $2^{n}$ subsets}, one
   yes-or-no per element: $\val{f10.features}$ features give
   $\val{f10.subsets}$, and one more feature doubles it. Write the count down
   before writing the loop \dash{} it is one multiplication and it is the
-  difference between a plan and a wish.}
-\sumitem{29--30}{\textbf{$n$ things make $\frac{n(n-1)}{2}$ pairs}, halved
-  because a set discards order and $\{a,b\}$ is $\{b,a\}$.}
-\sumitem{31--33}{\textbf{Twice the data is a shade over four times the work
+  difference between a plan and a wish}.}
+\sumitem{29--30}{\result{\textbf{$n$ things make $\frac{n(n-1)}{2}$ pairs}, halved
+  because a set discards order and $\{a,b\}$ is $\{b,a\}$}.}
+\sumitem{31--33}{\result{\textbf{Twice the data is a shade over four times the work
   when the work is per pair}: $\val{f10.docs}$ documents give
   $\val{f10.pairs}$ comparisons and $\val{f10.docs2}$ give $\val{f10.pairs2}$,
   a factor of $\val{f10.pairs.ratio}$. The ratio is $\frac{4n-2}{n-1}$ and
   falls towards four \emph{from above} \dash{} the script asserted the opposite
   and failed. The notation for that growth is
   Program~\ref{prog:P03}'s; the count is yours now, and it is the more useful
-  half in a design review.}
-\sumitem{34--37}{\textbf{Every naive probability is two counts and a
+  half in a design review}.}
+\sumitem{34--37}{\result{\textbf{Every naive probability is two counts and a
   division}, and the hard part is choosing the denominator, because requests,
   users and sessions all give correct answers to different questions. Report
   the two counts, not just the rate. What a probability \emph{is} belongs to
   Program~\ref{prog:P23}. Set, mask, count: three representations of one idea,
   and almost everything done to a dataset is one of them from a different
-  side.}
+  side}.}
 \end{summarybox}
 
 \canyou

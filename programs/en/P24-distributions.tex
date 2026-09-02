@@ -1103,103 +1103,103 @@ them is reversible.}{reweight or delete}
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--3}{A \textbf{random variable} is a \emph{function} from the sample
+\sumitem{1--3}{\result{A \textbf{random variable} is a \emph{function} from the sample
   space to numbers. It is not random and it is not a variable: the randomness
   is in which outcome the space hands it. Capital letter for the rule, small
-  letter for a value it took.}
-\sumitem{4--5}{One space carries as many random variables as you define, and
+  letter for a value it took}.}
+\sumitem{4--5}{\result{One space carries as many random variables as you define, and
   they all ride on the same draw. The space says what can happen; a random
-  variable is one question you decided to ask of it.}
-\sumitem{6--8}{$\Ex[X] = \sum_{\omega}\Prob(\omega)X(\omega)$, which is
+  variable is one question you decided to ask of it}.}
+\sumitem{6--8}{\result{$\Ex[X] = \sum_{\omega}\Prob(\omega)X(\omega)$, which is
   Program~\ref{prog:F13}'s value-times-weight with a name attached. It is a
-  \emph{number} and need not be a value $X$ can take.}
-\sumitem{9--10}{\textbf{The expectation of an indicator is the probability of
+  \emph{number} and need not be a value $X$ can take}.}
+\sumitem{9--10}{\result{\textbf{The expectation of an indicator is the probability of
   the event.} Every probability is an expectation and every expectation is a
-  weighted sum of probabilities \dash{} one object read two ways.}
-\sumitem{11--14}{$\Ex[aX + bY] = a\Ex[X] + b\Ex[Y]$ \textbf{with no condition
+  weighted sum of probabilities \dash{} one object read two ways}.}
+\sumitem{11--14}{\result{$\Ex[aX + bY] = a\Ex[X] + b\Ex[Y]$ \textbf{with no condition
   whatever}, checked on $X$ and $X^{2}$, which are as dependent as two
-  variables get. The proof is a rearranged finite sum.}
-\sumitem{15--17}{Expectation passes through sums and constant multiples and
+  variables get. The proof is a rearranged finite sum}.}
+\sumitem{15--17}{\result{Expectation passes through sums and constant multiples and
   \emph{nothing else}: $\Ex[XY] = \val{p24.ex.xy}$ against
-  $\val{p24.ex.xtimesy}$, and Program~\ref{prog:P19} owns the fact that it
+  $\val{p24.ex.xtimesy}$}, and Program~\ref{prog:P19} owns the fact that it
   does not pass through a convex function either.}
-\sumitem{18--20}{$\Var(X) = \Ex[(X - \Ex[X])^{2}] = \Ex[X^{2}] - (\Ex[X])^{2}$,
+\sumitem{18--20}{\result{$\Var(X) = \Ex[(X - \Ex[X])^{2}] = \Ex[X^{2}] - (\Ex[X])^{2}$,
   the same number by two routes, $\val{p24.var.x}$ here. The second reads the
-  data once, and is the one Program~\ref{prog:P02} shows failing.}
+  data once, and is the one Program~\ref{prog:P02} shows failing}.}
 \sumitem{21}{$\Var(X)$ is $D^{2}(X)$ and $\Ex[X]$ is $M(X)$; the square in
   $D^{2}$ records that a variance is in units squared.}
-\sumitem{22--23}{$\Var(aX) = a^{2}\Var(X)$, so minutes to seconds multiplies a
+\sumitem{22--23}{\result{$\Var(aX) = a^{2}\Var(X)$, so minutes to seconds multiplies a
   variance by $\val{p24.var.scale.sq}$ and a spread by
   $\val{p24.var.scale}$. Quote the square root, $\val{p24.sd.x}$ here, because
-  it is in the units of the quantity.}
+  it is in the units of the quantity}.}
 \sumitem{24--25}{That repays Program~\ref{prog:P21}, which borrowed the word.
   What P21 did with it \dash{} the variance of an average falling like $1/B$
   \dash{} is about \emph{sums} and belongs to Program~\ref{prog:P25}. And a
   standard deviation is not the average distance from the mean.}
-\sumitem{26--27}{$\Cov(X,Y) = \Ex[XY] - \Ex[X]\Ex[Y]$, and
+\sumitem{26--27}{\result{$\Cov(X,Y) = \Ex[XY] - \Ex[X]\Ex[Y]$, and
   $\Cov(X,X) = \Var(X)$ \dash{} \textbf{a variance is a covariance of
-  something with itself.}}
-\sumitem{28--29}{$\Corr$ divides the covariance by both spreads and lands in
+  something with itself.}}}
+\sumitem{28--29}{\result{$\Corr$ divides the covariance by both spreads and lands in
   $\intcc{-1}{1}$. For $X$ and $X^{2}$ it is $\val{p24.corr.xy}$, for two
   quantities where one determines the other: \textbf{a correlation sees the
-  straight-line part and nothing else.}}
-\sumitem{30--31}{$Z$ on $\{-1,0,1\}$ and $W = Z^{2}$ have covariance
+  straight-line part and nothing else.}}}
+\sumitem{30--31}{\result{$Z$ on $\{-1,0,1\}$ and $W = Z^{2}$ have covariance
   \emph{exactly} zero and complete dependence:
   $\Prob(W = 0) = \frac{1}{\val{p24.tri.n}}$ against
   $\Prob(W = 0 \mid Z = 0) = 1$. Independence gives zero correlation; the
-  converse is false.}
-\sumitem{32--33}{$\Cov(aX, bY) = ab\Cov(X,Y)$ and the correlation does not
+  converse is false}.}
+\sumitem{32--33}{\result{$\Cov(aX, bY) = ab\Cov(X,Y)$ and the correlation does not
   move, so \textbf{reading a covariance matrix as a correlation matrix is
-  reading your units} \dash{} and the two look identical on screen.}
+  reading your units} \dash{} and the two look identical on screen}.}
 \sumitem{34--36}{Program~\ref{prog:P07}'s $2\Cov(p,t)$ and
   Programs \ref{prog:P10} and \ref{prog:P11}'s covariance matrix were owed the
   word rather than the facts: \textbf{a forward reference whose facts can be
   proved locally should be}. The bound on a correlation is
   Program~\ref{prog:P05}'s geometry on a different space.}
-\sumitem{37--38}{\textbf{Bernoulli}: $\Ex = p$, $\Var = p(1-p)$, largest at
+\sumitem{37--38}{\result{\textbf{Bernoulli}: $\Ex = p$, $\Var = p(1-p)$, largest at
   $p = \num{0.5}$. An indicator is a Bernoulli and its expectation is a
-  probability, so a rare-class column carries almost no variance.}
-\sumitem{39--40}{\textbf{Binomial}: $nq$ and $nq(1-q)$, checked against every
-  enumerated outcome. Over $\val{p24.million}$ requests the detector raises
+  probability, so a rare-class column carries almost no variance}.}
+\sumitem{39--40}{\result{\textbf{Binomial}: $nq$ and $nq(1-q)$, checked against every
+  enumerated outcome.} Over $\val{p24.million}$ requests the detector raises
   $\val{p24.alarms.million}$ alarms of which $\val{p24.real.million}$ are
   real, and their ratio is Program~\ref{prog:P23}'s $\val{p23.ppv.pct}$ per
   cent \dash{} a probability turned into the counts people argue about.}
-\sumitem{41--42}{\textbf{Categorical} is what a softmax produces, by
-  Program~\ref{prog:P23}'s own two rules, and what a token is drawn from.}
-\sumitem{43--44}{\textbf{Poisson} counts arrivals in a window and
+\sumitem{41--42}{\result{\textbf{Categorical} is what a softmax produces, by
+  Program~\ref{prog:P23}'s own two rules, and what a token is drawn from}.}
+\sumitem{43--44}{\result{\textbf{Poisson} counts arrivals in a window and
   \textbf{exponential} times the wait between them; the exponential is
-  memoryless, so \enquote{it is due} is never true.}
-\sumitem{45--46}{\textbf{Gaussian} by its role: what a sum of many small
+  memoryless, so \enquote{it is due} is never true}.}
+\sumitem{45--46}{\result{\textbf{Gaussian} by its role: what a sum of many small
   independent contributions becomes. $\val{p24.gauss.one}$ within one spread
-  and $\val{p24.gauss.two}$ within two. The theorem is Program~\ref{prog:P25}'s.}
-\sumitem{47--48}{Almost nothing in this field is normal \dash{} token
+  and $\val{p24.gauss.two}$ within two.} The theorem is Program~\ref{prog:P25}'s.}
+\sumitem{47--48}{\result{Almost nothing in this field is normal \dash{} token
   frequencies are not, latencies are not \dash{} and \emph{averages} of them
-  are. Ask which of the two a stated normality is about.}
-\sumitem{49--51}{\textbf{Sampling a token is a draw from a categorical
+  are. Ask which of the two a stated normality is about}.}
+\sumitem{49--51}{\result{\textbf{Sampling a token is a draw from a categorical
   distribution.} Temperature reweights and cannot move the $\argmax$
   (Program~\ref{prog:F05}); every token stays possible and the edit is
-  reversible.}
-\sumitem{52--53}{\textbf{Top-$k$ removes.} At $T = 2$ it deletes
+  reversible}.}
+\sumitem{52--53}{\result{\textbf{Top-$k$ removes.} At $T = 2$ it deletes
   $\val{p24.topk.del.t20}$ per cent of the weight, and afterwards
-  \enquote{unlikely} and \enquote{impossible} are the same thing.}
-\sumitem{54--55}{The two knobs \textbf{fight}: the same $k$ deletes
+  \enquote{unlikely} and \enquote{impossible} are the same thing}.}
+\sumitem{54--55}{\result{The two knobs \textbf{fight}: the same $k$ deletes
   $\val{p24.topk.del.t05}$ per cent at $T = \num{0.5}$ and
   $\val{p24.topk.del.t20}$ at $T = 2$, a factor of
   $\val{p24.topk.del.ratio}$, because temperature moves weight into the tail
-  and the tail is what $k$ cuts.}
-\sumitem{56--57}{\textbf{Top-$p$ keeps a count that is an outcome}: the same
+  and the tail is what $k$ cuts}.}
+\sumitem{56--57}{\result{\textbf{Top-$p$ keeps a count that is an outcome}: the same
   $p = \val{p24.topp.mass}$ keeps $\val{p24.topp.kept.t05}$ tokens at
   $T = \num{0.5}$ and $\val{p24.topp.kept.t20}$ at $T = 2$, and between
-  $\val{p24.topp.sweep.lo}$ and $\val{p24.topp.sweep.hi}$ over the sweep.}
-\sumitem{58--59}{$\argmax(\ln p + \text{Gumbel})$ is \emph{exact} categorical
+  $\val{p24.topp.sweep.lo}$ and $\val{p24.topp.sweep.hi}$ over the sweep}.}
+\sumitem{58--59}{\result{$\argmax(\ln p + \text{Gumbel})$ is \emph{exact} categorical
   sampling, and the two-token case is Program~\ref{prog:F07}'s identity read
-  backwards.}
+  backwards}.}
 \sumitem{60--61}{The four-token case is \emph{integrated} rather than sampled,
   to better than $10^{-11}$, because a sample can only ever show
   that the trick is approximately right.}
-\sumitem{62--63}{The mass top-$k$ deletes and the frequency those tokens would
+\sumitem{62--63}{\result{The mass top-$k$ deletes and the frequency those tokens would
   have won are \emph{the same number}, and that is the theorem. Truncation does
-  not discourage a token; it removes it.}
+  not discourage a token; it removes it}.}
 \sumitem{64}{Not here: what happens when random variables are \emph{added}.
   Variances of independent ones add and averages concentrate at
   $1/\sqrt{n}$ \dash{} Program~\ref{prog:P25}, which is where

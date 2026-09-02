@@ -799,63 +799,63 @@ follows.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{A vector space with two operations cannot express size or
+\sumitem{1--2}{\result{\textbf{A vector space with two operations cannot express size or
   direction.} Perpendicular, nearest, unit length, orthogonal basis \dash{}
-  none of it. That is why Program~\ref{prog:P04} never used those words and
+  none of it.} That is why Program~\ref{prog:P04} never used those words and
   Program~\ref{prog:F09} used them freely: F09 was in $\R^{n}$ with the
   arithmetic assumed, P04 was proving things about spaces in general.}
-\sumitem{3--5}{An \textbf{inner product} returns one number from two vectors,
+\sumitem{3--5}{\result{An \textbf{inner product} returns one number from two vectors,
   is symmetric, is linear in each argument, and has $a \cdot a > 0$ for every
   non-zero $a$. \textbf{The length is defined from it}, $\lVert a \rVert =
   \sqrt{a \cdot a}$, and not the other way round \dash{} a different inner
-  product gives a space different lengths.}
-\sumitem{6--9}{Two vectors are \textbf{orthogonal} when their inner product is
+  product gives a space different lengths}.}
+\sumitem{6--9}{\result{Two vectors are \textbf{orthogonal} when their inner product is
   zero, and that definition never mentions a picture, so it is the one piece
   of geometry that transfers to any dimension unchanged. Making $\cos\theta$
   the subject of F08's identity turns it from a report into a
-  \textbf{definition} of the angle.}
-\sumitem{10--11}{\textbf{Three norms, three questions.} L1 is how far along the
+  \textbf{definition} of the angle}.}
+\sumitem{10--11}{\result{\textbf{Three norms, three questions.} L1 is how far along the
   axes, L2 how far in a straight line, L-infinity how bad the worst component
   is; for $(3, -4)$ they are $7$, $5$ and $4$. Only L2 comes from an inner
-  product, which is why only L2 has angles.}
-\sumitem{12--14}{\textbf{The L1 ball is a diamond and its corners are the whole
+  product, which is why only L2 has angles}.}
+\sumitem{12--14}{\result{\textbf{The L1 ball is a diamond and its corners are the whole
   of the sparsity argument}: a corner is a point where all but one coordinate
   is zero, and a contour arriving from a generic direction meets a diamond at
-  one. It is a statement about shape, not about the size of the penalty.}
-\sumitem{15--16}{The three norms \textbf{do not order vectors the same way}:
+  one. It is a statement about shape, not about the size of the penalty}.}
+\sumitem{15--16}{\result{The three norms \textbf{do not order vectors the same way}:
   $(3,-4)$ and $(5,0)$ are equal under L2, and each is larger than the other
   under one of the remaining two. \enquote{Bigger} is not a property of a pair
-  of vectors until a norm has been named.}
-\sumitem{17--21}{The \textbf{projection} of $a$ onto $b$ is $t\,b$ with $t = (a
+  of vectors until a norm has been named}.}
+\sumitem{17--21}{\result{The \textbf{projection} of $a$ onto $b$ is $t\,b$ with $t = (a
   \cdot b)/(b \cdot b)$, obtained by demanding the leftover be orthogonal to
   $b$ \dash{} and it is the \emph{closest} point because Pythagoras makes the
   hypotenuse longer than the leg. The derivation uses only the inner product's
-  three properties, so it works at any dimension and on any subspace.}
-\sumitem{24--26}{\textbf{The dot product is the cosine with both lengths in
+  three properties, so it works at any dimension and on any subspace}.}
+\sumitem{24--26}{\result{\textbf{The dot product is the cosine with both lengths in
   it.} They disagree only when the lengths differ, and choosing between them is
   a question about what your embeddings encode in their magnitude, which the
-  formulas cannot answer.}
-\sumitem{27--30}{\textbf{Normalising makes the two queries the same query}, to
+  formulas cannot answer}.}
+\sumitem{27--30}{\result{\textbf{Normalising makes the two queries the same query}, to
   $\val{p05.norm.identity.err}$ over $\val{p05.norm.identity.trials}$ pairs.
   So it is not a preprocessing step \dash{} it is the decision to throw the
-  lengths away, taken silently.}
-\sumitem{31--37}{\textbf{The cosine between two random directions concentrates
+  lengths away, taken silently}.}
+\sumitem{31--37}{\result{\textbf{The cosine between two random directions concentrates
   at zero with spread $1/\sqrt{d}$}, measured to within
   $\val{p05.sd.err.pct}\%$ over three decades. At $\val{f09.dim}$ dimensions
   $\val{p05.deg.within.768}\%$ of pairs are within five degrees of a right
   angle, against $\val{p05.deg.within.2}\%$ in the plane \dash{} so a cosine of
-  $\num{0.3}$ is about eight spreads out, and enormous.}
-\sumitem{38--40}{\textbf{Essentially all of a high-dimensional ball is in its
+  $\num{0.3}$ is about eight spreads out, and enormous}.}
+\sumitem{38--40}{\result{\textbf{Essentially all of a high-dimensional ball is in its
   skin}: the fraction inside radius $r$ is $r^{d}$, so the inner nine tenths of
   the radius hold $\val{p05.shell.inner.768}$ of a $\val{f09.dim}$-dimensional
-  ball. Computed rather than sampled, because no sample would ever land there.}
-\sumitem{41--45}{\textbf{\enquote{Nearly orthogonal} is not automatically
+  ball. Computed rather than sampled, because no sample would ever land there}.}
+\sumitem{41--45}{\result{\textbf{\enquote{Nearly orthogonal} is not automatically
   cheaper than orthogonal.} At $d = 64$ and tolerance $\val{p05.near.tol}$ the
   capacity is $\val{p05.near.n.64}$, below the $64$ that are exact, because
   the tolerance is only about one and a half spreads out. The crossover is at
   $d = \val{p05.near.cross}$; above it the capacity runs away, to about
   $\val{p05.near.n.4096}$ at $4096$ dimensions. \textbf{The slogan is true
-  above a threshold and is always quoted without it.}}
+  above a threshold and is always quoted without it.}}}
 \end{summarybox}
 
 % ============================================================

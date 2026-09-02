@@ -805,37 +805,37 @@ Program~\ref{prog:P30} go definiuje i pokazuje, że nie jest symetryczny.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Zaskoczenie to $-\ln p$}, a logarytm jest wymuszony, a
+\sumitem{1--2}{\textbf{\result{Zaskoczenie to $-\ln p$}}, a logarytm jest wymuszony, a
   nie wybrany: zaskoczenia niezależne muszą się dodawać, podczas gdy ich
   prawdopodobieństwa się mnożą. Pewność zaskakuje dokładnie o nic.}
 \sumitem{3}{Prawdopodobieństwo $\frac{1}{\val{p29.rare.den}}$ to
   $\val{p29.rare.nats}$ nata albo $\val{p29.rare.bits}$ bita zaskoczenia
   \dash{} nie dziesięć, bo tysiąc nie jest potęgą dwójki.}
-\sumitem{5--7}{\textbf{Entropia to średnie zaskoczenie}, czyli wartość
+\sumitem{5--7}{\result{\textbf{Entropia to średnie zaskoczenie}, czyli wartość
   oczekiwana z Programu~\ref{prog:P24} nałożona na tę funkcję:
-  $H(p) = -\sum_i p_i \ln p_i$. Uczciwa moneta to dokładnie
+  $H(p) = -\sum_i p_i \ln p_i$}. Uczciwa moneta to dokładnie
   $\val{p29.coin.bits}$ bit, a moneta na $\val{p29.bias.p}$ to
   $\val{p29.bias.bits}$.}
-\sumitem{8--9}{Rozkład jednostajny ma największą entropię przy ustalonej
-  liczbie wyników \dash{} sprawdzone na $\val{p29.max.tested}$ rozkładach na
+\sumitem{8--9}{\result{Rozkład jednostajny ma największą entropię przy
+  ustalonej liczbie wyników} \dash{} sprawdzone na $\val{p29.max.tested}$ rozkładach na
   siatce zawierającej punkt jednostajny, więc maksimum jest osiągane, a nie
   przybliżane.}
-\sumitem{11--13}{Kod prefiksowy o długościach $l_i$ istnieje dokładnie wtedy,
-  gdy $\sum_i 2^{-l_i} \le 1$. Krótkie słowo kodowe jest drogie, bo wydaje
+\sumitem{11--13}{\result{Kod prefiksowy o długościach $l_i$ istnieje
+  dokładnie wtedy, gdy $\sum_i 2^{-l_i} \le 1$}. Krótkie słowo kodowe jest drogie, bo wydaje
   całą gałąź.}
-\sumitem{14--15}{\textbf{Entropia to najmniejsza średnia długość kodu} i tym
+\sumitem{14--15}{\textbf{\result{Entropia to najmniejsza średnia długość kodu}} i tym
   właśnie jest bit. Na alfabecie diadycznym najlepszy z
   $\val{p29.code.assignments}$ dopuszczalnych kodów to
   $\val{p29.code.best}$ bita, a entropia to $\val{p29.code.h}$ \dash{}
   wyczerpująco, więc jest to dowód dla tego alfabetu, a nie świadectwo o nim.}
-\sumitem{16--17}{Tam, gdzie prawdopodobieństwa nie są potęgami dwójki,
-  ograniczenia nie da się osiągnąć: $\val{p29.nondy.best}$ wobec
+\sumitem{16--17}{\result{Tam, gdzie prawdopodobieństwa nie są potęgami
+  dwójki, ograniczenia nie da się osiągnąć}: $\val{p29.nondy.best}$ wobec
   $\val{p29.nondy.h}$, nadwyżka $\val{p29.nondy.gap}$, a różnica to
   zaokrąglenie długości do liczby całkowitej.}
-\sumitem{19--21}{\textbf{$e^{H}$ to efektywna liczba jednakowo
+\sumitem{19--21}{\result{\textbf{$e^{H}$ to efektywna liczba jednakowo
   prawdopodobnych wyborów}, zwracająca dokładnie $n$ dla rozkładu
-  jednostajnego na $n$.}
-\sumitem{22}{\textbf{Perpleksja to ten licznik dla modelu.}
+  jednostajnego na $n$}.}
+\sumitem{22}{\result{\textbf{Perpleksja to ten licznik dla modelu.}}
   Program~\ref{prog:F02} podaje $\val{p29.f02.loss}$ nata, a
   Program~\ref{prog:F03} \dash{} $\val{p29.f03.ppl}$, czyli
   $\val{p29.ppl.frac}$ procent słownika o $\val{p29.vocab}$ tokenach.}
@@ -850,16 +850,17 @@ Program~\ref{prog:P30} go definiuje i pokazuje, że nie jest symetryczny.
   podaje Program~\ref{prog:F05}: $\val{p29.tok.t05.eff}$,
   $\val{p29.tok.t10.eff}$, $\val{p29.tok.t20.eff}$ z
   $\val{p29.tok.n}$, gdy $T$ rośnie.}
-\sumitem{28--30}{\textbf{Entropia mierzy pewność, a nie trafność.} Model pewny
+\sumitem{28--30}{\textbf{\result{Entropia mierzy pewność, a nie trafność.}} Model pewny
   i błędny ma niską. Używaj jej jako filtra na własne zgadywanie modelu, a
   nigdy jako gwarancji odpowiedzi.}
-\sumitem{31--33}{\textbf{Bity na token to nie bity na znak.} Przemnóż przez
-  tokeny na znak, które należą do tokenizera: $\val{p29.tpc.a}$ i
+\sumitem{31--33}{\result{\textbf{Bity na token to nie bity na znak.} Przemnóż przez
+  tokeny na znak, które należą do tokenizera}: $\val{p29.tpc.a}$ i
   $\val{p29.tpc.b}$ dają $\val{p29.bpc.a}$ i $\val{p29.bpc.b}$ na tym samym
   modelu i tym samym tekście, czyli czynnik $\val{p29.bpc.ratio}$, który jest
   ilorazem tokenizerów i niczym o modelu.}
-\sumitem{34}{Dwie straty są porównywalne tylko przy jednym tokenizerze, a teza
-  o kompresji jest sprawdzalna tam, gdzie strata nie jest.}
+\sumitem{34}{\result{Dwie straty są porównywalne tylko przy jednym
+  tokenizerze}, a teza o kompresji jest sprawdzalna tam, gdzie strata nie
+  jest.}
 \end{summarybox}
 
 \canyou

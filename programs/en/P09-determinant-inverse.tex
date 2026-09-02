@@ -752,81 +752,81 @@ its pieces.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{A matrix scales every area by one factor}, because a
+\sumitem{1--3}{\result{\textbf{A matrix scales every area by one factor}, because a
   region is a covering of small squares and each is treated alike. That factor
   is the \textbf{determinant}, and the image of the unit square is the
   parallelogram spanned by the columns \dash{} area $\val{p09.stretch.det}$ for
-  the matrix that doubles $x$ and triples $y$.}
-\sumitem{4--5}{\textbf{The area is signed}, and the sign is orientation: the
+  the matrix that doubles $x$ and triples $y$}.}
+\sumitem{4--5}{\result{\textbf{The area is signed}, and the sign is orientation: the
   swap of the two coordinates has determinant $\val{p09.flip.det}$, having
   turned the plane over. Checked against the shoelace formula on
   $\val{p09.area.trials}$ matrices exactly. $\lvert \det \rvert$ is the area;
-  $\det$ is the area and the mirror.}
-\sumitem{6--7}{$ad - bc$ in two dimensions, a signed volume in three, a signed
+  $\det$ is the area and the mirror}.}
+\sumitem{6--7}{\result{$ad - bc$ in two dimensions, a signed volume in three, a signed
   $n$-volume in $n$. \textbf{Every later claim in the program is a consequence
   of \enquote{the factor by which signed volume scales}}, so a rule you cannot
-  derive from that sentence is probably about something else.}
-\sumitem{8--10}{\textbf{Zero means flat}, and flat means two inputs now share
+  derive from that sentence is probably about something else}.}
+\sumitem{8--10}{\result{\textbf{Zero means flat}, and flat means two inputs now share
   an output. $\det A = 0$ exactly when $\operatorname{rank} A < n$, checked on
   $\val{p09.sing.trials}$ matrices \dash{} which is Program~\ref{prog:P08}'s
-  null space measured as volume instead of counted as directions.}
-\sumitem{11--12}{The worked case: rows $1,2,3$ then $4,5,6$ then $7,8,9$ has
+  null space measured as volume instead of counted as directions}.}
+\sumitem{11--12}{\result{The worked case: rows $1,2,3$ then $4,5,6$ then $7,8,9$ has
   determinant $0$ and rank $\val{p09.worked.rank}$, because the third row is
   twice the second minus the first. \textbf{Rows lying in a plane cannot fill a
-  volume.}}
-\sumitem{13--14}{\textbf{A small determinant does not mean nearly singular.}
+  volume.}}}
+\sumitem{13--14}{\result{\textbf{A small determinant does not mean nearly singular.}
   Scaling a $100 \times 100$ matrix by $\num{0.1}$ takes its determinant to
   $10^{-100}$ and changes nothing about the map. \emph{Is anything destroyed}
   is the determinant's question; \emph{how nearly} is the condition number's,
-  and it is Program~\ref{prog:P11}'s.}
-\sumitem{15--16}{\textbf{$\det(AB) = \det(A)\det(B)$}, because a scale factor
+  and it is Program~\ref{prog:P11}'s}.}
+\sumitem{15--16}{\result{\textbf{$\det(AB) = \det(A)\det(B)$}, because a scale factor
   applied to a scale factor is a product \dash{} a restatement rather than a
   calculation. And $\det(AB) = \det(BA)$ always, even though
   Program~\ref{prog:P06} showed $AB \ne BA$: order matters to the map and not
-  to the volume.}
-\sumitem{17--18}{\textbf{One singular factor makes the whole chain singular},
+  to the volume}.}
+\sumitem{17--18}{\result{\textbf{One singular factor makes the whole chain singular},
   which is Program~\ref{prog:P08}'s bottleneck told in volumes: four full-rank
-  matrices stacked on a flattened one leave it flat.}
-\sumitem{19}{A product of hundreds of determinants underflows, so what is
+  matrices stacked on a flattened one leave it flat}.}
+\sumitem{19}{\result{A product of hundreds of determinants underflows, so what is
   carried is $\ln \lvert \det \rvert$ \dash{} Program~\ref{prog:F03}'s move for
   Program~\ref{prog:P02}'s reason. That term is a normalising flow's
-  change-of-variables charge, and it is why such layers are built triangular.}
-\sumitem{20--21}{\textbf{Invertible, $\det \ne 0$, full rank, and a null space
+  change-of-variables charge, and it is why such layers are built triangular}.}
+\sumitem{20--21}{\result{\textbf{Invertible, $\det \ne 0$, full rank, and a null space
   of nothing but zero are one condition in four sentences}, and the second is
-  the one a single number settles.}
-\sumitem{22--23}{$A^{-1}A = I$ exactly over the rationals, and
+  the one a single number settles}.}
+\sumitem{22--23}{\result{$A^{-1}A = I$ exactly over the rationals, and
   $\det(A^{-1}) = 1/\det A$ in one line from the product rule. \textbf{Most of
   what is true about determinants follows from their multiplying}, and deriving
-  it is quicker than looking it up.}
-\sumitem{24--26}{\textbf{Solving beats inverting} \dash{}
+  it is quicker than looking it up}.}
+\sumitem{24--26}{\result{\textbf{Solving beats inverting} \dash{}
   $\val{p09.cost.solve}$ operations against $\val{p09.cost.invert}$ at
   $n = \val{p09.cost.n}$, a factor of $\val{p09.cost.ratio}$, counted by the
   routines themselves. Elimination builds $n$ numbers; the inverse builds
-  $n^{2}$ of which you use $n$.}
-\sumitem{27}{And the stronger reason is accuracy rather than speed, which is
+  $n^{2}$ of which you use $n$}.}
+\sumitem{27}{\result{And the stronger reason is accuracy rather than speed, which is
   Program~\ref{prog:P11}'s to give. \textbf{The formula on the page is a
   description of the answer, not an instruction for computing it} \dash{} which
-  is what \code{inv(A.T @ A) @ A.T @ b} is.}
-\sumitem{28--29}{\textbf{A change of basis is a matrix}, gated against
+  is what \code{inv(A.T @ A) @ A.T @ b} is}.}
+\sumitem{28--29}{\result{\textbf{A change of basis is a matrix}, gated against
   Program~\ref{prog:P04}'s own committed coordinates: each new coordinate is a
   dot product with a new axis, and two of them arranged in rows are a matrix
-  times a vector.}
-\sumitem{30--31}{It must be invertible, because the point never moved and the
+  times a vector}.}
+\sumitem{30--31}{\result{It must be invertible, because the point never moved and the
   old description has to be recoverable \dash{} which is
   Program~\ref{prog:P04}'s independence requirement arriving as
-  \textbf{a determinant that is not zero}.}
-\sumitem{32--33}{\textbf{A rotation has determinant $\val{p09.rot.det}$ and its
+  \textbf{a determinant that is not zero}}.}
+\sumitem{32--33}{\result{\textbf{A rotation has determinant $\val{p09.rot.det}$ and its
   transpose is its inverse}, which is what \emph{orthogonal} means. Lengths and
   angles survive because dot products do, so an orthogonal change of basis is
-  \textbf{lossless} rather than merely cheap.}
-\sumitem{34}{Which is what Program~\ref{prog:F08}'s position encoding costs the
+  \textbf{lossless} rather than merely cheap}.}
+\sumitem{34}{\result{Which is what Program~\ref{prog:F08}'s position encoding costs the
   model: nothing. \textbf{Rotating the query and the key re-describes them
   rather than altering them}, so no direction of the embedding is spent on
-  carrying a position.}
-\sumitem{35--36}{\textbf{Determinant $1$ and preserving length are two
+  carrying a position}.}
+\sumitem{35--36}{\result{\textbf{Determinant $1$ and preserving length are two
   conditions.} The shear that adds a point's height to its width has
   determinant $1$ and stretches; the reflection has determinant
-  $\val{p09.reflect.det}$ and does not. A rotation is both at once.}
+  $\val{p09.reflect.det}$ and does not. A rotation is both at once}.}
 \end{summarybox}
 
 \canyou

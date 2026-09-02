@@ -662,66 +662,66 @@ zwykle dwuwierszowa arytmetyka, której nikt nie zapisał.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--2}{Gradient z partii jest \textbf{oszacowaniem} gradientu, którego
-  chciałeś. Szum jest metodą, a nie wadą w niej.}
-\sumitem{3--4}{\emph{Nieobciążoność} znaczy, że średnia po każdej partii, jaka
+\sumitem{1--2}{\result{Gradient z partii jest \textbf{oszacowaniem} gradientu, którego
+  chciałeś. Szum jest metodą, a nie wadą w niej}.}
+\sumitem{3--4}{\result{\emph{Nieobciążoność} znaczy, że średnia po każdej partii, jaka
   mogła zostać wylosowana, jest dokładna \dash{} udowodnione tu na wszystkich
   $\val{p21.pop.subsets}$ z nich, na ułamkach, co jest dowodem dla tej
-  populacji, a nie świadectwem o niej.}
-\sumitem{5--6}{Nie mówi nic o jednym losowaniu: średnie z partii biegną od
+  populacji, a nie świadectwem o niej}.}
+\sumitem{5--6}{\result{Nie mówi nic o jednym losowaniu: średnie z partii biegną od
   $\val{p21.pop.lo}$ do $\val{p21.pop.hi}$ wokół $\val{p21.pop.mean}$, a jedna
-  z nich ma zły znak.}
+  z nich ma zły znak}.}
 \sumitem{7}{Zależność w przód jest zadeklarowana: sama wariancja należy do
   Programu~\ref{prog:P24}, a koncentracja do Programu~\ref{prog:P25}, dwie
   części później, i P25 wraca do szumu z partii, gdy maszyneria już istnieje.}
-\sumitem{8--9}{Wariancja średniej z partii spada jak $1/B$, zmierzone z
+\sumitem{8--9}{\result{Wariancja średniej z partii spada jak $1/B$, zmierzone z
   dokładnością do $\val{p21.noise.tol}$ procent dla $B$ od
-  $\val{p21.noise.b.lo}$ do $\val{p21.noise.b.hi}$.}
-\sumitem{10--11}{\textbf{Rozrzut spada jak $1/\sqrt{B}$}, więc
+  $\val{p21.noise.b.lo}$ do $\val{p21.noise.b.hi}$}.}
+\sumitem{10--11}{\result{\textbf{Rozrzut spada jak $1/\sqrt{B}$}, więc
   $\val{p21.noise.b16}$ razy większa partia kupuje $\val{p21.noise.spread16}$
   razy mniej szumu. Ten pierwiastek jest całością \enquote{malejących zysków} i
-  jest dokładny, a nie przybliżony.}
-\sumitem{12}{Rozrzut kroku to $\eta$ razy rozrzut oszacowania, więc $\eta$ i
-  $B$ to dwie liczby opisujące jedną wielkość.}
-\sumitem{13--14}{Ogromny krok zdarza się, bo średnia z partii ma rozrzut. Nic
-  nie jest nie tak z modelem, danymi ani optymalizatorem, gdy się zdarza.}
-\sumitem{15--17}{Próg obcinania to decyzja o rozkładzie: na połowie typowego
+  jest dokładny, a nie przybliżony}.}
+\sumitem{12}{\result{Rozrzut kroku to $\eta$ razy rozrzut oszacowania, więc $\eta$ i
+  $B$ to dwie liczby opisujące jedną wielkość}.}
+\sumitem{13--14}{\result{Ogromny krok zdarza się, bo średnia z partii ma rozrzut. Nic
+  nie jest nie tak z modelem, danymi ani optymalizatorem, gdy się zdarza}.}
+\sumitem{15--17}{\result{Próg obcinania to decyzja o rozkładzie: na połowie typowego
   rozmiaru obcina $\val{p21.clip.half}$ procent kroków, a na czterokrotności
   $\val{p21.clip.four.n}$ z $\val{p21.clip.trials}$. \textbf{Pierwszy jest
   innym algorytmem}, podążającym za kierunkiem i odrzucającym długość, a
-  bezpieczny próg to ten, który prawie nigdy nie działa.}
-\sumitem{18--19}{Wariancja aktualizacji to $\eta^{2}\sigma^{2}/B$, co
-  rozstrzyga pytanie o skalowanie mechanicznie.}
-\sumitem{20--21}{Skalowanie $\eta$ przez $\sqrt{k}$ utrzymuje tę wariancję
+  bezpieczny próg to ten, który prawie nigdy nie działa}.}
+\sumitem{18--19}{\result{Wariancja aktualizacji to $\eta^{2}\sigma^{2}/B$, co
+  rozstrzyga pytanie o skalowanie mechanicznie}.}
+\sumitem{20--21}{\result{Skalowanie $\eta$ przez $\sqrt{k}$ utrzymuje tę wariancję
   \textbf{dokładnie} stałą; skalowanie przez $k$ mnoży ją przez
   $\val{p21.scale.linear}$ i utrzymuje zamiast tego teren pokonany na przykład.
   Dwie reguły, dwa niezmienniki, a pytanie empiryczne nie jest tu
-  rozstrzygnięte.}
-\sumitem{22}{Zostawienie $\eta$ przy zmianie $B$ nie utrzymuje żadnej z nich
-  stałej, i dlatego jest jedynym wyborem, za którym nikt nie argumentuje.}
-\sumitem{23--24}{Wygładzona krzywa straty opóźnia się o swój czas połowicznego
+  rozstrzygnięte}.}
+\sumitem{22}{\result{Zostawienie $\eta$ przy zmianie $B$ nie utrzymuje żadnej z nich
+  stałej, i dlatego jest jedynym wyborem, za którym nikt nie argumentuje}.}
+\sumitem{23--24}{\result{Wygładzona krzywa straty opóźnia się o swój czas połowicznego
   zaniku: $\val{p21.ema.lag}$ kroków zmierzone wobec $\val{p21.ema.halflife}$
   zatwierdzonego przez Program~\ref{prog:F04}. Opóźnienie nie zależy od
-  wielkości zmiany.}
-\sumitem{25}{Czytaj surową krzywą, gdy pytaniem jest \emph{kiedy}, a wygładzoną,
-  gdy jest nim \emph{czy}.}
-\sumitem{26--27}{Akumulacja mikropartii o różnych liczbach tokenów daje
+  wielkości zmiany}.}
+\sumitem{25}{\result{Czytaj surową krzywą, gdy pytaniem jest \emph{kiedy}, a wygładzoną,
+  gdy jest nim \emph{czy}}.}
+\sumitem{26--27}{\result{Akumulacja mikropartii o różnych liczbach tokenów daje
   $\val{p21.acc.accumulated}$ tam, gdzie duża partia daje
   $\val{p21.acc.pooled}$ \dash{} i jest to \textbf{gradient}, a nie raport, bo
-  strata uśredniona źle jest stratą zróżniczkowaną.}
-\sumitem{28--30}{Przy równych liczbach tokenów oba są identyczne na ułamkach, i
+  strata uśredniona źle jest stratą zróżniczkowaną}.}
+\sumitem{28--30}{\result{Przy równych liczbach tokenów oba są identyczne na ułamkach, i
   dokładnie dlatego to wychodzi na produkcję: jest niewidoczne na dopełnionych
-  danych i rozstrzygające na prawdziwym tekście.}
-\sumitem{31--33}{Krok losowania nie ma pochodnej, a są dwa sposoby, by go
+  danych i rozstrzygające na prawdziwym tekście}.}
+\sumitem{31--33}{\result{Krok losowania nie ma pochodnej, a są dwa sposoby, by go
   obejść: funkcja wynikowa, która potrzebuje samej wartości, i
-  reparametryzacja, która potrzebuje różniczkowalnej drogi.}
-\sumitem{34--35}{Oba są nieobciążone. Wariancja estymatora reparametryzowanego
+  reparametryzacja, która potrzebuje różniczkowalnej drogi}.}
+\sumitem{34--35}{\result{Oba są nieobciążone. Wariancja estymatora reparametryzowanego
   to $\val{p21.grad.repar}$ przy \emph{każdym} wymiarze; funkcji wynikowej
-  dochodzi do $\val{p21.grad.score.hi}$, o czynnik $\val{p21.grad.ratio.hi}$.}
-\sumitem{36--38}{Po $\val{p21.grad.samples}$ próbkach oszacowanie funkcji
+  dochodzi do $\val{p21.grad.score.hi}$, o czynnik $\val{p21.grad.ratio.hi}$}.}
+\sumitem{36--38}{\result{Po $\val{p21.grad.samples}$ próbkach oszacowanie funkcji
   wynikowej wciąż odbiega o $\val{p21.grad.off.score}$ procent.
   \textbf{Nieobciążony to nie to samo, co użyteczny}, i to jest rozwidlenie
-  między modelem wariacyjnym a gradientem polityki.}
+  między modelem wariacyjnym a gradientem polityki}.}
 \sumitem{39}{Każde zażalenie w tym programie było stwierdzeniem o
   \textbf{wariancji} i żadne nie było stwierdzeniem o modelu.}
 \end{summarybox}

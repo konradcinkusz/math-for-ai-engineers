@@ -739,82 +739,82 @@ tych liczb, czyli jedną liczbą tego programu rozłożoną na części.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Macierz skaluje każde pole jednym czynnikiem}, bo obszar
+\sumitem{1--3}{\result{\textbf{Macierz skaluje każde pole jednym czynnikiem}, bo obszar
   jest pokryciem małymi kwadratami i każdy z nich traktowany jest tak samo. Ten
   czynnik to \textbf{wyznacznik}, a obrazem kwadratu jednostkowego jest
   równoległobok rozpięty przez kolumny \dash{} pole $\val{p09.stretch.det}$ dla
-  macierzy, która podwaja $x$ i potraja $y$.}
-\sumitem{4--5}{\textbf{Pole jest ze znakiem}, a znak to orientacja: zamiana obu
+  macierzy, która podwaja $x$ i potraja $y$}.}
+\sumitem{4--5}{\result{\textbf{Pole jest ze znakiem}, a znak to orientacja: zamiana obu
   współrzędnych ma wyznacznik $\val{p09.flip.det}$, bo odwróciła płaszczyznę na
   drugą stronę. Sprawdzone wzorem sznurowadłowym na $\val{p09.area.trials}$
-  macierzach dokładnie. $\lvert \det \rvert$ to pole; $\det$ to pole i lustro.}
-\sumitem{6--7}{$ad - bc$ w dwóch wymiarach, objętość ze znakiem w trzech,
+  macierzach dokładnie. $\lvert \det \rvert$ to pole; $\det$ to pole i lustro}.}
+\sumitem{6--7}{\result{$ad - bc$ w dwóch wymiarach, objętość ze znakiem w trzech,
   $n$-objętość ze znakiem w $n$. \textbf{Każde późniejsze twierdzenie w tym
   programie jest konsekwencją \enquote{czynnika, którym skaluje się objętość ze
   znakiem}}, więc reguła, której z tego zdania nie wyprowadzisz, jest zapewne o
-  czymś innym.}
-\sumitem{8--10}{\textbf{Zero znaczy płasko}, a płasko znaczy, że dwa wejścia
+  czymś innym}.}
+\sumitem{8--10}{\result{\textbf{Zero znaczy płasko}, a płasko znaczy, że dwa wejścia
   dzielą teraz jedno wyjście. $\det A = 0$ dokładnie wtedy, gdy
   $\operatorname{rank} A < n$, sprawdzone na $\val{p09.sing.trials}$ macierzach
   \dash{} czyli jądro z Programu~\ref{prog:P08} zmierzone objętością zamiast
-  policzone kierunkami.}
-\sumitem{11--12}{Przykład policzony: wiersze $1,2,3$, potem $4,5,6$, potem
+  policzone kierunkami}.}
+\sumitem{11--12}{\result{Przykład policzony: wiersze $1,2,3$, potem $4,5,6$, potem
   $7,8,9$ dają wyznacznik $0$ i rząd $\val{p09.worked.rank}$, bo trzeci wiersz
   to dwa razy drugi minus pierwszy. \textbf{Wiersze leżące w płaszczyźnie nie
-  wypełnią objętości.}}
-\sumitem{13--14}{\textbf{Mały wyznacznik nie znaczy prawie osobliwa.}
+  wypełnią objętości.}}}
+\sumitem{13--14}{\result{\textbf{Mały wyznacznik nie znaczy prawie osobliwa.}
   Przeskalowanie macierzy $100 \times 100$ przez $\num{0.1}$ sprowadza jej
   wyznacznik do $10^{-100}$ i nie zmienia w odwzorowaniu niczego. \emph{Czy coś
   zostało zniszczone} to pytanie wyznacznika; \emph{jak blisko} to pytanie
-  wskaźnika uwarunkowania i należy do Programu~\ref{prog:P11}.}
-\sumitem{15--16}{\textbf{$\det(AB) = \det(A)\det(B)$}, bo czynnik skali
+  wskaźnika uwarunkowania i należy do Programu~\ref{prog:P11}}.}
+\sumitem{15--16}{\result{\textbf{$\det(AB) = \det(A)\det(B)$}, bo czynnik skali
   nałożony na czynnik skali to iloczyn \dash{} przeformułowanie, a nie rachunek.
   I $\det(AB) = \det(BA)$ zawsze, choć Program~\ref{prog:P06} pokazał
-  $AB \ne BA$: kolejność ma znaczenie dla odwzorowania, a dla objętości nie.}
-\sumitem{17--18}{\textbf{Jeden osobliwy czynnik czyni cały łańcuch osobliwym},
+  $AB \ne BA$: kolejność ma znaczenie dla odwzorowania, a dla objętości nie}.}
+\sumitem{17--18}{\result{\textbf{Jeden osobliwy czynnik czyni cały łańcuch osobliwym},
   czyli wąskie gardło z Programu~\ref{prog:P08} opowiedziane objętościami:
-  cztery macierze pełnego rzędu ułożone na spłaszczonej zostawiają ją płaską.}
-\sumitem{19}{Iloczyn setek wyznaczników znika w niedomiarze, więc niesie się
+  cztery macierze pełnego rzędu ułożone na spłaszczonej zostawiają ją płaską}.}
+\sumitem{19}{\result{Iloczyn setek wyznaczników znika w niedomiarze, więc niesie się
   $\ln \lvert \det \rvert$ \dash{} ruch z Programu~\ref{prog:F03} z powodu
   podanego w Programie~\ref{prog:P02}. Ten składnik to opłata za zamianę
   zmiennych w \emph{normalizing flow} i dlatego takie warstwy buduje się
-  trójkątne.}
-\sumitem{20--21}{\textbf{Odwracalna, $\det \ne 0$, pełny rząd i jądro bez
+  trójkątne}.}
+\sumitem{20--21}{\result{\textbf{Odwracalna, $\det \ne 0$, pełny rząd i jądro bez
   niczego poza zerem to jeden warunek w czterech zdaniach}, a drugie z nich
-  rozstrzyga jedna liczba.}
-\sumitem{22--23}{$A^{-1}A = I$ dokładnie na ułamkach, a
+  rozstrzyga jedna liczba}.}
+\sumitem{22--23}{\result{$A^{-1}A = I$ dokładnie na ułamkach, a
   $\det(A^{-1}) = 1/\det A$ w jednej linijce z reguły iloczynu.
   \textbf{Większość prawd o wyznacznikach wynika z tego, że się mnożą}, a
-  wyprowadzenie idzie szybciej niż szukanie.}
-\sumitem{24--26}{\textbf{Rozwiązywanie bije odwracanie} \dash{}
+  wyprowadzenie idzie szybciej niż szukanie}.}
+\sumitem{24--26}{\result{\textbf{Rozwiązywanie bije odwracanie} \dash{}
   $\val{p09.cost.solve}$ operacji wobec $\val{p09.cost.invert}$ przy
   $n = \val{p09.cost.n}$, czyli $\val{p09.cost.ratio}$ razy, policzone przez
   same procedury. Eliminacja buduje $n$ liczb; odwrotność buduje $n^{2}$, z
-  których używasz $n$.}
-\sumitem{27}{A mocniejszym powodem jest dokładność, nie szybkość, i to należy
+  których używasz $n$}.}
+\sumitem{27}{\result{A mocniejszym powodem jest dokładność, nie szybkość, i to należy
   do Programu~\ref{prog:P11}. \textbf{Wzór na kartce jest opisem odpowiedzi, a
   nie instrukcją jej liczenia} \dash{} czym właśnie jest
-  \code{inv(A.T @ A) @ A.T @ b}.}
-\sumitem{28--29}{\textbf{Zmiana bazy jest macierzą}, zabramkowana wobec
+  \code{inv(A.T @ A) @ A.T @ b}}.}
+\sumitem{28--29}{\result{\textbf{Zmiana bazy jest macierzą}, zabramkowana wobec
   współrzędnych zapisanych w Programie~\ref{prog:P04}: każda nowa współrzędna
   to iloczyn skalarny z nową osią, a dwa takie ułożone w wiersze to macierz
-  razy wektor.}
-\sumitem{30--31}{Musi być odwracalna, bo punkt się nie ruszył, a stary opis ma
+  razy wektor}.}
+\sumitem{30--31}{\result{Musi być odwracalna, bo punkt się nie ruszył, a stary opis ma
   dać się odzyskać \dash{} czyli wymaganie niezależności z
   Programu~\ref{prog:P04} przybywające jako \textbf{wyznacznik, który nie jest
-  zerem}.}
-\sumitem{32--33}{\textbf{Obrót ma wyznacznik $\val{p09.rot.det}$, a jego
+  zerem}}.}
+\sumitem{32--33}{\result{\textbf{Obrót ma wyznacznik $\val{p09.rot.det}$, a jego
   transpozycja jest jego odwrotnością}, co właśnie znaczy \emph{ortogonalna}.
   Długości i kąty przeżywają, bo przeżywają iloczyny skalarne, więc ortogonalna
-  zmiana bazy jest \textbf{bezstratna}, a nie tylko tania.}
-\sumitem{34}{I tyle właśnie kosztuje model kodowanie pozycji z
+  zmiana bazy jest \textbf{bezstratna}, a nie tylko tania}.}
+\sumitem{34}{\result{I tyle właśnie kosztuje model kodowanie pozycji z
   Programu~\ref{prog:F08}: nic. \textbf{Obrót zapytania i klucza opisuje je na
   nowo, zamiast je zmieniać}, więc żaden kierunek zanurzenia nie jest wydany na
-  niesienie pozycji.}
-\sumitem{35--36}{\textbf{Wyznacznik $1$ i zachowywanie długości to dwa
+  niesienie pozycji}.}
+\sumitem{35--36}{\result{\textbf{Wyznacznik $1$ i zachowywanie długości to dwa
   warunki.} Ścinanie, które dodaje wysokość punktu do jego szerokości, ma
   wyznacznik $1$ i rozciąga; odbicie ma wyznacznik $\val{p09.reflect.det}$ i
-  nie rozciąga. Obrót jest jednym i drugim naraz.}
+  nie rozciąga. Obrót jest jednym i drugim naraz}.}
 \end{summarybox}
 
 \canyou

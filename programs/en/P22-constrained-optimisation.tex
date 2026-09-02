@@ -631,60 +631,60 @@ for.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--2}{A constraint removes the answer you wanted. What remains is the
-  \textbf{feasible set}, and the problem is the best point on it.}
-\sumitem{3--4}{Substitution solves the small case exactly and does not
+\sumitem{1--2}{\result{A constraint removes the answer you wanted. What remains is the
+  \textbf{feasible set}, and the problem is the best point on it}.}
+\sumitem{3--4}{\result{Substitution solves the small case exactly and does not
   generalise, because most constraints cannot be rearranged. The method that
-  follows \textbf{never solves the constraint}.}
-\sumitem{5--6}{Program~\ref{prog:P15}'s result \dash{} the gradient is
+  follows \textbf{never solves the constraint}}.}
+\sumitem{5--6}{\result{Program~\ref{prog:P15}'s result \dash{} the gradient is
   perpendicular to the contour \dash{} said about two functions at once is the
-  whole of this program.}
-\sumitem{7--8}{A contour \emph{crossing} the constraint is never optimal,
+  whole of this program}.}
+\sumitem{7--8}{\result{A contour \emph{crossing} the constraint is never optimal,
   because you can slide along and improve. The optimum is where they
-  \textbf{touch}.}
-\sumitem{9}{Touching means the tangents agree, so the two gradients are
+  \textbf{touch}}.}
+\sumitem{9}{\result{Touching means the tangents agree, so the two gradients are
   \textbf{parallel}: $\nabla f = \lambda\nabla g$. That is where $\lambda$
-  comes from.}
-\sumitem{10--11}{Three equations, three unknowns, solved over fractions:
+  comes from}.}
+\sumitem{10--11}{\result{Three equations, three unknowns, solved over fractions:
   $\lambda = \val{p22.lam}$ at $(\val{p22.x}, \val{p22.y})$. Sign conventions
-  differ between books; read the line, not the letter.}
-\sumitem{12--14}{$\lambda = \mathrm{d}f^{*}/\mathrm{d}c$, checked as an
+  differ between books; read the line, not the letter}.}
+\sumitem{12--14}{\result{$\lambda = \mathrm{d}f^{*}/\mathrm{d}c$, checked as an
   \textbf{equality} over fractions at $\val{p22.price.levels}$ levels.
   \textbf{A multiplier is a price}, with units of objective per unit of
-  constraint.}
-\sumitem{15--16}{It prices the \emph{first} unit: relaxing from
+  constraint}.}
+\sumitem{15--16}{\result{It prices the \emph{first} unit: relaxing from
   $\val{p22.relax.from}$ to $\val{p22.relax.to}$ gains
   $\val{p22.relax.gain}$ against a multiplier of $\val{p22.relax.lam}$, and
-  the difference is the curvature of $f^{*}$.}
-\sumitem{17}{It is the same object as a solver's shadow price, and it says
-  which constraints are worth money.}
-\sumitem{18--19}{The other way to enforce a constraint is to
+  the difference is the curvature of $f^{*}$}.}
+\sumitem{17}{\result{It is the same object as a solver's shadow price, and it says
+  which constraints are worth money}.}
+\sumitem{18--19}{\result{The other way to enforce a constraint is to
   \textbf{project} onto it, which is Program~\ref{prog:P05}'s object with the
-  constraint's normal in place of a vector.}
-\sumitem{20--21}{Projection answers \emph{which feasible point is nearest} and
+  constraint's normal in place of a vector}.}
+\sumitem{20--21}{\result{Projection answers \emph{which feasible point is nearest} and
   the multiplier answers \emph{which is best}: $\val{p22.proj.f}$ against
   $\val{p22.fstar}$ here. Projecting keeps an iterate legal; it does not make
-  it good.}
-\sumitem{22--23}{An objective written as reward minus $\beta$ times a
+  it good}.}
+\sumitem{22--23}{\result{An objective written as reward minus $\beta$ times a
   divergence has a multiplier in it already, and $\beta$ is a \textbf{price in
-  reward per unit of divergence}.}
-\sumitem{24--25}{Measured along the family of solutions, the slope of reward
+  reward per unit of divergence}}.}
+\sumitem{24--25}{\result{Measured along the family of solutions, the slope of reward
   against divergence is $\beta$ itself, to better than
   $\val{p22.kl.slope.bound}$. So a $\beta$ tuned against one reward model does
-  not transfer to another.}
-\sumitem{26--28}{Each $\beta$ names one divergence level, so \textbf{a hard
+  not transfer to another}.}
+\sumitem{26--28}{\result{Each $\beta$ names one divergence level, so \textbf{a hard
   constraint and a penalty are the same problem} parameterised differently,
-  and neither is more fundamental.}
-\sumitem{29--31}{An inequality is tight or slack. Tight is an equality; slack
+  and neither is more fundamental}.}
+\sumitem{29--31}{\result{An inequality is tight or slack. Tight is an equality; slack
   means the constraint buys nothing, so its price is \textbf{zero}. Together:
-  $\lambda g(x) = 0$, complementary slackness.}
-\sumitem{32}{The KKT conditions are stationarity, feasibility,
-  $\lambda \ge 0$ and complementary slackness \dash{} stated for recognition,
+  $\lambda g(x) = 0$, complementary slackness}.}
+\sumitem{32}{\result{The KKT conditions are stationarity, feasibility,
+  $\lambda \ge 0$ and complementary slackness} \dash{} stated for recognition,
   with the constraint qualification and the sufficiency argument left to a
   first course.}
-\sumitem{33--35}{A negative multiplier on a $\le$ constraint means the sign
+\sumitem{33--35}{\result{A negative multiplier on a $\le$ constraint means the sign
   convention is not the one you assumed, because a larger feasible set cannot
-  have a worse best point.}
+  have a worse best point}.}
 \end{summarybox}
 
 \canyou

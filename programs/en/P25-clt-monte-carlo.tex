@@ -1020,76 +1020,75 @@ neither is this book's.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--4}{\textbf{For independent $X$ and $Y$, $\Var(X+Y) = \Var(X) +
+\sumitem{1--4}{\result{\textbf{For independent $X$ and $Y$, $\Var(X+Y) = \Var(X) +
   \Var(Y)$} \dash{} the variances add, not the spreads. Enumerated exactly
-  over thirty-six throws.}
-\sumitem{3--4}{One quantity counted twice is not two quantities:
+  over thirty-six throws}.}
+\sumitem{3--4}{\result{One quantity counted twice is not two quantities:
   $\Var(2X) = 4\Var(X)$, not $2\Var(X)$. The difference is what independence
-  buys, and duplicated evaluation items lose it silently.}
-\sumitem{5--7}{In general $\Var(X+Y) = \Var(X) + \Var(Y) + 2\Cov(X,Y)$, so a
+  buys, and duplicated evaluation items lose it silently}.}
+\sumitem{5--7}{\result{In general $\Var(X+Y) = \Var(X) + \Var(Y) + 2\Cov(X,Y)$, so a
   \textbf{zero covariance} is all the argument needs \dash{} which is weaker
-  than independence and, per Program~\ref{prog:P24}, dangerously so.}
-\sumitem{9--11}{An average of $n$ independent draws has variance
-  $\sigma^{2}/n$ and spread $\sigma/\sqrt{n}$, in two steps from section 1.
-  Program~\ref{prog:P21} measured this rate; this is its reason.}
-\sumitem{13--14}{\textbf{Halving an error bar costs four times the data};
+  than independence and, per Program~\ref{prog:P24}, dangerously so}.}
+\sumitem{9--11}{\result{An average of $n$ independent draws has variance
+  $\sigma^{2}/n$ and spread $\sigma/\sqrt{n}$, in two steps from section 1.} Program~\ref{prog:P21} measured this rate; this is its reason.}
+\sumitem{13--14}{\result{\textbf{Halving an error bar costs four times the data};
   a tenth of it costs $\val{p25.tenth.factor}$ times. Precision is
-  quadratic, from four different starting points.}
-\sumitem{15--16}{The \textbf{central limit theorem} is about the
+  quadratic, from four different starting points}.}
+\sumitem{15--16}{\result{The \textbf{central limit theorem} is about the
   \emph{shape}: a sum of many independent, non-dominating pieces approaches a
   Gaussian. Measured exactly on sums of uniforms, worst gap
   $\val{p25.clt.gap.1}$ at $n = 1$ and $\val{p25.clt.gap.12}$ at
-  $n = \val{p25.clt.n.hi}$.}
-\sumitem{17--19}{\textbf{And it is silent in the tail.} The Gaussian is right
+  $n = \val{p25.clt.n.hi}$}.}
+\sumitem{17--19}{\result{\textbf{And it is silent in the tail.} The Gaussian is right
   to a per cent one spread out and wrong by
   $\val{p25.tail.ratio5}$ times five spreads out; six spreads out the truth is
   exactly zero. The question the theorem answers worst is the one it is most
-  used for.}
-\sumitem{20--22}{The hypothesis is what fails in practice: independence, a
+  used for}.}
+\sumitem{20--22}{\result{The hypothesis is what fails in practice: independence, a
   finite variance, and no single piece dominating. \textbf{A Gaussian because
   a sum was involved is correct; a Gaussian because it looked bell-shaped is
-  an assumption nobody checked.}}
-\sumitem{23--25}{An accuracy on $\val{p25.eval.n.lo}$ items carries an
+  an assumption nobody checked.}}}
+\sumitem{23--25}{\result{An accuracy on $\val{p25.eval.n.lo}$ items carries an
   interval of $\pm\val{p25.eval.hw.100}$ points, and four times the items
-  halves it every time.}
-\sumitem{26--27}{Calling a $\val{p25.eval.gap.pct}$-point difference needs
+  halves it every time}.}
+\sumitem{26--27}{\result{Calling a $\val{p25.eval.gap.pct}$-point difference needs
   $\val{p25.eval.n.needed}$ items per model \dash{} \textbf{twice}
   $\val{p25.eval.n.naive}$, because the quantity in question is a
-  \emph{difference} and the variances of the two estimates add.}
-\sumitem{30--32}{An attention score is a sum of $d_k$ products of
+  \emph{difference} and the variances of the two estimates add}.}
+\sumitem{30--32}{\result{An attention score is a sum of $d_k$ products of
   unit-variance entries, so $\Var = d_k$ and the spread is $\sqrt{d_k}$
-  \dash{} enumerated exactly, with no limit theorem in it.}
+  \dash{} enumerated exactly, with no limit theorem in it}.}
 \sumitem{32--33}{Program~\ref{prog:P05} measured the same theorem at the
   normalised scaling, $1/\sqrt{d}$, and the derivation reproduces its four
   committed figures to $\val{p25.p05.worst.pct}$ per cent.
   $\sqrt{d_k} \times 1/\sqrt{d_k} = 1$ \emph{is} the division.}
-\sumitem{35--37}{\textbf{E9, run.} Without the division, at
+\sumitem{35--37}{\result{\textbf{E9, run.} Without the division, at
   $d_k = \val{p25.e9.d.hi}$ the row's entropy is
   $\val{p25.e9.raw.ent.512}$ of a possible $\val{p25.e9.maxent}$ and one key
   takes $\val{p25.e9.raw.top.512}$ per cent. With it, nothing moves at any
-  head size.}
-\sumitem{37}{Program~\ref{prog:P18}'s Jacobian diagonal $p(1-p)$ turns that
+  head size}.}
+\sumitem{37}{\result{Program~\ref{prog:P18}'s Jacobian diagonal $p(1-p)$ turns that
   into a gradient: $\val{p25.e9.resp.raw}$ against
   $\val{p25.e9.resp.scaled}$, so the scaled row is
-  $\val{p25.e9.resp.ratio}$ times as responsive.}
-\sumitem{39--41}{\textbf{The scaling is a variance correction and nothing
+  $\val{p25.e9.resp.ratio}$ times as responsive}.}
+\sumitem{39--41}{\result{\textbf{The scaling is a variance correction and nothing
   else.} A fixed constant cannot do the job, because the thing corrected grows
-  with the head dimension.}
-\sumitem{42--44}{A layer's output has variance
+  with the head dimension}.}
+\sumitem{42--44}{\result{A layer's output has variance
   $n_{\text{in}}\Var(w)\Var(x)$ \dash{} the same identity a fourth time
   \dash{} so a linear layer holds its scale at
-  $\Var(w) = 1/n_{\text{in}}$.}
-\sumitem{45--47}{A $\relu$ keeps \textbf{exactly half} the second moment of a
+  $\Var(w) = 1/n_{\text{in}}$}.}
+\sumitem{45--47}{\result{A $\relu$ keeps \textbf{exactly half} the second moment of a
   symmetric input, by symmetry and integrated to
   $\val{p25.init.relu.keeps}$. Making that up needs
   $\Var(w) = 2/n_{\text{in}}$, \textbf{which is where He's factor of two comes
-  from}.}
-\sumitem{48--52}{Depth compounds it geometrically: over
+  from}}.}
+\sumitem{48--52}{\result{Depth compounds it geometrically: over
   $\val{p25.init.depth}$ layers, half per layer leaves
   $\val{p25.init.deep.xavier}$ of the signal and four per layer gives
   $\val{p25.init.deep.hot}$. \textbf{A divergence at step one is the
   initialisation, not the learning rate}, and one forward pass tells you
-  which.}
+  which}.}
 \end{summarybox}
 
 \canyou

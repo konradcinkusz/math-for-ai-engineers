@@ -664,64 +664,63 @@ those in a line or two.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{A derivative by a vector defines nothing new; it needs
+\sumitem{1--2}{\result{\textbf{A derivative by a vector defines nothing new; it needs
   a layout.} This book uses \textbf{numerator layout} \dash{} one row per
-  output \dash{} declared rather than assumed.}
-\sumitem{3--4}{\textbf{Under it $\partial(W\vect{x})/\partial\vect{x}$ is $W$
+  output \dash{} declared rather than assumed}.}
+\sumitem{3--4}{\result{\textbf{Under it $\partial(W\vect{x})/\partial\vect{x}$ is $W$
   itself}, checked to $\val{p18.layout.bound}$. A convention that makes the
-  easiest case an identity is the one to hold.}
-\sumitem{5--6}{\textbf{The two conventions differ by one transpose},
+  easiest case an identity is the one to hold}.}
+\sumitem{5--6}{\result{\textbf{The two conventions differ by one transpose},
   $\val{p18.n.out} \times \val{p18.n.in}$ against $\val{p18.n.in} \times \val{p18.n.out}$. Neither is wrong;
   mixing them inside one derivation is, and it shows up as a shape error far
-  from the mixing.}
-\sumitem{8--9}{\textbf{The gradient of a scalar has the shape of the thing it
+  from the mixing}.}
+\sumitem{8--9}{\result{\textbf{The gradient of a scalar has the shape of the thing it
   is taken with respect to}, in either convention. That is a check available
-  before the derivative is written down.}
-\sumitem{10}{\textbf{Transposing until it runs terminates}, which is why the
+  before the derivative is written down}.}
+\sumitem{10}{\result{\textbf{Transposing until it runs terminates}, which is why the
   habit survives \dash{} and it stops working the moment two dimensions are
-  equal, where the wrong transpose runs too.}
-\sumitem{11--12}{$\partial L/\partial W = 2\vect{r}\vect{x}\T$ for a squared
-  error, checked to $\val{p18.sq.bound}$.}
-\sumitem{13--14}{\textbf{A weight's gradient is an outer product},
+  equal, where the wrong transpose runs too}.}
+\sumitem{11--12}{\result{$\partial L/\partial W = 2\vect{r}\vect{x}\T$ for a squared
+  error, checked to $\val{p18.sq.bound}$}.}
+\sumitem{13--14}{\result{\textbf{A weight's gradient is an outer product},
   $\vect{g}\vect{x}\T$, for any loss \dash{} and it needs the layer's input,
-  which is why the backward pass needs the forward pass's activations.}
-\sumitem{15--16}{\textbf{The $\softmax$ derivative is $n\times n$}, because
-  every output shares a denominator with every input.}
-\sumitem{16--17}{$J = \diag(\vect{p}) - \vect{p}\vect{p}\T$, checked to
-  $\val{p18.jac.bound}$.}
-\sumitem{18--19}{\textbf{Every row of $J$ sums to zero}: the probabilities sum
+  which is why the backward pass needs the forward pass's activations}.}
+\sumitem{15--16}{\result{\textbf{The $\softmax$ derivative is $n\times n$}, because
+  every output shares a denominator with every input}.}
+\sumitem{16--17}{\result{$J = \diag(\vect{p}) - \vect{p}\vect{p}\T$, checked to
+  $\val{p18.jac.bound}$}.}
+\sumitem{18--19}{\result{\textbf{Every row of $J$ sums to zero}: the probabilities sum
   to $1$ whatever the scores do, differentiated. A $\softmax$ moves
-  probability and never makes more.}
-\sumitem{20--21}{At $n = 2$ it reduces to $\sigma'(a-b)$, over
+  probability and never makes more}.}
+\sumitem{20--21}{\result{At $n = 2$ it reduces to $\sigma'(a-b)$, over
   $\val{p18.gate.f07.pairs}$ pairs \dash{} Program~\ref{prog:F07}'s identity
-  differentiated, and a gate rather than a resemblance.}
-\sumitem{22}{\textbf{Cross-entropy is defined here and justified later}:
-  $-\sum_j y_j \ln p_j$, which is $-\ln p_c$ for a one-hot target.
-  Program~\ref{prog:P26} says why it is the right thing to minimise and
+  differentiated, and a gate rather than a resemblance}.}
+\sumitem{22}{\result{\textbf{Cross-entropy is defined here and justified later}:
+  $-\sum_j y_j \ln p_j$, which is $-\ln p_c$ for a one-hot target.} Program~\ref{prog:P26} says why it is the right thing to minimise and
   Program~\ref{prog:P30} what it measures.}
-\sumitem{23--25}{\textbf{The gradient is $\vect{p} - \vect{y}$}, and the
+\sumitem{23--25}{\result{\textbf{The gradient is $\vect{p} - \vect{y}$}, and the
   derivation is one cancellation: the $1/p_c$ from the first step meets the
-  $p_c$ on the Jacobian's diagonal.}
-\sumitem{26--27}{Read as an instruction: lower every score in proportion to
+  $p_c$ on the Jacobian's diagonal}.}
+\sumitem{26--27}{\result{Read as an instruction: lower every score in proportion to
   the probability it has, raise the true one by the probability it lacks. The
-  correction is the size of the mistake.}
-\sumitem{28--29}{One layer back, $\partial L/\partial W =
-  (\vect{p}-\vect{y})\vect{x}\T$, checked to $\val{p18.cew.bound}$.}
-\sumitem{30--31}{\textbf{Layer normalisation is not elementwise either}, because
+  correction is the size of the mistake}.}
+\sumitem{28--29}{\result{One layer back, $\partial L/\partial W =
+  (\vect{p}-\vect{y})\vect{x}\T$, checked to $\val{p18.cew.bound}$}.}
+\sumitem{30--31}{\result{\textbf{Layer normalisation is not elementwise either}, because
   the mean and the variance depend on every input; its gradient carries two
-  correction terms, checked to $\val{p18.ln.bound}$.}
-\sumitem{32--33}{\textbf{Fusion, reason one: cost.}
+  correction terms, checked to $\val{p18.ln.bound}$}.}
+\sumitem{32--33}{\result{\textbf{Fusion, reason one: cost.}
   $\val{p18.fuse.ratio}$ times fewer operations, and the Jacobian nobody
-  forms would be $\val{p18.fuse.gib}$ GiB.}
-\sumitem{34--35}{\textbf{Reason two, and it is not about speed}: the two-step
+  forms would be $\val{p18.fuse.gib}$ GiB}.}
+\sumitem{34--35}{\result{\textbf{Reason two, and it is not about speed}: the two-step
   route forms $-1/p_c$ and $p_c$ underflows to zero, where
-  $\vect{p}-\vect{y}$ never forms the reciprocal.}
-\sumitem{36--37}{The cliff is at about $\val{p18.cliff}$ under the largest
+  $\vect{p}-\vect{y}$ never forms the reciprocal}.}
+\sumitem{36--37}{\result{The cliff is at about $\val{p18.cliff}$ under the largest
   score, which is Program~\ref{prog:P01}'s floor. \textbf{The two routes are
-  not the same function}, and they differ exactly where a run is worst.}
-\sumitem{38--39}{\textbf{The mathematics is the partial derivatives and the
+  not the same function}, and they differ exactly where a run is worst}.}
+\sumitem{38--39}{\result{\textbf{The mathematics is the partial derivatives and the
   convention is how they are arranged}; matrix calculus has a reputation
-  because the two get confused for one another.}
+  because the two get confused for one another}.}
 \end{summarybox}
 
 \canyou

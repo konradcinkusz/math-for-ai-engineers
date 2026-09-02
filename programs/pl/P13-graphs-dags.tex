@@ -743,58 +743,58 @@ ona przetrwa bycie szeroką na milion wierzchołków.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Graf to zbiór wierzchołków i zbiór ich par}, i nic
+\sumitem{1--3}{\result{\textbf{Graf to zbiór wierzchołków i zbiór ich par}, i nic
   więcej \dash{} bez położenia, bez rysunku. \textbf{Pary uporządkowane czynią
   go skierowanym}, co mają graf wywołań, graf importów i graf zależności, a
-  szkic na tablicy zwykle gubi.}
-\sumitem{4--5}{\textbf{Stopnie sumują się do podwojonej liczby krawędzi}, bo
+  szkic na tablicy zwykle gubi}.}
+\sumitem{4--5}{\result{\textbf{Stopnie sumują się do podwojonej liczby krawędzi}, bo
   każda krawędź jest liczona przy każdym ze swoich dwóch końców:
   $\val{p13.g.degsum}$ przy $\val{p13.g.ne}$ krawędziach. Wierzchołków o
-  nieparzystym stopniu jest więc parzyście wiele.}
-\sumitem{6--8}{Graf pełny o $\val{p13.complete.n}$ wierzchołkach ma
+  nieparzystym stopniu jest więc parzyście wiele}.}
+\sumitem{6--8}{\result{Graf pełny o $\val{p13.complete.n}$ wierzchołkach ma
   $\val{p13.complete.e}$ krawędzi, czyli liczbę par z~Programów~\ref{prog:F10}
   i~\ref{prog:P12} \dash{} krawędź nieskierowana \emph{jest} parą
-  nieuporządkowaną. Deduplikacja to znajdowanie spójnych składowych.}
-\sumitem{9--10}{\textbf{Macierz czy lista to pytanie o gęstość i o to, którą
+  nieuporządkowaną. Deduplikacja to znajdowanie spójnych składowych}.}
+\sumitem{9--10}{\result{\textbf{Macierz czy lista to pytanie o gęstość i o to, którą
   operację powtarzasz.} Przy $\val{p13.big.n}$ wierzchołkach i
   $\val{p13.big.m}$ krawędziach macierz ma $\val{p13.big.cells}$ komórek wobec
-  $\val{p13.big.slots}$ miejsc, a gęstość wynosi $\val{p13.big.density}$.}
-\sumitem{11--13}{Macierz odpowiada na \emph{czy istnieje krawędź} w jednym
+  $\val{p13.big.slots}$ miejsc, a gęstość wynosi $\val{p13.big.density}$}.}
+\sumitem{11--13}{\result{Macierz odpowiada na \emph{czy istnieje krawędź} w jednym
   kroku, a lista na \emph{jacy są sąsiedzi} w tylu krokach, ilu jest sąsiadów.
   \textbf{Macierz zarabia na swoje tym, że da się ją pomnożyć}, a nie tym, że
-  da się w niej wyszukać.}
-\sumitem{14--15}{\textbf{$(A^{k})_{ij}$ liczy spacery długości $k$ z $i$ do
+  da się w niej wyszukać}.}
+\sumitem{14--15}{\result{\textbf{$(A^{k})_{ij}$ liczy spacery długości $k$ z $i$ do
   $j$}, bo każdy wyraz $\sum_k A_{ik}A_{kj}$ to $1$ dokładnie wtedy, gdy oba
   kroki istnieją \dash{} złożenie z~Programu~\ref{prog:P06} robiące
-  arytmetykę.}
-\sumitem{16--18}{\textbf{Spacer to nie ścieżka}: $(A^{2})_{ii}$ to stopień
+  arytmetykę}.}
+\sumitem{16--18}{\result{\textbf{Spacer to nie ścieżka}: $(A^{2})_{ii}$ to stopień
   $i$, liczący \enquote{tam i z powrotem}. Zliczanie ścieżek jest problemem
-  trudniejszym i potęgi macierzy tego nie robią.}
-\sumitem{19--20}{\textbf{Przekazywanie komunikatów jest mnożeniem przez
+  trudniejszym i potęgi macierzy tego nie robią}.}
+\sumitem{19--20}{\result{\textbf{Przekazywanie komunikatów jest mnożeniem przez
   macierz sąsiedztwa}, więc $k$ warstw sięga dokładnie $k$ skoków:
   $\val{p13.reach.one}$ wierzchołków przy jednym skoku i wszystkie
   $\val{p13.reach}$ przy $\val{p13.hops}$. \textbf{Głębokość to zasięg, a nie
-  pojemność.}}
-\sumitem{21--23}{\textbf{Graf skierowany ma porządek topologiczny wtedy i
+  pojemność.}}}
+\sumitem{21--23}{\result{\textbf{Graf skierowany ma porządek topologiczny wtedy i
   tylko wtedy, gdy jest acykliczny}, a zwykle ma ich więcej niż jeden:
-  $\val{p13.topo.count}$ tutaj spośród $\val{p13.topo.total}$.}
-\sumitem{24--25}{\textbf{Każdy porządek topologiczny liczy te same wartości},
+  $\val{p13.topo.count}$ tutaj spośród $\val{p13.topo.total}$}.}
+\sumitem{24--25}{\result{\textbf{Każdy porządek topologiczny liczy te same wartości},
   bo każdy wierzchołek zależy tylko od rodziców, których wszystkie porządki
   liczą wcześniej. Dlatego system budowania, przepływ agenta, plan zapytania i
   przejście w przód są jednym obiektem i dlatego planista może swobodnie
-  zrównoleglać.}
-\sumitem{26}{\textbf{Cykl czyni obliczenie nieokreślonym, a nie trudnym.}
+  zrównoleglać}.}
+\sumitem{26}{\result{\textbf{Cykl czyni obliczenie nieokreślonym, a nie trudnym.}
   Rozerwij go albo rozwiń \dash{} czym jest sieć rekurencyjna i dlaczego jej
-  pamięć rośnie z liczbą rozwiniętych kroków.}
-\sumitem{27--30}{Krokiem błądzenia losowego jest $P\T p$, a
+  pamięć rośnie z liczbą rozwiniętych kroków}.}
+\sumitem{27--30}{\result{Krokiem błądzenia losowego jest $P\T p$, a
   \textbf{rozkład stacjonarny to wektor własny dla wartości własnej $1$}
   \dash{} Program~\ref{prog:P10} pod inną nazwą. To jest PageRank i sprawdza
-  się go tutaj jako dokładną równość, a nie tolerancję.}
-\sumitem{31--34}{\textbf{Wierzchołek bez krawędzi wychodzącej wysusza
+  się go tutaj jako dokładną równość, a nie tolerancję}.}
+\sumitem{31--34}{\result{\textbf{Wierzchołek bez krawędzi wychodzącej wysusza
   błądzenie}: po $\val{p13.drain.zeroat}$ krokach nie zostaje dokładnie nic
   masy. Tłumienie na $\val{p13.damp}$ czyni każdy wyraz dodatnim, a każdy
   wiersz sumującym się do jedności, i to kupuje jedyny punkt stały \dash{}
-  stała jest umowna, potrzeba jej nie.}
+  stała jest umowna, potrzeba jej nie}.}
 \end{summarybox}
 
 \canyou

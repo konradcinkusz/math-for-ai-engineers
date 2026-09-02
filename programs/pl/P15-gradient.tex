@@ -757,64 +757,64 @@ Ufaj tu algebrze i nie ufaj obrazowi w głowie, w tej kolejności.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Pochodna cząstkowa trzyma każde inne wejście w miejscu}
+\sumitem{1--2}{\result{\textbf{Pochodna cząstkowa trzyma każde inne wejście w miejscu}
   i jest wtedy zwykłą pochodną jednej zmiennej, więc każda reguła z
-  Programu~\ref{prog:F12} stosuje się bez zmian.}
-\sumitem{3--5}{Dla $f = x^{2}y + 3y$ pochodne cząstkowe to $2xy$ oraz
+  Programu~\ref{prog:F12} stosuje się bez zmian}.}
+\sumitem{3--5}{\result{Dla $f = x^{2}y + 3y$ pochodne cząstkowe to $2xy$ oraz
   $x^{2}+3$. \textbf{Trzymanie wejścia w miejscu nie usuwa go z odpowiedzi}
-  \dash{} pochodna cząstkowa nadal jest funkcją wszystkiego.}
-\sumitem{6--7}{W $(\val{p15.pt.x}, \val{p15.pt.y})$ wynoszą one
+  \dash{} pochodna cząstkowa nadal jest funkcją wszystkiego}.}
+\sumitem{6--7}{\result{W $(\val{p15.pt.x}, \val{p15.pt.y})$ wynoszą one
   $\val{p15.fx.at}$ i $\val{p15.fy.at}$, sprawdzone wobec różnicy centralnej
-  na siatce lepiej niż $\val{p15.partial.bound}$.}
-\sumitem{8--9}{\textbf{Gradient to pochodne cząstkowe zapisane jako wektor},
+  na siatce lepiej niż $\val{p15.partial.bound}$}.}
+\sumitem{8--9}{\result{\textbf{Gradient to pochodne cząstkowe zapisane jako wektor},
   $\nabla f$, mający długość oprócz kierunku \dash{} tutaj
-  $\val{p15.grad.len}$.}
-\sumitem{9}{\textbf{Słowo wykonuje dwie prace.} Programy F06 i F11 używają
+  $\val{p15.grad.len}$}.}
+\sumitem{9}{\result{\textbf{Słowo wykonuje dwie prace.} Programy F06 i F11 używają
   słowa \enquote{gradient} dla współczynnika kierunkowego prostej, jednej
-  liczby; tutaj jest to wektor po jednej składowej na wejście.}
-\sumitem{10--11}{Zapisuje się go jako wektor \textbf{po to, by dało się go
-  pomnożyć skalarnie}, i stąd bierze się reszta programu.}
-\sumitem{12--13}{W minimum gradient jest wektorem zerowym, a \textbf{odwrotne
+  liczby; tutaj jest to wektor po jednej składowej na wejście}.}
+\sumitem{10--11}{\result{Zapisuje się go jako wektor \textbf{po to, by dało się go
+  pomnożyć skalarnie}, i stąd bierze się reszta programu}.}
+\sumitem{12--13}{\result{W minimum gradient jest wektorem zerowym, a \textbf{odwrotne
   zdanie zawodzi} \dash{} siodło też ma gradient zerowy, a odróżnienie ich
-  należy do Programu~\ref{prog:P17}.}
-\sumitem{14--17}{\textbf{Tempo zmiany wzdłuż kierunku jednostkowego $u$ to
+  należy do Programu~\ref{prog:P17}}.}
+\sumitem{14--17}{\result{\textbf{Tempo zmiany wzdłuż kierunku jednostkowego $u$ to
   $\nabla f \cdot u$}, czyli granica z Programu~\ref{prog:F11} wzięta wzdłuż
   prostej. Sprawdzone wobec tej granicy na $\val{p15.dir.steps}$ kierunkach
-  lepiej niż $\val{p15.dir.bound}$.}
-\sumitem{20--21}{Z cosinusem z Programu~\ref{prog:P05}
+  lepiej niż $\val{p15.dir.bound}$}.}
+\sumitem{20--21}{\result{Z cosinusem z Programu~\ref{prog:P05}
   $D_u f = \lVert\nabla f\rVert\cos\theta$, więc \textbf{kierunkiem
   najbardziej stromym jest własny kierunek gradientu, a najszybszym tempem
-  jego długość}. Wyprowadzone, nie orzeczone.}
-\sumitem{23--24}{Przy $\cos\theta = 0$ tempo jest zerem, więc \textbf{gradient
+  jego długość}. Wyprowadzone, nie orzeczone}.}
+\sumitem{23--24}{\result{Przy $\cos\theta = 0$ tempo jest zerem, więc \textbf{gradient
   jest prostopadły do poziomicy} \dash{} to samo równanie odczytane na drugim
-  krańcu, dokładnie zero na $\val{p15.perp.trials}$ przypadkach wymiernych.}
+  krańcu, dokładnie zero na $\val{p15.perp.trials}$ przypadkach wymiernych}.}
 \sumitem{25--26}{Prostopadłość jest sprawdzona \textbf{dokładnie nad liczbami
   wymiernymi}, bez żadnej tolerancji, bo twierdzenie zawierające słowo
   \emph{prostopadły} jest twierdzeniem o dokładnym zerze.}
-\sumitem{27--28}{\textbf{Prostopadłość do poziomicy to nie to samo co
+\sumitem{27--28}{\result{\textbf{Prostopadłość do poziomicy to nie to samo co
   wskazywanie minimum}, chyba że poziomice są okręgami. Jedno jest lokalne, a
-  drugie globalne.}
-\sumitem{29--30}{Marsz to marsz Programu~\ref{prog:F11} z pochodną
+  drugie globalne}.}
+\sumitem{29--30}{\result{Marsz to marsz Programu~\ref{prog:F11} z pochodną
   wektorową, a minus ma teraz mocniejszy powód: gradient jest najszybszym
-  \emph{wzrostem}.}
-\sumitem{30}{\textbf{Znak jest najczęstszym błędem w ręcznie pisanej pętli.}
+  \emph{wzrostem}}.}
+\sumitem{30}{\result{\textbf{Znak jest najczęstszym błędem w ręcznie pisanej pętli.}
   Jeden krok we właściwą stronę sprowadza $\val{p15.sign.before}$ do
   $\val{p15.sign.down}$; jeden krok w złą podnosi to do
-  $\val{p15.sign.up}$, bez żadnego zgłoszonego błędu.}
-\sumitem{31--32}{Na niecce Programu~\ref{prog:P10}, o wartościach własnych
+  $\val{p15.sign.up}$, bez żadnego zgłoszonego błędu}.}
+\sumitem{31--32}{\result{Na niecce Programu~\ref{prog:P10}, o wartościach własnych
   $\val{p15.lam.hi}$ i $\val{p15.lam.lo}$, ujemny gradient wskazuje
   $\val{p15.zig.angle}$ stopni od minimum. W okrągłej niecce wskazuje je
-  dokładnie.}
-\sumitem{33--34}{Marsz przechodzi w poprzek doliny $\val{p15.zig.crossings}$
+  dokładnie}.}
+\sumitem{33--34}{\result{Marsz przechodzi w poprzek doliny $\val{p15.zig.crossings}$
   razy w $\val{p15.zig.steps}$ krokach i \textbf{przebywa
-  $\val{p15.zig.ratio}$ raza dalej, niż pokonuje}.}
-\sumitem{35--36}{Każda współrzędna mnożona jest przez $1 - \eta\lambda$:
+  $\val{p15.zig.ratio}$ raza dalej, niż pokonuje}}.}
+\sumitem{35--36}{\result{Każda współrzędna mnożona jest przez $1 - \eta\lambda$:
   czynnik wynosi $\val{p15.fac.hi}$ w kierunku stromym, który zmienia znak w
   każdym kroku, i $\val{p15.fac.lo}$ w płytkim, który pełznie. \textbf{Jeden
-  rozmiar kroku musi obsłużyć oba.}}
-\sumitem{37--38}{\textbf{Ani jeden krok argumentu nie skorzystał z tego, że
+  rozmiar kroku musi obsłużyć oba.}}}
+\sumitem{37--38}{\result{\textbf{Ani jeden krok argumentu nie skorzystał z tego, że
   wejść były dwa.} Obrazek jest ilustracją iloczynu skalarnego, a nigdy jego
-  przesłanką.}
+  przesłanką}.}
 \end{summarybox}
 
 \canyou

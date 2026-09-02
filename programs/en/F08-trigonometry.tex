@@ -705,74 +705,74 @@ putting position into a model that must not otherwise notice it.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--3}{\textbf{$\cos\theta$ and $\sin\theta$ are the two coordinates
+\sumitem{1--3}{\result{\textbf{$\cos\theta$ and $\sin\theta$ are the two coordinates
   of a point on a circle of radius $1$}, after it has walked $\theta$
   anticlockwise from the right-hand side. Not a ratio of sides and nothing to
   do with triangles \dash{} the whole subject is one picture, and the four
-  quarter-turn values are read off it rather than memorised.}
-\sumitem{4--5}{\textbf{An angle is a distance walked, which is what a radian
+  quarter-turn values are read off it rather than memorised}.}
+\sumitem{4--5}{\result{\textbf{An angle is a distance walked, which is what a radian
   is}, so a full turn is $2\pi$ and no conversion factor survives into any
   later formula. \code{math.sin(90)} returns $\val{f08.sin90rad}$, because
   $90$ radians is $\val{f08.turns90}$ full turns \dash{} and nothing raises,
-  nothing warns, and the answer is an ordinary number.}
-\sumitem{5--6}{$\cos^{2}\theta + \sin^{2}\theta = 1$ is
+  nothing warns, and the answer is an ordinary number}.}
+\sumitem{5--6}{\result{$\cos^{2}\theta + \sin^{2}\theta = 1$ is
   \textbf{the equation of the circle with the names substituted in}, so it
   needs no proof and no memorising. Checked to $\val{f08.pyth.err}$. It is
-  the only trigonometric identity this book uses.}
-\sumitem{7--8}{Both curves have period $2\pi$ and range $\intcc{-1}{1}$
+  the only trigonometric identity this book uses}.}
+\sumitem{7--8}{\result{Both curves have period $2\pi$ and range $\intcc{-1}{1}$
   because the point returns to where it started and never leaves the circle.
   $\cos$ is even and $\sin$ is odd, which is walking backwards mirrored in the
-  horizontal axis.}
-\sumitem{9--10}{\textbf{$\cos\theta = \sin(\theta + \frac{\pi}{2})$}, checked
+  horizontal axis}.}
+\sumitem{9--10}{\result{\textbf{$\cos\theta = \sin(\theta + \frac{\pi}{2})$}, checked
   to $\val{f08.shift.err}$: one curve, two names, and the $+$ inside the
   bracket moves the graph the other way, as Program~\ref{prog:F05} warned. At
   $\theta = 0$ they read $1$ and $0$, which is the only thing that tells them
-  apart.}
-\sumitem{11--13}{In $A\sin(B\theta + C) + D$ the four letters are
+  apart}.}
+\sumitem{11--13}{\result{In $A\sin(B\theta + C) + D$ the four letters are
   Program~\ref{prog:F05}'s four moves: $A$ the amplitude and $D$ the offset
   act on the output and read as written; $B$ the frequency and $C$ the phase
   act on the input and read backwards. The wavelength is $\frac{2\pi}{B}$ and
   the sideways slide is $\frac{C}{B}$, divided by $B$ because the shift is
-  measured after the squash.}
-\sumitem{14--15}{\textbf{A wavelength is a number of positions, not a number
+  measured after the squash}.}
+\sumitem{14--15}{\result{\textbf{A wavelength is a number of positions, not a number
   of radians.} A sinusoidal positional encoding is one wave per frequency over
   an enormous spread \dash{} about $\val{f08.pe.first}$ positions at the
   fastest and $\val{f08.pe.last}$ at the slowest \dash{} because neither end
-  can do the other's job.}
-\sumitem{16--17}{\textbf{Cosine similarity is the cosine of the angle between
+  can do the other's job}.}
+\sumitem{16--17}{\result{\textbf{Cosine similarity is the cosine of the angle between
   two vectors}, not an analogy and not a name. Checked against the angle
   computed independently, worst disagreement $\val{f08.cossim.err}$. The two
   lengths are in the denominator so that they cancel, which means the measure
   is about direction and knows nothing about magnitude \dash{} and whether
-  that is what you want is a question worth asking.}
-\sumitem{18--19}{$\val{f08.cos.same}$, $\val{f08.cos.right}$ and
+  that is what you want is a question worth asking}.}
+\sumitem{18--19}{\result{$\val{f08.cos.same}$, $\val{f08.cos.right}$ and
   $\val{f08.cos.opposite}$ are the same direction, right angles and opposite.
   \textbf{Cosine is flat near zero}, so a similarity of $\val{f08.cos.hi}$ is
   still about $\val{f08.ang.hi}$ degrees, and dropping the cutoff to
   $\val{f08.cos.lo}$ admits $\val{f08.ang.lo}$ \dash{} the scale is least
-  linear exactly where thresholds get set.}
-\sumitem{20--21}{\textbf{The mathematics is exact and the interpretation is
+  linear exactly where thresholds get set}.}
+\sumitem{20--21}{\result{\textbf{The mathematics is exact and the interpretation is
   empirical.} A high similarity says the vectors point the same way; that this
   tracks meaning is a claim about how they were trained, and it has to be
-  measured on the task.}
-\sumitem{22--23}{Cosine similarity depends on the two vectors only through the
+  measured on the task}.}
+\sumitem{22--23}{\result{Cosine similarity depends on the two vectors only through the
   angle between them, so scaling both leaves it alone \dash{} and so does
-  turning both by the same amount.}
-\sumitem{24--26}{A rotation sends $(x, y)$ to
+  turning both by the same amount}.}
+\sumitem{24--26}{\result{A rotation sends $(x, y)$ to
   $(x\cos\theta - y\sin\theta,\ x\sin\theta + y\cos\theta)$ and
   \textbf{changes where things are without changing how big they are}: worst
-  change in length $\val{f08.rot.len.err}$ over six hundred angles.}
-\sumitem{27--28}{Rotating \emph{both} vectors by the same angle leaves the dot
+  change in length $\val{f08.rot.len.err}$ over six hundred angles}.}
+\sumitem{27--28}{\result{Rotating \emph{both} vectors by the same angle leaves the dot
   product alone, to $\val{f08.rot.same.err}$, because all three of its
   ingredients survive. So rotating them by \emph{different} angles $\alpha$
   and $\beta$ leaves a dot product that can depend only on $\beta - \alpha$
-  \dash{} checked to $\val{f08.rot.rel.err}$.}
-\sumitem{29--30}{\textbf{That identity is rotary position embedding.} Turn the
+  \dash{} checked to $\val{f08.rot.rel.err}$}.}
+\sumitem{29--30}{\result{\textbf{That identity is rotary position embedding.} Turn the
   query and the key each by an angle proportional to its position and the
   attention score depends on the gap and not on the two positions: the same
   pair scores $\val{f08.rot.score.near}$ at positions $1$ and $2$ and
   $\val{f08.rot.score.far}$ at $9$ and $10$. It needs no learned parameters,
-  and it does not by itself extend past the angles the model was trained on.}
+  and it does not by itself extend past the angles the model was trained on}.}
 \end{summarybox}
 
 \canyou

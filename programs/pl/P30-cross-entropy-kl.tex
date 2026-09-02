@@ -965,34 +965,34 @@ tym, dlaczego stawiane z jej pomocą tezy zwykle nie są uzasadnione.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--3}{\textbf{Entropia krzyżowa to tyle, ile kosztuje kod}:
-  $H(p, q) = -\sum_i p_i \logb{2} q_i$, czyli długości słów kodowych ważone
+\sumitem{1--3}{\result{\textbf{Entropia krzyżowa to tyle, ile kosztuje kod}:
+  $H(p, q) = -\sum_i p_i \logb{2} q_i$}, czyli długości słów kodowych ważone
   tym, jak często trafia się każdy symbol. To strata z
   Programu~\ref{prog:P18} i to jest to, co ona mierzy.}
-\sumitem{4--6}{\textbf{Ten koszt się dzieli}: $H(p, q) = H(p) + \KL{p}{q}$.
+\sumitem{4--6}{\result{\textbf{Ten koszt się dzieli}: $H(p, q) = H(p) + \KL{p}{q}$}.
   \enquote{Zaokrąglenie} z Programu~\ref{prog:P29}, wynoszące
   $\val{p30.src.kl}$ bita, \emph{jest} dywergencją, a jego dwa alfabety są
   źródłem i kodem \dash{}
   $\val{p30.src.h} + \val{p30.src.kl} = \val{p30.src.ce}$.}
-\sumitem{7--9}{\textbf{Nadwyżka nigdy nie jest ujemna}, na mocy nierówności
+\sumitem{7--9}{\textbf{\result{Nadwyżka nigdy nie jest ujemna}}, na mocy nierówności
   Jensena z Programu~\ref{prog:P19} dla wklęsłego logarytmu, i wynosi zero
   dokładnie wtedy, gdy oba rozkłady się zgadzają. Sprawdzone po każdej
   uporządkowanej parze z $\val{p30.simplex.n}$ rozkładów na siatce.}
-\sumitem{11--12}{Entropia krzyżowa ma więc podłogę, a tą podłogą jest
-  entropia \emph{celu}. Strata, która przestaje spadać, mogła dojść, a nie
+\sumitem{11--12}{\result{Entropia krzyżowa ma więc podłogę, a tą podłogą
+  jest entropia \emph{celu}}. Strata, która przestaje spadać, mogła dojść, a nie
   utknąć, i sama strata nie powie ci która.}
-\sumitem{13--16}{\textbf{Nie jest symetryczna.} Na rozkładzie z
+\sumitem{13--16}{\textbf{\result{Nie jest symetryczna.}} Na rozkładzie z
   Programu~\ref{prog:F05} oba kierunki to $\val{p30.f05.fwd}$ i
   $\val{p30.f05.rev}$ nata, czynnik $\val{p30.f05.ratio}$. Pierwszy argument
   waży sumę, więc to on jest celem; drugi jest tym, co się ocenia.}
 \sumitem{17--18}{A para, która wychodzi prawie równa \dash{}
   $\val{p30.src.kl}$ przeciwko $\val{p30.src.klrev}$ \dash{} nie dowodzi
-  niczego: wielkość jednego kierunku nie ogranicza drugiego.}
-\sumitem{19--21}{\textbf{Cały mechanizm to jeden wyraz.} Tam, gdzie cel ma
-  masę, a kandydat jej nie ma, w przód płaci się $\infty$, a wstecz nic. To
+  niczego: \result{wielkość jednego kierunku nie ogranicza drugiego}.}
+\sumitem{19--21}{\result{\textbf{Cały mechanizm to jeden wyraz.} Tam, gdzie cel ma
+  masę, a kandydat jej nie ma, w przód płaci się $\infty$, a wstecz nic}. To
   nie różnica zaokrąglenia \dash{} to różnica między liczbą a brakiem
   liczby.}
-\sumitem{24--30}{\textbf{W przód pokrywa garby, wstecz szuka garbu},
+\sumitem{24--30}{\textbf{\result{W przód pokrywa garby, wstecz szuka garbu}},
   wyliczone po $\val{p30.fam.n}$ kandydatach, bez optymalizatora
   gdziekolwiek. Skończoną wartość w przód ma tylko $\val{p30.fin.fwd}$ z
   nich, przeciwko wszystkim $\val{p30.fin.rev}$ wstecz.}
@@ -1001,18 +1001,18 @@ tym, dlaczego stawiane z jej pomocą tezy zwykle nie są uzasadnione.
   a wstecz nie zachowuje \emph{nic} \dash{} na wszystkich
   $\val{p30.targets.n}$ wypróbowanych celach, więc zachowanie należy do
   kierunku, a nie do celu.}
-\sumitem{34--38}{\textbf{To nie jest odległość.} Nierówność trójkąta, którą
+\sumitem{34--38}{\textbf{\result{To nie jest odległość.}} Nierówność trójkąta, którą
   dał ci Program~\ref{prog:F09}, zawodzi dla $\val{p30.tri.bad}$ z
   $\val{p30.tri.total}$ uporządkowanych trójek \dash{}
   $\val{p30.tri.pct}$ procent, czyli w przypadku typowym \dash{} przy czym
   najgorszy objazd jest krótszy o $\val{p30.tri.gap}$ nata.}
-\sumitem{39--42}{\textbf{Usymetrycznienie kosztuje sygnał.} Dywergencja
+\sumitem{39--42}{\result{\textbf{Usymetrycznienie kosztuje sygnał.} Dywergencja
   Jensena--Shannona jest symetryczna, skończona i ograniczona, a
-  ograniczeniem jest $\ln 2 = \val{p30.js.cap}$: masy punktowe oddalone o
+  ograniczeniem jest $\ln 2 = \val{p30.js.cap}$}: masy punktowe oddalone o
   $1$ i $\val{p30.js.far}$ przedziały są oddalone dokładnie o tyle, a to
   reżim, w którym bieg się zaczyna.}
-\sumitem{43--45}{\textbf{Trening na stałym zbiorze danych minimalizuje
-  dywergencję w przód} do rozkładu empirycznego, bo
+\sumitem{43--45}{\result{\textbf{Trening na stałym zbiorze danych minimalizuje
+  dywergencję w przód} do rozkładu empirycznego}, bo
   $H(\hat p) = \val{p30.emp.h}$ nata nie zależy od modelu. Nikt nie wybrał
   kierunku pokrywającego garby; przyszedł on z celem.}
 \end{summarybox}

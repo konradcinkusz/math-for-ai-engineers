@@ -711,68 +711,68 @@ applies once the picture is gone.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--4}{\textbf{A vector is a list of numbers.} That is the whole
+\sumitem{1--4}{\result{\textbf{A vector is a list of numbers.} That is the whole
   definition; the arrow is a convenience available at two and three components
   and gone after that. Addition, subtraction and multiplication by a scalar
-  are done one component at a time, and none of them needs the picture.}
-\sumitem{5--6}{Adding a plain number to a vector is \textbf{not defined} in
+  are done one component at a time, and none of them needs the picture}.}
+\sumitem{5--6}{\result{Adding a plain number to a vector is \textbf{not defined} in
   the mathematics, whatever an array library does with it
   (Program~\ref{prog:P07} has the rules). And two vectors with different
   numbers of components support none of the three operations, which is the
-  entire content of a shape error.}
-\sumitem{7--9}{$\lVert a \rVert$ is the square root of the sum of the squares,
+  entire content of a shape error}.}
+\sumitem{7--9}{\result{$\lVert a \rVert$ is the square root of the sum of the squares,
   and it is Pythagoras applied once per component: the length in three
   dimensions is built from the length in two, and the same argument runs at
   any number. $\lVert (3,4) \rVert = 5$ and
-  $\lVert (2,3,6) \rVert = \val{f09.len3d}$.}
-\sumitem{10--13}{\textbf{Normalising divides every component by the length}
+  $\lVert (2,3,6) \rVert = \val{f09.len3d}$}.}
+\sumitem{10--13}{\result{\textbf{Normalising divides every component by the length}
   and gives a vector of length $1$ pointing the same way, because scaling
   changes size and not direction. Every vector can be normalised except the
   zero vector, which has no direction for a unit vector to have \dash{} and
   what your tools do about that case is a property of your tools, not of the
-  mathematics.}
-\sumitem{14--16}{$a \cdot b = \sum_i a_i b_i$ takes two vectors and returns
+  mathematics}.}
+\sumitem{14--16}{\result{$a \cdot b = \sum_i a_i b_i$ takes two vectors and returns
   one number. $a \cdot a = \lVert a \rVert^{2}$, so length is not a separate
-  idea \dash{} it is a dot product with a square root on it.}
-\sumitem{17--18}{\textbf{$a \cdot b = \lVert a \rVert \lVert b \rVert
+  idea \dash{} it is a dot product with a square root on it}.}
+\sumitem{17--18}{\result{\textbf{$a \cdot b = \lVert a \rVert \lVert b \rVert
   \cos\theta$}, which is Program~\ref{prog:F08}'s result rearranged: the dot
   product carries both sizes and the alignment multiplied together. A dot
   product of \emph{zero} means a right angle whatever the lengths, and that is
-  what \emph{orthogonal} means.}
-\sumitem{19--20}{\textbf{Lengths do not add.}
+  what \emph{orthogonal} means}.}
+\sumitem{19--20}{\result{\textbf{Lengths do not add.}
   $\lVert a + b \rVert \le \lVert a \rVert + \lVert b \rVert$, with equality
   only when the two point the same way; at right angles $3$ and $4$ give
-  $\val{f09.tri.actual}$ rather than $\val{f09.tri.sum}$.}
-\sumitem{21--22}{\textbf{$\lVert a - b \rVert^{2} = \lVert a \rVert^{2} +
+  $\val{f09.tri.actual}$ rather than $\val{f09.tri.sum}$}.}
+\sumitem{21--22}{\result{\textbf{$\lVert a - b \rVert^{2} = \lVert a \rVert^{2} +
   \lVert b \rVert^{2} - 2\,(a \cdot b)$}, checked to $\val{f09.law.err}$, and
   on the unit sphere it collapses to $2 - 2\cos\theta$, checked to
-  $\val{f09.unit.err}$.}
-\sumitem{23}{So \textbf{on the unit sphere distance and cosine similarity rank
+  $\val{f09.unit.err}$}.}
+\sumitem{23}{\result{So \textbf{on the unit sphere distance and cosine similarity rank
   identically} \dash{} one is a strictly decreasing function of the other and
   cannot reorder anything. Confirmed on $\val{f09.rank.checked}$ comparisons.
   If your vectors are normalised, \enquote{cosine or Euclidean?} has no
-  answer.}
-\sumitem{24--25}{\textbf{Off the sphere they can name different winners.} On
+  answer}.}
+\sumitem{24--25}{\result{\textbf{Off the sphere they can name different winners.} On
   one query and two candidates, $A$ is the more similar
   ($\val{f09.dis.cos.a}$ against $\val{f09.dis.cos.b}$) and $B$ is the nearer
   ($\val{f09.dis.dist.b}$ against $\val{f09.dis.dist.a}$). Both queries run,
   both return plausible results, and the disagreement is invisible in the
   output. The question to ask of an index is not which measure it uses but
-  whether what went into it was normalised.}
-\sumitem{26--27}{Normalising the same two candidates puts $A$ nearer
+  whether what went into it was normalised}.}
+\sumitem{26--27}{\result{Normalising the same two candidates puts $A$ nearer
   ($\val{f09.dis.ndist.a}$ against $\val{f09.dis.ndist.b}$) without changing
   either direction \dash{} which is why a pipeline normalises before it
-  indexes, and what it pays is the lengths.}
-\sumitem{28--30}{Every operation here is one pass over the components, so
+  indexes, and what it pays is the lengths}.}
+\sumitem{28--30}{\result{Every operation here is one pass over the components, so
   \textbf{the arithmetic transfers to $\val{f09.dim}$ dimensions unchanged and
   the picture does not}: $\val{f09.drawable}$ components can be drawn and
-  $\val{f09.undrawn}$ cannot.}
-\sumitem{31--32}{Identities transfer exactly. Claims about \emph{where things
+  $\val{f09.undrawn}$ cannot}.}
+\sumitem{31--32}{\result{Identities transfer exactly. Claims about \emph{where things
   are} \dash{} what is near what, what a typical pair looks like \dash{} are
   about how vectors are arranged rather than about the operations, and none of
   them is established by a drawing of two arrows.
   Program~\ref{prog:P05} measures them. When a definition and a picture agree,
-  know which one is load-bearing.}
+  know which one is load-bearing}.}
 \end{summarybox}
 
 \canyou
