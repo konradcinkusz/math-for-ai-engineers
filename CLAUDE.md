@@ -13,7 +13,7 @@ Read this before touching a program.
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
 | Programs | **All forty-seven written, both editions \dash{} F1–F13 and P1–P34, Parts I to IX entire.** There are no stubs | — |
-| Appendices | A (answers, generated), B (notation), **C (formulae, from 721 `\result{}` marks)** and **D (terminology, 27 `\plterm{}` rows gated against the Polish prose)** drafted; E and F are stubs | E, F |
+| Appendices | A (answers, generated), B (notation), **C (formulae, from 721 `\result{}` marks)**, **D (terminology, 24 `\plterm{}` rows gated against the Polish prose)** and **E (further reading)** drafted; F is a stub | F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
 the format the book is read in; 17 x 24 cm is the trade format shared with the
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1387 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1411 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1154 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1172 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1393 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1417 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1158 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1178 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -53,7 +53,7 @@ free**: its first build added an 11.2 pt box to `main-en-a4` alone, from a
 32-character `\code{}` in a test exercise, and the fix was to set the loop as a
 displayed three-line block instead of running it into the sentence. Parity
 reports **0 failures and 0 warnings** across 56 file pairs; `reflist.py`
-confirms 484 labels resolve to the same numbers in both editions.
+confirms 488 labels resolve to the same numbers in both editions.
 
 **The only page count that moved in the second F3 review pass was `main-pl-a4`,
 231 to 229**, and both of those pages were defects rather than content: a page
@@ -105,14 +105,22 @@ what was there before.
 - 82 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
-- **27 Polish renderings named in Appendix~D, every one used in the prose of
+- **54 Polish renderings named in Appendix~D, every one used in the prose of
   `programs/pl`** \dash{} `make debt` reports it and `make check` and CI both
   gate on it. A glossary row naming a word the book does not use is a claim
   about the body that is false, and `notes/03`'s suggested table has two of
-  them
+  them. **The number the tool prints is renderings across BOTH editions**:
+  24 `\plterm` rows per edition, 27 renderings, because three rows carry
+  several comma-separated words for one object. This entry said 27 for a
+  week, which is the per-edition figure and not what `make debt` puts on the
+  page \dash{} quote the instrument's own number, or say which of the three
+  quantities you mean
+- **9 part ranges in each introduction, every one matching the manifest**
+  \dash{} the same three places gate it. Seven of the nine were wrong in
+  both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **102 orphan-tail pages: 29 · 30 · 22 · 21** across `main-en`, `main-pl`,
+- **103 orphan-tail pages: 29 · 30 · 22 · 22** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
   **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one, **P30 one**, **P31 none**, **P32 none**, P33 one and P34 one
@@ -434,6 +442,7 @@ gates on it.
 | **C16 next-frame cues** | A `\nextframe` where the next frame answers nothing, or missing where the next frame answers. C4 and C14 are both blind to a cue dropped in *both* editions at once |
 | `check_structure.py --frames` (payloads) | A Quiz route, outcome range or Summary bracket naming a frame the program does not have, or a range that runs backwards. `\teachesat`, `\teachesatone`, `\outcome` and `\sumitem` are the whole of the book's return index, and they were compared *between the editions* and never against the program: a probe routing a Quiz question to frames 91--93 of a 48-frame program was green on `parity.py`, `check_structure.py`, `gen_stubs.py --check` and `make verify` alike, and stays green on parity even now, because the Polish edition says 91--93 too. **It closes the existence half only.** Whether frame 20 answers the question routed to it is a reading job, and the tool says so in its own comment rather than letting a green ledger imply otherwise |
 | **`check_structure.py --scripts`** | A `\transcript{}` naming a file that is not there, or written as a path rather than a stem. The macro's own fallback prints a grey marker and builds, which is what let ten of the book's twelve transcripts go nine programs without reaching a page. Hard gate in `make check`, because on a tree where `make numbers` has run it is always a typo |
+| **`check_structure.py --parts`** | A part range in the introduction that does not match `tools/programs.json`. This is the one class the parity checks are structurally blind to: C4, C8, C12 and C14 all compare the two **editions**, so a range stale in both stays green \dash{} and seven of the introduction's nine were wrong in both, on page one, for the whole of the book. Compares against the manifest, positionally and in order, because the part names differ between the editions by design |
 | `check_structure.py --frames` | A cue that is not the **last thing** in its frame. C16 counts cues and cannot see position, so a cue misplaced identically in both editions is invisible to C4, C14 and C16 alike. It is a *line* test on purpose: a cue hoisted above a frame's closing prose tokenises to nothing after it and reads as correctly placed |
 | `reflist.py` | `\label{prog:F08}` resolving to F8 in one edition and F9 in the other. Both builds stay internally consistent and neither warns |
 | **`checkpdf.py`** (openers) | A frame's rule and margin badge stranded at the foot of a page with the frame's body overleaf. It reads the finished PDF, because that defect produces no error, no warning and no overfull box — no log can see it, and the badge it strands is the book's navigation device |
@@ -9879,12 +9888,13 @@ estimating the book at **460--540 pages** for its 2,418 planned frames, and this
 file repeated it as 470--550. Neither number had been looked at since
 scaffolding.
 
-**Measured: 1,863 teaching frames are written and they set 1,387 pages in the
-trade format.** That is $\num{0.74}$ pages a frame against the estimate's
-$\num{0.21}$, with two appendices still to come. (It was 1,321 before
+**Measured: 1,863 teaching frames are written and they set 1,393 pages in the
+trade format.** That is $\num{0.75}$ pages a frame against the estimate's
+$\num{0.21}$, with one appendix still to come. (It was 1,321 before
 Appendix~C, which is the one of the four that is generated rather than
-written and which costs 62 pages of back matter on its own, and 1,383 before
-Appendix~D, which occupies six pages where its stub occupied two.) (The measurement was 1,757
+written and which costs 62 pages of back matter on its own, 1,383 before
+Appendix~D, which occupies six pages where its stub occupied two, and 1,387
+before Appendix~E, which costs six.) (The measurement was 1,757
 frames in 1,267 pages when it was first taken, before P33, and 1,811 in 1,295
 after it; the ratio has not moved across four re-measurements.)
 
@@ -9902,7 +9912,7 @@ It matters because it is the premise of **the one decision this book still
 records as open**. §20 item 1 now carries the measurement and the per-part page
 ranges, read out of the trade build's own part-title folios rather than
 estimated \dash{} front matter and Part I at 388 pages, Parts II--VI at 494,
-Parts VII--IX at 330, back matter at 109 as it stood then and **175 now**, the
+Parts VII--IX at 330, back matter at 109 as it stood then and **181 now**, the
 appendices since written being the whole of the difference \dash{} so the
 proposed Parts I--VI
 cut gives an **882-page first volume** before any back matter, which does not
@@ -11013,6 +11023,325 @@ number that looks like a measurement and is not; `notes/01-curriculum.md`
 §20's table carries them.
 
 
+### Appendix E pass, September 2026 --- and the introduction was wrong about the book
+
+Appendix~E is the further-reading list, and the *What is left* entry above
+says plainly what it does not get: **E cannot take any of Appendix~C's
+protection and only half of D's.** C is marked at the point of use so its
+coordinates cannot be wrong; D's rows are gated against the Polish prose. E is
+derived from nothing a program carries, so for E the older instruction is the
+only one available \dash{} read the brief as a checklist, and grep the
+destination before writing the sentence rather than after.
+
+**That instruction is what found the pass's real finding, and it is not in
+Appendix~E.**
+
+#### Seven of the introduction's nine part ranges were wrong, on page one
+
+§E.2 says which parts answer which of Stroud's limitations \dash{} Part~III
+the linear algebra, Part~IV the discrete mathematics and the rigour, Part~VI
+the optimisation, Part~VII the inference \dash{} and it says the introduction
+names those limitations rather than hiding them. Checking that one sentence
+meant opening `frontmatter/en/introduction.tex`, which prints its own map of
+the book:
+
+| Part | The introduction said | The manifest says |
+|---|---|---|
+| I Foundation | F1--F13 | F1--F13 |
+| II Number, precision and cost | P1--P3 | P1--P3 |
+| III Linear algebra | P4--**P10** | P4--**P11** |
+| IV Discrete structures | **P11--P13** | **P12--P14** |
+| V Calculus and autodiff | **P14--P17** | **P15--P18** |
+| VI Optimisation | **P18--P21** | **P19--P22** |
+| VII Probability and statistics | **P22--P27** | **P23--P28** |
+| VIII Information theory | **P28--P30** | **P29--P31** |
+| IX Assembling it | **P31--P33** | **P32--P34** |
+
+It is the **P7 insertion**, which renumbered the sequence and never swept the
+ordinary prose \dash{} the same mechanism this file has now recorded in the
+trap catalogue, the manifest, the curriculum notes, Appendix~B, the issues'
+trap lists and `notes/02` §4. This is the **seventh** artefact, and it is the
+worst of the seven for two reasons.
+
+**It prints on page one**, in the introduction, which is the book's own map
+and the first thing a reader uses to navigate. And **the ranges overlap**: the
+introduction sent Part~III to P10 and opened Part~IV at P11, so a reader
+following it is pointed at the wrong program at every boundary from Part~III
+onward, and P11 \dash{} the SVD \dash{} is filed under discrete structures.
+
+The prose around each range was right throughout. Part~IV really does cover
+counting, graphs and reading a theorem; Part~IX really does spend itself on
+one architecture, one training run and one evaluation. **Only the numbers were
+stale**, which is exactly what an insertion that renumbers a sequence and not
+its prose produces, and exactly why it reads as correct.
+
+#### Why every gate was green for the whole book
+
+**C4, C8, C12 and C14 all compare the two EDITIONS.** Both introductions
+carried the identical defect \dash{} the Polish twin is wrong in the same
+seven places, in the same order, with the same digits \dash{} so the ordered
+signature, the maths digest, the strict numeric-literal comparison and the
+macro histogram all agreed perfectly, because there was nothing to diverge on.
+
+That is this repository's oldest recorded class, from the scaffolding pass:
+**a check that is wrong in the same way in both editions stays green and only
+the ledger lies.** It has now cost the book its own front matter.
+
+#### So the fix is a gate against the source of truth, and it is watched firing
+
+Every previous instance of this class was answered the same way \dash{} C15
+after a main file was rewritten with a chapter dropped, `--frames` after a
+Quiz route to frames 91--93 passed everything, `--terms` after `notes/03`'s
+suggested glossary named two words the book does not use. The answer is
+always a check that compares against **the source of truth** rather than
+between the editions.
+
+`check_structure.py --parts` reads the part ranges out of both introductions
+**positionally, in document order**, and compares them against
+`tools/programs.json`. Positionally, because the part names differ between the
+editions by design and only the manifest carries both; in order, so a missing
+or extra range fails too.
+
+**It was proved by mutation before it was believed**, which is the rule
+Programs~\ref{prog:P32} to \ref{prog:P34} paid for five times in three passes:
+
+- restoring the defect that actually shipped gives
+  `part 6 prints (P18--P21) where the manifest says (P19--P22)`, exit 1;
+- deleting a range gives `prints 8 part ranges where the manifest has 9`,
+  exit 1;
+- the corrected tree gives `9 part ranges in each introduction, every one
+  matching the manifest`, exit 0.
+
+Wired into `make check`, `make debt` and the CI `parity:` job beside `--terms`
+and `--scripts` \dash{} confirmed with `awk` that it lands in that job rather
+than in one nobody reads, which is the check the Appendix~D pass earned.
+
+#### A prediction, made before the build and then checked
+
+Every one of the seven corrections is **character-length-neutral**
+\dash{} `(P4--P10)` to `(P4--P11)`, `(P31--P33)` to `(P32--P34)`, and so on
+\dash{} and the digits in this book's text font are tabular, so the predicted
+cost was **no page movement anywhere**. That is a reading of a mechanism,
+which this file's own rule says stays labelled as judgement until it is run;
+it was therefore written down before the build rather than after it, so the
+build could refute it. 
+
+**And it could not be tested from a book build, which is the part worth
+keeping.** The front-matter fix and Appendix~E's own content landed in the
+same tree, so any page count measures both and attributes neither \dash{}
+this file's own recurring complaint about a number that looks like a
+measurement and is not. The prediction was therefore settled the way
+Program~\ref{prog:P23}'s pass settled the multicol mechanism: **when the
+question is about TeX's own semantics rather than about this book, ask TeX.**
+A twelve-line standalone, `\sbox`-ing each range before and after:
+
+| | before | after |
+|---|---|---|
+| Part~III | $\num{45.0597}$ pt | $\num{45.0597}$ pt |
+| Part~VII | $\num{50.50363}$ pt | $\num{50.50363}$ pt |
+| Part~IX | $\num{50.50363}$ pt | $\num{50.50363}$ pt |
+
+Identical to the hundred-thousandth of a point, because the digits in this
+font are tabular. So the seven corrections cannot move a line break, and
+every page the build reports is Appendix~E's doing rather than theirs.
+
+The probe printed `PROBE MARKER` and `PROBE DONE` around its own output and
+both were checked before the numbers were believed, which is
+Program~\ref{prog:P34}'s rule after three probe builds there reported a
+confident zero from a file that had died before reaching the thing it was
+measuring.
+
+#### And a back-matter addition cost something for the first time
+
+Appendix~C's pass and Appendix~D's both measured the same result and gave the
+same reason: an appendix is *appended*, so it moves no page boundary in the
+body, and the only class of defect available to it is one of its own lines
+overflowing. C had one (the `\KL` box); D had none.
+
+**E broke that, with the largest overfull vbox this book has produced.**
+
+```
+Overfull \vbox (284.301pt too high) has occurred while \output is active
+```
+
+`checklog.py` reported it as *PDF page 1349*, and the recorded rule
+\dash{} anchor on what TeX says it had open, never on a page number \dash{}
+put it in one look: the complaint sits between the underfull hboxes
+`in paragraph at lines 243--243` and the `)` that **closes
+`appendices/en/appE-further-reading.tex`** before `appF` opens. Line 243 is
+§E.3's exclusions table.
+
+It is precisely the class this file's *Non-negotiable conventions* names and
+the sibling volume records: **an overfull vbox means a `center`+`tabularx`
+block grew past a page, and such a block cannot break, so it overflows by
+hundreds of points.** 284 pt is the predicted magnitude, not a surprise.
+
+And E is the first appendix that could produce it, which is why C and D did
+not. Measured across the book, **E's exclusions table and D's largest are
+tied for the most rows (eleven row-breaks each), and only E's overflows**,
+because D's rows are a word and a clause where E's are two `X` columns of
+running prose. The height that matters is rows times row height, and nothing
+counts that.
+
+**The recorded fix applied without a detour: split the table, do not shrink
+the text.** Five rows and five rows, and the split is a real distinction
+rather than an arbitrary halving \dash{} the first table is the rigorous
+foundations *underneath* what the book teaches, where it borrows a result and
+does not prove it; the second is the specialisms that begin *beyond* a
+working depth. The section reads better for it, which is the tell that the
+split was available rather than imposed.
+
+**And `longtable` is not the fix, which is worth writing down because it is
+loaded and unused.** `preamble.tex` has carried `\usepackage{longtable}`
+among the core packages, with no comment and no call site anywhere in the
+book, so it looks exactly like the answer to a table that will not break.
+**It has no `X` column.** Combining it with `tabularx` needs `xltabular` or
+`ltablex`, neither of which is loaded \dash{} and adding a package that one
+of this project's two TeX installations might not have is
+Program~\ref{prog:P09}'s recorded trap, latent on every machine here and
+waiting for a reader's. Splitting needs no package at all.
+
+#### A section heading that could not break, and the guard that stops at chapters
+
+The same build carried a $\num{5.5}$ pt hbox, and it was §E.2's own heading:
+
+```
+Overfull \hbox (5.54337pt too wide) in paragraph at lines 149--149
+[]\T1/lmr/bx/n/14.4 (-20) Two po-s-i-tions that are not books, and one method
+```
+
+`preamble.tex` sets **`\raggedright` on chapter titles** and says in its own
+comment that this is load-bearing rather than cosmetic, because at `\Huge` on
+a 13 cm block a justified title cannot break. **It does not set it on
+`\section`.** So a section heading is justified, and one that nearly fills the
+measure at `\Large` is a latent overfull hbox.
+
+The book has simply never had one close enough before. Measured, the longest
+section heading in the book is **59 characters** and sets perfectly well,
+where this 48-character one overflowed \dash{} because length is not the
+quantity: TeX preferred one 5.5 pt overfull line to a break that would have
+left a very short second one. **Shortening the heading is the fix that was
+taken** (*Two positions, and one method*, which is what the section is), and
+the Polish twin was shortened with it, being longer still.
+
+**Extending `\raggedright` to `\section` was NOT done, deliberately.** It is
+one line and it is probably nearly free \dash{} most headings occupy one line
+and would not move, and a wrapping heading would still wrap to the same
+number of lines \dash{} but *probably nearly free* is a reading of a
+mechanism, and this file's own rule is that such a reading stays labelled as
+judgement until it is run. It is a book-wide layout change measured by
+nobody, made inside an appendix pass, to fix one heading that a four-word cut
+fixes outright. Recorded here so the next person meets it with the reasoning
+rather than rediscovering the hbox.
+
+#### The appendix itself: what it may claim, and what it refuses to
+
+**Nothing in Appendix~E is written from memory**, and that constraint shaped
+it more than anything else.
+
+§§E.1--E.2 carry a verdict on every entry, because those works were read and
+compared **before the book was planned**: the competitive survey in
+`notes/02` §1 exists to answer *what already exists, and what does each do
+well and badly for this reader*, and it cites a published review for every
+quotation it carries. §E.3 is `notes/01` §13's exclusions table, whose rows
+the notes sweep had already settled against the destination briefs.
+
+**§E.4 carries names without verdicts, and says so in a warning box.** The
+repository records those titles as \enquote{positive pointers} and nothing
+more \dash{} verified by opening `notes/01` §13 rather than assumed \dash{} so
+writing a one-line characterisation to fill the column would be inventing one,
+which is precisely the move forty-seven programs ask the reader to refuse. The
+appendix states the asymmetry between its two halves instead of hiding it.
+
+**No web addresses.** The body of this book prints none, and a printed address
+rots faster than a title does.
+
+The closing sentence is the appendix's own scope statement and is the honest
+form of a further-reading list: this book teaches none of those subjects to
+the depth its sources do, it was never meant to, and *what it claims is
+narrower and checkable: that you can now open them.*
+
+#### Also
+
+- Every claim §E.3 makes about a program was checked against the written
+  program: Program~\ref{prog:P14} refusing proof-writing in its own
+  rigourbox and naming generalisation bounds as claims to read carefully,
+  Program~\ref{prog:F08}'s unit circle, Program~\ref{prog:P09}'s
+  do-not-invert and Program~\ref{prog:P11}'s squared condition number,
+  Programs~\ref{prog:P19} and \ref{prog:P22}'s working subset of convexity,
+  Programs~\ref{prog:P21} and \ref{prog:P22}'s estimators and KL constraint.
+  None of that is gated by anything and none of it can be.
+- **Parity came back clean on its first run**, and so did `--parts`,
+  `--terms`, `--frames`, `--answers`, `--scripts` and `gen_stubs --check`.
+  The source gates were run **before** the build rather than inside it, which
+  is Program~\ref{prog:P33}'s finding applied for the third pass running.
+- **The build was stopped on purpose**, for the second time after
+  Program~\ref{prog:P32}'s pass: the front-matter edit landed while
+  `make all-formats` was still inside `make numbers`, so LaTeX had not read
+  the introduction yet and stopping cost nothing, where letting it run would
+  have measured `main-en` on the old front matter and the other three on the
+  new. **An inconsistent measurement is worse than no measurement**, and the
+  cheapest moment to stop a build is before it has read the file you are
+  about to change.
+
+#### Layout, measured
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1393 | 1387 | `[]` | 0 |
+| `main-pl` | 1417 | 1411 | `[]` | 0 |
+| `main-en-a4` | 1158 | 1154 | `[6.3]` | 0 |
+| `main-pl-a4` | 1178 | 1172 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds**, with no stranded frame openers, no stranded section headings
+and **no orphaned cues at any point in the pass** \dash{} which an appendix
+cannot produce anyway, having no frames and therefore no cues.
+
+**One orphan tail added, in `main-pl-a4`**: 29, 30, 22, **22** against the
+pre-appendix 29, 30, 22, 21. It is Appendix~E's own \dash{} §E.2's Stroud
+paragraph, `część VI na optymalizację, a część VII na wnioskowanie`.
+
+Appendix~E is **six pages** in the trade format and four on A4.
+
+**And CI \dash{} the second machine, with newtx and inconsolata \dash{} built
+all four formats clean on the same source**, so the table split and the
+shortened heading hold under both sets of metrics rather than only this
+container's. All nine checks green, the new `--parts` step among them.
+
+#### A sixth misread instrument, and this one was mine
+
+The background monitor written to report the four page counts answered:
+
+```
+main-en: 1393 pages
+main-pl: 1417 pages
+main-en-a4: 4 pages
+main-pl-a4: 4 pages
+```
+
+**Four pages.** Its extraction was `grep -o '[0-9]*' | head -1` over
+`Output written on main-en-a4.pdf (1158 pages`, and the first digit run in
+that string is the **`4` in `a4`** \dash{} so it reported the format's own
+name as its page count, for exactly the two formats whose names carry a
+digit, and returned a plausible small integer rather than erroring.
+
+`checklog.py` \dash{} the repository's own instrument, which parses the line
+properly \dash{} says 1158 and 1178, and those are the numbers above.
+
+It is the same shape as the five Programs~\ref{prog:P32} to \ref{prog:P34}
+recorded and the several Appendix~D's pass met: **the tool accepted the input
+and returned a plausible answer.** The tell was free and needed no tooling
+\dash{} a four-page A4 build of a book whose trade build is 1393 pages is not
+a plausible answer \dash{} which is Program~\ref{prog:P34}'s rule exactly.
+The narrow lesson is worth keeping beside it: **a throwaway grep written to
+watch a build is an instrument, and it gets the same scepticism as one
+written to measure the book.** Prefer the checked-in tool over a fresh
+one-liner whenever the checked-in tool already answers the question.
+
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -11266,8 +11595,12 @@ summary on every build.
 4. `python3 tools/parity.py` — zero failures before you commit
 5. `python3 tools/check_structure.py --frames` — every frame number the program
    quotes exists, and every cue is the last thing in its frame. And
-   `--scripts`, which `make check` runs: every `\transcript{}` names a file
-   that is there
+   `--scripts`, `--terms` and `--parts`, which `make check` runs: every
+   `\transcript{}` names a file that is there, every glossary rendering is a
+   word the Polish prose writes, and the introduction's map of the book
+   matches the manifest. **Run all of these BEFORE the build**, not after —
+   they read the source, none of them needs a PDF, and they cost seconds
+   against a build that costs tens of minutes
 6. `make debt` and `make verify` — confirm the ledgers moved the way you
    expected, and that no computed value or transcript has drifted from its
    script
@@ -11284,41 +11617,51 @@ clone instead.
 
 ## What is left
 
-1. **Appendices E and F.** C and D are written; these two are the whole of
-   the remaining writing, and there is no longer a program behind them to
-   hide the fact. E is where to go next, F is the manifest. **The appendices
-   are not in `tools/programs.json`**, so there is nothing to re-derive an
-   owner from: each brief lives only in its own `\programstub{}`, in
+1. **Appendix F, and it is the last thing left to write.** C, D and E are
+   done. **Its brief is three things, not one** \dash{} the diagram manifest,
+   the measurement table, and the outstanding-work ledgers, *printed rather
+   than merely counted by the build*, because \emph{a reader is entitled to
+   know what the book still owes them}. This entry called it \enquote{the
+   diagram manifest} in its first draft, which is the class this whole file
+   keeps recording: written from the feel of the file rather than from the
+   file, and corrected by opening it. **The appendices are not in
+   `tools/programs.json`**, so there is nothing to re-derive an owner from:
+   F's brief lives only in its own `\programstub{}`, in
    `appendices/{en,pl}/`, and that is the whole contract.
 
-   **C is done and its exposure was retired structurally rather than
-   policed**, which is the thing to copy if D or E turns out to make claims
-   about the book. The decision this entry used to leave to the author is
-   taken: nothing in Appendix~C is transcribed, every line of it is a
-   `\result{}` mark in the Summary of the program that establishes it, and
-   the coordinate therefore cannot be wrong. The full pass note is above; the
-   part that matters here is why it was worth the mechanical edit across
-   forty-seven programs in two editions. **An appendix collecting what the
-   book proved is a claim about the book on every line**, which is the one
-   class nothing in this repository can check, and Appendix~B is the standing
-   warning: Program~\ref{prog:P18}'s pass found four false pointers in it,
-   Program~\ref{prog:P23}'s fixed the rest, and the audit that settled all
-   four was five greps nobody had run since the appendix was written. An
-   audit makes that defect detectable. Marking at the point of use makes it
-   impossible.
+   **Read the three that are finished as a gradient of protection, because F
+   sits at the top of it and can take the most.** C is marked at the point of
+   use, so its coordinates cannot be wrong. D's rows are gated against the
+   Polish prose, but the prose *between* its tables is not, and it made
+   exactly the failure the rows are gated against \dash{} **a gate is as wide
+   as the construct it parses**. E could take neither, being derived from
+   nothing a program carries, so it was held to the older instruction: read
+   the brief as a checklist, grep the destination before writing the
+   sentence, and say plainly which of its claims are verdicts and which are
+   bare pointers.
 
-   **D took half of that protection and E cannot take any of it.** D's rows
-   are `\plterm{}{}{}` and `check_structure.py --terms` requires every Polish
-   rendering they name to occur in the prose of `programs/pl`, so the row
-   that names a word the book does not use is now impossible rather than
-   merely detectable \dash{} and `notes/03`'s suggested table had two of
-   them. But **a gate is as wide as the construct it parses**: the prose
-   between D's tables made the same failure in the same pass, naming an
-   inflection the Polish edition never writes, and nothing would have caught
-   it. E is a further-reading list, derived from nothing a program carries,
-   so for E the older instruction is the only one available: read the brief
-   as a checklist, and grep the destination before writing the sentence
-   rather than after.
+   **F's first third needs almost none of that**, and that is the point of
+   leaving it last: `\mermaidfig` already accumulates the manifest at the
+   point of use, exactly as `\answerto`, `\canyou` and `\result{}` do, so
+   that coordinate cannot be wrong either, and `\listofdiagrams` is already
+   in the stub. **The other two thirds get none of it.** The measurement
+   table is `notes/01` §17's Status column, which is prose maintained by hand
+   and which sat wrong for five programs; the ledgers are the ones at the top
+   of this file, which is where the 27-against-54 above came from. So the
+   part of F that looks hardest is the part that is already done, and the
+   part that looks like transcription is the part that will be wrong \dash{}
+   write both against their instruments rather than from memory of them, and
+   quote the number the instrument prints.
+
+   **And the standing warning for any appendix that describes the book is
+   Appendix~B**, which was hand-authored, shipped four false pointers, and
+   needed two separate passes to find them by reading. An audit makes that
+   class detectable. Accumulating at the point of use makes it impossible.
+   **E's pass found the same class in the front matter** \dash{} seven of the
+   introduction's nine part ranges wrong, in both editions, on page one, with
+   every gate green because the gates compare the editions to each other.
+   `check_structure.py --parts` closes that one; nothing closes the general
+   case except opening the file you are describing.
 
 2. **The trained-model debt: five entries, one of them half answered.** It is
    the first thing in this book that cannot be done from a sandbox at all.
@@ -11484,9 +11827,12 @@ one is shaped by what the ones before it turned out to spend.
 
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
-for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.71**
-\dash{} 1,863 teaching frames in 1,387 trade pages, with two appendices
-still to come. §20 item 1 carries the measurement and the per-part page ranges, so
+for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.75**
+\dash{} 1,863 teaching frames in 1,393 trade pages, with one appendix
+still to come. (This sentence said **0.71** until the Appendix~E pass, which
+is $1{,}321/1{,}863$ \dash{} the figure from before Appendix~C, left behind
+when the page count above it was updated and the ratio was not. It is the
+class this file keeps recording, in the paragraph that states the class.) §20 item 1 carries the measurement and the per-part page ranges, so
 the decision has numbers in front of it rather than an estimate; **every
 program is now written, so those numbers will not move again except by the
 appendices**, which is as settled as the question is going to get before

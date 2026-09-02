@@ -1,10 +1,300 @@
 %% appE-further-reading \dash{} Co dalej
+%
+% NIC TUTAJ NIE JEST PISANE Z PAMIĘCI i to ograniczenie ukształtowało ten
+% dodatek bardziej niż cokolwiek innego. Sekcje E.1 i E.2 to przegląd
+% konkurencji z notes/02-grounding-and-traps.md sekcja 1, przeprowadzony przed
+% zaplanowaniem książki, który dla każdego cytatu podaje recenzję -- patrz
+% sekcja Sources w tamtym pliku. Sekcja E.3 to notes/01-curriculum.md sekcja 13.
+%
+% Sekcja E.4 celowo podaje NAZWY BEZ WERDYKTÓW. Repozytorium notuje te tytuły
+% jako wskazówki i nic więcej, więc dopisanie im charakterystyki byłoby jej
+% wymyśleniem -- a to jest dokładnie ta klasa, przed którą książka przestrzega
+% przez czterdzieści siedem programów. Dodatek mówi to wprost, zamiast wypełniać
+% lukę.
+%
+% Każde twierdzenie o PROGRAMIE zostało tu sprawdzone w napisanym programie,
+% zanim trafiło na stronę -- to dyscyplina wypracowana w passie Dodatku D.
+% Nic tego nie bramkuje; nic nie może.
+%
+% ŻADNYCH ADRESÓW WWW. Treść tej książki nie drukuje żadnego, a wydrukowany
+% adres psuje się szybciej niż tytuł.
 
 \chapter{Co dalej}
 \label{app:E}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia \dash{} patrz wydanie angielskie.]}
+\noindent
+Ten dodatek składa się z dwóch połówek, a różnica między nimi jest powiedziana,
+a nie ukryta.
 
-Czego ta książka nie uczy, dlaczego i co czytać zamiast tego.
-}
+Sekcje~\ref{sec:E-survey} i~\ref{sec:E-positions} podają werdykt o każdej
+pozycji, bo te prace zostały przeczytane i porównane, zanim książka powstała:
+przegląd, z którego pochodzą, istnieje po to, by odpowiedzieć, \emph{co już
+istnieje i co każda z tych prac robi dobrze, a co źle dla tego czytelnika},
+i dla każdego cytatu podaje opublikowaną recenzję.
+Sekcja~\ref{sec:E-not} mówi, czego ta książka nie uczy, dlaczego i gdzie dany
+temat jest zrobiony porządnie.
+
+Sekcja~\ref{sec:E-depth} to lista nazw bez werdyktów i mówi o tym wprost. Ta
+książka nie sprawdziła tamtych prac tak, jak sprawdziła pierwszą połowę, a
+jednozdaniowa charakterystyka wymyślona po to, by wypełnić kolumnę, byłaby
+dokładnie tym, o czym czterdzieści siedem programów prosi cię, byś tego nie
+przyjmował.
+
+Nie ma tu adresów WWW. Tytuł i nazwisko przeżyją każdy URL.
+
+\section{Książki, wobec których mierzona jest ta}
+\label{sec:E-survey}
+\index{further reading!competitive survey}
+
+Uporządkowane według tego, jak blisko każda praca stoi czytelnika, dla którego
+ta książka powstała: pracującego inżyniera, sprawnego w kodzie, któremu
+matematyka ze szkoły wyblakła, a który dziś wdraża modele.
+
+\medskip
+\textbf{Deisenroth, Faisal i Ong, \emph{Mathematics for Machine Learning}.}
+Najbliższy konkurent i nazywa tę samą lukę co ta książka \dash{} autorzy piszą,
+że dystans między matematyką szkolną a poziomem potrzebnym do czytania
+podręcznika uczenia maszynowego jest dla wielu osób za duży.
+\textbf{Robi dobrze:} najlepiej zorganizowana mapa terenu, darmowy PDF, spójna
+narracja od przestrzeni wektorowych do czterech opracowanych metod i najlepsze
+krótkie ujęcie rozkładów macierzy, jakie jest dostępne.
+\textbf{Robi źle, dla tego czytelnika:} nazywa lukę szkoła\dash{}uczenie
+maszynowe swoim celem, a potem zaczyna powyżej niej \dash{} rozdział 2 otwiera
+się układami równań liniowych, a nic w tej książce nie uczy przekształcania
+nierówności ani przesuwania wskaźnika sumowania. Cztery docelowe metody są
+sprzed uczenia głębokiego, nie ma ani jednej strony o nadmiarze czy
+uwarunkowaniu, a większość zadań nie ma rozwiązania.
+\textbf{Werdykt:} najlepsza pozycja, na którą można wskazać, i mimo przedmowy
+nie jest drogą od zera.
+
+\medskip
+\textbf{Goodfellow, Bengio i Courville, \emph{Deep Learning}, część~I.}
+\textbf{Robi dobrze:} rozdział 4, \emph{Numerical Computation}, to
+najwartościowsze sześćdziesiąt stron w całym tym przeglądzie i jedyne, których
+nikt nie naśladuje \dash{} nadmiar i niedomiar, stabilizacja log-sum-exp,
+uwarunkowanie, jakobian i hesjan. To jedyna praca tutaj, która traktuje maszynę
+jako obiekt o skończonej precyzji. \textbf{Robi źle:} część~I jest
+przypomnieniem, a nie nauczaniem \dash{} cztery rozdziały w miejsce dwóch lat
+studiów, bez zadań i bez przykładów rozwiązanych krok po kroku \dash{} i jest
+zamrożona w 2016 roku, więc nie ma transformera ani współczesnej praktyki
+mieszanej precyzji. \textbf{Werdykt:} ten rozdział jest przodkiem części~II tej
+książki, a ta książka schodzi o rząd wielkości głębiej i z liczbami.
+
+\medskip
+\textbf{Strang, \emph{Linear Algebra and Learning from Data}.}
+\textbf{Robi dobrze:} Strang jest najlepszym żyjącym wykładowcą algebry
+liniowej, a to jest miejsce, w którym łączy cztery podprzestrzenie, SVD i
+przybliżenie niskiego rzędu z danymi. Ustawienie SVD w środku ciężkości jest
+dokładnie słuszne i to ta książka wprowadziła takie ujęcie do głównego nurtu.
+\textbf{Robi źle:} recenzenci nie owijają w bawełnę \dash{} recenzja MAA pisze,
+że autor próbował wtłoczyć zdecydowanie za dużo materiału w 432 strony, więc
+każdy temat dostaje bardzo szybkie ujęcie, a wyniki bywają podane bez dowodu i
+bez cytowania. Zakłada też ukończony pierwszy kurs; to kurs drugi.
+\textbf{Werdykt:} źródło ujęcia, a nie wzór konstrukcji.
+
+\medskip
+\textbf{Boyd i Vandenberghe, \emph{Introduction to Applied Linear Algebra}.}
+\textbf{Robi dobrze:} najlepiej zaprojektowany podręcznik stosowanej algebry
+liniowej i temperamentem najbliższy tej książce. Jest agresywnie wąski \dash{}
+zbudowany na liniowej niezależności i faktoryzacji QR i prawie na niczym innym
+\dash{} i dowodzi, że książka może pominąć większość swojego przedmiotu i być
+przez to lepsza. Darmowy PDF, z materiałami w Pythonie i Julii.
+\textbf{Robi źle, dla tego czytelnika:} z założenia pomija wartości własne, SVD
+i wyznaczniki, czyli dokładnie te części, których potrzeba do uwarunkowania,
+uwagi i kowariancji, a i tak zakłada, że algebra przychodzi ci bez wysiłku.
+\textbf{Werdykt:} dyscyplina zakresu do naśladowania. Jego pominięcia nie są
+pominięciami tej książki.
+
+\medskip
+\textbf{Boyd i Vandenberghe, \emph{Convex Optimization}.}
+\textbf{Robi dobrze:} pozycja referencyjna. Wypukłość, dualność, a przede
+wszystkim problem rozpoznania \dash{} \emph{czy mój problem jest wypukły?}
+\dash{} to trwale przydatne słownictwo. Darmowy PDF, obszerne zadania.
+\textbf{Robi źle, dla tego czytelnika:} sama książka mówi, że chce dobrej
+algebry liniowej na wejściu, a uczenie głębokie nie należy do jej klasy
+problemów. Cele niewypukłe, stochastyczne i przeparametryzowane leżą poza tą
+teorią, a dowody tempa zbieżności się nie przenoszą.
+\textbf{Werdykt:} weź słownictwo do Programów~\ref{prog:P19}
+i~\ref{prog:P22}; nie bierz programu nauczania.
+
+\medskip
+\textbf{Bishop, \emph{Pattern Recognition and Machine Learning}, oraz Bishop i
+Bishop, \emph{Deep Learning: Foundations and Concepts}.}
+\textbf{Robi dobrze:} organizacja, rysunki i materiał o modelach
+probabilistycznych należą do najlepiej napisanych gdziekolwiek, a tom z 2024
+roku przenosi to samo ujęcie na transformery i dyfuzję. \textbf{Robi źle:} obie
+są bardziej zaawansowane niż większość wprowadzeń i zakładają rachunek wielu
+zmiennych, algebrę liniową i rachunek prawdopodobieństwa jako narzędzia
+robocze; matematyka jest tam zawsze w służbie modelu i nigdy nie jest uczona od
+podłogi. \textbf{Werdykt:} cel, a nie droga \dash{} a warunkiem powodzenia tej
+książki jest to, że możesz ją teraz otworzyć.
+
+\medskip
+\textbf{Murphy, \emph{Probabilistic Machine Learning}.}
+\textbf{Robi dobrze:} najpełniejsze i najbardziej aktualne pojedyncze ujęcie,
+spięte modelowaniem probabilistycznym, z dobrą sekcją o tle matematycznym i
+otwartym kodem. \textbf{Robi źle:} poziom magisterski wprost z własnej
+deklaracji, z założeniem rachunku różniczkowego, statystyki i algebry liniowej;
+opis recenzenta, że to encyklopedyczna pozycja referencyjna, jest zarazem
+pochwałą i problemem, przy ponad tysiącu stron.
+\textbf{Werdykt:} pozycja referencyjna, do której kierować się tematami, kiedy
+już umiesz ją czytać.
+
+\medskip
+\textbf{Blum, Hopcroft i Kannan, \emph{Foundations of Data Science}.}
+\textbf{Robi dobrze:} jedyna książka na tej liście, która poważnie traktuje to,
+co inżynierowie mylą najbardziej niezawodnie \dash{} zachowanie danych w
+wysokim wymiarze. Koncentracja miary, rzutowanie losowe, SVD, błądzenia losowe.
+\textbf{Robi źle, dla tego czytelnika:} to kurs teoretyczny, prowadzony
+dowodami i adresowany do studentów teorii informatyki, a jego postęp nie
+przypomina potrzeb praktyka.
+\textbf{Werdykt:} źródło treści Programu~\ref{prog:P05}, którą ta książka
+przekłada z postaci twierdzenie\dash{}dowód na coś, na czym można działać.
+
+\section{Dwa stanowiska i jedna metoda}
+\label{sec:E-positions}
+\index{further reading!positions}
+
+\medskip
+\textbf{3Blue1Brown.} \emph{Essence of Linear Algebra} i \emph{Essence of
+Calculus} robią coś, czego nie robi żadna książka: sprawiają, że geometryczna
+treść wyznacznika albo pochodnej staje się widoczna w kilka sekund.
+
+A najmocniejszy argument za czytaniem książki takiej jak ta stawia ich autor.
+Sanderson mówił publicznie, że obawia się, iż jego praca jest intelektualnym
+cukierkiem dającym poczucie rozumienia, i że jeśli widz nie zaangażuje się
+czynnie \dash{} nie wymyśli tego od nowa, nie porozwiązuje zadań \dash{} to mu
+nie zostanie; rozciąga tę uwagę na wykłady Feynmana, mówiąc, że to, jak
+przyjemnie ogląda się dany materiał, nie koreluje z uczeniem się na dłuższą
+metę.
+
+To ustępstwo osoby, która ma na nim najwięcej do stracenia, i jest to teza tej
+książki w jednym zdaniu. Właściwa relacja jest komplementarna: obejrzyj film dla
+obrazu, przerób program dla zapamiętania.
+
+\medskip
+\textbf{fast.ai i stanowisko, że matematyki potrzeba mniej, niż ci się
+wydaje.} Ma rację co do \emph{wejścia} i ta książka przyznaje to bez
+zastrzeżeń: wymaganie dwóch lat matematyki, zanim ktokolwiek wytrenuje
+klasyfikator, zamykało pole, nie dało nic i jest empirycznie fałszywe.
+
+To stanowisko odpowiada na pytanie, \emph{czy mogę coś wdrożyć?} Nie odpowiada,
+dlaczego strata poszła w \code{nan} na kroku cztery tysiące i tylko w połowicznej
+precyzji; czy trzypunktowy zysk w ewaluacji jest prawdziwy, czy to jedno
+losowanie z zaszumionego rozkładu; ani czy ustawienie akumulacji gradientu po
+cichu zmieniło funkcję celu. Te pytania przychodzą \emph{po} wdrożeniu i są
+pytaniami matematycznymi.
+
+Zatem: nie ucz się najpierw matematyki. Ta książka jest tym, po co sięgasz
+jako drugie, kiedy coś nie działa, a ty nie widzisz dlaczego.
+
+\medskip
+\textbf{Stroud, \emph{Engineering Mathematics} \dash{} metoda, a nie
+konkurent.} Ramka, odpowiedź na następnej stronie, Quiz, Podsumowanie i lista
+\emph{Czy potrafisz?} są jego. Jego własne ograniczenia są zobowiązaniami tej
+książki i są nazwane we wstępie, a nie ukryte:
+brak ścisłości; algebra liniowa na poziomie przepisów, bez przestrzeni
+wektorowych i bez rozkładów; statystyka opisowa bez wnioskowania; brak
+matematyki dyskretnej; brak optymalizacji w pierwszym tomie; oraz \dash{}
+zarzut stawiany najczęściej \dash{} bezużyteczność jako pozycji referencyjnej po
+przeczytaniu. Część~III odpowiada na algebrę liniową, część~IV na matematykę
+dyskretną i ścisłość, część~VI na optymalizację, a część~VII na wnioskowanie;
+Dodatki~B, C i D istnieją dla ostatniego zarzutu.
+
+\section{Czego ta książka nie uczy i gdzie iść zamiast tego}
+\label{sec:E-not}
+\index{further reading!exclusions}
+
+Reguła domu brzmi: książka może powiedzieć, że dany temat nie jest wart swojego
+kosztu dla tego czytelnika. Nie może udawać, że temat nie istnieje.
+
+Najpierw ścisłe fundamenty pod tym, czego ta książka uczy \dash{} miejsca, z
+których bierze wynik i go nie dowodzi.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}XXl@{}}
+\toprule
+\textbf{Czego nie uczy} & \textbf{Dlaczego} & \textbf{Gdzie iść} \\
+\midrule
+Rachunku prawdopodobieństwa w ujęciu teorii miary & Nic, co ta książka spłaca,
+  nie potrzebuje sigma-ciała, a ta maszyneria kosztuje semestr & Williams;
+  Durrett \\
+Analizy i dowodzenia na poziomie epsilon--delta & Program~\ref{prog:P14} uczy
+  \emph{czytać} twierdzenie i celowo nie uczy go pisać & Abbott; Tao \\
+Równań różniczkowych cząstkowych & Czytelnik spotyka je w pracy z fizyką w
+  modelu, a płytkie ujęcie tego nie obsłuży & Strauss; Evans \\
+Stochastycznych równań różniczkowych, a więc i pełnej matematyki modeli
+  dyfuzyjnych & Książka daje rozkład Gaussa i fakt, że wariancje niezależnych
+  wielkości się dodają, co jest całym łańcuchem Gaussów w czasie dyskretnym, i
+  nigdy tego do niego nie stosuje & Särkkä i Solin \\
+Analizy zespolonej i transformaty Fouriera poza wzmianką &
+  Program~\ref{prog:F08} daje okrąg jednostkowy; twierdzenia o splocie to
+  osobna książka & Bracewell \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+A dalej specjalizacje, które zaczynają się tam, gdzie kończy się głębokość
+robocza. Każda z nich to osobna dziedzina, a książka zatrzymuje się w miejscu,
+w którym inżynier przestaje potrzebować się o nią spierać.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}XXl@{}}
+\toprule
+\textbf{Czego nie uczy} & \textbf{Dlaczego} & \textbf{Gdzie iść} \\
+\midrule
+Numerycznej algebry liniowej na poziomie implementacji & Program~\ref{prog:P09}
+  mówi, czemu nie odwracać, a Program~\ref{prog:P11}, czemu równania normalne
+  podnoszą wskaźnik uwarunkowania do kwadratu; żaden nie uczy implementować
+  faktoryzacji QR & Trefethen i Bau; Higham \\
+Teorii optymalizacji wypukłej i pełnej dualności & Programy~\ref{prog:P19}
+  i~\ref{prog:P22} dają część roboczą, a nie ma powodu parafrazować jednej z
+  najlepiej napisanych książek matematycznych & Boyd i Vandenberghe \\
+Teorii uczenia statystycznego: wymiaru VC, ograniczeń na uogólnianie &
+  Program~\ref{prog:P14} nazywa je twierdzeniami do czytania uważnie; te
+  ograniczenia są w realnej skali prawie zawsze puste & Shalev-Shwartz i
+  Ben-David \\
+Teorii uczenia ze wzmocnieniem i wyników o zbieżności & Programy~\ref{prog:P21}
+  i~\ref{prog:P22} dają estymatory gradientu i ograniczenie KL, czyli to, czym
+  inżynier faktycznie manipuluje & Sutton i Barto \\
+Teorii kategorii, geometrii różniczkowej, rozmaitości & Czasem przywoływane w
+  pracach o interpretowalności; nie są nośne dla tej roboty & Lee \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Tematy, których uczy, ale tylko do głębokości roboczej}
+\label{sec:E-depth}
+\index{further reading!working depth}
+
+\begin{warning}
+\textbf{To są nazwy, nie werdykty, i ta różnica jest celowa.}
+Sekcja~\ref{sec:E-survey} mówi, co każda praca robi dobrze, a co źle, bo tamte
+prace zostały przeczytane i porównane ze sobą, zanim ta książka powstała.
+Poniższa lista nie została. Dopisanie jej charakterystyki mimo to jest dokładnie
+tym ruchem, o którego odrzucenie ta książka prosi przez czterdzieści siedem
+programów, więc dalej jest wskazówka i nic więcej.
+\end{warning}
+
+\medskip
+Na \textbf{algebrę liniową} poza roboczą głębokość części~III: Strang, a na
+ujęcie abstrakcyjne Axler. Na ten sam teren z nachyleniem ku uczeniu
+maszynowemu \dash{} Deisenroth, Faisal i Ong.
+
+Na \textbf{rachunek prawdopodobieństwa} \dash{} Blitzstein i Hwang. Na
+\textbf{wnioskowanie} \dash{} Wasserman, \emph{All of Statistics}. Na
+\textbf{metody bayesowskie} poza Program~\ref{prog:P28} \dash{} Gelman i
+współautorzy, \emph{Bayesian Data Analysis}.
+
+Na \textbf{teorię informacji} poza część~VIII \dash{} Cover i Thomas. Na
+\textbf{optymalizację numeryczną} jako przedmiot sam w sobie, a nie jako reguły
+aktualizacji, które wyprowadza Program~\ref{prog:P20} \dash{} Nocedal i Wright.
+
+A na uczenie maszynowe, które to wszystko konsumuje: Goodfellow, Bengio i
+Courville na obraz z 2016 roku, Murphy i Bishop na obecny.
+
+\medskip
+To ostatnie zdanie jest sensem całego dodatku. Ta książka nie uczy żadnego z
+tych tematów tak głęboko jak jej własne źródła i nigdy nie miała. To, co
+twierdzi, jest węższe i sprawdzalne: że możesz je teraz otworzyć.

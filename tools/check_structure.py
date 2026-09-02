@@ -440,6 +440,54 @@ def check_terms(soft: bool) -> int:
     return 0 if (bad == 0 or soft) else 1
 
 
+RE_PARTRANGE = re.compile(r"\(([FP]\d+)--([FP]\d+)\)")
+
+
+def check_parts(soft: bool) -> int:
+    """Every part range the introduction prints against the manifest.
+
+    This is the one class of claim that the parity checks are structurally
+    blind to. C4, C8, C12 and C14 all compare the two EDITIONS, so a range
+    that is stale in both stays green -- and both introductions carried the
+    P7-insertion off-by-one in seven of their nine ranges for the whole of
+    the book, on page one, with every gate passing. The fix is the one this
+    repository has reached for every other time: compare against the source
+    of truth (tools/programs.json) rather than between the editions.
+
+    The ranges are read positionally, in document order, because the part
+    names differ between the editions by design and the manifest carries
+    both. A missing or extra range is therefore a failure too.
+    """
+    import json
+    manifest = json.loads((ROOT / "tools" / "programs.json")
+                          .read_text(encoding="utf8"))
+    want = [(p["ids"][0], p["ids"][-1]) for p in manifest["parts"]]
+
+    bad = 0
+    for lang in LANGS:
+        f = ROOT / "frontmatter" / lang / "introduction.tex"
+        if not f.exists():
+            continue
+        src = RE_TEX_COMMENT.sub("", f.read_text(encoding="utf8"))
+        got = RE_PARTRANGE.findall(src)
+        if len(got) != len(want):
+            print(f"  {f.relative_to(ROOT)}: prints {len(got)} part ranges "
+                  f"where the manifest has {len(want)} parts.")
+            bad += 1
+            continue
+        for i, (g, w) in enumerate(zip(got, want), start=1):
+            if g != w:
+                print(f"  {f.relative_to(ROOT)}: part {i} prints "
+                      f"({g[0]}--{g[1]}) where the manifest says "
+                      f"({w[0]}--{w[1]}). The introduction is the book's own "
+                      f"map and it prints on page one.")
+                bad += 1
+    if bad == 0:
+        print(f"  {len(want)} part ranges in each introduction, "
+              f"every one matching the manifest.")
+    return 0 if (bad == 0 or soft) else 1
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--frames", action="store_true")
@@ -449,12 +497,13 @@ def main() -> int:
     p.add_argument("--elicit", action="store_true")
     p.add_argument("--scripts", action="store_true")
     p.add_argument("--terms", action="store_true")
+    p.add_argument("--parts", action="store_true")
     p.add_argument("--all", action="store_true")
     p.add_argument("--soft", action="store_true",
                    help="report but always exit 0 (the default for a draft)")
     a = p.parse_args()
     if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit,
-                a.scripts, a.terms, a.all)):
+                a.scripts, a.terms, a.parts, a.all)):
         a.all = True
     rc = 0
     if a.all or a.frames:
@@ -471,6 +520,8 @@ def main() -> int:
         rc |= check_scripts(a.soft)
     if a.all or a.terms:
         rc |= check_terms(a.soft)
+    if a.all or a.parts:
+        rc |= check_parts(a.soft)
     return rc
 
 

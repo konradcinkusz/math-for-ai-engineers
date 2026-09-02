@@ -115,6 +115,9 @@ jobs:
       - name: Every glossary rendering is used in the prose
         run: python3 tools/check_structure.py --terms
 
+      - name: The introduction's map matches the manifest
+        run: python3 tools/check_structure.py --parts
+
   diagrams:
     name: Render diagrams
     runs-on: ubuntu-latest
