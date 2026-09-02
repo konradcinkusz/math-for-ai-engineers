@@ -10870,8 +10870,11 @@ clone instead.
    formula reference and is the one that answers Stroud's fair criticism
    that a book of frames is a useless reference \dash{} a reader who wants
    $\Var(aX+b)$ six months later should not have to remember which program
-   proved it. D, E and F are stubs carrying their briefs; read them out of
-   `tools/programs.json` and out of the stub files themselves.
+   proved it. D is the Polish--English terminology, E is where to go next,
+   F is the manifest. **The appendices are not in `tools/programs.json`**, so
+   there is nothing to re-derive an owner from: each brief lives only in its
+   own `\programstub{}`, in `appendices/{en,pl}/`, and that is the whole
+   contract.
 
    **An appendix collecting what the book proved is a claim about the book on
    every line**, which is the one class nothing in this repository can check
@@ -10884,6 +10887,22 @@ clone instead.
    program it names**, and the cheapest form of that is the discipline the
    later program passes converged on \dash{} read the brief as a checklist,
    and grep the destination before writing the sentence rather than after.
+
+   **And there is a structural alternative that would retire the exposure
+   rather than police it**, which the next pass should settle before writing
+   a line. The book already accumulates three back-matter collections at the
+   point of use rather than by hand: `\outcome{}` builds `\canyou`,
+   `\mermaidfig` writes its own manifest line, and `\answerto` carries an
+   answer to Appendix~A through a global macro store \dash{} and none of the
+   three can name the wrong program, because the numbers are the ones LaTeX
+   is on when it reads the macro. A `\result{}` marked in the frame that
+   establishes a result, replayed by Appendix~C, is the same move a fourth
+   time, and it makes the tag **impossible to get wrong** where an audit only
+   makes it detectable. The cost is a mechanical edit across forty-seven
+   written programs in two editions, gated by C14's histogram and C4's
+   ordered signature, which is a better check than a hand-authored appendix
+   could ever carry. The reading is in the scratchpad; the decision is the
+   author's.
 
 2. **The trained-model debt: five entries, one of them half answered.** It is
    the first thing in this book that cannot be done from a sandbox at all.
