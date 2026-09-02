@@ -1,28 +1,884 @@
 %% P31 --- Informacja wzajemna
 %%
-%% Zalążek, wygenerowany przez tools/gen_stubs.py z tools/programs.json.
-%% Poniższy opis jest kontraktem tego programu: co ma uzasadnić i co ma dać
-%% czytelnikowi. Napisanie programu oznacza usunięcie bloku \programstub{} i
-%% zastąpienie go programem -- po czym ten plik nie jest już generowany.
+%% Bliźniak: programs/en/P31-mutual-information.tex. Ramka za ramką, makro za
+%% makrem: parity.py porównuje oba wydania W KOLEJNOŚCI, więc zdanie zbudowane
+%% po polsku musi nieść te same spany matematyczne i te same literały liczbowe
+%% w tej samej kolejności. Cyfra zostaje cyfrą, a słowo zostaje słowem.
+%%
+%% Uwaga tłumaczeniowa: \enquote{sonda} za angielskie \enquote{probe} --- to
+%% zwykłe polskie słowo o realnym użyciu w tym sensie, a nie kalka, więc
+%% reguła o zostawianiu angielskich terminów ML go nie obejmuje.
+%%
+%% ODNIESIENIE PRZED MATEMATYKĄ. Angielskie \enquote{Program P24's pair} musi
+%% po polsku zaczynać się od odniesienia, bo C4 czyta kolejność.
 
 \program{Informacja wzajemna}
 \label{prog:P31}
+\index{informacja wzajemna}
 
-\programstub{%
-\textit{[Opis do przetłumaczenia --- patrz wydanie angielskie.]}
+\begin{outcomes}
+\outcome{1--6}{powiedzieć, czego tabela korelacji parami nie rozstrzyga, i
+  nazwać wielkość, która to rozstrzyga}
+\outcome{7--10}{powiedzieć, dlaczego ta wielkość nigdy nie jest ujemna, kiedy
+  jest zerem i dlaczego jest symetryczna}
+\outcome{11--15}{powiedzieć, dlaczego jest symetryczna, choć dwie entropie
+  warunkowe, z których się ją składa, nie są}
+\outcome{16--25}{powiedzieć, w którą stronę myli się estymator wtykowy na
+  danych bez zależności i ile pozycji trzeba, żeby przestało to mieć
+  znaczenie}
+\outcome{26--34}{powiedzieć, co przetwarzanie może, a czego nie może zrobić z
+  informacją, i odczytać tę samą nierówność z obu jej końców}
+\outcome{35--38}{powiedzieć, co trzeba by zmierzyć, zanim twierdzenie
+  interpretowalnościowe o warstwie będzie uzasadnione}
+\end{outcomes}
 
-Argument: mutual information is the reduction in uncertainty about one
-quantity given another; it is symmetric, non-negative, and zero exactly
-under independence. Payoff: the vocabulary behind a large class of claims
-the reader will meet \dash{} \enquote{layer 12 contains information about
-syntax}, \enquote{this feature is informative about the label} \dash{}
-together with the reason to discount most of them: **mutual information in
-high dimension is extremely hard to estimate, and the common estimators are
-biased in the direction that flatters the claim.** The data-processing
-inequality, which says post-processing cannot create information, and is the
-clean argument against several popular interpretability claims. A folklore-
-puncturing program by design.
+\begin{quiz}
+\item Dwie wielkości mają korelację dokładnie zero. Czego się dowiedziałeś o
+  tym, czy jedna wyznacza drugą? \teachesat{1--2}
+  \answerto{Niczego. Program~\ref{prog:P24} buduje parę o korelacji dokładnie
+  zero, w której jedna jest funkcją drugiej; ten program buduje wielkość,
+  która to widzi.}
+\item Informacja wzajemna jest symetryczna. Czy dwie entropie warunkowe,
+  którymi można ją zapisać, też są? \teachesat{12--13}
+  \answerto{Nie, i mogą się różnić ogromnie \dash{} jedna z nich może być
+  dokładnie zerem, a druga nie. Ta sama liczba powstaje z dwóch różnych
+  kawałków.}
+\item Szacujesz informację wzajemną między dwiema wielkościami naprawdę
+  niezależnymi, na skończonej próbie. Co dostajesz? \teachesat{16--17}
+  \answerto{Liczbę dodatnią, w wartości oczekiwanej, przy każdym rozmiarze
+  próby. Prawda wynosi zero, a estymator jej nie zwraca.}
+\item Ktoś ulepsza swoją sondę i podaje wyższy wynik. Co to mówi o warstwie?
+  \teachesat{28--29}
+  \answerto{Nic nowego. Sonda jest przetwarzaniem, więc jej wynik od zawsze
+  był ograniczony tym, co warstwa niosła; lepsza sonda to zdanie o sondzie.}
+\item A jeśli sonda wypada źle? \teachesat{30--31}
+  \answerto{Też nic, w drugą stronę. To ograniczenie jest ograniczeniem od
+  dołu i jest luźne o wielkość, której nikt nie mierzy.}
+\end{quiz}
 
-\medskip
-\textbf{Planowana długość:} 50 ramek.
-}
+% ============================================================
+\section{Czego nie mówią dwa brzegi}
+\label{sec:P31-margins}
+\index{informacja wzajemna!a zerowa korelacja}
+
+\begin{fr}
+Program~\ref{prog:P24} zostawił na stole parę i przypiętą do niej obietnicę.
+
+$Z$ przyjmuje $-1$, $0$ lub $1$, każde z prawdopodobieństwem
+$\frac{1}{\val{p24.tri.n}}$, a $W = Z^{2}$. Tamten program dowiódł, dokładnie
+na ułamkach, że $\Cov(Z, W) = 0$.
+
+Zauważył też, że $W$ jest \emph{funkcją} $Z$, więc zależność jest całkowita.
+Podanie $Z$ mówi ci $W$ wprost.
+
+Zanim pójdziesz dalej: do jakiego wniosku o niezależności tej pary uprawnia
+cię korelacja równa zero?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Do żadnego}
+
+Korelacja mierzy prostoliniową część zależności, a tu prostoliniowej części
+nie ma: dodatnie i ujemne $Z$ ciągną średnią $ZW$ w przeciwne strony i
+znoszą się dokładnie. Cała reszta zależności jest dla niej niewidoczna.
+
+To nie jest wada korelacji. To zdanie o tym, co ta liczba w ogóle mierzyła
+\dash{} a Program~\ref{prog:P23} powiedział to samo z drugiej strony: tabela
+korelacji parami nie rozstrzyga niezależności.
+
+Warto powiedzieć, czym korelacja \emph{nie} jest. Nie jest bezużyteczna i nie
+jest zepsuta: na parze, w której zależność naprawdę jest prostą, mierzy
+dokładnie to, co trzeba, i mierzy to tanio. Czego nie potrafi, to odpowiedzieć
+na pytanie, o które nigdy jej nie proszono, a \enquote{czy te dwie są
+niezależne} jest właśnie tym pytaniem.
+
+Potrzebujesz więc wielkości, która odpowiada na pytanie, którym
+Program~\ref{prog:P23} \emph{naprawdę} zdefiniował niezależność. Jakie to
+było pytanie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Czy podanie jednej z nich zmienia rozkład drugiej?}
+
+Oto to pytanie zapisane jako arytmetyka.
+
+Jeśli $X$ i $Y$ są niezależne, to rozkład łączny jest iloczynem brzegów,
+$p(x, y) = p(x)\,p(y)$, dla każdej pary. Jeśli nie są \dash{} nie jest.
+
+Cała zależność to więc odstęp między dwoma rozkładami na tych samych
+zdarzeniach: łącznym, który masz, i iloczynem brzegów, który byś miał.
+
+Cały Program~\ref{prog:P30} spędziłeś na wielkości mierzącej odstęp między
+dwoma rozkładami. Co to za wielkość i co powinno wejść tu w jej dwa
+argumenty?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dywergencja, z rozkładem łącznym jako pierwszym i iloczynem brzegów
+jako drugim}
+
+\[ I(X; Y) \;=\; \KL{p(x, y)}{p(x)\,p(y)} \]
+
+i to jest definicja. Nazywa się to \textbf{informacją wzajemną} $X$ i $Y$.
+
+Nic nowego nie zostało zdefiniowane. To obiekt z
+Programu~\ref{prog:P30} zastosowany do jednej konkretnej pary rozkładów, a
+wszystko, co tamten program o nim udowodnił, obowiązuje tu bez słowa więcej.
+
+\begin{note}
+Kolejność ma znaczenie, jak zawsze przy tej wielkości, i rozkład łączny idzie
+pierwszy. Sekcja~4 mówi o tym, co się dzieje, gdy drugi argument ma lukę,
+której pierwszy nie ma, więc warto już teraz wiedzieć, który jest który.
+\end{note}
+\end{fr}
+
+\begin{fr}
+Zastosuj to do pary, którą zostawił Program~\ref{prog:P24}.
+
+Rozkład łączny kładzie $\frac{1}{\val{p24.tri.n}}$ na każdym z $(-1, 1)$,
+$(0, 0)$ i $(1, 1)$, a nigdzie indziej nic. Brzegi to $Z$ jednostajne na
+trzech wartościach i $W$ na dwóch.
+
+Policz albo przyjmij na jedną ramkę na wiarę: odpowiedź to
+$\val{p31.zw.mi}$ nata.
+
+Teraz pytanie, przy którym warto się zatrzymać. Skąd wzięła się ta liczba
+\dash{} czyją jest niepewnością?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{To dokładnie $H(W)$ \dash{} cała niepewność $W$}
+
+$\val{p31.zw.mi}$ nata, czyli $\val{p31.zw.mi.bits}$ bita, i jest to $H(W)$
+co do ostatniego miejsca, które liczy skrypt.
+
+To nie przypadek, a skrypt asertuje tożsamość, nie liczbę: $W$ jest funkcją
+$Z$, więc podanie $Z$ nie zostawia \emph{niczego} nieokreślonego w $W$, a
+tym, ile dowiadujesz się o $W$ z $Z$, jest zatem wszystko, co $W$ miało.
+
+\begin{trapbox}
+\textbf{\enquote{Zerowa korelacja, więc nie ma czego szukać} to teraz dwie
+liczby, a nie argument.}
+
+Na tej samej parze, w tej samej ramce: korelacja wynosi $0$, a informacja
+wzajemna $\val{p31.zw.mi}$ nata, czyli każdy nat, jaki $W$ posiada.
+Program~\ref{prog:P24} powiedział, że macierz korelacji pełna zer nie jest
+dowodem, że zbiór cech nie niesie wspólnej informacji. Tyle kosztuje
+zignorowanie tamtego zdania.
+\end{trapbox}
+
+\mermaidfig{p31-what-a-margin-drops}{Co odrzucają dwa brzegi}{same brzegi}
+\end{fr}
+
+% ============================================================
+\section{Dlaczego nie może być ujemna}
+\label{sec:P31-nonneg}
+\index{informacja wzajemna!nieujemność}
+
+\begin{fr}
+Wszystko, co udowodnił Program~\ref{prog:P30}, jest teraz twoje za darmo,
+bo to jest tamta wielkość, a nie nowa.
+
+Tamten program dowiódł, że dywergencja nigdy nie jest ujemna \dash{}
+stosując nierówność Jensena z Programu~\ref{prog:P19} do ilorazu \dash{} i
+że jest zerem dokładnie wtedy, gdy oba rozkłady się zgadzają.
+
+Odczytaj oba te fakty z rozkładem łącznym i iloczynem brzegów w dwóch
+gniazdach. Co mówią o $I(X; Y)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+$I(X; Y) \ge 0$ zawsze, a $I(X; Y) = 0$ \textbf{dokładnie wtedy, gdy rozkład
+łączny równa się iloczynowi swoich brzegów} \dash{} co jest definicją
+niezależności z Programu~\ref{prog:P23}, wypisaną wprost.
+\end{ansblock}
+
+Ta wielkość jest więc zerem wtedy i tylko wtedy, gdy oba są niezależne, a
+dodatnia w przeciwnym razie. Tej własności korelacja nie miała, a jej
+uzyskanie nie wymagało nowej matematyki: to twierdzenie o dywergencji,
+odczytane na konkretnej parze argumentów.
+
+Sprawdzone, nie zadeklarowane: na wszystkich $\val{p31.sym.trials}$
+rozkładach łącznych na wymiernej siatce ani jeden nie wychodzi ujemny.
+\end{fr}
+
+\begin{fr}
+Jest jeszcze jedna własność i warto postawić ci ją jako pytanie, zanim
+padnie, bo właśnie spędziłeś cały program na wielkości, która jej nie ma.
+
+Dywergencja z Programu~\ref{prog:P30} zdecydowanie \textbf{nie} jest
+symetryczna. Cała jej sekcja~3 była o tym, jak bardzo różnią się oba
+kierunki, a sekcja~5 o tym, ile kosztuje wybór między nimi.
+
+Czy $I(X; Y)$ to to samo co $I(Y; X)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Tak, dokładnie}
+
+I widać to bez liczenia czegokolwiek. Zamiana $X$ i $Y$ nie zamienia dwóch
+argumentów niczego: rozkład łączny $p(x, y)$ to ta sama tabela czytana z
+drugiej strony, a iloczyn $p(x)\,p(y)$ to ten sam iloczyn. Żaden argument
+dywergencji się nie ruszył.
+
+Sprawdzone na tych samych $\val{p31.sym.trials}$ rozkładach łącznych, z
+odpowiedziami zgodnymi co do ostatniego bitu, jaki niesie arytmetyka.
+
+\begin{note}
+Warto jasno powiedzieć, czego to \emph{nie} mówi. Dywergencja nadal jest
+niesymetryczna; to ta konkretna para argumentów akurat nie zmienia się przy
+zamianie. Sekcja~3 pokazuje asymetrię przetrwałą jedno piętro niżej, w
+kawałkach, z których tę wielkość da się złożyć.
+\end{note}
+\end{fr}
+
+% ============================================================
+\section{Symetryczna, z niesymetrycznych kawałków}
+\label{sec:P31-conditional}
+\index{entropia!warunkowa}
+\index{informacja wzajemna!jako spadek niepewności}
+
+\begin{fr}
+Definicja jest dokładna i nie jest tym, jak ktokolwiek o tej wielkości mówi.
+Ludzie mówią \emph{ile znajomość $X$ mówi ci o $Y$}, co brzmi jak zupełnie
+co innego.
+
+Łączy jedno z drugim jedna definicja i jest to jedyny nowy obiekt w tym
+programie. \textbf{Entropia warunkowa}
+\[ H(Y \mid X) \;=\; H(X, Y) \;-\; H(X) \]
+to tyle niepewności $Y$, ile zostaje, gdy $X$ jest znane: niepewność pary
+pomniejszona o niepewność samego $X$.
+
+Weź znowu parę z Programu~\ref{prog:P24}, z $W = Z^{2}$. Ile wynosi
+$H(W \mid Z)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dokładnie $0$}
+
+$W$ jest funkcją $Z$. Gdy $Z$ leży na stole, w $W$ nie zostaje już żadna
+niepewność, a arytmetyka zwraca zero, a nie coś małego.
+
+Teraz to samo pytanie w drugą stronę, bo o nim warto pomyśleć:
+$H(Z \mid W)$. Podano ci $W$. Ile z $Z$ pozostaje otwarte?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p31.zw.hzw}$ nata \dash{} zdecydowanie nie zero}
+
+Gdy powiedziano ci, że $W = 1$, wiesz, że $Z$ to $-1$ albo $1$, i nie wiesz
+które. Gdy powiedziano ci, że $W = 0$, znasz $Z$ dokładnie. Średnio
+$\val{p31.zw.hzw}$ nata z $Z$ przeżywa podanie $W$.
+
+Obie entropie warunkowe są więc tak różne, jak to możliwe: jedna jest
+dokładnie zerem, a druga nie.
+
+\begin{trapbox}
+\textbf{\enquote{Informacja wzajemna jest symetryczna, więc zależność jest
+symetryczna} nie wynika, a ta para jest kontrprzykładem.}
+
+$Z$ wyznacza $W$, a $W$ nie wyznacza $Z$. Ta asymetria jest prawdziwa, mówi
+o niej $H(W \mid Z) = 0$ wobec $H(Z \mid W) = \val{p31.zw.hzw}$, a
+informacja wzajemna jej nie widzi. Symetria jest własnością wielkości, a nie
+zależności, którą ta wielkość mierzy.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Obie te entropie warunkowe prowadzą do tej samej informacji wzajemnej, i to
+jest fakt wart wyniesienia z tej sekcji:
+\[ I(X; Y) \;=\; H(Y) - H(Y \mid X) \;=\; H(X) - H(X \mid Y) \]
+\dash{} niepewność, którą miałeś, pomniejszona o tę, która ci zostaje. To
+jest zdanie, które ludzie mają na myśli, mówiąc \emph{ile znajomość $X$ mówi
+ci o $Y$}, i jest to ta sama liczba co dywergencja.
+
+Sprawdź to na tej parze, od trudniejszej strony. $H(Z)$ wynosi
+$\val{p31.zw.hz}$ nata, a $H(Z \mid W)$ \dash{} $\val{p31.zw.hzw}$. Co
+zostaje?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p31.zw.hz} - \val{p31.zw.hzw} = \val{p31.zw.mi}$ nata}
+
+Czyli tyle, ile dała druga strona: $H(W) - 0$, cała niepewność $W$. Jedna
+liczba, osiągnięta z dwóch zestawów kawałków, które mają ze sobą niemal nic
+wspólnego.
+
+\begin{aibox}
+Dlatego ta sama wielkość nosi dwie nazwy w dwóch literaturach i jest tym
+samym. \emph{Przyrost informacji} w drzewie decyzyjnym to
+$H(\text{etykieta}) - H(\text{etykieta} \mid \text{podział})$, liczony przy
+każdym kandydacie na podział i maksymalizowany. To postać prawostronna.
+\emph{Informacja wzajemna} w procedurze selekcji cech to postać
+dywergencyjna. Biblioteka oferująca obie oferuje jedną liczbę dwa razy, a
+obie zgodzą się z dokładnością, jaką ma jej estymator \dash{} co jest
+tematem sekcji~4 i jest mniejsze, niż się zakłada.
+\end{aibox}
+
+\mermaidfig{p31-two-routes-one-number}{Dwie drogi do tej samej wielkości}{jedna liczba}
+\end{fr}
+
+% ============================================================
+\section{Co robi z nią skończona próba}
+\label{sec:P31-estimation}
+\index{informacja wzajemna!obciążenie estymatora}
+\index{estymacja!informacji wzajemnej}
+
+\begin{fr}
+Wszystko dotąd zakładało, że znasz rozkład łączny. Nie znasz. Masz próbę, a
+liczysz informację wzajemną tabeli, którą ta próba tworzy \dash{} estymat
+\textbf{wtykowy}.
+
+Program~\ref{prog:P26} spędził cały program na odstępie między estymatorem a
+tym, co estymuje, i na dwóch sposobach mylenia się. To jest to samo pytanie
+zadane o tę wielkość.
+
+Zacznij od łatwego przypadku i przewidź, zanim pójdziesz dalej. Dwie
+wielkości są \emph{naprawdę niezależne}, więc prawda wynosi dokładnie zero.
+Bierzesz skończoną próbę i liczysz estymat wtykowy. Co dostajesz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Liczbę dodatnią, w zasadzie zawsze}
+
+Nie czasem i nie z niewielką szansą pomyłki w drugą stronę: żeby wyszło
+zero, tabela próby musi mieć komórki \emph{dokładnie} w proporcji do swoich
+własnych brzegów, a skończona próba prawie nigdy tego nie ma.
+
+Wszystko inne to tabela z jakąś widoczną zależnością, a estymat wtykowy tę
+zależność raportuje, bo o to został poproszony.
+
+Oto najmniejszy tego przykład. Dwadzieścia rzutów dwiema uczciwymi monetami,
+niezależnymi z konstrukcji:
+
+\transcript{p31-plug-in}
+
+Tabela idealnie płaska raportuje zero. Ta przesunięta o jedną sztukę w
+każdej komórce raportuje coś innego, i nie jest to mało.
+\end{fr}
+
+\begin{fr}
+To jedna tabela. Liczy się to, co estymator robi \emph{średnio}, bo tym
+właśnie jest obciążenie.
+
+Dla tabeli dwa na dwa o ustalonej sumie możliwych wyników jest skończenie
+wiele \dash{} każdy sposób rozłożenia $N$ zliczeń na cztery komórki
+\dash{} a każdy ma znane prawdopodobieństwo. Wartość oczekiwaną można więc
+policzyć, dodając je wszystkie, zamiast losować próby i uśredniać.
+
+Przy $N = 10$ takich tabel jest $\val{p31.bias.tables10}$; przy $N = 100$
+jest ich $\val{p31.bias.tables100}$. Każda jest wyliczona, a wagi sprawdzone
+na zgodność z sumą dokładnie $1$.
+
+Zanim padną liczby: to pomiar czy dowód?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Dowód, dla tego $N$}
+
+Nic nie było losowane i nic nie zostało pominięte, więc odpowiedź jest
+wartością oczekiwaną, a nie jej oszacowaniem. To rozróżnienie z
+Programu~\ref{prog:P14}, a dyscyplina jest ta sama, której użył
+Program~\ref{prog:P30} na własnej rodzinie kandydatów: wyliczaj wyczerpująco
+tam, gdzie się da, żeby odpowiedź nie była zdaniem o twoim losowaniu.
+
+Oto, co daje to wyliczenie, na danych, których prawdziwa informacja wzajemna
+wynosi dokładnie zero.
+
+\begin{center}
+\begin{tabular}{rrrr}
+\toprule
+$N$ & tabel & $\Ex[\text{wtykowy}]$ & wobec $\frac{1}{2N}$ \\
+\midrule
+$10$ & $\val{p31.bias.tables10}$ & $\val{p31.bias.n10}$ & $\val{p31.bias.ratio10}$ \\
+$20$ & $\val{p31.bias.tables20}$ & $\val{p31.bias.n20}$ & $\val{p31.bias.ratio20}$ \\
+$50$ & $\val{p31.bias.tables50}$ & $\val{p31.bias.n50}$ & $\val{p31.bias.ratio50}$ \\
+$100$ & $\val{p31.bias.tables100}$ & $\val{p31.bias.n100}$ & $\val{p31.bias.ratio100}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Każda pozycja w trzeciej kolumnie to liczba dodatnia raportowana na danych,
+w których nic nie ma.
+\end{fr}
+
+\begin{fr}
+Ostatnia kolumna to część, przy której warto zwolnić.
+
+Na to obciążenie istnieje standardowa poprawka. Dla tabeli o $a$ wierszach i
+$b$ kolumnach odejmuje ona $\frac{(a-1)(b-1)}{2N}$, co przy dwóch na dwa
+daje $\frac{1}{2N}$, a kolumna pokazuje prawdziwe obciążenie jako jej
+wielokrotność.
+
+Przeczytaj tę kolumnę z góry na dół. Co robi ta poprawka i gdzie robi to
+najgorzej?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Zaniża obciążenie, i najbardziej przy najmniejszym $N$}
+
+$\val{p31.bias.ratio10}$ raza poprawka przy $N = 10$, spadając do
+$\val{p31.bias.ratio100}$ przy $N = 100$.
+
+Poprawka jest asymptotyczna: wyprowadzono ją dla dużych $N$ i zbiega, co ta
+kolumna pokazuje. Konsekwencja jest tą, której nikt nie wypowiada.
+
+\begin{trapbox}
+\textbf{\enquote{Zastosowałem standardową poprawkę na obciążenie, więc
+liczba jest solidna.}}
+
+Poprawka jest najmniej dokładna dokładnie tam, gdzie obciążenie jest
+największe. Przy $N = 100$ mieści się w dwóch procentach, a usuwane
+obciążenie to $\val{p31.bias.n100}$ nata, którego nikt nie potrzebował
+usuwać. Przy $N = 10$ zostawia prawie jedną trzecią obciążenia, a to jest
+ten reżim, dla którego po poprawkę się sięga.
+
+Środek zaradczy, który działa tam, gdzie go nie potrzebujesz, i zawodzi tam,
+gdzie potrzebujesz, jest gorszy niż brak środka, bo usuwa powód do
+ostrożności.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Teraz przeskaluj to, i przeskaluj uczciwie.
+
+Ta poprawka ma w sobie $(a-1)(b-1)$, więc obciążenie rośnie z liczbą
+\emph{komórek} tabeli i maleje z liczbą pozycji. Szesnaście kategorii w
+każdą stronę to $\val{p31.big.cells}$ komórek.
+
+Największa informacja wzajemna, jaką mogą mieć dwie szesnastowartościowe
+wielkości, to $\ln \val{p31.big.k} = \val{p31.big.max}$ nata.
+
+Oto pytanie, które powinien zadać przegląd projektu. Ile pozycji potrzeba,
+zanim obciążenie zejdzie poniżej jednego procenta tego maksimum?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p31.big.need}$, czyli około $\val{p31.big.per}$ pozycji na
+komórkę}
+
+Przy takim rozmiarze próby obciążenie wynosi $\val{p31.big.bias}$ nata,
+jeden procent największej wartości, jaką ta wielkość może przyjąć. Poniżej
+liczba, którą liczysz, jest po części pomiarem, a po części rozmiarem próby,
+w proporcji, której nic na stronie ci nie mówi.
+
+\begin{warning}
+\textbf{Ten program podaje tę liczbę w tę stronę, w którą jest ona ważna, a
+pierwsza wersja tego nie robiła.}
+
+Oczywisty ruch to puścić wzór przy jakimś małym $N$ \dash{} szesnaście
+kategorii w każdą stronę na pięćdziesięciu pozycjach daje przewidywane
+$\num{2.25}$ nata obciążenia, czyli większość maksimum, i robi to efektowne
+zdanie. Jest też poza własnym reżimem wzoru: pięćdziesiąt pozycji na
+$\val{p31.big.cells}$ komórek to jedna piąta pozycji na komórkę, a wzór jest
+asymptotyczny w pozycjach wobec komórek. Sonda tego przypadku wykazała błąd
+o jedną trzecią.
+
+Efektowne zdanie jest więc niedostępne, a rozmiar próby dostępny, bo
+$\val{p31.big.need}$ pozycji na $\val{p31.big.cells}$ komórek mieści się w
+reżimie z zapasem. Cytowanie wzoru poza zakresem, dla którego go
+wyprowadzono, to ten sam błąd, o którym jest ta sekcja, tylko piętro wyżej.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Zestaw te dwie liczby z prawdziwym ustawieniem. Sonda podaje informację
+wzajemną między aktywacjami warstwy a etykietą lingwistyczną, a zbiór
+ewaluacyjny ma kilkaset zdań.
+
+Aktywacje są ciągłe i zostają zbinowane, sklastrowane albo skwantowane
+\dash{} co ustala liczbę komórek, a nikt jej nie podaje. Jeśli ta liczba
+jest czymś w rodzaju $\val{p31.big.cells}$, a próba to kilkaset, to zgodnie
+z powyższą arytmetyką estymat jest zdominowany przez własne obciążenie i
+wyszedłby dodatni także na przetasowanych etykietach.
+
+Istnieje sprawdzian, który kosztuje jedno dodatkowe uruchomienie i
+rozstrzyga to całkowicie.
+\end{aibox}
+
+Jaki?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Przetasuj etykiety i puść cały potok jeszcze raz}
+
+Cokolwiek to zwróci, jest podłogą: to, co produkują twoje biny, twój rozmiar
+próby i twój estymator na danych, w których nie ma żadnej zależności.
+Twierdzeniem jest to, co zostaje ponad tą podłogą.
+
+Nikt tego prawie nigdy nie podaje, a to jest różnica między liczbą a
+wynikiem.
+
+\mermaidfig{p31-bias-is-not-signal}{Skąd bierze się estymat wtykowy}{sygnał czy próba}
+\end{fr}
+
+% ============================================================
+\section{Przetwarzanie jej nie tworzy}
+\label{sec:P31-dpi}
+\index{nierówność o przetwarzaniu danych}
+\index{informacja wzajemna!nierówność o przetwarzaniu danych}
+
+\begin{fr}
+Zostało jedno twierdzenie i to ono wykonuje najwięcej pracy.
+
+Załóżmy, że $Z$ jest liczone z $Y$ i z niczego więcej \dash{} $Y$ to
+warstwa, $Z$ to, co raportuje twoja sonda, a sonda widzi warstwę, a nie
+wejście. Zapisz to jako $X \to Y \to Z$.
+
+Sonda może być czymkolwiek: klasyfikatorem liniowym, siecią głęboką, tablicą
+przeglądową, rzutem monetą ignorującym wejście.
+
+Zgadnij, zanim ramka się odwróci. Czy $I(X; Z)$ może przekroczyć $I(X; Y)$?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Nie, nigdy, jakakolwiek by ta sonda była}
+
+\[ I(X; Z) \;\le\; I(X; Y) \qquad \text{gdy } X \to Y \to Z \]
+
+To \textbf{nierówność o przetwarzaniu danych}, a nieformalny odczyt jest jej
+całością: \emph{przetwarzaniem nie da się stworzyć informacji.} To, co $Z$
+wie o $X$, wie przez $Y$, więc nie może wiedzieć więcej niż $Y$.
+
+Sprawdzone tu, a nie założone. Wobec ustalonego rozkładu łącznego niosącego
+$\val{p31.dpi.ixy}$ nata wyliczono każdy kanał z $Y$ do $Z$ na wymiernej
+siatce \dash{} $\val{p31.dpi.channels}$ z nich \dash{} i ani jeden go nie
+przekracza.
+\end{fr}
+
+\begin{fr}
+To jest twierdzenie o sondach i warto je czytać powoli, bo rozstrzyga
+twierdzenie, które ludzie wygłaszają bez przerwy.
+
+Ktoś trenuje lepszą sondę na tej samej warstwie i podaje wyższy wynik.
+Warstwa się nie zmieniła i dane się nie zmieniły.
+
+Czego dowiedzieliśmy się o warstwie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Niczego o warstwie w ogóle}
+
+Nierówność mówi, że wynik każdej sondy przez cały czas był ograniczony przez
+$I(X; Y)$. Sonda, która punktuje wyżej, zbliżyła się do sufitu, który był
+tam zawsze. To lepsza sonda, a warstwa jest tym, czym była.
+
+\begin{trapbox}
+\textbf{\enquote{Nasza mocniejsza sonda odzyskuje więcej składni, więc
+reprezentacja koduje składnię bogaciej, niż sądziliśmy.}}
+
+Drugi człon nie wynika z pierwszego. Reprezentacja koduje to, co koduje;
+sonda stała się lepsza w odczytywaniu. To są różne zdania o różnych
+obiektach, a zmierzone zostało tylko jedno z nich.
+
+Nierówność jest tym, co czyni z tego twierdzenie, a nie przycinkę: żadna
+pojemność sondy nie przepchnie wyniku ponad $I(X; Y)$, więc poprawa jest
+zawsze ruchem ku sufitowi, a nigdy ruchem sufitu.
+\end{trapbox}
+\end{fr}
+
+\begin{fr}
+Ta sama nierówność ma drugi koniec i to jego nikt nie cytuje.
+
+Wróć do $\val{p31.dpi.channels}$ wyliczonych sond. Najlepsza z nich to
+konkretna liczba i nie jest nią $\val{p31.dpi.ixy}$.
+
+Sięga $\val{p31.dpi.best}$ nata. Wobec warstwy niosącej
+$\val{p31.dpi.ixy}$, ile zostawia za sobą najlepsza dostępna sonda w tej
+rodzinie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Więcej niż jedną czwartą}
+
+I to jest ta \emph{najlepsza} z nich. Każda inna sonda w rodzinie zostawia
+więcej.
+
+Nierówność czyta się więc dwojako i oba odczyty bywają rutynowo mylone, w
+przeciwnych kierunkach, przez tych samych ludzi:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Lepsza sonda punktuje wyżej} & nie mówi nic o warstwie \\
+\textbf{Każda sonda punktuje źle} & też nie mówi nic o warstwie \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Wynik sondy jest \textbf{ograniczeniem od dołu} tego, co niesie warstwa.
+Pierwszy wiersz to sufit, do którego się zbliżamy; drugi to luźne
+ograniczenie. Nic w wyniku sondowania nie mówi ci, na który z dwóch
+patrzysz, a odstęp nie jest podawany, bo nie jest mierzony.
+\end{fr}
+
+\begin{fr}
+Warto dokładnie powiedzieć, skąd bierze się tu ten odstęp, bo nie jest to
+porażka sond.
+
+Wyliczona wyżej rodzina to każde odwzorowanie z trójwartościowego $Y$ na
+dwuwartościowe $Z$.
+
+Powiedz, co każde takie odwzorowanie musi zrobić i dlaczego to coś kosztuje.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Musi scalić dwie z trzech wartości, a cokolwiek scali, część tego, co
+je rozróżniało, przepada}
+
+Najlepszy wybór traci najmniej; żaden wybór nie traci niczego.
+
+Sonda o wyjściu mniejszym niż wejście jest dokładnie w tej sytuacji, a to
+opisuje każdą sondę, jaką ktokolwiek trenuje.
+\end{fr}
+
+\begin{fr}
+\begin{aibox}
+Nierówność rozstrzyga też pytanie o warstwy, i to akurat w stronę, której
+ludzie się nie spodziewają.
+
+Sieć liczy warstwę $k+1$ z warstwy $k$. Zatem
+$X \to \text{warstwa } k \to \text{warstwa } k+1$, i nierówność stosuje się:
+\textbf{informacja o wejściu może z głębokością tylko spadać, nigdy rosnąć.}
+
+Brzmi to, jakby przeczyło wszystkiemu, co się mówi o głębszych warstwach
+niosących bogatsze cechy, a nie przeczy \dash{} poprawia to, co takie
+twierdzenie może znaczyć. Głęboka warstwa nie może wiedzieć więcej o
+wejściu. Może być \emph{łatwiejsza do odczytania}, a to jest zdanie o tym, co
+potrafi wyciągnąć mała sonda, a nie o tym, co tam jest. To są dwa końce
+nierówności z tej sekcji, a zlewanie ich to właśnie ten błąd.
+\end{aibox}
+
+\mermaidfig{p31-probe-is-a-floor}{Co ogranicza wynik sondy}{wynik to podłoga}
+\end{fr}
+
+% ============================================================
+\section{Co by to rozstrzygnęło}
+\label{sec:P31-notmeasured}
+\index{informacja wzajemna!czego ta książka nie zmierzyła}
+
+\begin{fr}
+Ten program był nietypowo surowy wobec pewnej klasy twierdzeń, więc jest ci
+winien zdanie o tym, co zrobił, a czego nie.
+
+Zrobił arytmetykę: definicję, dwie tożsamości, dokładną wartość oczekiwaną
+po wyliczonych tabelach i nierówność sprawdzoną wobec każdego kanału w
+rodzinie. Nic z tego nie angażuje wytrenowanego modelu.
+
+Czego \emph{nie} zrobił, to nie zmierzył żadnej warstwy czegokolwiek.
+
+\begin{warning}
+\textbf{Żadna liczba w tym programie nie została policzona z aktywacji
+prawdziwego modelu, a żadne z twierdzeń o sondowaniu nie jest pomiarem.}
+
+Arytmetyka jest dokładna i ogranicza to, co pomiar mógłby znaczyć. Nie mówi
+ci, co niesie konkretna warstwa, a ta książka nie ma wytrenowanego modelu,
+żeby go zapytać. Programy \ref{prog:P08} i \ref{prog:P11} zostawiły ten sam
+dług co do rzędu i powiedziały to; to jest w nim trzecia pozycja.
+\end{warning}
+\end{fr}
+
+\begin{fr}
+Oto więc, czego wymagałoby uzasadnienie twierdzenia postaci \emph{warstwa 12
+zawiera informację o składni}, a każda pozycja jest czymś, do czego ten
+program dał ci powód.
+
+Zatrzymaj się na chwilę i wypisz, o co byś poprosił, zanim pójdziesz dalej.
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+\begin{enumerate}
+\item \textbf{Liczba komórek}, której nikt nie podaje \dash{} binowanie albo
+  klastrowanie, które zamieniło ciągłe aktywacje w coś przeliczalnego.
+  Sekcja~4: obciążenie rośnie z komórkami i maleje z pozycjami.
+\item \textbf{Rozmiar próby wobec tej liczby}, jako pozycje na komórkę.
+\item \textbf{Podłoga z przetasowanych etykiet}: ten sam potok puszczony na
+  etykietach bez związku z wejściem. Cokolwiek zwróci, jest obciążeniem, a
+  twierdzeniem jest tylko to, co siedzi ponad nim.
+\item \textbf{Jaka była pojemność sondy}, bo sekcja~5 mówi, że wynik jest
+  ograniczeniem od dołu, a większa sonda podnosi go, nie ruszając warstwy.
+\item \textbf{Co jest z czym porównywane.} Sam wynik jest nieinterpretowalny;
+  wynik wobec przetasowanej podłogi albo wobec tej samej sondy na innej
+  warstwie \dash{} nie jest.
+\end{enumerate}
+\end{ansblock}
+
+Żadna z tych pięciu nie jest trudna. Trzecia rozstrzygnęłaby większość
+sporów i kosztuje jedno dodatkowe uruchomienie.
+\end{fr}
+
+\begin{fr}
+Ostatnia rzecz, i jest to uczciwa przeciwwaga.
+
+Nic z tego nie mówi, że te twierdzenia są fałszywe. Informacja wzajemna jest
+właściwą wielkością do tego pytania, jest jedyną na stole, która widzi to, co
+korelacji umyka, a warstwa niosąca informację o składni to zupełnie rozsądna
+rzecz dla warstwy.
+
+Program mówi coś węższego i trudniejszego do podważenia: \textbf{zwykły
+materiał dowodowy nie odróżnia tego twierdzenia od jego zaprzeczenia.}
+Dodatni estymat dostajesz tak czy owak, a uruchomienie, które by je
+rozróżniło, jest tym, którego nikt nie robi.
+
+To jest różnica między twierdzeniem fałszywym a twierdzeniem
+nieuzasadnionym, a stwierdzane jest tu tylko to drugie.
+\end{fr}
+
+\begin{summarybox}
+\sumitem{1--6}{\textbf{Zerowa korelacja niczego nie rozstrzyga}: para z
+  Programu~\ref{prog:P24} ma korelację dokładnie $0$ i informację wzajemną
+  $\val{p31.zw.mi}$ nata, czyli całą niepewność $W$.}
+\sumitem{3--4}{\textbf{Informacja wzajemna jest dywergencją}:
+  $I(X; Y) = \KL{p(x,y)}{p(x)p(y)}$, odstępem między rozkładem łącznym,
+  który masz, a iloczynem brzegów, który byś miał przy niezależności.}
+\sumitem{7--8}{\textbf{Nigdy więc nie jest ujemna i jest zerem dokładnie przy
+  niezależności}, oba odziedziczone po Programie~\ref{prog:P30} bez nowego
+  dowodu.}
+\sumitem{9--10}{\textbf{Jest symetryczna}, bo zamiana obu wielkości zostawia
+  oba argumenty dywergencji bez zmian.}
+\sumitem{11--15}{\textbf{Kawałki, z których się ją składa, symetryczne nie
+  są}: na tej samej parze $H(W \mid Z) = 0$, a
+  $H(Z \mid W) = \val{p31.zw.hzw}$, i obie drogi dochodzą do
+  $\val{p31.zw.mi}$.}
+\sumitem{16--19}{\textbf{Estymat wtykowy jest dodatni na danych
+  niezależnych}, w wartości oczekiwanej, przy każdym rozmiarze próby
+  \dash{} $\val{p31.bias.n10}$ nata przy $N = 10$ z dokładnego wyliczenia
+  wszystkich $\val{p31.bias.tables10}$ tabel.}
+\sumitem{20--21}{\textbf{Standardowa poprawka zawodzi najbardziej tam, gdzie
+  jest najbardziej potrzebna}: $\val{p31.bias.ratio10}$ raza obok przy
+  $N = 10$, zbiegając do $\val{p31.bias.ratio100}$ przy $N = 100$.}
+\sumitem{22--23}{\textbf{Szesnaście kategorii w każdą stronę wymaga
+  $\val{p31.big.need}$ pozycji}, żeby obciążenie zeszło poniżej jednego
+  procenta maksimum $\val{p31.big.max}$ nata \dash{} około
+  $\val{p31.big.per}$ na komórkę.}
+\sumitem{24--25}{\textbf{Sprawdzianem, który to rozstrzyga, jest jedno
+  dodatkowe uruchomienie}: przetasuj etykiety, puść cały potok jeszcze raz i
+  podaj tylko to, co siedzi ponad tym, co zwróci.}
+\sumitem{26--27}{\textbf{Przetwarzanie nie tworzy informacji}: jeśli
+  $X \to Y \to Z$, to $I(X; Z) \le I(X; Y)$, sprawdzone wobec wszystkich
+  $\val{p31.dpi.channels}$ kanałów w rodzinie.}
+\sumitem{28--33}{\textbf{Wynik sondy jest więc ograniczeniem od dołu}, a
+  najlepsza sonda w tej rodzinie i tak zostawia za sobą więcej niż jedną
+  czwartą. Lepsza sonda nie mówi nic o warstwie, i gorsza też nie.}
+\sumitem{35--38}{\textbf{Nic tutaj nie zostało zmierzone na prawdziwym
+  modelu}, a stawiane twierdzenie mówi, że zwykły materiał dowodowy nie
+  odróżnia tamtego twierdzenia od jego zaprzeczenia \dash{} a nie, że jest
+  ono fałszywe.}
+\end{summarybox}
+
+\begin{testexercises}
+\item $X$ jest jednostajne na $\{-2, -1, 1, 2\}$, a $Y = \lvert X \rvert$.
+  Bez liczenia dywergencji powiedz, ile wynosi $I(X; Y)$ i dlaczego.
+  \answerto{$H(Y) = \ln 2$ nata. $Y$ jest funkcją $X$, więc
+  $H(Y \mid X) = 0$ i $I(X; Y) = H(Y) - 0$. Ten sam argument co dla pary z
+  Programu~\ref{prog:P24}, z dwiema wartościami zamiast trzech.}
+\item Dwie wielkości mają $I(X; Y) = 0$. Ktoś wnioskuje, że ich korelacja
+  wynosi zero. Ma rację i czy odwrotność też jest bezpieczna?
+  \answerto{Ma rację, a odwrotność nie jest. $I = 0$ to niezależność, która
+  wymusza zerową korelację. Zerowa korelacja nie wymusza $I = 0$, i o tym
+  jest cała sekcja~1.}
+\item Liczysz wtykową informację wzajemną $\num{0.05}$ nata między binarną
+  cechą a binarną etykietą na $60$ pozycjach. Co zrobić najpierw?
+  \answerto{Porównać ją z obciążeniem na danych niezależnych przy tym
+  rozmiarze: tabela z sekcji~4 stawia tam wartość oczekiwaną między
+  $\val{p31.bias.n50}$ a $\val{p31.bias.n100}$ nata, więc większość
+  $\num{0.05}$ mogłaby być estymatorem. Przetasuj etykiety, puść jeszcze raz
+  i podaj różnicę.}
+\item Kolega podaje, że sonda na warstwie 20 punktuje wyżej niż ta sama
+  sonda na warstwie 4, i wnioskuje, że warstwa 20 niesie więcej informacji o
+  wejściu. Co jest złego w tym wniosku?
+  \answerto{Warstwa 20 jest liczona z warstwy 4, więc nierówność o
+  przetwarzaniu danych mówi, że nie może nieść więcej informacji o wejściu
+  \dash{} tylko mniej albo tyle samo. Zmieniło się to, jak łatwo sonda tego
+  rozmiaru potrafi ją wyciągnąć.}
+\item Zapisz $I(X; Y)$ na trzy sposoby: jako dywergencję i jako różnicę
+  entropii w każdym z dwóch kierunków.
+  \answerto{$\KL{p(x,y)}{p(x)p(y)}$, oraz $H(Y) - H(Y \mid X)$, oraz
+  $H(X) - H(X \mid Y)$. Wszystkie trzy to ta sama liczba; drugi i trzeci są
+  zbudowane z różnych kawałków.}
+\item Dlaczego estymatora wtykowego nie da się naprawić samym powiększeniem
+  próby, jeśli liczbie komórek wolno rosnąć razem z nią?
+  \answerto{Obciążenie idzie jak komórki na pozycje, więc powiększanie obu
+  naraz zostawia ten stosunek tam, gdzie był. Spaść muszą pozycje na
+  komórkę, i dlatego sekcja~4 stawia ten wymóg właśnie w tę stronę.}
+\end{testexercises}
+
+\canyou
+
+\begin{furtherproblems}
+\item Pokaż, że $I(X; X) = H(X)$, i powiedz słowami, co to znaczy.
+  \answerto{$H(X \mid X) = 0$, więc $I(X; X) = H(X) - 0 = H(X)$. Wielkość
+  mówi ci o sobie wszystko, a \enquote{wszystko} to dokładnie jej własna
+  entropia \dash{} dlatego entropię nazywa się czasem samoinformacją.}
+\item Program~\ref{prog:P30} pokazał, że jego dywergencja nie jest
+  symetryczna. Wyjaśnij w jednym zdaniu, dlaczego ta jest, nie licząc
+  niczego.
+  \answerto{Zamiana $X$ i $Y$ zostawia oba argumenty dywergencji bez zmian:
+  rozkład łączny to ta sama tabela, a iloczyn brzegów ten sam iloczyn.
+  Dywergencja nadal jest niesymetryczna; to ta konkretna para argumentów jest
+  nieruchoma przy zamianie.}
+\item Potok binuje ciągłą aktywację na $\val{p31.big.k}$ kubełków i liczy
+  informację wzajemną wobec $\val{p31.big.k}$-wartościowej etykiety. Ktoś
+  proponuje podwoić liczbę kubełków, żeby \enquote{rozdzielić więcej
+  struktury}. Co to robi z potrzebnym rozmiarem próby?
+  \answerto{Komórek robi się czterokrotnie więcej, więc obciążenie przy
+  ustalonej próbie rośnie mniej więcej czterokrotnie, a pozycje potrzebne do
+  utrzymania obciążenia rosną też mniej więcej czterokrotnie \dash{} z
+  $\val{p31.big.need}$ do jakichś szesnastu tysięcy. Drobniejsze biny kupują
+  rozdzielczość i płacą za nią pozycjami, a zapłata zwykle nie jest wnoszona.}
+\item Nierówność o przetwarzaniu danych mówi $I(X; Z) \le I(X; Y)$, gdy
+  $X \to Y \to Z$. Podaj $Z$, dla którego zachodzi ona z równością.
+  \answerto{Dowolna odwracalna funkcja $Y$ \dash{} choćby przenumerowanie
+  wartości. Nic nie zostaje scalone, więc nic nie ginie. To jest też test na
+  to, czy krok przetwarzania może cię cokolwiek kosztować: zapytaj, czy da
+  się go cofnąć.}
+\item Sekcja~4 zmierzyła obciążenie na danych \emph{niezależnych}.
+  Uzasadnij, że estymat wtykowy na danych \emph{zależnych} też nie jest
+  wiarygodny bez uruchomienia na przetasowanych etykietach.
+  \answerto{Obciążenie nie znika, gdy pojawia się prawdziwa zależność; ono
+  się do niej dodaje. Dodatni estymat to więc prawdziwa wielkość plus
+  nieznana ilość estymatora, a uruchomienie na przetasowanych etykietach jest
+  tym, co mierzy to drugie, żeby dało się je odjąć. Bez niego obu nie da się
+  rozdzielić.}
+\end{furtherproblems}
