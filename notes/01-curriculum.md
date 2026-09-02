@@ -48,10 +48,11 @@ Nine parts. **13 Foundation programs (F1--F13)** and **33 main programs
 Planned **2,418 frames**. The estimate that stood here — 460--540 pages at
 this page geometry — **is falsified by the written book and is wrong by a
 factor of about three**; see §20 item 1, which now carries the measurement.
-Forty-six of the forty-seven programs are written, and they set 1,295 pages in
-the trade format. The split into Parts I--VI and Parts VII--IX is still the
-clean one, and it is still an open question rather than a decision — but it is
-now a question with a number in front of it.
+All forty-seven programs are written, and they set 1,321 pages in the trade
+format. The split into Parts I--VI and Parts VII--IX is still the clean one,
+and it is still an open question rather than a decision — but it is now a
+question with a number in front of it, and the number will not move again
+except by the appendices.
 
 ---
 
@@ -607,10 +608,11 @@ Appendices:
 1. **One volume or two — still open, and the estimate it rested on is now
    measured and was wrong by a factor of about three.** The figure recorded
    here was 460--540 pages for ~2,418 frames, which is 0.21 pages a frame.
-   **Measured, August 2026: 1,811 teaching frames set 1,295 pages in the trade
-   format**, which is 0.72 — and that is with one program and four appendices
-   still to write.  (It was 1,757 frames in 1,267 pages when first taken,
-   before P33; the ratio has not moved.)
+   **Measured, August 2026: 1,863 teaching frames set 1,321 pages in the trade
+   format**, which is 0.71 — and that is with four appendices still to write.
+   (It was 1,757 frames in 1,267 pages when first taken, before P33, and 1,811
+   in 1,295 after it; the ratio has not moved across three re-measurements,
+   and every program is now written, so it will not move again.)
 
    The estimate is not mysteriously wrong. It was made before the Stroud layout
    pass existed, so a *frame* in it was a paragraph. A frame as built is a rule
@@ -620,19 +622,28 @@ Appendices:
    Further problems, with an answers appendix and a six-page index behind them
    all.
 
-   Measured from the trade build's own running heads, so the split can be
+   Measured from the trade build's own part-title pages, so the split can be
    priced rather than guessed:
 
-   | | pages |
-   |---|---|
-   | front matter + Part I (F1--F13) | 1--388 |
-   | Parts II--VI (P1--P22) | 389--882 |
-   | Parts VII--IX as written (P23--P33) + back matter | 883--1295 |
+   | | pages | count |
+   |---|---|---|
+   | front matter + Part I (F1--F13) | 1--388 | 388 |
+   | Parts II--VI (P1--P22) | 389--882 | 494 |
+   | Parts VII--IX (P23--P34) | 883--1212 | 330 |
+   | back matter (appendices, answers, index) | 1213--1321 | 109 |
 
-   So the proposed cut gives an 882-page first volume, which does not settle
-   it: at this geometry the book is nearer three volumes than two, or the
-   geometry has to change. **Decide before the front matter is written**, and
-   decide against these numbers rather than against the estimate.
+   So the proposed cut gives an 882-page first volume before any back matter,
+   which does not settle it: at this geometry the book is nearer three volumes
+   than two, or the geometry has to change. **Decide before the front matter is
+   written**, and decide against these numbers rather than against the
+   estimate.
+
+   The third row is a correction as well as an update. It previously read
+   `883--1295` and was labelled "Parts VII--IX as written + back matter",
+   which is 1295 minus the two rows above it — a subtraction rather than a
+   measurement, and it was not obvious from the table what it excluded. Read
+   off the part-title pages the four rows add to the total exactly. The 882
+   never depended on it.
 2. **`dotnetbox` or `codebox`** --- section 15(c).
 3. **Whether the mathematics packages may be hard requirements**, breaking the
    graceful degradation both companion preambles maintain --- section 15(a).
