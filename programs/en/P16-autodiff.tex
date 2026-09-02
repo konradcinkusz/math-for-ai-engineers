@@ -729,66 +729,66 @@ $\code{backward()}$ is, and there is nothing else in it.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{The derivative of a function from $m$ inputs to $n$
+\sumitem{1--2}{\result{\textbf{The derivative of a function from $m$ inputs to $n$
   outputs is an $n \times m$ matrix} \dash{} the Jacobian, one row per output
-  and one column per input.}
-\sumitem{3--4}{\textbf{Program~\ref{prog:P15}'s gradient is the one-output
-  case}, a single row, so nothing new was defined here.}
-\sumitem{5--6}{\textbf{A linear map is its own Jacobian}, which is
+  and one column per input}.}
+\sumitem{3--4}{\result{\textbf{Program~\ref{prog:P15}'s gradient is the one-output
+  case}, a single row, so nothing new was defined here}.}
+\sumitem{5--6}{\result{\textbf{A linear map is its own Jacobian}, which is
   Program~\ref{prog:F11}'s statement about a straight line one dimension count
-  up. An elementwise activation's Jacobian is diagonal.}
-\sumitem{9--10}{\textbf{The chain rule multiplies Jacobians}, in the order the
-  shapes allow, which is Program~\ref{prog:P06}'s composition.}
-\sumitem{11--14}{\textbf{Nobody forms a Jacobian.} What is computed is a
+  up. An elementwise activation's Jacobian is diagonal}.}
+\sumitem{9--10}{\result{\textbf{The chain rule multiplies Jacobians}, in the order the
+  shapes allow, which is Program~\ref{prog:P06}'s composition}.}
+\sumitem{11--14}{\result{\textbf{Nobody forms a Jacobian.} What is computed is a
   product with one, and the intermediates are then vectors rather than
-  matrices.}
-\sumitem{14--15}{The same product bracketed from either end costs differently
+  matrices}.}
+\sumitem{14--15}{\result{The same product bracketed from either end costs differently
   \dash{} Program~\ref{prog:P06} measured $\val{p06.cost.left}$ against
   $\val{p06.cost.right}$ for an identical answer. \textbf{Those two brackets
-  are the two modes.}}
-\sumitem{16--17}{\textbf{Forward mode costs one pass per input; reverse costs
+  are the two modes.}}}
+\sumitem{16--17}{\result{\textbf{Forward mode costs one pass per input; reverse costs
   one per output.} That is the whole decision procedure and it is two
-  integers.}
-\sumitem{17--18}{\textbf{A scalar loss makes reverse mode cheaper by a factor
+  integers}.}
+\sumitem{17--18}{\result{\textbf{A scalar loss makes reverse mode cheaper by a factor
   of the parameter count.} Nothing else about deep learning enters the
-  argument.}
-\sumitem{19--20}{Measured exactly over the rationals: $\val{p16.fwd.muls}$
+  argument}.}
+\sumitem{19--20}{\result{Measured exactly over the rationals: $\val{p16.fwd.muls}$
   multiplications forward against $\val{p16.rev.muls}$ reverse for an
   identical gradient, and \textbf{the ratio is the input count}, swept over
-  four widths.}
-\sumitem{21--22}{Program~\ref{prog:P13} is what makes the backward walk well
+  four widths}.}
+\sumitem{21--22}{\result{Program~\ref{prog:P13} is what makes the backward walk well
   defined: the graph has a topological order and \textbf{every one of them
-  computes the same values}.}
-\sumitem{23--24}{\textbf{Reverse mode must keep every layer's input}, because
+  computes the same values}}.}
+\sumitem{23--24}{\result{\textbf{Reverse mode must keep every layer's input}, because
   the Jacobian's entries depend on it. Memory grows with depth and with batch
-  size; forward mode needs none of it.}
-\sumitem{25--26}{\textbf{Checkpointing every $k$th layer holds
+  size; forward mode needs none of it}.}
+\sumitem{25--26}{\result{\textbf{Checkpointing every $k$th layer holds
   $\frac{L}{k} + k$ activations}, minimised at $k = \sqrt{L}$ \dash{} which is
-  where a derivative vanishes, not a rule of thumb.}
-\sumitem{26--27}{At $L = \val{p16.ckpt.layers}$ that is
+  where a derivative vanishes, not a rule of thumb}.}
+\sumitem{26--27}{\result{At $L = \val{p16.ckpt.layers}$ that is
   $\val{p16.ckpt.peak}$ held instead of $\val{p16.ckpt.layers}$, a factor of
   $\val{p16.ckpt.saving}$, for exactly $\val{p16.ckpt.passes}$ forward passes
-  rather than one.}
-\sumitem{28--29}{\textbf{A finite difference is a test, not an
+  rather than one}.}
+\sumitem{28--29}{\result{\textbf{A finite difference is a test, not an
   implementation}: it costs one evaluation per input and
   Program~\ref{prog:F11} measured its error floor, so agreement to a handful
-  of digits is what correct looks like.}
-\sumitem{30--31}{\textbf{$\relu$ at exactly zero has no derivative}, so an
+  of digits is what correct looks like}.}
+\sumitem{30--31}{\result{\textbf{$\relu$ at exactly zero has no derivative}, so an
   implementation chooses \dash{} the limits are $\val{p16.relu.left}$ and
   $\val{p16.relu.right}$ and this one returns $\val{p16.relu.chosen}$, without
-  saying so.}
-\sumitem{32--33}{\textbf{A detached value leaves the loss identical to the
+  saying so}.}
+\sumitem{32--33}{\result{\textbf{A detached value leaves the loss identical to the
   last bit} and a gradient component different by $\val{p16.detach.gap}$. A
-  term is missing rather than miscalculated.}
-\sumitem{34--35}{\textbf{An in-place write makes the tape a record of a
+  term is missing rather than miscalculated}.}
+\sumitem{34--35}{\result{\textbf{An in-place write makes the tape a record of a
   computation that did not happen}: the gradient here uses
-  $\val{p16.inplace.used}$ while the value holds $\val{p16.inplace.now}$.}
-\sumitem{36--37}{\textbf{All three leave the forward pass exactly right}, so
+  $\val{p16.inplace.used}$ while the value holds $\val{p16.inplace.now}$}.}
+\sumitem{36--37}{\result{\textbf{All three leave the forward pass exactly right}, so
   only a direct check of the derivative finds them \dash{} which is what the
-  finite difference is for.}
-\sumitem{38}{Autodiff is neither numerical nor symbolic. \textbf{It evaluates
+  finite difference is for}.}
+\sumitem{38}{\result{Autodiff is neither numerical nor symbolic. \textbf{It evaluates
   the chain rule on the graph the program actually ran}, to the same precision
-  as the forward pass.}
+  as the forward pass}.}
 \end{summarybox}
 
 \canyou

@@ -640,68 +640,67 @@ Wszystko inne wyprowadzono tutaj z nich w linijkę albo dwie.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\textbf{Pochodna po wektorze nie definiuje niczego nowego;
+\sumitem{1--2}{\result{\textbf{Pochodna po wektorze nie definiuje niczego nowego;
   potrzebuje układu.} Ta książka używa \textbf{układu licznikowego} \dash{}
   jeden wiersz na wyjście \dash{} zadeklarowanego, a nie przyjętego
-  milcząco.}
-\sumitem{3--4}{\textbf{W nim $\partial(W\vect{x})/\partial\vect{x}$ jest samym
+  milcząco}.}
+\sumitem{3--4}{\result{\textbf{W nim $\partial(W\vect{x})/\partial\vect{x}$ jest samym
   $W$}, sprawdzone do $\val{p18.layout.bound}$. Konwencji, która z
-  najłatwiejszego przypadku robi tożsamość, warto się trzymać.}
-\sumitem{5--6}{\textbf{Oba układy dzieli jedna transpozycja},
+  najłatwiejszego przypadku robi tożsamość, warto się trzymać}.}
+\sumitem{5--6}{\result{\textbf{Oba układy dzieli jedna transpozycja},
   $\val{p18.n.out} \times \val{p18.n.in}$ wobec $\val{p18.n.in} \times \val{p18.n.out}$. Żaden nie jest błędny;
   błędem jest mieszanie ich w jednym wyprowadzeniu, a ujawnia się to jako
-  błąd kształtu daleko od miejsca zmieszania.}
-\sumitem{8--9}{\textbf{Gradient skalara ma kształt tego, po czym się
+  błąd kształtu daleko od miejsca zmieszania}.}
+\sumitem{8--9}{\result{\textbf{Gradient skalara ma kształt tego, po czym się
   różniczkuje}, w obu układach. To sprawdzenie dostępne, zanim pochodna
-  zostanie zapisana.}
-\sumitem{10}{\textbf{Transponowanie, aż ruszy, się kończy}, i dlatego ten
+  zostanie zapisana}.}
+\sumitem{10}{\result{\textbf{Transponowanie, aż ruszy, się kończy}, i dlatego ten
   nawyk trwa \dash{} a przestaje działać w chwili, gdy dwa wymiary są równe,
-  bo wtedy zła transpozycja też rusza.}
-\sumitem{11--12}{$\partial L/\partial W = 2\vect{r}\vect{x}\T$ dla błędu
-  kwadratowego, sprawdzone do $\val{p18.sq.bound}$.}
-\sumitem{13--14}{\textbf{Gradient wagi jest iloczynem zewnętrznym},
+  bo wtedy zła transpozycja też rusza}.}
+\sumitem{11--12}{\result{$\partial L/\partial W = 2\vect{r}\vect{x}\T$ dla błędu
+  kwadratowego, sprawdzone do $\val{p18.sq.bound}$}.}
+\sumitem{13--14}{\result{\textbf{Gradient wagi jest iloczynem zewnętrznym},
   $\vect{g}\vect{x}\T$, dla dowolnej straty \dash{} i potrzebuje wejścia
-  warstwy, przez co przebieg wstecz potrzebuje aktywacji przebiegu w przód.}
-\sumitem{15--16}{\textbf{Pochodna $\softmax$ jest $n\times n$}, bo każde
-  wyjście dzieli mianownik z każdym wejściem.}
-\sumitem{16--17}{$J = \diag(\vect{p}) - \vect{p}\vect{p}\T$, sprawdzone do
-  $\val{p18.jac.bound}$.}
-\sumitem{18--19}{\textbf{Każdy wiersz $J$ sumuje się do zera}:
+  warstwy, przez co przebieg wstecz potrzebuje aktywacji przebiegu w przód}.}
+\sumitem{15--16}{\result{\textbf{Pochodna $\softmax$ jest $n\times n$}, bo każde
+  wyjście dzieli mianownik z każdym wejściem}.}
+\sumitem{16--17}{\result{$J = \diag(\vect{p}) - \vect{p}\vect{p}\T$, sprawdzone do
+  $\val{p18.jac.bound}$}.}
+\sumitem{18--19}{\result{\textbf{Każdy wiersz $J$ sumuje się do zera}:
   prawdopodobieństwa sumują się do $1$, cokolwiek robią wyniki, po
   zróżniczkowaniu. $\softmax$ przesuwa prawdopodobieństwo i nigdy nie robi go
-  więcej.}
-\sumitem{20--21}{Przy $n = 2$ sprowadza się do $\sigma'(a-b)$, na
+  więcej}.}
+\sumitem{20--21}{\result{Przy $n = 2$ sprowadza się do $\sigma'(a-b)$, na
   $\val{p18.gate.f07.pairs}$ parach \dash{} zróżniczkowana tożsamość z
-  Programu~\ref{prog:F07}, brama, a nie podobieństwo.}
-\sumitem{22}{\textbf{Entropia krzyżowa jest tu zdefiniowana, a uzasadniona
-  później}: $-\sum_j y_j \ln p_j$, czyli $-\ln p_c$ dla celu one-hot.
-  Program~\ref{prog:P26} mówi, dlaczego to właściwa rzecz do minimalizowania,
+  Programu~\ref{prog:F07}, brama, a nie podobieństwo}.}
+\sumitem{22}{\result{\textbf{Entropia krzyżowa jest tu zdefiniowana, a uzasadniona
+  później}: $-\sum_j y_j \ln p_j$, czyli $-\ln p_c$ dla celu one-hot.} Program~\ref{prog:P26} mówi, dlaczego to właściwa rzecz do minimalizowania,
   a Program~\ref{prog:P30}, co ona mierzy.}
-\sumitem{23--25}{\textbf{Gradient wynosi $\vect{p} - \vect{y}$}, a
+\sumitem{23--25}{\result{\textbf{Gradient wynosi $\vect{p} - \vect{y}$}, a
   wyprowadzenie jest jednym skróceniem: $1/p_c$ z pierwszego kroku spotyka
-  $p_c$ na przekątnej jakobianu.}
-\sumitem{26--27}{Czytane jako polecenie: obniż każdy wynik proporcjonalnie do
+  $p_c$ na przekątnej jakobianu}.}
+\sumitem{26--27}{\result{Czytane jako polecenie: obniż każdy wynik proporcjonalnie do
   prawdopodobieństwa, które ma, podnieś prawdziwy o to, którego mu brakuje.
-  Poprawka jest wielkością pomyłki.}
-\sumitem{28--29}{Warstwę wstecz, $\partial L/\partial W =
-  (\vect{p}-\vect{y})\vect{x}\T$, sprawdzone do $\val{p18.cew.bound}$.}
-\sumitem{30--31}{\textbf{Normalizacja warstwowa też nie działa po
+  Poprawka jest wielkością pomyłki}.}
+\sumitem{28--29}{\result{Warstwę wstecz, $\partial L/\partial W =
+  (\vect{p}-\vect{y})\vect{x}\T$, sprawdzone do $\val{p18.cew.bound}$}.}
+\sumitem{30--31}{\result{\textbf{Normalizacja warstwowa też nie działa po
   współrzędnych}, bo średnia i wariancja zależą od każdego wejścia; jej
   gradient niesie dwa człony poprawkowe, sprawdzone do
-  $\val{p18.ln.bound}$.}
-\sumitem{32--33}{\textbf{Łączenie, powód pierwszy: koszt.}
+  $\val{p18.ln.bound}$}.}
+\sumitem{32--33}{\result{\textbf{Łączenie, powód pierwszy: koszt.}
   $\val{p18.fuse.ratio}$ razy mniej operacji, a jakobian, którego nikt nie
-  tworzy, miałby $\val{p18.fuse.gib}$ GiB.}
-\sumitem{34--35}{\textbf{Powód drugi i nie chodzi w nim o szybkość}: droga
+  tworzy, miałby $\val{p18.fuse.gib}$ GiB}.}
+\sumitem{34--35}{\result{\textbf{Powód drugi i nie chodzi w nim o szybkość}: droga
   dwukrokowa tworzy $-1/p_c$, a $p_c$ wpada w niedomiar do zera, podczas gdy
-  $\vect{p}-\vect{y}$ nigdy nie tworzy odwrotności.}
-\sumitem{36--37}{Urwisko jest mniej więcej $\val{p18.cliff}$ pod największym
+  $\vect{p}-\vect{y}$ nigdy nie tworzy odwrotności}.}
+\sumitem{36--37}{\result{Urwisko jest mniej więcej $\val{p18.cliff}$ pod największym
   wynikiem, czyli na podłodze z Programu~\ref{prog:P01}. \textbf{Obie drogi
   nie są tą samą funkcją} i różnią się dokładnie tam, gdzie przebieg jest
-  najgorszy.}
-\sumitem{38--39}{\textbf{Matematyką są pochodne cząstkowe, a konwencją to,
+  najgorszy}.}
+\sumitem{38--39}{\result{\textbf{Matematyką są pochodne cząstkowe, a konwencją to,
   jak się je układa}; rachunek macierzowy ma swoją reputację dlatego, że
-  jedno bywa mylone z drugim.}
+  jedno bywa mylone z drugim}.}
 \end{summarybox}
 
 \canyou
