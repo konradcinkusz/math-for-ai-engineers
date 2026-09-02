@@ -4,8 +4,8 @@ Every number Program P29 prints, and the assertions that keep them honest.
 
 WHAT THE NEIGHBOURS ALREADY SPENT, read one brief item at a time before a line
 of this was written -- the discipline that made P27 come in at thirty-nine
-frames against sixty.  The brief lists four things and TWO OF THEM ARE HANDED
-HERE BY NAME, from file headers written by earlier passes:
+frames against sixty.  TWO OF THE BRIEF'S THREE PAYOFFS ARE HANDED HERE BY
+NAME, from file headers written by earlier passes:
 
   P19  section 5 works "why you cannot average perplexities" in full, with the
        measurement, and its own header says what is left:
