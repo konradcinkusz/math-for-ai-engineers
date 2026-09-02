@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P28 written, both editions \dash{} Parts I to VII entire.** P29–P34 are stubs carrying their briefs | 6 of 47 |
+| Programs | **F1–F13 and P1–P29 written, both editions \dash{} Parts I to VII entire, and Part VIII begun.** P30–P34 are stubs carrying their briefs | 5 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1168 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1182 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 975 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 987 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1188 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1207 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 993 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1008 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,22 +93,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **6 of 47 programs are stubs**, in each language. This is the whole of the
+- **5 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1376 computed values, all referenced, all present, plus the committed console
+- 1424 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 252 Mermaid sources, all rendering
-- 70 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 260 Mermaid sources, all rendering
+- 72 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **98 orphan-tail pages: 28 · 29 · 20 · 21** across `main-en`, `main-pl`,
+- **99 orphan-tail pages: 28 · 29 · 21 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
-  **P23 none**, P24 one, P25 two, P26 two, P27 two and **P28 none**
+  **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none** and P29 one
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -145,9 +145,9 @@ what was there before.
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
   **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22**,
   **53% in P23**, **46% in P24**, **48% in P25**, **52% in P26** and
-  **53% in P27** and **54% in P28** \dash{} P28 is the highest outside Part I,
-  with P23 and P27 next; P26 follows, and P13, P15 and P17 reach the book's own
-  rate.**
+  **53% in P27**, **54% in P28** and **55% in P29** \dash{} P29 is the highest
+  outside Part I, with P28 next and then P23 and P27; P26 follows, and P13, P15
+  and P17 reach the book's own rate.**
   **P24 is the first program whose rate is visible in its frame count**: nine
   of its sixty-four frames exist because the draft was raised from 36%, which
   is the elicitation ledger's cost measured in frames rather than in pages.
@@ -8559,6 +8559,239 @@ Pages 1168 / 1182 / 975 / 987, from 1146 / 1158 / 955 / 967.
 - Frame numbers mapped after writing: sections landed at
   `1--5 / 6--11 / 12--18 / 19--26 / 27--30 / 31--37`.
 
+### Program P29 pass, August 2026 --- Part VIII begins
+
+**Thirty-four teaching frames, thirty-six printed, both editions**, against a
+brief that projected forty-five. Six sections: how surprised should you be,
+entropy is average surprise, what a bit is, the effective number of choices,
+entropy at run time, and what a bits-per-token figure is missing.
+
+Twenty-second program under its brief's estimate, and the cause is the one
+Program~\ref{prog:P27} named rather than any of the three before it: **the
+brief was read as a checklist and two of its three payoffs turned out to be
+handed here by name**, by passes that had already written down what they were
+leaving. Program~\ref{prog:P19} §5 works \enquote{why you cannot average
+perplexities} in full, with the measurement, and its own header says what is
+left \dash{} *what a perplexity MEANS (the effective number of choices) ->
+P29*. Program~\ref{prog:P25} measures an attention row's entropy at three head
+sizes and its header says *entropy as a quantity in its own right -> P29*. So
+§4 owes the **reading** of a number the book already has and §5 owes the
+meaning of six committed ones, and neither may re-teach its neighbour.
+
+**What was genuinely left is one section.** §3 \dash{} entropy is the shortest
+average code length, and that is what makes a bit a thing somebody sends
+rather than a scale somebody picked. Program~\ref{prog:F03} owns the unit
+*conversion*; nothing in the book had said what a bit **is**.
+
+#### Every assertion passed on the first run, and Program P27's warning was right
+
+That pass recorded the finding and this one is its first test: **a script whose
+assertions all pass has told you only that it is self-consistent**, so read the
+formulas against the numbers anyway. Four defects were sitting in a script that
+ran green, and none of them is a kind any assertion would have caught.
+
+- **A number under two names, two hundred pages apart.** `p29.bpt` was
+  Program~\ref{prog:F03}'s committed `f03.nats.to.bits` \dash{} that exact
+  conversion of that exact loss \dash{} recomputed and emitted again. It is
+  Program~\ref{prog:F08}'s defect at the widest separation the book has
+  produced. It is now **gated and not emitted**, and the frames quote F03's
+  value directly.
+- **Two searches under one number.** `p29.code.assignments` was enumerated at
+  a codeword-length cap of six while the theorem check ran at seven, so the
+  page would have quoted a count about a different search from the one the
+  claim rests on. One cap throughout, and the count is
+  $\val{p29.code.assignments}$.
+- **An assertion weaker than its frame.** The maximum-entropy sweep asserted
+  that no distribution beats the uniform, where §2 says the maximum is
+  *attained*. That is Program~\ref{prog:P10}'s ridge finding from the other
+  side: a sweep that never lands on the point cannot establish attainment. The
+  grid now provably contains the uniform point (`GRID % 3 == 0` is asserted)
+  and the comparison is an equality.
+- **Two values duplicating a listing.** Program~\ref{prog:F11}'s finding, and
+  at a *different precision* than the transcript prints, which would have put
+  `4.0` and `4.00` on facing pages.
+
+**And a fifth, found by re-reading the same script in this pass**, which is
+Program~\ref{prog:P28}'s finding one program later: the `reproduces()` helper
+checked each bits-per-character figure against *its own* operands and said
+nothing about the sum a reader actually does \dash{} dividing the two figures
+printed side by side. **A helper is only as wide as the comparison it was
+pointed at.** The page's own row is now divided as the page prints it, and
+asserted.
+
+#### The one thing the book did not have: what a bit is
+
+Program~\ref{prog:F03} owns the conversion between nats and bits and the base
+warning. Nothing had said what a bit **is**, and §3 says it in the only way
+that is checkable: a prefix-free code exists with lengths $l_i$ exactly when
+$\sum_i 2^{-l_i} \le 1$, and **entropy is the shortest average code length
+those lengths can reach**.
+
+It is enumerated rather than argued. Every Kraft-admissible assignment is
+generated \dash{} $\val{p29.code.assignments}$ of them at a cap of
+$\val{p29.code.cap}$ \dash{} and the best is compared with the entropy over
+`Fraction`, with no tolerance anywhere:
+
+| alphabet | best average code | entropy | gap |
+|---|---|---|---|
+| dyadic, $(\frac12, \frac14, \frac18, \frac18)$ | $\val{p29.code.best}$ | $\val{p29.code.h}$ | **exactly zero** |
+| $(\frac25, \frac15, \frac15, \frac15)$ | $\val{p29.nondy.best}$ | $\val{p29.nondy.h}$ | $\val{p29.nondy.gap}$ |
+
+The first row is a **proof for that alphabet** rather than evidence about it,
+because nothing was left out \dash{} which is Program~\ref{prog:P14}'s
+distinction doing a second job, in the section that most invites a
+demonstration instead. The second row is why the bound is a bound: a length is
+a whole number of digits and $\logb{2} \frac{5}{2}$ is not.
+
+#### The payoff makes six numbers the book already had readable, and all six are gated
+
+$e^{H}$ is the number of equally likely choices with that entropy, so it
+returns $n$ exactly on a uniform distribution over $n$ \dash{} checked at
+$\val{p29.eff.checked}$ sizes over `Fraction` where the logarithm allows it.
+That one reading is the whole of §4 and §5, and it is worth having because it
+turns numbers three earlier programs committed into sentences:
+
+| what it was | what it says |
+|---|---|
+| F03's seven-way uniform, $\val{p29.seven.nats}$ nats | $\val{p29.seven.n}$ choices, exactly |
+| F02's $\val{p29.f02.loss}$ nats $\rightarrow$ F03's $\val{p29.f03.ppl}$ | $\val{p29.ppl.frac}$ per cent of a $\val{p29.vocab}$-token vocabulary |
+| P25's attention entropy without the division | $\val{p29.att.raw.eff}$ effective keys of $\val{p29.att.keys}$ |
+| P25's, with it | $\val{p29.att.scaled.eff}$ of $\val{p29.att.keys}$ |
+| F05's four tokens at $T = \num{0.5}, 1, 2$ | $\val{p29.tok.t05.eff}$, $\val{p29.tok.t10.eff}$, $\val{p29.tok.t20.eff}$ choices |
+
+**Every one of them is a cross-programme gate rather than a quotation**, which
+is Program~\ref{prog:P12}'s third kind \dash{} the same worked example
+continued. The F02-to-F03 chain is gated in **both** directions on
+Program~\ref{prog:P26}'s precedent. So this program cannot come apart from its
+four neighbours, and none of them can be corrected without it noticing.
+
+The best sentence the reading buys is P25's: an attention row that P25
+measured as giving $\val{p25.e9.raw.top.512}$ per cent of its weight to one key is
+\enquote{attending to $\val{p29.att.raw.eff}$ keys}, and the scaling buys back
+$\val{p29.att.scaled.eff}$ of $\val{p29.att.keys}$ \dash{} the same
+measurement P25 reported in nats, in the unit a design review can argue about.
+
+#### What §5 may conclude, and what it may not
+
+Entropy at run time is a real signal and it is cheap: it needs the
+distribution the model already computed and no second forward pass. What a low
+entropy licenses is exactly one sentence \dash{} *this model would give nearly
+the same answer if you asked again* \dash{} and that is repeatability, not
+accuracy. A confidently wrong model has an entropy of
+$\val{p29.wrong.ent}$ nats against an honestly uncertain one's
+$\val{p29.spread.ent}$.
+
+So the frame says **use it as a filter and never as a warrant**, and names the
+cost of getting it backwards: a dashboard built on an entropy threshold is
+green through exactly the incident it was bought for.
+
+#### §6: a ratio quoted without one of its two quantities
+
+Bits per character is bits per **token** times tokens per **character**, and
+the second factor belongs to the tokeniser and appears nowhere in a loss. The
+same model on the same text at $\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ tokens
+per character reports $\val{p29.bpc.a}$ and $\val{p29.bpc.b}$ bits per
+character \dash{} a factor of $\val{p29.bpc.ratio}$ in which **the model's
+contribution cancels exactly**, which the script asserts because it is the
+section's whole claim.
+
+Three consequences, each checkable rather than a caution: a model can lower
+its loss by changing its tokeniser with the weights untouched; two losses are
+comparable only under one tokeniser, and stating that condition costs a
+sentence; and a compression claim is a file size somebody can produce where a
+loss is not, which is why converting to it is worth the multiplication.
+
+That is this book's recurring complaint \dash{} a ratio quoted without one of
+its two quantities \dash{} arriving in the place it does the most damage,
+because two models are routinely compared on loss alone.
+
+#### Rule 2, and the figures
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P29.1 surprise-adds | 634 / 657 | 5.77 | 6.96 | 6.71 | 7.90 | 7.62 |
+| P29.2 code-budget | 595 / 628 | 6.39 | 7.41 | 7.02 | 8.42 | 7.97 |
+| P29.3 nats-to-count | 522 / 561 | 5.61 | 8.45 | 7.86 | 9.59 | 8.92 |
+| P29.4 two-tokenisers | 645 / 597 | 6.93 | 6.84 | 7.39 | 7.76 | 8.39 |
+
+All eight at three ranks and all above the aspect-ratio crossover on the first
+render, so no redesign. `p29-nats-to-count` at $522$ pt is the narrowest of
+the four and sets its node text at $\num{9.59}$ pt on A4, which is inside the
+band F03, F04 and F05 already occupy \dash{} checked against the recorded
+table rather than asserted, and the width budget was read before the nodes
+were written rather than after.
+
+Written against the frames **above** them, which is
+Program~\ref{prog:P22}'s rule, and **for the sixth pass running the last node
+of a three-rank chain needed no correction afterwards.** That is now long
+enough to say the rule works rather than that six passes were lucky.
+
+#### Parity: three rounds, every failure a recorded class
+
+- **A reference behind its maths, twice.** `Program~\ref{prog:F01} podaje
+  $2^{10} \approx 10^{3}$` had to be rebuilt so the reference leads, and
+  `dokładnie tak, jak Program~\ref{prog:P25} pokazuje dla $p(1-p)$` the same.
+  It is the class F06 lost three rounds to and F07 six, and it is still the
+  one to check for while translating.
+- **A summary item with two of them at once**, which is where P13, P15, P19,
+  P26 and P27 each hit it. Summary items are worth reading first.
+- **A bare decimal inside maths in both editions.** C10 caught `1.32`, which
+  the English owed as much as the Polish did \dash{} the half of that check
+  that is easy to forget.
+
+C7 reported four values the frames do not quote; all four emissions were cut
+on Program~\ref{prog:F11}'s finding rather than forced into the prose.
+
+#### Layout, and one round of lengthening cleared both cues
+
+Two orphaned cues \dash{} frame 7 in `main-en-a4` and frame 23 in
+`main-pl-a4` \dash{} cleared in **one round** by lengthening in both editions.
+Sixteenth confirmation of Program~\ref{prog:F06}'s two-sided rule and it has
+still never failed.
+
+Both added paragraphs earn their place. Frame 7's says that the unit is a
+choice of logarithm base and nothing more \dash{} the same fair coin is
+$\val{p29.coin.bits}$ bit or $\ln 2$ nats and neither is the more fundamental
+\dash{} and then says why the bit wins the rest of the program: §3 sends
+binary digits down a wire, and a digit is a two-way choice. Frame 23's says
+why the reading generalises at all: an attention row is a distribution,
+because the $\softmax$ is what makes it sum to one, so §2's definition applies
+to it unchanged. Nothing in this program was built for language models.
+
+**A Polish manifest line measured 48 characters against
+Program~\ref{prog:P14}'s budget of \enquote{under about 48}, and it was left
+alone deliberately.** The build is the instrument for that column, it reported
+no box, and this file's own rule is to be led by the measurement rather than by
+the guideline that summarises earlier ones. Recorded so that the next person
+meets the boundary case with the reasoning rather than the number.
+
+The overfull multiset came back element for element to the baseline in all
+four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with zero overfull
+vboxes, no stranded openers, no stranded headings and no orphaned cues.
+**One orphan tail added, in `main-en-a4`**: 28, 29, 21, 21 against the pre-P29
+28, 29, 20, 21.
+
+Pages 1188 / 1207 / 993 / 1008, from 1168 / 1182 / 975 / 987.
+
+#### Also
+
+- Traps 282 to 289 added to `notes/02`.
+- **Elicitation 55%, the highest outside Part I**, above
+  Program~\ref{prog:P28}'s 54% and Programs~\ref{prog:P23} and
+  \ref{prog:P27}'s 53%, and again with **no conversions at all** because the
+  frame plan was written that way. That is four consecutive programs
+  (P26, P27, P28, P29) demonstrating the same thing, so the finding is
+  settled: **designing the rate in is free and raising it afterwards is
+  not.** Program~\ref{prog:P24} paid nine frames for ten points.
+- The listing was extracted from the finished PDF and run as a REPL would: it
+  prints `(4.0, 1.18)`, which is what the page prints, and the rounding is
+  **inside** the listing, which is Program~\ref{prog:P19}'s rule applied
+  while writing rather than after.
+- The issue's *No Quiz (Foundation-only)* checkbox is stale in the way P04,
+  P14, P24, P25, P26, P27 and P28 each found it stale.
+- Frame numbers mapped after writing: sections landed at
+  `1--4 / 5--10 / 11--18 / 19--25 / 26--30 / 31--34`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -8830,30 +9063,46 @@ clone instead.
 
 ## What is left
 
-1. **Six programs, and Parts I to VII are complete.** F1 to F13 and P1 to P28,
-   both editions. What remains is Part VIII (P29--P31), Part IX (P32--P34)
-   and the appendices.
+1. **Five programs, and Part VIII is begun.** F1 to F13 and P1 to P29, both
+   editions. What remains is P30 and P31, Part IX (P32--P34) and the
+   appendices.
 
-   **P29 is next** \dash{} *Information, entropy and surprise*, deps and frame
-   estimate in `tools/programs.json`. Read Program~\ref{prog:P28}'s closing
-   frame first: it hands over by name, saying the next question is not how
-   sure you are but **how much a message is worth**.
+   **P30 is next** \dash{} *Cross-entropy and KL divergence*, deps and frame
+   estimate in `tools/programs.json`. Read Program~\ref{prog:P29}'s closing
+   frame first: it hands over by name and states the shape of the answer
+   \dash{} the moment you ask what it costs to use one distribution's code on
+   another's outcomes, the answer **splits into the target's own entropy plus
+   an excess**, and that excess is the object P30 defines and shows is not
+   symmetric.
 
-   **Three written programs owe P29 or P30 something, and two of them say so
-   in a box.** Program~\ref{prog:P18} gives cross-entropy a definitional frame
-   and names P30 for the meaning; Program~\ref{prog:P22} states its whole
-   payoff in terms of a KL-penalised objective and declares the one fact it
-   uses, naming P30; and Program~\ref{prog:P28} §6 prices a miscalibrated
-   judge in **odds** deliberately and says in as many words that the reading
-   in nats is P30's. So Part VIII opens with three debts already written down,
-   which is the cheapest starting position any part has had.
+   **Every debt P30 is owed is already written down in the program that owes
+   it**, which is the cheapest starting position any program in this book has
+   had. Do not count them \dash{} `grep -rn 'prog:P30' programs/en/*.tex`
+   prints the list with its contexts, and reading it is the first thing to do.
+   What it names: Program~\ref{prog:P18} gives cross-entropy a definitional
+   frame and says *what it measures* is P30's; Program~\ref{prog:P22}
+   declares the one KL fact its whole payoff rests on;
+   Program~\ref{prog:P26} says the excess *has a name and is P30's*;
+   Program~\ref{prog:P28} §6 prices a miscalibrated judge in **odds**
+   deliberately and hands the reading in nats over; Program~\ref{prog:P02}
+   says P30 gives cross-entropy its meaning in bits; and Programs~F02 and F03
+   both point here for units and meaning. P29 supplies the whole of the
+   machinery \dash{} surprise, entropy, the code-length theorem and the
+   effective-count reading \dash{} and computes the entropy of **one**
+   distribution throughout, saying so where a reader will expect otherwise.
 
-   **Read the brief as a checklist.** Program~\ref{prog:P27} found two of its
-   seven itemised deliverables already on the page and came in at
-   thirty-nine frames against sixty; Program~\ref{prog:P28} found all five of
-   its own still owed and came in at thirty-seven against fifty. Both answers
-   were cheap and neither was available from the general question
-   \enquote{what is left of the subject}.
+   **Read the brief as a checklist, and read the neighbours' file headers with
+   it.** Program~\ref{prog:P27} found two of its seven itemised deliverables
+   already on the page and came in at thirty-nine frames against sixty;
+   Program~\ref{prog:P28} found all five of its own still owed and came in at
+   thirty-seven against fifty; Program~\ref{prog:P29} found two of three
+   handed to it **by name**, because Programs~\ref{prog:P19} and
+   \ref{prog:P25} had each written *-> P29* beside the thing they were
+   leaving. All three answers were cheap and none was available from the
+   general question \enquote{what is left of the subject} \dash{} and the
+   third was the cheapest of the lot, because a neighbour had already done the
+   deciding. **So write the pointer when you leave something**, in the header,
+   with the program named.
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -8876,10 +9125,10 @@ clone instead.
    and moving the statement into the next frame's answer. P04 did three of
    those and went 26% to 35% without adding a frame; P23 did ten and went 33%
    to 53% for two frames, which is the measurement to plan against.
-   **P26, P27 and P28 are now three consecutive demonstrations that the rate
-   is free when it is designed in**: 52%, 53% and **54%** with no conversions
-   at all, because all three frame plans were written that way \dash{} and
-   P28 is the highest outside Part I. **This is the largest genuinely
+   **P26, P27, P28 and P29 are now four consecutive demonstrations that the
+   rate is free when it is designed in**: 52%, 53%, 54% and **55%** with no
+   conversions at all, because all four frame plans were written that way
+   \dash{} and P29 is the highest outside Part I. **This is the largest genuinely
    parallelisable job in the repository**, because it touches three merged
    program files and nothing else; the programs themselves are not
    parallelisable, for the reason the frame estimates below record.
@@ -8918,7 +9167,11 @@ clone instead.
    already on the page, by name, in Program~\ref{prog:P25} §4. **P28 came in
    at thirty-seven against fifty** with every one of its brief's five payoffs
    still owed \dash{} the neighbours had supplied only the machinery, and the
-   program defines no new object at all.
+   program defines no new object at all. **P29 came in at thirty-four against
+   forty-five**, for P27's reason rather than any of the other three: read as
+   a checklist, two of its three payoffs turned out to be handed here **by
+   name**, in the headers of Programs~\ref{prog:P19} and \ref{prog:P25},
+   which had written down what they were leaving.
    **A brief's frame estimate is otherwise a planning figure from before its
    neighbours were written**, and the elicitation rate is paid in frames on top
    of it. It is not a target \dash{} and the record above is also the reason

@@ -2904,3 +2904,71 @@ and unusable are compatible, which is trap 253 arriving from the other end.
      probability that the arm is best. The right rate depends on how much
      evidence you have, which changes hourly, so a constant is one point on a
      moving curve. Owner: P28 §5.
+
+### Entropy and surprise, written (P29)
+
+282. *“Surprise is just another word for improbability.”* It is a **function**
+     of the improbability, and the logarithm is forced rather than chosen: two
+     independent events at p = 1/2 have surprises that **add** to two bits
+     while their probabilities multiply to 1/4, and a single event at 1/4
+     gives the same two bits. Nothing sensible adds two improbabilities. That
+     additivity is why F03 computes a sequence's likelihood in logarithms and
+     why P01's product underflows to zero where the sum does not.
+     Owner: P29 §1.
+283. *“A probability of one in a thousand is ten bits of surprise.”* It is
+     9.97, because a thousand is not a power of two — F01's own
+     2^10 ≈ 10^3 read backwards, and the shortfall is the same one F01
+     measures at 2.40 per cent. Harmless at one token and not over a
+     sequence, where F01's compounding trap applies unchanged. Write the
+     digits rather than the round number, because §3 turns on a bit being a
+     countable thing. Owner: P29 §1.
+284. *“Entropy measures how much information is in the message.”* It measures
+     how much you did not already know, which is a property of the
+     **distribution** and not of any message. A source that always emits the
+     same token has entropy zero: the token still arrives, still occupies a
+     slot, still costs a forward pass, and carries nothing. So the same text
+     has different entropies under different models, and a claim of the form
+     “this text contains N bits” is incomplete until it names the distribution
+     it was measured against — which is exactly what §6 is about.
+     Owner: P29 §2.
+285. *“A short codeword is free, so give the common symbols short ones and be
+     done.”* The first half of the instruction is right and the reason is
+     the half people skip: a prefix-free code spends a whole **branch** on a
+     short codeword, and Kraft's inequality prices that exactly — a set of
+     lengths is admissible if and only if the sum of 2^(-l_i) is at most one.
+     That is the constraint under which entropy is a floor rather than a
+     scale somebody picked. Owner: P29 §3.
+286. *“Entropy is about compression, so my model's loss says how well it would
+     compress.”* The first half is right and the second is a claim with a
+     quantity missing. Entropy above is per **symbol** of a known alphabet, a
+     loss is per **token**, and a compression figure is per **character**.
+     And the codes assume the distribution is known to the receiver, which a
+     model's is not — that does not break the bound, it is why the bound is a
+     bound. Owner: P29 §3, paid in §6.
+287. *“A perplexity of seven means the model was considering seven tokens.”*
+     At one position on one distribution that is exactly right and is what §4
+     builds. A **reported** perplexity is almost never one position: it is the
+     exponential of a *mean* loss over a corpus, and P19 measured what that
+     hides — at a spread of two nats the per-token effective counts range over
+     orders of magnitude while the reported figure sits in the middle, and no
+     position at all need be weighing seven tokens. Owner: P29 §4.
+288. *“Low entropy means the model is confident, so I can trust the answer.”*
+     The first clause is a definition and the second does not follow. What a
+     low entropy licenses is one sentence: *this model would give nearly the
+     same answer if you asked again*. That is repeatability, not accuracy. An
+     entropy threshold catches the model that knows it is guessing, which is
+     real and cheap, and is silent on the confident hallucination, which is
+     the case that costs the most — so a dashboard built on it is green
+     through exactly the incident you care about. Use it as a filter and never
+     as a warrant. Owner: P29 §5.
+289. *“Model A's loss is lower than model B's, so A is the better model.”*
+     Only under one tokeniser. Bits per character is bits per token times
+     **tokens per character**, and the second factor belongs to the tokeniser
+     and appears nowhere in the loss: the same model on the same text at two
+     tokenisers gives bits-per-character figures differing by exactly the
+     tokenisers' ratio, with the model's contribution cancelling. So a model
+     can lower its loss by changing its tokeniser with the weights untouched,
+     and a comparison of losses is a comparison of models only when the
+     tokeniser is held fixed. It is this book's recurring complaint — a ratio
+     quoted without one of its two quantities — arriving where it does the
+     most damage. Owner: P29 §6.
