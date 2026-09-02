@@ -1,0 +1,11 @@
+>>> from math import log, inf
+>>> def kl(a, b):    # nats; inf if b is 0 where a is not
+...     if any(x and not y for x, y in zip(a, b)):
+...         return inf
+...     s = sum(x * log(x / y) for x, y in zip(a, b) if x)
+...     return round(s, 4)
+>>> p, q = [0.9, 0.1], [0.5, 0.5]
+>>> kl(p, q), kl(q, p)
+(0.3681, 0.5108)
+>>> kl([0.5, 0.5], [1.0, 0.0]), kl([1.0, 0.0], [0.5, 0.5])
+(inf, 0.6931)
