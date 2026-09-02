@@ -12,7 +12,7 @@ Read this before touching a program.
 |---|---|---|
 | Structure | Four mains over one `body.tex`, shared preamble, `structure.tex`, Makefile, CI, parity tooling, Mermaid pipeline | — |
 | Front matter | Title page, *How to use this book*, Introduction — **both editions** | — |
-| Programs | **F1–F13 and P1–P29 written, both editions \dash{} Parts I to VII entire, and Part VIII begun.** P30–P34 are stubs carrying their briefs | 5 of 47 |
+| Programs | **F1–F13 and P1–P30 written, both editions \dash{} Parts I to VII entire, and Part VIII half done.** P31–P34 are stubs carrying their briefs | 4 of 47 |
 | Appendices | A (answers, generated) and B (notation) drafted; C–F are stubs | C, D, E, F |
 
 **Two languages times two paper formats, four PDFs, all clean.** A4 at 12pt is
@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1188 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1207 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 993 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1008 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1216 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1233 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1015 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1028 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -93,22 +93,22 @@ what was there before.
 
 **Debt ledgers, reported by CI on every build** (`make debt`):
 
-- **5 of 47 programs are stubs**, in each language. This is the whole of the
+- **4 of 47 programs are stubs**, in each language. This is the whole of the
   remaining work and it dwarfs everything else.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1424 computed values, all referenced, all present, plus the committed console
+- 1454 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass
-- 0 `verifybox` blocks · 260 Mermaid sources, all rendering
-- 72 `\transcript{}` references, every one backed by a committed file and
+- 0 `verifybox` blocks · 268 Mermaid sources, all rendering
+- 74 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **99 orphan-tail pages: 28 · 29 · 21 · 21** across `main-en`, `main-pl`,
+- **100 orphan-tail pages: 29 · 29 · 21 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4` \dash{} P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
-  **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none** and P29 one
+  **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one and **P30 one**
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
   41 before F8, 43 before F9, 45 before F10, 49 before F11, 51 before F12,
   55 before P1, 57 before P2, 59 before P3, 60 before P4, 65 before P5 and 68
@@ -145,9 +145,9 @@ what was there before.
   **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
   **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22**,
   **53% in P23**, **46% in P24**, **48% in P25**, **52% in P26** and
-  **53% in P27**, **54% in P28** and **55% in P29** \dash{} P29 is the highest
-  outside Part I, with P28 next and then P23 and P27; P26 follows, and P13, P15
-  and P17 reach the book's own rate.**
+  **53% in P27**, **54% in P28**, **55% in P29** and **52% in P30** \dash{} P29 is the
+  highest outside Part I, with P28 next and then P23 and P27; P26 and P30
+  follow, and P13, P15 and P17 reach the book's own rate.**
   **P24 is the first program whose rate is visible in its frame count**: nine
   of its sixty-four frames exist because the draft was raised from 36%, which
   is the elicitation ledger's cost measured in frames rather than in pages.
@@ -8792,6 +8792,346 @@ Pages 1188 / 1207 / 993 / 1008, from 1168 / 1182 / 975 / 987.
 - Frame numbers mapped after writing: sections landed at
   `1--4 / 5--10 / 11--18 / 19--25 / 26--30 / 31--34`.
 
+### Program P30 pass, August 2026
+
+**Forty-six teaching frames, forty-eight printed, both editions**, against a
+brief that projected fifty-five. Eight sections: what it costs to use the
+wrong code, the excess cannot be negative, it is not symmetric, what a zero
+costs each way round, mode-covering and mode-seeking, it is not a distance,
+why not simply symmetrise it, and the direction you are already minimising.
+
+Twenty-third program under its brief's estimate, and the cause is
+Program~\ref{prog:P27}'s: **the brief was read as a checklist and its
+machinery turned out to be spent while its content was not.**
+Program~\ref{prog:P29} §3 supplies the whole of the coding argument
+exhaustively enumerated; Program~\ref{prog:P26} supplies cross-entropy as a
+negative log-likelihood; Program~\ref{prog:P18} supplies its derivative;
+Program~\ref{prog:P19} supplies Jensen in both directions, so
+$\KL{p}{q} \ge 0$ is two lines from a theorem the reader already has rather
+than a new proof; and Programs~\ref{prog:F09} and \ref{prog:P05} supply the
+triangle inequality **with its equality condition**, which is what makes §6's
+contrast land as a misnomer rather than as pedantry.
+
+**What no written program mentions at all** is the asymmetry's cost:
+mode-covering, mode-seeking, Jensen--Shannon, and the fact that minimising a
+training loss picks one of the two directions for you. That is P30's own, and
+it is four of the eight sections.
+
+#### Every debt was written down in the program that owed it
+
+Eight programs point here by name and a ninth points from a file header, and
+this file's own instruction was to read them rather than count them. That is
+the cheapest starting position any program in the book has had, and it is
+worth recording what it bought: **the arrival needed no new computation at
+all.**
+
+Program~\ref{prog:P29} §3 reports that on the non-dyadic alphabet
+$(\frac25, \frac15, \frac15, \frac15)$ the best code averages
+$\val{p29.nondy.best}$ bits against an entropy of $\val{p29.nondy.h}$, and
+calls the $\val{p29.nondy.gap}$ gap *the rounding of a length to a whole
+number*. The winning lengths are $(1, 2, 3, 3)$ with a Kraft sum of exactly
+one, so the code implies the distribution $q_i = 2^{-l_i}$ \dash{} which is
+**P29's own dyadic alphabet, the other row of the same table**. So
+
+\[ H(p) + \KL{p}{q} \;=\; \val{p29.nondy.h} + \val{p30.src.kl}
+   \;=\; \val{p30.src.ce} \]
+
+exactly, and P30's opening move is to say what a number already on the page
+**is**. The two alphabets P29 chose in order to contrast a dyadic case with a
+non-dyadic one turn out to be the source and the code of one divergence.
+
+That is Program~\ref{prog:P12}'s third kind of gate \dash{} the same worked
+example continued \dash{} and it is the cleanest instance available anywhere
+in the book, because the number was already committed and already meant
+something.
+
+#### The measurement was probed before drafting, and two designs failed first
+
+The brief says the mode behaviour must be **measured on a bimodal target, not
+asserted**, and Program~\ref{prog:P05}'s greedy-packing failure is the
+standing warning: a demonstration whose answer depends on where an optimiser
+stopped **measures the search rather than the geometry**. So the design was
+run as a probe before a line of prose existed, and two versions of it were
+wrong.
+
+- **A target with zeros in it destroys the asymmetry.** Reverse KL came back
+  infinite for $77$ of $81$ candidates, because a zero in the *target* is a
+  zero in reverse KL's second argument. The target has to be **strictly
+  positive everywhere** for the mechanism to be visible at all.
+- **A target whose modes are not sharp enough leaves $-H(q)$ dominating**, so
+  reverse KL still preferred a wide candidate and the finding disappeared.
+
+Both were found by running the design rather than by reasoning about it,
+which is this file's recorded rule arriving one step earlier than usual
+\dash{} before there was any prose for an assertion to contradict.
+
+**The mechanism that survived needs no optimiser at all**, which is what makes
+it exact. Forward KL contains $p_i \ln(p_i/q_i)$, so a $q$ that puts zero
+where $p$ is positive costs $+\infty$; reverse KL contains $q_i \ln(q_i/p_i)$,
+so the same omission costs it **nothing**, because the sum never visits that
+outcome. Every candidate in a $\val{p30.fam.n}$-member family is then
+enumerated and the minimiser of each direction reported \dash{} a proof over
+that family rather than a search, which is Program~\ref{prog:P14}'s
+distinction doing exactly the job P05 warns about.
+
+| | forward | reverse |
+|---|---|---|
+| candidate chosen | the widest, full support | the narrowest, a point mass |
+| its width | $\val{p30.fwd.width}$ bins | $\val{p30.rev.width}$ bin |
+| mass left on the second mode | $\val{p30.fwd.mode2}$ per cent | **exactly zero** |
+| candidates with a finite value | $\val{p30.fin.fwd}$ of $\val{p30.fam.n}$ | $\val{p30.fin.rev}$ of $\val{p30.fam.n}$ |
+
+Asserted over **all $\val{p30.targets.n}$ targets tried**, including one whose
+second mode carries $\val{p30.head.mode2}$ per cent of the distribution and
+which the reverse direction throws away entirely. So the finding is a property
+of **which distribution sits in the numerator of the ratio** rather than of
+the target, and the script says so over the whole set rather than reporting
+one cell.
+
+#### The triangle inequality does not merely fail, it fails as the common case
+
+On an exact grid of distributions on three points with denominator
+$\val{p30.tri.den}$, **$\val{p30.tri.bad}$ of $\val{p30.tri.total}$ ordered
+triples violate it** \dash{} $\val{p30.tri.pct}$ per cent, over `Fraction`
+with no tolerance anywhere. The worst on that grid is a detour
+$\val{p30.tri.gap}$ nats **shorter** than going direct:
+$\val{p30.tri.direct}$ against $\val{p30.tri.via}$.
+
+\enquote{Sometimes fails} would have been a hedge covering a quarter of all
+cases. And the contrast is against a property the reader can check, because
+Program~\ref{prog:F09} gave them the inequality *with* its equality
+condition \dash{} which is why the misnomer lands rather than reading as
+pedantry.
+
+#### And Jensen--Shannon's cost is one line
+
+Two point masses $\val{p30.js.seps}$ bins apart and one bin apart are at
+**exactly the same** Jensen--Shannon distance, $\ln 2 = \val{p30.js.cap}$,
+where KL is infinite for both. So the symmetric bounded alternative reports
+the same number however far apart the distributions are: it saturates, and it
+saturates in precisely the regime a training run starts in.
+
+That is the honest answer to *why not simply symmetrise it*, and it needs no
+hedging \dash{} KL's unboundedness is a gradient signal where JS has none, and
+the asymmetry is the thing §5 showed you were choosing on purpose.
+
+#### The payoff closes Program P26's loop from the other side
+
+Minimising cross-entropy against a fixed dataset **is** minimising the forward
+divergence to the empirical distribution, because the identity's other term is
+$H(\hat p)$, a property of the file, and no gradient reaches it. Checked at
+three models, exactly, and against a uniform model the page prints the
+identity with three numbers in it:
+$\val{p30.emp.ce.uniform} = \val{p30.emp.h} + \val{p30.emp.kl.uniform}$.
+
+So §5's choice was made for the reader by the shape of the objective long
+before anybody discussed it, and the consequence is checkable rather than
+rhetorical: **every run launched against a fixed dataset minimised the
+mode-covering direction**, which is why a model asked for something ambiguous
+hedges across the possibilities rather than committing to one. It was trained
+by an objective that pays an unbounded price for putting no mass where the
+data had some, and nothing at all for spreading.
+
+Program~\ref{prog:P26} said the excess *has a name and is P30's*; this is the
+same identity read from the training end rather than the estimation one.
+
+#### The two gates the pass earned, and both are the recorded classes
+
+**One fired on its first run and named a real defect.** The arrival gate
+asserted this program's cross-entropy against `p29.code.best`, which is the
+**dyadic** row of P29's table; the non-dyadic one is `p29.nondy.best`. Two
+committed values that look like one, in the very table P29 wrote in order to
+contrast them \dash{} which is Program~\ref{prog:F08}'s defect appearing
+inside the mechanism built to prevent it. It failed loudly rather than
+quietly, which is the whole argument for writing the gate before the prose.
+
+**The second was written for this pass and is P28's finding applied.** §8
+prints all three terms of the identity on one page, so a reader will *add* the
+two on the right. The existing assertion was on the underlying floats and had
+nothing to say about that \dash{} which is exactly the gap
+Program~\ref{prog:P28} found on an inequality and Program~\ref{prog:P29} found
+again on a row of a table. The sum is now checked **in the form the page
+prints it**, because that is the only form anybody will check.
+
+#### Two things caught by reading rather than by any gate
+
+- **A transcript that demonstrated symmetry in the section about asymmetry.**
+  The first version used $(\num{0.9}, \num{0.1})$ against
+  $(\num{0.1}, \num{0.9})$, whose two divergences are equal **by
+  construction** \dash{} a listing illustrating the asymmetry with a pair that
+  does not have one. It is $(\num{0.9}, \num{0.1})$ against
+  $(\num{0.5}, \num{0.5})$ now, which gives $\num{0.3681}$ and $\num{0.5108}$.
+- **A tail ratio dropped on Program~\ref{prog:F05}'s precedent.** F05's exact
+  ratio is $\num{51.7}$ and its own printed table divides to $\num{53.1}$,
+  which is why that program states a bound; quoting the $\num{53.1}$ here
+  would have imported a figure the source page cannot support. Asserted in the
+  script and not emitted.
+
+#### The elicitation rate broke a run of four, and the cost was measured
+
+**52%**, equal with Program~\ref{prog:P26} and below Programs
+\ref{prog:P27}, \ref{prog:P28} and \ref{prog:P29}. Those four were designed in
+from the frame plan and cost nothing. **This one was not**: the finished draft
+measured 41%, and six conversions took it to 52% for **two frames**.
+
+So the run of four is broken and the finding it established is unharmed,
+because the price is now measured at a third point: Program~\ref{prog:P23}
+paid two frames for twenty points, Program~\ref{prog:P24} paid nine for ten,
+and this pass paid two for eleven. **Designing it in is free; retrofitting it
+is cheap when the frames are short and dear when they are long.**
+
+The honest reason the plan came in at 41% is the one
+Program~\ref{prog:P05} recorded: §1 to §4 are derivations, and a derivation
+has fewer places to stop and ask than a section built on numbers. Five of the
+six conversions are in §5 to §8, where the material is measurements. Four of
+them produced the P06 pattern \dash{} a frame opening with `\ans` and ending
+with `\dotline`.
+
+#### Parity: two rounds, and neither was a word-order divergence
+
+**C4, C8, C12 and C16 all passed on the first run** \dash{} the ninth program
+to manage it, and the second running (after Program~\ref{prog:P28}) where the
+correction rounds were something other than the ordered-token classes.
+
+- **C10 fired on three bare decimals per edition**, all of them the subscript
+  in $p_{\num{0.5}}$ naming a distribution by its temperature. The fix was not
+  to wrap them: a distribution named by a **shape** reads better and carries
+  no decimal at all, so they are $p_{\text{peaked}}$ and $p_{\text{broad}}$ in
+  English and $p_{\text{szpiczasty}}$ and $p_{\text{szeroki}}$ in Polish.
+  Note the `\text{}`, which is Program~\ref{prog:P26}'s rule \dash{} `\mathrm{}`
+  names an operator and must not be translated.
+- **C7 reported two values the frames did not quote**, and here the fix was
+  the other way round from Program~\ref{prog:F11}'s usual one: they were
+  **worth quoting**, because printing all three terms makes the identity
+  concrete where stating it leaves it abstract. That is what earned the
+  printed-form assertion above.
+
+#### An over-correction to a lint became three overfull boxes
+
+C10 fired on three bare decimals per edition \dash{} the subscript in
+$p_{\num{0.5}}$, naming Program~\ref{prog:F05}'s distribution by its
+temperature. The check was right: a bare decimal in a Polish edition owes a
+comma. **The fix it asks for is `\num{}` around the decimal, and what was
+written instead was a long word.** $p_{\text{peaked}}$ is seventeen
+characters set as text where $p_{\num{0.5}}$ is eight, and the clause
+carried two of them inside two `\KL{}{}` spans.
+
+The next build came back with a **$\num{62.7}$ pt** hbox, the largest this
+book has produced from ordinary prose. It went into a display, on the
+recorded rule \dash{} and the build after **that** produced a
+$\num{46.9}$ pt box at a *third* site, inline, in **Polish only**, because
+the same sentence in English is short enough to break.
+
+**Fixing the instance was not fixing the class**, which is
+Program~\ref{prog:P28}'s finding arriving two programs later and in a
+different medium. And the class was never the width of a span: it was the
+name. The two distributions **are** §1's $p$ and $q$ with a particular pair
+in them, so they are called $p$ and $q$, declared in one clause where the
+prose already says *peaked* and *broad* in words. Every downstream formula is
+then two characters wide, C10 has nothing to complain about because there is
+no decimal left, and the notation connects §3 to §1 instead of inventing a
+private pair of names for one section.
+
+**So the generalisable half is not \enquote{a lint fix can cost you a
+box}** \dash{} though it can, and no gate connects a source-level check to a
+page-level one. It is narrower and more useful: **when a check names a token,
+fix the token it names.** C10 objected to a decimal and the decimal was
+replaced with something else entirely, which satisfied the check by
+removing the thing it was looking at rather than by correcting it. The width
+was the symptom; the over-correction was the defect; and the right answer
+turned out to be shorter *and* better notation than what was there before the
+lint fired.
+
+**And one box was a class this book has not recorded: a display can overflow
+too.** The Jensen chain is five relations on one line, and a display gets its
+own line but not an unlimited one. Broken after the inequality with `align*`,
+which Programs~\ref{prog:F06} and \ref{prog:P02} already use. So the
+recorded advice \dash{} *put it in a display* \dash{} has a limit worth
+knowing: a display rescues an unbreakable run **inside a paragraph**, and a
+display that is itself one long chain still has to be broken by hand.
+
+#### And the build's own exit line caught it, for the fifth time
+
+`MAKE_EXIT 2` while the harness reported the command complete, with
+`main-pl`, `main-en-a4` and `main-pl-a4` at **exactly** their pre-P30 page
+counts because `make` stopped after the English target. Both halves of the
+recorded habit fired together and either alone would have been enough.
+
+**And the hbox reporting Program~\ref{prog:P24}'s pass added paid for itself
+a third time.** It named the file, the source lines *and* the offending text
+\dash{} `Before computing anything: do you expect $D[...]$ and $D[...]$`
+\dash{} so there was no inference to make and no cycle to spend on one. That
+is now P24 (which paid a cycle to learn it), P26 and this pass.
+
+#### Rule 2, and the figures
+
+| | W (en / pl) | ratio | en | pl | en A4 | pl A4 |
+|---|---|---|---|---|---|---|
+| P30.1 two-pieces | 539 / 533 | 5.79 | 8.18 | 8.27 | 9.29 | 9.39 |
+| P30.2 which-is-first | 651 / 657 | 5.92 | 6.77 | 6.71 | 7.69 | 7.62 |
+| P30.3 two-fits | 546 / 582 | 5.86 | 8.08 | 7.58 | 9.17 | 8.60 |
+| P30.4 three-promises | 598 / 547 | 6.42 | 7.37 | 8.06 | 8.37 | 9.16 |
+
+All eight at three ranks and all above the aspect-ratio crossover on the
+first render, so no redesign. `p30-two-pieces` at $539$ pt is the narrowest
+and sets $\num{9.29}$ pt on A4, inside the band Programs~\ref{prog:F03},
+\ref{prog:F04} and \ref{prog:F05} already occupy \dash{} checked against the
+recorded table rather than asserted.
+
+Written against the frames **above** them, which is
+Program~\ref{prog:P22}'s rule, and **for the seventh pass running the last
+node of a three-rank chain needed no correction afterwards.**
+
+Measured on the page afterwards, in all four builds: `main-en` 1079, 1086,
+1091, 1093; `main-en-a4` 902, 907, 912, 914; `main-pl` 1095, 1102, 1107,
+1110; `main-pl-a4` 914, 919, 924, 926. Figures 1 and 2 each sit above the
+question that follows them and neither answers it \dash{} the P04/P07 case
+for the fifteenth time: F1 carries the split, which the frames above state in
+full, and the question below asks for the divergence **written out**, which
+appears nowhere in it; F2 carries what a zero costs each way round, and the
+question below asks whether adding a floor fixes it. Figures 3 and 4 each
+close a section with the next section's heading below them.
+
+#### Layout, and two rounds of lengthening
+
+The first build stopped at the English target with `MAKE_EXIT 2` and three
+page counts unmoved. After the boxes were cleared, two orphaned cues arrived
+in the **A4** builds \dash{} both the same frame, P30's 25 \dash{} and
+clearing them moved one into `main-pl`, at frame 13, which is the frame the
+box fix had just edited. Two rounds, both cleared by **lengthening**:
+seventeenth and eighteenth confirmations of Program~\ref{prog:F06}'s
+two-sided rule, which has still never failed.
+
+Both added paragraphs earn their place, and the first is load-bearing rather
+than filler. Frame 25's says precisely what would be wrong with fitting a
+candidate: the answer would depend on where the search started, when it
+stopped and how the candidate was parameterised, so a difference between the
+two answers could have come from any of four things and nothing on the page
+would say which. Frame 13's says that the two distributions have the **same
+support**, so nothing in §3 can be blamed on a missing outcome \dash{} which
+rules out §4's mechanism as a confound before §4 introduces it.
+
+The overfull multiset came back element for element to the baseline in all
+four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with zero overfull
+vboxes, no stranded openers, no stranded headings and no orphaned cues.
+**One orphan tail added, in `main-en`**: 29, 29, 21, 21 against the pre-P30
+28, 29, 21, 21.
+
+Pages 1216 / 1233 / 1015 / 1028, from 1188 / 1207 / 993 / 1008.
+
+#### Also
+
+- Traps 290 to 296 added to `notes/02`.
+- The listing was extracted from the finished PDF and run as a REPL would: it
+  prints `(0.3681, 0.5108)` and `(inf, 0.6931)`, which is what the page
+  prints. The rounding is **inside** the function, which is
+  Program~\ref{prog:P19}'s rule applied while writing rather than after, and
+  the `inf` is what Python prints rather than a value behind `\val{}`, which
+  is Program~\ref{prog:P01}'s rule.
+- Frame numbers mapped after writing and again after the six conversions:
+  sections landed at `1--6 / 7--12 / 13--18 / 19--23 / 24--33 / 34--38 /
+  39--42 / 43--46`.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -9063,46 +9403,36 @@ clone instead.
 
 ## What is left
 
-1. **Five programs, and Part VIII is begun.** F1 to F13 and P1 to P29, both
-   editions. What remains is P30 and P31, Part IX (P32--P34) and the
-   appendices.
+1. **Four programs, and Part VIII is half done.** F1 to F13 and P1 to P30,
+   both editions. What remains is P31, Part IX (P32--P34) and the appendices.
 
-   **P30 is next** \dash{} *Cross-entropy and KL divergence*, deps and frame
-   estimate in `tools/programs.json`. Read Program~\ref{prog:P29}'s closing
-   frame first: it hands over by name and states the shape of the answer
-   \dash{} the moment you ask what it costs to use one distribution's code on
-   another's outcomes, the answer **splits into the target's own entropy plus
-   an excess**, and that excess is the object P30 defines and shows is not
-   symmetric.
+   **P31 is next** \dash{} *Mutual information*, fifty frames estimated,
+   deps `P29, P30, P23`. Read
+   Program~\ref{prog:P30}'s closing frames first, and then do what the
+   previous four passes did rather than what its brief says: **read the brief
+   as a checklist and read the neighbours' file headers with it.** That
+   question has now been cheaper than \enquote{what is left of the subject}
+   five times running, and twice the answer was already written down by a
+   neighbour who had left a pointer.
 
-   **Every debt P30 is owed is already written down in the program that owes
-   it**, which is the cheapest starting position any program in this book has
-   had. Do not count them \dash{} `grep -rn 'prog:P30' programs/en/*.tex`
-   prints the list with its contexts, and reading it is the first thing to do.
-   What it names: Program~\ref{prog:P18} gives cross-entropy a definitional
-   frame and says *what it measures* is P30's; Program~\ref{prog:P22}
-   declares the one KL fact its whole payoff rests on;
-   Program~\ref{prog:P26} says the excess *has a name and is P30's*;
-   Program~\ref{prog:P28} §6 prices a miscalibrated judge in **odds**
-   deliberately and hands the reading in nats over; Program~\ref{prog:P02}
-   says P30 gives cross-entropy its meaning in bits; and Programs~F02 and F03
-   both point here for units and meaning. P29 supplies the whole of the
-   machinery \dash{} surprise, entropy, the code-length theorem and the
-   effective-count reading \dash{} and computes the entropy of **one**
-   distribution throughout, saying so where a reader will expect otherwise.
+   **Program~\ref{prog:P30} leaves P31 more machinery than it leaves work.**
+   It defines the divergence, proves it non-negative and zero only on
+   agreement, establishes the asymmetry and what a zero costs each way round,
+   and closes on the identity that makes a training loss a divergence. Mutual
+   information is a KL divergence between a joint and a product of marginals,
+   so P31's central object is P30's object applied to a particular pair
+   \dash{} which is the same relationship P30 had to P29 and is why P30 came
+   in nine frames under. Expect the same, and check it before planning the
+   length.
 
-   **Read the brief as a checklist, and read the neighbours' file headers with
-   it.** Program~\ref{prog:P27} found two of its seven itemised deliverables
-   already on the page and came in at thirty-nine frames against sixty;
-   Program~\ref{prog:P28} found all five of its own still owed and came in at
-   thirty-seven against fifty; Program~\ref{prog:P29} found two of three
-   handed to it **by name**, because Programs~\ref{prog:P19} and
-   \ref{prog:P25} had each written *-> P29* beside the thing they were
-   leaving. All three answers were cheap and none was available from the
-   general question \enquote{what is left of the subject} \dash{} and the
-   third was the cheapest of the lot, because a neighbour had already done the
-   deciding. **So write the pointer when you leave something**, in the header,
-   with the program named.
+   **Two owner corrections are already recorded and waiting.**
+   Program~\ref{prog:P24}'s pass found `notes/02` item 29 pointing at P30
+   for mutual information where it is **P31's**, and corrected it there. The
+   trap catalogue's items 1--73 are still a mix of corrected and stale
+   owners, for the reason Program~\ref{prog:P10}'s pass recorded, so
+   re-derive any owner from `tools/programs.json` and settle it against the
+   destination brief rather than by assuming the off-by-one.
+
 
    **Part III still leaves one measurement outstanding, deliberately.** P11's
    brief asks for the singular-value spectrum of a real embedding matrix,
@@ -9125,10 +9455,15 @@ clone instead.
    and moving the statement into the next frame's answer. P04 did three of
    those and went 26% to 35% without adding a frame; P23 did ten and went 33%
    to 53% for two frames, which is the measurement to plan against.
-   **P26, P27, P28 and P29 are now four consecutive demonstrations that the
-   rate is free when it is designed in**: 52%, 53%, 54% and **55%** with no
+   **P26, P27, P28 and P29 were four consecutive demonstrations that the rate
+   is free when it is designed in**: 52%, 53%, 54% and **55%** with no
    conversions at all, because all four frame plans were written that way
-   \dash{} and P29 is the highest outside Part I. **This is the largest genuinely
+   \dash{} and P29 is the highest outside Part I. **P30 broke the run and
+   priced the alternative a third time**: its plan came in at 41%, and six
+   conversions took it to 52% for two frames. So the three data points now
+   read P23 two frames for twenty points, P24 nine for ten, P30 two for
+   eleven \dash{} retrofitting is cheap when the frames are short and dear
+   when they are long, and designing it in is still free. **This is the largest genuinely
    parallelisable job in the repository**, because it touches three merged
    program files and nothing else; the programs themselves are not
    parallelisable, for the reason the frame estimates below record.
@@ -9171,7 +9506,15 @@ clone instead.
    forty-five**, for P27's reason rather than any of the other three: read as
    a checklist, two of its three payoffs turned out to be handed here **by
    name**, in the headers of Programs~\ref{prog:P19} and \ref{prog:P25},
-   which had written down what they were leaving.
+   which had written down what they were leaving. **P30 came in at forty-six
+   against fifty-five**, for the same reason once more \dash{} but with its
+   two halves separated, which is worth having: its *machinery* was entirely
+   spent (P29's coding argument, P26's likelihood, P18's derivative, P19's
+   Jensen, F09's triangle inequality with its equality condition) while its
+   *content* was untouched, since no written program mentions mode-covering,
+   mode-seeking or Jensen--Shannon at all. So four of its eight sections were
+   short because the tools were already there and four were full length
+   because nobody had been there.
    **A brief's frame estimate is otherwise a planning figure from before its
    neighbours were written**, and the elicitation rate is paid in frames on top
    of it. It is not a target \dash{} and the record above is also the reason

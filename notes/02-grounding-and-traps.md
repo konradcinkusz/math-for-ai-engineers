@@ -2972,3 +2972,64 @@ and unusable are compatible, which is trap 253 arriving from the other end.
      tokeniser is held fixed. It is this book's recurring complaint — a ratio
      quoted without one of its two quantities — arriving where it does the
      most damage. Owner: P29 §6.
+
+### Cross-entropy and the KL divergence, written (P30)
+
+290. *“Cross-entropy and KL are the same thing, give or take a constant.”*
+     They differ by a constant **only when the first argument is fixed**, and
+     that is exactly the training case, which is why the habit forms. The
+     constant is $H(p)$, and the moment $p$ moves — comparing two datasets,
+     two tokenisers, two label smoothings, anything where the target
+     distribution is not one file — the two quantities order things
+     differently. A model can have the lower cross-entropy and the larger
+     divergence. Owner: P30 §1, spent in §8.
+291. *“KL measures how different two distributions are, so the order of the
+     arguments is a convention.”*
+     The sum runs over the outcomes the **first** argument weights, so the
+     first says where to look and the second is judged there. That is not a
+     convention, it is the whole of §5: a gap in the second where the first
+     has weight costs infinity, and the same gap the other way round costs
+     nothing at all, because the sum never visits it. Owner: P30 §3.
+292. *“The infinity is a numerical edge case; add a small floor and it goes
+     away.”*
+     The floor fixes the arithmetic and keeps the behaviour. A term of that
+     size still dominates every other term in the sum, so the fit is still
+     driven by covering the target's support — which means every measured
+     finding about mode-covering survives every implementation of it. And the
+     infinity is not an accident: it is §1's coding statement read literally,
+     since a code with no codeword for a symbol cannot send that symbol.
+     Owner: P30 §4.
+293. *“Mode-seeking and mode-covering are a property of the model, or of the
+     optimiser.”*
+     Neither. They are a property of the **objective**, and they are visible
+     with no optimiser anywhere: enumerate every candidate and each direction
+     picks a different one. A variational objective and a KL-regularised
+     policy minimise the reverse direction because that is the direction whose
+     expectation is over samples you can draw; distillation against a
+     teacher's full distribution minimises the forward one. Neither chose its
+     mode behaviour — it came with the objective. Owner: P30 §5.
+294. *“The KL distance between them is about 0.3.”*
+     Three of the things the word promises fail, and they are the three
+     anybody uses: it is not symmetric, it does not obey the triangle
+     inequality, and it is unbounded, so no rescaling makes it fit a fixed
+     range. What survives is worth having and is not a distance — never
+     negative, and zero exactly when the two agree — which is why the name on
+     it is *divergence*. Chaining two of them to bound a third was never going
+     to work. Owner: P30 §6.
+295. *“Jensen–Shannon fixes the asymmetry, so use it instead.”*
+     It fixes every complaint and charges for it. Bounded means it **stops
+     distinguishing**: two distributions with nothing in common are at the
+     ceiling whatever else is true of them, so once a model has diverged past
+     that point the number cannot say it is getting worse. KL's unboundedness
+     is a gradient signal where JS has none, and the asymmetry is the thing §5
+     showed you were choosing on purpose. Owner: P30 §7.
+296. *“I train with cross-entropy, so I have not chosen a direction.”*
+     You have, and §5 measured which. Minimising cross-entropy against a fixed
+     dataset **is** minimising the forward divergence to the empirical
+     distribution, because the identity's other term is a property of the file
+     and no gradient reaches it. So every run against a fixed dataset
+     minimised the mode-covering direction, which is why a model asked for
+     something ambiguous hedges across the possibilities rather than commits:
+     it was trained by an objective that pays an unbounded price for putting
+     no mass where the data had some, and nothing at all for spreading.
+     Owner: P30 §8.
