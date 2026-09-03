@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1417 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1444 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1415 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1450 | 0 | 0 | **0** | 0 |
 | `main-en-a4` | 1180 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1190 | 0 | 0 | **0** | 0 |
+| `main-pl-a4` | 1194 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -66,13 +66,19 @@ the rest. Measured separately, the section guard alone took `main-pl` and
 `main-en-a4` down two and put two back on `main-pl-a4` — which is what a guard
 that turns pages does, and why its constant was swept rather than chosen.
 
-`main-pl` is six pages longer than `main-en` in the trade format, down from
-eight, and four pages longer on A4, where the two editions were briefly level
-at 262. That levelness was coincidence and not convergence: A4 spends the extra
-width on margin, so the same text sets in fewer, longer-lived lines and the two
-editions' page counts drift independently of the trade format's. The editions
-have never been required to paginate alike — nothing that matters navigates by
-page — but the gap is written down rather than left to look like a defect.
+**`main-pl` is thirty-five pages longer than `main-en` in the trade format and
+fourteen longer on A4**, and the gap widens as the book grows, because Polish
+prose is longer and sets in more lines. This paragraph said *six and four* for
+a long time after it stopped being true: those were the figures at
+286/294/262/262, when the two editions were briefly level on A4. That levelness
+was coincidence and not convergence: A4 spends the extra width on margin, so
+the same text sets in fewer, longer-lived lines and the two editions' page
+counts drift independently of the trade format's. The editions have never been
+required to paginate alike — nothing that matters navigates by page — but the
+gap is written down rather than left to look like a defect. **Every figure in
+this paragraph is a fact about one build**: derive it from the table above
+rather than quoting it from here, which is the rule this file states for the
+page counts themselves and had not applied to the sentence that reads them.
 
 **Four pages per format came from the Stroud layout pass**, from two causes.
 Two are the next-frame cue: 33 cues in a 45-frame program, measured with and
@@ -99,7 +105,7 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1634 computed values, all referenced, all present, plus the committed console
+- 1632 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
@@ -124,7 +130,7 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **93 orphan-tail pages: 29 · 26 · 18 · 20** across `main-en`, `main-pl`,
+- **95 orphan-tail pages: 28 · 30 · 17 · 20** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`. **Four passes have taken the count DOWN** and
   every other one has raised it: the two elicitation passes took it from 99 to
   96, the P05 review pass put three back, and the F01--F06 review batch took
@@ -13278,6 +13284,210 @@ elicitation pass's finding arriving in a preamble comment rather than in a
 frame. It names the **ordering** now, which is what the constraint actually
 is and which cannot go stale when a line moves.
 
+### Foundation review, F07, F12 and F13, September 2026
+
+Issues \#160, \#143 and \#164, taken as one batch on the F01--F06 precedent
+that each PR costs a four-format build. **Eleven majors across three
+programs, and not one needed anything from outside the book**: every one was
+settled against the frames' own numbers, a neighbouring program, or the
+page itself.
+
+#### THE FINDING: a column is the operand of a question, and its format is a precision decision
+
+Program~\ref{prog:F07} frame 17 prints a steepness column and tells the reader
+to divide its top row into its bottom one; frame 18 answers *about one part in
+$\val{f07.slope.ratio6}$*. At **four decimal places** the bottom row printed
+`0.0025` \dash{} which is two significant figures \dash{} and
+$\num{0.2500} / \num{0.0025}$ is **exactly 100**. So the reader who does what
+the frame asks gets a number the answer box contradicts.
+
+Nothing was wrong with the arithmetic: $\sigma'(6)$ is $\num{0.002467}$ and
+the ratio is $101$. What was wrong is that *four decimal places* is a
+formatting decision taken once for a whole column, and it **silently becomes a
+precision decision as the column descends** \dash{} the top three rows carry
+four significant figures at four decimals and the bottom one carries two. The
+fix is four *significant* figures, which leaves every row above it unchanged
+and prints $\num{0.002467}$.
+
+**The generalisable half: a column that is the operand of a question has to
+carry enough figures to answer it, and a per-column format cannot know that.**
+The script now asserts that the **printed** forms divide to the **printed**
+answer, at all three ratios the program quotes, which is the check the
+four-decimal column failed.
+
+**And the figure said \enquote{a hundred} where every frame said 101.** That
+is the same finding's second half, two hundred pages from the frames it
+disagrees with, and it is Program~\ref{prog:F08}'s
+two-numbers-that-look-like-one at the widest separation the class has had
+inside one program. The node says $101$ now. Each node's longest line was
+held at its previous character count \dash{} which governs the count and not
+the width, since different glyphs set differently \dash{} so the **rendered
+width was measured rather than reasoned about**: $\num{599.04}$ to
+$\num{597.12}$ pt in English and $\num{646.08}$ to $\num{646.08}$ in Polish.
+That moves the node text by two hundredths of a point, and both editions stay
+inside the book's band.
+
+#### Two claims true of something smaller than the sentence they sat in
+
+- Program~\ref{prog:F12}'s trap said the saturated forty-layer product
+  \enquote{is not a number at all in any arithmetic a computer does}. It is an
+  ordinary `fp64` value, and the script that printed it used one. What is true
+  is **stronger**: in `fp32` it falls below that format's last floor well
+  before layer forty, so the first layers receive exactly zero. The trap names
+  the arithmetic now, gated on Program~\ref{prog:P01}'s committed floor, and
+  the product is stated as a bound rather than as a figure that did not
+  reproduce from the factor printed beside it.
+- Its further-problem answer said a composition of two strictly increasing
+  functions has a positive derivative \enquote{because both factors are}.
+  Strictly increasing gives $f' \ge 0$, not $f' > 0$ \dash{} $x^{3}$ is
+  momentarily level at $0$ \dash{} in the program whose own trapbox is about a
+  rule carried one step past its hypotheses.
+
+#### F13: the wrong one is the one that travels
+
+The normalising constant was the **divisor** in frame 17 and the
+**multiplier** in Summary item 9, and a Test exercise then scored the reader
+on the difference. That is the blocker batch's shape again: the Summary is the
+return index, so it is the half that travels \dash{} into the reader's
+revision, and into Appendix~C through `\result{}`.
+
+Fixed to the divisor, **and to the exact $\frac{1}{6}$ rather than
+$\num{0.1667}$**, which closes a second finding in the same move: $1/0.1667$
+is $\num{5.9988}$, so the factor of six the frame asks for did not reproduce
+from the number the page printed.
+
+#### A Summary item that ran two true statements together into a false one
+
+Program~\ref{prog:F12} frame 19 says the bound holds *everywhere, with no
+exceptions*, and its answer box separately gives *$\num{0.25}$, at $z = 0$*,
+which is where the maximum is attained. The Summary wrote
+*$\sigma' \le \num{0.25}$ everywhere, at $z = 0$* \dash{} the two run
+together, and as printed it says the bound holds at one point. **Neither half
+was wrong; the join was.** It is `\result{}`-wrapped, so Appendix~C replayed
+it.
+
+Worth naming beside the F01--F06 batch's *a premise and its arithmetic are two
+claims*: **a Summary item compresses a frame, and compression is where a
+hypothesis gets dropped.** Both of this batch's Summary defects are that, and
+both replayed into the appendix.
+
+#### A file header falsified by its own pass's correction
+
+Program~\ref{prog:F12}'s header comment attributes the $h = 10^{-5}$ step to
+\enquote{near the bottom of the U-curve F11 measured}. The **prose** was
+corrected \dash{} it now says F11 swept a *forward* difference whose bottom is
+elsewhere, and that a central difference's truncation error is $h^{2}$ so its
+U bottoms out higher. The header was not, so the file's own summary of itself
+contradicted its page.
+
+Appendix~D's pass recorded the class \dash{} **a file header is a claim about
+the file and nothing checks it** \dash{} and named its sharpest form as a
+header falsified not by time but by the same pass's own rewrite two hundred
+lines below it. This is the second instance, and the first where the
+falsifying edit was a *correctness* fix rather than a restructuring. The
+comment now says what the prose says, and says that it used to say otherwise.
+
+#### A renamed value made a cross-programme gate go quiet, and `make numbers` still exited 0
+
+Making Program~\ref{prog:F12}'s product a bound retired `f12.sat.bound` for
+`f12.sat.exponent`. Program~\ref{prog:P01} **reads that key** \dash{} it is
+one of the four cross-programme gates that program carries, and it asserts the
+product is representable in `fp64` and exactly zero in `fp32`. Its reader
+returned `None` for a missing key exactly as it does for a missing file, so
+the gate stopped running, said nothing, and the build stayed green.
+
+**Those are two different failures and only one of them is survivable.** An
+absent *file* is a fresh checkout that has not run `make numbers`; an absent
+*key* is the other program having renamed or dropped the very thing this one
+checks, which is what the gate exists to catch. The reader raises on a missing
+key now, and the only thing that surfaced it was reading the values diff.
+
+That is the recorded class in a new place: **a graceful degradation is where a
+defect looks intentional** \dash{} `\transcript`'s file-is-absent marker,
+`\mermaidfig`'s fallback, `gen_stubs`'s `escape()` outside backticks, and now
+a cross-programme gate's own missing-key path. Every one of the four returned
+something plausible instead of failing.
+
+**And two of F12's three emissions at that site were F07's own quantities
+under second names**: `f12.sat.factor` and `f12.sat.ratio` against F07's
+`f07.slope.6` and `f07.slope.ratio6`, three hundred pages apart and at
+different precisions \dash{} $\num{0.0025}$ there and $\num{2.47e-03}$ here.
+That is this batch's own headline defect arriving from the other side, inside
+the program whose gate was written to prevent it. Deleted; the frames quote
+F07 directly and the gate stays. Programs~\ref{prog:P01} and \ref{prog:P32}
+each quote the product in one frame and one Summary item, and all four now say
+*below* a bound rather than naming a figure.
+
+#### Layout, and one round of lengthening cleared four cues
+
+The first build failed `check-a4` on **four orphaned cues, two in each A4
+build and none in the trade pair**, across three frames: two in
+Program~\ref{prog:F12} and Program~\ref{prog:F13}'s frame 2, each with its
+question and its dotted line on the page and only the cue overleaf. Cleared in
+**one round** by lengthening, in both editions. Twenty-ninth confirmation of
+Program~\ref{prog:F06}'s two-sided rule, which has still never failed.
+
+Every added paragraph earns its place: that the logistic's own derivation
+applied the chain rule to a chain four links long, so doing it to
+$\val{f12.depth}$ layers later changes nothing about the argument; that
+nothing in the two-layer working uses the fact that there are two, so what the
+reader writes there is the general answer with a small $n$ in it; and that a
+rectangle has one height where a varying rate has many, so the instruction has
+to name which point of each strip to measure at \dash{} a decision about the
+method rather than a fact about the rate.
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1415 | 1417 | `[]` | 0 |
+| `main-pl` | 1450 | 1444 | `[]` | 0 |
+| `main-en-a4` | 1180 | 1180 | `[6.3]` | 0 |
+| `main-pl-a4` | 1194 | 1190 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and no orphaned cues.
+
+**And the orphan tails went 93 to 95**: 28, 30, 17, 20 against 29, 26, 18, 20.
+The count is the signal and it is going the wrong way by two.
+
+**The two editions moved in opposite directions from the same edits**, which is
+worth recording rather than smoothing: `main-en` lost two pages and one tail
+while `main-pl` gained six pages and four, on paragraphs written to say the
+same thing in both. The A4 pair says it more plainly still \dash{} English flat
+at $1180$ and one tail fewer, Polish four pages longer \dash{} so in both
+formats the Polish grew and the English did not. That is the recorded
+asymmetry, Polish prose being longer and setting in more lines, arriving in a
+pass where the *English* half of a correctness batch happened to shorten. It is
+also the F01--F06 batch's finding once more: **a correctness pass is also a
+layout pass**, in whichever direction the arithmetic of the page falls.
+
+#### And the one-volume table had gone three merged batches without a re-measure
+
+`notes/01-curriculum.md` §20 item 1 is the only place the one-volume decision
+has numbers, and its per-part table still read the P05 review pass's
+388/504/330/187. The F01--F06 review, the blocker batch and the second review
+batch each moved the book past it, so re-measuring here recovers **four passes'
+movement at once** and none of it can be attributed to this one: Part~I *lost*
+two pages across a run of batches that mostly added prose to it, and
+Parts~II--VI gained six on the strength of a one-frame reword in
+Program~\ref{prog:P01}.
+
+Re-derived from the trade build's own part-title pages, each confirmed by
+extracting the page and reading the title rather than by adding twenty-eight to
+the toc, which is that entry's own rule: **386 / 510 / 332 / 187**, summing to
+$1415$ exactly, and an **896-page** first volume before any back matter. The
+`main-pl` gap paragraph at the top of this file needed the same treatment and
+had been saying *six pages* since it was thirty-five.
+
+**The rule the entry did not have: re-measure in the pass that moves the book,
+not in the pass that happens to notice.** A stale table there is worse than a
+stale page count here, because a reader cannot tell one measured last week from
+one measured four merges ago, and this file's own instruction to re-measure
+*all four rows* says nothing about *when*.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -13796,17 +14006,19 @@ one is shaped by what the ones before it turned out to spend.
 
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
-for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.75**
-\dash{} 1,863 teaching frames in 1,409 trade pages, and the book is now
+for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.76**
+\dash{} 1,864 teaching frames in 1,415 trade pages, and the book is now
 complete: every program and every appendix is written. (This sentence said **0.71** until the Appendix~E pass, which
 is $1{,}321/1{,}863$ \dash{} the figure from before Appendix~C, left behind
 when the page count above it was updated and the ratio was not. It is the
 class this file keeps recording, in the paragraph that states the class.) §20 item 1 carries the measurement and the per-part page ranges, so
 the decision has numbers in front of it rather than an estimate; **every
 program and every appendix is now written, so those numbers move only by
-revision** \dash{} the two elicitation passes are the only revisions so far to
-move them, adding four pages and then six to Parts~II--VI, which is as settled
-as the question is going to get before somebody answers it. The other two that
+revision** \dash{} and the review passes now move it as often as the two
+elicitation passes did, which is why §20's table went three merged batches
+without being re-measured and had to be re-derived from the part-title pages
+here. That is as settled as the question is going to get before somebody
+answers it. The other two that
 stood beside it are now settled in the passes that wrote their programs
 \dash{} P12's placement, and whether P14 is enough of a fix for the rigour gap
 \dash{} and each entry records the argument the written book falsified rather

@@ -627,7 +627,7 @@ Appendices:
 1. **One volume or two — still open, and the estimate it rested on is now
    measured and was wrong by a factor of about three.** The figure recorded
    here was 460--540 pages for ~2,418 frames, which is 0.21 pages a frame.
-   **Measured, September 2026: 1,863 teaching frames set 1,409 pages in the
+   **Measured, September 2026: 1,864 teaching frames set 1,415 pages in the
    trade format**, which is 0.76 — and **that is now the finished book**, with
    every program and every appendix written. (It was 1,757 frames in 1,267
    pages when first taken, before P33, 1,811 in 1,295 after it, 1,321 before
@@ -635,10 +635,8 @@ Appendices:
    before Appendix F. The programs' own 1,212 pages account for the ratio; the
    back matter grew from 109 pages to 187, and Appendix C alone is 62 of that,
    with D adding four, E six and F four.) **Nothing here moves except by
-   revision**, and the Part II elicitation pass is the first revision to move
-   it: four pages, all of them inside Parts II--VI where P1 to P3 live, with
-   the other three rows unchanged. This is the number the decision has to be
-   made against.
+   revision**, and the review passes now move it as often as the elicitation
+   ones did. This is the number the decision has to be made against.
 
    The estimate is not mysteriously wrong. It was made before the Stroud layout
    pass existed, so a *frame* in it was a paragraph. A frame as built is a rule
@@ -653,10 +651,10 @@ Appendices:
 
    | | pages | count |
    |---|---|---|
-   | front matter + Part I (F1--F13) | 1--388 | 388 |
-   | Parts II--VI (P1--P22) | 389--892 | 504 |
-   | Parts VII--IX (P23--P34) | 893--1222 | 330 |
-   | back matter (appendices, answers, index) | 1223--1409 | 187 |
+   | front matter + Part I (F1--F13) | 1--386 | 386 |
+   | Parts II--VI (P1--P22) | 387--896 | 510 |
+   | Parts VII--IX (P23--P34) | 897--1228 | 332 |
+   | back matter (appendices, answers, index) | 1229--1415 | 187 |
 
    These are **PDF pages**, not printed folios, and the difference is
    twenty-eight — the front matter. `main-en.toc` gives folios, so it puts
@@ -666,7 +664,7 @@ Appendices:
    part title rather than by adding twenty-eight to the toc, which is this
    entry's own rule about arithmetic on two measurements.
 
-   So the proposed cut gives an 892-page first volume before any back matter,
+   So the proposed cut gives an 896-page first volume before any back matter,
    which does not settle it: at this geometry the book is nearer three volumes
    than two, or the geometry has to change. **Decide before the front matter is
    written**, and decide against these numbers rather than against the
@@ -697,6 +695,22 @@ Appendices:
    Appendix~C replays every `\result{}`, so prose written into a Summary
    arrives twice. **Adjusting the row you wrote in would have been wrong in
    all four rows.**
+
+   **And then three merged batches went by without anybody re-measuring it.**
+   The F01--F06 review, the blocker batch and the second review batch each
+   moved the book and left this table at the P05 pass's 388/504/330/187, so
+   the figures above are four passes' movement taken together and cannot be
+   attributed to the one that finally re-measured them. That is why the deltas
+   read oddly: Part I *lost* two pages in a run of batches that mostly added
+   prose to it, and Parts II--VI gained six on the strength of a one-frame
+   reword in P1. Neither is what any single pass did.
+
+   The lesson is one this file already states about the rows and had not
+   stated about the schedule: **re-measure in the pass that moves the book,
+   not in the pass that happens to notice.** A stale table here is worse than
+   a stale page count elsewhere, because this is the only place the
+   one-volume decision has numbers at all, and a reader cannot tell a table
+   measured last week from one measured four merges ago.
 2. **`dotnetbox` or `codebox`** --- section 15(c).
 3. **Whether the mathematics packages may be hard requirements**, breaking the
    graceful degradation both companion preambles maintain --- section 15(a).
