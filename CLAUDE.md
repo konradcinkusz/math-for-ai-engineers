@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1413 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1440 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1178 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1184 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1417 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1444 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1180 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1190 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -124,7 +124,7 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **90 orphan-tail pages: 29 · 25 · 18 · 18** across `main-en`, `main-pl`,
+- **93 orphan-tail pages: 29 · 26 · 18 · 20** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`. **Four passes have taken the count DOWN** and
   every other one has raised it: the two elicitation passes took it from 99 to
   96, the P05 review pass put three back, and the F01--F06 review batch took
@@ -12155,6 +12155,35 @@ Pages 1407 / 1433 / 1172 / 1188, from 1401 / 1427 / 1164 / 1184.
 Issues \#125, \#145, \#149, \#114 and the two halves of \#123 the blocker
 batch left, taken together because five of the six share the cause the
 previous batch named: **a ledger narrower than the sentence it is read as.**
+
+#### Layout
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1417 | 1413 | `[]` | 0 |
+| `main-pl` | 1444 | 1440 | `[]` | 0 |
+| `main-en-a4` | 1180 | 1178 | `[6.3]` | 0 |
+| `main-pl-a4` | 1190 | 1184 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds**, with zero overfull vboxes, no stranded frame openers, no
+stranded section headings and \dash{} the part worth recording \dash{} **no
+orphaned cues at any point in the pass, on the first build.**
+
+That is unusual and it is worth saying why it was expected not to be. This
+batch adds a `\canyou` panel to four programs and moves it in four more, so
+**every page break from the Summary onward was re-rolled in eight programs**,
+and the standing expectation after Programs \ref{prog:P08} and \ref{prog:P32}
+is a chase of one to seven rounds. It cost none. The reason is structural
+rather than lucky: the panel sits between the Summary and the Test exercises,
+which is *after* every frame in the program, so it can move nothing that
+carries a cue. **A layout change is only as expensive as the number of frame
+tails downstream of it, and this one has none.**
+
+Sixteen pages across the four builds, and **three orphan tails**: 29, 26, 18,
+20 against 29, 25, 18, 18.
 
 #### The gate said the panel was generated; four programs printed none
 
