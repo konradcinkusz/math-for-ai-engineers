@@ -221,7 +221,7 @@ $x \ge 5$.
 \end{ansblock}
 
 Nawias musi wyjść zero lub więcej, więc $x - 5 \ge 0$. Właśnie zrobiłeś robotę
-sekcji 3 o sekcję za wcześnie i zrobiłeś ją bez podanej reguły.
+sekcji 3 wcześniej i zrobiłeś ją bez podanej reguły.
 
 Teraz rozróżnienie, które kosztuje pracujących inżynierów realny czas, bo obie
 rzeczy wyglądają na papierze niemal identycznie. $f$ i $f(x)$ to nie jest ten
@@ -354,8 +354,9 @@ Dla jakich wartości $x$ jej wykres jest płaski?
 \begin{fr}
 \ans{Dla $x \le 0$}
 Na lewo od początku układu wykres leży na osi poziomej; na prawo jest prostą
-$y = x$ pod kątem czterdziestu pięciu stopni. Obie połowy spotykają się w
-początku układu narożnikiem, a nie łukiem.
+$y = x$, wznosząca się o jedną jednostkę na każdą jedną w bok \dash{} pod
+kątem czterdziestu pięciu stopni, jeśli obie osie narysowano w tej samej skali.
+Obie połowy spotykają się w początku układu narożnikiem, a nie łukiem.
 
 Ten narożnik wart jest chwili, bo jest całym powodem, dla którego ta funkcja
 tam stoi. Wykres złożony z jednego prostego kawałka jest prostą, jakkolwiek
@@ -456,7 +457,7 @@ $0$, musisz teraz podać $g$ argument $3$.
 Powiedz to zdaniem, a przestanie zaskakiwać: \emph{żeby zobaczyć stary obrazek,
 musisz teraz stanąć trzy dalej}.
 
-To czwarty znak, pod którym pojawiło się to rozumowanie.
+To rozumowanie pojawiało się już pod innymi znakami.
 Program~\ref{prog:F01} ma $\sqrt{a+b} \ne \sqrt{a} + \sqrt{b}$;
 Program~\ref{prog:F02} ma $(a+b)^{2} \ne a^{2} + b^{2}$;
 Program~\ref{prog:F03} nie ma żadnej reguły dla $\ln(a+b)$;
@@ -589,7 +590,9 @@ wyrażenie w uczeniu maszynowym:
 
 Czytaj je jako dwa z czterech ruchów zastosowane do najprostszej funkcji, jaka
 istnieje, $f(x) = x$. Waga $w$ mnoży wartość, więc rozciąga prostą od osi
-poziomej i czyni ją bardziej stromą. Bias $b$ jest dodany poza nawiasem, więc
+poziomej: $w$ większe od $1$ czyni ją bardziej stromą, $w$ między $0$ a $1$
+spłaszcza ją, a ujemne $w$ dodatkowo ją odwraca. Bias $b$ jest dodany poza
+nawiasem, więc
 przesuwa całą prostą w górę. Tym właśnie jest jednostka liniowa:
 rozciągnięciem i przesunięciem, z nazwami z innego słownika.
 
@@ -708,9 +711,10 @@ Prosta $y = 2x + 1$ przechodzi dokładnie przez wszystkie trzy: $2 + 1$,
 $4 + 1$, $6 + 1$.
 
 Teraz zabroń biasu, więc modelem jest $y = wx$ i nic więcej. Prosta tej
-postaci dopasowana metodą najmniejszych kwadratów ma współczynnik kierunkowy
-$\val{f05.nobias.slope}$, a jej największe odchylenie od tych trzech punktów
-wynosi $\val{f05.nobias.worst}$.
+postaci, która czyni sumę kwadratów odchyleń najmniejszą \dash{} prosta
+\emph{najmniejszych kwadratów}, którą wyprowadza Program~\ref{prog:P08} \dash{}
+ma współczynnik kierunkowy $\val{f05.nobias.slope}$, a jej największe
+odchylenie od tych trzech punktów wynosi $\val{f05.nobias.worst}$.
 
 Dlaczego żadna prosta postaci $y = wx$ nie dopasuje się do tych trzech punktów,
 jakiekolwiek $w$ wybierzesz?
@@ -949,8 +953,8 @@ umiesz policzyć.
 \begin{fr}
 Została jedna własność, a reszta tej sekcji to to, co ona daje.
 
-Funkcja \textbf{ściśle rośnie}, gdy nigdy nie daje większemu argumentowi
-mniejszej wartości: ilekroć $a < b$, prawdą jest też, że $f(a) < f(b)$. Nie
+Funkcja \textbf{ściśle rośnie}, gdy ruch w prawo po niej zawsze podnosi
+wartość: ilekroć $a < b$, prawdą jest też, że $f(a) < f(b)$. Nie
 \emph{czasem}, nie \emph{średnio} i nie \emph{w końcu} \dash{} każda para,
 wszędzie tam, gdzie funkcja jest określona.
 
@@ -1109,8 +1113,9 @@ wiarogodności} nazywają te same parametry, bo $\ln$ ściśle rośnie, a zmiana
 znaku ściśle maleje, więc złożenie tych dwóch zamienia $\argmax$ wiarogodności
 w $\argmin$ straty i nigdzie indziej go nie przesuwa.
 
-Dlatego też strata, na której trenujesz, może być przeskalowana, przesunięta o
-stałą albo zlogarytmowana, a najlepszy model będzie tym samym modelem. Nie
+Dlatego też strata, na której trenujesz, może być przeskalowana stałą
+\emph{dodatnią}, przesunięta o stałą albo \dash{} jeśli jest dodatnia \dash{}
+zlogarytmowana, a najlepszy model będzie tym samym modelem. Nie
 tłumaczy to, dlaczego \emph{gradienty} są te same, bo to osobne pytanie i
 należy do Programu~\ref{prog:F12}.
 \end{aibox}
@@ -1185,7 +1190,7 @@ rosnące}
   jest logarytmem szansy, $\val{f05.logit.p9}$ dla $p = \num{0.9}$, a droga tam
   i z powrotem domyka się do $\val{f05.roundtrip.err}$. \textbf{$-1$ w
   $f^{-1}$ nie jest wykładnikiem.}}}
-\sumitem{41--44}{\result{\textbf{Funkcja ściśle rosnąca zachowuje porządek listy, więc
+\sumitem{41--45}{\result{\textbf{Funkcja ściśle rosnąca zachowuje porządek listy, więc
   nie może przesunąć $\argmax$.} Dzielenie przez dodatnie $T$ się kwalifikuje,
   $e^{x}$ się kwalifikuje i dzielenie każdej pozycji przez jedną dodatnią sumę
   też \dash{} zatem $\argmax \softmax(z/T) = \argmax z$ dla każdego $T > 0$,
