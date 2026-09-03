@@ -1063,9 +1063,10 @@ napiszesz pętlę.
 \item Wiązka o szerokości $b$ przez $L$ kroków przy słowniku $V$ ocenia
   $LbV$ przedłużeń. Jaka szerokość byłaby potrzebna, by ocenić jeden procent
   przestrzeni, przy $V = \val{p12.beam.vocab}$ i $L = \val{p12.beam.len}$?
-  \answerto{$b = \num{0.01}\,V^{L}/(LV)$, czyli około $2 \times 10^{84}$.
-  Sensem zadania jest to, że ta liczba jest nie tyle wielka, co nieosiągalna,
-  więc żadna szerokość nie jest argumentem z pokrycia.}
+  \answerto{$b = \num{0.01}\,V^{L}/(LV)$, czyli
+  $\val{p12.beam.pct.width}$. Sensem zadania jest to, że ta liczba jest nie
+  tyle wielka, co nieosiągalna, więc żadna szerokość nie jest argumentem z
+  pokrycia.}
 \item Iloczyn pusty daje $0! = 1$. Pokaż, że wymusza to rekurencja Pascala, a
   nie jest to umowa przyjęta dla wygody.
   \answerto{$\binom{n}{n} = \binom{n-1}{n-1} + \binom{n-1}{n}$, a ostatni

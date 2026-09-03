@@ -54,7 +54,7 @@
 \outcome{37--48}{name the distribution a quantity follows from its role rather
   than from its formula}
 \outcome{49--64}{say what temperature, top-$k$ and top-$p$ each do to a
-  distribution, and which of the three removes tokens}
+  distribution, and which of the three remove tokens}
 \end{outcomes}
 
 \begin{quiz}
@@ -345,8 +345,8 @@ none of them mentions it.}
 
 Program~\ref{prog:P07}'s broadcasting identity splits a mean over $n^{2}$
 pairs into a mean over $n$ of them plus a cross term. Program~\ref{prog:P21}
-shows that the average of every one of its $\val{p21.pop.subsets}$ batches
-equals the population mean exactly. Section 5 below turns a probability into a
+shows that the average of its $\val{p21.pop.subsets}$ batch means is the
+population mean exactly. Section 5 below turns a probability into a
 count of alarms per million requests.
 
 All three are the same step, and all three would need a condition attached if
@@ -450,14 +450,14 @@ definition.
 \end{fr}
 
 \begin{fr}
-That closes a loan. Program~\ref{prog:P21} used the word \emph{variance} two
-parts before this one, in a rigour box that gave the reader a single sentence
+That closes a loan. Program~\ref{prog:P21} used the word \emph{variance} a
+part before this one, in a rigour box that gave the reader a single sentence
 \dash{} the average squared distance from the mean \dash{} and pointed here.
 
 The definition is now the frames above, applied to P21's own population and
 gated against its own committed mean. What P21 did with it \dash{} that the
 variance of an average of $B$ draws falls like $1/B$, so the spread falls like
-$\sqrt{B}$ \dash{} is a statement about \emph{sums} of random variables, and
+$1/\sqrt{B}$ \dash{} is a statement about \emph{sums} of random variables, and
 that is Program~\ref{prog:P25}'s subject rather than this one's.
 
 It is worth knowing why the book keeps both numbers rather than settling on the
@@ -1065,8 +1065,8 @@ And the two halves of this section meet, on a number you can now predict.
 
 At $T = 2$, top-$\val{p24.topk.k}$ deletes $\val{p24.topk.del.t20}$ per cent
 of the weight. Suppose instead you add the Gumbel noise first and take the
-$\argmax$ of everything, truncating nothing. How often do those same two
-tokens win?
+$\argmax$ of everything, truncating nothing. How often does the $\argmax$
+land on one of the two tokens top-$\val{p24.topk.k}$ would have deleted?
 \dotline
 \nextframe
 \end{fr}
@@ -1155,7 +1155,7 @@ them is reversible.}{reweight or delete}
   Programs \ref{prog:P10} and \ref{prog:P11}'s covariance matrix were owed the
   word rather than the facts: \textbf{a forward reference whose facts can be
   proved locally should be}. The bound on a correlation is
-  Program~\ref{prog:P05}'s geometry on a different space.}
+  Program~\ref{prog:F09}'s geometry on a different space.}
 \sumitem{37--38}{\result{\textbf{Bernoulli}: $\Ex = p$, $\Var = p(1-p)$, largest at
   $p = \num{0.5}$. An indicator is a Bernoulli and its expectation is a
   probability, so a rare-class column carries almost no variance}.}
@@ -1226,8 +1226,10 @@ them is reversible.}{reweight or delete}
   this is negligible. Say what you would need to know before agreeing.
   \answerto{The two spreads. A covariance carries the units of both quantities,
   so its size on its own says nothing: if both features have spreads of about
-  $\num{0.01}$ then $\num{0.02}$ is an enormous correlation, and if they are
-  measured in thousands it is nothing. Ask for the correlation, which is the
+  $\num{0.15}$ then a covariance of $\num{0.02}$ is a correlation near
+  $\num{0.9}$, and if they are measured in thousands it is nothing. Note that
+  the spreads also bound it: at spreads of $\num{0.01}$ each, no covariance
+  above $\num{0.0001}$ can exist at all. Ask for the correlation, which is the
   covariance with both units divided out.}
 \item Somebody reports that two evaluation scores have correlation
   $\num{0.00}$ and concludes the two evaluations test unrelated things. Give
@@ -1257,7 +1259,7 @@ them is reversible.}{reweight or delete}
   average are unchanged with it. A variance is a statement about spread and a
   shift moves no two points closer together.}
 \item Show that $\Var(X + Y) = \Var(X) + \Var(Y) + 2\Cov(X, Y)$, and say what
-  has to be true for the variances simply to add.
+  has to be true for the variances to add on their own.
   \answerto{Expand $\Ex[((X - \Ex X) + (Y - \Ex Y))^{2}]$ and use linearity on
   the three terms; the cross term is twice the covariance by definition. The
   variances add exactly when the covariance is zero, which independence

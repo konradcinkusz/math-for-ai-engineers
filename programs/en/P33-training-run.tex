@@ -67,8 +67,8 @@
   \answerto{$\val{p33.loud}$ of $\val{p33.pieces}$. The other four are each a
   correct computation of the wrong quantity, so there is no invalid operation
   anywhere in them for anything to catch.}
-\item You have watched $\val{p33.watch}$ steps and the loss has not gone
-  below where it started. Is the run stuck?
+\item You have watched $\val{p33.watch}$ steps and the loss now is no lower
+  than it was then. Is the run stuck?
   \teachesat{15--16}
   \answerto{No. A healthy run looks exactly like that about
   $\val{p33.p.flat}$ per cent of the time, and a flat stretch becomes
@@ -82,9 +82,11 @@
 \item A dashboard smooths a loss curve at $\beta = \val{p33.beta.dash}$. What
   fraction of the run's real step-to-step spread does the picture show?
   \teachesat{30--31}
-  \answerto{$\val{p33.smooth.pct}$ per cent of it. The smoothed variance is
-  $\frac{1-\beta}{1+\beta}$ of the raw one, so the setting decides the
-  picture as much as the run does.}
+  \answerto{$\val{p33.smooth.dash}$ of it, about a tenth. The smoothed
+  variance is $\frac{1-\beta}{1+\beta}$ of the raw one, so the setting decides
+  the picture as much as the run does \dash{} Program~\ref{prog:P21} with its
+  own $\beta = \val{p33.beta}$ gets $\val{p33.smooth.pct}$ per cent out of the
+  same formula.}
 \item Seven points over $\val{p33.fit.decades}$ decades lie on a straight
   line on log-log axes, to better than $\val{p33.fit.resid}$ per cent. What
   does that bound about the fit's prediction three decades further on?
@@ -312,8 +314,9 @@ divergence, and the question asked of each is the same one:
   a flat stretch, and what it can be}
 
 \begin{fr}
-You have been watching for $\val{p33.watch}$ steps and the loss has not gone
-below where it was when you started watching.
+You have been watching for $\val{p33.watch}$ steps, and the loss on the
+dashboard now is no lower than the reading you remember from
+$\val{p33.watch}$ steps ago.
 
 Suppose the run is entirely healthy and the loss is genuinely falling by
 $\val{p33.improve}$ per step. How likely is it that you would see exactly
@@ -335,6 +338,26 @@ It is $\val{p33.p.flat}$ per cent.
 
 Nearly half the time. A healthy run looks stuck for $\val{p33.watch}$ steps
 about as often as a coin comes up heads.
+
+\begin{note}
+\textbf{That is two readings, and it is the question worth asking. A stricter
+reading of the same English is a different event by two orders of magnitude.}
+\enquote{The loss has not gone below where it started} can mean that no
+reading in the whole stretch ever dipped under the first, which is
+$\val{p33.watch}$ chances to fail rather than one. Computed under the same
+noise model \dash{} conditioning on the shared first reading, since the
+comparisons are not independent of it \dash{} that is
+$\val{p33.p.flat.min}$ per cent against $\val{p33.p.flat}$, a factor of
+$\val{p33.p.flat.ratio}$.
+
+Both numbers are right about their own event and only one of them is about a
+person. Nobody scans $\val{p33.watch}$ logged values and takes a minimum; they
+look at the number now and remember roughly where it was, which is the
+comparison above and the one the threshold in this section is derived from. The
+stricter figure is also the more fragile: it needs the per-step noise to be
+independent, and a real logged loss is correlated across steps because the
+batch stream was shuffled once.
+\end{note}
 
 One number in that arithmetic was measured and one was chosen. Which is
 which?
@@ -929,8 +952,11 @@ claim.
 \sumitem{12--14}{The four silent ones are detectable only from outside, and
   the instrument is a loss curve made of noisy numbers.}
 \sumitem{15--17}{\result{A healthy run whose loss falls $\val{p33.improve}$ per step
-  shows no improvement over $\val{p33.watch}$ steps
-  $\val{p33.p.flat}$ per cent of the time}.}
+  shows no improvement between two readings $\val{p33.watch}$ steps apart
+  $\val{p33.p.flat}$ per cent of the time} \dash{} and the stricter reading, no
+  reading in the stretch ever dipping under the first, is
+  $\val{p33.p.flat.min}$ per cent, a factor of $\val{p33.p.flat.ratio}$
+  rarer.}
 \sumitem{18--21}{\result{A flat stretch must last about $\val{p33.plateau.k}$ steps
   before a healthy run would produce it less than $\val{p33.alpha}$ of the
   time}.}
@@ -1015,8 +1041,10 @@ claim.
   $490$ real tokens, each having divided by its own count. Their mean losses
   are $2$, $8$, $3$ and $3$. Is the accumulated gradient the large-batch one?
   \answerto{No. The pooled mean weights by tokens and gives
-  $\num{2.475}$; the accumulated one averages the four and gives $4$. The
-  error is silent, it is in the gradient rather than in a report, and it is
+  $\val{p33.accum.pooled}$; the accumulated one averages the four and gives
+  $\val{p33.accum.naive}$, because the ten-token batch carries one
+  two-hundredth of the tokens and a quarter of the weight. The error is
+  silent, it is in the gradient rather than in a report, and it is
   Program~\ref{prog:P21}'s trap with one more micro-batch in it.}
 \item An exponential moving average is applied twice, at the same $\beta$.
   By what factor is the spread of the doubly-smoothed curve reduced?

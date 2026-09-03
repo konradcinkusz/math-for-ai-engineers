@@ -50,6 +50,7 @@ from __future__ import annotations
 
 import math
 import re
+from fractions import Fraction
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parent.parent / "figures" / "values" / "p33.tex"
@@ -298,6 +299,62 @@ emit("p33.watch", WATCH)
 emit("p33.p.flat", pct(100.0 * P_FLAT), 1)
 assert P_FLAT > 0.4, P_FLAT
 
+# The SAME 500 steps under the other reading of "the loss has not gone below
+# where it started", and the two are not close.  P_FLAT above compares TWO
+# readings -- now against 500 steps ago -- which is what a person watching a
+# dashboard actually does.  Read as a running minimum, the event is that none
+# of the 500 readings ever dipped below the first, and that is 500 chances to
+# fail rather than one.
+#
+# It is computed rather than bounded, because the two readings share the
+# step-0 noise and a product of marginals would be wrong.  Condition on that
+# shared term: given the step-0 noise z (in units of the spread), reading t is
+# above the first exactly when its own noise clears z + t*IMPROVE/SIGMA_STEP,
+# and those 500 events are then independent.  Simpson over z.
+#
+# The grid is deliberately coarse and that is checked rather than asserted by
+# eye: the integrand is smooth, so 500 panels already agree with 4000 to four
+# decimals, and the whole thing costs under a tenth of a second.
+def _never_below_first(steps: int, panels: int = 1000,
+                       lo: float = -9.0, hi: float = 9.0) -> float:
+    d = IMPROVE / SIGMA_STEP
+    h = (hi - lo) / panels
+    total = 0.0
+    for k in range(panels + 1):
+        z = lo + k * h
+        weight = 1.0 if k in (0, panels) else (4.0 if k % 2 else 2.0)
+        logp = 0.0
+        for t in range(1, steps + 1):
+            q = 1.0 - Phi(z + t * d)
+            if q <= 0.0:
+                logp = None
+                break
+            logp += math.log(q)
+        if logp is None:
+            continue
+        density = math.exp(-0.5 * z * z) / math.sqrt(2.0 * math.pi)
+        total += weight * density * math.exp(logp)
+    return total * h / 3.0
+
+P_FLAT_MIN = _never_below_first(WATCH)
+assert abs(P_FLAT_MIN - _never_below_first(WATCH, panels=4000)) < 1e-6, (
+    "the Simpson grid is too coarse to report to three decimals")
+
+# Three decimals, not two, and the reason is the recorded rule: divide the two
+# numbers AS THE PAGE PRINTS THEM.  At two the page divides to 257 against an
+# exact 260; at three it divides to 260.1, which is the same integer.
+emit("p33.p.flat.min", pct(100.0 * P_FLAT_MIN), 3)
+RATIO = P_FLAT / P_FLAT_MIN
+emit("p33.p.flat.ratio", RATIO, 0)
+_page = float(VALUES["p33.p.flat"][0]) / float(VALUES["p33.p.flat.min"][0])
+assert f"{_page:.0f}" == VALUES["p33.p.flat.ratio"][0], (
+    f"the page divides to {_page:.1f} where the ratio prints "
+    f"{VALUES['p33.p.flat.ratio'][0]}")
+# And the claim the frames make is the ORDER of magnitude rather than the
+# figure, so assert that: the running-minimum reading is two orders rarer.
+assert RATIO > 100.0, RATIO
+assert P_FLAT_MIN < 0.01, P_FLAT_MIN
+
 # --- the spike -----------------------------------------------------------
 # A run is long, so the largest deviation in it is large BY CONSTRUCTION.
 # This is P27's multiple-comparison arithmetic with steps in place of models,
@@ -498,6 +555,22 @@ _lo = math.exp(INTERCEPT) * N_OUT ** (SLOPE - 2 * SE_B)
 assert not (_lo <= truth(N_OUT) <= _hi), (_lo, truth(N_OUT), _hi)
 emit("p33.fit.band.lo", _lo, 3)
 emit("p33.fit.band.hi", _hi, 3)
+
+
+# --- the accumulation a further problem asks about ------------------------
+ACC_TOKENS = (1000, 10, 500, 490)
+ACC_LOSSES = (2, 8, 3, 3)
+_pooled = (sum(Fraction(t * l) for t, l in zip(ACC_TOKENS, ACC_LOSSES))
+           / Fraction(sum(ACC_TOKENS)))
+_naive = sum(Fraction(l) for l in ACC_LOSSES) / Fraction(len(ACC_LOSSES))
+emit("p33.accum.pooled", float(_pooled), 3)
+emit("p33.accum.naive", float(_naive), 0)
+# The exercise turns on the two denominators differing, so assert THAT rather
+# than either figure: the naive average is dragged up by the ten-token batch,
+# which carries one two-hundredth of the tokens and a quarter of the weight.
+assert _naive > _pooled, (_naive, _pooled)
+assert float(_naive) / float(_pooled) > 1.5, float(_naive) / float(_pooled)
+assert sum(ACC_TOKENS) == 2000
 
 
 # ======================================================================

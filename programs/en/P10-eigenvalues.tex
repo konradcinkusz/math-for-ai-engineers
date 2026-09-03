@@ -723,6 +723,19 @@ use. It is the number $L$ with $\lVert Ax \rVert \le L\lVert x \rVert$ for
 every $x$, which is to say it is the factor by which the layer can amplify, in
 the worst case, over all inputs including the ones nobody has tried.
 
+\begin{warning}
+\textbf{That the two coincide is a fact about a symmetric matrix, not about
+every matrix.} Program~\ref{prog:P09}'s shear
+$\left(\begin{smallmatrix} 1 & 1 \\ 0 & 1 \end{smallmatrix}\right)$ has both
+eigenvalues equal to $1$, so its largest $\lvert\lambda\rvert$ is $1$ \dash{}
+and it sends $(0, 1)$ to $(1, 1)$, so it amplifies by at least $\sqrt{2}$. Its
+spectral norm is $\num{1.618}$, over half again what the eigenvalues report.
+In general the spectral norm is the largest \emph{singular} value, and
+Program~\ref{prog:P11} builds those; here it is the largest
+$\lvert\lambda\rvert$ because the matrix is symmetric, which is exactly the
+case the spectral theorem covers.
+\end{warning}
+
 The script takes a symmetric matrix with eigenvalues $\val{p10.norm.max}$ and
 $-\val{p10.norm.min}$ and measures the stretch in $\val{p10.norm.dirs}$
 directions round the circle. The largest is $\val{p10.norm.max}$, the smallest
@@ -968,11 +981,13 @@ program's non-symmetric examples had no eigenvalues to give.
   ways}. And \emph{semi}-definite allows a zero, so a positive definite matrix
   is invertible and a positive semi-definite one need not be \dash{} the word
   \emph{semi} carries that entire difference}.}
-\sumitem{33--34}{\result{\textbf{The spectral norm is the largest
-  $\lvert\lambda\rvert$}, and it is the factor by which a layer can amplify in
-  the worst case over every input including the untried ones. Over
-  $\val{p10.norm.dirs}$ directions: largest $\val{p10.norm.max}$, smallest
-  $\val{p10.norm.min}$, attained at the top eigenvector}.}
+\sumitem{33--34}{\result{The spectral norm is the factor by which a layer can
+  amplify in the worst case over every input including the untried ones, and
+  \textbf{for a SYMMETRIC matrix it is the largest $\lvert\lambda\rvert$}
+  \dash{} in general it is the largest singular value, which is
+  Program~\ref{prog:P11}'s. Over $\val{p10.norm.dirs}$ directions: largest
+  $\val{p10.norm.max}$, smallest $\val{p10.norm.min}$, attained at the top
+  eigenvector}.}
 \sumitem{35--37}{\result{A level set of a positive definite form is an ellipse with
   its axes along the eigenvectors, and \textbf{the ratio of the axes is the
   SQUARE ROOT of the ratio of the eigenvalues} \dash{}
@@ -1011,9 +1026,13 @@ program's non-symmetric examples had no eigenvalues to give.
   eigenvectors are $(1,1)$ and $(1,0)$, whose dot product is $1$. The
   perpendicularity argument needs $(Av)\cdot w = v\cdot(Aw)$, which needs
   $A\T = A$.}
-\item A symmetric matrix has eigenvalues $9$ and $4$. Give the spectral norm,
+\item A symmetric matrix has eigenvalues $9$ and $4$. Give the spectral norm
+  \dash{} and say which word in this sentence the answer depends on,
   and the ratio of the axes of the ellipse $x\T Ax = 1$.
-  \answerto{The spectral norm is $9$. The axis ratio is
+  \answerto{The spectral norm is $9$, and the word it depends on is
+  \emph{symmetric}: for a symmetric matrix the largest $\lvert\lambda\rvert$
+  is the spectral norm, and for anything else it is the largest singular value
+  and can be strictly larger. The axis ratio is
   $\sqrt{9/4} = \frac{3}{2}$, because the half-axes go as $1/\sqrt{\lambda}$
   \dash{} not $9/4$.}
 \item Is $\begin{pmatrix} 1 & 3 \\ 3 & 1 \end{pmatrix}$ positive definite?

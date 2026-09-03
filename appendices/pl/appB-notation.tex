@@ -3,12 +3,14 @@
 \chapter{Notacja i symbole}
 \label{app:B}
 
-\programstub{%
-Wszystkie symbole używane w książce, w kolejności, w jakiej czytelnik je
-spotyka, wraz z numerem ramki wprowadzającej. To do tego dodatku odsyła wstęp
-\emph{Jak czytać wzór}; istnieje, bo czytelnika, który nigdy nie widział
-$\sum$, nie może to zatrzymać w Programie~F4.
-}
+\noindent
+Ten dodatek odnotowuje cztery miejsca, w których uzus matematyczny jest
+podzielony i książka musiała wybrać, oraz jedną regułę rozstrzygającą, jak
+nazwa jest zapisywana w każdym z wydań. Celowo nie jest tabelą wszystkich
+symboli: czytelnik, który nigdy nie widział $\sum$, spotyka go zbudowanego od
+zera w Programie~\ref{prog:F04}, a indeks pod nim w Programie~\ref{prog:F02},
+więc robotę, którą miałaby wykonać tabela symboli, wykonują programy
+wprowadzające te symbole.
 
 % ============================================================
 \section{Decyzje, które ta książka podjęła}
@@ -20,9 +22,21 @@ jest dla czytelnika wart więcej niż konwencja. Oto cztery, które naprawdę
 bolą.
 
 \begin{notationbox}
-\textbf{Logarytm zawsze niesie tutaj swoją podstawę.} Ta książka nigdy nie
-pisze samego $\mfalogplain$. Logarytm naturalny to $\ln$, logarytm o podstawie
-dwa to $\logb{2}$.
+\textbf{Logarytm niesie tutaj swoją podstawę, a build tego pilnuje.}
+Logarytm naturalny to $\ln$, logarytm o podstawie dwa to $\logb{2}$. Sam
+$\mfalogplain$ jest błędem builda, a lint parzystości nazywa plik i wiersz,
+zanim build w ogóle do tego dojdzie.
+
+Są dwa rodzaje miejsc, w których zakaz jest uchylony, i oba są celowe. Jedno
+to miejsce, w którym sam zakaz jest tematem: ten dodatek oraz sekcja~2
+Programu~\ref{prog:F03}, która każe czytelnikowi spotkać to zderzenie, zanim
+zostanie nazwane. Drugie to \textbf{wnętrze $O$}, gdzie zmiana podstawy mnoży
+przez stałą, a stała jest właśnie tym, co ta notacja odrzuca \dash{} więc
+$O(n \mfalogplain n)$ nazywa jedną klasę wzrostu naraz dla każdej podstawy, a
+wpisanie tam podstawy sugerowałoby rozróżnienie, którego nie ma.
+Program~\ref{prog:P03} ma to jako ramkę notacyjną, a Program~\ref{prog:P16} z
+tego korzysta. Liczba takich miejsc celowo nie jest tu podana, bo takie
+zliczenie się starzeje, a nic nie może go sprawdzić.
 
 Powód jest taki, że dwie grupy czytelników, którym ta książka służy, zostały
 nauczone przeciwnych konwencji. W polskich podręcznikach sam logarytm oznacza
@@ -37,10 +51,17 @@ pamięć.
 \end{notationbox}
 
 \begin{notationbox}
-\textbf{Wektory są kolumnami i są pogrubione.} $\vect{x} \in \R^{n}$ jest
-kolumną, a $\vect{x}\T$ wierszem. Polska szkoła pisze też strzałkę nad literą;
-prace, do których czytania ta książka cię przygotowuje, tego nie robią, więc
-ta książka też nie.
+\textbf{Wektory są kolumnami.} $x \in \R^{n}$ jest kolumną, a $x\T$ wierszem.
+Polska szkoła pisze też strzałkę nad literą; prace, do których czytania ta
+książka cię przygotowuje, tego nie robią, więc ta książka też nie.
+
+Wektor składa się zwykłą kursywą wszędzie tam, gdzie nic innego w wyrażeniu
+nie mogłoby zostać za niego wzięte, czyli w większości książki \dash{}
+Programy \ref{prog:F09}, \ref{prog:P04} i \ref{prog:P05} wprowadzają wektory i
+składają każdy z nich kursywą. \textbf{Pogrubienia} używamy tam, gdzie wektor
+i macierz dzielą jedno wyrażenie, a chodzi właśnie o kształty, jak w
+$\vect{y} = W\vect{x}$: to jest temat Programu~\ref{prog:P18} od początku do
+końca i tych kilku późniejszych miejsc, które go cytują.
 
 \textbf{Pochodne macierzowe używają układu licznikowego}, zadeklarowanego w
 Programie~P18 i nigdy nie przyjmowanego milcząco. To nie jest różnica polsko-
@@ -70,16 +91,25 @@ dostaje zdanie, a nie ramkę.
 \label{sec:appB-keyboard}
 
 \noindent
-Wydanie polskie pisze $\tg\theta$ na tangens i \code{tanh} na tangens
-hiperboliczny, co wygląda na niekonsekwencję. To jest reguła w działaniu.
+Wydanie polskie pisze \emph{tg} na tangens, tam gdzie wydanie angielskie
+pisze \emph{tan} \dash{} a oba wydania piszą \code{tanh} na tangens
+hiperboliczny, zamiast \emph{tgh}, które składa polskie piśmiennictwo
+matematyczne. Wygląda to na niekonsekwencję. To jest reguła w działaniu.
+
+Obie pisownie są tu złożone jako dosłowny tekst, a nie przez makra notacyjne,
+i musi tak być: makro renderuje się w wydaniu, które trzymasz, więc napisanie
+tego akapitu przez $\tg$ dałoby w obu kolumnach to samo słowo i opisywałoby
+rozbieżność, której strona nie pokazuje.
 
 \begin{note}
 \textbf{Jeśli będziesz wpisywał dany zapis do komputera, oba wydania używają
 pisowni, którą wpiszesz. Jeśli będziesz go wyłącznie czytał albo pisał ręcznie,
 wydanie polskie używa formy polskiej.}
 
-Nikt nie wpisuje $\tg$ do programu, więc wydanie polskie składa $\tg$, $\ctg$ i
-$\arctg$ tak, jak robi to polska matematyka. Ale \code{tanh} to
+Nikt nie wpisuje \emph{tg} do programu, więc wydanie polskie składa
+\emph{tg}, \emph{ctg} i \emph{arc tg} tak, jak robi to polska matematyka
+\dash{} przez $\tg$, $\ctg$ i $\arctg$, które tutaj składają formy polskie, a
+tam angielskie. Ale \code{tanh} to
 \code{torch.tanh} \dash{} jest funkcją aktywacji, zanim jest funkcją zmiennej
 rzeczywistej, a polski czytelnik, który nauczy się \emph{tgh}, nie znajdzie jej
 w żadnej bibliotece. Polskie piśmiennictwo matematyczne pisze \emph{tgh}, a

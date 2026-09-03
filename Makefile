@@ -192,10 +192,18 @@ stubs-check:
 	@python3 tools/gen_stubs.py --check
 
 # 1. Programs not yet written.
+# The appendices are scanned too, and that is not thoroughness for its own
+# sake. This ledger read `programs/` alone, so it reported "0 of 47 programs
+# are stubs" -- truthfully -- while Appendix B printed a red NOT YET WRITTEN
+# box in the finished book for months. A ledger phrased over one directory is
+# a ledger about that directory, and the gap between it and the sentence
+# somebody reads it as is where that defect lived.
 stubs:
 	@for L in $(LANGS); do \
 	  n=$$(grep -rl '\\programstub{' programs/$$L 2>/dev/null | wc -l); \
 	  echo "  $$L: $$n of $$(ls programs/$$L/*.tex 2>/dev/null | wc -l) programs are stubs"; \
+	  a=$$(grep -rl '\\programstub{' appendices/$$L 2>/dev/null | wc -l); \
+	  echo "  $$L: $$a of $$(ls appendices/$$L/*.tex 2>/dev/null | wc -l) appendices are stubs"; \
 	done
 
 # 2. Exercises with no answer. A mathematics book's most common defect, and

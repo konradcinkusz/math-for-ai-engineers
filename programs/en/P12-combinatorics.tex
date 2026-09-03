@@ -1062,9 +1062,9 @@ before writing the loop.
 \item A beam of width $b$ over $L$ steps and a vocabulary of $V$ scores
   $LbV$ continuations. What width would be needed to score one per cent of the
   space, at $V = \val{p12.beam.vocab}$ and $L = \val{p12.beam.len}$?
-  \answerto{$b = \num{0.01}\,V^{L}/(LV)$, which is about $2 \times 10^{84}$. The
-  point of the exercise is that the number is not merely large but
-  unreachable, so no width is a coverage argument.}
+  \answerto{$b = \num{0.01}\,V^{L}/(LV)$, which is
+  $\val{p12.beam.pct.width}$. The point of the exercise is that the number is
+  not merely large but unreachable, so no width is a coverage argument.}
 \item The empty product gives $0! = 1$. Show that this is forced by Pascal's
   rule rather than being a convention chosen for convenience.
   \answerto{$\binom{n}{n} = \binom{n-1}{n-1} + \binom{n-1}{n}$, and the last
