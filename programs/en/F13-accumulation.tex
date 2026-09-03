@@ -50,11 +50,13 @@
 \begin{outcomes}
 \outcome{1--5}{estimate an accumulated total as a sum of strips, and say what
   makes the estimate better}
-\outcome{6--9}{read the integral sign, and say what each part of it names}
+\outcome{6--7}{read the integral sign, and say what each part of it names}
+\outcome{8--9}{split an accumulation at a midpoint and over a sum, and say
+  which integration techniques this book leaves out and why}
 \outcome{10--12}{say how accumulating and differentiating are related}
 \outcome{13--17}{say what makes a curve a density, and say what a point on
   one measures}
-\outcome{18--22}{write a weighted average as an integral, and say what does
+\outcome{18--23}{write a weighted average as an integral, and say what does
   the weighting}
 \end{outcomes}
 
@@ -84,11 +86,11 @@
   \answerto{Yes. A height is not an area, so nothing bounds it by one \dash{}
   the uniform density on an interval of width $\val{f13.narrow}$ has exactly
   that height.}
-\item A curve is never negative and the area under it is
-  $\val{f13.unnorm.total}$. How do you turn it into a density?
+\item A curve is never negative and the area under it is $\frac{1}{6}$. How do
+  you turn it into a density?
   \teachesat{16--17}
-  \answerto{Divide it by $\val{f13.unnorm.total}$, or equivalently multiply by
-  $\val{f13.unnorm.const}$. That divisor is the normalising constant.}
+  \answerto{Divide it by $\frac{1}{6}$, or equivalently multiply by $6$. The
+  divisor is the normalising constant.}
 \item Write the shape of a weighted average of $x$ under a density $p$.
   \teachesatone{19}
   \answerto{$\int x\,p(x)\,\mathrm{d}x$: each value multiplied by how much of
@@ -102,8 +104,7 @@
 
 \begin{fr}
 Program~\ref{prog:F11} asked how fast something is changing. This program asks
-the opposite question, and it is the one you meet more often: given a rate,
-how much accumulated?
+the opposite question: given a rate, how much accumulated?
 
 You have done it. A service handles requests at a rate that varies through the
 day, and you want the total for the day. What do you actually do?
@@ -123,6 +124,12 @@ Draw it and the picture is areas. Each interval is a rectangle whose width is
 the interval and whose height is the rate, so its area is the amount
 accumulated in it, and the total is the total area.
 
+The rectangle is where the idea stops being exact. A rate that varies through
+an interval has no single value, and a rectangle has one height, so drawing it
+means choosing a height to stand for the whole interval. That choice is a
+decision about the method rather than a fact about the rate, and it is why the
+instruction below has to say which point of each strip to measure at.
+
 Try it on a curve. Take $y = x^{2}$ from $x = 0$ to $x = 1$, cut it into ten
 strips of width $\num{0.1}$, and take each strip's height at its right-hand
 edge. What total do the ten rectangles give?
@@ -137,27 +144,32 @@ $1^{2}$.
 
 That is an over-estimate, because the curve rises and each rectangle is as
 tall as its right-hand edge, so every one of them pokes out above the curve.
-Take a hundred strips instead and the overshoot shrinks. What do you get?
+Take a hundred strips instead. Without computing anything, say two things
+about the total they give: how it compares with $\val{f13.rect.10}$, and
+whether it is still an over-estimate.
 \nextframe
 \end{fr}
 
 \begin{fr}
 \begin{ansblock}
 \begin{center}
+\sisetup{group-minimum-digits = 4}%
 \begin{tabular}{lc}
 \toprule
 strips & total \\
 \midrule
-$10$ & $\val{f13.rect.10}$ \\
-$100$ & $\val{f13.rect.100}$ \\
-$1000$ & $\val{f13.rect.1000}$ \\
+$\num{10}$ & $\val{f13.rect.10}$ \\
+$\num{100}$ & $\val{f13.rect.100}$ \\
+$\num{1000}$ & $\val{f13.rect.1000}$ \\
 $\num{10000}$ & $\val{f13.rect.10000}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 \end{ansblock}
 
-Heading somewhere, from above, and $\frac{1}{3}$ is where.
+Smaller, and still too big: the overshoot argument does not care how narrow
+the strips are, so every total in the table is above the answer. Heading
+somewhere, from above, and $\frac{1}{3}$ is where.
 
 \textbf{And the rate is knowable rather than merely observable}, which is
 better than four rows suggesting a limit. The sum of the first $n$ squares has
@@ -356,10 +368,11 @@ is why that distribution's tables exist.
 Here is what the rest of this book needs an integral for.
 
 A quantity that can take any value in a range \dash{} a latency, a score, a
-weight \dash{} cannot have a probability at each individual value, because
-there are infinitely many of them and they would have to add to one. What is
-described instead is a curve, and \emph{areas} under that curve are the
-probabilities.
+weight \dash{} cannot have a probability at each individual value. Give every
+value the same positive probability and a large enough handful of them already
+totals more than one, so each one has to be zero \dash{} and zeros do not add
+to one either. What is described instead is a curve, and \emph{areas} under
+that curve are the probabilities.
 
 Such a curve is a \textbf{density}. Two things have to be true of it. One is
 that it is never negative. What is the other?
@@ -416,8 +429,8 @@ and narrowing the interval separates them.}{why a density can exceed one}
 One more operation, and it is the one you will do most often.
 
 Here is a curve: $x(1-x)$ on $\intcc{0}{1}$. It is never negative there, so it
-has the first property of a density. It accumulates to
-$\val{f13.unnorm.total}$, so it does not have the second.
+has the first property of a density. It accumulates to $\frac{1}{6}$, so it
+does not have the second.
 
 How do you fix it?
 \nextframe
@@ -425,8 +438,7 @@ How do you fix it?
 
 \begin{fr}
 \begin{ansblock}
-Divide by $\val{f13.unnorm.total}$ \dash{} that is, multiply by
-$\val{f13.unnorm.const}$.
+Divide by $\frac{1}{6}$ \dash{} that is, multiply by $6$.
 \end{ansblock}
 
 And then the area is one, because dividing every height by the total divides
@@ -439,17 +451,19 @@ so that the results add to one. Same operation: \textbf{make it non-negative,
 add it up, divide by the sum.} A sum for a list, an integral for a curve.
 
 \begin{aibox}
-The constant is also why a great deal of practical work never computes one. In
-a lot of settings the shape of a density is easy to write down and its total
-is an integral nobody can do, so what is available is the curve
-\emph{up to a constant}.
+Program~\ref{prog:F05} wrote a model's next-token distribution as a
+$\softmax$, whose denominator is a normalising constant computed outright: one
+exponential per token of the vocabulary, added up. It is a loop, it runs on
+every forward pass, and nobody calls it an integral because the outcomes are a
+finite list.
 
-That is usually enough, because most questions are ratios and the constant
-cancels: which of two values is more likely, or how much more likely. The
-questions that need the constant are the ones that ask for a probability
-outright, and the machinery invented to avoid computing it \dash{} sampling
-methods, variational bounds \dash{} exists because that one integral is hard
-and everything else is not.
+Replace the list with a curve and that loop has nothing to run over. The same
+constant becomes an integral, and for most of the densities that are easy to
+write down it is one nobody can do, so what is available is the curve
+\emph{up to a constant}. That is enough for a ratio, because the constant
+cancels, and not enough for a probability outright \dash{} which is why the
+sampling methods and variational bounds exist at all. The difference between
+the two settings is one denominator you can add up.
 \end{aibox}
 \end{fr}
 
@@ -494,7 +508,16 @@ replaces it.
 
 Now one where symmetry gives nothing. The curve $2x$ on $\intcc{0}{1}$ is a
 density (its area is $1$; check that), and it puts more weight at the top end.
-Its weighted average is $\val{f13.lop.centre}$, not $\num{0.5}$.
+Before computing: is its weighted average above or below $\num{0.5}$, and can
+you say roughly where?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f13.lop.centre}$}
+Above, because that is the end the weight leans towards, and two thirds of the
+way along rather than half.
 
 \textbf{So the weighted average is not the middle of the range}, and the only
 way to know where it is, is to do the accumulation.
@@ -504,12 +527,13 @@ done by a density.}{from a sum to an integral}
 \end{fr}
 
 \begin{fr}
-That integral has a name, and this program deliberately does not give it one.
+That integral has a name, and this program gives it once, here, and then does
+not use it again.
 
 \textbf{It is an expectation}, and what it is the expectation \emph{of} is a
 random variable, which is Program~\ref{prog:P24}'s subject and needs
-Program~\ref{prog:P23}'s account of what a probability is first. Naming it
-here would mean using three words this book has not defined.
+Program~\ref{prog:P23}'s account of what a probability is first. Using it
+would mean three words this book has not defined.
 
 What is yours after this program is the \emph{shape} \dash{} a value times a
 density, accumulated \dash{} and the knowledge that it is what an average
@@ -523,15 +547,19 @@ That is the Foundation part.
 
 Thirteen programs, and the last three are worth naming together because they
 are one arc. Program~\ref{prog:F11} defined a rate as a limit of differences.
-Program~\ref{prog:F12} made rates computable and found that a network is a
-product of them. This program went the other way: a total as a limit of sums,
+Program~\ref{prog:F12} made rates computable and found that a network's
+\emph{derivative} is a product of them, one factor per layer \dash{} the
+network itself is a composition, and the product is what differentiating one
+gives. This program went the other way: a total as a limit of sums,
 and the two directions turned out to undo each other.
 
-\textbf{Nothing after this assumes nothing.} From here the book has arithmetic,
-algebra, functions, vectors, sets, and both halves of the calculus, and it
-starts building on them rather than beside them. Program~\ref{prog:P01} is
-next and it is about what your machine actually computes, which is a good
-place to start being careful.
+\textbf{From here the book builds on Part I rather than beside it.} It has
+arithmetic, algebra, functions, vectors, sets and both halves of the calculus,
+and every program after this one is entitled to use them.
+Program~\ref{prog:P01} is next and it is about what your machine actually
+computes, which is a good place to start being careful. Note the number: the
+Foundation programs carry an F and everything after them is numbered from $1$
+to $34$ without one, so the next program is P1 and not F14.
 \end{fr}
 
 % ============================================================
@@ -578,19 +606,21 @@ place to start being careful.
   probability \emph{per unit of $x$} \dash{} a rate, as a speed is not a
   distance. A likelihood above one is not a bug}.}
 \sumitem{16--17}{\result{Divide a non-negative curve by its total and it becomes a
-  density: $x(1-x)$ on $\intcc{0}{1}$ accumulates to $\val{f13.unnorm.total}$,
-  so the \textbf{normalising constant} is $\val{f13.unnorm.const}$. Same
+  density: $x(1-x)$ on $\intcc{0}{1}$ accumulates to $\frac{1}{6}$, so the
+  \textbf{normalising constant} \dash{} the divisor \dash{} is $\frac{1}{6}$
+  and you multiply by $6$. Same
   operation as a softmax's denominator \dash{} make it non-negative, add it
   up, divide by the sum \dash{} with an integral in place of the sum. Much
   practical work never computes it, because ratios cancel it}.}
-\sumitem{18--20}{\result{\textbf{$\int x\,p(x)\,\mathrm{d}x$ is a weighted average}:
+\sumitem{18--21}{\result{\textbf{$\int x\,p(x)\,\mathrm{d}x$ is a weighted average}:
   each value multiplied by how much of it there is, accumulated. On the
   symmetric density it is $\val{f13.centre}$, which symmetry gives before the
   integral does; on $2x$ over $\intcc{0}{1}$ it is $\val{f13.lop.centre}$, not
   the middle \dash{} so the accumulation is the only way to know}.}
-\sumitem{21--22}{That integral is an \textbf{expectation}, and this program
-  deliberately stops before the word: what it is an expectation \emph{of} is
-  Program~\ref{prog:P24}'s, and it needs Program~\ref{prog:P23}'s account of
+\sumitem{22--23}{That integral is an \textbf{expectation}, and this program
+  deliberately stops after naming it once: what it is an expectation
+  \emph{of} is Program~\ref{prog:P24}'s, and it needs
+  Program~\ref{prog:P23}'s account of
   probability first. What is yours is the shape. \textbf{This closes the
   Foundation part}: from here the book has arithmetic, algebra, functions,
   vectors, sets and both halves of the calculus, and stops assuming nothing.}
@@ -627,8 +657,9 @@ place to start being careful.
   $\frac{1}{\num{0.02}}$.}
 \item A curve is non-negative with total area $\num{2.5}$. Give the
   normalising constant.
-  \answerto{$\num{0.4}$, since dividing by $\num{2.5}$ is multiplying by
-  $\frac{1}{\num{2.5}}$.}
+  \answerto{$\num{2.5}$: the constant is the total you divide by. Dividing
+  by it is the same as multiplying by $\num{0.4}$, which is its reciprocal and
+  not the constant.}
 \item A library reports a likelihood of $\num{3.2}$. Is something wrong?
   \answerto{Not necessarily. A density's height can exceed one; only areas are
   bounded.}

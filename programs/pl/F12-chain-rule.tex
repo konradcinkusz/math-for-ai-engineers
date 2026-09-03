@@ -8,9 +8,12 @@
 %% PROPAGACJA WSTECZNA TO REGUŁA ŁAŃCUCHOWA ZASTOSOWANA DO ZŁOŻENIA WARSTW.
 %%
 %% KAŻDA REGUŁA JEST SPRAWDZONA WOBEC POCHODNEJ UZYSKANEJ BEZ NIEJ, różnicą
-%% centralną przy h = 1e-5 -- blisko dna krzywej U, którą zmierzył F11. To
-%% jest ta korzyść, na którą F11 zapracował: różnica skończona jest
-%% prawdziwym testem, gdy jej krok dobrać właściwie, i po to właśnie jest.
+%% centralną przy h = 1e-5. To jest ta korzyść, na którą F11 zapracował:
+%% różnica skończona jest prawdziwym testem, gdy jej krok dobrać właściwie,
+%% i po to właśnie jest. Ale to NIE jest krok F11 -- tamten program badał
+%% różnicę W PRZÓD, której błąd obcięcia jest rzędu h, więc jej dno leży
+%% niżej. Błąd różnicy centralnej jest rzędu h do kwadratu, więc jej dno
+%% leży wyżej. Tekst na stronie to mówi; ten komentarz mówił inaczej.
 %%
 %% POMIARY:
 %%   pułapka reguły iloczynu z liczbami: na x^2 i x^3 w x = 2 poprawna
@@ -26,7 +29,7 @@
 %%     ogóle, dopóki |w| <= 4. Oba tryby porażki nie są symetryczne i to
 %%     dlatego.
 %%
-%% BRAMKA DRYFU MIĘDZY PROGRAMAMI, nowa w tym przebiegu. F07 zmierzył, że
+%% BRAMKA DRYFU MIĘDZY PROGRAMAMI, nowa w tym przebiegu. F7 zmierzył, że
 %% nasycona jednostka odpowiada mniej więcej setną częścią odpowiedzi ze
 %% środka, i zatwierdził f07.slope.ratio6 = 101. Ten program liczy ten sam
 %% stosunek od zera i ASERTUJE zgodność, więc "ten sam rachunek cytowany dwa
@@ -87,18 +90,20 @@
   \answerto{$\val{f12.sig.max}$, w $z = 0$.}
 \item Zróżniczkuj $\sigma(wx + b)$ po $x$. \teachesat{19--20}
   \answerto{$w\,\sigma(wx+b)\bigl(1 - \sigma(wx+b)\bigr)$, regułą łańcuchową.}
-\item Sieć ma $\num{40}$ warstw. Ile czynników wstawia reguła łańcuchowa do
-  pochodnej po wejściu pierwszej warstwy?
+\item Sieć ma $\num{40}$ warstw. Ile czynników warstwowych
+  $w_k\sigma'(z_k)$ wstawia reguła łańcuchowa do pochodnej po wejściu
+  pierwszej warstwy?
   \teachesat{22--23}
   \answerto{$\num{40}$, po jednym na warstwę, wszystkie wymnożone.}
-\item Każda z $\val{f12.depth}$ warstw wnosi czynnik co najwyżej
-  $\val{f12.sig.max}$. Ile wynosi iloczyn co najwyżej? \teachesat{26--27}
+\item Każda z $\val{f12.depth}$ warstw wnosi swój największy możliwy
+  czynnik. Ile wynosi iloczyn co najwyżej? \teachesat{26--27}
   \answerto{$\val{f12.vanish.bound}$, i to tylko wtedy, gdy każda jednostka
   siedzi dokładnie w swoim środku.}
 \item W warstwie logistycznej o wadze $w$: jak duże musi być $w$, żeby
   warstwa mogła wzmocnić gradient, a nie go zmniejszyć? \teachesat{28--29}
-  \answerto{Powyżej $\val{f12.explode.w}$, bo czynnikiem jest $w\sigma'$, a
-  $\sigma'$ nigdy nie przekracza $\val{f12.sig.max}$.}
+  \answerto{Powyżej $\val{f12.explode.w}$ co do wielkości, bo wielkością
+  czynnika jest $\lvert w \rvert\sigma'$, a $\sigma'$ nigdy nie przekracza
+  $\val{f12.sig.max}$. Waga $-8$ wzmacnia dokładnie tak samo mocno jak $8$.}
 \end{quiz}
 
 % ============================================================
@@ -154,7 +159,7 @@ Teraz $\sqrt[3]{x}$, czyli $x^{1/3}$.
 \end{fr}
 
 \begin{fr}
-\ans{$\frac{1}{3}x^{-2/3}$}
+\ans{$\dfrac{1}{3}x^{-2/3}$}
 Wykładnik zszedł na dół i zmalał o jeden: $\frac{1}{3} - 1 = -\frac{2}{3}$.
 
 Jeszcze dwie reguły, obie tak łagodne, że jedynym powodem, by je podać, jest
@@ -180,13 +185,18 @@ $2$ znika, bo stała nie ma nachylenia.
 \begin{note}
 Każda reguła w tym programie jest sprawdzona w
 \code{code/f12\_chain\_rule.py} wobec pochodnej policzonej \emph{bez} niej
-\dash{} różnicą centralną przy $h = 10^{-5}$, którą Program~\ref{prog:F11}
-znalazł blisko dna swojej krzywej U. Ta zgadza się do $\val{f12.err.sum}$ w
-dwustu punktach.
+\dash{} różnicą \emph{centralną}, $\frac{f(x+h) - f(x-h)}{2h}$, przy
+$h = 10^{-5}$. Ta zgadza się do $\val{f12.err.sum}$ w dwustu punktach.
 
-I po to właśnie różnica skończona jest. F11 pokazał, że robi z niej złą
-definicję; robi z niej doskonałe niezależne sprawdzenie, o ile krok dobierze
-się tam, gdzie krzywa U jest nisko, a nie tak mały, jak się da.
+I po to właśnie różnica skończona jest. Program~\ref{prog:F11} pokazał, że
+robi z niej złą definicję; robi z niej doskonałe niezależne sprawdzenie, o ile
+krok dobierze się tam, gdzie krzywa U jest nisko, a nie tak mały, jak się da.
+
+\textbf{Ale ten krok nie jest krokiem F11.} Tamten program przemiótł różnicę
+\emph{w przód} i znalazł jej najlepszy krok przy $\val{f11.fd.best.h}$;
+postać centralna ma inną krzywą U, a skrypt przemiata ją tutaj, zamiast
+pożyczać tamtą liczbę. Jej dno leży trzy dekady wyżej i stamtąd bierze się
+$h = 10^{-5}$.
 \end{note}
 
 Zróżniczkuj $\frac{4}{x} + \sqrt{x}$.
@@ -236,10 +246,12 @@ wiersz wcześniej, zostaje przeniesiona o krok poza swoje założenia, czyli ten
 sam kształt co podane w Programie~\ref{prog:F02} $(a+b)^{2}$ i dodawanie
 długości z Programu~\ref{prog:F09}.
 
-Oba wyrażenia zgadzają się w dokładnie $\val{f12.trap.agree}$ punktach całego
-przebiegu, który liczy skrypt, i oba te punkty są przypadkami tego, gdzie
-$5x^{4}$ przecina $6x^{3}$. Nie ma obszaru, w którym ten odruch byłby choćby w
-przybliżeniu poprawny.
+Oba wyrażenia przecinają się w dokładnie $\val{f12.trap.agree}$ punktach i
+oba te punkty są przypadkami tego, gdzie $5x^{4}$ spotyka $6x^{3}$. Poza nimi
+odruch nie jest po prostu niedokładny: jest inną \emph{potęgą} $x$, więc
+stosunek między nim a prawdą wynosi $\frac{6}{5x}$ i zależy całkowicie od
+tego, gdzie stoisz. Nie ma stałego czynnika, którym dałoby się to poprawić,
+ani przedziału, na którym odruch byłby rzetelnie bliski.
 
 Powód wart jest jednego zdania, bo wyjaśnia poprawną regułę, a nie tylko
 zastępuje błędną. Gdy $x$ się przesuwa, przesuwają się \emph{oba} czynniki, a
@@ -296,9 +308,12 @@ $\frac{f}{g}$.
 \textbf{Reguła ilorazu}. Licznik to reguła iloczynu z minusem, i przez to
 kolejność ma znaczenie: $f'g$ idzie pierwsze.
 
-Dwie rzeczy czynią ją zapamiętywalną, a nie wykutą. Minus jest tam dlatego, że
-zwiększenie \emph{mianownika} zmniejsza całość, więc wkład $g$ musi przyjść z
-przeciwnym znakiem niż wkład $f$. A $g^{2}$ pod spodem musi tam być, żeby
+Dwie rzeczy czynią ją zapamiętywalną, a nie wykutą. Minus jest tam dlatego,
+że dla dodatniego $f$ zwiększenie \emph{mianownika} zmniejsza całość, więc
+wkład $g$ musi przyjść z przeciwnym znakiem niż wkład $f$. To mnemonik, a nie
+wyprowadzenie \dash{} dla ujemnego $f$ całość \emph{rośnie} razem z $g$
+\dash{} a wyprowadzenie to problem dodatkowy $2$, który wyciąga tę regułę z
+reguły iloczynu w jednej linii. A $g^{2}$ pod spodem musi tam być, żeby
 jednostki się zgadzały: jeśli $f$ jest stratą, a $g$ liczbą, to $\frac{f}{g}$
 jest stratą na sztukę, a jej tempo zmiany po $x$ nie może mieć $g$
 pojawiającego się tylko raz.
@@ -308,7 +323,7 @@ Zróżniczkuj $\frac{x^{2}}{x+3}$.
 \end{fr}
 
 \begin{fr}
-\ans{$\frac{2x(x+3) - x^{2}}{(x+3)^{2}}$}
+\ans{$\dfrac{2x(x+3) - x^{2}}{(x+3)^{2}}$}
 Co upraszcza się do $\frac{x^{2} + 6x}{(x+3)^{2}}$, jeśli chcesz, i nie musi.
 Sprawdzone do $\val{f12.err.quotient}$.
 
@@ -379,13 +394,14 @@ Zróżniczkuj $\sqrt{x^{2} + 1}$.
 \end{fr}
 
 \begin{fr}
-\ans{$\frac{x}{\sqrt{x^{2}+1}}$}
+\ans{$\dfrac{x}{\sqrt{x^{2}+1}}$}
 Na zewnątrz $u^{1/2}$ daje $\frac{1}{2}u^{-1/2}$, policzone w $x^{2}+1$.
 Wewnątrz $x^{2}+1$ daje $2x$. Pomnóż, a oba $2$ się skracają.
 
 Teraz ta, której ta książka naprawdę potrzebuje. Program~\ref{prog:F07} dał ci
-funkcję logistyczną, $\sigma(z) = \frac{1}{1 + e^{-z}}$, i powiedział, że jej
-pochodna potrzebuje reguły łańcuchowej i przyjdzie tutaj.
+funkcję logistyczną, $\sigma(z) = \frac{1}{1 + e^{-z}}$, i zmierzył jej
+stromość, ani razu jej nie różniczkując. Sama pochodna potrzebuje reguły
+łańcuchowej, więc przychodzi tutaj.
 
 Jest ilorazem ze złożeniem w środku, więc bierze obie ostatnie sekcje. Policz
 to albo weź odpowiedź i sprawdź.
@@ -411,9 +427,16 @@ punktach od $-8$ do $8$.
 \textbf{Pochodna da się wyrazić przez samą funkcję}, co jest nietypowe i nie
 jest przypadkiem algebry. To powód, dla którego framework potrafi policzyć
 gradient warstwy logistycznej z wartości, którą już zapisał po drodze w przód,
-niczego nie licząc od nowa i nie trzymając wejścia. Ta obserwacja jest
-zalążkiem tego, co Program~\ref{prog:P16} nazywa trybem wstecznym.
+niczego nie licząc od nowa i nie trzymając wejścia. To wygoda właściwa
+funkcji logistycznej; tym, co się uogólnia i z czym Program~\ref{prog:P16}
+musi się rozliczyć, jest zachowywanie wartości z przebiegu w przód w ogóle.
 \end{note}
+
+Zwróć uwagę, jak długi był ten łańcuch. Czytając $\sigma$ od środka, $z$
+staje się $-z$, potem $e^{-z}$, potem $1 + e^{-z}$, a na końcu odwrotnością:
+cztery ogniwa, i regułę zastosowano do każdego z nich. Reszta tego programu
+robi dokładnie to samo z $\val{f12.depth}$ warstwami i nic w rozumowaniu się
+nie zmienia \dash{} po to właśnie jest reguła, która się składa.
 
 Ile najwięcej może wynosić $\sigma'$ i gdzie?
 \nextframe
@@ -463,6 +486,13 @@ Program~\ref{prog:F05} ustalił, że głęboka sieć jest złożeniem i niczym
 więcej. Rozpisz dwie warstwy:
 \[ y = \sigma\bigl(w_2\,\sigma(w_1 x + b_1) + b_2\bigr) \]
 i zróżniczkuj po $x$.
+
+Zanim zaczniesz, warto wiedzieć, że to jedyny przypadek, który musisz
+przerobić. Odpowiedź dla dwóch warstw nie korzysta z tego, że są dwie
+\dash{} te same kroki stosują się do trzeciej warstwy i do czwartej, w tej
+samej kolejności \dash{} więc to, co tu napiszesz, jest odpowiedzią ogólną z
+małym $n$, a reszta tego programu to ta sama odpowiedź czytana przy
+$\val{f12.depth}$.
 
 Weź to w dwóch krokach: jaka jest pochodna warstwy wewnętrznej i co robi z nią
 zewnętrzna?
@@ -557,10 +587,10 @@ Weź iloczyn z poprzedniej sekcji z każdą wagą równą $1$, tak że każdy cz
 to po prostu $\sigma'(z_k)$.
 
 Program~\ref{prog:F07} zmierzył, co robi nasycona funkcja logistyczna: przy
-$\lvert z \rvert = 6$ odpowiada na zmianę wejścia mniej więcej
-$\val{f12.sat.ratio}$-tą częścią odpowiedzi, jaką daje w środku. To jedna
+$\lvert z \rvert = 6$ odpowiada na zmianę wejścia mniej więcej jedną częścią
+na $\val{f07.slope.ratio6}$ tej odpowiedzi, jaką daje w środku. To jedna
 warstwa. Ten program liczy ten sam stosunek od zera i asertuje zgodność z
-wynikiem F07, więc oba programy dowodliwie cytują jeden rachunek.
+wynikiem F7, więc oba programy dowodliwie cytują jeden rachunek.
 
 Teraz ustaw czterdzieści z nich jedna za drugą. Sens pytania o przypadek
 najlepszy, a nie realistyczny, jest taki, że przypadek najlepszy jest
@@ -586,15 +616,21 @@ siedząca dokładnie w swoim najbardziej czułym punkcie \dash{} czego nie robi
 między stratą a wejściem pierwszej warstwy.
 
 Postaw jednostki tam, gdzie Program~\ref{prog:F07} zmierzył nasycenie, czyli
-przy $\sigma' = \val{f12.sat.factor}$, a iloczyn wynosi
-$\val{f12.sat.bound}$. To nie jest mała liczba, to w ogóle nie jest liczba w
-żadnej arytmetyce, którą robi komputer: znika do zera na długo przed
-czterdziestą warstwą, co jest terenem Programu~\ref{prog:P01} i znaczy, że
-pierwsze warstwy dostają \emph{dokładnie} nic, a nie bardzo mało.
+przy $\sigma' = \val{f07.slope.6}$, a iloczyn spada poniżej
+$10^{-\val{f12.sat.exponent}}$.
+
+\textbf{Czy to jest mała liczba, czy w ogóle nie liczba, zależy od formatu, w
+którym sieć się trenuje.} W arytmetyce $32$-bitowej, którą zwykle się to robi,
+najmniejsza wartość, jaka w ogóle istnieje, wynosi około
+$\val{p01.fp32.minsub}$, więc iloczyn znika do \emph{dokładnie} zera na długo
+przed czterdziestą warstwą, a pierwsze warstwy dostają nic, a nie bardzo mało.
+W $64$-bitowej nie znika: podłoga leży tam około $\val{p01.fp64.minsub}$, a
+$10^{-\val{f12.sat.exponent}}$ siedzi wygodnie nad nią. Program~\ref{prog:P01}
+ma obie podłogi, a skrypt asertuje, że iloczyn wpada między nie.
 
 Mechanizm nie jest subtelny i o to chodzi. \textbf{Nic tutaj nie jest
 własnością sieci neuronowych.} To jest to, co dzieje się, gdy czterdzieści
-liczb poniżej jedynki się mnoży, a F07 zmierzył te liczby, a ten program je
+liczb poniżej jedynki się mnoży, a F7 zmierzył te liczby, a ten program je
 pomnożył.
 \end{trapbox}
 
@@ -615,16 +651,18 @@ $w$, żeby warstwa mogła w ogóle wzmacniać?
 \end{fr}
 
 \begin{fr}
-\ans{Większe niż $\val{f12.explode.w}$}
-Bo czynnik wynosi najwyżej $\frac{w}{4}$, a to dochodzi do $1$ dokładnie przy
-$w = \val{f12.explode.w}$. Sprawdzone przy czterech wagach, każda w
-szesnastu tysiącach wartości $z$.
+\ans{$\lvert w \rvert$ większe niż $\val{f12.explode.w}$}
+Bo wielkość czynnika wynosi najwyżej $\frac{\lvert w \rvert}{4}$, a to dochodzi
+do $1$ dokładnie przy $\lvert w \rvert = \val{f12.explode.w}$. Moduł nie jest
+ozdobą: waga $-8$ wzmacnia dokładnie tak samo mocno jak $8$, bo składa się to,
+ile każdy czynnik mnoży, a nie w którą stronę wskazuje. Sprawdzone przy
+czterech wagach, każda w szesnastu tysiącach wartości $z$.
 
 \textbf{To jest ostry, sprawdzalny próg i warto go mieć.} Warstwa logistyczna
-o wadze $3$ nie może sprawić, że gradient urośnie, bez względu na to, gdzie
-siedzi jej wejście i ile takich warstw jest. Oba tryby porażki nie są
-symetryczne: zanikanie nie potrzebuje nic poza głębokością, a eksplozja
-potrzebuje wag powyżej konkretnej liczby.
+o wadze $3$, albo $-3$, nie może sprawić, że gradient urośnie, bez względu na
+to, gdzie siedzi jej wejście i ile takich warstw jest. Oba tryby porażki nie
+są symetryczne: zanikanie nie potrzebuje nic poza głębokością, a eksplozja
+potrzebuje wagi powyżej konkretnej wielkości.
 
 Przy $w = \val{f12.explode.big.w}$ czynnik w najlepszym razie wynosi
 $\val{f12.explode.big.factor}$, więc $\val{f12.depth}$ warstw mnoży gradient
@@ -700,20 +738,26 @@ zakładać i zaczyna budować.
 \sumitem{4--6}{\result{$(cf)' = cf'$ oraz $(f+g)' = f' + g'$. Każda reguła w tym
   programie jest sprawdzona wobec pochodnej policzonej \emph{bez} niej,
   różnicą centralną przy $h = 10^{-5}$ \dash{} i po to właśnie różnica
-  skończona jest, czyli krzywa U z Programu~\ref{prog:F11} zaprzęgnięta do
-  pracy, a nie tylko przestrzegająca}.}
+  skończona jest, czyli lekcja z Programu~\ref{prog:F11} zaprzęgnięta do
+  pracy, a nie tylko przestrzegająca. \textbf{Krok jest przemieciony tutaj, a
+  nie pożyczony}: F11 mierzył różnicę \emph{w przód} i jej najlepszy krok
+  wynosi $\val{f11.fd.best.h}$, a dno krzywej U postaci centralnej leży trzy
+  dekady wyżej}.}
 \sumitem{7--8}{\result{\textbf{Różniczkowanie nie rozdziela się na iloczyn.} Na
   $x^{2}$ i $x^{3}$ w $x = \val{f12.trap.x}$ prawdą jest
   $\val{f12.trap.right}$, a pierwszy odruch daje $\val{f12.trap.wrong}$, a oba
-  wyrażenia zgadzają się w dokładnie $\val{f12.trap.agree}$ punktach całego
-  przebiegu. Ten sam kształt co $(a+b)^{2}$ z F02 i dodawanie długości z F09:
-  reguła przeniesiona o krok poza swoje założenia}.}
+  przecinają się w dokładnie $\val{f12.trap.agree}$ punktach. Poza nimi odruch
+  jest inną \emph{potęgą} $x$, więc ich stosunek wynosi $\frac{6}{5x}$ i nie
+  ma stałego czynnika, który by go poprawił. Ten sam kształt co $(a+b)^{2}$ z
+  F2 i dodawanie długości z F9: reguła przeniesiona o krok poza swoje
+  założenia}.}
 \sumitem{9--13}{\result{\textbf{$(fg)' = f'g + fg'$}, bo gdy $x$ się przesuwa,
   przesuwają się \emph{oba} czynniki i iloczyn zmienia się z powodu każdego z
   nich; oraz $\left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^{2}}$, którego
-  minus jest tam, bo podniesienie mianownika obniża całość. Gdy iloczyn da się
-  też rozwinąć, obie drogi muszą się zgodzić \dash{} darmowe sprawdzenie warte
-  zamienienia w nawyk}.}
+  minus jest mnemonikiem z dodatniego $f$ \dash{} podniesienie mianownika
+  obniża całość \dash{} a którego wyprowadzeniem jest reguła iloczynu
+  zastosowana do $f g^{-1}$. Gdy iloczyn da się też rozwinąć, obie drogi muszą
+  się zgodzić \dash{} darmowe sprawdzenie warte zamienienia w nawyk}.}
 \sumitem{14--16}{\result{\textbf{Reguła łańcuchowa: $\bigl(f(g(x))\bigr)' =
   f'(g(x)) \cdot g'(x)$.} Tempa się mnożą, jak koła zębate w zazębieniu, a
   pochodna zewnętrzna liczy się w \emph{wartości tej wewnętrznej}, i to jest
@@ -721,13 +765,15 @@ zakładać i zaczyna budować.
 \sumitem{17--18}{\result{\textbf{$\sigma'(z) = \sigma(z)(1-\sigma(z))$}, sprawdzone do
   $\val{f12.err.sigmoid}$. Pochodna da się wyrazić przez samą funkcję, i
   dlatego framework potrafi policzyć gradient warstwy logistycznej z wartości,
-  którą już zapisał, idąc w przód \dash{} zalążek tego, co
-  Program~\ref{prog:P16} nazywa trybem wstecznym}.}
-\sumitem{19--20}{\result{\textbf{$\sigma' \le \val{f12.sig.max}$ wszędzie}, w
-  $z = 0$, bo $\sigma(1-\sigma)$ to iloczyn dwóch liczb sumujących się do
-  jedynki. A wkład jednej jednostki to $w\,\sigma(wx+b)(1-\sigma(wx+b))$: $w$,
-  bo warstwa skaluje, $\sigma(1-\sigma)$, bo zagina, i \emph{żadnego $b$}, bo
-  obciążenie przesuwa miejsce zagięcia, a nie to, jak mocno się zagina}.}
+  którą już zapisał, idąc w przód, zamiast liczyć cokolwiek drugi raz. To
+  oszczędność na przeliczaniu; tryb \emph{wsteczny} to osobna sprawa tego, od
+  którego końca mnoży się czynniki, i należy do Programu~\ref{prog:P16}}.}
+\sumitem{19--20}{\result{\textbf{$\sigma' \le \val{f12.sig.max}$ wszędzie},
+  z równością tylko w $z = 0$, bo $\sigma(1-\sigma)$ to iloczyn dwóch liczb
+  sumujących się do jedynki. A wkład jednej jednostki to
+  $w\,\sigma(wx+b)(1-\sigma(wx+b))$: $w$, bo warstwa skaluje,
+  $\sigma(1-\sigma)$, bo zagina, i \emph{żadnego $b$}, bo obciążenie przesuwa
+  miejsce zagięcia, a nie to, jak mocno się zagina}.}
 \sumitem{21--23}{\result{Pochodna sieci o $n$ warstwach po jej wejściu to
   $\prod_{k=1}^{n} w_k\,\sigma'(z_k)$ \dash{} \textbf{po jednym czynniku na
   warstwę, wymnożone razem}, każdy policzony we własnym wejściu tej warstwy}.}
@@ -743,15 +789,17 @@ zakładać i zaczyna budować.
 \sumitem{26--27}{\result{\textbf{$\val{f12.depth}$ warstw w najlepszym razie daje
   $\val{f12.sig.max}^{\val{f12.depth}} = \val{f12.vanish.bound}$}, a żadna
   wytrenowana sieć nie siedzi w swoim najlepszym razie. Postaw jednostki tam,
-  gdzie Program~\ref{prog:F07} zmierzył nasycenie \dash{}
-  $\val{f12.sat.factor}$, czyli $\val{f12.sat.ratio}$-ta część odpowiedzi ze
-  środka, a ten program przelicza tę wartość od zera i asertuje zgodność z
-  F07 \dash{} a iloczyn wynosi $\val{f12.sat.bound}$, co znika do dokładnie
-  zera na długo przed czterdziestą warstwą}.}
+  gdzie Program~\ref{prog:F07} zmierzył nasycenie \dash{} $\val{f07.slope.6}$,
+  czyli jedna część na $\val{f07.slope.ratio6}$ odpowiedzi ze środka, a ten
+  program przelicza obie od zera i asertuje zgodność z F7 \dash{} a iloczyn
+  spada poniżej $10^{-\val{f12.sat.exponent}}$, co jest \emph{dokładnie} zerem
+  w arytmetyce $32$-bitowej na długo przed czterdziestą warstwą, a zwykłą
+  liczbą w $64$-bitowej}.}
 \sumitem{28--29}{\result{\textbf{Łańcuch logistyczny nie może wzmacniać, chyba że
-  $\lvert w \rvert > \val{f12.explode.w}$}, bo czynnikiem jest
-  $w\sigma' \le \frac{w}{4}$. Oba tryby porażki nie są symetryczne: zanikanie
-  potrzebuje tylko głębokości, eksplozja konkretnej wagi. Przy
+  $\lvert w \rvert > \val{f12.explode.w}$}, bo wielkością czynnika jest
+  $\lvert w \rvert\sigma' \le \frac{\lvert w \rvert}{4}$. Oba tryby porażki
+  nie są symetryczne: zanikanie potrzebuje tylko głębokości, eksplozja
+  konkretnej wagi. Przy
   $w = \val{f12.explode.big.w}$ czynnik wynosi
   $\val{f12.explode.big.factor}$, a $\val{f12.depth}$ warstw mnoży przez
   $\val{f12.explode.big.depth}$}.}
@@ -836,10 +884,13 @@ zakładać i zaczyna budować.
   \answerto{$(fg^{-1})' = f'g^{-1} + f(-g^{-2}g') =
   \frac{f'}{g} - \frac{fg'}{g^{2}}$, co po sprowadzeniu do wspólnego
   mianownika daje $\frac{f'g - fg'}{g^{2}}$. Więc nie jest to piąta reguła.}
-\item $f(g(x))$, gdzie oba $f$ i $g$ są ściśle rosnące. Co da się powiedzieć o
-  znaku pochodnej złożenia?
-  \answerto{Jest dodatni, bo oba czynniki są. Czyli wynik o zachowaniu
-  porządku z Programu~\ref{prog:F05} widziany przez regułę łańcuchową.}
+\item $f(g(x))$, gdzie oba $f$ i $g$ są ściśle rosnące i różniczkowalne. Co
+  da się powiedzieć o znaku pochodnej złożenia?
+  \answerto{Nigdy nie jest ujemny i na tym koniec: funkcja ściśle rosnąca ma
+  $f' \ge 0$, a nie $f' > 0$, bo $x^{3}$ rośnie wszędzie, a w zerze ma
+  pochodną $0$. Więc iloczyn dwóch takich czynników jest $\ge 0$ i może być
+  zerem. Zostaje wynik z Programu~\ref{prog:F05}: złożenie jest rosnące, co
+  jest twierdzeniem o porządku, a nie o znaku.}
 \item Pokaż, że $\sigma'(z) = \sigma(z)\sigma(-z)$, i powiedz, co ta postać
   czyni oczywistym.
   \answerto{$1 - \sigma(z) = \sigma(-z)$, więc obie postaci są tym samym.
@@ -849,7 +900,7 @@ zakładać i zaczyna budować.
   i uprość.
   \answerto{$4\sigma(2x)(1 - \sigma(2x))$, którego maksimum wynosi $4 \times
   \val{f12.sig.max} = 1$ w $x = 0$ \dash{} czyli czynnik cztery, który
-  zmierzył F07, przychodzący tu jako wniosek, a nie obserwacja.}
+  zmierzył F7, przychodzący tu jako wniosek, a nie obserwacja.}
 \item Łańcuch warstw $\tanh$ z wagami jeden. Podaj czynnik na warstwę w
   najlepszym razie i powiedz, co to robi z argumentem o zanikaniu.
   \answerto{$1$, z poprzedniego zadania. Więc przypadek najlepszy w ogóle nie
@@ -872,8 +923,9 @@ zakładać i zaczyna budować.
   Program~\ref{prog:P16}.}
 \item Argument tego programu jest arytmetyczny, a jego wniosek nie jest
   uniwersalny. Podaj dokładnie, co jest ustalone, a co nie.
-  \answerto{Ustalone: łańcuch warstw logistycznych o wagach poniżej
-  $\val{f12.explode.w}$ ma gradient ograniczony iloczynem czynników poniżej
+  \answerto{Ustalone: łańcuch warstw logistycznych o wagach mniejszych co do
+  wielkości niż $\val{f12.explode.w}$ ma gradient ograniczony iloczynem
+  czynników poniżej
   jedynki, który spada wykładniczo z głębokością. Nieustalone: cokolwiek o
   sieciach z innymi aktywacjami, drogami rezydualnymi lub normalizacją, z
   których każda zmienia czynnik albo dodaje drogę.}

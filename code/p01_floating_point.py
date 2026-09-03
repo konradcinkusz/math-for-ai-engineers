@@ -344,7 +344,18 @@ def committed(fname: str, key: str) -> str | None:
         return None
     m = re.search(r"\\mfaval\{" + re.escape(key) + r"\}\{([^}]*)\}",
                   p.read_text(encoding="utf8"))
-    return m.group(1) if m else None
+    # AN ABSENT FILE AND AN ABSENT KEY ARE DIFFERENT FAILURES, and returning
+    # None for both is how a cross-programme gate goes quiet. A missing file is
+    # a fresh checkout that has not run `make numbers`; a missing key means the
+    # other program renamed or dropped the value this one is checking, which is
+    # exactly what this gate exists to catch. It happened: F12 replaced
+    # `f12.sat.bound` and the check below silently stopped running with `make
+    # numbers` still exiting 0, and only the values diff showed it.
+    if m is None:
+        raise SystemExit(
+            f"{fname} has no {key}: the program that commits it renamed or "
+            f"dropped the value, and this gate would otherwise go quiet")
+    return m.group(1)
 
 
 def decimal_exponent(written: str) -> int:
@@ -376,21 +387,24 @@ else:
 
 F03_LITERAL = _f03 if _f03 is not None else "2.43e-2085"
 
-_f12raw = committed("f12.tex", "f12.sat.bound")
-if _f12raw is None:                                          # pragma: no cover
+# F12 commits the EXPONENT rather than the product, because the product is a
+# bound -- "the saturated chain falls below 10^-e" -- and a bound is what
+# survives a change of chain length. So the bound is what is read back.
+_f12exp = committed("f12.tex", "f12.sat.exponent")
+if _f12exp is None:                                          # pragma: no cover
     _f12 = None
     NOTES.append("f12.tex absent: F12's underflow claim was NOT checked")
 else:
-    _f12 = float(_f12raw)
-    # F12's product is representable in fp64 and NOT in fp32 -- which is the
+    _f12 = 10.0 ** -int(float(_f12exp))
+    # F12's bound is representable in fp64 and NOT in fp32 -- which is the
     # more interesting half, because it means the same arithmetic gives a
     # number in one training format and exactly zero in another.
     assert _f12 > smallest_subnormal(*FORMATS["fp64"]), (
         "F12's product is no longer representable in fp64")
     assert _f12 < smallest_subnormal(*FORMATS["fp32"]), (
         "F12's product is no longer below fp32's floor")
-    emit("p01.f12.prod", f"{_f12:.1e}")
-    NOTES.append(f"F12's {_f12:.1e} is fine in fp64 and exactly zero in fp32")
+    emit("p01.f12.prod", f"1e-{int(float(_f12exp))}")
+    NOTES.append(f"F12's 1e-{int(float(_f12exp))} is fine in fp64 and exactly zero in fp32")
 
 # How long a sequence can be scored by multiplying, in each format, which is
 # F03's "shorter than a page" made precise. A fair coin gives 0.5 per token.

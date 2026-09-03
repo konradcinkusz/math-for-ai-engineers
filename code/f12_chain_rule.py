@@ -79,9 +79,14 @@ def emit(key: str, value, digits: int | None = None) -> None:
     VALUES[key] = (body, numeric)
 
 
-# The step F11 measured as near the bottom of its U-curve, used here for what
-# a finite difference is actually good for: checking a rule against an answer
-# obtained without it.
+# THE STEP IS NOT F11'S, AND SAYING SO IS A CORRECTION. F11 swept the FORWARD
+# difference, whose truncation error is O(h) against a rounding error of about
+# eps/h, so its two errors balance near sqrt(eps) -- and F11 measured exactly
+# that, committing f11.fd.best.h = 1e-8. A CENTRAL difference has truncation
+# error O(h^2), so it balances near eps^(1/3), three decades higher. Attributing
+# 1e-5 to F11's curve was a claim about a curve F11 did not measure, and it is
+# the kind of claim this book keeps recording: written from the feel of a
+# neighbour rather than from the neighbour. The step is swept here instead.
 H = 1e-5
 
 
@@ -150,6 +155,33 @@ def dsigmoid(z: float) -> float:
     s = sigmoid(z)
     return s * (1.0 - s)
 
+# The sweep, so the choice of H is a measurement of THIS program's instrument
+# rather than a borrowed one.
+#
+# NOT ON x^2, WHICH IS THE FUNCTION F11 SWEPT, and the first attempt here did
+# exactly that and the assertion caught it. A central difference of a QUADRATIC
+# is exact -- ((x+h)^2 - (x-h)^2) / 2h is 2x for every h, because the truncation
+# term carries a third derivative and a quadratic has none. So on x^2 the sweep
+# measures rounding alone, bottoms at the largest step offered, and settles
+# nothing. That is a probe that cannot fail, which is the defect this book keeps
+# recording, and it makes the correction above sharper rather than weaker: F11's
+# curve is not merely a different curve from this one, it is a curve this
+# instrument does not have on that function at all.
+#
+# Swept on the logistic instead, against the exact sigma(1-sigma), which is the
+# function the checks below actually run on.
+def _fd_err(h: float) -> float:
+    return abs((sigmoid(1.0 + h) - sigmoid(1.0 - h)) / (2.0 * h) - dsigmoid(1.0))
+
+_FD_SWEEP = {e: _fd_err(10.0 ** -e) for e in range(2, 13)}
+_FD_BEST = min(_FD_SWEEP, key=lambda e: _FD_SWEEP[e])
+assert 4 <= _FD_BEST <= 7, (
+    f"the central difference now bottoms at 1e-{_FD_BEST}, so H needs re-choosing")
+assert _FD_SWEEP[5] <= 10.0 * _FD_SWEEP[_FD_BEST], (
+    "h = 1e-5 is no longer within an order of magnitude of the central optimum")
+# And the whole point of the correction: F11's own optimum is NOT this one.
+assert _FD_BEST < 8, "the central optimum has drifted onto the forward one's"
+
 
 RULE_ERRORS["sigmoid"] = check("sigmoid", sigmoid, dsigmoid, -8.0, 8.0)
 emit("f12.err.sigmoid", f"{RULE_ERRORS['sigmoid']:.1e}")
@@ -183,10 +215,52 @@ emit("f12.vanish.bound", f"{SIG_MAX ** DEPTH:.1e}")
 # A chain whose units sit where F07 measured saturation instead is far smaller,
 # and F07's own figure is the per-layer factor.
 F07_SATURATED = dsigmoid(6.0)                        # F07's |x| = 6 point
-emit("f12.sat.factor", f"{F07_SATURATED:.2e}")
-emit("f12.sat.ratio", round(SIG_MAX / F07_SATURATED))
-emit("f12.sat.bound", f"{F07_SATURATED ** DEPTH:.1e}")
 assert F07_SATURATED < SIG_MAX / 100.0, "F07's saturated point is no longer 100x flatter"
+
+# NEITHER THE FACTOR NOR THE RATIO IS EMITTED HERE, and that is a correction.
+# Both are F07's own quantities and F07 commits them as f07.slope.6 and
+# f07.slope.ratio6; emitting them again gave the book two committed values for
+# one number at two precisions, three hundred pages apart -- 0.0025 there and
+# 2.47e-03 here. The frames quote F07's directly and this program keeps the
+# gate below, which is P29's resolution of exactly this shape.
+#
+# AND THE PRODUCT IS A BOUND rather than a figure, which is F05's rule. A
+# fortieth power multiplies the base's rounding by forty: the true product is
+# 4.82e-105, the printed factor 0.002467 gives 4.86e-105 and a three-figure
+# 2.47e-03 gives 5.10e-105, so no precision a table can carry makes the
+# printed product reproduce from the printed factor. A bound does, under every
+# one of them, and a bound is all the trap needs -- the point is that it is far
+# under the floor of every format below a double.
+SAT_PRODUCT = F07_SATURATED ** DEPTH
+SAT_EXPONENT = 104                                   # the product is below 10^-104
+emit("f12.sat.exponent", SAT_EXPONENT)
+
+# AND "not a number at all in any arithmetic a computer does" IS FALSE, which is
+# the correction section 5's trapbox needed. 10^-104 is perfectly representable
+# in binary64 -- P01 commits its smallest subnormal at about 5e-324 -- and is far
+# below binary32's, which P01 commits at about 1.4e-45. So the underflow is a
+# claim about the format a network is usually trained in, not about computers.
+# Gated against P01's own two floors rather than against a remembered pair.
+import re as _re
+_P01 = Path(__file__).resolve().parent.parent / "figures" / "values" / "p01.tex"
+if _P01.exists():
+    _txt = _P01.read_text(encoding="utf8")
+    _f32 = _re.search(r"\\mfaval\{p01\.fp32\.minsub\}\{([^}]*)\}", _txt)
+    _f64 = _re.search(r"\\mfaval\{p01\.fp64\.minsub\}\{([^}]*)\}", _txt)
+    assert _f32 and _f64, "P01's two floors have gone; F12 section 5 quotes fp32's"
+    assert SAT_PRODUCT < float(_f32.group(1)), (
+        "the saturated product no longer underflows in binary32")
+    assert SAT_PRODUCT > float(_f64.group(1)), (
+        "the saturated product now underflows in binary64 too, so the frame's "
+        "'the format is what decides it' is no longer the point")
+    P01_NOTE = (f"binary32 floor {_f32.group(1)} and binary64 floor "
+                f"{_f64.group(1)}: the product underflows in one and not the other")
+else:
+    P01_NOTE = "p01.tex absent: the underflow claim was NOT checked against a floor"
+assert SAT_PRODUCT < 10.0 ** -SAT_EXPONENT, "the saturated product no longer clears its bound"
+for _printed in ("2.47e-03", "0.002467", "0.0025"):
+    assert float(_printed) ** DEPTH < 10.0 ** -SAT_EXPONENT, (
+        f"the bound fails when the factor is read off the page as {_printed}")
 
 # AND THE RATIO IS F07's OWN NUMBER, computed here from scratch. F07 measured
 # that a saturated unit answers with about a hundredth of its centre response
@@ -196,13 +270,22 @@ assert F07_SATURATED < SIG_MAX / 100.0, "F07's saturated point is no longer 100x
 # change either program's arithmetic and the build fails here.
 _F07 = (Path(__file__).resolve().parent.parent / "figures" / "values" / "f07.tex")
 if _F07.exists():
-    import re as _re
     _m = _re.search(r"\\mfaval\{f07\.slope\.ratio6\}\{([^}]*)\}", _F07.read_text(encoding="utf8"))
     assert _m, "f07.slope.ratio6 has gone; F12 section 5 quotes it"
     assert int(_m.group(1)) == round(SIG_MAX / F07_SATURATED), (
         f"F12 computes {round(SIG_MAX / F07_SATURATED)} where F07 committed "
         f"{_m.group(1)}: the two programs no longer quote one computation")
-    F07_NOTE = f"F07's committed slope ratio ({_m.group(1)}) reproduced from scratch"
+    # AND THE FACTOR ITSELF, now that the frames quote it rather than emitting a
+    # second copy. Gating both halves is P26's both-directions pattern: this
+    # program can no longer print a per-layer factor F07 does not commit, and
+    # F07 can no longer move it without failing here.
+    _f = _re.search(r"\\mfaval\{f07\.slope\.6\}\{([^}]*)\}", _F07.read_text(encoding="utf8"))
+    assert _f, "f07.slope.6 has gone; F12 section 5 quotes it as the per-layer factor"
+    assert abs(float(_f.group(1)) - F07_SATURATED) < 1e-6, (
+        f"F12 computes {F07_SATURATED} where F07 committed {_f.group(1)}: "
+        "the per-layer factor is no longer one computation")
+    F07_NOTE = (f"F07's committed slope ratio ({_m.group(1)}) and factor "
+                f"({_f.group(1)}) both reproduced from scratch")
 else:                                                        # pragma: no cover
     F07_NOTE = "f07.tex absent: the cross-programme ratio was NOT checked"
 
@@ -265,6 +348,9 @@ def main() -> None:
         print(f"  {k:<{width}}  {body}{'' if numeric else '   (text)'}")
     print(f"\n  {len(VALUES)} values -> {OUT.relative_to(OUT.parents[2])}")
     print(f"  every rule agrees with a central difference at h = {H:.0e}")
+    print(f"  the central difference on sigma bottoms at h = 1e-{_FD_BEST}, "
+          f"where F11's forward one bottoms at 1e-8")
+    print(f"  {P01_NOTE}")
     print(f"  {F07_NOTE}")
     print(f"  {NUMPY_NOTE}")
 

@@ -618,8 +618,9 @@ przypadku nic się nie zapada.
 
 Zapada się przypadek realistyczny. Program~\ref{prog:F12} liczy ten sam
 iloczyn na warstwie \emph{nasyconej}, a nie w jej najlepszym punkcie, i
-dostaje $\val{f12.sat.bound}$ \dash{} poniżej każdej podłogi, jaką ten format
-ma. Wtedy wczesne warstwy dostają dokładnie zero i dostają je po cichu.
+dostaje iloczyn poniżej $10^{-\val{f12.sat.exponent}}$ \dash{} pod każdą
+podłogą, jaką ten format ma. Wtedy wczesne warstwy dostają dokładnie zero i
+dostają je po cichu.
 
 Program~\ref{prog:F12} nazywa następnie odpowiedź architektury i przekazuje
 wyprowadzenie tutaj: \emph{ścieżka od straty do wczesnych warstw, która wcale
@@ -1126,8 +1127,8 @@ było tym, po co ta książka powstała.
   Liczba jest wciąż reprezentowalna \dash{} najmniejsza liczba normalna
   $\code{float32}$ to $\val{p01.fp32.minnorm}$ \dash{} więc zwykły łańcuch
   zabija bezużyteczność tego ograniczenia, a nie niedomiar. Niedomiar to
-  przypadek realistyczny: przy warstwie nasyconej ten sam iloczyn wynosi
-  $\val{f12.sat.bound}$, poniżej każdej podłogi tego formatu}.}
+  przypadek realistyczny: przy warstwie nasyconej ten sam iloczyn spada poniżej
+  $10^{-\val{f12.sat.exponent}}$, pod każdą podłogę tego formatu}.}
 \sumitem{23--25}{\result{$y = x + f(x)$ czyni jakobian $\prod(1 + f'_k)$, którego
   rozwinięcie jest sumą po $2^{n}$ ścieżkach \dash{} po jednej na podzbiór
   warstw. \textbf{Pusty podzbiór wnosi dokładnie $1$.}} Gradient zwykłego

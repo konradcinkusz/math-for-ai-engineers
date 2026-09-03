@@ -78,16 +78,18 @@
 \item Policz $\tanh(1)$ oraz $2\sigma(2) - 1$. Co zauważasz?
   \teachesat{19--20}
   \answerto{Oba wynoszą $\val{f07.tanh.1}$. $\tanh$ to funkcja logistyczna
-  podwojona na wysokość i zsunięta w dół o jeden.}
-\item Co nasyca się mocniej, funkcja logistyczna czy $\tanh$? \teachesat{21--22}
-  \answerto{$\tanh$. Jego stromość spada z $\val{f07.tanh.slope0}$ do
-  $\val{f07.tanh.slope2}$ na dwóch jednostkach; stromość funkcji logistycznej
-  spada z $\val{f07.slope.0}$ do $\val{f07.slope.2}$.}
-\item Dlaczego zatem wolano $\tanh$ od funkcji logistycznej?
+  ściśnięta poziomo dwukrotnie, podwojona na wysokość i zsunięta w dół o
+  jeden \dash{} wszystkie trzy ruchy, a ściśnięcie jest tym, który łatwo
+  pominąć.}
+\item Dlaczego wolano $\tanh$ od funkcji logistycznej w warstwach ukrytych?
   \teachesat{20--21}
   \answerto{Bo jest wyśrodkowany na zerze, a funkcja logistyczna nie. To
   twierdzenie o tym, gdzie leżą jego wartości, a nie o tym, jak łagodnie się
   wygina.}
+\item Co nasyca się mocniej, funkcja logistyczna czy $\tanh$? \teachesat{21--22}
+  \answerto{$\tanh$. Jego stromość spada z $\val{f07.tanh.slope0}$ do
+  $\val{f07.tanh.slope2}$ na dwóch jednostkach; stromość funkcji logistycznej
+  spada z $\val{f07.slope.0}$ do $\val{f07.slope.2}$.}
 \item Mniej więcej ile razy mniej stroma jest funkcja logistyczna sześć
   jednostek od środka niż w nim? \teachesat{17--18}
   \answerto{Około $\val{f07.slope.ratio6}$ razy.}
@@ -344,8 +346,10 @@ Dwa harmonogramy opisane jako \enquote{mnóż przez $\num{0.99}$ na każdym
 kroku} i \enquote{zanikaj w tempie $\num{0.01}$} to ten sam harmonogram, a
 przeliczenie to jeden logarytm. Dwa opisane jako \enquote{mnóż przez
 $\num{0.5}$ na każdym kroku} i \enquote{zanikaj w tempie $\num{0.5}$}
-\emph{nie} są tym samym: $-\ln(\num{0.5}) = \num{0.693}$, więc drugi zanika o
-połowę szybciej niż pierwszy.
+\emph{nie} są tym samym: mnożenie przez $\num{0.5}$ to tempo
+$-\ln(\num{0.5}) = \num{0.693}$, więc \emph{pierwszy} zanika mniej więcej
+$\num{1.4}$ raza szybciej niż drugi. Połowienie zajmuje jeden krok przy
+pierwszym i $\num{1.39}$ przy drugim.
 
 Przybliżenie $k \approx 1 - \gamma$, które godzi pierwszą parę, jest dobre
 tylko blisko $\gamma = 1$, czyli tam, gdzie harmonogramy zwykle żyją, i
@@ -364,7 +368,7 @@ agresywnego.
 Programy~\ref{prog:F05} i~\ref{prog:F06} używały funkcji logistycznej i żaden
 nie powiedział, skąd bierze się jej kształt. Bierze się z szansy.
 
-Załóżmy, że szansa na coś wynosi $e^{x}$ do jednego \dash{} co jest po prostu
+Załóżmy, że szansa na coś wynosi $e^{x}$ do jednego \dash{} co jest
 sposobem, żeby $x$ przebiegało wszystkie liczby rzeczywiste, a szansa
 pozostawała dodatnia, bo $e^{x}$ nigdy nie jest zerem ani liczbą ujemną.
 Szansa $a$ do $1$ znaczy prawdopodobieństwo $\frac{a}{a+1}$, więc
@@ -562,7 +566,7 @@ stronach zera, nie. To był argument za $\tanh$ przeciw funkcji logistycznej w
 warstwach ukrytych i jest to argument o \emph{położeniu} wartości i o niczym
 innym.
 
-Stąd łatwo zsunąć się w drugie przekonanie. Odpowiedz na to szybko:
+Odpowiedz na to szybko, nic nie licząc:
 \textbf{czy $\tanh$ nasyca się też łagodniej niż funkcja logistyczna?}
 \dotline
 \nextframe
@@ -575,8 +579,10 @@ Stąd łatwo zsunąć się w drugie przekonanie. Odpowiedz na to szybko:
 \toprule
 & w $x = 0$ & w $x = 2$ & stosunek \\
 \midrule
-logistyczna & \val{f07.slope.0} & \val{f07.slope.2} & około $2$ \\
-$\tanh$ & \val{f07.tanh.slope0} & \val{f07.tanh.slope2} & około $14$ \\
+logistyczna & \val{f07.slope.0} & \val{f07.slope.2}
+  & około $\val{f07.slope.ratio2}$ \\
+$\tanh$ & \val{f07.tanh.slope0} & \val{f07.tanh.slope2}
+  & około $\val{f07.tanh.ratio2}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -584,14 +590,23 @@ $\tanh$ & \val{f07.tanh.slope0} & \val{f07.tanh.slope2} & około $14$ \\
 \begin{trapbox}
 \textbf{$\tanh$ jest bardziej stromy w środku i bardziej płaski na końcach, i
 to właśnie znaczy \enquote{nasyca się mocniej}.} Jego stromość zaczyna od $1$,
-a nie od ćwiartki, a dwie jednostki dalej stracił mniej więcej czternaście
-razy, gdzie funkcja logistyczna straciła mniej więcej dwa.
+a nie od ćwiartki, a dwie jednostki dalej stracił mniej więcej
+$\val{f07.tanh.ratio2}$ razy, gdzie funkcja logistyczna straciła mniej więcej
+$\val{f07.slope.ratio2}$.
 
 Wynika to z tożsamości, a nie jest osobnym faktem. Ściśnięcie krzywej poziomo
 dwukrotnie czyni ją dwa razy bardziej stromą; rozciągnięcie pionowo dwukrotnie
 czyni ją dwa razy bardziej stromą jeszcze raz; więc $\tanh$ ma w środku
 czterokrotną stromość funkcji logistycznej \dash{} cztery ćwiartki, czyli $1$.
-To samo ściśnięcie przysuwa jego płaski obszar czterokrotnie bliżej.
+
+Ale tylko \emph{ściśnięcie} przesuwa cokolwiek wzdłuż osi: rozciągnięcie
+pionowe skaluje każdą stromość i nie przesuwa żadnego punktu. Płaski obszar
+przysuwa się więc dwukrotnie, a nie czterokrotnie, a dowodem są dwie liczby,
+które się zgadzają \dash{} $\tanh$ traci mniej więcej
+$\val{f07.tanh.ratio2}$ razy na dwóch jednostkach, a funkcja logistyczna
+mniej więcej $\val{f07.slope.ratio4}$ razy na \emph{czterech}. To różne
+krzywe mierzone na różnych odcinkach, a wychodzi ta sama liczba, bo
+ściśnięcie jest dwukrotne.
 
 Argument za $\tanh$ zawsze dotyczył wyśrodkowania na zerze. Nikt nie twierdził,
 że wygina się łagodniej, i nie wygina.
@@ -615,9 +630,9 @@ jedynki, to właśnie tam powinna być.
 
 To, co jest prawdą o jednostce nasyconej, jest węższe i jest liczbą z
 poprzedniej sekcji. Sześć jednostek dalej funkcja logistyczna odpowiada na
-zmianę argumentu mniej więcej $\val{f07.slope.ratio6}$-tą częścią zmiany
-wartości, którą dałaby w środku. Cztery jednostki dalej to mniej więcej
-$\val{f07.slope.ratio4}$-ta część.
+zmianę argumentu mniej więcej jedną częścią na $\val{f07.slope.ratio6}$ tej
+zmiany wartości, którą dałaby w środku. Cztery jednostki dalej to mniej
+więcej jedna część na $\val{f07.slope.ratio4}$.
 
 Jednostka nie jest więc zepsuta ani zablokowana. Jest \emph{cicha}: melduje
 prawie to samo, cokolwiek jej zrobisz, w rozsądnych granicach.
@@ -669,10 +684,11 @@ niewrażliwość na obu końcach na doskonałą czułość po jednej stronie i
 doskonałą niewrażliwość po drugiej.
 
 \begin{aibox}
-To jest cały powód, dla którego $\relu$ wyparł $\tanh$ w sieciach głębokich, a
-argument mieści się w linijce, gdy ma się powyższe liczby: $\tanh$ traci
-mniej więcej czternastokrotnie na dwóch jednostkach po obu stronach zera, a
-$\relu$ nie traci nic na całej swojej dodatniej połowie.
+To jest główny powód, dla którego $\relu$ wyparł $\tanh$ w sieciach
+głębokich, a argument mieści się w linijce, gdy ma się powyższe liczby:
+$\tanh$ traci mniej więcej $\val{f07.tanh.ratio2}$ razy na dwóch jednostkach
+po obu stronach zera, a $\relu$ nie traci nic na całej swojej dodatniej
+połowie.
 
 Zauważ, czym ten argument nie jest. Nie jest tym, że $\relu$ jest gładszy,
 prostszy czy lepiej się zachowuje \dash{} ma narożnik tam, gdzie $\tanh$ jest
@@ -683,8 +699,8 @@ głębokość czyni kosztowną.
 \end{fr}
 
 \begin{fr}
-Jedno ostrzeżenie na odchodne, bo jest lustrzanym odbiciem pułapki z sekcji 4 i
-równie łatwo je nabyć.
+Jedno ostrzeżenie na odchodne, bo jest lustrzanym odbiciem pułapki z sekcji 4
+i tak samo łatwo je nabyć.
 
 \textbf{Nasycenie nie jest powodem, żeby unikać funkcji logistycznej na
 wyjściu.} Ostatnia warstwa klasyfikatora ma produkować prawdopodobieństwo, to
@@ -730,9 +746,9 @@ Z $\frac{e^{2}}{e^{2} + e^{\num{0.5}}}$ i jego partnera, a dodają się do $1$, 
 muszą.
 
 Spójrz teraz jeszcze raz na tę pierwszą liczbę. To $\sigma(\num{1.5})$
-\dash{} funkcja logistyczna policzona w \emph{różnicy} obu wyników, którą
-Program~\ref{prog:F06} kazał ci liczyć jako $\num{1.5}$ ze zgłoszenia
-$\num{0.8}$.
+\dash{} funkcja logistyczna policzona w \emph{różnicy} obu wyników. Funkcję
+logistyczną Program~\ref{prog:F06} kazał ci uruchamiać wstecz; tutaj biegnie
+w przód, a to, czym się ją karmi, jest różnicą.
 
 Pokaż, że to jest ogólne: zastosuj $\softmax$ do dwóch wyników $a$ i $b$ i
 uprość pierwszą składową.
@@ -840,10 +856,11 @@ ruszyć: potęga o dodatnim wykładniku zachowuje porządek.
   wyprzedza dopiero w $x = \val{f07.poly.crossover}$. Dodanie ustalonej
   wielkości do argumentu mnoży funkcję wykładniczą przez ustaloną liczbę i na
   tym polega całość}.}
-\sumitem{7--8}{\result{$y_0 e^{kt}$ rośnie dla $k > 0$ i zanika dla $k < 0$. Czas
-  połowicznego zaniku to $\frac{\ln 2}{k}$, czyli
-  $\val{f07.decay.halflife}$ kroków przy $k = \num{0.05}$, i \textbf{nie zależy
-  od tego, gdzie wielkość zaczęła}}.}
+\sumitem{7--8}{\result{$y_0 e^{kt}$ rośnie dla $k > 0$ i zanika dla $k < 0$.
+  Zapisany jako zanik, $y_0 e^{-kt}$ z $k > 0$, czas połowicznego zaniku to
+  $\frac{\ln 2}{k}$ \dash{} $\val{f07.decay.halflife}$ kroków przy
+  $k = \num{0.05}$ \dash{} i \textbf{nie zależy od tego, gdzie wielkość
+  zaczęła}}.}
 \sumitem{9--10}{\result{\textbf{Dojście do jednej dziesiątej zajmuje
   $\val{f07.decay.tenth.halflives}$ czasów połowicznego zaniku}, a nie
   dziesięć i nie pięć, bo $m$ połowień dzieli przez $2^{m}$, a ty chcesz
@@ -877,8 +894,8 @@ ruszyć: potęga o dodatnim wykładniku zachowuje porządek.
   środku czterokrotnie bardziej stromym. Argument za nim zawsze dotyczył
   wyśrodkowania na zerze}.}
 \sumitem{23--24}{\result{Jednostka nasycona jest cicha, a nie zepsuta: odpowiada na
-  zmianę argumentu mniej więcej $\val{f07.slope.ratio6}$-tą częścią
-  odpowiedzi, którą dałaby w środku. \textbf{To jeszcze nie jest problem
+  zmianę argumentu mniej więcej jedną częścią na $\val{f07.slope.ratio6}$
+  tej odpowiedzi, którą dałaby w środku. \textbf{To jeszcze nie jest problem
   znikającego gradientu} \dash{} jeden taki czynnik da się przeżyć, a iloczynu
   czterdziestu nie, a mnożenie należy do Programu~\ref{prog:F12}}.}
 \sumitem{25--26}{\result{$\relu$ nie ma po dodatniej stronie żadnej części płaskiej,
@@ -947,10 +964,14 @@ ruszyć: potęga o dodatnim wykładniku zachowuje porządek.
   \answerto{$2 \times \num{0.5} - 1 = 0$ oraz
   $2 \times \val{f05.sig.m2} - 1 = \val{f07.tanh.m1}$.}
 \item Dwoje inżynierów spiera się, czy w warstwie ukrytej użyć $\tanh$, czy
-  funkcji logistycznej. Który z ich argumentów dotyczy nasycenia, a który nie?
-  \answerto{\emph{Wyśrodkowany na zerze} nie dotyczy nasycenia; dotyczy tego,
-  gdzie leżą wartości. \emph{Wygina się łagodniej} dotyczy nasycenia i jest
-  fałszywy \dash{} $\tanh$ wygina się mocniej.}
+  funkcji logistycznej. Jedno mówi \emph{$\tanh$ jest wyśrodkowany na zerze};
+  drugie mówi \emph{$\tanh$ wygina się łagodniej}. Który argument dotyczy
+  nasycenia i czy jest prawdziwy?
+  \answerto{Nasycenia dotyczy ten drugi i jest fałszywy \dash{} $\tanh$
+  wygina się mocniej, tracąc mniej więcej $\val{f07.tanh.ratio2}$ razy na
+  dwóch jednostkach wobec $\val{f07.slope.ratio2}$ funkcji logistycznej.
+  Pierwszy nie dotyczy nasycenia w ogóle; dotyczy tego, gdzie leżą wartości,
+  i to on był zawsze tym prawdziwym argumentem.}
 \item Dlaczego $\relu$ nie nasyca się dla dodatnich argumentów?
   \answerto{Bo jest tam prostą $y = x$, a prosta ma wszędzie tę samą
   stromość.}
@@ -975,10 +996,12 @@ ruszyć: potęga o dodatnim wykładniku zachowuje porządek.
 \begin{furtherproblems}
 \item Tabela z ramki $2$ rośnie i zwalnia. Podaj zgrubny argument, dlaczego nie
   może przekroczyć $3$.
-  \answerto{Każde kolejne kumulowanie dokłada mniej niż poprzednie, a dokładki
-  maleją dostatecznie szybko, żeby mieć skończoną sumę. Uściślenie tego jest
-  argumentem o zbieżności, a maszyneria do niego mieszka w
-  Programie~\ref{prog:F13}.}
+  \answerto{Wymnóż nawias. Wyrazy po dwóch pierwszych są kolejno mniejsze niż
+  $\frac{1}{2}$, $\frac{1}{4}$, $\frac{1}{8}$ i tak dalej, a
+  Program~\ref{prog:F04} mówi, że cały ten ogon sumuje się do co najwyżej
+  $1$. Wartość jest więc co najwyżej $1 + 1 + 1 = 3$, jakiekolwiek byłoby
+  $n$. Uściślenie samej granicy jest argumentem o zbieżności, a ta maszyneria
+  mieszka w Programie~\ref{prog:F13}.}
 \item Dlaczego $\left(1 + \frac{1}{n}\right)^{n}$ nie jest w granicy po prostu
   $1$, skoro $1 + \frac{1}{n}$ dąży do $1$?
   \answerto{Bo wykładnik rośnie w tym samym czasie. Wielkość dążąca do $1$
@@ -990,9 +1013,10 @@ ruszyć: potęga o dodatnim wykładniku zachowuje porządek.
   kroków. Po $20$ krokach jaką część startu zachowuje każdy?
   \answerto{Jedną czwartą i połowę. Drugi nie jest \enquote{dwa razy
   wolniejszy} w żadnym sensie pozwalającym dodawać te ułamki.}
-\item Pokaż, że stromość funkcji logistycznej w $x$ równa się
-  $\sigma(x)\bigl(1 - \sigma(x)\bigr)$, przyjmując, że tak jest, i wyjaśnij z
-  tego, dlaczego maksimum wynosi jedną czwartą.
+\item Stromość funkcji logistycznej w $x$ to $\sigma(x)\bigl(1 -
+  \sigma(x)\bigr)$ \dash{} fakt, który wyprowadza Program~\ref{prog:F12}, a
+  ten program tylko z niego korzysta. Przyjmij go i wyjaśnij, dlaczego
+  największa stromość wynosi jedną czwartą.
   \answerto{Iloczyn $p(1-p)$ dla $p$ w $\intcc{0}{1}$ jest największy w
   $p = \frac{1}{2}$, gdzie wynosi $\frac{1}{4}$. Krzywa jest więc najbardziej
   stroma tam, gdzie odczytuje połowę, czyli w $x = 0$.}

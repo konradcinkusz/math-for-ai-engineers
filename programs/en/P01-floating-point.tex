@@ -818,9 +818,9 @@ the three significand bits \code{bf16} gave up to buy them take a little of it
 back, because a shallower significand is a shallower subnormal range.
 
 One more number to place against those floors, and it is not this program's.
-Program~\ref{prog:F12} multiplied forty layer factors together and reached
-$\val{p01.f12.prod}$ for a saturated logistic chain. Which of the four formats
-still holds it?
+Program~\ref{prog:F12} multiplied forty layer factors together and brought
+the product below $\val{p01.f12.prod}$ for a saturated logistic chain. Which
+of the four formats still holds a number that small?
 \dotline
 \nextframe
 \end{fr}
@@ -957,7 +957,8 @@ which do not.
   cannot type in}, which is why it was computed as a logarithm. A coin-flipping
   model's product is exactly zero after $\val{p01.coin.fp64}$ tokens in
   \code{fp64} and $\val{p01.coin.fp16}$ in \code{fp16}}.}
-\sumitem{33--35}{\result{Program~\ref{prog:F12}'s $\val{p01.f12.prod}$ is a small
+\sumitem{33--35}{\result{Program~\ref{prog:F12}'s product, below
+  $\val{p01.f12.prod}$, is a small
   number in \code{fp64} and \textbf{exactly zero in \code{fp32}}, so a
   vanishing gradient is not always a gradient that became small \dash{} often
   it is one that left the number system. And Program~\ref{prog:F11}'s

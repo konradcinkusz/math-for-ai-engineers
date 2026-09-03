@@ -75,15 +75,17 @@
   \answerto{$\tanh x = \frac{e^{x} - e^{-x}}{e^{x} + e^{-x}}$.}
 \item Evaluate $\tanh(1)$ and $2\sigma(2) - 1$. What do you notice?
   \teachesat{19--20}
-  \answerto{Both are $\val{f07.tanh.1}$. $\tanh$ is the logistic doubled in
-  height and slid down by one.}
+  \answerto{Both are $\val{f07.tanh.1}$. $\tanh$ is the logistic squashed
+  horizontally by two, doubled in height and slid down by one \dash{} all
+  three moves, and the squash is the one it is easy to drop.}
+\item Why was $\tanh$ preferred to the logistic in hidden layers?
+  \teachesat{20--21}
+  \answerto{Because it is centred on zero and the logistic is not. That is a
+  claim about where its outputs sit, not about how gently it bends.}
 \item Which saturates harder, the logistic or $\tanh$? \teachesat{21--22}
   \answerto{$\tanh$. Its steepness falls from $\val{f07.tanh.slope0}$ to
   $\val{f07.tanh.slope2}$ over two units; the logistic's falls from
   $\val{f07.slope.0}$ to $\val{f07.slope.2}$.}
-\item Then why was $\tanh$ preferred to the logistic? \teachesat{20--21}
-  \answerto{Because it is centred on zero and the logistic is not. That is a
-  claim about where its outputs sit, not about how gently it bends.}
 \item Roughly how much less steep is the logistic six units from its centre
   than at it? \teachesat{17--18}
   \answerto{About $\val{f07.slope.ratio6}$ times.}
@@ -337,8 +339,10 @@ Two schedules described as \enquote{multiply by $\num{0.99}$ each step} and
 \enquote{decay at a rate of $\num{0.01}$} are the same schedule, and the
 conversion is one logarithm. Two described as \enquote{multiply by
 $\num{0.5}$ each step} and \enquote{decay at a rate of $\num{0.5}$} are
-\emph{not}: $-\ln(\num{0.5}) = \num{0.693}$, so the second decays half as fast
-again as the first.
+\emph{not}: multiplying by $\num{0.5}$ is a rate of
+$-\ln(\num{0.5}) = \num{0.693}$, so the \emph{first} decays about
+$\num{1.4}$ times as fast as the second. Halving takes one step under the
+first and $\num{1.39}$ under the second.
 
 The approximation $k \approx 1 - \gamma$ that makes the first pair agree is
 only good near $\gamma = 1$, which is where schedules usually live and which
@@ -358,7 +362,7 @@ Programs~\ref{prog:F05} and~\ref{prog:F06} both used the logistic function and
 neither said where its shape comes from. It comes from odds.
 
 Suppose the odds in favour of something are $e^{x}$ to one \dash{} which is
-just a way of letting $x$ run over every real number while the odds stay
+a way of letting $x$ run over every real number while the odds stay
 positive, since $e^{x}$ is never zero and never negative. Odds of $a$ to $1$
 mean a probability of $\frac{a}{a+1}$, so
 \[ p = \frac{e^{x}}{1 + e^{x}} \]
@@ -551,7 +555,7 @@ signal into the next layer, and a layer whose outputs straddle zero does not.
 That was the argument for $\tanh$ over the logistic in hidden layers, and it is
 an argument about the \emph{location} of the outputs and nothing else.
 
-It is easy to slide from there into a second belief. Answer this one quickly:
+Answer this one quickly, without working anything out:
 \textbf{does $\tanh$ also saturate more gently than the logistic?}
 \dotline
 \nextframe
@@ -564,8 +568,10 @@ It is easy to slide from there into a second belief. Answer this one quickly:
 \toprule
 & at $x = 0$ & at $x = 2$ & ratio \\
 \midrule
-logistic & \val{f07.slope.0} & \val{f07.slope.2} & about $2$ \\
-$\tanh$ & \val{f07.tanh.slope0} & \val{f07.tanh.slope2} & about $14$ \\
+logistic & \val{f07.slope.0} & \val{f07.slope.2}
+  & about $\val{f07.slope.ratio2}$ \\
+$\tanh$ & \val{f07.tanh.slope0} & \val{f07.tanh.slope2}
+  & about $\val{f07.tanh.ratio2}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -573,14 +579,22 @@ $\tanh$ & \val{f07.tanh.slope0} & \val{f07.tanh.slope2} & about $14$ \\
 \begin{trapbox}
 \textbf{$\tanh$ is steeper in the middle and flatter at the ends, which is
 what \enquote{saturates harder} means.} Its steepness starts at $1$ rather
-than at a quarter, and two units out it has lost a factor of about fourteen
-where the logistic has lost about two.
+than at a quarter, and two units out it has lost a factor of about
+$\val{f07.tanh.ratio2}$ where the logistic has lost about
+$\val{f07.slope.ratio2}$.
 
 That follows from the identity rather than being a separate fact. Squashing
 the curve horizontally by two makes it twice as steep; stretching it
 vertically by two makes it twice as steep again; so $\tanh$ is four times the
-logistic's steepness at the centre \dash{} four quarters, which is $1$. The
-same squash moves its flat region four times closer in.
+logistic's steepness at the centre \dash{} four quarters, which is $1$.
+
+But only the \emph{squash} moves anything along the axis: a vertical stretch
+scales every steepness and shifts no point. So the flat region comes in by two
+rather than by four, and the evidence is two numbers that agree \dash{}
+$\tanh$ loses a factor of about $\val{f07.tanh.ratio2}$ over two units, and
+the logistic loses about $\val{f07.slope.ratio4}$ over \emph{four}. Those are
+different curves measured over different distances, and they come to the same
+figure because the squash is by two.
 
 The case for $\tanh$ was always about being centred on zero. Nobody claimed it
 bends more gently, and it does not.
@@ -604,9 +618,9 @@ one then that is where it should be.
 
 What is true of a saturated unit is narrower and it is the number of the
 previous section. Six units out, the logistic answers a change in its input
-with about a $\val{f07.slope.ratio6}$th as much change in its output as it
-would at the centre. Four units out it is about a
-$\val{f07.slope.ratio4}$th.
+with about one part in $\val{f07.slope.ratio6}$ of the change in its output it
+would give at the centre. Four units out it is about one part in
+$\val{f07.slope.ratio4}$.
 
 So the unit is not broken and it is not stuck. It is \emph{quiet}: it reports
 almost the same thing whatever you do to it, within reason.
@@ -659,10 +673,10 @@ perfectly responsive on one side and perfectly unresponsive on the other,
 instead of gently unresponsive at both ends.
 
 \begin{aibox}
-This is the whole reason $\relu$ displaced $\tanh$ in deep networks, and the
+This is the main reason $\relu$ displaced $\tanh$ in deep networks, and the
 argument is one line long once you have the numbers above: $\tanh$ loses a
-factor of about fourteen over two units either side of zero, and $\relu$ loses
-nothing over its entire positive half.
+factor of about $\val{f07.tanh.ratio2}$ over two units either side of zero,
+and $\relu$ loses nothing over its entire positive half.
 
 Note what the argument is not. It is not that $\relu$ is smoother, simpler or
 better behaved \dash{} it has a corner where $\tanh$ is smooth, and a dead
@@ -674,7 +688,7 @@ expensive.
 
 \begin{fr}
 One caution before leaving, because it is the mirror image of the trap in
-section 4 and it is just as easy to acquire.
+section 4 and it is as easy to acquire.
 
 \textbf{Saturation is not a reason to avoid the logistic at an output.} A
 classifier's final layer is supposed to produce a probability, the flatness is
@@ -719,9 +733,9 @@ From $\frac{e^{2}}{e^{2} + e^{\num{0.5}}}$ and its partner, and they add to $1$ 
 they must.
 
 Now look at that first number again. It is $\sigma(\num{1.5})$ \dash{} the
-logistic evaluated at the \emph{difference} of the two scores, which
-Program~\ref{prog:F06} had you computing as $\num{1.5}$ from a report of
-$\num{0.8}$.
+logistic evaluated at the \emph{difference} of the two scores. The logistic is
+the function Program~\ref{prog:F06} had you running backwards; here it is
+running forwards, and what it is being fed is a difference.
 
 Show that this is general: apply $\softmax$ to two scores $a$ and $b$, and
 simplify the first component.
@@ -828,9 +842,10 @@ power with a positive exponent preserves order.
   larger than $e^{x}$, and the exponential does not overtake until
   $x = \val{f07.poly.crossover}$. Adding a fixed amount to the input
   multiplies an exponential by a fixed amount; that is the whole of it}.}
-\sumitem{7--8}{\result{$y_0 e^{kt}$ grows for $k > 0$ and decays for $k < 0$. The
-  half-life is $\frac{\ln 2}{k}$, which is $\val{f07.decay.halflife}$ steps at
-  $k = \num{0.05}$, and \textbf{it does not depend on where the quantity
+\sumitem{7--8}{\result{$y_0 e^{kt}$ grows for $k > 0$ and decays for $k < 0$.
+  Written as a decay, $y_0 e^{-kt}$ with $k > 0$, the half-life is
+  $\frac{\ln 2}{k}$ \dash{} $\val{f07.decay.halflife}$ steps at
+  $k = \num{0.05}$ \dash{} and \textbf{it does not depend on where the quantity
   started}}.}
 \sumitem{9--10}{\result{\textbf{Reaching a tenth takes
   $\val{f07.decay.tenth.halflives}$ half-lives}, not ten and not five, because
@@ -863,10 +878,11 @@ power with a positive exponent preserves order.
   that follows from the identity: two squashes make it four times as steep at
   the centre. The case for it was always that it is centred on zero}.}
 \sumitem{23--24}{\result{A saturated unit is quiet rather than broken: it answers a
-  change in its input with about a $\val{f07.slope.ratio6}$th of the response
-  it would give at the centre. \textbf{This is not yet the vanishing-gradient
-  problem} \dash{} one such factor is survivable and the product of forty is
-  not, and the multiplying is Program~\ref{prog:F12}'s}.}
+  change in its input with about one part in $\val{f07.slope.ratio6}$ of the
+  response it would give at the centre. \textbf{This is not yet the
+  vanishing-gradient problem} \dash{} one such factor is survivable and the
+  product of forty is not, and the multiplying is
+  Program~\ref{prog:F12}'s}.}
 \sumitem{25--26}{\result{$\relu$ has no flat part on its positive side at all, so
   there is nothing there to compound; below zero it is flat entirely, which is
   a harder version of the problem rather than an escape. And saturation is no
@@ -932,10 +948,14 @@ power with a positive exponent preserves order.
   \answerto{$2 \times \num{0.5} - 1 = 0$, and
   $2 \times \val{f05.sig.m2} - 1 = \val{f07.tanh.m1}$.}
 \item Two engineers argue about whether to use $\tanh$ or the logistic in a
-  hidden layer. Which of their arguments is about saturation and which is not?
-  \answerto{\emph{Centred on zero} is not about saturation; it is about where
-  the outputs sit. \emph{Bends more gently} is about saturation and it is
-  false \dash{} $\tanh$ bends harder.}
+  hidden layer. One says \emph{$\tanh$ is centred on zero}; the other says
+  \emph{$\tanh$ bends more gently}. Which argument is about saturation, and is
+  it true?
+  \answerto{The second is the one about saturation, and it is false \dash{}
+  $\tanh$ bends harder, losing a factor of about $\val{f07.tanh.ratio2}$ over
+  two units against the logistic's $\val{f07.slope.ratio2}$. The first is not
+  about saturation at all; it is about where the outputs sit, and it is the
+  argument that was always the real one.}
 \item Why does $\relu$ not saturate for positive inputs?
   \answerto{Because it is the straight line $y = x$ there, and a straight line
   has the same steepness everywhere.}
@@ -960,11 +980,13 @@ power with a positive exponent preserves order.
 \begin{furtherproblems}
 \item The table in frame $2$ climbs and slows. Give a rough argument for why
   it cannot climb past $3$.
-  \answerto{Each extra compounding adds less than the one before, and the
-  additions shrink fast enough to have a finite total. Making that precise is
-  a convergence argument and Program~\ref{prog:F13} is where the machinery for
-  it lives.}
-\item Why is $\left(1 + \frac{1}{n}\right)^{n}$ not simply $1$ in the limit,
+  \answerto{Multiply the bracket out. The terms after the first two are each
+  smaller than $\frac{1}{2}$, $\frac{1}{4}$, $\frac{1}{8}$ and so on, and
+  Program~\ref{prog:F04} says that whole tail totals at most $1$. So the value
+  is at most $1 + 1 + 1 = 3$, whatever $n$ is. Making the limit itself precise
+  is a convergence argument and Program~\ref{prog:F13} is where that machinery
+  lives.}
+\item Why is $\left(1 + \frac{1}{n}\right)^{n}$ not equal to $1$ in the limit,
   given that $1 + \frac{1}{n}$ tends to $1$?
   \answerto{Because the exponent grows at the same time. A quantity tending to
   $1$ raised to a power tending to infinity can do anything, and which it does
@@ -976,9 +998,9 @@ power with a positive exponent preserves order.
   steps, what fraction of its start does each retain?
   \answerto{A quarter and a half. The second is not \enquote{twice as slow} in
   any sense that lets you add the fractions.}
-\item Show that the logistic's steepness at $x$ equals
-  $\sigma(x)\bigl(1 - \sigma(x)\bigr)$, given that it does, and use it to
-  explain why the maximum is a quarter.
+\item The logistic's steepness at $x$ is $\sigma(x)\bigl(1 - \sigma(x)\bigr)$
+  \dash{} a fact Program~\ref{prog:F12} derives and this program only uses.
+  Take it as given and explain why the largest steepness is a quarter.
   \answerto{The product $p(1-p)$ over $p$ in $\intcc{0}{1}$ is largest at
   $p = \frac{1}{2}$, where it is $\frac{1}{4}$. So the curve is steepest where
   it reads a half, which is $x = 0$.}

@@ -127,9 +127,14 @@ def integrate(f, lo: float, hi: float, n: int = 200000) -> float:
     return sum(f(lo + (i + 0.5) * w) * w for i in range(n))
 
 
+# NEITHER THE TOTAL NOR ITS RECIPROCAL IS EMITTED, and that is a correction on
+# this book's own rule that arithmetic the program is teaching is written
+# inline. The total is exactly 1/6 -- which the reader can produce from the
+# power rule six frames earlier -- and 0.1667 is what it printed instead, so
+# the reader who divided the page's own two numbers got 1/0.1667 = 5.9988 and
+# had to guess that 6 was meant. An exact fraction reproduces exactly, and it
+# is the form the frame is teaching the reader to reach.
 TOTAL = integrate(unnormalised, 0.0, 1.0)
-emit("f13.unnorm.total", TOTAL, 4)
-emit("f13.unnorm.const", 1.0 / TOTAL, 0)
 assert abs(TOTAL - 1.0 / 6.0) < 1e-9, "the unnormalised curve no longer accumulates to 1/6"
 
 # And after dividing, the area is one. Asserted, because that is the defining
