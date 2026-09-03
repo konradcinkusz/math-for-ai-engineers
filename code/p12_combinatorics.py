@@ -410,6 +410,17 @@ emit("p12.beam.scored.a", sci(float(scored(BEAM_A)), 2))
 emit("p12.beam.scored.b", sci(float(scored(BEAM_B)), 2))
 emit("p12.beam.frac.a", sci(scored(BEAM_A) / float(SPACE), 2))
 emit("p12.beam.frac.b", sci(scored(BEAM_B) / float(SPACE), 2))
+# The width a further problem asks for: the b that scores one per cent of the
+# space, b = 0.01 * V^L / (L*V). Exact in Fractions, because V^L has ninety
+# digits and a float cannot hold the numerator.
+BEAM_PCT = Fraction(1, 100) * Fraction(SPACE) / Fraction(LENGTH * VOCAB)
+emit("p12.beam.pct.width", sci(float(BEAM_PCT), 2))
+# And the property that makes the exercise work rather than the figure: the
+# width needed is astronomically larger than anything nameable, and it scales
+# with the space rather than with the beam.
+assert float(BEAM_PCT) > 1e80, float(BEAM_PCT)
+assert abs(float(scored(int(1)) * BEAM_PCT / Fraction(SPACE)) - 0.01) < 1e-12
+
 # The invariant, not the figure: doubling the beam doubles the coverage, and
 # doubling a number that small is what makes the coverage argument worthless.
 assert scored(BEAM_B) == 2 * scored(BEAM_A)

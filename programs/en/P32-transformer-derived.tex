@@ -1155,8 +1155,12 @@ this book was for.
   width $\val{p32.d.head}$ hold exactly the parameters of one head of width
   $\val{p32.d}$. What changes is rank, not cost}.}
 \sumitem{21--22}{\result{A plain chain of $\val{p32.depth}$ layers has a gradient of
-  at most $\val{p32.plain.bound}$, which is below what a $\code{float32}$
-  can hold}.}
+  at most $\val{p32.plain.bound}$, and that is its \emph{best} case. The number
+  is still representable \dash{} $\code{float32}$'s smallest normal is
+  $\val{p01.fp32.minnorm}$ \dash{} so what kills a plain chain is that the
+  bound is useless rather than that it underflows. Underflow is the realistic
+  case: at a saturated layer the same product is $\val{f12.sat.bound}$, below
+  every floor the format has}.}
 \sumitem{23--25}{\result{$y = x + f(x)$ makes the Jacobian $\prod(1 + f'_k)$, whose
   expansion is a sum over $2^{n}$ paths \dash{} one per subset of layers.
   \textbf{The empty subset contributes exactly $1$.}} A plain chain's

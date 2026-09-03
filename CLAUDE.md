@@ -99,7 +99,7 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1627 computed values, all referenced, all present, plus the committed console
+- 1633 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
@@ -12149,6 +12149,172 @@ Pages 1407 / 1433 / 1172 / 1188, from 1401 / 1427 / 1164 / 1184.
   twice. `make verify` refuses the tree until it is, which is the whole
   argument for computing that appendix rather than typing it, demonstrated for
   the second pass running.
+
+### The blocker batch, September 2026
+
+Issues \#153, \#170, \#165, \#175 and \#123, with parts of \#149 and \#125,
+taken together because the whole-book verdict in \#180 says to do the blockers
+first and because five of the seven turned out to share one cause.
+
+**The verdict's own count was twelve and two were already merged** \dash{}
+\#124 in the Foundation batch and \#136 in the P05 review. Of the ten left,
+this batch takes eight. The two it does not take are \#113, which needs
+Appendix~B's symbol table written rather than a line corrected, and \#110,
+which is a repository settings toggle nobody working in the tree can flip.
+
+#### THE FINDING: three of the book's four wrong numbers were in answer keys, which no gate reaches
+
+The verdict says it in one sentence and it is worth repeating with the
+mechanism attached: *the wrong numbers are in the places the gates do not
+reach \dash{} answer keys, Summary restatements, and prose about other
+programs.* All three of the answer-key numbers this batch fixes were
+**literals**:
+
+| where | printed | is | out by |
+|---|---|---|---|
+| P12 further problem 2 | $2 \times 10^{84}$ | $\val{p12.beam.pct.width}$ | a factor of $100$ |
+| P30 further problem 3 | $\ln 2 = \val{p30.js.cap}$ | $\val{p30.js.overlap}$ | a factor of $3.2$ |
+| P33 further problem 2 | $\num{2.475}$ | $\val{p33.accum.pooled}$ | the wrong weighting |
+
+C7 could not see any of them, because C7 asks whether every `\val{}` has a
+script behind it and whether every emitted value is used. **A literal is
+neither**, so an answer key that writes the number out is outside the
+mechanism this book was built around, in the one part of the book a reader
+opens *because they already suspect they are wrong.*
+
+So the fix is not three corrected digits. All three are now **computed in
+their program's script and asserted there**, which puts them inside the same
+gate as everything else and means the next person who changes the scenario
+gets a failed build rather than a stale answer. P12's is exact over
+`Fraction` because $V^{L}$ has ninety digits; P30's is the same `js()` the
+section already uses; P33's is a weighted mean over `Fraction`.
+
+**The rule: an `\answerto{}` may not carry a number the reader cannot derive
+from values on the page.** Where it needs one, emit it.
+
+#### The generated appendix propagated a false claim, and that is the design working
+
+Program~\ref{prog:P32}'s Summary item 21--22 said the $\val{p32.depth}$-layer
+bound $\val{p32.plain.bound}$ is \enquote{below what a `float32` can hold}.
+Frame 22, two pages earlier, says it is *still perfectly representable* and
+gives the format's smallest normal as $\val{p01.fp32.minnorm}$ \dash{} twelve
+orders lower. The frame is right.
+
+The item is wrapped in `\result{}`, so **the false version was replayed
+verbatim into Appendix~C**, where it stands as a general formula with none of
+the section's argument around it. That is issue \#165's half of the same
+defect and it needed no separate fix: correcting the mark corrected both
+places.
+
+It is worth being precise about what the generated appendix does and does not
+buy. It does **not** make a claim true \dash{} nothing in this repository
+checks a Summary item against the frames it summarises. What it buys is that
+**one wrong statement is wrong in exactly two places and one fix is right in
+exactly two places**, which is the property Appendix~B lacks and which is why
+Appendix~B shipped four false pointers and Appendix~A is the cleanest thing in
+the book.
+
+#### A claim true of the section's own matrix, stated as though it were general
+
+Program~\ref{prog:P10} §5 works with a **symmetric** matrix throughout
+\dash{} its own script says \enquote{takes a symmetric matrix} \dash{} and
+there the spectral norm really is the largest $\lvert\lambda\rvert$. The
+Summary item said it flat, and Appendix~C replayed it flat.
+
+Refuted by a matrix the book already uses: Program~\ref{prog:P09}'s shear has
+both eigenvalues equal to $1$ and sends $(0,1)$ to $(1,1)$, so its spectral
+norm is $\num{1.618}$ and the eigenvalues understate it by over half again.
+The general answer is the largest singular value, which is
+Program~\ref{prog:P11}'s object.
+
+**The shape is not \enquote{a wrong theorem}. It is a hypothesis dropped on
+the way from a frame to its Summary**, and the Summary is the half that
+travels: into the reader's return index, and into an appendix where the
+section's standing assumption is nowhere on the page. Both now name
+*symmetric* and both name what the general answer is. The Test exercise that
+used it was reworded to ask which word in its own sentence the answer depends
+on, which is a better question than the one it replaced.
+
+#### The program about computing the wrong quantity contained one
+
+Program~\ref{prog:P33} §2 is built on the observation that four of a training
+step's six pieces fail by being **a correct computation of the wrong
+quantity**. Its own §3 then asked:
+
+> You have been watching for $\val{p33.watch}$ steps and the loss has not gone
+> below where it was when you started watching.
+
+and answered with the probability that the reading **at** step
+$\val{p33.watch}$ is not below the reading at step $0$ \dash{} two readings.
+The English asks about a running minimum: no reading in the stretch ever
+dipping under the first, which is $\val{p33.watch}$ chances to fail rather
+than one. Measured under the program's own noise model, conditioning on the
+shared first reading because the comparisons are not independent of it, the
+two events are $\val{p33.p.flat}$ per cent and $\val{p33.p.flat.min}$ per cent
+\dash{} a factor of $\val{p33.p.flat.ratio}$, and the section's headline
+(\emph{about as often as a coin comes up heads}) was resting on the wrong one.
+
+**The question moved, not the arithmetic, and not for convenience.** The
+two-reading comparison is what a person watching a dashboard actually does
+\dash{} nobody scans five hundred logged values and takes a minimum \dash{}
+and it is the same model the section's plateau threshold is derived from. The
+running minimum is also the more fragile of the two: it needs the per-step
+noise to be independent, where a real logged loss is correlated across steps
+because the batch stream was shuffled once.
+
+So the other reading became a note box with both numbers in it, which is
+better than either a silent correction or a hedge: the section now contains
+its own instance of the failure it is about.
+
+The integral is Simpson over the conditioning variable and is checked rather
+than trusted \dash{} the integrand is smooth, so five hundred panels already
+agree with four thousand to four decimals, and the whole thing costs under a
+tenth of a second. **It is emitted at three decimals rather than two, and
+that is the recorded rule rather than taste**: at two the page divides to
+$257$ against an exact $260$, and at three it divides to $260.1$, which is the
+same integer. The script asserts the printed forms agree.
+
+#### Two more numbers that were simply wrong
+
+- **Program~\ref{prog:P24} frame 24 said an average's spread falls like
+  $\sqrt{B}$.** If the variance falls like $1/B$ the spread falls like
+  $1/\sqrt{B}$, so as printed the sentence said minibatch noise **grows** with
+  batch size \dash{} the reverse of the argument it repays
+  (Program~\ref{prog:P21}) and the one it sets up (Program~\ref{prog:P25}),
+  and it contradicted three other places in the same volume. A dropped `1/`.
+- **The same frame put Program~\ref{prog:P21} two parts earlier.** It is one:
+  Part~VI against Part~VII.
+
+#### A quantifier, again, and this time in an aibox
+
+Program~\ref{prog:P24}'s frame 17 said Program~\ref{prog:P21} shows *the
+average of every one of its $\val{p21.pop.subsets}$ batches equals the
+population mean exactly.* Computed on P21's own ten numbers, **seven of the
+$\val{p21.pop.subsets}$ batch means equal it** and they run from $-4$ to
+$22/3$. What P21 proves is the collective statement \dash{} the mean of the
+batch means \dash{} and its own trapbox turns on individual batch means
+*straddling* the population mean.
+
+That is the Foundation batch's macro/micro finding one program later and one
+level up: **a quantifier right about the ensemble and false about any member
+of it**, in the box whose job is to say where the idea shows up in practice.
+The distinction is exactly what P21 and P25 exist to break, so an ambiguous
+sentence about it costs more here than the same sentence would anywhere else.
+
+#### And an answer whose justification named the condition it violated
+
+Program~\ref{prog:P30}'s further problem 3 takes $p = (\num{0.5}, \num{0.5})$
+against $q = (1, 0)$ and reported Jensen--Shannon as the bound,
+\enquote{attained, because the two share no support beyond the midpoint's}.
+They do share support: $q$ puts all its weight on the outcome where $p$ has
+half of its. So the sentence **states the condition for attaining the bound
+and then applies it to a pair that fails the condition** \dash{} and §7's own
+measurement, which does attain it, uses point masses, which are disjoint.
+
+The answer imported a figure from the one case its stated reason excludes.
+Worth keeping beside the F09 triangle-inequality finding and F02's `-3**2`
+box: all three are a justification written from the feel of a neighbouring
+case rather than from the case in hand.
 
 ### Program P5 review pass, September 2026 --- the first of the thirty
 

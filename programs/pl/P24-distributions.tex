@@ -27,7 +27,7 @@
 \outcome{37--48}{nazwać rozkład, którym rządzi się dana wielkość, po jego roli,
   a nie po wzorze}
 \outcome{49--64}{powiedzieć, co temperatura, top-$k$ i top-$p$ robią z
-  rozkładem i która z tych trzech rzeczy usuwa tokeny}
+  rozkładem i które z tych trzech rzeczy usuwają tokeny}
 \end{outcomes}
 
 \begin{quiz}
@@ -316,7 +316,7 @@ liniowości i żaden z nich o niej nie wspomina.}
 
 Tożsamość rozgłaszania z Programu~\ref{prog:P07} rozbija średnią po $n^{2}$
 parach na średnią po $n$ z nich plus wyraz mieszany. Program~\ref{prog:P21}
-pokazuje, że średnia z każdej z jego $\val{p21.pop.subsets}$ partii równa się
+pokazuje, że średnia z jego $\val{p21.pop.subsets}$ średnich partii równa się
 dokładnie średniej populacji. Sekcja 5 poniżej zamienia prawdopodobieństwo na
 liczbę alarmów na milion żądań.
 
@@ -419,14 +419,14 @@ tej definicji.
 \end{fr}
 
 \begin{fr}
-To zamyka pożyczkę. Program~\ref{prog:P21} użył słowa \emph{wariancja} dwie
-części przed tą, w ramce o rygorze, która dała czytelnikowi jedno zdanie
+To zamyka pożyczkę. Program~\ref{prog:P21} użył słowa \emph{wariancja} część
+przed tą, w ramce o rygorze, która dała czytelnikowi jedno zdanie
 \dash{} średni kwadrat odległości od średniej \dash{} i wskazała tutaj.
 
 Definicją są teraz ramki powyżej, zastosowane do własnej populacji P21 i
 podpięte pod jej własną zatwierdzoną średnią. To, co P21 z nią zrobił
 \dash{} że wariancja średniej z $B$ losowań spada jak $1/B$, więc rozrzut
-spada jak $\sqrt{B}$ \dash{} jest zdaniem o \emph{sumach}, a to jest tematem
+spada jak $1/\sqrt{B}$ \dash{} jest zdaniem o \emph{sumach}, a to jest tematem
 Programu~\ref{prog:P25}, nie tego.
 
 Warto wiedzieć, dlaczego książka trzyma obie liczby, zamiast zostać przy tej
@@ -1036,8 +1036,8 @@ przewidzieć.
 
 Przy $T = 2$ top-$\val{p24.topk.k}$ kasuje $\val{p24.topk.del.t20}$ procent
 wagi. Przypuśćmy zamiast tego, że najpierw dodajesz szum Gumbela i bierzesz
-$\argmax$ z całości, nie obcinając niczego. Jak często wygrywają te same dwa
-tokeny?
+$\argmax$ z całości, nie obcinając niczego. Jak często $\argmax$ trafia na
+jeden z dwóch tokenów, które top-$\val{p24.topk.k}$ by usunęło?
 \dotline
 \nextframe
 \end{fr}
@@ -1129,7 +1129,7 @@ jest odwracalna.}{przeważyć czy usunąć}
   Programom \ref{prog:P10} i \ref{prog:P11} z ich macierzą kowariancji należało
   się słowo, a nie fakty: \textbf{odwołanie w przód, którego fakty da się
   udowodnić lokalnie, powinno być tak udowodnione}. Ograniczenie korelacji to
-  geometria z Programu~\ref{prog:P05} na innej przestrzeni.}
+  geometria z Programu~\ref{prog:F09} na innej przestrzeni.}
 \sumitem{37--38}{\result{\textbf{Bernoulli}: $\Ex = p$, $\Var = p(1-p)$, największa
   przy $p = \num{0.5}$. Wskaźnik jest zmienną Bernoulliego, a jego wartość
   oczekiwana prawdopodobieństwem, więc kolumna z rzadką klasą niesie prawie
@@ -1204,9 +1204,11 @@ jest odwracalna.}{przeważyć czy usunąć}
   pomijalne. Powiedz, czego potrzebujesz, zanim się zgodzisz.
   \answerto{Obu rozrzutów. Kowariancja niesie jednostki obu wielkości, więc jej
   rozmiar sam z siebie nic nie mówi: jeśli obie cechy mają rozrzut rzędu
-  $\num{0.01}$, to $\num{0.02}$ jest ogromną korelacją, a jeśli są mierzone w
-  tysiącach, to jest niczym. Poproś o korelację, czyli kowariancję z
-  wydzielonymi obiema jednostkami.}
+  $\num{0.15}$, to kowariancja $\num{0.02}$ daje korelację blisko
+  $\num{0.9}$, a jeśli są mierzone w tysiącach, to jest niczym. Zauważ, że
+  rozrzuty ją też ograniczają: przy rozrzutach po $\num{0.01}$ żadna
+  kowariancja powyżej $\num{0.0001}$ nie może w ogóle istnieć. Poproś o
+  korelację, czyli kowariancję z wydzielonymi obiema jednostkami.}
 \item Ktoś raportuje, że dwa wyniki ewaluacji mają korelację $\num{0.00}$, i
   wnioskuje, że obie ewaluacje badają rzeczy niepowiązane. Podaj najkrótszy
   kontrprzykład, jaki umiesz, i powiedz, o co poprosisz zamiast tego.
@@ -1234,7 +1236,7 @@ jest odwracalna.}{przeważyć czy usunąć}
   są kwadraty i ich średnia. Wariancja jest zdaniem o rozrzucie, a przesunięcie
   nie zbliża do siebie żadnych dwóch punktów.}
 \item Pokaż, że $\Var(X + Y) = \Var(X) + \Var(Y) + 2\Cov(X, Y)$, i powiedz, co
-  musi zachodzić, żeby wariancje po prostu się dodawały.
+  musi zachodzić, żeby wariancje dodawały się same z siebie.
   \answerto{Rozwiń $\Ex[((X - \Ex X) + (Y - \Ex Y))^{2}]$ i użyj liniowości na
   trzech składnikach; wyraz mieszany to z definicji podwojona kowariancja.
   Wariancje dodają się dokładnie wtedy, gdy kowariancja jest zerem, co

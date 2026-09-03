@@ -403,6 +403,20 @@ NOTES.append(
     f" apart at exactly the same distance, ln 2 = {_js[0]:.4f}, where KL is"
     f" infinite for both.")
 
+# The OVERLAPPING pair a further problem asks about, gated for the same reason.
+# Disjoint support attains the bound; sharing an outcome does not, and the gap
+# is a factor of three rather than a rounding.
+_half = [Fraction(1, 2), Fraction(1, 2)]
+_mass = [Fraction(1), Fraction(0)]
+JS_OVERLAP = js(_half, _mass)
+emit("p30.js.overlap", JS_OVERLAP, 4)
+assert JS_OVERLAP < 0.5 * math.log(2), (JS_OVERLAP, math.log(2))
+assert math.log(2) / JS_OVERLAP > 3.0, math.log(2) / JS_OVERLAP
+# And the two halves of the same answer: one direction is infinite because q
+# is zero where p has weight, the other is exactly ln 2.
+assert kl(_half, _mass) == math.inf
+assert abs(kl(_mass, _half) - math.log(2)) < 1e-12, kl(_mass, _half)
+
 
 # ======================================================================
 # 8.  Where the choice is already made for you.  Minimising cross-entropy

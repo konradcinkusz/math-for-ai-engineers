@@ -1105,9 +1105,11 @@ claims people make with it are usually not supported.
   directions and both Jensen--Shannon values.
   \answerto{$\KL{p}{q}$ is infinite: $q$ is zero where $p$ has weight.
   $\KL{q}{p} = 1 \times \ln\frac{1}{\num{0.5}} = \ln 2$.
-  Jensen--Shannon is $\val{p30.js.cap}$ in both directions, being symmetric
-  \dash{} the bound, attained, because the two share no support beyond the
-  midpoint's.}
+  Jensen--Shannon is $\val{p30.js.overlap}$ in both directions, being
+  symmetric \dash{} and it is well \emph{under} the bound, because these two
+  do share support: $q$ puts all its weight on the outcome where $p$ has half
+  of its. Section 7 attains $\val{p30.js.cap}$ on point masses, which share
+  nothing, and that is the condition rather than an incidental detail.}
 \item The triangle inequality fails for $\val{p30.tri.pct}$ per cent of
   ordered triples on §6's grid. Explain why counting \emph{ordered} triples
   is the right thing to count.

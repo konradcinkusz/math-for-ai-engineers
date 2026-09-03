@@ -48,8 +48,8 @@
   \answerto{$\val{p33.loud}$ z $\val{p33.pieces}$. Pozostałe cztery to
   poprawne obliczenie niewłaściwej wielkości, więc nie ma w nich żadnej
   niedozwolonej operacji, którą cokolwiek mogłoby wychwycić.}
-\item Obserwujesz od $\val{p33.watch}$ kroków i strata nie zeszła poniżej
-  wartości początkowej. Czy trening utknął?
+\item Obserwujesz od $\val{p33.watch}$ kroków, a strata teraz nie jest niższa
+  niż wtedy. Czy trening utknął?
   \teachesat{15--16}
   \answerto{Nie. Zdrowy trening wygląda dokładnie tak w około
   $\val{p33.p.flat}$ procent przypadków, a płaski odcinek staje się dowodem
@@ -64,9 +64,11 @@
 \item Panel wygładza krzywą straty przy $\beta = \val{p33.beta.dash}$. Jaką
   część prawdziwego rozrzutu krok po kroku pokazuje ten obraz?
   \teachesat{30--31}
-  \answerto{$\val{p33.smooth.pct}$ procent. Wariancja po wygładzeniu to
-  $\frac{1-\beta}{1+\beta}$ surowej, więc o obrazie decyduje ustawienie tak
-  samo jak trening.}
+  \answerto{$\val{p33.smooth.dash}$, czyli około jednej dziesiątej. Wariancja
+  po wygładzeniu to $\frac{1-\beta}{1+\beta}$ surowej, więc o obrazie decyduje
+  ustawienie tak samo jak trening \dash{} Program~\ref{prog:P21} ze swoim
+  własnym $\beta = \val{p33.beta}$ dostaje z tej samej formuły
+  $\val{p33.smooth.pct}$ procent.}
 \item Siedem punktów na $\val{p33.fit.decades}$ dekadach leży na prostej na
   osiach log-log, z dokładnością lepszą niż $\val{p33.fit.resid}$ procent. Co
   to wiąże w przewidywaniu dopasowania trzy dekady dalej?
@@ -292,8 +294,8 @@ pytanie zadawane każdemu z nich jest tym samym pytaniem:
   płaski odcinek i czym może być}
 
 \begin{fr}
-Obserwujesz od $\val{p33.watch}$ kroków i strata nie zeszła poniżej wartości,
-którą miała, gdy zacząłeś obserwować.
+Obserwujesz od $\val{p33.watch}$ kroków, a strata na panelu teraz nie jest
+niższa od odczytu, który pamiętasz sprzed $\val{p33.watch}$ kroków.
 
 Załóż, że trening jest całkiem zdrowy i strata naprawdę spada o
 $\val{p33.improve}$ na krok. Jak prawdopodobne jest, że zobaczyłbyś dokładnie
@@ -315,6 +317,26 @@ Wynosi $\val{p33.p.flat}$ procent.
 
 Prawie połowa przypadków. Zdrowy trening wygląda na zablokowany przez
 $\val{p33.watch}$ kroków mniej więcej tak często, jak moneta wypada orłem.
+
+\begin{note}
+\textbf{To dwa odczyty i to jest pytanie, które warto zadać. Surowsze
+odczytanie tego samego zdania daje zdarzenie o dwa rzędy wielkości rzadsze.}
+\enquote{Strata nie zeszła poniżej wartości początkowej} może znaczyć, że
+żaden odczyt na całym odcinku nigdy nie spadł pod pierwszy, a to
+$\val{p33.watch}$ szans na porażkę, nie jedna. Policzone przy tym samym
+modelu szumu \dash{} z warunkowaniem po wspólnym pierwszym odczycie, bo
+porównania nie są od niego niezależne \dash{} daje to
+$\val{p33.p.flat.min}$ procent przeciw $\val{p33.p.flat}$, czyli czynnik
+$\val{p33.p.flat.ratio}$.
+
+Obie liczby są prawdziwe o swoim własnym zdarzeniu i tylko jedna z nich mówi o
+człowieku. Nikt nie przegląda $\val{p33.watch}$ zapisanych wartości i nie
+bierze z nich minimum; patrzy się na liczbę teraz i pamięta, gdzie była z
+grubsza wcześniej, czyli robi to porównanie powyżej \dash{} i z niego wyprowadza
+się próg z tej sekcji. Surowsza liczba jest też bardziej krucha: potrzebuje
+niezależności szumu krok po kroku, a prawdziwa zapisana strata jest
+skorelowana między krokami, bo strumień partii przetasowano raz.
+\end{note}
 
 Jedna liczba w tej arytmetyce została zmierzona, a jedna wybrana. Która jest
 która?
@@ -910,8 +932,11 @@ osłabiania całego twierdzenia.
 \sumitem{12--14}{Te cztery ciche są wykrywalne tylko z zewnątrz, a narzędziem
   jest krzywa straty zbudowana z zaszumionych liczb.}
 \sumitem{15--17}{\result{Zdrowy trening, którego strata spada o $\val{p33.improve}$ na
-  krok, nie pokazuje poprawy przez $\val{p33.watch}$ kroków w
-  $\val{p33.p.flat}$ procentach przypadków}.}
+  krok, nie pokazuje poprawy między dwoma odczytami odległymi o
+  $\val{p33.watch}$ kroków w $\val{p33.p.flat}$ procentach przypadków}
+  \dash{} a surowsze odczytanie, przy którym żaden odczyt na odcinku nigdy nie
+  spadł pod pierwszy, to $\val{p33.p.flat.min}$ procent, czyli
+  $\val{p33.p.flat.ratio}$ razy rzadziej.}
 \sumitem{18--21}{\result{Płaski odcinek musi trwać około $\val{p33.plateau.k}$ kroków,
   zanim zdrowy trening produkowałby go rzadziej niż w $\val{p33.alpha}$
   przypadków}.}
@@ -998,10 +1023,11 @@ osłabiania całego twierdzenia.
   prawdziwych tokenach, z których każda podzieliła już przez własną liczbę.
   Ich średnie straty to $2$, $8$, $3$ i $3$. Czy zakumulowany gradient jest
   tym z dużej partii?
-  \answerto{Nie. Średnia ważona tokenami daje $\num{2.475}$; zakumulowana
-  uśrednia te cztery i daje $4$. Błąd jest cichy, jest w gradiencie, a nie w
-  raporcie, i jest pułapką Programu~\ref{prog:P21} z jedną mikropartią
-  więcej.}
+  \answerto{Nie. Średnia ważona tokenami daje $\val{p33.accum.pooled}$;
+  zakumulowana uśrednia te cztery i daje $\val{p33.accum.naive}$, bo partia
+  dziesięciotokenowa niesie jedną dwusetną tokenów i ćwierć wagi. Błąd jest
+  cichy, jest w gradiencie, a nie w raporcie, i jest pułapką
+  Programu~\ref{prog:P21} z jedną mikropartią więcej.}
 \item Średnia wykładnicza jest zastosowana dwa razy, przy tym samym $\beta$.
   O jaki czynnik zmniejszony jest rozrzut podwójnie wygładzonej krzywej?
   \answerto{Mniej niż o kwadrat pojedynczego czynnika, bo ciąg raz wygładzony
