@@ -147,3 +147,17 @@
 
 % The date the book's facts were last checked. User-visible, so it lives here.
 \newcommand{\pinnedon}{sierpień 2026}
+
+% ---------- Metadane PDF ----------
+% Temat, lista słów kluczowych i język dokumentu to łańcuchy widoczne dla
+% czytelnika i różne w obu wydaniach, więc mieszkają tutaj, a nie w czterech
+% plikach głównych, gdzie został *tytuł* PDF-a, bo pliki główne to okablowanie
+% i C15 pilnuje ich kształtu.
+%
+% preamble.tex ustawia kolory odsyłaczy w \hypersetup, który działa ZANIM
+% wczyta ten plik, więc tych trzech nie da się tam podać -- są podawane
+% w drugim \hypersetup zaraz po \input, czyli w pierwszym miejscu, w którym
+% w ogóle istnieją. Nie łącz tych dwóch bloków.
+\newcommand{\lblPdfSubject}{Programowany kurs matematyki potrzebnej inżynierowi AI, od arytmetyki po jeden blok transformera}
+\newcommand{\lblPdfKeywords}{matematyka, uczenie maszynowe, algebra liniowa, analiza matematyczna, prawdopodobieństwo, teoria informacji, nauczanie programowane}
+\newcommand{\lblPdfLang}{pl-PL}
