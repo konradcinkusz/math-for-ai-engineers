@@ -144,3 +144,17 @@
 
 % The date the book's facts were last checked. User-visible, so it lives here.
 \newcommand{\pinnedon}{August 2026}
+
+% ---------- PDF metadata ----------
+% The subject, the keyword list and the document language are user-visible
+% strings that differ between the editions, so they live here rather than in
+% the four main files, where the PDF *title* still sits because the main files
+% are the wiring and C15 guards their shape.
+%
+% preamble.tex sets its link colours in a \hypersetup that runs BEFORE it
+% reads this file, so these three cannot go in that block -- they are applied
+% in a second \hypersetup immediately after the \input, which is the first
+% point at which they exist. Do not merge the two blocks.
+\newcommand{\lblPdfSubject}{A programmed course in the mathematics an AI engineer needs, from arithmetic to one transformer block}
+\newcommand{\lblPdfKeywords}{mathematics, machine learning, linear algebra, calculus, probability, information theory, programmed learning}
+\newcommand{\lblPdfLang}{en-GB}

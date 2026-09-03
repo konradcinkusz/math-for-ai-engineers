@@ -235,6 +235,26 @@
 % macro argument that the other edition also uses.
 \input{lang/\booklang}
 
+% The PDF's subject, keyword list and document language. They are here rather
+% than in the colour \hypersetup above, because they read \lblPdf... from the
+% language file input on the line above and that block runs before it.
+%
+% Two blocks is the ordering, not an oversight. Asked of pdflatex rather than
+% reasoned about: merging them raises Undefined control sequence and exits 1
+% -- AND still writes a PDF, with the three fields empty, because
+% -interaction=nonstopmode writes one over the error and -file-line-error puts
+% a path where grep '^!' looks for a bang. So the merged form fails in exactly
+% the shape this book's first recorded build trap describes: a red exit that
+% is easy to miss and a shipped file that looks fine.
+%
+% Metadata lives in the PDF catalogue and the trailer, so none of this can
+% move a line, a page or a break.
+\hypersetup{
+  pdfsubject={\lblPdfSubject},
+  pdfkeywords={\lblPdfKeywords},
+  pdflang={\lblPdfLang}
+}
+
 % ============================================================
 %  PROGRAM NUMBERING
 %  ---------------------------------------------------------

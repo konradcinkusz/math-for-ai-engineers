@@ -13153,6 +13153,131 @@ word does not settle.
 - **Blank versos carrying a running head**, found and deliberately left in the
   F04 review pass.
 
+### The metadata pass, September 2026 --- and a finding refuted by measuring it
+
+Issue \#122, four findings about the PDF as an artefact rather than about the
+mathematics. **One was real and is fixed, one was already fixed, one is
+refuted by measurement, and one is a figure-pipeline pass.** The pass is three
+files and moved no page; what it produced is the record of how the four were
+told apart.
+
+#### The one that was real: the PDF said nothing about itself
+
+`subject`, `keywords` and `/Lang` were empty in all four builds. The first two
+are what a library, a shop or a search index reads; the third is what a screen
+reader uses to choose a voice, and a Polish book announcing no language is
+read aloud in English.
+
+They are **user-visible strings that differ between the editions**, so they
+belong in `lang/{en,pl}.tex` beside every other such string, and not in the
+four main files \dash{} where the PDF *title* stays, because the main files
+are the wiring and C15 guards their shape.
+
+#### And they could not go where the other `\hypersetup` is
+
+`preamble.tex` sets its link colours in a `\hypersetup` that runs **before**
+`\input{lang/\booklang}`, so at that point `\lblPdfSubject` does not exist.
+The three fields are therefore applied in a **second** `\hypersetup`
+immediately after the input, which is the first point at which they are
+defined.
+
+**Two blocks is the ordering rather than an oversight**, and the comment says
+so \dash{} because the obvious tidy-up is to merge them, and the merged form
+fails in this book's own first recorded shape: `Undefined control sequence`,
+exit 1, **and a PDF written over the top of it** with the three fields empty,
+because `-interaction=nonstopmode` writes one and `-file-line-error` puts a
+path where `grep '^!'` looks for a bang. A red exit that is easy to miss and a
+shipped file that looks fine.
+
+**That paragraph is the second draft.** The first said merging gives three
+empty fields *and no error*, which is half right and was written from the feel
+of the mechanism. Asked of pdflatex instead \dash{} which is
+Program~\ref{prog:P23}'s rule, and it cost seconds \dash{} it errors *and*
+ships. This file's own class, arriving inside the comment warning about it.
+
+#### The prediction, stated before the build and exact
+
+Metadata lives in the PDF catalogue and the trailer, so **nothing can move a
+line, a page or a break.** Written down before `make all-formats` was launched
+rather than after it, so the build could refute it, which is
+Program~\ref{prog:P34}'s discipline:
+
+| | predicted | measured |
+|---|---|---|
+| pages | 1417 / 1444 / 1180 / 1190 | 1417 / 1444 / 1180 / 1190 |
+| overfull hbox | `[]` `[]` `[6.3]` `[]` | `[]` `[]` `[6.3]` `[]` |
+| orphan tails | 29 / 26 / 18 / 20 | 29 / 26 / 18 / 20 |
+
+Zero overfull vboxes, zero errors, zero unresolved references, no stranded
+frame openers, no stranded section headings and no orphaned cues.
+
+#### The finding that was refuted, and the reviewer's reading was reasonable
+
+\#122 says every internal link prints in body black, so a reader cannot tell a
+cross-reference from ordinary text \dash{} which would matter more in this
+book than in most, because the Summary's brackets and the Quiz's routes are
+the whole return index.
+
+**Measured: 662 of 662 internal link annotations across 600 body pages sit on
+text coloured mblue** (31, 78, 121), and none on black. Confirmed from both
+ends \dash{} the log reports `Hy@colorlinks = TRUE`, and the artefact agrees.
+
+The reading behind the finding is one a careful person makes:
+`\usepackage[hidelinks]{hyperref}` really does say what the issue says it
+says. What it does not say is that **twenty lines below it a `\hypersetup`
+sets `colorlinks=true` and `linkcolor=mblue`**, which overrides it. So the
+finding is a claim about the source read without its next twenty lines, and
+the only thing that settles it is the finished page.
+
+Worth keeping as a shape rather than as an incident: **a review finding is a
+hypothesis, and it gets the same treatment as one of mine** \dash{} run it
+before fixing it. Had the `hidelinks` been "corrected" on the issue's word,
+the fix would have been a no-op at best and a colour change nobody asked for
+at worst.
+
+#### And the probe that refuted it was wrong on its first run
+
+The first version filtered link annotations to `LINK_GOTO` and reported
+**zero links in the book**. This book's links are `LINK_NAMED`.
+
+The tell was free and needed no tooling: **zero internal links in a book whose
+every Summary item carries a frame range is not a plausible answer**, which is
+Program~\ref{prog:P34}'s rule. What made it catchable at all is that the probe
+had a **known-answer half** \dash{} it measured body-text colour as well as
+link colour, and the body-text half returned the right thing while the link
+half returned zero. One instrument, two questions, and only one of them wrong,
+which is the cheapest form of the two-instrument rule the Part~II elicitation
+pass recorded.
+
+#### The fourth finding: real, measured, and a pass of its own
+
+\#122's last finding is two claims and they are not the same job.
+
+- **The contents runs to fourteen pages**, and the cause is that nothing sets
+  `tocdepth` or `secnumdepth` anywhere, so book.cls's default of 2 puts every
+  numbered section of forty-seven programs into it. That is a front-matter
+  decision and belongs with \#111.
+- **151 diagram PDFs carry 152 font subsets, every one LiberationSans**, which
+  matches the issue's own count exactly. Fixing it means re-rendering all 151
+  \dash{} and a diagram's rendered **width** is the one quantity this book has
+  a formula for, so every figure's node size and rule-2 placement would have
+  to be re-measured in all four builds. **A figure pass, and this file already
+  carries one from the Foundation batch.**
+
+Recorded rather than taken, with the mechanism named, which is the P05 review
+pass's precedent: the next person meets the obstacle with the reasoning rather
+than rediscovering it.
+
+#### And my own comment made the claim this file most often records
+
+The first draft of the comment above `\hypersetup` named line numbers \dash{}
+*the block at line 203*, *the input at line 236* \dash{} and **the same
+insertion had already made both stale.** A positional claim is the cheapest
+sentence to write and the most expensive to leave wrong, which is the Part~II
+elicitation pass's finding arriving in a preamble comment rather than in a
+frame. It names the **ordering** now, which is what the constraint actually
+is and which cannot go stale when a line moves.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
