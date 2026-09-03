@@ -324,7 +324,7 @@ Exactly as F11 did, along that line: take a small step $h$ in the direction
 $u$, see how much $f$ changed, divide by $h$, and shrink $h$.
 \end{ansblock}
 
-\[ D_u f = \lim_{h \to 0} \frac{f(\mathbf{p} + h u) - f(\mathbf{p})}{h} \]
+\[ D_u f = \lim_{h \to 0} \frac{f(\vect{p} + h u) - f(\vect{p})}{h} \]
 
 It is the same limit, on the one-variable function you get by walking along a
 straight line through the point. Nothing new has been defined; a direction has
@@ -560,7 +560,7 @@ Program~\ref{prog:F11} already wrote the walk, in one dimension:
 \[ x \;\longleftarrow\; x - \eta\, f'(x) \]
 and called the minus sign the entire steering mechanism. In more than one
 dimension the only thing that changes is that the derivative is a vector:
-\[ \mathbf{p} \;\longleftarrow\; \mathbf{p} - \eta\, \nabla f(\mathbf{p}) \]
+\[ \vect{p} \;\longleftarrow\; \vect{p} - \eta\, \nabla f(\vect{p}) \]
 
 Notice that the update is \emph{componentwise}: each coordinate moves by its
 own partial derivative and consults none of the others. That is why a

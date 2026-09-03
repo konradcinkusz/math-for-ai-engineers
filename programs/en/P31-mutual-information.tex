@@ -820,6 +820,8 @@ unsupported, and only the second is being asserted here.
   from its absence \dash{} not that it is false.}
 \end{summarybox}
 
+\canyou
+
 \begin{testexercises}
 \item $X$ is uniform on $\{-2, -1, 1, 2\}$ and $Y = \lvert X \rvert$.
   Without computing a divergence, say what $I(X; Y)$ is and why.
@@ -836,8 +838,10 @@ unsupported, and only the second is being asserted here.
   to do?
   \answerto{Compare it against the bias on independent data at that size:
   the table in section~4 puts the expectation between $\val{p31.bias.n50}$
-  and $\val{p31.bias.n100}$ nats there, so most of $\num{0.05}$ could be
-  the estimator. Shuffle the labels, re-run, and report the difference.}
+  and $\val{p31.bias.n100}$ nats there, so about a fifth of $\num{0.05}$ is
+  what the estimator returns on nothing \dash{} and an expectation is not a
+  ceiling, so the tail of that distribution reaches higher still. Shuffle the
+  labels, re-run, and report the difference.}
 \item A colleague reports that a probe on layer 20 scores higher than the
   same probe on layer 4, and concludes layer 20 carries more information
   about the input. What is wrong with the conclusion?
@@ -857,7 +861,6 @@ unsupported, and only the second is being asserted here.
   is why section~4 states the requirement that way round.}
 \end{testexercises}
 
-\canyou
 
 \begin{furtherproblems}
 \item Show that $I(X; X) = H(X)$, and say in words what that means.

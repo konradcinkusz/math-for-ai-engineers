@@ -1764,6 +1764,15 @@
   % is, and on those pages the material is headings.
   \par\vspace{0pt plus 0pt minus 3pt}%
   \subsection*{\lblProgram~#1\quad\textmd{\itshape\csuse{mfa@title@#1}}}%
+  % The recto head. Both of these appendices are entered by LOOKUP rather
+  % than by reading -- from a program's Test exercises, or from a formula
+  % somebody half-remembers -- and \sectionmark is silenced above, so
+  % \rightmark stayed the chapter title for sixty-eight pages of answers
+  % and the head said only "Answers". \fancyhead[LO] already sets
+  % \mfaheadmark{\itshape\nouppercase{\rightmark}}, which width-caps it,
+  % so a long program title is handled. The head's text changes and its
+  % height does not, so this cannot move a page -- measured, not assumed.
+  \markright{\lblProgram~#1}%
   \ifcsdef{mfa@akeys@#1}{%
     % The three list lengths below carry SHRINK, and that is not cosmetic --
     % see the note above \answersbody. Rigid, they made a page of answers a
@@ -1842,6 +1851,15 @@
   % a run of those is a concertina of rigid blocks with nothing to give.
   \par\vspace{0pt plus 0pt minus 3pt}%
   \subsection*{\lblProgram~#1\quad\textmd{\itshape\csuse{mfa@title@#1}}}%
+  % The recto head. Both of these appendices are entered by LOOKUP rather
+  % than by reading -- from a program's Test exercises, or from a formula
+  % somebody half-remembers -- and \sectionmark is silenced above, so
+  % \rightmark stayed the chapter title for sixty-eight pages of answers
+  % and the head said only "Answers". \fancyhead[LO] already sets
+  % \mfaheadmark{\itshape\nouppercase{\rightmark}}, which width-caps it,
+  % so a long program title is handled. The head's text changes and its
+  % height does not, so this cannot move a page -- measured, not assumed.
+  \markright{\lblProgram~#1}%
   \ifcsdef{mfa@reskeys@#1}{%
     \begin{reslist}%
       \forlistcsloop{\mfa@resultone{#1}}{mfa@reskeys@#1}%

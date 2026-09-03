@@ -243,9 +243,9 @@ and $n$ columns.
 The second-order model in many dimensions is then the one-dimensional one with
 the two products replaced by the two things
 Program~\ref{prog:P05} and Program~\ref{prog:P10} supply:
-\[ f(\mathbf{p} + \mathbf{h}) \approx f(\mathbf{p})
-   + \nabla f \cdot \mathbf{h}
-   + \tfrac{1}{2}\, \mathbf{h}^{\mathsf{T}} H \mathbf{h} \]
+\[ f(\vect{p} + \vect{h}) \approx f(\vect{p})
+   + \nabla f \cdot \vect{h}
+   + \tfrac{1}{2}\, \vect{h}^{\mathsf{T}} H \vect{h} \]
 a dot product and a quadratic form.
 \end{fr}
 
@@ -477,7 +477,7 @@ If the trouble is that one step size has to serve directions with different
 curvatures, there is an obvious fix: give each direction its own.
 
 That is Newton's method \dash{} instead of stepping against the gradient,
-solve $H\,\mathbf{s} = -\nabla f$ and step by $\mathbf{s}$. On a quadratic,
+solve $H\,\vect{s} = -\nabla f$ and step by $\vect{s}$. On a quadratic,
 how many steps does it take?
 \nextframe
 \end{fr}
