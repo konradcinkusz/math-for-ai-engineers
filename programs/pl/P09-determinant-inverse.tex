@@ -355,18 +355,26 @@ jest przeformułowaniem tego, czym wyznacznik \emph{jest}, a jedynym powodem,
 dla którego podaje się ją zwykle jako coś do sprawdzenia, jest to, że wzór
 $2 \times 2$ każe jej wyglądać na przypadek algebry.
 
-I wypada z tego rzecz, która ludzi zaskakuje. Program~\ref{prog:P06} zrobił
-wiele hałasu wokół $AB \ne BA$ \dash{} ale $\det(AB) = \det(BA)$ zawsze, bo
-obie strony to $\det A \det B$, a liczby są przemienne. Kolejność ma znaczenie
-dla odwzorowania, a dla objętości nie.
+I wypada z tego rzecz, która ludzi zaskakuje.
+Program~\ref{prog:P06} zrobił wiele hałasu wokół $AB \ne BA$. Wobec powyższej
+tożsamości powiedz, czy $\det(AB)$ i $\det(BA)$ mogą się różnić.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Nie mogą. Obie strony to $\det A \det B$, a liczby są przemienne \dash{}
+kolejność ma znaczenie dla odwzorowania, a dla objętości nie.}
 Teraz złóż to z wąskim gardłem z Programu~\ref{prog:P08}.
 
 Łańcuch macierzy stosowany jest jedna po drugiej, a jedna z nich, gdzieś w
 środku, jest osobliwa. Po niej stosowane są jeszcze cztery macierze pełnego
 rzędu.
+
+O łańcuch warto pytać bardziej niż o parę, bo łańcuchem jest sieć.
+Program~\ref{prog:P08} odpowiedział na to, licząc kierunki, i dostał
+odpowiedź, której żadna późniejsza warstwa nie mogła zmienić; reguła iloczynu
+odpowiada na to samo pytanie, mnożąc liczby, i lepiej, żeby obie się zgadzały.
 
 Ile wynosi wyznacznik całego łańcucha?
 \dotline
@@ -498,8 +506,14 @@ drogi. Wyeliminować w dół kolumn $A$ i odczytać odpowiedź z powrotem w gór
 Albo zbudować $A^{-1}$, a potem pomnożyć przez $b$.
 
 Obie dają to samo $x$ \dash{} skrypt sprawdza, że zgadzają się dokładnie na
-ułamkach, bo różnica między nimi zrobiłaby z porównania coś innego. Przy
-$n = \val{p09.cost.n}$: która jest tańsza i mniej więcej ile razy?
+ułamkach, bo różnica między nimi zrobiłaby z porównania coś innego.
+
+To sprawdzenie jest tym, co czyni następną liczbę porównaniem, a nie wyścigiem.
+Dwie drogi, które by się nie zgadzały, byłyby dwiema odpowiedziami, a tańsza z
+dwóch odpowiedzi nie jest wielkością interesującą; dwie drogi zgodne co do
+ostatniego ułamka różnią się wyłącznie ceną.
+
+Przy $n = \val{p09.cost.n}$: która jest tańsza i mniej więcej ile razy?
 \dotline
 \nextframe
 \end{fr}
@@ -528,13 +542,15 @@ Eliminacja buduje odpowiedź i nic poza nią: $n$ liczb. Budowanie odwrotności
 daje $n^{2}$ liczb, z których używasz potem $n$ \dash{} pozostałe $n^{2} - n$
 to odpowiedzi na prawe strony, o które nikt nie pytał.
 
-Argument za odwrotnością jest więc wtedy, gdy naprawdę masz wiele prawych stron
-i przychodzą one w różnych chwilach. Ten przypadek istnieje i jest rzadszy, niż
-sugeruje kod, bo rozkład $A$ obsługuje powtarzające się prawe strony też, i to
-taniej.
+Jest przypadek, w którym zbudowanie ich wszystkich się opłaca. Powiedz, jaki,
+a potem powiedz, co czyni go rzadszym, niż sugeruje kod.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Naprawdę wiele prawych stron, przychodzących w różnych chwilach \dash{} a
+rozkład $A$ obsługuje powtarzające się prawe strony też, i to taniej.}
 Jest i drugi powód, mocniejszy od pierwszego, i nie jest on tego programu do
 oddania.
 
@@ -661,12 +677,21 @@ kąty zbudowane w Programie~\ref{prog:P05} są zachowane, bo są zbudowane z
 iloczynów skalarnych, a $R\T R = I$ mówi dokładnie tyle, że iloczyny skalarne
 przeżywają.
 
-W tym sensie ortogonalna zmiana bazy jest darmowa. Nie tania, tylko
-\emph{bezstratna}: żadna informacja o wektorach nie zostaje w starym układzie
-współrzędnych.
+Ten warunek jest przy tym tani do sprawdzenia, co nie zawsze jest prawdą o
+warunku zwięzłym. $R\T R = I$ to mnożenie macierzy i porównanie, bez potrzeby
+wyznacznika, eliminacji czy wartości własnej \dash{} jest to więc rzadka
+własność, która daje mocną gwarancję i którą da się przetestować na macierzy,
+jaką ktoś ci podaje.
+
+Ortogonalną zmianę bazy nazywa się często darmową. Są dwa sensy tego słowa
+\dash{} tania i bezstratna. Powiedz, na który zasługuje i dlaczego.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Nie tania \dash{} \emph{bezstratna}. Żadna informacja o wektorach nie
+zostaje w starym układzie współrzędnych.}
 Co pozwala powiedzieć porządnie ostatnią sekcję Programu~\ref{prog:F08}.
 
 Rotary position embedding daje każdej pozycji kąt i obraca o niego zapytanie
@@ -674,18 +699,26 @@ oraz klucz, a Program~\ref{prog:F08} pokazał, że wynikowy wynik uwagi zależy
 tylko od różnicy obu pozycji.
 
 Czego tam powiedzieć nie było można, to ile ten obrót kosztuje model, bo
-powiedzenie tego wymaga wyznacznika. Obrót jest ortogonalną zmianą bazy: jest
-odwracalny, jego wyznacznik wynosi $\val{p09.rot.det}$ i nic nie niszczy.
-Informacja o pozycji jest dodawana przez \emph{ponowne opisanie} zapytania i
-klucza, a nie przez ich zmianę, więc żaden kierunek zanurzenia nie jest wydany
-na jej niesienie.
+powiedzenie tego wymaga wyznacznika. Informacja o pozycji jest dodawana przez
+\emph{ponowne opisanie} zapytania i klucza, a nie przez ich zmianę.
+
+Powiedz więc, ile ten obrót kosztuje, słownikiem tej sekcji.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Nic. Obrót jest ortogonalną zmianą bazy \dash{} odwracalną, o wyznaczniku
+$\val{p09.rot.det}$, nic nie niszczącą \dash{} więc żaden kierunek zanurzenia
+nie jest wydany na niesienie pozycji.}
 Ostatnie pytanie programu, i łapie ono większość ludzi.
 
-$\det = 1$ dla obrotu, a obrót zachowuje długość. Oto macierz o wyznaczniku
-$1$:
+$\det = 1$ dla obrotu, a obrót zachowuje długość. Stąd już krok do czytania
+wyznacznika jako testu na długość, a ten krok nie jest poprawny: wszystko w
+sekcji 1 mówiło, że wyznacznik mierzy \emph{pole}, a pole można trzymać stałe,
+zmieniając boki, które je tworzą.
+
+Oto macierz o wyznaczniku $1$:
 \[ S = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix} \]
 Czy zachowuje ona długość?
 \dotline

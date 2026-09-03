@@ -154,13 +154,19 @@ independently of it:
 \[ \lVert a \rVert = \sqrt{a \cdot a} \]
 
 and $\lVert a \rVert = \val{p05.proj.alen}$ here. This is the direction of
-definition that gets remembered backwards. A length is not a thing the space
-came with that the dot product happens to reproduce. \textbf{The inner product
-is what a length is made of}, and a space with a different inner product has
-different lengths in it.
+definition that gets remembered backwards: a length is not a thing the space
+came with that the dot product happens to reproduce.
+
+So keep the space and its vectors exactly as they are, and replace the inner
+product with a different one that still has the three properties. What happens
+to the lengths?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{They change. \textbf{The inner product is what a length is made of}, so a
+space with a different inner product has different lengths in it.}
 \begin{note}
 The requirement that $a \cdot a > 0$ for every non-zero $a$ is what makes
 $\sqrt{a \cdot a}$ a length rather than a formula. Drop it and you can have
@@ -258,11 +264,15 @@ one vector. Not three approximations of a true size \dash{} three answers to
 three different questions. L1 asks how far you would walk along the axes, L2
 how far in a straight line, L-infinity how bad the worst single component is.
 
-Only L2 comes from an inner product. That is why it is the one with angles
-attached, and why the other two have no notion of perpendicular at all.
+One of the three has angles attached to it and the other two have no notion of
+perpendicular at all. Say which, and what decides it.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{L2. Only L2 comes from an inner product, and orthogonality is defined by
+an inner product being zero, so the other two have nothing that could be zero.}
 The way to hold the difference is to draw what each calls a unit vector \dash{}
 the set of all $v$ with $\lVert v \rVert = 1$.
 
@@ -284,20 +294,27 @@ precise about why, because the argument is usually quoted as a slogan.
 Minimising a loss subject to a norm being small means finding where the loss's
 contours first touch the ball. The L2 ball is round, so it can be touched at
 any angle at all and the touching point has no reason to sit on an axis. The L1
-ball is not round: it has corners, and its corners are exactly the points where
-all but one coordinate is zero.
+ball is not round: in two dimensions its corners are $(\pm 1, 0)$ and
+$(0, \pm 1)$.
+
+Say what those four points have in common as vectors, and therefore what a
+solution that lands on one of them looks like.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{All but one coordinate is zero in every one of them. \textbf{A corner of
+the L1 ball is a sparse vector by construction.}}
 \begin{trapbox}
 \textbf{The sparsity of L1 is a fact about the shape of the ball, not about the
 size of the penalty.}
 
 A contour arriving from a generic direction meets a diamond at a corner far
-more often than chance would suggest, and a corner is a sparse vector by
-construction. Turn the penalty up on an L2 objective and every coefficient
-shrinks together, arriving at zero only in the limit; turn it up on an L1
-objective and coefficients reach exactly zero one after another.
+more often than chance would suggest. Turn the penalty up on an L2 objective
+and every coefficient shrinks together, arriving at zero only in the limit;
+turn it up on an L1 objective and coefficients reach exactly zero one after
+another.
 
 So \enquote{L1 gives sparsity} is not a rule of thumb somebody found by
 experiment. It is a statement about corners, and it would still be true if the
@@ -370,14 +387,17 @@ divide \dash{} and state the condition, because $b \cdot b = 0$ only for the
 zero vector, which is not a line. That is Program~\ref{prog:F06}'s rule about
 dividing by a letter, and the inner product's positivity is what discharges it.
 
-The \emph{projection} of $a$ onto $b$ is then $t\,b$, and it is the answer to
-the minimisation even though nothing has been minimised yet.
+The \emph{projection} of $a$ onto $b$ is then $t\,b$ \dash{} and it is being
+offered as the answer to the minimisation, even though nothing has been
+minimised. Name the step that has just been taken without being argued for.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Which is the step worth being suspicious about. Solving for orthogonality is
-not the same as solving for shortest, and the frame has quietly swapped one
-for the other.
+\ans{Solving for orthogonality was substituted for solving for shortest, and
+the two are not the same question.}
+Which is the step worth being suspicious about, so here it is on numbers.
 
 Take $a = (\val{p05.proj.ax}, \val{p05.proj.ay})$ and $b = (1, 0)$. The formula
 gives $t = \val{p05.proj.t}$, so the projection is
@@ -475,12 +495,15 @@ the cosine with both lengths in it. $B$ wins on the dot product because it is
 $\val{p05.norm.len.b}$ long against $A$'s $\val{p05.norm.len.a}$, and that
 factor of about three swamps the cosine's preference.
 
-\textbf{So the two measures are not rivals. One of them is the other one
-multiplied by something, and the question is only ever whether you want that
-something in the answer.}
+Which settles what the two measures are to each other. Are they rivals, and if
+not, what is the relationship?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{Not rivals. One is the other multiplied by the two lengths}, and
+the question is only ever whether you want that factor in the answer.}
 Which turns the choice into a question about your data rather than a question
 about geometry.
 
@@ -570,11 +593,15 @@ That is the honest answer in two dimensions, and it is why \enquote{typical}
 feels like a word with no content. Every angle is as likely as every other, so
 a typical pair is nothing in particular.
 
-Now the same question in $\val{f09.dim}$ dimensions, and the answer is
-completely different.
+Now the same question in $\val{f09.dim}$ dimensions. Before you read on: does
+the angle between two random directions stay uniform, spread out further, or
+settle on something in particular?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{It settles \dash{} on a right angle, and tightly.}
 Here is the measurement. $\val{p05.pairs}$ random pairs of unit vectors at each
 of six dimensions, with the spread of their cosines:
 

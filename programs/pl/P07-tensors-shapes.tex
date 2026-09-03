@@ -275,12 +275,17 @@ wskaźniku obu zestawia wiersz $i$ macierzy $A$ z wierszem $j$ macierzy $B$
 \dash{} czyli $A$ razy $B$ transponowane.
 
 Co zamyka pętlę otwartą na początku programu: $XW\T$ jest warstwą frameworka, a
-we wskaźnikach jest to $\sum_k X_{ik} W_{jk}$. \textbf{Transpozycja nigdy nie
-musiała się zdarzyć.} Jest opisem tego, który wskaźnik spotyka który, i żadna
-tablica nie musi być obracana, żeby go spełnić.
+we wskaźnikach jest to $\sum_k X_{ik} W_{jk}$.
+
+Ile więc danych przenosi ta transpozycja?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Żadnych. \textbf{Transpozycja nigdy nie musiała się zdarzyć.} Jest opisem
+tego, który wskaźnik spotyka który, i żadna tablica nie musi być obracana, żeby
+go spełnić.}
 Teraz cztery litery, na obiekcie, dla którego ten program istnieje.
 
 \[ S_{bhqk} = \sum_d Q_{bhqd} K_{bhkd} \]
@@ -337,12 +342,17 @@ Przecinek rozdziela argumenty, strzałka wprowadza wynik, a każda grupa liter t
 wskaźniki jednej tablicy po kolei. Porównaj to z $\sum_k A_{ik} B_{kj}$ i nie
 ma w jednym niczego, czego nie ma w drugim.
 
-\textbf{Wszystko na lewo od strzałki, czego nie ma na prawo, jest sumowane.} To
-doprecyzowanie z poprzedniej ramki, zapisane jako składnia, a nie jako
-konwencja \dash{} i po to właśnie jest ta strzałka.
+Strzałka wykonuje jedną robotę i jest to ta robota, której potrzebowało
+doprecyzowanie z poprzedniej ramki. Powiedz, co napis robi z literą, która
+pojawia się wśród argumentów, ale nie za strzałką.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Sumuje ją. \textbf{Wszystko na lewo od strzałki, czego nie ma na prawo,
+jest sumowane} \dash{} konwencja zapisana jako składnia, i po to właśnie jest
+ta strzałka.}
 Przeczytaj więc trzy na zimno. Powiedz, co robi każdy z nich, przy tablicach
 dwuwymiarowych tam, gdzie potrzebne są dwie.
 
@@ -385,12 +395,17 @@ Pozycje zapytań to $q$, pozycje kluczy to $k$, oś cech $d$ jest tą sumowaną,
 iloczyn skalarny sumuje po cechach, a $b$ i $h$ są po obu stronach, bo całość
 wykonuje się raz na element partii i raz na głowicę.
 
-To suma z ramki 12, wpisana. \textbf{Nie jest to nowy pomysł, sztuczka
-biblioteki ani udogodnienie wydajnościowe} \dash{} to sigma z pominiętą sigmą,
-a kto umie przeczytać tę sumę, przeczyta i ten napis.
+To suma z ramki 12, wpisana.
+
+Powiedz więc, czym jest ten napis w kategoriach matematyki, którą już masz.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Sigmą z pominiętą sigmą. \textbf{Nie jest to nowy pomysł, sztuczka
+biblioteki ani udogodnienie wydajnościowe} \dash{} kto umie przeczytać tę sumę,
+przeczyta i ten napis.}
 Zostaje ten, który ludzie mylą, i warto w niego wejść.
 
 Rozważ \code{'bij,bjk->bik'}. Trzy litery pojawiają się dwa razy: $b$, $j$ i
@@ -548,13 +563,19 @@ dobre dopasowanie & $\val{p07.mse.true.lo}$ & $\val{p07.mse.bcast.lo}$ \\
 Przy słabym dopasowaniu raportowana strata jest $\val{p07.mse.ratio.hi}$ razy
 większa od prawdziwej. Przy dobrym jest $\val{p07.mse.ratio.lo}$ razy większa.
 
-\textbf{Im lepszy staje się model, tym bardziej raportowana liczba kłamie}, bo
-nadwyżka jest podwojoną kowariancją, a kowariancja jest dokładnie tym, co
-trening zwiększa. Błąd łagodny, dopóki debugujesz, i ostry, gdy wszystko już
-działa, ma najgorszy możliwy kształt.
+Zestaw te dwa wiersze ze sobą i powiedz, w którą stronę biegnie błąd, w miarę
+jak model się poprawia, i dlaczego.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Robi się gorzej. \textbf{Im lepszy staje się model, tym bardziej
+raportowana liczba kłamie}, bo nadwyżka jest podwojoną kowariancją, a
+kowariancja jest dokładnie tym, co trening zwiększa.}
+Błąd łagodny, dopóki debugujesz, i ostry, gdy wszystko już działa, ma najgorszy
+możliwy kształt.
+
 \begin{aibox}
 Poprawka to jeden argument i warto wiedzieć, co robi, a nie tylko że działa.
 Redukcja tablicy wzdłuż osi normalnie tę oś usuwa: $(n, 1)$ zsumowane wzdłuż

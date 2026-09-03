@@ -172,12 +172,16 @@ dimension $\val{p08.wide.null}$, and
 
 \[ \val{p08.wide.rank} + \val{p08.wide.null} = \val{p08.wide.cols}. \]
 
-\textbf{That is the rank--nullity theorem}, and the right-hand side is the
-number of \emph{columns} \dash{} the size of the space $A$ reads from, not the
-one it writes into.
+That sum has a name, and the number on the right is one of the matrix's two
+shape numbers. Name the theorem, and say which of the two.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{The rank--nullity theorem}, and the right-hand side is the number
+of \emph{columns} \dash{} the size of the space $A$ reads from, not the one it
+writes into.}
 \begin{trapbox}
 \textbf{\enquote{Rank plus nullity is the size of the matrix} is the version
 people carry, and it is wrong on both counts.}
@@ -261,6 +265,16 @@ Nothing in the definitions connects the two. One is about what combinations of
 the columns can produce; the other is about what combinations of the rows can
 produce; and for a wide matrix one of the two spaces lives somewhere the other
 cannot even be compared to.
+
+And the shapes make the mismatch concrete rather than abstract. A
+$2 \times 3$ matrix has a column space sitting in a two-dimensional space and
+a row space sitting in a three-dimensional one, so the two are not subsets of
+anything in common and no containment argument is available.
+
+It matters beyond the tidiness. If the two could differ, a matrix would have
+two ranks, and every statement in the rest of this program \dash{} about what
+survives it, about what it can be factored into, about how much of an update is
+reachable \dash{} would have to say which of them it meant.
 
 One operation ties them, and it is one you already know. Which?
 \dotline
@@ -353,12 +367,20 @@ $A$.
 \transcript{p08-least-squares}
 
 The first line is the test, and it is exact: $A$ has rank $2$, and adding $b$
-as a third column takes the rank to $3$. \textbf{A right-hand side that raises
-the rank is a right-hand side the columns cannot build}, and that is what
-\enquote{no solution} means without ever attempting one.
+as a third column takes the rank to $3$. Note that it is a test on the
+\emph{augmented} matrix rather than on $A$, and that it asks a question about
+the two together rather than about either alone.
+
+Say what that rise means about $b$, and therefore what \enquote{no solution}
+amounts to without attempting one.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{A right-hand side that raises the rank is a right-hand side the
+columns cannot build.} It reaches outside their span, so no combination of them
+is $b$.}
 So change the question, which is the only honest move available.
 
 If $b$ cannot be reached, ask for the point of the column space that comes
@@ -389,13 +411,28 @@ That is the whole of least squares. If the residual leaned even slightly on one
 of the columns you could move along that column and get closer, so the fit
 would not have been the closest point.
 
-\textbf{So the test for a best fit is a set of dot products, all zero.} No
-optimisation, no iteration and nothing about squares: the squares appear only
-because \enquote{closest} was measured with a length, and
-Program~\ref{prog:P05} says what a length is.
+And the argument runs both ways, which is what makes it a characterisation
+rather than a consequence. A residual perpendicular to every column means no
+column can improve the fit; a fit that cannot be improved leaves a residual
+with nothing to lean on. Neither direction needs a derivative, a step size or
+a stopping rule.
+
+That is worth holding on to, because almost every other minimisation in this
+book is iterative. Program~\ref{prog:P15} walks a surface and
+Program~\ref{prog:P20} builds optimisers, both because most surfaces have no
+closed form to solve. This one has, and the reason is that the quantity being
+minimised is a distance in a space with an inner product.
+
+So say what the test for a best fit is, mechanically, and what it does not
+involve.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{A set of dot products, all zero.} No optimisation, no iteration
+and nothing about squares: the squares appear only because \enquote{closest}
+was measured with a length, and Program~\ref{prog:P05} says what a length is.}
 Worked on the three points, and every number is exact.
 
 The fit is $y = \val{p08.ls.slope}x + \val{p08.ls.intercept}$, so the fitted
@@ -461,12 +498,17 @@ and said this program is where the thin dimension gets its name and the
 assumption behind it gets stated.
 
 The name is $r$, and it is a rank: writing an update as $BA$ with $r$ between
-the factors forces the product to have rank at most $r$, because
-Program~\ref{prog:P06}'s composition cannot reach more directions than the
-narrowest map in it allows.
+the factors forces the product to have rank at most $r$.
+
+Say why it is forced. The reason is one sentence, and it is about what a
+product of matrices is.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Program~\ref{prog:P06} made the product a composition, and a composition
+cannot reach more directions than the narrowest map in it allows.}
 So price it, because the price is the whole argument.
 
 A full update to a $\val{p08.lora.d} \times \val{p08.lora.d}$ weight matrix has
@@ -596,12 +638,16 @@ bottleneck survives $\val{p08.chain.len}$ full-rank
 $\val{p08.chain.d} \times \val{p08.chain.d}$ factors stacked on top with its
 rank unchanged.
 
-\textbf{Rank is lost forwards only.} That is a stronger statement than it
-sounds: it is not that recovering it is hard, or needs more parameters, or
-takes longer to train. There is nothing downstream that can do it.
+Say which direction rank can be lost in, and what that leaves available to
+anything downstream.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{Rank is lost forwards only}, and downstream there is nothing at
+all \dash{} not that recovering it is hard, or needs more parameters, or takes
+longer to train.}
 \begin{trapbox}
 \textbf{\enquote{A later layer can learn to undo it} is the intuition, and it
 is the one place where more capacity provably does not help.}

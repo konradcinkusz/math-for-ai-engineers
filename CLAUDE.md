@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1401 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1427 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1164 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1184 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1407 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1433 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1172 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1188 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -124,15 +124,17 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **99 orphan-tail pages: 28 · 29 · 21 · 21** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`. **The Part II elicitation pass is the first thing
-  in this book's record to take the count DOWN**, by one in every one of the
-  four builds, and it did it in two measurable movements: the twenty-one
+- **96 orphan-tail pages: 28 · 27 · 21 · 20** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`. **The two elicitation passes are the only things
+  in this book's record to take the count DOWN**, and between them they took it
+  from 99 to 96. Part~II did it in two measurable movements: its twenty-one
   conversions went 29/30/22/22 to 31/31/21/21, and the three lengthenings that
   cleared their cues then went to 28/29/21/21. So the cues cost the trade
   builds two tails each and the lengthenings returned three each \dash{} which
   is the clearest evidence in the file that lengthening a frame acts on this
-  ledger and not only on the cue's. Before that: P12 moved none, P13 two, P14 two,
+  ledger and not only on the cue's. Part~III then ran the same shape over six
+  rounds and finished one below where it started in `main-pl` and `main-pl-a4`
+  and level in the other two. Before that: P12 moved none, P13 two, P14 two,
   **P15 none**, P16 one, **P17 none**, P18 one, **P19 none**, P20 three, P21 three, P22 one,
   **P23 none**, P24 one, P25 two, P26 two, P27 two, **P28 none**, P29 one, **P30 one**, **P31 none**, **P32 none**, P33 one and P34 one
   \dash{} from 15 before F5, 26 before F6, 33 before F7,
@@ -165,30 +167,23 @@ what was there before.
   This is the second ledger that is reported rather than gated, and like the
   first it must not quietly go away. **When the count goes up, that is the
   signal.**
-- **Elicitation rate: 53% of the book's frames put a question to the reader**,
+- **Elicitation rate: 55% of the book's frames put a question to the reader**,
   and the trend is the ledger rather than the number: **73--78% through
-  F01--F06, 50--66% through F08--F13, **48% in P01**, **48% in P02** and
-  **52% in P03**,
-  35% in P04, 36% in P05, 38% in P06, 40% in P07, 35% in P08, 40% in P09,
-  39% in P10, 39% in P11, **46% in P12**, **50% in P13**, **48% in P14** and
-  **50% in P15**, **47% in P16**, **50% in P17**, **48% in P18** and
-  **47% in P19**, **47% in P20**, **48% in P21**, **45% in P22**,
-  **53% in P23**, **46% in P24**, **48% in P25**, **52% in P26** and
-  **53% in P27**, **54% in P28**, **55% in P29**, **52% in P30**, **50% in
-  P31**, **51% in P32**, **51% in P33** and **55% in P34** \dash{} P29 and P34
-  are joint highest outside Part I, with P28 next and then P23 and P27; P26 and
-  P30 follow, and P13, P15, P17, P31, P32 and P33 reach or pass the book's own
-  rate.**
+  F01--F06, 50--66% through F08--F13**, and **45--55% across every one of
+  P01--P34** \dash{} P29 and P34 at the top of that band, P22 at the bottom
+  of it.
   **P24 is the first program whose rate is visible in its frame count**: nine
   of its sixty-four frames exist because the draft was raised from 36%, which
   is the elicitation ledger's cost measured in frames rather than in pages.
-  **Part II was 29--31% and is now 48--52%**, raised in a pass of its own after
-  the book was drafted, at a cost of twenty-one conversions and **no frames at
-  all** \dash{} see *The Part II elicitation pass* below. That moves the trough:
-  **Part III, at 35--40%, is now the lowest run in the book**, and the appendix
-  that names the trough had to be corrected with it. Which is why the
-  per-program
-  column is the ledger and the single number is not. A frame carries `\nextframe` if and only if the
+  **Part II was 29--31% and Part III 35--40%; both are now 50--52%**, each
+  raised in a pass of its own after the book was drafted, at a cost of
+  twenty-one and thirty-seven conversions respectively and **no frames at all**
+  \dash{} see *The Part II elicitation pass* and *The Part III elicitation
+  pass* below. **There is no longer a trough**: after Part III the whole main
+  sequence sits inside ten percentage points, and the unevenness that remains
+  is between Part I and everything after it. Appendix~F's own prose named the
+  trough and had to be corrected in both passes, which is the standing reason
+  the per-program column is the ledger and the single number is not. A frame carries `\nextframe` if and only if the
   next frame opens
   with an answer, so the cue rate *is* the elicitation rate. It halved over
   seventeen programs with every gate green, because `RE_DEMANDS` treats
@@ -9903,12 +9898,12 @@ estimating the book at **460--540 pages** for its 2,418 planned frames, and this
 file repeated it as 470--550. Neither number had been looked at since
 scaffolding.
 
-**Measured: 1,863 teaching frames are written and they set 1,401 pages in the
-trade format.** That is $\num{0.75}$ pages a frame against the estimate's
+**Measured: 1,863 teaching frames are written and they set 1,407 pages in the
+trade format.** That is $\num{0.76}$ pages a frame against the estimate's
 $\num{0.21}$, and **that is the finished book** \dash{} every program and
-every appendix. (1,397 until the Part~II elicitation pass, which is a revision
-rather than new writing and which added four pages without adding a frame; the
-ratio did not move.) (It was 1,321 before
+every appendix. (1,397 until the Part~II elicitation pass and 1,401 until the
+Part~III one; both are revisions rather than new writing and neither added a
+frame, so the frame count is the same at all three figures.) (It was 1,321 before
 Appendix~C, which is the one of the six that is generated rather than
 written and which costs 62 pages of back matter on its own, 1,383 before
 Appendix~D, which occupies six pages where its stub occupied two, 1,387
@@ -11916,6 +11911,217 @@ unmoved. That is a consistency check on the whole table rather than only on
 this change, and it is the reason the first-volume figure moves 882 to 886 and
 nothing else does.
 
+### The Part III elicitation pass, September 2026
+
+*What is left* item 2 named this as the last of the two part-wide elicitation
+jobs, and it is now done. **P04 to P11 went 35--40% to 50--51%, for
+thirty-seven conversions and no frames at all**, so all eight programs still
+carry exactly the frame counts they were merged with and not one `\teachesat`,
+`\outcome` or `\sumitem` payload had to move. The book's own rate went 53 to
+**55%**.
+
+That is P33's method at the largest scale it has been run: every conversion
+took a frame that **stated** something the reader could produce, moved the
+statement into the next frame's answer, and ended the first frame by asking.
+Twenty-one of the thirty-seven produced the P06 pattern \dash{} a frame that
+opens with `\ans` and ends with `\dotline`.
+
+#### The two-PR plan was abandoned because of one sentence in Appendix~F
+
+The pass was planned as P04--P07 and then P08--P11, which is how the work
+divides. **Appendix~F §F.4 names the trough**, so after the first half that
+sentence would have had to say something true and transient \dash{} \enquote{the
+second half of Part~III} \dash{} and the second half would have rewritten it
+again, hours later, on the same branch.
+
+The deciding argument is not about size. **An appendix that describes the book
+describes its shape rather than the state of a branch**, so a split that makes
+such a sentence true only between two merges is a split that publishes a
+statement nobody will ever read and that is wrong the moment it lands. Eight
+programs in one pass cost one cue chase instead of two and left the appendix
+one true state to describe.
+
+#### And the sentence it was protecting can now say something durable
+
+**There is no trough left.** Every one of P01--P34 sits between 45 and 55 per
+cent, and Part~I between 50 and 78. So §F.4 no longer names a part at all: the
+unevenness that remains is **between Part~I and everything after it**, and it
+has a cause rather than an excuse, which the appendix now states \dash{} a
+program that derives a result has fewer places to stop and ask than one built
+on numbers. Program~\ref{prog:P05}'s pass recorded that reason about its own
+sections; it turns out to be the general one.
+
+That entry had to be corrected in the Part~II pass and again in this one,
+which is two corrections to one sentence in two passes. **A ledger's prose
+goes stale in the pass that moves the ledger**, and the standing instruction
+gained from Part~II \dash{} grep the appendices for prose about a ledger you
+have moved \dash{} is what caught it both times.
+
+#### THE PASS'S SHARPEST FINDING: the detector reported a clean tree because it had nothing to check
+
+`/tmp/detect.py` is the three-instrument prose check the Part~II pass built:
+word joins against `HEAD`, new over-long lines, lost paragraph breaks. It takes
+its subject from `sys.argv[1:]`.
+
+It was run as `python3 /tmp/detect.py`, with **no file arguments**, after every
+scripted edit in the first half of the pass. The loop body never executed and
+it printed `flagged 0`, four times, while two genuinely joined lines sat in
+P05 in both editions \dash{} 98 and 111 characters, from a trapbox trim whose
+replacement string dropped the wrap.
+
+It is this repository's oldest recorded class in its purest form: **the tool
+accepted the input and returned a plausible answer.** No error, no empty-input
+warning, and the answer it gives when there is nothing to check is
+byte-identical to the answer it gives when everything is clean. Programs
+\ref{prog:P32} to \ref{prog:P34} recorded five of these in three passes and
+named the rule \dash{} watch the instrument produce an answer you already know
+\dash{} and this one slipped past it because `flagged 0` is the answer you
+*expect*, so there was nothing to be surprised by.
+
+**So the rule gains a clause that is cheaper than the discipline it
+supplements: a tool that takes its subject from the command line must fail
+when given none.** `detect.py` now exits 1 with
+`no files given -- refusing to report a clean tree`, verified by running it
+bare. That is three lines and it retires the class for this tool, where
+remembering to pass the files retires nothing.
+
+#### Two of my own questions were defective, and the audit found both
+
+An elicitation pass writes nothing but new sentences, so every added question
+is a fresh claim and the audit is the whole surface rather than a spot check.
+Thirty-seven questions and thirty-seven answers were read end to end against
+what they point at.
+
+- **P08 frame 22 over-claimed recall.** It asked why writing an update as $BA$
+  with $r$ between the factors forces rank at most $r$, and said \enquote{the
+  reason is one sentence and you already have it}. The reader has
+  Program~\ref{prog:P06}'s composition; the *rank* consequence is a step the
+  book itself only states outright at P08 frame 31, nine frames later. The
+  question now points at what a product of matrices is and claims no recall.
+- **P09 frame 33 was unanswerable as posed.** \enquote{Say which of two senses
+  of that word applies here} named neither sense, so it was a guess rather
+  than a choice. It now names both \dash{} cheap, and lossless \dash{} which
+  is the right question, because the whole point is that people say the first
+  and mean the second.
+
+**And two of the answers over-claimed, which the same read-through caught.**
+P05's said a different inner product changes \enquote{all} the lengths; what is
+true, and what the frame's own bolded sentence says, is that the space gets a
+different length function, which is not a claim about every vector. And P10's
+said the route that survives seven hundred dimensions is \enquote{the
+quadratic} \dash{} which is the frame's own word for the $2 \times 2$ case and
+is not what the surviving route is at that size. The frame is entitled to the
+elision because it is talking about a $2 \times 2$ matrix; **an answer written
+nine words later inherits the word and turns it into a claim about seven
+hundred dimensions**, which is a smaller version of the same failure and worth
+watching for whenever a conversion lifts a phrase out of the frame it was
+written in.
+
+**And a sub-class worth naming, because rule~2 does not cover it: a question
+can spoil a later question.** Rule 2 is about a figure answering the frame
+beside it; two elicitations nine frames apart can collide the same way, and
+nothing looks for it. The check is to read each added question against the
+*later* frames as well as the adjacent ones, which is what found the first of
+the two above.
+
+#### The build was stopped once, and the harness reported it complete
+
+Both answer corrections landed while `make all-formats` was half-way through
+`main-en`, so the build was killed on Program~\ref{prog:P32}'s rule \dash{} a
+build that measures a tree about to stop existing produces a number to be
+discarded. `make clean` after it, `.idx`, `.ind` and `.ilg` included, which is
+that program's other finding.
+
+**The harness then reported the background task as \enquote{completed, exit
+code 0}, and the log's own line said `MAKE_EXIT 2`.** That is the recorded trap
+firing for the sixth time in this repository, and the recorded habit \dash{}
+read the log's own exit line, never the notification \dash{} is the whole of
+what separated the two. Worth noting that here the harness was not wrong about
+anything: the compound command really did exit 0, because the `echo` is the
+last thing in it. The reading is what has to be right.
+
+#### The JOIN detector's false positives, and the two-instrument rule again
+
+Nine candidates, seven of them Polish: `sprawdzają`, `także`, `pozostaje`,
+`zerowanie`, `zmieniają`, `pojedynczego`, `oddaje`, `Tamten`, and the English
+`replace`. Every one is an ordinary word in newly *added* prose that happens to
+split into two words the file already contains, which is what an inflected
+language does to that heuristic.
+
+The line-length detector reported zero for all nine and reading confirmed all
+nine. That disagreement is the signal, and the remedy is still **not** to raise
+the threshold: the Part~II pass measured that eight letters misses `nadwóch` at
+seven. Report them as candidates, read them, and require the two instruments to
+agree before believing either.
+
+#### Layout: six rounds of the cue chase, and the tail ledger went down again
+
+The first clean build came back with **nine orphaned cues** across six frames
+\dash{} five in `main-en` and four in `main-pl`, four of the six shared between
+the editions. Six rounds of **lengthening** cleared them, and the walk in
+between is the plainest this book has recorded after
+Program~\ref{prog:P32}'s seven:
+
+| round | edit | result |
+|---|---|---|
+| 1 | six frames lengthened, both editions | 9 cues to 4 |
+| 2 | P09's frames 24 and 35 | 4 to 2, and `check-a4` ran for the first time |
+| 3 | P08's frames 11 and 16 | 2 to 2, both moved to the trade builds |
+| 4 | P08's frames 11 and 18 | 2 to 1, in `main-pl-a4` |
+| 5 | P08's frame 18 again | 1 to 1, moved to `main-en-a4` |
+| 6 | P08's frame 18 a third time | clean |
+
+Two things in that table are worth having. **`check-a4` cannot run until
+`check` passes**, so rounds 1 and 2 were measuring two of the four builds and
+the A4 pair's cues only became visible at round 3 \dash{} which is why the
+count went 9, 4, 2, 2, 1, 1 rather than falling monotonically. And **one frame
+needed lengthening three times**, its cue moving `main-pl-a4` to `main-en-a4`
+and back, which is Program~\ref{prog:P32}'s finding that a frame is not fixed,
+only a pagination is.
+
+Twenty-third to twenty-eighth confirmations of Program~\ref{prog:F06}'s
+two-sided rule, which has still never failed. Every added paragraph earns its
+place: that the basis theorem does not say a space has one basis; that a chain
+is what a network is, so P08's counting argument and the product rule had
+better agree; that $R\T R = I$ is cheap to check as well as strong; that a
+repeated eigenvalue is visible before any eigenvector is computed; that the
+singular values came from two different rotations where an eigenvalue asks
+about one side only; that the pseudoinverse names an answer rather than making
+one possible; that a check for agreement is what turns a race into a
+comparison; that an area can be held fixed while the sides that make it
+change; that two ranks would force every later statement to say which it
+meant; and that least squares has a closed form where almost every other
+minimisation in the book is iterative.
+
+**And the orphan tails went 103 to 96**, one below the pre-pass figure in
+`main-pl` and `main-pl-a4` and level in the other two: 28, 27, 21, 20 against
+28, 29, 21, 21. That is the second pass in this book's record to take that
+ledger down, after Part~II's, and for the same reason \dash{} the cues cost
+tails and the lengthening that clears them pays more back than it cost.
+
+The overfull multiset came back element for element to the baseline in all
+four builds \dash{} `[]`, `[]`, `[6.3]`, `[]` \dash{} with zero overfull
+vboxes, zero errors, zero unresolved references, no stranded frame openers and
+no stranded section headings.
+
+Pages 1407 / 1433 / 1172 / 1188, from 1401 / 1427 / 1164 / 1184.
+
+#### Also
+
+- **Parity came back clean on its first run for all eight programs**, and so
+  did `--frames`, `--answers`, `--outcomes`, `--values`, `--scripts`,
+  `--terms`, `--parts` and `gen_stubs --check`. The source gates were run
+  **before** the build rather than inside it, which is Program~\ref{prog:P33}'s
+  finding applied for the fifth pass running.
+- The accumulated translator rules held: no number spelled as a word, no word
+  spelled as a number, and every reference built to lead its maths while
+  drafting. Not one C4, C8 or C12 round in thirty-seven conversions across
+  sixteen files.
+- `figures/values/appf.tex` was regenerated twice, because the ledger moved
+  twice. `make verify` refuses the tree until it is, which is the whole
+  argument for computing that appendix rather than typing it, demonstrated for
+  the second pass running.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -12236,40 +12442,42 @@ look first when one of them next goes stale.
    model away from being five answers, and one of the five is already half
    given.
 
-2. **Part III's elicitation rate, which is nobody's program.** Part II's was
-   this item and is **done** \dash{} P01, P02 and P03 went 31/29/29% to
-   48/48/52% for twenty-one conversions and no frames at all; the pass note is
-   below. What that moved is the trough rather than the problem: **P04 to P11
-   now run at 35--40%**, the lowest run left in the book, against Part I's
-   73--78%.
+2. **The elicitation rate, which is nobody's program.** Parts II and III were
+   both this item and both are **done** \dash{} P01--P03 went 29--31% to
+   48--52% for twenty-one conversions, and P04--P11 went 35--40% to 50--51%
+   for thirty-seven, neither adding a single frame. The pass notes are below.
 
-   The method is the one the Part II pass used and is worth copying exactly:
-   find the frames that *state* something the reader could produce, move the
-   statement into the next frame's answer, and end the first frame by asking.
-   Two constraints decide which pairs are available, and both cost a build to
-   discover the hard way: **the next frame must not already open with an
-   answer**, and **no `\section` or `\mermaidfig` may sit between the two**
-   \dash{} a question whose answer is overleaf from a section heading, or from
-   a figure, is a defect rather than a conversion. Map them before writing.
+   **What is left is smaller and is a choice rather than a defect.** The whole
+   main sequence now sits in 45--55% and Part I in 50--78%, so there is no
+   trough to fix; raising Parts IV to IX would be raising a floor that is
+   already level, and the honest reason the Foundation programs ask more is
+   that elementary material has more places to stop. Anyone who takes it
+   should say which they are doing.
+
+   The method is worth keeping whoever takes it: find the frames that *state*
+   something the reader could produce, move the statement into the next
+   frame's answer, and end the first frame by asking. Two constraints decide
+   which pairs are available, and both cost a build to discover the hard way:
+   **the next frame must not already open with an answer**, and **no
+   `\section` or `\mermaidfig` may sit between the two** \dash{} a question
+   whose answer is overleaf from a section heading, or from a figure, is a
+   defect rather than a conversion. Map them before writing.
 
    **The price has been measured several times and it is not the same price
    everywhere.** P04 did three conversions and went 26% to 35% with no frame
    added; P23 did ten and went 33% to 53% for two frames; P24 paid nine
    frames for ten points; P30 paid two for eleven; P31 paid two for six;
    **P33 did ten conversions for 33% to 51% and added nothing at all**; and
-   the Part II pass did twenty-one across three programs, also for nothing.
-   The
-   variable is not the number of points but what is being converted: a
+   the two part passes did twenty-one and thirty-seven, also for nothing.
+   The variable is not the number of points but what is being converted: a
    *statement* the reader could have produced converts for nothing, and a
-   *question* that has to be invented costs a frame. Part III is full of the
-   first kind, which is why P33 and the Part II pass are the instances to plan
-   against rather than P24.
+   *question* that has to be invented costs a frame. Parts II and III were
+   full of the first kind, which is why P33 is the instance to plan against
+   rather than P24.
 
    Designing the rate in is free, which P26 to P29 and P34 each demonstrate
    \dash{} written that way from the frame plan, no conversions, and P29 and
-   P34 the highest outside Part I. **This is the largest genuinely
-   parallelisable job left in the repository**, because it touches eight
-   merged program files and nothing else.
+   P34 the highest outside Part I.
 
    **Budget for two builds rather than one, and expect the tail ledger to move
    twice.** Part II's twenty-one conversions produced three orphaned cues and
@@ -12395,16 +12603,16 @@ one is shaped by what the ones before it turned out to spend.
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
 for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.75**
-\dash{} 1,863 teaching frames in 1,401 trade pages, and the book is now
+\dash{} 1,863 teaching frames in 1,407 trade pages, and the book is now
 complete: every program and every appendix is written. (This sentence said **0.71** until the Appendix~E pass, which
 is $1{,}321/1{,}863$ \dash{} the figure from before Appendix~C, left behind
 when the page count above it was updated and the ratio was not. It is the
 class this file keeps recording, in the paragraph that states the class.) §20 item 1 carries the measurement and the per-part page ranges, so
 the decision has numbers in front of it rather than an estimate; **every
 program and every appendix is now written, so those numbers move only by
-revision** \dash{} and the Part~II elicitation pass is the first revision to
-move them, adding four pages to Parts~II--VI and none to any other row, which
-is as settled as the question is going to get before somebody answers it. The other two that
+revision** \dash{} the two elicitation passes are the only revisions so far to
+move them, adding four pages and then six to Parts~II--VI, which is as settled
+as the question is going to get before somebody answers it. The other two that
 stood beside it are now settled in the passes that wrote their programs
 \dash{} P12's placement, and whether P14 is enough of a fix for the rigour gap
 \dash{} and each entry records the argument the written book falsified rather

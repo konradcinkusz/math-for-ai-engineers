@@ -137,13 +137,16 @@ Znowu $(1, -1)$ \dash{} wartość własna $\val{p10.sym.lo}$.
 $A$ ma więc dwa wektory własne, o wartościach $\val{p10.sym.hi}$ i
 $\val{p10.sym.lo}$, wskazujące wzdłuż $(1,1)$ oraz $(1,-1)$.
 
-Dwie rzeczy w tej parze warto zauważyć teraz, bo są całą treścią dwóch
-następnych sekcji. Są \textbf{prostopadłe}, a przy tym jest ich \textbf{dwa w
-przestrzeni dwuwymiarowej} \dash{} co na mocy Programu~\ref{prog:P04} czyni je
-bazą.
+Dwie rzeczy w tej parze warto zauważyć teraz i będą one całą treścią dwóch
+następnych sekcji. Popatrz na oba kierunki i na to, ile ich jest, i nazwij
+jedno i drugie.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Są \textbf{prostopadłe}, a przy tym jest ich \textbf{dwa w przestrzeni
+dwuwymiarowej} \dash{} co na mocy Programu~\ref{prog:P04} czyni je bazą.}
 Znajdowanie ich to kawałek algebry, a nie szukanie.
 
 $Av = \lambda v$ mówi $(A - \lambda I)v = 0$ przy $v \ne 0$, więc macierz
@@ -308,21 +311,28 @@ Algebra się zgadza i mówi to użyteczniej. Ślad wynosi $0$, a wyznacznik $1$,
 więc równanie charakterystyczne to $\lambda^{2} + 1 = 0$, które nie ma żadnego
 rozwiązania rzeczywistego.
 
-Macierz rzeczywista może nie mieć \textbf{żadnej rzeczywistej wartości
-własnej}. Ma za to parę zespolonych, a zespolone wartości własne to sposób, w
-jaki algebra mówi \emph{to odwzorowanie obraca}. Ta książka ich nie potrzebuje,
-a uczciwym powodem, by o nich wspomnieć, jest to, żeby czytelnik, który spotka
-zespoloną wartość własną w wyniku biblioteki, wiedział, że to obrót, a nie
-błąd.
+Powiedz więc, co mówi ci biblioteka, gdy oddaje zespoloną wartość własną dla
+macierzy rzeczywistej.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Że odwzorowanie obraca. Macierz rzeczywista może nie mieć \textbf{żadnej
+rzeczywistej wartości własnej}; ma za to parę zespolonych, a ta para jest
+sposobem, w jaki algebra to mówi \dash{} nie jest błędem.}
 Trzecia porażka jest najsubtelniejsza i jest to znowu ścinanie z
 Programu~\ref{prog:P09}:
 \[ S = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix} \]
 
 Jej ślad wynosi $2$, a wyznacznik $1$, więc $\lambda^{2} - 2\lambda + 1 =
 (\lambda - 1)^{2}$ i jedyną wartością własną jest $1$, dwukrotnie.
+
+Algebra powiedziała więc już coś, czego dwie poprzednie porażki nie mówiły.
+Równanie charakterystyczne ma pierwiastek rzeczywisty i ma go tylko jeden,
+podczas gdy macierz $2 \times 2$ ma miejsce na dwa. Ta krotność jest całą
+różnicą tego przypadku i widać ją, zanim policzy się jakikolwiek wektor
+własny.
 
 Ile niezależnych kierunków zostawia ona nieobróconych?
 \dotline
@@ -519,12 +529,17 @@ $x\T A x = (x\T A x)\T = x\T A\T x$, więc $x\T A x = x\T \big(\frac{A + A\T}{2}
 \big) x$.
 
 Każdą formę kwadratową można więc zapisać macierzą symetryczną i od tej pory
-zawsze się tak robi. Dlatego hesjan, kowariancja i macierz Grama są
-symetryczne: wszystkie są formami kwadratowymi w przebraniu, a niesymetryczna
-część którejkolwiek z nich nigdy nic nie robiła.
+zawsze się tak robi.
+
+Hesjan, kowariancja i macierz Grama są symetryczne. Powiedz, dlaczego jest to
+jeden fakt, a nie trzy.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Wszystkie są formami kwadratowymi w przebraniu, a niesymetryczna część
+którejkolwiek z nich nigdy nic nie robiła.}
 Weź symetryczne $A$ o wartościach własnych $\lambda_1$ i $\lambda_2$ i zapisz
 $x$ w bazie wektorów własnych z poprzedniej sekcji, czyli $x = c_1v_1 +
 c_2v_2$.
@@ -619,15 +634,18 @@ Ta zerowa wartość własna też nie jest nowym obiektem.
 Jej wektor własny $v$ spełnia $Av = 0v = 0$, więc $v$ jest w jądrze, więc $A$
 jest osobliwa, więc $\det A = 0$.
 
-\textbf{\enquote{Ma zerową wartość własną}, \enquote{jest osobliwa}, \enquote{ma
-nietrywialne jądro} i \enquote{ma płaski kierunek w swojej formie kwadratowej}
-to jeden warunek powiedziany czterokrotnie} \dash{} przez
-Program~\ref{prog:P08}, przez Program~\ref{prog:P09} i dwa razy tutaj. Jest to
-warte więcej niż każdy z nich osobno, bo czytelnik, który spotka jedno z tych
-czterech w komunikacie błędu, zna teraz pozostałe trzy.
+Na stole leżą teraz cztery opisy: \enquote{ma zerową wartość własną},
+\enquote{jest osobliwa}, \enquote{ma nietrywialne jądro} i \enquote{ma płaski
+kierunek w swojej formie kwadratowej}. Powiedz, ile to warunków.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{Jeden, powiedziany czterokrotnie} \dash{} przez
+Program~\ref{prog:P08}, przez Program~\ref{prog:P09} i dwa razy tutaj.
+Czytelnik, który spotka jedno z tych czterech w komunikacie błędu, zna teraz
+pozostałe trzy.}
 Jeszcze jedno słowo, a potem zapłata sekcji.
 
 \textbf{Dodatnio półokreślona} znaczy, że każda wartość własna jest $\ge 0$
@@ -808,9 +826,11 @@ stwierdza, że największy zgadza się z górną wartością własną $C$. Ten k
 niesie $\val{p10.pca.top.pct}\%$ całego rozrzutu, zostawiając
 $\val{p10.pca.rest.pct}\%$ dla drugiego.
 
-Dwie drogi do tej odpowiedzi: spróbować dwudziestu tysięcy kierunków albo
-rozwiązać równanie kwadratowe. Zgadzają się, a w siedmiuset wymiarach działa
-tylko jedna.
+Do tej odpowiedzi doszły dwie drogi: spróbować dwudziestu tysięcy kierunków
+albo rozwiązać równanie kwadratowe. Zgadzają się. Powiedz, która działa jeszcze
+w siedmiuset wymiarach.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{trapbox}
@@ -831,6 +851,9 @@ które jej zadano, a pytanie zawierało jednostki.
 \end{trapbox}
 
 \begin{fr}
+\ans{Wyznaczenie wektora własnego. Przeglądanie kierunków próbkuje sferę, a w
+siedmiuset wymiarach żadna wykonalna liczba próbek jej nie pokryje \dash{}
+podczas gdy wektor własny jest rozwiązaniem równania w dowolnym wymiarze.}
 Wartości własne okazały się kształtem wszystkiego, czego ta sekcja dotknęła:
 tego, jak bardzo warstwa może rozciągnąć wektor, jak wydłużona jest niecka i w
 którą stronę leży chmura danych.

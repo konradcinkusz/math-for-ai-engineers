@@ -229,12 +229,17 @@ Złożenie jest więc przekształceniem liniowym, ma więc własną macierz, i
 \enquote{mnożenie wierszy przez kolumny} \dash{} to arytmetyka, która z niej
 wychodzi.
 
-Czytaj $AB$ jako \emph{najpierw $B$, potem $A$}, od prawej do lewej, tak jak
-czyta się $f(g(x))$. Kolejność wygląda na odwróconą, bo notacja stawia funkcję
-na lewo od tego, co ona zjada.
+Więc $AB$ jest macierzą złożenia \dash{} ale którego? Powiedz, czy robi
+najpierw $A$, czy najpierw $B$, i dlaczego notacja czyta się tak, jak się
+czyta.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Najpierw $B$. Czytaj $AB$ jako \emph{najpierw $B$, potem $A$}, od prawej
+do lewej, tak jak czyta się $f(g(x))$ \dash{} notacja stawia funkcję na lewo od
+tego, co ona zjada.}
 Wszystko, co niewygodne w tej procedurze, wypada z takiego odczytania, więc
 pierwszą rzecz warto obrócić w palcach samemu.
 
@@ -508,17 +513,22 @@ $W_2 h + b_2$, i złóż je. Zapisz, co wychodzi.
 \[ W_2(W_1x + b_1) + b_2 = (W_2W_1)\,x + (W_2b_1 + b_2) \]
 \end{ansblock}
 
-Jedna macierz i jeden wektor obciążeń. Argument przeżywa dokładnie, a dwa
-kroki, dzięki którym działa, to dwie własności z sekcji 1: $W_2$ rozdziela się
-względem sumy i przepuszcza skalar na wylot.
+Jedna macierz i jeden wektor obciążeń. Argument przeżywa dokładnie.
 
 Skrypt sprawdza tę tożsamość na $\val{p06.collapse.trials}$ losowych wejściach
 przy kształtach $\val{p06.din} \to \val{p06.dmid} \to \val{p06.dout}$,
 największa rozbieżność poniżej $\val{p06.collapse.err}$ \dash{} co jest
 zaokrągleniem, a nie różnicą.
+
+Dwa kroki sprawiły, że to przekształcenie zadziałało, i oba zostały nazwane w
+sekcji 1. Powiedz, które dwa.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{$W_2$ rozdziela się względem sumy i przepuszcza skalar na wylot \dash{}
+dwie własności, które od początku czyniły tę funkcję liniową.}
 Warto się przy tym zatrzymać, bo stos takich warstw jest dużym obiektem.
 
 Osiem warstw liniowych o szerokości $\val{p06.stack.width}$ mieści
@@ -535,11 +545,14 @@ A ułamek ten nie jest w ogóle własnością szerokości: $k$ warstw zwija się
 jednej, więc $(k-1)/k$ parametrów jest zbędnych bez względu na to, jak szerokie
 są. Dodaj warstw, a zbliża się do wszystkich.
 
-\textbf{Marnotrawstwem jest dokładnie ta głębokość, którą myślałeś, że
-kupujesz.}
+Powiedz więc, co kupuje głębokość w stosie samych warstw liniowych.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Nic. \textbf{Marnotrawstwem jest dokładnie ta głębokość, którą myślałeś,
+że kupujesz.}}
 Teraz lekarstwo, które nazwał Program~\ref{prog:F05}, a o którym ten program
 może powiedzieć coś nowego.
 
@@ -564,17 +577,23 @@ zwiniętą macierz.
 \end{ansblock}
 
 Zwinięta macierz utrzymuje je współliniowo z dokładnością do zaokrągleń, bo
-musi. Para rozdzielona przez $\relu$ nie utrzymuje, więc \textbf{żadne
-pojedyncze przekształcenie afiniczne jej nie odtworzy, jakiekolwiek by ono nie
-było} \dash{} argument wyklucza je wszystkie naraz, zamiast nie znaleźć
-jednego.
+musi. Para rozdzielona przez $\relu$ nie utrzymuje.
 
 To narożnik z F05, powiedziany na nowo w formie, która się uogólnia: liniowość
 jest ograniczeniem tego, co funkcja może zrobić prostej, a aktywacja jest po
 to, żeby je złamać.
+
+Powiedz więc, co wyklucza zagięta prosta i dlaczego jest to mocniejsze niż
+nieznalezienie pojedynczego przekształcenia afinicznego, które pasuje.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Wszystkie przekształcenia afiniczne naraz. \textbf{Żadne pojedyncze
+przekształcenie afiniczne jej nie odtworzy, jakiekolwiek by ono nie było}
+\dash{} zagięcie prostej jest czymś, czego żadne z nich nie potrafi, więc nie
+zostaje nic do przeszukania.}
 \begin{aibox}
 Mówi też, po co aktywacja \emph{nie} jest, a to właśnie tam siedzi folklor. Nie
 po to, żeby ściskać wartości do przedziału \dash{} $\relu$ jest nieograniczony

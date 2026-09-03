@@ -364,17 +364,25 @@ all: the identity is a restatement of what a determinant \emph{is}, and the
 only reason it is usually presented as something to verify is that the
 $2 \times 2$ formula makes it look like an accident of algebra.
 
-And one thing falls out of it that surprises people. Program~\ref{prog:P06}
-made a good deal of $AB \ne BA$ \dash{} but $\det(AB) = \det(BA)$ always,
-because both are $\det A \det B$ and numbers commute. The order matters to the
-map and not to the volume.
+And one thing falls out of it that surprises people.
+Program~\ref{prog:P06} made a good deal of $AB \ne BA$. Given the identity
+above, say whether $\det(AB)$ and $\det(BA)$ can differ.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{They cannot. Both are $\det A \det B$ and numbers commute \dash{} the
+order matters to the map and not to the volume.}
 Now put it together with Program~\ref{prog:P08}'s bottleneck.
 
 A chain of matrices is applied one after another, and one of them somewhere in
 the middle is singular. Four more full-rank matrices are applied after it.
+
+The chain is worth asking about rather than the pair, because a chain is what
+a network is. Program~\ref{prog:P08} answered this by counting directions and
+got an answer no later layer could change; the product rule answers the same
+question by multiplying numbers, and the two had better agree.
 
 What is the determinant of the whole chain?
 \dotline
@@ -508,8 +516,14 @@ up. Or form $A^{-1}$, then multiply it by $b$.
 
 Both give the same $x$ \dash{} the script checks that they agree exactly over
 fractions, because a difference between them would make the comparison about
-something else. At $n = \val{p09.cost.n}$, which is cheaper, and by roughly how
-much?
+something else.
+
+That check is what makes the next number a comparison rather than a race. Two
+routes that disagreed would be two answers, and the cheaper of two answers is
+not an interesting quantity; two routes that agree to the last fraction differ
+in nothing but their cost.
+
+At $n = \val{p09.cost.n}$, which is cheaper, and by roughly how much?
 \dotline
 \nextframe
 \end{fr}
@@ -538,13 +552,15 @@ Elimination builds the answer and nothing else: $n$ numbers. Forming the
 inverse builds $n^{2}$ numbers, of which you then use $n$ \dash{} the other
 $n^{2} - n$ are the answers to right-hand sides nobody asked about.
 
-So the case for the inverse is when you genuinely have many right-hand sides
-and they arrive at different times. That case exists and it is rarer than the
-code suggests, because a factorisation of $A$ answers repeated right-hand sides
-too, and more cheaply.
+There is a case in which building all of them is worth it. Say what it is, and
+then say what makes it rarer than the code suggests.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Genuinely many right-hand sides, arriving at different times \dash{} and a
+factorisation of $A$ answers repeated right-hand sides too, and more cheaply.}
 And there is a second reason, which is stronger than the first and is not
 this program's to give.
 
@@ -673,12 +689,21 @@ Program~\ref{prog:P05} built are all preserved, because they are built out of
 dot products and $R\T R = I$ is precisely the statement that dot products
 survive.
 
-That is the sense in which an orthogonal change of basis is free. It is not
-cheap, it is \emph{lossless}: no information about the vectors is left behind
-in the old coordinate system.
+The condition is also cheap to check, which is not always true of a compact
+one. $R\T R = I$ is a matrix multiplication and a comparison, needing no
+determinant, no elimination and no eigenvalue \dash{} so it is the rare
+property that is both a strong guarantee and something you can test on a
+matrix somebody hands you.
+
+An orthogonal change of basis is often called free. There are two senses of
+that word \dash{} cheap, and lossless. Say which one it earns, and why.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Not cheap \dash{} \emph{lossless}. No information about the vectors is
+left behind in the old coordinate system.}
 Which lets Program~\ref{prog:F08}'s last section be said properly.
 
 Rotary position embedding gives each position an angle and rotates the query
@@ -686,18 +711,26 @@ and the key by it, and Program~\ref{prog:F08} showed the resulting attention
 score depends only on the difference of the two positions.
 
 What could not be said there is what the rotation costs the model, because
-saying it needs a determinant. A rotation is an orthogonal change of basis: it
-is invertible, its determinant is $\val{p09.rot.det}$, and it destroys nothing.
-The position information is added by \emph{re-describing} the query and the key
-rather than by altering them, so no direction of the embedding is spent on
-carrying it.
+saying it needs a determinant. The position information is added by
+\emph{re-describing} the query and the key rather than by altering them.
+
+So say what the rotation costs, in this section's vocabulary.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Nothing. A rotation is an orthogonal change of basis \dash{} invertible,
+determinant $\val{p09.rot.det}$, destroying nothing \dash{} so no direction of
+the embedding is spent on carrying the position.}
 Last question of the program, and it catches most people.
 
-$\det = 1$ for a rotation, and a rotation preserves length. Here is a matrix
-with determinant $1$:
+$\det = 1$ for a rotation, and a rotation preserves length. It is a short step
+from there to reading the determinant as a length test, and the step is not
+sound: everything in section 1 said the determinant measures \emph{area}, and
+an area can be held fixed while the sides that make it change.
+
+Here is a matrix with determinant $1$:
 \[ S = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix} \]
 Does it preserve length?
 \dotline

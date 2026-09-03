@@ -275,12 +275,16 @@ index of both is pairing row $i$ of $A$ with row $j$ of $B$ \dash{} which is
 $A$ times $B$ transposed.
 
 Which closes the loop this program opened with: $XW\T$ is a framework's layer,
-and in indices it is $\sum_k X_{ik} W_{jk}$. \textbf{The transpose never had to
-happen.} It is a description of which index meets which, and no array needs
-turning round to satisfy it.
+and in indices it is $\sum_k X_{ik} W_{jk}$.
+
+So how much data does that transpose move?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{None. \textbf{The transpose never had to happen.} It is a description of
+which index meets which, and no array needs turning round to satisfy it.}
 Now four letters, on the object the program exists for.
 
 \[ S_{bhqk} = \sum_d Q_{bhqd} K_{bhkd} \]
@@ -337,12 +341,17 @@ The comma separates the operands, the arrow introduces the result, and each
 group of letters is one array's indices in order. Compare it with
 $\sum_k A_{ik} B_{kj}$ and there is nothing in one that is not in the other.
 
-\textbf{Everything left of the arrow that is not right of it is summed.} That
-is the refinement from the last frame, written as syntax rather than as a
-convention \dash{} which is why the arrow is there at all.
+The arrow is doing one job, and it is the job the previous frame's refinement
+needed. Say what the string does with a letter that appears among the operands
+but not after the arrow.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{It sums it away. \textbf{Everything left of the arrow that is not right of
+it is summed} \dash{} the convention written as syntax, which is why the arrow
+is there at all.}
 So read three cold. Say what each one does, given two-dimensional arrays where
 two are needed.
 
@@ -385,12 +394,17 @@ being summed because a dot product sums over features, and $b$ and $h$ appear
 on both sides because the whole thing is done once per batch element and once
 per head.
 
-That is the frame 12 sum, typed. \textbf{It is not a new idea, a library trick
-or a performance feature} \dash{} it is a sigma with the sigma left out, and
-anyone who can read the sum can read the string.
+That is the frame 12 sum, typed.
+
+So say what that string is, in terms of the mathematics you already had.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{A sigma with the sigma left out. \textbf{It is not a new idea, a library
+trick or a performance feature} \dash{} anyone who can read the sum can read
+the string.}
 Which leaves the one people get wrong, and it is worth walking into.
 
 Consider \code{'bij,bjk->bik'}. Three letters appear twice: $b$, $j$ and one
@@ -547,13 +561,19 @@ a good fit & $\val{p07.mse.true.lo}$ & $\val{p07.mse.bcast.lo}$ \\
 At the poor fit the reported loss is $\val{p07.mse.ratio.hi}$ times the true
 one. At the good fit it is $\val{p07.mse.ratio.lo}$ times.
 
-\textbf{The better the model gets, the more the reported number lies}, because
-the excess is twice a covariance and a covariance is exactly what training
-increases. A bug that is mild while you are debugging and severe once things
-are working is the worst shape a bug can have.
+Read those two rows against each other and say which way the error runs as the
+model improves, and why.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{It gets worse. \textbf{The better the model gets, the more the reported
+number lies}, because the excess is twice a covariance and a covariance is
+exactly what training increases.}
+A bug that is mild while you are debugging and severe once things are working
+is the worst shape a bug can have.
+
 \begin{aibox}
 The fix is one argument, and it is worth knowing what it does rather than that
 it works. Reducing an array along an axis normally removes that axis:

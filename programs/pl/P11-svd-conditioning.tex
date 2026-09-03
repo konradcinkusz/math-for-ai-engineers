@@ -196,15 +196,27 @@ jest symetryczna, jakiekolwiek było $A$, więc twierdzenie spektralne zawsze si
 do niej stosuje, a każde $\sigma_i$ jest rzeczywiste i nieujemne, bo jest
 pierwiastkiem z liczby nieujemnej.
 
-Dlatego wartości osobliwe istnieją dla każdej macierzy: są pożyczone z macierzy
-symetrycznej, którą zawsze da się zbudować.
+Twierdzenie z Programu~\ref{prog:P10} stosuje się tylko do macierzy
+symetrycznych, a ten program jest o macierzach dowolnego kształtu. Powiedz,
+dlaczego nie jest to luka.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Bo $A\T A$ jest symetryczna, jakiekolwiek było $A$. Wartości osobliwe
+istnieją dla każdej macierzy, bo są pożyczone z macierzy symetrycznej, którą
+zawsze da się zbudować.}
 Teraz pułapka, a ten przykład dobrano tak, by była trudna, a nie łatwa.
 
 Zbudowane $A$ ma wartości osobliwe $\val{p11.sig.hi}$ i $\val{p11.sig.lo}$.
 Jest kwadratowe, więc ma też własne wartości własne.
+
+Warto rozdzielić obie konstrukcje, zanim odpowiesz. Wartości osobliwe wzięły
+się z dwóch \emph{różnych} obrotów, po jednym z każdej strony, czego wymaga
+macierz dowolnego kształtu; wartość własna pyta o kierunek, który macierz
+zostawia w spokoju, a to pytanie dotyczy tylko jednej strony. Nic dotąd nie
+mówi, że obie odpowiedzi muszą być powiązane.
 
 Zapisz, jakie według ciebie są, i czytaj dalej.
 \dotline
@@ -458,13 +470,16 @@ razem z wejściem.}{wskaznik uwarunkowania jako wzmocnienie}
 Do jakichś dziesięciu. Sześć z szesnastu przepadło.
 \end{ansblock}
 
-Reguła kciuka jest tą, którą warto nieść: \textbf{tracisz mniej więcej
-$\logb{10}\kappa$ cyfr dziesiętnych}. Podwójna precyzja zaczyna z jakimiś
-szesnastoma, więc wskaźnik $10^{16}$ nie zostawia nic, a wskaźnik
-$\val{p11.spec.kappa}$ kosztuje dwie z szesnastu i jest niczym szczególnym.
+Tamten przypadek miał wskaźnik uwarunkowania rzędu miliona i kosztował sześć z
+szesnastu cyfr. Uogólnij to: ile cyfr kosztuje wskaźnik $\kappa$?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{Mniej więcej $\logb{10}\kappa$ z nich.} Podwójna precyzja zaczyna
+z jakimiś szesnastoma, więc wskaźnik $10^{16}$ nie zostawia nic, a wskaźnik
+$\val{p11.spec.kappa}$ kosztuje dwie z szesnastu i jest niczym szczególnym.}
 Dwie rzeczy, którymi on nie jest, a obie są częstymi odczytami.
 
 Nie jest własnością \emph{algorytmu}. Wskaźnik uwarunkowania jest faktem o
@@ -556,9 +571,17 @@ prawa strona zbudowana na ułamkach, żeby nic nie przepadło przed rozwiązywan
 
 Potem ten sam układ rozwiązuje się dwa razy w zwykłej podwójnej precyzji
 \dash{} raz przez $A\T A$, raz rozkładem, który jej nigdy nie tworzy.
+
+Przed tabelą: przewidz z grubsza, ile cyfr dziesiętnych dzieli obie
+odpowiedzi.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Podniesienie $\kappa$ do kwadratu podwaja $\logb{10}\kappa$, więc równania
+normalne powinny oddać mniej więcej drugie tyle cyfr, ile samo zadanie już
+kosztuje.}
 \begin{tabularx}{\linewidth}{@{}lX@{}}
 \toprule
 \textbf{droga} & \textbf{błąd względny współczynników} \\
@@ -601,12 +624,16 @@ liczeniem. Ten program: tworzenie $A\T A$ podnosi wskaźnik uwarunkowania do
 kwadratu, więc podwaja tracone cyfry, zmierzone dwukrotnym rozwiązaniem tego
 samego układu.
 
-Ta druga rozstrzyga. Czynnik $\val{p09.cost.ratio}$ w szybkości to kompromis
-inżynierski, który wchłonie szybsza maszyna. Cyfr nie odzyskuje się przy żadnej
-szybkości.
+Dwie tezy, obie z liczbami. Powiedz, która z nich rozstrzyga tę radę i
+dlaczego druga rozstrzygnąć nie może.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Ta druga. Czynnik $\val{p09.cost.ratio}$ w szybkości to kompromis
+inżynierski, który wchłonie szybsza maszyna; cyfr nie odzyskuje się przy żadnej
+szybkości.}
 Jeszcze jeden obiekt, i jest to definicja, a nie technika.
 
 Program~\ref{prog:P08} pokazał, że wysoki układ zwykle nie ma rozwiązania i że
@@ -623,6 +650,12 @@ macierzą ortogonalną to bezstratna zmiana bazy z Programu~\ref{prog:P09};
 dzielenie przez wartości osobliwe to jedyne miejsce, w którym cokolwiek się
 skaluje; a obrót z powrotem to ten sam ruch jeszcze raz. Nic w tej definicji
 nie jest nowe, i dlatego jest to definicja, a nie technika.
+
+Warto powiedzieć wprost, po co ona jest. Pseudoodwrotność nie jest sposobem na
+odwrócenie macierzy, która odwrotności nie ma \dash{} nic nim nie jest \dash{}
+jest nazwą odpowiedzi, którą Program~\ref{prog:P08} już wyprowadził, zapisaną
+tak, by wystarczał jej jeden symbol. Nazwanie czegoś nie czyni tego możliwym;
+czyni to cytowalnym.
 
 Na ten środkowy krok warto popatrzeć dłużej. Dzieli przez \emph{każdą} wartość
 osobliwą, także najmniejszą. Powiedz, co to robi w kierunku, który macierz
