@@ -200,7 +200,7 @@ cicha. Cztery wywołania:
   \code{RuntimeWarning: invalid value encountered in log}.
 \end{itemize}
 
-\textbf{Jedna wielkość nieokreślona, trzy różne zachowania, w dwóch
+\textbf{Dwie wielkości nieokreślone, trzy różne zachowania, w dwóch
 bibliotekach, które importujesz do tego samego pliku.} Biblioteka standardowa
 zatrzymuje się; biblioteka tablicowa oddaje wartość i idzie dalej. \code{nan},
 który wszedł tutaj do uczenia, wypłynie w zupełnie innym miejscu, jako strata,
@@ -315,9 +315,9 @@ symbol mówi.
 za każdym razem: $\ln$ dla podstawy $e$, $\logb{2}$ dla podstawy dwa,
 $\logb{10}$ dla podstawy dziesięć. Budowanie odrzuca sam znak, zamiast liczyć
 na czyjąś pamięć, a odrzucenie jest zawieszone dokładnie tam, gdzie tematem
-jest właśnie ta niejednoznaczność: w tej sekcji, w Quizie wejściowym tego
-programu i w \S\ref{sec:appB-decisions}, który podaje tę zasadę dla całej
-książki.
+jest właśnie ta niejednoznaczność: w tej sekcji, w odpowiedzi z
+Dodatku~\ref{app:A} do Quizu wejściowego tego programu i w
+\S\ref{sec:appB-decisions}, który podaje tę zasadę dla całej książki.
 
 Kosztuje to dwa znaki i usuwa całą klasę błędów. Koszt tej klasy nie jest
 hipotetyczny: entropię podaje się w bitach, entropię krzyżową w natach, a
@@ -389,10 +389,12 @@ tą większą od $1$.
 \end{ansblock}
 
 \begin{aibox}
-W kodzie podstawa siedzi w nazwie funkcji i nigdzie indziej. \code{math.log} i
-\code{np.log} to podstawa $e$; \code{np.log2} oraz \code{np.log10} same mówią,
-jaką mają podstawę. Nie ma argumentu do sprawdzenia ani domyślnej wartości do
-odszukania.
+W kodzie podstawa siedzi albo w nazwie funkcji, albo w jawnym argumencie, i
+nigdy w konwencji. \code{math.log} i \code{np.log} domyślnie mają podstawę $e$;
+\code{np.log2} oraz \code{np.log10} same mówią, jaką mają podstawę; a
+\code{math.log(x, base)} przyjmuje ją jako argument. Ta ostatnia postać jest
+powodem, dla którego nazwane funkcje w ogóle istnieją: \code{math.log(1000, 10)}
+zwraca $\num{2.9999999999999996}$, a \code{math.log10(1000)} zwraca $3$.
 
 To stan lepszy niż ten, w jakim są prace naukowe, i ma praktyczny skutek, gdy
 którąś z nich reimplementujesz. Linia, która w pracy brzmi $\mfalogplain p$,
@@ -1078,19 +1080,23 @@ model lubi tak samo.
 geometryczna: $\val{f03.gm}$.
 \end{ansblock}
 
-\textbf{Porządkowanie po zsumowanym logarytmie prawdopodobieństwa za każdym
-razem woli kandydatkę krótszą, niezależnie od tego, co uważa model.} Każdy
-dodatkowy token dokłada kolejną liczbę ujemną, więc długość jest karana wprost,
-a jakości nikt nie pyta. Średnia nie zależy od długości i dlatego
-implementacje porządkują po niej albo po czymś z niej wyprowadzonym.
+\textbf{Spośród kandydatek, które model lubi mniej więcej tak samo,
+porządkowanie po zsumowanym logarytmie prawdopodobieństwa zawsze woli
+krótszą.} Każdy dodatkowy token dokłada kolejną liczbę ujemną, więc długość
+jest karana \emph{oprócz} jakości, a nie zamiast niej \dash{} dwadzieścia
+pewnych tokenów nadal bije trzy niepewne. Średnia nie zależy od długości i
+dlatego implementacje porządkują po niej albo po czymś z niej wyprowadzonym.
 
 Obie średnie robią drugą połowę tej puenty. $\val{f03.gm}$ leży wyraźnie
 poniżej $\val{f03.am}$ i nie są to dwa oszacowania jednej wielkości: średnia
 arytmetyczna uśrednia prawdopodobieństwa, a geometryczna uśrednia ich
 logarytmy. Zatem średnia z perplexity poszczególnych dokumentów nie jest
-perplexity korpusu, a błąd idzie w jedną stronę, zamiast być szumem.
-Nierówność, która gwarantuje ten kierunek, i jej nazwa należą do
-Programu~\ref{prog:P19}.
+perplexity korpusu. Przy dokumentach równej długości uśredniona liczba zawsze
+wychodzi \emph{powyżej} prawdziwej, a nierówność, która gwarantuje ten kierunek,
+i jej nazwa należą do Programu~\ref{prog:P19}. Przy dokumentach nierównej
+długości strata korpusu jest ważona liczbą tokenów, co dokłada drugi błąd,
+którego znak zależy od danych \dash{} więc uśredniona liczba nie jest
+perplexity niczego, w żadną stronę.
 
 \begin{aibox}
 Obie połowy są usterkami występującymi naprawdę, a nie ciekawostkami. Dekoder,
@@ -1341,9 +1347,11 @@ liczby, którą ten program nauczył cię liczyć.
 \sumitem{39--40}{\result{Strata podana bez podstawy nie jest pomiarem:
   $\val{f02.loss.nats}$ nata i $\val{f03.nats.to.bits}$ bita to ten sam model,
   odległy o $\val{f03.bits.over.nats.pct}$\%, w stronę, która pochlebia}.}
-\sumitem{41--42}{\result{Porządkowanie po \emph{zsumowanym} logarytmie
-  prawdopodobieństwa woli kandydatkę krótszą, cokolwiek uważa model; średnia
-  nie. A średnia geometryczna $\val{f03.gm}$ nie jest średnią arytmetyczną
+\sumitem{41--42}{\result{Spośród kandydatek, które model lubi mniej więcej tak
+  samo, porządkowanie po \emph{zsumowanym} logarytmie prawdopodobieństwa woli
+  krótszą; długość jest karana oprócz jakości, a nie zamiast niej, i średnia
+  na to nie reaguje. A średnia geometryczna $\val{f03.gm}$ nie jest średnią
+  arytmetyczną
   $\val{f03.am}$, więc średnia z perplexity nie jest perplexity}.}
 \sumitem{43--46}{\result{Połowa drogi między dwiema podziałkami osi logarytmicznej to
   średnia \emph{geometryczna} \dash{} $\val{f03.axis.mid}$ między $10$ a $100$,

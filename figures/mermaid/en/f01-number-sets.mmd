@@ -6,16 +6,16 @@ flowchart LR
       subgraph Z["Z -- integers"]
         direction LR
         subgraph N["N -- 0, 1, 2, 3, ..."]
-          n1["7"]
+          n1["4"]
         end
-        z1["-17"]
+        z1["-3"]
       end
       q1["1/3 = 0.333..."]
       q2["0.1"]
     end
-    r1["sqrt(2)"]
+    r1["e"]
     r2["pi"]
   end
 
   F["F -- what your machine stores:<br/>a FINITE subset of Q.<br/>0.1 is not in it.<br/>See Program 1."]
-  Q -. "not a subset either way" .-> F
+  Q -. "holds F, but F holds no N or Z" .-> F

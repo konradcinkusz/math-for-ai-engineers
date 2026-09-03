@@ -191,7 +191,7 @@ silent. Four calls:
   \code{RuntimeWarning: invalid value encountered in log}.
 \end{itemize}
 
-\textbf{One undefined quantity, three different behaviours, in two libraries
+\textbf{Two undefined quantities, three different behaviours, in two libraries
 you import into the same file.} The standard library stops; the array library
 hands you a value and carries on. A \code{nan} that entered a training run
 here will surface somewhere else entirely, as a loss that has stopped being a
@@ -301,8 +301,9 @@ what the symbol says.
 single time: $\ln$ for base $e$, $\logb{2}$ for base two, $\logb{10}$ for base
 ten. The build refuses a bare mark rather than trusting anybody to remember,
 and the refusal is lifted in exactly the places where the ambiguity is itself
-the subject: this section, this program's entry Quiz, and
-\S\ref{sec:appB-decisions}, which states the rule for the book as a whole.
+the subject: this section, the Appendix~\ref{app:A} answer to this program's
+entry Quiz, and \S\ref{sec:appB-decisions}, which states the rule for the book
+as a whole.
 
 It costs two characters and it removes a class of error entirely. What that
 class costs is not hypothetical: entropy is quoted in bits, cross-entropy in
@@ -373,9 +374,12 @@ one greater than $1$.
 \end{ansblock}
 
 \begin{aibox}
-In code the base is in the function name and nowhere else. \code{math.log} and
-\code{np.log} are base $e$; \code{np.log2} and \code{np.log10} say which base
-they are. There is no argument to check and no default to look up.
+In code the base is either in the function name or an explicit argument, and
+never a convention. \code{math.log} and \code{np.log} default to base $e$;
+\code{np.log2} and \code{np.log10} say which base they are; and
+\code{math.log(x, base)} takes one. That last form is the reason the named
+functions exist: \code{math.log(1000, 10)} returns
+$\num{2.9999999999999996}$, where \code{math.log10(1000)} returns $3$.
 
 That is a better state of affairs than the papers are in, and it has a
 practical consequence when you are reimplementing one. A line that reads
@@ -1056,18 +1060,23 @@ Arithmetic mean of the four probabilities: $\val{f03.am}$. Geometric mean:
 $\val{f03.gm}$.
 \end{ansblock}
 
-\textbf{Ranking by summed log-probability prefers the shorter candidate every
-time, whatever the model thinks.} Each additional token adds another negative
-number, so length is penalised directly and quality is not consulted. The mean
-is unaffected by length, which is why implementations rank by it or by
-something derived from it.
+\textbf{Between candidates the model likes about equally, ranking by summed
+log-probability always prefers the shorter.} Each additional token adds another
+negative number, so length is penalised \emph{in addition} to quality rather
+than instead of it \dash{} twenty confident tokens still outscore three
+unconfident ones. The mean is unaffected by length, which is why
+implementations rank by it or by something derived from it.
 
 The two means make the second half of the point. $\val{f03.gm}$ is well below
 $\val{f03.am}$, and they are not two estimates of one quantity: the arithmetic
 mean averages the probabilities and the geometric mean averages their
 logarithms. So an average of per-document perplexities is not the perplexity of
-the corpus, and the error goes one way rather than being noise. The inequality
-that guarantees the direction, and its name, are Program~\ref{prog:P19}'s.
+the corpus. On documents of equal length the averaged figure always comes out
+\emph{above} the true one, and the inequality that guarantees that direction,
+and its name, are Program~\ref{prog:P19}'s. On documents of unequal length the
+corpus loss is token-weighted, which adds a second error whose sign depends on
+the data \dash{} so the averaged number is not the perplexity of anything, in
+either direction.
 
 \begin{aibox}
 Both halves are live defects rather than curiosities. A decoder that ranks
@@ -1322,8 +1331,10 @@ number this program taught you to compute.
   $\val{f02.loss.nats}$ nats and $\val{f03.nats.to.bits}$ bits are the same
   model, $\val{f03.bits.over.nats.pct}$\% apart, in the direction that
   flatters}.}
-\sumitem{41--42}{\result{Ranking by \emph{summed} log-probability prefers the shorter
-  candidate whatever the model thinks; the mean does not. And the geometric
+\sumitem{41--42}{\result{Between candidates the model likes about equally,
+  ranking by \emph{summed} log-probability prefers the shorter; length is
+  penalised on top of quality, not instead of it, and the mean is unaffected.
+  And the geometric
   mean $\val{f03.gm}$ is not the arithmetic mean $\val{f03.am}$, so an average
   of perplexities is not a perplexity}.}
 \sumitem{43--46}{\result{Halfway between two ticks of a logarithmic axis is the

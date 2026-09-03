@@ -280,12 +280,13 @@ krótkie, jak się da, a zapisanie go jako $5x^{2}$ czy $5x^{3}$ jest błędem.
 \end{ansblock}
 
 \begin{warning}
-Twój framework cię nie powstrzyma. Dodanie tablicy o kształcie $(n,1)$ do
-tablicy o kształcie $(n,d)$ to ten sam błąd \dash{} dodane dwie rzeczy
-niepodobne \dash{} a biblioteka, zamiast odmówić, rozgłasza pierwszą po drugiej
-i oddaje całkiem zwyczajny wynik o kształcie $(n,d)$. Bez wyjątku, bez
+Twój framework cię nie powstrzyma. Odjęcie tablicy o kształcie $(n,1)$ od
+tablicy o kształcie $(n)$ to ten sam błąd \dash{} złożone dwie rzeczy
+niepodobne \dash{} a biblioteka, zamiast odmówić, rozgłasza je względem siebie
+i oddaje całkiem zwyczajny wynik o kształcie $(n,n)$. Bez wyjątku, bez
 ostrzeżenia i z liczbą na końcu, która jest błędna w sposób, którego nie
-sprawdza żaden z twoich testów.
+sprawdza żaden z twoich testów. Program~\ref{prog:P07} mierzy, ile to kosztuje:
+stratę uśrednioną po każdej \emph{parze} zamiast po każdym przykładzie.
 
 Matematyka odmawia dodawania wyrazów niepodobnych. Biblioteki tablicowe nie, i
 dlatego Program~\ref{prog:P07} poświęca kształtom całą swoją długość.
@@ -366,7 +367,8 @@ Oblicz $2 + 3 \times 4^{2}$.
 \ans{$50$}
 Najpierw wiąże potęga, dając $4^{2} = 16$; potem mnożenie, $3 \times 16 = 48$;
 na końcu dodawanie, $2 + 48 = 50$. Odpowiedź $80$ oznacza dodawanie przed
-mnożeniem, a odpowiedź $400$ \dash{} mnożenie przed potęgowaniem.
+mnożeniem, odpowiedź $146$ \dash{} mnożenie przed potęgowaniem, a odpowiedź
+$400$ \dash{} całą linię czytaną ściśle od lewej do prawej.
 
 Teraz coś mniejszego, co łapie więcej osób niż pierwsze pytanie. Oblicz
 $-3^{2}$, a następnie oblicz $(-3)^{2}$.
@@ -396,7 +398,7 @@ Zatem gdy twoje odczytanie i twój program się rozjeżdżają, błąd jest w tw
 wzorze, a błąd kwadratowy, który wychodzi ujemny, to często dokładnie
 to. \emph{Wariancja}, która wychodzi ujemna, to inna usterka o innej
 przyczynie \dash{} katastrofalne znoszenie się w jednoprzebiegowym wzorze
-\dash{} i należy do Programu~\ref{prog:P01}.
+\dash{} i należy do Programu~\ref{prog:P02}.
 \end{trapbox}
 Coś jeszcze wypada z wydrukowanej strony i zwykle ofiarą jest mnożenie: $2x$
 znaczy $2 \times x$, tylko że znak nie został wydrukowany. Nieszkodliwe,
@@ -471,13 +473,16 @@ Weź wiersz o wariancji $\val{f02.lnorm.var}$ \dash{} wiersz niemal stały, czyl
 ten przypadek, dla którego $\eps$ istnieje \dash{} przy
 $\eps = \val{f02.lnorm.eps}$, $x = \val{f02.lnorm.x}$ i
 $\mu = \val{f02.lnorm.mu}$. Odczytana tak, jak ją wydrukowano, linia daje
-$\val{f02.ln.eps.inside}$. Odczytana błędnie, z $\eps$ poza pierwiastkiem, daje
+$\val{f02.ln.eps.inside}$. Odczytana błędnie, z $\eps$ poza pierwiastkiem, ale
+nadal wewnątrz dzielnika, daje
 $\val{f02.ln.eps.outside}$, czyli o \val{f02.ln.eps.diff.pct}\% powyżej
 wydrukowanej wartości.
 
 \begin{aibox}
 To prawdziwa linia prawdziwego systemu \dash{} normalizacja warstwowa, z pracy
-Ba, Kirosa i Hintona \dash{} i siedzi w każdym transformerze, którego użyjesz.
+Ba, Kirosa i Hintona, z $\eps$ tam, gdzie stawiają go implementacje
+referencyjne, a nie sama praca \dash{} i siedzi w każdym transformerze, którego
+użyjesz.
 $\eps$ jest decyzją numeryczną, a nie interpunkcją, i to, gdzie stoi, zmienia
 działanie warstwy na cesze niemal stałej.
 
@@ -784,9 +789,10 @@ $t^{2} - 16 = (t + 4)(t - 4)$.
 \begin{note}
 Ta książka nie ćwiczy rozkładu na czynniki dalej niż do tego miejsca. Wspólny
 czynnik i różnica kwadratów pokrywają razem to, czego faktycznie potrzebują
-dalsze programy, a ogólne równanie kwadratowe załatwione jest tam, gdzie się go
-używa: Program~\ref{prog:F06} rozwiązuje równania kwadratowe, ze wzoru, w
-miejscu, w którym trzeba je rozwiązać.
+dalsze programy. Ogólne równanie kwadratowe nie jest w tej książce rozwiązywane
+nigdzie, i jest to decyzja, a nie przeoczenie: nic w dalszej części tego nie
+wymaga, a wzór, który sprawdzisz, kiedy będzie ci potrzebny, nie jest wart
+tutaj popołudnia.
 
 Jeśli twoja szkoła obejmowała godziny rozkładania trójmianów metodą prób, nic
 nie tracisz, nie powtarzając ich tutaj.
@@ -893,7 +899,7 @@ niego nie skraca. To reguła tej sekcji i to przez nią softmaksu nie da się
 policzyć po jednym wpisie naraz, a cały wiersz trzeba zsumować, zanim
 poznasz choć jedno prawdopodobieństwo. To także powód, dla którego liczby w tym
 wierszu nie są od siebie niezależne, o czym mówią
-Programy~\ref{prog:F07} i~\ref{prog:P30}.
+Programy~\ref{prog:F07} i~\ref{prog:P18}.
 \end{aibox}
 
 \yourturn
@@ -1026,8 +1032,9 @@ To nie jest ciekawostka o pierwiastkach. To powód, dla którego \textbf{wartoś
 straty mówi, jak bardzo się mylisz, i nigdy nie mówi, w którą stronę}, a zatem
 powód, dla którego żadnej procedury uczenia nigdy nie zbudowano z samych
 wartości straty. Kierunek niesie \emph{gradient} \dash{} pochodna straty, która
-dla tej straty wynosi $-2(y - \hat{y})$ i zachowuje dokładnie ten znak, który
-kwadrat zniszczył. Programy~\ref{prog:F11} i~\ref{prog:P15} to rozbierają.
+dla tej straty po predykcji wynosi $-2(y - \hat{y})$ i zachowuje dokładnie ten
+znak, który kwadrat zniszczył. Programy~\ref{prog:F11} i~\ref{prog:P15} to
+rozbierają.
 \end{trapbox}
 Oto przekształcenie z liczbą na końcu. Program~\ref{prog:F01} liczył pamięć z
 liczby parametrów wzorem
@@ -1082,9 +1089,11 @@ $d = \left(\frac{q}{s}\right)^{2}$, przy założeniu $s \ne 0$.
 
 To drugie to skala uwagi w postaci skalarnej. Czynnik
 $\frac{1}{\sqrt{d}}$, który dzieli wynik w każdym transformerze, to właśnie to
-przekształcenie przeczytane w drugą stronę; wersja wektorowa to
-Program~\ref{prog:P05}, a powód, dla którego dzielnikiem jest $\sqrt{d}$, a nie
-$d$ czy cokolwiek innego, to Program~\ref{prog:P32}.
+przekształcenie przeczytane w drugą stronę; iloczyn skalarny, z którego jest
+zbudowane, to Programy~\ref{prog:F09} i~\ref{prog:P05}, a powód, dla którego
+dzielnikiem jest $\sqrt{d}$, a nie $d$ czy cokolwiek innego, wyprowadza
+Program~\ref{prog:P25}, a przez cały blok sprawdza go
+Program~\ref{prog:P32}.
 
 \begin{note}
 Nawyk, który czyni to wszystko bezpiecznym, kosztuje dziesięć sekund.
@@ -1302,8 +1311,8 @@ z tej ostatniej sekcji i robi z niej nawyk.
   \emph{cztery} iloczyny \dash{} po jednym na komórkę siatki
   $2 \times 2$}.}
 \sumitem{22--23}{\result{$(a+b)^{2} = a^{2} + 2ab + b^{2}$. Wykładnik rozdziela się
-  względem iloczynu i względem niczego innego. Sprawdź przy $a = 3$, $b = 4$:
-  $49$, a nie $25$}.}
+  względem iloczynu albo ilorazu i względem niczego innego. Sprawdź przy
+  $a = 3$, $b = 4$: $49$, a nie $25$}.}
 \sumitem{24--26}{\result{$(a+b)(a-b) = a^{2} - b^{2}$ to jedyny przypadek, w którym
   wyrazy mieszane się znoszą. W $(y - \hat{y})^{2}$ wyraz mieszany jest jedyną
   częścią straty, która wie o obu wielkościach}.}

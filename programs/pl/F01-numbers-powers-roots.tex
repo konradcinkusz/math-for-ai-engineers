@@ -56,8 +56,9 @@
 \item Model ma \val{f01.params} parametrów zapisanych w formacie
   2-bajtowym. Ile bajtów zajmują jego wagi? \teachesat{34--36}
   \answerto{$\val{f01.weights.bytes}$ bajtów, czyli \val{f01.weights.gb}~GB.}
-\item Twój rachunek mówi 14~GB, a narzędzie raportuje \val{f01.weights.gib}~GiB. Który wynik
-  jest błędny? \teachesat{38--40}
+\item Twój rachunek daje liczbę w gigabajtach, a narzędzie raportuje te same
+  wagi jako \val{f01.weights.gib}~GiB. Który wynik jest błędny?
+  \teachesat{38--40}
   \answerto{Żaden. To są różne jednostki: gibibajt to $2^{30}$ bajtów, a
   gigabajt $10^{9}$, więc gibibajt ma o \val{f01.gib.over.si.pct}\% bajtów
   więcej.}
@@ -158,9 +159,10 @@ powtarzają. Razem z wymiernymi tworzą \emph{liczby rzeczywiste}, $\R$.
 \end{fr}
 
 \mermaidfig{f01-number-sets}{%
-  Cztery zbiory, jeden w drugim, i ten jeden, który nie mieści się w tej
-  hierarchii. To, co przechowuje maszyna, jest skończonym podzbiorem liczb
-  wymiernych \dash{} nie zawiera więc ani całego $\Q$, ani dokładnie żadnej
+  Cztery zbiory, jeden w drugim, i ten jeden, który mieści się w $\Q$, nie
+  zawierając ani jednej liczby z $\N$ czy $\Z$. To, co przechowuje maszyna,
+  jest skończonym podzbiorem liczb wymiernych \dash{} nie zawiera więc ani
+  całego $\Q$, ani dokładnie żadnej
   liczby niewymiernej.}{%
   Zagnieżdżone zbiory liczbowe, ze zbiorem zmiennoprzecinkowym maszyny jako
   skończonym podzbiorem liczb wymiernych.}
@@ -225,8 +227,7 @@ A potęga potęgi mnoży wykładniki:
 \[ (a^{m})^{n} = a^{mn} \]
 ponieważ $(2^{3})^{4}$ to cztery kopie trzech dwójek.
 
-Teraz pytanie, które nie jest tym, na co wygląda. Czy $2^{3} \times 3^{2}$
-równa się $6^{5}$?
+Teraz: czy $2^{3} \times 3^{2}$ równa się $6^{5}$?
 \nextframe
 \end{fr}
 
@@ -372,8 +373,8 @@ Pierwiastek trzeciego stopnia z $\tfrac{8}{27}$ to $\tfrac{2}{3}$; podniesiony
 do kwadratu daje $\tfrac{4}{9}$.
 \end{ansblock}
 
-Jeszcze jedno pytanie, zanim zostawimy pierwiastki, i jest to pułapka. Czy
-$\sqrt{9 + 16}$ równa się $\sqrt{9} + \sqrt{16}$?
+Jeszcze jedno pytanie, zanim zostawimy pierwiastki. Czy $\sqrt{9 + 16}$ równa
+się $\sqrt{9} + \sqrt{16}$?
 \nextframe
 \end{fr}
 
@@ -390,8 +391,8 @@ $\sqrt{ab} = \sqrt{a}\sqrt{b}$ \dash{} i właśnie to sprawia, że ten błąd ta
 
 Spotkasz to jeszcze w postaci, która kosztuje realne pieniądze. Norma sumy
 wektorów nie jest sumą norm, a założenie, że jest, pojawia się w wiarygodnie
-wyglądających rozumowaniach o embeddingach. Program~\ref{prog:P05} zajmuje się
-tym na tamtym gruncie.
+wyglądających rozumowaniach o embeddingach. Program~\ref{prog:F09} zajmuje się
+tym na tamtym gruncie, a Program~\ref{prog:P05} mierzy, ile to kosztuje.
 \end{trapbox}
 \end{fr}
 
@@ -511,7 +512,7 @@ na serwetce nic nie znaczy.
 Mów tak i zawsze w tę stronę. \enquote{Przybliżenie jest zaniżone o
 \val{f01.kib.over.si.pct}\%} to inne twierdzenie o innym mianowniku, a obie
 odpowiedzi nie są tą samą liczbą. To \S\ref{sec:F01-ratios} przychodzące
-osiemnaście ramek za wcześnie, i będzie przychodzić dalej.
+wcześniej, niż powinno, i będzie przychodzić dalej.
 
 Teraz je przyciśnij. $2^{80}$ to osiem takich czynników jeden na drugim, więc
 powinno wynosić około $10^{24}$. Czy błąd nadal nic nie znaczy?
@@ -541,7 +542,7 @@ znormalizuj.
 
 \begin{fr}
 \textbf{Przykład rozwiązany.} Powieść liczy około \val{f01.novel.words} słów.
-Reguła kciuka mówi, że angielskie słowo to mniej więcej trzy czwarte tokena.
+Reguła kciuka mówi, że angielski token to mniej więcej trzy czwarte słowa.
 Ile z grubsza tokenów ma ta powieść?
 
 \[ \frac{\num{1e5}}{\num{0.75}} \approx \num{1.3e5} \]
@@ -650,9 +651,10 @@ parametr. Ile gigabajtów zajmują jego wagi?
 $(\num{7e10}) \times 2 = \num{1.4e11}$ bajtów, czyli \val{f01.big.gb}~GB.
 \end{ansblock}
 
-Warto się zatrzymać: \val{f01.big.gb}~GB to więcej pamięci, niż ma dziś
-pojedynczy powszechnie używany akcelerator, i dlatego model tej wielkości
-trzeba rozdzielić na kilka urządzeń, zanim ktokolwiek w ogóle go uruchomi. To,
+Warto się zatrzymać: \val{f01.big.gb}~GB nie mieści się na karcie $80$~GB,
+czyli w rozmiarze, który wycenia ramka~41, i dlatego model tej wielkości trzeba
+rozdzielić na kilka urządzeń, zanim ktokolwiek w ogóle go uruchomi. Większe
+karty istnieją; rozstrzyga arytmetyka i to ona przenosi się dalej. To,
 że podział jest konieczny, wynika z arytmetyki; to, jak się go robi i ile
 kosztuje, już nie, i tym ta książka się nie zajmuje.
 \end{fr}
@@ -765,8 +767,9 @@ o \val{f01.speedup.discrepancy.ms}~ms.}
 \val{f01.fifty.pct.more.rate.ms}$~ms.
 
 Oba są zwykłą polszczyzną i oba są w powszechnym użyciu. Rozbieżność wynosi tu
-jedną trzecią wartości wyjściowej, czyli więcej niż większość poprawek, jakie
-ktokolwiek zgłasza.
+jedną szóstą wyjściowego opóźnienia \dash{} i jedną trzecią mniejszej z dwóch
+odpowiedzi, czyli tego mianownika, po który ludzie sięgają, nie mówiąc o tym.
+Tak czy inaczej to więcej niż większość poprawek, jakie ktokolwiek zgłasza.
 
 \textbf{Podaj liczbę.} \enquote{Opóźnienie spadło z \val{f01.base.ms}~ms do
 \val{f01.fifty.pct.less.ms}~ms} nie da się źle odczytać. Poprawa w procentach
@@ -898,8 +901,11 @@ nie powtarzaj twierdzenia.
   \answerto{$\tfrac{1}{2} + \tfrac{1}{3} = \tfrac{3}{6} + \tfrac{2}{6} =
   \tfrac{5}{6}$.}
 \item Czy $\sqrt{a^{2} + b^{2}}$ bywa równe $a + b$ dla dodatnich $a$ i $b$?
-  \answerto{Nie. Weź $a = 3$, $b = 4$: lewa strona to $\sqrt{25} = 5$, a prawa
-  to $7$. Jeden kontrprzykład wystarczy.}
+  \answerto{Nie, nigdy: $(a+b)^{2} = a^{2} + 2ab + b^{2}$ przewyższa $a^{2} +
+  b^{2}$ o $2ab$, czyli o liczbę dodatnią, więc $\sqrt{a^{2}+b^{2}} < a + b$
+  dla każdych dodatnich $a$ i $b$. Jeden przypadek obaliłby \emph{zawsze}; nie
+  może dowieść \emph{nigdy}, a Program~\ref{prog:P14} jest właśnie o tej
+  różnicy.}
 \item Zapisz $\num{6.02e23}$ jako zwykłą liczbę i powiedz, dlaczego nie
   chciałbyś tego robić.
   \answerto{$602\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000$. Dwadzieścia cztery cyfry
@@ -929,9 +935,9 @@ nie powtarzaj twierdzenia.
 \item Karta ma reklamowane 24~GB. Wyraź to w gibibajtach.
   \answerto{$24 \times 10^{9} / 2^{30} \approx \num{22.4}$~GiB.}
 \item Co jest większe: 1~TiB czy $\num{1.1}$~TB?
-  \answerto{1~TiB, przy $\num{1.0995e12}$ bajtach wobec $\num{1.1e12}$
-  \dash{} o włos, i to jest dokładnie ten margines, przy którym zgadywanie
-  zawodzi.}
+  \answerto{$\num{1.1}$~TB, przy $\num{1.1e12}$ bajtach wobec 1~TiB, czyli
+  $\num{1.0995e12}$ \dash{} o włos, i to jest dokładnie ten margines, przy
+  którym zgadywanie zawodzi.}
 \item Opóźnienie spada z 250~ms do 200~ms. Wyraź zmianę jako redukcję
   procentową i jako współczynnik przyspieszenia.
   \answerto{Redukcja o $20\%$; przyspieszenie $\num{1.25}\times$.}

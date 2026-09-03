@@ -54,8 +54,8 @@
 \item A model has \val{f01.params} parameters stored in a 2-byte format. How
   many bytes are its weights? \teachesat{34--36}
   \answerto{$\val{f01.weights.bytes}$ bytes, which is \val{f01.weights.gb}~GB.}
-\item Your arithmetic says 14~GB and your tooling reports \val{f01.weights.gib}~GiB. Which is
-  wrong? \teachesat{38--40}
+\item Your arithmetic gives a figure in gigabytes and your tooling reports the
+  same weights as \val{f01.weights.gib}~GiB. Which is wrong? \teachesat{38--40}
   \answerto{Neither. They are different units: a gibibyte is $2^{30}$ bytes and
   a gigabyte is $10^{9}$, so a gibibyte is \val{f01.gib.over.si.pct}\% more
   bytes.}
@@ -154,9 +154,10 @@ with the rationals they make the \emph{real} numbers, $\R$.
 \end{fr}
 
 \mermaidfig{f01-number-sets}{%
-  The four sets, nested, and the one that is not nested with them. What a
-  machine stores is a finite subset of the rationals \dash{} so it holds
-  neither all of $\Q$ nor any irrational number exactly.}{%
+  The four sets, nested, and the one that sits inside $\Q$ without holding a
+  single $\N$ or $\Z$. What a machine stores is a finite subset of the
+  rationals \dash{} so it holds neither all of $\Q$ nor any irrational number
+  exactly.}{%
   Nested number sets, with the machine's floating-point set shown as a finite
   subset of the rationals.}
 
@@ -220,8 +221,7 @@ And a power of a power multiplies:
 \[ (a^{m})^{n} = a^{mn} \]
 because $(2^{3})^{4}$ is four copies of three twos.
 
-Now a question that is not what it looks like. Is $2^{3} \times 3^{2}$ equal to
-$6^{5}$?
+Now: is $2^{3} \times 3^{2}$ equal to $6^{5}$?
 \nextframe
 \end{fr}
 
@@ -362,8 +362,8 @@ The negative index inverts the fraction: $\left(\tfrac{8}{27}\right)^{2/3}$.
 The cube root of $\tfrac{8}{27}$ is $\tfrac{2}{3}$; squared, $\tfrac{4}{9}$.
 \end{ansblock}
 
-One more question before we leave roots, and it is a trap. Is
-$\sqrt{9 + 16}$ equal to $\sqrt{9} + \sqrt{16}$?
+One more question before we leave roots. Is $\sqrt{9 + 16}$ equal to
+$\sqrt{9} + \sqrt{16}$?
 \nextframe
 \end{fr}
 
@@ -381,8 +381,8 @@ is true.
 
 You will meet this again in a form that costs real money. The norm of a sum of
 vectors is not the sum of the norms, and the assumption that it is turns up in
-plausible-looking arguments about embeddings. Program~\ref{prog:P05} deals with
-it there.
+plausible-looking arguments about embeddings. Program~\ref{prog:F09} deals with
+it there, and Program~\ref{prog:P05} measures what it costs.
 \end{trapbox}
 \end{fr}
 
@@ -449,8 +449,8 @@ $(\num{3e8}) + (\num{2e7})$?
 short cut here at all: the two quantities must be brought to a common exponent
 first, and only then do the mantissas add.
 \[ \num{3e8} + \num{2e7} = \num{3e8} + \num{0.2e8} = \num{3.2e8} \]
-The reason this matters beyond arithmetic: it is the same reason a floating-
-point sum of numbers with very different exponents loses the small one
+The reason this matters beyond arithmetic: it is the same reason a
+floating-point sum of numbers with very different exponents loses the small one
 entirely. Line up the exponents, and the small number's digits fall off the end
 of the mantissa. Program~\ref{prog:P02} measures exactly that.
 \end{trapbox}
@@ -502,8 +502,7 @@ back-of-envelope answer is nothing.
 Say it that way round, and always. \enquote{The approximation is low by
 \val{f01.kib.over.si.pct}\%} is a different claim about a different
 denominator, and the two answers are not the same number. This is
-\S\ref{sec:F01-ratios} arriving eighteen frames early, and it will keep
-arriving.
+\S\ref{sec:F01-ratios} arriving early, and it will keep arriving.
 
 Now push it. $2^{80}$ is eight of those factors stacked up, so it should be
 about $10^{24}$. Is the error still nothing?
@@ -532,7 +531,7 @@ significant figure, add or subtract the exponents, and renormalise.
 
 \begin{fr}
 \textbf{Worked.} A novel runs to about \val{f01.novel.words} words. A rule of
-thumb puts an English word at about three quarters of a token. Roughly how
+thumb puts an English token at about three quarters of a word. Roughly how
 many tokens is the novel?
 
 \[ \frac{\num{1e5}}{\num{0.75}} \approx \num{1.3e5} \]
@@ -643,9 +642,11 @@ parameter. How many gigabytes are its weights?
 $(\num{7e10}) \times 2 = \num{1.4e11}$ bytes, which is \val{f01.big.gb}~GB.
 \end{ansblock}
 
-Worth a moment: \val{f01.big.gb}~GB is more memory than any single accelerator
-in common use carries today, which is why a model of that size has to be split
-across several devices before anybody can run it at all. That the split is
+Worth a moment: \val{f01.big.gb}~GB does not fit on an $80$~GB card, which is
+the size frame~41 prices, so a model of that size has to be split across
+several devices before anybody can run it at all. Cards larger than this
+exist; the arithmetic is what decides, and it is the arithmetic that
+travels. That the split is
 necessary follows from the arithmetic; how it is done, and what it costs, does
 not, and this book does not cover it.
 \end{fr}
@@ -758,8 +759,9 @@ How long does it take?
 \val{f01.fifty.pct.more.rate.ms}$~ms.
 
 Both are ordinary English and both are in common use. The discrepancy here is
-a third of the original, which is larger than most of the improvements anybody
-reports.
+a sixth of the original latency \dash{} and a third of the smaller of the two
+answers, which is the denominator people reach for without saying so. Either
+way it is larger than most of the improvements anybody reports.
 
 \textbf{Say the number.} \enquote{Latency fell from \val{f01.base.ms}~ms to
 \val{f01.fifty.pct.less.ms}~ms} cannot be misread. A percentage improvement
@@ -890,8 +892,11 @@ claim.
   \answerto{$\tfrac{1}{2} + \tfrac{1}{3} = \tfrac{3}{6} + \tfrac{2}{6} =
   \tfrac{5}{6}$.}
 \item Is $\sqrt{a^{2} + b^{2}}$ ever equal to $a + b$ for positive $a$ and $b$?
-  \answerto{No. Try $a = 3$, $b = 4$: the left side is $\sqrt{25} = 5$ and the
-  right side is $7$. One counterexample settles it.}
+  \answerto{No, never: $(a+b)^{2} = a^{2} + 2ab + b^{2}$ exceeds $a^{2} +
+  b^{2}$ by $2ab$, which is positive, so $\sqrt{a^{2}+b^{2}} < a + b$ for every
+  positive $a$ and $b$. One instance would have refuted \emph{always}; it
+  cannot establish \emph{never}, and Program~\ref{prog:P14} is about exactly
+  that difference.}
 \item Write $\num{6.02e23}$ as an ordinary number, and say why you would not
   want to.
   \answerto{$602\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000\,\allowbreak 000$. Twenty-four digits carry
@@ -920,8 +925,9 @@ claim.
 \item A card advertises 24~GB. Express it in gibibytes.
   \answerto{$24 \times 10^{9} / 2^{30} \approx \num{22.4}$~GiB.}
 \item Which is larger, 1~TiB or $\num{1.1}$~TB?
-  \answerto{1~TiB, at $\num{1.0995e12}$ bytes against $\num{1.1e12}$ \dash{}
-  by a whisker, and this is exactly the margin where guessing fails.}
+  \answerto{$\num{1.1}$~TB, at $\num{1.1e12}$ bytes against 1~TiB's
+  $\num{1.0995e12}$ \dash{} by a whisker, and this is exactly the margin where
+  guessing fails.}
 \item A latency drops from 250~ms to 200~ms. Express the change as a
   percentage reduction and as a speed-up factor.
   \answerto{A $20\%$ reduction; a $\num{1.25}\times$ speed-up.}
