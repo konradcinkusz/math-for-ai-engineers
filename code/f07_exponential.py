@@ -186,11 +186,45 @@ def slope(x: float) -> float:
 
 
 SLOPE_AT = (0.0, 1.0, 2.0, 4.0, 6.0)
+
+# FOUR SIGNIFICANT FIGURES, not four decimal places, and the difference is the
+# whole of a defect the review found. At four decimals sigma'(6) prints 0.0025,
+# which carries TWO significant figures -- and frame 17 asks the reader to
+# divide it into 0.2500, which gives exactly 100 against an answer box saying
+# 101. The table is the operand of a question, so it has to carry enough
+# figures to answer it. Four significant figures leaves the top three rows
+# unchanged and gives 0.01766 and 0.002467, both of which reproduce.
+def _sigfig(value: float, figures: int = 4) -> str:
+    """Format to a fixed number of significant figures, trailing zeros kept.
+
+    `f"{x:.4g}"` drops them -- 0.25 rather than 0.2500 -- which would make one
+    column carry two conventions. This keeps them, so the column reads as one.
+    """
+    if value == 0.0:                                         # pragma: no cover
+        return "0"
+    exponent = math.floor(math.log10(abs(value)))
+    decimals = max(figures - 1 - exponent, 0)
+    return f"{value:.{decimals}f}"
+
+
+SLOPE_PRINTED = {x: _sigfig(slope(x)) for x in SLOPE_AT}
 for _x in SLOPE_AT:
-    emit(f"f07.slope.{int(_x)}", slope(_x), 4)
+    emit(f"f07.slope.{int(_x)}", SLOPE_PRINTED[_x])
 
 emit("f07.slope.ratio6", slope(0.0) / slope(6.0), 0)
 emit("f07.slope.ratio4", slope(0.0) / slope(4.0), 0)
+emit("f07.slope.ratio2", slope(0.0) / slope(2.0), 1)
+
+# AND THE PAGE MUST REPRODUCE ITS OWN RATIOS. Frame 17 tells the reader to
+# divide two numbers off the table; frames 18 and 23 print the answers. This
+# asserts that dividing the PRINTED forms gives the PRINTED answer, which is
+# the check the four-decimal column failed.
+for _at, _key, _digits in ((6.0, "ratio6", 0), (4.0, "ratio4", 0), (2.0, "ratio2", 1)):
+    _from_page = float(SLOPE_PRINTED[0.0]) / float(SLOPE_PRINTED[_at])
+    _printed = f"{slope(0.0) / slope(_at):.{_digits}f}"
+    assert f"{_from_page:.{_digits}f}" == _printed, (
+        f"f07.slope.{_key} prints {_printed} where the table divides to "
+        f"{_from_page:.{_digits}f}: the reader cannot reproduce it")
 
 # Invariants, not observations: the steepness peaks at the centre at exactly a
 # quarter, and falls monotonically as you move out.
@@ -204,14 +238,27 @@ assert slope(0.0) / slope(6.0) > 50, "the collapse over six units is no longer d
 # place onwards -- so ln(1 - p) is always defined in exact arithmetic and is
 # not on a machine. The frame quotes the place rather than "around 37", which
 # is what it said when it was written from memory.
-_step = 0.1
-_x = 0.0
-while sigmoid(_x) != 1.0:
-    _x += _step
-SIG_SATURATES = round(_x, 1)
-emit("f07.sig.saturates", SIG_SATURATES, 1)
+#
+# AND THE PLACE IS DERIVED RATHER THAN SWEPT, which is a correction. This used
+# to walk out from zero in steps of a tenth and report the first grid point
+# that rounded to one, which gives 36.8 -- so a reader checking at 36.75 found
+# sigma already exactly 1.0 and the page wrong. The threshold is where e^-x
+# falls below the last place of 1.0, at 2^-53, so it is exactly 53 ln 2: a
+# property of IEEE-754 binary64 rather than of the grid this program swept.
+SIG_SATURATES_EXACT = 53.0 * math.log(2.0)
+_lo, _hi = 30.0, 45.0
+for _ in range(200):
+    _mid = (_lo + _hi) / 2.0
+    if sigmoid(_mid) == 1.0:
+        _hi = _mid
+    else:
+        _lo = _mid
+assert abs(_hi - SIG_SATURATES_EXACT) < 1e-9, (
+    f"sigma first returns 1.0 at {_hi}, not at 53 ln 2 = {SIG_SATURATES_EXACT}")
+SIG_SATURATES = round(SIG_SATURATES_EXACT, 2)
+emit("f07.sig.saturates", SIG_SATURATES, 2)
 assert sigmoid(SIG_SATURATES) == 1.0, "sigma no longer rounds to one there"
-assert sigmoid(SIG_SATURATES - _step) < 1.0, "sigma rounds to one earlier than reported"
+assert sigmoid(SIG_SATURATES - 0.01) < 1.0, "sigma rounds to one earlier than reported"
 
 # ==========================================================================
 # SECTION 4 --- tanh IS the logistic, moved
@@ -235,10 +282,38 @@ assert math.tanh(0.0) == 0.0 and sigmoid(0.0) == 0.5
 
 # tanh saturates HARDER, not less: its steepness is 1 - tanh^2, which peaks at
 # 1 against the logistic's quarter and therefore falls further.
-emit("f07.tanh.slope0", 1.0 - math.tanh(0.0) ** 2, 4)
-emit("f07.tanh.slope2", 1.0 - math.tanh(2.0) ** 2, 4)
-assert (1.0 - math.tanh(0.0) ** 2) / (1.0 - math.tanh(2.0) ** 2) > \
-       slope(0.0) / slope(2.0), "tanh no longer saturates harder than the logistic"
+def tanh_slope(x: float) -> float:
+    return 1.0 - math.tanh(x) ** 2
+
+# Four DECIMALS here, not four significant figures: 0.0707 carries three of
+# them, so the division below reproduces and there is no reason to churn two
+# committed values. The logistic's column needed the sigfig form because
+# sigma'(6) rounds to 0.0025 at four decimals, which is two figures.
+TANH_PRINTED = {x: f"{tanh_slope(x):.4f}" for x in (0.0, 2.0)}
+emit("f07.tanh.slope0", TANH_PRINTED[0.0])
+emit("f07.tanh.slope2", TANH_PRINTED[2.0])
+assert tanh_slope(0.0) / tanh_slope(2.0) > slope(0.0) / slope(2.0), \
+    "tanh no longer saturates harder than the logistic"
+
+# AND THE COMPARISON IS TWO COMPUTATIONS RATHER THAN ONE VALUE PRINTED TWICE.
+# Section 4's whole argument is that only the horizontal squash moves anything
+# ALONG the axis, so tanh's flat region comes in by two rather than by four --
+# and the evidence for it is that tanh loses over TWO units what the logistic
+# takes FOUR to lose. Those are different quantities computed from different
+# curves. Emitting one of them under both names would be the two-numbers-that-
+# look-like-one defect appearing inside the sentence that needs them to be two,
+# so both are emitted and their agreement is asserted rather than assumed.
+emit("f07.tanh.ratio2", tanh_slope(0.0) / tanh_slope(2.0), 0)
+assert abs(tanh_slope(0.0) / tanh_slope(2.0) - slope(0.0) / slope(4.0)) < 0.5, \
+    "tanh's two-unit loss no longer matches the logistic's four-unit loss"
+assert f"{tanh_slope(0.0) / tanh_slope(2.0):.0f}" == f"{slope(0.0) / slope(4.0):.0f}", \
+    "the two losses no longer print as the same figure, so the frame's evidence is gone"
+
+# And the ratio has to survive the reader dividing the two printed cells of the
+# table it sits in, which is what the frame instructs.
+_from_page = float(TANH_PRINTED[0.0]) / float(TANH_PRINTED[2.0])
+assert f"{_from_page:.0f}" == f"{tanh_slope(0.0) / tanh_slope(2.0):.0f}", \
+    "f07.tanh.ratio2 does not reproduce from the two cells beside it"
 
 # ==========================================================================
 # SECTION 6 --- softmax on two scores IS the logistic

@@ -814,8 +814,9 @@ subnormalny.
 
 Jeszcze jedna liczba do postawienia obok tych podłóg, i nie jest ona tego
 programu. Program~\ref{prog:F12} pomnożył przez siebie czterdzieści czynników
-warstwowych i doszedł do $\val{p01.f12.prod}$ dla nasyconego łańcucha
-logistycznego. Który z czterech formatów jeszcze ją mieści?
+warstwowych i sprowadził iloczyn poniżej $\val{p01.f12.prod}$ dla nasyconego
+łańcucha logistycznego. Który z czterech formatów jeszcze mieści tak małą
+liczbę?
 \dotline
 \nextframe
 \end{fr}
@@ -950,8 +951,9 @@ inżynierskie: skoro tyle masz, które algorytmy to przeżyją, a które nie.
   i której nie da się wpisać}, i dlatego liczono ją jako logarytm. Iloczyn
   modelu rzucającego monetą jest dokładnie zerem po $\val{p01.coin.fp64}$
   tokenach w \code{fp64} i po $\val{p01.coin.fp16}$ w \code{fp16}}.}
-\sumitem{33--35}{\result{Program~\ref{prog:F12} doszedł do $\val{p01.f12.prod}$, co
-  jest małą liczbą w \code{fp64} i \textbf{dokładnie zerem w \code{fp32}}, więc zanikający
+\sumitem{33--35}{\result{Iloczyn Programu~\ref{prog:F12}, poniżej
+  $\val{p01.f12.prod}$, jest
+  małą liczbą w \code{fp64} i \textbf{dokładnie zerem w \code{fp32}}, więc zanikający
   gradient nie zawsze jest gradientem, który zrobił się mały \dash{} często
   jest tym, który wyszedł z systemu liczbowego. A prawa gałąź
   Programu~\ref{prog:F11} to odejmowanie zostawiające zaokrąglenie. Oba

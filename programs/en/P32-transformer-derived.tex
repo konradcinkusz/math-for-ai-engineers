@@ -641,9 +641,10 @@ representable: Program~\ref{prog:P01} puts $\code{float32}$'s smallest normal
 at $\val{p01.fp32.minnorm}$, so nothing underflows in the best case.
 
 What underflows is the realistic one. Program~\ref{prog:F12} evaluates the
-same product at a \emph{saturated} layer rather than at its best, and gets
-$\val{f12.sat.bound}$ \dash{} below every floor that format has. Then the
-early layers receive exactly zero, and receive it silently.
+same product at a \emph{saturated} layer rather than at its best, and gets a
+product under $10^{-\val{f12.sat.exponent}}$ \dash{} below every floor that
+format has. Then the early layers receive exactly zero, and receive it
+silently.
 
 Program~\ref{prog:F12} then names the architecture's answer and hands the
 derivation here: \emph{a path from the loss to the early layers that is not
@@ -1159,8 +1160,8 @@ this book was for.
   is still representable \dash{} $\code{float32}$'s smallest normal is
   $\val{p01.fp32.minnorm}$ \dash{} so what kills a plain chain is that the
   bound is useless rather than that it underflows. Underflow is the realistic
-  case: at a saturated layer the same product is $\val{f12.sat.bound}$, below
-  every floor the format has}.}
+  case: at a saturated layer the same product falls under
+  $10^{-\val{f12.sat.exponent}}$, below every floor the format has}.}
 \sumitem{23--25}{\result{$y = x + f(x)$ makes the Jacobian $\prod(1 + f'_k)$, whose
   expansion is a sum over $2^{n}$ paths \dash{} one per subset of layers.
   \textbf{The empty subset contributes exactly $1$.}} A plain chain's

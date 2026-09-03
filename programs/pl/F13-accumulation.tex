@@ -47,11 +47,13 @@
 \begin{outcomes}
 \outcome{1--5}{oszacować zsumowaną całość jako sumę pasków i powiedzieć, co
   czyni to oszacowanie lepszym}
-\outcome{6--9}{odczytać znak całki i powiedzieć, co nazywa każda jego część}
+\outcome{6--7}{odczytać znak całki i powiedzieć, co nazywa każda jego część}
+\outcome{8--9}{rozdzielić sumowanie w punkcie pośrednim i po sumie oraz
+  powiedzieć, jakie techniki całkowania ta książka pomija i dlaczego}
 \outcome{10--12}{powiedzieć, jak sumowanie i różniczkowanie mają się do siebie}
 \outcome{13--17}{powiedzieć, co czyni krzywą gęstością, i powiedzieć, co mierzy
   punkt na niej}
-\outcome{18--22}{zapisać średnią ważoną jako całkę i powiedzieć, co nadaje
+\outcome{18--23}{zapisać średnią ważoną jako całkę i powiedzieć, co nadaje
   wagi}
 \end{outcomes}
 
@@ -80,10 +82,10 @@
   jedynki \dash{} gęstość jednostajna na przedziale szerokości
   $\val{f13.narrow}$ ma dokładnie taką wysokość.}
 \item Krzywa nigdy nie jest ujemna, a pole pod nią wynosi
-  $\val{f13.unnorm.total}$. Jak zamienić ją w gęstość?
+  $\frac{1}{6}$. Jak zamienić ją w gęstość?
   \teachesat{16--17}
-  \answerto{Podzielić przez $\val{f13.unnorm.total}$, czyli równoważnie
-  pomnożyć przez $\val{f13.unnorm.const}$. Ten dzielnik to stała
+  \answerto{Podzielić przez $\frac{1}{6}$, czyli równoważnie pomnożyć przez
+  $6$. Dzielnik to stała
   normalizująca.}
 \item Zapisz kształt średniej ważonej $x$ przy gęstości $p$.
   \teachesatone{19}
@@ -98,7 +100,7 @@
 
 \begin{fr}
 Program~\ref{prog:F11} pytał, jak szybko coś się zmienia. Ten program zadaje
-pytanie odwrotne, i to jego spotykasz częściej: mając tempo, ile się nazbierało?
+pytanie odwrotne: mając tempo, ile się nazbierało?
 
 Robiłeś to. Usługa obsługuje żądania w tempie zmiennym w ciągu dnia, a ty
 chcesz sumy z całego dnia. Co właściwie robisz?
@@ -118,6 +120,12 @@ Narysuj to, a obrazkiem są pola. Każdy przedział jest prostokątem, którego
 szerokością jest przedział, a wysokością tempo, więc jego polem jest ilość
 zebrana w nim, a sumą jest suma pól.
 
+Prostokąt jest miejscem, w którym pomysł przestaje być dokładny. Tempo, które
+zmienia się w przedziale, nie ma jednej wartości, a prostokąt ma jedną
+wysokość, więc narysowanie go oznacza wybór wysokości reprezentującej cały
+przedział. Ten wybór jest decyzją o metodzie, a nie faktem o tempie, i dlatego
+instrukcja poniżej musi powiedzieć, w którym punkcie każdego paska mierzyć.
+
 Spróbuj na krzywej. Weź $y = x^{2}$ od $x = 0$ do $x = 1$, potnij na dziesięć
 pasków szerokości $\num{0.1}$ i weź wysokość każdego paska na jego prawej
 krawędzi. Jaką sumę dają te dziesięć prostokątów?
@@ -132,27 +140,32 @@ $\num{0.1}^{2}$ do $1^{2}$.
 
 To jest oszacowanie z góry, bo krzywa rośnie, a każdy prostokąt jest tak
 wysoki jak jego prawa krawędź, więc każdy z nich wystaje ponad krzywą. Weź
-zamiast tego sto pasków, a nadmiar zmaleje. Co dostajesz?
+zamiast tego sto pasków. Nie licząc niczego, powiedz o ich sumie dwie rzeczy:
+jak wypada w porównaniu z $\val{f13.rect.10}$ i czy nadal jest oszacowaniem z
+góry.
 \nextframe
 \end{fr}
 
 \begin{fr}
 \begin{ansblock}
 \begin{center}
+\sisetup{group-minimum-digits = 4}%
 \begin{tabular}{lc}
 \toprule
 pasków & suma \\
 \midrule
-$10$ & $\val{f13.rect.10}$ \\
-$100$ & $\val{f13.rect.100}$ \\
-$1000$ & $\val{f13.rect.1000}$ \\
+$\num{10}$ & $\val{f13.rect.10}$ \\
+$\num{100}$ & $\val{f13.rect.100}$ \\
+$\num{1000}$ & $\val{f13.rect.1000}$ \\
 $\num{10000}$ & $\val{f13.rect.10000}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 \end{ansblock}
 
-Zmierza gdzieś, od góry, a tym miejscem jest $\frac{1}{3}$.
+Mniejsza i nadal za duża: argument o nadmiarze nie zważa na to, jak wąskie
+są paski, więc każda suma w tabeli jest powyżej odpowiedzi. Zmierza gdzieś, od
+góry, a tym miejscem jest $\frac{1}{3}$.
 
 \textbf{A tempo jest poznawalne, a nie tylko obserwowalne}, co jest lepsze niż
 cztery wiersze sugerujące granicę. Suma pierwszych $n$ kwadratów ma postać
@@ -352,9 +365,10 @@ Oto po co reszcie tej książki całka.
 
 Wielkość, która może przyjąć dowolną wartość z przedziału \dash{} opóźnienie,
 wynik, waga \dash{} nie może mieć prawdopodobieństwa przy każdej pojedynczej
-wartości, bo jest ich nieskończenie wiele i musiałyby sumować się do jedynki.
-Opisuje się zamiast tego krzywą, a prawdopodobieństwami są \emph{pola} pod tą
-krzywą.
+wartości. Daj każdej wartości to samo dodatnie prawdopodobieństwo, a
+dostatecznie duża garść z nich sumuje się już do więcej niż jedynki, więc
+każde musi być zerem \dash{} a zera też nie sumują się do jedynki. Opisuje się
+zamiast tego krzywą, a prawdopodobieństwami są \emph{pola} pod tą krzywą.
 
 Taka krzywa to \textbf{gęstość}. Muszą być o niej prawdziwe dwie rzeczy. Jedną
 jest to, że nigdy nie jest ujemna. Jaka jest druga?
@@ -411,7 +425,7 @@ zwężanie przedziału je rozdziela.}{dlaczego gęstość może przekroczyć jed
 Jeszcze jedno działanie i to jest to, które będziesz robił najczęściej.
 
 Oto krzywa: $x(1-x)$ na $\intcc{0}{1}$. Nie jest tam nigdy ujemna, więc ma
-pierwszą własność gęstości. Sumuje się do $\val{f13.unnorm.total}$, więc nie
+pierwszą własność gęstości. Sumuje się do $\frac{1}{6}$, więc nie
 ma drugiej.
 
 Jak to naprawić?
@@ -420,8 +434,7 @@ Jak to naprawić?
 
 \begin{fr}
 \begin{ansblock}
-Podzielić przez $\val{f13.unnorm.total}$ \dash{} czyli pomnożyć przez
-$\val{f13.unnorm.const}$.
+Podzielić przez $\frac{1}{6}$ \dash{} czyli pomnożyć przez $6$.
 \end{ansblock}
 
 I wtedy pole wynosi jeden, bo podzielenie każdej wysokości przez sumę dzieli
@@ -434,17 +447,19 @@ samo działanie: \textbf{uczyń to nieujemnym, dodaj do siebie, podziel przez
 sumę.} Suma dla listy, całka dla krzywej.
 
 \begin{aibox}
-Ta stała jest też powodem, dla którego mnóstwo pracy praktycznej nigdy jej nie
-liczy. W wielu sytuacjach kształt gęstości łatwo zapisać, a jej sumę daje
-całka, której nikt nie umie policzyć, więc dostępna jest krzywa
-\emph{z dokładnością do stałej}.
+Program~\ref{prog:F05} zapisał rozkład kolejnego tokenu modelu jako
+$\softmax$, którego mianownik jest stałą normalizującą liczoną wprost: jedna
+eksponenta na token słownika, wszystkie dodane. To pętla, wykonuje się przy
+każdym przebiegu w przód i nikt nie nazywa jej całką, bo wyniki są skończoną
+listą.
 
-Zwykle to wystarcza, bo większość pytań to stosunki, a stała się skraca: która
-z dwóch wartości jest bardziej prawdopodobna albo o ile bardziej. Pytania,
-które potrzebują tej stałej, to te pytające wprost o prawdopodobieństwo, a
-maszyneria wymyślona po to, żeby jej nie liczyć \dash{} metody próbkowania,
-ograniczenia wariacyjne \dash{} istnieje, bo ta jedna całka jest trudna, a
-wszystko inne nie.
+Zastąp listę krzywą, a ta pętla nie ma po czym biec. Ta sama stała staje się
+całką, a dla większości gęstości, które łatwo zapisać, jest to całka, której
+nikt nie umie policzyć, więc dostępna jest krzywa \emph{z dokładnością do
+stałej}. To wystarcza na stosunek, bo stała się skraca, a nie wystarcza na
+prawdopodobieństwo wprost \dash{} i dlatego w ogóle istnieją metody
+próbkowania i ograniczenia wariacyjne. Różnicą między tymi dwoma sytuacjami
+jest jeden mianownik, który da się dodać.
 \end{aibox}
 \end{fr}
 
@@ -487,8 +502,16 @@ liczba potwierdzająca argument warta jest więcej niż taka, która go zastępu
 
 Teraz jedna, przy której symetria nie daje nic. Krzywa $2x$ na $\intcc{0}{1}$
 jest gęstością (jej pole wynosi $1$; sprawdź to) i kładzie więcej wagi na
-górnym końcu. Jej średnia ważona wynosi $\val{f13.lop.centre}$, a nie
-$\num{0.5}$.
+górnym końcu. Zanim policzysz: czy jej średnia ważona jest powyżej, czy
+poniżej $\num{0.5}$, i czy umiesz powiedzieć mniej więcej gdzie?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{f13.lop.centre}$}
+Powyżej, bo to ten koniec, ku któremu przechyla się waga, i w dwóch trzecich
+drogi, a nie w połowie.
 
 \textbf{Więc średnia ważona nie jest środkiem zakresu}, a jedynym sposobem,
 żeby wiedzieć, gdzie jest, jest wykonanie sumowania.
@@ -498,13 +521,13 @@ gęstość.}{od sumy do całki}
 \end{fr}
 
 \begin{fr}
-Ta całka ma nazwę, a ten program celowo jej nie nadaje.
+Ta całka ma nazwę, a ten program nadaje ją raz, tutaj, i więcej jej nie
+używa.
 
 \textbf{To jest wartość oczekiwana}, a to, czego jest wartością oczekiwaną, to
 zmienna losowa, która jest tematem Programu~\ref{prog:P24} i potrzebuje
 najpierw wykładu Programu~\ref{prog:P23} o tym, czym jest prawdopodobieństwo.
-Nazwanie tego tutaj oznaczałoby użycie trzech słów, których ta książka nie
-zdefiniowała.
+Użycie tego oznaczałoby trzy słowa, których ta książka nie zdefiniowała.
 
 Twój po tym programie jest \emph{kształt} \dash{} wartość razy gęstość,
 zsumowane \dash{} oraz wiedza, że jest tym, czym staje się średnia, gdy to, po
@@ -517,15 +540,19 @@ To jest część Podstawy.
 
 Trzynaście programów, a trzy ostatnie warto nazwać razem, bo są jednym łukiem.
 Program~\ref{prog:F11} zdefiniował tempo jako granicę różnic.
-Program~\ref{prog:F12} uczynił tempa obliczalnymi i znalazł, że sieć jest ich
-iloczynem. Ten program poszedł w drugą stronę: całość jako granica sum, a oba
+Program~\ref{prog:F12} uczynił tempa obliczalnymi i znalazł, że
+\emph{pochodna} sieci jest ich iloczynem, po jednym czynniku na warstwę
+\dash{} sama sieć jest złożeniem, a iloczyn to wynik jej zróżniczkowania. Ten
+program poszedł w drugą stronę: całość jako granica sum, a oba
 kierunki okazały się odwracać nawzajem.
 
-\textbf{Nic po tym miejscu niczego nie zakłada.} Stąd książka ma arytmetykę,
-algebrę, funkcje, wektory, zbiory i obie połowy rachunku, i zaczyna na nich
-budować, a nie obok nich. Program~\ref{prog:P01} jest następny i dotyczy tego,
-co twoja maszyna faktycznie liczy, a to dobre miejsce, żeby zacząć być
-ostrożnym.
+\textbf{Stąd książka buduje na części Podstawy, a nie obok niej.} Ma
+arytmetykę, algebrę, funkcje, wektory, zbiory i obie połowy rachunku, a każdy
+program po tym jest uprawniony, żeby z nich korzystać.
+Program~\ref{prog:P01} jest następny i dotyczy tego, co twoja maszyna
+faktycznie liczy, a to dobre miejsce, żeby zacząć być ostrożnym. Zwróć uwagę
+na numer: programy Podstaw noszą F, a wszystko po nich jest numerowane od $1$
+do $34$ bez niego, więc następny program to P1, a nie F14.
 \end{fr}
 
 % ============================================================
@@ -572,17 +599,19 @@ ostrożnym.
   nie jest odległością. Wiarygodność powyżej jedynki nie jest błędem}.}
 \sumitem{16--17}{\result{Podziel nieujemną krzywą przez jej sumę, a stanie się
   gęstością: $x(1-x)$ na $\intcc{0}{1}$ sumuje się do
-  $\val{f13.unnorm.total}$, więc \textbf{stała normalizująca} wynosi
-  $\val{f13.unnorm.const}$. To samo działanie co mianownik softmaksu \dash{}
+  $\frac{1}{6}$, więc \textbf{stała normalizująca} \dash{} dzielnik \dash{}
+  wynosi $\frac{1}{6}$, a mnoży się przez $6$. To samo działanie co mianownik
+  softmaksu \dash{}
   uczyń nieujemnym, dodaj, podziel przez sumę \dash{} z całką zamiast sumy.
   Mnóstwo pracy praktycznej nigdy jej nie liczy, bo stosunki ją skracają}.}
-\sumitem{18--20}{\result{\textbf{$\int x\,p(x)\,\mathrm{d}x$ jest średnią ważoną}:
+\sumitem{18--21}{\result{\textbf{$\int x\,p(x)\,\mathrm{d}x$ jest średnią ważoną}:
   każda wartość pomnożona przez to, ile jej jest, i zsumowana. Na gęstości
   symetrycznej wynosi $\val{f13.centre}$, co symetria daje przed całką; na
   $2x$ na $\intcc{0}{1}$ wynosi $\val{f13.lop.centre}$, a nie środek \dash{}
   więc sumowanie jest jedynym sposobem, żeby to wiedzieć}.}
-\sumitem{21--22}{Ta całka jest \textbf{wartością oczekiwaną}, a ten program
-  celowo zatrzymuje się przed tym słowem: to, czego jest wartością oczekiwaną,
+\sumitem{22--23}{Ta całka jest \textbf{wartością oczekiwaną}, a ten program
+  celowo zatrzymuje się po jednokrotnym jej nazwaniu: to, czego jest wartością
+  oczekiwaną,
   należy do Programu~\ref{prog:P24} i potrzebuje najpierw wykładu
   Programu~\ref{prog:P23} o prawdopodobieństwie. Twój jest kształt.
   \textbf{To zamyka część Podstawy}: stąd książka ma arytmetykę, algebrę,
@@ -622,8 +651,9 @@ ostrożnym.
   $\frac{1}{\num{0.02}}$.}
 \item Krzywa jest nieujemna, a jej całkowite pole wynosi $\num{2.5}$. Podaj
   stałą normalizującą.
-  \answerto{$\num{0.4}$, bo dzielenie przez $\num{2.5}$ to mnożenie przez
-  $\frac{1}{\num{2.5}}$.}
+  \answerto{$\num{2.5}$: stałą jest całość, przez którą dzielisz. Dzielenie
+  przez nią to to samo co mnożenie przez $\num{0.4}$, które jest jej
+  odwrotnością, a nie stałą.}
 \item Biblioteka podaje wiarygodność $\num{3.2}$. Czy coś jest nie tak?
   \answerto{Niekoniecznie. Wysokość gęstości może przekroczyć jedynkę;
   ograniczone są tylko pola.}
