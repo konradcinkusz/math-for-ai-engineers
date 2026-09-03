@@ -66,10 +66,12 @@
 \item Dokładnie $d$ wektorów może być wzajemnie prostopadłych w $d$ wymiarach.
   Ile mniej więcej może być wzajemnie \emph{prawie} prostopadłych?
   \teachesat{41--44}
-  \answerto{Zależy to całkowicie od tego, co znaczy \enquote{prawie}, i to jest
-  cała odpowiedź. Przy tolerancji $\val{p05.near.tol}$ jest ich mniej niż $d$
-  poniżej mniej więcej $\val{p05.near.cross}$ wymiarów i astronomicznie więcej
-  powyżej.}
+  \answerto{Co najmniej $d$, zawsze, bo kosinus zerowy jest poniżej każdej
+  dodatniej tolerancji \dash{} zbiór prostopadły nadal się kwalifikuje, a
+  rozluźnienie nie może nic kosztować. To, co ono \emph{daje}, zależy
+  całkowicie od tego, co znaczy \enquote{prawie}: przy tolerancji
+  $\val{p05.near.tol}$ losowanie zwraca mniej niż $d$ poniżej mniej więcej
+  $\val{p05.near.cross}$ wymiarów i astronomicznie więcej powyżej.}
 \end{quiz}
 
 % ============================================================
@@ -201,9 +203,9 @@ co się zmienia w statusie tego równania, gdy to zrobisz.
 \end{fr}
 
 \begin{fr}
-\ans{$\cos\theta = \frac{a \cdot b}{\lVert a \rVert \lVert b \rVert}$, i
-przestaje ono raportować kąt, a zaczyna go definiować.}
-W dwóch wymiarach zgadza się to z kątomierzem. Przy $\val{f09.dim}$ jest to
+\ans{$\cos\theta = \dfrac{a \cdot b}{\lVert a \rVert \lVert b \rVert}$}
+I przestaje ono raportować kąt, a zaczyna go definiować. W dwóch wymiarach
+zgadza się to z kątomierzem. Przy $\val{f09.dim}$ jest to
 \emph{definicja} kąta, nie ma kątomierza, który by się z nią nie zgodził, i
 każda znana ci własność $\cos$ nadal obowiązuje, bo w wyprowadzeniu nic nie
 korzystało z obrazka.
@@ -459,8 +461,9 @@ $B$ & $\val{p05.norm.len.b}$ & $\val{p05.norm.dot.b}$ & $\val{p05.norm.cos.b}$ \
 \end{tabular}
 \end{center}
 
-Iloczyn skalarny woli $B$, a kosinus $A$, dokładnie tak, jak znalazł F09.
-Spójrz na pierwszą kolumnę i powiedz, co iloczyn skalarny robi, a kosinus nie.
+Iloczyn skalarny woli $B$, a kosinus nadal $A$ \dash{} ten sam rozjazd, który
+znalazł F09, tyle że z iloczynem skalarnym w miejscu odległości. Spójrz na
+pierwszą kolumnę i powiedz, co iloczyn skalarny robi, a kosinus nie.
 \nextframe
 \end{fr}
 
@@ -511,8 +514,10 @@ Kosinus, dokładnie \dash{} mianownik jest już jedynką.
 \end{ansblock}
 
 Sprawdzone na $\val{p05.norm.identity.trials}$ losowych parach w wymiarach od
-dwóch do sześćdziesięciu czterech: największa niezgodność to
-$\val{p05.norm.identity.err}$, czyli zaokrąglenie, a nie różnica.
+dwóch do sześćdziesięciu czterech: największa niezgodność jest lepsza niż
+$\val{p05.norm.identity.bound}$, czyli jest zaokrągleniem, a nie różnicą. Na
+stronie stoi ograniczenie, a nie pomiar, bo pomiar to szum zaokrągleń jednego
+interpretera i u ciebie skończy się inną cyfrą.
 
 Więc normalizacja nie sprawia, że iloczyn skalarny \emph{zachowuje się jak}
 kosinus. Sprawia, że oba zapytania są \textbf{tym samym zapytaniem}, a po niej
@@ -530,10 +535,10 @@ swojej wielkości, nie jest warte porządkowania. To może być całkiem słuszn
 Nie jest to rzecz, która powinna dziać się w funkcji pomocniczej, której nikt
 nie przejrzał.
 
-Reguła Programu~\ref{prog:F09} jest operacyjną połową tego \dash{} pytanie do
-indeksu podobieństwa nie brzmi, której miary używa, tylko czy wektory do niego
-wchodzące były znormalizowane, bo pierwsze pytanie ma konsekwencje tylko wtedy,
-gdy odpowiedź na drugie brzmi nie.
+Reguła Programu~\ref{prog:F09} jest operacyjną połową tego \dash{} \emph{pytanie
+do indeksu podobieństwa nie brzmi, której miary używa, tylko czy wektory do
+niego wchodzące były znormalizowane}, bo pierwsze pytanie ma konsekwencje tylko
+wtedy, gdy odpowiedź na drugie brzmi nie.
 \end{trapbox}
 \end{fr}
 
@@ -566,7 +571,8 @@ nimi byś oczekiwał?
 \begin{fr}
 \begin{ansblock}
 Dowolnego. Na płaszczyźnie kąt między dwoma losowymi kierunkami jest
-jednostajny, więc nie ma wartości oczekiwanej wartej tej nazwy.
+jednostajny \dash{} jego wartość oczekiwana to kąt prosty, i nie mówi ona
+zupełnie nic o parze, którą masz przed sobą.
 \end{ansblock}
 
 To uczciwa odpowiedź w dwóch wymiarach i dlatego \enquote{typowa} brzmi jak
@@ -583,7 +589,7 @@ jeszcze bardziej, czy ustala się na czymś konkretnym?
 \begin{fr}
 \ans{Ustala się \dash{} na kącie prostym, i to ciasno.}
 Oto pomiar. $\val{p05.pairs}$ losowych par wektorów jednostkowych w każdym z
-sześciu wymiarów, z rozrzutem ich kosinusów:
+czterech wymiarów, z rozrzutem ich kosinusów:
 
 \transcript{p05-spread}
 
@@ -700,15 +706,25 @@ jest kształtem twierdzenia niezdolnego do porażki.
 \begin{fr}
 I trzecie, czyli dług, który Program~\ref{prog:P04} nazwał wprost.
 
-P04 udowodnił, że co najwyżej $d$ wektorów może być wzajemnie ortogonalnych w
-$d$ wymiarach, i zatrzymał się, mówiąc, że rozluźnienie \emph{dokładnie}
-ortogonalnych do \emph{prawie} ortogonalnych wymaga sposobu mierzenia
-\enquote{prawie}, i to właśnie ten program budował.
+P04 udowodnił, że co najwyżej $d$ kierunków może być wzajemnie
+\emph{niezależnych} w $d$ wymiarach \dash{} wzajemnie ortogonalne to szczególny
+przypadek, który ten program potrafi już nazwać \dash{} i zatrzymał się, bo
+przestrzeń mieści znacznie więcej takich, które są \emph{prawie} niezależne, a
+policzenie ich wymaga sposobu mierzenia \enquote{prawie}, i to właśnie ten
+program budował.
 
 Rozluźnij więc. Nazwij dwa kierunki prawie ortogonalnymi, gdy ich kosinus co do
-wartości bezwzględnej jest poniżej $\val{p05.near.tol}$. Ile może być
-wzajemnie prawie ortogonalnych w $64$ wymiarach \dash{} więcej niż $64$ czy
-mniej?
+wartości bezwzględnej jest poniżej $\val{p05.near.tol}$.
+
+Zauważ, zanim pójdziesz dalej, że rozluźnienie nie może nic kosztować. Kosinus
+zerowy jest poniżej każdej dodatniej tolerancji, więc $64$ wzajemnie
+prostopadłe kierunki nadal tam są i nadal się kwalifikują: odpowiedzią na
+\enquote{ile ich jest} jest \emph{co najmniej $64$}, cokolwiek innego byłoby
+prawdą. Pytaniem wartym zadania jest, co rozluźnienie \textbf{daje}, a
+najtańszym sposobem na kierunki jest wylosowanie ich.
+
+Zatem: losuj w $64$ wymiarach, zatrzymując kierunki, dopóki każda para mieści
+się w tolerancji. Ilu byś się spodziewał \dash{} więcej niż $64$ czy mniej?
 \nextframe
 \end{fr}
 
@@ -719,13 +735,14 @@ programu twierdził coś przeciwnego, zanim skrypt to obalił.
 
 Powodem jest poprzednia sekcja. Przy $d = 64$ rozrzut wynosi
 $1/\sqrt{64} = \num{0.125}$, więc tolerancja $\val{p05.near.tol}$ leży ledwie
-półtora rozrzutu od środka, a losowa para łamie ją w $\val{p05.near.tail.64}$
-przypadków. Zażądaj, żeby cały zbiór kierunków mieścił się w niej parami, a
-zabraknie ci ich niemal natychmiast.
+półtora rozrzutu od środka, a losowa para łamie ją w około
+$\val{p05.near.tail.64.pct}\%$ przypadków. Zażądaj, żeby cały zbiór kierunków
+mieścił się w niej parami, a zabraknie ci ich niemal natychmiast.
 
-\textbf{Przy $64$ wymiarach \enquote{prawie ortogonalny} przy tej tolerancji
-jest wymaganiem trudniejszym niż \emph{dokładna} ortogonalność, a nie
-łatwiejszym.}
+\textbf{Przy $64$ wymiarach losowanie nie daje nic.} Zwraca mniej kierunków
+niż $64$, które baza ortogonalna daje za darmo, a te $64$ mieściły się w
+tolerancji od początku. Rozluźnienie nie jest trudniejsze do spełnienia
+\dash{} to losowość jest tu złym sposobem, żeby je wykorzystać.
 \end{fr}
 
 \begin{fr}
@@ -736,9 +753,9 @@ jest prawdziwym wynikiem i cytuje się go bez jego warunku. Warunek brzmi, że
 tolerancja musi leżeć kilka rozrzutów od środka, a rozrzut to $1/\sqrt{d}$,
 więc to, czy dana tolerancja jest hojna czy wymagająca, zależy od wymiaru.
 
-Istnieje więc próg: poniżej niego rozluźnienie nie daje nic, powyżej pojemność
-ucieka. Przy tolerancji $\val{p05.near.tol}$ w jakim mniej więcej wymiarze on
-leży?
+Istnieje więc próg, a przychodzi on wtedy, gdy tolerancja leży jakieś cztery i
+pół rozrzutu od środka. Rozrzut to $1/\sqrt{d}$. Przy tolerancji
+$\val{p05.near.tol}$ w jakim mniej więcej wymiarze on leży?
 \nextframe
 \end{fr}
 
@@ -754,19 +771,22 @@ $d$ & $64$ & $\val{f09.dim}$ & $4096$ \\
 \midrule
 $P(\lvert\cos\rvert > \val{p05.near.tol})$ & $\val{p05.near.tail.64}$ &
   $\val{p05.near.tail.768}$ & $\val{p05.near.tail.4096}$ \\
-pojemność & $\val{p05.near.n.64}$ & $\val{p05.near.n.768}$ &
+z losowania & $\val{p05.near.n.64}$ & $\val{p05.near.n.768}$ &
   $\val{p05.near.n.4096}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-Przy $\val{f09.dim}$ wymiarach jest to około $\val{p05.near.mult.768}$ razy
-$d$. Przy $4096$, gdzie dokładnie $4096$ kierunków jest wzajemnie
-ortogonalnych, mniej więcej $\val{p05.near.n.4096}$ mieści się w
-$\val{p05.near.tol}$ od tego.
+Przy $\val{f09.dim}$ wymiarach losowanie zwraca już około
+$\val{p05.near.mult.768}$ razy $d$. Przy $4096$, gdzie dokładnie $4096$
+kierunków jest wzajemnie ortogonalnych, zwraca mniej więcej
+$\val{p05.near.n.4096}$.
 
 \textbf{Ta luka jest tym, czego P04 nie mógł zmierzyć, i dlatego jego
 ograniczenie zliczeniowe ogranicza o wiele mniej, niż się wydaje.}
+Ograniczenie na \emph{dokładną} ortogonalność wynosi $d$ i jest ciasne; prawie
+ortogonalnych kierunków jest więcej w każdym wymiarze, a powyżej progu więcej o
+czynnik, którego nic w P04 nie mogło podsunąć.
 \end{fr}
 
 \begin{fr}
@@ -781,12 +801,18 @@ rozmiarem, jakiego można oczekiwać z losowania. Świadoma konstrukcja poradzi
 sobie lepiej, a prawdziwe maksimum przy danej tolerancji to znany trudny
 problem teorii kodowania, w który ta książka nie wchodzi.
 
-Czym to nie jest, to wynikiem przeszukiwania. Pierwsza wersja tego pomiaru
-losowała kierunki i zachowywała te, które pasowały, i podawała \emph{mniej} niż
-$d$ przy $d = 64$ z powodu niemającego nic wspólnego z geometrią: akceptacja
-spada, gdy zbiór zachowanych rośnie, więc zachłanne przeszukiwanie grzęźnie
-długo przed przestrzenią. Mierzyło przeszukiwanie. Prawdopodobieństwo ogona
-powyżej jest dokładne.
+Pierwsza wersja tego pomiaru losowała kierunki i zachowywała te, które
+pasowały, i warto powiedzieć dokładnie, dlaczego ją zastąpiono. \emph{Nie}
+dlatego, że podawała mniej niż $d$: ograniczenie sumacyjne też podaje mniej niż
+$d$ przy $d = 64$, a oba są ograniczeniami od dołu uzyskanymi przez losowanie.
+Zastąpiono ją dlatego, że jej odpowiedź zależała od ziarna i od tego, kiedy
+zachłanne przeszukiwanie ugrzęzło, podczas gdy prawdopodobieństwo ogona jest
+dokładne i odtwarzalne.
+
+Żadna z tych liczb nie jest więc pojemnością przestrzeni i tabela powyżej ma
+nagłówek zgodny z tym. Przestrzeń mieści co najmniej $d$ przez samo spojrzenie
+i więcej przez konstrukcję; te liczby opisują to, co dostajesz, nie konstruując
+niczego.
 \end{rigourbox}
 \end{fr}
 
@@ -847,7 +873,7 @@ z niej wynika.
   między nimi jest pytaniem o to, co twoje zanurzenia kodują w swojej
   wielkości, na co wzory nie odpowiedzą}.}
 \sumitem{27--30}{\result{\textbf{Normalizacja czyni z obu zapytań jedno zapytanie}, z
-  dokładnością do $\val{p05.norm.identity.err}$ na
+  dokładnością lepszą niż $\val{p05.norm.identity.bound}$ na
   $\val{p05.norm.identity.trials}$ parach. Nie jest więc krokiem przygotowania
   danych \dash{} jest podjętą po cichu decyzją o wyrzuceniu długości}.}
 \sumitem{31--37}{\result{\textbf{Kosinus między dwoma losowymi kierunkami skupia się
@@ -861,11 +887,12 @@ z niej wynika.
   dziesiątych promienia mieści $\val{p05.shell.inner.768}$ kuli o
   $\val{f09.dim}$ wymiarach. Policzone, a nie wylosowane, bo żadna próbka nigdy
   by tam nie trafiła}.}
-\sumitem{41--45}{\result{\textbf{\enquote{Prawie ortogonalny} nie jest automatycznie
-  tańszy niż ortogonalny.} Przy $d = 64$ i tolerancji $\val{p05.near.tol}$
-  pojemność to $\val{p05.near.n.64}$, poniżej $64$ dokładnych, bo tolerancja
-  leży ledwie półtora rozrzutu od środka. Próg jest przy
-  $d = \val{p05.near.cross}$; powyżej pojemność ucieka, do jakichś
+\sumitem{41--45}{\result{\textbf{\enquote{Prawie ortogonalnych} kierunków jest
+  zawsze co najmniej $d$, bo ortogonalne się kwalifikują \dash{} zmienia się
+  to, co daje losowanie.} Przy $d = 64$ i tolerancji $\val{p05.near.tol}$
+  losowanie zwraca $\val{p05.near.n.64}$, mniej niż $64$, które są za darmo, bo
+  tolerancja leży ledwie półtora rozrzutu od środka. Próg jest przy
+  $d = \val{p05.near.cross}$; powyżej liczba ucieka, do jakichś
   $\val{p05.near.n.4096}$ przy $4096$ wymiarach. \textbf{Hasło jest prawdziwe
   powyżej progu i zawsze cytowane bez niego.}}}
 \end{summarybox}
@@ -915,12 +942,14 @@ z niej wynika.
   \answerto{$r^{d}$, więc wewnętrzne dziewięć dziesiątych mieści $\num{0.9}^{768} =
   \val{p05.shell.inner.768}$ objętości. Zasadniczo cała kula jest w swojej
   najbardziej zewnętrznej skórze.}
-\item Przy $d = 64$ i tolerancji $\val{p05.near.tol}$: więcej czy mniej niż
-  $64$ kierunków może być wzajemnie prawie ortogonalnych? Podaj powód.
-  \answerto{Mniej \dash{} około $\val{p05.near.n.64}$. Rozrzut przy $d = 64$ to
-  $\num{0.125}$, więc tolerancja leży ledwie półtora rozrzutu od środka, a losowa
-  para łamie ją często. Rozluźnienie staje się tanie dopiero powyżej
-  $d = \val{p05.near.cross}$.}
+\item Przy $d = 64$ i tolerancji $\val{p05.near.tol}$: ile jest wzajemnie
+  prawie ortogonalnych kierunków, a ile dałoby ci losowanie? Podaj powód dla
+  drugiej liczby.
+  \answerto{Co najmniej $64$, bo prostopadłe mają kosinus zerowy i się
+  kwalifikują. Losowanie daje około $\val{p05.near.n.64}$: rozrzut przy
+  $d = 64$ to $\num{0.125}$, więc tolerancja leży ledwie półtora rozrzutu od
+  środka, a losowa para łamie ją często. Losowanie staje się dobrym sposobem na
+  nie dopiero powyżej $d = \val{p05.near.cross}$.}
 \end{testexercises}
 
 % ============================================================
@@ -948,7 +977,7 @@ z niej wynika.
   podprzestrzeń, i \dash{} gdy przyjdzie Program~\ref{prog:P08} \dash{} na
   przestrzeń kolumn macierzy, czyli na najmniejsze kwadraty.}
 \item Dwa losowe wektory jednostkowe losujemy w $d$ wymiarach. Powiedz, jak
-  zachowuje się oczekiwany kąt między nimi, gdy $d$ rośnie, i co się nie
+  rozkłada się kąt między nimi, gdy $d$ rośnie, i co się nie
   zmienia.
   \answerto{Skupia się wokół kąta prostego, z rozrzutem $1/\sqrt{d}$. Nie
   zmienia się sam oczekiwany kosinus, który jest zerowy w każdym wymiarze
@@ -957,8 +986,9 @@ z niej wynika.
   kierunków. Podaj warunek, którego brakuje w tym zdaniu.
   \answerto{Że tolerancja musi leżeć kilka rozrzutów od środka, a rozrzut to
   $1/\sqrt{d}$. Poniżej progu \dash{} $d = \val{p05.near.cross}$ przy
-  tolerancji $\val{p05.near.tol}$ \dash{} rozluźnienie daje mniej kierunków niż
-  dokładna ortogonalność.}
+  tolerancji $\val{p05.near.tol}$ \dash{} losowanie zwraca mniej kierunków, niż
+  baza ortogonalna daje za darmo, więc \enquote{wykładniczo wiele} jest
+  stwierdzeniem o wysokim $d$, a nie o samym rozluźnieniu.}
 \item Powiedz, dlaczego liczby pojemności w tym programie są ograniczeniem od
   dołu, a nie maksimum.
   \answerto{Pochodzą z ograniczenia sumacyjnego na \emph{losowe} losowania:
@@ -970,6 +1000,9 @@ z niej wynika.
   naprawdę mierzyła.
   \answerto{Akceptacja spada, gdy zbiór zachowanych rośnie, bo nowy kierunek
   musi przejść przy każdym zachowanym naraz, więc przeszukiwanie grzęźnie długo
-  przed geometrią. Mierzyło przeszukiwanie, a nie przestrzeń \dash{} i dlatego
-  podana liczba pochodzi z dokładnego prawdopodobieństwa ogona.}
+  przed geometrią, a liczba, którą zwraca, jest własnością ziarna i reguły
+  akceptacji. Ograniczenie sumacyjne zastąpiło je za to, że jest dokładne i
+  niezależne od ziarna, a nie za to, że mierzy przestrzeń: też jest
+  ograniczeniem od dołu z losowej konstrukcji, a przy $d = 64$ jest z tych
+  dwóch mniejsze.}
 \end{furtherproblems}

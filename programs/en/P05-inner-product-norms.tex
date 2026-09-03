@@ -88,10 +88,12 @@
 \item Exactly $d$ vectors can be mutually perpendicular in $d$ dimensions.
   Roughly how many can be mutually \emph{nearly} perpendicular?
   \teachesat{41--44}
-  \answerto{It depends entirely on what \enquote{nearly} means, and that is
-  the whole answer. At a tolerance of $\val{p05.near.tol}$ it is fewer than
-  $d$ below about $\val{p05.near.cross}$ dimensions and astronomically more
-  above it.}
+  \answerto{At least $d$, always, because a cosine of zero is under any
+  positive tolerance \dash{} so the perpendicular set still qualifies and the
+  relaxation cannot cost you anything. What it \emph{buys} depends entirely on
+  what \enquote{nearly} means: at a tolerance of $\val{p05.near.tol}$ random
+  drawing returns fewer than $d$ below about $\val{p05.near.cross}$ dimensions
+  and astronomically more above it.}
 \end{quiz}
 
 % ============================================================
@@ -222,9 +224,9 @@ what changes about the status of that equation when you do.
 \end{fr}
 
 \begin{fr}
-\ans{$\cos\theta = \frac{a \cdot b}{\lVert a \rVert \lVert b \rVert}$, and
-it stops reporting the angle and starts defining it.}
-In two dimensions this agrees with the protractor. In
+\ans{$\cos\theta = \dfrac{a \cdot b}{\lVert a \rVert \lVert b \rVert}$}
+And it stops reporting the angle and starts defining it. In two dimensions this
+agrees with the protractor. In
 $\val{f09.dim}$ it is the \emph{definition} of the angle, there is no
 protractor to disagree with it, and every property of $\cos$ you know still
 holds because nothing about the derivation used a picture.
@@ -479,9 +481,9 @@ $B$ & $\val{p05.norm.len.b}$ & $\val{p05.norm.dot.b}$ & $\val{p05.norm.cos.b}$ \
 \end{tabular}
 \end{center}
 
-The dot product prefers $B$ and the cosine prefers $A$, exactly as F09 found.
-Look at the first column and say what the dot product is doing that the cosine
-is not.
+The dot product prefers $B$ and the cosine still prefers $A$ \dash{} the same
+split F09 found, with the dot product where the distance was. Look at the first
+column and say what the dot product is doing that the cosine is not.
 \nextframe
 \end{fr}
 
@@ -532,8 +534,10 @@ The cosine, exactly \dash{} the denominator is already one.
 \end{ansblock}
 
 Checked over $\val{p05.norm.identity.trials}$ random pairs in two to sixty-four
-dimensions, the largest disagreement is $\val{p05.norm.identity.err}$, which is
-rounding and not a difference.
+dimensions, the largest disagreement is better than
+$\val{p05.norm.identity.bound}$, which is rounding and not a difference. The
+page prints a ceiling rather than the measurement, because the measurement is
+one interpreter's rounding noise and yours will end in a different digit.
 
 So normalising does not make the dot product \emph{behave like} the cosine. It
 makes the two queries \textbf{the same query}, and after it there is nothing
@@ -550,9 +554,9 @@ being a modelling choice: you have declared that nothing your embeddings encode
 in their magnitude is worth ranking on. That may well be right. It is not the
 kind of thing that should happen in a utility function nobody reviewed.
 
-Program~\ref{prog:F09}'s rule is the operational half of this \dash{} *the
+Program~\ref{prog:F09}'s rule is the operational half of this \dash{} \emph{the
 question to ask of a similarity index is not which measure it uses but whether
-the vectors going into it were normalised*, because the first question only has
+the vectors going into it were normalised}, because the first question only has
 consequences when the answer to the second is no.
 \end{trapbox}
 \end{fr}
@@ -586,7 +590,8 @@ What angle would you expect between them?
 \begin{fr}
 \begin{ansblock}
 Any angle at all. In the plane the angle between two random directions is
-uniform, so there is no expected value worth the name.
+uniform \dash{} its expected value is a right angle, and that tells you nothing
+whatever about the pair in front of you.
 \end{ansblock}
 
 That is the honest answer in two dimensions, and it is why \enquote{typical}
@@ -603,7 +608,7 @@ settle on something in particular?
 \begin{fr}
 \ans{It settles \dash{} on a right angle, and tightly.}
 Here is the measurement. $\val{p05.pairs}$ random pairs of unit vectors at each
-of six dimensions, with the spread of their cosines:
+of four dimensions, with the spread of their cosines:
 
 \transcript{p05-spread}
 
@@ -721,14 +726,25 @@ assertion that cannot fail.
 \begin{fr}
 And the third, which is the debt Program~\ref{prog:P04} named explicitly.
 
-P04 proved that at most $d$ vectors can be mutually orthogonal in $d$
-dimensions, and then stopped, saying that relaxing \emph{exactly} orthogonal to
-\emph{nearly} orthogonal needs a way to measure \enquote{almost}, which is what
-this program has been building.
+P04 proved that at most $d$ directions can be mutually \emph{independent} in
+$d$ dimensions \dash{} mutually orthogonal is the special case this program can
+now state \dash{} and then stopped, because the space holds vastly more that are
+\emph{almost} independent and counting them needs a way to measure
+\enquote{almost}, which is what this program has been building.
 
 So relax it. Call two directions nearly orthogonal when their cosine is under
-$\val{p05.near.tol}$ in absolute value. How many can be mutually nearly
-orthogonal in $64$ dimensions \dash{} more than $64$, or fewer?
+$\val{p05.near.tol}$ in absolute value.
+
+Notice before going on that the relaxation cannot cost you anything. A cosine
+of zero is under any positive tolerance, so the $64$ mutually perpendicular
+directions are still there and still qualify: the answer to \enquote{how many
+are there} is \emph{at least $64$}, whatever else is true. The question worth
+asking is what the relaxation \textbf{buys}, and the cheapest way to get
+directions is to draw them at random.
+
+So: draw at random in $64$ dimensions, keeping directions while every pair
+stays inside the tolerance. How many would you expect \dash{} more than $64$,
+or fewer?
 \nextframe
 \end{fr}
 
@@ -739,12 +755,14 @@ asserted the opposite before the script refuted it.
 
 The reason is the previous section. At $d = 64$ the spread is
 $1/\sqrt{64} = \num{0.125}$, so a tolerance of $\val{p05.near.tol}$ is only about one
-and a half spreads out, and a random pair violates it
-$\val{p05.near.tail.64}$ of the time. Ask for a whole set of directions to be
-pairwise inside it and you run out almost immediately.
+and a half spreads out, and a random pair violates it about
+$\val{p05.near.tail.64.pct}\%$ of the time. Ask for a whole set of directions
+to be pairwise inside it and you run out almost immediately.
 
-\textbf{At $64$ dimensions, \enquote{nearly orthogonal} at this tolerance is a
-harder requirement than \emph{exactly} orthogonal, not an easier one.}
+\textbf{At $64$ dimensions, drawing at random buys nothing.} It returns fewer
+directions than the $64$ an orthogonal basis hands you for nothing, and those
+$64$ were inside the tolerance all along. The relaxation is not harder to
+satisfy \dash{} it is just that randomness is a bad way to exploit it here.
 \end{fr}
 
 \begin{fr}
@@ -756,9 +774,9 @@ condition is that the tolerance has to sit several spreads out, and the spread
 is $1/\sqrt{d}$, so whether a given tolerance is generous or demanding depends
 on the dimension.
 
-There is therefore a crossover: below it the relaxation buys nothing, above it
-the capacity runs away. At a tolerance of $\val{p05.near.tol}$, roughly what
-dimension is it at?
+There is therefore a crossover, and it arrives once the tolerance sits about
+four and a half spreads out. The spread is $1/\sqrt{d}$. At a tolerance of
+$\val{p05.near.tol}$, roughly what dimension is that?
 \nextframe
 \end{fr}
 
@@ -774,18 +792,21 @@ $d$ & $64$ & $\val{f09.dim}$ & $4096$ \\
 \midrule
 $P(\lvert\cos\rvert > \val{p05.near.tol})$ & $\val{p05.near.tail.64}$ &
   $\val{p05.near.tail.768}$ & $\val{p05.near.tail.4096}$ \\
-capacity & $\val{p05.near.n.64}$ & $\val{p05.near.n.768}$ &
+from random drawing & $\val{p05.near.n.64}$ & $\val{p05.near.n.768}$ &
   $\val{p05.near.n.4096}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-At $\val{f09.dim}$ dimensions it is about $\val{p05.near.mult.768}$ times $d$.
-At $4096$, where exactly $4096$ directions are mutually orthogonal, roughly
-$\val{p05.near.n.4096}$ are within $\val{p05.near.tol}$ of it.
+At $\val{f09.dim}$ dimensions random drawing already returns about
+$\val{p05.near.mult.768}$ times $d$. At $4096$, where exactly $4096$ directions
+are mutually orthogonal, it returns roughly $\val{p05.near.n.4096}$.
 
 \textbf{That gap is what P04 could not measure, and it is why its counting
-bound constrains far less than it appears to.}
+bound constrains far less than it appears to.} The bound on \emph{exactly}
+orthogonal is $d$ and it is tight; the number of nearly orthogonal directions
+is larger at every dimension, and above the crossover it is larger by a factor
+nothing in P04 could have suggested.
 \end{fr}
 
 \begin{fr}
@@ -800,11 +821,17 @@ a size you can expect to achieve by drawing at random. A deliberate
 construction can do better, and the true maximum for a given tolerance is a
 known hard problem in coding theory that this book does not enter.
 
-What it is not is a search result. The first version of this measurement drew
-directions and kept the ones that fitted, and reported \emph{fewer} than $d$ at
-$d = 64$ for a reason that had nothing to do with the geometry: acceptance
-falls off as the kept set grows, so a greedy search stalls long before the
-space does. It was measuring the search. The tail probability above is exact.
+The first version of this measurement drew directions and kept the ones that
+fitted, and it is worth being exact about why it was replaced. It was
+\emph{not} replaced for reporting fewer than $d$: the union bound reports fewer
+than $d$ at $d = 64$ too, and both are lower bounds obtained by drawing at
+random. It was replaced because its answer depended on the seed and on when the
+greedy search stalled, where the tail probability is exact and reproducible.
+
+So neither figure is the capacity of the space, and the table above is headed
+accordingly. What the space holds is at least $d$ by inspection and more than
+that by construction; what these numbers describe is what you get without
+constructing anything.
 \end{rigourbox}
 \end{fr}
 
@@ -812,9 +839,9 @@ space does. It was measuring the search. The tail probability above is exact.
 The last frame, and it is about what the reader can now do that F09 could not.
 
 F09 said its right-hand column was a different class of question and named
-three of them. All three now have numbers: a typical pair is within
-$\val{p05.deg.within.768}\%$-of-five-degrees of perpendicular at
-$\val{f09.dim}$ dimensions, essentially all of a ball is in its skin, and the
+three of them. All three now have numbers: $\val{p05.deg.within.768}\%$ of
+pairs at $\val{f09.dim}$ dimensions are within five degrees of perpendicular,
+essentially all of a ball is in its skin, and the
 number of nearly-orthogonal directions depends on a tolerance measured against
 $1/\sqrt{d}$ rather than on the dimension alone.
 
@@ -863,7 +890,8 @@ follows.
   a question about what your embeddings encode in their magnitude, which the
   formulas cannot answer}.}
 \sumitem{27--30}{\result{\textbf{Normalising makes the two queries the same query}, to
-  $\val{p05.norm.identity.err}$ over $\val{p05.norm.identity.trials}$ pairs.
+  better than $\val{p05.norm.identity.bound}$ over
+  $\val{p05.norm.identity.trials}$ pairs.
   So it is not a preprocessing step \dash{} it is the decision to throw the
   lengths away, taken silently}.}
 \sumitem{31--37}{\result{\textbf{The cosine between two random directions concentrates
@@ -876,13 +904,15 @@ follows.
   skin}: the fraction inside radius $r$ is $r^{d}$, so the inner nine tenths of
   the radius hold $\val{p05.shell.inner.768}$ of a $\val{f09.dim}$-dimensional
   ball. Computed rather than sampled, because no sample would ever land there}.}
-\sumitem{41--45}{\result{\textbf{\enquote{Nearly orthogonal} is not automatically
-  cheaper than orthogonal.} At $d = 64$ and tolerance $\val{p05.near.tol}$ the
-  capacity is $\val{p05.near.n.64}$, below the $64$ that are exact, because
-  the tolerance is only about one and a half spreads out. The crossover is at
-  $d = \val{p05.near.cross}$; above it the capacity runs away, to about
-  $\val{p05.near.n.4096}$ at $4096$ dimensions. \textbf{The slogan is true
-  above a threshold and is always quoted without it.}}}
+\sumitem{41--45}{\result{\textbf{\enquote{Nearly orthogonal} always holds at
+  least $d$ directions, because orthogonal ones qualify \dash{} what varies is
+  what random drawing buys you.} At $d = 64$ and tolerance
+  $\val{p05.near.tol}$ drawing returns $\val{p05.near.n.64}$, fewer than the
+  $64$ that are free, because the tolerance is only about one and a half
+  spreads out. The crossover is at $d = \val{p05.near.cross}$; above it the
+  number runs away, to about $\val{p05.near.n.4096}$ at $4096$ dimensions.
+  \textbf{The slogan is true above a threshold and is always quoted without
+  it.}}}
 \end{summarybox}
 
 % ============================================================
@@ -930,12 +960,14 @@ follows.
   \answerto{$r^{d}$, so the inner nine tenths hold $\num{0.9}^{768} =
   \val{p05.shell.inner.768}$ of the volume. Essentially all of the ball is in
   its outermost skin.}
-\item At $d = 64$ and a tolerance of $\val{p05.near.tol}$, more or fewer than
-  $64$ directions can be mutually nearly orthogonal? Give the reason.
-  \answerto{Fewer \dash{} about $\val{p05.near.n.64}$. The spread at $d = 64$
-  is $\num{0.125}$, so the tolerance is only about one and a half spreads out and a
-  random pair violates it often. The relaxation only becomes cheap above
-  $d = \val{p05.near.cross}$.}
+\item At $d = 64$ and a tolerance of $\val{p05.near.tol}$, how many mutually
+  nearly orthogonal directions are there, and how many would drawing at random
+  give you? Give the reason for the second.
+  \answerto{At least $64$, because the perpendicular ones have cosine zero and
+  qualify. Random drawing gives about $\val{p05.near.n.64}$: the spread at
+  $d = 64$ is $\num{0.125}$, so the tolerance is only about one and a half
+  spreads out and a random pair violates it often. Drawing only becomes a good
+  way to get them above $d = \val{p05.near.cross}$.}
 \end{testexercises}
 
 % ============================================================
@@ -962,8 +994,8 @@ follows.
   mentions dimension. So it projects onto a line in any number of dimensions,
   and onto a subspace, and \dash{} once Program~\ref{prog:P08} arrives \dash{}
   onto the column space of a matrix, which is least squares.}
-\item Two random unit vectors are drawn in $d$ dimensions. Say how the expected
-  angle between them behaves as $d$ grows, and what does not change.
+\item Two random unit vectors are drawn in $d$ dimensions. Say how the angle
+  between them is distributed as $d$ grows, and what does not change.
   \answerto{It concentrates on a right angle, with spread $1/\sqrt{d}$. What
   does not change is the expected cosine itself, which is zero at every
   dimension \dash{} it is the \emph{spread} that shrinks, and that is the whole
@@ -972,8 +1004,10 @@ follows.
   nearly-orthogonal directions. State the condition their sentence is missing.
   \answerto{That the tolerance must sit several spreads out, and the spread is
   $1/\sqrt{d}$. Below the crossover \dash{} $d = \val{p05.near.cross}$ at a
-  tolerance of $\val{p05.near.tol}$ \dash{} the relaxation gives you fewer
-  directions than exact orthogonality does.}
+  tolerance of $\val{p05.near.tol}$ \dash{} drawing at random returns fewer
+  directions than an orthogonal basis hands you for nothing, so the
+  \enquote{exponentially many} is a statement about high $d$ and not about the
+  relaxation itself.}
 \item Say why the capacity figures in this program are a lower bound rather
   than a maximum.
   \answerto{They come from the union bound on \emph{random} draws: the largest
@@ -985,7 +1019,8 @@ follows.
   it was really measuring.
   \answerto{Acceptance decays as the kept set grows, because a new direction
   must clear every kept one at once, so the search stalls long before the
-  geometry does. It was measuring the search rather than the space \dash{}
-  which is why the reported figure comes from the exact tail probability
-  instead.}
+  geometry does, and the number it returns is a property of the seed and the
+  acceptance rule. The union bound replaced it for being exact and seed-free,
+  not for measuring the space: it is a lower bound from a random construction
+  too, and at $d = 64$ it is the smaller of the two.}
 \end{furtherproblems}

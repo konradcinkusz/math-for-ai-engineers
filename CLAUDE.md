@@ -21,9 +21,9 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1407 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1433 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1172 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-en` (17x24) | 1409 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1436 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1174 | 0 | 0 | 1, the 6.3 pt below | 0 |
 | `main-pl-a4` | 1188 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
@@ -124,7 +124,7 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **96 orphan-tail pages: 28 · 27 · 21 · 20** across `main-en`, `main-pl`,
+- **99 orphan-tail pages: 28 · 27 · 23 · 21** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`. **The two elicitation passes are the only things
   in this book's record to take the count DOWN**, and between them they took it
   from 99 to 96. Part~II did it in two measurable movements: its twenty-one
@@ -4228,15 +4228,24 @@ and defers all three here by name. All three now have numbers.
 
 | $d$ | cosine spread | within 5 deg of a right angle |
 |---|---|---|
-| 2 | 0.715 | 5% |
-| 10 | 0.320 | 21% |
-| 100 | 0.100 | 61% |
-| 768 | 0.035 | **99%** |
+| 2 | 0.7054 | 6% |
+| 10 | 0.3180 | 20% |
+| 100 | 0.1001 | 61% |
+| 768 | 0.0356 | **98%** |
 
 The assertion is the **invariant** \dash{} the measured spread tracks
-$1/\sqrt{d}$ to within $2.0\%$ over three decades \dash{} and not any single
+$1/\sqrt{d}$ to within $1.4\%$ over three decades \dash{} and not any single
 cosine, which is a random variable that would move with the seed. F11 paid for
 the lesson that a threshold chosen so an assertion passes is not an assertion.
+
+**Both columns moved in the September 2026 review pass and only one of them was
+a measurement before.** The spreads moved because the sweep now seeds per
+dimension, so the listing and the table are one computation; the figures are
+the same quantity re-drawn. **The right-hand column is a different kind of
+number now**: it used to be one seed's sample and is now the exact
+$P(\lvert\cos\rvert < \sin 5^{\circ})$ from the same integral the capacity
+table already used, which is why 5% became 6% and 99% became 98%. Two of the
+four sampled figures had been wrong after rounding, printed in five places.
 
 The consequence worth carrying out of the program: **a cosine similarity of
 $0.3$ at 768 dimensions is about eight spreads out, and enormous.** Read on
@@ -4293,6 +4302,17 @@ and `dot` from the script that produced it and was verified by extraction and
 execution before the frame around it was written, printing
 `[0.715, 0.315, 0.099, 0.036]` \dash{} which is $1/\sqrt{d}$ at
 $d = 2, 10, 100, 768$, and is the concentration in one line.
+
+> **That verified the FILE, and the file disagreed with the frame it sat in.**
+> The row above was a typed literal in the generator recording a 2000-pair run,
+> where the four numbers the page quoted four lines below came from the
+> script's 4000-pair sweep \dash{} so the listing ran, reproduced exactly, and
+> still contradicted the prose beside it. The sentence is left standing with
+> this under it, on the P06 precedent, because the distinction between
+> verifying a transcript and verifying the page it lands on is exactly the one
+> that is easy to miss. It now prints
+> `0.7054 0.3180 0.1001 0.0356`, computed by the script, and those strings are
+> the four the frame quotes. See the September 2026 review pass below.
 
 #### Rule 2 moved one figure and reworded another
 
@@ -12122,6 +12142,218 @@ Pages 1407 / 1433 / 1172 / 1188, from 1401 / 1427 / 1164 / 1184.
   argument for computing that appendix rather than typing it, demonstrated for
   the second pass running.
 
+### Program P5 review pass, September 2026 --- the first of the thirty
+
+Issue \#136, and the first review issue worked. One blocker, three majors and
+thirteen smaller findings, of which fifteen are fixed here and three are
+recorded rather than taken. The blocker was confirmed by computation before a
+line was changed; the two findings the pass produced on its own were both
+caught by an assertion written before the prose it was for.
+
+#### The blocker: a lower bound from random drawing, stated as the answer
+
+Frame 41 asked how many directions can be mutually nearly orthogonal in $64$
+dimensions and frame 42 answered \enquote{fewer, about four}, with Summary 12,
+Test 10, Quiz Q8 and a further-problem answer built on it. **Nearly orthogonal
+is defined on the page as $\lvert\cos\rvert < \val{p05.near.tol}$, and a cosine
+of zero satisfies it**, so the $64$ mutually perpendicular directions already
+qualify: a weaker requirement cannot hold fewer. Checked rather than reasoned
+about \dash{} the $64$ normalised rows of a Sylvester Hadamard matrix plus the
+$64$ standard basis vectors give $128$ unit vectors in $\R^{64}$ with worst
+$\lvert\cos\rvert = \num{0.125}$, so the true answer is not merely $\ge 64$ but
+at least twice that.
+
+The number four is the largest $n$ with $\binom{n}{2}P(\lvert\cos\rvert > \tau)
+< 1$, which is what **drawing at random** achieves. The rigour box said so and
+a further-problem answer called it a lower bound; the frames, the Summary, the
+Test and the Quiz all stated it as a property of the space. **The program that
+exists to correct a slogan was teaching one.**
+
+Every one of those sites now separates the two questions: what the space holds
+is at least $d$ by inspection, and what random drawing buys is the measured
+figure. The section is better for it, because the honest form is a comparison
+\dash{} below the crossover, drawing returns *fewer* than the basis you already
+had for nothing.
+
+#### The transcript ran, reproduced exactly, and still disagreed with the page
+
+This is the pass's most transferable finding and it is a fourth kind.
+Program~\ref{prog:P04} found a generated transcript that could not run;
+Program~\ref{prog:P16} found one whose numbers described a different
+computation from the prose beside it; Program~\ref{prog:P19} found one where a
+rounding had been applied to the script's output instead of written into the
+listing's own code. This one **runs, and its printed row is exactly what its
+own code produces** \dash{} and the frame four lines below quoted four
+different numbers, because the row was a typed literal recording a $2000$-pair
+run while the page quoted the script's $4000$-pair sweep.
+
+So the defect is not that the listing was fabricated. It is that **a literal in
+the generator is outside every drift gate the repository has**: `make verify`
+compares the transcript against the script that wrote it, and the script wrote
+exactly what it was told to. Change the sample size in the format string and
+the row stays.
+
+The fix is the one \enquote{one computation} actually means. The sweep and the
+listing are now the same two functions, the row is computed rather than typed,
+and both **seed per dimension** rather than sharing one stream \dash{} which is
+what makes it possible at all, since the sweep visits six dimensions and the
+listing calls four, so a shared generator would draw different samples and
+agree only to within the sampling noise. That noise *was* the third-decimal
+disagreement.
+
+#### And the assertion that binds them fired on its first run, on a STRING
+
+Written as `repr(round(spread(d), 4)) == f"{committed:.4f}"`, it failed
+immediately at $d = 10$: the value is $\num{0.3180}$, `emit` writes `0.3180`
+and Python's `repr` drops the trailing zero, so the listing would have printed
+`0.318` four lines above a frame printing `0.3180`. **Same quantity, two
+spellings** \dash{} Program~\ref{prog:F08}'s two-numbers-that-look-like-one,
+appearing inside the fix for Program~\ref{prog:P16}'s.
+
+The remedy is to format both ends the same way: the listing prints
+`f"{spread(d):.4f}"` strings rather than a list of rounded floats. The rule is
+worth stating on its own, because rounding is the obvious answer and it is not
+enough: **two numbers on one page are the same number only if they are the same
+string.**
+
+#### A sample where the exact answer was already implemented, two frames away
+
+The four \enquote{within five degrees of a right angle} percentages were one
+seed's $\val{p05.pairs}$-pair fractions, printed in five places as facts. Two
+of the four differ from the truth after rounding: $5\%$ against $\num{5.6}\%$
+in the plane and $99\%$ against $98\%$ at $\val{f09.dim}$ dimensions.
+
+What makes it a defect rather than a rounding is that **the exact answer was
+already in the file**. The union bound two frames later integrates the exact
+cosine density $(1 - c^{2})^{(d-3)/2}$, so
+$P(\lvert\cos\rvert < \sin 5^{\circ})$ is one call to a function the program
+had written for something else. The four figures are now exact and the sample
+is the *check*, which is the pattern that section already used for the $0.1$
+tail. The generalisable half: **a sampled figure standing where an exact one is
+one call away is not a precision choice, it is an oversight**, and the tell is
+an exact computation of the same kind sitting nearby.
+
+#### The book was wrong about a neighbour twice, and once it contradicted itself
+
+Both were caught by opening the neighbour, which is the discipline this file
+has now recorded a dozen times.
+
+- **Frame 41 credited Program~\ref{prog:P04} with a theorem about
+  orthogonality.** P04 had no inner product and its theorem is about
+  \emph{independent} directions \dash{} and **P05's own frame 2 says so**, in
+  as many words, thirty-nine frames earlier: *F09 used several of those words
+  freely and P04 used none of them.* So the program contradicted itself, and
+  the correction is also the better sentence, because P04's promise of
+  \enquote{vastly more that are almost independent} is what this section
+  delivers.
+- **Frame 25 credited Program~\ref{prog:F09} with a dot-product finding.** F09
+  compared \emph{distance} with cosine; the table here compares the dot product
+  with cosine, which is a third ranking. Now: the same split F09 found, with
+  the dot product where the distance was.
+
+#### An elicitation the reader had no way to answer
+
+Frame 43 asked roughly what dimension the crossover sits at, having given the
+reader nothing to compute it from \dash{} the answer needs the exact tail
+solved against $\binom{d}{2}p(d) = 1$. So the reader guesses, turns the page,
+and can neither check the number nor learn from the miss.
+
+**The tool was in the answer box's own clause**: the crossover is where the
+tolerance sits about four and a half spreads out, and the spread is
+$1/\sqrt{d}$. Moving that rule into the question turns a guess into
+$\num{0.2}\sqrt{d} \approx \num{4.4}$, which a reader can solve. Worth naming
+as a class of its own, because every gate in the repository is blind to it:
+**an elicitation whose answer the reader cannot produce is a guess, and a guess
+teaches nothing** \dash{} C16 checks that a cue is answered, never that the
+question is answerable.
+
+#### Three smaller ones, each of a recorded class
+
+- **Literal markdown asterisks** in the frame-30 trapbox, which is the class
+  P02 and P03 each met while being written, here in a red outlined box. The
+  Polish
+  twin carried no emphasis at all, so `\emph{}` went into both or C14 would
+  have diverged. **The book was then swept**: 25 candidate lines, every one of
+  them a legitimate `\code{-3**2}`, `0.9*v` or $f^{*}$, so the class is now
+  clear. A sweep has to skip `\section*`, `\newcommand*` and maths, which is
+  why nothing had been written for it.
+- **A machine-dependent residual printed as a figure, twice.** CLAUDE.md's own
+  build trap names P05 among the fourteen latent instances; this discharges one
+  of them. The page prints a ceiling now and says why, and the script asserts
+  the measurement clears it.
+- **A probability in scientific notation in running prose.** $\num{1.1e-1}$ is
+  right in the table two frames on and wrong in a sentence, where a reader has
+  to convert it back before the clause means anything. Emitted as a percentage
+  for the sentence; the table keeps the exponent form.
+
+#### And `\dfrac` inside `\ans` has a condition this file already states
+
+The frame-9 answer set $\cos\theta = (a \cdot b)/(\lVert a\rVert \lVert
+b\rVert)$ as a cramped textstyle fraction \dash{} the one formula the section
+exists to deliver, in the smallest type on the page. CLAUDE.md permits `\dfrac`
+inside `\ans` and states the condition: *a centred box with no line under it.*
+The clause after the formula was the line under it.
+
+So the fix is to honour the condition rather than to add vertical space: the
+box now carries the formula alone and the clause opens the frame body under it.
+Adding `\\[1ex]` would have been the obvious move and it is the one this
+file warns about \dash{} a display-size fraction whose depth exceeds the
+leading, with a line beneath.
+
+#### Three findings recorded rather than taken
+
+- **The Quiz box breaks inside an item, stranding its route boxes.** The route
+  boxes are the Quiz's navigation device and finding them on a different page
+  from their question is a real defect \dash{} and the fix (`\interlinepenalty`
+  or `samepage` inside the Quiz enumerate) is a preamble change that moves
+  pagination in every program with a Quiz spanning a break. That is a book-wide
+  layout change measured by nobody, made inside a review pass for one page, and
+  this file's own precedent is the `\raggedright`-on-`\section` decision: it is
+  a pass of its own, with a sweep against `checkpdf` in all four builds.
+- **All three figures are three-box prose chains, in a program about lengths,
+  angles, projections and unit balls that never draws one.** The obstacle is
+  convention rather than capability: TikZ is already loaded (the frame badge is
+  a TikZ box), so a projection triangle is ten lines. What stops it is that
+  every figure in this book is a committed Mermaid source rendered per language
+  and counted in Appendix~F's manifest, and a TikZ figure would be a second
+  mechanism outside that pipeline. **An author decision, and the mechanism is
+  named here so it does not have to be rediscovered.**
+- **A blank verso carries a running head.** Found and deliberately left in the
+  F04 review pass, for the reason recorded there; nothing about this program
+  changes that.
+
+#### Layout
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1409 | 1407 | `[]` | 0 |
+| `main-pl` | 1436 | 1433 | `[]` | 0 |
+| `main-en-a4` | 1174 | 1172 | `[6.3]` | 0 |
+| `main-pl-a4` | 1188 | 1188 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with no stranded frame openers, no stranded section headings and **no
+orphaned cues**, which is worth saying because the issue named one: its
+near-blank page was the tail of a frame this pass rewrote, and the rewrite
+cleared it without anybody aiming at it.
+
+**Three orphan tails added**: 28, 27, **23**, **21** against the pre-pass 28,
+27, 21, 20. Not chased, on this file's standing reasoning for that ledger
+\dash{} it is reported rather than gated, clearing one is a random walk across
+four paginations, and P25, P26 and P27 each added two without a chase. The
+count is the signal and it is recorded going the wrong way.
+
+**And the page-count instrument lied again, in exactly the recorded way.**
+`grep -o '[0-9]*'` on `Output written on main-en-a4.pdf (1174 pages` returns
+the **`4` in `a4`** first, so a throwaway one-liner reported the two A4 formats
+as four pages each. The Appendix~E pass recorded this instrument defect and its
+remedy in the same breath: **prefer the checked-in tool over a fresh
+one-liner** \dash{} `checklog.py` parses the line properly and is where the
+numbers above come from.
+
 ### Stroud layout pass, August 2026
 
 The seven structural elements of the original's page, applied from photographed
@@ -12495,11 +12727,18 @@ look first when one of them next goes stale.
 
    **E2 and E7 are unclaimed and free**, and are the whole of what a pass
    could pick up tomorrow. **E4 needs a trained model** and is item 2's debt
-   under another name. Three rows \dash{} E1, E3 and E5 \dash{} say "see the
-   note below" because P02, P05 and P16 each measured something that closely
-   resembles the specification beside them and no pass claimed it; deciding
-   those is a reading job on three merged programs and is not an inference to
-   make from the table.
+   under another name.
+
+   **The three "see the note below" rows are settled**, September 2026, by
+   reading the three scripts against the three specifications rather than
+   inferring from the table: **E3 is met line by line** and is claimed for the
+   P05 pass (the sweep is `(2, 3, 10, 100, 768, 4096)`, the angle is measured
+   in degrees, and the `1/sqrt(d)` concentration is asserted to 2.0 per cent);
+   **E1 is half met** \dash{} P02 has the cliff for all four formats and does
+   not have the magnitude sweep, because its five-way sweep is over *pivots* on
+   one fixed row; and **E5 is not met**, because it asks for time and peak
+   memory on a machine where P16 deliberately counted operations. E1's missing
+   half is small and free and would finish that row.
 4. **The residual sweep.** Fourteen committed values are measured
    floating-point residuals rather than invariants — every key ending `.err`
    across F05, F07, F08, F09, F12 and P05, plus the figures quoted beside them.
@@ -12512,6 +12751,25 @@ look first when one of them next goes stale.
    minute. Specified in `notes/01-curriculum.md` §18; nothing built.
 6. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
    ledger stays open and the book may not claim it.
+7. **The review issues.** The book has been read end to end \dash{} one
+   layout reviewer over every page image, one technical reviewer recomputing
+   every number, and an adversarial judge refuting what did not hold \dash{}
+   and the findings are open on the repository under the `review` label, one
+   issue per unit, each with its evidence quoted and its page number. **Work
+   them from the label rather than from a count here**, because a count in
+   this file is the class of claim nothing can check and it would be wrong
+   within a day.
+
+   The first one worked (P05, issue \#136) is written up under *Resolved
+   questions*, and its shape is worth expecting again: one genuine blocker, a
+   few majors that turn out to be recorded classes recurring, and a tail of
+   findings that are cheap, clear and correctness-bearing. Two of its
+   seventeen were **not** taken, both for the same reason \dash{} the fix is
+   a book-wide layout change nobody has measured, or a second figure mechanism
+   outside the Mermaid pipeline. **Recording those with the mechanism named is
+   part of the job**, not an evasion of it: the next person needs to meet them
+   with the reasoning rather than rediscover the obstacle.
+
 
 ---
 
@@ -12603,7 +12861,7 @@ one is shaped by what the ones before it turned out to spend.
 **One decision still open**, recorded in `notes/01-curriculum.md` §20: whether
 this is one volume or two. **Its stated premise is falsified**: 470–550 pages
 for ≈2,418 frames is 0.21 pages a frame, and the written book measures **0.75**
-\dash{} 1,863 teaching frames in 1,407 trade pages, and the book is now
+\dash{} 1,863 teaching frames in 1,409 trade pages, and the book is now
 complete: every program and every appendix is written. (This sentence said **0.71** until the Appendix~E pass, which
 is $1{,}321/1{,}863$ \dash{} the figure from before Appendix~C, left behind
 when the page count above it was updated and the ratio was not. It is the

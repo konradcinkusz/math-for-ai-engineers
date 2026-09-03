@@ -473,11 +473,11 @@ Fill the column in the pass that runs the experiment; never restate a total.
 
 | # | Program | Experiment | Cost | Status |
 |---|---|---|---|---|
-| E1 | P2 | The logit at which a naive softmax overflows `fp32` and `fp16`, and the error of naive against stabilised, across magnitudes | Free | see the note below |
+| E1 | P2 | The logit at which a naive softmax overflows `fp32` and `fp16`, and the error of naive against stabilised, across magnitudes | Free | **half run, P02 pass** — the cliff; not the magnitude sweep |
 | E2 | P3 | Hand-counted FLOPs and bytes for one transformer forward pass against measured wall clock; where the model is wrong and by how much | Free (CPU) | not run |
-| E3 | P5 | Angle between random unit vectors as dimension goes 2 -> 4096; the concentration towards orthogonality | Free | see the note below |
+| E3 | P5 | Angle between random unit vectors as dimension goes 2 -> 4096; the concentration towards orthogonality | Free | **run, P05 pass** — checked against the specification, September 2026 |
 | E4 | P11 | Singular-value spectrum of a real open-weights embedding matrix; reconstruction error against rank | Free | not run — needs a trained model |
-| E5 | P16 | Forward against reverse mode: time and peak memory against depth; the measured cost of gradient checkpointing | Free | see the note below |
+| E5 | P16 | Forward against reverse mode: time and peak memory against depth; the measured cost of gradient checkpointing | Free | **not run** — P16 counted operations instead, deliberately |
 | E6 | P20 | SGD, momentum and Adam on a quadratic of known condition number; iterations to tolerance against the predicted count | Free | **run, P20 pass** |
 | E7 | P27 | Bootstrap confidence-interval width against evaluation-set size on a public benchmark; the size needed to resolve one point | Free | not run |
 | E8 | P30 | Forward against reverse KL fitted to the same bimodal target; mode covering against mode seeking | Free | **run, P30 pass** — see the note |
@@ -534,16 +534,35 @@ where an optimiser's answer would have depended on where the search started
 and stopped. P30's pass note gives that reasoning in full; it simply never
 came back to the table.
 
-**Three rows say “see the note below” because nobody has checked them, and
-that is the honest answer.** P02 measured the overflow cliff per format and
-the cost of a non-maximal pivot; P05 swept the cosine spread over
-`d = 2, 3, 10, 100, 768, 4096` and the concentration towards orthogonality;
-P16 counted forward against reverse multiplications exactly and derived the
-checkpointing peak. Each looks like the experiment beside it and **no pass
-claimed one**, so whether the specification is met is a reading job on three
-merged programs and not an inference to make from this table. E5 is the
-clearest case for “no”: it asks for time and peak memory measured on a
-machine, and P16 deliberately counted operations instead.
+**Those three rows said “see the note below” for six passes, and the reading
+job is now done — one yes, one half and one no.** It was a reading job rather
+than an inference precisely because all three *look* like the experiment beside
+them.
+
+- **E3 is met, line by line.** `code/p05_inner_product_norms.py` sweeps
+  `DIMS = (2, 3, 10, 100, 768, 4096)`, which is the specification's range
+  verbatim; it measures the **angle** in degrees and not only the cosine
+  (5, 21, 61 and 99 per cent of pairs within five degrees of a right angle at
+  d = 2, 10, 100 and 768); and it asserts the concentration as `1/sqrt(d)` to
+  within 2.0 per cent over three decades. Claimed for the P05 pass.
+- **E1 is half met, and the missing half is small and free.** P02 has the
+  cliff for all four formats — 709.8, 88.7, 11.1 and 88.7 in `fp64`, `fp32`,
+  `fp16` and `bf16` — which is the specification's first clause exactly. Its
+  second clause, *the error of naive against stabilised across magnitudes*, is
+  not there: the sweep is over five **pivots** on one fixed row
+  `[12, 9, 3, -4, -18]`, which measures which pivots survive rather than how
+  the error grows with the logits. Sweeping the magnitude and reporting naive
+  against stabilised would finish it and needs nothing this container lacks.
+- **E5 is not met**, and it is the clearest of the three. The specification
+  asks for **time and peak memory measured on a machine**; P16 counted
+  multiplications exactly and derived the checkpointing peak from the
+  arithmetic. That was a deliberate choice with its reasons in P16's own pass
+  note, and it is a different experiment from the one this row names.
+
+The general finding is worth more than the three answers: **a row that says
+“probably” is a row nobody has read**, and reading three of them cost one pass
+over three scripts. The Status column exists so the next such row is settled in
+the pass that could settle it.
 
 Until an experiment runs, the claim it supports is labelled as judgement and its
 table stays empty. **Do not fill them with plausible numbers.**
@@ -608,13 +627,13 @@ Appendices:
 1. **One volume or two — still open, and the estimate it rested on is now
    measured and was wrong by a factor of about three.** The figure recorded
    here was 460--540 pages for ~2,418 frames, which is 0.21 pages a frame.
-   **Measured, September 2026: 1,863 teaching frames set 1,407 pages in the
+   **Measured, September 2026: 1,863 teaching frames set 1,409 pages in the
    trade format**, which is 0.76 — and **that is now the finished book**, with
    every program and every appendix written. (It was 1,757 frames in 1,267
    pages when first taken, before P33, 1,811 in 1,295 after it, 1,321 before
    Appendix C, 1,383 before Appendix D, 1,387 before Appendix E and 1,393
    before Appendix F. The programs' own 1,212 pages account for the ratio; the
-   back matter grew from 109 pages to 183, and Appendix C alone is 62 of that,
+   back matter grew from 109 pages to 187, and Appendix C alone is 62 of that,
    with D adding four, E six and F four.) **Nothing here moves except by
    revision**, and the Part II elicitation pass is the first revision to move
    it: four pages, all of them inside Parts II--VI where P1 to P3 live, with
@@ -636,8 +655,8 @@ Appendices:
    |---|---|---|
    | front matter + Part I (F1--F13) | 1--388 | 388 |
    | Parts II--VI (P1--P22) | 389--892 | 504 |
-   | Parts VII--IX (P23--P34) | 893--1224 | 332 |
-   | back matter (appendices, answers, index) | 1225--1407 | 183 |
+   | Parts VII--IX (P23--P34) | 893--1222 | 330 |
+   | back matter (appendices, answers, index) | 1223--1409 | 187 |
 
    These are **PDF pages**, not printed folios, and the difference is
    twenty-eight — the front matter. `main-en.toc` gives folios, so it puts
@@ -667,6 +686,17 @@ Appendices:
    and every part after it gains or loses one blank verso. **A row of this
    table can move without its content moving**, so re-measure all four after
    any change rather than adjusting the one you wrote in.
+
+   The P05 review pass then did the same thing in a sharper form, and it is
+   the clearest instance yet of why the rule above is a rule. It wrote in
+   Part III alone and **Parts II--VI did not move at all** \dash{} the added
+   prose fitted inside pages that already existed. The two pages the book
+   gained are the back matter's four, less two that Parts VII--IX lost, and
+   the back matter's four are explicable: the pass lengthened a Summary item
+   and two further-problem answers, and Appendix~A prints the answers while
+   Appendix~C replays every `\result{}`, so prose written into a Summary
+   arrives twice. **Adjusting the row you wrote in would have been wrong in
+   all four rows.**
 2. **`dotnetbox` or `codebox`** --- section 15(c).
 3. **Whether the mathematics packages may be hard requirements**, breaking the
    graceful degradation both companion preambles maintain --- section 15(a).
