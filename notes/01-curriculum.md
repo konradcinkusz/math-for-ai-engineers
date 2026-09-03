@@ -473,11 +473,11 @@ Fill the column in the pass that runs the experiment; never restate a total.
 
 | # | Program | Experiment | Cost | Status |
 |---|---|---|---|---|
-| E1 | P2 | The logit at which a naive softmax overflows `fp32` and `fp16`, and the error of naive against stabilised, across magnitudes | Free | see the note below |
+| E1 | P2 | The logit at which a naive softmax overflows `fp32` and `fp16`, and the error of naive against stabilised, across magnitudes | Free | **half run, P02 pass** — the cliff; not the magnitude sweep |
 | E2 | P3 | Hand-counted FLOPs and bytes for one transformer forward pass against measured wall clock; where the model is wrong and by how much | Free (CPU) | not run |
-| E3 | P5 | Angle between random unit vectors as dimension goes 2 -> 4096; the concentration towards orthogonality | Free | see the note below |
+| E3 | P5 | Angle between random unit vectors as dimension goes 2 -> 4096; the concentration towards orthogonality | Free | **run, P05 pass** — checked against the specification, September 2026 |
 | E4 | P11 | Singular-value spectrum of a real open-weights embedding matrix; reconstruction error against rank | Free | not run — needs a trained model |
-| E5 | P16 | Forward against reverse mode: time and peak memory against depth; the measured cost of gradient checkpointing | Free | see the note below |
+| E5 | P16 | Forward against reverse mode: time and peak memory against depth; the measured cost of gradient checkpointing | Free | **not run** — P16 counted operations instead, deliberately |
 | E6 | P20 | SGD, momentum and Adam on a quadratic of known condition number; iterations to tolerance against the predicted count | Free | **run, P20 pass** |
 | E7 | P27 | Bootstrap confidence-interval width against evaluation-set size on a public benchmark; the size needed to resolve one point | Free | not run |
 | E8 | P30 | Forward against reverse KL fitted to the same bimodal target; mode covering against mode seeking | Free | **run, P30 pass** — see the note |
@@ -534,16 +534,35 @@ where an optimiser's answer would have depended on where the search started
 and stopped. P30's pass note gives that reasoning in full; it simply never
 came back to the table.
 
-**Three rows say “see the note below” because nobody has checked them, and
-that is the honest answer.** P02 measured the overflow cliff per format and
-the cost of a non-maximal pivot; P05 swept the cosine spread over
-`d = 2, 3, 10, 100, 768, 4096` and the concentration towards orthogonality;
-P16 counted forward against reverse multiplications exactly and derived the
-checkpointing peak. Each looks like the experiment beside it and **no pass
-claimed one**, so whether the specification is met is a reading job on three
-merged programs and not an inference to make from this table. E5 is the
-clearest case for “no”: it asks for time and peak memory measured on a
-machine, and P16 deliberately counted operations instead.
+**Those three rows said “see the note below” for six passes, and the reading
+job is now done — one yes, one half and one no.** It was a reading job rather
+than an inference precisely because all three *look* like the experiment beside
+them.
+
+- **E3 is met, line by line.** `code/p05_inner_product_norms.py` sweeps
+  `DIMS = (2, 3, 10, 100, 768, 4096)`, which is the specification's range
+  verbatim; it measures the **angle** in degrees and not only the cosine
+  (5, 21, 61 and 99 per cent of pairs within five degrees of a right angle at
+  d = 2, 10, 100 and 768); and it asserts the concentration as `1/sqrt(d)` to
+  within 2.0 per cent over three decades. Claimed for the P05 pass.
+- **E1 is half met, and the missing half is small and free.** P02 has the
+  cliff for all four formats — 709.8, 88.7, 11.1 and 88.7 in `fp64`, `fp32`,
+  `fp16` and `bf16` — which is the specification's first clause exactly. Its
+  second clause, *the error of naive against stabilised across magnitudes*, is
+  not there: the sweep is over five **pivots** on one fixed row
+  `[12, 9, 3, -4, -18]`, which measures which pivots survive rather than how
+  the error grows with the logits. Sweeping the magnitude and reporting naive
+  against stabilised would finish it and needs nothing this container lacks.
+- **E5 is not met**, and it is the clearest of the three. The specification
+  asks for **time and peak memory measured on a machine**; P16 counted
+  multiplications exactly and derived the checkpointing peak from the
+  arithmetic. That was a deliberate choice with its reasons in P16's own pass
+  note, and it is a different experiment from the one this row names.
+
+The general finding is worth more than the three answers: **a row that says
+“probably” is a row nobody has read**, and reading three of them cost one pass
+over three scripts. The Status column exists so the next such row is settled in
+the pass that could settle it.
 
 Until an experiment runs, the claim it supports is labelled as judgement and its
 table stays empty. **Do not fill them with plausible numbers.**

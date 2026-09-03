@@ -12495,11 +12495,18 @@ look first when one of them next goes stale.
 
    **E2 and E7 are unclaimed and free**, and are the whole of what a pass
    could pick up tomorrow. **E4 needs a trained model** and is item 2's debt
-   under another name. Three rows \dash{} E1, E3 and E5 \dash{} say "see the
-   note below" because P02, P05 and P16 each measured something that closely
-   resembles the specification beside them and no pass claimed it; deciding
-   those is a reading job on three merged programs and is not an inference to
-   make from the table.
+   under another name.
+
+   **The three "see the note below" rows are settled**, September 2026, by
+   reading the three scripts against the three specifications rather than
+   inferring from the table: **E3 is met line by line** and is claimed for the
+   P05 pass (the sweep is `(2, 3, 10, 100, 768, 4096)`, the angle is measured
+   in degrees, and the `1/sqrt(d)` concentration is asserted to 2.0 per cent);
+   **E1 is half met** \dash{} P02 has the cliff for all four formats and does
+   not have the magnitude sweep, because its five-way sweep is over *pivots* on
+   one fixed row; and **E5 is not met**, because it asks for time and peak
+   memory on a machine where P16 deliberately counted operations. E1's missing
+   half is small and free and would finish that row.
 4. **The residual sweep.** Fourteen committed values are measured
    floating-point residuals rather than invariants — every key ending `.err`
    across F05, F07, F08, F09, F12 and P05, plus the figures quoted beside them.
