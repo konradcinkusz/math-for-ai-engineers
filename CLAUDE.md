@@ -4228,15 +4228,24 @@ and defers all three here by name. All three now have numbers.
 
 | $d$ | cosine spread | within 5 deg of a right angle |
 |---|---|---|
-| 2 | 0.715 | 5% |
-| 10 | 0.320 | 21% |
-| 100 | 0.100 | 61% |
-| 768 | 0.035 | **99%** |
+| 2 | 0.7054 | 6% |
+| 10 | 0.3180 | 20% |
+| 100 | 0.1001 | 61% |
+| 768 | 0.0356 | **98%** |
 
 The assertion is the **invariant** \dash{} the measured spread tracks
-$1/\sqrt{d}$ to within $2.0\%$ over three decades \dash{} and not any single
+$1/\sqrt{d}$ to within $1.4\%$ over three decades \dash{} and not any single
 cosine, which is a random variable that would move with the seed. F11 paid for
 the lesson that a threshold chosen so an assertion passes is not an assertion.
+
+**Both columns moved in the September 2026 review pass and only one of them was
+a measurement before.** The spreads moved because the sweep now seeds per
+dimension, so the listing and the table are one computation; the figures are
+the same quantity re-drawn. **The right-hand column is a different kind of
+number now**: it used to be one seed's sample and is now the exact
+$P(\lvert\cos\rvert < \sin 5^{\circ})$ from the same integral the capacity
+table already used, which is why 5% became 6% and 99% became 98%. Two of the
+four sampled figures had been wrong after rounding, printed in five places.
 
 The consequence worth carrying out of the program: **a cosine similarity of
 $0.3$ at 768 dimensions is about eight spreads out, and enormous.** Read on
@@ -4293,6 +4302,17 @@ and `dot` from the script that produced it and was verified by extraction and
 execution before the frame around it was written, printing
 `[0.715, 0.315, 0.099, 0.036]` \dash{} which is $1/\sqrt{d}$ at
 $d = 2, 10, 100, 768$, and is the concentration in one line.
+
+> **That verified the FILE, and the file disagreed with the frame it sat in.**
+> The row above was a typed literal in the generator recording a 2000-pair run,
+> where the four numbers the page quoted four lines below came from the
+> script's 4000-pair sweep \dash{} so the listing ran, reproduced exactly, and
+> still contradicted the prose beside it. The sentence is left standing with
+> this under it, on the P06 precedent, because the distinction between
+> verifying a transcript and verifying the page it lands on is exactly the one
+> that is easy to miss. It now prints
+> `0.7054 0.3180 0.1001 0.0356`, computed by the script, and those strings are
+> the four the frame quotes. See the September 2026 review pass below.
 
 #### Rule 2 moved one figure and reworded another
 

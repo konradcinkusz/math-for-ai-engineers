@@ -64,6 +64,7 @@ from __future__ import annotations
 
 import math
 import random
+import statistics
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parents[1] / "figures" / "values" / "p05.tex"
@@ -132,15 +133,37 @@ def unit(d, rnd):
 # ==========================================================================
 DIMS = (2, 3, 10, 100, 768, 4096)
 PAIRS = 4000
-_rnd = random.Random(20260831)
+SEED = 20260831
+
+
+# ONE computation, and the transcript at the foot of this file is these two
+# functions verbatim. P16 shipped a listing whose numbers described a different
+# run from the frames beside it, and no drift gate could see it: make verify
+# proves a transcript matches the script that wrote it, and the script wrote
+# exactly what it computed. The only arrangement in which the two cannot come
+# apart is the one where the page's four numbers ARE the listing's output.
+#
+# Seeding per dimension rather than sharing one stream is what makes that
+# possible: the sweep below visits six dimensions and the listing calls four,
+# so with one shared generator the two would draw different samples and agree
+# only to within the sampling noise -- which is exactly the third-decimal
+# disagreement this pass was opened to fix.
+def cosines(d, n=PAIRS):
+    rnd = random.Random(SEED + d)
+    return [dot(unit(d, rnd), unit(d, rnd)) for _ in range(n)]
+
+
+def spread(d, n=PAIRS):
+    return statistics.pstdev(cosines(d, n))
+
 
 ORTHO = {}
 for _d in DIMS:
-    cosines = [dot(unit(_d, _rnd), unit(_d, _rnd)) for _ in range(PAIRS)]
-    sd = math.sqrt(sum(c * c for c in cosines) / PAIRS)
-    mean_abs = sum(abs(c) for c in cosines) / PAIRS
-    within_cos = sum(1 for c in cosines if abs(c) < 0.1) / PAIRS
-    within_deg = sum(1 for c in cosines
+    _cos = cosines(_d)
+    sd = spread(_d)
+    mean_abs = sum(abs(c) for c in _cos) / PAIRS
+    within_cos = sum(1 for c in _cos if abs(c) < 0.1) / PAIRS
+    within_deg = sum(1 for c in _cos
                      if abs(math.degrees(math.acos(max(-1.0, min(1.0, c)))) - 90.0)
                      < 5.0) / PAIRS
     ORTHO[_d] = (mean_abs, sd, within_cos, within_deg)
@@ -154,7 +177,6 @@ emit("p05.pairs", PAIRS)
 for _d in QUOTED:
     _ma, _sd, _wc, _wd = ORTHO[_d]
     emit(f"p05.cos.sd.{_d}", _sd, 4)
-    emit(f"p05.deg.within.{_d}", round(100 * _wd))
 
 for _d, (_ma, _sd, _wc, _wd) in ORTHO.items():
     predicted = 1.0 / math.sqrt(_d)
@@ -223,6 +245,21 @@ for _d in (10, 100, 768):
 NOTES.append("the exact cosine tail agrees with the sampled fraction at "
              "d = 10, 100 and 768, which is what makes the union bound usable")
 
+# THE FIVE-DEGREE FIGURES ARE EXACT, and the sample is the check rather than
+# the source. They used to be one seed's 4000-pair fractions, and two of the
+# four differed from the truth after rounding -- 5% against 5.6% and 99%
+# against 98% -- in a program that computes the capacity table exactly two
+# frames later, and printed in five places as though they were facts. The
+# integral is already here; using the sample where an exact answer is one call
+# away is the defect, not the rounding.
+FIVE_DEG = math.sin(math.radians(5.0))
+for _d in QUOTED:
+    _exact = 1.0 - cos_tail(_d, FIVE_DEG)
+    emit(f"p05.deg.within.{_d}", round(100 * _exact))
+    assert abs(_exact - ORTHO[_d][3]) < 0.03, (
+        f"at d={_d} the exact five-degree fraction is {_exact:.4f} and "
+        f"{PAIRS} samples gave {ORTHO[_d][3]:.4f}: one of the two is wrong")
+
 NEAR_TOL = 0.2
 emit("p05.near.tol", NEAR_TOL, 1)
 
@@ -255,6 +292,10 @@ emit("p05.near.cross.sigmas", NEAR_TOL * math.sqrt(CROSS_LO), 1)
 assert capacity(CROSS_LO, NEAR_TOL) > CROSS_LO >= capacity(CROSS_LO - 1, NEAR_TOL), (
     "the bisection did not bracket the crossover")
 
+# The percentage as well as the exponent form: 1.1e-01 is right in a table and
+# wrong in a sentence, where a reader has to convert it back to "about one pair
+# in nine" before the clause means anything.
+emit("p05.near.tail.64.pct", round(100 * cos_tail(64, NEAR_TOL)))
 for _d in (64, 768, 4096):
     emit(f"p05.near.tail.{_d}", f"{cos_tail(_d, NEAR_TOL):.1e}")
     _n = capacity(_d, NEAR_TOL)
@@ -359,14 +400,27 @@ for _tag, _v in (("a", NORM_A), ("b", NORM_B)):
     emit(f"p05.norm.cos.{_tag}", dot(NORM_Q, _v) / (norm(NORM_Q) * norm(_v)), 4)
     emit(f"p05.norm.len.{_tag}", norm(_v), 4)
 
-# The identity, swept rather than shown at a point.
+# The identity, swept rather than shown at a point. Its own generator, because
+# the near-orthogonality sweep above now seeds per dimension and no longer
+# leaves a shared stream behind for anything downstream to inherit.
+_rnd = random.Random(SEED)
 _worst_gap = 0.0
 for _ in range(2000):
     d = _rnd.choice((2, 3, 8, 64))
     u, v = unit(d, _rnd), unit(d, _rnd)
     _worst_gap = max(_worst_gap, abs(dot(u, v) - dot(u, v) / (norm(u) * norm(v))))
-emit("p05.norm.identity.err", f"{_worst_gap:.1e}")
+# A BOUND, never the figure. P06 had two committed residuals rejected by CI
+# for being properties of the machine, and the build trap names P05 among the
+# instances still latent: the measured gap here is one interpreter's rounding
+# noise and a reader reproducing it gets a different last digit. What is true
+# on any machine is that the disagreement is rounding rather than a difference,
+# and the honest way to write that is a ceiling the measurement clears.
+IDENTITY_BOUND = 1e-15
+emit("p05.norm.identity.bound", f"{IDENTITY_BOUND:.0e}")
 emit("p05.norm.identity.trials", 2000)
+assert _worst_gap < IDENTITY_BOUND, (
+    f"the dot product and the cosine differ by {_worst_gap:g} on unit vectors, "
+    f"which is above the {IDENTITY_BOUND:g} the page prints")
 assert _worst_gap < 1e-12, (
     "on unit vectors the dot product and the cosine must be the same number; "
     f"they differ by {_worst_gap:g}, so the section's identity is not one")
@@ -410,23 +464,42 @@ if _f09dim is not None:
 # one that named a function it never defined, so a reader pasting it out of
 # the PDF got NameError while every drift gate stayed green.
 # ==========================================================================
+# The row is COMPUTED, and it is the same call the four committed values come
+# from. Typed here as a literal it reproduced perfectly and still disagreed
+# with the frames beside it in the third decimal, because the literal recorded
+# a different sample size from the one the page quoted -- a fabricated console
+# block with a build step in front of it.
+# It prints FORMATTED strings rather than a list of rounded floats, and that is
+# the assertion below talking. round(0.31804, 4) reprs as 0.318 where emit()
+# writes 0.3180, so a value landing on a trailing zero -- one of these four did,
+# on the first run -- puts 0.318 in the listing and 0.3180 four lines under it.
+# Same quantity, two spellings, which is F08's defect appearing inside the fix
+# for P16's. Formatting both ends the same way makes them the same STRING.
+_TROW = [f"{spread(_d):.4f}" for _d in QUOTED]
 RANK_TEXT = """>>> from p05_inner_product_norms import unit, dot
 >>> import random, statistics          # run this from code/
->>> rnd = random.Random({seed})
 >>> def spread(d, n={n}):
+...     rnd = random.Random({seed} + d)
 ...     return statistics.pstdev(
 ...         dot(unit(d, rnd), unit(d, rnd)) for _ in range(n))
 ...
->>> [round(spread(d), 3) for d in (2, 10, 100, 768)]
+>>> print(*(f"{{spread(d):.4f}}" for d in {dims}))
 {row}
-""".format(seed=20260831, n=2000, row=[0.715, 0.315, 0.099, 0.036])
+""".format(seed=SEED, n=PAIRS, dims=QUOTED, row=" ".join(_TROW))
 assert RANK_TEXT.isascii(), "listings cannot set a non-ASCII transcript"
 assert max(len(l) for l in RANK_TEXT.splitlines()) <= 64, "transcript too wide"
 assert len(RANK_TEXT.strip().splitlines()) <= 14, "transcript too tall for one frame"
-# The row must be the concentration the frames talk about, not four numbers.
-_row = [0.715, 0.315, 0.099, 0.036]
-for _d, _s in zip((2, 10, 100, 768), _row):
-    assert abs(_s - 1 / math.sqrt(_d)) / (1 / math.sqrt(_d)) < 0.08, (
+# The listing's output and the page's four numbers must be the same STRING, not
+# merely the same quantity: emit() writes .4f and Python's repr drops a trailing
+# zero, so a value landing on one would print 0.715 in the listing and 0.7150
+# four lines below it -- F08's two-numbers-that-look-like-one, inside the fix
+# for it. Assert rather than hope, and the day it fires the answer is to quote
+# the listing's own row in the frame instead of re-emitting it.
+for _d, _s in zip(QUOTED, _TROW):
+    assert _s == f"{ORTHO[_d][1]:.4f}", (
+        f"at d={_d} the listing prints {_s!r} where the page prints "
+        f"{ORTHO[_d][1]:.4f}: the transcript and the frames have come apart")
+    assert abs(float(_s) - 1 / math.sqrt(_d)) / (1 / math.sqrt(_d)) < 0.08, (
         f"the transcript's spread at d={_d} is {_s}, which is not 1/sqrt(d)")
 
 
