@@ -287,6 +287,19 @@ emit("p03.fuse.chain", CHAIN)
 emit("p03.fuse.factor", f"{_unfused_bytes / _fused_bytes:.0f}")
 emit("p03.fuse.after", f"{CHAIN / _fused_bytes:.2f}")
 assert _unfused_bytes / _fused_bytes == CHAIN, "fusion no longer saves a factor of the chain length"
+
+# How long a fused chain would have to be to reach the device, which is the
+# number the frames used to assert away. Bytes are fixed once the chain is
+# fused, so intensity is linear in the chain length and unbounded; what makes
+# "fusion does not rescue" true is the SIZE of this number, not a ceiling.
+FUSE_COMPUTE_CHAIN = round(DEV_RATIO * _fused_bytes)
+emit("p03.fuse.compute.chain", FUSE_COMPUTE_CHAIN)
+assert FUSE_COMPUTE_CHAIN > 500, FUSE_COMPUTE_CHAIN
+# And it has to reproduce from the two figures the page prints beside it,
+# which is the recorded rule: divide the numbers AS THE PAGE PRINTS THEM.
+_page = float(VALUES["p03.dev.ratio"][0]) / (
+    float(VALUES["p03.fuse.after"][0]) / float(VALUES["p03.fuse.chain"][0]))
+assert f"{_page:.0f}" == f"{FUSE_COMPUTE_CHAIN}", (_page, FUSE_COMPUTE_CHAIN)
 assert CHAIN / _fused_bytes < DEV_RATIO, (
     "a fused chain of three is now compute-bound, which would make the "
     "frame's point that fusion helps and does not rescue")

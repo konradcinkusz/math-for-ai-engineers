@@ -61,9 +61,9 @@
 \begin{note}
 \textbf{Two facts borrowed forward, and named.} Section 5 uses the
 \emph{covariance matrix}, which Program~\ref{prog:P24} defines. This program
-needs exactly two things about it \dash{} that it is symmetric, and that it is
-positive semi-definite \dash{} and both are \emph{proved here} rather than
-assumed, from the one line $C = \frac{1}{n}X\T X$. So nothing waits on
+needs exactly two properties of it, and both are \emph{proved here} rather
+than assumed, from the one line $C = \frac{1}{n}X\T X$ \dash{} which two, and
+why each follows, is section 5's to elicit. So nothing waits on
 Program~\ref{prog:P24} except the meaning of the word, and the pointer is an
 attribution rather than a debt.
 \end{note}
@@ -92,8 +92,9 @@ attribution rather than a debt.
   saddle, and the form takes both signs.}
 \item A covariance matrix is formed as $\frac{1}{n}X\T X$. Can any of its
   eigenvalues be negative? \teachesat{39--40}
-  \answerto{No. $v\T Cv = \frac{1}{n}\lVert Xv\rVert^{2}$ is a sum of squares,
-  so the matrix is positive semi-definite whatever the data was.}
+  \answerto{No, and the reason is one line of section 5 rather than a fact
+  about your data: any matrix of that form is positive semi-definite,
+  whatever $X$ was.}
 \end{quiz}
 
 % ============================================================

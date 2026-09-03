@@ -327,7 +327,7 @@ $h$ w kierunku $u$, zobacz, o ile zmieniło się $f$, podziel przez $h$ i
 zmniejszaj $h$.
 \end{ansblock}
 
-\[ D_u f = \lim_{h \to 0} \frac{f(\mathbf{p} + h u) - f(\mathbf{p})}{h} \]
+\[ D_u f = \lim_{h \to 0} \frac{f(\vect{p} + h u) - f(\vect{p})}{h} \]
 
 To ta sama granica, na funkcji jednej zmiennej, którą dostajesz, idąc wzdłuż
 prostej przez punkt. Nic nowego nie zostało zdefiniowane; wybrano kierunek i
@@ -561,7 +561,7 @@ Program~\ref{prog:F11} zapisał już marsz, w jednym wymiarze:
 \[ x \;\longleftarrow\; x - \eta\, f'(x) \]
 i nazwał minus całym mechanizmem sterowania. W więcej niż jednym wymiarze
 zmienia się tylko to, że pochodna jest wektorem:
-\[ \mathbf{p} \;\longleftarrow\; \mathbf{p} - \eta\, \nabla f(\mathbf{p}) \]
+\[ \vect{p} \;\longleftarrow\; \vect{p} - \eta\, \nabla f(\vect{p}) \]
 
 Zauważ, że aktualizacja jest \emph{po współrzędnych}: każda współrzędna
 przesuwa się o własną pochodną cząstkową i nie radzi się żadnej innej.

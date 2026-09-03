@@ -497,7 +497,8 @@ assert _years > 20, "the point is that the reduced form is still out of reach"
 # =====================================================================
 # The transcript: P02's finding, in a hash
 # =====================================================================
-TRAP_TEXT = f""">>> N = 2 ** 128
+TRAP_TEXT = f""">>> import math
+>>> N = 2 ** 128
 >>> m = {TRAP_M}
 >>> p = 1.0
 >>> for i in range(m):

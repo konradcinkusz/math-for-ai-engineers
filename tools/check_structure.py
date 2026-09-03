@@ -303,8 +303,30 @@ def check_outcomes(soft: bool) -> int:
             elif n < 4:
                 print(f"  {lang}/{f.stem}: only {n} learning outcomes")
                 bad += 1
+            # DECLARING the outcomes is not the same as PRINTING the panel,
+            # and this check said the second while testing only the first. Its
+            # own message -- "'Can you?' is generated from them" -- is the
+            # sentence a reader takes it for, and under it P05, P06, P07 and
+            # P08 shipped with no panel at all. C14 is blind to it too, because
+            # both editions lacked it and the histograms therefore agreed.
+            if "\\canyou" not in t:
+                print(f"  {lang}/{f.stem}: declares outcomes but never calls "
+                      f"\\canyou, so no 'Can you?' panel is printed")
+                bad += 1
+            else:
+                # And the ORDER carries meaning: \lblCanYouFooter sends the
+                # reader from the self-rating to the scored Test exercises as
+                # the instrument, so a program that scores first inverts its
+                # own footer. Four did.
+                i_can = t.index("\\canyou")
+                i_test = t.find("\\begin{testexercises}")
+                if 0 <= i_test < i_can:
+                    print(f"  {lang}/{f.stem}: Test exercises come before "
+                          f"'Can you?', which inverts the footer's own logic")
+                    bad += 1
     if bad == 0:
-        print("  Every written program declares its outcomes; 'Can you?' is generated from them.")
+        print("  Every written program declares its outcomes, prints its "
+              "'Can you?' panel, and prints it before the Test exercises.")
     return 0 if (bad == 0 or soft) else 1
 
 

@@ -761,15 +761,21 @@ Set that against $\val{p03.dev.ratio}$. Is the fused chain compute-bound?
 \ans{No. $\val{p03.fuse.after}$ is still far below $\val{p03.dev.ratio}$, so
 the fused chain is memory-bound exactly as the unfused one was.}
 
-And it will stay memory-bound however many operations are folded into it,
-because the bytes have
-a floor: the input has to be read once and the output written once, whatever
-happens in between.
+And now be careful, because the obvious next sentence is false. Once the
+chain is fused the bytes have a floor \dash{} the input is read once and the
+output written once, whatever happens in between \dash{} while the operations
+go on accumulating. So the intensity does not stop climbing; it climbs by
+$\frac{1}{6}$ for every further operation folded in, and nothing caps it.
+
+What stops fusion rescuing anything is the \emph{size} of that climb.
+Reaching $\val{p03.dev.ratio}$ from $\val{p03.fuse.after}$ at
+$\frac{1}{6}$ a step needs a chain of about
+$\val{p03.fuse.compute.chain}$ elementwise operations on one tensor.
 
 \textbf{Fusion helps and does not rescue.} What it does is remove the round
 trips that were pure overhead, which is worth a factor of
-$\val{p03.fuse.factor}$ here and can be worth more in a longer chain. What it
-cannot do is turn a memory-bound operation into a compute-bound one, and a plan
+$\val{p03.fuse.factor}$ here and more in a longer chain. What it does not do
+is reach the compute-bound side at any chain length anybody writes, and a plan
 that assumes it will is a plan that will be disappointed by a profile.
 \end{fr}
 
@@ -871,9 +877,12 @@ book that needs a new \emph{object} rather than a new question.
 \sumitem{32--34}{\result{Fusing $\val{p03.fuse.chain}$ elementwise operations divides
   the bytes by $\val{p03.fuse.factor}$ for exactly the same operations, taking
   the intensity to $\val{p03.fuse.after}$ \dash{} still far below
-  $\val{p03.dev.ratio}$. \textbf{Fusion helps and does not rescue}, because the
-  input must be read once and the output written once whatever happens between.} \textbf{This closes Part II}: three questions about one arithmetic, answered
-  with nothing beyond arithmetic, algebra and a sigma.}
+  $\val{p03.dev.ratio}$. The floor on bytes makes the intensity \emph{grow}
+  by $\frac{1}{6}$ per further operation rather than capping it, so
+  \textbf{fusion helps and does not rescue} on the size of the climb:
+  $\val{p03.fuse.compute.chain}$ folded operations would be needed to reach
+  the device.} \textbf{This closes Part II}: three questions about one
+  arithmetic, answered with nothing beyond arithmetic, algebra and a sigma.}
 \end{summarybox}
 
 \canyou

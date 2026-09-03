@@ -219,9 +219,9 @@ i $n$ kolumn.
 Model drugiego rzędu w wielu wymiarach jest wtedy tym jednowymiarowym, w
 którym dwa iloczyny zastąpiono dwiema rzeczami, jakich dostarczają
 Program~\ref{prog:P05} i Program~\ref{prog:P10}:
-\[ f(\mathbf{p} + \mathbf{h}) \approx f(\mathbf{p})
-   + \nabla f \cdot \mathbf{h}
-   + \tfrac{1}{2}\, \mathbf{h}^{\mathsf{T}} H \mathbf{h} \]
+\[ f(\vect{p} + \vect{h}) \approx f(\vect{p})
+   + \nabla f \cdot \vect{h}
+   + \tfrac{1}{2}\, \vect{h}^{\mathsf{T}} H \vect{h} \]
 iloczynem skalarnym i formą kwadratową.
 \end{fr}
 
@@ -458,7 +458,7 @@ Jeśli kłopotem jest to, że jeden rozmiar kroku musi obsłużyć kierunki o r�
 krzywiznach, jest oczywista poprawka: dać każdemu kierunkowi własny.
 
 To metoda Newtona \dash{} zamiast kroku przeciw gradientowi rozwiąż
-$H\,\mathbf{s} = -\nabla f$ i zrób krok o $\mathbf{s}$. Ile kroków zajmuje to
+$H\,\vect{s} = -\nabla f$ i zrób krok o $\vect{s}$. Ile kroków zajmuje to
 na funkcji kwadratowej?
 \nextframe
 \end{fr}

@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1413 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1440 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1178 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1184 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1417 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1444 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1180 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1190 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -99,7 +99,7 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1633 computed values, all referenced, all present, plus the committed console
+- 1634 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
@@ -124,7 +124,7 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **90 orphan-tail pages: 29 · 25 · 18 · 18** across `main-en`, `main-pl`,
+- **93 orphan-tail pages: 29 · 26 · 18 · 20** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`. **Four passes have taken the count DOWN** and
   every other one has raised it: the two elicitation passes took it from 99 to
   96, the P05 review pass put three back, and the F01--F06 review batch took
@@ -12149,6 +12149,210 @@ Pages 1407 / 1433 / 1172 / 1188, from 1401 / 1427 / 1164 / 1184.
   twice. `make verify` refuses the tree until it is, which is the whole
   argument for computing that appendix rather than typing it, demonstrated for
   the second pass running.
+
+### The second review batch, September 2026 --- and the check that was measured and not shipped
+
+Issues \#125, \#145, \#149, \#114 and the two halves of \#123 the blocker
+batch left, taken together because five of the six share the cause the
+previous batch named: **a ledger narrower than the sentence it is read as.**
+
+#### Layout
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1417 | 1413 | `[]` | 0 |
+| `main-pl` | 1444 | 1440 | `[]` | 0 |
+| `main-en-a4` | 1180 | 1178 | `[6.3]` | 0 |
+| `main-pl-a4` | 1190 | 1184 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds**, with zero overfull vboxes, no stranded frame openers, no
+stranded section headings and \dash{} the part worth recording \dash{} **no
+orphaned cues at any point in the pass, on the first build.**
+
+That is unusual and it is worth saying why it was expected not to be. This
+batch adds a `\canyou` panel to four programs and moves it in four more, so
+**every page break from the Summary onward was re-rolled in eight programs**,
+and the standing expectation after Programs \ref{prog:P08} and \ref{prog:P32}
+is a chase of one to seven rounds. It cost none. The reason is structural
+rather than lucky: the panel sits between the Summary and the Test exercises,
+which is *after* every frame in the program, so it can move nothing that
+carries a cue. **A layout change is only as expensive as the number of frame
+tails downstream of it, and this one has none.**
+
+Sixteen pages across the four builds, and **three orphan tails**: 29, 26, 18,
+20 against 29, 25, 18, 18.
+
+#### The gate said the panel was generated; four programs printed none
+
+`check_structure.py --outcomes` reported *Every written program declares its
+outcomes; \enquote{Can you?} is generated from them*, and it counted
+`\outcome` matches and nothing else \dash{} the string `canyou` occurs zero
+times in that file. Under it, **Programs \ref{prog:P05}, \ref{prog:P06},
+\ref{prog:P07} and \ref{prog:P08} shipped with no panel at all**, and
+`parity.py`'s C14 was blind for the usual reason: both editions lacked it, so
+the histograms agreed.
+
+**And four more had it in the wrong place.** Programs \ref{prog:P31} to
+\ref{prog:P34} print the Test exercises *before* the panel where the other
+forty-three print it after, which inverts `\lblCanYouFooter`'s own logic
+\dash{} the footer sends the reader **from** the self-rating **to** the scored
+exercises as the instrument, so scoring first makes the rating an afterthought
+on a page the reader has already left.
+
+The check now requires the panel to be present and to precede the Test
+exercises, and it was proved by mutation on both halves:
+
+| probe | reported |
+|---|---|
+| panel removed | *declares outcomes but never calls `\canyou`* |
+| panel moved after the tests | *Test exercises come before \enquote{Can you?}* |
+| restored | clean, exit 0 |
+
+That is the third ledger widened in two batches, after the stub ledger that
+greps `programs/` and the value ledger that cannot see an answer-key literal.
+The shape is identical every time: **the check is right about the question it
+asks and the message describes a larger question.** Read the message against
+the code, not the code against the message.
+
+#### The book's own mechanism refuted its conclusion, and the fix is a number
+
+Program~\ref{prog:P03} said a fused chain *will stay memory-bound however many
+operations are folded into it, because the bytes have a floor*, and that
+fusion *cannot turn a memory-bound operation into a compute-bound one*.
+
+**The floor on bytes is exactly what makes the intensity grow.** Once the
+chain is fused the bytes are fixed at read-once and write-once while the
+operations keep accumulating, so the intensity climbs by $\frac{1}{6}$ for
+every further operation and nothing caps it. Both the *however many* and the
+*cannot* are false, and the reason offered for them is the reason they are
+false.
+
+The replacement is a measurement and it is a better frame than the assertion
+was: reaching the device ratio of $\val{p03.dev.ratio}$ from
+$\val{p03.fuse.after}$ needs a chain of $\val{p03.fuse.compute.chain}$
+elementwise operations on one tensor. **Fusion does not rescue because nobody
+writes twelve hundred elementwise operations in a row, not because the
+intensity is capped**, and the figure reproduces exactly from the two the page
+already prints beside it, which the script asserts.
+
+Note what was *not* touched: the existing assertion is correct and is about a
+chain of three specifically. Only the prose over-generalised it. **An
+assertion about an instance does not license a sentence about the class**, and
+the comment above that assertion had said so all along.
+
+The Summary item carried the same false reasoning and is `\result{}`-wrapped,
+so Appendix~C replayed it \dash{} one cause, two places, one fix, exactly as
+in Program~\ref{prog:P32}'s blocker.
+
+#### A transcript that does not run, for the third time
+
+`figures/transcripts/p12-collision-zero.txt` calls `math.expm1` and never
+imports `math`, so a reader pasting it out of the finished PDF gets
+`NameError` on the last line. Confirmed by replaying it rather than by reading
+it.
+
+That is Program~\ref{prog:P04}'s class for the third time (P04, P13, P12), and
+`make verify` cannot see any of them **by construction**: the script wrote
+exactly what it computed, so the file matches its generator perfectly and
+still does not run. The only instrument is the one Program~\ref{prog:F03}
+established \dash{} extract it and run what comes out \dash{} and it has to be
+pointed at every transcript rather than at the new one.
+
+#### The opener spent a frame twice, and neither leak was a number
+
+Program~\ref{prog:P10}'s forward-reference note said the program needs *that
+it is symmetric, and that it is positive semi-definite* \dash{} which is frame
+40's answer block, word for word, on the program's first page. A Quiz item
+routing to 39--40 then printed frame 40's own derivation in its
+`\answerto`.
+
+The declaration stays, because the book's convention requires a forward
+reference to be named; only its payload goes, and section 5 is left to elicit
+*which* two properties. Same move the F03, F04 and F08 passes made on
+outcomes: **a promise may name the skill and may not carry the finding.**
+
+#### And the running head said \enquote{Answers} for sixty-eight pages
+
+`\sectionmark` is silenced, and both back-matter replays emitted their
+per-program heading with no mark, so `\rightmark` stayed the chapter title
+throughout and the recto head never named the program \dash{} in the two
+appendices a reader arrives at by **lookup** rather than by reading. One
+`\markright` in each replay; `\fancyhead[LO]` was already wired for it and
+`\mfaheadmark` already width-caps it.
+
+#### One convention, two mechanisms
+
+`\vect{}` is defined so the bolding rule lives in one place, and Programs
+\ref{prog:P15} and \ref{prog:P17} bypassed it with raw `\mathbf`. Every use
+was legitimate *by* the convention \dash{} a vector sharing an expression with
+a matrix or a scalar, checked one at a time: they are a displacement, a point
+and a Newton step, and no matrix was among them \dash{} so no glyph changes
+and no page can move. What changes is that the day somebody redefines `\vect`,
+all of them move together. There is now no raw `\mathbf` outside
+`preamble.tex`.
+
+#### THE ONE WORTH THE MOST: a check measured, and deliberately not shipped
+
+Issue \#174 counts 48 elicitations spent before the reader reaches them, and
+suggests a cheap mechanical signal: **a `\val{}` key appearing both in a
+program's opener and in one of its answer boxes is nearly always a spoiler.**
+It was prototyped, and the prototype settled what to ship by settling what
+not to.
+
+- **Naive** \dash{} the key anywhere in the opener and anywhere in an answer:
+  **103 hits.** Too noisy to gate, which is the permanently-red ledger this
+  file already refuses.
+- **Routed** \dash{} an opener item whose `\teachesat` range contains a frame
+  whose answer carries the same key: **14 hits**, and sampling four found
+  **one** genuine. Program~\ref{prog:P10}'s Quiz Q3 gives eigenvalues $5$ and
+  $2$ and routes to frame 8, whose whole answer box is those two eigenvalues,
+  which frames 1--7 exist to derive. The other three are the question's own
+  *scenario* \dash{} two counts, a vector's components, a step count \dash{}
+  with the answer computed from it. **The discriminator is semantic**: a value
+  can be scenario in one place and payload in the other, and nothing syntactic
+  separates them.
+- **Phrase overlap**, for the prose two thirds of the class: maximal shared
+  word-runs between the opener and the program's own answer boxes.
+
+  | shingle | hits |
+  |---|---|
+  | 7 words | **0** |
+  | 6 words | 1 |
+  | 5 words | 3 |
+  | 4 words | 14 |
+
+  The opener region must **exclude Quiz `\answerto{}` bodies**, which typeset
+  in Appendix~A rather than on the opener: a Quiz answer restating a frame's
+  answer is two answers in two places, not a spoiler. Before that exclusion
+  the check reported 21 and **every one of the 21 was a Quiz answer**,
+  verified by hand on Program~\ref{prog:P28}.
+
+**So there are no verbatim seven-word leaks in the book, and the real ones are
+paraphrases.** Program~\ref{prog:P10}'s verified opener leak surfaces only at
+four words, as *\enquote{it is symmetric and}* plus *\enquote{it is positive
+semi definite}*, among thirteen generic phrases like *\enquote{the square root
+of}*. **Choosing four because it catches the case you already knew about is
+the threshold-chosen-so-a-claim-passes trap this file names**, and it has been
+paid for by Programs \ref{prog:F11}, \ref{prog:P15}, \ref{prog:P20},
+\ref{prog:P21} and \ref{prog:P33}.
+
+Recorded here with the numbers, the way `preamble.tex` records the three
+failed orphaned-cue fixes, so nobody re-runs it. **The prose half of \#174 is
+a reading job and the issue's own table \dash{} 48 instances, found by
+reading \dash{} is the evidence.**
+
+And one distinction the sampling produced, worth applying rather than judging
+each case afresh: **does the opener item STATE the answer, or ASK the
+question?** Program~\ref{prog:P17}'s Quiz Q4 states *Newton's method lands on
+the minimum of a quadratic in one step* and frame 24 asks *how many steps does
+it take* \dash{} a defect. Program~\ref{prog:F05}'s last item asks *divide
+every score by two, which is the largest now* \dash{} that is triage, which is
+what the Quiz is for, and its answer is in Appendix~A rather than on the
+opener. Only the first kind is worth fixing, and \#174 says in as many words
+that the author is the one who can tell them apart.
 
 ### The blocker batch, September 2026
 

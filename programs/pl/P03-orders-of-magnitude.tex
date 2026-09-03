@@ -769,15 +769,23 @@ obliczeniami?
 $\val{p03.dev.ratio}$, więc zlany łańcuch jest ograniczony przez pamięć
 dokładnie tak jak niezlany.}
 
-I pozostanie
-taki, ile operacji by w niego nie złożyć, bo bajty mają podłogę: wejście trzeba
-przeczytać raz, a wyjście zapisać raz, cokolwiek dzieje się pomiędzy.
+A teraz uwaga, bo oczywiste następne zdanie jest fałszywe. Po zlaniu
+łańcucha bajty mają podłogę \dash{} wejście czyta się raz, a wyjście zapisuje
+raz, cokolwiek dzieje się pomiędzy \dash{} podczas gdy operacji wciąż
+przybywa. Intensywność więc nie przestaje rosnąć; rośnie o $\frac{1}{6}$ na
+każdą kolejną złożoną operację i nic jej nie ogranicza.
+
+Fuzji nie pozwala niczego uratować \emph{rozmiar} tego wzrostu. Dojście do
+$\val{p03.dev.ratio}$ od $\val{p03.fuse.after}$ po $\frac{1}{6}$ na krok
+wymaga łańcucha około $\val{p03.fuse.compute.chain}$ operacji elementowych na
+jednym tensorze.
 
 \textbf{Fuzja pomaga i nie ratuje.} Robi to, że usuwa podróże, które były
 czystym narzutem, co jest tutaj warte czynnika $\val{p03.fuse.factor}$, a w
-dłuższym łańcuchu bywa warte więcej. Czego nie potrafi, to zamienić operacji
-ograniczonej przez pamięć w ograniczoną przez obliczenia, a plan, który
-zakłada, że potrafi, jest planem, który rozczaruje profiler.
+dłuższym łańcuchu więcej. Czego nie robi, to nie dochodzi do strony
+ograniczonej przez obliczenia przy żadnej długości łańcucha, jaką ktokolwiek
+pisze, a plan, który zakłada, że dojdzie, jest planem, który rozczaruje
+profiler.
 \end{fr}
 
 \begin{fr}
@@ -881,9 +889,12 @@ książce, który potrzebuje nowego \emph{obiektu}, a nie nowego pytania.
 \sumitem{32--34}{\result{Zlanie $\val{p03.fuse.chain}$ operacji elementowych dzieli
   bajty przez $\val{p03.fuse.factor}$ przy dokładnie tych samych operacjach,
   podnosząc intensywność do $\val{p03.fuse.after}$ \dash{} wciąż daleko poniżej
-  $\val{p03.dev.ratio}$. \textbf{Fuzja pomaga i nie ratuje}, bo wejście trzeba
-  przeczytać raz, a wyjście zapisać raz, cokolwiek dzieje się pomiędzy.} \textbf{To zamyka część II}: trzy pytania o jedną arytmetykę, odpowiedziane
-  bez niczego poza arytmetyką, algebrą i sigmą.}
+  $\val{p03.dev.ratio}$. Podłoga na bajtach sprawia, że intensywność
+  \emph{rośnie} o $\frac{1}{6}$ na każdą kolejną operację, zamiast ją
+  ograniczać, więc \textbf{fuzja pomaga i nie ratuje} rozmiarem tego wzrostu:
+  do dojścia do urządzenia trzeba by $\val{p03.fuse.compute.chain}$ złożonych
+  operacji.} \textbf{To zamyka część II}: trzy pytania o jedną arytmetykę,
+  odpowiedziane bez niczego poza arytmetyką, algebrą i sigmą.}
 \end{summarybox}
 
 \canyou
