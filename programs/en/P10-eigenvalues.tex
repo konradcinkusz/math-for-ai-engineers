@@ -162,13 +162,17 @@ $(1, -1)$ again \dash{} eigenvalue $\val{p10.sym.lo}$.
 So $A$ has two eigenvectors, with eigenvalues $\val{p10.sym.hi}$ and
 $\val{p10.sym.lo}$, and they point along $(1,1)$ and $(1,-1)$.
 
-Two things about that pair are worth noticing now and will be the whole of the
-next two sections. They are \textbf{perpendicular}, and there are
-\textbf{two of them in a two-dimensional space} \dash{} which by
-Program~\ref{prog:P04} makes them a basis.
+Two things about that pair are worth noticing now, and they will be the whole
+of the next two sections. Look at the two directions and at how many of them
+there are, and name both.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{They are \textbf{perpendicular}, and there are \textbf{two of them in a
+two-dimensional space} \dash{} which by Program~\ref{prog:P04} makes them a
+basis.}
 Finding them is a small piece of algebra rather than a search.
 
 $Av = \lambda v$ says $(A - \lambda I)v = 0$ with $v \ne 0$, so the matrix
@@ -333,20 +337,28 @@ The algebra agrees and says it more usefully. The trace is $0$ and the
 determinant is $1$, so the characteristic equation is $\lambda^{2} + 1 = 0$,
 which has no real solution at all.
 
-A real matrix can have \textbf{no real eigenvalue}. What it has instead is a
-pair of complex ones, and complex eigenvalues are the algebra's way of saying
-\emph{this map rotates}. This book does not need them, and the honest reason to
-mention them is so that a reader who meets a complex eigenvalue in a library's
-output knows it is a rotation and not an error.
+So say what a library is telling you when it hands back a complex eigenvalue
+for a real matrix.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{That the map rotates. A real matrix can have \textbf{no real eigenvalue};
+what it has instead is a pair of complex ones, and that pair is the algebra's
+way of saying so \dash{} it is not an error.}
 The third failure is the subtlest, and it is Program~\ref{prog:P09}'s shear
 again:
 \[ S = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix} \]
 
 Its trace is $2$ and its determinant is $1$, so $\lambda^{2} - 2\lambda + 1 =
 (\lambda - 1)^{2}$ and the only eigenvalue is $1$, twice over.
+
+So the algebra has already said something the previous two failures did not.
+The characteristic equation has a real root, and it has only one of them,
+where a $2 \times 2$ matrix has room for two. That repetition is the whole of
+what makes this case different, and it is visible before any eigenvector is
+computed.
 
 How many independent directions does it leave unturned?
 \dotline
@@ -545,12 +557,17 @@ $x\T A x = (x\T A x)\T = x\T A\T x$, so $x\T A x = x\T \big(\frac{A + A\T}{2}
 \big) x$.
 
 Any quadratic form can therefore be written with a symmetric matrix, and from
-here they always are. This is why the Hessian, a covariance and a Gram matrix
-are all symmetric: they are all quadratic forms in disguise, and the
-non-symmetric part of any of them was never doing anything.
+here they always are.
+
+The Hessian, a covariance and a Gram matrix are all symmetric. Say why that is
+one fact rather than three.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{They are all quadratic forms in disguise, and the non-symmetric part of
+any of them was never doing anything.}
 Take a symmetric $A$ with eigenvalues $\lambda_1$ and $\lambda_2$, and write
 $x$ in the eigenvector basis of the previous section, so that $x = c_1v_1 +
 c_2v_2$.
@@ -644,15 +661,17 @@ That zero eigenvalue is not a new object either.
 Its eigenvector $v$ satisfies $Av = 0v = 0$, so $v$ is in the null space, so
 $A$ is singular, so $\det A = 0$.
 
-\textbf{\enquote{Has a zero eigenvalue}, \enquote{is singular}, \enquote{has a
-non-trivial null space} and \enquote{has a flat direction in its quadratic
-form} are one condition said four ways} \dash{} by Program~\ref{prog:P08}, by
-Program~\ref{prog:P09}, and twice here. That is worth more than any of them
-separately, because a reader who meets one of the four in an error message now
-knows the other three.
+Four descriptions are now on the table: \enquote{has a zero eigenvalue},
+\enquote{is singular}, \enquote{has a non-trivial null space} and \enquote{has
+a flat direction in its quadratic form}. Say how many conditions that is.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{One, said four ways} \dash{} by Program~\ref{prog:P08}, by
+Program~\ref{prog:P09}, and twice here. A reader who meets one of the four in
+an error message now knows the other three.}
 One more piece of vocabulary, and then the section's payoff.
 
 \textbf{Positive semi-definite} means every eigenvalue is $\ge 0$ \dash{} so
@@ -833,8 +852,10 @@ and finds the largest agrees with the top eigenvalue of $C$. That direction
 carries $\val{p10.pca.top.pct}\%$ of the total spread, leaving
 $\val{p10.pca.rest.pct}\%$ for the other one.
 
-Two ways to that answer: try twenty thousand directions, or solve a quadratic.
-They agree, and only one of them still works in seven hundred dimensions.
+Two ways got to that answer: try twenty thousand directions, or solve a
+quadratic. They agree. Say which one still works in seven hundred dimensions.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{trapbox}
@@ -855,6 +876,9 @@ question it was asked, and the question contained the units.
 \end{trapbox}
 
 \begin{fr}
+\ans{Solving for the eigenvector. Sweeping directions samples a sphere, and no
+feasible number of samples covers one in seven hundred dimensions \dash{}
+where an eigenvector is the answer to an equation whatever the dimension is.}
 The eigenvalues turned out to be the shape of everything this section touched:
 the most a layer can stretch a vector, how elongated a basin is, and which way
 a cloud of data lies.

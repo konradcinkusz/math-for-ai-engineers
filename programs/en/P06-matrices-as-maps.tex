@@ -225,12 +225,16 @@ So the composition is a linear map, so it has a matrix of its own, and
 \enquote{multiply rows into columns} \dash{} that is the arithmetic that comes
 out of it.
 
-Read $AB$ as \emph{do $B$, then $A$}, right to left, the way $f(g(x))$ is read.
-The order looks backwards because the notation puts the function on the left of
-the thing it eats.
+So $AB$ is the matrix of a composition \dash{} but which one? Say whether it
+does $A$ first or $B$ first, and why the notation reads the way it does.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{$B$ first. Read $AB$ as \emph{do $B$, then $A$}, right to left, the way
+$f(g(x))$ is read \dash{} the notation puts the function on the left of the
+thing it eats.}
 Everything awkward about the procedure falls out of that reading, so it is
 worth turning the first one over yourself.
 
@@ -505,17 +509,22 @@ $W_2 h + b_2$, and compose them. Write down what comes out.
 \[ W_2(W_1x + b_1) + b_2 = (W_2W_1)\,x + (W_2b_1 + b_2) \]
 \end{ansblock}
 
-One matrix and one bias vector. The argument survives exactly, and the two
-steps that made it work are the two properties from section 1: $W_2$
-distributes over the sum, and it carries a scalar straight through.
+One matrix and one bias vector. The argument survives exactly.
 
 The script checks the identity over $\val{p06.collapse.trials}$ random inputs
 at shapes $\val{p06.din} \to \val{p06.dmid} \to \val{p06.dout}$, worst
 disagreement under $\val{p06.collapse.err}$ \dash{} which is rounding, not a
 difference.
+
+Two steps made that rearrangement work, and both were named in section 1. Say
+which two.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{$W_2$ distributes over the sum, and it carries a scalar straight through
+\dash{} the two properties that made the function linear in the first place.}
 Which is worth pausing on, because a stack of these is a large object.
 
 Eight linear layers of width $\val{p06.stack.width}$ hold
@@ -532,10 +541,14 @@ And the fraction is not a property of the width at all: $k$ layers collapse to
 one, so $(k-1)/k$ of the parameters are redundant however wide they are. Add
 layers and it approaches all of them.
 
-\textbf{The waste is exactly the depth you thought you were buying.}
+So say what the depth in a stack of purely linear layers is buying.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Nothing. \textbf{The waste is exactly the depth you thought you were
+buying.}}
 Now the fix, which Program~\ref{prog:F05} named and this program can now say
 something new about.
 
@@ -559,16 +572,22 @@ the collapsed matrix.
 \end{ansblock}
 
 The collapsed matrix keeps them collinear to rounding, because it must. The
-$\relu$-separated pair does not, so \textbf{no single affine map reproduces it,
-whatever that map might be} \dash{} the argument rules out all of them at once
-rather than failing to find one.
+$\relu$-separated pair does not.
 
 That is F05's corner, restated in a form that generalises: linearity is a
 constraint on what the function can do to a straight line, and the activation
 is there to break it.
+
+So say what a bent line rules out, and why that is stronger than having failed
+to find a single affine map that matches.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Every affine map at once. \textbf{No single affine map reproduces it,
+whatever that map might be} \dash{} bending a line is something none of them
+can do, so nothing is left to search.}
 \begin{aibox}
 It also says what an activation is \emph{not} for, which is where the folklore
 sits. Not squashing values into a range \dash{} $\relu$ is unbounded above and

@@ -216,15 +216,26 @@ $A\T A$ is symmetric whatever $A$ was, so the spectral theorem always applies
 to it, and every $\sigma_i$ is real and non-negative because it is the square
 root of a non-negative number.
 
-That is why singular values exist for every matrix: they are borrowed from a
-symmetric matrix you can always build.
+Program~\ref{prog:P10}'s theorem applies to symmetric matrices only, and this
+one is about matrices of every shape. Say why that is not a gap.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Because $A\T A$ is symmetric whatever $A$ was. Singular values exist for
+every matrix because they are borrowed from a symmetric matrix you can always
+build.}
 Now the trap, and this example is chosen to make it hard rather than easy.
 
 The constructed $A$ has singular values $\val{p11.sig.hi}$ and
 $\val{p11.sig.lo}$. It is square, so it also has eigenvalues of its own.
+
+The two constructions are worth holding apart before you answer. The singular
+values came from two \emph{different} rotations, one on each side, which is
+what a matrix of general shape needs; an eigenvalue asks for a direction the
+matrix leaves alone, which is a question about one side only. Nothing so far
+says the two answers have to be related.
 
 Write down what you would guess they are, then read on.
 \dotline
@@ -477,13 +488,16 @@ with the input.}{the condition number as amplification}
 About ten. Six of the sixteen have gone.
 \end{ansblock}
 
-The rule of thumb is the one to carry: \textbf{you lose about
-$\logb{10}\kappa$ decimal digits}. Double precision starts with about sixteen,
-so a condition number of $10^{16}$ leaves nothing at all, and one of
-$\val{p11.spec.kappa}$ costs two digits of the sixteen and is unremarkable.
+That case had a condition number of a million and cost six of sixteen digits.
+Generalise it: how many digits does a condition number of $\kappa$ cost?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{About $\logb{10}\kappa$ of them.} Double precision starts with
+about sixteen, so a condition number of $10^{16}$ leaves nothing at all, and
+one of $\val{p11.spec.kappa}$ costs two of the sixteen and is unremarkable.}
 Two things it is not, and both are common readings.
 
 It is not a property of the \emph{algorithm}. A condition number is a fact
@@ -574,9 +588,16 @@ is built over fractions so that nothing is lost before the solving starts.
 
 Then the same system is solved twice in ordinary double precision \dash{} once
 through $A\T A$, and once by a factorisation that never forms it.
+
+Before the table: predict roughly how many decimal digits separate the two
+answers.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Squaring $\kappa$ doubles $\logb{10}\kappa$, so the normal equations
+should give away about as many digits again as the problem already costs.}
 \begin{tabularx}{\linewidth}{@{}lX@{}}
 \toprule
 \textbf{route} & \textbf{relative error in the coefficients} \\
@@ -618,12 +639,16 @@ $\val{p09.cost.ratio}$ times the arithmetic of solving, measured by counting.
 This program: forming $A\T A$ squares the condition number, so it doubles the
 digits lost, measured by solving the same system twice.
 
-The second is the half that decides it. A factor of $\val{p09.cost.ratio}$ in
-speed is an engineering trade-off that a faster machine can absorb. Digits are
-not recoverable at any speed.
+Two claims, both with numbers. Say which of them decides the advice, and why
+the other one cannot.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{The second. A factor of $\val{p09.cost.ratio}$ in speed is an engineering
+trade-off that a faster machine can absorb; digits are not recoverable at any
+speed.}
 One more object, and it is a definition rather than a technique.
 
 Program~\ref{prog:P08} showed a tall system usually has no solution and that
@@ -639,6 +664,12 @@ Turning by an orthogonal matrix is Program~\ref{prog:P09}'s lossless change of
 basis; dividing by the singular values is the only place any scaling happens;
 and turning back is the same move again. Nothing in the definition is new,
 which is why it is a definition rather than a technique.
+
+It is worth being plain about what it is for. The pseudoinverse is not a way
+of inverting a matrix that has no inverse \dash{} nothing is \dash{} it is a
+name for the answer Program~\ref{prog:P08} already derived, written so that
+one symbol stands for it. Naming a thing does not make it possible; it makes
+it quotable.
 
 That middle step is worth staring at. It divides by \emph{each} singular value,
 including the smallest. Say what that does in a direction the matrix nearly

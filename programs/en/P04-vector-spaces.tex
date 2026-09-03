@@ -135,13 +135,23 @@ and it is still $0$. Closed on both counts.
 
 Add $(1, a, b)$ and $(1, c, d)$ and the first component is $2$, which is not in
 the set. One counterexample and it is not a space \dash{} and notice that the
-set is a perfectly reasonable set of vectors. It is a plane, it is
-$\R^{3}$-shaped, and it does not contain the zero vector, which is the quickest
-test there is: \textbf{every vector space contains the zero vector}, because
-scaling any member by $0$ has to land inside.
+set is a perfectly reasonable set of vectors. It is a plane and it is
+$\R^{3}$-shaped.
+
+There is a quicker test than either closure check, and this set fails that one
+too. Both properties above are about what stays inside a set; name the single
+vector every space is therefore obliged to contain, and say which of the two
+properties forces it.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{The zero vector, forced by scaling: take any member and scale it by $0$.}
+
+\textbf{Every vector space contains the zero vector}, so a set that does not is
+not one, and the check costs nothing.
+
 \begin{aibox}
 The set of embeddings your model actually produces is not a vector space, and
 the distinction is worth holding.
@@ -254,15 +264,20 @@ Two vectors in $\R^{3}$, neither of them zero. What do they span?
 Through the origin, because taking both coefficients to be $0$ is one of the
 combinations and it gives the zero vector. Every span contains it.
 
-And \emph{usually}, because there is an exception you can probably already see:
-if one of the two is a multiple of the other, every combination of them is a
-multiple of either, and the span is a line.
-
-That exception is the whole of the next section, arriving before it has a name.
-\textbf{Two vectors do not always give you two directions.}
+And \emph{usually}, which is the word to stop at. Two vectors span a plane in
+almost every case, and there is one arrangement of them for which they do not.
+Name it, and say what the span is instead.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{When one is a multiple of the other. Every combination is then a multiple
+of either, so the span is a line.}
+
+That exception is the whole of the next section, arriving before it has a name.
+\textbf{Two vectors do not always give you two directions.}
+
 Which raises the question this program exists to answer. Here is a family of
 $\val{p04.family.count}$ vectors, each with $\val{p04.family.ambient}$
 components, and every one of them is built from the same two:
@@ -281,15 +296,18 @@ member of the family is a combination of two fixed vectors, so every
 combination of members is also a combination of those two, and the span is the
 plane they determine.
 
-\textbf{Three numbers, all different, and only the last one is the dimension:}
-how many vectors are in the list, how long each vector is, and how many
-independent directions they actually reach between them.
-
-The first two are properties of how the data was written down. The third is a
-property of the data.
+Three numbers are now on the table and they are all different: how many
+vectors are in the list, how long each vector is, and how many independent
+directions they actually reach between them. Say which of the three is the
+dimension.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{The third. The first two are properties of how the data was written down;
+only the third is a property of the data.}
+
 That distinction is worth one more frame, because the words for the first two
 get used for the third constantly.
 
@@ -365,12 +383,20 @@ $\val{p04.sat.dim}$ times.
 
 The script checks it over $\val{p04.sat.trials}$ random draws and never finds an
 exception, which is the right kind of reassurance and the wrong kind of
-evidence. \textbf{It cannot find one.} A search that succeeded would have
-refuted a proof, and what the draws are really testing is the code.
+evidence.
 \end{trapbox}
+
+Say what those draws are evidence of, given that the statement they are
+checking is a theorem.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{The code. \textbf{A search that succeeded would have refuted a proof}, so
+the draws cannot test the theorem \dash{} only whether the program implements
+it.}
+
 Stated plainly, because everything in section 5 rests on it:
 
 \medskip
@@ -448,10 +474,22 @@ algebra. What this program needs is the statement, and the statement is what
 makes the next paragraph a definition rather than an ambiguity.
 \end{rigourbox}
 
-The \emph{dimension} of a space is the size of any of its bases.
+Notice what it does not say. It does not say a space has one basis, or that
+any basis is preferred \dash{} this program has already shown that a space has
+many. It says only that they all have the same size, which is the weakest
+statement a definition could be built on and exactly the one a definition
+needs.
+
+That theorem is what licenses a definition rather than an ambiguity, so write
+the definition down: the \emph{dimension} of a space is what?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{The size of any of its bases \dash{} \emph{any}, because the theorem says
+they all have the same one.}
+
 So the four words of this program's title are one idea seen four ways.
 
 \begin{center}

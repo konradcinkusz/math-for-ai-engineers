@@ -134,13 +134,24 @@ przeskaluj jeden, a wciąż wynosi $0$. Domknięty na obu rachunkach.
 
 Dodaj $(1, a, b)$ i $(1, c, d)$, a pierwsza współrzędna wynosi $2$, czego w
 zbiorze nie ma. Jeden kontrprzykład i to nie jest przestrzeń \dash{} i zauważ,
-że ten zbiór jest zupełnie rozsądnym zbiorem wektorów. Jest płaszczyzną, ma
-kształt z $\R^{3}$ i nie zawiera wektora zerowego, co jest najszybszym testem,
-jaki istnieje: \textbf{każda przestrzeń liniowa zawiera wektor zerowy}, bo
-przeskalowanie dowolnego elementu przez $0$ musi wylądować wewnątrz.
+że ten zbiór jest zupełnie rozsądnym zbiorem wektorów. Jest płaszczyzną i ma
+kształt z $\R^{3}$.
+
+Istnieje test szybszy niż którekolwiek ze sprawdzeń domknięcia, a ten zbiór nie
+przechodzi także jego. Obie powyższe własności mówią o tym, co zostaje wewnątrz
+zbioru; nazwij jedyny wektor, który każda przestrzeń musi wobec tego zawierać,
+i powiedz, która z tych dwóch własności go wymusza.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Wektor zerowy, wymuszony przez skalowanie: weź dowolny element i
+przeskaluj go przez $0$.}
+
+\textbf{Każda przestrzeń liniowa zawiera wektor zerowy}, więc zbiór, który go
+nie zawiera, nie jest przestrzenią, a to sprawdzenie nic nie kosztuje.
+
 \begin{aibox}
 Zbiór zanurzeń, które twój model naprawdę produkuje, nie jest przestrzenią
 liniową, a to rozróżnienie warto trzymać.
@@ -253,15 +264,20 @@ Dwa wektory w $\R^{3}$, żaden z nich zerowy. Co one rozpinają?
 Przez początek, bo wzięcie obu współczynników równych $0$ jest jedną z tych
 kombinacji i daje wektor zerowy. Każda powłoka go zawiera.
 
-I \emph{zwykle}, bo jest wyjątek, który pewnie już widzisz: jeśli jeden z nich
-jest wielokrotnością drugiego, to każda ich kombinacja jest wielokrotnością
-któregokolwiek, a powłoka jest prostą.
-
-Ten wyjątek jest całą następną sekcją, przybywającą, zanim dostał nazwę.
-\textbf{Dwa wektory nie zawsze dają ci dwa kierunki.}
+I \emph{zwykle}, bo to jest słowo, przy którym trzeba się zatrzymać. Dwa
+wektory rozpinają płaszczyznę niemal zawsze, i jest jedno ich ustawienie, dla
+którego tego nie robią. Nazwij je i powiedz, czym jest wtedy powłoka.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Gdy jeden jest wielokrotnością drugiego. Każda kombinacja jest wtedy
+wielokrotnością któregokolwiek, więc powłoka jest prostą.}
+
+Ten wyjątek jest całą następną sekcją, przybywającą, zanim dostał nazwę.
+\textbf{Dwa wektory nie zawsze dają ci dwa kierunki.}
+
 Co prowadzi do pytania, dla którego ten program istnieje. Oto rodzina
 $\val{p04.family.count}$ wektorów, każdy po $\val{p04.family.ambient}$
 współrzędnych, i każdy z nich jest zbudowany z tych samych dwóch:
@@ -280,15 +296,17 @@ rodziny jest kombinacją dwóch ustalonych wektorów, więc każda kombinacja
 elementów też jest kombinacją tych dwóch, a powłoka jest płaszczyzną, którą
 one wyznaczają.
 
-\textbf{Trzy liczby, wszystkie różne, a wymiarem jest tylko ostatnia:} ile
-wektorów jest na liście, jak długi jest każdy wektor i ile niezależnych
-kierunków naprawdę razem osiągają.
-
-Pierwsze dwie są własnościami tego, jak dane zapisano. Trzecia jest
-własnością danych.
+Trzy liczby są już na stole i wszystkie są różne: ile wektorów jest na liście,
+jak długi jest każdy wektor i ile niezależnych kierunków naprawdę razem
+osiągają. Powiedz, która z tych trzech jest wymiarem.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Trzecia. Pierwsze dwie są własnościami tego, jak dane zapisano; tylko
+trzecia jest własnością danych.}
+
 To rozróżnienie warte jest jeszcze jednej ramki, bo słów na dwa pierwsze
 używa się na trzecie bez przerwy.
 
@@ -362,12 +380,20 @@ co najwyżej $\val{p04.sat.dim}$ razy.
 
 Skrypt sprawdza to na $\val{p04.sat.trials}$ losowych losowaniach i nigdy nie
 znajduje wyjątku, co jest właściwym rodzajem otuchy i niewłaściwym rodzajem
-dowodu. \textbf{Nie może go znaleźć.} Szukanie, które by się powiodło,
-obaliłoby dowód, a to, co te losowania naprawdę testują, to kod.
+dowodu.
 \end{trapbox}
+
+Powiedz, czego te losowania dowodzą, skoro stwierdzenie, które sprawdzają, jest
+twierdzeniem.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Kodu. \textbf{Szukanie, które by się powiodło, obaliłoby dowód}, więc
+losowania nie mogą testować twierdzenia \dash{} tylko to, czy program je
+implementuje.}
+
 Powiedziane wprost, bo wszystko w sekcji 5 na tym się opiera:
 
 \medskip
@@ -445,10 +471,22 @@ liniowej. Ten program potrzebuje samego stwierdzenia, a to stwierdzenie czyni
 następny akapit definicją, a nie dwuznacznością.
 \end{rigourbox}
 
-\emph{Wymiar} przestrzeni to liczba elementów którejkolwiek z jej baz.
+Zauważ, czego ono nie mówi. Nie mówi, że przestrzeń ma jedną bazę ani że
+któraś baza jest wyróżniona \dash{} ten program pokazał już, że przestrzeń ma
+ich wiele. Mówi tylko, że wszystkie mają ten sam rozmiar, co jest najsłabszym
+stwierdzeniem, na jakim dałoby się zbudować definicję, i dokładnie tym,
+którego definicja potrzebuje.
+
+To twierdzenie jest tym, co pozwala na definicję zamiast dwuznaczności, więc
+zapisz tę definicję: \emph{wymiar} przestrzeni to co?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Liczba elementów którejkolwiek z jej baz \dash{} \emph{którejkolwiek}, bo
+twierdzenie mówi, że wszystkie mają tę samą.}
+
 Cztery słowa z tytułu tego programu to więc jedna myśl widziana na cztery
 sposoby.
 

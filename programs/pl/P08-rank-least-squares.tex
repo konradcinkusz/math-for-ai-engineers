@@ -176,12 +176,16 @@ $\val{p08.wide.null}$, oraz
 
 \[ \val{p08.wide.rank} + \val{p08.wide.null} = \val{p08.wide.cols}. \]
 
-\textbf{To twierdzenie o rzędzie i defekcie}, a prawa strona jest liczbą
-\emph{kolumn} \dash{} rozmiarem przestrzeni, z której $A$ czyta, a nie tej, do
-której pisze.
+Ta suma ma nazwę, a liczba po prawej jest jednym z dwóch rozmiarów macierzy.
+Nazwij to twierdzenie i powiedz, który to z tych dwóch.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{Twierdzenie o rzędzie i defekcie}, a prawa strona jest liczbą
+\emph{kolumn} \dash{} rozmiarem przestrzeni, z której $A$ czyta, a nie tej, do
+której pisze.}
 \begin{trapbox}
 \textbf{\enquote{Rząd plus defekt to rozmiar macierzy} to wersja, którą ludzie
 noszą, i jest błędna pod obydwoma względami.}
@@ -268,6 +272,16 @@ Nic w definicjach nie łączy tych dwóch. Jedna mówi, co potrafią wyprodukowa
 kombinacje kolumn; druga, co potrafią kombinacje wierszy; a dla macierzy
 szerokiej jedna z tych przestrzeni żyje tam, gdzie drugiej nie da się nawet
 porównać.
+
+A kształty czynią tę niewspółmierność konkretną, a nie abstrakcyjną. Macierz
+$2 \times 3$ ma przestrzeń kolumn siedzącą w przestrzeni dwuwymiarowej i
+przestrzeń wierszy siedzącą w trójwymiarowej, więc obie nie są podzbiorami
+niczego wspólnego i żaden argument z zawierania nie jest dostępny.
+
+Ma to znaczenie poza samą elegancją. Gdyby te dwie mogły się różnić, macierz
+miałaby dwa rzędy, a każde stwierdzenie w dalszej części tego programu \dash{}
+o tym, co ją przeżywa, na co da się ją rozłożyć, jaka część aktualizacji jest
+osiągalna \dash{} musiałoby mówić, który z nich ma na myśli.
 
 Wiąże je jedno działanie, i to takie, które już znasz. Które?
 \dotline
@@ -363,12 +377,20 @@ kolumn $A$.
 \transcript{p08-least-squares}
 
 Pierwszy wiersz jest tym testem i jest dokładny: $A$ ma rząd $2$, a dodanie $b$
-jako trzeciej kolumny podnosi rząd do $3$. \textbf{Prawa strona, która podnosi
-rząd, to prawa strona, której kolumny nie potrafią zbudować}, i to właśnie
-znaczy \enquote{brak rozwiązania}, bez podejmowania choćby próby.
+jako trzeciej kolumny podnosi rząd do $3$. Zauważ, że jest to test na macierzy
+\emph{rozszerzonej}, a nie na $A$, i że pyta o obie razem, a nie o którąkolwiek
+z osobna.
+
+Powiedz, co ten wzrost mówi o $b$, a więc czym jest \enquote{brak rozwiązania},
+gdy nie podejmuje się żadnej próby.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{Prawa strona, która podnosi rząd, to prawa strona, której kolumny
+nie potrafią zbudować.} Wystaje poza ich powłokę, więc żadna ich kombinacja nie
+jest $b$.}
 Zmień więc pytanie, bo to jedyny uczciwy ruch, jaki jest dostępny.
 
 Skoro $b$ nie da się osiągnąć, poproś o punkt przestrzeni kolumn leżący
@@ -400,13 +422,30 @@ To całe najmniejsze kwadraty. Gdyby reszta opierała się choć trochę o któr
 kolumn, mógłbyś przesunąć się wzdłuż niej i podejść bliżej, więc dopasowanie
 nie byłoby punktem najbliższym.
 
-\textbf{Testem na najlepsze dopasowanie jest więc zestaw iloczynów skalarnych,
-wszystkie zerowe.} Żadnej optymalizacji, żadnej iteracji i nic o kwadratach:
-kwadraty pojawiają się tylko dlatego, że \enquote{najbliżej} zmierzono
-długością, a Program~\ref{prog:P05} mówi, czym jest długość.
+A argument biegnie w obie strony, i to czyni z niego charakteryzację, a nie
+konsekwencję. Reszta prostopadła do każdej kolumny znaczy, że żadna kolumna nie
+poprawi dopasowania; dopasowanie, którego nie da się poprawić, zostawia resztę,
+która nie ma na czym się oprzeć. Żaden z tych kierunków nie potrzebuje
+pochodnej, kroku ani reguły zatrzymania.
+
+Warto to zapamiętać, bo prawie każda inna minimalizacja w tej książce jest
+iteracyjna. Program~\ref{prog:P15} chodzi po powierzchni, a
+Program~\ref{prog:P20} buduje optymalizatory, oba dlatego, że większość
+powierzchni nie ma postaci zamkniętej do rozwiązania. Ta ma, a powodem jest
+to, że minimalizowana wielkość jest odległością w przestrzeni z iloczynem
+skalarnym.
+
+Powiedz więc, czym mechanicznie jest test na najlepsze dopasowanie i czego w
+nim nie ma.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{Zestawem iloczynów skalarnych, wszystkie zerowe.} Żadnej
+optymalizacji, żadnej iteracji i nic o kwadratach: kwadraty pojawiają się tylko
+dlatego, że \enquote{najbliżej} zmierzono długością, a Program~\ref{prog:P05}
+mówi, czym jest długość.}
 Policzone na trzech punktach, i każda liczba jest dokładna.
 
 Dopasowanie to $y = \val{p08.ls.slope}x + \val{p08.ls.intercept}$, więc wartości
@@ -472,12 +511,17 @@ to ten program jest miejscem, w którym chudy wymiar dostaje nazwę, a założen
 za nim zostaje wypowiedziane.
 
 Ta nazwa to $r$ i jest rzędem: zapisanie aktualizacji jako $BA$ z $r$ pomiędzy
-czynnikami wymusza, by iloczyn miał rząd co najwyżej $r$, bo złożenie z
-Programu~\ref{prog:P06} nie osiągnie więcej kierunków, niż pozwala najwęższe
-przekształcenie w nim.
+czynnikami wymusza, by iloczyn miał rząd co najwyżej $r$.
+
+Powiedz, dlaczego jest to wymuszone. Powód mieści się w jednym zdaniu i
+dotyczy tego, czym jest iloczyn macierzy.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Program~\ref{prog:P06} uczynił ten iloczyn złożeniem, a złożenie nie
+osiągnie więcej kierunków, niż pozwala najwęższe przekształcenie w nim.}
 Wyceń to więc, bo cena jest całym argumentem.
 
 Pełna aktualizacja macierzy wag $\val{p08.lora.d} \times \val{p08.lora.d}$ ma
@@ -606,12 +650,16 @@ rzędu $\val{p08.chain.r}$ przeżywa $\val{p08.chain.len}$ czynników pełnego
 rzędu $\val{p08.chain.d} \times \val{p08.chain.d}$ ułożonych na nim, z rzędem
 niezmienionym.
 
-\textbf{Rząd traci się tylko do przodu.} To mocniejsze zdanie, niż brzmi: nie
-chodzi o to, że odzyskanie go jest trudne, wymaga więcej parametrów albo dłużej
-się trenuje. Nie ma niżej niczego, co mogłoby to zrobić.
+Powiedz, w którą stronę można stracić rząd i co to zostawia dostępnego
+czemukolwiek niżej.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{Rząd traci się tylko do przodu}, a niżej nie ma niczego \dash{}
+nie chodzi o to, że odzyskanie go jest trudne, wymaga więcej parametrów albo
+dłużej się trenuje.}
 \begin{trapbox}
 \textbf{\enquote{Późniejsza warstwa nauczy się to odwrócić} to intuicja i
 jedyne miejsce, w którym większa pojemność dowodliwie nie pomaga.}

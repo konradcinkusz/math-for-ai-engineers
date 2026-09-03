@@ -133,13 +133,20 @@ niezależnie od niego:
 \[ \lVert a \rVert = \sqrt{a \cdot a} \]
 
 i tutaj $\lVert a \rVert = \val{p05.proj.alen}$. To jest kierunek definicji,
-który zapamiętuje się na odwrót. Długość nie jest czymś, co przestrzeń już
-miała, a iloczyn skalarny przypadkiem odtwarza. \textbf{Iloczyn skalarny jest
-tym, z czego długość jest zrobiona}, a przestrzeń z innym iloczynem skalarnym
-ma w sobie inne długości.
+który zapamiętuje się na odwrót: długość nie jest czymś, co przestrzeń już
+miała, a iloczyn skalarny przypadkiem odtwarza.
+
+Więc zostaw przestrzeń i jej wektory dokładnie takimi, jakie są, i zastąp
+iloczyn skalarny innym, który wciąż ma te trzy własności. Co dzieje się z
+długościami?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Zmieniają się. \textbf{Iloczyn skalarny jest tym, z czego długość jest
+zrobiona}, więc przestrzeń z innym iloczynem skalarnym ma w sobie inne
+długości.}
 \begin{note}
 Wymaganie, żeby $a \cdot a > 0$ dla każdego niezerowego $a$, jest tym, co czyni
 z $\sqrt{a \cdot a}$ długość, a nie wzór. Porzuć je, a możesz mieć niezerowe
@@ -237,11 +244,16 @@ odpowiedziami na trzy różne pytania. L1 pyta, ile przejdziesz wzdłuż osi, L2
 ile w linii prostej, L-nieskończoność jak zła jest najgorsza pojedyncza
 składowa.
 
-Tylko L2 pochodzi z iloczynu skalarnego. Dlatego to ona ma doczepione kąty i
-dlatego pozostałe dwie nie mają w ogóle pojęcia prostopadłości.
+Jedna z tych trzech ma doczepione kąty, a pozostałe dwie nie mają w ogóle
+pojęcia prostopadłości. Powiedz która i co o tym decyduje.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{L2. Tylko L2 pochodzi z iloczynu skalarnego, a ortogonalność jest
+zdefiniowana przez zerowanie się iloczynu skalarnego, więc pozostałe dwie nie
+mają czego zerować.}
 Sposobem na utrzymanie tej różnicy jest narysowanie tego, co każda z nich
 nazywa wektorem jednostkowym \dash{} zbioru wszystkich $v$ o
 $\lVert v \rVert = 1$.
@@ -264,19 +276,24 @@ dlaczego, bo argument cytuje się zwykle jako hasło.
 Minimalizacja straty przy małej normie oznacza szukanie, gdzie warstwice straty
 po raz pierwszy dotkną kuli. Kula L2 jest okrągła, więc można jej dotknąć pod
 dowolnym kątem i punkt styczności nie ma powodu leżeć na osi. Kula L1 okrągła
-nie jest: ma rogi, a jej rogi to dokładnie punkty, w których wszystkie
-współrzędne poza jedną są zerowe.
+nie jest: w dwóch wymiarach jej rogi to $(\pm 1, 0)$ i $(0, \pm 1)$.
+
+Powiedz, co te cztery punkty mają wspólnego jako wektory, a więc jak wygląda
+rozwiązanie, które ląduje na jednym z nich.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{W każdym z nich wszystkie współrzędne poza jedną są zerowe. \textbf{Róg
+kuli L1 jest z konstrukcji wektorem rzadkim.}}
 \begin{trapbox}
 \textbf{Rzadkość L1 jest faktem o kształcie kuli, a nie o wielkości kary.}
 
 Warstwica nadchodząca z ogólnego kierunku spotyka romb w rogu o wiele częściej,
-niż sugerowałby przypadek, a róg jest z konstrukcji wektorem rzadkim. Zwiększ
-karę w zadaniu L2, a wszystkie współczynniki kurczą się razem, docierając do
-zera dopiero w granicy; zwiększ ją w zadaniu L1, a współczynniki osiągają
-dokładne zero jeden po drugim.
+niż sugerowałby przypadek. Zwiększ karę w zadaniu L2, a wszystkie
+współczynniki kurczą się razem, docierając do zera dopiero w granicy; zwiększ
+ją w zadaniu L1, a współczynniki osiągają dokładne zero jeden po drugim.
 
 Więc \enquote{L1 daje rzadkość} nie jest regułą, którą ktoś znalazł
 doświadczalnie. To stwierdzenie o rogach i byłoby prawdziwe także wtedy, gdyby
@@ -349,14 +366,17 @@ podziel \dash{} i podaj warunek, bo $b \cdot b = 0$ tylko dla wektora zerowego,
 który nie jest prostą. To reguła Programu~\ref{prog:F06} o dzieleniu przez
 literę, a dodatniość iloczynu skalarnego jest tym, co ją tu spełnia.
 
-\emph{Rzut} wektora $a$ na $b$ to wtedy $t\,b$ i jest odpowiedzią na
-minimalizację, choć nic jeszcze nie zostało zminimalizowane.
+\emph{Rzut} wektora $a$ na $b$ to wtedy $t\,b$ \dash{} i jest podawany jako
+odpowiedź na minimalizację, choć nic nie zostało zminimalizowane. Nazwij krok,
+który właśnie został zrobiony bez uzasadnienia.
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
-Co jest krokiem, wobec którego warto być podejrzliwym. Rozwiązanie warunku
-ortogonalności to nie to samo co rozwiązanie warunku najkrótszej długości, a
-ramka po cichu zamieniła jedno na drugie.
+\ans{Rozwiązanie warunku ortogonalności zostało podstawione za rozwiązanie
+warunku najkrótszej długości, a to nie jest to samo pytanie.}
+Co jest krokiem, wobec którego warto być podejrzliwym, więc oto on na liczbach.
 
 Weź $a = (\val{p05.proj.ax}, \val{p05.proj.ay})$ i $b = (1, 0)$. Wzór daje
 $t = \val{p05.proj.t}$, więc rzut to $(\val{p05.proj.t}, 0)$, a reszta to
@@ -455,11 +475,15 @@ bo ma długość $\val{p05.norm.len.b}$, podczas gdy $A$ ma
 $\val{p05.norm.len.a}$, a ten czynnik około trzech przykrywa preferencję
 kosinusa.
 
-\textbf{Więc te dwie miary nie są rywalkami. Jedna jest drugą pomnożoną przez
-coś, a pytanie brzmi wyłącznie, czy chcesz to coś mieć w odpowiedzi.}
+Co rozstrzyga, czym te dwie miary są dla siebie nawzajem. Czy są rywalkami, a
+jeśli nie, jaka jest zależność?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{\textbf{Nie rywalkami. Jedna jest drugą pomnożoną przez obie długości}, a
+pytanie brzmi wyłącznie, czy chcesz ten czynnik mieć w odpowiedzi.}
 Co zamienia wybór w pytanie o twoje dane, a nie w pytanie o geometrię.
 
 Długość zanurzenia nie jest ozdobą. Zależnie od modelu może śledzić, jak częsty
@@ -549,11 +573,15 @@ To uczciwa odpowiedź w dwóch wymiarach i dlatego \enquote{typowa} brzmi jak
 słowo bez treści. Każdy kąt jest tak samo prawdopodobny jak każdy inny, więc
 typowa para jest niczym szczególnym.
 
-Teraz to samo pytanie w $\val{f09.dim}$ wymiarach, i odpowiedź jest zupełnie
-inna.
+Teraz to samo pytanie w $\val{f09.dim}$ wymiarach. Zanim pójdziesz dalej: czy
+kąt między dwoma losowymi kierunkami pozostaje jednostajny, rozprasza się
+jeszcze bardziej, czy ustala się na czymś konkretnym?
+\dotline
+\nextframe
 \end{fr}
 
 \begin{fr}
+\ans{Ustala się \dash{} na kącie prostym, i to ciasno.}
 Oto pomiar. $\val{p05.pairs}$ losowych par wektorów jednostkowych w każdym z
 sześciu wymiarów, z rozrzutem ich kosinusów:
 
