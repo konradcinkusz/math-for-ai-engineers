@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1409 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1436 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1176 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1182 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1413 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1440 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1178 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1184 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -124,7 +124,7 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **90 orphan-tail pages: 28 · 25 · 19 · 18** across `main-en`, `main-pl`,
+- **90 orphan-tail pages: 29 · 25 · 18 · 18** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`. **Four passes have taken the count DOWN** and
   every other one has raised it: the two elicitation passes took it from 99 to
   96, the P05 review pass put three back, and the F01--F06 review batch took
@@ -12172,9 +12172,13 @@ programs.* All three of the answer-key numbers this batch fixes were
 
 | where | printed | is | out by |
 |---|---|---|---|
-| P12 further problem 2 | $2 \times 10^{84}$ | $\val{p12.beam.pct.width}$ | a factor of $100$ |
-| P30 further problem 3 | $\ln 2 = \val{p30.js.cap}$ | $\val{p30.js.overlap}$ | a factor of $3.2$ |
-| P33 further problem 2 | $\num{2.475}$ | $\val{p33.accum.pooled}$ | the wrong weighting |
+| P12 further problem 2 | $2 \times 10^{84}$ | $\num{1.98e82}$ | a factor of $100$ |
+| P30 further problem 3 | $\ln 2 = \num{0.6931}$ | $\num{0.2158}$ | a factor of $3.2$ |
+| P33 further problem 2 | $\num{2.475}$ | $\num{2.525}$ | the wrong weighting |
+
+(The figures are written out here because this file is read and never
+typeset; on the page all three are `\val{}` keys, which is the point of the
+fix.)
 
 C7 could not see any of them, because C7 asks whether every `\val{}` has a
 script behind it and whether every emitted value is used. **A literal is
@@ -12315,6 +12319,122 @@ The answer imported a figure from the one case its stated reason excludes.
 Worth keeping beside the F09 triangle-inequality finding and F02's `-3**2`
 box: all three are a justification written from the feel of a neighbouring
 case rather than from the case in hand.
+
+#### Layout
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1413 | 1409 | `[]` | 0 |
+| `main-pl` | 1440 | 1436 | `[]` | 0 |
+| `main-en-a4` | 1178 | 1176 | `[6.3]` | 0 |
+| `main-pl-a4` | 1184 | 1182 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and **no orphaned cues at any point in the pass**, which is
+unusual for a batch that added a note box, a warning box and a rigour box to
+three different programs.
+
+**And the orphan-tail total did not move**: 90 either side, at
+29 · 25 · 18 · 18 against 28 · 25 · 19 · 18. One page moved from
+`main-en-a4` to `main-en` and nothing else did, which is the closest this
+ledger has come to standing still across a batch of this size.
+
+#### Appendix B: the stub that printed, and four claims the book contradicted
+
+Issue \#113, taken in the same batch because it is the verdict's third
+priority and because its blocker is one deleted block.
+
+**The `\programstub{}` was still on line 6 of a finished appendix**, so a
+reader arriving at *Notation and Symbols* met a red dashed NOT YET WRITTEN box
+promising \enquote{every symbol the book uses, in the order a reader meets it}
+\dash{} followed by no such table \dash{} and a pointer back to a front-matter
+section called *How to read a formula* that **does not exist**. A grep of
+`frontmatter/` finds nothing of the name, and no file outside the appendices
+uses the label `app:B`, so there was no second half of the pointer to repair.
+
+**References to the appendix by name are a different matter and they all
+survive**, which is worth stating rather than leaving to be inferred from the
+sentence above: both introductions, Program~\ref{prog:P03},
+Program~\ref{prog:P24} and Program~\ref{prog:F03} point at Appendix~B, and
+every one of them points at a notation *decision* rather than at a symbol
+table. Program~\ref{prog:P03}'s is the useful one \dash{} it says in as many
+words that it writes $O(n \mfalogplain n)$ *and* that Appendix~B calls a bare
+logarithm a build error, so the tension the appendix denied was already
+written down by the program that creates it.
+
+**The symbol table is not written, and that is a decision rather than a
+retreat.** The stub's own justification is that \enquote{a reader who has
+never seen $\sum$ must not be stopped by it in Program~F4} \dash{} and
+Program~\ref{prog:F04} builds the sigma from nothing while
+Program~\ref{prog:F02} introduces the subscript underneath it, so the job the
+table was for is already done by the programs that introduce the symbols. The
+appendix now says that in its own opening rather than promising a table, and
+the option is on the *What is left* list, where a thing the book has not done
+belongs.
+
+Generating it would be the Appendix~C move \dash{} a mark at each symbol's
+first use, replayed \dash{} and it is a pass of its own, because \enquote{in
+the order a reader meets it} is a property of where the marks are placed.
+
+**Three of the four remaining claims were false about the book.**
+
+- **\enquote{This book never writes a bare logarithm.}** It does, in three
+  places and for two different reasons: Program~\ref{prog:F03} §2 prints them
+  deliberately so the reader meets the collision before it is named, and
+  Programs \ref{prog:P03} and \ref{prog:P16} write $O(n \mfalogplain n)$
+  because inside an $O$ the base is provably immaterial. The appendix now
+  states the rule the way `preamble.tex` does \dash{} the ban, and the two
+  kinds of place it is lifted \dash{} and says no count, for the reason that
+  comment already gives. **This is the second sweep of that universal**: the
+  Foundation batch corrected `preamble.tex`'s own list of places a week
+  earlier and did not open the appendix that makes the same claim.
+- **\enquote{Vectors are bold.}** `\vect{}` is used in **three programs out of
+  forty-seven**, and Programs \ref{prog:F09}, \ref{prog:P04} and
+  \ref{prog:P05} \dash{} the three that actually teach vectors \dash{} use it
+  **zero** times. What is true is narrower and is a real convention worth
+  recording: italic wherever nothing else in the expression could be mistaken
+  for a vector, bold where a vector and a matrix share an expression and the
+  shapes are the point, which is Program~\ref{prog:P18}'s subject and the few
+  later places quoting it. Verified by reading P18's instances rather than
+  inferred from the count: they are $\vect{y} = W\vect{x}$,
+  $\partial\vect{y}/\partial\vect{x}$ and $\vect{r} = W\vect{x} - \vect{t}$.
+- **The keyboard test described a divergence its own page could not show.**
+  The paragraph was written with the contract macros, so in the English build
+  $\tg$ sets `tan` in both halves and the sentence \enquote{that looks
+  inconsistent} pointed at two identical words. It is the one place in the
+  book where both spellings must be **literal**, and Appendix~D's table
+  already does it that way \dash{} as `\emph{tg}` and `\emph{tan}` rather than
+  as the operators, because C10 forbids the operator spelt out. The paragraph
+  now says why it is literal, which is the part that stops somebody
+  \enquote{tidying} it back into macros.
+
+**And the debt ledger reported zero stubs the whole time, truthfully.**
+`make stubs` is `grep -rl '\programstub{' programs/$$L`, so it scans
+`programs/` and nothing else \dash{} which is right for the question it was
+built to ask (*how many of the forty-seven are unwritten*) and blind to the
+one place a stub could still print in a finished book. The top of this file
+has said **0 of 47 programs are stubs** for months and it was never wrong;
+the claim was simply narrower than the thing a reader meets.
+
+The ledger now scans `appendices/` as well, and it was proved to fire by
+putting a `\programstub{}` back into Appendix~B and watching it report
+`appendices: 1` before it was removed again. **A ledger phrased over one
+directory is a ledger about that directory**, and the gap between it and the
+sentence somebody reads it as is exactly where this defect lived.
+
+**The generalisable half is the one this file keeps paying for, in its
+sharpest form yet: a notation appendix is a claim about the book's own
+notation, and it is the one kind of claim that cannot be checked against
+anything outside the book.** Appendix~D's rows are gated against the Polish
+prose by `--terms` and its surrounding sentences are not, and that is where
+its own defect was. Appendix~B has no gated part at all: every sentence in it
+is a description of practice, and three of the five were wrong. Both of the
+`\vect` and bare-log findings are one `grep` from settled, which is exactly
+why nobody ran it.
 
 ### Program P5 review pass, September 2026 --- the first of the thirty
 
@@ -13221,12 +13341,24 @@ look first when one of them next goes stale.
    bounds; the rest have survived so far, which is not the same as being
    reproducible. See the build trap. It is a pass of its own, because each is
    quoted in prose in two editions.
-5. **`odzera`, the companion library.** One stage per part, every gradient
+5. **Appendix~B's symbol table, decided against for now and recorded rather
+   than promised.** The appendix carried a `\programstub{}` promising every
+   symbol in the order a reader meets it; the stub is gone and the appendix
+   now says in its own opening that it is deliberately not that table, because
+   Program~\ref{prog:F04} builds the sigma from nothing and
+   Program~\ref{prog:F02} introduces the subscript, so the programs already do
+   the job. Whoever wants it should do it the Appendix~C way \dash{} a
+   `\notation{}` mark at each symbol's first use, replayed at the back \dash{}
+   and should know that the hard half is not the macro but the placement:
+   \enquote{in the order a reader meets it} is a property of where the marks
+   go, so it is a reading pass over forty-seven programs and not a scripted
+   one.
+6. **`odzera`, the companion library.** One stage per part, every gradient
    checked against finite differences in CI, no GPU, the whole suite under a
    minute. Specified in `notes/01-curriculum.md` §18; nothing built.
-6. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
+7. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
    ledger stays open and the book may not claim it.
-7. **The review issues.** The book has been read end to end \dash{} one
+8. **The review issues.** The book has been read end to end \dash{} one
    layout reviewer over every page image, one technical reviewer recomputing
    every number, and an adversarial judge refuting what did not hold \dash{}
    and the findings are open on the repository under the `review` label, one
