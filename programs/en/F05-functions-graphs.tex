@@ -220,8 +220,7 @@ $x \ge 5$.
 \end{ansblock}
 
 The bracket has to come out at zero or more, so $x - 5 \ge 0$. You have just
-done section 3's work a section early, and you did it without being told a
-rule.
+done section 3's work early, and you did it without being told a rule.
 
 Now a distinction that costs working engineers real time, because the two
 things look almost identical on the page. $f$ and $f(x)$ are not the same
@@ -355,7 +354,9 @@ Over which values of $x$ is its graph flat?
 \begin{fr}
 \ans{For $x \le 0$}
 To the left of the origin the graph lies along the horizontal axis; to the
-right it is the line $y = x$ at forty-five degrees. The two halves meet at the
+right it is the line $y = x$, climbing one unit for every one across \dash{}
+forty-five degrees if the axes are drawn to the same scale. The two halves meet
+at the
 origin in a corner rather than a curve.
 
 That corner is worth a moment, because it is the entire reason the function is
@@ -456,7 +457,7 @@ feed $g$ the input $3$.
 Say it as a sentence and it stops being surprising: \emph{to see the old
 picture you now have to stand three further along.}
 
-This is the fourth sign this reasoning has arrived under. Program~\ref{prog:F01}
+This reasoning has arrived under other signs already. Program~\ref{prog:F01}
 has $\sqrt{a+b} \ne \sqrt{a} + \sqrt{b}$; Program~\ref{prog:F02} has
 $(a+b)^{2} \ne a^{2} + b^{2}$; Program~\ref{prog:F03} has no rule for
 $\ln(a+b)$; Program~\ref{prog:F04} has
@@ -590,7 +591,9 @@ common expression in machine learning:
 
 Read it as two of the four moves applied to the plainest function there is,
 $f(x) = x$. The weight $w$ multiplies the output, so it stretches the line away
-from the horizontal axis and makes it steeper. The bias $b$ is added outside,
+from the horizontal axis: a $w$ bigger than $1$ makes it steeper, a $w$ between
+$0$ and $1$ flattens it, and a negative $w$ turns it over as well. The bias $b$
+is added outside,
 so it slides the whole line up. That is all a linear unit is: a stretch and a
 shift, with names from a different vocabulary.
 
@@ -712,9 +715,11 @@ Here is the smallest answer. Take three measurements:
 The line $y = 2x + 1$ passes through all three exactly: $2 + 1$, $4 + 1$,
 $6 + 1$.
 
-Now forbid the bias, so the model is $y = wx$ and nothing else. The
-least-squares line of that form has slope $\val{f05.nobias.slope}$, and its
-worst miss against the three points is $\val{f05.nobias.worst}$.
+Now forbid the bias, so the model is $y = wx$ and nothing else. The line of
+that form that makes the sum of the squared misses smallest \dash{} the
+\emph{least-squares} line, which Program~\ref{prog:P08} derives \dash{} has
+slope $\val{f05.nobias.slope}$, and its worst miss against the three points is
+$\val{f05.nobias.worst}$.
 
 Why can no line of the form $y = wx$ fit these three points, whatever $w$ you
 choose?
@@ -953,8 +958,8 @@ safe move is to check what they do with a case you can evaluate.
 \begin{fr}
 One property is left, and the rest of this section is what it buys.
 
-A function is \textbf{strictly increasing} when it never gives the larger input
-the smaller output: whenever $a < b$, it is also true that $f(a) < f(b)$. Not
+A function is \textbf{strictly increasing} when moving right along it always
+raises the output: whenever $a < b$, it is also true that $f(a) < f(b)$. Not
 \emph{sometimes}, not \emph{on average}, and not \emph{eventually} \dash{}
 every pair, everywhere it is defined.
 
@@ -1113,8 +1118,9 @@ name the same parameters, because $\ln$ is strictly increasing and negation
 strictly decreasing, so the composition of the two turns the $\argmax$ of the
 likelihood into the $\argmin$ of the loss and moves it nowhere else.
 
-That is also why the loss you train on may be scaled, shifted by a constant, or
-have its logarithm taken, and the best model is the same model. It is not why
+That is also why the loss you train on may be scaled by a \emph{positive}
+constant, shifted by a constant, or \dash{} if it is positive \dash{} have its
+logarithm taken, and the best model is the same model. It is not why
 the \emph{gradients} are the same, which is a separate question and belongs to
 Program~\ref{prog:F12}.
 \end{aibox}
@@ -1187,7 +1193,7 @@ survives as the largest.}{order kept by increasing maps}
   is the logarithm of the odds, $\val{f05.logit.p9}$ at $p = \num{0.9}$, and
   the round trip closes to $\val{f05.roundtrip.err}$. \textbf{The $-1$ in
   $f^{-1}$ is not an exponent.}}}
-\sumitem{41--44}{\result{\textbf{A strictly increasing function keeps the order of a
+\sumitem{41--45}{\result{\textbf{A strictly increasing function keeps the order of a
   list, and therefore cannot move the $\argmax$.} Dividing by a positive $T$
   qualifies, $e^{x}$ qualifies, and dividing every entry by one positive total
   qualifies \dash{} so $\argmax \softmax(z/T) = \argmax z$ for every $T > 0$,

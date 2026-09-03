@@ -1,5 +1,5 @@
 flowchart LR
-  A["total = 0<br/>for i in 1..n:<br/>total = total + x_i"]
+  A["total = 0.0<br/>for x in losses:<br/>total = total + x"]
   A --> B["four parts:<br/>the index's name,<br/>where it starts,<br/>where it stops,<br/>the body"]
   B --> C["sum from i = 1 to n<br/>of x_i<br/><br/>n terms"]
   B --> D["sum from i = 0 to n-1<br/>of x_i, which is<br/>what range(n) walks<br/><br/>n terms"]

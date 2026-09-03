@@ -6,16 +6,16 @@ flowchart LR
       subgraph Z["Z -- calkowite"]
         direction LR
         subgraph N["N -- 0, 1, 2, 3, ..."]
-          n1["7"]
+          n1["4"]
         end
-        z1["-17"]
+        z1["-3"]
       end
       q1["1/3 = 0,333..."]
       q2["0,1"]
     end
-    r1["sqrt(2)"]
+    r1["e"]
     r2["pi"]
   end
 
   F["F -- to, co przechowuje maszyna:<br/>SKONCZONY podzbior Q.<br/>Nie ma w nim 0,1.<br/>Patrz Program 1."]
-  Q -. "w zadna strone nie podzbior" .-> F
+  Q -. "zawiera F, ale F nie zawiera N ani Z" .-> F

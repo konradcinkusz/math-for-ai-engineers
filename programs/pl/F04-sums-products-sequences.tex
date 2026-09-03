@@ -681,7 +681,8 @@ formatu, od kolejności, od sprzętu i od tego, którą redukcję wybrała
 biblioteka, więc liczba wydrukowana tutaj byłaby liczbą o jednej maszynie w
 jednym dniu.
 
-Program~\ref{prog:P01} mówi, dlaczego suma gradientów nie jest łączna i
+Program~\ref{prog:P01} mówi, dlaczego dodawanie zmiennoprzecinkowe nie jest
+łączne i
 dlaczego dwa akceleratory rozjeżdżają się na ostatnich bitach.
 Program~\ref{prog:P02} mówi, ile kosztuje sumowanie miliona małych liczb w złej
 kolejności i co z tym zrobić.
@@ -778,7 +779,11 @@ Zapisane raz i ogólnie, dla grupy $i$ o liczniku $a_i$ i mianowniku $b_i$:
 Po lewej jest średnia \emph{makro}: każda grupa niesie wagę $1/k$, cokolwiek
 by za nią stało. Po prawej jest średnia \emph{mikro}: każdy element niesie tę
 samą wagę, więc wpływ grupy jest jej rozmiarem. Obie są równe dokładnie wtedy,
-gdy wszystkie $b_i$ są równe, i nie w innym przypadku.
+gdy wszystkie $b_i$ są równe \dash{} i jest to stwierdzenie o wszystkich
+możliwych $a_i$ naraz. Dla jednego konkretnego zestawu liczb mogą się oczywiście
+zejść: dwa fragmenty o tej samej skuteczności zgadzają się niezależnie od
+rozmiarów. Równe mianowniki to warunek, który da się zapewnić z góry, i dlatego
+właśnie warto go znać.
 
 Trzymaj to z dala od porażki z perplexity z Programu~\ref{prog:F03}, która
 wygląda tak samo, a taka nie jest. Tam do średniej przyłożono funkcję
@@ -929,8 +934,9 @@ ogóle działa.
 Weź czynnik przykładany raz na warstwę, przez pięćdziesiąt warstw:
 \[ (\num{0.9})^{50} = \val{f04.decay.fifty} \qquad
    (\num{1.1})^{50} = \val{f04.grow.fifty} \]
-Dwa czynniki odległe o $\num{0.2}$ na starcie i o mniej więcej
-$\val{f04.decay.ratio}$ na drugim końcu, a żaden z nich nie był skrajny.
+Dwa czynniki odległe o $\num{0.2}$ na starcie, a na drugim końcu jeden jest
+mniej więcej $\val{f04.decay.ratio}$ razy większy od drugiego \dash{} i żaden z
+nich nie był skrajny.
 
 \yourturn
 Policz $50 \ln \num{0.9}$ i powiedz, co to mówi o pierwszej z tych dwóch
@@ -981,7 +987,7 @@ for g in stream:
     m = beta * m + (1 - beta) * g
 \end{python}
 
-Jedna liczba stanu i jedno mnożenie z dodawaniem na obserwację. Nazywa się to
+Jedna liczba stanu i kilka mnożeń na obserwację. Nazywa się to
 \emph{wykładniczą średnią ruchomą}, a ta sekcja rozbiera ją na części, bo jest
 całym momentum i połową Adama.
 
@@ -1217,7 +1223,7 @@ kupuje kolejny tysiąc?
   sigmy przeniesiona na iloczyn, czyli rozumowanie, które
   Programy~\ref{prog:F01}, \ref{prog:F02} i~\ref{prog:F03} złapały każdy pod
   innym znakiem}.}
-\sumitem{7--8}{\result{Liczba wyrazów to $\text{koniec} - \text{początek} + 1$, bo obie
+\sumitem{7--9}{\result{Liczba wyrazów to $\text{koniec} - \text{początek} + 1$, bo obie
   granice są włączone. $\sum_{i=0}^{n}$ ma $n+1$ wyrazów, a
   $\sum_{i=0}^{n-1}$ ma $n$, czyli tyle, po ilu chodzi \code{range(n)}}.}
 \sumitem{9}{\result{Przeindeksowanie przesuwa granice w jedną stronę, a indeks dolny w
@@ -1257,8 +1263,9 @@ kupuje kolejny tysiąc?
   $\val{f04.acc.micro}$, a nie $\num{0.50}$; dwa przebiegi po $100$ i $1$
   token na sekundę dają razem $\val{f04.rate.micro}$, a nie $\num{50.5}$}.}
 \sumitem{27--28}{\result{Średnia makro waży równo grupy, średnia mikro waży równo
-  elementy, a zgadzają się dokładnie wtedy, gdy wszystkie mianowniki są równe.
-  Obie są prawomocne; błędem jest podanie jednej jako drugiej}.}
+  elementy, a jakiekolwiek byłyby liczniki, zgadzają się dokładnie wtedy, gdy
+  wszystkie mianowniki są równe. Obie są prawomocne; błędem jest podanie jednej
+  jako drugiej}.}
 \sumitem{29--32}{\result{Rekurencja robi jeden krok, a wzór ogólny pomija je wszystkie.
   $\sum_{k=0}^{n-1} r^{k} = \frac{1-r^{n}}{1-r}$, co wynosi
   $\val{f04.geom.ten}$ przy $r = \num{0.9}$ i $n = 10$, a dąży do
@@ -1266,8 +1273,8 @@ kupuje kolejny tysiąc?
 \sumitem{33--34}{\result{$\ln \prod_i x_i = \sum_i \ln x_i$, czyli pierwsze prawo z
   Programu~\ref{prog:F03} zapisane nad pi. Pięćdziesiąt warstw po $\num{0.9}$
   daje $\val{f04.decay.fifty}$, a po $\num{1.1}$ daje $\val{f04.grow.fifty}$:
-  dwa czynniki odległe o $\num{0.2}$ są na drugim końcu odległe o mniej więcej
-  $\val{f04.decay.ratio}$}.}
+  dwa czynniki odległe o $\num{0.2}$ na starcie, a na drugim końcu jeden jest
+  mniej więcej $\val{f04.decay.ratio}$ razy większy od drugiego}.}
 \sumitem{35--38}{\result{Wykładnicza średnia ruchoma to
   $m \leftarrow \beta m + (1-\beta) g$, a rozwinięta jest sumą ważoną
   wszystkiego, co zobaczyła, z wagami $(1-\beta)\beta^{k}$.

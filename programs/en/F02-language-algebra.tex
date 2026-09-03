@@ -277,11 +277,13 @@ already as short as it goes, and writing $5x^{2}$ or $5x^{3}$ for it is wrong.
 \end{ansblock}
 
 \begin{warning}
-Your framework will not stop you. Adding an array of shape $(n,1)$ to an array
-of shape $(n,d)$ is this same error \dash{} two unlike things added \dash{} and
-rather than refusing, the library broadcasts the first over the second and
-hands back an entirely ordinary $(n,d)$ result. No exception, no warning, and a
-number at the far end that is wrong in a way none of your tests is looking for.
+Your framework will not stop you. Subtracting an array of shape $(n,1)$ from
+one of shape $(n)$ is this same error \dash{} two unlike things combined
+\dash{} and rather than refusing, the library broadcasts them against each
+other and hands back an entirely ordinary $(n,n)$ result. No exception, no
+warning, and a number at the far end that is wrong in a way none of your tests
+is looking for. Program~\ref{prog:P07} measures what that one costs: a loss
+averaged over every \emph{pair} instead of every example.
 
 Mathematics refuses unlike terms. Array libraries do not, which is why
 Program~\ref{prog:P07} spends its whole length on shapes.
@@ -361,7 +363,8 @@ Evaluate $2 + 3 \times 4^{2}$.
 \ans{$50$}
 The index binds first, giving $4^{2} = 16$; then the multiplication,
 $3 \times 16 = 48$; then the addition, $2 + 48 = 50$. An answer of $80$ added
-before multiplying, and an answer of $400$ multiplied before taking the index.
+before multiplying, an answer of $146$ multiplied before taking the index, and
+an answer of $400$ the whole line read strictly left to right.
 
 Now a smaller one, which catches more people than the first did. Evaluate
 $-3^{2}$, and then evaluate $(-3)^{2}$.
@@ -390,7 +393,7 @@ So when your reading and your program disagree, the bug is in your formula, and
 a squared error that comes out negative is often exactly this. A
 \emph{variance} that comes out negative is a different fault with a different
 cause \dash{} catastrophic cancellation in the one-pass formula \dash{} and it
-belongs to Program~\ref{prog:P01}.
+belongs to Program~\ref{prog:P02}.
 \end{trapbox}
 Something else gets left off the printed page, and multiplication is the usual
 victim: $2x$ means $2 \times x$ with the sign not printed. Harmless, until it
@@ -464,13 +467,16 @@ Take a row whose variance is $\val{f02.lnorm.var}$ \dash{} a nearly constant
 row, which is the case the $\eps$ exists for \dash{} with
 $\eps = \val{f02.lnorm.eps}$, $x = \val{f02.lnorm.x}$ and
 $\mu = \val{f02.lnorm.mu}$. Read as printed, the line gives
-$\val{f02.ln.eps.inside}$. Misread with the $\eps$ outside the root, it gives
+$\val{f02.ln.eps.inside}$. Misread with the $\eps$ outside the root but still
+inside the divisor, it gives
 $\val{f02.ln.eps.outside}$, which is \val{f02.ln.eps.diff.pct}\% above the
 printed value.
 
 \begin{aibox}
 That is a real line of a real system \dash{} layer normalisation, from Ba,
-Kiros and Hinton \dash{} and it sits inside every transformer you will use. The
+Kiros and Hinton, with the $\eps$ as the reference implementations write it
+rather than as the paper does \dash{} and it sits inside every transformer you
+will use. The
 $\eps$ is a numerical decision rather than punctuation, and where it sits
 changes what the layer does to a near-constant feature.
 
@@ -776,9 +782,9 @@ $t^{2} - 16 = (t + 4)(t - 4)$.
 \begin{note}
 This book drills factorisation no further than that. A common factor and a
 difference of two squares between them cover what the later programs actually
-need, and the general quadratic is handled where it is used:
-Program~\ref{prog:F06} solves quadratics, by formula, at the point where one
-has to be solved.
+need. The general quadratic is not solved anywhere in this book, and that is
+a decision rather than an oversight: nothing later in it requires one, and a
+formula you will look up when you need it is not worth an afternoon here.
 
 If your schooling included hours of factorising trinomials by inspection, you
 have lost nothing by not repeating them here.
@@ -886,7 +892,7 @@ The denominator is a \emph{sum}, so no single exponential cancels out of it.
 That is this section's rule, and it is why a softmax cannot be computed one
 entry at a time and why the whole row must be summed before any one probability
 is known. It is also why the numbers in that row are not independent of one
-another, which is what Programs~\ref{prog:F07} and~\ref{prog:P30} are about.
+another, which is what Programs~\ref{prog:F07} and~\ref{prog:P18} are about.
 \end{aibox}
 
 \yourturn
@@ -1015,7 +1021,8 @@ This is not a curiosity about roots. It is why \textbf{a loss value tells you
 how far wrong you are and never in which direction}, and therefore why no
 training procedure has ever been built out of loss values alone. What carries
 the direction is the \emph{gradient} \dash{} the derivative of the loss, which
-for this loss is $-2(y - \hat{y})$ and keeps exactly the sign the square
+for this loss with respect to the prediction is $-2(y - \hat{y})$ and keeps
+exactly the sign the square
 destroyed. Programs~\ref{prog:F11} and~\ref{prog:P15} take that apart.
 \end{trapbox}
 Here is a rearrangement with a number at the end of it.
@@ -1070,9 +1077,11 @@ $d = \left(\frac{q}{s}\right)^{2}$, needing $s \ne 0$.
 
 That second one is the attention scale in its scalar form. The
 $\frac{1}{\sqrt{d}}$ that divides a score in every transformer is this
-rearrangement read the other way round; the vector version is
-Program~\ref{prog:P05}, and the reason the divisor is $\sqrt{d}$ rather than
-$d$ or anything else is Program~\ref{prog:P32}.
+rearrangement read the other way round; the dot product it is built from is
+Programs~\ref{prog:F09} and~\ref{prog:P05}, and the reason the divisor is
+$\sqrt{d}$ rather than $d$ or anything else is derived in
+Program~\ref{prog:P25} and checked through a whole block in
+Program~\ref{prog:P32}.
 
 \begin{note}
 The habit that makes all of this safe costs ten seconds. \textbf{Check a
@@ -1284,7 +1293,8 @@ this last section and makes a habit of it.
 \sumitem{20--21}{\result{$a(b+c) = ab + ac$, and two brackets of two terms give
   \emph{four} products \dash{} one per cell of a $2 \times 2$ grid}.}
 \sumitem{22--23}{\result{$(a+b)^{2} = a^{2} + 2ab + b^{2}$. An index distributes over a
-  product and over nothing else. Check at $a = 3$, $b = 4$: $49$, not $25$}.}
+  product or a quotient, and over nothing else. Check at $a = 3$, $b = 4$:
+  $49$, not $25$}.}
 \sumitem{24--26}{\result{$(a+b)(a-b) = a^{2} - b^{2}$ is the one case where the cross
   terms cancel. In $(y - \hat{y})^{2}$ the cross term is the only part of the
   loss that knows about both quantities}.}

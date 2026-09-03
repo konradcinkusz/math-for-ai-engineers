@@ -58,7 +58,8 @@
   rozwiązywania równań nie przenosi się na nią}
 \outcome{36--42}{zapisać próg i wartość przyciętą jako nierówności oraz
   powiedzieć, co każdy z dwóch sposobów przycinania wektora robi z jego
-  długością i kierunkiem}
+  długością i kierunkiem \dash{} przyjmując długość wektora jako pierwiastek z
+  sumy kwadratów składowych, co porządnie buduje Program~\ref{prog:F09}}
 \end{outcomes}
 
 \begin{quiz}
@@ -341,7 +342,7 @@ Ostatni punkt procentowy prawdopodobieństwa kupuje się większym ruchem
 argumentu niż pierwsze pięćdziesiąt i żadne uczenie tego nie zmieni \dash{}
 to własność funkcji, a nie dopasowania.
 
-Zostało jedno i jest w nim pułapka. Rozwiąż $x^{2} = 9$.
+Zostało jedno. Bez rachunków \dash{} zapisz odpowiedź. Rozwiąż $x^{2} = 9$.
 \dotline
 \nextframe
 \end{fr}
@@ -818,8 +819,9 @@ nie jako droga tam i z powrotem.
 Dlatego próg modelu da się stroić bez przeliczania choćby jednego
 prawdopodobieństwa. Porównuj logity z $\logit(\text{próg})$, a dostaniesz te
 same decyzje o jedną funkcję wykładniczą mniej na element, co przy dużym
-zbiorze ewaluacyjnym nie jest niczym. Program~\ref{prog:P27} zajmuje się
-pytaniem, jak próg wybrać, a to pytanie jest inne i dużo trudniejsze.
+zbiorze ewaluacyjnym nie jest niczym. Gdzie postawić próg, to pytanie inne i
+dużo trudniejsze, i jest to pytanie o to, ile kosztują cię dwa rodzaje błędu, a
+nie o arytmetykę. Ta książka go nie rozstrzyga.
 \end{note}
 \end{fr}
 
@@ -877,8 +879,20 @@ nie przekraczała progu.
 
 Weź gradient
 \[ g = (6, \num{0.5}, -\num{0.25}) \]
-którego długość wynosi $\lVert g \rVert = \val{f06.grad.norm}$. Oba działania
-zostaną teraz zastosowane z progiem $\num{1.0}$.
+którego długość wynosi
+\[ \lVert g \rVert = \sqrt{6^{2} + \num{0.5}^{2} + \num{0.25}^{2}}
+   = \val{f06.grad.norm} \]
+Oba działania zostaną teraz zastosowane z progiem $\num{1.0}$.
+
+\begin{rigourbox}
+Pojawiają się tu dwa obiekty, których ten program nie zdefiniował:
+\emph{długość} wektora o więcej niż jednej składowej i \emph{kąt} między dwoma
+wektorami. Pierwszy buduje Program~\ref{prog:F09}, a drugi
+Program~\ref{prog:P05}, i żaden nie jest potrzebny, żeby śledzić dalszy ciąg
+\dash{} jedyny fakt, z którego ta sekcja korzysta, stoi powyżej: długość to
+pierwiastek z sumy kwadratów składowych, więc każdą liczbę w tej sekcji da się
+sprawdzić kalkulatorem. Kąt podajemy dla skali, a nie liczymy.
+\end{rigourbox}
 
 Policz, co daje przycinanie po wartości.
 \nextframe
@@ -917,7 +931,8 @@ gdzie indziej.
 
 Przycinanie po \emph{normie} robi to, co sugeruje nazwa \enquote{przytnij na
 $\num{1.0}$}. Mnoży każdą składową przez ten sam czynnik
-$\frac{\num{1.0}}{\lVert g \rVert}$, dając
+$\min\bigl(1,\; \frac{\num{1.0}}{\lVert g \rVert}\bigr)$ \dash{} więc gradient
+już krótszy od progu zostaje dokładnie taki, jaki był \dash{} dając
 \[ (\val{f06.clip.norm.c1},\; \val{f06.clip.norm.c2},\;
    \val{f06.clip.norm.c3}) \]
 którego długość wynosi dokładnie $\val{f06.clip.norm.norm}$, a kierunek jest
@@ -1198,8 +1213,9 @@ jedno zachowuje kierunek.}{przycinanie po wartości i po normie}
   dokładnie to samo, i powiedz, co charakteryzuje takie wektory.
   \answerto{Każdy już mieszczący się w progu w obu sensach, na przykład
   $(\num{0.1}, \num{0.1})$ przy $t = 1$: oba zostawiają go w spokoju. Gdy
-  przycinanie naprawdę zaczyna gryźć, oba zgadzają się tylko w jednym wymiarze,
-  gdzie kierunek jest po prostu znakiem.}
+  przycinanie zaczyna gryźć, zgadzają się dokładnie wtedy, gdy co najwyżej
+  jedna składowa jest niezerowa \dash{} obcięcie tej składowej i przeskalowanie
+  całego wektora są wtedy tym samym działaniem, w dowolnej liczbie wymiarów.}
 \item Gradient to $(10, 0, 0, \ldots, 0)$: jedna niezerowa składowa,
   w tysiącu wymiarów. Co daje każdy rodzaj przycinania progiem $\num{1.0}$?
   \answerto{Po wartości: ten sam wektor ze składową zmniejszoną do $1$, co ma

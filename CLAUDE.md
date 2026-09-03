@@ -23,8 +23,8 @@ companion volumes.
 |---|---|---|---|---|---|
 | `main-en` (17x24) | 1409 | 0 | 0 | **0** | 0 |
 | `main-pl` (17x24) | 1436 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1174 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1188 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1176 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1186 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -124,10 +124,13 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **99 orphan-tail pages: 28 · 27 · 23 · 21** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`. **The two elicitation passes are the only things
-  in this book's record to take the count DOWN**, and between them they took it
-  from 99 to 96. Part~II did it in two measurable movements: its twenty-one
+- **95 orphan-tail pages: 28 · 25 · 22 · 20** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`. **Three passes have taken the count DOWN** and
+  every other one has raised it: the two elicitation passes took it from 99 to
+  96, the P05 review pass put three back, and the F01--F03 review batch took
+  four off \dash{} the first of the three that was not aiming at the ledger at
+  all, which is why *a correctness pass is also a layout pass* is written into
+  its note. Part~II did it in two measurable movements: its twenty-one
   conversions went 29/30/22/22 to 31/31/21/21, and the three lengthenings that
   cleared their cues then went to 28/29/21/21. So the cues cost the trade
   builds two tails each and the lengthenings returned three each \dash{} which
@@ -12353,6 +12356,161 @@ as four pages each. The Appendix~E pass recorded this instrument defect and its
 remedy in the same breath: **prefer the checked-in tool over a fresh
 one-liner** \dash{} `checklog.py` parses the line properly and is where the
 numbers above come from.
+
+### Foundation review, F01--F03, September 2026
+
+Issues \#124, \#126 and \#141, taken as one batch because each PR costs a
+four-format build and the three programs share their defects. Fifteen
+correctness findings fixed; the layout and figure-size ones recorded.
+
+#### Two wrong answers in Appendix~A, both printing the numbers that refute them
+
+`1~TiB, at 1.0995e12 bytes against 1.1e12` names the smaller of the two as the
+larger, with both figures on the page. And **a counterexample was offered to
+settle an \emph{ever equal} claim**, which is a universal: one instance refutes
+\emph{always} and cannot establish \emph{never}, and
+Program~\ref{prog:P14} teaches that distinction thirteen programs later. The
+answer is now the one-line proof.
+
+That pairing is the finding rather than either error alone. **Appendix~A is
+where a reader goes to check themselves**, so an answer that is wrong there is
+wrong at the moment the reader has decided to trust the book over their own
+working \dash{} and both of these had survived a full draft, an index pass and
+a consistency pass.
+
+#### A rule of thumb that was its own reciprocal
+
+*A rule of thumb puts an English word at about three quarters of a token*, and
+then the page divides by $0.75$. If a **word** is $0.75$ of a token then $10^5$
+words is $7.5 \times 10^4$ tokens; dividing is the rule the other way round.
+A reader who follows the sentence and one who follows the arithmetic end up a
+factor of $1.8$ apart, and the second is the one the rest of the frame uses.
+
+**Neither half was wrong on its own.** That is what let it ship: the sentence
+is a true statement about some tokenisers, the division is the right
+computation, and only reading them together shows they are not the same claim.
+The class is worth naming \dash{} **a premise and its arithmetic are two
+claims, and a gate that checks numbers checks only one of them.**
+
+#### Five false forward pointers, every one confirmed by opening the file
+
+| said | is |
+|---|---|
+| F06 solves quadratics by formula | `grep` finds the word nowhere in F06 |
+| a negative one-pass variance belongs to P01 | P01 has neither *one-pass* nor *variance*; it is P02's |
+| softmax row dependence is P30's | P30 has no *softmax* at all; it is P18's Jacobian |
+| the $\sqrt{d}$ divisor is P32's | derived in P25; P32 only checks it survives assembly |
+| the norm-of-a-sum trap is P05's | F09's, with P05 measuring what it costs |
+
+This file has recorded *open the program before writing a sentence about it* a
+dozen times, and every previous instance was one pointer in one program. Five
+in three programs is a different observation: **the pointers were written when
+the destination was a stub**, so each was true of a brief and false of the
+program that replaced it. The quadratic one is the worst, because it invites
+the reader to skip something \dash{} a reader who takes that permission finds
+the formula nowhere in the book. It now says the book does not solve a general
+quadratic anywhere, and why.
+
+#### The warning box called correct broadcasting an error
+
+Broadcasting an $(n,1)$ column over $(n,d)$ is exactly how $x - \mu$ is
+computed in the layer-norm line **the same section flattens two pages later**.
+The silent failure this book actually measures is Program~\ref{prog:P07}'s
+$(n)$ against $(n,1)$ giving $(n,n)$, so that is the example now \dash{} and it
+is the better one, because P07 prices it.
+
+Worth noticing that the box was the *only* claim in F02 an ML reader would
+recognise as wrong on sight, and it sat in a red outlined box, which is the
+treatment this book reserves for *stop and read*.
+
+#### The recorded residue, decided
+
+CLAUDE.md left $\num{2.43e-2085}$ against $10^{-2084.61}$ \dash{} the F03
+second review pass wrote it down explicitly *so the next pass decides rather
+than rediscovers*. Undo the printed exponent and you get $\num{2.455e-2085}$,
+so the page carried two printed forms of one number that a reader can put side
+by side and find different.
+
+**Three decimals is the smallest precision at which they agree**:
+$10^{-2084.614}$ is $\num{2.432e-2085}$, which rounds to the printed mantissa,
+where two gives $2.455$ and four gives $2.435$. So it is not a taste question,
+and an assertion now holds the two together **on the printed strings** rather
+than on the floats \dash{} which is Program~\ref{prog:P05}'s finding from the
+same week, applied to a value that had been left open for four programs.
+
+Both downstream gates still pass: P26 reads the exponent and its rounding slack
+was derived from *two* decimals, so the comment as well as the constant had to
+move.
+
+#### Two claims about the book, in places nothing can check
+
+- **The notation box said the bare-logarithm ban is lifted in the entry Quiz.**
+  The Quiz **as printed** carries no bare mark; the one that exists is in its
+  Appendix~A answer, which is a different page in a different part of the book.
+- **`preamble.tex`'s own comment said the same thing** \dash{} in the paragraph
+  that warns about exactly this class, immediately below the note explaining
+  why the *count* is deliberately not stated there. The tally was retired and
+  the place-name beside it was never checked.
+
+That second one is the sharper of the two and it generalises: **retiring a
+tally does not audit the sentence the tally was in.** The comment's own
+reasoning was right; only its list of places was wrong.
+
+#### And the Quiz heading contradicted the Can you? footer, on all 47 programs
+
+*Take this before you read the program and again after you have finished it*,
+against a footer three pages later saying that answering the same items twice
+measures memory rather than learning. The footer was corrected in the F04
+review pass and the front matter in the P04 pass, **for exactly this reason**,
+and the heading string was missed both times \dash{} because it lives in
+`lang/*.tex` and neither pass was looking there.
+
+#### Layout, and the ledger went DOWN
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1409 | 1409 | `[]` | 0 |
+| `main-pl` | 1436 | 1436 | `[]` | 0 |
+| `main-en-a4` | 1176 | 1174 | `[6.3]` | 0 |
+| `main-pl-a4` | 1186 | 1188 | `[]` | 0 |
+
+The overfull multiset came back element for element to the baseline, with no
+stranded openers, no stranded headings and **no orphaned cues at any point in
+the pass** \dash{} which is unusual for a batch that rewrote thirty-odd
+paragraphs across six files, and is the accumulated rules being applied while
+editing rather than after a build named a defect.
+
+**And the orphan tails went 99 to 95**: 28, **25**, **22**, **20** against 28,
+27, 23, 21. That is the third pass in this book's record to take that ledger
+down, after the two elicitation passes, and the first that was not aiming at
+it: this batch is prose corrections, and correcting prose changes its length.
+Worth expecting again \dash{} **a correctness pass is also a layout pass**, in
+whichever direction the arithmetic of the page happens to fall.
+
+Note the trade builds did not move a page while both A4 builds did, in opposite
+directions. That is the same shape the P05 pass recorded from the other end and
+the reason this file's rule is to re-measure all four rather than adjust the
+one you wrote in.
+
+#### Recorded rather than taken
+
+- **Four figures set their node text at about a third of body size** (F1.1,
+  F1.2, F1.3, F2.2), all of them height-bound or narrow. The recorded fixes
+  apply \dash{} *add a rank* for a wrapping graph, *wordier nodes* for a chain
+  \dash{} but redrawing four means re-measuring every render width with
+  `pdfinfo` and re-checking rule 2 in all four builds, and `f01-magnitudes` is
+  the standing case this file already flags as on the wrong side of the
+  aspect-ratio crossover. **A figure pass, not a clause in a prose pass.**
+  What was taken here is F1.1's *content*: it drew three of the five numbers
+  frame 6 asks the reader to classify, on the verso facing the question, and
+  its edge label called a finite subset of $\Q$ *not nested* with $\Q$.
+- **The Quiz box breaking inside an item**, stranding the route boxes that are
+  its navigation device. A preamble change that moves pagination in every
+  program with a Quiz spanning a break.
+- **Blank versos carrying a running head**, found and deliberately left in the
+  F04 review pass.
 
 ### Stroud layout pass, August 2026
 

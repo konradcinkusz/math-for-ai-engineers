@@ -356,10 +356,10 @@ _log10 = F03_TOKENS * math.log10(math.exp(-F02_LOSS))
 assert f"{_log10:.2f}" == f"{F03_LOG10:.2f}", (_log10, F03_LOG10)
 # Backwards, which is what this section is: divide a log-likelihood by the
 # token count and negate, and the cross-entropy loss comes back.  The
-# tolerance is not chosen -- it is what rounding F03's exponent to two
+# tolerance is not chosen -- it is what rounding F03's exponent to three
 # decimals can account for, and nothing wider.
 BACK_LOSS = -F03_LOG10 * math.log(10) / F03_TOKENS
-_rounding_slack = 0.005 * math.log(10) / F03_TOKENS
+_rounding_slack = 0.0005 * math.log(10) / F03_TOKENS
 assert abs(BACK_LOSS - F02_LOSS) <= _rounding_slack, (BACK_LOSS, F02_LOSS)
 
 # Label smoothing, which is maximum likelihood against a different target.

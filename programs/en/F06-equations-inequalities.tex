@@ -57,8 +57,9 @@
 \outcome{28--35}{solve an inequality, and say which single step of
   equation-solving does not carry across to one}
 \outcome{36--42}{write a threshold and a clipped value as inequalities, and
-  say what each of the two ways of clipping a vector does to its length and
-  its direction}
+  say what each of the two ways of clipping a vector does to its length and its
+  direction \dash{} taking a vector's length as the square root of the sum of
+  its squared components, which Program~\ref{prog:F09} builds properly}
 \end{outcomes}
 
 \begin{quiz}
@@ -337,7 +338,7 @@ percentage point of probability is bought with more movement of the input than
 the first fifty, and no amount of training changes that \dash{} it is a
 property of the function, not of the fit.
 
-One left, and it has a trap in it. Solve $x^{2} = 9$.
+One left. No working \dash{} write the answer down. Solve $x^{2} = 9$.
 \dotline
 \nextframe
 \end{fr}
@@ -808,8 +809,9 @@ computed, arriving here as a threshold rather than as a round trip.
 This is why a model's threshold can be tuned without recomputing a single
 probability. Compare the logits against $\logit(\text{threshold})$ and you get
 the same decisions with one exponential fewer per item, which for a large
-evaluation set is not nothing. Program~\ref{prog:P27} owns the question of how
-to choose the threshold, which is a different and much harder one.
+evaluation set is not nothing. Where to put the threshold is a different and
+much harder question, and it is a question about what the two kinds of error
+cost you rather than about the arithmetic. This book does not settle it.
 \end{note}
 \end{fr}
 
@@ -868,8 +870,20 @@ at most the threshold.
 
 Take the gradient
 \[ g = (6, \num{0.5}, -\num{0.25}) \]
-whose length is $\lVert g \rVert = \val{f06.grad.norm}$. Both operations are
-now applied with a threshold of $\num{1.0}$.
+whose length is
+\[ \lVert g \rVert = \sqrt{6^{2} + \num{0.5}^{2} + \num{0.25}^{2}}
+   = \val{f06.grad.norm} \]
+Both operations are now applied with a threshold of $\num{1.0}$.
+
+\begin{rigourbox}
+Two objects arrive here that this program has not defined: the \emph{length} of
+a vector with more than one component, and the \emph{angle} between two of
+them. Program~\ref{prog:F09} builds the first and Program~\ref{prog:P05} the
+second, and neither is needed to follow what comes next \dash{} the one fact
+this section uses is the one printed above, that a length is the square root of
+the sum of the squared components, so every figure in this section can be
+checked with a calculator. The angle is quoted for scale rather than computed.
+\end{rigourbox}
 
 Work out what clipping by value gives.
 \nextframe
@@ -907,7 +921,8 @@ shorter version of the gradient; it points somewhere else.
 
 Clipping by \emph{norm} does what the name \enquote{clip at $\num{1.0}$}
 suggests. It multiplies every component by the same factor
-$\frac{\num{1.0}}{\lVert g \rVert}$, giving
+$\min\bigl(1,\; \frac{\num{1.0}}{\lVert g \rVert}\bigr)$ \dash{} so a gradient
+already shorter than the threshold is left exactly as it is \dash{} giving
 \[ (\val{f06.clip.norm.c1},\; \val{f06.clip.norm.c2},\;
    \val{f06.clip.norm.c3}) \]
 whose length is $\val{f06.clip.norm.norm}$ exactly and whose direction is the
@@ -1181,8 +1196,9 @@ of them keeps the direction.}{clipping by value against by norm}
   exactly, and say what characterises such vectors.
   \answerto{Any vector already inside the threshold in both senses, for
   instance $(\num{0.1}, \num{0.1})$ at $t = 1$: both leave it alone. Once
-  clipping actually bites, the two agree only in one dimension, where
-  direction is just a sign.}
+  clipping bites, they agree exactly when at most one component is non-zero
+  \dash{} truncating that component and rescaling the whole vector are then the
+  same operation, in any number of dimensions.}
 \item A gradient is $(10, 0, 0, \ldots, 0)$: a single non-zero component,
   in a thousand dimensions. What does each kind of clipping at
   $\num{1.0}$ produce?

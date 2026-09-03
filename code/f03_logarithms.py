@@ -249,18 +249,33 @@ emit("f03.seq.tokens", SEQ_TOKENS)
 #
 # and a base change puts that on the decimal scale the reader can read:
 #
-#     log10 p(seq) = -4800 / ln 10 = -2084.61,  so p(seq) = 10^-2084.61
+#     log10 p(seq) = -4800 / ln 10 = -2084.614,  so p(seq) = 10^-2084.614
+#
+# THREE decimals on the exponent, not two, and it is a reproduce-from-the-
+# page constraint rather than a precision preference: 10^-2084.61 is
+# 2.455e-2085 against the mantissa's 2.43, so the two printed forms of one
+# number disagreed. The assertion below holds them together.
 #
 # The mantissa and exponent are split out so the frame can print an ordinary
 # piece of scientific notation. Not emitted separately: -4800 itself, which is
 # 2000 x 2.4 and is the head arithmetic the frame is teaching.
 SEQ_LOGPROB_NATS = SEQ_TOKENS * math.log(P_TOKEN)
 SEQ_LOG10 = SEQ_LOGPROB_NATS / LN10
-emit("f03.seq.prod.log10", SEQ_LOG10, 2)
+emit("f03.seq.prod.log10", SEQ_LOG10, 3)
 
 _exponent = math.floor(SEQ_LOG10)
 _mantissa = 10.0 ** (SEQ_LOG10 - _exponent)
 emit("f03.seq.prod", f"{_mantissa:.2f}e{_exponent}")
+
+# The page prints both forms within four lines of each other, so a reader
+# will undo one and compare. Assert on the PRINTED strings, which is the
+# only form anybody checks.
+_printed_exp = f"{SEQ_LOG10:.3f}"
+_undone = 10.0 ** (float(_printed_exp) - math.floor(float(_printed_exp)))
+assert f"{_undone:.2f}" == f"{_mantissa:.2f}", (
+    f"the page prints 10^{_printed_exp}, which undoes to {_undone:.2f}, "
+    f"beside a mantissa of {_mantissa:.2f}: two printed forms of one number "
+    f"that a reader can put side by side and find different")
 
 # Two routes to the same number, so the script demonstrates its own thesis:
 # summing 2000 logarithms and taking one logarithm of the product are the same
