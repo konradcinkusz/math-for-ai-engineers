@@ -24,7 +24,7 @@ companion volumes.
 | `main-en` (17x24) | 1409 | 0 | 0 | **0** | 0 |
 | `main-pl` (17x24) | 1436 | 0 | 0 | **0** | 0 |
 | `main-en-a4` | 1176 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1186 | 0 | 0 | **0** | 0 |
+| `main-pl-a4` | 1182 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -99,7 +99,7 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1626 computed values, all referenced, all present, plus the committed console
+- 1627 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
@@ -124,13 +124,18 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **95 orphan-tail pages: 28 · 25 · 22 · 20** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`. **Three passes have taken the count DOWN** and
+- **90 orphan-tail pages: 28 · 25 · 19 · 18** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`. **Four passes have taken the count DOWN** and
   every other one has raised it: the two elicitation passes took it from 99 to
-  96, the P05 review pass put three back, and the F01--F03 review batch took
-  four off \dash{} the first of the three that was not aiming at the ledger at
-  all, which is why *a correctness pass is also a layout pass* is written into
-  its note. Part~II did it in two measurable movements: its twenty-one
+  96, the P05 review pass put three back, and the F01--F06 review batch took
+  nine off across two builds \dash{} the first of the four that was not aiming
+  at the ledger at all, which is why *a correctness pass is also a layout pass*
+  is written into its note. **Read \enquote{across two builds} literally**: the
+  batch's own build failed at `check` on an orphaned cue, and `check-a4` does
+  not run until `check` passes, so the A4 half of this ledger was not measured
+  until the cue was cleared. A hard-gate failure in the trade builds hides every
+  A4 page-level measurement, which is why a figure taken from a red build is
+  worth nothing. Part~II did it in two measurable movements: its twenty-one
   conversions went 29/30/22/22 to 31/31/21/21, and the three lengthenings that
   cleared their cues then went to 28/29/21/21. So the cues cost the trade
   builds two tails each and the lengthenings returned three each \dash{} which
@@ -12357,11 +12362,32 @@ remedy in the same breath: **prefer the checked-in tool over a fresh
 one-liner** \dash{} `checklog.py` parses the line properly and is where the
 numbers above come from.
 
-### Foundation review, F01--F03, September 2026
+### Foundation review, F01--F06, September 2026
 
-Issues \#124, \#126 and \#141, taken as one batch because each PR costs a
-four-format build and the three programs share their defects. Fifteen
-correctness findings fixed; the layout and figure-size ones recorded.
+Issues \#124, \#126, \#141, \#150, \#154 and \#156, taken as one batch because
+each PR costs a four-format build and the six programs share their defects.
+Thirty-odd correctness findings fixed; the layout and figure-size ones
+recorded.
+
+**This note said F01--F03 for its first day, and the merged commit's own
+message still does.** The batch grew from three programs to six while it was
+being worked and neither was updated, so the note described half of what
+shipped and the F04--F06 findings below were written up nowhere. That is this
+file's oldest class arriving at its own account of itself: **a pass note is a
+claim about what shipped, so it has to be checked against the diff rather than
+against what the pass set out to do**, and `git show --stat` settles it in one
+command \dash{} 23 files, F01 to F06. The six issues were closed against the
+right pull request throughout, so GitHub had it right and the prose did not.
+
+**And the live value ledger above was one short**, at 1626 against the tool's
+1627: the P05 review pass replaced a machine-dependent `.err` with a bound and
+added a percentage, regenerated `figures/values/appf.tex` so `make verify`
+stayed green, and did not touch the count in this file. That is the standing
+instruction from the Part~II pass \dash{} **a pass that moves a ledger has to
+grep the appendices *and this file* for prose about it** \dash{} arriving one
+pass after it was written, and it is worth noticing that the *gated* copy was
+right and the ungated one was not. Appendix~F's own $1626$ is a historical
+figure inside a pass note and stays as it is.
 
 #### Two wrong answers in Appendix~A, both printing the numbers that refute them
 
@@ -12465,6 +12491,98 @@ review pass and the front matter in the P04 pass, **for exactly this reason**,
 and the heading string was missed both times \dash{} because it lives in
 `lang/*.tex` and neither pass was looking there.
 
+#### A quantifier right about every input and false about the one in your hand
+
+Program~\ref{prog:F04} §5 said the macro and micro averages *agree exactly when
+every $b_i$ is equal, and not otherwise*. As an identity in the $a_i$ that is
+exactly right, and it is the condition worth teaching. As a statement about the
+numbers a reader has in front of them it is false: $a = (1, 2)$, $b = (2, 4)$
+gives $\num{0.5}$ both ways with unequal denominators, as does any pair of
+shards scoring the same accuracy.
+
+**An engineer reads a sentence like that with particular data in hand**, and
+this is the section whose whole subject is knowing which average you are
+holding \dash{} so a reader who checks it the way the program has just taught
+them to check things finds it false. The frame now says which quantifier is
+meant and why equal denominators is still the condition worth knowing: it is
+the one you can arrange in advance. Summary item 14 got the same clause.
+
+#### Program F06 §6 computed with a length the program never defines
+
+Four figures in the clipping section are lengths of a three-component vector,
+and nothing anywhere in F06 says how a length is computed \dash{} it arrives
+eleven programs later, in Program~\ref{prog:F09}. So every number in the
+payoff section was unverifiable, in a book whose standing rule is that a figure
+reproduces from what is beside it. Printing
+$\lVert g \rVert = \sqrt{6^{2} + \num{0.5}^{2} + \num{0.25}^{2}}$ makes all
+four checkable with a calculator, and a rigour box declares the two forward
+objects \dash{} the length to Program~\ref{prog:F09}, the angle to
+Program~\ref{prog:P05} \dash{} on the pattern this book already uses for
+Program~\ref{prog:P21}'s variance and Program~\ref{prog:P22}'s KL.
+
+**And the operation beside it was stated without its condition.** Clipping by
+norm was *multiplies every component by $\frac{t}{\lVert g \rVert}$*, which
+inflates any gradient already shorter than the threshold: $(\num{0.1},
+\num{0.1})$ at $t = 1$ would be multiplied by $\num{7.07}$. The program then
+contradicted itself two frames later, in a further-problem answer saying both
+operations leave that vector alone. It is
+$\min\bigl(1, \frac{t}{\lVert g \rVert}\bigr)$ now, which is what every
+implementation does and what makes the answer true.
+
+That same answer then characterised the agreement wrongly \dash{} *the two
+agree only in one dimension* \dash{} where they agree exactly when at most one
+component is non-zero, in any number of dimensions, which the further problem
+four lines below works out in full.
+
+#### Six claims true only under a condition nobody stated
+
+Three in Program~\ref{prog:F05} and three in Program~\ref{prog:F04}, and the
+class is worth naming because none of them is a wrong number and none is
+catchable by any gate here.
+
+| said | true only if |
+|---|---|
+| $y = x$ is at forty-five degrees | both axes are drawn to the same scale |
+| the weight $w$ makes the line steeper | $w > 1$; between $0$ and $1$ it flattens, and a negative $w$ turns it over |
+| a loss may be scaled, shifted or logarithmed | the scaling is **positive**, and the loss is positive before its logarithm |
+| a sum of gradients is not associative | \dash{} associativity is a property of an **operation**, so it is floating-point addition that fails |
+| two factors $\num{0.2}$ apart, then $22\,800$ apart | \dash{} the first is a difference and the second a ratio, in the program about reporting a quantity under the wrong description |
+| one multiply-add per observation | \dash{} the line above it is two multiplications and an addition |
+
+The last three are the same defect as the first three read from the other
+side: a sentence that is true of the thing the author had in mind and false of
+the thing on the page. And the third row is the one that would have cost a
+reader most, because Program~\ref{prog:F05}'s whole payoff is that a strictly
+increasing function cannot move the $\argmax$ \dash{} and a negative scaling is
+strictly *decreasing*, so the permission the frame granted reverses the very
+ordering the section exists to protect.
+
+**Two Summary routes also stopped one frame before their answer** \dash{} F04's
+item 4 at frames 7--8 where frame 9 answers, and F05's item at 41--44 where 45
+does. The book's convention is that a bracket includes the answering frame, and
+both now overlap the next item, which is established practice.
+
+#### A figure whose caption its own node falsified
+
+Figure F4.1's caption says *the loop names no positions and the sigma does,
+which is why the sigma has to say where its index starts and the loop does
+not.* The loop drawn in the panel reads `total = 0 / for i in 1..n: / total =
+total + x_i` \dash{} it names an index, names the position, and says where the
+index starts. Every one of the three things the caption says a loop does not
+do.
+
+**And it falsified frame 1's headline claim**, which is the claim that figure
+exists to illustrate: *the one thing the notation has that the loop has not is
+a name for the position of each term.* Redrawn in both editions to frame 1's
+own idiom, `for x in losses`, which names no position and makes the caption
+true.
+
+That is rule 2's neighbour rather than rule 2 itself. Rule 2 asks whether a
+figure answers the frame beside it; this asks whether it **contradicts** the
+frame beside it, which no gate looks for and which reading the node against the
+caption settles in one look. Program~\ref{prog:P11}'s *read the caption as a
+node* was the same discovery from the other end.
+
 #### Layout, and the ledger went DOWN
 
 `MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
@@ -12472,27 +12590,60 @@ and the heading string was missed both times \dash{} because it lives in
 | | pages | was | overfull hbox | vbox |
 |---|---|---|---|---|
 | `main-en` | 1409 | 1409 | `[]` | 0 |
-| `main-pl` | 1436 | 1436 | `[]` | 0 |
+| `main-pl` | 1436 | 1438 | `[]` | 0 |
 | `main-en-a4` | 1176 | 1174 | `[6.3]` | 0 |
-| `main-pl-a4` | 1186 | 1188 | `[]` | 0 |
+| `main-pl-a4` | 1182 | 1188 | `[]` | 0 |
 
 The overfull multiset came back element for element to the baseline, with no
-stranded openers, no stranded headings and **no orphaned cues at any point in
-the pass** \dash{} which is unusual for a batch that rewrote thirty-odd
-paragraphs across six files, and is the accumulated rules being applied while
-editing rather than after a build named a defect.
+stranded openers and no stranded headings.
 
-**And the orphan tails went 99 to 95**: 28, **25**, **22**, **20** against 28,
-27, 23, 21. That is the third pass in this book's record to take that ledger
-down, after the two elicitation passes, and the first that was not aiming at
-it: this batch is prose corrections, and correcting prose changes its length.
-Worth expecting again \dash{} **a correctness pass is also a layout pass**, in
-whichever direction the arithmetic of the page happens to fall.
+**And the orphan tails went 99 to 90**: 28, **25**, **19**, **18** against 28,
+27, 23, 21. That is the fourth pass in this book's record to take that ledger
+down, after the two elicitation passes, and the first of the four that was not
+aiming at it: this batch is prose corrections, and correcting prose changes its
+length. Worth expecting again \dash{} **a correctness pass is also a layout
+pass**, in whichever direction the arithmetic of the page happens to fall.
 
-Note the trade builds did not move a page while both A4 builds did, in opposite
-directions. That is the same shape the P05 pass recorded from the other end and
-the reason this file's rule is to re-measure all four rather than adjust the
+Note the trade builds moved by nothing and two pages while the A4 pair moved by
+nothing and six. That is the same shape the P05 pass recorded from the other end
+and the reason this file's rule is to re-measure all four rather than adjust the
 one you wrote in.
+
+#### An orphaned cue reached `main`, and the gate arrangement is why
+
+The `was` column above is not the tree this batch first pushed. **The rigour
+box added to Program~\ref{prog:F06} §6 lengthened frame 38, and in `main-pl`
+its question, its row of dots and its next-frame cue then landed alone on the
+following page** \dash{} the reader turns over expecting an answer and gets a
+running head, two italic words and white paper. `make check` failed on it and
+said so; the batch merged anyway, so `main` carried the defect until the next
+push cleared it.
+
+**The mechanism is the one this file already argues for and had not followed
+to its consequence.** The cue check is hard where a person can act on it and
+`--cues=warn` in CI, because trimming the line CI names moves the defect here
+and trimming the line this container names moves it there \dash{} an unwinnable
+loop, entered once before it was recognised. That reasoning is still right. What
+follows from it is that **the cue is the one page-level defect class that a
+green CI run cannot vouch for**, so a local `MAKE_EXIT 0` is not a formality on
+a pass that lengthens anything: it is the only instrument that reports this
+class at all.
+
+And the cost compounded, because **`check-a4` does not run until `check`
+passes**. One cue in one trade build therefore withheld every A4 page-level
+figure \dash{} openers, headings, cues and tails \dash{} which is why the
+recorded orphan-tail count for this batch was two builds' figures stitched
+together and was wrong by five. A red gate hides the measurements downstream of
+it, and a figure taken from a red build is worth nothing.
+
+The fix was Program~\ref{prog:F06}'s own two-sided rule and its twenty-third
+confirmation: **lengthen**, in both editions, so the question, the dots and the
+cue carry over together. Trimming cannot work \dash{} every line taken out
+pulls a line of the previous frame up behind it and the tail stays where it was.
+The sentence added earns its place, because it says what the reader is being
+asked to compare: how long the result is, and whether it still points where $g$
+pointed, which is exactly the pair a library offering both operations under one
+word does not settle.
 
 #### Recorded rather than taken
 
