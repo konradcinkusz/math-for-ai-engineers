@@ -1,4 +1,4 @@
 flowchart LR
   A["wynik za duzy: eksponenta przechodzi<br/>sufit formatu i staje sie inf"]
   A --> B["wynik za maly: przechodzi podloge<br/>i staje sie dokladnie zerem"]
-  B --> C["pasmo miedzy nimi ustala sam budzet<br/>wykladnika, wiec bf16 i fp32 maja je rowne"]
+  B --> C["sufit ustala budzet wykladnika, wiec bf16 i fp32<br/>przepelniaja sie przy tym samym wyniku; podloge<br/>wyznacza takze zakres subnormalny mantysy,<br/>wiec niedomiar maja przy roznych"]

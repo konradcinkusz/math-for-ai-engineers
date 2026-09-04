@@ -1,4 +1,4 @@
 flowchart LR
   A["a score too large: the exponential passes<br/>the format's ceiling and becomes inf"]
   A --> B["a score too small: it passes the floor<br/>and becomes exactly zero"]
-  B --> C["the band between them is set by the exponent<br/>budget alone, so bf16 and fp32 share it"]
+  B --> C["the ceiling is the exponent budget, so bf16 and<br/>fp32 overflow at the same score; the floor also<br/>counts the significand's subnormal range, so<br/>they do not underflow at the same one"]

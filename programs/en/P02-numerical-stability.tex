@@ -58,7 +58,7 @@
 
 \begin{quiz}
 \item Five readings are $\val{p02.var.offset}$ and the four microseconds after
-  it. Their variance is computed in \code{float32} by
+  it. Their variance, dividing by five, is computed in \code{float32} by
   $\Ex[x^{2}] - (\Ex[x])^{2}$. What comes back? \teachesat{2--3}
   \answerto{$\val{p02.var.naive}$. A variance cannot be negative, and the true
   answer is $\val{p02.var.true}$.}
@@ -68,20 +68,21 @@
   \answerto{None. \code{float32} carries about seven, so the two are stored
   identically in the digits that agree and the difference is made entirely of
   what was left after rounding.}
-\item An attention score reaches $\val{p02.over.fp16.int}$. What does its
-  exponential do in \code{fp16}? \teachesat{14--15}
-  \answerto{Overflows to \code{inf}. The ceiling is passed at a score of
-  $\val{p02.over.fp16}$, and everything downstream becomes \code{nan}.}
+\item Attention scores are exponentiated inside a softmax. What can that do
+  in \code{fp16}? \teachesat{14--15}
+  \answerto{Overflow to \code{inf}, at an ordinary score rather than an exotic
+  one \dash{} and everything downstream then becomes \code{nan}.}
 \item $\ln\sum_i e^{z_i} = c + \ln\sum_i e^{z_i - c}$ holds for every $c$. So
   why is $c$ taken to be the maximum? \teachesat{17--18}
   \answerto{Because it is the only choice that bounds every remaining exponent
   at or below zero, so it is the only one guaranteed not to overflow for every
   input rather than for this input.}
-\item You need $\ln \sigma(x)$ at $x = \val{p02.logsig.under}$. What does
-  computing $\sigma$ first give you? \teachesat{24--25}
-  \answerto{\code{-inf}, because $\sigma$ has underflowed to
-  exactly zero. Computed as one operation the answer is
-  $\val{p02.logsig.stable}$.}
+\item You need $\ln \sigma(x)$ for a large negative logit. What does
+  computing $\sigma$ first give you, and below roughly what $x$?
+  \teachesat{24--25}
+  \answerto{\code{-inf}, because $\sigma$ has underflowed to exactly zero
+  \dash{} which happens at the bottom cliff of whichever format you are in.
+  Computed as one operation there is no difficulty at all.}
 \item $\val{p02.sum.n}$ values of $\val{p02.sum.small}$ are added one at a time
   to a \code{float32} running total that starts at $1$. What is the total?
   \teachesat{29--30}
@@ -145,8 +146,8 @@ is $\val{p02.var.naive}$.}
 Nothing in the algebra went wrong. The two quantities being subtracted are
 \[ \Ex[x^{2}] = \val{p02.var.ex2}, \qquad
    \left(\Ex[x]\right)^{2} = \val{p02.var.exsq} \]
-and they agree to $\val{p02.var.shared}$ significant figures, where
-\code{float32} carries about seven. So in that format the two are stored as
+and their first $\val{p02.var.shared}$ digits are shared, where
+\code{float32} holds about seven of them. So in that format the two are stored as
 numbers whose leading digits are identical, the subtraction cancels every
 digit they share, and what is handed back is made of what happened to be left
 underneath \dash{} which is the rounding, not the variance.
@@ -177,8 +178,8 @@ quantities, and ask where they came from.}
 
 
 \begin{fr}
-Two numbers agree to $\val{p02.var.shared}$ significant figures and are
-subtracted in \code{float32}, which carries about seven. How many significant
+Two numbers share their first $\val{p02.var.shared}$ digits and are
+subtracted in \code{float32}, which holds about seven. How many significant
 figures does the answer have?
 \nextframe
 \end{fr}
@@ -272,7 +273,7 @@ variance above.
 
 \begin{fr}
 \ans{$\frac{|a| + |b|}{|a - b|}$, and for the variance above it is of the
-order of $10^{\val{p02.var.shared}}$.}
+order of $10^{\val{p02.var.amp.exp}}$.}
 
 That ratio is worth recognising because it is not confined to subtraction.
 
@@ -287,7 +288,7 @@ code \dash{} no amount of careful implementation removes it.
 \begin{rigourbox}
 \textbf{The general form of that number is the condition number}, and for a
 system of equations it is a statement about a matrix, which this book has not
-yet defined. Program~\ref{prog:P10} gives it properly. What belongs here is the
+yet defined. Program~\ref{prog:P11} gives it properly. What belongs here is the
 scalar version and the habit it buys: before trusting a computed difference,
 ask what its inputs' relative errors were and what the operation did to them.
 \end{rigourbox}
@@ -384,8 +385,10 @@ overflows.
 \transcript{p02-cliff}
 
 \textbf{That is not an exotic number.} It is a score, on the scale scores are
-naturally on, and keeping attention scores small enough to be safe is the
-entire job of the $1/\sqrt{d_k}$ factor that Program~\ref{prog:P25} derives.
+naturally on, and the $1/\sqrt{d_k}$ factor that Program~\ref{prog:P25}
+derives keeps that scale from growing with the head size \dash{} for reasons
+about the softmax's gradient rather than about a format's ceiling, though it
+takes this failure off the table as well.
 The failure is not a rare event at the edge of the format's range; it is a
 value the architecture has a correction built in to avoid, and what it produces
 is \code{inf} and then \code{nan} rather than an error anybody would call an
@@ -409,7 +412,7 @@ of the four overflow at the same score. Say which two, and say why.
 
 \begin{fr}
 \ans{\code{bf16} and \code{fp32}, because they share an exponent budget and
-the range of the exponential is set by that budget alone.}
+the \emph{top} of the exponential's range is set by that budget alone.}
 
 Both cliffs, in all four formats \dash{} the score at which the exponential
 leaves at the top, and the score at which it leaves at the bottom:
@@ -427,9 +430,19 @@ leaves at the top, and the score at which it leaves at the bottom:
 \end{tabular}
 \end{center}
 
-That is Program~\ref{prog:P01}'s point restated, and the table says the rest
-of it too: \textbf{the significand does not appear anywhere in it.} Neither
-column moves when the significand does, at either end.
+That is Program~\ref{prog:P01}'s point restated \dash{} about the first
+column. The second is a different story, and the row that says so is
+\code{bf16}'s: it shares \code{fp32}'s exponent budget exactly, and its floor
+sits $\val{p02.floor.gap}$ of score \emph{above} \code{fp32}'s.
+
+Every entry in that column is the logarithm of a format's smallest
+\emph{subnormal}, and a subnormal's depth is bought with significand bits.
+\code{fp32} has $\val{p02.floor.bits}$ more of them than \code{bf16}, which
+buys $\val{p02.floor.bits}$ more binades of subnormal range \dash{}
+$\val{p02.floor.bits} \ln 2$, which is that $\val{p02.floor.gap}$.
+
+\textbf{The exponent budget sets the ceiling; the significand extends the
+floor.}
 \end{fr}
 
 \mermaidfig{p02-two-cliffs}{The two ways a number leaves its format, and what
@@ -478,9 +491,12 @@ largest term that has to be formed.}{choosing the pivot}
 That last sentence is worth a measurement, because it explains why the choice
 is so easy to get away with.
 
-Take a row of $\val{p02.pivot.total}$ scores and pivot on each of them in turn,
-in \code{fp16}. How many of the $\val{p02.pivot.total}$ choices keep every term
-inside the format?
+Here is a row of $\val{p02.pivot.total}$ scores:
+\[ \val{p02.pivot.s1}, \quad \val{p02.pivot.s2}, \quad
+   \val{p02.pivot.s3}, \quad \val{p02.pivot.s4}, \quad \val{p02.pivot.s5} \]
+
+Pivot on each of them in turn, in \code{fp16}. How many of the
+$\val{p02.pivot.total}$ choices keep every term inside the format?
 \nextframe
 \end{fr}
 
@@ -614,9 +630,12 @@ number at which it does is $\val{p02.logsig.saturates}$. A binary cross-entropy
 needs both $\ln p$ and $\ln(1 - p)$, and at that point $1 - p$ is exactly zero,
 so $\ln(1 - p)$ is \code{-inf}.
 
-A confident \emph{correct} prediction therefore produces the same
-\code{-inf} as a confident wrong one, and the loss becomes
-\code{nan} on an example the model got right. That is the failure that sends
+And that is not the end of it, because an infinity in a loss gives
+\code{inf} rather than \code{nan}. The target for a confident correct
+prediction is $y = 1$, so the loss forms
+$(1 - y)\ln(1 - p) = 0 \times (-\infty)$, and \emph{that} is \code{nan}. The
+confidently \emph{wrong} example merely diverges to \code{inf}; it is the
+\emph{right} one that poisons the batch, which is the failure that sends
 people looking for a bug in their data.
 
 \textbf{Both ends are removed by the same move}: keep the logit, and let the
@@ -723,8 +742,8 @@ away?
 \end{fr}
 
 \begin{fr}
-\ans{The part of the last addition that was lost: one extra variable, added
-back into the next term before it is used.}
+\ans{The part of the last addition that was lost: one extra variable, folded
+into the next term before it is used.}
 
 The second entry attacks the drift directly. \emph{Compensated summation}
 \dash{} Kahan's \dash{} keeps exactly that variable:
@@ -735,9 +754,10 @@ The second entry attacks the drift directly. \emph{Compensated summation}
   s &= t
 \end{align*}
 Read the third line. $t - s$ is what the addition \emph{actually} moved the
-total by, and $y$ is what it was asked to move it by; the difference is exactly
-what was rounded away, and it is recovered by a subtraction of two nearly equal
-numbers.
+total by, and $y$ is what it was asked to move it by. So $c$ holds exactly what
+was rounded away \emph{with the opposite sign} \dash{} which is why the first
+line subtracts it rather than adding it \dash{} and it is recovered by a
+subtraction of two nearly equal numbers.
 
 \textbf{Cancellation is the mechanism, used deliberately.} The same operation
 that destroyed the variance in \S\ref{sec:P02-correct} is here the only one
@@ -779,7 +799,7 @@ Before it does: which of the four do you expect to come out worst?
 \ans{Sorting \dash{} the cheapest of the four and the one most often described
 as sufficient.}
 
-All five, on the same million values:
+The four fixes and the naive loop they replace, on the same million values:
 
 \begin{center}
 \begin{tabular}{lrr}
@@ -856,8 +876,8 @@ same arithmetic \dash{} not whether it is right, but what it costs.
   $\val{p02.var.true}$. The algebra is beyond reproach and the result is not a
   variance}.}
 \sumitem{4--6}{\result{\textbf{Catastrophic cancellation} is the mechanism: the two
-  quantities agree to $\val{p02.var.shared}$ significant figures where the
-  format holds seven, so the subtraction cancels every digit they share and
+  quantities share their first $\val{p02.var.shared}$ digits where the format
+  holds seven, so the subtraction cancels every digit they share and
   hands back the rounding. The subtraction is exact; the loss happened when the
   operands were rounded. Look for a difference of nearly equal quantities and
   ask where they came from}.}
@@ -869,7 +889,7 @@ same arithmetic \dash{} not whether it is right, but what it costs.
   accurate}.}
 \sumitem{9--10}{\result{The amplification is $\frac{|a| + |b|}{|a - b|}$, and it is a
   property of the \emph{problem}. Its general form is the condition number,
-  which is Program~\ref{prog:P10}'s because it is a statement about a matrix}.}
+  which is Program~\ref{prog:P11}'s because it is a statement about a matrix}.}
 \sumitem{11--13}{\result{Over $\val{p02.layers}$ layers \code{fp16}'s worst case is
   $\val{p02.grow.fp16}$\% and \code{bf16}'s is $\val{p02.grow.bf16}$\%
   \dash{} but \textbf{a bound is not a prediction}: errors of random sign grow
@@ -878,8 +898,11 @@ same arithmetic \dash{} not whether it is right, but what it costs.
 \sumitem{14--16}{\result{\textbf{An exponential leaves a format at the logarithm of its
   ceiling}, which is $\val{p02.over.fp16}$ for \code{fp16} \dash{} so a score
   of $\val{p02.over.fp16.int}$ overflows, and that is an ordinary attention
-  logit. \code{bf16} and \code{fp32} share the row at
-  $\val{p02.over.fp32}$, because the range is the exponent budget alone}.}
+  logit. \code{bf16} and \code{fp32} share the row at the \emph{top},
+  $\val{p02.over.fp32}$, because a ceiling is the exponent budget alone; they
+  do not share the bottom, because a subnormal's depth is bought with
+  significand bits and \code{fp32} has $\val{p02.floor.bits}$ more of
+  them}.}
 \sumitem{17--20}{\result{$\ln\sum_i e^{z_i} = c + \ln\sum_i e^{z_i - c}$ holds for
   \emph{every} $c$, so the identity forces no choice. \textbf{The maximum is
   the only $c$ that bounds every exponent at or below zero}, hence the only one
@@ -900,8 +923,8 @@ same arithmetic \dash{} not whether it is right, but what it costs.
   $\sigma$ has underflowed; as one operation it returns
   $\val{p02.logsig.stable}$. \textbf{The upper end fails too}: $\sigma$ is
   exactly $\num{1.0}$ from $\val{p02.logsig.saturates}$, so $\ln(1-p)$ is
-  \code{-inf} and a confident \emph{correct} prediction produces
-  a \code{nan}}.}
+  \code{-inf} \dash{} and because the target multiplies that term by zero,
+  the loss is a \code{nan} on a prediction that was \emph{right}}.}
 \sumitem{27--28}{\result{The forward pass ends at the logits and the loss composes.
   The tell in a diff is a softmax or sigmoid immediately followed by a
   logarithm. What a probability \emph{is}, and why cross-entropy is the loss,

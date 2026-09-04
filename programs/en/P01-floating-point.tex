@@ -53,8 +53,10 @@
   what makes a contribution too small to add}
 \outcome{20--26}{compute a format's ceiling from its exponent budget, and
   compare two formats of the same width}
-\outcome{27--33}{say what a subnormal is, and what a format's two floors are
-  each for}
+\outcome{27--33}{say what a subnormal is, and what each of a format's two
+  floors is for}
+\outcome{34--35}{say why subtracting two nearly equal numbers loses accuracy,
+  and why that is not the subtraction's fault}
 \end{outcomes}
 
 \begin{quiz}
@@ -93,7 +95,7 @@
   \answerto{Subnormal numbers, which continue down to a second and lower
   floor \dash{} $\val{p01.fp64.minsub}$ for a double, against a smallest
   normal of $\val{p01.fp64.minnorm}$.}
-\item Program F03 computed a sequence probability of $\val{p01.f03.prob}$.
+\item Program~\ref{prog:F03} computed a sequence probability of $\val{p01.f03.prob}$.
   What happens when you ask a double to hold it? \teachesat{30--31}
   \answerto{It cannot. The value is far below the smallest subnormal, so it
   reads back as $\val{p01.f03.readback}$ \dash{} exactly zero, with no
@@ -149,7 +151,7 @@ enough preparation for this. What is new is that $m$ has a fixed budget of
 bits, so the precision is fixed \emph{as a number of significant figures} and
 not as a distance.
 
-Hold that sentence. It is the whole of section 2.
+Hold that sentence. It is the whole of \emph{The gap grows with magnitude}.
 
 A float therefore has three fields: a \emph{sign} bit, an \emph{exponent}, and
 a \emph{significand} holding the bits of $m$. You do not have to take that on
@@ -162,9 +164,10 @@ machine actually stores, so the three fields can be read off directly.
 
 \transcript{p01-bits}
 
-Two of those three lines do a job. $\num{1.0}$ and $\num{2.0}$ have the same sign and the
-same significand and differ only in the exponent. $\num{1.0}$ and $\num{1.5}$ have the
-same sign and the same exponent and differ only in the significand.
+Two comparisons, and each does a job. $\num{1.0}$ and $\num{2.0}$ have the
+same sign and the same significand and differ only in the exponent.
+$\num{1.0}$ and $\num{1.5}$ have the same sign and the same exponent and
+differ only in the significand.
 
 What has the exponent done between $\num{1.0}$ and $\num{2.0}$?
 \nextframe
@@ -203,7 +206,7 @@ this program uses.
 There is one more piece of housekeeping, and it buys a bit for nothing. Since
 $1 \le m < 2$, the leading binary digit of $m$ is always $1$ \dash{} so it is
 never stored. A double's $\val{p01.fp64.mbits}$ stored bits therefore carry
-$53$ significant bits. That is the \emph{implicit leading one}, and section 5
+$53$ significant bits. That is the \emph{implicit leading one}, and \emph{Two floors, not one}
 is about what happens when it has to be given up.
 \end{fr}
 
@@ -245,10 +248,11 @@ a billion & $\val{p01.gap.billion}$ \\
 \end{tabular}
 \end{center}
 
-The reason is section 1's, and there is nothing else in it. The significand
-budget fixes the number of \emph{significant figures}, and a fixed number of
-significant figures is a fixed \emph{relative} precision. So the absolute gap
-has to grow in step with the number, and it does.
+The reason is the one \emph{Scientific notation, in base two} gave, and there
+is nothing else in it. The significand budget fixes the number of
+\emph{significant figures}, and a fixed number of significant figures is a
+fixed \emph{relative} precision. So the absolute gap has to grow in step with
+the number, and it does.
 
 Anybody who reasons about floating point as though it had a fixed absolute
 accuracy \dash{} a tolerance of $10^{-9}$, say, applied to every comparison in
@@ -271,7 +275,7 @@ a name.
 
 \textbf{Machine epsilon} is the gap between $1$ and the next representable
 number up. For a double that is $\val{p01.fp64.eps}$, which is $2^{-52}$ and
-therefore just the significand budget written as a number. The factor of two
+therefore the significand budget written as a number. The factor of two
 either side is where the number falls between one power of two and the next;
 what matters is that dividing by the magnitude leaves a constant behind, and
 that is why one number can replace a table.
@@ -381,7 +385,7 @@ No.
 
 \begin{trapbox}
 \textbf{Addition in floating point is not associative}, and the mechanism is
-the one section 2 established rather than anything new.
+the one \emph{The gap grows with magnitude} established rather than anything new.
 
 Each operation rounds to the nearest representable number, immediately. On the
 left, $a + b$ is rounded first: $\val{p01.assoc.small}$ is smaller than the gap
@@ -478,7 +482,7 @@ box divides the two the same way.
 \end{rigourbox}
 
 The \code{fp32} row is worth stopping at before the next frame stops at it for
-you. It is half the gap at $1$ in that format. Section 2's table gives a
+you. It is half the gap at $1$ in that format. \emph{The gap grows with magnitude}'s table gives a
 double's gap at three magnitudes: at which of the three is half that gap the
 same number?
 \dotline
@@ -489,8 +493,8 @@ same number?
 \ans{At a billion. Half a double's gap there is
 $\val{p01.swamp.at.billion}$, which is the \code{fp32} row exactly.}
 
-One number from section 2 is worth a second look, because it connects the two
-formats you actually choose between.
+One number from the table in the frame above is worth a second look, because
+it connects the two formats you actually choose between.
 
 Half the gap at $1$ in a double is $\val{p01.swamp.at.one}$. Half the gap at a
 billion in a double is $\val{p01.swamp.at.billion}$ \dash{} and half the gap
@@ -520,7 +524,7 @@ open: what \enquote{two bytes per parameter} actually buys, and why
 \code{bf16} became the training format while \code{fp16} needs a scaling trick
 to work at all. That question is this section.
 
-Both are sixteen bits. Both spend one on the sign. Given section 1, there is
+Both are sixteen bits. Both spend one on the sign. Given \emph{Scientific notation, in base two}, there is
 exactly one thing left that can differ between them. What?
 \nextframe
 \end{fr}
@@ -551,14 +555,18 @@ a bit added to one field is a bit taken from the other.
 \end{fr}
 
 \mermaidfig{p01-same-width}{Sixteen bits, two ways of spending them, and the
-trade that fixes.}{one width, two splits}
+trade a fixed width forces.}{one width, two splits}
 
 \begin{fr}
 Work out what those three bits are worth, and do it in the direction that
 matters \dash{} the exponent's.
 
 An exponent field of $b$ bits holds $2^{b}$ patterns, two of which are reserved
-(one for zero and the subnormals of section 5, one for the infinities), so the
+(one for zero and the subnormals of \emph{Two floors, not one}, one for the
+infinities and the \code{nan}s \dash{} a \code{nan} is what an invalid
+operation such as $0/0$ or $\infty - \infty$ returns, and it propagates
+through every arithmetic operation it touches, which is why one of them
+anywhere in a batch turns the whole loss into a \code{nan}), so the
 true exponent runs over about $2^{b} - 2$ values, roughly half of them
 negative. For $\val{p01.fp16.ebits}$ bits the largest true exponent works out
 at $15$.
@@ -574,34 +582,41 @@ Exactly that, and it is a number worth recognising on sight, because you will
 meet it as an \code{inf} in a log file rather than as a documented limit.
 
 Now do \code{bf16}, which has $\val{p01.bf16.ebits}$ exponent bits. The
-arithmetic is the same and the answer is $\val{p01.bf16.max}$ \dash{} and set
-that beside \code{fp32}'s ceiling, which is $\val{p01.fp32.max}$.
+arithmetic is the same, so work out its ceiling and set your answer beside
+\code{fp32}'s, which is $\val{p01.fp32.max}$.
 
-They agree to two figures and not to three, and both halves of that are worth
-a moment. They are close because \code{bf16} and \code{fp32} have the same
-exponent budget, $\val{p01.bf16.ebits}$ bits each. They are not equal because
-the largest value of a format is $(2 - 2^{-m}) \times 2^{127}$, and
+Then one more, and write it down before you read on: \code{fp16} and
+\code{bf16} are the same sixteen bits split two ways. Which of the two is the
+more precise?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p01.bf16.max}$, and \code{fp16} is the more precise of the two.}
+The ceilings agree to two figures and not to three, and both halves of that
+are worth a moment. They are close because \code{bf16} and \code{fp32} have
+the same exponent budget, $\val{p01.bf16.ebits}$ bits each. They are not equal
+because the largest value of a format is $(2 - 2^{-m}) \times 2^{127}$, and
 \code{bf16}'s shorter significand makes its first bracket slightly smaller
 \dash{} a shortfall of $\val{p01.bf16.short.pct}$ per cent.
 
 \textbf{\code{bf16} is \code{fp32} with the bottom of the significand cut
 off.} It reaches within half a per cent as far, it resolves far more coarsely,
 and a conversion between the two cannot overflow in either direction.
-\end{fr}
 
-\begin{fr}
 \begin{trapbox}
 \textbf{\code{bf16} is not the more precise format. It is the less precise
 one, by a factor of eight, and that is what it was designed to be.}
 
-The ratio of the two ceilings is $\val{p01.bf16.over.fp16}$ \dash{} thirty-three
-orders of magnitude of extra reach, bought with three bits. What it cost is in
-the epsilon row of section 2: $\val{p01.bf16.eps}$ against \code{fp16}'s
-$\val{p01.fp16.eps}$, so about $\val{p01.bf16.digits}$ decimal digits of
-precision against about $\val{p01.fp16.digits}$.
+The ratio of the two ceilings is $\val{p01.bf16.over.fp16}$ \dash{}
+thirty-three orders of magnitude of extra reach, bought with three bits. What
+it cost is in the epsilon row of \emph{The gap grows with magnitude}:
+$\val{p01.bf16.eps}$ against \code{fp16}'s $\val{p01.fp16.eps}$, so about
+$\val{p01.bf16.digits}$ decimal digits of precision against about
+$\val{p01.fp16.digits}$.
 
-If you had guessed that the newer format was the more accurate one, that is
-the ordinary reading and it is the wrong way round. The design question was
+If you wrote \code{bf16}, that is the ordinary reading and it is the wrong
+way round. The design question was
 never \enquote{how accurate} but \enquote{what fails first}, and the answer
 for training is range, not precision.
 \end{trapbox}
@@ -626,9 +641,11 @@ it stops.
 That is what \emph{loss scaling} is for. Multiply the loss by a large constant
 before the backward pass, so every gradient is multiplied by the same constant
 and lifted off \code{fp16}'s floor; divide the gradients by it again before the
-update, which restores the mathematics exactly because a constant factor
-distributes over the whole backward pass. The constant is usually chosen
-dynamically \dash{} raise it until something overflows, then back off.
+update, which restores the mathematics exactly \dash{} provided the
+constant is a power of two, so that both the multiplication and the division
+move only exponents and no significand bit is touched. That is why loss scales
+are quoted as $512$ or $65\,536$ and not as $1000$. The constant is usually
+chosen dynamically \dash{} raise it until something overflows, then back off.
 
 It is a workaround for $\val{p01.fp16.ebits}$ exponent bits, and it is the
 reason \code{bf16} training needs no such machinery: with
@@ -636,7 +653,7 @@ $\val{p01.bf16.ebits}$ bits the gradients were never near the floor.
 \end{aibox}
 
 That settles the weights and the gradients. It leaves the running sums that
-section 3 showed swallowing small contributions whole. Which of the two
+\emph{Order changes the answer} showed swallowing small contributions whole. Which of the two
 budgets does an accumulator need, and therefore which format?
 \dotline
 \nextframe
@@ -655,10 +672,13 @@ that. Ask which quantity needs to be told apart from its neighbours, and give
 the significand bits to that.
 
 In practice the two answers land in different places, which is why mixed
-precision exists at all: weights and gradients in sixteen bits because they
-need range and tolerate coarseness, and the accumulators \dash{} the running
-sums that section 3 showed swallowing small contributions whole \dash{} in
-\code{fp32}, because that is where precision is what runs out.
+precision exists at all: weights and gradients in sixteen bits for the two
+passes, because they need range and tolerate coarseness, and a master copy of
+the weights alongside the accumulators \dash{} the running sums that
+\emph{Order changes the answer} showed swallowing small contributions whole
+\dash{} in \code{fp32}, because that is where precision is what runs out. The
+update is applied to the master copy rather than to the sixteen-bit weights,
+which is why Program~\ref{prog:P03} bills for it as a row of its own.
 \end{fr}
 
 % ============================================================
@@ -673,8 +693,9 @@ is, and why a format has two thresholds rather than one \dash{} and here is the
 first half of the debt.
 
 A double's smallest \emph{normal} number \dash{} the smallest one with the
-implicit leading $1$ of section 1 still in place \dash{} is
-$\val{p01.fp64.minnorm}$. That is what the exponent budget reaches down to.
+implicit leading $1$ of \emph{Scientific notation, in base two} still in place
+\dash{} is $\val{p01.fp64.minnorm}$. That is what the exponent budget reaches
+down to.
 
 What is directly below it? Write down what you think happens between
 $\val{p01.fp64.minnorm}$ and zero.
@@ -687,8 +708,10 @@ Not zero, and not nothing. There is a second range of numbers, and a second
 floor a long way below the first.
 \end{ansblock}
 
-The smallest number a double can represent at all is $\val{p01.fp64.minsub}$,
-which is smaller than the smallest normal by a factor of about $10^{16}$. The
+The smallest positive number a double can represent at all is
+$\val{p01.fp64.minsub}$, which is smaller than the smallest normal by a factor
+of $2^{52}$ \dash{} one factor of two for every significand bit you can give
+away, so the subnormal range is as deep as the significand is wide. The
 numbers in between are the \emph{subnormals}, and they exist because of the
 implicit leading one.
 
@@ -781,6 +804,13 @@ the exponent budget is a hard ceiling on how long a sequence can be scored by
 multiplying, and working in logarithms is not a refinement, it is the only way
 the quantity exists at all.
 
+Notice what the answer cannot depend on. Every token contributes the same
+factor, so the count turns on that factor and the format's floor and on
+nothing else \dash{} not the vocabulary, not the architecture, not how long
+the text is. It is a property of the arithmetic, and two models that agree on
+the per-token probability run out at the same place whatever else is different
+about them.
+
 Put a number on it before the next frame does. A model that assigns
 $\num{0.5}$ to every token, scored in \code{fp16} by multiplying: how many
 tokens before the product is exactly zero \dash{} thousands, hundreds, or
@@ -812,6 +842,9 @@ in this format & the product is exactly zero after \\
 The arithmetic here is exact until it underflows, because $\num{0.5}^{n}$ is
 exactly $2^{-n}$ and every one of those is representable down to the smallest
 subnormal \dash{} so the cliff is one step past the floor, in every format.
+Which floor, though: with the flush-to-zero mode of the frame above in force
+the \code{fp16} row drops to $\val{p01.coin.ftz.fp16}$, because the floor is
+then the smallest normal. That is why the two floors are worth telling apart.
 Set the \code{bf16} row against it: $\val{p01.coin.bf16}$ tokens out of the
 same sixteen bits. Almost all of that is the three extra exponent bits, and
 the three significand bits \code{bf16} gave up to buy them take a little of it
@@ -819,8 +852,16 @@ back, because a shallower significand is a shallower subnormal range.
 
 One more number to place against those floors, and it is not this program's.
 Program~\ref{prog:F12} multiplied forty layer factors together and brought
-the product below $\val{p01.f12.prod}$ for a saturated logistic chain. Which
-of the four formats still holds a number that small?
+the product below $\val{p01.f12.prod}$ for a saturated logistic chain.
+
+Two things make that number worth placing rather than merely quoting. It is a
+\emph{bound} \dash{} the best such a chain can do \dash{} so a format that
+cannot hold it cannot hold anything a real chain of that depth produces
+either, which turns one comparison into a statement about every such chain.
+And the answer needs no new arithmetic: the four floors are in the table
+above, and the question is only which of them the number clears.
+
+Which of the four formats still holds a number that small?
 \dotline
 \nextframe
 \end{fr}
@@ -855,7 +896,7 @@ bits were at the bottom, and the fewer of those there are the coarser the
 answer. Dividing that by a tiny $h$ magnifies it.
 
 \begin{rigourbox}
-\textbf{Which is as far as P01 takes it.} The mechanism has a name \dash{}
+\textbf{Which is as far as this program takes it.} The mechanism has a name \dash{}
 catastrophic cancellation \dash{} and a catalogue of remedies, and both are
 Program~\ref{prog:P02}'s. What belongs here is why it happens: not that the
 subtraction is inaccurate, but that its inputs were rounded before it started,
@@ -896,7 +937,7 @@ which do not.
   $1 + \val{p01.fp64.ebits} + \val{p01.fp64.mbits}$ in a double. They can be
   read with \code{struct} rather than taken on trust \dash{} $\num{1.0}$ and $\num{2.0}$
   differ only in the exponent, $\num{1.0}$ and $\num{1.5}$ only in the significand. The
-  leading $1$ of $m$ is never stored, which buys a bit and is what section 5
+  leading $1$ of $m$ is never stored, which buys a bit and is what \emph{Two floors, not one}
   is about giving up}.}
 \sumitem{7--8}{\result{\textbf{The gap grows with the number}:
   $\val{p01.gap.one}$ at $1$, $\val{p01.gap.thousand}$ at $1000$,
@@ -935,11 +976,13 @@ which do not.
   only in where they cut: $\val{p01.fp16.ebits}$ exponent bits against
   $\val{p01.bf16.ebits}$. The width is fixed, so \textbf{a bit added to one
   field is a bit taken from the other}}.}
-\sumitem{22--23}{\result{\code{fp16}'s ceiling is $\val{p01.fp16.max.exact}$, computed from
+\sumitem{22--24}{\result{\code{fp16}'s ceiling is $\val{p01.fp16.max.exact}$, computed from
   its exponent budget rather than looked up. \code{bf16}'s is
-  $\val{p01.bf16.max}$, which is \code{fp32}'s $\val{p01.fp32.max}$ \dash{} the
-  same exponent budget. \textbf{\code{bf16} is \code{fp32} with the bottom of
-  the significand removed}, so converting between them cannot overflow}.}
+  $\val{p01.bf16.max}$, within $\val{p01.bf16.short.pct}$ per cent of
+  \code{fp32}'s $\val{p01.fp32.max}$ because the exponent budgets match; the
+  shortfall is \code{bf16}'s shorter significand. \textbf{\code{bf16} is
+  \code{fp32} with the bottom of the significand removed}, so converting
+  between them cannot overflow}.}
 \sumitem{24--26}{\result{\textbf{\code{bf16} is the \emph{less} precise format} \dash{}
   $\val{p01.bf16.eps}$ against $\val{p01.fp16.eps}$ \dash{} bought
   $\val{p01.bf16.over.fp16}$ times the reach. Range fails first because a value
@@ -992,7 +1035,7 @@ which do not.
   demands agreement finer than the format can express and calls equal numbers
   different. Near $10^{-12}$ it calls every pair equal, including ones that
   differ by a factor of a thousand. A tolerance has to be relative.}
-\item Two accelerators report training losses differing in the eighth decimal
+\item Two accelerators report training losses differing in the seventh decimal
   place. Say what to conclude.
   \answerto{Nothing about the model. Reduction order differs, addition is not
   associative, and in \code{fp32} that decimal place is below epsilon at loss
@@ -1013,11 +1056,22 @@ which do not.
   implicit leading $1$ and shifting the significand right. It costs one bit of
   precision per step down, and possibly speed, since flush-to-zero modes exist
   precisely because subnormals can be slow.}
-\item Program F03 computed $\val{p01.f03.prob}$. Say what a double does with
-  it and what F03 did instead.
+\item Program~\ref{prog:F03} computed $\val{p01.f03.prob}$. Say what a double
+  does with it and what that program did instead.
   \answerto{Reads it back as $\val{p01.f03.readback}$ \dash{} exactly zero,
-  about seventeen hundred orders of magnitude below the floor. F03 computed
+  about seventeen hundred orders of magnitude below the floor.
+  Program~\ref{prog:F03} computed
   the logarithm of the product rather than the product.}
+\item Two numbers agree to nine significant figures and are subtracted in
+  \code{fp32}. Say roughly how many figures of the difference are trustworthy,
+  and where the lost ones went.
+  \answerto{About none: \code{fp32} carries about
+  $\val{p01.fp32.digits}$ significant figures, so two numbers agreeing to nine
+  are the \emph{same} \code{fp32} number and the difference is zero or one
+  gap. The figures were not lost by the subtraction, which is exact here
+  \dash{} they were never in the operands, which had already been rounded to
+  the format. The subtraction only made the shortfall visible by cancelling
+  the digits that were.}
 \item Give the number of $\num{0.5}$ factors after which the product is
   exactly zero in \code{fp64} and in \code{fp16}, and say why the two differ
   by so much.
@@ -1042,15 +1096,31 @@ which do not.
   $\val{p01.fp32.mbits}$ significand bits. It happens for every value in
   $\intco{2^{29}}{2^{30}}$ and nowhere else \dash{} at $2^{30}$ itself the
   binade changes and the gap doubles.}
-\item A running total in \code{bf16} sits at $100$. Give the smallest
+\item A running total in \code{bf16} sits at $\val{p01.bf16.total}$. Give the
+  smallest
   contribution that can still change it.
-  \answerto{About $\val{p01.swamp.bf16} \times 100$, so roughly $\num{0.4}$. The
-  threshold is half an epsilon of the total, and it scales with the total.}
+  \answerto{Anything above $\val{p01.bf16.total.half}$.
+  $\val{p01.bf16.total}$ sits in the binade
+  $\intco{\val{p01.bf16.binade.lo}}{\val{p01.bf16.binade.hi}}$, where the
+  \code{bf16} gap is $\val{p01.bf16.total.gap}$, so half the gap is
+  $\val{p01.bf16.total.half}$. Half an epsilon of the total is
+  $\val{p01.bf16.total.thumb}$, which is the rule of thumb and an upper bound
+  on the answer: it is half the gap at the \emph{top} of the binade, and a
+  total at the bottom of one is where it is furthest out. The exact answer
+  needs the magnitude as well as the format, which is what \emph{The gap grows
+  with magnitude} is for.}
 \item \code{bf16} and \code{fp32} have the same exponent budget. Say what that
   means for a conversion in each direction.
-  \answerto{Neither direction can overflow or underflow, because the
-  representable range is the same. Converting down loses significand bits and
-  nothing else; converting up is exact.}
+  \answerto{Converting up is exact. Converting down cannot overflow \dash{} the
+  exponent budgets match, so the two ceilings sit within
+  $\val{p01.bf16.short.pct}$ per cent of each other \dash{} but it can
+  underflow, and that is the half a shared exponent budget does not cover.
+  The two \emph{normal} ranges are the same; the subnormal ones are not,
+  because a subnormal's depth is bought with significand bits. \code{fp32} has
+  $\val{p01.fp32.mbits}$ of them against \code{bf16}'s
+  $\val{p01.bf16.mbits}$, so its floor reaches to $\val{p01.fp32.minsub}$
+  where \code{bf16} stops at $\val{p01.bf16.minsub}$, and anything below about
+  half of that converts to zero.}
 \item Loss scaling multiplies the loss by a constant before the backward pass
   and divides the gradients by it afterwards. Explain why this does not change
   the mathematics.
@@ -1061,12 +1131,13 @@ which do not.
 \item Suppose a format's subnormals were removed, so that anything below the
   smallest normal became zero. Say what would get worse and what would get
   better.
-  \answerto{Worse: the floor rises abruptly by a factor of about $10^{16}$ in
+  \answerto{Worse: the floor rises abruptly by a factor of $2^{52}$ in
   a double, so underflow arrives much sooner and the loss of the smallest
   values is sudden rather than gradual. Better: every representable number has
   full precision and the hardware has one fewer case to handle, which is why
   flush-to-zero modes exist.}
-\item Program F11's finite-difference error rises again as $h$ gets small.
+\item Program~\ref{prog:F11}'s finite-difference error rises again as $h$ gets
+  small.
   Explain the rise using nothing but the gap.
   \answerto{$f(x+h)$ and $f(x)$ are each stored to a relative precision of
   about epsilon, so each carries an absolute error of about $\epsilon|f(x)|$.

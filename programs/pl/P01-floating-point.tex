@@ -46,6 +46,8 @@
   dwa formaty o tej samej szerokości}
 \outcome{27--33}{powiedzieć, czym jest liczba subnormalna i do czego służy
   każda z dwóch podłóg formatu}
+\outcome{34--35}{powiedzieć, czemu odejmowanie dwóch prawie równych liczb
+  traci dokładność i czemu nie jest to wina odejmowania}
 \end{outcomes}
 
 \begin{quiz}
@@ -83,7 +85,7 @@
   \answerto{Liczby subnormalne, schodzące do drugiej i niższej podłogi
   \dash{} $\val{p01.fp64.minsub}$ dla podwójnej precyzji, przy najmniejszej
   normalnej $\val{p01.fp64.minnorm}$.}
-\item Program F03 policzył prawdopodobieństwo sekwencji równe
+\item Program~\ref{prog:F03} policzył prawdopodobieństwo sekwencji równe
   $\val{p01.f03.prob}$. Co się dzieje, gdy każesz liczbie podwójnej precyzji
   je pomieścić? \teachesat{30--31}
   \answerto{Nie może. Wartość leży daleko poniżej najmniejszej subnormalnej,
@@ -142,7 +144,7 @@ Program~\ref{prog:F01} wystarcza za przygotowanie. Nowe jest to, że $m$ ma
 stały budżet bitów, więc precyzja jest ustalona \emph{jako liczba cyfr
 znaczących}, a nie jako odległość.
 
-Zatrzymaj to zdanie. To cała sekcja 2.
+Zatrzymaj to zdanie. To cała sekcja \emph{Odstęp rośnie z wielkością}.
 
 Liczba zmiennoprzecinkowa ma zatem trzy pola: bit \emph{znaku},
 \emph{wykładnik} i \emph{mantysę} trzymającą bity $m$. Nie musisz przyjmować
@@ -156,9 +158,9 @@ odczytać wprost.
 
 \transcript{p01-bits}
 
-Dwie z tych trzech linijek wykonują pracę. $\num{1.0}$ i $\num{2.0}$ mają ten sam znak i
-tę samą mantysę, a różnią się tylko wykładnikiem. $\num{1.0}$ i $\num{1.5}$ mają ten sam
-znak i ten sam wykładnik, a różnią się tylko mantysą.
+Dwa porównania, i każde wykonuje pracę. $\num{1.0}$ i $\num{2.0}$ mają ten sam
+znak i tę samą mantysę, a różnią się tylko wykładnikiem. $\num{1.0}$ i
+$\num{1.5}$ mają ten sam znak i ten sam wykładnik, a różnią się tylko mantysą.
 
 Co zrobił wykładnik między $\num{1.0}$ a $\num{2.0}$?
 \nextframe
@@ -198,7 +200,7 @@ Zostaje jeszcze jedna sprawa porządkowa, i kupuje ona bit za darmo. Skoro
 $1 \le m < 2$, to wiodąca cyfra dwójkowa $m$ jest zawsze równa $1$ \dash{}
 więc nigdy się jej nie przechowuje. $\val{p01.fp64.mbits}$ przechowywanych
 bitów liczby podwójnej precyzji niesie zatem $53$ bity znaczące. To
-\emph{domyślna wiodąca jedynka}, a sekcja 5 mówi o tym, co się dzieje, gdy
+\emph{domyślna wiodąca jedynka}, a sekcja \emph{Dwie podłogi, nie jedna} mówi o tym, co się dzieje, gdy
 trzeba z niej zrezygnować.
 \end{fr}
 
@@ -240,10 +242,10 @@ miliard & $\val{p01.gap.billion}$ \\
 \end{tabular}
 \end{center}
 
-Powód jest ten z sekcji 1 i nie ma w nim nic ponadto. Budżet mantysy ustala
-liczbę \emph{cyfr znaczących}, a stała liczba cyfr znaczących to stała
-precyzja \emph{względna}. Odstęp bezwzględny musi więc rosnąć razem z liczbą i
-tak właśnie robi.
+Powód jest ten z sekcji \emph{Notacja naukowa przy podstawie dwa} i nie ma w
+nim nic ponadto. Budżet mantysy ustala liczbę \emph{cyfr znaczących}, a stała
+liczba cyfr znaczących to stała precyzja \emph{względna}. Odstęp bezwzględny
+musi więc rosnąć razem z liczbą i tak właśnie robi.
 
 Kto rozumuje o liczbach zmiennoprzecinkowych tak, jakby miały stałą dokładność
 bezwzględną \dash{} tolerancję $10^{-9}$, powiedzmy, przyłożoną do każdego
@@ -265,7 +267,7 @@ Względna wersja odstępu jest jedną liczbą zamiast tabeli i ma nazwę.
 
 \textbf{Epsilon maszynowy} to odstęp między $1$ a następną reprezentowalną
 liczbą powyżej. Dla podwójnej precyzji wynosi $\val{p01.fp64.eps}$, czyli
-$2^{-52}$, a zatem po prostu budżet mantysy zapisany jako liczba. Czynnik dwa
+$2^{-52}$, a zatem budżet mantysy zapisany jako liczba. Czynnik dwa
 w jedną lub drugą stronę bierze się z tego, gdzie liczba wypada między jedną
 potęgą dwójki a następną; liczy się to, że dzielenie przez wielkość zostawia
 stałą, i dlatego jedna liczba może zastąpić tabelę.
@@ -377,7 +379,7 @@ Nie.
 
 \begin{trapbox}
 \textbf{Dodawanie zmiennoprzecinkowe nie jest łączne}, a mechanizm jest tym z
-sekcji 2, a nie czymś nowym.
+sekcji \emph{Odstęp rośnie z wielkością}, a nie czymś nowym.
 
 Każde działanie zaokrągla natychmiast do najbliższej liczby reprezentowalnej.
 Po lewej najpierw zaokrągla się $a + b$: $\val{p01.assoc.small}$ jest mniejsze
@@ -474,7 +476,7 @@ Programu~\ref{prog:F04} dzieli te dwie rzeczy tak samo.
 \end{rigourbox}
 
 Na wierszu \code{fp32} warto zatrzymać się wcześniej, niż zrobi to za ciebie
-następna ramka. To połowa odstępu przy $1$ w tym formacie. Tabela z sekcji 2
+następna ramka. To połowa odstępu przy $1$ w tym formacie. Tabela z sekcji \emph{Odstęp rośnie z wielkością}
 podaje odstęp podwójnej precyzji przy trzech wielkościach: przy której z tych
 trzech połowa tego odstępu daje tę samą liczbę?
 \dotline
@@ -485,8 +487,8 @@ trzech połowa tego odstępu daje tę samą liczbę?
 \ans{Przy miliardzie. Połowa odstępu podwójnej precyzji wynosi tam
 $\val{p01.swamp.at.billion}$, czyli dokładnie tyle, ile wiersz \code{fp32}.}
 
-Jedna liczba z sekcji 2 zasługuje na drugie spojrzenie, bo łączy dwa formaty,
-między którymi naprawdę wybierasz.
+Jedna liczba z tabeli w ramce powyżej zasługuje na drugie spojrzenie, bo
+łączy dwa formaty, między którymi naprawdę wybierasz.
 
 Połowa odstępu przy $1$ w podwójnej precyzji to $\val{p01.swamp.at.one}$.
 Połowa odstępu przy miliardzie w podwójnej precyzji to
@@ -517,7 +519,7 @@ co naprawdę kupuje \enquote{dwa bajty na parametr} i dlaczego \code{bf16}
 stał się formatem treningowym, a \code{fp16} potrzebuje sztuczki ze
 skalowaniem, żeby w ogóle działać. To pytanie jest tą sekcją.
 
-Oba mają szesnaście bitów. Oba wydają jeden na znak. Po sekcji 1 zostaje
+Oba mają szesnaście bitów. Oba wydają jeden na znak. Po sekcji \emph{Notacja naukowa przy podstawie dwa} zostaje
 dokładnie jedna rzecz, którą mogą się różnić. Jaka?
 \nextframe
 \end{fr}
@@ -546,15 +548,19 @@ polu jest bitem zabranym drugiemu.
 \end{fr}
 
 \mermaidfig{p01-same-width}{Szesnaście bitów, dwa sposoby ich wydania i
-wymiana, którą to ustala.}{jedna szerokość, dwa podziały}
+wymiana, którą wymusza stała szerokość.}{jedna szerokość, dwa podziały}
 
 \begin{fr}
 Policz, ile te trzy bity są warte, i zrób to w kierunku, który ma znaczenie
 \dash{} wykładnika.
 
 Pole wykładnika o $b$ bitach mieści $2^{b}$ wzorców, z których dwa są
-zarezerwowane (jeden na zero i liczby subnormalne z sekcji 5, jeden na
-nieskończoności), więc prawdziwy wykładnik przebiega mniej więcej $2^{b} - 2$
+zarezerwowane (jeden na zero i liczby subnormalne z sekcji \emph{Dwie
+podłogi, nie jedna}, jeden na nieskończoności i na \code{nan}-y \dash{}
+\code{nan} to wynik operacji niepoprawnej, takiej jak $0/0$ albo
+$\infty - \infty$, i propaguje się przez każdą operację arytmetyczną, której
+dotknie, dlatego jeden taki wynik gdziekolwiek w partii zamienia całą stratę
+w \code{nan}), więc prawdziwy wykładnik przebiega mniej więcej $2^{b} - 2$
 wartości, z grubsza połowę z nich ujemnych. Dla $\val{p01.fp16.ebits}$ bitów
 największy prawdziwy wykładnik wychodzi $15$.
 
@@ -569,11 +575,19 @@ Dokładnie tyle, i to liczba warta rozpoznawania na pierwszy rzut oka, bo
 spotkasz ją jako \code{inf} w logu, a nie jako udokumentowany limit.
 
 Teraz zrób \code{bf16}, który ma $\val{p01.bf16.ebits}$ bitów wykładnika.
-Arytmetyka jest ta sama, a odpowiedź to $\val{p01.bf16.max}$ \dash{} i postaw
-ją obok sufitu \code{fp32}, który wynosi $\val{p01.fp32.max}$.
+Arytmetyka jest ta sama, więc wylicz jego sufit i postaw swoją odpowiedź obok
+sufitu \code{fp32}, który wynosi $\val{p01.fp32.max}$.
 
-Zgadzają się do dwóch cyfr, a nie do trzech, i obie połowy tego są warte
-chwili. Są blisko, bo \code{bf16} i \code{fp32} mają ten sam budżet
+I jeszcze jedno, zapisz to, zanim pójdziesz dalej: \code{fp16} i \code{bf16}
+to te same szesnaście bitów podzielone na dwa sposoby. Który z nich jest
+dokładniejszy?
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p01.bf16.max}$, a dokładniejszy z tych dwóch jest \code{fp16}.}
+Sufity zgadzają się do dwóch cyfr, a nie do trzech, i obie połowy tego są
+warte chwili. Są blisko, bo \code{bf16} i \code{fp32} mają ten sam budżet
 wykładnika, po $\val{p01.bf16.ebits}$ bitów. Nie są równe, bo największa
 wartość formatu to $(2 - 2^{-m}) \times 2^{127}$, a krótsza mantysa
 \code{bf16} czyni jego pierwszy nawias nieco mniejszym \dash{} niedobór
@@ -582,21 +596,20 @@ wynosi $\val{p01.bf16.short.pct}$ procenta.
 \textbf{\code{bf16} to \code{fp32} z uciętym dołem mantysy.} Sięga tak samo
 daleko z dokładnością do pół procenta, rozdziela znacznie zgrubniej, a
 konwersja między nimi nie może się przepełnić w żadną stronę.
-\end{fr}
 
-\begin{fr}
 \begin{trapbox}
 \textbf{\code{bf16} nie jest formatem dokładniejszym. Jest mniej dokładny,
 ośmiokrotnie, i taki miał być z założenia.}
 
 Stosunek obu sufitów wynosi $\val{p01.bf16.over.fp16}$ \dash{} trzydzieści
 trzy rzędy wielkości dodatkowego zasięgu, kupione za trzy bity. Co to
-kosztowało, widać w wierszu epsilona z sekcji 2: $\val{p01.bf16.eps}$ przeciw
-$\val{p01.fp16.eps}$ w \code{fp16}, czyli około $\val{p01.bf16.digits}$ cyfr
-dziesiętnych precyzji przeciw około $\val{p01.fp16.digits}$.
+kosztowało, widać w wierszu epsilona z sekcji \emph{Odstęp rośnie z
+wielkością}: $\val{p01.bf16.eps}$ przeciw $\val{p01.fp16.eps}$ w \code{fp16},
+czyli około $\val{p01.bf16.digits}$ cyfr dziesiętnych precyzji przeciw około
+$\val{p01.fp16.digits}$.
 
-Jeśli obstawiałeś, że nowszy format jest dokładniejszy, to zwyczajny odczyt i
-jest odwrotnie. Pytanie projektowe nigdy nie brzmiało \enquote{jak dokładnie},
+Jeśli napisałeś \code{bf16}, to zwyczajny odczyt i jest odwrotnie.
+Pytanie projektowe nigdy nie brzmiało \enquote{jak dokładnie},
 tylko \enquote{co zawodzi pierwsze}, a odpowiedzią dla treningu jest zasięg, a
 nie precyzja.
 \end{trapbox}
@@ -621,16 +634,18 @@ się kończy.
 Do tego służy \emph{loss scaling}. Pomnóż stratę przez dużą stałą przed
 przejściem wstecz, żeby każdy gradient został pomnożony przez tę samą stałą i
 podniesiony ponad podłogę \code{fp16}; podziel gradienty przez nią z powrotem
-przed aktualizacją, co odtwarza matematykę dokładnie, bo stały czynnik
-rozdziela się na całe przejście wstecz. Stałą dobiera się zwykle dynamicznie
-\dash{} podnosić, aż coś się przepełni, a potem cofnąć.
+przed aktualizacją, co odtwarza matematykę dokładnie \dash{} pod warunkiem,
+że stała jest potęgą dwójki, bo wtedy i mnożenie, i dzielenie ruszają tylko
+wykładnik i żaden bit mantysy nie zostaje tknięty. Dlatego skale straty podaje
+się jako $512$ albo $65\,536$, a nie jako $1000$. Stałą dobiera się zwykle
+dynamicznie \dash{} podnosić, aż coś się przepełni, a potem cofnąć.
 
 To obejście $\val{p01.fp16.ebits}$ bitów wykładnika i powód, dla którego
 trening w \code{bf16} nie potrzebuje takiej maszynerii: przy
 $\val{p01.bf16.ebits}$ bitach gradienty nigdy nie były blisko podłogi.
 \end{aibox}
 
-To rozstrzyga wagi i gradienty. Zostają sumy bieżące, o których sekcja 3
+To rozstrzyga wagi i gradienty. Zostają sumy bieżące, o których sekcja \emph{Kolejność zmienia wynik}
 pokazała, że połykają małe wkłady w całości. Którego z dwóch budżetów
 potrzebuje akumulator i jaki format z tego wynika?
 \dotline
@@ -649,10 +664,13 @@ najbliżej wyjścia poza zakres, i daj bity wykładnika jej. Zapytaj, którą
 wielkość trzeba odróżniać od sąsiadek, i daj bity mantysy jej.
 
 W praktyce te dwie odpowiedzi wypadają w różnych miejscach i właśnie dlatego
-mieszana precyzja w ogóle istnieje: wagi i gradienty na szesnastu bitach, bo
-potrzebują zasięgu i znoszą zgrubność, a akumulatory \dash{} bieżące sumy,
-które w sekcji 3 połykały drobne wkłady w całości \dash{} w \code{fp32}, bo
-tam kończy się precyzja.
+mieszana precyzja w ogóle istnieje: wagi i gradienty na szesnastu bitach na
+oba przejścia, bo potrzebują zasięgu i znoszą zgrubność, a kopia główna wag
+obok akumulatorów \dash{} bieżących sum, które w sekcji \emph{Kolejność zmienia
+wynik} połykały drobne wkłady w całości \dash{} w \code{fp32}, bo tam kończy
+się precyzja. Aktualizację nakłada się na kopię główną, a nie na wagi
+szesnastobitowe, i dlatego Program~\ref{prog:P03} liczy ją jako osobny
+wiersz.
 \end{fr}
 
 % ============================================================
@@ -667,8 +685,9 @@ subnormalna i czemu format ma dwa progi, a nie jeden \dash{} a oto pierwsza
 połowa długu.
 
 Najmniejsza liczba \emph{normalna} podwójnej precyzji \dash{} najmniejsza z
-domyślną wiodącą $1$ z sekcji 1 wciąż na miejscu \dash{} to
-$\val{p01.fp64.minnorm}$. Tak nisko sięga budżet wykładnika.
+domyślną wiodącą $1$ z sekcji \emph{Notacja naukowa przy podstawie dwa} wciąż
+na miejscu \dash{} to $\val{p01.fp64.minnorm}$. Tak nisko sięga budżet
+wykładnika.
 
 Co leży bezpośrednio poniżej? Zapisz, co twoim zdaniem dzieje się między
 $\val{p01.fp64.minnorm}$ a zerem.
@@ -681,9 +700,11 @@ Nie zero i nie nic. Jest tam drugi zakres liczb i druga podłoga daleko poniżej
 pierwszej.
 \end{ansblock}
 
-Najmniejsza liczba, jaką podwójna precyzja w ogóle reprezentuje, to
+Najmniejsza dodatnia liczba, jaką podwójna precyzja w ogóle reprezentuje, to
 $\val{p01.fp64.minsub}$, czyli mniejsza od najmniejszej normalnej o czynnik
-około $10^{16}$. Liczby pomiędzy to \emph{subnormalne} i istnieją z powodu
+$2^{52}$ \dash{} po jednym czynniku dwa na każdy bit mantysy, który można
+oddać, więc zakres subnormalny jest tak głęboki, jak mantysa jest szeroka.
+Liczby pomiędzy to \emph{subnormalne} i istnieją z powodu
 domyślnej wiodącej jedynki.
 
 Gdy wykładnik sięgnie dna, jedynym sposobem zejścia niżej jest pozwolić
@@ -775,6 +796,13 @@ wykładnika jest twardym sufitem na to, jak długą sekwencję da się ocenić p
 mnożenie, a praca na logarytmach nie jest udoskonaleniem, tylko jedynym
 sposobem, żeby ta wielkość w ogóle istniała.
 
+Zauważ, od czego ta odpowiedź nie może zależeć. Każdy token wnosi ten sam
+czynnik, więc liczba zależy od tego czynnika i od podłogi formatu, i od niczego
+więcej \dash{} nie od słownika, nie od architektury, nie od tego, jak długi
+jest tekst. To własność arytmetyki, a dwa modele zgodne co do
+prawdopodobieństwa na token kończą się w tym samym miejscu, cokolwiek innego
+je różni.
+
 Podaj liczbę, zanim zrobi to następna ramka. Model, który przypisuje
 $\num{0.5}$ każdemu tokenowi, oceniany w \code{fp16} przez mnożenie: po ilu
 tokenach iloczyn jest dokładnie zerem \dash{} po tysiącach, po setkach, czy
@@ -806,6 +834,9 @@ w tym formacie & iloczyn jest dokładnie zerem po \\
 Arytmetyka jest tu dokładna aż do niedomiaru, bo $\num{0.5}^{n}$ to dokładnie
 $2^{-n}$, a każda z tych liczb jest reprezentowalna aż do najmniejszej
 subnormalnej \dash{} więc urwisko leży o krok za podłogą, w każdym formacie.
+Tylko za którą: przy trybie flush-to-zero z ramki powyżej wiersz \code{fp16}
+spada do $\val{p01.coin.ftz.fp16}$, bo podłogą jest wtedy najmniejsza liczba
+normalna. Dlatego warto odróżniać obie podłogi.
 Postaw obok niego wiersz \code{bf16}: $\val{p01.coin.bf16}$ tokenów z tych
 samych szesnastu bitów. Prawie całość tego bierze się z trzech dodatkowych
 bitów wykładnika, a trzy bity mantysy, które \code{bf16} oddał, żeby je kupić,
@@ -815,8 +846,17 @@ subnormalny.
 Jeszcze jedna liczba do postawienia obok tych podłóg, i nie jest ona tego
 programu. Program~\ref{prog:F12} pomnożył przez siebie czterdzieści czynników
 warstwowych i sprowadził iloczyn poniżej $\val{p01.f12.prod}$ dla nasyconego
-łańcucha logistycznego. Który z czterech formatów jeszcze mieści tak małą
-liczbę?
+łańcucha logistycznego.
+
+Dwie rzeczy sprawiają, że tę liczbę warto postawić obok, a nie tylko
+zacytować. To \emph{ograniczenie} \dash{} najlepsze, co taki łańcuch potrafi
+\dash{} więc format, który jej nie mieści, nie zmieści też niczego, co
+produkuje prawdziwy łańcuch tej głębokości, a to zamienia jedno porównanie w
+stwierdzenie o każdym takim łańcuchu. A odpowiedź nie wymaga nowej arytmetyki:
+cztery podłogi są w tabeli powyżej, a pytanie brzmi tylko, którą z nich ta
+liczba mija.
+
+Który z czterech formatów jeszcze mieści tak małą liczbę?
 \dotline
 \nextframe
 \end{fr}
@@ -849,7 +889,7 @@ skróciły, więc różnicę niosą te bity, które były na dole, a im mniej ic
 tym zgrubniejsza odpowiedź. Podzielenie tego przez drobne $h$ to powiększa.
 
 \begin{rigourbox}
-\textbf{I na tym P01 poprzestaje.} Mechanizm ma nazwę \dash{} katastrofalne
+\textbf{I na tym ten program poprzestaje.} Mechanizm ma nazwę \dash{} katastrofalne
 skracanie \dash{} i katalog środków zaradczych, a oba należą do
 Programu~\ref{prog:P02}. Tutaj należy powód, dla którego to się dzieje: nie
 to, że odejmowanie jest niedokładne, ale to, że jego argumenty zostały
@@ -890,7 +930,7 @@ inżynierskie: skoro tyle masz, które algorytmy to przeżyją, a które nie.
   Można je odczytać przez \code{struct}, a nie przyjmować na wiarę \dash{}
   $\num{1.0}$ i $\num{2.0}$ różnią się tylko wykładnikiem, $\num{1.0}$ i $\num{1.5}$ tylko mantysą.
   Wiodąca $1$ liczby $m$ nigdy nie jest przechowywana, co kupuje bit, a
-  sekcja 5 mówi o rezygnowaniu z niej}.}
+  sekcja \emph{Dwie podłogi, nie jedna} mówi o rezygnowaniu z niej}.}
 \sumitem{7--8}{\result{\textbf{Odstęp rośnie z liczbą}: $\val{p01.gap.one}$ przy $1$,
   $\val{p01.gap.thousand}$ przy $1000$, $\val{p01.gap.billion}$ przy
   miliardzie. Stały budżet bitów znaczących to stała precyzja \emph{względna},
@@ -928,11 +968,13 @@ inżynierskie: skoro tyle masz, które algorytmy to przeżyją, a które nie.
   się tylko miejscem cięcia: $\val{p01.fp16.ebits}$ bitów wykładnika przeciw
   $\val{p01.bf16.ebits}$. Szerokość jest ustalona, więc \textbf{bit dodany
   jednemu polu jest bitem zabranym drugiemu}}.}
-\sumitem{22--23}{\result{Sufit \code{fp16} to $\val{p01.fp16.max.exact}$, policzony z
+\sumitem{22--24}{\result{Sufit \code{fp16} to $\val{p01.fp16.max.exact}$, policzony z
   budżetu wykładnika, a nie odszukany. Sufit \code{bf16} to
-  $\val{p01.bf16.max}$, czyli $\val{p01.fp32.max}$ formatu \code{fp32} \dash{}
-  ten sam budżet wykładnika. \textbf{\code{bf16} to \code{fp32} z usuniętym
-  dołem mantysy}, więc konwersja między nimi nie może się przepełnić}.}
+  $\val{p01.bf16.max}$, w granicach $\val{p01.bf16.short.pct}$ procent od
+  $\val{p01.fp32.max}$ formatu \code{fp32}, bo budżety wykładnika są te same;
+  niedobór bierze się z krótszej mantysy \code{bf16}. \textbf{\code{bf16} to
+  \code{fp32} z usuniętym dołem mantysy}, więc konwersja między nimi nie może
+  się przepełnić}.}
 \sumitem{24--26}{\result{\textbf{\code{bf16} jest formatem \emph{mniej} dokładnym}
   \dash{} $\val{p01.bf16.eps}$ przeciw $\val{p01.fp16.eps}$ \dash{} kupionym
   za $\val{p01.bf16.over.fp16}$ razy większy zasięg. Zasięg zawodzi pierwszy,
@@ -988,7 +1030,7 @@ inżynierskie: skoro tyle masz, które algorytmy to przeżyją, a które nie.
   żąda zgodności drobniejszej, niż format potrafi wyrazić, i nazywa liczby
   równe różnymi. Przy $10^{-12}$ nazywa równą każdą parę, w tym różniące się
   tysiąckrotnie. Tolerancja musi być względna.}
-\item Dwa akceleratory podają straty treningowe różniące się na ósmym miejscu
+\item Dwa akceleratory podają straty treningowe różniące się na siódmym miejscu
   po przecinku. Powiedz, co z tego wynika.
   \answerto{Nic o modelu. Kolejność redukcji się różni, dodawanie nie jest
   łączne, a w \code{fp32} to miejsce po przecinku i tak leży poniżej epsilona
@@ -1010,11 +1052,21 @@ inżynierskie: skoro tyle masz, które algorytmy to przeżyją, a które nie.
   Kosztuje jeden bit precyzji na każdy krok w dół, a możliwe że i szybkość,
   skoro tryby flush-to-zero istnieją właśnie dlatego, że subnormalne bywają
   wolne.}
-\item Program F03 policzył $\val{p01.f03.prob}$. Powiedz, co robi z tym
-  podwójna precyzja i co F03 zrobił zamiast tego.
+\item Program~\ref{prog:F03} policzył $\val{p01.f03.prob}$. Powiedz, co robi
+  z tym podwójna precyzja i co tamten program zrobił zamiast tego.
   \answerto{Odczytuje jako $\val{p01.f03.readback}$ \dash{} dokładnie zero,
-  jakieś siedemnaście setek rzędów wielkości poniżej podłogi. F03 policzył
+  jakieś siedemnaście setek rzędów wielkości poniżej podłogi.
+  Program~\ref{prog:F03} policzył
   logarytm iloczynu, a nie iloczyn.}
+\item Dwie liczby zgadzają się na dziewięciu cyfrach znaczących i zostają
+  odjęte w \code{fp32}. Powiedz z grubsza, ile cyfr różnicy jest wiarygodnych
+  i gdzie podziały się utracone.
+  \answerto{Mniej więcej żadna: \code{fp32} niesie około
+  $\val{p01.fp32.digits}$ cyfr znaczących, więc dwie liczby zgodne na
+  dziewięciu to \emph{ta sama} liczba \code{fp32}, a różnica wynosi zero albo
+  jeden odstęp. Cyfr nie zgubiło odejmowanie, które jest tu dokładne \dash{}
+  ich nigdy nie było w argumentach, bo te zostały już zaokrąglone do formatu.
+  Odejmowanie tylko uwidoczniło ten brak, kasując cyfry, które tam były.}
 \item Podaj liczbę czynników $\num{0.5}$, po której iloczyn jest dokładnie
   zerem w \code{fp64} i w \code{fp16}, i powiedz, czemu obie tak bardzo się
   różnią.
@@ -1041,15 +1093,32 @@ inżynierskie: skoro tyle masz, które algorytmy to przeżyją, a które nie.
   $\val{p01.fp32.mbits}$ bitów mantysy. Dzieje się to dla każdej wartości z
   $\intco{2^{29}}{2^{30}}$ i nigdzie indziej \dash{} przy samym $2^{30}$
   zakres wykładnika się zmienia i odstęp się podwaja.}
-\item Bieżąca suma w \code{bf16} stoi na $100$. Podaj najmniejszy wkład, który
+\item Bieżąca suma w \code{bf16} stoi na $\val{p01.bf16.total}$. Podaj
+  najmniejszy wkład, który
   może ją jeszcze zmienić.
-  \answerto{Około $\val{p01.swamp.bf16} \times 100$, czyli mniej więcej
-  $\num{0.4}$. Progiem jest połowa epsilona sumy, a próg skaluje się z sumą.}
+  \answerto{Cokolwiek powyżej $\val{p01.bf16.total.half}$.
+  $\val{p01.bf16.total}$ leży w zakresie wykładnika
+  $\intco{\val{p01.bf16.binade.lo}}{\val{p01.bf16.binade.hi}}$, gdzie odstęp
+  \code{bf16} wynosi $\val{p01.bf16.total.gap}$, więc połowa odstępu to
+  $\val{p01.bf16.total.half}$. Połowa epsilona sumy to
+  $\val{p01.bf16.total.thumb}$ \dash{} to reguła kciuka i ograniczenie górne
+  odpowiedzi: jest to połowa odstępu na \emph{górze} tego zakresu, a suma na
+  jego dole leży tam, gdzie ta reguła myli się najbardziej. Dokładna odpowiedź
+  potrzebuje wielkości, nie tylko formatu, i po to jest sekcja \emph{Odstęp
+  rośnie z wielkością}.}
 \item \code{bf16} i \code{fp32} mają ten sam budżet wykładnika. Powiedz, co to
   znaczy dla konwersji w każdą stronę.
-  \answerto{Żadna strona nie może się przepełnić ani wpaść w niedomiar, bo
-  zakres reprezentowalny jest ten sam. Konwersja w dół traci bity mantysy i
-  nic poza tym; konwersja w górę jest dokładna.}
+  \answerto{Konwersja w górę jest dokładna. Konwersja w dół nie może się
+  przepełnić \dash{} budżety wykładnika są te same, więc oba sufity różnią się
+  o $\val{p01.bf16.short.pct}$ procent \dash{} ale może wpaść w niedomiar, i
+  tego wspólny budżet wykładnika nie obejmuje. Zakresy liczb
+  \emph{znormalizowanych} są te same; zakresy liczb zdenormalizowanych nie,
+  bo głębokość liczby zdenormalizowanej kupuje się bitami mantysy.
+  \code{fp32} ma ich $\val{p01.fp32.mbits}$, a \code{bf16} tylko
+  $\val{p01.bf16.mbits}$, więc jego podłoga sięga
+  $\val{p01.fp32.minsub}$, podczas gdy \code{bf16} zatrzymuje się na
+  $\val{p01.bf16.minsub}$, a cokolwiek poniżej mniej więcej połowy tej
+  wartości zamienia się w zero.}
 \item Loss scaling mnoży stratę przez stałą przed przejściem wstecz i dzieli
   gradienty przez nią potem. Wyjaśnij, czemu nie zmienia to matematyki.
   \answerto{Różniczkowanie jest liniowe, więc przeskalowanie straty skaluje
@@ -1059,12 +1128,13 @@ inżynierskie: skoro tyle masz, które algorytmy to przeżyją, a które nie.
 \item Przypuśćmy, że usunięto z formatu liczby subnormalne, więc wszystko
   poniżej najmniejszej normalnej staje się zerem. Powiedz, co by się
   pogorszyło, a co poprawiło.
-  \answerto{Gorzej: podłoga podnosi się skokowo o czynnik rzędu $10^{16}$ w
+  \answerto{Gorzej: podłoga podnosi się skokowo o czynnik $2^{52}$ w
   podwójnej precyzji, więc niedomiar przychodzi znacznie wcześniej, a utrata
   najmniejszych wartości jest nagła zamiast stopniowej. Lepiej: każda liczba
   reprezentowalna ma pełną precyzję, a sprzęt ma o jeden przypadek mniej do
   obsłużenia, i dlatego tryby flush-to-zero istnieją.}
-\item Błąd ilorazu różnicowego z Programu F11 znowu rośnie, gdy $h$ maleje.
+\item Błąd ilorazu różnicowego z Programu~\ref{prog:F11} znowu rośnie, gdy $h$
+  maleje.
   Wyjaśnij ten wzrost, używając wyłącznie odstępu.
   \answerto{$f(x+h)$ i $f(x)$ są przechowywane z precyzją względną rzędu
   epsilona, więc każde niesie błąd bezwzględny rzędu $\epsilon|f(x)|$.
