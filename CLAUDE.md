@@ -22,9 +22,9 @@ companion volumes.
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
 | `main-en` (17x24) | 1415 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1450 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1454 | 0 | 0 | **0** | 0 |
 | `main-en-a4` | 1180 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1194 | 0 | 0 | **0** | 0 |
+| `main-pl-a4` | 1198 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -130,7 +130,7 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **95 orphan-tail pages: 28 · 30 · 17 · 20** across `main-en`, `main-pl`,
+- **97 orphan-tail pages: 28 · 32 · 18 · 19** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`. **Four passes have taken the count DOWN** and
   every other one has raised it: the two elicitation passes took it from 99 to
   96, the P05 review pass put three back, and the F01--F06 review batch took
@@ -1058,6 +1058,17 @@ Each cost time; none is obvious from its error message.
   \dash{} `p01.gap.one`, `p01.fp64.eps`, `f11.fd.vanishes` and the rest
   \dash{} are **not** in this class: they are exact everywhere and must stay
   as figures.
+
+- **A PDF a build is still writing is not a PDF, and the tools say so
+  loudly.** `pdftotext -bbox` on `main-pl.pdf` while `latexmk` was part-way
+  through its second pass exits 1, and `checkpdf.py` comes back as a
+  `CalledProcessError` traceback naming a subprocess rather than a defect. It
+  is the one instrument failure in this repository's record that is *not* the
+  recorded class \dash{} it did not accept the input and return a plausible
+  answer, it refused \dash{} which is exactly why it costs nothing. The rule is
+  narrow: **read a PDF only after the build that writes it has reported its own
+  exit line.** Checking a format early to save a round is a false economy; wait
+  for `MAKE_EXIT` and check all four.
 
 - **A background `sleep` is not a wait, and reading repeated identical poll
   results as elapsed time is how you invent a failure that never happened.**
@@ -13487,6 +13498,424 @@ not in the pass that happens to notice.** A stale table there is worse than a
 stale page count here, because a reader cannot tell one measured last week from
 one measured four merges ago, and this file's own instruction to re-measure
 *all four rows* says nothing about *when*.
+
+### Foundation review, F08 to F11, September 2026
+
+Issues \#128, \#130, \#132 and \#142, taken as one batch on the F01--F06
+precedent that each PR costs a four-format build. Correctness findings across
+all four programs, and **one structural fix**, and the structural one is the
+pass's whole argument: it is the first defect in this book that **no editorial
+fix could have settled**, and the measurement that says so took one command.
+
+#### THE FINDING: a listing split in two builds of four, at two different rows
+
+Program~\ref{prog:F11}'s seventeen-row sweep of $h$ is its central
+measurement, and the whole argument is a shape \dash{} the error falls, bottoms
+out at $\val{f11.fd.best.h}$ and climbs back. Issue \#142 reports it cut across
+a page turn **at the bottom of the U**, with no column heading on the
+continuation, so the descent is on the recto and the ascent overleaf.
+
+Measured twice, because the first measurement was taken before this batch's
+prose edits and this file's own rule is to re-measure from the build in front
+of you:
+
+| build | before the batch | on the prose-only build |
+|---|---|---|
+| `main-en` | whole | whole |
+| `main-pl` | whole | whole |
+| `main-en-a4` | **split** after $10^{-4}$ | **split** after $10^{-8}$ |
+| `main-pl-a4` | **split** after $10^{-9}$ | **split** after $10^{-9}$ |
+
+**Two of four, the two splits are in different places, and one of them moved
+under edits that were not aimed at it.** That last column is stronger evidence
+than the first, and it is what retires the editorial fix rather than merely
+making it awkward: `main-en-a4`'s split walked four rows down the table because
+some prose three hundred pages earlier got longer. The issue's own suggestion
+\dash{} lengthen the frame above so the listing starts on a fresh page \dash{}
+moves the break in all four builds at once, so a wording that clears
+`main-en-a4` re-rolls `main-pl-a4`, and CI's metrics paginate differently
+again. It is this file's unwinnable loop, and the reason the orphaned cue is
+treated the way it is.
+
+**What is different, and it is the whole of why the fix is available here: the
+defect is not knife-edge.** An orphaned cue is one line landing a line past a
+boundary, so where it lands is a property of the installation. A listing is a
+box of known height: it either fits in the room left or it does not, and both
+quantities are things TeX will tell you. So `\transcript` now measures the
+listing into a box and turns the page when it will not fit \dash{} the
+mechanism `\begin{fr}` and `\section` already use, with `\pagegoal`'s
+`\maxdimen` (a fresh page, meaning unlimited room) excluded as they exclude it,
+and a second guard that prints a listing **taller than the text block** where
+it stands rather than wasting a leaf and splitting it anyway.
+
+**Asked of TeX rather than reasoned about**, which is Program~\ref{prog:P23}'s
+rule and cost seconds: a standalone file boxing the book's tallest transcript
+prints its own markers, reports $\num{94.24} + \num{88.76}$ pt against a
+$\num{541.40}$ pt text block \dash{} so the tallest listing in the book is a
+third of a page and the taller-than-the-block branch cannot fire today
+\dash{} and `pdftotext -bbox` puts every glyph of the boxed listing at the
+**same $x$ to the micro-point** as the unboxed one, with the only difference a
+$\num{1.84}$ pt vertical skip. The extraction had said otherwise: without
+`-layout` it reordered the boxed minipage into columns and with `-layout` it
+shifted the whole page two spaces, which is the recorded instrument class one
+more time \dash{} the tool accepted the input and returned a plausible answer,
+and the coordinates settled it.
+
+#### The guard's cost, measured in isolation, and the prediction it refuted
+
+Two builds were run on purpose rather than one: **build 2 with the prose
+corrections and no guard, build 3 with the guard and nothing else.** That is
+the separation the F04 review pass established for its section guard and the
+F06 pass for the `\dotline` experiment, and it is the only way the number
+below is attributable to anything.
+
+| | prose only | + guard | delta |
+|---|---|---|---|
+| `main-en` pages | 1415 | 1417 | $+2$ |
+| `main-pl` pages | 1454 | 1454 | $0$ |
+| `main-en-a4` pages | 1180 | 1180 | $0$ |
+| `main-pl-a4` pages | 1192 | 1200 | $+8$ |
+| overfull hbox | `[]` `[]` `[6.3]` `[]` | identical | $0$ |
+| overfull vbox | $0$ everywhere | identical | $0$ |
+| orphaned cues | $0$ everywhere | $1$ / $0$ / $0$ / $2$ | $+3$ |
+| orphan tails | $27 / 32 / 18 / 19$ | $29 / 31 / 17 / 22$ | $+3$ |
+| **split listings** | F11's, in both A4 builds | **$0$ of $41$, all four** | cleared |
+
+That last row is the only one in the table whose left-hand column is not a
+count: the F11 sweep was the listing the issue named and the only one measured
+before the guard. What replaces the inference is below.
+
+**The prediction was written down before build 3 so the build could refute it,
+and it did, in one row.** `\transcript` occurs $41$ times per edition, so the
+guard can turn at most $41$ pages and only where a listing genuinely does not
+fit; the expectation was the two splits clearing, a handful of pages, and the
+tail ledger moving by at most a few. Three of the four rows came out that way.
+**The cues did not**: three arrived where none had been, one of them a hard
+gate locally, and nothing in the prediction had allowed for it.
+
+The mechanism is obvious afterwards and was not before: **turning a page moves
+every break after it, so a guard that repairs one page-level defect re-rolls
+every other page-level defect downstream of it.** That is the same fact this
+file records as the random walk, arriving from a structural fix rather than
+from an editorial one. It is not an argument against the guard \dash{} the
+cues are clearable by the recorded remedy and the split was not \dash{} but it
+is the reason a structural page-level fix has to be measured rather than
+reasoned about, and the reason it cannot be shipped in the same build it is
+measured in.
+
+**And this is where it differs from the `\dotline` guard, which was measured
+and reverted.** That one turned the page *before* the row of dots, so the page
+it left behind was short and the reader still met white paper: two cues became
+eight tails and the defect was relabelled rather than repaired. This one turns
+the page before a *listing*, and the page it leaves behind ends on prose. A
+split listing is genuinely gone; what is bought with it is three short pages
+somewhere else, which is a trade rather than a rename.
+
+**And then the benefit was counted, because the table above could not count
+it.** The split was measured before the guard for the F11 sweep alone; the
+other forty transcripts were not, so \enquote{cleared} in that last row was an
+inference from the page deltas. The guard now `\typeout`s a marker each time
+it turns a page, so a build reports its own firing count:
+
+| | `main-en` | `main-pl` | `main-en-a4` | `main-pl-a4` |
+|---|---|---|---|---|
+| listings turned | $7$ | $5$ | $6$ | $10$ |
+
+**Five to ten of the forty-one listings did not fit, in every build, where the
+issue reported one.** The issue found the one it found because that listing is
+the tallest in the book and its program's central measurement; the other four
+to nine per build were nobody's headline and nobody had looked. That is the
+whole case for the guard and it took one `\typeout` to make, so the marker
+stays in \dash{} `grep -c MFA-TRANSCRIPT-TURN main-<fmt>.log` is now a ledger
+rather than a debugging line, and the comment above the guard says so.
+
+Two cautions on reading that row. A firing is **a page turned, not a split
+repaired**: after the first turn everything downstream moves, so the set the
+guard fires on is not identical to the set that would have split in an
+unguarded build. And the counts must be taken from the **final** `latexmk`
+pass \dash{} a mid-run log gave $1$ and $2$ for two of these, which is the
+partial-file class this repository keeps recording.
+
+The cues were cleared by **lengthening**, in both editions, which is
+Program~\ref{prog:F06}'s two-sided rule; it took three rounds and the walk is
+under *Layout* below. Every added paragraph earns its place: that the unrolled recurrence stops at $m_0$
+because there were only $t$ steps, so it is an identity rather than an
+approximation, and that nothing in the derivation used what the $g$s are
+\dash{} feed it gradients and it is momentum, losses and it is a dashboard
+curve, squared gradients and it is half of Adam; that a coin is the worst a
+model can honestly be, so the underflow length that comes out is a ceiling
+rather than a complaint about one bad model; and that the picture and the
+algebra reached the rotation's answer independently, the picture from the
+definition of a rotation and the algebra from two numbers read off the matrix,
+which is a check where they agree and all you have left above three dimensions.
+
+#### The aibox invented a mechanism, and the same program proves the real one
+
+Program~\ref{prog:F08}'s aibox explained why a positional encoding alternates
+sine and cosine: so that position zero reads $0, 1, 0, 1$ rather than all
+zeros, and cannot be confused with a padded slot. It is a tidy story, it is
+the kind of thing a model will produce with complete confidence, and **the
+published reason is the one this program derives two sections later**
+\dash{} the pair $(\cos, \sin)$ is frame 1's point on the circle, moving $k$
+places turns it through a fixed angle, and turning a point is a linear map, so
+the encoding at one position is a fixed linear function of the encoding at any
+position a fixed distance away.
+
+That is the sharpest form of the aibox rule this book has met. The rule says a
+box that cannot name a specific line of a specific system is prose; this box
+named one and **got the mechanism wrong about a fact its own section 5
+establishes**, and the correction needed nothing from outside the program.
+Worth pairing with Program~\ref{prog:F02}'s `-3**2` box and
+Program~\ref{prog:F04}'s momentum claim: all three are a confident
+mechanical explanation written from the feel of the mechanism.
+
+#### The tally class, and this time the program falsified itself
+
+*The only trigonometric identity this book uses*, in a note box, in a Summary
+item that `\result{}` replays into Appendix~\ref{app:C}, and in a Test
+exercise. **The program reads three more off the same circle in the next two
+sections** \dash{} the two symmetries, and the quarter-turn shift \dash{} and
+one of them is in a Summary item four lines below the claim.
+
+Every previous instance of this class was a claim about *another* program
+(Program~\ref{prog:F03}'s five bare logarithms, Program~\ref{prog:P14}'s
+fifteen rigour boxes), which is why the standing rule is *open the program
+before writing a sentence about it*. Here the falsifying evidence was in the
+same file, in the same section, and the rule that catches it is the narrower
+and more useful one this file already states: **never state a count of
+occurrences.** All three sites now name the *practice* \dash{} every identity
+here is read off the circle and none is borrowed \dash{} which is checkable,
+is what the book actually does, and cannot go stale when a fourth is read off.
+
+#### An answer box that answered a different question, and a number nobody had computed
+
+Program~\ref{prog:F10}'s grid frame asks how many configurations survive
+after a constraint rules out one model at one precision, and the answer box
+said `\ans{No}`.
+
+**And the count it should have carried is not the one the arithmetic
+invites.** The reader multiplies $\val{f10.grid.a} \times \val{f10.grid.b}
+\times \val{f10.grid.c} = \val{f10.grid}$, removes what looks like one run,
+and gets $\val{f10.grid.less.two}$ plus four. What the constraint removes is a
+\emph{pair} \dash{} that model at that precision \dash{} which is gone at
+every one of the $\val{f10.grid.c}$ batch sizes, so the answer is
+$\val{f10.grid.less.one}$. The frame is now enumerated in
+`code/f10_sets.py` rather than reasoned about, with the arithmetic-invited
+figure named in the answer as the trap it is.
+
+Two things generalise. **An `\ans{}` is under the same rule as a frame**, so a
+yes/no box on a counting question is a defect in its own right whatever number
+it withholds. And this is the second time in two batches that the fix for a
+wrong answer key has been *to compute it*: the blocker batch found three wrong
+literals in answer keys and moved all three into their scripts, and this is a
+fourth. **A number in an `\answerto{}` or an `\ans{}` that the reader cannot
+derive from values on the page belongs in the script.**
+
+#### Six quantifiers, and the one in the answer key is the expensive one
+
+Program~\ref{prog:F09} carried five claims true of something smaller than the
+sentence they sat in, and Program~\ref{prog:F08} a sixth:
+
+| said | is |
+|---|---|
+| on the unit sphere the distance is $2 - 2\cos\theta$ | the \emph{squared} distance |
+| a scalar changes the size and not the direction | a \emph{positive} scalar; a negative one reverses it |
+| none of the three operations is defined between a vector and a number | scaling is exactly that, and is fine |
+| every comparison against a `nan` component is `False` | `!=` returns `True`; a `nan` compares unequal to everything, itself included |
+| normalising makes distance and cosine rank alike | any \emph{common} length does; normalising is the usual way to arrange one |
+| $\cos$ even and $\sin$ odd, in exactly F05's sense | F05 defines even; odd is the same idea with a sign on it |
+
+The first is in an answer key, which is where a reader goes **after** deciding
+to trust the book over their own working \dash{} the blocker batch's finding,
+recurring. The third and fifth were also in Summary items, so both replayed
+into Appendix~\ref{app:C}.
+
+And the fifth is the useful one rather than the most wrong: *normalise and the
+two agree* is true and is not the reason. `code/f09_vectors.py` now sweeps
+candidates at a common length that is not one and asserts the two rankings
+still agree, so the section can say what the condition actually is. The same
+sweep settles the sentence beside it \dash{} *long vectors are penalised by
+distance and ignored by cosine* is half a rule, since the distance is
+minimised at length $\lVert q\rVert\cos\theta$ and a candidate loses for being
+too **short** as readily as too long. Frame 25's own worked case is the short
+one.
+
+#### Four Quiz items asked about a function they did not name
+
+Program~\ref{prog:F11}'s Quiz asked what happens to the error as $h$ shrinks,
+what the quotient gives at $\val{f11.fd.vanishes}$, and which of two step
+sizes gets closer in eight steps \dash{} **and named neither the function nor
+the point in any of them.** Every one of those answers is a property of a
+particular $f$ at a particular $x$: the quotient collapses at
+$\val{f11.fd.vanishes}$ because $3 + h$ is $3$, and at a smaller $x$ it would
+not have, because the gap between one stored number and the next grows with
+the number.
+
+A Quiz item is a triage instrument answered **before** frame 1, so a reader
+who supplies their own $f$ answers correctly and is marked wrong. All four now
+name the function and the start; the collapse answer names the dependence on
+$x$ rather than stating the collapse as a fact about the method, which is
+Program~\ref{prog:P01}'s subject arriving where a reader will meet it first.
+
+#### And three derivatives arrived with no provenance in the program that derives them
+
+Section 5 asserts the slopes of $x^{4} - 4x^{2}$ at two points, section 4
+asserts that $-x^{2}$ has derivative $-2x$, and section 6 asserts
+$f'(x) = 2(x-3)$ \dash{} in a program whose entire argument is that a
+derivative is *computed* from the definition and whose sections 1 to 3 do
+exactly that three times.
+
+Two of the three are one line from what the reader already has and now carry
+it: every chord slope on $-x^{2}$ is the negative of $x^{2}$'s, and expanding
+$\frac{((x-3)+h)^{2} - (x-3)^{2}}{h}$ is frame 13 with a shifted variable. The
+fourth power is genuinely a page of algebra, so it is **taken on trust and
+labelled as such**, with the pointer to Program~\ref{prog:F12} and a sentence
+saying what the frame actually turns on \dash{} the two numbers, not their
+provenance.
+
+**A program that teaches a method owes its own examples that method**, and
+where it cannot pay it owes the reader the word *trust*. The same frame gained
+the reading its sign already licensed: negative at
+$\val{f11.shallow.x}$ and positive at $\val{f11.steep.x}$ settles which side
+of the minimum each point is on, so the section can say plainly that the sign
+has answered one question and the size is being asked for another.
+
+#### Also
+
+- Program~\ref{prog:F08}'s aibox said rotary embedding is \enquote{the only
+  way} to make a score depend on the difference of two positions. It is the
+  one **this identity** forces among maps that turn the query and the key by
+  an angle the position alone decides; a learned relative term inside the
+  score, or a bias added to it depending only on the gap, reach the property
+  another way. Narrowed, with a sentence saying the book compares none of
+  them \dash{} which is the F04-to-P20 shape, and the honest form.
+- Its \enquote{gone round hundreds of times} was the wavelength arithmetic
+  read generously: over a thousand positions the fastest wave completes well
+  over a hundred cycles and not several hundred. Corrected in both editions.
+- $\lVert a \rVert$ arrived in the cosine-similarity formula as
+  \enquote{the length}, undefined, eleven programs before
+  Program~\ref{prog:F09} defines it \dash{} which is exactly
+  Program~\ref{prog:F06}'s §6 finding from the batch before this one, in a
+  second program. It is now $\sqrt{a \cdot a}$, named as this section's own
+  circle equation with the radius left free, with the pointer forward and a
+  clause saying the section needs only that both lengths are positive.
+- A node of `f08-cosine-angle` read \enquote{the lengths go}, cut off
+  mid-clause. **The Polish twin already read \enquote{a długości znikają}**,
+  so the fix was to align the English with the Polish rather than to invent
+  wording \dash{} and it is worth noticing that C9 compares diagram *keys*
+  and nothing compares their *text*, so a truncated node in one edition is
+  invisible to every gate.
+- Two figures reworded for rule~2 on the four places
+  Program~\ref{prog:P18} names: `f11-sign-and-size`'s last node stated
+  frame 26's answer, and `f11-chord-to-tangent` carried \enquote{and no chord
+  ever reaches it}, which is frame 12's trapbox. The first is the last-node
+  case for the eleventh time.
+- Program~\ref{prog:F11}'s frame 18 opened with `\ans{$\val{}$}` and put the
+  reason underneath, so the covered box carried a number the reader could not
+  check and the sentence that explains it was outside the hand. It is an
+  `ansblock` now, carrying \emph{because at that size $3 + h$ is $3$}, with
+  the table's last row quoted in the prose below.
+- Two house-banned words (\emph{just}, twice) and one metaphor that
+  contradicted its own trapbox: \enquote{a long walk down a gentle slope} is
+  not steep ground, and the trapbox is about steep ground being far from the
+  bottom. Now \enquote{at the top of a long run that flattens out for miles}.
+- Summary item 24 credited Program~\ref{prog:P17} alone with classifying a
+  stationary point. The rules for the second derivative are
+  Program~\ref{prog:F12}'s and P17 turns it into curvature; both are named.
+- Further problem 4's central-difference answer was right about the general
+  case and wrong about the one it was asked on: on $x^{2}$ the $h$ terms
+  cancel **exactly**, so the quotient is $2x$ for every $h$ and the
+  left-hand branch is not moved but removed. The $h^{2}$ claim is now made on
+  $x^{3}$, where it is true.
+- Program~\ref{prog:F10}'s Test 13 said a ratio was \enquote{a shade over, by
+  the same factor as $\val{f10.pairs.ratio}$}. It is a different factor,
+  computed now, **and it shrinks as the corpus grows** \dash{} which is the
+  more useful sentence and is why quoting the other program's figure was
+  wrong rather than merely imprecise. Its further problem's five hard-coded
+  integers are `\val{}` keys.
+- Six of Program~\ref{prog:F08}'s reference values were emitted through
+  `\num{}` at a precision that printed integers as decimals; they are exact by
+  construction and the script now asserts it.
+- **The value ledger at the top of this file was three short again**, at
+  $1632$ against the tool's $1635$. The F01--F06 batch found the same thing at
+  $1626$ against $1627$ and wrote down the remedy \dash{} a pass that moves a
+  ledger has to grep the appendices *and this file* for prose about it. It is
+  the third occurrence, and the shape is the same every time: **the gated copy
+  in `figures/values/appf.tex` was right**, because `make verify` refuses the
+  tree otherwise, and the ungated sentence four hundred lines up was not. That
+  is the argument for computing Appendix~F, demonstrated a third time by the
+  one number in the pair that nothing checks.
+
+#### Layout, and a cue walk whose second round moved the defect onto its own neighbour
+
+| round | edit | result |
+|---|---|---|
+| 1 | six frames lengthened in F03, F04 and P10, both editions | `main-en` cleared, one of `main-pl-a4`'s two cleared |
+| 2 | P10's quadratic-form frame | `main-pl-a4` cleared, **one appeared in `main-pl`** |
+| 3 | the frame immediately after it | clean, all four |
+
+**Round 2 is the instructive one.** The cue it produced was on the frame
+*directly after* the one it had just lengthened, two printed pages on: the
+addition pushed that frame's tail one line past a boundary. Every previously
+recorded instance of this walk moved a defect to another program or another
+build; this one moved it one frame. It is the same random walk at its shortest
+possible range, and it is worth expecting when the lengthening is late in a
+long section.
+
+Thirtieth to thirty-second confirmations of Program~\ref{prog:F06}'s two-sided
+rule, which has still never failed. Every added paragraph earns its place: that
+the unrolled recurrence stops at $m_0$ because there were only $t$ steps, so it
+is an identity rather than an approximation, and that nothing in it used what
+the $g$s are; that a coin is the worst a model can honestly be, so the underflow
+length is a ceiling rather than a complaint about one model; that the picture
+and the algebra reached the rotation's answer independently and agree; that
+nothing new is defined by a quadratic form and $q(-x) = q(x)$, so the question
+worth asking is about directions; and that \enquote{always written symmetric}
+is a convention with teeth, because a routine that assumes symmetry reads one
+triangle and does not check.
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1415 | 1415 | `[]` | 0 |
+| `main-pl` | 1454 | 1450 | `[]` | 0 |
+| `main-en-a4` | 1180 | 1180 | `[6.3]` | 0 |
+| `main-pl-a4` | 1198 | 1194 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and no orphaned cues. **And no listing is split in any build:
+$0$ of $41$, with the checker confirmed to have located all $41$** before its
+zero was believed, which is Program~\ref{prog:P34}'s rule about an instrument
+that has not produced a known answer.
+
+**One orphan tail added**: 28 / 32 / 18 / 19 = $97$ against the pre-pass
+29 / 30 / 17 / 20 = $96$. Worth reading against the guard's own contribution,
+which was $+3$: the three rounds of lengthening gave two of them back.
+
+#### Recorded rather than taken
+
+All five are book-wide layout changes nobody has measured, which is the P05
+review pass's precedent \dash{} the next person meets the obstacle with the
+reasoning rather than rediscovering it:
+
+- **The Quiz box breaks inside an item**, stranding the route boxes that are
+  its navigation device. Third batch running that this has been recorded; the
+  fix is `\interlinepenalty` or `samepage` inside the Quiz enumerate, and it
+  moves pagination in every program whose Quiz spans a break.
+- **Figure F11.2 restates its own trapbox** rather than teaching something
+  the frames do not. That is a figure pass, and this file already carries one
+  from the F01--F06 batch.
+- **A trap box and a Summary item each split across a page turn.** Both are
+  the class the transcript guard now handles for listings, and neither is
+  knife-edge in the same way \dash{} but a `tcolorbox` room test is a change
+  to eight admonition environments at once and belongs with the Quiz fix.
+- **The \enquote{Can you?} rows are not separated**, so a reader ticking one
+  can lose their place. A `tabularx` row rule, book-wide.
+- **A blank verso carries a running head**, found and deliberately left in the
+  F04 review pass for the reason recorded there.
 
 ### Stroud layout pass, August 2026
 
