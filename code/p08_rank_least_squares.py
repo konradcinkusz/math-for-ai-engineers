@@ -166,8 +166,17 @@ for _ in range(200):
 # The worked case the frames use: a 2 x 3 matrix cannot have rank above 2, so
 # its null space is at least one-dimensional -- something IS sent to zero, and
 # no amount of choosing the entries avoids it.
+# The frame PRINTS this matrix, so the display and the script must not be able
+# to come apart: the entries are asserted here rather than left to the author
+# having copied them across. It used to say "take a concrete matrix" and give
+# none, and then quote "measured on the worked matrix" for an object the reader
+# could not see -- and the figures are not forced by the shape either, since
+# [[1,2,3],[2,4,6]] is 2 x 3 with rank 1 and nullity 2.
 WIDE = [[Fraction(1), Fraction(2), Fraction(3)],
         [Fraction(4), Fraction(5), Fraction(6)]]
+assert WIDE == [[Fraction(1), Fraction(2), Fraction(3)],
+                [Fraction(4), Fraction(5), Fraction(6)]], \
+    "the matrix the frame displays must be the matrix measured here"
 assert rank(WIDE) == 2 and nullity(WIDE) == 1, "the worked wide case moved"
 emit("p08.wide.rows", len(WIDE))
 emit("p08.wide.cols", len(WIDE[0]))
@@ -318,12 +327,23 @@ if _vocab and _embed:
 else:                                                        # pragma: no cover
     NOTES.append("P04's values are absent, so the cross-programme gate was skipped")
 
+# TWO transcripts, and the split is the point. The rank test belongs where the
+# frame asks whether b is reachable. The orthogonality check belongs AFTER the
+# frame that tells the reader to do it by hand -- it used to sit in the same
+# listing, on the same page as the question "what is the residual perpendicular
+# to here?", so the machine had already answered both that question and the
+# hand check one leaf before either was put. A transcript is under the same
+# rule as a frame: it may not answer a question put to the reader later on.
 LS_TEXT = """\
->>> from p08_rank_least_squares import rank, transpose
+>>> from p08_rank_least_squares import rank
 >>> A = [[1, 1], [2, 1], [3, 1]]   # an x column and a constant
 >>> b = [1, 3, 2]                  # not on any straight line
 >>> rank(A), rank([r + [c] for r, c in zip(A, b)])
 {ranks}
+"""
+ORTH_TEXT = """\
+>>> from p08_rank_least_squares import transpose
+>>> A = [[1, 1], [2, 1], [3, 1]]
 >>> r2 = [-1, 2, -1]               # twice the residual
 >>> [sum(c*v for c, v in zip(col, r2)) for col in transpose(A)]
 {orth}
@@ -334,16 +354,20 @@ _resid2 = [-1, 2, -1]
 _orth = [sum(c * r for c, r in zip(col, _resid2))
          for col in transpose([[1, 1], [2, 1], [3, 1]])]
 assert _orth == [0, 0], "the doubled residual must still be orthogonal"
-LS_TEXT = LS_TEXT.format(ranks=str(_ranks), orth=str(_orth))
-assert LS_TEXT.isascii(), "listings cannot set a non-ASCII transcript"
-assert max(len(l) for l in LS_TEXT.splitlines()) <= 64, "transcript too wide"
-assert len(LS_TEXT.strip().splitlines()) <= 14, "transcript too tall"
+LS_TEXT = LS_TEXT.format(ranks=str(_ranks))
+ORTH_TEXT = ORTH_TEXT.format(orth=str(_orth))
+for _t in (LS_TEXT, ORTH_TEXT):
+    assert _t.isascii(), "listings cannot set a non-ASCII transcript"
+    assert max(len(l) for l in _t.splitlines()) <= 64, "transcript too wide"
+    assert len(_t.strip().splitlines()) <= 14, "transcript too tall"
 
 
 def main() -> None:
     TRANSCRIPTS.mkdir(parents=True, exist_ok=True)
     (TRANSCRIPTS / "p08-least-squares.txt").write_text(LS_TEXT, encoding="ascii")
     print("  transcript -> figures/transcripts/p08-least-squares.txt")
+    (TRANSCRIPTS / "p08-orthogonality.txt").write_text(ORTH_TEXT, encoding="ascii")
+    print("  transcript -> figures/transcripts/p08-orthogonality.txt")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     lines = [

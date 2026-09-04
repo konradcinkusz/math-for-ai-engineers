@@ -390,8 +390,11 @@ macierz z identycznością, dowolna macierz sama ze sobą, dwa obroty płaszczyz
 wokół tego samego środka.
 
 Przemienność obrotów na płaszczyźnie warto zapamiętać, bo obroty w trzech
-wymiarach przemienne nie są \dash{} obróć książkę najpierw okładką do góry, a
-potem na bok, następnie odwrotnie, a okładki wskażą różne strony. \textbf{Dwa
+wymiarach \emph{wokół różnych osi} przemienne nie są \dash{} obróć książkę
+najpierw okładką do góry, a potem na bok, następnie odwrotnie, a okładki wskażą
+różne strony. Wokół jednej ustalonej osi są w trzech wymiarach przemienne
+dokładnie tak jak na płaszczyźnie, i z tego samego powodu: obie kolejności
+dodają te same dwa kąty. \textbf{Dwa
 wymiary są przypadkiem szczególnym i to w nim zbudowana została intuicja
 każdego z nas.}
 \end{fr}
@@ -471,8 +474,11 @@ miała nic do powiedzenia o pozostałych kolumnach.
 
 \begin{note}
 Prawdziwe frameworki układają partię wzdłuż \emph{pierwszej} osi, więc warstwa
-liczy $XW\T$ z $X$ o kształcie $k \times n$. To to samo złożenie z odwróconą
-konwencją, a Program~\ref{prog:P07} jest miejscem, w którym osie dostają
+liczy $XW\T$ z $X$ o kształcie $k \times n$. Indeks górny to
+\textbf{transpozycja}: $W\T$ to $W$ z zamienionymi wierszami i kolumnami, więc
+$(W\T)_{ij} = W_{ji}$, a macierz $m \times n$ staje się $n \times m$. To to samo
+złożenie z odwróconą konwencją, a Program~\ref{prog:P07} jest miejscem, w
+którym osie dostają
 porządne nazwy \dash{} razem z reshape, transpozycją i tablicami rzędu 4,
 których dwa indeksy tego programu nie opiszą.
 \end{note}
@@ -501,8 +507,9 @@ Program~\ref{prog:F05} postawił już ten argument i postawił go w całości, w
 jednym wymiarze: dwieście warstw $w x + b$ zwija się do jednej, dodatkowe
 $199$ nie kupuje nic poza arytmetyką, a sama głębokość nie jest zdolnością.
 
-Program~\ref{prog:F06} zapowiedział, że wagi stają się tutaj macierzą, i
-zapytał, czy argument to przeżyje. Weź więc dwie warstwy, $W_1 x + b_1$, potem
+Program~\ref{prog:F06} zapowiedział, że wagi stają się tutaj macierzą i że
+argument o zwijaniu zostaje przeprowadzony jeszcze raz w więcej niż jednym
+wymiarze. Weź więc dwie warstwy, $W_1 x + b_1$, potem
 $W_2 h + b_2$, i złóż je. Zapisz, co wychodzi.
 \dotline
 \nextframe
@@ -527,11 +534,16 @@ sekcji 1. Powiedz, które dwa.
 \end{fr}
 
 \begin{fr}
-\ans{$W_2$ rozdziela się względem sumy i przepuszcza skalar na wylot \dash{}
-dwie własności, które od początku czyniły tę funkcję liniową.}
+\ans{$W_2$ rozdziela się względem sumy, a $W_2(W_1x)$ jest $(W_2W_1)x$, bo
+iloczyn \emph{jest} złożeniem.}
+Pierwsze to addytywność, jedna z dwóch własności, które czyniły tę funkcję
+liniową. Drugie nie jest tą drugą: w tym przekształceniu nie pojawia się żaden
+skalar. To definicja iloczynu z sekcji 2, czyli zdanie, na którym zbudowany
+jest cały ten program, wykonujące pracę jeszcze raz.
 Warto się przy tym zatrzymać, bo stos takich warstw jest dużym obiektem.
 
-Osiem warstw liniowych o szerokości $\val{p06.stack.width}$ mieści
+Osiem warstw \emph{afinicznych} o szerokości $\val{p06.stack.width}$ \dash{}
+wagi i obciążenia, liczone tak, jak raportuje je framework \dash{} mieści
 $\val{p06.stack.params}$ parametrów. Jedna warstwa, do której się zwijają,
 mieści $\val{p06.stack.collapsed}$.
 
@@ -600,9 +612,10 @@ po to, żeby ściskać wartości do przedziału \dash{} $\relu$ jest nieogranicz
 od góry i nie ściska. Nie po to, żeby przypominać biologię. Nie po to, żeby
 cokolwiek wygładzać.
 
-Jest po to, że złożenie bez niej jest dowodliwie marnotrawstwem
-$\val{p06.stack.wasted.pct}\%$ parametrów, a wystarczy dowolna funkcja, która
-łamie liniowość. Dlatego dziedzina mogła wymienić logistyczną na $\relu$, a
+Jest po to, że złożenie bez niej jest dowodliwie marnotrawstwem $(k-1)/k$
+parametrów \dash{} $\val{p06.stack.wasted.pct}\%$ przy ośmiu warstwach, połowy
+przy dwóch \dash{} a wystarczy dowolna funkcja, która łamie liniowość.
+Dlatego dziedzina mogła wymienić logistyczną na $\relu$, a
 potem na GELU, bez przepisywania teorii: wymaganiem jest
 \enquote{nie afiniczna}, a jest ono spełnione z zapasem.
 \end{aibox}
@@ -643,7 +656,7 @@ rachunki.
 Ten kształt \dash{} szeroka macierz, bardzo chuda, znów szeroka \dash{} nie
 jest wydumanym przykładem. Tak wygląda aktualizacja niskiego rzędu, a powodem,
 dla którego taka aktualizacja jest tania, jest dokładnie powyższe nawiasowanie:
-trzymaj chudy czynnik w środku i nigdy nie twórz iloczynu dwóch zewnętrznych.
+trzymaj chudy czynnik w środku i nigdy nie twórz iloczynu zewnętrznego $BC$.
 
 Program~\ref{prog:P08} jest miejscem, w którym chudy wymiar dostaje nazwę, a
 założenie za nim zostaje wypowiedziane. Ten program może powiedzieć połowę
@@ -699,8 +712,9 @@ większości ludzi przestaje być obrazkiem i musi stać się notacją.
 \sumitem{17--19}{\result{Wśród $\val{p06.commute.trials}$ losowych par $3 \times 3$
   przemiennych jest $\val{p06.commute.found}$ i inaczej być nie mogło:
   przemienność jest warunkiem miary zero. Niektóre pary są przemienne \dash{}
-  obroty płaszczyzny wokół jednego środka \dash{} a \textbf{obroty w trzech
-  wymiarach nie są}, i dlatego dwa wymiary są przypadkiem mylącym}.}
+  obroty płaszczyzny wokół jednego środka oraz obroty w trzech wymiarach wokół
+  \emph{jednej} osi \dash{} a \textbf{obroty w trzech wymiarach wokół różnych
+  osi nie są}, i dlatego dwa wymiary są przypadkiem mylącym}.}
 \sumitem{20--22}{\result{\textbf{Kształt to zapisana dziedzina i przeciwdziedzina},
   więc $(m \times n)(n \times p) \to (m \times p)$: wewnętrzne wymiary spotykają
   się tam, gdzie wyjście jednej funkcji jest wejściem następnej. Błąd kształtu
@@ -762,7 +776,8 @@ większości ludzi przestaje być obrazkiem i musi stać się notacją.
   złożenie przestaje być mnożeniem.}
 \item Zwiń $W_2(W_1x + b_1) + b_2$ do jednego przekształcenia afinicznego.
   \answerto{$(W_2W_1)x + (W_2b_1 + b_2)$. Jedna macierz i jeden wektor
-  obciążeń, przez rozdzielenie $W_2$ względem sumy i przepuszczenie skalara.}
+  obciążeń, przez rozdzielenie $W_2$ względem sumy, a potem odczytanie
+  $W_2(W_1x)$ jako $(W_2W_1)x$, czyli iloczynu zdefiniowanego jako złożenie.}
 \item Stos $k$ warstw liniowych o szerokości $d$ nie ma aktywacji. Powiedz,
   jaka część jego parametrów jest zbędna i czy szerokość ma znaczenie.
   \answerto{$(k-1)/k$, a szerokość nie ma znaczenia w ogóle \dash{} przy

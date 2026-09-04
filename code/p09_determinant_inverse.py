@@ -342,10 +342,18 @@ else:                                                        # pragma: no cover
 
 # An ORTHOGONAL change of basis, exactly, using the 3-4-5 triple so that every
 # entry is rational and the reader can check the determinant by hand.
-ROT345 = [[Fraction(3, 5), Fraction(-4, 5)], [Fraction(4, 5), Fraction(3, 5)]]
+# NOTE the convention. This is the CHANGE-OF-BASIS matrix the section derived
+# three frames earlier -- rows (cos, sin) and (-sin, cos) -- at cos = 3/5 and
+# sin = 4/5, so a reader substituting into that formula gets exactly this
+# matrix. It used to be written the other way round, which is the same rotation
+# through -theta and the active convention rather than the passive one, so the
+# page displayed the transpose of the formula it told the reader to check
+# against. Both are rotations and every number below is unchanged; what was
+# wrong was that the two frames disagreed with nothing said about it.
+ROT345 = [[Fraction(3, 5), Fraction(4, 5)], [Fraction(-4, 5), Fraction(3, 5)]]
 assert det(ROT345) == 1, "a rotation must preserve signed area exactly"
-assert matmul(ROT345, [[Fraction(3, 5), Fraction(4, 5)],
-                       [Fraction(-4, 5), Fraction(3, 5)]]) == eye(2), \
+assert matmul(ROT345, [[Fraction(3, 5), Fraction(-4, 5)],
+                       [Fraction(4, 5), Fraction(3, 5)]]) == eye(2), \
     "the transpose of a rotation must be its inverse"
 _v = [Fraction(3), Fraction(4)]
 _rv = matvec(ROT345, _v)

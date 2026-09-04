@@ -58,10 +58,12 @@
   space? \teachesat{2--3}
   \answerto{No. Add two of them and the first component is $2$, which is
   outside the set. The set whose first component is $0$ is one.}
-\item Two vectors in $\R^{3}$ are given. What do they span? \teachesat{10--11}
+\item Two vectors in $\R^{3}$ are given, neither of them zero. What do they
+  span? \teachesat{10--11}
   \answerto{A plane through the origin \dash{} unless one is a multiple of the
   other, in which case a line. That exception is linear dependence, before it
-  has been named.}
+  has been named. (With both zero the span is the zero vector alone, which is
+  why the question says neither is.)}
 \item Can $\val{p04.family.count}$ vectors of $\val{p04.family.ambient}$
   components each be linearly independent? \teachesat{16--17}
   \answerto{No. At most $\val{p04.family.ambient}$ vectors can be independent
@@ -191,8 +193,8 @@ Subspaces are where the rest of this program lives, because the interesting
 question is almost never \enquote{is this a space} \dash{} it is
 \textbf{which part of the space is being used}.
 
-Test one more, and this one is worth getting wrong. Is the set of vectors in
-$\R^{3}$ with at most one non-zero component a subspace?
+Test one more. Is the set of vectors in $\R^{3}$ with at most one non-zero
+component a subspace?
 \nextframe
 \end{fr}
 
@@ -374,12 +376,14 @@ stop rising.}{why the count saturates}
 \textbf{More vectors do not give you more directions once you have run out of
 directions to give.}
 
-The reasoning behind the saturation needs no machinery. Each new vector either
-points somewhere the earlier ones could not reach, in which case the span grows
-by one dimension, or it is already a combination of them, in which case the
-span does not grow at all. The span sits inside a space of
-$\val{p04.sat.dim}$ dimensions, so it can grow at most
-$\val{p04.sat.dim}$ times.
+The reasoning behind the saturation is two lines and needs nothing this
+program has not given. Take $\val{p04.sat.dim} + 1$ vectors of
+$\val{p04.sat.dim}$ components each and look for a combination of them that is
+zero: that is $\val{p04.sat.dim}$ equations, one per component, in
+$\val{p04.sat.dim} + 1$ unknown coefficients. More unknowns than equations, so
+a solution other than all-zeros always exists \dash{} which is exactly what
+dependence says. So no set of more than $\val{p04.sat.dim}$ vectors in
+$\val{p04.sat.dim}$ components can be independent, whatever the entries.
 
 The script checks it over $\val{p04.sat.trials}$ random draws and never finds an
 exception, which is the right kind of reassurance and the wrong kind of
@@ -406,8 +410,8 @@ independent.} Any $d + 1$ of them are dependent, whatever they are, however
 they were produced, and whatever they were trained on.
 
 Notice what that does not need. No inner product, no angles, no notion of
-distance \dash{} none of which this program has been given. It follows from
-closure and counting alone, which is why it survives every choice of how to
+distance \dash{} none of which this program has been given. It needs only the
+counting argument above, which is why it survives every choice of how to
 measure the space, and why Program~\ref{prog:P05} can arrive later without
 disturbing it.
 
@@ -419,7 +423,7 @@ fault. Are the eight vectors of section 2 a defective set?
 \begin{fr}
 \ans{No. They are a perfectly good eight vectors that reach two directions.}
 A dependent set is not a broken set. The eight vectors of section 2 are a
-perfectly good eight vectors; they simply reach two directions rather than
+perfectly good eight vectors; they reach two directions rather than
 eight. Dependence says something about the \emph{list}, not about the members.
 
 And the redundancy is often the point. A list carrying more vectors than its
@@ -553,10 +557,18 @@ list of $\val{p04.embed}$ independent ones is a basis for that space.
 It says nothing about the coordinates being meaningful individually. A
 component is a coordinate against the basis training happened to land on, and
 another training run \dash{} or the same one with a different seed \dash{} lands
-on a different basis for a space that may be doing the same job. That is why
-\enquote{neuron 2317 detects X} is a claim about a basis and not about a model,
-and why comparing two models component by component is comparing two arbitrary
-choices of axes.
+on a different basis for a space that may be doing the same job. That is why a
+claim about a single embedding component is a claim about a basis rather than
+about a model, and why comparing two models component by component is comparing
+two arbitrary choices of axes.
+
+One qualification, because the word \enquote{neuron} usually names something
+else. This argument holds for a purely linear object \dash{} an embedding
+table, a residual stream \dash{} where any invertible change of basis leaves
+the function unchanged. A unit sitting behind an elementwise activation is
+different: $\relu$ applied coordinate by coordinate is not unchanged by a
+rotation, so \emph{that} basis is singled out by the architecture, and a claim
+about such a unit can be a claim about the model.
 \end{aibox}
 \end{fr}
 
@@ -634,8 +646,10 @@ No. It says it cannot give each of them its own \emph{independent direction}.
 Those are different claims and the gap between them is the whole of the
 interesting question.
 
-A space of $\val{p04.embed}$ dimensions holds exactly $\val{p04.embed}$
-mutually independent directions and not one more \dash{} that is the theorem.
+In a space of $\val{p04.embed}$ dimensions a set of mutually independent
+directions has at most $\val{p04.embed}$ members \dash{} that is the theorem.
+There are infinitely many such sets, as the previous section said; what is
+bounded is how many can be in one of them at a time.
 It holds vastly more directions that are \emph{almost} independent, and how
 many is a question this program cannot ask, because asking it needs a way to
 measure \enquote{almost}, which means angles, which is
@@ -740,7 +754,7 @@ a number back.
   of the others, equivalently when the zero vector has a non-trivial
   combination; \textbf{independent} when neither. The two forms are the same
   statement divided through by a coefficient}.}
-\sumitem{16--18}{\result{\textbf{Rank saturates.} Random vectors in
+\sumitem{16--18}{\result{\textbf{Independence saturates.} Random vectors in
   $\val{p04.sat.dim}$ dimensions reach $\val{p04.sat.rank.2}$,
   $\val{p04.sat.rank.4}$, $\val{p04.sat.rank.8}$ directions \dash{} and then
   $\val{p04.sat.rank.12}$, $\val{p04.sat.rank.20}$ and
@@ -891,7 +905,7 @@ a number back.
   and every layer's width would follow it, which is why nobody does this and
   why the packing question exists at all.}
 \item Argue that the counting bound cannot by itself distinguish between the
-  superposition account and an account in which the model simply represents
+  superposition account and an account in which the model represents
   fewer features than people think.
   \answerto{The bound constrains independent directions and says nothing about
   how many features there are. Both accounts are consistent with it: one posits

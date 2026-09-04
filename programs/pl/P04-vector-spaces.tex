@@ -56,10 +56,12 @@
   jest przestrzenią liniową? \teachesat{2--3}
   \answerto{Nie. Dodaj dwa z nich, a pierwsza współrzędna wynosi $2$, co leży
   poza zbiorem. Zbiór z pierwszą współrzędną $0$ nią jest.}
-\item Dane są dwa wektory w $\R^{3}$. Co one rozpinają? \teachesat{10--11}
+\item Dane są dwa wektory w $\R^{3}$, żaden z nich zerowy. Co one rozpinają?
+  \teachesat{10--11}
   \answerto{Płaszczyznę przez początek układu \dash{} chyba że jeden jest
   wielokrotnością drugiego, wtedy prostą. Ten wyjątek to liniowa zależność,
-  zanim została nazwana.}
+  zanim została nazwana. (Gdy oba są zerowe, powłoką jest sam wektor zerowy, i
+  dlatego pytanie mówi, że żaden nie jest.)}
 \item Czy $\val{p04.family.count}$ wektorów po $\val{p04.family.ambient}$
   współrzędnych może być liniowo niezależnych? \teachesat{16--17}
   \answerto{Nie. W $\val{p04.family.ambient}$ wymiarach niezależnych może być
@@ -192,8 +194,8 @@ Podprzestrzenie są tym, gdzie żyje reszta tego programu, bo ciekawe pytanie
 prawie nigdy nie brzmi \enquote{czy to jest przestrzeń} \dash{} brzmi
 \textbf{której części przestrzeni się używa}.
 
-Sprawdź jeszcze jeden, i tego warto nie trafić. Czy zbiór wektorów w $\R^{3}$
-mających co najwyżej jedną niezerową współrzędną jest podprzestrzenią?
+Sprawdź jeszcze jeden. Czy zbiór wektorów w $\R^{3}$ mających co najwyżej
+jedną niezerową współrzędną jest podprzestrzenią?
 \nextframe
 \end{fr}
 
@@ -372,11 +374,15 @@ przestać rosnąć.}{czemu liczba sie nasyca}
 \textbf{Więcej wektorów nie daje ci więcej kierunków, gdy kierunki do dania się
 skończyły.}
 
-Rozumowanie za tym nasyceniem nie potrzebuje maszynerii. Każdy nowy wektor albo
-wskazuje tam, gdzie wcześniejsze nie sięgały, i wtedy powłoka rośnie o jeden
-wymiar, albo jest już ich kombinacją i wtedy powłoka nie rośnie wcale. Powłoka
-siedzi wewnątrz przestrzeni o $\val{p04.sat.dim}$ wymiarach, więc może urosnąć
-co najwyżej $\val{p04.sat.dim}$ razy.
+Rozumowanie za tym nasyceniem ma dwie linijki i nie potrzebuje niczego, czego
+ten program nie dał. Weź $\val{p04.sat.dim} + 1$ wektorów po
+$\val{p04.sat.dim}$ składowych każdy i poszukaj ich kombinacji równej zeru: to
+$\val{p04.sat.dim}$ równań, po jednym na składową, przy
+$\val{p04.sat.dim} + 1$ niewiadomych współczynnikach. Więcej niewiadomych niż
+równań, więc rozwiązanie inne niż same zera zawsze istnieje \dash{} a to jest
+dokładnie to, co mówi zależność. Żaden zbiór więcej niż $\val{p04.sat.dim}$
+wektorów o $\val{p04.sat.dim}$ składowych nie może więc być niezależny,
+jakiekolwiek by były wyrazy.
 
 Skrypt sprawdza to na $\val{p04.sat.trials}$ losowych losowaniach i nigdy nie
 znajduje wyjątku, co jest właściwym rodzajem otuchy i niewłaściwym rodzajem
@@ -404,9 +410,9 @@ by nie powstały i na czym by nie były trenowane.
 
 Zauważ, czego to nie potrzebuje. Żadnego iloczynu skalarnego, żadnych kątów,
 żadnego pojęcia odległości \dash{} a żadnego z nich ten program nie dostał.
-Wynika z samego domknięcia i zliczania, i dlatego przeżywa każdy wybór sposobu
-mierzenia przestrzeni i dlatego Program~\ref{prog:P05} może przyjść później i
-niczego nie zaburzyć.
+Potrzebuje tylko powyższego argumentu z liczenia, i dlatego przeżywa każdy
+wybór sposobu mierzenia przestrzeni i dlatego Program~\ref{prog:P05} może
+przyjść później i niczego nie zaburzyć.
 
 Jedno słowo w tym zdaniu szkodzi. \enquote{Zależna} brzmi jak usterka. Czy
 osiem wektorów z sekcji 2 to zbiór wadliwy?
@@ -416,7 +422,7 @@ osiem wektorów z sekcji 2 to zbiór wadliwy?
 \begin{fr}
 \ans{Nie. To całkowicie porządne osiem wektorów, osiągających dwa kierunki.}
 Zbiór zależny nie jest zbiorem zepsutym. Osiem wektorów z sekcji 2 to
-całkowicie porządne osiem wektorów; po prostu osiągają dwa kierunki, a nie
+całkowicie porządne osiem wektorów; osiągają dwa kierunki, a nie
 osiem. Zależność mówi coś o \emph{liście}, a nie o jej elementach.
 
 A ta nadmiarowość bywa właśnie pointą. Lista niosąca więcej wektorów, niż jej
@@ -551,9 +557,18 @@ $\val{p04.embed}$ niezależnych jest bazą tej przestrzeni.
 Nie mówi nic o tym, że pojedyncze współrzędne są znaczące. Współrzędna jest
 współrzędną względem bazy, na której trening akurat wylądował, a inny przebieg
 \dash{} albo ten sam z innym ziarnem \dash{} ląduje na innej bazie przestrzeni,
-która może robić to samo. Dlatego \enquote{neuron 2317 wykrywa X} jest
-twierdzeniem o bazie, a nie o modelu, i dlatego porównywanie dwóch modeli
-współrzędna po współrzędnej jest porównywaniem dwóch dowolnych wyborów osi.
+która może robić to samo. Dlatego twierdzenie o pojedynczej współrzędnej
+zanurzenia jest twierdzeniem o bazie, a nie o modelu, i dlatego porównywanie
+dwóch modeli współrzędna po współrzędnej jest porównywaniem dwóch dowolnych
+wyborów osi.
+
+Jedno zastrzeżenie, bo słowo \enquote{neuron} nazywa zwykle coś innego. Ten
+argument dotyczy obiektu czysto liniowego \dash{} tablicy zanurzeń, strumienia
+rezydualnego \dash{} gdzie dowolna odwracalna zmiana bazy zostawia funkcję bez
+zmian. Jednostka siedząca za aktywacją stosowaną po współrzędnych jest inna:
+$\relu$ stosowany współrzędna po współrzędnej nie jest niezmienniczy na obrót,
+więc \emph{ta} baza jest wyróżniona przez architekturę, a twierdzenie o takiej
+jednostce może być twierdzeniem o modelu.
 \end{aibox}
 \end{fr}
 
@@ -630,9 +645,11 @@ kierunku}.
 
 To są różne twierdzenia, a przerwa między nimi jest całym ciekawym pytaniem.
 
-Przestrzeń o $\val{p04.embed}$ wymiarach mieści dokładnie $\val{p04.embed}$
-wzajemnie niezależnych kierunków i ani jednego więcej \dash{} to jest
-twierdzenie. Mieści zdecydowanie więcej kierunków \emph{prawie} niezależnych, a
+W przestrzeni o $\val{p04.embed}$ wymiarach zbiór wzajemnie niezależnych
+kierunków ma co najwyżej $\val{p04.embed}$ elementów \dash{} to jest
+twierdzenie. Takich zbiorów jest nieskończenie wiele, jak powiedziała
+poprzednia sekcja; ograniczone jest to, ilu naraz może być w jednym z nich.
+Mieści zdecydowanie więcej kierunków \emph{prawie} niezależnych, a
 ile, to pytanie, którego ten program nie umie zadać, bo zadanie go potrzebuje
 sposobu mierzenia \enquote{prawie}, czyli kątów, czyli
 Programu~\ref{prog:P05}.
@@ -739,7 +756,7 @@ liczba.
   pozostałych, równoważnie gdy wektor zerowy ma nietrywialną kombinację;
   \textbf{niezależna}, gdy ani jedno, ani drugie. Obie postacie to to samo
   stwierdzenie podzielone przez współczynnik}.}
-\sumitem{16--18}{\result{\textbf{Rząd się nasyca.} Losowe wektory w
+\sumitem{16--18}{\result{\textbf{Niezależność się nasyca.} Losowe wektory w
   $\val{p04.sat.dim}$ wymiarach osiągają $\val{p04.sat.rank.2}$,
   $\val{p04.sat.rank.4}$, $\val{p04.sat.rank.8}$ kierunków \dash{} a potem
   $\val{p04.sat.rank.12}$, $\val{p04.sat.rank.20}$ i
@@ -892,7 +909,7 @@ liczba.
   szerokość każdej warstwy poszłaby za nią, i dlatego nikt tego nie robi i
   dlatego pytanie o upakowanie w ogóle istnieje.}
 \item Uzasadnij, że ograniczenie zliczeniowe samo w sobie nie odróżni opowieści
-  o superpozycji od opowieści, w której model po prostu reprezentuje mniej
+  o superpozycji od opowieści, w której model reprezentuje mniej
   cech, niż ludzie sądzą.
   \answerto{Ograniczenie dotyczy niezależnych kierunków i nic nie mówi o tym,
   ile jest cech. Obie opowieści są z nim zgodne: jedna zakłada wiele cech

@@ -387,8 +387,11 @@ the identity, any matrix with itself, two rotations of the plane about the same
 centre.
 
 Rotations in the plane commuting is worth holding on to, because rotations in
-three dimensions do not \dash{} turn a book face-up-then-sideways and
-sideways-then-face-up and the covers point different ways. \textbf{Two
+three dimensions \emph{about different axes} do not \dash{} turn a book
+face-up-then-sideways and sideways-then-face-up and the covers point different
+ways. About one fixed axis they commute in three dimensions exactly as they do
+in the plane, for the same reason: the two orders add the same two
+angles. \textbf{Two
 dimensions is the special case, and it is the one everybody's intuition was
 built in.}
 \end{fr}
@@ -468,9 +471,11 @@ never had anything to say about the other columns.
 
 \begin{note}
 Real frameworks stack the batch along the \emph{first} axis instead, so a
-layer computes $XW\T$ with $X$ of shape $k \times n$. That is the same
-composition with the convention flipped, and Program~\ref{prog:P07} is where
-the axes get named properly \dash{} along with reshape, transpose and the
+layer computes $XW\T$ with $X$ of shape $k \times n$. The superscript is the
+\textbf{transpose}: $W\T$ is $W$ with its rows and columns exchanged, so
+$(W\T)_{ij} = W_{ji}$, and an $m \times n$ matrix becomes $n \times m$. That is
+the same composition with the convention flipped, and Program~\ref{prog:P07} is
+where the axes get named properly \dash{} along with reshape, transpose and the
 rank-4 arrays this program's two indices cannot describe.
 \end{note}
 \end{fr}
@@ -497,8 +502,9 @@ Program~\ref{prog:F05} already made this argument and made it completely, in
 one dimension: two hundred layers of $w x + b$ collapse to one, the extra
 $199$ buy nothing but arithmetic, and depth on its own is not a capability.
 
-Program~\ref{prog:F06} said the weights become a matrix here and asked whether
-the argument survives. So take two layers, $W_1 x + b_1$ then
+Program~\ref{prog:F06} said the weights become a matrix here and that the
+collapse argument is done again in more than one dimension. So take two layers,
+$W_1 x + b_1$ then
 $W_2 h + b_2$, and compose them. Write down what comes out.
 \dotline
 \nextframe
@@ -523,11 +529,16 @@ which two.
 \end{fr}
 
 \begin{fr}
-\ans{$W_2$ distributes over the sum, and it carries a scalar straight through
-\dash{} the two properties that made the function linear in the first place.}
+\ans{$W_2$ distributes over the sum, and $W_2(W_1x)$ is $(W_2W_1)x$ because
+the product \emph{is} the composition.}
+The first is additivity, one of the two properties that made the function
+linear. The second is not the other one: no scalar appears anywhere in the
+rearrangement. It is section 2's definition of the product, which is the
+sentence this whole program is built on doing the work again.
 Which is worth pausing on, because a stack of these is a large object.
 
-Eight linear layers of width $\val{p06.stack.width}$ hold
+Eight \emph{affine} layers of width $\val{p06.stack.width}$ \dash{} weights and
+biases, counted the way a framework reports them \dash{} hold
 $\val{p06.stack.params}$ parameters. The single layer they collapse to holds
 $\val{p06.stack.collapsed}$.
 
@@ -593,9 +604,10 @@ It also says what an activation is \emph{not} for, which is where the folklore
 sits. Not squashing values into a range \dash{} $\relu$ is unbounded above and
 does not. Not being biologically suggestive. Not smoothing anything.
 
-It is there because the composition without it is provably a waste of
-$\val{p06.stack.wasted.pct}\%$ of the parameters, and any function that breaks
-linearity will do. That is why the field could swap the logistic for $\relu$
+It is there because a composition without it is provably a waste of $(k-1)/k$
+of the parameters \dash{} $\val{p06.stack.wasted.pct}\%$ at eight layers, half
+at two \dash{} and any function that breaks linearity will do. That is why the
+field could swap the logistic for $\relu$
 for GELU without rewriting the theory: the requirement is
 \enquote{not affine}, and it is met with room to spare.
 \end{aibox}
@@ -636,7 +648,7 @@ and different bills.
 That shape \dash{} a wide matrix, a very thin one, a wide one \dash{} is not a
 contrived example. It is what a low-rank update looks like, and the reason such
 an update is cheap is precisely the bracketing above: keep the thin factor in
-the middle and never form the product of the outer two.
+the middle and never form the outer product $BC$.
 
 Program~\ref{prog:P08} is where the thin dimension gets its name and the
 assumption behind it gets stated. What this program can say is the mechanical
@@ -692,8 +704,9 @@ array stops being a picture and has to become notation.
 \sumitem{17--19}{\result{Of $\val{p06.commute.trials}$ random $3 \times 3$ pairs,
   $\val{p06.commute.found}$ commute, and it could not be otherwise: commuting
   is a measure-zero condition. Some pairs do \dash{} rotations of the plane
-  about one centre \dash{} and \textbf{rotations in three dimensions do not},
-  which is why two dimensions is the misleading case}.}
+  about one centre, and rotations in three dimensions about \emph{one} axis
+  \dash{} and \textbf{rotations in three dimensions about different axes do
+  not}, which is why two dimensions is the misleading case}.}
 \sumitem{20--22}{\result{\textbf{Shape is the domain and the codomain written down}, so
   $(m \times n)(n \times p) \to (m \times p)$: the inner dimensions meet where
   one function's output is the next one's input. A shape error is a type error,
@@ -752,7 +765,8 @@ array stops being a picture and has to become notation.
   composition stops being multiplication.}
 \item Collapse $W_2(W_1x + b_1) + b_2$ into a single affine map.
   \answerto{$(W_2W_1)x + (W_2b_1 + b_2)$. One matrix and one bias vector, by
-  distributing $W_2$ over the sum and passing it through the scalar.}
+  distributing $W_2$ over the sum and then reading $W_2(W_1x)$ as $(W_2W_1)x$,
+  which is the product defined as composition.}
 \item A stack of $k$ linear layers of width $d$ has no activations. Say what
   fraction of its parameters is redundant, and whether the width matters.
   \answerto{$(k-1)/k$, and the width does not matter at all \dash{} at

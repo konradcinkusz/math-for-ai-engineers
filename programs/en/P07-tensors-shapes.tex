@@ -50,10 +50,7 @@
 \outcome{16--22}{read an \code{einsum} string as the sum it denotes, and write
   one for an operation given in words}
 \outcome{23--30}{apply the broadcasting rule exactly, and recognise the shapes
-  that pair up in a way nobody asked for \dash{} this section states its
-  identity in terms of $\operatorname{Cov}(p, t)$ and $\operatorname{Var}(t)$,
-  which Program~\ref{prog:P24} defines, and gives the one sentence about each
-  that the argument needs}
+  that pair up in a way nobody asked for}
 \outcome{31--37}{say which of reshape, transpose and permute moves data, and
   which order splits a batch into heads correctly}
 \end{outcomes}
@@ -520,6 +517,20 @@ pairs expands into three terms, and what comes out is
 The reported loss is the true loss plus twice the covariance of the predictions
 with the targets.
 
+\begin{rigourbox}
+Two objects arrive here that Program~\ref{prog:P24} defines properly, and the
+argument needs one sentence about each. With every mean taken over the $n$
+examples,
+\[ \operatorname{Cov}(p, t)
+   = \operatorname{mean}(p_i t_i)
+     - \operatorname{mean}(p)\operatorname{mean}(t),
+   \qquad \operatorname{Var}(t) = \operatorname{Cov}(t, t). \]
+The $\frac{1}{n}$ convention is used throughout, which is the one that makes the
+identity above exact; Program~\ref{prog:P26} says why a divisor of $n - 1$ is
+sometimes wanted instead, and nothing here turns on the choice except the
+arithmetic below.
+\end{rigourbox}
+
 Now the question the identity is for. Suppose the model becomes perfect, so
 every prediction equals its target. What does the reported loss do?
 \dotline
@@ -536,7 +547,8 @@ go below it however good the model gets.
 
 Three predictions equal to their three targets: the true loss is $0$ and the
 reported one is $\val{p07.demo.floor}$, which is twice the variance of
-$1, 2, 3$.
+$1, 2, 3$ under the $\frac{1}{n}$ convention above \dash{} the mean of
+$1, 4, 9$ less the square of $2$, which is $\frac{2}{3}$.
 
 \textbf{What an engineer sees is a loss that falls, flattens at a number nobody
 can account for, and stays there.} That is read as a model that has stopped
@@ -615,9 +627,22 @@ either. It changes the \emph{rule}, so that the index tuple is turned into a
 position a different way round, and hands back the same buffer.
 
 What moves data is asking for the result \emph{contiguous} \dash{} for a fresh
-buffer whose order matches its shape \dash{} and that is a third operation with
-a name of its own. Program~\ref{prog:P03} priced a pass over memory; this is
-where you find out you have asked for one.
+buffer whose order matches its shape \dash{} and that is a separate operation
+with a name of its own. Program~\ref{prog:P03} priced a pass over memory; this
+is where you find out you have asked for one.
+
+\begin{warning}
+\textbf{\enquote{In the usual case} is carrying weight, and the exception is
+the one you will meet.} A reshape can only hand back the same buffer when the
+axes it merges are already adjacent and in the buffer's own order. Reshape a
+\emph{permuted} array across axes that are not, and the library has to copy
+\dash{} or, in a strict one, refuses and tells you to ask for contiguous first.
+
+That is not a corner case. It is the merge back from heads, $(b, h, s, d)
+\rightarrow (b, s, h \times d)$, which every attention implementation performs
+on the way out, and it is the one pass over memory in this section that nobody
+asks for.
+\end{warning}
 
 \textbf{So \enquote{reshape is cheap and transpose is expensive} is wrong twice
 over}, and the reason it is believed is that a transpose is sometimes followed
@@ -782,9 +807,11 @@ smaller than its shape.
   model, the more it lies}}.}
 \sumitem{30--32}{\result{\code{keepdims} leaves an axis of length $1$ in place so the
   next alignment is stated rather than inferred. And \textbf{none of reshape,
-  transpose and permute moves a number}: each hands back the same buffer with a
-  different rule for reading it, and what moves data is asking for the result
-  contiguous}.}
+  transpose and permute moves a number while the axes stay in buffer order}:
+  each hands back the same buffer with a different rule for reading it, and what
+  moves data is asking for the result contiguous \dash{} or a reshape across
+  axes a permute has put out of order, which has to copy and is the merge back
+  from heads}.}
 \sumitem{33--36}{\result{\textbf{Same shape is not same array.}
   \code{x.reshape(b, s, h, d).transpose(1, 2)} and \code{x.reshape(b, h, s, d)}
   both give $(b, h, s, d)$ and differ in $\val{p07.split.differ}$ of
@@ -829,9 +856,11 @@ smaller than its shape.
   good, so it looks like a plateau rather than like a fault.}
 \item Say which of reshape, transpose and permute moves numbers in memory, and
   what does.
-  \answerto{None of them, in the usual case: each returns the same buffer with
-  a different rule for reading it. Asking for the result contiguous is what
-  copies, and it is a separate operation.}
+  \answerto{None of them while the axes stay in buffer order: each returns the
+  same buffer with a different rule for reading it. Asking for the result
+  contiguous is what copies. So does a reshape whose merged axes a permute has
+  put out of order \dash{} which is the merge back from heads, and the one copy
+  nobody writes down.}
 \item An array of shape $(b, s, h \times d)$ must become $(b, h, s, d)$. Give
   the operations in order and say why a single reshape will not do.
   \answerto{Split the last axis, giving $(b, s, h, d)$, then exchange the two

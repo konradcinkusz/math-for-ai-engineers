@@ -1,0 +1,5 @@
+>>> from p08_rank_least_squares import transpose
+>>> A = [[1, 1], [2, 1], [3, 1]]
+>>> r2 = [-1, 2, -1]               # twice the residual
+>>> [sum(c*v for c, v in zip(col, r2)) for col in transpose(A)]
+[0, 0]
