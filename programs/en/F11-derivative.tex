@@ -76,14 +76,17 @@
   \teachesat{11--12}
   \answerto{No. It is the number the chord slopes settle on, which is a
   different kind of statement and is why the definition needs a limit.}
-\item A program computes a derivative as $\frac{f(x+h) - f(x)}{h}$ and $h$ is
-  made smaller and smaller. What happens to the error? \teachesat{16--17}
+\item A program computes the derivative of $f(x) = x^{2}$ at $x = 3$ as
+  $\frac{f(x+h) - f(x)}{h}$, and $h$ is made smaller and smaller. What happens
+  to the error? \teachesat{16--17}
   \answerto{It falls, reaches about $\val{f11.fd.best.err}$ at
   $h = \val{f11.fd.best.h}$, and then climbs again.}
 \item What does $\frac{f(x+h) - f(x)}{h}$ give at
   $h = \val{f11.fd.vanishes}$? \teachesat{17--18}
-  \answerto{Exactly zero, because at that size $x + h$ is $x$ and the
-  numerator is a subtraction of a number from itself.}
+  \answerto{Exactly zero here, because $3 + h$ is $3$ in double precision, so
+  the numerator is a subtraction of a number from itself. At a smaller $x$ the
+  quotient would not have collapsed yet, because the gap between one stored
+  number and the next grows with the size of the number.}
 \item A derivative is negative. Which way does the curve go as $x$ increases?
   \teachesat{21--22}
   \answerto{Downwards. The sign is the direction.}
@@ -97,8 +100,8 @@
 \item You are at $x$ and the derivative there is positive. Which way is
   downhill? \teachesat{27--28}
   \answerto{Towards smaller $x$ \dash{} against the sign of the derivative.}
-\item Two walks use step sizes $\val{f11.gd.small.eta}$ and
-  $\val{f11.gd.big.eta}$ on the same curve from the same start. Which gets
+\item Two walks on $f(x) = (x-3)^{2} + 1$ from $x = \val{f11.gd.start}$ use
+  step sizes $\val{f11.gd.small.eta}$ and $\val{f11.gd.big.eta}$. Which gets
   closer in eight steps? \teachesat{30--31}
   \answerto{Neither: they land on exactly the same number,
   $\val{f11.gd.small.end}$, and the program says why.}
@@ -295,14 +298,15 @@ Is the derivative the slope of a chord with a very small gap?
 \begin{fr}
 \ans{No}
 \begin{trapbox}
-\textbf{The derivative is not a chord slope at all.} Every chord slope for
-$x^{2}$ at $3$ is $6 + h$, and none of those is $6$. The derivative is the
+\textbf{The derivative is not defined as a chord slope.} Every chord slope
+for $x^{2}$ at $3$ is $6 + h$, and none of those is $6$. The derivative is the
 number they approach, which is a statement about the whole family of chords
-rather than about any one of them.
+rather than about any one of them. On a straight line the two happen to agree,
+as the next two frames show; the definition never says they must.
 
 That distinction sounds like pedantry until section 3, where a machine is
 asked to shrink $h$ and the answer gets \emph{worse}. If the derivative were
-just \enquote{the chord with a tiny gap}, that could not happen.
+merely \enquote{the chord with a tiny gap}, that could not happen.
 
 The habit worth taking: when you see $\lim_{h \to 0}$, read it as
 \emph{as close as you like, by choosing $h$}, not as \emph{at $h = 0$}. The
@@ -403,10 +407,13 @@ exactly that?
 \end{fr}
 
 \begin{fr}
-\ans{$\val{f11.fd.approx.16}$}
-Exactly zero. At that size \textbf{$3 + h$ is $3$}: the machine has no room to
-record the difference, so the numerator is a number subtracted from itself and
-the quotient is $\frac{0}{h}$.
+\begin{ansblock}
+Because at that size \textbf{$3 + h$ is $3$}.
+\end{ansblock}
+
+The machine has no room to record the difference, so the numerator is a number
+subtracted from itself, the quotient is $\frac{0}{h}$, and the last row of the
+table reads $\val{f11.fd.approx.16}$.
 
 \begin{trapbox}
 \textbf{\enquote{Smaller $h$ is more accurate} is true in the mathematics and
@@ -534,7 +541,8 @@ But not because the derivative is zero.
 too.} So is the flat spot in the middle of a curve that goes up, levels off,
 and carries on up.
 
-Take $f(x) = -x^{2}$. Its derivative is $-2x$, which is zero at $x = 0$, and
+Take $f(x) = -x^{2}$. Every chord slope on it is the negative of $x^{2}$'s,
+so its derivative is $-2x$, which is zero at $x = 0$, and
 $x = 0$ is its \emph{maximum}. The derivative cannot tell the two apart,
 because it is computed from an arbitrarily small neighbourhood and both look
 level there.
@@ -558,7 +566,18 @@ Now the size, and the misconception that costs the most.
 Here is $f(x) = x^{4} - 4x^{2}$, which has a minimum at
 $x = \val{f11.min.x}$. Consider two points on it: $x = \val{f11.steep.x}$,
 where the derivative is $\val{f11.steep.slope}$, and $x =
-\val{f11.shallow.x}$, where it is $\val{f11.shallow.slope}$.
+\val{f11.shallow.x}$, where it is $\val{f11.shallow.slope}$. Take those two
+slopes on trust for the moment \dash{} expanding the quotient for a fourth
+power is a page of algebra, and Program~\ref{prog:F12} is where the rules that
+make it a line arrive. What the frame turns on is the two numbers, not where
+they came from.
+
+And the signs say what this section has already made them say: negative at
+$x = \val{f11.shallow.x}$ means the curve is still falling as $x$ increases, so
+that point sits before the minimum, and positive at $x = \val{f11.steep.x}$
+means it is rising again, so that one sits after it. The sign has settled which
+side of the minimum each point is on. The size is being asked for something
+else.
 
 One of those points is much steeper than the other. Which is further from the
 minimum?
@@ -576,8 +595,8 @@ $x = \val{f11.shallow.x}$ is $\val{f11.shallow.dist}$ from it.
 
 \begin{trapbox}
 \textbf{A big derivative does not mean a long way to go.} It means the ground
-is steep here, and steep ground can be a short walk from the bottom of a
-narrow pit or a long walk down a gentle slope.
+is steep here, and steep ground can sit a step from the bottom of a narrow
+pit, or at the top of a long run that flattens out for miles.
 
 This is the previous frame's point with a number attached: the derivative is
 computed from an arbitrarily small neighbourhood, so it \emph{cannot} know how
@@ -638,7 +657,9 @@ does not know how far anything is.
 optimiser this book discusses later is that line with a better answer to
 \emph{how far}, and Program~\ref{prog:P20} is where they get compared.
 
-Try it. $f(x) = (x-3)^{2} + 1$, so $f'(x) = 2(x-3)$. Start at
+Try it. $f(x) = (x-3)^{2} + 1$, and expanding
+$\frac{((x-3)+h)^{2} - (x-3)^{2}}{h}$ exactly as in frame 13 gives
+$2(x-3) + h$, so $f'(x) = 2(x-3)$. Start at
 $x = \val{f11.gd.start}$ with $\eta = \val{f11.gd.small.eta}$. Where does one
 step take you?
 \nextframe
@@ -778,10 +799,10 @@ $(x-3)^{2}$ into something that works on a network.
   $\val{f11.deriv.at3}$ \dash{} which is the \textbf{derivative} of $x^{2}$
   there. The cancellation of $h$ is allowed precisely because $h$ is not
   zero}.}
-\sumitem{11--12}{\result{\textbf{The derivative is not a chord slope.} Every chord
-  slope here is $6 + h$ and none of them is $6$; the derivative is the number
-  they approach, and $\lim_{h \to 0}$ means \emph{as close as you like, by
-  choosing $h$}, never \emph{at $h = 0$}}.}
+\sumitem{11--12}{\result{\textbf{The derivative is not defined as a chord
+  slope.} Every chord slope here is $6 + h$ and none of them is $6$; the
+  derivative is the number they approach, and $\lim_{h \to 0}$ means \emph{as
+  close as you like, by choosing $h$}, never \emph{at $h = 0$}}.}
 \sumitem{13--15}{\result{From the definition alone: $x^{2}$ gives $2x$, a constant
   gives $0$, and $mx + c$ gives $m$. There is a pattern and
   Program~\ref{prog:F12} states it \dash{} what matters here is that all three
@@ -805,7 +826,9 @@ $(x-3)^{2}$ into something that works on a network.
 \sumitem{24}{\result{\textbf{A zero derivative is a \emph{stationary point}, not a
   minimum}: a maximum is level too, and so is a flat spot on the way up. Which
   kind it is takes more than the first derivative \dash{}
-  Program~\ref{prog:P17} supplies it. Stopping is not the same as arriving}.}
+  Program~\ref{prog:F12} gives the rules for the second derivative and
+  Program~\ref{prog:P17} turns it into curvature. Stopping is not the same as
+  arriving}.}
 \sumitem{25--26}{\result{\textbf{A big derivative does not mean a long way to go.} On
   $x^{4} - 4x^{2}$ the point $x = \val{f11.steep.x}$ has slope
   $\val{f11.steep.slope}$ and is $\val{f11.steep.dist}$ from the minimum,
@@ -906,9 +929,13 @@ $(x-3)^{2}$ into something that works on a network.
   why the table's first few rows fall by a factor of ten each time.}
 \item Would using $\frac{f(x+h) - f(x-h)}{2h}$ instead move the bottom of the
   U? Say what you would measure to find out.
-  \answerto{Yes: its left-hand branch falls faster, so the bottom moves to a
-  larger $h$ and a smaller error. Measure it the same way \dash{} sweep $h$
-  over many decades against a known derivative and plot the error.}
+  \answerto{On $x^{2}$ it removes the left-hand branch altogether: the $h$
+  terms cancel exactly, so the quotient is $2x$ for every $h$ and the only
+  error left is the machine's. On a curve whose quotient keeps an $h^{2}$
+  \dash{} $x^{3}$, where it is $3x^{2} + h^{2}$ \dash{} that branch falls like
+  $h^{2}$ rather than like $h$, so the bottom moves to a larger $h$ and a
+  smaller error. Measure it the same way: sweep $h$ over many decades against a
+  known derivative and plot the error.}
 \item A function's derivative is zero at three different points. What can you
   say about it, and what can you not?
   \answerto{It is level at three places. Which of them are minima, which are

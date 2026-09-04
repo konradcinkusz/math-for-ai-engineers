@@ -77,14 +77,17 @@
   \teachesat{11--12}
   \answerto{Nie. Jest liczbą, na której nachylenia cięciw się zatrzymują, co
   jest twierdzeniem innego rodzaju i dlatego definicja potrzebuje granicy.}
-\item Program liczy pochodną jako $\frac{f(x+h) - f(x)}{h}$, a $h$ robi się
-  coraz mniejsze. Co dzieje się z błędem? \teachesat{16--17}
+\item Program liczy pochodną $f(x) = x^{2}$ w $x = 3$ jako
+  $\frac{f(x+h) - f(x)}{h}$, a $h$ robi się coraz mniejsze. Co dzieje się z
+  błędem? \teachesat{16--17}
   \answerto{Spada, dochodzi do około $\val{f11.fd.best.err}$ przy
   $h = \val{f11.fd.best.h}$, a potem znowu rośnie.}
 \item Co daje $\frac{f(x+h) - f(x)}{h}$ przy
   $h = \val{f11.fd.vanishes}$? \teachesat{17--18}
-  \answerto{Dokładnie zero, bo przy tym rozmiarze $x + h$ jest równe $x$, a
-  licznik jest odejmowaniem liczby od niej samej.}
+  \answerto{Dokładnie zero \dash{} tutaj, bo $3 + h$ jest równe $3$ w podwójnej
+  precyzji, więc licznik jest odejmowaniem liczby od niej samej. Przy mniejszym
+  $x$ iloraz jeszcze by się nie załamał, bo odstęp między jedną zapisaną liczbą
+  a następną rośnie wraz z rozmiarem liczby.}
 \item Pochodna jest ujemna. W którą stronę idzie krzywa, gdy $x$ rośnie?
   \teachesat{21--22}
   \answerto{W dół. Znak jest kierunkiem.}
@@ -98,9 +101,9 @@
 \item Jesteś w $x$, a pochodna tam jest dodatnia. W którą stronę jest w dół?
   \teachesat{27--28}
   \answerto{Ku mniejszym $x$ \dash{} przeciw znakowi pochodnej.}
-\item Dwa marsze używają kroków $\val{f11.gd.small.eta}$ i
-  $\val{f11.gd.big.eta}$ na tej samej krzywej z tego samego startu. Który
-  podejdzie bliżej w ośmiu krokach? \teachesat{30--31}
+\item Dwa marsze po $f(x) = (x-3)^{2} + 1$ z $x = \val{f11.gd.start}$ używają
+  kroków $\val{f11.gd.small.eta}$ i $\val{f11.gd.big.eta}$. Który podejdzie
+  bliżej w ośmiu krokach? \teachesat{30--31}
   \answerto{Żaden: lądują na dokładnie tej samej liczbie,
   $\val{f11.gd.small.end}$, a program mówi dlaczego.}
 \item Użyto zamiast tego kroku $\val{f11.gd.toobig.eta}$. Co się dzieje?
@@ -296,14 +299,16 @@ Czy pochodna jest nachyleniem cięciwy o bardzo małej odległości?
 \begin{fr}
 \ans{Nie}
 \begin{trapbox}
-\textbf{Pochodna w ogóle nie jest nachyleniem cięciwy.} Każde nachylenie
+\textbf{Pochodna nie jest z definicji nachyleniem cięciwy.} Każde nachylenie
 cięciwy dla $x^{2}$ w $3$ wynosi $6 + h$, a żadne z nich nie jest $6$.
 Pochodna jest liczbą, do której one zmierzają, co jest twierdzeniem o całej
-rodzinie cięciw, a nie o którejkolwiek z nich.
+rodzinie cięciw, a nie o którejkolwiek z nich. Na prostej obie rzeczy
+przypadkiem się zgadzają, co pokazują dwie następne ramki; definicja nigdy nie
+mówi, że muszą.
 
 To rozróżnienie brzmi jak pedanteria aż do sekcji 3, gdzie maszynę prosi się o
 zmniejszanie $h$, a odpowiedź robi się \emph{gorsza}. Gdyby pochodna była po
-prostu \enquote{cięciwą o maleńkiej odległości}, nie mogłoby się to zdarzyć.
+tylko \enquote{cięciwą o maleńkiej odległości}, nie mogłoby się to zdarzyć.
 
 Nawyk wart wzięcia: gdy widzisz $\lim_{h \to 0}$, czytaj to jako \emph{tak
 blisko, jak zechcesz, przez wybór $h$}, a nie jako \emph{przy $h = 0$}.
@@ -403,10 +408,13 @@ dokładnie taka?
 \end{fr}
 
 \begin{fr}
-\ans{$\val{f11.fd.approx.16}$}
-Dokładnie zero. Przy tym rozmiarze \textbf{$3 + h$ jest równe $3$}: maszyna
-nie ma miejsca, żeby zapisać różnicę, więc licznik jest liczbą odjętą od samej
-siebie, a iloraz wynosi $\frac{0}{h}$.
+\begin{ansblock}
+Bo przy tym rozmiarze \textbf{$3 + h$ jest równe $3$}.
+\end{ansblock}
+
+Maszyna nie ma miejsca, żeby zapisać różnicę, więc licznik jest liczbą odjętą
+od samej siebie, iloraz wynosi $\frac{0}{h}$, a ostatni wiersz tabeli pokazuje
+$\val{f11.fd.approx.16}$.
 
 \begin{trapbox}
 \textbf{\enquote{Mniejsze $h$ jest dokładniejsze} jest prawdą w matematyce i
@@ -533,7 +541,8 @@ Ale nie dlatego, że pochodna jest zerem.
 płaskie.} Tak samo jak płaskie miejsce w środku krzywej, która idzie w górę,
 wypłaszcza się i idzie w górę dalej.
 
-Weź $f(x) = -x^{2}$. Jego pochodną jest $-2x$, która wynosi zero w $x = 0$, a
+Weź $f(x) = -x^{2}$. Każde nachylenie cięciwy na nim jest przeciwne do tego
+dla $x^{2}$, więc jego pochodną jest $-2x$, która wynosi zero w $x = 0$, a
 $x = 0$ jest jego \emph{maksimum}. Pochodna nie potrafi odróżnić tych dwóch,
 bo liczy się ją z dowolnie małego otoczenia, a oba wyglądają tam płasko.
 
@@ -555,7 +564,17 @@ Teraz wielkość i nieporozumienie, które kosztuje najwięcej.
 Oto $f(x) = x^{4} - 4x^{2}$, które ma minimum w $x = \val{f11.min.x}$. Rozważ
 dwa punkty na nim: $x = \val{f11.steep.x}$, gdzie pochodna wynosi
 $\val{f11.steep.slope}$, oraz $x = \val{f11.shallow.x}$, gdzie wynosi
-$\val{f11.shallow.slope}$.
+$\val{f11.shallow.slope}$. Weź te dwa nachylenia chwilowo na wiarę \dash{}
+rozwinięcie ilorazu dla czwartej potęgi to strona algebry, a
+Program~\ref{prog:F12} jest tam, gdzie przychodzą reguły skracające ją do
+jednej linijki. Ramka obraca się wokół tych dwóch liczb, a nie wokół tego,
+skąd się wzięły.
+
+A znaki mówią to, co ta sekcja już kazała im mówić: ujemny przy
+$x = \val{f11.shallow.x}$ znaczy, że krzywa wciąż opada, gdy $x$ rośnie, więc
+ten punkt leży przed minimum, a dodatni przy $x = \val{f11.steep.x}$ znaczy, że
+znowu rośnie, więc tamten leży za nim. Znak rozstrzygnął, po której stronie
+minimum leży każdy z punktów. Od wielkości oczekuje się czegoś innego.
 
 Jeden z tych punktów jest znacznie stromszy od drugiego. Który jest dalej od
 minimum?
@@ -573,8 +592,8 @@ $x = \val{f11.shallow.x}$ jest $\val{f11.shallow.dist}$ od niego.
 
 \begin{trapbox}
 \textbf{Duża pochodna nie znaczy, że jest daleko do przejścia.} Znaczy, że
-grunt jest stromy tutaj, a stromy grunt może być krótkim marszem od dna
-wąskiego dołu albo długim marszem po łagodnym zboczu.
+grunt jest stromy tutaj, a stromy grunt może leżeć krok od dna wąskiego dołu
+albo na szczycie długiego zbocza, które wypłaszcza się na całe mile.
 
 To jest teza poprzedniej ramki z doczepioną liczbą: pochodną liczy się z
 dowolnie małego otoczenia, więc \emph{nie może} wiedzieć, jak daleko cokolwiek
@@ -635,7 +654,9 @@ optymalizator omawiany w tej książce później jest tym wierszem z lepszą
 odpowiedzią na \emph{jak daleko}, a Program~\ref{prog:P20} jest miejscem, w
 którym się je porównuje.
 
-Spróbuj. $f(x) = (x-3)^{2} + 1$, więc $f'(x) = 2(x-3)$. Zacznij w
+Spróbuj. $f(x) = (x-3)^{2} + 1$, a rozwinięcie
+$\frac{((x-3)+h)^{2} - (x-3)^{2}}{h}$ dokładnie tak jak w ramce 13 daje
+$2(x-3) + h$, więc $f'(x) = 2(x-3)$. Zacznij w
 $x = \val{f11.gd.start}$ przy $\eta = \val{f11.gd.small.eta}$. Dokąd zabierze
 cię jeden krok?
 \nextframe
@@ -773,10 +794,11 @@ $(x-3)^{2}$ w coś, co działa na sieci.
   zatrzymują się na $\val{f11.deriv.at3}$ \dash{} co jest \textbf{pochodną}
   $x^{2}$ w tym punkcie. Skrócenie $h$ jest dozwolone właśnie dlatego, że $h$
   nie jest zerem}.}
-\sumitem{11--12}{\result{\textbf{Pochodna nie jest nachyleniem cięciwy.} Każde
-  nachylenie cięciwy tutaj to $6 + h$ i żadne z nich nie jest $6$; pochodna
-  jest liczbą, do której zmierzają, a $\lim_{h \to 0}$ znaczy \emph{tak
-  blisko, jak zechcesz, przez wybór $h$}, a nigdy \emph{przy $h = 0$}}.}
+\sumitem{11--12}{\result{\textbf{Pochodna nie jest z definicji nachyleniem
+  cięciwy.} Każde nachylenie cięciwy tutaj to $6 + h$ i żadne z nich nie jest
+  $6$; pochodna jest liczbą, do której zmierzają, a $\lim_{h \to 0}$ znaczy
+  \emph{tak blisko, jak zechcesz, przez wybór $h$}, a nigdy
+  \emph{przy $h = 0$}}.}
 \sumitem{13--15}{\result{Z samej definicji: $x^{2}$ daje $2x$, stała daje $0$, a
   $mx + c$ daje $m$. Jest tam wzorzec i Program~\ref{prog:F12} go podaje
   \dash{} tutaj liczy się to, że wszystkie trzy wyszły z jednej definicji i
@@ -799,8 +821,9 @@ $(x-3)^{2}$ w coś, co działa na sieci.
 \sumitem{24}{\result{\textbf{Zerowa pochodna to \emph{punkt stacjonarny}, a nie
   minimum}: maksimum też jest płaskie, i tak samo płaskie miejsce w drodze w
   górę. To, którego jest rodzaju, wymaga więcej niż pierwszej pochodnej
-  \dash{} dostarcza to Program~\ref{prog:P17}. Zatrzymanie się to nie to samo
-  co dojście}.}
+  \dash{} Program~\ref{prog:F12} podaje reguły na drugą pochodną, a
+  Program~\ref{prog:P17} zamienia ją w twierdzenie o krzywiźnie. Zatrzymanie
+  się to nie to samo co dojście}.}
 \sumitem{25--26}{\result{\textbf{Duża pochodna nie znaczy, że jest daleko.} Na
   $x^{4} - 4x^{2}$ punkt $x = \val{f11.steep.x}$ ma nachylenie
   $\val{f11.steep.slope}$ i jest $\val{f11.steep.dist}$ od minimum, a
@@ -899,9 +922,13 @@ $(x-3)^{2}$ w coś, co działa na sieci.
   dziesięciokrotnie za każdym razem.}
 \item Czy użycie $\frac{f(x+h) - f(x-h)}{2h}$ przesunęłoby dno litery U?
   Powiedz, co byś zmierzył, żeby się dowiedzieć.
-  \answerto{Tak: jej lewa gałąź spada szybciej, więc dno przesuwa się ku
-  większemu $h$ i mniejszemu błędowi. Zmierz to tak samo \dash{} przejedź $h$
-  przez wiele rzędów wielkości wobec znanej pochodnej i narysuj błąd.}
+  \answerto{Na $x^{2}$ usuwa lewą gałąź całkowicie: wyrazy z $h$ skracają się
+  dokładnie, więc iloraz wynosi $2x$ dla każdego $h$, a jedyny pozostały błąd
+  jest błędem maszyny. Na krzywej, której iloraz zachowuje $h^{2}$ \dash{}
+  $x^{3}$, gdzie wynosi on $3x^{2} + h^{2}$ \dash{} ta gałąź spada jak
+  $h^{2}$, a nie jak $h$, więc dno przesuwa się ku większemu $h$ i mniejszemu
+  błędowi. Zmierz to tak samo: przejedź $h$ przez wiele rzędów wielkości wobec
+  znanej pochodnej i narysuj błąd.}
 \item Pochodna funkcji jest zerem w trzech różnych punktach. Co możesz o niej
   powiedzieć, a czego nie?
   \answerto{Że jest płaska w trzech miejscach. Które z nich są minimami, które

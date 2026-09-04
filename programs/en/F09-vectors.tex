@@ -81,7 +81,7 @@
   \answerto{$\lVert a \rVert^{2} + \lVert b \rVert^{2} - 2\,(a \cdot b)$.}
 \item Two vectors both have length $1$. If one is nearer to a query than the
   other, is it also the more similar by cosine? \teachesat{22--23}
-  \answerto{Yes, always. On the unit sphere the distance is
+  \answerto{Yes, always. On the unit sphere the \emph{squared} distance is
   $2 - 2\cos\theta$, which falls as the cosine rises, so the two orderings are
   the same one.}
 \item And if the lengths are not $1$? \teachesat{24--25}
@@ -156,7 +156,8 @@ What is $3(1, 2)$?
 \begin{fr}
 \ans{$(3, 6)$}
 Every component multiplied. The arrow points the same way and is three times
-as long, so a scalar changes the size and not the direction.
+as long, so a \textbf{positive} scalar changes the size and not the
+direction.
 
 Two special cases are worth naming now because both come back:
 
@@ -202,8 +203,9 @@ One more piece of vocabulary, and it is one the book will use constantly.
 The numbers in the list are its \textbf{components}, and the number of them is
 how many the vector has \dash{} two for a point in the plane,
 $\val{f09.dim}$ for the embeddings you will meet. When two vectors have
-different numbers of components, none of the three operations above is
+different numbers of components, neither addition nor subtraction is
 defined, because there is nothing to pair the leftover components with.
+Scaling is untouched: it takes one vector and a number.
 
 That is the entire content of a shape error, and it is why one is an error
 rather than a wrong answer.
@@ -311,8 +313,10 @@ A library will tell you about this in its own way, and the way depends on the
 library. Plain Python raises \code{ZeroDivisionError} and stops. An array
 library is more likely to produce components that are all \code{nan} and carry
 on, with a warning you may not be reading, and then every downstream
-comparison against those components is \code{False} \dash{} including the ones
-that ask whether it is equal to itself.
+equality or ordering comparison against those components is \code{False}
+\dash{} including the one that asks whether it is equal to itself \dash{}
+while \code{!=} comes back \code{True}. A \code{nan} compares unequal to
+everything, itself included.
 
 The invariant is what to remember: \textbf{the zero vector cannot be
 normalised}, whatever your tools do about it. A pipeline that normalises
@@ -386,7 +390,7 @@ without computing anything:
 \begin{center}
 \begin{tabular}{lcc}
 \toprule
-The two point & $\cos\theta$ & $a \cdot b$ \\
+The two vectors point & $\cos\theta$ & $a \cdot b$ \\
 \midrule
 the same way & $1$ & $\lVert a \rVert\, \lVert b \rVert$ \\
 at right angles & $0$ & $0$ \\
@@ -492,9 +496,7 @@ lengths are gone \dash{} which is Program~\ref{prog:F08}'s result with the
 denominator equal to $1$. Checked to $\val{f09.unit.err}$.
 
 Read what that says. On the right there is nothing but the cosine, and it
-comes with a minus sign. So as the cosine goes up the distance goes down, and
-as the cosine goes down the distance goes up, with no exceptions and no
-regions where the behaviour changes.
+comes with a minus sign.
 
 You have a query and two candidates, all three normalised. Candidate A is
 nearer to the query than candidate B. Which has the higher cosine similarity?
@@ -504,8 +506,11 @@ nearer to the query than candidate B. Which has the higher cosine similarity?
 
 \begin{fr}
 \ans{A, necessarily}
-\textbf{On the unit sphere, distance and cosine similarity are one question
-with two answers.} Not usually, not approximately: they rank every pair of
+The minus sign is the whole of it: as the cosine goes up the distance goes
+down, and as the cosine goes down the distance goes up, with no exceptions and
+no regions where the behaviour changes. \textbf{On the unit sphere, distance
+and cosine similarity are one question with two answers.} Not usually, not
+approximately: they rank every pair of
 candidates identically, because one is a strictly decreasing function of the
 other and a strictly decreasing function cannot reorder anything. The script
 checks it on $\val{f09.rank.checked}$ comparisons and finds no exception,
@@ -554,8 +559,11 @@ asked different questions and they answered them.
 
 \begin{trapbox}
 \textbf{\enquote{Nearest} and \enquote{most similar} are the same ranking only
-on the unit sphere, and the previous frame is exactly why.} Take the lengths
-away and $\lVert a - b \rVert^{2} = 2 - 2\cos\theta$ becomes
+when the candidates all share one length, and the previous frame is exactly
+why.} Normalising is the usual way to arrange that and it is not the only one:
+any common length will do, because the cosine is then the only thing left that
+varies. Take the shared length away and
+$\lVert a - b \rVert^{2} = 2 - 2\cos\theta$ becomes
 $\lVert a \rVert^{2} + \lVert b \rVert^{2} - 2\lVert a \rVert \lVert b \rVert
 \cos\theta$, which has the two lengths in it in their own right. The cosine no
 longer determines the distance, so it can no longer order it.
@@ -718,8 +726,8 @@ applies once the picture is gone.
 \sumitem{5--6}{\result{Adding a plain number to a vector is \textbf{not defined} in
   the mathematics, whatever an array library does with it
   (Program~\ref{prog:P07} has the rules). And two vectors with different
-  numbers of components support none of the three operations, which is the
-  entire content of a shape error}.}
+  numbers of components support neither addition nor subtraction, which is
+  the entire content of a shape error}.}
 \sumitem{7--9}{\result{$\lVert a \rVert$ is the square root of the sum of the squares,
   and it is Pythagoras applied once per component: the length in three
   dimensions is built from the length in two, and the same argument runs at
@@ -819,8 +827,11 @@ applies once the picture is gone.
   query returns the same neighbours in the same order.}
 \item The same store holds unnormalised embeddings and the same switch is
   made. What changes?
-  \answerto{The ranking can change, and nothing in the output says so. Long
-  vectors are penalised by distance and ignored by cosine.}
+  \answerto{The ranking can change, and nothing in the output says so. Distance
+  has the lengths in it as well as the angle, so a vector can be pushed down by
+  its length alone \dash{} too short as much as too long \dash{} while its
+  cosine does not move. Frame 25 is the case: the candidate that loses on
+  distance is the \emph{short} one, which is also the more similar.}
 \item Which of these is a claim the two-dimensional picture is evidence for at
   $\val{f09.dim}$ components: that the triangle inequality holds; that two
   vectors picked at random are usually far apart in angle?
@@ -865,9 +876,10 @@ applies once the picture is gone.
   retrieval bug. Give the most likely mechanism, and say what evidence would
   confirm it.
   \answerto{The index was ranking by distance while the intended semantics
-  was direction, so long vectors were being pushed down the list. It would be
-  confirmed by finding that the documents that moved are the ones whose
-  embeddings had unusual lengths.}
+  was direction, so documents whose embeddings were the wrong length \dash{}
+  short or long \dash{} were being pushed down the list for a reason that had
+  nothing to do with what they said. It would be confirmed by finding that the
+  documents that moved are the ones whose embeddings had unusual lengths.}
 \item Why can a dot product of zero not tell you that two documents are
   unrelated?
   \answerto{Because it is a statement about the angle between two vectors, and

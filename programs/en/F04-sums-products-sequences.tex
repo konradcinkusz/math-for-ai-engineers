@@ -1050,6 +1050,15 @@ The weights are \S\ref{sec:F04-sequences}'s geometric sequence, and it is
 \S\ref{sec:F04-sequences}'s series that says what they come to. Nothing new
 was needed to get here, which is why the sequences came first.
 
+Two things about that expression are worth pausing on. The substitution
+stops at $m_0$ because there were only $t$ steps to unroll, so this is an
+identity rather than an approximation \dash{} it is exactly what the loop
+computed, for whatever $t$ you like. And nothing in getting here used what
+the $g$s are. Feed the loop gradients and it is momentum; feed it losses and
+it is the smoothed curve on a dashboard; feed it squared gradients and it is
+half of Adam. One derivation, which Program~\ref{prog:P20} spends three
+times.
+
 At $\beta = \num{0.9}$, what weight sits on the newest value $g_t$, and what
 weight sits on the one before it?
 \[ \text{newest: } \blank \qquad\qquad \text{the one before: } \blank \]

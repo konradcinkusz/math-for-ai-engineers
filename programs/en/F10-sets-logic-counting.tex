@@ -59,9 +59,9 @@
   \answerto{Repeats and order.}
 \item Two sets have $\val{f10.eval.a}$ and $\val{f10.eval.b}$ members. How
   many are in their union? \teachesat{8--9}
-  \answerto{You cannot say without the overlap. Here it is
-  $\val{f10.eval.shared}$, so the union has $\val{f10.eval.union}$ and not
-  $\val{f10.eval.naive}$.}
+  \answerto{You cannot say without the overlap, and that is the whole answer.
+  In the program's own example it turns out to be $\val{f10.eval.shared}$, so
+  the union has $\val{f10.eval.union}$ and not $\val{f10.eval.naive}$.}
 \item What is a mask? \teachesatone{11}
   \answerto{One yes-or-no per position, in the same order as the data:
   the same information as a set of positions, written differently.}
@@ -211,14 +211,15 @@ $A \subseteq B$ & everything in $A$ is also in $B$ \\
 The last one is worth a moment. $A \subseteq B$ says nothing about whether $B$
 has anything $A$ does not, so every set is a subset of itself.
 
-Of the $\val{f10.lines}$ lines in the corpus above, how many distinct ones do
-you think there are?
+The corpus above has $\val{f10.lines}$ lines and $\val{f10.distinct.lines}$
+distinct ones. Which of those two numbers is a set size?
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{$\val{f10.distinct.lines}$}
-So the same three questions apply at any grain. \enquote{How many log lines
+\ans{$\val{f10.distinct.lines}$, the distinct count}
+The other is an occurrence count, and the same three questions apply at any
+grain. \enquote{How many log lines
 did we see} and \enquote{how many kinds of log line are there} are the
 occurrence count and the set size again, and the second is the one that tells
 you how many distinct things your system does.
@@ -229,7 +230,7 @@ One more piece of vocabulary before the operations.
 
 Two sets are \textbf{disjoint} when nothing is in both. That is worth a name
 because it is the special case where nearly everything about counting gets
-easier, and section 3 turns on it.
+easier, and the next section's union rule turns on it.
 \end{fr}
 
 % ============================================================
@@ -410,8 +411,7 @@ there are four cases and no subtlety in any of them.
 
 The subtlety is entirely in \emph{or}, and it is a fact about English rather
 than about logic. \enquote{Tea or coffee} in a sentence usually means one or
-the other and not both. \enquote{$p$ or $q$} in logic and in every programming
-language you will use means \textbf{at least one, possibly both}.
+the other and not both.
 
 A filter keeps rows where \code{is\_long or is\_flagged}. A row is both long
 and flagged. Is it kept?
@@ -420,7 +420,8 @@ and flagged. Is it kept?
 
 \begin{fr}
 \ans{Yes}
-Because \emph{or} asks for at least one, and this row has two. Wanting
+\enquote{$p$ or $q$} in logic and in every programming language you will use
+means \textbf{at least one, possibly both}, and this row has two. Wanting
 exactly one is a different operation \dash{} \emph{exclusive or} \dash{} and
 the three words in this section do not have it, so it has to be built out of
 them.
@@ -555,17 +556,22 @@ move on a different operation. \emph{Independent} means every choice of the
 first leaves the same options open for the second. Drop that and
 the multiplication is wrong.
 
-Suppose one of the models cannot run at the lowest precision. Is the answer
-still $\val{f10.grid}$?
+Suppose one of the models cannot run at the lowest precision. How many runs
+is the grid now?
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{No}
-It is one fewer, because that combination does not exist: the choices are no
-longer independent, since which model you pick changes which precisions are
-open to you. That is the whole content of the condition, and it is why a grid
-search over a constrained configuration cannot be sized by multiplying.
+\ans{$\val{f10.grid.less.one}$}
+Not $59$, which is the answer the arithmetic invites. What the constraint
+removes is not a run but a \emph{pair}: that model at that precision is gone
+at every one of the $\val{f10.grid.c}$ batch sizes, so $\val{f10.grid.c}$
+runs go with it. The choices are no longer independent, since which model you
+pick changes which precisions are open to you, and the thing the constraint
+names is not the thing you are counting.
+
+That is the whole content of the condition, and it is why a grid search over a
+constrained configuration cannot be sized by multiplying.
 
 Notice where that constraint usually lives. It is rarely written down beside
 the grid; it is enforced somewhere further in, as a validation error or a
@@ -642,8 +648,8 @@ twice, once from each end, so halve it.
 \[ \text{pairs} = \frac{n(n-1)}{2} \]
 
 The \enquote{halve it because order does not matter} step is a set fact:
-$\{a, b\}$ and $\{b, a\}$ are one pair, because a set discards order, which is
-section 1's second sentence doing arithmetic.
+$\{a, b\}$ and $\{b, a\}$ are one pair, because a set discards order. That is
+the second of section 1's two discards, doing arithmetic.
 
 \mermaidfig{f10-three-growths}{Three ways a count grows, and each is the
 product rule with a different independent choice in it.}{multiply, double,
@@ -720,7 +726,7 @@ fraction that failed.
 \end{fr}
 
 \begin{fr}
-\ans{$\frac{\val{f10.faults}}{\val{f10.docs}}$}
+\ans{$\dfrac{\val{f10.faults}}{\val{f10.docs}}$}
 A count on top and a count underneath. \textbf{Every naive probability is two
 counts and a division}, and the counting is the part this program has been
 about.
@@ -809,7 +815,8 @@ meant.
 \sumitem{23--24}{\result{\textbf{Independent choices multiply}, and \emph{independent}
   is a condition to state rather than assume: $\val{f10.grid.a}$ models times
   $\val{f10.grid.b}$ precisions times $\val{f10.grid.c}$ batch sizes is
-  $\val{f10.grid}$ runs, and one forbidden combination makes it wrong}.}
+  $\val{f10.grid}$ runs, and one forbidden model-and-precision pair takes
+  $\val{f10.grid.c}$ of them with it}.}
 \sumitem{25--28}{\result{\textbf{A set of $n$ elements has $2^{n}$ subsets}, one
   yes-or-no per element: $\val{f10.features}$ features give
   $\val{f10.subsets}$, and one more feature doubles it. Write the count down
@@ -828,7 +835,7 @@ meant.
 \sumitem{34--37}{\result{\textbf{Every naive probability is two counts and a
   division}, and the hard part is choosing the denominator, because requests,
   users and sessions all give correct answers to different questions. Report
-  the two counts, not just the rate. What a probability \emph{is} belongs to
+  the two counts, not the rate alone. What a probability \emph{is} belongs to
   Program~\ref{prog:P23}. Set, mask, count: three representations of one idea,
   and almost everything done to a dataset is one of them from a different
   side}.}
@@ -880,8 +887,9 @@ meant.
   \answerto{$1225$, from $\frac{50 \times 49}{2}$.}
 \item An all-pairs job over $\num{5000}$ documents takes an hour. Roughly how
   long over $\num{10000}$?
-  \answerto{About four hours \dash{} a shade over, by the same factor as
-  $\val{f10.pairs.ratio}$. Twice the input is four times the pairs.}
+  \answerto{About four hours \dash{} a shade over, by a factor of
+  $\val{f10.t13.ratio}$ here. Twice the input is four times the pairs, and the
+  shade over shrinks as the corpus grows.}
 \item Of $\num{20000}$ requests, $\num{140}$ produced an error. Give the
   fraction, and name one other denominator somebody might reasonably use.
   \answerto{$\frac{140}{20000}$, which is $\num{0.007}$. Sessions, users, or
@@ -921,11 +929,14 @@ meant.
   It is called \emph{exclusive or} and most languages have an operator for it,
   but it is not one of the three words this section gives you, so from those it
   has to be built.}
-\item A grid search has $4$ models, $3$ precisions and $5$ batch sizes, but two
-  particular model-and-precision pairs are unsupported. How many runs?
-  \answerto{$50$: the full grid is $60$ and each unsupported pair removes the
-  $5$ batch sizes under it. The product rule does not apply to the whole grid
-  once the choices are not independent, so count the exclusions and subtract.}
+\item A grid search has $\val{f10.grid.a}$ models, $\val{f10.grid.b}$
+  precisions and $\val{f10.grid.c}$ batch sizes \dash{} the same grid this
+  program sized \dash{} but now two particular model-and-precision pairs are
+  unsupported. How many runs?
+  \answerto{$\val{f10.grid.less.two}$: the full grid is $\val{f10.grid}$ and
+  each unsupported pair removes the $\val{f10.grid.c}$ batch sizes under it.
+  The product rule does not apply to the whole grid once the choices are not
+  independent, so count the exclusions and subtract.}
 \item Somebody proposes evaluating every subset of $30$ features to find the
   best combination, at a second per subset. Say how long it takes and what to
   propose instead.

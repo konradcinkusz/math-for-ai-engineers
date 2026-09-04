@@ -79,7 +79,7 @@
   \answerto{$\lVert a \rVert^{2} + \lVert b \rVert^{2} - 2\,(a \cdot b)$.}
 \item Dwa wektory mają długość $1$. Jeśli jeden jest bliżej zapytania niż
   drugi, czy jest też bardziej podobny kosinusowo? \teachesat{22--23}
-  \answerto{Tak, zawsze. Na sferze jednostkowej odległość to
+  \answerto{Tak, zawsze. Na sferze jednostkowej \emph{kwadrat} odległości to
   $2 - 2\cos\theta$, co maleje, gdy kosinus rośnie, więc oba porządki są
   jednym porządkiem.}
 \item A jeśli długości nie są równe $1$? \teachesat{24--25}
@@ -152,7 +152,8 @@ wynosi $3(1, 2)$?
 \begin{fr}
 \ans{$(3, 6)$}
 Każda współrzędna pomnożona. Strzałka wskazuje w tę samą stronę i jest trzy
-razy dłuższa, więc skalar zmienia rozmiar, a nie kierunek.
+razy dłuższa, więc skalar \textbf{dodatni} zmienia rozmiar, a nie
+kierunek.
 
 Dwa szczególne przypadki warto nazwać już teraz, bo oba wracają:
 
@@ -198,8 +199,9 @@ Jeszcze jedno słowo, i to takie, którego książka będzie używać stale.
 Liczby na liście to jego \textbf{współrzędne}, a ich liczba mówi, ile ich
 wektor ma \dash{} dwie dla punktu na płaszczyźnie, $\val{f09.dim}$ dla
 zanurzeń, które spotkasz. Gdy dwa wektory mają różną liczbę współrzędnych,
-żadne z trzech powyższych działań nie jest zdefiniowane, bo nie ma z czym
-sparować współrzędnych, które zostały.
+ani dodawanie, ani odejmowanie nie jest zdefiniowane, bo nie ma z czym
+sparować współrzędnych, które zostały. Skalowania to nie dotyka: bierze jeden
+wektor i liczbę.
 
 To jest cała treść błędu kształtu i dlatego jest on błędem, a nie złą
 odpowiedzią.
@@ -308,8 +310,10 @@ Biblioteka powie ci o tym po swojemu, a po jakiemu, zależy od biblioteki. Czyst
 Python podnosi \code{ZeroDivisionError} i się zatrzymuje. Biblioteka tablicowa
 raczej zwróci współrzędne będące same \code{nan} i pójdzie dalej, z
 ostrzeżeniem, którego możesz nie czytać, a wtedy każde późniejsze porównanie
-z tymi współrzędnymi da \code{False} \dash{} łącznie z tymi, które pytają, czy
-jest równa samej sobie.
+na równość lub porządek z tymi współrzędnymi da \code{False} \dash{} łącznie
+z tym, które pyta, czy jest równa samej sobie \dash{} podczas gdy \code{!=}
+wraca jako \code{True}. \code{nan} jest różny od wszystkiego, od siebie
+samego też.
 
 Zapamiętać należy niezmiennik: \textbf{wektora zerowego nie da się
 znormalizować}, cokolwiek zrobią twoje narzędzia. Potok normalizujący zanurzenia
@@ -488,8 +492,7 @@ gdy długości znikną \dash{} czyli wynik Programu~\ref{prog:F08} z mianownikie
 równym $1$. Sprawdzone do $\val{f09.unit.err}$.
 
 Odczytaj, co to mówi. Po prawej nie ma nic poza kosinusem i przychodzi on ze
-znakiem minus. Więc gdy kosinus rośnie, odległość maleje, a gdy kosinus maleje,
-odległość rośnie, bez wyjątków i bez obszarów, w których zachowanie się zmienia.
+znakiem minus.
 
 Masz zapytanie i dwóch kandydatów, wszystkich troje znormalizowanych. Kandydat
 A jest bliżej zapytania niż kandydat B. Który ma wyższe podobieństwo
@@ -500,8 +503,11 @@ kosinusowe?
 
 \begin{fr}
 \ans{A, z konieczności}
-\textbf{Na sferze jednostkowej odległość i podobieństwo kosinusowe są jednym
-pytaniem o dwóch odpowiedziach.} Nie zwykle i nie w przybliżeniu: ustawiają
+Znak minus jest tu wszystkim: gdy kosinus rośnie, odległość maleje, a gdy
+kosinus maleje, odległość rośnie, bez wyjątków i bez obszarów, w których
+zachowanie się zmienia. \textbf{Na sferze jednostkowej odległość i
+podobieństwo kosinusowe są jednym pytaniem o dwóch odpowiedziach.} Nie zwykle i
+nie w przybliżeniu: ustawiają
 każdą parę kandydatów identycznie, bo jedno jest ściśle malejącą funkcją
 drugiego, a ściśle malejąca funkcja nie może niczego przestawić. Skrypt
 sprawdza to na $\val{f09.rank.checked}$ porównaniach i nie znajduje wyjątku,
@@ -551,8 +557,11 @@ zadano im różne pytania i one na nie odpowiedziały.
 
 \begin{trapbox}
 \textbf{\enquote{Najbliższy} i \enquote{najbardziej podobny} to ten sam
-porządek tylko na sferze jednostkowej, a poprzednia ramka mówi dokładnie
-dlaczego.} Zabierz długości, a $\lVert a - b \rVert^{2} = 2 - 2\cos\theta$
+porządek tylko wtedy, gdy wszyscy kandydaci mają jedną wspólną długość, a
+poprzednia ramka mówi dokładnie dlaczego.} Normalizacja to zwykły sposób, by
+to osiągnąć, i nie jedyny: wystarczy dowolna wspólna długość, bo wtedy jedyną
+zmieniającą się rzeczą zostaje kosinus. Zabierz wspólną długość, a
+$\lVert a - b \rVert^{2} = 2 - 2\cos\theta$
 staje się $\lVert a \rVert^{2} + \lVert b \rVert^{2} - 2\lVert a \rVert
 \lVert b \rVert \cos\theta$, gdzie obie długości występują samodzielnie.
 Kosinus nie wyznacza już odległości, więc nie może już jej porządkować.
@@ -715,8 +724,8 @@ ma.
 \sumitem{5--6}{\result{Dodanie zwykłej liczby do wektora \textbf{nie jest
   zdefiniowane} w matematyce, cokolwiek zrobi z tym biblioteka tablicowa
   (reguły ma Program~\ref{prog:P07}). A dwa wektory o różnej liczbie
-  współrzędnych nie obsługują żadnego z trzech działań, i to jest cała treść
-  błędu kształtu}.}
+  współrzędnych nie obsługują ani dodawania, ani odejmowania, i to jest cała
+  treść błędu kształtu}.}
 \sumitem{7--9}{\result{$\lVert a \rVert$ to pierwiastek z sumy kwadratów i jest to
   Pitagoras zastosowany raz na współrzędną: długość w trzech wymiarach buduje
   się z długości w dwóch, a ten sam argument biegnie przy dowolnej liczbie.
@@ -815,7 +824,11 @@ ma.
 \item Ten sam magazyn trzyma nieznormalizowane zanurzenia i robi się to samo
   przełączenie. Co się zmienia?
   \answerto{Porządek może się zmienić i nic w wyniku tego nie powie. Odległość
-  karze długie wektory, a kosinus ich nie widzi.}
+  ma w sobie długości, a nie tylko kąt, więc wektor może zostać zepchnięty w dół
+  samą swoją długością \dash{} zarówno zbyt krótką, jak i zbyt długą \dash{}
+  podczas gdy jego kosinus nie drgnie. Ramka 25 jest tym właśnie przypadkiem:
+  kandydat, który przegrywa na odległości, jest tym \emph{krótkim}, a zarazem
+  bardziej podobnym.}
 \item Które z tych twierdzeń dwuwymiarowy obrazek uzasadnia przy
   $\val{f09.dim}$ współrzędnych: że zachodzi nierówność trójkąta; że dwa
   wektory wzięte losowo są zwykle daleko od siebie kątowo?
@@ -860,9 +873,10 @@ ma.
   wyszukiwania. Podaj najbardziej prawdopodobny mechanizm i powiedz, jaki dowód
   by go potwierdził.
   \answerto{Indeks porządkował według odległości, a zamierzoną semantyką był
-  kierunek, więc długie wektory były spychane w dół listy. Potwierdziłoby to
-  odkrycie, że dokumenty, które się przesunęły, to te, których zanurzenia miały
-  nietypowe długości.}
+  kierunek, więc dokumenty o zanurzeniach niewłaściwej długości \dash{}
+  krótkich albo długich \dash{} były spychane w dół listy z powodu niemającego
+  nic wspólnego z tym, co mówiły. Potwierdziłoby to odkrycie, że dokumenty,
+  które się przesunęły, to te, których zanurzenia miały nietypowe długości.}
 \item Dlaczego zerowy iloczyn skalarny nie może ci powiedzieć, że dwa dokumenty
   są niepowiązane?
   \answerto{Bo jest twierdzeniem o kącie między dwoma wektorami, a to, czy kąt

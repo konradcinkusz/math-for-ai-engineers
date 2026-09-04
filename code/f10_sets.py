@@ -175,6 +175,32 @@ emit("f10.grid.a", CHOICES[0])
 emit("f10.grid.b", CHOICES[1])
 emit("f10.grid.c", CHOICES[2])
 
+# A run is a TRIPLE, so excluding one model-and-precision PAIR takes every
+# batch size under it. Enumerated rather than subtracted, because the whole
+# point of the frame is that the arithmetic people reach for is a subtraction
+# of one and the object being removed is not one thing. Frame 25 quotes the
+# one-pair figure and further problem 7 quotes the two-pair figure, so both
+# come from this enumeration and cannot come apart.
+GRID = [(m, p, b)
+        for m in range(CHOICES[0])
+        for p in range(CHOICES[1])
+        for b in range(CHOICES[2])]
+assert len(GRID) == CHOICES[0] * CHOICES[1] * CHOICES[2]
+
+
+def runs_without(excluded_pairs):
+    """Count the surviving triples once these (model, precision) pairs go."""
+    return sum(1 for m, p, _ in GRID if (m, p) not in excluded_pairs)
+
+
+ONE_PAIR = runs_without({(0, 0)})
+TWO_PAIRS = runs_without({(0, 0), (1, 2)})
+emit("f10.grid.less.one", ONE_PAIR)
+emit("f10.grid.less.two", TWO_PAIRS)
+assert len(GRID) - ONE_PAIR == CHOICES[2], "one excluded pair no longer costs a full row of batch sizes"
+assert len(GRID) - TWO_PAIRS == 2 * CHOICES[2], "two excluded pairs no longer cost two rows"
+assert ONE_PAIR != len(GRID) - 1, "the naive one-fewer answer now happens to be right"
+
 FEATURES = 20
 emit("f10.features", FEATURES)
 emit("f10.subsets", 2 ** FEATURES)
@@ -211,6 +237,14 @@ for _n in (100, 1000, 10_000, 100_000):
 for _n in (100, 1000, 10_000):
     assert pairs(2 * _n) / pairs(_n) > pairs(20 * _n) / pairs(10 * _n), \
         "the doubling ratio no longer falls towards four"
+
+# Test exercise 13 doubles a DIFFERENT corpus, so it needs its own ratio and
+# not this section's. Quoting the n = 1000 figure there would attach a fixed
+# number to the one quantity this section exists to show is n-dependent.
+T13_DOCS = 5000                          # the exercise names it; not emitted
+emit("f10.t13.ratio", pairs(2 * T13_DOCS) / pairs(T13_DOCS), 4)
+assert round(pairs(2 * T13_DOCS) / pairs(T13_DOCS), 4) != round(pairs(2 * N_DOCS) / pairs(N_DOCS), 4), \
+    "the exercise's ratio now equals the section's, so one of the two figures is redundant"
 
 # The denominator. Counting is what a naive probability divides by, and F10
 # stops exactly there: it produces the two counts and names the fraction.
