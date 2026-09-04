@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1415 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1454 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1180 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1198 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1419 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1456 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1182 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1202 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -105,7 +105,7 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1635 computed values, all referenced, all present, plus the committed console
+- 1650 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
@@ -130,13 +130,14 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **97 orphan-tail pages: 28 · 32 · 18 · 19** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`. **Four passes have taken the count DOWN** and
+- **96 orphan-tail pages: 28 · 32 · 18 · 18** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`. **Five passes have taken the count DOWN** and
   every other one has raised it: the two elicitation passes took it from 99 to
-  96, the P05 review pass put three back, and the F01--F06 review batch took
-  nine off across two builds \dash{} the first of the four that was not aiming
-  at the ledger at all, which is why *a correctness pass is also a layout pass*
-  is written into its note. **Read \enquote{across two builds} literally**: the
+  96, the P05 review pass put three back, the F01--F06 review batch took nine
+  off across two builds \dash{} the first that was not aiming at the ledger at
+  all, which is why *a correctness pass is also a layout pass* is written into
+  its note \dash{} and the P01/P02 review took one more off, in `main-pl-a4`
+  alone, on a pass that added prose to two programs. **Read \enquote{across two builds} literally**: the
   batch's own build failed at `check` on an orphaned cue, and `check-a4` does
   not run until `check` passes, so the A4 half of this ledger was not measured
   until the cue was cleared. A hard-gate failure in the trade builds hides every
@@ -13916,6 +13917,293 @@ reasoning rather than rediscovering it:
   can lose their place. A `tabularx` row rule, book-wide.
 - **A blank verso carries a running head**, found and deliberately left in the
   F04 review pass for the reason recorded there.
+
+### Part II review, P01 and P02, September 2026
+
+Issues \#169 and \#144, taken as one batch on the Foundation precedent that
+each PR costs a four-format build. What is worth noticing before the findings
+is **where they were**: two Appendix~A answers, an entry Quiz, a table's
+number formatting, a diagram node, and a row of data that existed only in a
+script \dash{} five places no gate in this repository reaches, and none of
+them prose a proof-reader would stop at.
+
+#### THE FINDING: a value reused for a second quantity is a coincidence with a lifetime
+
+Program~\ref{prog:P02}'s `p02.var.shared` was computed as
+$-\log_{10}(|\Delta| / \Ex[x^{2}])$, which is $8.65$ and rounds to $9$, and
+three places said the two quantities \enquote{agree to nine significant
+figures}. They are $900\,120\,006$ and $900\,120\,004$: they share **eight**
+leading digits, and at nine significant figures they \emph{differ}. So the
+claim was wrong on the digit-counting reading, wrong on the rounding reading,
+and only approximately right on the relative-error one \dash{} in the frame
+whose whole exercise is counting those digits against the format's seven.
+
+**And the page could not show any agreement at all**, because both were
+emitted as `.6e` and printed as `9.001200e+08` \dash{} the same string twice,
+followed by a sentence about how far apart they are. Both are exact integers;
+they are printed in full now, the count is the length of the common prefix,
+and it is gated against Program~\ref{prog:P01}'s own figure for how many
+decimal digits `fp32` resolves.
+
+**Correcting it exposed a second quantity riding on the first, and that is the
+part worth carrying.** A different frame said the amplification
+$\frac{|a| + |b|}{|a - b|}$ is \enquote{of the order of
+$10^{\val{p02.var.shared}}$} \dash{} which read correctly \emph{only} because
+the old count was $9$ and the order really is $9$. Two different quantities
+that coincided at one digit, under one key: correct the first and the second
+goes wrong silently, with nothing to fail.
+
+That is this book's two-numbers-that-look-like-one defect from the other side
+\dash{} **one number doing two jobs** rather than one job done by two numbers
+\dash{} and the tell was available in the key's own name, which says
+\emph{shared} and was being read as \emph{order of magnitude}. The
+amplification has its own key and its own assertion now. The rule is narrow
+and mechanical: **a `\val{}` used for a second quantity is a coincidence with
+a lifetime, and the lifetime ends the first time either quantity is
+corrected.**
+
+#### A review is a claim about the build it was made on
+
+Two of the issue's findings do not reproduce: \enquote{the table two frames
+back points at a frame with no table} \dash{} the current text says
+\enquote{which is the gap table doing its second job}, with no positional
+claim at all \dash{} and \enquote{the reader is told to look at the fp16 row
+twice}, which appears nowhere in the file. The elicitation figure it quotes
+($11$ questions in $35$ frames) was $48\%$ before this pass and is
+$51\%$ after it.
+
+All three are the Part~II elicitation pass, which landed after the reviewed
+build and rewrote those frames. **So the first thing to do with each finding
+is re-read it against the current source**, not because the reviewer was
+careless but because a review of a merged build is a statement about that
+build, and this repository moves. It cost two greps and it retired two
+findings that would otherwise have been \enquote{fixed} into something worse.
+
+#### The condition number, in a written program for the first time
+
+Program~\ref{prog:P02} routed the condition number to Program~\ref{prog:P10}
+twice \dash{} in a rigour box whose whole function is to say where the proof
+lives, and in a `\result{}`-wrapped Summary item, so Appendix~C replayed it.
+It is Program~\ref{prog:P11}'s.
+
+**Confirmed three ways rather than assumed from the off-by-one**, which is
+Program~\ref{prog:P10}'s own rule: the manifest gives P10 as
+\emph{Eigenvalues, quadratic forms and positive definiteness} and P11 as
+\emph{SVD, low-rank approximation and conditioning}; **P10's own file header
+defers the condition number to P11 by name**; and the phrase occurs twenty
+times in P11 and once in P10, in that header.
+
+That is the P7 insertion surviving in one more artefact \dash{} it is already
+recorded in the trap catalogue, the manifest, the curriculum notes,
+Appendix~B, the issues' trap lists, `notes/02` §4, the issues' contract
+paragraphs and both introductions \dash{} and this is the first time it has
+been found in **a written program's own prose** rather than in a document
+about the book. No count is stated, for the reason this file gives about
+tallies; the list is the record.
+
+#### A bound that printed smaller than the estimate it bounds
+
+The depth table set `p02.grow.*` at two decimals and `p02.walk.*` at four, so
+the `fp32` row read $0.00\%$ against $0.0001\%$: the thing you cannot exceed
+printed as zero and the thing to expect as a ten-thousandth of a per cent,
+directly above a sentence saying which is which.
+
+Four decimals throughout, and **a guard on the printed forms rather than on
+the floats** \dash{} whatever the precision, a bound may never print below the
+estimate it bounds. It asserts on the two values themselves rather than on a
+formula, so a change of depth or of format cannot quietly reintroduce it.
+
+**And the paragraph that first stood here committed the defect it was
+describing**, which is why it is left in view. It said the ratio between the
+columns is $\sqrt{96} = 9.80$ \enquote{to every decimal the table carries},
+which is true of the underlying quantities \dash{} the bound tends to
+$n\varepsilon$ and the estimate is $\varepsilon\sqrt{n}$, so both the
+`fp64` and `fp32` rows are $9.798$ exactly \dash{} and false of the page:
+`fp32` prints $0.0011$ against $0.0001$ and divides to $11$, and `fp64` prints
+$0.0000$ in both columns and divides to nothing at all. **The one row a reader
+can divide is `fp16`'s**, at $10.27$, which is the \enquote{about
+$\val{p02.grow.ratio}$} the warning box beside it quotes and the only ratio
+the frames state. So the table's factor reproduces exactly where the box
+points and nowhere else, which is an arrangement to leave alone rather than to
+generalise \dash{} and the rule that catches it is the book's most repeated
+one, arriving in a note about the book: **divide the two numbers as the page
+prints them**, before writing the sentence that quotes the answer.
+
+#### The significand is in the second column, and the frame said it was nowhere
+
+\enquote{The significand does not appear anywhere in it}, in bold, under a
+table of two cliffs \dash{} and every entry in the under-cliff column is the
+logarithm of a format's smallest \emph{subnormal}, whose depth is bought with
+significand bits. `fp32` and `bf16` share an exponent budget and differ by
+$\val{p02.floor.bits}$ of them, so their floors differ by exactly
+$\val{p02.floor.bits}\ln 2 = \val{p02.floor.gap}$ while both ceilings read the
+same number.
+
+So a reader who asks the one obvious question about the table \dash{} why is
+`bf16`'s floor eleven above `fp32`'s when they share a budget? \dash{} was
+told in bold that there was nothing there to find. **The exponent budget sets
+the ceiling; the significand extends the floor**, and the gap is now emitted
+and **gated against the two numbers the table prints** rather than only
+against the formula, because a reader subtracts what is on the page. Figure
+2.2's third node said the same false thing and is redrawn in both editions.
+
+#### An elicitation on data that was never printed
+
+Frame 19 asked the reader to pivot on each of five scores in turn. The five
+lived in `code/`, and three quoted numbers hung off them \dash{} the count,
+the worst term formed, and the log-sum-exp \dash{} so the one elicitation in
+the program a reader could not attempt was also the one place they could check
+nothing. The row is emitted and printed as a display; five numbers cost one
+line.
+
+#### Two Appendix A answers, and the rule of thumb that is an upper bound
+
+Both of Program~\ref{prog:P01}'s majors are in the back matter, which is
+where a reader goes \emph{because they already suspect they are wrong}.
+
+**Further problem 3** gave the smallest contribution that can move a `bf16`
+total of $\val{p01.bf16.total}$ as \enquote{half an epsilon of the total, so
+roughly $\val{p01.bf16.total.thumb}$}. The threshold is half the gap
+\emph{at that magnitude}, and $100$ sits in
+$\intco{\val{p01.bf16.binade.lo}}{\val{p01.bf16.binade.hi}}$ where the gap is
+$\val{p01.bf16.total.gap}$ \dash{} so the answer is
+$\val{p01.bf16.total.half}$ and the rule of thumb is $56$ per cent too large.
+
+The correction is better than a corrected number, because the rule of thumb is
+not a wrong guess: **it is half the gap at the \emph{top} of the binade, so it
+is an upper bound, and it is furthest out exactly at the bottom of one**,
+which is where $100$ sits. That is the program's own slogan \dash{} precision
+is a property of a format and a magnitude together \dash{} biting the exercise
+that quotes it.
+
+Verified with a real round-to-nearest-even `bf16` rather than from the
+formula, and the boundary is the interesting part: **exactly $0.25$ is a tie
+and rounds back to $100$**, because $100$ is the even neighbour. So the answer
+is \enquote{anything above}, and both halves are asserted.
+
+**Further problem 4** said a conversion between `bf16` and `fp32` can neither
+overflow nor underflow \enquote{because the representable range is the same}.
+The \emph{normal} ranges match; the subnormal ones do not, for the reason
+Program~\ref{prog:P02}'s table needed above. An `fp32` value below about half
+of `bf16`'s smallest subnormal converts to exactly zero, and the answer
+contradicted its own program's table two frames earlier.
+
+#### A trap that warned about an answer nobody was allowed to give
+
+Frame 23 said \enquote{Now do `bf16` \dots and the answer is $X$} \dash{} an
+instruction whose answer arrives eleven words later \dash{} and frame 24's
+trapbox then corrected a mistake the program had never let the reader make:
+\enquote{If you had guessed that the newer format was the more accurate one}.
+
+Re-cut across the same three frames, adding none: 23 asks for the ceiling and
+then asks which of the two sixteen-bit formats is the more precise; 24 opens
+with both answers, carries the comparison, and keeps the trap, whose
+counterfactual is now \enquote{If you wrote `bf16`}. The Quiz was read first
+and discloses neither. It is the one elicitation the pass adds, and it takes
+the book's rate from $1027$ to $1028$.
+
+#### Ten section references named rather than numbered
+
+The prose said \enquote{section 2} where the heading prints \enquote{1.2},
+ten times, in a program that also cites \enquote{Program 2} by number on the
+same pages \dash{} so the reader does a silent translation and meets a real
+collision. Named instead, which is what the rest of the book does and what
+survives a renumbering. It cost ten numeric literals in each edition,
+identically, which is why C12 fell from $252$ to $242$ and stayed equal.
+
+#### Also
+
+- **`nan` is defined**, where the two reserved exponent patterns are named,
+  and the Test exercise answer that relied on it is earned.
+- **The `nan` mechanism**, which the trapbox elided: an infinity in a loss
+  gives `inf`. The `nan` needs $(1 - y)\ln(1 - p) = 0 \times (-\infty)$, so
+  the confidently \emph{wrong} example merely diverges and it is the
+  confidently \emph{right} one that poisons the batch.
+- **Kahan's compensation variable holds what was lost with the \emph{opposite}
+  sign**, which is why the first line subtracts it. A reader implementing from
+  the prose rather than from the four lines wrote a loop that adds the error
+  twice \dash{} and it runs, and returns an ordinary number.
+- **The flush-to-zero cliff**, computed rather than asserted: under the mode
+  the frame above describes, `fp16`'s coin-flip row drops from
+  $\val{p01.coin.fp16}$ to $\val{p01.coin.ftz.fp16}$, because the floor is
+  then the smallest normal.
+- **The two floors of a double differ by $2^{52}$**, about $4.5 \times
+  10^{15}$, not the $10^{16}$ the page gave twice \dash{} one factor of two
+  per significand bit, which is why the subnormal range is as deep as the
+  significand is wide.
+- **Loss scaling restores the mathematics exactly only for a power of two**,
+  which is why loss scales are quoted as $512$ or $65\,536$ and not as $1000$.
+  The Appendix~A answer was the careful one and the frame was not.
+- **Mixed precision keeps an `fp32` master copy**, which the frame omitted and
+  Program~\ref{prog:P03} bills for as a row of its own.
+- A seventh outcome and a scored Test exercise for frames 34--35, which the
+  outcomes, the \enquote{Can you?} panel and the Test exercises all stopped
+  short of.
+- The Quiz, Test and Further problems now cite sister programs through the
+  same `\ref` the frames use, so they render as \enquote{F3} rather than as an
+  unlinked \enquote{F03}, which names nothing in the contents.
+- Summary item 10 no longer equates the two ceilings frame 23 spends a
+  paragraph distinguishing; \enquote{P01} is off the page; Figure 1.2's
+  caption parses; T5 names the same decimal place as its frame; the banned
+  \enquote{just}; \enquote{All five} heading a table of four fixes and the
+  baseline they replace; and the variance divisor is named in the Quiz, so a
+  reader with statistics does not produce $2.5$ and doubt themselves.
+
+#### The orphaned cue, and the frame that earned its paragraph
+
+One, in `main-en`: Program~\ref{prog:P01}'s coin-flip elicitation, with its
+question and its row of dots on one page and \enquote{Next frame.} alone on
+the next. Cleared by **lengthening** in both editions, which is
+Program~\ref{prog:F06}'s two-sided rule.
+
+The paragraph earns its place, which is the test: it says what the answer
+\emph{cannot} depend on. Every token contributes the same factor, so the count
+turns on that factor and the format's floor and on nothing else \dash{} not
+the vocabulary, not the architecture, not the length of the text \dash{} and
+two models that agree on the per-token probability run out at the same place
+whatever else differs. That is true, it is the frame's own subject, and it
+gives away nothing about the number.
+
+#### Recorded rather than taken
+
+Six, all layout, all book-wide, each with its mechanism named so the next
+person meets the obstacle rather than rediscovering it: the Quiz box breaking
+inside an item and its heading stranding on the opener with the questions
+overleaf; the \enquote{Can you?} grid's row separation; an admonition box
+opening a page with no lead-in and no badge; and blank versos carrying a
+running head. Program~\ref{prog:P02}'s Quiz Q8 routes backwards where the
+other seven ascend, which is a reordering of a diagnostic and not a fix to
+one.
+
+#### Layout, and the ledger went down by one
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1419 | 1415 | `[]` | 0 |
+| `main-pl` | 1456 | 1454 | `[]` | 0 |
+| `main-en-a4` | 1182 | 1180 | `[6.3]` | 0 |
+| `main-pl-a4` | 1202 | 1198 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and, after the two rounds above, no orphaned cues.
+
+**And the orphan tails went 97 to 96**: 28, 32, 18, **18** against 28, 32, 18,
+19. One down, in `main-pl-a4`, on a pass that added prose to two programs
+\dash{} which is the F01--F06 batch's finding once more, that *a correctness
+pass is also a layout pass* in whichever direction the arithmetic of the page
+happens to fall.
+
+Two things about the page movement are worth separating, because the pass note
+would otherwise read as though four pages of prose were added. **The two
+lengthenings and the frame 23/24 re-cut account for the trade builds' four and
+two**; the A4 pair's two and four are the same edits paginating differently,
+and the Polish A4 build gained four pages while losing a tail. Nothing here
+was aimed at either ledger.
+
 
 ### Stroud layout pass, August 2026
 

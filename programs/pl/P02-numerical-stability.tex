@@ -53,7 +53,7 @@
 
 \begin{quiz}
 \item Pięć odczytów to $\val{p02.var.offset}$ i cztery kolejne mikrosekundy po
-  nim. Ich wariancję liczy się w \code{float32} jako
+  nim. Ich wariancję, dzieląc przez pięć, liczy się w \code{float32} jako
   $\Ex[x^{2}] - (\Ex[x])^{2}$. Co wraca? \teachesat{2--3}
   \answerto{$\val{p02.var.naive}$. Wariancja nie może być ujemna, a prawdziwa
   odpowiedź to $\val{p02.var.true}$.}
@@ -62,20 +62,21 @@
   \answerto{Żadnej. \code{float32} niesie około siedmiu, więc obie są
   przechowywane identycznie na cyfrach, na których się zgadzają, a różnica
   składa się wyłącznie z tego, co zostało po zaokrągleniu.}
-\item Wynik uwagi sięga $\val{p02.over.fp16.int}$. Co robi jego eksponenta w
-  \code{fp16}? \teachesat{14--15}
-  \answerto{Przepełnia się do \code{inf}. Sufit zostaje przekroczony przy
-  wyniku $\val{p02.over.fp16}$, a wszystko dalej staje się \code{nan}.}
+\item Wyniki uwagi przechodzą przez eksponentę wewnątrz softmaksu. Co to może
+  zrobić w \code{fp16}? \teachesat{14--15}
+  \answerto{Przepełnić się do \code{inf}, przy zwyczajnym wyniku, a nie przy
+  jakimś egzotycznym \dash{} a wtedy wszystko dalej staje się \code{nan}.}
 \item $\ln\sum_i e^{z_i} = c + \ln\sum_i e^{z_i - c}$ zachodzi dla każdego $c$.
   Czemu zatem bierze się $c$ równe maksimum? \teachesat{17--18}
   \answerto{Bo to jedyny wybór ograniczający każdy pozostały wykładnik do zera
   lub poniżej, więc jedyny z gwarancją braku przepełnienia dla każdego wejścia,
   a nie dla tego jednego.}
-\item Potrzebujesz $\ln \sigma(x)$ przy $x = \val{p02.logsig.under}$. Co daje
-  policzenie najpierw $\sigma$? \teachesat{24--25}
-  \answerto{\code{-inf}, bo $\sigma$ wpadła w niedomiar do
-  dokładnego zera. Policzone jako jedna operacja daje
-  $\val{p02.logsig.stable}$.}
+\item Potrzebujesz $\ln \sigma(x)$ dla dużego ujemnego logitu. Co daje
+  policzenie najpierw $\sigma$ i poniżej jakiego z grubsza $x$?
+  \teachesat{24--25}
+  \answerto{\code{-inf}, bo $\sigma$ wpadła w niedomiar do dokładnego zera
+  \dash{} co dzieje się na dolnym urwisku tego formatu, w którym liczysz.
+  Policzone jako jedna operacja nie sprawia żadnej trudności.}
 \item $\val{p02.sum.n}$ wartości równych $\val{p02.sum.small}$ dodaje się po
   jednej do bieżącej sumy \code{float32}, która startuje z $1$. Ile wynosi
   suma? \teachesat{29--30}
@@ -139,7 +140,7 @@ $\val{p02.var.naive}$.}
 Nic w algebrze nie poszło źle. Odejmowane wielkości to
 \[ \Ex[x^{2}] = \val{p02.var.ex2}, \qquad
    \left(\Ex[x]\right)^{2} = \val{p02.var.exsq} \]
-i zgadzają się na $\val{p02.var.shared}$ cyfrach znaczących, podczas gdy
+i dzielą swoich pierwszych $\val{p02.var.shared}$ cyfr, podczas gdy
 \code{float32} niesie ich około siedmiu. W tym formacie obie są więc
 przechowywane jako liczby o identycznych cyfrach wiodących, odejmowanie skraca
 każdą wspólną cyfrę, a to, co wraca, składa się z tego, co przypadkiem zostało
@@ -171,7 +172,7 @@ pytaj, skąd się wzięły.}
 
 
 \begin{fr}
-Dwie liczby zgadzają się na $\val{p02.var.shared}$ cyfrach znaczących i zostają
+Dwie liczby dzielą swoich pierwszych $\val{p02.var.shared}$ cyfr i zostają
 odjęte w \code{float32}, który niesie ich około siedmiu. Ile cyfr znaczących ma
 wynik?
 \nextframe
@@ -266,7 +267,7 @@ powyższej wariancji.
 
 \begin{fr}
 \ans{$\frac{|a| + |b|}{|a - b|}$, a dla powyższej wariancji jest rzędu
-$10^{\val{p02.var.shared}}$.}
+$10^{\val{p02.var.amp.exp}}$.}
 
 Ten iloraz warto rozpoznawać, bo nie ogranicza się do odejmowania.
 
@@ -281,7 +282,7 @@ go nie usuwa.
 \begin{rigourbox}
 \textbf{Ogólną postacią tej liczby jest wskaźnik uwarunkowania}, a dla układu
 równań jest on stwierdzeniem o macierzy, której ta książka jeszcze nie
-zdefiniowała. Program~\ref{prog:P10} podaje go porządnie. Tutaj należy wersja
+zdefiniowała. Program~\ref{prog:P11} podaje go porządnie. Tutaj należy wersja
 skalarna i nawyk, który ona kupuje: zanim uwierzysz policzonej różnicy, zapytaj,
 jakie błędy względne miały jej wejścia i co zrobiła z nimi ta operacja.
 \end{rigourbox}
@@ -378,9 +379,11 @@ najmniejszy całkowity wynik, który się przepełnia.
 \transcript{p02-cliff}
 
 \textbf{To nie jest liczba egzotyczna.} To wynik w tej skali, w której wyniki
-naturalnie występują, a utrzymanie wyników uwagi dość małymi, by były
-bezpieczne, jest całym zadaniem czynnika $1/\sqrt{d_k}$, który wyprowadza
-Program~\ref{prog:P25}. Awaria nie jest rzadkim zdarzeniem na skraju zakresu
+naturalnie występują, a czynnik $1/\sqrt{d_k}$, który wyprowadza
+Program~\ref{prog:P25}, nie pozwala tej skali rosnąć wraz z rozmiarem głowy
+\dash{} z powodów dotyczących gradientu softmaksu, a nie sufitu formatu, choć
+zdejmuje ze stołu i tę awarię.
+Awaria nie jest rzadkim zdarzeniem na skraju zakresu
 formatu; jest wartością, przed którą architektura ma wbudowaną poprawkę, a
 produkuje \code{inf}, a potem \code{nan}, a nie błąd, który ktokolwiek nazwałby
 błędem.
@@ -402,8 +405,8 @@ powiedz dlaczego.
 \end{fr}
 
 \begin{fr}
-\ans{\code{bf16} i \code{fp32}, bo dzielą budżet wykładnika, a zasięg
-eksponenty wyznacza sam ten budżet.}
+\ans{\code{bf16} i \code{fp32}, bo dzielą budżet wykładnika, a \emph{górę}
+zasięgu eksponenty wyznacza sam ten budżet.}
 
 Oba urwiska we wszystkich czterech formatach \dash{} wynik, przy którym
 eksponenta wychodzi górą, i wynik, przy którym wychodzi dołem:
@@ -421,9 +424,18 @@ eksponenta wychodzi górą, i wynik, przy którym wychodzi dołem:
 \end{tabular}
 \end{center}
 
-To powtórzenie pointy Programu~\ref{prog:P01}, a tabela mówi też resztę:
-\textbf{mantysa nie pojawia się w niej nigdzie.} Żadna z kolumn nie drgnie,
-gdy mantysa się zmieni, po żadnej ze stron.
+To powtórzenie pointy Programu~\ref{prog:P01} \dash{} o pierwszej kolumnie.
+Druga to inna historia, a wiersz, który to mówi, należy do \code{bf16}: dzieli
+budżet wykładnika \code{fp32} dokładnie, a jego podłoga leży
+$\val{p02.floor.gap}$ wyniku \emph{powyżej} podłogi \code{fp32}.
+
+Każdy wpis w tamtej kolumnie to logarytm najmniejszej liczby
+\emph{subnormalnej} formatu, a głębokość liczby subnormalnej kupuje się bitami
+mantysy. \code{fp32} ma ich o $\val{p02.floor.bits}$ więcej niż \code{bf16}, co
+kupuje o $\val{p02.floor.bits}$ więcej zakresów subnormalnych \dash{}
+$\val{p02.floor.bits} \ln 2$, czyli właśnie te $\val{p02.floor.gap}$.
+
+\textbf{Budżet wykładnika ustala sufit; mantysa przedłuża podłogę.}
 \end{fr}
 
 \mermaidfig{p02-two-cliffs}{Dwa sposoby, na jakie liczba opuszcza format, i co
@@ -471,9 +483,12 @@ największy składnik, który trzeba utworzyć.}{wybór elementu}
 To ostatnie zdanie warte jest pomiaru, bo wyjaśnia, czemu ten wybór tak łatwo
 uchodzi na sucho.
 
-Weź wiersz $\val{p02.pivot.total}$ wyników i wyciągaj kolejno każdy z nich, w
-\code{fp16}. Ile z $\val{p02.pivot.total}$ możliwości utrzymuje każdy składnik
-wewnątrz formatu?
+Oto wiersz $\val{p02.pivot.total}$ wyników:
+\[ \val{p02.pivot.s1}, \quad \val{p02.pivot.s2}, \quad
+   \val{p02.pivot.s3}, \quad \val{p02.pivot.s4}, \quad \val{p02.pivot.s5} \]
+
+Wyciągaj kolejno każdy z nich, w \code{fp16}. Ile z
+$\val{p02.pivot.total}$ możliwości utrzymuje każdy składnik wewnątrz formatu?
 \nextframe
 \end{fr}
 
@@ -612,10 +627,12 @@ entropia krzyżowa potrzebuje i $\ln p$, i $\ln(1 - p)$, a w tym punkcie
 $1 - p$ jest dokładnym zerem, więc $\ln(1 - p)$ wynosi
 \code{-inf}.
 
-Pewna \emph{poprawna} predykcja daje więc to samo \code{-inf} co
-pewna błędna, a strata staje się \code{nan} na przykładzie, który model
-odgadł dobrze. To jest ta awaria, która wysyła ludzi na poszukiwanie błędu w
-danych.
+I to nie koniec, bo nieskończoność w stracie daje \code{inf}, a nie
+\code{nan}. Cel dla pewnej poprawnej predykcji to $y = 1$, więc strata tworzy
+$(1 - y)\ln(1 - p) = 0 \times (-\infty)$, a \emph{to} jest \code{nan}. Pewny
+\emph{błędny} przykład jedynie rozbiega się do \code{inf}; to ten
+\emph{poprawny} zatruwa partię, i to jest ta awaria, która wysyła ludzi na
+poszukiwanie błędu w danych.
 
 \textbf{Oba końce usuwa ten sam ruch}: zachowaj logit i pozwól funkcji straty
 wykonać złożenie. Biblioteka dostarcza jedną funkcję właśnie dlatego, że nie ma
@@ -722,7 +739,7 @@ wyrzucane. Co trzeba by trzymać obok sumy, żeby przestać je wyrzucać?
 
 \begin{fr}
 \ans{Tę część ostatniego dodawania, która przepadła: jedną dodatkową zmienną,
-dodawaną z powrotem do następnego składnika przed jego użyciem.}
+wciąganą do następnego składnika przed jego użyciem.}
 
 Druga pozycja atakuje dryf wprost. \emph{Sumowanie z kompensacją} \dash{}
 Kahana \dash{} trzyma dokładnie taką zmienną:
@@ -733,9 +750,10 @@ Kahana \dash{} trzyma dokładnie taką zmienną:
   s &= t
 \end{align*}
 Przeczytaj trzecią linijkę. $t - s$ to tyle, o ile dodawanie \emph{naprawdę}
-ruszyło sumę, a $y$ to tyle, o ile miało ją ruszyć; różnica jest dokładnie tym,
-co zostało zaokrąglone, i odzyskuje się ją odejmowaniem dwóch prawie równych
-liczb.
+ruszyło sumę, a $y$ to tyle, o ile miało ją ruszyć. Zatem $c$ trzyma dokładnie
+to, co zostało zaokrąglone, \emph{z przeciwnym znakiem} \dash{} i dlatego
+pierwsza linijka je odejmuje, a nie dodaje \dash{} a odzyskuje się je
+odejmowaniem dwóch prawie równych liczb.
 
 \textbf{Skracanie jest tu mechanizmem, użytym celowo.} Ta sama operacja, która
 zniszczyła wariancję w \S\ref{sec:P02-correct}, jest tutaj jedyną, która w
@@ -777,7 +795,8 @@ wartości. Zanim to zrobi: która z czterech wypadnie twoim zdaniem najgorzej?
 \ans{Sortowanie \dash{} najtańsza z czterech i ta, którą najczęściej opisuje
 się jako wystarczającą.}
 
-Wszystkie pięć, na tym samym milionie wartości:
+Cztery poprawki i naiwna pętla, którą zastępują, na tym samym milionie
+wartości:
 
 \begin{center}
 \begin{tabular}{lrr}
@@ -854,7 +873,7 @@ następne pytanie \dash{} nie czy jest poprawna, ale ile kosztuje.
   $\val{p02.var.true}$. Algebrze nie można nic zarzucić, a wynik nie jest
   wariancją}.}
 \sumitem{4--6}{\result{\textbf{Katastrofalne skracanie} jest mechanizmem: obie
-  wielkości zgadzają się na $\val{p02.var.shared}$ cyfrach znaczących, podczas
+  wielkości dzielą swoich pierwszych $\val{p02.var.shared}$ cyfr, podczas
   gdy format trzyma siedem, więc odejmowanie skraca każdą wspólną cyfrę i
   oddaje zaokrąglenie. Odejmowanie jest dokładne; strata nastąpiła przy
   zaokrąglaniu argumentów. Szukaj różnicy prawie równych wielkości i pytaj,
@@ -866,7 +885,7 @@ następne pytanie \dash{} nie czy jest poprawna, ale ile kosztuje.
   ten kształt: usuń niszczącą operację, nie czyń jej dokładniejszą}.}
 \sumitem{9--10}{\result{Wzmocnienie wynosi $\frac{|a| + |b|}{|a - b|}$ i jest
   własnością \emph{zadania}. Jego ogólną postacią jest wskaźnik uwarunkowania,
-  który należy do Programu~\ref{prog:P10}, bo jest stwierdzeniem o macierzy}.}
+  który należy do Programu~\ref{prog:P11}, bo jest stwierdzeniem o macierzy}.}
 \sumitem{11--13}{\result{Na $\val{p02.layers}$ warstwach najgorszy przypadek
   \code{fp16} to $\val{p02.grow.fp16}$\%, a \code{bf16} to
   $\val{p02.grow.bf16}$\% \dash{} ale \textbf{ograniczenie nie jest
@@ -876,8 +895,10 @@ następne pytanie \dash{} nie czy jest poprawna, ale ile kosztuje.
 \sumitem{14--16}{\result{\textbf{Eksponenta opuszcza format przy logarytmie jego
   sufitu}, czyli przy $\val{p02.over.fp16}$ dla \code{fp16} \dash{} więc wynik
   $\val{p02.over.fp16.int}$ się przepełnia, a to zwyczajny logit uwagi.
-  \code{bf16} i \code{fp32} dzielą ten wiersz przy $\val{p02.over.fp32}$, bo
-  zakres to sam budżet wykładnika}.}
+  \code{bf16} i \code{fp32} dzielą wiersz \emph{u góry}, przy
+  $\val{p02.over.fp32}$, bo sufit to sam budżet wykładnika; dołu nie dzielą, bo
+  głębokość liczby subnormalnej kupuje się bitami mantysy, a \code{fp32} ma ich
+  o $\val{p02.floor.bits}$ więcej}.}
 \sumitem{17--20}{\result{$\ln\sum_i e^{z_i} = c + \ln\sum_i e^{z_i - c}$ zachodzi dla
   \emph{każdego} $c$, więc tożsamość nie wymusza wyboru. \textbf{Maksimum jest
   jedynym $c$ ograniczającym każdy wykładnik do zera lub poniżej}, a więc
@@ -898,8 +919,8 @@ następne pytanie \dash{} nie czy jest poprawna, ale ile kosztuje.
   gdzie $\sigma$ wpadła w niedomiar; jako jedna operacja zwraca
   $\val{p02.logsig.stable}$. \textbf{Górny koniec też zawodzi}: $\sigma$ jest
   dokładnym $\num{1.0}$ od $\val{p02.logsig.saturates}$, więc $\ln(1-p)$ to
-  \code{-inf}, a pewna \emph{poprawna} predykcja produkuje
-  \code{nan}}.}
+  \code{-inf} \dash{} a że cel mnoży ten składnik przez zero, strata jest
+  \code{nan}-em na predykcji, która była \emph{poprawna}}.}
 \sumitem{27--28}{\result{Przejście w przód kończy się na logitach, a strata wykonuje
   złożenie. Sygnałem w diffie jest softmax albo sigmoida bezpośrednio przed
   logarytmem. Czym prawdopodobieństwo \emph{jest} i czemu entropia krzyżowa

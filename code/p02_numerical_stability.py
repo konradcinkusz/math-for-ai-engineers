@@ -136,6 +136,32 @@ for _name, (_e, _m) in FORMATS.items():
     if _name == "fp16":
         emit(f"p02.drop.{_name}", -math.log(smallest_subnormal(_e, _m)), 1)
 
+# THE SECOND COLUMN IS NOT THE EXPONENT BUDGET'S, AND THE DRAFT SAID IT WAS.
+# "The significand does not appear anywhere in it" is false of every entry in
+# the under-cliff column: each is the logarithm of a format's smallest
+# SUBNORMAL, and a subnormal's depth is bought with significand bits. bf16 and
+# fp32 share an exponent budget and differ by 16 of them, so their floors
+# differ by exactly 16 ln 2 -- which is why one row reads -103.3 and the other
+# -92.2 while both ceilings read 88.7.
+_bits = FORMATS["fp32"][1] - FORMATS["bf16"][1]
+_gap = _bits * math.log(2)
+emit("p02.floor.bits", _bits)
+emit("p02.floor.gap", f"{_gap:.2f}")
+assert FORMATS["fp32"][0] == FORMATS["bf16"][0], (
+    "fp32 and bf16 no longer share an exponent budget, which is the frame's premise")
+assert abs(math.log(largest(*FORMATS["fp32"])) - math.log(largest(*FORMATS["bf16"]))) < 0.01, (
+    "the two ceilings have come apart, so 'they overflow at the same score' is "
+    "no longer the answer the frame gives")
+# The gap has to reproduce from the two numbers the TABLE prints, not merely
+# from the formula -- a reader subtracts what is on the page.
+_printed_gap = (float(f"{math.log(smallest_subnormal(*FORMATS['bf16'])):.1f}")
+                - float(f"{math.log(smallest_subnormal(*FORMATS['fp32'])):.1f}"))
+assert abs(_printed_gap - float(f"{_gap:.2f}")) < 0.05, (
+    f"the printed floors differ by {_printed_gap} where the page says {_gap:.2f}")
+NOTES.append(
+    f"fp32 and bf16 share a ceiling and their floors differ by {_bits} ln 2 "
+    f"= {_gap:.2f}, which is the significand appearing in the second column")
+
 # The smallest term that survives a max-subtracted softmax, as a fraction of
 # the largest. The draft said "less than one part in 10^5", which is true and
 # is two orders of magnitude weaker than the truth.
@@ -199,6 +225,16 @@ for pivot in SCORES:
         _survived.append(pivot)
     except OverflowError:
         _failed.append(pivot)
+# THE ROW ITSELF, PRINTED. The frame asked the reader to pivot on each of five
+# scores in turn and the five were never on the page -- they lived here, so
+# the elicitation could not be attempted and the three numbers quoted off the
+# row (the count, the worst term, the log-sum-exp) could not be checked. Five
+# numbers cost one line.
+for _i, _s in enumerate(SCORES, 1):
+    emit(f"p02.pivot.s{_i}", f"{_s:.0f}")
+assert all(_s == int(_s) for _s in SCORES), (
+    "the scores are no longer whole numbers, so printing them at zero decimals "
+    "would show the reader something other than what is pivoted on")
 emit("p02.pivot.total", len(SCORES))
 emit("p02.pivot.safe", len(_survived))
 
@@ -298,11 +334,56 @@ NOTES.append(f"one-pass variance in fp32: {NAIVE_VAR}; Welford: {WELFORD_VAR}; t
 # many significant figures they share. That is what "catastrophic" names.
 _ex2 = sum(x * x for x in READINGS) / N
 _ex_2 = (sum(READINGS) / N) ** 2
-emit("p02.var.ex2", f"{_ex2:.6e}")
-emit("p02.var.exsq", f"{_ex_2:.6e}")
-_shared = -math.log10(abs(_ex2 - _ex_2) / _ex2)
-emit("p02.var.shared", round(_shared))
-assert round(_shared) > 7, "the two quantities no longer agree to more than fp32 can hold"
+
+# BOTH ARE EXACT INTEGERS, AND THE PAGE HAS TO PRINT THEM AS SUCH. The draft
+# emitted them as `.6e`, which gives 9.001200e+08 for BOTH -- so the display
+# showed two identical strings and then said they agreed to nine significant
+# figures, in a frame whose whole subject is counting those figures against
+# the format's seven. A reader could see no agreement at all, because there
+# was no visible difference to agree about.
+assert _ex2 == int(_ex2) and _ex_2 == int(_ex_2), (
+    "the two quantities are no longer exact integers, so printing them in full "
+    "is no longer safe")
+emit("p02.var.ex2", f"{int(_ex2)}")
+emit("p02.var.exsq", f"{int(_ex_2)}")
+
+# AND THE COUNT IS OF SHARED LEADING DIGITS, NOT OF A LOGARITHM. The draft took
+# -log10 of the relative difference, which gives 8.65 and rounds to 9 -- and at
+# nine significant figures the two DIFFER, which is the one reading this frame
+# cannot afford to get wrong. Counted as digits it is eight, and eight is what
+# the sentence needs: they share eight, the format holds about seven, so every
+# digit fp32 can see is one they agree on.
+_a, _b = str(int(_ex2)), str(int(_ex_2))
+assert len(_a) == len(_b), "the two quantities no longer have the same number of digits"
+_shared = sum(1 for _i in range(len(_a)) if _a[:_i + 1] == _b[:_i + 1])
+emit("p02.var.shared", _shared)
+assert _a[:_shared] == _b[:_shared] and _a[_shared] != _b[_shared], (
+    "the shared-digit count is no longer the length of the common prefix")
+
+# Gated against Program P01's own figure for how many decimal digits fp32
+# resolves: the sentence is that the shared digits OUTNUMBER what the format
+# can hold, so if either number moves the claim has to be re-read.
+_p01_digits = committed("p01.tex", "p01.fp32.digits")
+if _p01_digits is None:                                          # pragma: no cover
+    NOTES.append("p01.tex absent: the shared-digit claim was NOT checked against P01")
+else:
+    assert _shared > int(_p01_digits), (
+        f"the two quantities share {_shared} digits where P01 gives fp32 "
+        f"{_p01_digits}: the cancellation argument no longer holds")
+    NOTES.append(
+        f"the two quantities share {_shared} leading digits where P01 gives "
+        f"fp32 about {_p01_digits}")
+# THE AMPLIFICATION IS A SECOND QUANTITY AND WAS PRINTED WITH THE FIRST ONE'S
+# VALUE. The frame that names (|a| + |b|) / |a - b| said it is "of the order of
+# 10^shared" -- which happened to read correctly only because the old shared
+# count was 9 and the order really is 9. They are different quantities that
+# coincided at one digit, which is this book's two-numbers-that-look-like-one
+# defect from the other side: correct the first and the second goes wrong
+# silently. It gets its own key and its own assertion.
+_amp = (abs(_ex2) + abs(_ex_2)) / abs(_ex2 - _ex_2)
+emit("p02.var.amp.exp", round(math.log10(_amp)))
+assert 10 ** (round(math.log10(_amp)) - 1) < _amp < 10 ** (round(math.log10(_amp)) + 1), (
+    "the amplification is no longer of the order the page prints")
 
 # It is exactly ONE gap at the magnitude of the quantities being subtracted,
 # not "a multiple of the gap" as the draft said -- and one gap is the smallest
@@ -471,10 +552,27 @@ else:
 # accumulate like the square root of the count rather than the count.
 # ==========================================================================
 LAYERS = 96
+#
+# THE TWO COLUMNS MUST BE PRINTED AT THE SAME PRECISION, and the draft did not
+# do it: the bound at two decimals and the estimate at four. The fp32 row then
+# read 0.00% against 0.0001%, which says the thing you cannot exceed is zero
+# and the thing to expect is a ten-thousandth of a per cent -- the reverse of
+# the sentence under the table, and it hid the row's teaching point, which is
+# that the ratio between the columns is about the square root of the depth.
+# Four decimals throughout; fp64 then reads 0.0000% in both columns, which is
+# honest.
 for _name, (_e, _m) in FORMATS.items():
     _eps = 2.0 ** -_m
-    emit(f"p02.grow.{_name}", f"{((1 + _eps) ** LAYERS - 1) * 100:.2f}")
-    emit(f"p02.walk.{_name}", f"{_eps * math.sqrt(LAYERS) * 100:.4f}")
+    _bound = ((1 + _eps) ** LAYERS - 1) * 100
+    _rand = _eps * math.sqrt(LAYERS) * 100
+    emit(f"p02.grow.{_name}", f"{_bound:.4f}")
+    emit(f"p02.walk.{_name}", f"{_rand:.4f}")
+    # The guard for the defect itself, on the PRINTED forms rather than on the
+    # floats: whatever the precision, a bound may never print below the
+    # estimate it bounds.
+    assert float(f"{_bound:.4f}") >= float(f"{_rand:.4f}"), (
+        f"{_name}'s printed bound {_bound:.4f} is below its printed estimate "
+        f"{_rand:.4f}, which is the precision defect this line exists to stop")
 emit("p02.layers", LAYERS)
 assert (1 + 2.0 ** -10) ** LAYERS - 1 > 0.09, "fp16's worst case over 96 layers moved"
 _bound = (1 + 2.0 ** -10) ** LAYERS - 1

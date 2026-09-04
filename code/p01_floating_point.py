@@ -61,6 +61,7 @@ import struct
 from pathlib import Path
 
 VALUES: dict[str, tuple[str, bool]] = {}
+NOTES: list[str] = []
 
 
 def emit(key: str, value, digits: int | None = None) -> None:
@@ -309,6 +310,76 @@ for _tag, _x in (("one", 1.0), ("billion", 1e9)):
     assert _x + _half * 0.9 == _x, f"a value below half a gap now moves the total at {_x}"
     assert _x + _half * 1.1 != _x, f"a value above half a gap no longer moves the total at {_x}"
 
+
+# ==========================================================================
+# HALF AN EPSILON OF THE TOTAL IS A RULE OF THUMB, NOT THE ANSWER.
+#
+# Further problem 3 asks for the smallest contribution that can still move a
+# bf16 total of 100, and its answer said "half an epsilon of the total, so
+# roughly 0.4". That is the rule the section above teaches and it is not what
+# the format does: the threshold is half the gap AT THAT MAGNITUDE, and 100
+# sits in the binade [64, 128) where bf16's gap is 0.5. So the answer is 0.25,
+# and the rule of thumb is 56 per cent too large.
+#
+# The rule of thumb is an upper bound rather than a wrong guess -- half an
+# epsilon of the total is half the gap at the top of the binade -- and the
+# error is largest exactly at the bottom of one, which is where 100 sits. That
+# is the section's own slogan (precision is a property of a format AND a
+# magnitude) biting the exercise that quotes it.
+def to_bf16(x: float) -> float:
+    """Round a Python float to bfloat16, to nearest, ties to even."""
+    bits = struct.unpack("<I", struct.pack("<f", x))[0]
+    lsb = (bits >> 16) & 1
+    return struct.unpack("<f", struct.pack("<I", (bits + 0x7FFF + lsb) & 0xFFFF0000))[0]
+
+
+BF16_TOTAL = 100.0
+_lo = 2.0 ** math.floor(math.log2(BF16_TOTAL))
+_gap = _lo * epsilon(FORMATS["bf16"][1])
+emit("p01.bf16.binade.lo", f"{_lo:.0f}")
+emit("p01.bf16.binade.hi", f"{2 * _lo:.0f}")
+emit("p01.bf16.total", f"{BF16_TOTAL:.0f}")
+emit("p01.bf16.total.gap", f"{_gap:.2f}")
+emit("p01.bf16.total.half", f"{_gap / 2:.2f}")
+emit("p01.bf16.total.thumb",
+     f"{0.5 * epsilon(FORMATS['bf16'][1]) * BF16_TOTAL:.2f}")
+
+assert to_bf16(BF16_TOTAL) == BF16_TOTAL, "100 is no longer exact in bf16"
+# EXACTLY half the gap is a tie, and 100 is the even neighbour, so it does NOT
+# move -- which is why the answer says "anything above" rather than "0.25 or
+# more". Both halves are checked, because the boundary is the whole point.
+assert to_bf16(BF16_TOTAL + _gap / 2) == BF16_TOTAL, (
+    "half the gap is no longer a tie that rounds back to the total")
+assert to_bf16(BF16_TOTAL + _gap / 2 * 1.001) > BF16_TOTAL, (
+    "a contribution just above half the gap no longer moves the total")
+# And the rule of thumb, applied to this total, is comfortably above it -- so a
+# reader following the answer as it stood would believe 0.3 was swallowed.
+_thumb = 0.5 * epsilon(FORMATS["bf16"][1]) * BF16_TOTAL
+assert _thumb > _gap / 2, "half an epsilon of the total is no longer the larger"
+assert to_bf16(BF16_TOTAL + 0.3) > BF16_TOTAL, (
+    "0.3 no longer moves a bf16 total of 100, which is what the old answer claimed")
+NOTES.append(
+    f"a bf16 total of {BF16_TOTAL:.0f} moves on anything above {_gap / 2}, "
+    f"against the rule of thumb's {_thumb:.2f}")
+
+# Further problem 4 said a conversion between bf16 and fp32 can neither
+# overflow nor underflow "because the representable range is the same". The
+# NORMAL ranges match -- that is the shared exponent budget -- and the
+# SUBNORMAL ranges do not, because a subnormal's depth is bought with
+# significand bits. fp32 has 16 more of them, so its floor is 16 binades lower
+# and a down-cast can land on zero. The section on the two floors is two frames
+# earlier and says so; only the answer disagreed.
+_f32_sub = smallest_subnormal(*FORMATS["fp32"])
+_bf_sub = smallest_subnormal(*FORMATS["bf16"])
+assert smallest_normal(FORMATS["fp32"][0]) == smallest_normal(FORMATS["bf16"][0]), (
+    "the two formats no longer share a smallest normal, which is the exercise's premise")
+assert _f32_sub < _bf_sub, "fp32's subnormals no longer reach below bf16's"
+assert to_bf16(_bf_sub / 4) == 0.0, "a value well under bf16's floor no longer flushes to zero"
+assert to_bf16(_bf_sub) == _bf_sub, "bf16's own smallest subnormal no longer survives"
+NOTES.append(
+    f"an fp32 value of {_bf_sub / 4:.2e} converts to exactly 0.0 in bf16, "
+    f"so a down-cast CAN underflow")
+
 # An exact coincidence, and the frames say in as many words that it is one.
 # A billion falls in the binade starting at 2^29, and 29 is exactly the
 # difference between the two significand budgets (52 - 23), so half the gap at
@@ -365,7 +436,6 @@ def decimal_exponent(written: str) -> int:
     return int(exp) + (len(mant.split(".")[0].lstrip("-")) - 1)
 
 
-NOTES: list[str] = []
 _f03 = committed("f03.tex", "f03.seq.prod")
 if _f03 is None:                                             # pragma: no cover
     NOTES.append("f03.tex absent: F03's underflow claim was NOT checked")
@@ -425,6 +495,19 @@ for _name, (_e, _m) in FORMATS.items():
     k = -round(math.log2(smallest_subnormal(_e, _m)))
     assert 2.0 ** -k == smallest_subnormal(_e, _m), f"{_name}'s floor is not a power of 2"
     emit(f"p01.coin.{_name}", k + 1)
+
+# AND THE SAME COUNT UNDER FLUSH-TO-ZERO, which the frame two above says the
+# hardware often has in force. Then the floor is the smallest NORMAL, so every
+# row moves in and fp16 moves furthest -- it spends ten of its binades on
+# subnormals against fp64's fifty-two, which is a larger share of a much
+# shorter range. Only the fp16 figure is quoted; the ordering is asserted for
+# all four so the claim cannot quietly stop holding.
+for _name, (_e, _m) in FORMATS.items():
+    _ftz = -round(math.log2(smallest_normal(_e))) + 1
+    assert _ftz < -round(math.log2(smallest_subnormal(_e, _m))) + 1, (
+        f"{_name}'s flush-to-zero cliff is no longer the earlier of the two")
+    if _name == "fp16":
+        emit("p01.coin.ftz.fp16", _ftz)
 
 for _name, _key in (("fp64", "f03.half.f64.zero"), ("fp32", "f03.half.f32.zero")):
     _raw = committed("f03.tex", _key)
