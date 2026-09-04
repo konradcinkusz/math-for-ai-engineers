@@ -36,7 +36,7 @@
 
 \begin{outcomes}
 \outcome{1--6}{read $\cos$ and $\sin$ off a point going round a circle, work in
-  radians, and get the one identity this book needs straight from the picture}
+  radians, and read an identity off that picture instead of remembering it}
 \outcome{7--10}{sketch both curves from the circle, and say what their period,
   their range and their symmetry are without recalling any of them}
 \outcome{11--15}{apply Program~\ref{prog:F05}'s four moves to a wave, and say
@@ -237,11 +237,13 @@ fourteen hundred angles, with a worst disagreement of $\val{f08.pyth.err}$,
 which is as close to exactly $1$ as binary64 gets.
 
 \begin{note}
-This is the only trigonometric identity this book uses, and it is here because
-it falls out of the picture. There is no sine rule here, no cosine rule, no
-solving of triangles and no list of formulas to learn \dash{} the book's scope
-statement excludes all of it, and nothing in the rest of the book needs it.
-What the rest of the book needs is the circle, and you now have it.
+There is no sine rule here, no cosine rule, no addition formulas, no solving
+of triangles and no list of formulas to learn \dash{} the book's scope
+statement excludes all of it, and nothing later needs any of it. What it keeps
+instead is the picture, and every identity this program does use is read off
+the circle rather than remembered: this one, the two symmetries in the next
+section, and the quarter-turn shift after them. You now have the circle, which
+is the part that generalises.
 \end{note}
 \end{fr}
 
@@ -281,14 +283,16 @@ $2\pi$ and $\intcc{-1}{1}$.
 
 And the same for $\cos$, for the same reason.
 
-Now the symmetry, which Program~\ref{prog:F05} gave you the words for. Walking
-backwards round the circle by $\theta$ puts the point at the mirror image, in
+Now the symmetry, which Program~\ref{prog:F05} gave you the first word for.
+Walking backwards round the circle by $\theta$ puts the point at the mirror
+image, in
 the horizontal axis, of where walking forwards puts it. So the across-value is
 unchanged and the up-value flips sign:
 \[ \cos(-\theta) = \cos\theta \qquad \sin(-\theta) = -\sin\theta \]
 
-$\cos$ is \emph{even} and $\sin$ is \emph{odd}, in exactly
-Program~\ref{prog:F05}'s sense, and again the picture is the proof.
+$\cos$ is \emph{even}, in exactly Program~\ref{prog:F05}'s sense. $\sin$ is
+\emph{odd}, which is the same idea with a sign on it \dash{} the mirror image
+comes back negated. Again the picture is the proof.
 
 The two curves look like the same shape moved. Write $\cos$ in terms of $\sin$.
 \nextframe
@@ -326,13 +330,18 @@ where the point starts.
 
 \begin{aibox}
 Sine and cosine both appear in a positional encoding, at alternating
-coordinates, and the reason is this frame: at position zero the sine
-coordinates read $0$ and the cosine coordinates read $1$, so the pattern at
-position zero is not all zeros and the encoding can distinguish it from a
-position that is genuinely absent.
+coordinates, and the reason is the one section 5 proves. Read the two together
+as a \emph{pair}: that pair is frame 1's point on the circle, at an angle the
+position sets. Moving $k$ places along the sequence turns the point through a
+fixed angle, and turning a point is a linear map.
 
-Using one function for every coordinate would give a first position encoded as
-a vector of zeros, which is the same thing a padded slot looks like.
+That is the motivation the original transformer's paper gives for choosing
+these functions \dash{} the encoding at one position is a fixed linear
+function of the encoding at any position a fixed distance away, so the model
+can learn to attend by relative position rather than learning every absolute
+position on its own. One function alone will not do it: a lone
+$\sin\theta$ coordinate is half of a point, and the shift needs the other
+half to be written down at all.
 \end{aibox}
 \end{fr}
 
@@ -397,7 +406,8 @@ $\val{f08.pe.last}$ at the slowest, with $\val{f08.pe.mid}$ in the middle.
 
 That spread is the design. A wave of wavelength $\val{f08.pe.first}$ tells
 neighbouring positions apart and says nothing about positions a thousand
-tokens away, because it has gone round hundreds of times in between. A wave of
+tokens away, because it has gone round well over a hundred times in between.
+A wave of
 wavelength $\val{f08.pe.last}$ has barely started moving over the whole
 sequence and so cannot distinguish neighbours, but it does distinguish the
 beginning from the end.
@@ -409,7 +419,7 @@ scale at once, which is what a single frequency could not.
 
 \begin{fr}
 One caution about frequency, because it is the mirror of the units trap and
-just as easy to acquire.
+every bit as easy to acquire.
 
 \textbf{A wavelength is a number of positions, not a number of radians.} The
 wave $\sin(B\theta)$ completes a cycle when $B\theta$ advances by $2\pi$, so
@@ -432,7 +442,10 @@ Here is the formula you have used and possibly never unpacked. For two
 vectors $a$ and $b$,
 \[ \cos\theta = \frac{a \cdot b}{\lVert a \rVert\, \lVert b \rVert} \]
 where $a \cdot b$ is Program~\ref{prog:F04}'s $\sum_i a_i b_i$ and
-$\lVert a \rVert$ is the length.
+$\lVert a \rVert$ is the length of $a$, which is $\sqrt{a \cdot a}$ \dash{}
+Pythagoras on the components, and this section's own circle equation with the
+radius left free. Program~\ref{prog:F09} does both properly; all this section
+needs is that the two lengths are positive numbers.
 
 \textbf{The $\theta$ on the left is an angle, and this is an equality, not an
 analogy.} Cosine similarity is not \emph{like} a cosine and it is not
@@ -570,6 +583,10 @@ not, because the angle is a relationship between the two rather than a
 property of either. That is obvious from the picture and it is the entire
 subject of section 5, where it turns out to be worth a great deal more than it
 looks.
+
+Reflecting both in a line through the origin would have done as well, and so
+would negating both. The rotation is the one the next section needs, because
+it is the one a position can be turned into.
 \end{fr}
 
 % ============================================================
@@ -619,16 +636,17 @@ their dot product?
 \ans{Nothing}
 Worst change $\val{f08.rot.same.err}$ over six hundred angles.
 
-And you can see why without any algebra, from the previous section. The dot
-product is
+And you can see why without any algebra, from the previous section.
+Rearranging the cosine-similarity formula gives
 \[ a \cdot b = \lVert a \rVert\, \lVert b \rVert \cos\theta \]
-by rearranging the cosine-similarity formula. A rotation leaves both lengths
+and a rotation leaves both lengths
 alone, and it leaves the angle between the two vectors alone because it turns
 them both by the same amount. All three ingredients survive, so the product
 does.
 
 Now the step that matters. Rotate $a$ by an angle $\alpha$ and $b$ by a
-\emph{different} angle $\beta$. What can their dot product depend on?
+\emph{different} angle $\beta$. Their dot product still depends on $a$ and on
+$b$. What can it depend on \emph{about the two angles}?
 \nextframe
 \end{fr}
 
@@ -665,9 +683,13 @@ $10$ the same two vectors score $\val{f08.rot.score.far}$.
 
 \begin{aibox}
 That is rotary position embedding, and \enquote{rotate the query and the key}
-is now a sentence rather than an incantation: it is the only way to put
-position into a dot product such that the answer depends on the difference of
-the positions and not on the positions themselves.
+is now a sentence rather than an incantation: it puts position into a dot
+product so that the answer depends on the difference of the positions and not
+on the positions themselves, and among the maps that turn the query and the
+key by an angle the position alone decides, it is the one this identity
+forces. It is not the only route to that property \dash{} a learned relative
+term inside the score, or a bias added to it that depends only on the gap,
+reach it another way \dash{} and this book compares none of them.
 
 Two consequences fall straight out of the identity and are worth having. A
 sequence shifted bodily along produces identical attention scores, because
@@ -717,8 +739,10 @@ putting position into a model that must not otherwise notice it.
   nothing warns, and the answer is an ordinary number}.}
 \sumitem{5--6}{\result{$\cos^{2}\theta + \sin^{2}\theta = 1$ is
   \textbf{the equation of the circle with the names substituted in}, so it
-  needs no proof and no memorising. Checked to $\val{f08.pyth.err}$. It is
-  the only trigonometric identity this book uses}.}
+  needs no proof and no memorising. Checked to $\val{f08.pyth.err}$. Every
+  identity in this program is read off that circle the same way, and the book
+  borrows none from outside it \dash{} no sine rule, no cosine rule, no
+  addition formulas}.}
 \sumitem{7--8}{\result{Both curves have period $2\pi$ and range $\intcc{-1}{1}$
   because the point returns to where it started and never leaves the circle.
   $\cos$ is even and $\sin$ is odd, which is walking backwards mirrored in the
@@ -765,7 +789,8 @@ putting position into a model that must not otherwise notice it.
 \sumitem{27--28}{\result{Rotating \emph{both} vectors by the same angle leaves the dot
   product alone, to $\val{f08.rot.same.err}$, because all three of its
   ingredients survive. So rotating them by \emph{different} angles $\alpha$
-  and $\beta$ leaves a dot product that can depend only on $\beta - \alpha$
+  and $\beta$ leaves a dot product that depends on the two angles only
+  through $\beta - \alpha$
   \dash{} checked to $\val{f08.rot.rel.err}$}.}
 \sumitem{29--30}{\result{\textbf{That identity is rotary position embedding.} Turn the
   query and the key each by an angle proportional to its position and the
@@ -836,7 +861,7 @@ putting position into a model that must not otherwise notice it.
   \answerto{Because a rotation preserves length. It moves points round circles
   centred on the origin, and every point of one circle is the same distance
   out.}
-\item Name the one trigonometric identity this program uses, and say where it
+\item Name the identity this program takes from the circle, and say where it
   comes from.
   \answerto{$\cos^{2}\theta + \sin^{2}\theta = 1$, which is the equation of
   the unit circle with $\cos$ and $\sin$ substituted for the coordinates.}

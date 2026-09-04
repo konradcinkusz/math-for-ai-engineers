@@ -62,7 +62,8 @@
   \answerto{Powtórzenia i kolejność.}
 \item Dwa zbiory mają $\val{f10.eval.a}$ i $\val{f10.eval.b}$ elementów. Ile
   jest w ich sumie? \teachesat{8--9}
-  \answerto{Nie da się powiedzieć bez części wspólnej. Tutaj jest ona równa
+  \answerto{Nie da się powiedzieć bez części wspólnej i to jest cała
+  odpowiedź. W przykładzie samego programu wychodzi ona
   $\val{f10.eval.shared}$, więc suma ma $\val{f10.eval.union}$, a nie
   $\val{f10.eval.naive}$.}
 \item Czym jest maska? \teachesatone{11}
@@ -210,13 +211,15 @@ $A \subseteq B$ & wszystko z $A$ jest też w $B$ \\
 Ostatnie warto na chwilę zatrzymać. $A \subseteq B$ nie mówi nic o tym, czy $B$
 ma coś, czego $A$ nie ma, więc każdy zbiór jest swoim własnym podzbiorem.
 
-Jak myślisz, ile z $\val{f10.lines}$ wierszy powyższego korpusu jest różnych?
+Powyższy korpus ma $\val{f10.lines}$ wierszy i $\val{f10.distinct.lines}$
+różnych. Która z tych dwóch liczb jest rozmiarem zbioru?
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{$\val{f10.distinct.lines}$}
-Więc te same trzy pytania stosują się na każdym poziomie.
+\ans{$\val{f10.distinct.lines}$, liczba różnych}
+Ta druga to liczba wystąpień, a te same trzy pytania stosują się na każdym
+poziomie.
 \enquote{Ile wierszy logu widzieliśmy} i \enquote{ile jest rodzajów wiersza
 logu} to znów liczba wystąpień i rozmiar zbioru, a ta druga mówi ci, ile
 różnych rzeczy twój system robi.
@@ -227,7 +230,7 @@ Jeszcze jedno słowo przed działaniami.
 
 Dwa zbiory są \textbf{rozłączne}, gdy nic nie należy do obu. To zasługuje na
 nazwę, bo jest szczególnym przypadkiem, w którym prawie wszystko w zliczaniu
-robi się łatwiejsze, i na tym obraca się sekcja 3.
+robi się łatwiejsze, i na tym obraca się reguła sumy z następnej sekcji.
 \end{fr}
 
 % ============================================================
@@ -407,8 +410,7 @@ Wypisane są cztery przypadki i w żadnym nie ma subtelności.
 
 Subtelność siedzi w całości w \emph{lub} i jest faktem o języku, a nie o
 logice. \enquote{Herbata lub kawa} w zdaniu znaczy zwykle jedno albo drugie i
-nie oba naraz. \enquote{$p$ lub $q$} w logice i w każdym języku programowania,
-którego użyjesz, znaczy \textbf{przynajmniej jedno, być może oba}.
+nie oba naraz.
 
 Filtr zatrzymuje wiersze, gdzie \code{is\_long or is\_flagged}. Wiersz jest i
 długi, i oznaczony. Czy zostaje zatrzymany?
@@ -417,10 +419,11 @@ długi, i oznaczony. Czy zostaje zatrzymany?
 
 \begin{fr}
 \ans{Tak}
-Bo \emph{lub} prosi o przynajmniej jedno, a ten wiersz ma dwa. Chcieć
-dokładnie jednego to inne działanie \dash{} \emph{alternatywa wykluczająca}
-\dash{} a trzy słowa z tej sekcji go nie mają, więc trzeba je z nich
-zbudować.
+\enquote{$p$ lub $q$} w logice i w każdym języku programowania, którego
+użyjesz, znaczy \textbf{przynajmniej jedno, być może oba}, a ten wiersz ma
+dwa. Chcieć dokładnie jednego to inne działanie \dash{} \emph{alternatywa
+wykluczająca} \dash{} a trzy słowa z tej sekcji go nie mają, więc trzeba je z
+nich zbudować.
 
 Ta niejednoznaczność warta jest jeszcze jednego zdania, bo to w niej
 specyfikacja rozstaje się ze swoją implementacją. Wymaganie napisane po polsku
@@ -553,17 +556,22 @@ działaniu. \emph{Niezależne} znaczy, że każdy wybór pierwszego zostawia te 
 możliwości dla drugiego. Opuść to, a
 mnożenie jest błędne.
 
-Załóż, że jeden z modeli nie działa w najniższej precyzji. Czy odpowiedzią
-nadal jest $\val{f10.grid}$?
+Załóż, że jeden z modeli nie działa w najniższej precyzji. Ile przebiegów
+liczy teraz siatka?
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{Nie}
-Jest o jeden mniej, bo ta kombinacja nie istnieje: wybory przestały być
-niezależne, skoro to, który model weźmiesz, zmienia to, które precyzje stoją
-przed tobą otworem. To cała treść tego warunku i dlatego przeszukiwania siatki
-po konfiguracji z ograniczeniami nie da się wymierzyć mnożeniem.
+\ans{$\val{f10.grid.less.one}$}
+Nie $59$, choć właśnie do tej liczby prowadzi odruch. Ograniczenie usuwa nie
+przebieg, lecz \emph{parę}: tego modelu w tej precyzji nie ma przy żadnym z
+$\val{f10.grid.c}$ rozmiarów wsadu, więc odchodzi z nim $\val{f10.grid.c}$
+przebiegów. Wybory przestały być niezależne, skoro to, który model weźmiesz,
+zmienia to, które precyzje stoją przed tobą otworem \dash{} a to, co nazywa
+ograniczenie, nie jest tym, co liczysz.
+
+To cała treść tego warunku i dlatego przeszukiwania siatki po konfiguracji z
+ograniczeniami nie da się wymierzyć mnożeniem.
 
 Zauważ, gdzie takie ograniczenie zwykle mieszka. Rzadko jest zapisane obok
 siatki; jest wymuszane gdzieś dalej, jako błąd walidacji albo wywrotka, więc
@@ -638,8 +646,8 @@ raz z każdego końca, więc podziel przez dwa.
 \[ \text{pary} = \frac{n(n-1)}{2} \]
 
 Krok \enquote{podziel przez dwa, bo kolejność nie ma znaczenia} jest faktem o
-zbiorach: $\{a, b\}$ i $\{b, a\}$ to jedna para, bo zbiór odrzuca kolejność,
-czyli drugie zdanie sekcji 1 uprawiające arytmetykę.
+zbiorach: $\{a, b\}$ i $\{b, a\}$ to jedna para, bo zbiór odrzuca kolejność.
+To drugie z dwóch odrzuceń z sekcji 1, uprawiające arytmetykę.
 
 \mermaidfig{f10-three-growths}{Trzy sposoby, na jakie liczba rośnie, a każdy to
 reguła iloczynu z innym niezależnym wyborem w środku.}{pomnóż, podwój,
@@ -715,7 +723,7 @@ zawiodły.
 \end{fr}
 
 \begin{fr}
-\ans{$\frac{\val{f10.faults}}{\val{f10.docs}}$}
+\ans{$\dfrac{\val{f10.faults}}{\val{f10.docs}}$}
 Liczba u góry i liczba na dole. \textbf{Każde naiwne prawdopodobieństwo to dwie
 liczebności i dzielenie}, a zliczanie jest tą częścią, o której ten program
 był.
@@ -807,7 +815,8 @@ myśli.
 \sumitem{23--24}{\result{\textbf{Niezależne wybory się mnożą}, a \emph{niezależne} to
   warunek do powiedzenia, a nie do założenia: $\val{f10.grid.a}$ modeli razy
   $\val{f10.grid.b}$ precyzji razy $\val{f10.grid.c}$ rozmiarów wsadu to
-  $\val{f10.grid}$ przebiegów, a jedna zabroniona kombinacja czyni to błędnym}.}
+  $\val{f10.grid}$ przebiegów, a jedna zabroniona para modelu i precyzji
+  zabiera $\val{f10.grid.c}$ z nich ze sobą}.}
 \sumitem{25--28}{\result{\textbf{Zbiór $n$-elementowy ma $2^{n}$ podzbiorów}, jedno
   tak-lub-nie na element: $\val{f10.features}$ cech daje $\val{f10.subsets}$, a
   jedna cecha więcej to podwaja. Zapisz liczbę przed napisaniem pętli \dash{}
@@ -875,9 +884,9 @@ myśli.
   \answerto{$1225$, z $\frac{50 \times 49}{2}$.}
 \item Zadanie po wszystkich parach na $\num{5000}$ dokumentach trwa godzinę. Ile
   mniej więcej na $\num{10000}$?
-  \answerto{Około czterech godzin \dash{} odrobinę ponad, tym samym czynnikiem
-  co $\val{f10.pairs.ratio}$. Dwa razy większe wejście to cztery razy więcej
-  par.}
+  \answerto{Około czterech godzin \dash{} odrobinę ponad, czynnikiem
+  $\val{f10.t13.ratio}$ w tym przypadku. Dwa razy większe wejście to cztery
+  razy więcej par, a ta odrobina maleje wraz ze wzrostem korpusu.}
 \item Z $\num{20000}$ żądań $\num{140}$ dało błąd. Podaj ułamek i wskaż jeden
   inny mianownik, którego ktoś mógłby rozsądnie użyć.
   \answerto{$\frac{140}{20000}$, czyli $\num{0.007}$. Sesje, użytkownicy albo
@@ -917,11 +926,14 @@ myśli.
   Nazywa się to \emph{alternatywą wykluczającą} i większość języków ma na to
   operator, ale nie jest to jedno z trzech słów tej sekcji, więc z nich trzeba
   to zbudować.}
-\item Przeszukiwanie siatki ma $4$ modele, $3$ precyzje i $5$ rozmiarów wsadu,
-  ale dwie konkretne pary model-precyzja nie są wspierane. Ile przebiegów?
-  \answerto{$50$: pełna siatka to $60$, a każda niewspierana para usuwa $5$
-  rozmiarów wsadu pod sobą. Reguła iloczynu nie stosuje się do całej siatki,
-  gdy wybory przestają być niezależne, więc policz wykluczenia i odejmij.}
+\item Przeszukiwanie siatki ma $\val{f10.grid.a}$ modele, $\val{f10.grid.b}$
+  precyzje i $\val{f10.grid.c}$ rozmiarów wsadu \dash{} tę samą siatkę, którą
+  ten program wymierzył \dash{} ale teraz dwie konkretne pary model-precyzja
+  nie są wspierane. Ile przebiegów?
+  \answerto{$\val{f10.grid.less.two}$: pełna siatka to $\val{f10.grid}$, a
+  każda niewspierana para usuwa $\val{f10.grid.c}$ rozmiarów wsadu pod sobą.
+  Reguła iloczynu nie stosuje się do całej siatki, gdy wybory przestają być
+  niezależne, więc policz wykluczenia i odejmij.}
 \item Ktoś proponuje ocenić każdy podzbiór $30$ cech, żeby znaleźć najlepszą
   kombinację, po sekundzie na podzbiór. Powiedz, ile to potrwa i co
   zaproponować zamiast tego.

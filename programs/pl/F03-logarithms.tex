@@ -917,6 +917,12 @@ poświęconej $\logsumexp$.
 Weź model, który wybiera między dwiema możliwościami i nie radzi sobie lepiej
 niż moneta, czyli $p = \num{0.5}$ przy każdym tokenie.
 
+Moneta jest najgorszym, czym model może uczciwie być, więc to, co wyjdzie, jest
+sufitem, a nie skargą na jeden zły model: każdy model wart serwowania przypisuje
+więcej niż $\num{0.5}$ tokenowi, który faktycznie widzi, a większy czynnik na
+token przeżywa dłużej. Liczba, którą zaraz policzysz, jest więc najkrótszą
+sekwencją, na jakiej ta arytmetyka może zawieść, a nie najdłuższą.
+
 Przy jakiej długości bieżący iloczyn staje się dokładnie zerem w float32, a
 przy jakiej w float64? Skorzystaj z dwóch najmniejszych liczb subnormalnych z
 poprzednich ramek i zauważ na starcie, że $\val{f03.f32.sub}$ to dokładnie

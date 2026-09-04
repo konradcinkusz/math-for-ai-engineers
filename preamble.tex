@@ -2219,13 +2219,74 @@
 % kept as well -- tools/check_structure.py fails on a \transcript naming a
 % file that is not there, before the build rather than after it, because on a
 % tree where `make numbers` has run the marker means a typo and nothing else.
+%
+% AND THE LISTING IS MEASURED BEFORE IT IS PLACED, because a transcript is a
+% SHAPE and a split one is not. Program F11's seventeen-row sweep of h is the
+% clearest case: the error falls, bottoms out at 1e-08 and climbs back, and the
+% whole argument is that curve. Measured on the four builds:
+%
+%     main-en      whole
+%     main-pl      whole
+%     main-en-a4   SPLIT after 1e-08, which is the bottom of the U itself
+%     main-pl-a4   SPLIT after 1e-09
+%
+% Two of four, and the two splits in different places -- so a wording that
+% keeps main-en-a4 whole re-rolls main-pl-a4, and CI's metrics paginate
+% differently again. That is this file's unwinnable loop, the one the orphaned
+% cue is treated for. And it is not hypothetical here: the prose corrections in
+% the same pass MOVED main-en-a4's split from after 1e-04 to after 1e-08
+% without clearing it, from an edit that was not aimed at it.
+%
+% What is different, and what makes a structural fix available where it is not
+% available for the cue: the defect is not knife-edge. An orphaned cue is one
+% line landing a line past a boundary, so where it lands is a property of the
+% installation. A listing is a box of KNOWN HEIGHT: it either fits in the room
+% left or it does not, and both quantities are things TeX will tell you.
+%
+% So the listing goes into a box and the page is turned when the box will not
+% fit -- the mechanism \begin{fr} and \section already use, with \pagegoal's
+% \maxdimen (a fresh page, meaning unlimited room, not none) excluded as they
+% exclude it. The second guard is the one that matters: a listing TALLER than
+% the text block prints where it stands and is allowed to break, because
+% turning the page for it would waste a leaf and split it anyway. Asked of TeX
+% rather than reasoned about, the tallest transcript in the book -- F11's own
+% eighteen lines -- boxes to 94.24 + 88.76 pt against a 541.40 pt block, so it
+% is a third of a page and nothing reaches that branch today. It is there so
+% that the first listing that does degrades rather than loops.
+%
+% The whole block sits inside \makeatletter, because \mfa@transcriptbox,
+% \mfa@transcriptroom and \@tempdima all carry an @ and this part of the
+% preamble is outside the group above. That is the trap this file already
+% records twice -- \mfa@outframes and \resultsbody each parsed as \mfa plus a
+% literal @name and produced undefined control sequences by the dozen.
+\makeatletter
+% The \typeout is a ledger, not debugging: `grep -c MFA-TRANSCRIPT-TURN
+% main-<fmt>.log` counts how many listings did not fit and were turned.
+% Measured when the guard was added: 7 / 5 / 6 / 10 across the four builds,
+% against ONE split listing reported by the review issue that prompted it.
+\newsavebox{\mfa@transcriptbox}
+\newcommand{\mfa@transcriptroom}{%
+  \ifdim\pagegoal=\maxdimen\else
+    \@tempdima=\dimexpr\ht\mfa@transcriptbox+\dp\mfa@transcriptbox\relax
+    \ifdim\@tempdima>\textheight\else
+      \ifdim\@tempdima>\dimexpr\pagegoal-\pagetotal\relax
+        \typeout{MFA-TRANSCRIPT-TURN}\newpage
+      \fi
+    \fi
+  \fi}
 \newcommand{\transcript}[1]{%
   \par\smallskip
   \IfFileExists{figures/transcripts/#1.txt}{%
+    \begin{lrbox}{\mfa@transcriptbox}%
+    \begin{minipage}{\linewidth}%
     \lstinputlisting[style=mfacode, numbers=none,
                      basicstyle=\ttfamily\scriptsize,
                      keywordstyle=\color{black},
                      backgroundcolor=\color{white}]{figures/transcripts/#1.txt}%
+    \end{minipage}%
+    \end{lrbox}%
+    \mfa@transcriptroom
+    \par\noindent\usebox{\mfa@transcriptbox}\par
   }{%
     \begin{tcolorbox}[
       enhanced, breakable, width=\linewidth, sharp corners,
@@ -2237,6 +2298,7 @@
   }%
   \par\smallskip
 }
+\makeatother
 
 % Inline literals
 \newcommand{\code}[1]{\texttt{\small #1}}

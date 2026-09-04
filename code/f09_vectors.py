@@ -202,6 +202,27 @@ for _q in range(0, 120):
                 _checked += 1
 emit("f09.rank.checked", _checked)
 
+# The unit sphere is the FAMILIAR case of the condition and not the condition
+# itself. What the two rankings need is that the candidates share ONE length,
+# any length: with ||b|| fixed at L, ||q - b||^2 = ||q||^2 + L^2 - 2L||q||cos
+# is strictly decreasing in the cosine whatever L and ||q|| are. The trapbox in
+# frame 25 used to say "only on the unit sphere", which states a condition
+# stronger than the one that holds, so the wider claim is checked here.
+for _L in (0.25, 0.5, 1.0, 2.0, 7.5):
+    for _Q in (0.4, 1.0, 3.0):
+        for _q in range(0, 60, 7):
+            _query = (_Q * math.cos(_q / 19.0), _Q * math.sin(_q / 19.0))
+            for _m in range(0, 120, 11):
+                for _n in range(0, 120, 13):
+                    if _m == _n:
+                        continue
+                    _c1 = (_L * math.cos(_m / 19.0), _L * math.sin(_m / 19.0))
+                    _c2 = (_L * math.cos(_n / 19.0), _L * math.sin(_n / 19.0))
+                    _d1, _d2 = norm(sub(_query, _c1)), norm(sub(_query, _c2))
+                    _s1, _s2 = cossim(_query, _c1), cossim(_query, _c2)
+                    if abs(_d1 - _d2) > 1e-9:
+                        assert (_d1 < _d2) == (_s1 > _s2),                             f"a common length of {_L} no longer makes the two rankings agree"
+
 # ==========================================================================
 # The disagreement, off the sphere. ONE concrete triple, because the frame
 # needs the reader to compute it and be wrong; the general case is P05's.
@@ -225,6 +246,24 @@ _ua, _ub = unit(CAND_A), unit(CAND_B)
 emit("f09.dis.ndist.a", norm(sub(QUERY, _ua)), 4)
 emit("f09.dis.ndist.b", norm(sub(QUERY, _ub)), 4)
 assert norm(sub(QUERY, _ua)) < norm(sub(QUERY, _ub)), "normalising no longer settles it"
+
+# WHY A loses on distance, and it is not the reason people give. For a query q
+# and a candidate at angle theta, ||q - b||^2 = ||q||^2 + ||b||^2 - 2||q|| ||b||
+# cos(theta), which as a function of the candidate's LENGTH is a parabola with
+# its minimum at ||b|| = ||q|| cos(theta). So a candidate is pushed down by
+# distance when its length is far from that optimum in EITHER direction -- too
+# short as much as too long -- while its cosine does not move at all.
+#
+# Appendix A said "long vectors are penalised by distance", which is the wrong
+# half: A is the SHORT one here and it is the one that loses. Asserted so the
+# corrected answer cannot come apart from the example it cites.
+for _tag, _c in (("a", CAND_A), ("b", CAND_B)):
+    _best = norm(QUERY) * cossim(QUERY, _c)          # the length that minimises it
+    _far = [(abs(_L - _best), norm(sub(QUERY, tuple(_L * _x / norm(_c) for _x in _c))))
+            for _L in (_best * 0.25, _best * 0.5, _best, _best * 1.5, _best * 2.0)]
+    assert min(_far, key=lambda r: r[0])[1] == min(d for _, d in _far),         f"the distance to candidate {_tag} is no longer smallest at length ||q||cos(theta)"
+assert norm(CAND_A) < norm(QUERY) * cossim(QUERY, CAND_A),     "candidate A is no longer SHORTER than its own distance-optimal length"
+assert norm(CAND_B) > norm(QUERY) * cossim(QUERY, CAND_B),     "candidate B is no longer LONGER than its own distance-optimal length"
 
 # ==========================================================================
 # SECTION 6 --- the picture runs out, and the arithmetic does not

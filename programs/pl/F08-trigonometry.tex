@@ -36,8 +36,7 @@
 
 \begin{outcomes}
 \outcome{1--6}{odczytywać $\cos$ i $\sin$ z punktu idącego po okręgu, pracować
-  w radianach i wyprowadzać jedyną tożsamość, jakiej ta książka potrzebuje,
-  wprost z obrazka}
+  w radianach i czytać tożsamość wprost z obrazka, zamiast ją pamiętać}
 \outcome{7--10}{naszkicować obie krzywe na podstawie okręgu i podać ich okres,
   zbiór wartości i symetrię, nie przypominając sobie żadnej z tych rzeczy}
 \outcome{11--15}{zastosować cztery ruchy z Programu~\ref{prog:F05} do fali i
@@ -241,12 +240,13 @@ najgorsza rozbieżność $\val{f08.pyth.err}$ jest tak blisko dokładnego $1$, j
 binary64 potrafi.
 
 \begin{note}
-To jedyna tożsamość trygonometryczna, jakiej ta książka używa, i jest tu
-dlatego, że wypada z obrazka. Nie ma tu twierdzenia sinusów, nie ma
-twierdzenia cosinusów, nie ma rozwiązywania trójkątów i nie ma listy wzorów
-do nauczenia \dash{} zakres książki wyklucza to wszystko i nic w dalszej
-części nie jest tego potrzebne. Dalsza część potrzebuje okręgu, a okrąg już
-masz.
+Nie ma tu twierdzenia sinusów, nie ma twierdzenia cosinusów, nie ma wzorów na
+sumę kątów, nie ma rozwiązywania trójkątów i nie ma listy wzorów do nauczenia
+\dash{} zakres książki wyklucza to wszystko i nic dalej nie jest tego
+potrzebne. To, co zostaje, to obrazek, a każda tożsamość, której ten program
+używa, jest z okręgu odczytana, a nie zapamiętana: ta, dwie symetrie z
+następnej sekcji i przesunięcie o ćwierć obrotu po nich. Okrąg już masz, a to
+ta część, która się przenosi.
 \end{note}
 
 \mermaidfig{f08-unit-circle}{Definicja w jednym wierszu: kąt to droga, którą
@@ -286,14 +286,16 @@ $2\pi$ oraz $\intcc{-1}{1}$.
 
 I to samo dla $\cos$, z tego samego powodu.
 
-Teraz symetria, na którą Program~\ref{prog:F05} dał ci słowa. Pójście do tyłu
-po okręgu o $\theta$ stawia punkt w odbiciu lustrzanym, względem osi poziomej,
+Teraz symetria, na którą Program~\ref{prog:F05} dał ci pierwsze słowo.
+Pójście do tyłu po okręgu o $\theta$ stawia punkt w odbiciu lustrzanym,
+względem osi poziomej,
 tego miejsca, w którym stawia go pójście do przodu. Więc wartość pozioma się
 nie zmienia, a pionowa zmienia znak:
 \[ \cos(-\theta) = \cos\theta \qquad \sin(-\theta) = -\sin\theta \]
 
-$\cos$ jest \emph{parzysty}, a $\sin$ \emph{nieparzysty}, dokładnie w sensie
-Programu~\ref{prog:F05}, i znów obrazek jest dowodem.
+$\cos$ jest \emph{parzysty}, dokładnie w sensie Programu~\ref{prog:F05}.
+$\sin$ jest \emph{nieparzysty}, czyli ta sama myśl ze znakiem \dash{} odbicie
+wraca ze zmienionym znakiem. I znów obrazek jest dowodem.
 
 Obie krzywe wyglądają jak ten sam kształt przesunięty. Zapisz $\cos$ przez
 $\sin$.
@@ -332,14 +334,18 @@ gdzie punkt startuje.
 
 \begin{aibox}
 Sinus i kosinus pojawiają się w kodowaniu pozycyjnym oba, na przemiennych
-współrzędnych, i powodem jest ta ramka: na pozycji zerowej współrzędne
-sinusowe dają $0$, a kosinusowe dają $1$, więc wzorzec na pozycji zerowej nie
-jest samymi zerami i kodowanie odróżnia ją od pozycji, której faktycznie nie
-ma.
+współrzędnych, a powodem jest to, co dowodzi sekcja 5. Czytaj je razem jako
+\emph{parę}: ta para to punkt na okręgu z ramki 1, pod kątem, który wyznacza
+pozycja. Przesunięcie o $k$ miejsc w sekwencji obraca punkt o stały kąt, a
+obrót punktu jest odwzorowaniem liniowym.
 
-Użycie jednej funkcji do wszystkich współrzędnych dałoby pierwszą pozycję
-zakodowaną jako wektor zer, czyli dokładnie to, na co wygląda miejsce
-wypełnione dopełnieniem.
+Taką właśnie motywację podaje praca o pierwotnym transformerze dla wyboru tych
+funkcji \dash{} kodowanie jednej pozycji jest stałą funkcją liniową kodowania
+dowolnej pozycji oddalonej o stały dystans, więc model może się nauczyć
+uwzględniać pozycję względną, zamiast uczyć się każdej pozycji bezwzględnej z
+osobna. Jedna funkcja tego nie da: samotna współrzędna $\sin\theta$ to połowa
+punktu, a przesunięcie potrzebuje drugiej połowy, żeby dało się je w ogóle
+zapisać.
 \end{aibox}
 \end{fr}
 
@@ -404,8 +410,9 @@ $\val{f08.pe.last}$ na najwolniejszej, z $\val{f08.pe.mid}$ pośrodku.
 
 Ten rozrzut jest zamysłem. Fala o długości $\val{f08.pe.first}$ odróżnia
 sąsiednie pozycje i nie mówi nic o pozycjach oddalonych o tysiąc tokenów, bo
-po drodze okrążyła setki razy. Fala o długości $\val{f08.pe.last}$ ledwie
-ruszyła na całej sekwencji, więc nie odróżni sąsiadów, ale odróżni początek
+po drodze okrążyła grubo ponad sto razy. Fala o długości
+$\val{f08.pe.last}$ ledwie ruszyła na całej sekwencji, więc nie odróżni
+sąsiadów, ale odróżni początek
 od końca.
 
 Żadna z nich nie wykona pracy tej drugiej. Razem niosą pozycję na każdej
@@ -438,7 +445,10 @@ Oto wzór, którego używałeś i być może nigdy nie rozpakowałeś. Dla dwóc
 wektorów $a$ i $b$
 \[ \cos\theta = \frac{a \cdot b}{\lVert a \rVert\, \lVert b \rVert} \]
 gdzie $a \cdot b$ to znana z Programu~\ref{prog:F04} suma
-$\sum_i a_i b_i$, a $\lVert a \rVert$ to długość.
+$\sum_i a_i b_i$, a $\lVert a \rVert$ to długość $a$, czyli $\sqrt{a \cdot a}$
+\dash{} Pitagoras na współrzędnych, czyli równanie okręgu z tej sekcji z
+uwolnionym promieniem. Program~\ref{prog:F09} robi jedno i drugie porządnie;
+tej sekcji wystarczy, że obie długości są liczbami dodatnimi.
 
 \textbf{$\theta$ po lewej jest kątem, a to jest równość, nie analogia.}
 Podobieństwo kosinusowe nie jest \emph{podobne} do kosinusa ani nie jest od
@@ -574,6 +584,10 @@ Obróć cały obrazek, a wektory się przesuną, ale kąt między nimi nie, bo k
 jest relacją między nimi, a nie własnością żadnego z nich. To widać z obrazka
 i jest to cały temat sekcji 5, gdzie okazuje się wart znacznie więcej, niż
 wygląda.
+
+Odbicie obu w prostej przez początek układu zdałoby się tak samo, i tak samo
+zmiana znaku obu. Obrót jest tym, którego potrzebuje następna sekcja, bo jest
+tym, w który da się zamienić pozycję.
 \end{fr}
 
 % ============================================================
@@ -622,15 +636,16 @@ iloczynem skalarnym?
 \ans{Nic}
 Najgorsza zmiana $\val{f08.rot.same.err}$ na sześciuset kątach.
 
-I widać, dlaczego, bez żadnej algebry, z poprzedniej sekcji. Iloczyn skalarny
-to
+I widać, dlaczego, bez żadnej algebry, z poprzedniej sekcji. Przekształcenie
+wzoru na podobieństwo kosinusowe daje
 \[ a \cdot b = \lVert a \rVert\, \lVert b \rVert \cos\theta \]
-po przekształceniu wzoru na podobieństwo kosinusowe. Obrót zostawia obie
+a obrót zostawia obie
 długości w spokoju i zostawia w spokoju kąt między wektorami, bo obraca oba o
 tyle samo. Wszystkie trzy składniki przeżywają, więc iloczyn też.
 
 Teraz krok, o który chodzi. Obróć $a$ o kąt $\alpha$, a $b$ o \emph{inny} kąt
-$\beta$. Od czego może zależeć ich iloczyn skalarny?
+$\beta$. Ich iloczyn skalarny nadal zależy od $a$ i od $b$. Od czego może
+zależeć \emph{jeśli chodzi o oba kąty}?
 \nextframe
 \end{fr}
 
@@ -667,9 +682,13 @@ $10$ te same dwa wektory dają $\val{f08.rot.score.far}$.
 
 \begin{aibox}
 To jest obrotowe kodowanie pozycyjne, a \enquote{obróć zapytanie i klucz} jest
-teraz zdaniem, a nie zaklęciem: to jedyny sposób, żeby włożyć pozycję do
-iloczynu skalarnego tak, aby odpowiedź zależała od różnicy pozycji, a nie od
-samych pozycji.
+teraz zdaniem, a nie zaklęciem: wkłada pozycję do iloczynu skalarnego tak, że
+odpowiedź zależy od różnicy pozycji, a nie od samych pozycji, a wśród
+odwzorowań obracających zapytanie i klucz o kąt wyznaczony samą pozycją jest
+tym, który ta tożsamość wymusza. Nie jest jedyną drogą do tej własności
+\dash{} uczony człon względny w środku wyniku albo dodana do wyniku
+poprawka zależna tylko od odstępu dochodzą tam inaczej \dash{} a ta książka
+żadnej z nich nie porównuje.
 
 Dwie konsekwencje wypadają wprost z tożsamości i warto je mieć. Sekwencja
 przesunięta w całości daje identyczne wyniki uwagi, bo każda różnica jest bez
@@ -720,8 +739,10 @@ włożenia pozycji do modelu, który poza tym nie ma jej zauważać.
   wyjątku, nic nie ostrzega, a odpowiedź jest zwyczajną liczbą}.}
 \sumitem{5--6}{\result{$\cos^{2}\theta + \sin^{2}\theta = 1$ to
   \textbf{równanie okręgu z podstawionymi nazwami}, więc nie wymaga ani dowodu,
-  ani zapamiętywania. Sprawdzone do $\val{f08.pyth.err}$. To jedyna tożsamość
-  trygonometryczna, jakiej ta książka używa}.}
+  ani zapamiętywania. Sprawdzone do $\val{f08.pyth.err}$. Każda tożsamość w
+  tym programie jest odczytana z tego okręgu tak samo, a książka nie pożycza
+  żadnej z zewnątrz \dash{} ani twierdzenia sinusów, ani twierdzenia
+  cosinusów, ani wzorów na sumę kątów}.}
 \sumitem{7--8}{\result{Obie krzywe mają okres $2\pi$ i zbiór wartości $\intcc{-1}{1}$,
   bo punkt wraca tam, skąd wyszedł, i nigdy nie opuszcza okręgu. $\cos$ jest
   parzysty, a $\sin$ nieparzysty, co jest chodzeniem do tyłu odbitym w osi
@@ -768,7 +789,8 @@ włożenia pozycji do modelu, który poza tym nie ma jej zauważać.
 \sumitem{27--28}{\result{Obrócenie \emph{obu} wektorów o ten sam kąt zostawia iloczyn
   skalarny w spokoju, do $\val{f08.rot.same.err}$, bo przeżywają wszystkie trzy
   jego składniki. Więc obrócenie ich o \emph{różne} kąty $\alpha$ i $\beta$
-  zostawia iloczyn skalarny, który może zależeć tylko od $\beta - \alpha$
+  zostawia iloczyn skalarny, który zależy od obu kątów tylko przez
+  $\beta - \alpha$
   \dash{} sprawdzone do $\val{f08.rot.rel.err}$}.}
 \sumitem{29--30}{\result{\textbf{Ta tożsamość to obrotowe kodowanie pozycyjne.} Obróć
   zapytanie i klucz, każde o kąt proporcjonalny do jego pozycji, a wynik uwagi
@@ -837,8 +859,8 @@ włożenia pozycji do modelu, który poza tym nie ma jej zauważać.
   \answerto{Bo obrót zachowuje długość. Przesuwa punkty po okręgach o środku w
   początku układu, a każdy punkt jednego okręgu leży w tej samej odległości od
   środka.}
-\item Wskaż jedyną tożsamość trygonometryczną, której ten program używa, i
-  powiedz, skąd się bierze.
+\item Wskaż tożsamość, którą ten program bierze z okręgu, i powiedz, skąd się
+  bierze.
   \answerto{$\cos^{2}\theta + \sin^{2}\theta = 1$, czyli równanie okręgu
   jednostkowego z $\cos$ i $\sin$ podstawionymi za współrzędne.}
 \end{testexercises}

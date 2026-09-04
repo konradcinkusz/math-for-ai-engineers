@@ -312,6 +312,14 @@ Algebra się zgadza i mówi to użyteczniej. Ślad wynosi $0$, a wyznacznik $1$,
 więc równanie charakterystyczne to $\lambda^{2} + 1 = 0$, które nie ma żadnego
 rozwiązania rzeczywistego.
 
+Zauważ, że obie drogi zgodziły się, choć żadnej nie powiedziano o drugiej.
+Obrazek odpowiedział pierwszy, i odpowiedział z definicji obrotu: obracanie
+każdego kierunku jest tym, czym obrót \emph{jest}, więc odpowiedź była dostępna,
+zanim zapisano jakiekolwiek równanie. Algebra doszła potem w to samo miejsce z
+dwóch liczb odczytanych wprost z macierzy. Tam, gdzie się zgadzają, masz
+sprawdzenie, a tam, gdzie obrazek się kończy \dash{} czyli wszędzie powyżej
+trzech wymiarów \dash{} te dwie liczby są tym, co zostaje.
+
 Powiedz więc, co mówi ci biblioteka, gdy oddaje zespoloną wartość własną dla
 macierzy rzeczywistej.
 \dotline
@@ -514,6 +522,13 @@ Bierze wektor i zwraca jedną liczbę, ma więc wartość w każdym kierunku, w
 którym można odejść od początku, a pytaniem wartym zadania jest, jak te
 wartości wyglądają razem.
 
+Dwie rzeczy warto zauważyć przed tym. Nic nowego tu nie zdefiniowano:
+$q$ to iloczyn skalarny z Programu~\ref{prog:P05} z macierzą z
+Programu~\ref{prog:P06} w środku, złożone razem. Oraz $q(-x) = q(x)$, bo obie
+kopie $x$ zmieniają znak i te dwie zmiany się znoszą \dash{} forma przyjmuje
+więc tę samą wartość w punkcie i w punkcie przeciwnym, i dlatego pytaniem
+wartym zadania jest pytanie o \emph{kierunki}, a nie o punkty.
+
 Ale najpierw pytanie rozstrzygające, czy poprzednia sekcja w ogóle się stosuje.
 $x\T Ax$ jest jedną liczbą, więc równa się własnej transpozycji. Co to wymusza
 na tej części $A$, która \emph{nie} jest symetryczna?
@@ -531,6 +546,15 @@ $x\T A x = (x\T A x)\T = x\T A\T x$, więc $x\T A x = x\T \big(\frac{A + A\T}{2}
 
 Każdą formę kwadratową można więc zapisać macierzą symetryczną i od tej pory
 zawsze się tak robi.
+
+Z \enquote{zawsze zapisywana symetrycznie} wynikają dwie rzeczy warte
+zapamiętania. To konwencja z konsekwencjami: procedura zakładająca symetrię
+może przechowywać połowę wpisów i użyć rozkładu, który istnieje wyłącznie dla
+macierzy symetrycznych, i dlatego właśnie takie procedury są tymi szybkimi.
+I nie sprawdza ona tego założenia. Podaj procedurze wartości własnych dla
+macierzy symetrycznych macierz, która symetryczna nie jest, a odczyta jeden
+trójkąt, zignoruje drugi i odpowie z pełnym przekonaniem o macierzy, której jej
+nie podałeś.
 
 Hesjan, kowariancja i macierz Grama są symetryczne. Powiedz, dlaczego jest to
 jeden fakt, a nie trzy.

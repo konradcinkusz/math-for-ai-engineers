@@ -115,9 +115,22 @@ def cossim(a, b):
     return dot(a, b) / (norm(a) * norm(b))
 
 
+# All six of these are EXACT, and they are emitted as whole numbers because of
+# it. The three dot products are 50, 0 and -25 in integer arithmetic and the
+# three norms are 5, 10 and 5, so every quotient is a whole number a binary64
+# holds without error, and acos of 1, 0 and -1 gives the three quarter-turn
+# angles. Printing 0.0000 beside a frame that has just argued "the dot product
+# is -12 + 12 = 0" reads as a rounded measurement of the one thing on the page
+# that is not measured at all. The 8.1 and 11.5 degree figures in the threshold
+# table below are a different quantity and keep their decimal.
 for _name, (_a, _b) in PAIRS.items():
-    emit(f"f08.cos.{_name}", cossim(_a, _b), 4)
-    emit(f"f08.ang.{_name}", math.degrees(math.acos(max(-1.0, min(1.0, cossim(_a, _b))))), 1)
+    _c = cossim(_a, _b)
+    _d = math.degrees(math.acos(max(-1.0, min(1.0, _c))))
+    assert _c == round(_c) and _d == round(_d), (
+        f"the {_name} pair no longer gives an exact similarity and angle: {_c}, {_d}"
+    )
+    emit(f"f08.cos.{_name}", _c, 0)
+    emit(f"f08.ang.{_name}", _d, 0)
 
 # The identity itself, over a sweep rather than at those four points: the
 # cosine-similarity formula agrees with the angle computed from the two

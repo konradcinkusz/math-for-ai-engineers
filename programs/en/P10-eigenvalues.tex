@@ -338,6 +338,14 @@ The algebra agrees and says it more usefully. The trace is $0$ and the
 determinant is $1$, so the characteristic equation is $\lambda^{2} + 1 = 0$,
 which has no real solution at all.
 
+Notice that the two routes agreed without either being told about the other.
+The picture answered first, and it answered from the definition of a rotation:
+turning every direction is what a rotation \emph{is}, so the answer was
+available before any equation was written. The algebra then arrived at the same
+place from two numbers read straight off the matrix. Where they agree you have
+a check, and where the picture runs out \dash{} which is everywhere above three
+dimensions \dash{} the two numbers are what you still have.
+
 So say what a library is telling you when it hands back a complex eigenvalue
 for a real matrix.
 \dotline
@@ -542,6 +550,13 @@ It takes a vector and returns one number, so it has a value in every direction
 you can leave the origin along, and the question worth asking is what those
 values look like taken together.
 
+Two things are worth noticing before that. Nothing new has been defined here:
+$q$ is Program~\ref{prog:P05}'s dot product with Program~\ref{prog:P06}'s
+matrix inside it, composed. And $q(-x) = q(x)$, because both copies of $x$
+change sign and the two changes cancel \dash{} so the form takes the same value
+at a point and at its opposite, which is why the question worth asking is about
+\emph{directions} rather than about points.
+
 But first a question that decides whether the last section applies at all.
 $x\T Ax$ is a single number, so it equals its own transpose. What does that
 force about the part of $A$ that is \emph{not} symmetric?
@@ -559,6 +574,14 @@ $x\T A x = (x\T A x)\T = x\T A\T x$, so $x\T A x = x\T \big(\frac{A + A\T}{2}
 
 Any quadratic form can therefore be written with a symmetric matrix, and from
 here they always are.
+
+Two things follow from \enquote{always written symmetric} that are worth
+having. It is a convention with teeth: a routine that assumes symmetry can
+store half the entries and use a decomposition that exists only for symmetric
+matrices, which is why such routines are the fast ones. And it does not check.
+Hand a symmetric-eigenvalue routine a matrix that is not symmetric and it reads
+one triangle, ignores the other, and answers confidently about a matrix you did
+not give it.
 
 The Hessian, a covariance and a Gram matrix are all symmetric. Say why that is
 one fact rather than three.

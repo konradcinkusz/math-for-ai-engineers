@@ -899,6 +899,12 @@ exponentiation as \S\ref{sec:F03-laws}'s frame on $\logsumexp$.
 Take a model that is choosing between two options and doing no better than a
 coin, so $p = \num{0.5}$ at every token.
 
+A coin is the worst a model can honestly be, so what comes out is a ceiling
+rather than a complaint about one bad model: any model worth serving assigns
+more than $\num{0.5}$ to the token it actually sees, and a larger factor per
+token survives longer. The number you are about to compute is therefore the
+shortest sequence this arithmetic can fail on, not the longest.
+
 At what length does the running product become exactly zero in float32, and at
 what length in float64? Use the two smallest subnormals from the previous
 frames, and note before you start that $\val{f03.f32.sub}$ is exactly
