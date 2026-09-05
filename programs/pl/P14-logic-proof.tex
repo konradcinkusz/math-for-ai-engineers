@@ -61,12 +61,13 @@
   \answerto{Nie. To \emph{odwrotne} zdanie i jest innym twierdzeniem; oba
   różnią się w $\val{p14.differ}$ z $\val{p14.rows}$ wierszy. Wynika
   natomiast, że coś, co nie kwacze, nie jest kaczką.}
-\item Ograniczenie zachodzi \enquote{z prawdopodobieństwem $\val{p14.conf}$
-  procent}. Używasz go $\val{p14.uses}$ razy. Jaka jest szansa, że zachodzą
-  wszystkie? \teachesat{28--29}
-  \answerto{Około $\val{p14.allhold}$ procent, więc gdzieś zawodzi w
-  $\val{p14.anyfails}$ procentach przypadków. Pewność podana raz nie jest
-  pewnością wniosku, który budujesz z dwudziestu takich.}
+\item Ograniczenie zachodzi \enquote{z prawdopodobieństwem co najmniej
+  $\val{p14.conf}$ procent}. Używasz go $\val{p14.uses}$ razy, na niezależnych
+  losowaniach. Co ta gwarancja daje dla wszystkich naraz? \teachesat{28--29}
+  \answerto{Co najmniej $\val{p14.allhold}$ procent i nic lepszego: zostawia
+  miejsce na porażkę gdzieś w $\val{p14.anyfails}$ procentach przypadków.
+  Pewność podana raz nie jest pewnością wniosku, który budujesz z dwudziestu
+  takich.}
 \item \enquote{Dla każdej tolerancji istnieje sieć} oraz \enquote{istnieje
   sieć dla każdej tolerancji}. To samo zdanie? \teachesat{15--16}
   \answerto{Nie, a drugie jest znacznie mocniejsze. Zamiana tych dwóch
@@ -82,7 +83,7 @@
   je o sieci neuronowej. Co poszło nie tak? \teachesat{26--27}
   \answerto{Zgubiono założenie. Teza jest cytowana, a warunek, pod którym ją
   udowodniono, nie \dash{} a strata sieci neuronowej nie jest wypukła, więc
-  twierdzenie po prostu nie ma zastosowania.}
+  twierdzenie w ogóle nie ma zastosowania.}
 \end{quiz}
 
 % ============================================================
@@ -351,7 +352,8 @@ wystąpienie, zakończył dyskusję, i dlatego \enquote{ale zwykle działa} nie
 jest odpowiedzią.
 
 \begin{note}
-Program~\ref{prog:F10} zmierzył ten sam spójnik psujący się w filtrze: z
+Program~\ref{prog:F10} zmierzył negację przepchniętą przez niewłaściwy
+spójnik w filtrze, czyli ten sam ruch o jeden spójnik dalej: z
 $\val{p14.filter.total}$ rekordów właściwy warunek zachowuje
 $\val{p14.filter.right}$, a \code{not spam and not short} zachowuje
 $\val{p14.filter.wrong}$, gubiąc $\val{p14.filter.lost}$ bez żadnego objawu.
@@ -411,9 +413,11 @@ Teraz to, co ta dziedzina cytuje najczęściej. Twierdzenie o uniwersalnej
 aproksymacji w postaci, w jakiej zwykle się je podaje:
 
 \begin{quote}
-Dla każdej funkcji ciągłej $f$ na obszarze ograniczonym i każdej tolerancji
-$\varepsilon > 0$ istnieje sieć z jedną warstwą ukrytą, której wyjście jest w
-odległości mniejszej niż $\varepsilon$ od $f$ wszędzie na tym obszarze.
+Dla każdej funkcji ciągłej $f$ na obszarze domkniętym i ograniczonym,
+każdej tolerancji $\varepsilon > 0$ i dowolnej ustalonej aktywacji, która nie
+jest wielomianem, istnieje sieć z jedną warstwą ukrytą używająca tej
+aktywacji, której wyjście jest w odległości mniejszej niż $\varepsilon$ od $f$
+wszędzie na tym obszarze.
 \end{quote}
 
 Która to kolejność i co wobec tego może od czego zależeć?
@@ -423,8 +427,8 @@ Która to kolejność i co wobec tego może od czego zależeć?
 
 \begin{fr}
 \begin{ansblock}
-Dla-każdego, a potem istnieje. Sieć może więc zależeć i od $f$, i od
-$\varepsilon$ \dash{} i zależy.
+Dla-każdego, a potem istnieje. Sieć może więc zależeć od $f$, od
+$\varepsilon$ i od ustalonej aktywacji \dash{} i zależy.
 \end{ansblock}
 
 Przeczytaj to jeszcze raz z nawykiem z sekcji 2: co to zdanie faktycznie
@@ -444,7 +448,7 @@ $\val{p14.silent}$ rzeczy, a każda z nich jest tym, o co pytał ten, kto
 cytował twierdzenie.
 
 \mermaidfig{p14-exists-is-not-found}{Co obiecuje twierdzenie o istnieniu i
-trzy pytania, których nie dotyka.}{obietnica istnienia}
+o czym milczy.}{obietnica istnienia}
 \end{fr}
 
 \begin{fr}
@@ -456,10 +460,24 @@ wyboru architektury jest błędem, który ten program umie nazwać precyzyjnie:
 traktuje twierdzenie o istnieniu jak konstrukcję.
 
 Analogia, która to unaocznia, jest taka, że wielomian dostatecznie wysokiego
-stopnia też przybliża dowolną funkcję ciągłą na obszarze ograniczonym i nikt
+stopnia też przybliża dowolną funkcję ciągłą na obszarze domkniętym i
+ograniczonym, i nikt
 nie wnioskuje stąd, że wielomiany są dobrą klasą modeli. O sprawie
 rozstrzyga wszystko to, o czym twierdzenie milczy.
 \end{trapbox}
+
+Dwie z hipotez znikają częściej niż kwantyfikator i obie łatwo obalić.
+\emph{Domkniętość} pracuje: funkcja ciągła na przedziale z odjętymi końcami
+wcale nie musi być ograniczona, a $1/x$ między $0$ a $1$ przyjmuje każdą
+wartość powyżej $1$, więc żadna sieć żadnego rozmiaru nie zbliży się do niej
+na żadne $\varepsilon$. \emph{Brak wielomianu} pracuje tak samo: przy
+aktywacji identycznościowej sieć z jedną warstwą ukrytą jest afiniczna
+względem wejścia, najlepszym przybliżeniem afinicznym $x^{2}$ na
+$\intcc{0}{1}$ jest $x - \frac{1}{8}$, a jego najgorszy błąd wynosi dokładnie
+$\frac{1}{8}$, więc $\varepsilon = \num{0.1}$ jest nieosiągalne niezależnie od
+tego, ile jednostek dodasz. Żadna z nich nie jest szczegółem.
+\emph{Z czego składa się twierdzenie} policzyło hipotezy jako jedną z trzech
+części, więc zdanie cytowane bez nich jest innym zdaniem.
 
 \begin{warning}
 \textbf{To, jak rośnie wymagany rozmiar, jest prawdziwym pytaniem z
@@ -640,35 +658,39 @@ losowaniu danych treningowych}.
 
 Czytasz artykuł, który stosuje takie ograniczenie $\val{p14.uses}$ razy
 \dash{} raz na eksperyment albo raz na model w porównaniu. Przy założeniu, że
-losowania są niezależne, jaka jest szansa, że zachodzą wszystkie
-$\val{p14.uses}$?
+losowania są niezależne, co ta gwarancja daje dla wszystkich
+$\val{p14.uses}$ naraz?
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{Około $\val{p14.allhold}$ procent}
-Szansa, że przynajmniej jedno zawiedzie, wynosi więc $\val{p14.anyfails}$
-procent. \textbf{Bardziej prawdopodobne niż nie, że jedno z dwudziestu zdań w
-tamtej tabeli jest po prostu fałszywe}, a nic w artykule nie zaznacza które.
+\ans{Co najmniej $\val{p14.allhold}$ procent}
+Przesłanka jest dolną granicą, a nie prawdopodobieństwem, więc iloczyn też
+jest dolną granicą i gwarancja nie daje nic lepszego. Czytana w drugą stronę
+zostawia miejsce na to, by przynajmniej jedno z $\val{p14.uses}$ twierdzeń
+zawodziło nawet w $\val{p14.anyfails}$ procentach przypadków: \textbf{gwarancja
+dopuszcza fałszywe zdanie wśród nich częściej niż nie}, a nic w artykule nie
+zaznacza które.
 
 Dwie kolejne liczby pokazują ten kształt jasno.
 
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-użyć, zanim staje się to rzutem monetą & $\val{p14.flip}$ \\
-pewność na użycie potrzebna do $95\%$ przy $\val{p14.uses}$
+użyć, zanim gwarancja staje się rzutem monetą & $\val{p14.flip}$ \\
+pewność na użycie dla $\val{p14.joint}$ procent przy $\val{p14.uses}$
   & $\val{p14.needed}$ procent \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\textbf{Ograniczenie na $\val{p14.conf}$ procent jest rzutem monetą po
-$\val{p14.flip}$ użyciach}, a żeby dwadzieścia z nich zachodziło razem, każde
-musiałoby zachodzić na $\val{p14.needed}$ procent \dash{} czyli
-prawdopodobieństwo porażki $\val{p14.neededdelta}$ procent zamiast $5$, prawie
-dwadzieścia razy ciaśniej.
+\textbf{Ograniczenie na $\val{p14.conf}$ procent gwarantuje nie więcej niż
+rzut monetą po $\val{p14.flip}$ użyciach}, a żeby zagwarantować
+$\val{p14.uses}$ z nich razem na $\val{p14.joint}$ procent, każde musiałoby
+zachodzić na $\val{p14.needed}$ procent \dash{} czyli prawdopodobieństwo
+porażki $\val{p14.neededdelta}$ procent zamiast $5$, prawie dwadzieścia razy
+ciaśniej.
 
 \begin{note}
 Założenie niezależności wykonuje wyżej pracę i zwykle jest fałszywe:
@@ -760,7 +782,8 @@ której będziesz używał co tydzień.
   zawodzi, co pokazuje relacja na $\val{p14.dom}$ elementach i potwierdza
   wszystkie $\val{p14.qchecked}$ relacji na trzech}.}
 \sumitem{17--18}{\result{\textbf{Uniwersalna aproksymacja jest dla-każdego-a-potem-
-  istnieje}, więc sieć może zależeć od funkcji i od tolerancji. Milczy o
+  istnieje}, więc sieć może zależeć od funkcji, tolerancji i ustalonej
+  aktywacji. Milczy o
   $\val{p14.silent}$ rzeczach, w tym o tym, jak duża musi być sieć i czy
   uczenie ją znajduje}.}
 \sumitem{19}{\result{\enquote{Sieci potrafią przybliżyć dowolną funkcję} traktuje
@@ -782,10 +805,10 @@ której będziesz używał co tydzień.
   mówi nic o sieci neuronowej.} Traci się gwarancję, a nie metodę \dash{} co
   jest własną regułą tej książki o pomiarze zastosowaną do zdania}.}
 \sumitem{28--29}{\result{\textbf{Ograniczenie na $\val{p14.conf}$ procent użyte
-  $\val{p14.uses}$ razy zachodzi wszędzie tylko w $\val{p14.allhold}$
-  procentach przypadków}, jest rzutem monetą po $\val{p14.flip}$ użyciach i
-  potrzebowałoby $\val{p14.needed}$ procent na każde, żeby dać $95\%$ przy
-  dwudziestu}.}
+  $\val{p14.uses}$ razy gwarantuje wszystkie tylko w $\val{p14.allhold}$
+  procentach przypadków}, gwarantuje nie więcej niż rzut monetą po
+  $\val{p14.flip}$ użyciach i potrzebowałoby $\val{p14.needed}$ procent na
+  każde, żeby sięgnąć $\val{p14.joint}$ procent przy $\val{p14.uses}$}.}
 \sumitem{30--31}{\result{Trzy błędne cytaty to po jednym z każdej części: zgubione
   założenie, zgubiony kwantyfikator i przepaść między istnieniem a
   konstrukcją. \textbf{Nie ma czwartego rodzaju pomyłki, bo nie ma czwartej

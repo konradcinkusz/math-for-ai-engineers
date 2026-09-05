@@ -66,12 +66,13 @@
   \answerto{No. That is the \emph{converse} and it is a different claim; the
   two disagree in $\val{p14.differ}$ of the $\val{p14.rows}$ rows. What does
   follow is that a thing which does not quack is not a duck.}
-\item A bound holds \enquote{with probability $\val{p14.conf}$ per cent}. You
-  use it $\val{p14.uses}$ times. What is the chance all of them hold?
-  \teachesat{28--29}
-  \answerto{About $\val{p14.allhold}$ per cent, so it fails somewhere
-  $\val{p14.anyfails}$ per cent of the time. A confidence quoted once is not a
-  confidence in the conclusion you build out of twenty of them.}
+\item A bound holds \enquote{with probability at least $\val{p14.conf}$ per
+  cent}. You use it $\val{p14.uses}$ times, on independent draws. What does
+  that guarantee give you for all of them together? \teachesat{28--29}
+  \answerto{At least $\val{p14.allhold}$ per cent, and nothing better: it
+  leaves room for a failure somewhere $\val{p14.anyfails}$ per cent of the
+  time. A confidence quoted once is not a confidence in the conclusion you
+  build out of twenty of them.}
 \item \enquote{For every tolerance there is a network} and \enquote{there is a
   network for every tolerance}. Same claim? \teachesat{15--16}
   \answerto{No, and the second is far stronger. Swapping those two quantifiers
@@ -86,7 +87,7 @@
   about a neural network. What has gone wrong? \teachesat{26--27}
   \answerto{A hypothesis was dropped. The conclusion is quoted and the
   condition it was proved under is not, and a neural network's loss is not
-  convex \dash{} so the theorem simply does not apply.}
+  convex \dash{} so the theorem does not apply at all.}
 \end{quiz}
 
 % ============================================================
@@ -356,7 +357,8 @@ one instance has finished the discussion, and why \enquote{but it usually
 works} is not a reply.
 
 \begin{note}
-Program~\ref{prog:F10} measured this same connective going wrong in a filter:
+Program~\ref{prog:F10} measured a negation pushed through the wrong
+connective in a filter, which is the same move one connective over:
 of $\val{p14.filter.total}$ records, the right condition keeps
 $\val{p14.filter.right}$ and \code{not spam and not short} keeps
 $\val{p14.filter.wrong}$, losing $\val{p14.filter.lost}$ with no symptom. This
@@ -415,9 +417,11 @@ Now the one this field quotes most. The universal approximation theorem, in
 the shape it is usually stated:
 
 \begin{quote}
-For every continuous function $f$ on a bounded region and every tolerance
-$\varepsilon > 0$, there exists a network with one hidden layer whose output
-is within $\varepsilon$ of $f$ everywhere on that region.
+For every continuous function $f$ on a closed bounded region, every
+tolerance $\varepsilon > 0$, and any fixed activation that is not a
+polynomial, there exists a network with one hidden layer using that
+activation whose output is within $\varepsilon$ of $f$ everywhere on that
+region.
 \end{quote}
 
 Which order is that, and what is therefore allowed to depend on what?
@@ -427,8 +431,8 @@ Which order is that, and what is therefore allowed to depend on what?
 
 \begin{fr}
 \begin{ansblock}
-For-all, then there-exists. So the network is allowed to depend on both $f$
-and $\varepsilon$ \dash{} and does.
+For-all, then there-exists. So the network is allowed to depend on $f$, on
+$\varepsilon$ and on the activation you fixed \dash{} and does.
 \end{ansblock}
 
 Read that again with section 2's habit: what does the sentence actually claim?
@@ -448,7 +452,7 @@ $\val{p14.silent}$ things, and every one of them is what somebody quoting the
 theorem was actually asking about.
 
 \mermaidfig{p14-exists-is-not-found}{What an existence theorem promises, and
-the three questions it does not touch.}{exists is not found}
+what it is silent about.}{exists is not found}
 \end{fr}
 
 \begin{fr}
@@ -460,10 +464,23 @@ justify a choice of architecture is a mistake of a kind this program can name
 precisely: it treats an existence claim as a construction.
 
 The parallel that makes it obvious is that a polynomial of high enough degree
-also approximates any continuous function on a bounded region, and nobody
+also approximates any continuous function on a closed bounded region, and
 concludes from that that polynomials are a good model class. What decides the
 question is everything the theorem is silent about.
 \end{trapbox}
+
+Two of the hypotheses go missing more often than the quantifier does, and both
+are cheap to falsify. \emph{Closed} is doing work: a continuous function on an
+interval with its ends left off need not be bounded at all, and $1/x$ between
+$0$ and $1$ takes every value above $1$, so no network of any size comes
+within any $\varepsilon$ of it. \emph{Not a polynomial} is doing work too:
+with the identity activation a one-hidden-layer network is affine in its
+input, the best affine approximation to $x^{2}$ on $\intcc{0}{1}$ is
+$x - \frac{1}{8}$, and its worst error is exactly $\frac{1}{8}$, so
+$\varepsilon = \num{0.1}$ is out of reach however many units are added.
+Neither is a detail. \emph{What a theorem is made of} counted the hypotheses
+as one of the three parts, so a statement quoted without them is a different
+statement.
 
 \begin{warning}
 \textbf{How the required size grows is a real question with real answers, and
@@ -642,33 +659,38 @@ the training data}.
 
 You are reading a paper that applies such a bound $\val{p14.uses}$ times
 \dash{} once per experiment, or once per model in a comparison. Assuming the
-draws are independent, what is the chance that all $\val{p14.uses}$ hold?
+draws are independent, what does that guarantee give you for all
+$\val{p14.uses}$ holding together?
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{About $\val{p14.allhold}$ per cent}
-So the chance that at least one of them fails is $\val{p14.anyfails}$ per
-cent. \textbf{More likely than not, one of the twenty statements in that
-table is simply false}, and nothing in the paper marks which.
+\ans{At least $\val{p14.allhold}$ per cent}
+The premise is a floor rather than a probability, so the product is a floor
+too and the guarantee gives nothing better. Read the other way, it leaves
+room for at least one of the $\val{p14.uses}$ claims to fail as often as
+$\val{p14.anyfails}$ per cent of the time: \textbf{the guarantee permits a
+false statement among them more often than not}, and nothing in the paper
+marks which.
 
 Two more numbers make the shape clear.
 
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-uses before it is a coin flip & $\val{p14.flip}$ \\
-per-use confidence needed for $95\%$ across $\val{p14.uses}$
+uses before the guarantee is a coin flip & $\val{p14.flip}$ \\
+per-use confidence for $\val{p14.joint}$ per cent across $\val{p14.uses}$
   & $\val{p14.needed}$ per cent \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\textbf{A $\val{p14.conf}$ per cent bound is a coin flip after
-$\val{p14.flip}$ uses}, and to have twenty of them hold together you would
-need each to hold at $\val{p14.needed}$ per cent \dash{} a failure probability
-of $\val{p14.neededdelta}$ per cent rather than $5$, nearly twenty times
+\textbf{A $\val{p14.conf}$ per cent bound guarantees no better than a coin
+flip after $\val{p14.flip}$ uses}, and to guarantee $\val{p14.uses}$ of them
+together at $\val{p14.joint}$ per cent you would need each to hold at
+$\val{p14.needed}$ per cent \dash{} a failure probability of
+$\val{p14.neededdelta}$ per cent rather than $5$, nearly twenty times
 tighter.
 
 \begin{note}
@@ -757,7 +779,8 @@ subject you will use every week.
   relation on $\val{p14.dom}$ elements shows and all
   $\val{p14.qchecked}$ relations on three confirm}.}
 \sumitem{17--18}{\result{\textbf{Universal approximation is for-all-then-there-exists},
-  so the network may depend on the function and the tolerance. It is silent on
+  so the network may depend on the function, the tolerance and the fixed
+  activation. It is silent on
   $\val{p14.silent}$ things, including how large the network must be and
   whether training finds it}.}
 \sumitem{19}{\result{\enquote{Networks can approximate any function} treats an
@@ -779,9 +802,10 @@ subject you will use every week.
   \dash{} which is this book's own rule about measurement applied to a
   sentence}.}
 \sumitem{28--29}{\result{\textbf{A $\val{p14.conf}$ per cent bound used
-  $\val{p14.uses}$ times holds throughout only $\val{p14.allhold}$ per cent of
-  the time}, is a coin flip after $\val{p14.flip}$ uses, and would need
-  $\val{p14.needed}$ per cent each to give $95\%$ across twenty}.}
+  $\val{p14.uses}$ times guarantees all of them only $\val{p14.allhold}$ per
+  cent of the time}, guarantees no better than a coin flip after
+  $\val{p14.flip}$ uses, and would need $\val{p14.needed}$ per cent each to
+  reach $\val{p14.joint}$ per cent across $\val{p14.uses}$}.}
 \sumitem{30--31}{\result{The three misquotations are one of each part: a dropped
   hypothesis, a dropped quantifier, and the gap between existence and
   construction. \textbf{There is no fourth kind of mistake because there is no

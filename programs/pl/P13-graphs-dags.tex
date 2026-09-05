@@ -86,10 +86,11 @@
 \index{graf!definicja}
 
 \begin{fr}
-Program~\ref{prog:F10} powiedział wprost, że graf to zbiór plus relacja i że
-porządne powiedzenie tego należy tutaj. To jest ten program i w
-przeciwieństwie do poprzedniego opiera się na Części~III: do sekcji 3 cały
-temat zamieni się w mnożenie macierzy.
+Program~\ref{prog:F10} dał ci zbiór, a o grafach nie powiedział nic. Ten
+program potrzebuje obok zbioru jednej rzeczy \dash{} zbioru par jego
+elementów \dash{} a wszystko inne wynika z tych dwóch. W przeciwieństwie do
+poprzedniego programu opiera się on na Części~III: do sekcji 3 cały temat
+zamieni się w mnożenie macierzy.
 
 Zacznij konkretnie. Sześć usług woła się nawzajem: brama woła
 \code{auth} i \code{search}; \code{search} woła \code{rank} i
@@ -218,8 +219,14 @@ duplikatami to zbiór wierzchołków połączonych ze sobą i z niczym innym.
 \begin{aibox}
 Ten ostatni obiekt ma nazwę i spotkałeś go bez niej. \textbf{Spójna składowa}
 to zbiór wierzchołków osiągalnych z siebie nawzajem i z niczego spoza, a
-deduplikacja korpusu jest dokładnie zadaniem znalezienia składowych i
-zostawienia po jednym dokumencie z każdej.
+znalezienie składowych jest tym, jak deduplikuje się korpus: zostaw po jednym
+dokumencie z każdej.
+
+To jest dokładnie tak, gdy \enquote{jest duplikatem} jest przechodnie, a
+dopasowanie prawie-duplikatów zwykle nie jest. $A$ może pasować do $B$, a $B$
+do $C$, podczas gdy $A$ i $C$ nie mają nic wspólnego, więc składowa łączy w
+jedno dokumenty, z których żadna para nie pasowała \dash{} i tak przebieg
+deduplikacji po cichu usuwa cały temat.
 
 Nazwanie tego ma znaczenie, bo zmienia to, czego szukasz. \enquote{Które pary
 pasują} to pytanie o $\binom{n}{2}$ rzeczy. \enquote{Jakie są składowe} to
@@ -239,6 +246,12 @@ Relację da się zapisać na dwa sposoby i nie są one wymienne.
 \textbf{Macierz sąsiedztwa} $A$ jest $n \times n$, z $A_{ij} = 1$, gdy istnieje
 krawędź z $i$ do $j$, i $0$ w przeciwnym razie. \textbf{Lista sąsiedztwa}
 trzyma dla każdego wierzchołka listę tych, na które wskazuje.
+
+Przeczytaj ten graf jako nieskierowany, tak jak deduplikowany korpus powyżej:
+krawędź łączy oba swoje końce, zamiast biec od jednego do drugiego, więc siedzi
+na liście każdego z nich, a macierz wychodzi symetryczna. Definicje są ogólne,
+a sekcje o DAG-ach i o błądzeniu losowym potrzebują ich właśnie takich; odczyt
+zmienia nie to, czym jest kodowanie, ale ile miejsca zajmuje w nim krawędź.
 
 Weź graf o $\val{p13.big.n}$ wierzchołkach i $\val{p13.big.m}$ krawędziach, co
 jest zwykłym rozmiarem dla sieci cytowań albo grafu społecznego. Ile komórek
@@ -304,9 +317,13 @@ liniowe}, a dostępne bez żadnej notacji.
 \end{fr}
 
 \begin{fr}
-Lista wygrywa więc na pamięci, wygrywa na sąsiadach i remisuje na odczycie.
-Macierz byłaby dziwną rzeczą do trzymania \dash{} poza jedną własnością, która
-nie ma nic wspólnego z odczytywaniem czegokolwiek.
+Lista wygrywa więc na pamięci, wygrywa na sąsiadach i \emph{przegrywa} trzecie
+pytanie: macierz odpowiada na \emph{czy istnieje krawędź z $u$ do $v$} w jednym
+kroku, a lista przechodzi sąsiadów $u$ \dash{} w skali tej sekcji średnio
+$\val{p13.big.avgdeg}$ z nich. To jedyna wygrana macierzy, a płacenie za nią
+całymi wierszami jest powodem, dla którego nikt jej nie kupuje. Macierz byłaby
+dziwną rzeczą do trzymania \dash{} poza jedną własnością, która nie ma nic
+wspólnego z odczytywaniem czegokolwiek.
 
 \textbf{Macierz można pomnożyć.} Następna sekcja jest o tym, co to daje, i to
 jest powód, dla którego macierz sąsiedztwa przetrwała w temacie, w którym jest
@@ -405,11 +422,16 @@ To ostatnie zdanie jest zapłatą, więc oto ono w całości.
 
 Grafowa sieć neuronowa daje każdemu wierzchołkowi wektor cech, układa je jako
 wiersze macierzy $X$, a jedna warstwa liczy coś o kształcie
-\[ X' = \sigma(AXW) \]
-Czytaj trzy czynniki od prawej: $W$ miesza własne cechy wierzchołka, $A$
-zastępuje wiersz każdego wierzchołka sumą wierszy jego sąsiadów, a $\sigma$
-jest nieliniowością, bez której Program~\ref{prog:P06} pokazał, że złożenie by
-się zapadło.
+\[ X' = \sigma((A + I)XW) \]
+Czytaj trzy czynniki od prawej: $W$ miesza własne cechy wierzchołka, $A + I$
+zastępuje wiersz każdego wierzchołka sumą wierszy jego sąsiadów oraz jego
+własnego, a $\sigma$ jest nieliniowością, bez której Program~\ref{prog:P06}
+pokazał, że złożenie by się zapadło.
+
+To $I$ jest pętlą własną, którą taka sieć dodaje przed agregacją, i nie jest
+ozdobą: przy samym $A$ nowy wiersz wierzchołka powstaje z jego sąsiadów, a nie
+z niego samego, więc warstwa zastępowałaby to, co wierzchołek wie, zamiast do
+tego dokładać.
 
 \textbf{Przekazywanie komunikatów jest mnożeniem przez macierz sąsiedztwa.}
 Nie jest do niego podobne i nie jest tak zaimplementowane dla wygody; zdanie
@@ -424,9 +446,12 @@ danego wierzchołka?
 
 \begin{fr}
 \ans{Dokładnie te w odległości $k$ od niego}
-Bo $k$ warstw stosuje $A$ $k$ razy, a wzór niezerowych wyrazów $A^{k}$ to
-dokładnie pary połączone spacerem długości $k$ \dash{} czyli twierdzenie
-sprzed dwóch ramek, przybywające jako zdanie o architekturze.
+Bo $k$ warstw stosuje $A + I$ $k$ razy, a twierdzenie o liczeniu spacerów mówi,
+czym są niezerowe wyrazy potęgi macierzy: to pary połączone spacerem długości
+\textbf{dokładnie} $k$. Tak twierdzenie przybywa jako zdanie o architekturze
+\dash{} a $I$ zamienia \emph{dokładnie} na \emph{w odległości}, bo krok zużyty
+na pętlę własną stoi w miejscu, więc spacer dowolnej długości do $k$ zostaje
+dopełniony do $k$ i policzony.
 
 Zmierzone na usługach: przy jednym skoku brama sięga
 $\val{p13.reach.one}$ wierzchołków, a przy $\val{p13.hops}$ skokach sięga
@@ -473,8 +498,8 @@ acykliczny to \emph{DAG}.
 
 Zastrzeżenie o powtarzaniu czyni to słowo używalnym i warto się przy nim
 zatrzymać. Każdy graf nieskierowany mający choć jedną krawędź ma spacer, który
-wychodzi z wierzchołka i wraca \dash{} owo \enquote{tam i z powrotem} sprzed
-dwóch ramek \dash{} więc bez tego zastrzeżenia nic nie byłoby acykliczne, a
+wychodzi z wierzchołka i wraca \dash{} owo \enquote{tam i z powrotem} z
+pułapki \dash{} więc bez tego zastrzeżenia nic nie byłoby acykliczne, a
 słowo nie znaczyłoby nic. W grafie skierowanym zastrzeżenie pracuje mniej, bo
 przejście krawędzią z powrotem jest możliwe tylko wtedy, gdy taka krawędź
 istnieje; \emph{to} jest powód, dla którego acykliczność orzeka się o grafach
@@ -585,8 +610,9 @@ Dwa wyjścia warto rozpoznawać. \emph{Rozerwij cykl} \dash{} znajdź krawędź,
 której nie powinno być, co w grafie wywołań jest zwykle złamaniem warstw. Albo
 \emph{rozwiń go}: sieć rekurencyjna to cykl w architekturze i DAG w obliczeniu,
 bo te same wagi stosuje się w każdym z ustalonej liczby kroków, a te kroki są
-osobnymi wierzchołkami. Dlatego sieć rekurencyjną da się w ogóle
-zróżniczkować i dlatego jej pamięć rośnie z liczbą rozwiniętych kroków.
+osobnymi wierzchołkami. Rozwinięcie jest tym, co daje trybowi wstecznemu
+porządek topologiczny do pracy, i dlatego pamięć rośnie z liczbą
+rozwiniętych kroków.
 \end{trapbox}
 \end{fr}
 
@@ -652,9 +678,12 @@ Program~\ref{prog:P10} zdefiniował dokładnie to: kierunek, którego macierz ni
 obraca, tylko rozciąga, a tutaj współczynnik rozciągnięcia wynosi $1$.
 
 Rozkład stacjonarny błądzenia losowego jest więc rachunkiem na wektorze
-własnym i wszystko, co tamten program powiedział, stosuje się bez zmian
-\dash{} w tym to, że znajdowanie go przez wielokrotne mnożenie jest metodą
-potęgową i że tempo osiadania rządzi druga wartość własna.
+własnym, a odczyt, który daje tamten program, stosuje się bez zmian
+\dash{} wielokrotne stosowanie macierzy mnoży każdy kierunek własny przez
+jego własny współczynnik podniesiony do tej potęgi, więc ten, którego
+współczynnik zostawia wektor bez zmian, jest tym, na czym osiada długie
+błądzenie. Ani iteracyjnej metody jego szukania, ani tempa, w jakim taka
+metoda by osiadała, nie ma w tamtym programie ani w tej książce.
 
 \begin{note}
 Skrypt nie iteruje z nadzieją. Rozwiązuje $(P\T - I)p = 0$ przy
@@ -722,7 +751,7 @@ udział, zamiast pochłaniać wszystko.
 Wartość $\val{p13.damp}$ jest umowna, a nie wyprowadzona, i ta książka nie
 będzie udawać inaczej. \emph{Wyprowadzone} jest to, że tłumienie musi tam być:
 bez niego punkt stały albo nie istnieje, albo nie jest jedyny, a z nim macierz
-jest dodatnia, o co prosi odpowiednie twierdzenie.
+jest dodatnia, o co prosi twierdzenie Perrona--Frobeniusa.
 \end{note}
 \end{fr}
 
@@ -771,7 +800,8 @@ ona przetrwa bycie szeroką na milion wierzchołków.
   $i$, liczący \enquote{tam i z powrotem}. Zliczanie ścieżek jest problemem
   trudniejszym i potęgi macierzy tego nie robią}.}
 \sumitem{19--20}{\result{\textbf{Przekazywanie komunikatów jest mnożeniem przez
-  macierz sąsiedztwa}, więc $k$ warstw sięga dokładnie $k$ skoków:
+  macierz sąsiedztwa}, więc $k$ warstw sięga w promieniu $k$ skoków, gdy
+  warstwa dodaje pętlę własną:
   $\val{p13.reach.one}$ wierzchołków przy jednym skoku i wszystkie
   $\val{p13.reach}$ przy $\val{p13.hops}$. \textbf{Głębokość to zasięg, a nie
   pojemność.}}}
