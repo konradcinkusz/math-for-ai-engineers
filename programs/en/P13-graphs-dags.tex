@@ -47,7 +47,7 @@
 \outcome{21--26}{say what a topological order is, why there is usually more
   than one, and why they all give the same answer}
 \outcome{27--34}{read a stationary distribution as an eigenvector, and say what
-  a node with no outgoing edge does to one}
+  a vertex with no outgoing edge does to one}
 \end{outcomes}
 
 \begin{quiz}
@@ -56,7 +56,7 @@
   \answerto{$\val{p13.g.degsum}$, twice the edges, because every edge is
   counted once at each of its two ends. It is Program~\ref{prog:P12}'s double
   counting in a new coat.}
-\item $\val{p13.big.n}$ nodes and $\val{p13.big.m}$ edges. Roughly how many
+\item $\val{p13.big.n}$ vertices and $\val{p13.big.m}$ edges. Roughly how many
   cells does the adjacency matrix have? \teachesat{9--10}
   \answerto{$\val{p13.big.cells}$ \dash{} a million squared \dash{} against
   $\val{p13.big.slots}$ slots for the list, a factor of
@@ -64,12 +64,12 @@
   when it is going to be multiplied.}
 \item What does the $(i,j)$ entry of $A^{2}$ count? \teachesat{14--15}
   \answerto{Walks of length two from $i$ to $j$. The sum
-  $\sum_k A_{ik}A_{kj}$ has a term of $1$ for each intermediate node joined to
-  both, which is Program~\ref{prog:P06}'s composition doing arithmetic.}
+  $\sum_k A_{ik}A_{kj}$ has a term of $1$ for each intermediate vertex joined
+  to both, which is Program~\ref{prog:P06}'s composition doing arithmetic.}
 \item A directed graph with no cycle has how many topological orders?
   \teachesat{22--23}
   \answerto{Usually more than one \dash{} $\val{p13.topo.count}$ for the
-  six-node graph in this program, out of $\val{p13.topo.total}$ orderings.
+  six-vertex graph in this program, out of $\val{p13.topo.total}$ orderings.
   What matters is that every one of them computes the same values.}
 \item A page links nowhere. What does a random walk do when it lands on it?
   \teachesat{31--32}
@@ -84,10 +84,11 @@
 \index{graph!definition}
 
 \begin{fr}
-Program~\ref{prog:F10} said, in as many words, that a graph is a set plus a
-relation and that saying so properly belonged here. This is that program, and
-unlike the last one it does lean on Part~III: by section 3 the whole subject
-will have turned into matrix multiplication.
+Program~\ref{prog:F10} gave you the set, and said nothing at all about
+graphs. This program needs one thing beside the set \dash{} a set of pairs of
+its members \dash{} and everything else follows from those two. Unlike the
+last program it does lean on Part~III: by section 3 the whole subject will
+have turned into matrix multiplication.
 
 Start concretely. Six services call one another: the gateway calls
 \code{auth} and \code{search}; \code{search} calls \code{rank} and
@@ -173,7 +174,7 @@ The immediate consequence is worth having: since the degrees sum to an even
 number, \textbf{the number of vertices of odd degree is even.} You cannot have
 a network in which exactly one machine has an odd number of links, and that
 kind of parity argument is often the cheapest sanity check on a graph you have
-just built.
+newly built.
 \end{note}
 \end{fr}
 
@@ -216,8 +217,14 @@ joined to each other and to nothing else.
 \begin{aibox}
 That last object has a name and you have met it without it. A
 \textbf{connected component} is a set of vertices reachable from one another
-and from nothing outside, and deduplicating a corpus is exactly the job of
-finding the components and keeping one document from each.
+and from nothing outside, and finding the components is how a corpus gets
+deduplicated: keep one document from each.
+
+That is exactly right when \enquote{is a duplicate of} is transitive, and
+near-duplicate matching usually is not. $A$ can match $B$ and $B$ match $C$
+while $A$ and $C$ have nothing in common, so a component chains together
+documents no pair of which matched \dash{} which is how a deduplication pass
+quietly removes a whole topic.
 
 Naming it matters because it changes what you look for. \enquote{Which pairs
 match} is a question about $\binom{n}{2}$ things. \enquote{Which components
@@ -238,6 +245,13 @@ interchangeable.
 The \textbf{adjacency matrix} $A$ is $n \times n$ with $A_{ij} = 1$ when there
 is an edge from $i$ to $j$ and $0$ otherwise. The \textbf{adjacency list}
 keeps, for each vertex, the list of vertices it points at.
+
+Read the graph undirected for this section, as the deduplicated corpus above
+was: an edge joins its two endpoints rather than running from one of them to
+the other, so it sits in the list of each and the matrix comes out symmetric.
+The definitions are the general ones, and the sections on DAGs and on random
+walks need them that way; what the reading changes is not what an encoding is
+but how much of one an edge occupies.
 
 Take a graph with $\val{p13.big.n}$ vertices and $\val{p13.big.m}$ edges,
 which is an ordinary size for a citation network or a social graph. How many
@@ -305,9 +319,13 @@ linear}, and it is available without any notation at all.
 \end{fr}
 
 \begin{fr}
-So the list wins on memory, wins on neighbours, and ties on lookup. The matrix
-would be an odd thing to keep at all \dash{} except for one property that has
-nothing to do with looking anything up.
+So the list wins on memory, wins on neighbours, and \emph{loses} the third
+question: the matrix answers \emph{is there an edge from $u$ to $v$} in one
+step, where the list walks $u$'s neighbours \dash{} at this section's scale,
+$\val{p13.big.avgdeg}$ of them on average. That is the matrix's only win, and
+paying for it in whole rows is why nobody buys it. The matrix would be an odd
+thing to keep at all \dash{} except for one property that has nothing to do
+with looking anything up.
 
 \textbf{You can multiply a matrix.} The next section is what that buys, and it
 is the reason the adjacency matrix survives in a subject where it is
@@ -322,6 +340,22 @@ $\val{p13.big.ratio}$ times too large to store.
 \begin{fr}
 A \textbf{walk} of length $k$ is a sequence of $k$ edges laid end to end. It
 may revisit a vertex; a walk that does not is a \emph{path}.
+
+The distinction is not a nicety. A matrix power counts every sequence of
+edges that fits end to end, and there is no arithmetic anywhere in a matrix
+product that could skip the sequences which come back to a vertex they have
+already used \dash{} a product has no memory of where it has been. So
+everything this section proves is about walks by construction, and counting
+\emph{paths} is a genuinely harder problem that no power of $A$ answers.
+
+And the walk question is nearly always the one you have. Asking whether a
+change here can reach a service $k$ steps away, or how much of the graph a
+signal touches after $k$ rounds, is asking about sequences of edges laid end
+to end and nothing more: a route that doubles back has wasted a step and
+still arrives. The path question \dash{} how many distinct simple routes are
+there \dash{} is the one that is rarely asked and expensively answered, so
+the cheap machinery this section is about is pointed at the question that
+comes up.
 
 Now the question the whole section rests on. Write out the $(i,j)$ entry of
 $A^{2}$ as a sum, using nothing but the definition of matrix multiplication:
@@ -369,6 +403,13 @@ The two routes through \code{search}: by way of \code{rank} and by way of
 \code{store}. Reading them off $A^{3}$ takes no search and no traversal, and
 the same multiplication answers the question for every pair at once.
 
+Before you answer the next one, notice two things about how it is put. The
+diagonal is the part of $A^{2}$ nobody looks at, because \enquote{walks from
+$i$ back to $i$} sounds like a triviality \dash{} and the theorem covers it
+with no exception, so whatever the entry says is forced rather than chosen.
+And the word \emph{undirected} is load-bearing: the answer moves if you drop
+it, so work out what that word is buying before you commit.
+
 Here is a second reading of the same theorem, worth a moment because it is
 where people slip. On an \emph{undirected} graph, what is the diagonal entry
 $(A^{2})_{ii}$?
@@ -405,11 +446,16 @@ That last sentence is the payoff, so here it is in full.
 
 A graph neural network gives each vertex a feature vector, stacks them as the
 rows of a matrix $X$, and one layer computes something of the shape
-\[ X' = \sigma(AXW) \]
+\[ X' = \sigma((A + I)XW) \]
 Read the three factors from the right: $W$ mixes each vertex's own features,
-$A$ replaces each vertex's row by the sum of its neighbours' rows, and
-$\sigma$ is the nonlinearity Program~\ref{prog:P06} showed the composition
-would collapse without.
+$A + I$ replaces each vertex's row by the sum of its neighbours' rows and its
+own, and $\sigma$ is the nonlinearity Program~\ref{prog:P06} showed the
+composition would collapse without.
+
+The $I$ is the self-loop such a network adds before it aggregates, and it is
+not decoration: under $A$ alone a vertex's new row is built out of its
+neighbours and not out of itself, so a layer would replace what a vertex knows
+rather than adding to it.
 
 \textbf{Message passing is a multiplication by the adjacency matrix.} It is
 not analogous to one and it is not implemented as one for convenience; the
@@ -424,9 +470,12 @@ vertex's row?
 
 \begin{fr}
 \ans{Exactly those within $k$ steps of it}
-Because $k$ layers apply $A$ $k$ times, and $A^{k}$'s pattern of non-zeros is
-precisely the pairs joined by a walk of length $k$ \dash{} which is the
-theorem two frames ago, arriving as a statement about architecture.
+Because $k$ layers apply $A + I$ $k$ times, and the walk-counting theorem
+says what a matrix power's non-zeros are: the pairs joined by a walk of length
+\textbf{exactly} $k$. That is the theorem arriving as a statement about
+architecture \dash{} and the $I$ is what turns \emph{exactly} into
+\emph{within}, because a step spent on a self-loop stands still, so a walk of
+any length up to $k$ is padded out to $k$ and counted.
 
 Measured on the services: at one hop the gateway reaches
 $\val{p13.reach.one}$ vertices, and at $\val{p13.hops}$ hops it reaches all
@@ -468,17 +517,21 @@ Back to the call graph, and to the property it has that has not been used yet:
 you cannot get back to where you started.
 
 A \textbf{cycle} is a walk that returns to its starting vertex without
-retracing an edge. A directed graph with none is \textbf{acyclic}, and a
-directed acyclic graph is a \emph{DAG}.
+retracing an edge and without passing through any other vertex twice. A
+directed graph with none is \textbf{acyclic}, and a directed acyclic graph is
+a \emph{DAG}.
 
-The clause about retracing is what makes the word usable, and it is worth a
-moment. Every undirected graph with even one edge has a walk that leaves a
-vertex and comes back \dash{} the \enquote{out and back} of two frames ago
-\dash{} so without that clause nothing would be acyclic and the word would
-mean nothing. On a directed graph the clause is doing less work, because
-following an edge back is only possible if the edge back exists; \emph{that}
-is the reason acyclicity is a statement people make about directed graphs and
-almost never about undirected ones.
+Both clauses earn their place, and they exclude different things. Every
+undirected graph with even one edge has a walk that leaves a vertex and comes
+back \dash{} the \enquote{out and back} the trapbox named \dash{} so without
+the clause about edges nothing would be acyclic and the word would mean
+nothing. On a directed graph that clause is doing less work, because following
+an edge back is only possible if the edge back exists; \emph{that} is the
+reason acyclicity is a statement people make about directed graphs and almost
+never about undirected ones. The clause about vertices excludes something the
+other one does not: two loops joined at a single point, walked as one closed
+route. It repeats no edge, so the clause about edges would let it through, and
+it is a pair of cycles rather than one.
 
 Suppose you have to run those six services in some order, each after
 everything it depends on. What does acyclicity buy you?
@@ -584,8 +637,8 @@ find the edge that should not be there, which in a call graph is usually a
 layering violation. Or \emph{unroll it}: a recurrent network is a cycle in the
 architecture and a DAG in the computation, because the same weights are
 applied at each of a fixed number of steps and those steps are distinct
-vertices. That is why a recurrent network can be differentiated at all, and
-why its memory grows with the number of steps unrolled.
+vertices. Unrolling is what gives reverse mode a topological order to work
+in, and it is why the memory grows with the number of steps unrolled.
 \end{trapbox}
 \end{fr}
 
@@ -601,7 +654,9 @@ One last object, and it puts Part~III's machinery on a graph.
 Instead of asking which vertices are reachable, follow the edges at random:
 from a vertex, pick one of its outgoing edges uniformly and go. The matrix of
 those probabilities is $P$, where $P_{ij}$ is the chance of stepping from $i$
-to $j$ \dash{} the adjacency matrix with each row divided by its own row sum.
+to $j$ \dash{} the adjacency matrix with each row divided by its own row sum,
+which needs that sum to be positive. A vertex with no outgoing edges has
+nothing to divide, and its row stays as it was: all zeros.
 
 What must each row of $P$ add up to, and why?
 \dotline
@@ -651,9 +706,11 @@ Program~\ref{prog:P10} defined exactly this: a direction the matrix does not
 turn, only stretches, and here the stretch factor is $1$.
 
 So the stationary distribution of a random walk is an eigenvector calculation,
-and everything that program said applies unchanged \dash{} including that
-finding it by repeated multiplication is what power iteration is, and that the
-rate it settles at is governed by the second eigenvalue.
+and the reading that program gives applies unchanged \dash{} repeatedly
+applying a matrix multiplies each eigendirection by its own factor raised to
+that power, so the one whose factor leaves the vector alone is what a long
+walk settles on. An iterative method for finding it, and the rate such a
+method would settle at, are in neither that program nor this book.
 
 \begin{note}
 The script does not iterate and hope. It solves $(P\T - I)p = 0$ with
@@ -719,8 +776,8 @@ the dead end keeps the largest share rather than swallowing everything.
 The value $\val{p13.damp}$ is conventional rather than derived, and this book
 will not pretend otherwise. What \emph{is} derived is that the damping has to
 be there: without it the fixed point either fails to exist or fails to be
-unique, and with it the matrix is positive, which is the condition the
-relevant theorem asks for.
+unique, and with it the matrix is positive, which is what the
+Perron--Frobenius theorem asks for.
 \end{note}
 \end{fr}
 
@@ -730,7 +787,7 @@ One closing observation, which is what this program has really been about.
 Three questions were asked of one object and each turned into arithmetic
 already in the book. \emph{What can reach what} became a power of a matrix.
 \emph{In what order may this be evaluated} became a property that costs
-nothing to check and buys determinism. \emph{Where does attention settle}
+nothing to check and buys determinism. \emph{Where does a random walk settle}
 became an eigenvector.
 
 \textbf{None of the three needed a picture}, and the picture is the thing most
@@ -770,7 +827,8 @@ part that survives being a million vertices wide.
   $i$, counting \enquote{out and back}. Counting paths is a harder problem and
   matrix powers do not do it}.}
 \sumitem{19--20}{\result{\textbf{Message passing is a multiplication by the adjacency
-  matrix}, so $k$ layers reach exactly $k$ hops: $\val{p13.reach.one}$
+  matrix}, so $k$ layers reach within $k$ hops once the layer adds the
+  self-loop: $\val{p13.reach.one}$
   vertices at one hop here and all $\val{p13.reach}$ at $\val{p13.hops}$.
   \textbf{Depth is reach, not capacity.}}}
 \sumitem{21--23}{\result{\textbf{A directed graph has a topological order if and only

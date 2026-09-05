@@ -171,6 +171,13 @@ emit("p13.big.slots", sci(float(LIST_SLOTS), 2))
 emit("p13.big.ratio", sci(MAT_CELLS / LIST_SLOTS, 2))
 # One byte a cell is already absurd; say it in bytes so the number bites.
 emit("p13.big.tb", MAT_CELLS / 1e12, digits=0)
+# Mean degree: the handshake lemma of section 1 divided by n. It is also the
+# size of the list's edge-test cost, against the matrix's one step -- which is
+# what makes "the matrix wins on lookup" a real win and not a formality.
+AVG_DEG = 2 * BIG_M / BIG_N
+assert AVG_DEG * BIG_N == 2 * BIG_M, "the mean degree IS the handshake lemma over n"
+assert AVG_DEG < BIG_N / 1000, "and it must be tiny beside a whole matrix row"
+emit("p13.big.avgdeg", AVG_DEG, digits=0)
 # Density: the fraction of possible edges that exist.
 DENSITY = BIG_M / (BIG_N * (BIG_N - 1) / 2)
 emit("p13.big.density", sci(DENSITY, 2))
@@ -217,10 +224,24 @@ emit("p13.walk.count", int(matpow(A_DIR, K_SHOW)[0][5]))
 # for \mfaval and a text value is reported unused -- and these two would
 # differ between the editions anyway.
 
-# THE RECEPTIVE FIELD. k rounds of message passing reach exactly the nodes
-# within distance k, and that is not a metaphor for the matrix power -- it IS
-# the matrix power's sparsity pattern. Checked against a breadth-first search,
-# which knows nothing about matrices.
+# THE RECEPTIVE FIELD, and the self-loop that makes the sentence true.
+# A^k's pattern is the pairs joined by a walk of length EXACTLY k, so it is
+# not the reach of k rounds of message passing: a vertex two hops away is
+# absent from A^1 and a vertex one hop away is absent from A^2. What reaches
+# within k is (A+I)^k, because the I lets a step be spent standing still --
+# which is exactly the self-loop every GCN adds before it aggregates, and is
+# why the frames print sigma((A+I)XW) rather than sigma(AXW).
+#
+# The old assertion here compared BFS against the union of A^1..A^k plus the
+# source, which is the within-k reading spelled out by hand: it was true, and
+# it was not the claim its own comment made, so it could not have caught the
+# page saying "exactly those within k steps" under a layer with no self-loop.
+# Test the pattern the page prints.
+def add_identity(A):
+    return [[A[i][j] + (1 if i == j else 0) for j in range(len(A))]
+            for i in range(len(A))]
+
+
 def reachable_within(A, src, k):
     n, seen, frontier = len(A), {src}, {src}
     for _ in range(k):
@@ -229,13 +250,19 @@ def reachable_within(A, src, k):
     return seen
 
 
+A_LOOP = add_identity(A_UND)
 for src in range(NV):
     for k in range(1, 5):
         by_bfs = reachable_within(A_UND, src, k)
-        by_mat = {src} | {j for step in range(1, k + 1)
-                          for j in range(NV) if matpow(A_UND, step)[src][j]}
+        by_mat = {j for j in range(NV) if matpow(A_LOOP, k)[src][j]}
         assert by_bfs == by_mat, \
-            "the reach of k message-passing rounds must be A^k's own pattern"
+            "the reach of k message-passing rounds must be (A+I)^k's pattern"
+# And the half that says the self-loop is doing the work rather than riding
+# along: at one hop A alone omits the vertex itself, and at two it omits the
+# neighbours reached in one.
+assert {j for j in range(NV) if A_UND[0][j]} != reachable_within(A_UND, 0, 1)
+assert ({j for j in range(NV) if matpow(A_UND, 2)[0][j]}
+        != reachable_within(A_UND, 0, 2))
 HOPS = 3
 emit("p13.hops", HOPS)
 emit("p13.reach", len(reachable_within(A_UND, 0, HOPS)))
@@ -352,7 +379,7 @@ EXACT = stationary_exact(P)
 assert matvec(transpose(P), EXACT) == EXACT, \
     "the exact stationary vector must be an eigenvector for eigenvalue 1"
 assert sum(EXACT) == 1
-# and power iteration must be heading there
+# and the iteration must be heading there
 # A BOUND, never the figure. The gap after sixty steps is rounding noise whose
 # size is a property of the arithmetic rather than of the mathematics, and
 # Program P06 had two of exactly these rejected by CI for being committed as
@@ -360,7 +387,7 @@ assert sum(EXACT) == 1
 _err = max(abs(float(a - b)) for a, b in zip(PI, EXACT))
 PI_BOUND = 15
 assert _err < 10 ** -PI_BOUND, \
-    f"power iteration must clear 1e-{PI_BOUND}, off by {_err:.2e}"
+    f"the iteration must clear 1e-{PI_BOUND}, off by {_err:.2e}"
 emit("p13.pi.bound", PI_BOUND)
 for i, x in enumerate(EXACT):
     emit(f"p13.exact.num.{i}", x.numerator)

@@ -66,12 +66,13 @@
   \answerto{No. That is the \emph{converse} and it is a different claim; the
   two disagree in $\val{p14.differ}$ of the $\val{p14.rows}$ rows. What does
   follow is that a thing which does not quack is not a duck.}
-\item A bound holds \enquote{with probability $\val{p14.conf}$ per cent}. You
-  use it $\val{p14.uses}$ times. What is the chance all of them hold?
-  \teachesat{28--29}
-  \answerto{About $\val{p14.allhold}$ per cent, so it fails somewhere
-  $\val{p14.anyfails}$ per cent of the time. A confidence quoted once is not a
-  confidence in the conclusion you build out of twenty of them.}
+\item A bound holds \enquote{with probability at least $\val{p14.conf}$ per
+  cent}. You use it $\val{p14.uses}$ times, on independent draws. What does
+  that guarantee give you for all of them together? \teachesat{28--29}
+  \answerto{At least $\val{p14.allhold}$ per cent, and nothing better: it
+  leaves room for a failure somewhere $\val{p14.anyfails}$ per cent of the
+  time. A confidence quoted once is not a confidence in the conclusion you
+  build out of twenty of them.}
 \item \enquote{For every tolerance there is a network} and \enquote{there is a
   network for every tolerance}. Same claim? \teachesat{15--16}
   \answerto{No, and the second is far stronger. Swapping those two quantifiers
@@ -79,14 +80,14 @@
   the first of the two.}
 \item A claim is checked on forty consecutive inputs and holds every time.
   What has been established? \teachesat{22--23}
-  \answerto{That it holds on those forty. $n^{2}+n+41$ is prime for every $n$
-  from $0$ to $\val{p14.euler.first}$ exclusive and composite at
-  $\val{p14.euler.first}$, so forty confirmations can be worth nothing.}
+  \answerto{That it holds on those forty. $n^{2}+n+41$ is prime for
+  $\val{p14.euler.first}$ consecutive values and composite at
+  $n = \val{p14.euler.first}$, so forty confirmations can be worth nothing.}
 \item A convergence theorem assumes the objective is convex. A paper cites it
   about a neural network. What has gone wrong? \teachesat{26--27}
   \answerto{A hypothesis was dropped. The conclusion is quoted and the
   condition it was proved under is not, and a neural network's loss is not
-  convex \dash{} so the theorem simply does not apply.}
+  convex \dash{} so the theorem does not apply at all.}
 \end{quiz}
 
 % ============================================================
@@ -161,10 +162,13 @@ exactly what Program~\ref{prog:P13} said when it proved one direction in a
 sentence and handed the other here.
 
 \textbf{The hypothesis in both is \enquote{directed}}, and it is doing real
-work: an undirected graph with one edge has a walk out and back, so without
-that word the theorem is false and the whole of Program~\ref{prog:P13}'s
-section 4 evaporates. It is also the word a reader is likeliest to skip,
-because it sits before the noun and reads like scenery.
+work. An undirected edge points both ways, so each of its endpoints would have
+to come after the other and no order exists \dash{} and yet, by the definition
+Program~\ref{prog:P13} gives, that graph has no cycle at all, because the walk
+out and back retraces its one edge. Acyclic and with no topological order: so
+without that word the theorem is false and the whole of section 4 of
+Program~\ref{prog:P13} evaporates. It is also the word a reader is likeliest
+to skip, because it sits before the noun and reads like scenery.
 \end{fr}
 
 \begin{fr}
@@ -233,8 +237,9 @@ about. You will not be able to prove it, and you will not need to.
 
 \begin{fr}
 Almost every hypothesis-and-conclusion pair is an \emph{implication}: if $P$,
-then $Q$. Program~\ref{prog:F10} gave \emph{and}, \emph{or} and \emph{not};
-this is the fourth connective and it is the one people get wrong.
+then $Q$, written $P \Rightarrow Q$ and read \emph{$P$ implies $Q$}.
+Program~\ref{prog:F10} gave \emph{and}, \emph{or} and \emph{not}; this is the
+fourth connective and it is the one people get wrong.
 
 There are $\val{p14.rows}$ cases, since $P$ and $Q$ are each true or false.
 In how many of them is \enquote{if $P$ then $Q$} \emph{false}?
@@ -249,14 +254,14 @@ no claim at all and is counted true, which reads as a technicality and is the
 whole of what the connective means.
 
 \begin{center}
-\begin{tabular}{cccc}
+\begin{tabular}{ccccc}
 \toprule
-$P$ & $Q$ & $P \Rightarrow Q$ & $Q \Rightarrow P$ \\
+& $P$ & $Q$ & $P \Rightarrow Q$ & $Q \Rightarrow P$ \\
 \midrule
-F & F & T & T \\
-F & T & T & F \\
-T & F & F & T \\
-T & T & T & T \\
+1 & F & F & T & T \\
+2 & F & T & T & F \\
+3 & T & F & F & T \\
+4 & T & T & T & T \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -356,7 +361,8 @@ one instance has finished the discussion, and why \enquote{but it usually
 works} is not a reply.
 
 \begin{note}
-Program~\ref{prog:F10} measured this same connective going wrong in a filter:
+Program~\ref{prog:F10} measured a negation pushed through the wrong
+connective in a filter, which is the same move one connective over:
 of $\val{p14.filter.total}$ records, the right condition keeps
 $\val{p14.filter.right}$ and \code{not spam and not short} keeps
 $\val{p14.filter.wrong}$, losing $\val{p14.filter.lost}$ with no symptom. This
@@ -401,8 +407,9 @@ sentence is true and the second is false. One witness is a proof that the two
 are different claims, which is section 2's asymmetry doing work.
 
 \begin{note}
-Only one direction is safe, and it is worth knowing which. \textbf{There-is-a-
-$y$-for-all-$x$ always implies for-all-$x$-there-is-a-$y$}, never the reverse:
+Only one direction is safe, and it is worth knowing which.
+\textbf{There-is-a-$y$-for-all-$x$ always implies
+for-all-$x$-there-is-a-$y$}, never the reverse:
 the universal witness serves as each individual one. The script checks that
 over \emph{every} relation on a three-element set \dash{} all
 $\val{p14.qchecked}$ of them \dash{} which is again an exhaustive proof rather
@@ -415,9 +422,11 @@ Now the one this field quotes most. The universal approximation theorem, in
 the shape it is usually stated:
 
 \begin{quote}
-For every continuous function $f$ on a bounded region and every tolerance
-$\varepsilon > 0$, there exists a network with one hidden layer whose output
-is within $\varepsilon$ of $f$ everywhere on that region.
+For every continuous function $f$ on a closed bounded region, every
+tolerance $\varepsilon > 0$, and any fixed activation that is not a
+polynomial, there exists a network with one hidden layer using that
+activation whose output is within $\varepsilon$ of $f$ everywhere on that
+region.
 \end{quote}
 
 Which order is that, and what is therefore allowed to depend on what?
@@ -427,8 +436,8 @@ Which order is that, and what is therefore allowed to depend on what?
 
 \begin{fr}
 \begin{ansblock}
-For-all, then there-exists. So the network is allowed to depend on both $f$
-and $\varepsilon$ \dash{} and does.
+For-all, then there-exists. So the network is allowed to depend on $f$, on
+$\varepsilon$ and on the activation you fixed \dash{} and does.
 \end{ansblock}
 
 Read that again with section 2's habit: what does the sentence actually claim?
@@ -448,7 +457,7 @@ $\val{p14.silent}$ things, and every one of them is what somebody quoting the
 theorem was actually asking about.
 
 \mermaidfig{p14-exists-is-not-found}{What an existence theorem promises, and
-the three questions it does not touch.}{exists is not found}
+what it is silent about.}{exists is not found}
 \end{fr}
 
 \begin{fr}
@@ -460,12 +469,24 @@ justify a choice of architecture is a mistake of a kind this program can name
 precisely: it treats an existence claim as a construction.
 
 The parallel that makes it obvious is that a polynomial of high enough degree
-also approximates any continuous function on a bounded region, and nobody
+also approximates any continuous function on a closed bounded region, and
 concludes from that that polynomials are a good model class. What decides the
 question is everything the theorem is silent about.
 \end{trapbox}
 
-\begin{warning}
+Two of the hypotheses go missing more often than the quantifier does, and both
+are cheap to falsify. \emph{Closed} is doing work: a continuous function on an
+interval with its ends left off need not be bounded at all, and $1/x$ between
+$0$ and $1$ takes every value above $1$, so no network of any size comes
+within any $\varepsilon$ of it. \emph{Not a polynomial} is doing work too:
+with the identity activation a one-hidden-layer network is affine in its
+input, the best affine approximation to $x^{2}$ on $\intcc{0}{1}$ is
+$x - \frac{1}{8}$, and its worst error is exactly $\frac{1}{8}$, so
+$\varepsilon = \num{0.1}$ is out of reach however many units are added.
+Neither is a detail. \emph{What a theorem is made of} counted the hypotheses
+as one of the three parts, so a statement quoted without them is a different
+statement.
+
 \textbf{How the required size grows is a real question with real answers, and
 this book has neither run the experiment nor surveyed that literature.} There
 are results in both directions \dash{} constructions that are efficient for
@@ -475,7 +496,6 @@ for others.
 Saying which applies to any particular architecture is beyond what this book
 has done, so it is not said. What is established here is the shape of the
 statement, which is a fact about the quantifiers and needs no experiment.
-\end{warning}
 \end{fr}
 
 % ============================================================
@@ -538,8 +558,8 @@ Here is why the distinction is not academic. Consider $n^{2} + n + 41$.
 \transcript{p14-forty-confirmations}
 
 \begin{trapbox}
-\textbf{It is prime for every $n$ from $0$ to $\val{p14.euler.first}$
-exclusive, and composite at $\val{p14.euler.first}$}, where it is
+\textbf{It is prime for $\val{p14.euler.first}$ consecutive values from
+$n = 0$, and composite at $n = \val{p14.euler.first}$}, where it is
 $\val{p14.euler.at}$ \dash{} which is $\val{p14.euler.factor}$ squared.
 
 Forty consecutive confirmations. Any test suite would have passed it; any
@@ -642,33 +662,38 @@ the training data}.
 
 You are reading a paper that applies such a bound $\val{p14.uses}$ times
 \dash{} once per experiment, or once per model in a comparison. Assuming the
-draws are independent, what is the chance that all $\val{p14.uses}$ hold?
+draws are independent, what does that guarantee give you for all
+$\val{p14.uses}$ holding together?
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{About $\val{p14.allhold}$ per cent}
-So the chance that at least one of them fails is $\val{p14.anyfails}$ per
-cent. \textbf{More likely than not, one of the twenty statements in that
-table is simply false}, and nothing in the paper marks which.
+\ans{At least $\val{p14.allhold}$ per cent}
+The premise is a floor rather than a probability, so the product is a floor
+too and the guarantee gives nothing better. Read the other way, it leaves
+room for at least one of the $\val{p14.uses}$ claims to fail as often as
+$\val{p14.anyfails}$ per cent of the time: \textbf{the guarantee permits a
+false statement among them more often than not}, and nothing in the paper
+marks which.
 
 Two more numbers make the shape clear.
 
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-uses before it is a coin flip & $\val{p14.flip}$ \\
-per-use confidence needed for $95\%$ across $\val{p14.uses}$
+uses before the guarantee is a coin flip & $\val{p14.flip}$ \\
+per-use confidence for $\val{p14.joint}$ per cent across $\val{p14.uses}$
   & $\val{p14.needed}$ per cent \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\textbf{A $\val{p14.conf}$ per cent bound is a coin flip after
-$\val{p14.flip}$ uses}, and to have twenty of them hold together you would
-need each to hold at $\val{p14.needed}$ per cent \dash{} a failure probability
-of $\val{p14.neededdelta}$ per cent rather than $5$, nearly twenty times
+\textbf{A $\val{p14.conf}$ per cent bound guarantees no better than a coin
+flip after $\val{p14.flip}$ uses}, and to guarantee $\val{p14.uses}$ of them
+together at $\val{p14.joint}$ per cent you would need each to hold at
+$\val{p14.needed}$ per cent \dash{} a failure probability of
+$\val{p14.neededdelta}$ per cent rather than $5$, nearly twenty times
 tighter.
 
 \begin{note}
@@ -752,12 +777,14 @@ subject you will use every week.
   holding and the conclusion failing}, because
   $\lnot(P \Rightarrow Q) = P \wedge \lnot Q$. Establishing may need every
   case; refuting needs one}.}
-\sumitem{15--16}{\result{\textbf{Quantifier order changes the claim.} There-is-a-$y$-
-  for-all-$x$ is the stronger, and implies the other; the reverse fails, as a
+\sumitem{15--16}{\result{\textbf{Quantifier order changes the claim.}
+  There-is-a-$y$-for-all-$x$ is the stronger, and implies the other; the
+  reverse fails, as a
   relation on $\val{p14.dom}$ elements shows and all
   $\val{p14.qchecked}$ relations on three confirm}.}
 \sumitem{17--18}{\result{\textbf{Universal approximation is for-all-then-there-exists},
-  so the network may depend on the function and the tolerance. It is silent on
+  so the network may depend on the function, the tolerance and the fixed
+  activation. It is silent on
   $\val{p14.silent}$ things, including how large the network must be and
   whether training finds it}.}
 \sumitem{19}{\result{\enquote{Networks can approximate any function} treats an
@@ -779,9 +806,10 @@ subject you will use every week.
   \dash{} which is this book's own rule about measurement applied to a
   sentence}.}
 \sumitem{28--29}{\result{\textbf{A $\val{p14.conf}$ per cent bound used
-  $\val{p14.uses}$ times holds throughout only $\val{p14.allhold}$ per cent of
-  the time}, is a coin flip after $\val{p14.flip}$ uses, and would need
-  $\val{p14.needed}$ per cent each to give $95\%$ across twenty}.}
+  $\val{p14.uses}$ times guarantees all of them together at no better than
+  $\val{p14.allhold}$ per cent}, falls to a coin flip after $\val{p14.flip}$
+  uses, and would need $\val{p14.needed}$ per cent each to reach
+  $\val{p14.joint}$ per cent across $\val{p14.uses}$}.}
 \sumitem{30--31}{\result{The three misquotations are one of each part: a dropped
   hypothesis, a dropped quantifier, and the gap between existence and
   construction. \textbf{There is no fourth kind of mistake because there is no
@@ -813,8 +841,8 @@ subject you will use every week.
   $\val{p14.conf}$ per cent \dash{} tightening the per-use bound from $5\%$ to
   $1\%$ buys about five times as many uses, which is the trade the paper's
   author had to make and usually does not state.}
-\item \emph{There is a learning rate that works for every architecture}
-  against \emph{for every architecture there is a learning rate that works}.
+\item \enquote{There is a learning rate that works for every architecture}
+  and \enquote{for every architecture there is a learning rate that works}.
   Which would you rather have, and which is plausible?
   \answerto{The first is far stronger and is what a default in a library
   claims implicitly; the second is nearly vacuous and is what anybody would

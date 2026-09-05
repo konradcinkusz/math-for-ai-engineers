@@ -41,6 +41,7 @@ Run:  python3 code/p14_logic_proof.py      (or: make numbers)
 from __future__ import annotations
 
 import math
+from fractions import Fraction
 from itertools import product
 from pathlib import Path
 
@@ -184,9 +185,14 @@ emit("p14.qchecked", _checked)
 # =====================================================================
 # 3. What "with high probability" costs when you use it more than once
 # =====================================================================
-# A bound that holds with probability 1 - delta on ONE draw. This is the
-# arithmetic the phrase hides, and it is the whole of section 5's first
-# worked example.
+# A bound that holds with probability AT LEAST 1 - delta on ONE draw, and the
+# "at least" is load-bearing: 1 - delta is the FLOOR the guarantee gives, not
+# the probability. So every product below is a floor too and every failure
+# figure is a ceiling, and what the arithmetic establishes is what the
+# guarantee LICENSES rather than what is true. The prose said "the chance that
+# all twenty hold" and "more likely than not one is false" for a draft, which
+# reads a floor as an equality and a ceiling as an observation -- in the
+# program whose subject is that dropping a quantifier changes the claim.
 DELTA = 0.05
 CONF = 1 - DELTA
 emit("p14.conf", CONF * 100, digits=0)
@@ -197,8 +203,8 @@ emit("p14.uses", USES)
 emit("p14.allhold", ALL_HOLD * 100, digits=1)
 emit("p14.anyfails", (1 - ALL_HOLD) * 100, digits=1)
 assert ALL_HOLD < 0.5, \
-    "the point is that a 95% bound used twenty times is more likely than " \
-    "not to fail somewhere, and if that stops being true the frame is wrong"
+    "the point is that a 95% guarantee used twenty times guarantees nothing " \
+    "better than a coin flip, and if that stops being true the frame is wrong"
 
 # The union bound gives the same conclusion without independence, which is why
 # it is the one people actually use -- Program P05 used it for capacity.
@@ -206,17 +212,75 @@ UNION = min(1.0, USES * DELTA)
 emit("p14.union", UNION * 100, digits=0)
 assert UNION >= 1 - ALL_HOLD, "the union bound must be the weaker statement"
 
-# How many uses before a 95% bound is a coin flip on the whole set?
+# How many uses before the guarantee is worth no more than a coin flip?
 FLIP = math.ceil(math.log(0.5) / math.log(CONF))
 emit("p14.flip", FLIP)
 assert CONF ** FLIP < 0.5 <= CONF ** (FLIP - 1), "the coin flip must be sharp"
 
-# And the confidence a single bound needs so that twenty uses hold 95% of the
-# time: this is the correction people leave out.
-NEEDED = 0.95 ** (1 / USES)
+# And the confidence a single bound needs so that twenty uses hold together at
+# a chosen JOINT level: the correction people leave out. JOINT is a target
+# somebody picks and CONF is what a paper's bound states, and they are two
+# different quantities that both print 95 in this example -- so they get two
+# names, because one key doing two jobs is a coincidence with a lifetime.
+JOINT = 0.95
+assert JOINT == CONF, \
+    "they coincide here by choice of example; if either moves the frame has " \
+    "to say which 95 it means rather than relying on them looking alike"
+emit("p14.joint", JOINT * 100, digits=0)
+NEEDED = JOINT ** (1 / USES)
 emit("p14.needed", NEEDED * 100, digits=2)
 emit("p14.neededdelta", (1 - NEEDED) * 100, digits=2)
 assert NEEDED > CONF, "the per-use bound has to be tighter, not looser"
+
+# =====================================================================
+# 3b. What the two dropped hypotheses of universal approximation cost
+# =====================================================================
+# The theorem is usually quoted with the activation and the closedness of the
+# region both left out, and this program's own subject is that dropping a
+# hypothesis is one of exactly three ways to misquote a theorem. So the cost
+# of dropping each is computed rather than asserted.
+#
+# Drop the activation condition -- allow the identity, which IS a polynomial
+# -- and a one-hidden-layer network is an affine function of its input. The
+# best uniform affine approximation to x^2 on [0, 1] is x - 1/8, and its error
+# is exactly 1/8: the residual x^2 - x + 1/8 equioscillates at 0, 1/2 and 1
+# with amplitude 1/8, which is Chebyshev's criterion and settles it without
+# any search. Everything here is a Fraction, so "exactly" is exact.
+AFF_SLOPE, AFF_INTERCEPT = Fraction(1), Fraction(-1, 8)
+AFF_FLOOR = Fraction(1, 8)
+_resid = [
+    Fraction(x) ** 2 - (AFF_SLOPE * Fraction(x) + AFF_INTERCEPT)
+    for x in (Fraction(0), Fraction(1, 2), Fraction(1))
+]
+assert _resid == [AFF_FLOOR, -AFF_FLOOR, AFF_FLOOR], \
+    "the residual must equioscillate at the three points, which is what " \
+    "makes this the BEST affine approximation rather than merely one of them"
+# No affine function does better, and a sampled sweep is not what settles it
+# -- but a sweep that found something better would mean the algebra above is
+# wrong, so it is worth running as a check on the code.
+_best = min(
+    max(abs(Fraction(k, 64) ** 2 - (a * Fraction(k, 64) + b)) for k in range(65))
+    for a in (Fraction(n, 8) for n in range(0, 17))
+    for b in (Fraction(n, 32) for n in range(-8, 9))
+)
+assert _best >= AFF_FLOOR, "no affine function may beat the equioscillating one"
+# Nothing here is emitted. The floor is 1/8 and the tolerance the frame names
+# is 0.1: a fraction siunitx cannot print, and a chosen parameter of a
+# demonstration rather than a computed quantity. Both are written inline in
+# both editions and both are asserted here, which is Program P09's shear
+# trapbox -- gated rather than argued, and emitting nothing.
+AFF_EPS = Fraction(1, 10)
+assert AFF_EPS < AFF_FLOOR, \
+    "the tolerance quoted in the frame has to be one the identity activation " \
+    "provably cannot meet, or the counterexample is not one"
+
+# Drop the closedness -- keep "bounded" alone -- and 1/x on the open interval
+# (0, 1) is continuous and unbounded, so no network of any size and any
+# activation is within any tolerance of it everywhere. Nothing is emitted:
+# the frame states the function and the interval, and both are things the
+# reader can check in their head.
+assert all(Fraction(1, 1) / Fraction(1, n) == n for n in range(1, 100)), \
+    "1/x on (0, 1) takes every value above 1, so it is unbounded there"
 
 # =====================================================================
 # 4. Induction, as a shape rather than as a technique
