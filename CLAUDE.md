@@ -108,7 +108,7 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1656 computed values, all referenced, all present, plus the committed console
+- 1663 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
@@ -133,7 +133,7 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **99 orphan-tail pages: 28 · 31 · 22 · 18** across `main-en`, `main-pl`,
+- **97 orphan-tail pages: 28 · 30 · 22 · 17** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`. **The passes that have taken the count DOWN are
   listed rather than counted**, because the tally that used to head this entry
   said *five* over a list of four and nothing could check it \dash{} which is
@@ -144,7 +144,8 @@ what was there before.
   pass is also a layout pass* is written into its note \dash{} the P01/P02
   review took one more off, in `main-pl-a4` alone, and the Part III review took
   two more, in `main-en` and `main-pl`, on a pass that added prose to six
-  programs and lengthened three frames twice over. **Read \enquote{across two builds} literally**: the
+  programs and lengthened three frames twice over, and the Part~VI review took
+  two off the Polish builds on a batch that turned no leaf in any format. **Read \enquote{across two builds} literally**: the
   batch's own build failed at `check` on an orphaned cue, and `check-a4` does
   not run until `check` passes, so the A4 half of this ledger was not measured
   until the cue was cleared. A hard-gate failure in the trade builds hides every
@@ -15048,6 +15049,198 @@ failures and $0$ warnings on the first run; `--frames --answers --outcomes
 --values --elicit --scripts --terms --parts` green; `gen_stubs --check`
 current. The elicitation rate is unmoved at $1028/1864$, because the batch
 converted nothing and added no frame.
+
+### Part VI review, P19 to P22, September 2026
+
+Issues \#167, \#131, \#134 and \#135, taken as one batch on the Foundation
+precedent that each PR costs a four-format build. This closes Part~VI's
+program reviews, and with them every part of the book that had open
+program-review issues except Parts~IV and VIII.
+
+#### THE FINDING: a pointer to a derivation nobody had licensed anyone to write
+
+Program~\ref{prog:P22} frame 24 states the solution of the KL-penalised
+problem \dash{} the tilted family $p \propto q e^{r/\beta}$ \dash{} and
+credited the derivation to Program~\ref{prog:P26}. **Nothing in the book
+derives it.** A grep for the family across all forty-seven programs returns
+only P22; P26 has zero occurrences.
+
+That much is the recorded class, for the umpteenth time: *open the program
+before writing a sentence about it*. **The reason it is not there is the part
+worth having.** The rigour box directly above declares exactly one fact about
+KL \dash{} it is non-negative, and zero only when the two distributions agree
+\dash{} which is the declared forward reference this book's own convention
+requires. Deriving the tilted family needs the **form** of the divergence, so
+that $\Ex_p[r] - \beta\KL{p}{q}$ can be differentiated under a normalisation
+constraint, and that is strictly more than the declaration allows.
+
+**So the pointer did not merely name the wrong program: it named work the
+book's own forward-reference convention had not licensed anyone to do.** A
+reader following it to P26 would find nothing, and a reader who went looking
+for it in P30 would find the definition without the derivation. The frame now
+says the family is stated here and derived nowhere in this book, and says why
+\dash{} which is the issue's own second option and is the honest form.
+
+Worth keeping beside the Part~V batch's declared-forward-reference finding:
+both are about the same convention, and they fail in opposite directions.
+There, a spoiler fix deleted a pointer the convention requires. Here, a
+pointer promised something the convention forbids. **The convention is a
+constraint on what a program may borrow, so it is also a constraint on what a
+pointer may promise**, and nothing checks either half.
+
+#### An answer key that ran its own scenario backwards
+
+Test exercise 4 asks what happens when a $\beta$ tuned on one project is
+carried to a reward model whose scale is ten times larger. $\beta$ is a price
+in reward per nat, so a $\beta$ from the cheaper scale is **ten times too
+dear** here: the penalty is *stronger* and the model stays *closer* to the
+reference. The shipped answer said weaker and further \dash{} the reverse, in
+the back matter, which is where a reader goes because they already suspect
+they are wrong. That is the fourth batch running to find a wrong answer key,
+and the class is now better attested than most of the layout ones.
+
+**And \enquote{ten times} was a second defect inside the first.** The program's
+own sweep measures the relationship and it is not linear: a sixteenfold drop
+in $\beta$ spends $62$ times the divergence. So the corrected answer names the
+direction, which is what the exercise is testing, and refuses the multiple,
+which the section's own measurement refutes.
+
+#### The KKT table said \enquote{the sign moved} and left the reader to find out where
+
+Section~2 writes stationarity as $\nabla f = \lambda \nabla g$ and reads the
+multiplier as $\mathrm{d}f^{*}/\mathrm{d}c$; the standard KKT form moves
+$\lambda \nabla g$ across, so **the same number is $-\mathrm{d}f^{*}/\mathrm{d}c$
+there**. The table noted that a sign moves and stopped.
+
+That is exactly what makes the third KKT line say something: $\lambda \ge 0$
+is the statement that relaxing a bound cannot make the minimum worse, and
+under the other convention it would read as the opposite. **Frame 34 warns
+about that sign**, so the program had been setting the trap four frames after
+declining to disarm it. One paragraph, in both editions, carrying five maths
+spans in the same order so C4, C8 and C12 had nothing to diverge on.
+
+#### Also
+
+- **$134$ per cent now reproduces from the page.** The reward column moved to
+  three decimals with printed-form assertions, which is this book's most
+  repeated rule \dash{} divide the two numbers as the page prints them.
+- **The chord is computed rather than left to be discovered.** A reader who
+  divides the table's two rows gets $\num{0.81}$, which is $\beta$ at neither
+  end, because the slope is local and the chord is an average over the
+  interval. It is emitted now, and asserted to lie strictly between the two
+  $\beta$s, so the frame can say what a reader's own arithmetic will produce.
+- **The hyperparameter point is Program~\ref{prog:P20}'s, and two programs
+  earlier** \dash{} not Program~\ref{prog:P21}'s and one part later.
+  `grep -c hyperparameter` gives P20 four and P21 zero, and both are in
+  Part~VI, so the pointer was wrong about the program and about the part.
+- Two outcomes stripped of the findings they carried; \enquote{two vector
+  equations} is one vector equation and two components; the middle constraint
+  row carries its multiplier; the projection prints the integers it is; an
+  inline `\dfrac` is gone; the headline-identity box is a `note` rather than a
+  `trapbox`, because it states a result rather than correcting an error the
+  reader has just made; and Program~\ref{prog:P21}'s \enquote{one of them has
+  the wrong sign} is measured \dash{} $24$ of $120$ batch means are negative
+  and $4$ are exactly zero.
+
+#### A remedy that had already shipped, for the second time in three batches
+
+Issue \#135 asks for \enquote{a `needspace` sized to the listing before
+`\transcript`} to stop the program's one console listing splitting across a
+page turn. **That is verbatim the guard the F08--F11 batch shipped**, and the
+ancestry is checkable: the issue's own base, `9402620`, is an ancestor of
+`5dc186c`, where the guard landed.
+
+That is the P01/P02 rule at its strongest, and it is now the second such
+retirement after the Part~V batch's sliver finding: **a review is a claim
+about the build it was made on.** It cost one `git merge-base`, and the two
+instances share a shape worth naming \dash{} in both, the reviewer specified
+the *remedy* that is already in the tree, arrived at independently from the
+same defect. A finding that no longer reproduces is cheap to retire; a
+**remedy** that has already shipped reads exactly like work to do.
+
+#### Measured and not taken
+
+Four of \#135's findings are book-wide layout changes nobody has measured,
+which is the P05 review pass's standing precedent \dash{} the next person
+meets the obstacle with the reasoning rather than rediscovering it:
+
+- the Quiz heading and its instruction stranded on the opener with the
+  questions overleaf. **Fifth batch running that this has been recorded**, and
+  the Part~V batch added the diagnosis it needs: the `quiz` room test and the
+  box's own `lines before break` disagree, and `checkpdf`'s heading check
+  learns the *numbered* heading's size from the document, so a `\section*`
+  left behind is invisible to it. The instrument is owed before the sweep;
+- the Summary broken $1 + 16 + 1$ across three pages, which needs a `\penalty`
+  inside `\sumitem` and moves pagination in every program whose Summary spans
+  a break;
+- the \enquote{Can you?} rows packed with no separation;
+- three chain diagrams restating the prose, which is the figure pass this
+  repository already carries from the Foundation batch.
+
+#### Layout: thirteen prose substitutions absorbed without turning a leaf
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1435 | 1435 | `[]` | 0 |
+| `main-pl` | 1460 | 1460 | `[]` | 0 |
+| `main-en-a4` | 1194 | 1194 | `[6.3]` | 0 |
+| `main-pl-a4` | 1210 | 1210 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and **no orphaned cues at any point in the pass, on the first
+build**. That last is unusual for a batch that inserts a paragraph in the
+middle of a program: the KKT paragraph sits mid-P22, so it re-rolled every cue
+after it in that program, and none landed badly.
+
+**No page count moved in any format, which is this repository's own
+\enquote{an unchanged page count is a failed build} tell, so it was checked
+rather than assumed.** Two instruments, on the recorded rule: the four PDFs
+were minutes old rather than carried over from the previous build, and the KKT
+paragraph is present in the finished `main-en.pdf` and `main-pl.pdf` under
+`pdftotext`. Both had to agree before the zeros were believed, because a
+build that never ran and a build that changed nothing report identically.
+
+**And the orphan tails went 99 to 97**: 28, 30, 22, 17 against the pre-batch
+28, 31, 22, 18. One off each Polish build, on a batch that added prose to two
+programs \dash{} which is the F01--F06 batch's finding for the fifth time,
+that **a correctness pass is also a layout pass** in whichever direction the
+arithmetic of the page happens to fall. The ledger entry above lists the
+passes that have taken it down and this batch is added to that list rather
+than counted into an ordinal here, which is the correction the Part~III
+review pass earned when the entry's own tally said five over a list of four.
+
+The transcript guard fired 8 / 9 / 6 / 11, identical to the Part~V batch,
+which is what a batch that splits no listing should give.
+
+#### Gates
+
+Every source gate run **before** the build, which is Program~\ref{prog:P33}'s
+rule and the seventh pass running: parity $56$ file pairs / $1864$ frames /
+$0$ failures and $0$ warnings; `--frames --answers --outcomes --values
+--elicit --scripts --terms --parts` green; `gen_stubs --check` current. The
+elicitation rate is unmoved at $1028/1864$, because the batch converted
+nothing and added no frame.
+
+**And this file's own value ledger was stale for the fourth time**, at $1656$
+against `make debt`'s $1663$. The shape has been identical on every one of the
+four: **the gated copy in `figures/values/appf.tex` is right**, because
+`make verify` refuses the tree otherwise, and the ungated sentence four
+hundred lines up is not. The standing instruction from the Part~II elicitation
+pass \dash{} a pass that moves a ledger has to grep the appendices *and this
+file* for prose about it \dash{} has now been written down three times and
+missed four, which is itself the evidence for what Appendix~F is for.
+
+**The corrected figure is the tool's own**, which is the Appendix~F pass's
+rule rather than a preference: a fresh
+`grep -o mfaval figures/values/*.tex | wc -l` also answers $1663$ here and is
+a one-liner nobody has watched produce a known answer, so it is not what the
+number was taken from. The transcript count needed nothing \dash{} the Part~V
+batch had already moved it to $88$ when it split two listings, which is the
+one occasion in four that the instruction was followed.
 
 ### Stroud layout pass, August 2026
 
