@@ -134,7 +134,7 @@ Ilu pozycji to wymaga, zanim to miejsce w ogóle zaokrągli się poprawnie?
 \begin{fr}
 \ans{Ponad tysiąca: $\val{p27.decimal.floor}$}
 
-Siatka musi być gęstsza niż pół dziesiątej punktu, więc $1/n$ musi być
+Siatka musi być gęstsza niż dziesiąta punktu, więc $1/n$ musi być
 poniżej $\num{0.001}$.
 
 To stwierdzenie o arytmetyce, a za nim stoi drugie zastrzeżenie, dużo
@@ -263,8 +263,9 @@ $\val{p27.boot.k}/\val{p27.boot.n}$, a losowania są niezależne.
 
 Na proporcji \textbf{rozkład bootstrapowy nie jest więc przybliżeniem
 czegokolwiek} \dash{} jest rozkładem dwumianowym i nie trzeba żadnej symulacji,
-żeby go znaleźć. Przedział to kwantyle tego rozkładu, zsumowane symbolem
-Newtona z Programu~\ref{prog:P12}:
+żeby go znaleźć. Przedział to kwantyle tego rozkładu, otrzymane przez
+zsumowanie
+symbolu Newtona z Programu~\ref{prog:P12}:
 
 \begin{center}
 \begin{tabular}{lrr}
@@ -583,8 +584,7 @@ niego dodać.
 
 \begin{fr}
 \begin{aibox}
-\textbf{Gdzie to widać.} Dwie linijki, które twój harness mógłby drukować i
-nie drukuje.
+\textbf{Dwie linijki, które twój harness mógłby drukować i nie drukuje.}
 
 Każdy raport ewaluacyjny w tej dziedzinie drukuje dwie dokładności. Prawie
 żaden nie drukuje \textbf{liczby pozycji niezgodnych} i \textbf{przewagi}, a
@@ -717,9 +717,9 @@ wychodzi poniżej $\val{p27.alpha}$?
 \ans{W $\val{p27.null.rate.pct}$ procentach przypadków}
 
 Z konstrukcji, i nie jest to wada \dash{} to definicja progu widziana z drugiej
-strony. \textbf{Jedno na dwadzieścia porównań dwóch identycznych modeli
-zaraportuje istotną różnicę} i nie ma wersji tej procedury, w której jest
-inaczej.
+strony. Próg jest tak zbudowany, że \textbf{jedno na dwadzieścia porównań dwóch
+identycznych modeli raportuje istotną różnicę}, i żaden wybór testu tego nie
+usuwa.
 
 Pomiar daje tu $\val{p27.null.rate.pct}$, a nie dokładnie $\val{p27.alpha}$, i
 powód warto mieć: test na pozycjach niezgodnych jest dyskretny, więc jego
@@ -795,8 +795,8 @@ przywraca łączną częstość. Ile kosztuje?
 \begin{fr}
 \ans{$\val{p27.bonf.cost}$ raza tyle pozycji}
 
-Próg przesuwa mnożnik w przedziale z Programu~\ref{prog:P25} na
-$\val{p27.z.bonf}$ zamiast $\num{1.96}$, a wzór z sekcji 3 niesie ten mnożnik
+Próg przesuwa mnożnik w przedziale z Programu~\ref{prog:P25} z
+$\num{1.96}$ na $\val{p27.z.bonf}$, a wzór z sekcji 3 niesie ten mnożnik
 \emph{do kwadratu}. Ranking, który chce czterdziestu uczciwych porównań,
 potrzebuje więc $\val{p27.bonf.cost}$ raza tylu pozycji ewaluacyjnych co
 jedno, na dokładkę do wszystkiego innego.
@@ -964,8 +964,8 @@ rozkład na to, czego nie jesteś pewien, a nie na dane, które już masz.
   Wynik $k$ zaliczonych z $n$ leży na siatce o oczku $100/n$ punktu, więc
   $\val{p27.quoted.hi}$ procent na $\val{p27.items}$ pozycjach to
   $\val{p27.k.hi}$ pozycji i jest nieosiągalne. Dokładność z jednym miejscem
-  po przecinku wymaga ponad $\val{p27.decimal.floor}$ pozycji, zanim to
-  miejsce się zaokrągli}.}
+  po przecinku wymaga ponad tysiąca pozycji \dash{}
+  $\val{p27.decimal.floor}$ \dash{} zanim to miejsce się zaokrągli}.}
 \sumitem{3--5}{\result{\textbf{Opublikowana różnica to $\val{p27.gap.items}$ pozycja.}
   $\val{p27.gap.pts}$ punktu z $\val{p27.items}$ pozycji, wobec przedziału
   $\pm\val{p27.hw.200}$ punktu \dash{} ponad
@@ -1037,10 +1037,13 @@ rozkład na to, czego nie jesteś pewien, a nie na dane, które już masz.
 \begin{testexercises}
 \item Model raportuje $\num{83.3}$ procent na $60$ pozycjach ewaluacyjnych.
   Czy to osiągalne i jakie są dwa najbliższe osiągalne wyniki?
-  \answerto{Tak: $\num{83.3}$ procent z $60$ to dokładnie $50$ pozycji. Siatka
-  ma tu oczko $100/60 = \num{1.67}$ punktu, więc sąsiadami są $49/60 =
-  \num{81.7}$ i $51/60 = \num{85.0}$ procent \dash{} tak gruboziarnisty jest
-  benchmark o $60$ pozycjach.}
+  \answerto{Tak \dash{} ale nie z powodu, dla którego ramka 2 odrzuciła
+  $\num{71.4}$. $50/60$ to $\num{83.33}\ldots$ procent, co drukuje się jako
+  $\num{83.3}$, więc podana liczba jest zaokrągleniem osiągalnego wyniku; ani
+  $\num{71.0}$, ani $\num{71.5}$ nie zaokrągla się do $\num{71.4}$ i dlatego
+  tamta nie była. Siatka ma tu oczko $100/60 = \num{1.67}$ punktu, więc
+  sąsiadami są $49/60 = \num{81.7}$ i $51/60 = \num{85.0}$ procent \dash{}
+  tak gruboziarnisty jest benchmark o $60$ pozycjach.}
 \item Dwa modele zewaluowano na $500$ wspólnych promptach. Nie zgadzają się na
   $80$ z nich, a z tych $46$ idzie do B i $34$ do A. Ile wynosi przewaga, w
   pozycjach i w punktach?
@@ -1073,9 +1076,11 @@ rozkład na to, czego nie jesteś pewien, a nie na dane, które już masz.
 \begin{furtherproblems}
 \item Benchmark raportuje $\num{62.48}$ procent. Jaka jest najmniejsza liczba
   pozycji, na której dałoby się w ogóle policzyć tyle miejsc po przecinku?
-  \answerto{Siatka musi być gęstsza niż pół setnej punktu, więc
-  $1/n < \num{0.00005}$ i $n > 20\,000$. Prawie żaden benchmark nie ma tylu
-  pozycji, więc dwa miejsca po przecinku w publicznym rankingu są ozdobą.}
+  \answerto{Ten sam warunek co w ramce 3, o jedno miejsce dalej: siatka musi
+  być gęstsza niż setna punktu, więc $1/n < \num{0.0001}$ i $n > 10\,000$
+  \dash{} czyli $\val{p27.decimal.floor.two}$ pozycji. Prawie żaden benchmark
+  nie ma tylu, więc dwa miejsca po przecinku w publicznym rankingu są
+  ozdobą.}
 \item Pokaż, że rozkład bootstrapowy \emph{średniej} z $n$ wartości ma
   wariancję $(1 - 1/n)$ razy zwykłe $s^{2}/n$, i powiedz, dlaczego nie ma to
   znaczenia przy $n = \val{p27.items}$.
@@ -1091,7 +1096,11 @@ rozkład na to, czego nie jesteś pewien, a nie na dane, które już masz.
   \answerto{Ułamek pozycji niezgodnych jest tym, co harness umie zliczyć, i
   jest wielkością, której test dokładny używa wprost: przewaga musi sięgnąć
   około $\num{1.96}\sqrt{dn}$ pozycji, żeby uczciwa moneta jej nie
-  produkowała. $\rho$ trzeba oszacować; $d$ to dwa liczniki w pętli, i
+  produkowała \dash{} zaokrąglone w górę do kolejnej wartości o tej samej
+  parzystości co $dn$, i z luzem: przy $dn = \val{p27.disc}$ daje to $11$,
+  gdzie dokładne przeszukanie daje $\val{p27.net.needed}$, bo test dyskretny
+  przeskakuje swój próg, zamiast na nim wylądować. $\rho$ trzeba oszacować;
+  $d$ to dwa liczniki w pętli, i
   dlatego aibox z sekcji 3 prosi właśnie o nie.}
 \item Dwa czołowe modele rankingu dzieli $\num{0.3}$ punktu na
   $\val{p27.lb.n}$ pozycjach. Bez żadnych dalszych informacji, co

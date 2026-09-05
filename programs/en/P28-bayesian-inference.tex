@@ -42,7 +42,7 @@
   another}
 \outcome{27--30}{route traffic under uncertainty, and say what a fixed
   exploration rate assumes}
-\outcome{31--37}{check a judge model's stated probability, and price it when
+\outcome{31--36}{check a judge model's stated probability, and price it when
   it is wrong}
 \end{outcomes}
 
@@ -184,10 +184,8 @@ instead of an argument.
 The reason the objection feels strong is that a prior is genuinely a choice
 and nothing forces one. What it misses is that the choice has a
 \emph{magnitude}, and the magnitude is computable: section 2 shows that a
-prior is worth a definite number of observations, and section 3 shows what
-that is worth against a real evaluation set. On
-$\val{p28.n}$ items it moves the answer by less than one item; on
-$\val{p28.small.n}$ it moves it a great deal.
+prior is worth a definite number of observations, and then what that is worth
+against a real evaluation set.
 
 So the question \enquote{does the prior matter here} has an arithmetic answer
 every time it is asked, and the argument people have instead is usually being
@@ -425,7 +423,8 @@ $\mathrm{Beta}(\val{p28.prior.a}, \val{p28.prior.b})$
   & $\val{p28.small.cred.lo}$ to $\val{p28.small.cred.hi}$
   & $\val{p28.width.small}$ \\
 $\mathrm{Beta}(\val{p28.strong}, \val{p28.strong})$
-  & $\val{p28.strong.cred.lo}$ to $\val{p28.strong.cred.hi}$ & \\
+  & $\val{p28.strong.cred.lo}$ to $\val{p28.strong.cred.hi}$
+  & $\val{p28.width.strong}$ \\
 \midrule
 $\val{p28.k}$ of $\val{p28.n}$, uniform prior
   & $\val{p28.cred.lo}$ to $\val{p28.cred.hi}$
@@ -434,8 +433,8 @@ $\val{p28.k}$ of $\val{p28.n}$, uniform prior
 \end{tabular}
 \end{center}
 
-The first row spans two thirds of everything a rate could be. Which of the
-three numbers in that table is the one to put in a report?
+The first row spans two thirds of everything a rate could be. Each row gives
+three numbers. Which of them is the one to put in a report?
 \dotline
 \nextframe
 \end{fr}
@@ -469,8 +468,10 @@ first makes that visible without anybody having to raise it.
 \begin{fr}
 Program~\ref{prog:P27} §4 ends by naming a quantity and declining to compute
 it. Two models were compared on the same $\val{p28.n}$ prompts;
-$\val{p28.disc}$ items were \textbf{discordant}, meaning exactly one model got
-them right, and of those $\val{p28.to.b}$ went to B and $\val{p28.to.a}$ to A.
+$\val{p28.disc}$ items were \textbf{discordant} \dash{} a figure
+Program~\ref{prog:P27} stipulated rather than measured, and nothing below
+depends on which it is \dash{} meaning exactly one model got them right, and
+of those $\val{p28.to.b}$ went to B and $\val{p28.to.a}$ to A.
 The concordant items cancel exactly and carry no information about the
 difference.
 
@@ -577,13 +578,19 @@ favourable, to get from \enquote{a nudge} to \enquote{worth acting on}.
 Two things fall out of that number and both are worth carrying.
 
 \begin{itemize}
-\item \textbf{It is the same size as the frequentist threshold, and that is
-  not a coincidence.} Program~\ref{prog:P27} asked a different question of the
-  same data \dash{} how lopsided would these $\val{p28.disc}$ items have to
-  be before a fair coin would rarely produce them \dash{} and answered
+\item \textbf{It is not the frequentist threshold in disguise.}
+  Program~\ref{prog:P27} asked a different question of the same data
+  \dash{} how lopsided would these $\val{p28.disc}$ items have to be before
+  a fair coin would rarely produce them \dash{} and answered
   $\val{p27.net.needed}$. Both are sums of binomial coefficients over
-  $2^{m}$, read two ways, so the two frameworks disagree about what the number
-  \emph{means} and hardly at all about how much evidence it takes.
+  $2^{m}$ read two ways, which makes them look interchangeable, and they are
+  not. Put them in the same units: at the point the posterior crosses $95$
+  per cent the evaluation stands at $\val{p28.reach.b}$ of
+  $\val{p28.reach.disc}$, a net of $\val{p28.cross.net}$, and
+  Program~\ref{prog:P27}'s test on that many items wants
+  $\val{p28.cross.need}$ and returns $p = \val{p28.cross.p}$. A one-sided
+  posterior threshold and a two-sided $p$-value threshold are different
+  bars, and that is how far apart they sit.
 \item \textbf{It is a question you can ask before running anything.} The
   posterior after a hypothetical result is computable now, so \enquote{how
   much more evidence would change my mind} has a number, and it is the number
@@ -625,8 +632,8 @@ to keep serving traffic while the evidence accumulates, and you would rather
 not send half of it to whichever model is losing.
 
 Here is a rule that needs no threshold and no schedule. \textbf{Draw one
-sample from each posterior and route the request to whichever sample came out
-larger.}
+sample from each model's own posterior \dash{} the pair of frame 26 \dash{}
+and route the request to whichever sample came out larger.}
 
 What fraction of traffic does that send to B?
 \dotline
@@ -639,9 +646,13 @@ is better}
 
 \emph{By construction}, and that is the whole of the argument: the rule routes
 to B exactly when B's draw is larger, and the probability of that event is
-$\Prob(\theta_B > \theta_A)$, which is the number section 4 already computed.
+$\Prob(\theta_B > \theta_A)$ \dash{} which is frame 26's \emph{unpaired}
+figure and not the paired $\val{p28.p.better.pct}$ the section leads on.
+Routing is a question about one model against the other, so it is the
+per-model posteriors that answer it. The rule has a name, \emph{Thompson
+sampling}.
 
-So the rule needs no experiment to describe and no parameter to set. It
+So it needs no experiment to describe and no parameter to set. It
 \textbf{explores in exact proportion to how likely each arm is to be the best
 one}, and the proportion is a quantity you were computing anyway.
 
@@ -671,13 +682,16 @@ Set beside the rule above, what does that fixed fraction assume?
 \begin{fr}
 \ans{That the evidence never becomes strong enough to stop paying for it}
 
-The two rules agree while the posterior is near a half, because
-$\val{p28.route.b.pct}$ per cent and \enquote{half the traffic, minus a bit}
-are the same instruction. They part company as evidence arrives, and the
-crossing point is computable rather than a matter of taste: after
-$\val{p28.eps.crossover}$ more successes for B the posterior probability that
-A is better falls below $\val{p28.eps.pct}$ per cent, and from that point on
-the fixed rule is spending more on the worse arm than the evidence supports.
+The two rules are furthest apart at the start. At
+$\val{p28.route.b.pct}$ per cent the posterior rule sends
+$\val{p28.route.a.pct}$ per cent of the traffic to the arm that is behind
+and the fixed rule sends $\val{p28.eps.pct}$, so a fixed rate
+\emph{under}-explores exactly while the evidence is thinnest. They meet at
+one point, and it is computable rather than a matter of taste: after
+$\val{p28.eps.crossover}$ more successes for B the posterior probability
+that A is better falls to $\val{p28.eps.pct}$ per cent, which is the split
+the fixed rule was using all along. From there on it is the fixed rule that
+spends more on the worse arm than the evidence supports.
 
 \begin{trapbox}
 \textbf{\enquote{The exploration rate is a hyperparameter, so I will tune
@@ -717,8 +731,10 @@ What are the two statements in odds?
 \ans{$\val{p28.judge.odds.says}$ to one against
 $\val{p28.judge.odds.means}$ to one}
 
-$\frac{p}{1-p}$ in each case, and the ratio of the two is
-$\val{p28.judge.factor}$. \textbf{The judge is overstating the evidence by
+$\frac{p}{1-p}$ in each case. The second is $\frac{7}{3}$, of which
+$\val{p28.judge.odds.means}$ is a rounding, so the ratio of the two is
+$9 \div \frac{7}{3} = \frac{27}{7} = \val{p28.judge.factor}$. \textbf{The
+judge is overstating the evidence by
 nearly a factor of four}, which is a much larger error than twenty points of
 probability sounds like \dash{} because a probability near a boundary
 compresses, exactly as Program~\ref{prog:P05} and Program~\ref{prog:P21} each
@@ -808,7 +824,8 @@ This section prices a bad judge in \emph{odds}, which is
 Program~\ref{prog:P23}'s form and needs nothing new. There is a second reading
 \dash{} a stated probability that is wrong costs you a measurable number of
 nats, and that number is what a calibration loss minimises \dash{} and it
-belongs to Program~\ref{prog:P30}, which defines the units.
+belongs to Program~\ref{prog:P30}, which defines the quantity, on the
+units Program~\ref{prog:P29} supplies.
 \end{note}
 \end{fr}
 
@@ -839,7 +856,8 @@ how much a message is worth.
 \sumitem{6--7}{\result{\textbf{The update adds the counts.} $k$ successes in $n$
   trials takes $\mathrm{Beta}(a, b)$ to $\mathrm{Beta}(a + k,\ b + n - k)$,
   which is what conjugacy buys and it is the whole of the arithmetic}.}
-\sumitem{8--10}{\result{\textbf{A prior is worth $a + b$ observations}, so it moves
+\sumitem{8--11}{\result{\textbf{A prior is worth $a + b$ observations}, so
+it moves
   the answer by $\frac{a+b}{a+b+n}$ of the way. On $\val{p28.n}$ items a
   uniform prior moves it less than one item; on $\val{p28.small.n}$ it moves
   it by three points}.}
@@ -907,7 +925,8 @@ how much a message is worth.
 \item Two models are compared on the same $500$ prompts. They disagree on
   $60$ items, of which $36$ go to B. Is B better?
   \answerto{The posterior is $\mathrm{Beta}(37, 25)$ and
-  $\Prob(\theta > \frac{1}{2})$ is about $\num{0.93}$ \dash{} suggestive and short
+  $\Prob(\theta > \frac{1}{2})$ is about $\num{0.938}$ \dash{} suggestive
+  and short
   of the conventional bar. The $440$ concordant items are irrelevant to the
   comparison and should not appear in it.}
 \item A judge states $\num{0.8}$ and is right $\num{0.6}$ of the time on those

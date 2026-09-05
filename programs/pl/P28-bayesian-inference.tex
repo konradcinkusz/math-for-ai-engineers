@@ -28,7 +28,7 @@
   drugiego}
 \outcome{27--30}{kierować ruch przy niepewności i powiedzieć, co zakłada stała
   stopa eksploracji}
-\outcome{31--37}{sprawdzić deklarowane prawdopodobieństwo modelu sędziego i
+\outcome{31--36}{sprawdzić deklarowane prawdopodobieństwo modelu sędziego i
   wycenić je, gdy jest błędne}
 \end{outcomes}
 
@@ -172,10 +172,8 @@ argumentem.
 
 Zarzut wydaje się mocny dlatego, że prior jest naprawdę wyborem i nic go nie
 narzuca. Umyka mu to, że wybór ma \emph{wielkość}, a wielkość da się policzyć:
-sekcja 2 pokazuje, że prior wart jest określonej liczby obserwacji, a sekcja 3
-pokazuje, ile to warte wobec prawdziwego zbioru ewaluacyjnego. Na
-$\val{p28.n}$ pozycjach przesuwa odpowiedź o mniej niż jedną pozycję; na
-$\val{p28.small.n}$ przesuwa ją bardzo.
+sekcja 2 pokazuje, że prior wart jest określonej liczby obserwacji, a potem
+\dash{} ile to warte wobec prawdziwego zbioru ewaluacyjnego.
 
 Więc pytanie \enquote{czy prior ma tu znaczenie} ma za każdym razem
 arytmetyczną odpowiedź, a spór, który ludzie toczą zamiast tego, dotyczy
@@ -411,7 +409,8 @@ $\mathrm{Beta}(\val{p28.prior.a}, \val{p28.prior.b})$
   & $\val{p28.small.cred.lo}$ do $\val{p28.small.cred.hi}$
   & $\val{p28.width.small}$ \\
 $\mathrm{Beta}(\val{p28.strong}, \val{p28.strong})$
-  & $\val{p28.strong.cred.lo}$ do $\val{p28.strong.cred.hi}$ & \\
+  & $\val{p28.strong.cred.lo}$ do $\val{p28.strong.cred.hi}$
+  & $\val{p28.width.strong}$ \\
 \midrule
 $\val{p28.k}$ z $\val{p28.n}$, prior jednostajny
   & $\val{p28.cred.lo}$ do $\val{p28.cred.hi}$
@@ -421,7 +420,7 @@ $\val{p28.k}$ z $\val{p28.n}$, prior jednostajny
 \end{center}
 
 Pierwszy wiersz obejmuje dwie trzecie wszystkiego, czym współczynnik mógłby
-być. Którą z trzech liczb w tej tabeli wpisać do raportu?
+być. Każdy wiersz podaje trzy liczby. Którą z nich wpisać do raportu?
 \dotline
 \nextframe
 \end{fr}
@@ -454,8 +453,10 @@ czyni to widocznym, zanim ktokolwiek musi to podnieść.
 \begin{fr}
 Program~\ref{prog:P27} §4 kończy się nazwaniem pewnej wielkości i odmową jej
 policzenia. Dwa modele porównano na tych samych $\val{p28.n}$ promptach;
-$\val{p28.disc}$ pozycji było \textbf{niezgodnych}, czyli dokładnie jeden
-model je zaliczył, a z nich $\val{p28.to.b}$ przypadło B, a
+$\val{p28.disc}$ pozycji było \textbf{niezgodnych} \dash{} liczba, którą
+Program~\ref{prog:P27} założył, a nie zmierzył, i nic poniżej nie zależy od
+tego, która to \dash{} czyli dokładnie jeden model je zaliczył, a z nich
+$\val{p28.to.b}$ przypadło B, a
 $\val{p28.to.a}$ modelowi A. Pozycje zgodne znoszą się dokładnie i nie niosą
 żadnej informacji o różnicy.
 
@@ -564,13 +565,19 @@ działać}.
 Z tej liczby wynikają dwie rzeczy i obie warto wynieść.
 
 \begin{itemize}
-\item \textbf{Jest tego samego rzędu co próg częstościowy i nie jest to
-  przypadek.} Program~\ref{prog:P27} zadał inne pytanie o te same dane
+\item \textbf{To nie jest próg częstościowy w przebraniu.}
+  Program~\ref{prog:P27} zadał inne pytanie o te same dane
   \dash{} jak nierówno musiałoby wypaść tych $\val{p28.disc}$ pozycji, żeby
   uczciwa moneta rzadko dawała taki wynik \dash{} i odpowiedział
   $\val{p27.net.needed}$. Oba są sumami symboli Newtona przez
-  $2^{m}$, czytanymi na dwa sposoby, więc oba ujęcia różnią się co do tego, co
-  liczba \emph{znaczy}, a niemal wcale co do tego, ile dowodu potrzeba.
+  $2^{m}$ czytanymi na dwa sposoby, co sprawia, że wyglądają wymiennie, a nie
+  są. Sprowadź je do tych samych jednostek: w chwili, gdy rozkład a
+  posteriori przekracza $95$ procent, ewaluacja stoi na $\val{p28.reach.b}$
+  z $\val{p28.reach.disc}$, przewaga netto to $\val{p28.cross.net}$, a test
+  Programu~\ref{prog:P27} na tylu pozycjach chce $\val{p28.cross.need}$ i
+  zwraca $p = \val{p28.cross.p}$. Jednostronny próg a posteriori i
+  dwustronny próg wartości $p$ to różne poprzeczki i tak daleko od siebie
+  stoją.
 \item \textbf{To pytanie, które możesz zadać, zanim cokolwiek uruchomisz.}
   Rozkład a posteriori po hipotetycznym wyniku jest policzalny już teraz, więc
   \enquote{ile jeszcze dowodu zmieniłoby moje zdanie} ma liczbę i jest to
@@ -611,8 +618,9 @@ się musisz dalej obsługiwać ruch, gdy dowody się gromadzą, i wolałbyś nie
 posyłać połowy do tego modelu, który przegrywa.
 
 Oto reguła, która nie potrzebuje ani progu, ani harmonogramu. \textbf{Wylosuj
-po jednej próbce z każdego rozkładu a posteriori i skieruj żądanie tam, gdzie
-próbka wypadła większa.}
+po jednej próbce z własnego rozkładu a posteriori każdego modelu \dash{} tej
+pary z ramki 26 \dash{} i skieruj żądanie tam, gdzie próbka wypadła
+większa.}
 
 Jaki ułamek ruchu posyła to do B?
 \dotline
@@ -625,8 +633,12 @@ Jaki ułamek ruchu posyła to do B?
 
 \emph{Z konstrukcji}, i na tym polega cały argument: reguła kieruje do B
 dokładnie wtedy, gdy losowanie B jest większe, a prawdopodobieństwo tego
-zdarzenia to $\Prob(\theta_B > \theta_A)$, czyli liczba, którą sekcja 4 już
-policzyła.
+zdarzenia to $\Prob(\theta_B > \theta_A)$ \dash{} czyli \emph{niesparowana}
+liczba
+z ramki 26, a nie sparowane $\val{p28.p.better.pct}$, którymi prowadzi
+sekcja. Kierowanie ruchu to pytanie o jeden model wobec drugiego, więc
+odpowiadają na nie rozkłady a posteriori każdego z nich. Reguła ma nazwę:
+\emph{próbkowanie Thompsona}.
 
 Reguła nie potrzebuje więc eksperymentu, by ją opisać, ani parametru, by ją
 ustawić. \textbf{Eksploruje dokładnie proporcjonalnie do tego, jak
@@ -661,13 +673,16 @@ Zestawiony z regułą powyżej, co zakłada ten stały ułamek?
 \begin{fr}
 \ans{Że dowód nigdy nie staje się dość mocny, by przestać za to płacić}
 
-Obie reguły zgadzają się, dopóki rozkład a posteriori jest blisko połowy, bo
-$\val{p28.route.b.pct}$ procent i \enquote{połowa ruchu, minus trochę} to to
-samo polecenie. Rozchodzą się, gdy przybywa dowodu, a punkt przecięcia jest
-policzalny, a nie kwestią gustu: po $\val{p28.eps.crossover}$ dalszych
-sukcesach modelu B prawdopodobieństwo a posteriori, że lepszy jest A, spada
-poniżej $\val{p28.eps.pct}$ procent, i od tego momentu stała reguła wydaje na
-gorsze ramię więcej, niż wspiera dowód.
+Obie reguły są najdalej od siebie na starcie. Przy
+$\val{p28.route.b.pct}$ procentach reguła a posteriori kieruje
+$\val{p28.route.a.pct}$ procent ruchu do ramienia, które przegrywa, a stała
+reguła kieruje $\val{p28.eps.pct}$, więc stała stopa
+\emph{niedo}eksploruje dokładnie wtedy, gdy dowód jest najcieńszy.
+Spotykają się w jednym punkcie, a jest on policzalny, a nie kwestią gustu: po
+$\val{p28.eps.crossover}$ dalszych sukcesach modelu B prawdopodobieństwo a
+posteriori, że lepszy jest A, spada do $\val{p28.eps.pct}$ procent, czyli do
+podziału, którego stała reguła używała od początku. Od tego momentu to stała
+reguła wydaje na gorsze ramię więcej, niż wspiera dowód.
 
 \begin{trapbox}
 \textbf{\enquote{Stopa eksploracji to hiperparametr, więc go dostroję.}}
@@ -706,8 +721,10 @@ Jak brzmią oba stwierdzenia w szansach?
 \ans{$\val{p28.judge.odds.says}$ do jednego wobec
 $\val{p28.judge.odds.means}$ do jednego}
 
-$\frac{p}{1-p}$ w każdym przypadku, a iloraz obu wynosi
-$\val{p28.judge.factor}$. \textbf{Sędzia zawyża dowód blisko
+$\frac{p}{1-p}$ w każdym przypadku. Drugie to $\frac{7}{3}$, którego
+$\val{p28.judge.odds.means}$ jest zaokrągleniem, więc iloraz obu wynosi
+$9 \div \frac{7}{3} = \frac{27}{7} = \val{p28.judge.factor}$. \textbf{Sędzia
+zawyża dowód blisko
 czterokrotnie}, co jest błędem dużo większym, niż brzmi dwadzieścia punktów
 prawdopodobieństwa \dash{} bo prawdopodobieństwo blisko granicy ściska się,
 dokładnie tak, jak Program~\ref{prog:P05} i Program~\ref{prog:P21} stwierdziły
@@ -797,7 +814,8 @@ Ta sekcja wycenia złego sędziego w \emph{szansach}, czyli w postaci, którą
 podaje Program~\ref{prog:P23}, i nie potrzebuje niczego nowego. Jest drugi
 odczyt \dash{} błędne deklarowane prawdopodobieństwo kosztuje cię mierzalną
 liczbę natów, a ta liczba jest tym, co minimalizuje strata kalibracyjna
-\dash{} i należy on do Programu~\ref{prog:P30}, który definiuje jednostki.
+\dash{} i należy on do Programu~\ref{prog:P30}, który definiuje wielkość,
+w jednostkach dostarczonych przez Program~\ref{prog:P29}.
 \end{note}
 \end{fr}
 
@@ -829,7 +847,8 @@ lecz ile wart jest komunikat.
 \sumitem{6--7}{\result{\textbf{Aktualizacja dodaje zliczenia.} $k$ sukcesów w $n$
   próbach przeprowadza $\mathrm{Beta}(a, b)$ w $\mathrm{Beta}(a + k,\ b + n -
   k)$, i to kupuje sprzężoność, i na tym cała arytmetyka się kończy}.}
-\sumitem{8--10}{\result{\textbf{Prior wart jest $a + b$ obserwacji}, więc przesuwa
+\sumitem{8--11}{\result{\textbf{Prior wart jest $a + b$ obserwacji}, więc
+przesuwa
   odpowiedź o $\frac{a+b}{a+b+n}$ drogi. Na $\val{p28.n}$ pozycjach prior
   jednostajny przesuwa ją o mniej niż jedną pozycję; na
   $\val{p28.small.n}$ przesuwa ją o trzy punkty}.}
@@ -900,7 +919,8 @@ lecz ile wart jest komunikat.
 \item Dwa modele porównano na tych samych $500$ promptach. Rozeszły się na
   $60$ pozycjach, z których $36$ przypada B. Czy B jest lepszy?
   \answerto{Rozkład a posteriori to $\mathrm{Beta}(37, 25)$, a
-  $\Prob(\theta > \frac{1}{2})$ wynosi około $\num{0.93}$ \dash{} sugestywnie i
+  $\Prob(\theta > \frac{1}{2})$ wynosi około $\num{0.938}$ \dash{}
+  sugestywnie i
   poniżej umownej poprzeczki. Pozostałe $440$ zgodnych pozycji nie ma
   znaczenia dla porównania i nie powinno się w nim pojawiać.}
 \item Sędzia deklaruje $\num{0.8}$ i ma rację w $\num{0.6}$ przypadków na tych

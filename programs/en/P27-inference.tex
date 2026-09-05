@@ -131,7 +131,7 @@ items does that need before the decimal can round correctly?
 \begin{fr}
 \ans{Over a thousand: $\val{p27.decimal.floor}$}
 
-The grid has to be finer than half a tenth of a point, so $1/n$ has to be
+The grid has to be finer than a tenth of a point, so $1/n$ has to be
 under $\num{0.001}$.
 
 That is a statement about arithmetic and there is a second objection sitting
@@ -261,8 +261,8 @@ $\val{p27.boot.k}/\val{p27.boot.n}$ and the draws are independent.
 
 So on a proportion \textbf{the bootstrap distribution is not an
 approximation to anything} \dash{} it is a binomial, and no simulation is
-needed to find it. The interval is the binomial's own percentiles, summed
-with Program~\ref{prog:P12}'s coefficient:
+needed to find it. The interval is the binomial's own percentiles, obtained by
+summing Program~\ref{prog:P12}'s coefficient:
 
 \begin{center}
 \begin{tabular}{lrr}
@@ -583,8 +583,7 @@ most useful number you could add to one.
 
 \begin{fr}
 \begin{aibox}
-\textbf{Where this shows up.} Two lines your harness could print and does
-not.
+\textbf{Two lines your harness could print and does not.}
 
 Every evaluation report in this field prints two accuracies. Almost none
 prints the \textbf{discordant count} and the \textbf{net}, and those two
@@ -717,12 +716,13 @@ how often does $p$ come out below $\val{p27.alpha}$?
 \ans{$\val{p27.null.rate.pct}$ per cent of the time}
 
 By construction, and that is not a defect \dash{} it is the definition of the
-threshold, seen from the other end. \textbf{One comparison in twenty between
-two identical models will report a significant difference}, and there is no
-version of the procedure in which that is not so.
+threshold, seen from the other end. The threshold is built so that
+\textbf{one comparison in twenty between two identical models reports a
+significant difference}, and no choice of test removes that.
 
-The measurement here is $\val{p27.null.rate.pct}$ rather than exactly
-$\val{p27.alpha}$, and the reason is worth having: the discordant test is
+What the procedure achieves here is $\val{p27.null.rate.pct}$ rather than
+exactly $\val{p27.alpha}$, and the reason is worth having: the discordant
+test is
 discrete, so its p-value cannot land on the threshold and the achievable
 values step over it. A discrete test is therefore slightly
 \emph{conservative}, and the script enumerates every one of the
@@ -797,7 +797,7 @@ that it restores the overall rate. What does it cost?
 \ans{$\val{p27.bonf.cost}$ times the items}
 
 The threshold moves the multiplier in Program~\ref{prog:P25}'s interval from
-$\val{p27.z.bonf}$ in place of $\num{1.96}$, and section 3's formula carries
+$\num{1.96}$ to $\val{p27.z.bonf}$, and section 3's formula carries
 that multiplier \emph{squared}. So a leaderboard that wants forty honest
 comparisons needs $\val{p27.bonf.cost}$ times the evaluation items of one,
 on top of everything else.
@@ -968,7 +968,8 @@ already have.
   score of $k$ right out of $n$ lands on a grid $100/n$ points apart, so
   $\val{p27.quoted.hi}$ per cent on $\val{p27.items}$ items is
   $\val{p27.k.hi}$ items and is not achievable. A one-decimal accuracy needs
-  over $\val{p27.decimal.floor}$ items before the decimal can round}.}
+  over a thousand items \dash{} $\val{p27.decimal.floor}$ \dash{} before the
+  decimal can round}.}
 \sumitem{3--5}{\result{\textbf{The published gap is $\val{p27.gap.items}$ item.}
   $\val{p27.gap.pts}$ points of $\val{p27.items}$ items, against an interval
   of $\pm\val{p27.hw.200}$ points \dash{} over
@@ -1039,10 +1040,13 @@ already have.
 \begin{testexercises}
 \item A model is reported at $\num{83.3}$ per cent on $60$ evaluation items.
   Is that achievable, and what are the two nearest scores that are?
-  \answerto{Yes: $\num{83.3}$ per cent of $60$ is exactly $50$ items. The
-  grid here is $100/60 = \num{1.67}$ points, so the neighbours are $49/60 =
-  \num{81.7}$ and $51/60 = \num{85.0}$ per cent \dash{} which is how coarse
-  a $60$-item benchmark is.}
+  \answerto{Yes \dash{} but not for the reason frame 2 rejected
+  $\num{71.4}$. $50/60$ is $\num{83.33}\ldots$ per cent, which prints as
+  $\num{83.3}$, so the figure is a rounding of an achievable score; neither
+  $\num{71.0}$ nor $\num{71.5}$ rounds to $\num{71.4}$, which is why that
+  one was not. The grid here is $100/60 = \num{1.67}$ points, so the
+  neighbours are $49/60 = \num{81.7}$ and $51/60 = \num{85.0}$ per cent
+  \dash{} which is how coarse a $60$-item benchmark is.}
 \item Two models are evaluated on $500$ shared prompts. They disagree on
   $80$ of them, and of those, $46$ go to B and $34$ to A. What is the net, in
   items and in points?
@@ -1075,9 +1079,11 @@ already have.
 \begin{furtherproblems}
 \item A benchmark reports $\num{62.48}$ per cent. What is the smallest number
   of items on which that many decimal places could be computed at all?
-  \answerto{The grid must be finer than half a hundredth of a point, so
-  $1/n < \num{0.00005}$ and $n > 20\,000$. Almost no benchmark has that many
-  items, so two decimal places on a public leaderboard are decoration.}
+  \answerto{The same criterion as frame 3, one decimal further out: the grid
+  must be finer than a hundredth of a point, so $1/n < \num{0.0001}$ and
+  $n > 10\,000$ \dash{} that is $\val{p27.decimal.floor.two}$ items. Almost
+  no benchmark has that many, so two decimal places on a public leaderboard
+  are decoration.}
 \item Show that the bootstrap distribution of a \emph{mean} of $n$ values has
   variance $(1 - 1/n)$ times the usual $s^{2}/n$, and say why that does not
   matter at $n = \val{p27.items}$.
@@ -1092,7 +1098,11 @@ already have.
   harness could actually report.
   \answerto{The discordant fraction is what the harness can count, and it is
   the quantity the exact test uses directly: the net has to reach about
-  $\num{1.96}\sqrt{dn}$ items for a fair coin not to produce it. $\rho$ has
+  $\num{1.96}\sqrt{dn}$ items for a fair coin not to produce it \dash{}
+  rounded up to the next value of the same parity as $dn$, and loose: at
+  $dn = \val{p27.disc}$ it gives $11$ where the exact search gives
+  $\val{p27.net.needed}$, because a discrete test steps over its threshold
+  rather than landing on it. $\rho$ has
   to be estimated; $d$ is two counters in a loop, which is why section 3's
   aibox asks for it.}
 \item A leaderboard's top two models are separated by $\num{0.3}$ points on

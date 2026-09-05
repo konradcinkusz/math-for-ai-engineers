@@ -354,10 +354,16 @@ emit("p28.strong.cred.hi", 100.0 * beta_quantile(*T_POST, Fraction(39, 40)), 1)
 # The widths, so the page can say which one the data actually chose.
 W_SMALL = (100.0 * beta_quantile(*S_POST, Fraction(39, 40))
            - 100.0 * beta_quantile(*S_POST, Fraction(1, 40)))
+W_STRONG = (100.0 * beta_quantile(*T_POST, Fraction(39, 40))
+            - 100.0 * beta_quantile(*T_POST, Fraction(1, 40)))
 W_BIG = (CRED_HI - CRED_LO)
 emit("p28.width.small", W_SMALL, 1)
+emit("p28.width.strong", W_STRONG, 1)
 emit("p28.width.big", W_BIG, 1)
 assert W_SMALL > 4 * W_BIG, (W_SMALL, W_BIG)
+# The three widths are a progression, which is what the frame's elicitation
+# turns on; the middle one had been left out of the table entirely.
+assert W_SMALL > W_STRONG > W_BIG, (W_SMALL, W_STRONG, W_BIG)
 
 
 # ======================================================================
@@ -403,6 +409,28 @@ emit("p28.reach.b", TO_B + extra)
 emit("p28.reach.disc", DISC + extra)
 assert extra > 0
 
+# P27's threshold and this one are NOT the same bar, and the frame used to
+# say they were.  Put them in the same units before comparing: at the point
+# the posterior crosses 95 per cent the evaluation stands at TO_B + extra of
+# DISC + extra, so the net is a lead within a LARGER denominator than the
+# 31 items P27 tested.  Run P27's own two-sided test there.
+def _p27_two_sided(m: int, net: int) -> float:
+    return sum(comb(m, c) for c in range(m + 1)
+               if abs(2 * c - m) >= net) / 2 ** m
+
+_M = DISC + extra
+_NET = (TO_B + extra) - (_M - (TO_B + extra))
+# the net has the parity of m, so only those values are reachable
+_NEED = next(v for v in range(1, _M + 1)
+             if (v - _M) % 2 == 0 and _p27_two_sided(_M, v) < 0.05)
+emit("p28.cross.net", _NET)
+emit("p28.cross.p", _p27_two_sided(_M, _NET), 2)
+emit("p28.cross.need", _NEED)
+# The claim the prose may now make: at the posterior's own threshold the
+# frequentist test has not fired, and is not close to firing.
+assert _p27_two_sided(_M, _NET) > 0.10, _p27_two_sided(_M, _NET)
+assert _NEED > _NET, (_NEED, _NET)
+
 # The UNPAIRED case, which is what "Bayesian A/B testing" usually means, and
 # it is the same integral with two parameters instead of one.
 # THE CONTROL HAS TO BE THE SAME GAP, and a first version of this comparison
@@ -431,7 +459,10 @@ assert P_B_BETTER > P_UNPAIRED, (P_B_BETTER, P_UNPAIRED)
 #
 # Draw one sample from each posterior and route to whichever is larger.  The
 # probability of routing to B is then, BY CONSTRUCTION, P(theta_B > theta_A)
-# -- which is the number section 4 already computed.  So the routing rule
+# -- which is section 4's UNPAIRED figure, not the paired one the section
+# leads on: routing is a per-model question, so it is the per-model
+# posteriors that answer it.  The assert below is what pins that.
+# So the routing rule
 # needs no experiment to describe: it explores in exact proportion to how
 # likely each arm is to be the best one.
 # ======================================================================
@@ -439,6 +470,12 @@ assert P_B_BETTER > P_UNPAIRED, (P_B_BETTER, P_UNPAIRED)
 ROUTE_B = p_greater(*PB_POST, *PA_POST)
 assert ROUTE_B == P_UNPAIRED
 emit("p28.route.b.pct", pct(100.0 * float(ROUTE_B)), 0)
+# The share the same rule sends to the arm that is behind -- the quantity
+# section 5 sets against a fixed exploration rate, so it is on the page
+# rather than left as a subtraction the reader does mid-argument.
+emit("p28.route.a.pct", pct(100.0 - 100.0 * float(ROUTE_B)), 0)
+assert abs(pct(100.0 * float(ROUTE_B))
+           + pct(100.0 - 100.0 * float(ROUTE_B)) - 100.0) < 1e-9
 
 # And it self-corrects: give B ten more successes and the routing follows.
 MORE = 10
