@@ -14,7 +14,7 @@
 %%   * terminy ML zostaja angielskie i odmieniaja sie po polsku.
 
 \program[Sumy zmiennych losowych]{Sumy zmiennych losowych: centralne
-twierdzenie graniczne, koncentracja i Monte Carlo}
+twierdzenie graniczne, koncentracja i inicjalizacja}
 \label{prog:P25}
 \index{centralne twierdzenie graniczne}
 \index{koncentracja}
@@ -49,15 +49,15 @@ twierdzenie graniczne, koncentracja i Monte Carlo}
   \answerto{Nie. Twierdzenie dotyczy środka, a ogon jest tym jednym pytaniem,
   na które nie odpowiada \dash{} i to właśnie po to ogon jest zwykle
   potrzebny.}
-\item Uwaga dzieli swoje wyniki przez $\sqrt{d_k}$. Skąd bierze się ta liczba?
-  \teachesat{30--33}
+\item Wynik uwagi to iloczyn skalarny po $d_k$ składnikach, każdym o
+  wariancji jednostkowej. Jaki jest rozrzut takiego wyniku i co z tego wynika
+  dla $\softmax$? \teachesat{30--33}
   \answerto{Z wariancji iloczynu skalarnego. Przy wpisach o wariancji
   jednostkowej każdy z $d_k$ składników wnosi $1$, a wariancje się dodają,
   więc wynik ma wariancję $d_k$ i rozrzut $\sqrt{d_k}$. Dzielenie przez
   $\sqrt{d_k}$ sprowadza go z powrotem do $1$ przy dowolnym rozmiarze głowicy.}
-\item Głęboka sieć zwraca \code{nan} na pierwszym kroku. Podaj przyczynę,
-  która nie ma nic wspólnego z danymi ani z krokiem uczenia.
-  \teachesat{48--52}
+\item Głęboka sieć zwraca \code{nan} na pierwszym kroku uczenia. Co
+  sprawdzisz najpierw? \teachesat{48--52}
   \answerto{Skala wag. Każda warstwa mnoży wariancję sygnału przez swój
   fan-in razy wariancja wag, więc skala błędna o pewien czynnik kumuluje się
   geometrycznie z głębokością \dash{} do zera albo do przepełnienia.}
@@ -100,8 +100,7 @@ więc nic tutaj nie jest granicą ani przybliżeniem.
 \end{fr}
 
 \begin{fr}
-Teraz pytanie, które mówi, co robi słowo \emph{niezależne}, i większość
-czytelników odpowiada na nie źle, gdy odpowiada szybko.
+Teraz pytanie, które mówi, co robi słowo \emph{niezależne}.
 
 Zamiast rzucać dwiema kostkami, rzuć jedną i podwój wynik. To też jest suma
 warta dwóch kostek. Czy jej wariancja to ta sama liczba
@@ -188,8 +187,11 @@ przed nawias to ćwiczenie z pierwszego kursu rachunku prawdopodobieństwa, a
 ten program bierze wynik.
 
 Twierdzenie odwrotne jest fałszywe i książka spotkała już kontrprzykład:
-wielkość i jej własny kwadrat, w sekcji Programu~\ref{prog:P24} o tym, czego
-korelacja nie widzi.
+wielkość \emph{symetryczną wokół zera} i jej własny kwadrat, w sekcji
+Programu~\ref{prog:P24} o tym, czego
+korelacja nie widzi. Symetria jest tu wszystkim \dash{} kostka dwie ramki
+wyżej nie jest symetryczna wokół zera, a jej składnik mieszany z własnym
+kwadratem jest daleki od zera.
 \end{rigourbox}
 \end{fr}
 
@@ -248,7 +250,8 @@ z jaką to robi, jest ustalona: nie przez tę wielkość, nie przez dziedzinę, 
 przez to, jak starannie zebrano dane, tylko przez pierwiastek z pewnej
 liczności.
 
-Program~\ref{prog:P21} spotkał to tempo dwie części temu i je \emph{zmierzył}
+Program~\ref{prog:P21} spotkał to tempo w poprzedniej części i je
+\emph{zmierzył}
 \dash{} dwadzieścia tysięcy wartości, cztery tysiące prób przy każdym
 rozmiarze paczki \dash{} pisząc w ramce o rygorze, że powód jest tutaj. To
 jest ten powód i są to cztery wiersze z sekcji 1.
@@ -321,32 +324,35 @@ wszędzie mieścić się w procencie od rozkładu Gaussa?
 
 \begin{fr}
 \begin{ansblock}
-Czterech, a przy dwunastu mieści się w jednej piątej procenta.
+Trzech, i to ledwo; cztery mieszczą się z zapasem.
 \end{ansblock}
 
 Mierzone jako największa różnica między dokładnym rozkładem a rozkładem
 Gaussa o tej samej średniej i tym samym rozrzucie:
 
 \begin{center}
-\begin{tabular}{rrrr}
+\begin{tabular}{rrrrr}
 \toprule
-$n = 1$ & $n = 2$ & $n = 4$ & $n = \val{p25.clt.n.hi}$ \\
+$n = 1$ & $n = 2$ & $n = 3$ & $n = 4$ & $n = \val{p25.clt.n.hi}$ \\
 \midrule
-$\val{p25.clt.gap.1}$ & $\val{p25.clt.gap.2}$ & $\val{p25.clt.gap.4}$ &
-$\val{p25.clt.gap.12}$ \\
+$\val{p25.clt.gap.1}$ & $\val{p25.clt.gap.2}$ & $\val{p25.clt.gap.3}$ &
+$\val{p25.clt.gap.4}$ & $\val{p25.clt.gap.12}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-Cztery rozkłady jednostajne są już bliżej dzwonu, niż większość ludzi by
-zgadywała, a dwanaście mieści się wszędzie w jednej piątej procenta. Skrypt
-stwierdza \emph{porządek}, a nie te cztery liczby, bo porządek jest
-twierdzeniem, a liczby zależą od siatki.
+Trzy rozkłady jednostajne są już bliżej dzwonu, niż większość ludzi by
+zgadywała, a dwanaście mieści się wszędzie w jednej czwartej procenta. Skrypt
+stwierdza \emph{porządek}, a nie te liczby, bo porządek jest twierdzeniem, a
+liczby zależą od siatki.
+
+Zbieżność jest najszybsza tam, gdzie jest najtańsza: większość drogi znika już
+przy trzech, a osiem kolejnych rozkładów jednostajnych między trójką a
+dwunastką kupuje ostatnie $\val{p25.clt.gap.3}$.
 \end{fr}
 
 \begin{fr}
-Teraz pytanie, dla którego ta sekcja istnieje, i jest to pytanie, które
-zamienia prawdziwe zdanie w błędną odpowiedź.
+Teraz pytanie, dla którego ta sekcja istnieje.
 
 Pewna wielkość jest sumą dwunastu niezależnych kawałków, więc według tabeli
 powyżej jest bliska rozkładowi Gaussa. Chcesz wiedzieć, jak często przekracza
@@ -377,8 +383,9 @@ stosunek & $\val{p25.tail.ratio1}$ & $\val{p25.tail.ratio3}$ &
 \end{tabular}
 \end{center}
 
-Jeden rozrzut od środka rozkład Gaussa trafia z dokładnością do procenta.
-Pięć rozrzutów od środka myli się o czynnik $\val{p25.tail.ratio5}$.
+Jeden rozrzut od środka rozkład Gaussa trafia z dokładnością do mniej więcej
+półtora procenta. Pięć rozrzutów od środka myli się o czynnik
+$\val{p25.tail.ratio5}$.
 \end{fr}
 
 \begin{fr}
@@ -427,7 +434,7 @@ Warto natomiast zabrać kształt założenia, bo to ono bywa łamane w praktyce,
 nie teza. Twierdzenie potrzebuje, żeby kawałki były niezależne, miały
 skończoną wariancję i żeby żaden z nich nie dominował sumy. Wielkości o
 ciężkich ogonach łamią drugie założenie; suma po populacji, w której jeden
-element to większość całości, łamie trzecie. W obu przypadkach teza po prostu
+element to większość całości, łamie trzecie. W obu przypadkach teza w ogóle
 nie obowiązuje i nic w arytmetyce cię przed tym nie ostrzeże.
 \end{rigourbox}
 
@@ -454,7 +461,7 @@ ich nie odróżni, bo oba dają dzwon.
 
 % ============================================================
 \section{Ile kosztuje przebieg ewaluacji}
-\label{sec:P25-monte-carlo}
+\label{sec:P25-eval-cost}
 \index{pomiar!dobór rozmiaru ewaluacji}
 \index{ewaluacja!ile pozycji}
 
@@ -480,9 +487,11 @@ Czyli o wiele szerzej niż dwa miejsca po przecinku, do których taką liczbę
 zwykle się podaje.
 
 Trafienie albo pudło ma wariancję $p(1-p)$, więc średnia z $n$ takich wyników
-ma rozrzut $\sqrt{p(1-p)/n}$, a przyjęty przedział to mniej więcej dwa takie
-rozrzuty po każdej stronie. Nic tu nie jest próbkowane: to jeden pierwiastek i
-czytelnik może go przeliczyć na odwrocie wiersza z logu przebiegu.
+ma rozrzut $\sqrt{p(1-p)/n}$, a przyjęty przedział to $\val{p25.eval.z}$
+takich rozrzutów po każdej stronie \dash{} stąd bierze się zwyczajowe $95$
+procent i dlatego ta liczba to nie całkiem dwa rozrzuty. Nic tu nie jest
+próbkowane: to jeden pierwiastek i czytelnik może go przeliczyć na odwrocie
+wiersza z logu przebiegu.
 
 Zauważ, co robi $p(1-p)$, bo to powód, dla którego dwa wyniki benchmarku o tej
 samej wielkości nie są jednakowo wiarygodne. Jest największe przy połowie i
@@ -522,9 +531,9 @@ liczby, bo podział na pół jest tempem, a liczby zależą od wybranej trafnoś
 \begin{fr}
 Teraz pytanie, które rozstrzyga o czyimś tygodniu pracy.
 
-Porównujemy dwa modele i jeden dostaje wynik o punkt procentowy wyższy od
-drugiego. Na ilu pozycjach trzeba ocenić każdy z nich, zanim ta różnica
-cokolwiek znaczy?
+Porównujemy dwa modele o wynikach około $\val{p25.eval.p}$ i jeden dostaje
+wynik o punkt procentowy wyższy od drugiego. Na ilu pozycjach trzeba ocenić
+każdy z nich, zanim ta różnica cokolwiek znaczy?
 
 Podaj rząd wielkości, zanim pójdziesz dalej \dash{} chodzi o rozmiar, a nie o
 cyfry.
@@ -543,7 +552,9 @@ różnica dwóch niezależnych oszacowań ma sumę ich wariancji \dash{} sekcja 
 ostatnim miejscu, w którym ktokolwiek jej szuka. Przedział, który się liczy,
 jest więc $\sqrt{2}$ razy szerszy od przedziału dla każdego modelu z osobna, a
 liczba pozycji jest dwa razy większa, niż sugeruje pojedynczy przedział:
-$\val{p25.eval.n.naive}$ wobec $\val{p25.eval.n.needed}$.
+$\val{p25.eval.n.naive}$ wobec $\val{p25.eval.n.needed}$. Obie są zaokrąglone
+w górę z liczb, które nie są całkowite, i dlatego druga jest o jeden mniejsza
+niż dwukrotność pierwszej.
 \end{fr}
 
 \begin{fr}
@@ -551,10 +562,10 @@ $\val{p25.eval.n.naive}$ wobec $\val{p25.eval.n.needed}$.
 \textbf{Gdzie to widać.} Dwa wiersze tego samego raportu z ewaluacji zachowują
 się pod tym względem zupełnie inaczej.
 
-Wynik benchmarku podany jako $\num{74.31}$ procent na
-$\val{p25.eval.n.lo}$ pozycjach niesie przedział rzędu
-$\pm\val{p25.eval.hw.100}$ punktu, więc trzy ostatnie z tych cyfr to szum
-\dash{} a leaderboard i tak po nich sortuje. Tymczasem różnica punktu między
+Wynik benchmarku podany jako $\num{80.00}$ procent na
+$\val{p25.eval.n.lo}$ pozycjach niesie przedział $\pm\val{p25.eval.hw.100}$
+punktu, więc obie te cyfry po przecinku to szum \dash{} a leaderboard i tak po
+nich sortuje. Tymczasem różnica punktu między
 dwoma wierszami tej samej tabeli przy takiej liczbie pozycji nie jest w ogóle
 różnicą.
 
@@ -626,27 +637,30 @@ skalarny dwóch takich wektorów?
 Bo $d \times \frac{1}{d} \times \frac{1}{d} = \frac{1}{d}$, a rozrzut jest
 pierwiastkiem z tego.
 
-\textbf{A to książka już zmierzyła}, pod inną nazwą i trzy części wcześniej.
+\textbf{A to książka już zmierzyła}, pod inną nazwą, jeszcze w części~III.
 Program~\ref{prog:P05} pytał, jak zachowuje się cosinus między dwoma losowymi
-kierunkami, gdy wymiar rośnie, i zapisał jego rozrzut przy czterech wymiarach.
+kierunkami, gdy wymiar rośnie, i zapisał jego rozrzut przy czterech różnych
+wymiarach.
 
 \textbf{Te dwie rzeczy to jedno twierdzenie przy dwóch skalowaniach}, a
 wyprowadzenie odtwarza wszystkie cztery zapisane liczby tamtego programu z
 dokładnością do $\val{p25.p05.worst.pct}$ procent \dash{} co skrypt sprawdza,
 więc pomiar z Części~III i to wyprowadzenie nie mogą się rozjechać.
 
-Postaw oba skalowania obok siebie. Wpisy nieznormalizowane dają $\sqrt{d_k}$, a
-znormalizowane $1/\sqrt{d_k}$. Jaki jest iloczyn i co on każe zrobić?
+Wróćmy do surowego wyniku, który przy każdym rozmiarze głowicy ma rozrzut
+$\sqrt{d_k}$. Chcesz rozrzutu $1$ niezależnie od rozmiaru głowicy. Przez co
+dzielisz i dlaczego dzielnik nie może być stałą?
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{$1$ \dash{} czyli podzielić przez $\sqrt{d_k}$}
+\ans{Przez $\sqrt{d_k}$, a stała tego nie zrobi}
 
 Dzielenie surowego wyniku przez $\sqrt{d_k}$ nie jest konwencją ani stałą,
-którą ktoś dostroił. To krok, który przenosi cię z pierwszego skalowania do
-rozrzutu jeden, przy dowolnym rozmiarze głowicy.
+którą ktoś dostroił. Korygowana wielkość \emph{rośnie z rozmiarem głowicy},
+więc każdy ustalony dzielnik jest dobry przy jednym $d_k$ i zły przy każdym
+innym; dzielnik musi nieść $d_k$, bo niesie je to, co on skraca.
 \end{fr}
 
 \begin{fr}
@@ -667,9 +681,8 @@ Co softmax robi z wierszem, którego wpisy dzielą dziesiątki?
 Przestaje być ważeniem, a staje się wyborem.
 \end{ansblock}
 
-Zmierzone. To eksperyment E9 tej książki i pierwszy z dziesięciu, który został
-przeprowadzony \dash{} $\val{p25.e9.trials}$ prób przy każdym rozmiarze
-głowicy:
+Zmierzone. To eksperyment E9 tej książki \dash{} $\val{p25.e9.trials}$ prób
+przy każdym rozmiarze głowicy:
 
 \begin{center}
 \begin{tabular}{rrrrr}
@@ -734,7 +747,7 @@ macierzy nie tworzy. Jest też całą historią w tym miejscu: wpisy poza
 przekątną opisują wagę przenoszoną między kluczami, a wiersz, który już oddał
 wszystko jednemu kluczowi, nie ma czego przenosić.
 
-Policz to przy dwóch największych wagach powyżej.
+Policz to przy $d_k = \val{p25.e9.d.hi}$, z dzieleniem i bez niego.
 \dotline
 \nextframe
 \end{fr}
@@ -818,26 +831,36 @@ Czwarta nazwa i ta, która kosztuje ludzi całe popołudnia.
 
 Warstwa liniowa bierze $n_{\text{in}}$ wejść, mnoży każde przez wagę i dodaje
 je do siebie. To znowu iloczyn skalarny, więc tożsamość z sekcji 5 stosuje się
-bez zmian: wejścia są niezależne i mają pewną wariancję, wagi są niezależne i
-mają pewną wariancję, a wyjście jest ich sumą.
+bez zmian: wejścia są niezależne, wagi są niezależne i losowane wokół zera, a
+wyjście jest ich sumą.
 
 Zauważ, jak dzielą się te trzy wielkości. Fan-in jest licznością i należy do
-architektury; obie wariancje należą do inicjalizatora i do tego, co karmi
-warstwę. Tożsamość trzyma je osobno i dlatego pytanie projektowe poniżej ma
-jedną odpowiedź, a nie całą ich rodzinę.
+architektury; wariancja wag należy do inicjalizatora, a rozmiar wejść do tego,
+co karmi warstwę. Tożsamość trzyma je osobno i dlatego pytanie projektowe
+poniżej ma jedną odpowiedź, a nie całą ich rodzinę.
 
-Zapisz wariancję jednego wyjścia w kategoriach fan-in i tych dwóch
-wariancji.
+Zapisz wariancję jednego wyjścia w kategoriach fan-in, wariancji wag i
+średniej z kwadratu wejścia.
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{$n_{\text{in}} \times \Var(w) \times \Var(x)$}
+\ans{$n_{\text{in}} \times \Var(w) \times \Ex[x^{2}]$}
 
 Te same trzy kroki po raz trzeci. Skrypt wylicza to dokładnie przy czterech
 wartościach fan-in i trzech skalach wag, więc jest to tożsamość, a nie
 przybliżenie \dash{} dokładnie jak wynik uwagi.
+
+\begin{note}
+\textbf{Drugi moment, a nie wariancja.} To ta sama liczba, gdy wejście jest
+wycentrowane, a wejście pierwszej warstwy takie jest \dash{} więc rozróżnienie
+nic tutaj nie kosztuje i kosztuje wszystko dwie sekcje dalej: wyjście $\relu$
+jest nieujemne, więc ma dodatnią średnią, a od drugiej warstwy $\Ex[x^{2}]$ i
+$\Var(x)$ to różne liczby. Skrypt sprawdza tę tożsamość na alfabecie
+wycentrowanym i na niewycentrowanym, a na drugim odczyt przez wariancję myli
+się o czynnik dwa.
+\end{note}
 
 I od razu odpowiada na pytanie projektowe. Jeśli chcesz, żeby warstwa
 przepuszczała sygnał, nie powiększając go ani nie zmniejszając, chcesz, by ten
@@ -846,10 +869,10 @@ $1/n_{\text{in}}$ i na niczym innym.
 \end{fr}
 
 \begin{fr}
-\mermaidfig{p25-one-rate}{Jedna tożsamość spotkana pod czterema różnymi
-nazwami.}{suma, średnia, wynik, warstwa}
+\mermaidfig{p25-one-rate}{Jedna tożsamość i skąd bierze się pierwiastek.}%
+{suma, średnia, pierwiastek}
 
-To cały kręgosłup tego programu, a ostatnia sekcja mówi, co się dzieje, gdy
+To cały kręgosłup tego programu, a reszta tej sekcji mówi, co się dzieje, gdy
 czwarte wystąpienie zostanie zrobione źle.
 \end{fr}
 
@@ -906,7 +929,7 @@ zamiast do pieniędzy.
 
 Sieć o głębokości $\val{p25.init.depth}$ warstw jest zbudowana z
 $\Var(w) = 1/n_{\text{in}}$, czyli z regułą dla warstwy liniowej, i z $\relu$
-między nimi. Jaka część sygnału dociera na szczyt?
+między nimi. Jaka część \emph{wariancji} sygnału dociera na szczyt?
 \dotline
 \nextframe
 \end{fr}
@@ -946,10 +969,15 @@ samych $\val{p25.init.depth}$ warstw.
 Dwa razy większa skala to cztery razy większa \emph{wariancja}, więc każda
 warstwa mnoży sygnał przez $\val{p25.init.hot.factor}$ zamiast przez jeden.
 
-Program~\ref{prog:P01} mówi, czym jest liczba tego rozmiaru w \code{fp16}: nie
-jest liczbą. Przebieg raportuje \code{nan} na pierwszym kroku, a pierwszą
-rzeczą, którą wszyscy robią, jest zmniejszenie kroku uczenia o połowę, co nie
-może pomóc, bo żaden gradient w tym nie uczestniczył.
+To jest wariancja, więc sama aktywacja jest rzędu jej pierwiastka, a
+Program~\ref{prog:P01} mówi, czym każda z nich jest w \code{fp16}: obie są
+daleko powyżej sufitu formatu, który wynosi $\val{p01.fp16.max.exact}$, więc
+obie stają się \code{inf}. \code{inf} to zwyczajna wartość IEEE z dobrze
+określoną arytmetyką; \code{nan} pojawia się krok później, kiedy \code{inf}
+po raz pierwszy spotka odejmowanie albo mnożenie przez zero \dash{}
+odejmowanie maksimum w $\softmax$, normalizację, funkcję straty. Log mówi więc
+\code{nan}, a pierwszą rzeczą, którą wszyscy robią, jest zmniejszenie kroku
+uczenia o połowę, co nie może pomóc, bo żaden gradient w tym nie uczestniczył.
 \end{fr}
 
 \begin{fr}
@@ -1032,12 +1060,13 @@ powyżej i żaden nie należy do tej książki.
   do rozkładu Gaussa. Zmierzone dokładnie na sumach rozkładów jednostajnych,
   największa różnica $\val{p25.clt.gap.1}$ przy $n = 1$ i
   $\val{p25.clt.gap.12}$ przy $n = \val{p25.clt.n.hi}$}.}
-\sumitem{17--19}{\result{\textbf{I milczy w ogonie.} Rozkład Gaussa trafia z
-  dokładnością do procenta jeden rozrzut od środka i myli się
+\sumitem{17--20}{\result{\textbf{I milczy w ogonie.} Rozkład Gaussa trafia z
+  dokładnością do mniej więcej półtora procenta jeden rozrzut od środka i myli
+  się
   $\val{p25.tail.ratio5}$ razy pięć rozrzutów od środka; sześć rozrzutów od
   środka prawda wynosi dokładnie zero. Pytanie, na które twierdzenie
   odpowiada najgorzej, jest tym, do którego najczęściej się go używa}.}
-\sumitem{20--22}{\result{W praktyce zawodzi założenie: niezależność, skończona
+\sumitem{21--22}{\result{W praktyce zawodzi założenie: niezależność, skończona
   wariancja i brak dominującego kawałka. \textbf{Rozkład Gaussa dlatego, że w
   grę wchodziła suma, jest poprawny; rozkład Gaussa dlatego, że wyglądało to
   jak dzwon, jest założeniem, którego nikt nie sprawdził.}}}
@@ -1045,16 +1074,17 @@ powyżej i żaden nie należy do tej książki.
   $\pm\val{p25.eval.hw.100}$ punktu, a cztery razy więcej pozycji zmniejsza go
   o połowę za każdym razem}.}
 \sumitem{26--27}{\result{Orzeczenie o różnicy $\val{p25.eval.gap.pct}$ punktu wymaga
-  $\val{p25.eval.n.needed}$ pozycji na model \dash{} \textbf{dwa razy}
-  $\val{p25.eval.n.naive}$, bo wielkością, o którą chodzi, jest
+  $\val{p25.eval.n.needed}$ pozycji na model \dash{} \textbf{dwa razy} tyle,
+  co $\val{p25.eval.n.naive}$ sugerowane przez pojedynczy przedział, z
+  dokładnością do zaokrąglenia, bo wielkością, o którą chodzi, jest
   \emph{różnica}, a wariancje obu oszacowań się dodają}.}
 \sumitem{30--32}{\result{Wynik uwagi jest sumą $d_k$ iloczynów wpisów o wariancji
   jednostkowej, więc $\Var = d_k$, a rozrzut to $\sqrt{d_k}$ \dash{} wyliczone
   dokładnie, bez żadnego twierdzenia granicznego w środku}.}
 \sumitem{32--33}{Program~\ref{prog:P05} zmierzył to samo twierdzenie przy
   skalowaniu znormalizowanym, $1/\sqrt{d}$, a wyprowadzenie odtwarza jego
-  cztery zapisane liczby z dokładnością do $\val{p25.p05.worst.pct}$ procent.
-  $\sqrt{d_k} \times 1/\sqrt{d_k} = 1$ \emph{jest} tym dzieleniem.}
+  cztery zapisane liczby z dokładnością do $\val{p25.p05.worst.pct}$ procent
+  \dash{} jedno twierdzenie przy dwóch skalowaniach i wzajemna kontrola.}
 \sumitem{35--37}{\result{\textbf{E9, przeprowadzone.} Bez dzielenia, przy
   $d_k = \val{p25.e9.d.hi}$, entropia wiersza wynosi
   $\val{p25.e9.raw.ent.512}$ z możliwych $\val{p25.e9.maxent}$, a jeden klucz
@@ -1068,8 +1098,9 @@ powyżej i żaden nie należy do tej książki.
   Ustalona stała nie wykona tego zadania, bo rzecz korygowana rośnie z
   wymiarem głowicy}.}
 \sumitem{42--44}{\result{Wyjście warstwy ma wariancję
-  $n_{\text{in}}\Var(w)\Var(x)$ \dash{} ta sama tożsamość po raz czwarty
-  \dash{} więc warstwa liniowa utrzymuje swoją skalę przy
+  $n_{\text{in}}\Var(w)\Ex[x^{2}]$ \dash{} ta sama tożsamość po raz czwarty, i
+  \emph{drugi moment} zamiast wariancji, bo wejście $\relu$ nie jest
+  wycentrowane \dash{} więc warstwa liniowa utrzymuje swoją skalę przy
   $\Var(w) = 1/n_{\text{in}}$}.}
 \sumitem{45--47}{\result{$\relu$ zachowuje \textbf{dokładnie połowę} drugiego momentu
   symetrycznego wejścia, z symetrii i scałkowane do
@@ -1078,7 +1109,7 @@ powyżej i żaden nie należy do tej książki.
   Hego}}.}
 \sumitem{48--52}{\result{Głębokość kumuluje to geometrycznie: przez
   $\val{p25.init.depth}$ warstw połowa na warstwę zostawia
-  $\val{p25.init.deep.xavier}$ sygnału, a cztery na warstwę dają
+  $\val{p25.init.deep.xavier}$ wariancji sygnału, a cztery na warstwę dają
   $\val{p25.init.deep.hot}$. \textbf{Rozbieżność na kroku pierwszym to
   inicjalizacja, a nie krok uczenia}, i jeden przebieg w przód mówi, co z
   tych dwóch}.}

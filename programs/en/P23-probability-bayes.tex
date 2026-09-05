@@ -320,15 +320,14 @@ $\frac{\val{p23.alarm.num}}{\val{p23.alarm.den}}$, or
 $\val{p23.alarm.pct}$ per cent.
 \end{ansblock}
 
-An alarm is a rare event, which is what you would want. Hold on to the two
-pieces it came from rather than the total: $\val{p23.alarm.real}$ of those
-alarms are about a real fault and $\val{p23.alarm.false}$ are not.
+An alarm is a rare event, which is what you would want.
 
 \begin{note}
-Notice that neither number was given to you. The detector's specification
-describes what it does to a faulty request and what it does to a clean one, and
-these two counts are what happens when you also say how many of each there
-were. Section 4 is entirely about the consequences of that sentence.
+Notice that neither of the two counts you added was given to you. The
+detector's specification describes what it does to a faulty request and what
+it does to a clean one, and those counts are what happens when you also say
+how many of each there were. A specification and a population are two
+different things, and only the pair produces a number.
 \end{note}
 \end{fr}
 
@@ -497,7 +496,7 @@ there is not stupid \dash{} it is one substitution away from correct.
 $\val{p23.sens.pct}$ per cent is $\Prob(\text{alarm} \mid \text{fault})$: the
 detector's behaviour on the faulty requests. What you were asked for is
 $\Prob(\text{fault} \mid \text{alarm})$: the composition of its alarms. The
-last section's warning box named those as different numbers; this is how
+Section 2's trap box named those as different numbers; this is how
 different.
 
 The reason is the denominator, and section 3's law of total probability put it
@@ -538,10 +537,9 @@ $\Prob(\text{flagged} \mid \text{real})$, which is the other one.
 A classification report prints both, measured on a population somebody chose,
 and that population is usually balanced, because a balanced set makes every
 class visible. Production traffic is not. Recall conditions on the real class
-alone, so it is a property of the model and it travels; precision conditions on
-what the model flagged, so it depends on how many of each class there were and
-it does not. Two adjacent lines of the same report, behaving completely
-differently, with nothing on the card to say so.
+alone, so the base rate cannot move it; precision conditions on what the model
+flagged, so the base rate is inside it. Two adjacent lines of the same report,
+behaving completely differently, with nothing on the card to say so.
 \end{aibox}
 
 \mermaidfig{p23-two-populations}{Where the alarms come from, and why counting
@@ -606,10 +604,10 @@ $\val{p23.ppv.100.pct}$ per cent \dash{} exactly half.
 \end{ansblock}
 
 That row is worth carrying away, because it is a landmark rather than a
-coincidence. When the fault rate equals the error rate, the real alarms and the
-false alarms come from populations whose sizes exactly cancel the two rates,
-and the answer is $\frac{1}{2}$ on the nose. It is exact over fractions and the
-script asserts it.
+coincidence. Real alarms are $ps$ and false ones $(1-p)f$, so they are equal
+when $p = f/(s+f)$ \dash{} and for a detector whose miss rate equals its
+false-alarm rate, as this one's does, that is $f$ itself. It is exact over
+fractions and the script asserts it.
 
 So the rule of thumb, and it is the one sentence to keep: \textbf{compare the
 base rate with the error rate.} Rarer than the error rate and most alarms are
@@ -784,10 +782,12 @@ conditioned. It runs the other way just as easily, and that direction is the
 one the whole of applied probability is built on.
 
 Two monitors watch the same service. Each is a noisy reading of one underlying
-truth \dash{} whether the service is actually broken \dash{} and each is right
-three times in four. The two monitors do not talk to each other at all.
+truth \dash{} whether the service is actually broken, which it is half the
+time \dash{} and each is right three times in four. The two monitors do not
+talk to each other at all. Write $X$ and $Y$ for the events that the first and
+the second monitor report it broken.
 
-Are their two readings independent?
+Are $X$ and $Y$ independent?
 \dotline
 \nextframe
 \end{fr}
@@ -885,8 +885,8 @@ $\frac{\val{p23.two.num}}{\val{p23.two.den}}$, or $\val{p23.two.pct}$ per cent.
 
 $9801$ to $999$ divides by $27$ to give $363$ to $37$, so the probability is
 $\frac{363}{400}$. Two alarms take you from $\val{p23.ppv.pct}$ per cent to
-$\val{p23.two.pct}$: \textbf{$\val{p23.k.half}$ independent detectors are
-enough to cross a half}, and a third leaves only
+$\val{p23.two.pct}$: \textbf{two independent detectors are enough to cross a
+half}, and a third leaves only
 $\val{p23.three.false.pct}$ per cent of triples false.
 
 That is the constructive answer to section 4. A single weak signal against a
@@ -917,8 +917,8 @@ $\val{p23.ppv.pct}$ per cent.
 \begin{trapbox}
 \textbf{\enquote{We have two independent signals, so the evidence multiplies.}}
 The ratios multiply when the two signals are conditionally independent
-\emph{given the truth} \dash{} which is section 5's second row, and which
-nothing in either alarm tells you.
+\emph{given the truth} \dash{} which is the second row of this section's own
+two-row table, and which nothing in either alarm tells you.
 
 The gap between $\val{p23.ppv.pct}$ and $\val{p23.two.pct}$ per cent
 \textbf{is} what the independence assumption is worth, and it is the whole of
@@ -982,7 +982,7 @@ distribution you have been editing all along.
   probability may not}.}
 \sumitem{10}{\result{\textbf{Conditioning is changing the denominator}:
   $\Prob(A \mid B) = \Prob(A \cap B)/\Prob(B)$. Two of the four outcomes are
-  simply gone, and what is left is renormalised}.}
+  gone entirely, and what is left is renormalised}.}
 \sumitem{11--12}{It is a \textbf{definition} and not a theorem, which is
   Program~\ref{prog:F10}'s decision made on purpose. Bayes' theorem is the
   other kind, and that is what makes it rebuildable.}
@@ -1011,17 +1011,18 @@ distribution you have been editing all along.
 \sumitem{23--24}{\result{$\val{p23.sens.pct}$ per cent is
   $\Prob(\text{alarm} \mid \text{fault})$ and the question was
   $\Prob(\text{fault} \mid \text{alarm})$. A detector's quoted numbers are
-  properties of the detector \emph{and} the population, and only one of the
-  two travels with the model}.}
+  properties of the detector \emph{and} the population, and the base rate
+  moves only one of the two}.}
 \sumitem{25--26}{\result{The \textbf{prosecutor's fallacy} is swapping those two:
   $\val{p23.fpr.pct}$ per cent of clean requests raise an alarm and
   $\val{p23.false.pct}$ per cent of alarms are about clean requests, both true
   of the same detector on the same day}.}
 \sumitem{26--28}{\result{Same detector, four base rates:
-  $\val{p23.ppv.10.pct}$\%, $\val{p23.ppv.100.pct}$\%, $\val{p23.ppv.pct}$\%,
-  $\val{p23.ppv.10000.pct}$\%. \textbf{Compare the base rate with the error
-  rate}: equal gives exactly half}, and the transcript prints it as a fraction
-  so that it says so.}
+  $\val{p23.ppv.10.pct}$, $\val{p23.ppv.100.pct}$, $\val{p23.ppv.pct}$ and
+  $\val{p23.ppv.10000.pct}$ per cent. \textbf{Compare the base rate with the
+  error rate}: the alarms are half real at $p = f/(s+f)$, which for this
+  detector is the error rate itself}, and the transcript prints it as a
+  fraction so that it says so.}
 \sumitem{29--30}{\result{A detector that never fires is $\val{p23.never.pct}$ per cent
   accurate against the real one's $\val{p23.acc.pct}$. Accuracy on an
   unbalanced population is a weighted average with the weights left out}.}
@@ -1133,8 +1134,13 @@ distribution you have been editing all along.
   take any three events of probability $\frac{1}{2}$ whose pairwise
   intersections each contain exactly one outcome and which have no common
   outcome. Relabelling the outcomes gives every such triple, so up to renaming
-  it is the only one. On more outcomes there are others \dash{} three of the
-  six faces of a die, for instance, chosen so no face lies in all three.}
+  it is the only one. On more outcomes there are others, and the natural one
+  is section 5's construction with three faces instead of two: let $X$ and $Y$
+  be independent and uniform on $\{0, 1, 2\}$, and take $A = \{X = 0\}$,
+  $B = \{Y = 0\}$ and $C = \{X + Y \equiv 1 \bmod 3\}$. Each has probability
+  $\frac{1}{3}$, each pair meets in exactly one of the nine outcomes, and no
+  outcome is in all three. A die does not work, incidentally: on six equally
+  likely outcomes there is no such triple at all.}
 \item Section 6 says a duplicate detector has likelihood ratio $1$. Write down
   what would have to be true of the two detectors for the ratio of the second
   to be exactly $1$, and say whether that is the same as the two detectors

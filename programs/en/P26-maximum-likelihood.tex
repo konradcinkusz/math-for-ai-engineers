@@ -67,6 +67,17 @@
   \answerto{That they are believed to be Gaussian about zero with a
   particular width. A penalty is the logarithm of a prior, and the width is
   fixed by $\lambda$.}
+\item Take the derivative of a log-probability with respect to the parameter,
+  and average it over the data the model itself says you will see. What do you
+  get? \teachesat{42--43}
+  \answerto{Zero, exactly. The probabilities sum to one whatever the parameter
+  does, so their derivative sums to nothing \dash{} which is why setting the
+  total of that derivative to zero is what maximum likelihood is.}
+\item You need the gradient of an average over a random draw, and you cannot
+  differentiate the draw. What do you differentiate instead? \teachesat{44--45}
+  \answerto{The probability. The expectation is a sum of $p(x \mid \theta)
+  f(x)$ and $p$ is differentiable even where the draw is not, so the gradient
+  comes out as an expectation and can be estimated by sampling.}
 \end{quiz}
 
 % ============================================================
@@ -103,7 +114,7 @@ So there are two axes and they are independent of each other.
 estimator can be wrong in either way, in both, or \dash{} at a cost \dash{} in
 one to buy the other.
 
-Everything in this section is exact. Take the population
+Everything in this section is exact. Take the population of
 $\val{p26.pop.n}$ numbers $1$, $2$, $3$, $6$, draw
 $\val{p26.draw.n}$ independently, and there are $\val{p26.samples}$ possible
 samples; the script enumerates all of them over fractions with no tolerance
@@ -171,7 +182,7 @@ is the same reason Program~\ref{prog:P24} keeps a variance and not an average
 distance, and it is the reason this loss and not another one is the one that
 has a decomposition to talk about.
 
-Read it before turning over: does $c = 1$ \dash{} the unbiased choice
+Read it before you read on: does $c = 1$ \dash{} the unbiased choice
 \dash{} minimise it?
 \dotline
 \nextframe
@@ -276,7 +287,7 @@ is a property of the recipe rather than of your data. That is why the fix can
 be a fixed factor applied once and not something estimated alongside
 everything else.
 
-That is a bias, so it has a size. Guess the factor before turning over.
+That is a bias, so it has a size. Guess the factor before you read on.
 \dotline
 \nextframe
 \end{fr}
@@ -304,6 +315,14 @@ At $n = \val{p26.draw.n}$ the naive version is short by
 $\val{p26.var.understate.pct}$ per cent, because $\frac{n-1}{n}$ is a half
 there. Dividing by $n-1$ instead makes the average exactly right, which is
 the whole of what the correction corrects.
+
+Two things about that table are worth having. Every sample of size $n$ was
+enumerated rather than drawn, so nothing was left out and the middle row is
+a proof about this population rather than evidence about it. And
+\emph{exactly} is a claim about an exact zero, so the arithmetic runs over
+fractions with no tolerance anywhere: comparing against a small threshold
+instead would have turned a statement about equality into a statement about
+how small a difference you were prepared to overlook.
 
 So that is settled. Now the question the flag's name invites: is the square
 root of the corrected variance an unbiased estimate of the standard
@@ -365,15 +384,17 @@ spread less.
 \begin{trapbox}
 \textbf{\enquote{\code{ddof=1} gives me an unbiased standard deviation.}}
 
-It gives an unbiased \emph{variance}. Nothing in any library gives an
-unbiased standard deviation, because the correction depends on the
-distribution and there is no flag for it.
+It gives an unbiased \emph{variance}. No \code{ddof} flag gives an unbiased
+standard deviation, and none can, because the correction depends on the
+distribution rather than on the sample size.
 
 The size is what makes this worth knowing rather than pedantry. Over five
 runs of an experiment \dash{} which is what people actually report a standard
 deviation of \dash{} the number is short by about
-$\val{p26.sd.short.5}$ per cent, and it is short in the direction that makes
-results look more reproducible than they are.
+$\val{p26.sd.short.5}$ per cent on this program's population, and short in
+the direction that makes results look more reproducible than they are. The
+figure moves with the distribution \dash{} that is the whole reason no flag
+can correct it \dash{} but the direction does not.
 \end{trapbox}
 \end{fr}
 
@@ -454,7 +475,7 @@ Program~\ref{prog:F05} proved that a strictly increasing function keeps the
 order of a list.
 
 So: write the log-likelihood, differentiate, set to zero, which is
-Program~\ref{prog:P15}'s recipe for a maximum. Try it. Twenty trials give
+Program~\ref{prog:F11}'s recipe for a maximum. Try it. Twenty trials give
 seven successes; what rate maximises the likelihood?
 \dotline
 \nextframe
@@ -474,8 +495,8 @@ then checks every other rate on a thousand-point grid is strictly worse, so
 it is the maximum rather than a stationary point.
 
 \textbf{Every rate anybody has ever computed by dividing successes by trials
-was a maximum likelihood estimate}, and this is the first time the book has
-said so.
+was a maximum likelihood estimate}, and no earlier program in this book
+needed to say it.
 \end{fr}
 
 \begin{fr}
@@ -554,11 +575,15 @@ Write the probability the model assigns to the whole observed sequence.
 \ans{$\prod_{i=1}^{n} p_\theta(t_i \mid t_{<i})$}
 
 Which is a likelihood: a probability of the data, read as a function of the
-parameters. So maximum likelihood says to maximise it over $\theta$.
+parameters \dash{} a \emph{density} where the data are continuous, which is
+Program~\ref{prog:F13}'s distinction and is why a likelihood a library prints
+above one is not a bug. It is never a probability of the parameters. So
+maximum likelihood says to maximise it over $\theta$.
 
-Now do the two things \S\ref{sec:P26-mle} said to do. Take the logarithm,
-which turns it into a sum. Then, because optimisers minimise, negate it. Then
-divide by $n$, so that sequences of different lengths are comparable.
+Now do what \S\ref{sec:P26-mle} said to do, and two things more. Take the
+logarithm, which turns it into a sum, and maximise. Then, because optimisers
+minimise, negate it. Then divide by $n$, so that sequences of different
+lengths are comparable.
 
 The negation is the only one of the three that is pure convention. Maximising
 a quantity and minimising its negative are the same problem, and every
@@ -619,9 +644,15 @@ without a reason to hand.
 \end{fr}
 
 \begin{fr}
-The first. \textbf{Label smoothing} replaces the one-hot target with
-$1-\varepsilon$ on the observed token and $\varepsilon/K$ spread over all
-$K$ of them, and it is usually introduced as a regularisation trick.
+The first. \textbf{Label smoothing} puts $\varepsilon/K$ on every one of the
+$K$ classes and adds the remaining $1-\varepsilon$ to the observed one, so the
+observed token carries $1 - \varepsilon + \varepsilon/K$ and the target sums to
+one. It is usually introduced as a regularisation trick.
+
+Read the allocation carefully, because it is stated two ways in the literature
+and only one of them sums to one. The two are not a hair's breadth apart: at
+the numbers this section uses they differ in the second decimal place of the
+observed token's target.
 
 Read it as maximum likelihood instead. The loss $-\sum_j t_j \ln p_j$ is
 minimised over the simplex when $\vect{p}$ equals $\vect{t}$, whatever
@@ -728,6 +759,13 @@ Negate it, as \S\ref{sec:P26-training} did, and the second term becomes
 something added to a loss and minimised alongside it.
 
 That is the shape of every regularised objective anybody has ever written.
+
+Notice what the split does and does not decide. The first term is the only one
+that sees the data, so the prior cannot be fitted from the data it is applied
+to; and the second term does not depend on the data at all, so its size is
+settled before a single example arrives. Choosing a penalty is choosing a
+belief, and the objective keeps the two apart whether or not anybody says so.
+
 Now put a Gaussian prior of width $\tau$ on each weight, centred on zero, and
 say what the added term is.
 \dotline
@@ -963,8 +1001,8 @@ askable and neither is its own.
 \sumitem{13--16}{\result{\textbf{It does not correct the standard deviation.} A
   square root is concave, so Program~\ref{prog:P19}'s Jensen makes the
   corrected $s$ understate \dash{} by $\val{p26.sd.short.2}$ per cent at
-  $n = 2$ and still $\val{p26.sd.short.5}$ per cent at $n = 5$, which is the
-  size people report a spread over}.}
+  $n = 2$ and still $\val{p26.sd.short.5}$ per cent at $n = 5$ on this
+  program's population, which is the size people report a spread over}.}
 \sumitem{18--20}{\result{\textbf{Maximum likelihood} picks the parameter that makes
   the observed data most probable. Take the logarithm to turn the product
   into a sum (Program~\ref{prog:F03}) and to avoid underflow
@@ -1053,8 +1091,9 @@ askable and neither is its own.
   architecture. State what each is claiming about the weights, and say which
   claim is the stronger.
   \answerto{Widths of $\val{p26.tau.001}$ and $\val{p26.tau.10}$ about zero.
-  The second is much the stronger claim \dash{} a tenfold larger $\lambda$ is
-  a prior narrower by $\sqrt{10}$, so it asserts far more confidently that
+  The second is much the stronger claim \dash{} a hundredfold larger
+  $\lambda$ is a prior narrower by ten, so it asserts far more confidently
+  that
   the weights are small, and it will be far more visibly wrong if they are
   not.}
 \end{testexercises}

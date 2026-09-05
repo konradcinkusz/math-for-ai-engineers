@@ -58,6 +58,19 @@ wiarogodności}
   nie co im robi. \teachesat{37--38}
   \answerto{Że według ciebie są gaussowskie wokół zera o pewnej szerokości.
   Kara jest logarytmem rozkładu a priori, a szerokość ustala $\lambda$.}
+\item Weź pochodną logarytmu prawdopodobieństwa po parametrze i uśrednij ją po
+  danych, o których sam model mówi, że je zobaczysz. Co dostajesz?
+  \teachesat{42--43}
+  \answerto{Dokładnie zero. Prawdopodobieństwa sumują się do jedynki bez
+  względu na parametr, więc ich pochodna sumuje się do niczego \dash{} i
+  właśnie dlatego przyrównanie sumy tej pochodnej do zera jest metodą
+  największej wiarogodności.}
+\item Potrzebujesz gradientu średniej po losowaniu, a losowania nie da się
+  zróżniczkować. Co różniczkujesz zamiast niego? \teachesat{44--45}
+  \answerto{Prawdopodobieństwo. Wartość oczekiwana to suma
+  $p(x \mid \theta) f(x)$, a $p$ jest różniczkowalne tam, gdzie losowanie nie
+  jest, więc gradient wychodzi jako wartość oczekiwana i da się go oszacować
+  przez próbkowanie.}
 \end{quiz}
 
 % ============================================================
@@ -94,7 +107,7 @@ Są więc dwie osie i są od siebie niezależne.
 być zły na jeden z tych sposobów, na oba albo \dash{} pewnym kosztem \dash{}
 na jeden, żeby kupić drugi.
 
-Wszystko w tej sekcji jest dokładne. Weź populację
+Wszystko w tej sekcji jest dokładne. Weź populację złożoną z
 $\val{p26.pop.n}$ liczb $1$, $2$, $3$, $6$, losuj
 $\val{p26.draw.n}$ niezależnie, a możliwych prób jest $\val{p26.samples}$;
 skrypt wylicza je wszystkie po kolei nad ułamkami i nie ma w tym nigdzie
@@ -162,7 +175,7 @@ samego powodu Program~\ref{prog:P24} trzyma wariancję, a nie średnią
 odległość; dlatego właśnie to ta strata, a nie inna, ma rozkład, o którym da
 się mówić.
 
-Przeczytaj to, zanim przewrócisz stronę: czy $c = 1$ \dash{} wybór
+Przeczytaj to, zanim pójdziesz dalej: czy $c = 1$ \dash{} wybór
 nieobciążony \dash{} minimalizuje ten błąd?
 \dotline
 \nextframe
@@ -271,8 +284,8 @@ jest własnością przepisu, a nie twoich danych. Dlatego poprawka może być
 stałym czynnikiem stosowanym raz, a nie czymś szacowanym obok wszystkiego
 innego.
 
-To jest obciążenie, więc ma swój rozmiar. Zgadnij czynnik, zanim przewrócisz
-stronę.
+To jest obciążenie, więc ma swój rozmiar. Zgadnij czynnik, zanim pójdziesz
+dalej.
 \dotline
 \nextframe
 \end{fr}
@@ -300,6 +313,13 @@ Przy $n = \val{p26.draw.n}$ naiwna wersja jest za mała o
 $\val{p26.var.understate.pct}$ procent, bo $\frac{n-1}{n}$ wynosi tam połowę.
 Dzielenie przez $n-1$ sprawia, że średnia wychodzi dokładnie taka, jaka
 powinna, i na tym polega całość tego, co ta poprawka poprawia.
+
+Dwie rzeczy o tej tabeli warto mieć. Każda próba rozmiaru $n$ została
+wyliczona, a nie wylosowana, więc nic nie zostało pominięte i środkowy
+wiersz jest dowodem o tej populacji, a nie świadectwem na jej temat. A
+\emph{dokładnie} to twierdzenie o dokładnym zerze, więc rachunek idzie na
+ułamkach, bez żadnej tolerancji: porównanie z małym progiem zamieniłoby
+zdanie o równości na zdanie o tym, jak małą różnicę byłeś gotów przeoczyć.
 
 To jest więc załatwione. Teraz pytanie, do którego zachęca nazwa flagi: czy
 pierwiastek z poprawionej wariancji jest nieobciążoną oceną odchylenia
@@ -360,15 +380,17 @@ rozrzucają.
 \begin{trapbox}
 \textbf{\enquote{\code{ddof=1} daje mi nieobciążone odchylenie standardowe.}}
 
-Daje nieobciążoną \emph{wariancję}. Żadna biblioteka nie daje nieobciążonego
-odchylenia standardowego, bo poprawka zależy od rozkładu i nie ma na nią
-flagi.
+Daje nieobciążoną \emph{wariancję}. Żadna flaga \code{ddof} nie daje
+nieobciążonego odchylenia standardowego i żadna nie może, bo poprawka zależy
+od rozkładu, a nie od liczebności próby.
 
 Wart wiedzy, a nie pedanterii, czyni to rozmiar. Przy pięciu przebiegach
 eksperymentu \dash{} a to właśnie od tylu ludzie raportują odchylenie
 standardowe \dash{} liczba jest za mała o jakieś
-$\val{p26.sd.short.5}$ procent, i to za mała w tę stronę, która sprawia, że
-wyniki wyglądają na powtarzalniejsze, niż są.
+$\val{p26.sd.short.5}$ procent na populacji z tego programu, i to za mała w tę
+stronę, która sprawia, że wyniki wyglądają na powtarzalniejsze, niż są. Sama
+liczba zmienia się z rozkładem \dash{} i właśnie dlatego żadna flaga nie może
+tego poprawić \dash{} ale kierunek nie.
 \end{trapbox}
 \end{fr}
 
@@ -447,7 +469,7 @@ A logarytm nie może przesunąć maksimum, bo Program~\ref{prog:F05} dowiódł, 
 funkcja ściśle rosnąca zachowuje porządek listy.
 
 Zatem: zapisz logarytm wiarogodności, zróżniczkuj, przyrównaj do zera, co
-jest przepisem Programu~\ref{prog:P15} na maksimum. Spróbuj. Dwadzieścia prób
+jest przepisem Programu~\ref{prog:F11} na maksimum. Spróbuj. Dwadzieścia prób
 daje siedem sukcesów; jaka częstość maksymalizuje wiarogodność?
 \dotline
 \nextframe
@@ -467,8 +489,8 @@ sprawdza, że każda inna częstość na siatce tysiąca punktów jest ściśle
 gorsza, więc jest to maksimum, a nie punkt stacjonarny.
 
 \textbf{Każda częstość, jaką ktokolwiek policzył, dzieląc sukcesy przez
-próby, była oceną największej wiarogodności}, i książka mówi to po raz
-pierwszy.
+próby, była oceną największej wiarogodności}, a żaden wcześniejszy program tej
+książki nie musiał tego powiedzieć.
 \end{fr}
 
 \begin{fr}
@@ -551,13 +573,16 @@ sekwencji.
 \ans{$\prod_{i=1}^{n} p_\theta(t_i \mid t_{<i})$}
 
 Co jest wiarogodnością: prawdopodobieństwem danych czytanym jako funkcja
-parametrów. Metoda największej wiarogodności każe więc maksymalizować to po
-$\theta$.
+parametrów \dash{} \emph{gęstością}, gdy dane są ciągłe, co jest
+rozróżnieniem Programu~\ref{prog:F13} i powodem, dla którego wiarogodność
+większa od jedynki wypisana przez bibliotekę nie jest błędem. Nigdy nie jest
+to prawdopodobieństwo parametrów. Metoda największej wiarogodności każe więc
+maksymalizować to po $\theta$.
 
-Zrób teraz te dwie rzeczy, które kazała robić \S\ref{sec:P26-mle}. Weź
-logarytm, który zamienia to w sumę. Potem, skoro optymalizatory minimalizują,
-zmień znak. Potem podziel przez $n$, żeby sekwencje różnej długości były
-porównywalne.
+Zrób teraz to, co kazała robić \S\ref{sec:P26-mle}, i jeszcze dwie rzeczy.
+Weź logarytm, który zamienia to w sumę, i maksymalizuj. Potem, skoro
+optymalizatory minimalizują, zmień znak. Potem podziel przez $n$, żeby
+sekwencje różnej długości były porównywalne.
 
 Zmiana znaku jest jedyną z tych trzech rzeczy, która jest czystą konwencją.
 Maksymalizowanie wielkości i minimalizowanie jej wartości przeciwnej to ten
@@ -621,10 +646,15 @@ ludzie robią, nie mając pod ręką powodu.
 \end{fr}
 
 \begin{fr}
-Pierwsza. \textbf{Label smoothing} zastępuje cel one-hot wartością
-$1-\varepsilon$ na zaobserwowanym tokenie i $\varepsilon/K$ rozłożonym po
-wszystkich $K$ z nich, i zwykle wprowadza się je jako sztuczkę
-regularyzacyjną.
+Pierwsza. \textbf{Label smoothing} kładzie $\varepsilon/K$ na każdej z $K$
+klas i dodaje pozostałe $1-\varepsilon$ do zaobserwowanej, więc zaobserwowany
+token niesie $1 - \varepsilon + \varepsilon/K$, a cel sumuje się do jedynki.
+Zwykle wprowadza się je jako sztuczkę regularyzacyjną.
+
+Przeczytaj ten podział uważnie, bo w piśmiennictwie bywa podawany na dwa
+sposoby, a tylko jeden z nich sumuje się do jedynki. Nie różnią się o włos:
+przy liczbach z tej sekcji rozjeżdżają się na drugim miejscu po przecinku
+w celu zaobserwowanego tokena.
 
 Przeczytaj je zamiast tego jako metodę największej wiarogodności. Strata
 $-\sum_j t_j \ln p_j$ jest minimalizowana na sympleksie wtedy, gdy $\vect{p}$
@@ -729,8 +759,17 @@ Zmień znak, jak zrobiła to \S\ref{sec:P26-training}, a drugi składnik staje
 się czymś dodanym do straty i minimalizowanym razem z nią.
 
 Taki jest kształt każdej regularyzowanej funkcji celu, jaką ktokolwiek
-zapisał. Nałóż teraz na każdą wagę gaussowski rozkład a priori o szerokości
-$\tau$, wyśrodkowany na zerze, i powiedz, jaki jest dodany składnik.
+zapisał.
+
+Zwróć uwagę, co ten podział rozstrzyga, a czego nie. Pierwszy składnik jest
+jedynym, który widzi dane, więc rozkładu a priori nie da się dopasować do
+danych, do których się go stosuje; a drugi w ogóle od danych nie zależy, więc
+jego rozmiar jest ustalony, zanim przyjdzie choćby jeden przykład. Wybór kary
+jest wyborem przekonania, a funkcja celu trzyma te dwie rzeczy osobno,
+niezależnie od tego, czy ktoś to powie.
+
+Nałóż teraz na każdą wagę gaussowski rozkład a priori o szerokości $\tau$,
+wyśrodkowany na zerze, i powiedz, jaki jest dodany składnik.
 \dotline
 \nextframe
 \end{fr}
@@ -964,7 +1003,8 @@ uczynił możliwymi do zadania i żadne nie jest jego własne.
 \sumitem{13--16}{\result{\textbf{Nie poprawia odchylenia standardowego.} Pierwiastek
   jest wklęsły, więc nierówność Jensena z Programu~\ref{prog:P19} sprawia, że
   poprawione $s$ zaniża \dash{} o $\val{p26.sd.short.2}$ procent przy
-  $n = 2$ i wciąż o $\val{p26.sd.short.5}$ procent przy $n = 5$, czyli przy
+  $n = 2$ i wciąż o $\val{p26.sd.short.5}$ procent przy $n = 5$ na populacji z
+  tego programu, czyli przy
   tym rozmiarze, od którego ludzie podają rozrzut}.}
 \sumitem{18--20}{\result{\textbf{Metoda największej wiarogodności} wybiera parametr,
   który czyni zaobserwowane dane najbardziej prawdopodobnymi. Weź logarytm,
@@ -1056,8 +1096,8 @@ uczynił możliwymi do zadania i żadne nie jest jego własne.
   tej samej architekturze. Powiedz, co każdy z nich twierdzi o wagach, i
   które twierdzenie jest mocniejsze.
   \answerto{Szerokości $\val{p26.tau.001}$ i $\val{p26.tau.10}$ wokół zera.
-  Drugie jest o wiele mocniejsze \dash{} dziesięciokrotnie większe $\lambda$
-  to rozkład a priori węższy o $\sqrt{10}$, więc twierdzi znacznie pewniej,
+  Drugie jest o wiele mocniejsze \dash{} stukrotnie większe $\lambda$ to
+  rozkład a priori węższy dziesięciokrotnie, więc twierdzi znacznie pewniej,
   że wagi są małe, i będzie znacznie wyraźniej w błędzie, jeśli nie są.}
 \end{testexercises}
 

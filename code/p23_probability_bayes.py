@@ -48,6 +48,7 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
+from itertools import combinations, product
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parents[1] / "figures" / "values" / "p23.tex"
@@ -300,6 +301,51 @@ assert (Q(A), Q(lambda k: A(k) and B(k)), a_c * b_c) == (
 NOTES.append("two independent coins become perfectly dependent given their "
              "exclusive or: the joint conditional is 0 where the product of "
              "the conditionals is 1/4, so independence survives nothing")
+
+# AND THE FURTHER PROBLEM'S OWN CONSTRUCTION, because an answer key is under
+# the same rule as a frame and this one used to name a triple that does not
+# exist. The claim was "three of the six faces of a die"; every non-trivial
+# triple of subsets of six equally likely outcomes is enumerated below and NOT
+# ONE is pairwise independent with an empty triple intersection. That is a
+# proof for that sample space rather than evidence about it -- Program P14's
+# distinction -- because nothing was left out.
+def _pairwise_indep_empty(n: int) -> int:
+    """How many non-trivial triples on n equally likely outcomes qualify."""
+    subs = [frozenset(c) for k in range(1, n)
+            for c in combinations(range(n), k)]
+    found = 0
+    for X, Y, Z in combinations(subs, 3):
+        px, py, pz = (Fraction(len(t), n) for t in (X, Y, Z))
+        if Fraction(len(X & Y), n) != px * py:
+            continue
+        if Fraction(len(X & Z), n) != px * pz:
+            continue
+        if Fraction(len(Y & Z), n) != py * pz:
+            continue
+        if X & Y & Z:
+            continue
+        found += 1
+    return found
+
+
+assert _pairwise_indep_empty(6) == 0, "a die admits no such triple"
+assert _pairwise_indep_empty(4) > 0, "the coins are on four outcomes"
+
+# The replacement the answer key now gives: X and Y independent and uniform on
+# {0,1,2}, A = {X=0}, B = {Y=0}, C = {X+Y = 1 mod 3}. Nine outcomes, each event
+# a third, every pair a ninth, and the triple intersection empty.
+_S = list(product(range(3), repeat=2))
+_p = lambda E: Fraction(len(E), len(_S))
+_A = {w for w in _S if w[0] == 0}
+_B = {w for w in _S if w[1] == 0}
+_C = {w for w in _S if (w[0] + w[1]) % 3 == 1}
+assert _p(_A) == _p(_B) == _p(_C) == Fraction(1, 3)
+for _X, _Y in ((_A, _B), (_A, _C), (_B, _C)):
+    assert _p(_X & _Y) == _p(_X) * _p(_Y), (_X, _Y)
+assert not (_A & _B & _C)
+NOTES.append("the further problem's triple is checked: a die admits none at "
+             "all (every triple of subsets of six outcomes enumerated), and "
+             "the mod-3 construction on nine outcomes is exact")
 
 # And the other direction, which is what makes the pair worth teaching: two
 # events can be dependent and become independent once you condition on the

@@ -256,11 +256,15 @@ def kolmogorov(n: int, steps: int = 4000) -> float:
     return worst
 
 
-CLT_NS = (1, 2, 4, 12)
+CLT_NS = (1, 2, 3, 4, 12)
 CLT_GAPS = {n: kolmogorov(n) for n in CLT_NS}
 
 # The claim is that the gap FALLS as n grows -- the ordering, which is
-# structural -- and not any one of the four numbers, which move with the grid.
+# structural -- and not any one of the numbers, which move with the grid.
+#
+# n = 3 IS IN THE SWEEP ON PURPOSE. The frame asks for the smallest n inside
+# one per cent, and 3 already clears it at 0.00985 -- so a table that jumped
+# from 2 to 4 skipped exactly the row that settles its own question.
 gaps_in_order = [CLT_GAPS[n] for n in CLT_NS]
 assert gaps_in_order == sorted(gaps_in_order, reverse=True), gaps_in_order
 for n in CLT_NS:
@@ -317,7 +321,7 @@ for z, true_tail, gauss_tail, ratio in TAIL_ROWS:
     if z in (1, 3, 5):
         VALUES[f"p25.tail.true{z}"] = (f"{true_tail:.3g}", True)
         VALUES[f"p25.tail.gauss{z}"] = (f"{gauss_tail:.3g}", True)
-        emit(f"p25.tail.ratio{z}", ratio, {1: 2, 3: 1, 5: 0}[z])
+        emit(f"p25.tail.ratio{z}", ratio, {1: 3, 3: 1, 5: 0}[z])
 NOTES.append(
     "the Gaussian tail is excellent in the middle and runs away outside it: "
     f"{ratios[0]:.2f}x at one spread, {ratios[2]:.1f}x at three, "
@@ -361,6 +365,12 @@ for (n1, h1), (n2, h2) in zip(EVAL_ROWS, EVAL_ROWS[1:]):
 for n, h in EVAL_ROWS:
     emit(f"p25.eval.hw.{n}", pct(h), 1)
 emit("p25.eval.p", EVAL_P, 2)
+emit("p25.eval.z", Z95, 2)
+# The interval is 1.96 spreads and not 2, and the frame invites the reader to
+# redo the arithmetic -- so the multiplier has to be on the page or the reader
+# gets 8.0 where the table prints 7.8.
+assert abs(pct(half_width(EVAL_P, EVAL_NS[0])) - Z95 * 100.0
+           * math.sqrt(EVAL_P * (1.0 - EVAL_P) / EVAL_NS[0])) < 1e-12
 emit("p25.eval.n.lo", EVAL_NS[0])
 emit("p25.eval.n.hi", EVAL_NS[-1])
 
@@ -566,26 +576,54 @@ NOTES.append(
 # Nothing else in the book explains this, which the review called the single
 # most common cause of a run that never starts.
 # ---------------------------------------------------------------------------
-# Var(out) = fan_in x Var(w) x Var(x), exactly, for independent zero-mean
-# weights and inputs. Enumerated over sign vectors, as section 5 was.
-def layer_out_variance(fan_in: int, wscale: Fraction) -> Fraction:
-    space = list(product((-1, 1), repeat=fan_in))
-    w = Fraction(1, len(space) ** 2)
+# Var(out) = fan_in x Var(w) x E[x^2], exactly, for independent zero-mean
+# WEIGHTS. Enumerated over value vectors, as section 5 was.
+#
+# THE SECOND MOMENT AND NOT THE VARIANCE, and the distinction is the whole of
+# why this section works. The two agree when the input is centred, which the
+# first layer's is -- and a ReLU output is non-negative and has a positive
+# mean, so from the second layer on they are different numbers. The frames
+# below reuse this identity across ReLUs, so stating it in Var(x) would make
+# every later step rest on a hypothesis that has just been broken.
+#
+# The first version of this check enumerated over +/-1 inputs alone, where
+# Var(x) and E[x^2] are both 1, so it could not tell the two readings apart --
+# it passed, and the page carried the wrong one. The alphabet is a parameter
+# now and the check is run over a NON-CENTRED one as well, where the two
+# readings differ by a factor of two and only one of them holds.
+def layer_out_variance(fan_in: int, wscale: Fraction,
+                       xs: tuple = (-1, 1)) -> Fraction:
+    xspace = list(product(xs, repeat=fan_in))
+    wspace = list(product((-1, 1), repeat=fan_in))
+    p = Fraction(1, len(xspace) * len(wspace))
     total = Fraction(0)
-    for x in space:
-        for ws in space:
-            total += w * (wscale * Fraction(sum(a * b for a, b in zip(x, ws)))) ** 2
+    for x in xspace:
+        for ws in wspace:
+            total += p * (wscale * Fraction(sum(a * b for a, b in zip(x, ws)))) ** 2
     return total
 
 
-for fan_in in (1, 2, 3, 4):
-    for wscale in (Fraction(1), Fraction(1, 2), Fraction(3, 7)):
-        got = layer_out_variance(fan_in, wscale)
-        assert got == fan_in * wscale ** 2, (fan_in, wscale, got)
+def moments(xs: tuple) -> tuple:
+    """(E[x], E[x^2], Var(x)) for the uniform distribution on xs."""
+    n = Fraction(len(xs))
+    m1 = sum(Fraction(v) for v in xs) / n
+    m2 = sum(Fraction(v) ** 2 for v in xs) / n
+    return m1, m2, m2 - m1 ** 2
+
+
+for xs in ((-1, 1), (0, 1)):
+    _, second, var_x = moments(xs)
+    for fan_in in (1, 2, 3, 4):
+        for wscale in (Fraction(1), Fraction(1, 2), Fraction(3, 7)):
+            got = layer_out_variance(fan_in, wscale, xs)
+            assert got == fan_in * wscale ** 2 * second, (xs, fan_in, wscale, got)
+            if second != var_x:
+                assert got != fan_in * wscale ** 2 * var_x, (xs, fan_in, wscale)
 NOTES.append(
-    "Var(out) = fan_in x Var(w) x Var(x) enumerated exactly at four fan-ins "
-    "and three weight scales -- the same identity as the attention scaling, "
-    "which is why one program owns both")
+    "Var(out) = fan_in x Var(w) x E[x^2] enumerated exactly at four fan-ins "
+    "and three weight scales, over a centred input alphabet and a non-centred "
+    "one -- on the second the variance reading is out by a factor of two, "
+    "which is what a ReLU does to the input of the next layer")
 
 # So holding the variance at 1 through a linear layer needs Var(w) = 1/fan_in.
 FAN_IN = 512
