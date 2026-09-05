@@ -46,8 +46,8 @@ multipliers}
   are}
 \outcome{18--21}{name the other way to enforce a constraint, and say what
   projecting does and does not buy}
-\outcome{22--28}{read the coefficient of a penalty as an exchange rate, and
-  say why a hard constraint and a penalty are the same problem}
+\outcome{22--28}{read the coefficient of a penalty in this program's own
+  vocabulary, and say how a penalty relates to a hard constraint}
 \outcome{29--35}{recognise the conditions for an inequality constraint, and
   say what a multiplier of zero means}
 \end{outcomes}
@@ -212,8 +212,9 @@ interpretation \dash{} section 3 is where it becomes one.
 \end{fr}
 
 \begin{fr}
-Two vector equations plus the constraint is three equations in three unknowns,
-so the problem is now algebra. On ours, $\nabla f = (2x, 4y)$ and
+One vector equation \dash{} two components \dash{} plus the constraint is three
+equations in three unknowns, so the problem is now algebra. On ours,
+$\nabla f = (2x, 4y)$ and
 $\nabla g = (1, 1)$:
 \[ 2x = \lambda, \qquad 4y = \lambda, \qquad x + y = \val{p22.c} \]
 
@@ -228,8 +229,8 @@ $\lambda = \val{p22.lam}$, so $x = \val{p22.x}$ and $y = \val{p22.y}$
 \end{ansblock}
 
 The script does this over fractions and asserts that the two gradients really
-are parallel at the answer, so the word \emph{exactly} in the last frame is
-earned rather than assumed. What it also does is show what has been gained:
+are parallel at the answer, so the parallelism is checked rather than
+\emph{assumed}. What it also does is show what has been gained:
 \textbf{the constraint was never solved}. It was used, as one more equation,
 which is why the method survives a constraint nobody can rearrange.
 
@@ -257,7 +258,7 @@ optimal values:
 \begin{tabular}{ll}
 \toprule
 $x + y = \val{p22.c.lo}$ & best $f$ is $\val{p22.fstar.lo}$, $\lambda = \val{p22.lam.lo}$ \\
-$x + y = \val{p22.c}$ & best $f$ is $\val{p22.fstar}$ \\
+$x + y = \val{p22.c}$ & best $f$ is $\val{p22.fstar}$, $\lambda = \val{p22.lam}$ \\
 $x + y = \val{p22.c.hi}$ & best $f$ is $\val{p22.fstar.hi}$, $\lambda = \val{p22.lam.hi}$ \\
 \bottomrule
 \end{tabular}
@@ -275,7 +276,7 @@ Its \emph{rate of change} \dash{} how much the best value moves when the
 constraint moves.
 \end{ansblock}
 
-Which is a derivative, $\dfrac{\mathrm{d}f^{*}}{\mathrm{d}c}$, and it is the
+Which is a derivative, $\mathrm{d}f^{*}/\mathrm{d}c$, and it is the
 number a person actually wants: it says what relaxing the budget is worth.
 
 Compute it at $c = \val{p22.c.lo}$, $c = \num{2}$ and $c = \val{p22.c}$, and
@@ -285,7 +286,7 @@ compare with the multipliers at those levels.
 \end{fr}
 
 \begin{fr}
-\begin{trapbox}
+\begin{note}
 \textbf{The two lists are identical, term for term, as exact fractions.}
 \[ \lambda \;=\; \frac{\mathrm{d}f^{*}}{\mathrm{d}c} \]
 That is not an approximation and not an analogy. The script checks it at
@@ -297,7 +298,7 @@ anywhere in it, because a central difference is exact for a quadratic.
 per unit of constraint relaxed, and it has units: objective divided by
 constraint. A multiplier is not a bookkeeping variable to be eliminated; it is
 usually the most interesting number in the answer.
-\end{trapbox}
+\end{note}
 \end{fr}
 
 \begin{fr}
@@ -444,9 +445,11 @@ Program~\ref{prog:P18} declares cross-entropy, and it is recorded as such.
 \begin{fr}
 That reading is checkable, so it is checked. The solution of the penalised
 problem is the tilted distribution $p \propto q\,e^{r/\beta}$
-\dash{} stated here and derived in Program~\ref{prog:P26} \dash{} so the
-family of solutions can be swept over $\beta$ and the exchange rate measured
-directly.
+\dash{} stated here and derived nowhere in this book, because deriving it needs
+the \emph{form} of the divergence where the box above declares only that it is
+non-negative \dash{} so the family of solutions can be swept over $\beta$ and
+the
+exchange rate measured directly.
 
 \begin{center}
 \begin{tabular}{lll}
@@ -466,15 +469,19 @@ Predict the slope of reward against divergence along that family.
 \begin{fr}
 \ans{$\beta$}
 Measured to better than $\val{p22.kl.slope.bound}$ at every $\beta$ tried, over
-$\val{p22.kl.betas}$ of them. \textbf{$\beta$ is the exchange rate}, in exactly
+$\val{p22.kl.betas}$ of them. Dividing the two rows of the table gives
+$\val{p22.kl.chord}$, which is not $\beta$ at either end: the slope is local, so
+an average taken across a sixteenfold change in $\beta$ lands between the two.
+
+\textbf{$\beta$ is the exchange rate}, in exactly
 the sense section 3 established, and it is the same object as $\lambda$ wearing
 a Greek letter people are less suspicious of.
 
 Which turns a tuning knob into a quantity with units, and that has a
 consequence: a $\beta$ tuned against one reward model does not transfer to
-another, because the two rewards are in different units. It is
-Program~\ref{prog:P21}'s point about hyperparameters, one part later and one
-level up.
+another, because the two rewards are in different units. Program~\ref{prog:P20}
+makes the same point about a step size that does not travel between two
+conventions, two programs earlier and one level down.
 \end{fr}
 
 \begin{fr}
@@ -567,13 +574,21 @@ set. For minimising $f$ subject to $g \le 0$:
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-$\nabla f + \lambda \nabla g = 0$ & stationarity \dash{} section 2 \\
+$\nabla f + \lambda \nabla g = 0$ & stationarity \dash{} section 2, sign moved \\
 $g(x) \le 0$ & feasibility \\
 $\lambda \ge 0$ & the price of a bound is not negative \\
 $\lambda\, g(x) = 0$ & complementary slackness \\
 \bottomrule
 \end{tabular}
 \end{center}
+
+Note where the sign went. Section 2 wrote the stationarity condition as
+$\nabla f = \lambda \nabla g$ and read the multiplier as
+$\mathrm{d}f^{*}/\mathrm{d}c$; the standard form above moves
+$\lambda \nabla g$ across, so the same number is
+$-\mathrm{d}f^{*}/\mathrm{d}c$ here. That is what makes the third line say
+something rather than merely look tidy: $\lambda \ge 0$ is the statement that
+relaxing a bound cannot make the minimum worse.
 
 These are the \textbf{KKT conditions}, and they are here to be recognised
 rather than developed: this program does not prove that they are necessary,
@@ -631,7 +646,8 @@ for.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--2}{\result{A constraint removes the answer you wanted. What remains is the
+\sumitem{1--2}{\result{A constraint removes the answer you wanted. What
+remains is the
   \textbf{feasible set}, and the problem is the best point on it}.}
 \sumitem{3--4}{\result{Substitution solves the small case exactly and does not
   generalise, because most constraints cannot be rearranged. The method that
@@ -639,7 +655,8 @@ for.
 \sumitem{5--6}{\result{Program~\ref{prog:P15}'s result \dash{} the gradient is
   perpendicular to the contour \dash{} said about two functions at once is the
   whole of this program}.}
-\sumitem{7--8}{\result{A contour \emph{crossing} the constraint is never optimal,
+\sumitem{7--8}{\result{A contour \emph{crossing} the constraint is never
+optimal,
   because you can slide along and improve. The optimum is where they
   \textbf{touch}}.}
 \sumitem{9}{\result{Touching means the tangents agree, so the two gradients are
@@ -656,33 +673,39 @@ for.
   $\val{p22.relax.from}$ to $\val{p22.relax.to}$ gains
   $\val{p22.relax.gain}$ against a multiplier of $\val{p22.relax.lam}$, and
   the difference is the curvature of $f^{*}$}.}
-\sumitem{17}{\result{It is the same object as a solver's shadow price, and it says
+\sumitem{17}{\result{It is the same object as a solver's shadow price, and it
+says
   which constraints are worth money}.}
 \sumitem{18--19}{\result{The other way to enforce a constraint is to
   \textbf{project} onto it, which is Program~\ref{prog:P05}'s object with the
   constraint's normal in place of a vector}.}
-\sumitem{20--21}{\result{Projection answers \emph{which feasible point is nearest} and
+\sumitem{20--21}{\result{Projection answers \emph{which feasible point is
+nearest} and
   the multiplier answers \emph{which is best}: $\val{p22.proj.f}$ against
   $\val{p22.fstar}$ here. Projecting keeps an iterate legal; it does not make
   it good}.}
 \sumitem{22--23}{\result{An objective written as reward minus $\beta$ times a
   divergence has a multiplier in it already, and $\beta$ is a \textbf{price in
   reward per unit of divergence}}.}
-\sumitem{24--25}{\result{Measured along the family of solutions, the slope of reward
+\sumitem{24--25}{\result{Measured along the family of solutions, the slope of
+reward
   against divergence is $\beta$ itself, to better than
   $\val{p22.kl.slope.bound}$. So a $\beta$ tuned against one reward model does
   not transfer to another}.}
-\sumitem{26--28}{\result{Each $\beta$ names one divergence level, so \textbf{a hard
+\sumitem{26--28}{\result{Each $\beta$ names one divergence level, so \textbf{a
+hard
   constraint and a penalty are the same problem} parameterised differently,
   and neither is more fundamental}.}
-\sumitem{29--31}{\result{An inequality is tight or slack. Tight is an equality; slack
+\sumitem{29--31}{\result{An inequality is tight or slack. Tight is an
+equality; slack
   means the constraint buys nothing, so its price is \textbf{zero}. Together:
   $\lambda g(x) = 0$, complementary slackness}.}
 \sumitem{32}{\result{The KKT conditions are stationarity, feasibility,
   $\lambda \ge 0$ and complementary slackness} \dash{} stated for recognition,
   with the constraint qualification and the sufficiency argument left to a
   first course.}
-\sumitem{33--35}{\result{A negative multiplier on a $\le$ constraint means the sign
+\sumitem{33--35}{\result{A negative multiplier on a $\le$ constraint means the
+sign
   convention is not the one you assumed, because a larger feasible set cannot
   have a worse best point}.}
 \end{summarybox}
@@ -712,10 +735,13 @@ for.
 \item An objective is $\mathbb{E}_p[r] - \beta D(p \Vert q)$ with $r$ measured
   in a reward model's arbitrary units. Your colleague ports $\beta$ from a
   project whose reward model was scaled ten times larger. What has happened?
-  \answerto{The effective price has changed by a factor of ten. $\beta$ is
-  reward per unit of divergence, so scaling the reward by ten while keeping
-  $\beta$ makes the penalty ten times weaker relative to the objective \dash{}
-  the model will move ten times further from the reference than intended.}
+  \answerto{The effective price has changed by a factor of ten, in the
+  direction people do not expect. $\beta$ is reward per unit of divergence, so
+  a $\beta$ tuned where rewards were ten times larger is ten times too dear
+  here: the penalty is \emph{stronger} relative to the objective and the model
+  stays \emph{closer} to the reference than intended. By how much is not a
+  factor of ten \dash{} this program's own sweep drops $\beta$ sixteenfold and
+  spends $\val{p22.kl.spend}$ times the divergence.}
 \item Why can a constrained optimum never be better than the unconstrained
   one, and what does that imply about the sign of the multiplier for a
   constraint written $g \le 0$?

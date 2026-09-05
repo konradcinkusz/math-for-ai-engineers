@@ -42,9 +42,10 @@
   każda wartość jest taka sama.}
 \item Tabela wyników uśrednia wartości perplexity na dokument. Co podaje?
   \teachesat{19--20}
-  \answerto{Inną wielkość niż perplexity, i większą. Perplexity to
+  \answerto{Inną wielkość niż perplexity, i nigdy nie mniejszą. Perplexity to
   eksponenta średniej straty; średnia z eksponent leży powyżej niej o
-  czynnik rosnący z tym, jak zróżnicowane są dokumenty.}
+  czynnik rosnący z tym, jak zróżnicowane są dokumenty, a równa jej się tylko
+  wtedy, gdy wszystkie są takie same.}
 \item Czy $\ln$ jest wypukły, czy wklęsły, i co to robi z nierównością?
   \teachesat{27--28}
   \answerto{Wklęsły, więc nierówność się odwraca: logarytm średniej jest co
@@ -342,13 +343,16 @@ dlaczego nie jest to przypadek tamtego przykładu.
 
 \begin{fr}
 \begin{ansblock}
-Średnia z wartości perplexity, zawsze \dash{} bo $e^{x}$ jest wypukłe, a
-Jensen mówi tak dla każdego zestawu strat.
+Średnia z wartości perplexity \dash{} ściśle, dla tych czterech, bo $e^{x}$
+jest wypukłe, a te cztery straty się różnią.
 \end{ansblock}
 
 Te dwie liczby są więc \textbf{uporządkowane}, a nie tylko różne, i ta błędna
-jest zawsze większa. Harness z tym błędem nigdy niczego nie upiększa i zawsze
-podaje model jako gorszy, niż jest.
+nigdy nie jest mniejsza. Jest ściśle większa zawsze wtedy, gdy straty na
+poszczególnych dokumentach się różnią, a równa tej właściwej tylko wtedy, gdy
+każdy dokument kosztuje tyle samo. Harness z tym błędem nigdy więc nie
+upiększa modelu i podaje go jako gorszy, niż jest, na każdym korpusie, który
+nie jest jednorodny.
 
 Skrypt stwierdza to uporządkowanie, a nie liczby, na
 $\val{p19.ppl.tokens}$ tokenach przy czterech różnych rozrzutach, i czyta dwie
@@ -638,20 +642,24 @@ straty była czymkolwiek.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\result{\textbf{Funkcja jest wypukła, gdy cięciwa nigdy nie schodzi
+\sumitem{1--2}{\result{\textbf{Funkcja jest wypukła, gdy cięciwa nigdy nie
+schodzi
   poniżej krzywej}, dla każdej pary punktów i każdego położenia między nimi.
   To jest definicja, a nie jej obrazek}.}
-\sumitem{3--4}{\result{\textbf{Nierówność da się sprawdzić tam, gdzie obrazka nie},
+\sumitem{3--4}{\result{\textbf{Nierówność da się sprawdzić tam, gdzie obrazka
+nie},
   i dlatego jest tą użyteczną postacią: $\val{p19.chord.fns}$ funkcji po
   $\val{p19.chord.tests}$ trójek każda. $\lvert x\rvert$ jest wypukła i ma
   ostrze, więc \textbf{wypukłość nie jest gładkością}}.}
 \sumitem{5--6}{Test, który nie może zawieść, nie jest testem: to samo
   przemiatanie na funkcji czwartego stopnia zawodzi o
   $\val{p19.chord.counterexample}$.}
-\sumitem{7--8}{\result{\textbf{Drugim testem jest obiekt z Programu~\ref{prog:P17}}:
+\sumitem{7--8}{\result{\textbf{Drugim testem jest obiekt z
+Programu~\ref{prog:P17}}:
   $f'' \ge 0$ wszędzie albo hesjan dodatnio półokreślony wszędzie. Zwróć uwagę
   na kwantyfikator \dash{} P17 pytał w punkcie, to pyta w każdym punkcie}.}
-\sumitem{9--10}{\result{\textbf{Każde minimum lokalne funkcji wypukłej jest globalne},
+\sumitem{9--10}{\result{\textbf{Każde minimum lokalne funkcji wypukłej jest
+globalne},
   co daje cięciwa w dwóch linijkach. Tym właśnie jest ta obietnica}.}
 \sumitem{11--12}{\result{$\val{p19.basins.convex}$ niecka wobec
   $\val{p19.basins.wiggle}$, wartych $\val{p19.wiggle.lo}$ i
@@ -662,17 +670,22 @@ straty była czymkolwiek.
   wypukłość kupuje to, że osiągnięty punkt stacjonarny jest odpowiedzią}.}
 \sumitem{15--16}{\result{\textbf{Nierówność Jensena} to cięciwa przeczytana jako
   średnia: $f$ ze średniej ważonej jest co najwyżej ważoną średnią z $f$}.}
-\sumitem{17--18}{\result{\textbf{Zastosowanie funkcji wypukłej najpierw daje większą
+\sumitem{17--18}{\result{\textbf{Zastosowanie funkcji wypukłej najpierw daje
+większą
   liczbę}, a oba są równe dokładnie wtedy, gdy każde wejście jest takie samo.
   Dla funkcji wklęsłej każda nierówność się odwraca}.}
-\sumitem{19--20}{\result{\textbf{Średnia z wartości perplexity jest zawsze tą większą
-  z dwóch}, bo $e^{x}$ jest wypukłe \dash{} więc obie liczby są uporządkowane,
-  a nie tylko różne, a para z Programu~\ref{prog:F04} jest bramkowana wobec
-  tego uporządkowania}.}
-\sumitem{21}{\result{\textbf{Przekonanie trzyma się, bo jest prawie prawdziwe}: obie
+\sumitem{19--20}{\result{\textbf{Średnia z wartości perplexity nigdy nie jest
+tą mniejszą
+  z dwóch}, bo $e^{x}$ jest wypukłe \dash{} ściśle większa zawsze wtedy, gdy
+  straty na poszczególnych dokumentach się różnią, równa, gdy się nie różnią,
+  a para z Programu~\ref{prog:F04} jest bramkowana wobec tego
+  uporządkowania}.}
+\sumitem{21}{\result{\textbf{Przekonanie trzyma się, bo jest prawie
+prawdziwe}: obie
   liczby zgadzają się dokładnie wtedy, gdy każdy token kosztuje tyle samo,
   czyli tak, jak wygląda podkładka testowa}.}
-\sumitem{22--24}{\result{\textbf{Rozmiar błędu ustala rozrzut strat}, a nie model:
+\sumitem{22--24}{\result{\textbf{Rozmiar błędu ustala rozrzut strat}, a nie
+model:
   $\val{p19.ppl.ratio.00}$ przy zerowym rozrzucie i
   $\val{p19.ppl.ratio.20}$ przy $\num{2.0}$ nata, przy nieruchomej poprawnej
   liczbie. Harness z tym błędem przechodzi na podkładce i podaje źle na
@@ -680,7 +693,8 @@ straty była czymkolwiek.
 \sumitem{25--26}{\result{Trzymaj to osobno od średniej makro i mikro, którą
   Program~\ref{prog:F04} stawia obok: \textbf{tam szkodę robią wagi, a tu
   krzywizna}, i nie mają tej samej naprawy}.}
-\sumitem{27--28}{\result{\textbf{$\ln$ jest wklęsły, więc nierówność się odwraca}, a
+\sumitem{27--28}{\result{\textbf{$\ln$ jest wklęsły, więc nierówność się
+odwraca}, a
   $\ln\Ex[x] \ge \Ex[\ln x]$ to ELBO w jednej linijce.} Nazwane tu dla
   rozpoznania; sama metoda nie należy do tej książki.}
 \sumitem{29--30}{\result{\textbf{Jensen dla $x^{2}$ to nieujemność wariancji}, i
@@ -688,7 +702,8 @@ straty była czymkolwiek.
 \sumitem{31--32}{\result{\textbf{Strata sieci jest niewypukła przed jakąkolwiek
   aktywacją i jakąkolwiek głębokością}, bo wagi różnych warstw się mnożą, a
   iloczyn dwóch zmiennych jest siodłem}.}
-\sumitem{33--38}{\result{\textbf{Stracone zostaje jedno twierdzenie i nic więcej.}
+\sumitem{33--38}{\result{\textbf{Stracone zostaje jedno twierdzenie i nic
+więcej.}
   Najbardziej stromy kierunek, ograniczenie na krok i tożsamości gradientowe
   wyprowadzono bez wypukłości. \textbf{A nierówność przeżywa obietnicę}, i to
   czyni ten program wartym swoich ramek}.}

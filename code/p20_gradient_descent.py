@@ -653,6 +653,7 @@ emit("p20.wd.l2.steep", W_L2[0], 3)
 emit("p20.wd.l2.flat", W_L2[1], 3)
 emit("p20.wd.l2.spread", L2_SPREAD, 1)
 emit("p20.wd.decoupled", W_WD[0], 3)
+emit("p20.wd.decoupled.flat", W_WD[1], 3)
 emit("p20.wd.gap", bound(abs(W_WD[0] - W_WD[1]), 1e-3))
 NOTES.append(f"with one lambda of {LAMBDA}, L2 settles the steep coordinate "
              f"at {W_L2[0]:.3f} and the flat one at {W_L2[1]:.3f} -- a factor "
@@ -674,14 +675,31 @@ def sgd_wd(eta, lam):
     return step
 
 
-_a = settle(sgd_l2, LAMBDA, steps=50_000)
-_b = settle(sgd_wd, LAMBDA, steps=50_000)
+# 50,000 steps is not enough: the flat coordinate's contraction factor is
+# 1 - eta(a + lambda) with a = 0.01, so it still carries 4e-3 of its opening
+# gap and prints 0.095 where the minimiser is 0.091.  The assertion below
+# caught that, which is why the count is 400,000 rather than a round number.
+_a = settle(sgd_l2, LAMBDA, steps=400_000)
+_b = settle(sgd_wd, LAMBDA, steps=400_000)
 assert max(abs(x - y) for x, y in zip(_a, _b)) < 1e-12, (_a, _b)
 emit("p20.wd.sgd.gap",
      bound(max(abs(x - y) for x, y in zip(_a, _b)), 1e-12))
+emit("p20.wd.sgd.steep", _a[0], 3)
+emit("p20.wd.sgd.flat", _a[1], 3)
+# And the L2 row is the PENALISED OBJECTIVE'S OWN MINIMISER, which every
+# optimiser that puts the penalty in the gradient finds -- so the spread
+# between the two coordinates is one lambda meeting two curvatures rather
+# than anything Adam does.  Asserted against the closed form and against
+# Adam's own L2 row, because the page prints them as one number.
+for _c, _s, _t in zip(_a, CURV, TARGET):
+    assert abs(_c - _s * _t / (_s + LAMBDA)) < 1e-9, (_c, _s)
+assert max(abs(x - y) for x, y in zip(_a, W_L2)) < 1e-3, (_a, W_L2)
+assert f"{_a[0]:.3f}" == f"{W_L2[0]:.3f}" and f"{_a[1]:.3f}" == f"{W_L2[1]:.3f}"
 NOTES.append("for plain descent the two forms are the same update and settle "
              "in identical places, which is why the distinction is a fact "
-             "about adaptive methods rather than about penalties")
+             "about adaptive methods rather than about penalties -- and both "
+             "land on the penalised objective's own minimiser at/(a+lambda), "
+             "which is where Adam's L2 row sits too")
 
 
 # ---------------------------------------------------------------------------

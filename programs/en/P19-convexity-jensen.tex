@@ -73,10 +73,10 @@
   every value is the same.}
 \item A leaderboard averages the per-document perplexities of a model. What
   is it reporting? \teachesat{19--20}
-  \answerto{A different quantity from the perplexity, and a larger one. The
-  perplexity is the exponential of the mean loss; the mean of the
+  \answerto{A different quantity from the perplexity, and one that is never
+  smaller. The perplexity is the exponential of the mean loss; the mean of the
   exponentials sits above it by a factor that grows with how varied the
-  documents are.}
+  documents are, and equals it only when they are all the same.}
 \item Is $\ln$ convex or concave, and what does that do to the inequality?
   \teachesat{27--28}
   \answerto{Concave, so the inequality turns round: the logarithm of a mean
@@ -377,13 +377,15 @@ and why it is not a coincidence of that example.
 
 \begin{fr}
 \begin{ansblock}
-The average of the perplexities, always \dash{} because $e^{x}$ is convex and
-Jensen says so for every set of losses.
+The average of the perplexities \dash{} strictly, for those four, because
+$e^{x}$ is convex and the four losses differ.
 \end{ansblock}
 
 So the two numbers are \textbf{ordered}, not merely different, and the wrong
-one is always the larger. A harness with this bug always flatters nothing and
-always reports a model as worse than it is.
+one is never the smaller. It is strictly larger whenever the per-document
+losses differ, and equal to the right one only when every document costs the
+same. A harness with this bug therefore never flatters a model, and reports it
+as worse than it is on every corpus that is not uniform.
 
 The script asserts that ordering rather than the figures, over
 $\val{p19.ppl.tokens}$ tokens at four different spreads, and it reads
@@ -673,19 +675,23 @@ anything at all.
 
 % ============================================================
 \begin{summarybox}
-\sumitem{1--2}{\result{\textbf{A function is convex when the chord never dips below
+\sumitem{1--2}{\result{\textbf{A function is convex when the chord never dips
+below
   the curve}, for every pair of points and every position between them. That
   is the definition, not a picture of it}.}
-\sumitem{3--4}{\result{\textbf{The inequality can be checked where the picture cannot},
+\sumitem{3--4}{\result{\textbf{The inequality can be checked where the picture
+cannot},
   which is why it is the useful form: $\val{p19.chord.fns}$ functions over
   $\val{p19.chord.tests}$ triples each. $\lvert x\rvert$ is convex and has a
   corner, so \textbf{convexity is not smoothness}}.}
 \sumitem{5--6}{A test that cannot fail is not a test: the same sweep on a
   quartic fails by $\val{p19.chord.counterexample}$.}
-\sumitem{7--8}{\result{\textbf{The second test is Program~\ref{prog:P17}'s object}:
+\sumitem{7--8}{\result{\textbf{The second test is Program~\ref{prog:P17}'s
+object}:
   $f'' \ge 0$ everywhere, or the Hessian positive semi-definite everywhere.
   Note the quantifier \dash{} P17 asked at a point, this asks at every point}.}
-\sumitem{9--10}{\result{\textbf{Every local minimum of a convex function is global},
+\sumitem{9--10}{\result{\textbf{Every local minimum of a convex function is
+global},
   by the chord in two lines. That is what the promise is}.}
 \sumitem{11--12}{\result{$\val{p19.basins.convex}$ basin against
   $\val{p19.basins.wiggle}$, worth $\val{p19.wiggle.lo}$ and
@@ -694,19 +700,24 @@ anything at all.
 \sumitem{13--14}{\result{\textbf{It is a promise about the problem, not the
   algorithm.} An optimiser can still diverge or crawl on a convex function;
   what convexity buys is that a stationary point it reaches is the answer}.}
-\sumitem{15--16}{\result{\textbf{Jensen's inequality} is the chord read as an average:
+\sumitem{15--16}{\result{\textbf{Jensen's inequality} is the chord read as an
+average:
   $f$ of a weighted mean is at most the weighted mean of $f$}.}
-\sumitem{17--18}{\result{\textbf{Applying the convex function first gives the larger
+\sumitem{17--18}{\result{\textbf{Applying the convex function first gives the
+larger
   number}, and the two are equal exactly when every input is the same. For a
   concave function every inequality turns round}.}
-\sumitem{19--20}{\result{\textbf{An average of perplexities is always the larger of
-  the two}, because $e^{x}$ is convex \dash{} so the two numbers are ordered
-  and not merely different, and Program~\ref{prog:F04}'s pair is gated
-  against that ordering}.}
-\sumitem{21}{\result{\textbf{The belief survives because it is almost true}: the two
+\sumitem{19--20}{\result{\textbf{An average of perplexities is never the
+smaller of
+  the two}, because $e^{x}$ is convex \dash{} strictly larger whenever the
+  per-document losses differ, equal when they do not, and
+  Program~\ref{prog:F04}'s pair is gated against that ordering}.}
+\sumitem{21}{\result{\textbf{The belief survives because it is almost true}:
+the two
   agree exactly when every token costs the same, which is what a test fixture
   looks like}.}
-\sumitem{22--24}{\result{\textbf{The size of the error is set by the spread of the
+\sumitem{22--24}{\result{\textbf{The size of the error is set by the spread of
+the
   losses}, not by the model: $\val{p19.ppl.ratio.00}$ at zero spread and
   $\val{p19.ppl.ratio.20}$ at $\num{2.0}$ nats, with the right number
   unmoved. A harness with the bug passes on a fixture and misreports on a
@@ -714,16 +725,19 @@ anything at all.
 \sumitem{25--26}{\result{Keep it apart from the macro/micro average
   Program~\ref{prog:F04} sets beside it: \textbf{there the weights do the
   damage and here the curvature does}, and the two do not have the same fix}.}
-\sumitem{27--28}{\result{\textbf{$\ln$ is concave, so the inequality turns round}, and
+\sumitem{27--28}{\result{\textbf{$\ln$ is concave, so the inequality turns
+round}, and
   $\ln\Ex[x] \ge \Ex[\ln x]$ is the ELBO in one line.} Named here for
   recognition; the method is not this book's.}
 \sumitem{29--30}{\result{\textbf{Jensen for $x^{2}$ is the variance being
   non-negative}, which is why the inequality is worth knowing by name: one
   statement, three places}.}
-\sumitem{31--32}{\result{\textbf{A network's loss is non-convex before any activation
+\sumitem{31--32}{\result{\textbf{A network's loss is non-convex before any
+activation
   or any depth}, because the weights of different layers multiply and a
   product of two variables is a saddle}.}
-\sumitem{33--38}{\result{\textbf{What is lost is one claim and nothing else.} The
+\sumitem{33--38}{\result{\textbf{What is lost is one claim and nothing else.}
+The
   steepest direction, the step-size bound and the gradient identities were all
   derived without convexity. \textbf{And the inequality survives the promise},
   which is why this program is worth its frames}.}

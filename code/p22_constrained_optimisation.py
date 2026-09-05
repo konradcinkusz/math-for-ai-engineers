@@ -216,8 +216,12 @@ for k in range(-20, 21):
     assert d2(P_OFF, other) > base, (t, other)
 emit("p22.proj.from.x", float(P_OFF[0]), 0)
 emit("p22.proj.from.y", float(P_OFF[1]), 0)
-emit("p22.proj.to.x", float(P_ON[0]), 1)
-emit("p22.proj.to.y", float(P_ON[1]), 1)
+# The projection is exact over fractions -- both components are integers here
+# -- so it is printed as integers.  "4.0, -1.0" reads as the floating-point
+# result of a computation that never touched a float.
+assert P_ON[0].denominator == 1 and P_ON[1].denominator == 1, P_ON
+emit("p22.proj.to.x", float(P_ON[0]), 0)
+emit("p22.proj.to.y", float(P_ON[1]), 0)
 emit("p22.proj.tried", 40)
 NOTES.append("the projection of (5, 0) onto x + y = 3 is (4, -1), and it beats "
              "40 other points of the same line on distance -- Program P05's "
@@ -283,8 +287,12 @@ emit("p22.kl.beta.hi", BETAS[0], 0)
 emit("p22.kl.beta.lo", BETAS[-1], 2)
 emit("p22.kl.hi", kl_rows[0][1], 3)
 emit("p22.kl.lo", kl_rows[-1][1], 2)
-emit("p22.kl.r.hi", kl_rows[0][2], 2)
-emit("p22.kl.r.lo", kl_rows[-1][2], 2)
+# THREE decimals, not two, and the reason is the recorded rule rather than
+# taste: the frames divide these two to get p22.kl.buy, and at two decimals
+# the page prints 1.27 and 2.96, which divide to 133 against an exact 134.
+# The assertion below holds the printed forms to the printed answer.
+emit("p22.kl.r.hi", kl_rows[0][2], 3)
+emit("p22.kl.r.lo", kl_rows[-1][2], 3)
 emit("p22.kl.slope.bound", bound(worst, 1e-4))
 NOTES.append("the slope of expected reward against KL along the family of "
              f"solutions is beta itself, to better than 1e-4 -- so beta is "
@@ -298,6 +306,25 @@ assert kl_rows[-1][2] > kl_rows[0][2]
 emit("p22.kl.spend", kl_rows[-1][1] / kl_rows[0][1], 0)
 emit("p22.kl.buy",
      100 * (kl_rows[-1][2] - kl_rows[0][2]) / kl_rows[0][2], 0)
+
+# The chord between the two printed rows, which is what a reader who divides
+# the table gets.  It is not beta: the slope is a local derivative running
+# from BETAS[0] down to BETAS[-1], and this average of it sits between them.
+_chord = ((kl_rows[-1][2] - kl_rows[0][2])
+          / (kl_rows[-1][1] - kl_rows[0][1]))
+assert BETAS[-1] < _chord < BETAS[0], (_chord, BETAS)
+emit("p22.kl.chord", _chord, 2)
+
+# Both multiples have to reproduce from the table the page prints, not only
+# from the floats behind it -- divide the two numbers as the page prints them.
+_khi, _klo = float(f"{kl_rows[0][1]:.3f}"), float(f"{kl_rows[-1][1]:.2f}")
+_rhi, _rlo = float(f"{kl_rows[0][2]:.3f}"), float(f"{kl_rows[-1][2]:.3f}")
+assert (f"{_klo / _khi:.0f}"
+        == f"{kl_rows[-1][1] / kl_rows[0][1]:.0f}"), (_khi, _klo)
+assert (f"{100 * (_rlo - _rhi) / _rhi:.0f}"
+        == f"{100 * (kl_rows[-1][2] - kl_rows[0][2]) / kl_rows[0][2]:.0f}"), (
+            _rhi, _rlo)
+assert f"{(_rlo - _rhi) / (_klo - _khi):.2f}" == f"{_chord:.2f}", _chord
 NOTES.append(f"dropping beta from {BETAS[0]:.0f} to {BETAS[-1]:.2f} spends "
              f"{kl_rows[-1][1]/kl_rows[0][1]:.0f} times the KL to buy "
              f"{100*(kl_rows[-1][2]-kl_rows[0][2])/kl_rows[0][2]:.0f} per cent "

@@ -182,7 +182,8 @@ $\val{p20.rate.sgd}$, więc dojście do jednego procenta początkowej odległoś
 wymaga $\val{p20.pred.sgd}$ kroków.
 
 Pomiar to $\val{p20.steps.sgd}$. \textbf{Przewidywanie jest dokładne}, a skrypt
-sprawdza je przy $\val{p20.sweep.kappas}$ wskaźnikach uwarunkowania od $\val{p20.sweep.k.lo}$ do
+sprawdza je przy $\val{p20.sweep.kappas}$ wskaźnikach uwarunkowania od
+$\val{p20.sweep.k.lo}$ do
 $\val{p20.sweep.k.hi}$, a nie przy tym jednym. Zapamiętaj to, bo przewidywanie
 z następnej sekcji zachowuje się inaczej, a ta różnica jest pouczająca.
 \end{fr}
@@ -670,32 +671,53 @@ więc jego skuteczna siła staje się $\lambda/\sqrt{v}$ \dash{} inną liczbą w
 każdej współrzędnej, i ruchomą.
 \end{ansblock}
 
-Zmierzone. Dwie współrzędne różniące się wyłącznie krzywizną, o czynnik
+Zmierzone, i doprowadzone do równowagi pod oboma optymalizatorami, bo istotne
+jest porównanie dwóch reguł, a nie dwóch współrzędnych. Dwie współrzędne
+różniące się wyłącznie krzywizną, o czynnik
 $\val{p20.wd.curvratio}$, obie z minimum w $1$, jedna kara
 $\lambda = \val{p20.wd.lambda}$:
 
 \begin{center}
 \begin{tabular}{lll}
 \toprule
-& współrzędna stroma & współrzędna płaska \\
+& stroma & płaska \\
 \midrule
-kara w gradiencie & $\val{p20.wd.l2.steep}$ & $\val{p20.wd.l2.flat}$ \\
-kara na wadze & $\val{p20.wd.decoupled}$ & $\val{p20.wd.decoupled}$ \\
+Adam, kara w gradiencie & $\val{p20.wd.l2.steep}$ & $\val{p20.wd.l2.flat}$ \\
+Adam, kara na wadze & $\val{p20.wd.decoupled}$ & $\val{p20.wd.decoupled.flat}$ \\
+zwykły spadek, kara w gradiencie & $\val{p20.wd.sgd.steep}$ & $\val{p20.wd.sgd.flat}$ \\
+zwykły spadek, kara na wadze & $\val{p20.wd.sgd.steep}$ & $\val{p20.wd.sgd.flat}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-Ta sama $\lambda$ kurczy jedną współrzędną o dziewięć procent, a drugą o
-dziewięćdziesiąt, czyli o czynnik $\val{p20.wd.l2.spread}$ \dash{} a ta, którą
-niemal unicestwia, jest tą o małym gradiencie. Wiersz odsprzężony to dwie
-identyczne liczby z dokładnością lepszą niż $\val{p20.wd.gap}$, bo ta kara nie
-wie nic o żadnej ze współrzędnych.
+Trzy z tych czterech wierszy to ta sama para liczb, a ten, który nią nie jest,
+stanowi całą różnicę. Dwa wiersze zwykłego spadku zgadzają się z dokładnością
+lepszą niż $\val{p20.wd.sgd.gap}$, bo dla niego obie postaci to jedno
+uaktualnienie zapisane dwa razy. Wiersze Adama już nie.
+
+A para, którą trzy z nich dzielą, też nie jest zasługą Adama: w punkcie stałym
+cały gradient jest zerem, więc każdy optymalizator dodający $\lambda w$ przed
+krokiem osiada tam, gdzie minimum ma funkcja \emph{z karą}, czyli w
+$at/(a+\lambda)$ \dash{} co jest stwierdzone wobec postaci zamkniętej. Stamtąd
+bierze się $\val{p20.wd.l2.spread}$ między współrzędnymi \dash{} jedna
+$\lambda$ spotykająca dwie krzywizny, więc kara niemal unicestwia współrzędną
+o małym gradiencie \dash{} i jest to własność kary, a nie metody, która ją
+niesie.
+
+Do samego Adama należy drugi wiersz. Kara odsprzężona nigdy nie przechodzi
+przez $\sqrt{v}$, więc ciągnie obie współrzędne o ten sam ułamek ich samych,
+wobec kroku, którego rozmiar normalizator już ustalił; przy tej $\lambda$
+zostawia to obie w ich minimum danych, z dokładnością lepszą niż
+$\val{p20.wd.gap}$. Kara nie wie nic o żadnej ze współrzędnych, i to jest ta
+własność, dla której ją odsprzężono.
 \end{fr}
 
 \begin{fr}
 \begin{trapbox}
 \textbf{\enquote{Adam z \code{weight\_decay} to regularyzacja $L_2$.}} Nie
-jest, i powyższa tabela mówi dlaczego. Dodanie kary do gradientu czyni jej
+jest, i powyższa tabela mówi dlaczego: obie postaci to jedna reguła dla
+zwykłego spadku i dwie różne reguły dla metody adaptacyjnej. Dodanie kary do
+gradientu czyni jej
 skuteczną siłę funkcją historii gradientów każdego parametru, więc
 \enquote{siła regularyzacji} nie jest jedną liczbą i nie stoi w miejscu.
 
@@ -782,29 +804,34 @@ która zmienia jego znaczenie.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--2}{\result{Każdy optymalizator tutaj to $w \leftarrow w - \eta d$ z innym
+\sumitem{1--2}{\result{Każdy optymalizator tutaj to $w \leftarrow w - \eta d$
+z innym
   $d$. \textbf{Lista to jeden wiersz i ciąg napraw}, a nie sześć algorytmów}.}
 \sumitem{3--4}{\result{Krok ma sufit wyznaczony przez kierunek \emph{najbardziej
   stromy}, $\eta < 2/\lambda_{\max}$, więc każdy płaszczy porusza się wolniej,
   niż mógłby. To ograniczenie Programu~\ref{prog:P17} i to je naprawia
   wszystko, co po nim następuje}.}
-\sumitem{5--6}{\result{Zmarnowany wysiłek to składowa boczna odwracająca się w każdym
+\sumitem{5--6}{\result{Zmarnowany wysiłek to składowa boczna odwracająca się w
+każdym
   kroku: $\val{p15.zig.crossings}$ zmian znaku w $\val{p15.zig.steps}$ krokach,
   czyli pomiar Programu~\ref{prog:P15} na tej samej misie}.}
 \sumitem{7}{\result{Na tej misie zwykła metoda gradientu potrzebuje
   $\val{p20.steps.sgd}$ kroków, a jej przewidywana liczba z
   $(\kappa-1)/(\kappa+1)$ jest \textbf{dokładna przy każdym sprawdzonym
   wskaźniku uwarunkowania}}.}
-\sumitem{8--9}{\result{Momentum to średnia Programu~\ref{prog:F04} z gradientem w
+\sumitem{8--9}{\result{Momentum to średnia Programu~\ref{prog:F04} z
+gradientem w
   środku: znosi to, co zmienia znak, i zachowuje to, co go nie zmienia, czyli
   dokładnie kształt zygzaka}.}
-\sumitem{10--11}{\result{Zastępuje $\kappa$ przez $\sqrt{\kappa}$ \textbf{w tempie}
+\sumitem{10--11}{\result{Zastępuje $\kappa$ przez $\sqrt{\kappa}$ \textbf{w
+tempie}
   \dash{} $\val{p20.rate.sgd}$ staje się $\val{p20.rate.mom}$}.}
 \sumitem{12--14}{\result{Zmierzona liczba to $\val{p20.steps.mom}$ wobec
   przewidywanych $\val{p20.pred.mom}$, bo marsz najpierw wybiega na
   $\val{p20.overshoot}$ raza początkową odległość i bo optymalne współczynniki
   dają pierwiastek podwójny. \textbf{Tempo jest granicą, a liczba kroków nie.}}}
-\sumitem{15--16}{\result{Zysk rośnie z $\kappa$ i nigdy nie sięga $\sqrt{\kappa}$:
+\sumitem{15--16}{\result{Zysk rośnie z $\kappa$ i nigdy nie sięga
+$\sqrt{\kappa}$:
   $\val{p20.sweep.ratio.lo}\times$ przy $\kappa = \val{p20.sweep.k.lo}$ i
   $\val{p20.sweep.ratio.hi}\times$ przy $\kappa = \val{p20.sweep.k.hi}$, wobec
   sufitu $\val{p20.sweep.sqrt.hi}$}.}
@@ -813,19 +840,24 @@ która zmienia jego znaczenie.
   o $1/(1-\beta)$. \textbf{Krok nie podróżuje między nimi}: przeskalowanie
   odtwarza $\val{p20.conv.same}$-krokowy marsz dokładnie, a brak
   przeskalowania rozbiega się}.}
-\sumitem{20}{\result{Razem z hiperparametrem podróżuje wyrażenie, w którym występuje,
+\sumitem{20}{\result{Razem z hiperparametrem podróżuje wyrażenie, w którym
+występuje,
   nigdy sama liczba}.}
-\sumitem{21--24}{\result{Dzielenie przez $\sqrt{v}$ usuwa jednostki, więc krok wynosi
+\sumitem{21--24}{\result{Dzielenie przez $\sqrt{v}$ usuwa jednostki, więc krok
+wynosi
   około $\eta$ niezależnie od rozmiaru gradientu \dash{} i dlatego też Adam
   jest niewrażliwy na skalowanie straty. Obie średnie razem to Adam}.}
-\sumitem{25}{\result{Zmierzone na dwunastu rzędach wielkości, pierwszy krok wynosi
+\sumitem{25}{\result{Zmierzone na dwunastu rzędach wielkości, pierwszy krok
+wynosi
   $\eta/(1 + \varepsilon/\lvert g\rvert)$, więc jedyne odchylenie od $\eta$
   należy do epsilona i jest największe tam, gdzie gradient jest najmniejszy}.}
-\sumitem{26--27}{\result{Epsilon idzie \textbf{na zewnątrz} pierwiastka, gdzie jest
+\sumitem{26--27}{\result{Epsilon idzie \textbf{na zewnątrz} pierwiastka, gdzie
+jest
   porównywany z gradientem. W środku jest porównywany z kwadratem gradientu:
   $\val{p20.eps.short.in}$ procent kroku traconego wobec
   $\val{p20.eps.short.out}$}.}
-\sumitem{28--29}{\result{Przy przeparametryzowaniu Programu~\ref{prog:P17} zwykła
+\sumitem{28--29}{\result{Przy przeparametryzowaniu Programu~\ref{prog:P17}
+zwykła
   metoda gradientu rozbiega się \dash{} $\val{p20.sgd.overshoot}$ razy poza
   swoje ograniczenie \dash{} a Adam wykonuje te same $\val{p20.adam.plain}$
   kroków. \textbf{Odpowiedź metody adaptacyjnej nie zależy od tego, jak
@@ -833,16 +865,20 @@ która zmienia jego znaczenie.
 \sumitem{30--31}{\result{Program~\ref{prog:F04} podaje poprawkę obciążenia jako
   $1 - \beta^{\,t}$, jedną na współczynnik, a przy
   $\beta_2 = \num{0.999}$ pracuje ona przez setki kroków, a nie przez trzy}.}
-\sumitem{32--33}{\result{Warmup chroni mianownik oszacowany z prawie żadnych danych:
+\sumitem{32--33}{\result{Warmup chroni mianownik oszacowany z prawie żadnych
+danych:
   oszacowanie skali waha się o $\val{p20.warm.early}$ przez dziesięć kroków i o
   $\val{p20.warm.late}$ przez trzysta}.}
 \sumitem{34--35}{\result{Karę można dodać do gradientu albo odjąć od wagi, a
   \textbf{dla zwykłej metody gradientu to ten sam wiersz}}.}
-\sumitem{36--37}{\result{Dla metody adaptacyjnej już nie: kara w gradiencie jest
-  dzielona przez bieżącą skalę razem ze wszystkim innym, więc jedna $\lambda$
-  zostawia współrzędną stromą na $\val{p20.wd.l2.steep}$, a płaską na
-  $\val{p20.wd.l2.flat}$}.}
-\sumitem{38--39}{\result{\code{gamma} \emph{mnoży}: $\val{p20.sched.lr0}$ staje się
+\sumitem{36--37}{\result{Dla metody adaptacyjnej już nie, a dowodem jest
+tabela o
+  czterech wierszach: trzy z nich się zgadzają, bo każdy optymalizator
+  dodający $\lambda w$ przed krokiem osiada w minimum funkcji z karą, czyli w
+  $at/(a+\lambda)$, a wiersz Adama z karą odsprzężoną jest tym, który tam nie
+  osiada}.}
+\sumitem{38--39}{\result{\code{gamma} \emph{mnoży}: $\val{p20.sched.lr0}$
+staje się
   $\val{p20.sched.after}$ po $\val{p20.sched.boundaries}$ granicach, czyli
   $\val{p20.sched.factor}$ razy mniej niż przy błędnym odczytaniu}.}
 \sumitem{40--42}{\result{Cosinus i prosta wydają ten sam budżet \dash{}

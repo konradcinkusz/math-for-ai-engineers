@@ -209,7 +209,8 @@ $\kappa = \val{p20.kappa}$ that is $\val{p20.rate.sgd}$, so reaching one per
 cent of the starting distance needs $\val{p20.pred.sgd}$ steps.
 
 The measurement is $\val{p20.steps.sgd}$. \textbf{The prediction is exact}, and
-the script checks it at $\val{p20.sweep.kappas}$ condition numbers from $\val{p20.sweep.k.lo}$ to
+the script checks it at $\val{p20.sweep.kappas}$ condition numbers from
+$\val{p20.sweep.k.lo}$ to
 $\val{p20.sweep.k.hi}$ rather than at this one. Hold on to that, because the
 next section's prediction behaves differently and the difference is
 instructive.
@@ -430,7 +431,8 @@ travel with it?
 The expression it appears in, not the number.
 \end{ansblock}
 
-A hyperparameter is only meaningful together with the line it sits in. Two libraries can both offer \code{momentum=0.9} and mean different
+A hyperparameter is only meaningful together with the line it sits in. Two
+libraries can both offer \code{momentum=0.9} and mean different
 lengths; two schedulers can both offer \code{gamma} and mean different
 operations, which is section 7. When a number is carried from one setting to
 another, what has to travel with it is not the number but the line it sits in.
@@ -700,35 +702,55 @@ its effective strength becomes $\lambda/\sqrt{v}$ \dash{} a different number in
 every coordinate, and a moving one.
 \end{ansblock}
 
-Measured. Two coordinates differing only in curvature, by a factor of
+Measured, and run to equilibrium under both optimisers, because the comparison
+that matters is between the two rules rather than between the two coordinates.
+Two coordinates differing only in curvature, by a factor of
 $\val{p20.wd.curvratio}$, both with their minimum at $1$, one penalty
 $\lambda = \val{p20.wd.lambda}$:
 
 \begin{center}
 \begin{tabular}{lll}
 \toprule
-& steep coordinate & flat coordinate \\
+& steep & flat \\
 \midrule
-penalty in the gradient & $\val{p20.wd.l2.steep}$ & $\val{p20.wd.l2.flat}$ \\
-penalty on the weight & $\val{p20.wd.decoupled}$ & $\val{p20.wd.decoupled}$ \\
+Adam, penalty in the gradient & $\val{p20.wd.l2.steep}$ & $\val{p20.wd.l2.flat}$ \\
+Adam, penalty on the weight & $\val{p20.wd.decoupled}$ & $\val{p20.wd.decoupled.flat}$ \\
+plain descent, penalty in the gradient & $\val{p20.wd.sgd.steep}$ & $\val{p20.wd.sgd.flat}$ \\
+plain descent, penalty on the weight & $\val{p20.wd.sgd.steep}$ & $\val{p20.wd.sgd.flat}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-The same $\lambda$ shrinks one coordinate by nine per cent and the other by
-ninety, a factor of $\val{p20.wd.l2.spread}$ \dash{} and the one it nearly
-annihilates is the one with the small gradient. The decoupled row is two
-identical numbers to better than $\val{p20.wd.gap}$, because that penalty
-knows nothing about either coordinate.
+Three of those four rows are the same pair of numbers, and the one that is not
+is the whole of the distinction. Plain descent's two rows agree to better than
+$\val{p20.wd.sgd.gap}$, because for it the two forms are one update written
+twice. Adam's do not.
+
+And the pair three of them share is not Adam's doing either: at a fixed point
+the whole gradient is zero, so any optimiser that adds $\lambda w$ before
+stepping settles where the \emph{penalised} objective has its minimum, which
+is $at/(a+\lambda)$ and is asserted against the closed form. That is where the
+$\val{p20.wd.l2.spread}$ between the coordinates comes from \dash{} one
+$\lambda$ meeting two curvatures, so the penalty nearly annihilates the
+coordinate with the small gradient \dash{} and it is a property of the penalty
+rather than of the method carrying it.
+
+What belongs to Adam alone is the second row. Decoupled decay never passes
+through $\sqrt{v}$, so it pulls both coordinates by the same fraction of
+themselves against a step whose size the normaliser has already fixed; at this
+$\lambda$ that leaves both at their data minimum, to better than
+$\val{p20.wd.gap}$. The penalty knows nothing about either coordinate, which
+is the property it was decoupled to have.
 \end{fr}
 
 \begin{fr}
 \begin{trapbox}
 \textbf{\enquote{Adam with \code{weight\_decay} is $L_2$ regularisation.}} It
-is not, and the table above is why. Adding the penalty to the gradient makes
-its effective strength a function of each parameter's own gradient history, so
-\enquote{the regularisation strength} is not one number and does not stay
-still.
+is not, and the table above is why: the two forms are one rule for plain
+descent and two different rules for an adaptive method. Adding the penalty to
+the gradient makes its effective strength a function of each parameter's own
+gradient history, so \enquote{the regularisation strength} is not one number
+and does not stay still.
 
 That is the entire content of the distinction between the two \dash{} one
 line moved from before the optimiser to after it \dash{} and the reason a
@@ -823,13 +845,16 @@ means.
   $\eta < 2/\lambda_{\max}$, so every flatter direction moves more slowly
   than it could. That is Program~\ref{prog:P17}'s bound, and it is what
   everything after it repairs}.}
-\sumitem{5--6}{\result{The wasted effort is a sideways component that reverses every
+\sumitem{5--6}{\result{The wasted effort is a sideways component that reverses
+every
   step: $\val{p15.zig.crossings}$ sign changes in $\val{p15.zig.steps}$ steps,
   which is Program~\ref{prog:P15}'s measurement on the same bowl}.}
-\sumitem{7}{\result{On that bowl plain descent needs $\val{p20.steps.sgd}$ steps, and
+\sumitem{7}{\result{On that bowl plain descent needs $\val{p20.steps.sgd}$
+steps, and
   its predicted count from $(\kappa-1)/(\kappa+1)$ is \textbf{exact at every
   condition number tried}}.}
-\sumitem{8--9}{\result{Momentum is Program~\ref{prog:F04}'s average with a gradient
+\sumitem{8--9}{\result{Momentum is Program~\ref{prog:F04}'s average with a
+gradient
   in it: it cancels what alternates and keeps what does not, which is exactly
   the shape of the zig-zag}.}
 \sumitem{10--11}{\result{It replaces $\kappa$ by $\sqrt{\kappa}$ \textbf{in the
@@ -849,9 +874,11 @@ means.
   by $1/(1-\beta)$. \textbf{A step size does not travel between them}:
   rescaling reproduces a $\val{p20.conv.same}$-step walk exactly and not
   rescaling diverges}.}
-\sumitem{20}{\result{What travels with a hyperparameter is the expression it appears
+\sumitem{20}{\result{What travels with a hyperparameter is the expression it
+appears
   in, never the number on its own}.}
-\sumitem{21--24}{\result{Dividing by $\sqrt{v}$ removes the units, so the step is
+\sumitem{21--24}{\result{Dividing by $\sqrt{v}$ removes the units, so the step
+is
   about $\eta$ whatever the gradient's size \dash{} which is also why Adam is
   insensitive to loss scaling. Both averages together are Adam}.}
 \sumitem{25}{\result{Measured over twelve decades the first step is
@@ -869,15 +896,18 @@ means.
 \sumitem{30--31}{\result{Bias correction is Program~\ref{prog:F04}'s
   $1 - \beta^{\,t}$, one per coefficient, and at $\beta_2 = \num{0.999}$ it is
   working for hundreds of steps rather than for three}.}
-\sumitem{32--33}{\result{A warmup protects a denominator estimated from almost no
+\sumitem{32--33}{\result{A warmup protects a denominator estimated from almost
+no
   data: the scale estimate swings by $\val{p20.warm.early}$ over ten steps and
   $\val{p20.warm.late}$ over three hundred}.}
-\sumitem{34--35}{\result{A penalty can be added to the gradient or subtracted from
+\sumitem{34--35}{\result{A penalty can be added to the gradient or subtracted
+from
   the weight, and \textbf{for plain descent the two are the same line}}.}
-\sumitem{36--37}{\result{For an adaptive method they are not: the penalty in the
-  gradient is divided by the running scale with everything else, so one
-  $\lambda$ leaves the steep coordinate at $\val{p20.wd.l2.steep}$ and the
-  flat one at $\val{p20.wd.l2.flat}$}.}
+\sumitem{36--37}{\result{For an adaptive method they are not, and the four-row
+  table is the evidence: three rows agree because any optimiser that adds
+  $\lambda w$ before stepping settles at the penalised objective's own
+  minimiser $at/(a+\lambda)$, and Adam's decoupled row is the one that does
+  not}.}
 \sumitem{38--39}{\result{\code{gamma} \emph{multiplies}:
   $\val{p20.sched.lr0}$ becomes $\val{p20.sched.after}$ over
   $\val{p20.sched.boundaries}$ boundaries, which is
