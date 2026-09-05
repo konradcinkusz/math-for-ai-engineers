@@ -105,7 +105,8 @@ happened to be drawn.
 
 That is the whole subject of this program, and it is worth saying plainly
 before anything is derived: \textbf{the noise is not a defect in the method,
-it is the method}. Nobody could afford the full gradient, and nobody wants it \dash{}
+it is the method}. Nobody could afford the full gradient, and nobody wants it
+\dash{}
 so what training does is take a noisy step, very many times, and the
 properties of that noise decide almost everything people complain about.
 
@@ -149,7 +150,8 @@ They run from $\val{p21.pop.lo}$ to $\val{p21.pop.hi}$.
 \transcript{p21-every-batch}
 
 A span of $\val{p21.pop.span}$ around a quantity of $\val{p21.pop.mean}$, and
-one of them has the wrong sign.
+$\val{p21.pop.wrong}$ of the $\val{p21.pop.subsets}$ point the opposite way,
+with $\val{p21.pop.nodir}$ more pointing nowhere at all.
 \end{fr}
 
 \begin{fr}
@@ -157,8 +159,8 @@ one of them has the wrong sign.
 \textbf{\enquote{The gradient is unbiased, so I can trust it.}} Unbiased is a
 statement about the \emph{ensemble}: average over every batch that could have
 been drawn and the answer is exact. It says nothing at all about the batch in
-front of you, and here the batches straddle the answer with one of them
-pointing the opposite way.
+front of you, and here the batches straddle the answer, with
+$\val{p21.pop.wrong.pct}$ per cent of them pointing the opposite way.
 
 The two words that go together are \emph{unbiased} and \emph{variance}, and a
 method that has the first without the second under control is a method whose
@@ -418,7 +420,7 @@ Neither.
 \begin{trapbox}
 \textbf{\enquote{I halved the batch size, so I will keep the learning rate.}}
 That is a third rule, and it is the only one of the three nobody argues for:
-it lets the noise in each update grow by $\sqrt{2}$ \emph{and} halves the
+it lets the noise in each update grow by $\sqrt{2}$ \emph{and} doubles the
 ground covered per example.
 
 The useful habit is not to memorise a rule. It is to notice that $\eta$ and
@@ -517,7 +519,8 @@ each.
 They are equal \dash{} exactly, over fractions.
 \end{ansblock}
 
-\textbf{That is why it hides.} With equal token counts the two expressions are the
+\textbf{That is why it hides.} With equal token counts the two expressions are
+the
 same expression, so a test written on padded fixtures passes, a small run with
 uniform batches passes, and the defect appears only when the micro-batches are
 ragged \dash{} which is to say, on real text, at scale, in the run that
@@ -687,30 +690,37 @@ is usually two lines of arithmetic that nobody had written down.
 \end{fr}
 
 \begin{summarybox}
-\sumitem{1--2}{\result{A minibatch gradient is an \textbf{estimate} of the gradient
+\sumitem{1--2}{\result{A minibatch gradient is an \textbf{estimate} of the
+gradient
   you wanted. The noise is the method rather than a defect in it}.}
-\sumitem{3--4}{\result{\emph{Unbiased} means the average over every batch that could
+\sumitem{3--4}{\result{\emph{Unbiased} means the average over every batch that
+could
   have been drawn is exact \dash{} proved here over all
   $\val{p21.pop.subsets}$ of them, over fractions, which is a proof for this
   population rather than evidence about it}.}
 \sumitem{5--6}{\result{It says nothing about one draw: the batch means run from
   $\val{p21.pop.lo}$ to $\val{p21.pop.hi}$ around $\val{p21.pop.mean}$, and
-  one of them has the wrong sign}.}
+  $\val{p21.pop.wrong}$ of the $\val{p21.pop.subsets}$ point the opposite
+  way}.}
 \sumitem{7}{The forward prerequisite is declared: variance itself is
   Program~\ref{prog:P24}'s and concentration is Program~\ref{prog:P25}'s, two
   parts later, and P25 returns to minibatch noise once the machinery exists.}
-\sumitem{8--9}{\result{The variance of a batch mean falls like $1/B$, measured to
+\sumitem{8--9}{\result{The variance of a batch mean falls like $1/B$, measured
+to
   within $\val{p21.noise.tol}$ per cent over $B$ from
   $\val{p21.noise.b.lo}$ to $\val{p21.noise.b.hi}$}.}
 \sumitem{10--11}{\result{\textbf{The spread falls like $1/\sqrt{B}$}, so
   $\val{p21.noise.b16}$ times the batch buys $\val{p21.noise.spread16}$ times
   less noise. That square root is the whole of \enquote{diminishing returns}
   and it is exact rather than a rule of thumb}.}
-\sumitem{12}{\result{The step's spread is $\eta$ times the estimate's, so $\eta$ and
+\sumitem{12}{\result{The step's spread is $\eta$ times the estimate's, so
+$\eta$ and
   $B$ are two numbers describing one quantity}.}
-\sumitem{13--14}{\result{An enormous step happens because a batch mean has a spread.
+\sumitem{13--14}{\result{An enormous step happens because a batch mean has a
+spread.
   Nothing is wrong with the model, the data or the optimiser when it does}.}
-\sumitem{15--17}{\result{A clipping threshold is a decision about a distribution: at
+\sumitem{15--17}{\result{A clipping threshold is a decision about a
+distribution: at
   half the typical size it clips $\val{p21.clip.half}$ per cent of steps and
   at four times it, $\val{p21.clip.four.n}$ of $\val{p21.clip.trials}$.
   \textbf{The first is a different algorithm}, following the direction and
@@ -723,7 +733,8 @@ is usually two lines of arithmetic that nobody had written down.
   $\val{p21.scale.linear}$ and holds the ground covered per example fixed
   instead. Two rules, two invariants, and the empirical question is not
   settled here}.}
-\sumitem{22}{\result{Keeping $\eta$ while changing $B$ holds neither fixed, which is
+\sumitem{22}{\result{Keeping $\eta$ while changing $B$ holds neither fixed,
+which is
   why it is the one choice nobody argues for}.}
 \sumitem{23--24}{\result{A smoothed loss curve lags by its half-life:
   $\val{p21.ema.lag}$ steps measured against $\val{p21.ema.halflife}$
@@ -731,21 +742,26 @@ is usually two lines of arithmetic that nobody had written down.
   the change}.}
 \sumitem{25}{\result{Read the raw curve when the question is \emph{when} and the
   smoothed one when it is \emph{whether}}.}
-\sumitem{26--27}{\result{Accumulating micro-batches with different token counts gives
+\sumitem{26--27}{\result{Accumulating micro-batches with different token
+counts gives
   $\val{p21.acc.accumulated}$ where the large batch gives
   $\val{p21.acc.pooled}$ \dash{} and it is the \textbf{gradient} rather than a
   report, because the loss that was averaged wrongly is the loss that was
   differentiated}.}
-\sumitem{28--30}{\result{With equal token counts the two are identical over fractions,
+\sumitem{28--30}{\result{With equal token counts the two are identical over
+fractions,
   which is exactly why it ships: it is invisible on a padded fixture and
   decisive on real text}.}
-\sumitem{31--33}{\result{A sampling step has no derivative, and there are two ways
+\sumitem{31--33}{\result{A sampling step has no derivative, and there are two
+ways
   round it: the score function, which needs only the value, and
   reparameterisation, which needs a differentiable path}.}
-\sumitem{34--35}{\result{Both are unbiased. The reparameterised estimator's variance
+\sumitem{34--35}{\result{Both are unbiased. The reparameterised estimator's
+variance
   is $\val{p21.grad.repar}$ at \emph{every} dimension; the score function's
   goes to $\val{p21.grad.score.hi}$, a factor of $\val{p21.grad.ratio.hi}$}.}
-\sumitem{36--38}{\result{After $\val{p21.grad.samples}$ samples the score-function
+\sumitem{36--38}{\result{After $\val{p21.grad.samples}$ samples the
+score-function
   estimate is still $\val{p21.grad.off.score}$ per cent out.
   \textbf{Unbiased is not the same as usable}, and that is the fork between a
   variational model and a policy gradient}.}
@@ -801,7 +817,8 @@ is usually two lines of arithmetic that nobody had written down.
   \dash{} holds fixed.
   \answerto{Square-root scaling holds $\eta^{2}/B$ fixed, which is the
   variance of one update. Linear scaling holds the ground covered per
-  example fixed, since $k$ times the batch means $k$ times fewer steps. Keeping $\eta$ holds neither fixed: the update's variance
+  example fixed, since $k$ times the batch means $k$ times fewer steps.
+Keeping $\eta$ holds neither fixed: the update's variance
   changes by $1/k$ and the ground covered per example by $1/k$ as well, which
   is why it is a choice nobody argues for rather than a third rule.}
 \item A colleague reports that clipping \enquote{does nothing} because

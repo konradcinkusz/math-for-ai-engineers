@@ -138,6 +138,24 @@ emit("p21.pop.lo", float(LO), 2)
 emit("p21.pop.hi", float(HI), 2)
 emit("p21.pop.span", float(HI - LO), 2)
 
+# A REVIEW FOUND THE PROSE SAYING "one of them has the wrong sign", in three
+# places, one of them a \result{} that Appendix C replays.  Counted rather
+# than eyeballed: it is a fifth of them, and four more report no direction at
+# all, which is the worse half and was the half nobody had looked for.  The
+# population's own sign is asserted so the sentence cannot invert under a
+# change of numbers.
+assert POP_MEAN > 0, POP_MEAN
+WRONG = sum(1 for m in batch_means if m < 0)
+NODIR = sum(1 for m in batch_means if m == 0)
+assert WRONG > 0 and NODIR > 0, (WRONG, NODIR)
+emit("p21.pop.wrong", WRONG)
+emit("p21.pop.nodir", NODIR)
+emit("p21.pop.wrong.pct", 100 * WRONG / len(batch_means), 0)
+NOTES.append(f"{WRONG} of the {len(subsets)} batch means point the opposite "
+             f"way to the population mean and {NODIR} more are exactly zero, "
+             "so a draft that said one of them has the wrong sign was out by "
+             "a factor of twenty-four and silent about the four")
+
 
 # ---------------------------------------------------------------------------
 # 2. THE VARIANCE FALLS LIKE 1/B, and that is the whole noise model.
@@ -333,10 +351,19 @@ emit("p21.grad.d.hi", DIMS[-1])
 emit("p21.grad.score.lo", grad_rows[0][1], 1)
 emit("p21.grad.score.hi", grad_rows[-1][1], 0)
 emit("p21.grad.repar", 4.0 * SIGMA ** 2, 1)
-emit("p21.grad.ratio.hi", grad_rows[-1][1] / grad_rows[-1][2], 0)
+# THE RATIO IS AGAINST THE EXACT DENOMINATOR, NOT THE SAMPLED ONE.  The table
+# prints 4*sigma^2, which is exact -- Var(2x_1) with x_1 = theta + sigma*eps
+# is 4*sigma^2 and nothing else enters it -- and a draft divided by the
+# SAMPLED variance instead, so the page printed a ratio a reader dividing the
+# two printed numbers could not reproduce.  Asserted on the printed forms,
+# which is the only form anybody checks.
+REPAR_EXACT = 4.0 * SIGMA ** 2
+emit("p21.grad.ratio.hi", grad_rows[-1][1] / REPAR_EXACT, 0)
+assert (f"{grad_rows[-1][1] / REPAR_EXACT:.0f}"
+        == f"{float(f'{grad_rows[-1][1]:.0f}') / float(f'{REPAR_EXACT:.1f}'):.0f}")
 emit("p21.grad.score.est", grad_rows[-1][3], 2)
 NOTES.append(f"at {DIMS[-1]} dimensions the score-function estimator's "
-             f"variance is {grad_rows[-1][1]/grad_rows[-1][2]:.0f} times the "
+             f"variance is {grad_rows[-1][1]/REPAR_EXACT:.0f} times the "
              "reparameterised one's, and the reparameterised variance has not "
              "moved from 4 at any dimension")
 

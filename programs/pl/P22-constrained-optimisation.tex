@@ -24,8 +24,8 @@ mnożniki Lagrange'a}
   jednostki}
 \outcome{18--21}{nazwać drugi sposób egzekwowania ograniczenia i powiedzieć,
   co rzutowanie daje, a czego nie}
-\outcome{22--28}{czytać współczynnik kary jako kurs wymiany i powiedzieć,
-  dlaczego twarde ograniczenie i kara to to samo zadanie}
+\outcome{22--28}{czytać współczynnik kary w słowniku samego tego programu i
+  powiedzieć, jak kara ma się do twardego ograniczenia}
 \outcome{29--35}{rozpoznać warunki dla ograniczenia nierównościowego i
   powiedzieć, co znaczy zerowy mnożnik}
 \end{outcomes}
@@ -189,8 +189,9 @@ interpretacją \dash{} sekcja 3 jest miejscem, gdzie się nią staje.
 \end{fr}
 
 \begin{fr}
-Dwa równania wektorowe plus ograniczenie to trzy równania z trzema niewiadomymi,
-więc zadanie jest teraz algebrą. W naszym $\nabla f = (2x, 4y)$ i
+Jedno równanie wektorowe \dash{} dwie składowe \dash{} plus ograniczenie to trzy
+równania z trzema niewiadomymi, więc zadanie jest teraz algebrą. W naszym
+$\nabla f = (2x, 4y)$ i
 $\nabla g = (1, 1)$:
 \[ 2x = \lambda, \qquad 4y = \lambda, \qquad x + y = \val{p22.c} \]
 
@@ -205,8 +206,8 @@ ten sam punkt, który dało podstawienie.
 \end{ansblock}
 
 Skrypt robi to na ułamkach i sprawdza, że oba gradienty naprawdę są równoległe w
-odpowiedzi, więc słowo \emph{dokładnie} z poprzedniej ramki jest zapracowane, a
-nie założone. Pokazuje też, co zyskano: \textbf{ograniczenie nigdy nie zostało
+odpowiedzi, więc równoległość jest sprawdzona, a nie \emph{założona}. Pokazuje
+też, co zyskano: \textbf{ograniczenie nigdy nie zostało
 rozwiązane}. Zostało użyte, jako jeszcze jedno równanie, i dlatego metoda
 przeżywa ograniczenie, którego nikt nie przekształci.
 
@@ -234,7 +235,7 @@ optymalne:
 \begin{tabular}{ll}
 \toprule
 $x + y = \val{p22.c.lo}$ & najlepsze $f$ to $\val{p22.fstar.lo}$, $\lambda = \val{p22.lam.lo}$ \\
-$x + y = \val{p22.c}$ & najlepsze $f$ to $\val{p22.fstar}$ \\
+$x + y = \val{p22.c}$ & najlepsze $f$ to $\val{p22.fstar}$, $\lambda = \val{p22.lam}$ \\
 $x + y = \val{p22.c.hi}$ & najlepsze $f$ to $\val{p22.fstar.hi}$, $\lambda = \val{p22.lam.hi}$ \\
 \bottomrule
 \end{tabular}
@@ -252,17 +253,18 @@ Jej \emph{tempo zmiany} \dash{} o ile przesuwa się najlepsza wartość, gdy
 przesuwa się ograniczenie.
 \end{ansblock}
 
-Czyli pochodną, $\dfrac{\mathrm{d}f^{*}}{\mathrm{d}c}$, i to jest liczba, której
+Czyli pochodną, $\mathrm{d}f^{*}/\mathrm{d}c$, i to jest liczba, której
 człowiek naprawdę chce: mówi, ile warte jest poluzowanie budżetu.
 
-Policz ją przy $c = \val{p22.c.lo}$, $c = \num{2}$ i $c = \val{p22.c}$ i porównaj
+Policz ją przy $c = \val{p22.c.lo}$, $c = \num{2}$ i $c = \val{p22.c}$ i
+porównaj
 z mnożnikami na tych poziomach.
 
 \transcript{p22-lambda-is-slope}
 \end{fr}
 
 \begin{fr}
-\begin{trapbox}
+\begin{note}
 \textbf{Obie listy są identyczne, wyraz po wyrazie, jako dokładne ułamki.}
 \[ \lambda \;=\; \frac{\mathrm{d}f^{*}}{\mathrm{d}c} \]
 Nie jest to przybliżenie ani analogia. Skrypt sprawdza to na
@@ -274,7 +276,7 @@ centralna jest dokładna dla funkcji kwadratowej.
 poluzowanego ograniczenia, i ma jednostki: cel podzielony przez ograniczenie.
 Mnożnik nie jest zmienną pomocniczą do wyrugowania; zwykle jest najciekawszą
 liczbą w odpowiedzi.
-\end{trapbox}
+\end{note}
 \end{fr}
 
 \begin{fr}
@@ -364,7 +366,8 @@ Nie. Jego wartość celu to $\val{p22.proj.f}$ wobec $\val{p22.fstar}$ w optimum
 \textbf{Rzutowanie odpowiada na pytanie \emph{który punkt dopuszczalny jest
 najbliżej}. Mnożnik odpowiada na pytanie \emph{który jest najlepszy}.} To dwa
 różne pytania o dwóch różnych odpowiedziach, a mówi się to wprost tylko dlatego,
-że metody gradientu rzutowanego zapraszają do pomyłki: robią krok w dół, rzutują,
+że metody gradientu rzutowanego zapraszają do pomyłki: robią krok w dół,
+rzutują,
 krok w dół, rzutują, i to \emph{krok} znajduje optimum, a rzutowanie tylko
 utrzymuje punkt legalnym.
 
@@ -418,8 +421,10 @@ taka.
 \begin{fr}
 Ten odczyt da się sprawdzić, więc jest sprawdzony. Rozwiązaniem zadania z karą
 jest przechylony rozkład $p \propto q\,e^{r/\beta}$ \dash{} podany tutaj, a
-wyprowadzony w Programie~\ref{prog:P26} \dash{} więc rodzinę rozwiązań można
-przejść po $\beta$ i zmierzyć kurs wymiany wprost.
+nigdzie w tej książce niewyprowadzony, bo wyprowadzenie potrzebuje
+\emph{postaci}
+dywergencji, a ramka wyżej deklaruje tylko jej nieujemność \dash{} więc rodzinę
+rozwiązań można przejść po $\beta$ i zmierzyć kurs wymiany wprost.
 
 \begin{center}
 \begin{tabular}{lll}
@@ -439,15 +444,20 @@ Przewidz nachylenie nagrody względem dywergencji wzdłuż tej rodziny.
 \begin{fr}
 \ans{$\beta$}
 Zmierzone z dokładnością lepszą niż $\val{p22.kl.slope.bound}$ przy każdym
-sprawdzonym $\beta$, na $\val{p22.kl.betas}$ z nich. \textbf{$\beta$ jest kursem
-wymiany}, dokładnie w sensie ustalonym w sekcji 3, i jest tym samym obiektem co
+sprawdzonym $\beta$, na $\val{p22.kl.betas}$ z nich. Podzielenie dwóch wierszy
+tabeli daje $\val{p22.kl.chord}$, co nie jest $\beta$ z żadnego końca:
+nachylenie jest lokalne, więc średnia wzięta przez szesnastokrotną zmianę
+$\beta$ ląduje między nimi.
+
+\textbf{$\beta$ jest kursem wymiany}, dokładnie w sensie ustalonym w sekcji 3,
+i jest tym samym obiektem co
 $\lambda$ w innej greckiej literze, wobec której ludzie są mniej podejrzliwi.
 
 Zamienia to pokrętło do strojenia w wielkość z jednostkami, a to ma
 konsekwencję: $\beta$ dostrojone przy jednym modelu nagrody nie przenosi się na
-drugi, bo obie nagrody są w innych jednostkach. Jest to uwaga
-Programu~\ref{prog:P21} o hiperparametrach, jedną część później i o poziom
-wyżej.
+drugi, bo obie nagrody są w innych jednostkach. Program~\ref{prog:P20} czyni tę
+samą uwagę o kroku uczenia, który nie przenosi się między dwiema konwencjami,
+dwa programy wcześniej i o poziom niżej.
 \end{fr}
 
 \begin{fr}
@@ -470,7 +480,8 @@ sparametryzowane.} Wybierz poziom, a wyjdzie mnożnik; wybierz mnożnik, a wyjdz
 poziom. Żadne nie jest bardziej podstawowe, a to, które udostępnia
 implementacja, jest kwestią tego, czym wygodnie sterować.
 
-Dlatego metoda, która przycina albo ogranicza aktualizację, i metoda, która karze
+Dlatego metoda, która przycina albo ogranicza aktualizację, i metoda, która
+karze
 tę samą wielkość, spierają się o parametryzację, a nie o cele, i warto umieć to
 powiedzieć, gdy przedstawia się je jako konkurencyjne pomysły.
 \end{fr}
@@ -538,13 +549,21 @@ minimalizacji $f$ przy $g \le 0$:
 \begin{center}
 \begin{tabular}{ll}
 \toprule
-$\nabla f + \lambda \nabla g = 0$ & stacjonarność \dash{} sekcja 2 \\
+$\nabla f + \lambda \nabla g = 0$ & stacjonarność \dash{} sekcja 2, znak przeniesiony \\
 $g(x) \le 0$ & dopuszczalność \\
 $\lambda \ge 0$ & cena ograniczenia nie jest ujemna \\
 $\lambda\, g(x) = 0$ & komplementarność \\
 \bottomrule
 \end{tabular}
 \end{center}
+
+Zwróć uwagę, dokąd powędrował znak. Sekcja 2 zapisała warunek stacjonarności
+jako $\nabla f = \lambda \nabla g$ i odczytała mnożnik jako
+$\mathrm{d}f^{*}/\mathrm{d}c$; standardowa postać powyżej przenosi
+$\lambda \nabla g$ na drugą stronę, więc ta sama liczba jest tutaj równa
+$-\mathrm{d}f^{*}/\mathrm{d}c$. To właśnie sprawia, że trzeci wiersz coś mówi,
+a nie tylko ładnie wygląda: $\lambda \ge 0$ to stwierdzenie, że rozluźnienie
+ograniczenia nie może pogorszyć minimum.
 
 Są to \textbf{warunki KKT} i stoją tu do rozpoznania, a nie do rozwinięcia: ten
 program nie dowodzi, że są konieczne, nie zajmuje się przypadkiem wielu
@@ -569,7 +588,8 @@ Dlaczego $\lambda$ musi być nieujemne dla ograniczenia zapisanego $g \le 0$?
 
 \begin{fr}
 \begin{ansblock}
-Bo poluzowanie ograniczenia może tylko pomóc. Gdyby cena była ujemna, rozluźnienie
+Bo poluzowanie ograniczenia może tylko pomóc. Gdyby cena była ujemna,
+rozluźnienie
 ograniczenia pogorszyłoby optimum, a większy zbiór dopuszczalny nie może
 zawierać gorszego najlepszego punktu.
 \end{ansblock}
@@ -601,10 +621,12 @@ optymalizacji.
 \begin{summarybox}
 \sumitem{1--2}{\result{Ograniczenie usuwa odpowiedź, której chciałeś. Zostaje
   \textbf{zbiór dopuszczalny}, a zadaniem jest najlepszy punkt na nim}.}
-\sumitem{3--4}{\result{Podstawienie rozwiązuje mały przypadek dokładnie i nie uogólnia
+\sumitem{3--4}{\result{Podstawienie rozwiązuje mały przypadek dokładnie i nie
+uogólnia
   się, bo większości ograniczeń nie da się przekształcić. Metoda, która
   następuje, \textbf{nigdy nie rozwiązuje ograniczenia}}.}
-\sumitem{5--6}{\result{Wynik Programu~\ref{prog:P15} \dash{} gradient jest prostopadły
+\sumitem{5--6}{\result{Wynik Programu~\ref{prog:P15} \dash{} gradient jest
+prostopadły
   do poziomicy \dash{} powiedziany o dwóch funkcjach naraz jest całością tego
   programu}.}
 \sumitem{7--8}{\result{Poziomica \emph{przecinająca} ograniczenie nigdy nie jest
@@ -616,22 +638,26 @@ optymalizacji.
 \sumitem{10--11}{\result{Trzy równania, trzy niewiadome, rozwiązane na ułamkach:
   $\lambda = \val{p22.lam}$ w $(\val{p22.x}, \val{p22.y})$. Konwencje znaku
   różnią się między książkami; czytaj wiersz, a nie literę}.}
-\sumitem{12--14}{\result{$\lambda = \mathrm{d}f^{*}/\mathrm{d}c$, sprawdzone jako
+\sumitem{12--14}{\result{$\lambda = \mathrm{d}f^{*}/\mathrm{d}c$, sprawdzone
+jako
   \textbf{równość} na ułamkach na $\val{p22.price.levels}$ poziomach.
   \textbf{Mnożnik jest ceną}, w jednostkach celu na jednostkę ograniczenia}.}
 \sumitem{15--16}{\result{Wycenia \emph{pierwszą} jednostkę: poluzowanie z
   $\val{p22.relax.from}$ do $\val{p22.relax.to}$ daje $\val{p22.relax.gain}$
   wobec mnożnika $\val{p22.relax.lam}$, a różnicą jest krzywizna $f^{*}$}.}
-\sumitem{17}{\result{Jest tym samym obiektem co cena dualna z solvera i mówi, na które
+\sumitem{17}{\result{Jest tym samym obiektem co cena dualna z solvera i mówi,
+na które
   ograniczenia warto wydać pieniądze}.}
 \sumitem{18--19}{\result{Drugim sposobem egzekwowania ograniczenia jest
   \textbf{rzutowanie} na nie, czyli obiekt z Programu~\ref{prog:P05} z normalną
   ograniczenia w miejscu wektora}.}
-\sumitem{20--21}{\result{Rzutowanie odpowiada na pytanie \emph{który punkt dopuszczalny
+\sumitem{20--21}{\result{Rzutowanie odpowiada na pytanie \emph{który punkt
+dopuszczalny
   jest najbliżej}, a mnożnik \emph{który jest najlepszy}: $\val{p22.proj.f}$
   wobec $\val{p22.fstar}$. Rzutowanie utrzymuje punkt legalnym; nie czyni go
   dobrym}.}
-\sumitem{22--23}{\result{Cel zapisany jako nagroda minus $\beta$ razy dywergencja ma w
+\sumitem{22--23}{\result{Cel zapisany jako nagroda minus $\beta$ razy
+dywergencja ma w
   sobie mnożnik, a $\beta$ jest \textbf{ceną w nagrodzie na jednostkę
   dywergencji}}.}
 \sumitem{24--25}{\result{Zmierzone wzdłuż rodziny rozwiązań, nachylenie nagrody
@@ -641,13 +667,16 @@ optymalizacji.
 \sumitem{26--28}{\result{Każde $\beta$ nazywa jeden poziom dywergencji, więc
   \textbf{twarde ograniczenie i kara to to samo zadanie} inaczej
   sparametryzowane, i żadne nie jest bardziej podstawowe}.}
-\sumitem{29--31}{\result{Nierówność jest aktywna albo ma zapas. Aktywna to równość;
+\sumitem{29--31}{\result{Nierówność jest aktywna albo ma zapas. Aktywna to
+równość;
   zapas znaczy, że ograniczenie nic nie kupuje, więc jego cena wynosi
   \textbf{zero}. Razem: $\lambda g(x) = 0$, komplementarność}.}
-\sumitem{32}{\result{Warunki KKT to stacjonarność, dopuszczalność, $\lambda \ge 0$ i
+\sumitem{32}{\result{Warunki KKT to stacjonarność, dopuszczalność,
+$\lambda \ge 0$ i
   komplementarność} \dash{} podane do rozpoznania, z warunkiem regularności i
   argumentem o dostateczności zostawionymi pierwszemu kursowi.}
-\sumitem{33--35}{\result{Ujemny mnożnik przy ograniczeniu $\le$ znaczy, że konwencja
+\sumitem{33--35}{\result{Ujemny mnożnik przy ograniczeniu $\le$ znaczy, że
+konwencja
   znaku nie jest tą, którą założyłeś, bo większy zbiór dopuszczalny nie może
   mieć gorszego najlepszego punktu}.}
 \end{summarybox}
@@ -677,10 +706,14 @@ optymalizacji.
 \item Cel to $\mathbb{E}_p[r] - \beta D(p \Vert q)$, gdzie $r$ jest mierzone w
   dowolnych jednostkach modelu nagrody. Kolega przenosi $\beta$ z projektu, w
   którym model nagrody był skalowany dziesięciokrotnie większy. Co się stało?
-  \answerto{Skuteczna cena zmieniła się dziesięciokrotnie. $\beta$ to nagroda
-  na jednostkę dywergencji, więc przeskalowanie nagrody dziesięciokrotnie przy
-  zachowaniu $\beta$ czyni karę dziesięć razy słabszą względem celu \dash{}
-  model odejdzie dziesięć razy dalej od odniesienia, niż zamierzano.}
+  \answerto{Skuteczna cena zmieniła się dziesięciokrotnie, i to w stronę, po
+  której nikt się jej nie spodziewa. $\beta$ to nagroda na jednostkę
+  dywergencji, więc $\beta$ dostrojone tam, gdzie nagrody były dziesięć razy
+  większe, jest tutaj dziesięć razy za drogie: kara jest \emph{silniejsza}
+  względem celu, a model zostaje \emph{bliżej} odniesienia, niż zamierzano. O
+  ile bliżej \dash{} nie dziesięciokrotnie: własny przegląd tego programu
+  obniża $\beta$ szesnastokrotnie i wydaje $\val{p22.kl.spend}$ razy więcej
+  dywergencji.}
 \item Dlaczego optimum z ograniczeniem nigdy nie może być lepsze niż bez niego i
   co to znaczy dla znaku mnożnika przy ograniczeniu zapisanym $g \le 0$?
   \answerto{Zbiór dopuszczalny jest podzbiorem wszystkiego, więc najlepszy
