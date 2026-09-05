@@ -52,10 +52,7 @@
 \outcome{16--22}{czytać napis \code{einsum} jako sumę, którą oznacza, i pisać
   taki napis dla działania podanego słowami}
 \outcome{23--30}{stosować regułę rozgłaszania dokładnie i rozpoznawać
-  kształty, które zestawiają się w sposób, o który nikt nie prosił \dash{} ta
-  sekcja zapisuje swoją tożsamość przez $\operatorname{Cov}(p, t)$ i
-  $\operatorname{Var}(t)$, które definiuje Program~\ref{prog:P24}, i podaje
-  jedno zdanie o każdym z nich, którego wymaga argument}
+  kształty, które zestawiają się w sposób, o który nikt nie prosił}
 \outcome{31--37}{powiedzieć, które z reshape, transpozycji i permute przesuwa
   dane, i która kolejność poprawnie dzieli partię na głowice}
 \end{outcomes}
@@ -521,6 +518,20 @@ parach rozwija się w trzy składniki, a wychodzi z tego
 Raportowana strata to strata prawdziwa plus podwojona kowariancja predykcji z
 wartościami docelowymi.
 
+\begin{rigourbox}
+Pojawiają się tu dwa obiekty, które porządnie definiuje
+Program~\ref{prog:P24}, a argument potrzebuje jednego zdania o każdym z nich.
+Przy każdej średniej branej po $n$ przykładach,
+\[ \operatorname{Cov}(p, t)
+   = \operatorname{mean}(p_i t_i)
+     - \operatorname{mean}(p)\operatorname{mean}(t),
+   \qquad \operatorname{Var}(t) = \operatorname{Cov}(t, t). \]
+Wszędzie używana jest konwencja $\frac{1}{n}$, bo to ona czyni powyższą
+tożsamość dokładną; Program~\ref{prog:P26} mówi, dlaczego czasem chce się
+dzielnika $n - 1$, a tutaj nic poza poniższą arytmetyką od tego wyboru nie
+zależy.
+\end{rigourbox}
+
 Teraz pytanie, dla którego ta tożsamość jest. Załóż, że model staje się
 doskonały, więc każda predykcja równa się swojej wartości docelowej. Co robi
 raportowana strata?
@@ -538,7 +549,8 @@ $2\operatorname{Var}(t)$ i nie zejdzie niżej, jakkolwiek dobry byłby model.
 
 Trzy predykcje równe swoim trzem wartościom docelowym: prawdziwa strata wynosi
 $0$, a raportowana $\val{p07.demo.floor}$, czyli podwojoną wariancję
-$1, 2, 3$.
+$1, 2, 3$ w powyższej konwencji $\frac{1}{n}$ \dash{} średnią z $1, 4, 9$ mniej
+kwadrat $2$, czyli $\frac{2}{3}$.
 
 \textbf{Inżynier widzi stratę, która spada, wypłaszcza się na liczbie, której
 nikt nie umie wyjaśnić, i tam zostaje.} Czyta się to jako model, który
@@ -617,9 +629,23 @@ Niespodzianką jest to drugie: transponowanie też niczego nie przesuwa. Zmienia
 oddaje ten sam bufor.
 
 Dane przesuwa dopiero prośba o wynik \emph{spójny w pamięci} \dash{} o świeży
-bufor, którego kolejność pasuje do kształtu \dash{} a to jest trzecie działanie
+bufor, którego kolejność pasuje do kształtu \dash{} a to jest osobne działanie
 z własną nazwą. Program~\ref{prog:P03} wycenił przebieg przez pamięć; tutaj
 dowiadujesz się, że o niego poprosiłeś.
+
+\begin{warning}
+\textbf{Zwrot \enquote{w typowym przypadku} niesie tu ciężar, a wyjątek jest
+tym, który spotkasz.} Reshape może oddać ten sam bufor tylko wtedy, gdy osie,
+które scala, już sąsiadują i są w kolejności bufora. Zrób reshape
+\emph{spermutowanej} tablicy przez osie, które nie są, a biblioteka musi
+skopiować \dash{} albo, w tej surowej, odmawia i każe najpierw poprosić o
+spójność.
+
+To nie jest przypadek brzegowy. To scalanie z powrotem z głów, $(b, h, s, d)
+\rightarrow (b, s, h \times d)$, które w drodze wyjściowej wykonuje każda
+implementacja uwagi, i jedyny w tej sekcji przebieg przez pamięć, o który nikt
+nie prosi.
+\end{warning}
 
 \textbf{Zdanie \enquote{reshape jest tani, a transpozycja droga} jest więc
 błędne podwójnie}, a wierzy się w nie dlatego, że po transpozycji czasem
@@ -784,9 +810,11 @@ kształt.
   lepszy model, tym bardziej kłamie}}.}
 \sumitem{30--32}{\result{\code{keepdims} zostawia oś długości $1$ na miejscu, żeby
   następne zestawienie było wypowiedziane, a nie wywnioskowane. A
-  \textbf{żadne z reshape, transpozycji i permute nie przesuwa liczby}: każde
-  oddaje ten sam bufor z inną regułą czytania, a dane przesuwa dopiero żądanie
-  wyniku spójnego w pamięci}.}
+  \textbf{żadne z reshape, transpozycji i permute nie przesuwa liczby, dopóki
+  osie zostają w kolejności bufora}: każde oddaje ten sam bufor z inną regułą
+  czytania, a dane przesuwa dopiero żądanie wyniku spójnego w pamięci \dash{}
+  albo reshape przez osie, które permute wyprowadził z kolejności, który musi
+  kopiować i jest scalaniem z powrotem z głów}.}
 \sumitem{33--36}{\result{\textbf{Ten sam kształt to nie ta sama tablica.}
   \code{x.reshape(b, s, h, d).transpose(1, 2)} i \code{x.reshape(b, h, s, d)}
   dają oba $(b, h, s, d)$ i różnią się na $\val{p07.split.differ}$ z
@@ -834,9 +862,11 @@ kształt.
   wygląda więc jak wypłaszczenie, a nie jak usterka.}
 \item Powiedz, które z reshape, transpozycji i permute przesuwa liczby w
   pamięci i co je przesuwa.
-  \answerto{Żadne, w typowym przypadku: każde zwraca ten sam bufor z inną
-  regułą czytania. Kopiuje dopiero żądanie wyniku spójnego w pamięci, będące
-  osobnym działaniem.}
+  \answerto{Żadne, dopóki osie zostają w kolejności bufora: każde zwraca ten
+  sam bufor z inną regułą czytania. Kopiuje żądanie wyniku spójnego w pamięci.
+  Kopiuje też reshape, którego scalane osie permute wyprowadził z kolejności
+  \dash{} czyli scalanie z powrotem z głów, i jedyna kopia, której nikt nie
+  zapisuje.}
 \item Tablica o kształcie $(b, s, h \times d)$ ma stać się $(b, h, s, d)$.
   Podaj działania po kolei i powiedz, dlaczego jeden reshape nie wystarczy.
   \answerto{Rozbij ostatnią oś, co daje $(b, s, h, d)$, a potem zamień dwie

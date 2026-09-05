@@ -48,14 +48,14 @@
 \begin{outcomes}
 \outcome{1--8}{say which vectors a matrix can reach and which it sends to
   zero, and read both off its shape before computing anything}
-\outcome{9--14}{say what the rank of a matrix is, and why it is one number
-  rather than two}
+\outcome{9--14}{say what the rank of a matrix is, and what the column space
+  and the row space each have to do with it}
 \outcome{15--21}{turn a system with no solution into one with a best answer,
   and say what makes that answer the best one}
 \outcome{22--29}{price a low-rank update against the dense one it stands in
   for, and state the assumption it is making}
-\outcome{30--34}{say why a narrow layer costs something no later layer can
-  recover}
+\outcome{30--34}{say what a narrow layer in the middle of a stack does to
+  everything after it}
 \end{outcomes}
 
 \begin{quiz}
@@ -150,6 +150,8 @@ the wrong room.
 
 And it is the one that decides the most, so take a concrete matrix.
 
+\[ A = \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{pmatrix} \]
+
 $A$ is $\val{p08.wide.rows} \times \val{p08.wide.cols}$: it reads a space of
 $\val{p08.wide.cols}$ dimensions and writes into one of
 $\val{p08.wide.rows}$.
@@ -167,8 +169,9 @@ combination of them is the zero vector. The coefficients of that combination
 \emph{are} a vector $A$ kills, and choosing the entries differently only
 changes which one it is.
 
-Measured on the worked matrix: rank $\val{p08.wide.rank}$, null space of
-dimension $\val{p08.wide.null}$, and
+What the counting bound forces is only that the null space is not empty. How
+big it is depends on the entries: measured on the matrix above, rank
+$\val{p08.wide.rank}$, null space of dimension $\val{p08.wide.null}$, and
 
 \[ \val{p08.wide.rank} + \val{p08.wide.null} = \val{p08.wide.cols}. \]
 
@@ -290,7 +293,7 @@ It changes neither the row space (the new rows build the same combinations) nor
 which columns are independent, so the count you read off at the end is the same
 count either way round.
 
-Which bounds it, and the bound is the sentence Program~\ref{prog:P07} promised.
+Which bounds it, and the bound is one line.
 
 The rank cannot exceed the number of rows, because the column space sits in a
 space of that many dimensions; and it cannot exceed the number of columns, for
@@ -460,6 +463,15 @@ $-\frac{1}{2} + 2 - \frac{3}{2} = 0$
 Both exactly zero, and the sum of squared residuals is $\val{p08.ls.sse}$. The
 script also perturbs the fit in eight directions and every one of them is
 worse, so \enquote{closest} is measured rather than asserted.
+
+Here is the same pair of dot products taken by machine, on twice the residual
+so that every entry is an integer:
+
+\transcript{p08-orthogonality}
+
+Doubling changes nothing, because a dot product is linear in each argument
+\dash{} which is worth noticing: perpendicularity is a property of a direction
+rather than of a length.
 \end{fr}
 
 \mermaidfig{p08-closest-in-the-space}{Why the best answer to an unsolvable
@@ -469,8 +481,8 @@ system is a shadow.}{closest point in the space}
 \begin{aibox}
 That is linear regression, and the closed form everybody quotes is those dot
 products written as one equation: $A\T A\,\hat{x} = A\T b$, the \emph{normal
-equations}, whose left side is exactly \enquote{make the residual orthogonal to
-every column}.
+equations}, which are $A\T(b - A\hat{x}) = 0$ \dash{} \enquote{make the
+residual orthogonal to every column} \dash{} with the bracket multiplied out.
 
 Two things are worth carrying out of it. \textbf{The fit is a projection, so it
 can only ever land in the column space} \dash{} if the relationship is not a

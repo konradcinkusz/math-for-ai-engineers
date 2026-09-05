@@ -327,8 +327,9 @@ well. The only thing that changed is the units.
 
 The determinant scales like the $n$th power of the matrix, so in any dimension
 worth caring about its size is dominated by scaling and says almost nothing
-about how close to flat the map is. $10^{-100}$ above, for a matrix that is not
-close to singular in any sense.
+about how close to flat the map is. $10^{-100}$ above, for a matrix no closer
+to singular than it was before the scaling: multiplying every entry leaves the
+condition number untouched, because that number is a ratio.
 
 The determinant answers \emph{is anything destroyed} exactly, in yes and no.
 The question \emph{how nearly is something destroyed} is a different question
@@ -538,7 +539,7 @@ $\val{p09.cost.invert}$, for the same answer to the same question.
 
 Those two numbers are not quoted from a textbook's operation count. Both
 routines count their own arithmetic as they do it \dash{} every multiply and
-every divide increments a counter \dash{} so the ratio on this page is a
+every divide increments a counter \dash{} so the ratio above is a
 measurement of the code beside it.
 \end{fr}
 
@@ -655,7 +656,9 @@ Of all the changes of basis available, one family is used far more than the
 rest: the rotations.
 
 Turning the axes and leaving the point alone does not change any distance in
-the picture, so a rotation cannot be scaling area.
+the picture, so a rotation cannot be scaling area \dash{} which pins
+$\lvert\det\rvert$ to $1$ and leaves the sign open. Frame 5 said what the sign
+records: whether the map turns the plane over. A rotation does not.
 
 What, then, is its determinant?
 \dotline
@@ -668,9 +671,11 @@ $\val{p09.rot.det}$.
 \end{ansblock}
 
 Worked exactly, with the $3$--$4$--$5$ triangle so every entry is a fraction and
-you can check it by hand:
-\[ R = \begin{pmatrix} \tfrac{3}{5} & -\tfrac{4}{5} \\[2pt]
-                       \tfrac{4}{5} & \tfrac{3}{5} \end{pmatrix},
+you can check it by hand. It is the matrix three frames back at
+$\cos\theta = \tfrac{3}{5}$ and $\sin\theta = \tfrac{4}{5}$, so substituting
+into that formula is the check:
+\[ R = \begin{pmatrix} \tfrac{3}{5} & \tfrac{4}{5} \\[2pt]
+                       -\tfrac{4}{5} & \tfrac{3}{5} \end{pmatrix},
    \qquad \det R = \tfrac{9}{25} + \tfrac{16}{25} = \val{p09.rot.det} \]
 
 Two more properties, both checked exactly rather than to a tolerance. Its
@@ -753,9 +758,9 @@ determinant $\val{p09.reflect.det}$ and preserves every length there is.
 \begin{trapbox}
 \textbf{\enquote{Determinant $1$ means it is a rotation.}}
 
-Two independent conditions, and each has a counterexample against the other on
-this page: the shear preserves area and not length, the reflection preserves
-length and not orientation.
+Two independent conditions, and this program has a counterexample against each:
+the shear preserves area and not length, the reflection preserves length and
+not orientation.
 
 What makes a rotation is $R\T R = I$ \emph{and} $\det R = 1$ \dash{} the first
 for lengths, the second for orientation \dash{} and dropping either one gives a
@@ -808,8 +813,9 @@ its pieces.
   twice the second minus the first. \textbf{Rows lying in a plane cannot fill a
   volume.}}}
 \sumitem{13--14}{\result{\textbf{A small determinant does not mean nearly singular.}
-  Scaling a $100 \times 100$ matrix by $\num{0.1}$ takes its determinant to
-  $10^{-100}$ and changes nothing about the map. \emph{Is anything destroyed}
+  Scaling a $100 \times 100$ matrix by $\num{0.1}$ multiplies its determinant by
+  $10^{-100}$ \dash{} from $1$ to $10^{-100}$ in the worked case \dash{} and
+  changes nothing about the map. \emph{Is anything destroyed}
   is the determinant's question; \emph{how nearly} is the condition number's,
   and it is Program~\ref{prog:P11}'s}.}
 \sumitem{15--16}{\result{\textbf{$\det(AB) = \det(A)\det(B)$}, because a scale factor
@@ -867,9 +873,9 @@ its pieces.
 \begin{testexercises}
 \item A matrix has first row $(3, 1)$ and second row $(6, 2)$. Compute its
   determinant, and say without further computation whether it has an inverse.
-  \answerto{$3 \times 2 - 1 \times 6 = 0$. No inverse: the second column is
-  twice the first, so the plane is pressed onto a line and two inputs share an
-  output.}
+  \answerto{$3 \times 2 - 1 \times 6 = 0$. No inverse: the second row is twice
+  the first, so both rows lie on one line through the origin, the plane is
+  pressed onto a line, and two inputs share an output.}
 \item $A$ is $4 \times 4$ with $\det A = 3$, and $B$ is $4 \times 4$ with
   $\det B = -2$. Give $\det(AB)$, $\det(BA)$ and $\det(A^{-1})$.
   \answerto{$-6$, $-6$ and $\frac{1}{3}$. The first two are equal because both
@@ -889,9 +895,11 @@ its pieces.
   and the answers are more accurate. The inverse wins on neither count, which
   is why the case for it is narrower than it looks.}
 \item Show that the product of two orthogonal matrices is orthogonal.
-  \answerto{$(PQ)\T(PQ) = Q\T P\T P Q = Q\T I Q = Q\T Q = I$. So changing basis
-  twice by rotations is one change of basis by a rotation, and nothing is lost
-  either time.}
+  \answerto{$(PQ)\T(PQ) = Q\T P\T P Q = Q\T I Q = Q\T Q = I$. So composing two
+  orthogonal changes of basis is one orthogonal change of basis, and nothing is
+  lost either time. Note that it need not be a rotation: determinants multiply,
+  so two rotations give a rotation and a rotation with a reflection gives a
+  reflection.}
 \item A matrix sends $(1,0)$ to $(2,1)$ and $(0,1)$ to $(4,2)$. Give its
   determinant, and say what the unit square becomes.
   \answerto{The columns are $(2,1)$ and $(4,2)$, so $\det = 2 \times 2 - 4

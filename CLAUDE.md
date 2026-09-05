@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1419 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1423 | 0 | 0 | **0** | 0 |
 | `main-pl` (17x24) | 1456 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1182 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1202 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1188 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1204 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -66,10 +66,13 @@ the rest. Measured separately, the section guard alone took `main-pl` and
 `main-en-a4` down two and put two back on `main-pl-a4` — which is what a guard
 that turns pages does, and why its constant was swept rather than chosen.
 
-**`main-pl` is thirty-five pages longer than `main-en` in the trade format and
-fourteen longer on A4**, and the gap widens as the book grows, because Polish
-prose is longer and sets in more lines. This paragraph said *six and four* for
-a long time after it stopped being true: those were the figures at
+**`main-pl` is longer than `main-en` in both formats**, and the gap widens as
+the book grows, because Polish prose is longer and sets in more lines. **The
+two figures are one subtraction from the table above and are deliberately no
+longer repeated here**, because every version of this sentence that stated them
+went stale: it said *six and four* for a long time after it stopped being true,
+and the pair that replaced them, *thirty-five and fourteen*, was out by two and
+by six at the moment the Part III review pass read it. Those were the figures at
 286/294/262/262, when the two editions were briefly level on A4. That levelness
 was coincidence and not convergence: A4 spends the extra width on margin, so
 the same text sets in fewer, longer-lived lines and the two editions' page
@@ -105,14 +108,14 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1650 computed values, all referenced, all present, plus the committed console
+- 1651 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
   moves and the appendix does not \dash{} which is why the appendix's own
   fourteen values are inside this count
 - 0 `verifybox` blocks · 300 Mermaid sources, all rendering
-- 82 `\transcript{}` references, every one backed by a committed file and
+- 84 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **54 Polish renderings named in Appendix~D, every one used in the prose of
@@ -130,14 +133,18 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **96 orphan-tail pages: 28 · 32 · 18 · 18** across `main-en`, `main-pl`,
-  `main-en-a4`, `main-pl-a4`. **Five passes have taken the count DOWN** and
-  every other one has raised it: the two elicitation passes took it from 99 to
-  96, the P05 review pass put three back, the F01--F06 review batch took nine
-  off across two builds \dash{} the first that was not aiming at the ledger at
-  all, which is why *a correctness pass is also a layout pass* is written into
-  its note \dash{} and the P01/P02 review took one more off, in `main-pl-a4`
-  alone, on a pass that added prose to two programs. **Read \enquote{across two builds} literally**: the
+- **94 orphan-tail pages: 27 · 30 · 19 · 18** across `main-en`, `main-pl`,
+  `main-en-a4`, `main-pl-a4`. **The passes that have taken the count DOWN are
+  listed rather than counted**, because the tally that used to head this entry
+  said *five* over a list of four and nothing could check it \dash{} which is
+  this file's own rule about a count of occurrences, applied to the file: the
+  two elicitation passes took it from 99 to 96, the P05 review pass put three
+  back, the F01--F06 review batch took nine off across two builds \dash{} the
+  first that was not aiming at the ledger at all, which is why *a correctness
+  pass is also a layout pass* is written into its note \dash{} the P01/P02
+  review took one more off, in `main-pl-a4` alone, and the Part III review took
+  two more, in `main-en` and `main-pl`, on a pass that added prose to six
+  programs and lengthened three frames twice over. **Read \enquote{across two builds} literally**: the
   batch's own build failed at `check` on an orphaned cue, and `check-a4` does
   not run until `check` passes, so the A4 half of this ledger was not measured
   until the cue was cleared. A hard-gate failure in the trade builds hides every
@@ -14204,6 +14211,332 @@ two**; the A4 pair's two and four are the same edits paginating differently,
 and the Polish A4 build gained four pages while losing a tail. Nothing here
 was aimed at either ledger.
 
+
+### Part III review, P04 and P06 to P11, September 2026
+
+Issues \#133, \#137, \#146, \#147, \#148 and \#152, taken as one batch on the
+Foundation precedent that each PR costs a four-format build. With \#136
+(Program~\ref{prog:P05}) already merged and Program~\ref{prog:P10} carrying no
+open issue, this closes Part~III's program reviews.
+
+#### Two of the batch's majors were already fixed, and finding that out cost one command
+
+Both \#137's and \#146's headline finding is \enquote{the \enquote{Can you?}
+panel is missing, in four consecutive Part~III programs}. It is present in all
+six now, put there by the \#114 pass, and one `grep -c` over the six files
+settled it before any prose was read.
+
+That is the P01/P02 pass's rule paying off for the second batch running:
+**a review is a claim about the build it was made on**, so the first thing to
+do with any finding is re-read it against the current source. Two majors
+retired for the cost of one command, and neither would have been \enquote{fixed}
+into something worse, but both would have been read, chased and then abandoned.
+
+#### THE FINDING: a proof that presupposed the theorem the same program declines to prove
+
+Program~\ref{prog:P04}'s saturation argument said, in a trapbox, that the
+reasoning \enquote{needs no machinery}: each new vector either adds a dimension
+or does not, \emph{and the span sits inside a space of $d$ dimensions, so it can
+grow at most $d$ times}.
+
+**That last step is the theorem frame 22's rigour box says it is not proving.**
+\enquote{A strictly increasing chain of subspaces of $\R^{d}$ has length at most
+$d$} is invariance of dimension; the box calls it the exchange argument and
+hands it to a first course. So the program proved a theorem from itself, told
+the reader it was elementary, and then scored them on reproducing it in a Test
+exercise.
+
+**The replacement is genuinely elementary and it is two lines**, which is what
+makes the correction worth more than a hedge: take $d + 1$ vectors of $d$
+components and look for a zero combination, and that is $d$ equations in
+$d + 1$ unknowns. More unknowns than equations, so a non-trivial solution always
+exists \dash{} which is what dependence says. Nothing about spans, nothing about
+dimension, and no forward reference.
+
+The generalisable half is narrow: **a claim that an argument needs no machinery
+is a claim about the argument, and it is checkable by naming each step.** The
+one that could not be named was the one doing all the work.
+
+#### Two measures one square apart, inside one sentence
+
+Program~\ref{prog:P11} frame 13 defines the size of a matrix as the
+\emph{sum of squares} of its entries and shows it equals
+$\sigma_1^{2} + \sigma_2^{2} + \cdots$. Frame 14 then asks what truncation
+leaves \enquote{measured the same way}, the answer block correctly says
+$\sigma_{r+1}^{2} + \cdots$ \dash{} and the very next sentence reported the
+rank-1 error as \enquote{exactly $2$, which is $\sigma_2$}.
+
+Measured the way the frame just defined, it is $\sigma_2^{2} = 4$. Two is its
+square root, the Frobenius norm of the error matrix, and the change of unit was
+unsignalled one clause after the definition.
+
+**The script had it right and the emission had it wrong**, which is where this
+belongs in the ledger of recurring defects: it computes `frob2(sub(A, A1))` and
+asserts it equals `SIG[1] ** 2`, then emits `int(SIG[1])` \dash{} the root of
+the quantity the assertion establishes \dash{} under a key called `ey.err`. Both
+are emitted now, under names that say which is which, with an assertion that
+they stay one square apart; the frame names the Frobenius norm, says it is the
+measure Eckart--Young is stated in, and Summary item 8, the Quiz Q3 answer and
+Test exercise 3 all use one convention.
+
+Test exercise 3 gained something from the fix rather than merely being made
+consistent: under the squared measure an error of $1$ gives $\sigma_3 \le 1$
+with equality only when $\sigma_4$ onwards vanish, so the answer is now an
+inequality with its equality condition rather than a bare equality the
+question's data cannot pin down.
+
+#### An answer key that justified a correct number with a false sentence
+
+Program~\ref{prog:P09}'s Test exercise 1 gives a matrix with first row $(3, 1)$
+and second row $(6, 2)$. The determinant is zero and the printed answer is
+right. Its reason was \enquote{the second column is twice the first}, and the
+columns are $(3, 6)$ and $(1, 2)$: the second is one \emph{third} of the first.
+What is twice the first is the second \emph{row}.
+
+The sentence is correct four lines below, in the answer to T6, where the columns
+really are $(2, 1)$ and $(4, 2)$ \dash{} so it is one true sentence copied to a
+place where it is false, in Appendix~A, which is where a reader goes
+**because they already suspect they are wrong**. That is the Foundation batch's
+finding once more and it is now three batches running: the wrong numbers are in
+the answer keys, and no gate in this repository reaches them.
+
+#### A transcript that answered two later frames, on the page above them
+
+Program~\ref{prog:P08} frame 16's listing printed the residual's dot products
+against every column of $A$ as `[0, 0]`. Frame 17, **lower on the same page**,
+asks what the residual is perpendicular to; frame 19 then says
+\enquote{check them by hand, and do it before reading on}.
+
+So the machine had answered both, one leaf earlier, where no covering hand
+reaches. Split in two: the rank test stays where the frame is about
+reachability, and the orthogonality check moved to after the hand check, where
+it is confirmation rather than reveal. **The width guard fired on my own comment
+line while I was doing it**, which is the only way to know a check is looking at
+anything.
+
+#### Four claims true of something narrower than the sentence they sat in
+
+- **Program~\ref{prog:P07}: \enquote{none of reshape, transpose and permute
+  moves a number}**, in the body, the Summary and two answers. A reshape whose
+  merged axes a permute has put out of buffer order **must copy**, or a strict
+  library refuses \dash{} and that is the merge back from heads,
+  $(b, h, s, d) \rightarrow (b, s, h \times d)$, which every attention
+  implementation performs. It surfaced only in Further problem 8's answer.
+- **Program~\ref{prog:P06}: \enquote{rotations in three dimensions do not
+  commute}.** About one fixed axis they commute exactly as they do in the plane;
+  it is rotations about \emph{different} axes that fail. The frame's own
+  two-dimensional clause says \enquote{about the same centre}, so the
+  three-dimensional one needed the matching qualifier.
+- **Program~\ref{prog:P04}: \enquote{a space of $d$ dimensions holds exactly $d$
+  mutually independent directions and not one more}**, which reads as one
+  privileged set. There are infinitely many such sets, as the section two frames
+  earlier says; what is bounded is how many can be in one of them at a time.
+- **Program~\ref{prog:P04}'s neuron claim.** Basis-freedom is right for a
+  linear object \dash{} an embedding table, a residual stream \dash{} and wrong
+  for what the word \enquote{neuron} usually names: a coordinate behind an
+  elementwise activation, which is not rotation-equivariant, so the architecture
+  singles that basis out. The claim is restricted to an embedding component and
+  the qualification is stated.
+
+#### Three attributions, and one of them is the book about the book
+
+- **Program~\ref{prog:P08}: \enquote{the bound is the sentence
+  Program~\ref{prog:P07} promised}.** P07 refers to P08 three times and none is
+  that promise. What does own the bound is Program~\ref{prog:P04}'s counting
+  argument, which the same program used eight frames earlier \dash{} so the
+  attribution is dropped rather than moved.
+- **Program~\ref{prog:P06}: \enquote{Program~\ref{prog:F06} asked whether the
+  argument survives}.** F06 states the outcome and asks nothing: *makes the
+  weights a matrix and shows that matrix multiplication is composition*. One
+  `grep` of that file, and it is the class this document keeps recording.
+- **Program~\ref{prog:P09} frame 32's rotation was the transpose of frame 29's
+  own formula.** Both are rotations \dash{} one passive, one active \dash{} and
+  a reader substituting $\cos\theta = \frac{3}{5}$ into the formula three frames
+  back got a different matrix from the one labelled $R$, with nothing said. The
+  script now uses the section's own convention, every number is unchanged, and
+  the frame says in one clause that substituting into that formula \emph{is} the
+  check.
+
+#### Two arguments that gave the wrong reason for a right answer
+
+Both are Program~\ref{prog:P06} and Program~\ref{prog:P11}, and both are worth
+more corrected than they were as hedges.
+
+- **P06 frame 27 credited the scaling property with a step that is the
+  composition rule.** No scalar appears anywhere in
+  $W_2(W_1x + b_1) + b_2 = (W_2W_1)x + (W_2b_1 + b_2)$. The second step is
+  $W_2(W_1x) = (W_2W_1)x$, which is section 2's definition of the product
+  \dash{} so the program's own thesis was being undersold by its answer box.
+- **P11 frame 11 offered equal traces as the reason two Gram matrices share
+  their singular values.** They do not imply it: $\operatorname{diag}(1, 3)$ and
+  $\operatorname{diag}(2, 2)$ have the same trace and different spectra. The
+  reason is one line \dash{} $R\T Rv = \lambda v$ gives
+  $RR\T(Rv) = \lambda(Rv)$ \dash{} and the equal traces are that fact showing up
+  as a total, which the frame now says.
+
+#### Two more numbers that did not reproduce from the page
+
+- **Program~\ref{prog:P04} boxed $80\%$** where $15\,904 / 20\,000$ is $79.52$,
+  so a reader doing the division the frame asks for got $79.5$ against a boxed
+  $80$. Emitted at one decimal, guarded on the printed forms.
+- **Program~\ref{prog:P11}'s \enquote{$5\%$ difference}** reproduces from
+  neither of its two pairs: $4.67\%$ at the top and $4.90\%$ at the bottom. It
+  is a bound now \dash{} under $5\%$ \dash{} asserted on the exact and the
+  printed forms, which is Program~\ref{prog:F05}'s recorded remedy for a figure
+  no single precision supports.
+
+#### Also
+
+- **The pseudoinverse was defined as dividing by every singular value**,
+  including the zero ones, in Program~\ref{prog:P11}'s frame 31, Summary item 17
+  and the answer to Test exercise 6 \dash{} which says outright that $A^{+}$
+  divides by zero. It inverts the non-zero ones and sends the zero ones to zero,
+  and that qualification is exactly why it exists where $A^{-1}$ does not.
+- **The transpose is defined at first use.** Program~\ref{prog:P06} used the
+  superscript in an identity and in the batching convention, and a grep of every
+  program before it finds the word nowhere.
+- **Program~\ref{prog:P06} counted biases while calling the layers linear**
+  \dash{} $\val{p06.stack.params}$ is $8(512^{2} + 512)$, four frames after its
+  own trap insisted on the distinction \dash{} and quoted the eight-layer
+  $87.5\%$ as a property of a two-layer composition. Both say what they mean now.
+- **Program~\ref{prog:P07}'s outcome 4 promised a defining sentence for
+  $\operatorname{Cov}$ and $\operatorname{Var}$ that the section never gave**,
+  and the identity the whole section rests on is stated in terms of them. The
+  sentence is delivered in a rigour box, with the $\frac{1}{n}$ convention named
+  \dash{} which the $\val{p07.demo.floor}$ figure needs and nothing on the page
+  had said.
+- **Program~\ref{prog:P08}'s \enquote{take a concrete matrix} gave no entries**,
+  and frame 5 then quoted \enquote{the worked matrix}. The script had one all
+  along; it is printed now, gated against the script, and the frame says what
+  the counting bound forces and what depends on the entries \dash{} because
+  $[[1,2,3],[2,4,6]]$ is also $2 \times 3$ and has rank $1$.
+- Two outcome pairs stripped of the findings they carried (P08's rank result and
+  its section-5 trap), one aibox slip corrected (\enquote{the product of the
+  outer two} for the outer product $BC$), one announced trap cut, one Quiz
+  question given the condition its own frame states, and six instances of the
+  banned \enquote{simply}.
+
+#### Three ledgers were stale, and all three were the class these files forbid
+
+None was found by looking for it. All three surfaced while writing down the
+figures this pass measured, which is the only moment anybody reads them.
+
+- **The page-gap sentence was out by two and by six.** It said `main-pl` is
+  \enquote{thirty-five pages longer than `main-en` in the trade format and
+  fourteen longer on A4}, and the build it was read against said thirty-seven
+  and twenty. The paragraph's own closing instruction is *derive it from the
+  table above rather than quoting it from here*, so the fix is not a corrected
+  pair \dash{} the figures are gone and the instruction stands alone.
+- **The orphan-tail ledger's own tally said five over a list of four.** It
+  opened \enquote{Five passes have taken the count DOWN} and then named the two
+  elicitation passes, the F01--F06 batch and the P01/P02 review. Replaced by
+  the list, which is what the entry already carried and which is checkable.
+- **`notes/01-curriculum.md` §20's one-volume table had gone three merged
+  batches without a re-measure**, at 386/510/332/187 against a book that had
+  reached 1423. That entry's own rule, written after the last time this
+  happened, is *re-measure in the pass that moves the book, not in the pass
+  that happens to notice* \dash{} and the pass that wrote the rule is the last
+  one that followed it. Re-derived from the part-title pages, confirmed by
+  extracting each one: **386 / 518 / 332 / 187**, a **904-page** first volume.
+
+The generalisable half is one this file states about the book and had not
+applied to itself: **a number in one of these files that is derived from
+another number in the same file has to be derived again**, and a tally over a
+list is the same defect one level up. Both had survived every pass since they
+were written, because a page count is re-measured on every build and a
+sentence about page counts is not.
+
+#### Rule 2, and the figures
+
+No figure was moved or reworded in this batch, which is the first time in a
+review pass. Every one was read against the frames on either side of it and
+against its caption and its manifest copy as well as its nodes, which are the
+places Program~\ref{prog:P18} names \dash{} and none carries an answer to a
+question put beside it. (That note and two after it call them \emph{four
+places} while listing three; the list is what matters and the count is the
+class this pass spent its afternoon on.) Program~\ref{prog:P11}'s `keep-the-largest` was already
+corrected in the P11 pass and the four programs' remaining figures restate what
+the frames above them deliver.
+
+#### Layout, and a frame lengthened twice
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1423 | 1419 | `[]` | 0 |
+| `main-pl` | 1456 | 1456 | `[]` | 0 |
+| `main-en-a4` | 1188 | 1182 | `[6.3]` | 0 |
+| `main-pl-a4` | 1204 | 1202 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and, after two rounds, no orphaned cues.
+
+**And the orphan tails went 96 to 94**: 27, 30, 19, 18 against 28, 32, 18, 18.
+Down one in `main-en`, two in `main-pl`, up one in `main-en-a4`, level in
+`main-pl-a4`. It is the F01--F06 batch's finding for the third batch running
+\dash{} *a correctness pass is also a layout pass* \dash{} and the direction is
+not something a pass can choose.
+
+**`main-pl` did not move by a single page** while the other three grew by four,
+six and two, and it lost two tails doing it. The same paragraphs went into both
+editions, so the asymmetry is entirely where the lines fall, and it is the
+opposite of the F07/F12/F13 batch's, where Polish grew and English did not.
+Neither is evidence of anything about the editions; both are the reason this
+file's rule is to re-measure all four rather than the one you wrote in.
+
+The cue walk took two rounds and the second is the recorded shape.
+
+| round | edit | result |
+|---|---|---|
+| 1 | Program~\ref{prog:P06}'s \enquote{say which two} frame and Program~\ref{prog:P11}'s frames 12 and 18, both editions | all three cleared, **one appeared in `main-en-a4`** |
+| 2 | Program~\ref{prog:P11}'s frame 12 again | clean, all four |
+
+Round 2's cue was the tail of the frame round 1 had just lengthened, which is
+Program~\ref{prog:P32}'s finding at its shortest range: **a frame is not fixed,
+only a pagination is.** Both rounds were **lengthenings**, in both editions,
+which is Program~\ref{prog:F06}'s two-sided rule; it has still never failed.
+
+**And the ordinal that used to follow that sentence is not written here**, for
+the reason the two ledgers above earned. The last one recorded is
+\emph{thirty-second}, and the P01/P02 review then cleared two cues without
+numbering them \dash{} so any ordinal written now is a guess dressed as a
+count, and it is the third instance of the same class in one pass. What is
+checkable is the claim itself: **no recorded attempt to clear an orphaned cue
+by lengthening has failed**, and that is what the sentence should say.
+
+Every added paragraph earns its place, and round 2's is the one worth naming.
+It gives $u_iv_i\T$ its name \dash{} the outer product, which
+Program~\ref{prog:P06} priced as the thing a low-rank update must never form
+\dash{} and then says what a reader of that program would otherwise have to
+work out: here only one of the two pairings is even available, because $u_i$
+has as many components as $A$ has rows and $v_i$ as many as it has columns, so
+for a rectangular $A$ the transpose cannot be moved to the other vector at all.
+Round 1's two say why the perpendicularity is what makes the share question
+answerable, and why a Gram matrix's shape is not the matrix it came from.
+
+**The transcript guard fired 8 / 7 / 6 / 11**, against the 7 / 5 / 6 / 10 the
+F08--F11 batch recorded. Two of the difference are Program~\ref{prog:P08}'s
+listing, which this batch split in two, so the book now has 84 transcript
+references where it had 82 and two more places a listing can fail to fit.
+
+#### Gates
+
+Every source gate run **before** the build, which is
+Program~\ref{prog:P33}'s rule and the fifth pass running: parity 56 file pairs
+/ 1864 frames / 0 failures and 0 warnings; `--frames --answers --outcomes
+--values --scripts --terms --parts` green; `gen_stubs --check` current;
+`make verify` reports all computed output current. The elicitation rate is
+unmoved at 1028/1864, because the batch converted nothing and added no frame.
+
+The prose detector flagged eight over-long source lines my own replacements
+had introduced, and one garbled Polish Summary item where a replacement
+duplicated a word \dash{} all fixed before the build, which is what that
+instrument is for. Its JOIN candidates were ordinary inflected Polish words and
+the line-length instrument reported zero for every one of them, which is the
+two-instrument rule doing its job rather than a defect.
 
 ### Stroud layout pass, August 2026
 

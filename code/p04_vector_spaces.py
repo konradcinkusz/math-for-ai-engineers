@@ -144,7 +144,15 @@ VOCAB, EMBED = 20_000, 4_096
 emit("p04.vocab", VOCAB)
 emit("p04.embed", EMBED)
 emit("p04.dependent", VOCAB - EMBED)
-emit("p04.dependent.pct", f"{(VOCAB - EMBED) / VOCAB * 100:.0f}")
+# One decimal, not zero. At zero this printed 80 while the two figures beside
+# it on the page divide to 79.5, so a reader doing the division the frame asks
+# for got a different number from the one boxed as the answer -- and it was
+# boxed, in the place a reader goes to check themselves. Guarded on the PRINTED
+# forms, which is the only form anybody divides.
+emit("p04.dependent.pct", f"{(VOCAB - EMBED) / VOCAB * 100:.1f}")
+_printed = float(f"{(VOCAB - EMBED) / VOCAB * 100:.1f}")
+assert abs(_printed - (VOCAB - EMBED) / VOCAB * 100) < 0.05, \
+    "the printed percentage no longer reproduces from the two counts beside it"
 assert VOCAB > EMBED, "the vocabulary no longer exceeds the embedding dimension"
 NOTES.append(f"at least {VOCAB - EMBED:,} of {VOCAB:,} embeddings are combinations of the others")
 

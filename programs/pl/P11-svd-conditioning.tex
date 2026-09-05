@@ -44,8 +44,10 @@
   wartości własne to kwadraty wartości osobliwych, jakiekolwiek było $A$.}
 \item Aproksymację rzędu $1$ odjęto od $A$. Co zostaje, w terminach wartości
   osobliwych? \teachesat{14--15}
-  \answerto{Dokładnie $\sigma_2$, jeśli usunięty kawałek był największy. Każdy
-  kawałek rzędu jeden wnosi własną wartość osobliwą i nic poza tym nie wnosi.}
+  \answerto{Mierzone jako suma kwadratów: $\sigma_2^{2}$, jeśli usunięty
+  kawałek był największy \dash{} każdy kawałek rzędu jeden wnosi kwadrat własnej
+  wartości osobliwej i nic poza tym nie wnosi. Jej pierwiastek, $\sigma_2$, to
+  ta sama odpowiedź w normie Frobeniusa.}
 \item $A$ ma wartości osobliwe między $\val{p11.sig.lo}$ a
   $\val{p11.sig.hi}$. O ile może wzmocnić błąd względny w najgorszym
   przypadku? \teachesat{20--21}
@@ -163,9 +165,11 @@ $\val{p11.sig.hi} \times \val{p11.sig.lo}$.
 To nie przypadek i nie jest to nic nowego. $\det(U\Sigma V\T) = \det U \cdot
 \det\Sigma \cdot \det V\T$ na mocy reguły iloczynu z Programu~\ref{prog:P09},
 oba obroty mają wyznacznik $\pm 1$, a $\det\Sigma$ jest iloczynem wartości
-osobliwych. \textbf{Wyznacznik jest iloczynem rozciągnięć, a obroty nie wnoszą
-nic} \dash{} czyli to, co Program~\ref{prog:P09} nazywał objętością,
-powiedziane w języku tego programu.
+osobliwych. \textbf{$\lvert\det A\rvert$ jest iloczynem rozciągnięć} \dash{}
+czyli to, co Program~\ref{prog:P09} nazywał objętością, powiedziane w języku
+tego programu. Moduł nie jest tu ozdobą: oba obroty wnoszą znak i nic poza tym,
+więc znak $\det A$ mówi, czy odwzorowanie odwraca przestrzeń, i nie niesie
+żadnej informacji o rozmiarze.
 \end{fr}
 
 % ============================================================
@@ -207,8 +211,6 @@ dlaczego nie jest to luka.
 \ans{Bo $A\T A$ jest symetryczna, jakiekolwiek było $A$. Wartości osobliwe
 istnieją dla każdej macierzy, bo są pożyczone z macierzy symetrycznej, którą
 zawsze da się zbudować.}
-Teraz pułapka, a ten przykład dobrano tak, by była trudna, a nie łatwa.
-
 Zbudowane $A$ ma wartości osobliwe $\val{p11.sig.hi}$ i $\val{p11.sig.lo}$.
 Jest kwadratowe, więc ma też własne wartości własne.
 
@@ -261,8 +263,8 @@ Wszędzie indziej różnią się, i to nie tylko wartością, ale rodzajem:
 \end{itemize}
 
 Powyższy przykład jest przypadkiem niewygodnym: $\val{p11.lam.hi}$ wobec
-$\val{p11.sig.hi}$ to różnica $5\%$, a wykres jednego opisany jako drugie
-wyglądałby zupełnie rozsądnie.
+$\val{p11.sig.hi}$ to różnica poniżej $5\%$, a wykres jednego opisany jako
+drugie wyglądałby zupełnie rozsądnie.
 \end{trapbox}
 
 \begin{fr}
@@ -274,10 +276,16 @@ $R\T R$ rozmiaru $\val{p11.rect.cols} \times \val{p11.rect.cols}$ oraz $RR\T$
 rozmiaru $\val{p11.rect.rows} \times \val{p11.rect.rows}$. Różne macierze,
 różne rozmiary, i żadna z nich nie jest $R$.
 
-Ich ślady zgadzają się na $\val{p11.rect.energy}$, co skrypt sprawdza, i to
-jest wskazówka: obie niosą tę samą sumę, więc implikowane przez nie wartości
-osobliwe są tą samą listą. \textbf{Większa macierz Grama ma po prostu dodatkowe
-zera}, po jednym na każdy wymiar, do którego macierz nie sięga.
+Mimo to implikują tę samą listę wartości osobliwych, a powód mieści się w
+jednej linijce: jeśli $R\T R v = \lambda v$ przy $\lambda \ne 0$, to
+$RR\T(Rv) = \lambda(Rv)$, więc każda niezerowa wartość własna jednej jest
+niezerową wartością własną drugiej. \textbf{Większa macierz Grama niesie
+dodatkowe zera}, po jednym na każdy wymiar, do którego macierz nie sięga.
+
+Ich ślady zgadzają się na $\val{p11.rect.energy}$, co skrypt sprawdza. To jest
+wspólne widmo pokazujące się jako suma, a nie powód tej zgodności \dash{} same
+równe ślady niczego by nie dowiodły, bo $\operatorname{diag}(1, 3)$ i
+$\operatorname{diag}(2, 2)$ mają ten sam ślad i różne wartości osobliwe.
 \end{fr}
 
 % ============================================================
@@ -294,8 +302,25 @@ Każdy składnik to kolumna razy wiersz, co na mocy Programu~\ref{prog:P08} jest
 macierzą rzędu dokładnie jeden. Macierz jest więc sumą kawałków rzędu jeden, po
 jednym na wartość osobliwą, z nią jako wagą.
 
-Kawałki nie oddziałują: wektory $u$ są prostopadłe i wektory $v$ też. Powiedz,
-co to daje \dash{} na co rozkłada się całkowity \enquote{rozmiar} $A$?
+Konstrukcja ma nazwę i pułapkę w środku. $u_i v_i\T$ to kolumna razy wiersz,
+czyli \textbf{iloczyn zewnętrzny} \dash{} to, czego według
+Programu~\ref{prog:P06} aktualizacja niskiego rzędu nigdy nie powinna tworzyć.
+Przenieś transpozycję na drugi wektor, a $a\T b$ jest iloczynem skalarnym,
+czyli \emph{liczbą}. Jeden znak w innym miejscu, a po jednej stronie macierz,
+po drugiej skalar. Tutaj dostępny jest zresztą tylko pierwszy: $u_i$ ma tyle
+składowych, ile $A$ ma wierszy, a $v_i$ tyle, ile kolumn, więc dla prostokątnej
+$A$ tych dwóch wektorów w ogóle nie da się sparować na odwrót.
+
+Kawałki nie oddziałują: wektory $u$ są prostopadłe i wektory $v$ też.
+
+I to właśnie czyni następne pytanie w ogóle odpowiadalnym. Gdy kawałki
+zachodzą na siebie, nie da się powiedzieć, co wnosi którykolwiek z nich z
+osobna \dash{} całość nie jest sumą części, a pytanie o udział jest pytaniem o
+coś, czego nie ma. Kawałki prostopadłe to dokładnie ten przypadek, w którym
+udział istnieje.
+
+Przeczytaj więc $A$ jako jeden długi wektor i weź jego kwadrat długości, tak
+jak zrobiłby to Program~\ref{prog:P05}. Na co rozkłada się ta suma?
 \dotline
 \nextframe
 \end{fr}
@@ -332,11 +357,20 @@ $\sigma_{r+1}^{2} + \sigma_{r+2}^{2} + \cdots$ \dash{} dokładnie te kawałki,
 które wyrzuciłeś.
 \end{ansblock}
 
-Na zbudowanej macierzy z sekcji 1 obcięcie do rzędu $1$ zostawia błąd dokładnie
-$\val{p11.ey.err}$, czyli $\sigma_2$, i skrypt sprawdza to na ułamkach.
+Na zbudowanej macierzy z sekcji 1 obcięcie do rzędu $1$ zostawia
+$\val{p11.ey.err2}$ mierzone w ten sposób \dash{} czyli $\sigma_2^{2}$, i
+skrypt sprawdza to na ułamkach.
+
+\textbf{Dwie miary, oddalone o jeden kwadrat, i przy tej zmianie jednostki
+warto się zatrzymać.} Wielkość, którą dwie poprzednie ramki dodawały, jest sumą
+kwadratów, więc obcięcie zostawia $\sigma_2^{2} = \val{p11.ey.err2}$. Jej
+pierwiastek, $\val{p11.ey.err}$, to samo $\sigma_2$ \dash{} długość macierzy
+błędu czytanej jako jeden długi wektor, która ma nazwę, \textbf{norma
+Frobeniusa}, i to w tej mierze podane jest poniżej twierdzenie
+Eckarta--Younga.
 
 Błąd nie jest \emph{mniej więcej} $\sigma_2$ ani przez tę wielkość
-ograniczony. Jest $\sigma_2$.
+ograniczony. W tej normie \emph{jest} $\sigma_2$.
 
 Co prowadzi do pytania, o które chodzi w reszcie sekcji. Obcięcie to
 \emph{jeden} sposób zbudowania macierzy rzędu $1$ blisko $A$. Czy jest lepszy?
@@ -381,7 +415,12 @@ wydziału matematyki.
 Weź macierz, której wartości osobliwe biegną $100, 40, 16, 6, 2, 1$. Zachowaj
 $\val{p11.spec.keep}$ największe z $\val{p11.spec.n}$, a cztery wyrzuć.
 
-Jaki ułamek całości nadal masz?
+Zauważ, że same liczby maleją wzdłuż tej listy stukrotnie, a ich kwadraty
+dziesięciotysiąckrotnie, więc dwa sposoby ich sumowania dają zupełnie różne
+odpowiedzi. Weź sumę kwadratów \dash{} te $\sigma_i^{2}$ sprzed czterech ramek,
+bo to ona się rozkłada.
+
+Jaki jej ułamek nadal masz?
 \dotline
 \nextframe
 \end{fr}
@@ -430,8 +469,8 @@ ma, a powiedzenie, co jest czym, jest całą tą dyscypliną.
 Inne pytanie o te same trzy ruchy, i to ono rozstrzyga, czy odpowiedzi można
 ufać.
 
-Wejście przychodzi już obarczone błędem \dash{} z pomiaru, z czujnika albo po
-prostu z ostatniego zaokrąglenia, które opisał Program~\ref{prog:P01}. Macierz
+Wejście przychodzi już obarczone błędem \dash{} z pomiaru, z czujnika albo z
+ostatniego zaokrąglenia, które opisał Program~\ref{prog:P01}. Macierz
 działa na błąd dokładnie tak, jak działa na wszystko inne.
 
 Jeśli błąd wejścia akurat wskazuje wzdłuż $v_1$, zostaje pomnożony przez
@@ -605,7 +644,7 @@ oczywistą.
 
 Nic się nie podnosi. Żadne ostrzeżenie się nie pojawia. Współczynniki, które
 wracają, wyglądają jak współczynniki: właściwy rząd wielkości, właściwe znaki,
-wiarygodne dla każdego, kto nie znał odpowiedzi wcześniej. Są po prostu błędne
+wiarygodne dla każdego, kto nie znał odpowiedzi wcześniej. Są błędne
 od szóstej cyfry znaczącej wzwyż.
 
 Program~\ref{prog:P07} nazwał ten kształt dokładnie \dash{} usterka łagodna,
@@ -638,8 +677,14 @@ Jeszcze jeden obiekt, i jest to definicja, a nie technika.
 
 Program~\ref{prog:P08} pokazał, że wysoki układ zwykle nie ma rozwiązania i że
 najlepszą odpowiedzią jest rzut. SVD daje tej odpowiedzi postać zamkniętą:
-obróć przez $U\T$, podziel przez każdą wartość osobliwą, obróć przez $V$.
-Zapisane jako macierz nazywa się to \textbf{pseudoodwrotnością}, $A^{+}$.
+obróć przez $U\T$, podziel przez każdą \emph{niezerową} wartość osobliwą, a
+zerowe wyślij do zera, obróć przez $V$. Zapisane jako macierz nazywa się to
+\textbf{pseudoodwrotnością}, $A^{+}$.
+
+To zastrzeżenie jest całym powodem, dla którego ten obiekt istnieje. Zerowa
+wartość osobliwa to kierunek, który $A$ spłaszcza, a spłaszczenia nie da się
+odwrócić żadną regułą; odmowa odpowiedzi w tym kierunku jest tym, co pozwala
+zdefiniować $A^{+}$ dla macierzy, która nie ma odwrotności.
 
 Tam, gdzie $A$ jest odwracalne, zgadza się z $A^{-1}$. Tam, gdzie nie jest,
 daje odpowiedź najmniejszych kwadratów, a gdy kilka odpowiedzi remisuje, daje
@@ -717,20 +762,24 @@ rozkładu}, i to jest najmocniejszy powód, by wiedzieć, że ten rozkład istni
 \sumitem{9--10}{\result{\textbf{Wartości osobliwe to nie wartości własne}, a przykład
   dobrano tak, by pomyłka była zrozumiała: $\val{p11.lam.hi}$ i
   $\val{p11.lam.lo}$ wobec $\val{p11.sig.hi}$ i $\val{p11.sig.lo}$, różnica
-  $5\%$, której żaden wykres nie pokaże. Różnią się też rodzajem \dash{}
+  poniżej $5\%$, której żaden wykres nie pokaże. Różnią się też rodzajem \dash{}
   wartości osobliwe istnieją dla każdego kształtu, są zawsze rzeczywiste i
   nieujemne i nigdy nie brakuje im kierunków}.}
 \sumitem{11}{\result{Macierz prostokątna ma \textbf{dwie} macierze Grama różnych
-  rozmiarów, których ślady zgadzają się na $\val{p11.rect.energy}$. Większa
-  niesie po prostu dodatkowe zera, po jednym na każdy wymiar, do którego
-  macierz nie sięga}.}
+  rozmiarów, których ślady zgadzają się na $\val{p11.rect.energy}$ \dash{} co
+  jest wspólnym niezerowym widmem pokazującym się jako suma, a nie powodem tej
+  zgodności. Większa niesie dodatkowe zera, po jednym na każdy wymiar, do
+  którego macierz nie sięga}.}
 \sumitem{12--13}{\result{$A$ jest \textbf{sumą kawałków rzędu jeden}, po jednym na
   wartość osobliwą, i one nie oddziałują \dash{} całkowity rozmiar rozkłada się
   więc na $\sigma_i^{2}$, co jest twierdzeniem Pitagorasa z
   Programu~\ref{prog:F09} z macierzami w miejsce strzałek}.}
 \sumitem{14--15}{\result{Obcięcie do rzędu $r$ zostawia zatem \textbf{dokładnie}
-  wyrzucone kawałki: $\val{p11.ey.err}$ dla przykładowej macierzy, czyli
-  $\sigma_2$. Nie mniej więcej $\sigma_2$, nie ograniczone przez nią}.}
+  wyrzucone kawałki: $\val{p11.ey.err2}$ dla przykładowej macierzy, czyli
+  $\sigma_2^{2}$, mierzone jako suma kwadratów zdefiniowana ramkę wcześniej.
+  Jej pierwiastek, $\val{p11.ey.err}$, to $\sigma_2$ \dash{} norma Frobeniusa
+  błędu i miara, w której podane jest twierdzenie Eckarta--Younga. Nie mniej
+  więcej $\sigma_2$, nie ograniczone przez nią}.}
 \sumitem{16--17}{\result{\textbf{Eckart--Young}: ze wszystkich macierzy rzędu $r$
   obcięcie jest najbliższe.} Podane, nie dowodzone, i sprawdzone wobec
   $\val{p11.ey.trials}$ alternatyw \dash{} nie jako dowód twierdzenia, tylko
@@ -770,8 +819,9 @@ rozkładu}, i to jest najmocniejszy powód, by wiedzieć, że ten rozkład istni
   dokładność \dash{} a \textbf{dokładność rozstrzyga}, bo czynnik w szybkości
   wchłonie szybsza maszyna, a cyfr nie odzyskuje się przy żadnej szybkości}.}
 \sumitem{31--32}{\result{\textbf{Pseudoodwrotność} $A^{+}$ to obróć, podziel przez każdą
-  wartość osobliwą, obróć \dash{} zgodna z $A^{-1}$ tam, gdzie ta istnieje, i
-  dająca odpowiedź najmniejszych kwadratów tam, gdzie nie. Dzielenie przez
+  \emph{niezerową} wartość osobliwą, a zerowe wyślij do zera, obróć \dash{}
+  zgodna z $A^{-1}$ tam, gdzie ta istnieje, i dająca odpowiedź najmniejszych
+  kwadratów tam, gdzie nie. Dzielenie przez
   najmniejszą $\sigma$ jest miejscem, w którym wskaźnik uwarunkowania staje się
   dzieleniem, które da się wskazać palcem, a wcześniejsze obcięcie jest
   kompromisem, który je ogranicza}.}
@@ -798,9 +848,12 @@ rozkładu}, i to jest najmocniejszy powód, by wiedzieć, że ten rozkład istni
   to, że drugi jest dwa razy większy od pierwszego, zawsze.}
 \item Obcięcie $A$ do rzędu $2$ zostawia błąd $1$. Co to mówi o $\sigma_3$ i co
   to mówi o każdej innej macierzy rzędu $2$?
-  \answerto{$\sigma_3 = 1$, dokładnie, bo zostawiony błąd to to, co wyrzucono. A
-  na mocy Eckarta--Younga żadna inna macierz rzędu $2$ nie jest bliżej, więc $1$
-  nie jest błędem tej metody, tylko najlepszym dostępnym.}
+  \answerto{W normie Frobeniusa błąd wynosi
+  $\sqrt{\sigma_3^{2} + \sigma_4^{2} + \cdots}$, więc $\sigma_3 \le 1$, z
+  równością dokładnie wtedy, gdy $\sigma_4$ i dalsze znikają \dash{} czyli gdy
+  $A$ ma trzy wartości osobliwe. A na mocy Eckarta--Younga żadna inna macierz
+  rzędu $2$ nie jest bliżej, więc $1$ nie jest błędem tej metody, tylko
+  najlepszym dostępnym.}
 \item Dwie macierze mają widma $(100, 99, 98, 97)$ oraz $(100, 3, 2, 1)$.
   Powiedz, którą warto aproksymować rzędem $1$ i dlaczego.
   \answerto{Drugą. Rząd $1$ zachowuje $100^{2}$ z
@@ -815,10 +868,12 @@ rozkładu}, i to jest najmocniejszy powód, by wiedzieć, że ten rozkład istni
   nie sprawdza. \enquote{Wygląda rozsądnie} jest dokładnie tym objawem.}
 \item Dlaczego macierz z zerową wartością osobliwą nie ma odwrotności, w języku
   tego programu?
-  \answerto{Bo $A^{+}$ dzieli przez każdą wartość osobliwą, a dzielenie przez
-  zero jest miejscem, w którym to się kończy. Równoważnie: $\Sigma$ spłaszcza
-  ten kierunek, więc odwzorowanie nie jest różnowartościowe, co jest jądrem z
-  Programu~\ref{prog:P08} i zerowym wyznacznikiem z Programu~\ref{prog:P09}.}
+  \answerto{Bo $\Sigma$ spłaszcza ten kierunek: odwrócenie odwzorowania tam
+  oznaczałoby dzielenie przez zero, i dlatego odwrotność nie istnieje.
+  Odwzorowanie nie jest różnowartościowe, co jest jądrem z
+  Programu~\ref{prog:P08} i zerowym wyznacznikiem z Programu~\ref{prog:P09}.
+  Zauważ, że $A^{+}$ \emph{nie} dzieli przez zero \dash{} wysyła ten kierunek
+  do zera i odmawia odpowiedzi, i tak przeżywa tam, gdzie $A^{-1}$ nie może.}
 \end{testexercises}
 
 \begin{furtherproblems}
@@ -826,9 +881,10 @@ rozkładu}, i to jest najmocniejszy powód, by wiedzieć, że ten rozkład istni
   osiągają $1$.
   \answerto{$\sigma_{\max} \ge \sigma_{\min}$ z definicji, więc stosunek wynosi
   co najmniej $1$. Równość oznacza, że każda wartość osobliwa jest ta sama, więc
-  $\Sigma$ jest wielokrotnością identyczności, a $A$ obrotem przeskalowanym
-  stałą \dash{} co rozciąga każdy kierunek jednakowo i nie może zniekształcić
-  błędu względnego wcale.}
+  $\Sigma$ jest wielokrotnością identyczności, a $A$ macierzą ortogonalną
+  przeskalowaną stałą \dash{} obrotem albo odbiciem, a dla prostokątnego $A$
+  dowolną przeskalowaną izometrią \dash{} co rozciąga każdy kierunek jednakowo i
+  nie może zniekształcić błędu względnego wcale.}
 \item Program~\ref{prog:P10} powiedział, że ćwierć obrotu nie ma żadnej
   rzeczywistej wartości własnej. Podaj jej wartości osobliwe.
   \answerto{Obie $1$. $A\T A = I$ dla każdego obrotu, więc każda wartość

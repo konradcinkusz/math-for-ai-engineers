@@ -191,6 +191,18 @@ assert abs(_lam[0] * _lam[1] - float(_det)) < 1e-9, "they multiply to det A"
 assert abs(sum(_lam) - float(_tr)) < 1e-9, "and add to the trace"
 emit("p11.lam.hi", round(_lam[0], 4), 4)
 emit("p11.lam.lo", round(_lam[1], 4), 4)
+# The page says the eigenvalues and the singular values differ by UNDER 5%, and
+# that is stated as a bound rather than as "a 5% difference" because the two
+# pairs give different figures -- 4.67% at the top and 4.90% at the bottom, so
+# no single percentage reproduces from both. The bound is asserted on the
+# PRINTED forms as well as the exact ones, since a reader divides what is on
+# the page.
+for _e, _sv in ((_lam[0], SIG[0]), (_lam[1], SIG[1])):
+    for _a, _b in ((_e, float(_sv)), (float(f"{_e:.4f}"), float(_sv))):
+        assert abs(_a - _b) / _b < 0.05, (
+            f"the eigenvalue/singular-value gap reached {abs(_a - _b) / _b:.2%}, "
+            "so the page's 'under 5%' no longer holds")
+
 NOTES.append(f"|det A| = {int(abs(_det))} = product of the singular values. "
              f"A's OWN eigenvalues are {_lam[0]:.4f} and {_lam[1]:.4f} against "
              f"singular values {int(SIG[0])} and {int(SIG[1])} -- close enough "
@@ -232,8 +244,17 @@ def rank1(u, s, v):
 A1 = rank1(transpose(U2)[0], SIG[0], transpose(V2)[0])
 _err2 = frob2(sub(A, A1))
 assert _err2 == SIG[1] ** 2, \
-    "the error left by truncating to rank 1 must be exactly sigma_2"
-emit("p11.ey.err", int(SIG[1]))
+    "the error left by truncating to rank 1 must be exactly sigma_2 squared"
+# TWO quantities, and the section's whole difficulty is that they are not the
+# same one. frame 13 defines size as a SUM OF SQUARES, so what truncation
+# leaves "measured the same way" is sigma_2 SQUARED; its square root is the
+# Frobenius norm of the error matrix, and that is the norm Eckart-Young is
+# stated in. The page used to print the root under a name that said error and
+# a sentence that said "measured the same way", which are different units one
+# clause apart. Both are emitted now, under names that say which is which.
+emit("p11.ey.err2", int(_err2))          # 4  -- the squared error
+emit("p11.ey.err", int(SIG[1]))          # 2  -- its root, the Frobenius norm
+assert int(_err2) == int(SIG[1]) ** 2, "the two measures must stay one square apart"
 
 # and nothing else of rank 1 does better. Sweep rank-1 matrices built from
 # rational direction pairs; every one must be at least as bad.

@@ -49,14 +49,14 @@
 \begin{outcomes}
 \outcome{1--8}{powiedzieć, które wektory macierz osiąga, a które przeprowadza
   na zero, i odczytać jedno i drugie z kształtu przed jakimkolwiek rachunkiem}
-\outcome{9--14}{powiedzieć, czym jest rząd macierzy i dlaczego jest jedną
-  liczbą, a nie dwiema}
+\outcome{9--14}{powiedzieć, czym jest rząd macierzy i co ma z nim wspólnego
+  przestrzeń kolumn oraz przestrzeń wierszy}
 \outcome{15--21}{zamienić układ bez rozwiązania w układ z najlepszą
   odpowiedzią i powiedzieć, co czyni tę odpowiedź najlepszą}
 \outcome{22--29}{wycenić aktualizację niskiego rzędu wobec gęstej, którą
   zastępuje, i wypowiedzieć założenie, które przy tym robi}
-\outcome{30--34}{powiedzieć, dlaczego wąska warstwa kosztuje coś, czego żadna
-  późniejsza warstwa nie odzyska}
+\outcome{30--34}{powiedzieć, co wąska warstwa w środku stosu robi wszystkiemu,
+  co jest po niej}
 \end{outcomes}
 
 \begin{quiz}
@@ -153,6 +153,8 @@ pokoju.
 
 I to ono rozstrzyga najwięcej, więc weź konkretną macierz.
 
+\[ A = \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{pmatrix} \]
+
 $A$ jest $\val{p08.wide.rows} \times \val{p08.wide.cols}$: czyta przestrzeń o
 $\val{p08.wide.cols}$ wymiarach i pisze do przestrzeni o
 $\val{p08.wide.rows}$.
@@ -171,8 +173,9 @@ jakaś ich kombinacja jest wektorem zerowym. Współczynniki tej kombinacji
 \emph{są} wektorem, który $A$ zabija, a inny wybór wpisów zmienia tylko to,
 który to wektor.
 
-Zmierzone na tej macierzy: rząd $\val{p08.wide.rank}$, jądro wymiaru
-$\val{p08.wide.null}$, oraz
+Ograniczenie z liczenia wymusza tylko tyle, że jądro nie jest puste. Jak duże
+jest, zależy od wyrazów: zmierzone na macierzy powyżej, rząd
+$\val{p08.wide.rank}$, jądro wymiaru $\val{p08.wide.null}$, oraz
 
 \[ \val{p08.wide.rank} + \val{p08.wide.null} = \val{p08.wide.cols}. \]
 
@@ -297,8 +300,7 @@ Nie zmienia ona ani przestrzeni wierszy (nowe wiersze budują te same
 kombinacje), ani tego, które kolumny są niezależne, więc liczba odczytana na
 końcu jest tą samą liczbą w obie strony.
 
-Co ją ogranicza, a to ograniczenie jest zdaniem, które obiecał
-Program~\ref{prog:P07}.
+Co ją ogranicza, a to ograniczenie mieści się w jednej linijce.
 
 Rząd nie może przekroczyć liczby wierszy, bo przestrzeń kolumn siedzi w
 przestrzeni o tylu wymiarach; i nie może przekroczyć liczby kolumn, z
@@ -473,6 +475,15 @@ $-\frac{1}{2} + 2 - \frac{3}{2} = 0$
 Oba dokładnie zerowe, a suma kwadratów reszt wynosi $\val{p08.ls.sse}$. Skrypt
 zaburza też dopasowanie w ośmiu kierunkach i każdy z nich jest gorszy, więc
 \enquote{najbliżej} jest zmierzone, a nie stwierdzone.
+
+Oto ta sama para iloczynów skalarnych wzięta maszynowo, na podwojonej reszcie,
+żeby każdy wyraz był całkowity:
+
+\transcript{p08-orthogonality}
+
+Podwojenie niczego nie zmienia, bo iloczyn skalarny jest liniowy w każdym
+argumencie \dash{} co warto zauważyć: prostopadłość jest własnością kierunku, a
+nie długości.
 \end{fr}
 
 \mermaidfig{p08-closest-in-the-space}{Dlaczego najlepszą odpowiedzią na układ
@@ -482,8 +493,8 @@ bez rozwiązania jest cień.}{najbliższy punkt przestrzeni}
 \begin{aibox}
 To jest regresja liniowa, a wzór zamknięty, który wszyscy cytują, to te iloczyny
 skalarne zapisane jednym równaniem: $A\T A\,\hat{x} = A\T b$, \emph{równania
-normalne}, których lewa strona jest dokładnie zdaniem \enquote{spraw, by reszta
-była prostopadła do każdej kolumny}.
+normalne}, czyli $A\T(b - A\hat{x}) = 0$ \dash{} \enquote{spraw, by reszta
+była prostopadła do każdej kolumny} \dash{} z wymnożonym nawiasem.
 
 Dwie rzeczy warto stąd wynieść. \textbf{Dopasowanie jest rzutem, może więc
 wylądować tylko w przestrzeni kolumn} \dash{} jeśli zależność nie jest

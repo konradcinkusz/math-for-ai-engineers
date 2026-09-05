@@ -317,7 +317,9 @@ macierzą zachowa się dokładnie tak samo dobrze. Zmieniły się tylko jednostk
 Wyznacznik skaluje się jak $n$-ta potęga macierzy, więc w każdym wymiarze,
 którym warto się przejmować, o jego wielkości decyduje skalowanie, a o tym, jak
 blisko płaskiego jest odwzorowanie, nie mówi prawie nic. Powyżej $10^{-100}$,
-dla macierzy, która w żadnym sensie nie jest bliska osobliwej.
+dla macierzy nie bliższej osobliwej niż przed przeskalowaniem: pomnożenie
+każdego wyrazu nie rusza wskaźnika uwarunkowania, bo ta liczba jest
+stosunkiem.
 
 Wyznacznik odpowiada dokładnie na pytanie \emph{czy coś zostało zniszczone}, na
 tak i nie. Pytanie \emph{jak blisko zniszczenia} jest innym pytaniem z inną
@@ -528,7 +530,7 @@ samej odpowiedzi na to samo pytanie.
 
 Te dwie liczby nie są przepisane z podręcznikowego rachunku operacji. Obie
 procedury liczą własną arytmetykę w trakcie \dash{} każde mnożenie i każde
-dzielenie zwiększa licznik \dash{} więc stosunek na tej stronie jest pomiarem
+dzielenie zwiększa licznik \dash{} więc stosunek powyżej jest pomiarem
 kodu obok.
 \end{fr}
 
@@ -643,7 +645,9 @@ Ze wszystkich dostępnych zmian bazy jedna rodzina jest używana o wiele częśc
 niż reszta: obroty.
 
 Obracanie osi przy nieruszaniu punktu nie zmienia na obrazku żadnej
-odległości, więc obrót nie może skalować pola.
+odległości, więc obrót nie może skalować pola \dash{} co przybija
+$\lvert\det\rvert$ do $1$ i zostawia znak otwarty. Ramka 5 powiedziała, co
+zapisuje znak: czy odwzorowanie odwraca płaszczyznę. Obrót nie odwraca.
 
 Ile zatem wynosi jego wyznacznik?
 \dotline
@@ -656,9 +660,11 @@ $\val{p09.rot.det}$.
 \end{ansblock}
 
 Policzone dokładnie, na trójkącie $3$--$4$--$5$, żeby każdy wyraz był ułamkiem
-i żebyś mógł sprawdzić to ręcznie:
-\[ R = \begin{pmatrix} \tfrac{3}{5} & -\tfrac{4}{5} \\[2pt]
-                       \tfrac{4}{5} & \tfrac{3}{5} \end{pmatrix},
+i żebyś mógł sprawdzić to ręcznie. To macierz sprzed trzech ramek przy
+$\cos\theta = \tfrac{3}{5}$ i $\sin\theta = \tfrac{4}{5}$, więc podstawienie do
+tamtego wzoru jest tym sprawdzeniem:
+\[ R = \begin{pmatrix} \tfrac{3}{5} & \tfrac{4}{5} \\[2pt]
+                       -\tfrac{4}{5} & \tfrac{3}{5} \end{pmatrix},
    \qquad \det R = \tfrac{9}{25} + \tfrac{16}{25} = \val{p09.rot.det} \]
 
 Jeszcze dwie własności, obie sprawdzone dokładnie, a nie do tolerancji. Jego
@@ -741,9 +747,9 @@ $\val{p09.reflect.det}$ i zachowuje każdą długość, jaka jest.
 \begin{trapbox}
 \textbf{\enquote{Wyznacznik $1$ znaczy, że to obrót.}}
 
-Dwa niezależne warunki, i każdy ma na tej stronie kontrprzykład przeciwko
-drugiemu: ścinanie zachowuje pole, a nie długość, odbicie zachowuje długość, a
-nie orientację.
+Dwa niezależne warunki, i ten program ma kontrprzykład przeciwko każdemu z
+nich: ścinanie zachowuje pole, a nie długość, odbicie zachowuje długość, a nie
+orientację.
 
 Obrotem czyni $R\T R = I$ \emph{oraz} $\det R = 1$ \dash{} pierwsze dla
 długości, drugie dla orientacji \dash{} a porzucenie któregokolwiek daje inną
@@ -796,8 +802,9 @@ tych liczb, czyli jedną liczbą tego programu rozłożoną na części.
   to dwa razy drugi minus pierwszy. \textbf{Wiersze leżące w płaszczyźnie nie
   wypełnią objętości.}}}
 \sumitem{13--14}{\result{\textbf{Mały wyznacznik nie znaczy prawie osobliwa.}
-  Przeskalowanie macierzy $100 \times 100$ przez $\num{0.1}$ sprowadza jej
-  wyznacznik do $10^{-100}$ i nie zmienia w odwzorowaniu niczego. \emph{Czy coś
+  Przeskalowanie macierzy $100 \times 100$ przez $\num{0.1}$ mnoży jej
+  wyznacznik przez $10^{-100}$ \dash{} z $1$ do $10^{-100}$ w rozważanym
+  przypadku \dash{} i nie zmienia w odwzorowaniu niczego. \emph{Czy coś
   zostało zniszczone} to pytanie wyznacznika; \emph{jak blisko} to pytanie
   wskaźnika uwarunkowania i należy do Programu~\ref{prog:P11}}.}
 \sumitem{15--16}{\result{\textbf{$\det(AB) = \det(A)\det(B)$}, bo czynnik skali
@@ -855,9 +862,10 @@ tych liczb, czyli jedną liczbą tego programu rozłożoną na części.
 \begin{testexercises}
 \item Macierz ma pierwszy wiersz $(3, 1)$ i drugi wiersz $(6, 2)$. Policz jej
   wyznacznik i powiedz bez dalszych rachunków, czy ma odwrotność.
-  \answerto{$3 \times 2 - 1 \times 6 = 0$. Odwrotności nie ma: druga kolumna
-  jest dwa razy większa od pierwszej, więc płaszczyzna zostaje przyciśnięta do
-  prostej i dwa wejścia dzielą jedno wyjście.}
+  \answerto{$3 \times 2 - 1 \times 6 = 0$. Odwrotności nie ma: drugi wiersz
+  jest dwa razy większy od pierwszego, więc oba wiersze leżą na jednej prostej
+  przez początek, płaszczyzna zostaje przyciśnięta do prostej i dwa wejścia
+  dzielą jedno wyjście.}
 \item $A$ jest $4 \times 4$ i $\det A = 3$, a $B$ jest $4 \times 4$ i
   $\det B = -2$. Podaj $\det(AB)$, $\det(BA)$ i $\det(A^{-1})$.
   \answerto{$-6$, $-6$ i $\frac{1}{3}$. Dwie pierwsze są równe, bo obie to
@@ -875,8 +883,10 @@ tych liczb, czyli jedną liczbą tego programu rozłożoną na części.
   odpowiedzi są dokładniejsze. Odwrotność nie wygrywa w żadnym z tych
   punktów, i dlatego argument za nią jest węższy, niż wygląda.}
 \item Pokaż, że iloczyn dwóch macierzy ortogonalnych jest ortogonalny.
-  \answerto{$(PQ)\T(PQ) = Q\T P\T P Q = Q\T I Q = Q\T Q = I$. Dwie zmiany bazy
-  obrotami to więc jedna zmiana bazy obrotem i nic nie ginie ani razu.}
+  \answerto{$(PQ)\T(PQ) = Q\T P\T P Q = Q\T I Q = Q\T Q = I$. Złożenie dwóch
+  ortogonalnych zmian bazy to więc jedna ortogonalna zmiana bazy i nic nie ginie
+  ani razu. Zauważ, że nie musi to być obrót: wyznaczniki się mnożą, więc dwa
+  obroty dają obrót, a obrót z odbiciem daje odbicie.}
 \item Macierz posyła $(1,0)$ na $(2,1)$, a $(0,1)$ na $(4,2)$. Podaj jej
   wyznacznik i powiedz, czym staje się kwadrat jednostkowy.
   \answerto{Kolumny to $(2,1)$ i $(4,2)$, więc $\det = 2 \times 2 - 4
