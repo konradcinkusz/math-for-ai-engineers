@@ -33,23 +33,27 @@
 
 \begin{quiz}
 \item Znasz wartość funkcji, nachylenie i krzywiznę w punkcie. Co najlepszego
-  możesz powiedzieć o niej w pobliżu? \teachesat{3--4}
+  możesz powiedzieć o niej w pobliżu? \teachesat{1--4}
   \answerto{Parabola \dash{} model Taylora drugiego rzędu. Jej błąd maleje
   jak sześcian odległości, gdzie błąd stycznej maleje jak kwadrat, i to
   właśnie znaczy tu \enquote{najlepszy}: rząd, a nie rozmiar.}
 \item Program~\ref{prog:P15} pokazał, że każdy kierunek jest mnożony przez
-  $1 - \eta\lambda$ w każdym kroku. Jaki jest największy użyteczny $\eta$?
-  \teachesat{16--17}
-  \answerto{$2/\lambda$, bo spacer pozostaje ograniczony dokładnie wtedy, gdy
-  $\lvert 1 - \eta\lambda \rvert < 1$. Przy wielu kierunkach wygrywa
+  $1 - \eta\lambda$ w każdym kroku. Jaki pułap kładzie to na $\eta$ i czy sam
+  pułap jest użyteczny? \teachesat{16--17}
+  \answerto{$\eta$ musi być ściśle poniżej $2/\lambda$, bo spacer pozostaje
+  ograniczony dokładnie wtedy, gdy $\lvert 1 - \eta\lambda \rvert < 1$
+  \dash{} nie ma więc największej użytecznej wartości, jest tylko granica,
+  której zbiór nie zawiera. Dokładnie przy $2/\lambda$ czynnik wynosi $-1$ i
+  współrzędna nigdy się nie kurczy, co rozpisuje ćwiczenie testowe 1. Przy
+  wielu kierunkach wygrywa
   najmniejsze z tych ograniczeń, czyli $2/\lambda_{\max}$.}
 \item Który kierunek doliny decyduje o rozmiarze kroku, a który musi z tym
   żyć? \teachesat{18--19}
   \answerto{Najbardziej stromy ustala pułap, bo to on rozbiega się pierwszy;
   najbardziej płaski musi z tym żyć, a jego własne ograniczenie jest większe
   o wskaźnik uwarunkowania.}
-\item Metoda Newtona używa krzywizny i trafia w minimum funkcji kwadratowej w
-  jednym kroku. Dlaczego nie używa się jej do trenowania?
+\item Metoda Newtona używa krzywizny, by wybrać krok osobno dla każdego
+  kierunku. Dlaczego nie używa się jej do trenowania?
   \teachesat{26--27}
   \answerto{Bo hesjan ma jeden wpis na każdą \emph{parę} parametrów, a
   rozwiązanie układu z nim jest jeszcze gorsze. Przy realnym rozmiarze modelu
@@ -391,9 +395,18 @@ spacer jest bezpieczny?
 
 \begin{fr}
 \begin{ansblock}
-Tak, i to ledwo \dash{} dlatego jego stroma współrzędna zmienia znak w każdym
-kroku zamiast rozbiegać się.
+Tak, z zapasem. Jego czynnik to
+$1 - \val{p17.p15.eta} \times \val{p17.lam.hi} = \val{p17.p15.factor}$:
+ujemny, więc stroma współrzędna zmienia stronę w każdym kroku, i mniejszy od
+jedynki co do rozmiaru, więc się kurczy.
 \end{ansblock}
+
+\textbf{Zmiana znaku nie jest ostrzeżeniem.} Zaczyna się, gdy tylko $\eta$
+przekroczy $1/\lambda$, czyli tutaj połowę granicy, więc naprzemienność jest
+normalnym zachowaniem na całej górnej połowie zakresu stabilności. Strata,
+która oscyluje, nie jest przez to o włos od rozbieżności; może być na połowie
+pułapu i całkiem bezpieczna, a rozróżnienie wymaga czynnika, a nie kształtu
+krzywej.
 
 Skrypt czyta zapisany rozmiar kroku z P15 i stwierdza, że
 leży on ściśle poniżej granicy z tego programu, więc oba nie mogą się
@@ -438,8 +451,11 @@ Tam mierzył, jak bardzo rozwiązanie układu wzmacnia błąd. Tutaj mierzy, jak
 bardzo rozmiar kroku, na który ci pozwolono, różni się od rozmiaru kroku,
 którego chce wolny kierunek, a oba odczyty są tą samą arytmetyką.
 
-Jego konsekwencją jest tempo. Nawet przy najlepszym kompromisowym kroku
-$\val{p17.best.eta}$ wolny kierunek kurczy się o czynnik $\val{p17.rate}$ na
+Jego konsekwencją jest tempo. Najlepszym pojedynczym rozmiarem kroku dla
+funkcji kwadratowej jest $2/(\lambda_{\max} + \lambda_{\min})$ \dash{} zadanie
+dodatkowe 2 pyta dlaczego, a krótka odpowiedź brzmi: tam oba skrajne kierunki
+są tak samo źle obsłużone. Nawet przy tym kroku, tutaj $\val{p17.best.eta}$,
+wolny kierunek kurczy się o czynnik $\val{p17.rate}$ na
 krok, więc zamknięcie $99$ procent pozostałej luki zajmuje
 $\val{p17.steps.99}$ kroków \dash{} na misie z tylko dwoma kierunkami i przy
 dokładnej arytmetyce.
@@ -487,9 +503,17 @@ ile byłoby to w bajtach przy dwóch bajtach na wpis?
 $\val{p17.hess.entries}$ wpisów, czyli około $\val{p17.hess.bytes}$ bajtów.
 \end{ansblock}
 
-Program~\ref{prog:F01} zbudował drabinę rzędów wielkości i nie ma na niej
-niczego tak dużego. Liczba parametrów jest liczbą, którą da się utrzymać; liczba
-\emph{par} parametrów nie jest, a robi to podnoszenie do kwadratu.
+Postaw to obok drabiny rzędów wielkości z Programu~\ref{prog:F01}, a
+przekracza każdy jej szczebel poza najwyższym. Jest większe niż liczba tokenów
+w korpusie treningowym i większe niż arytmetyka, którą urządzenie robi w
+sekundę; jedyne, co jest tam wyżej, to cała arytmetyka jednego wytrenowania
+modelu, jakieś sto razy większa. A to porównanie nie jest jak za jak: tamte
+wielkości się \emph{wydaje}, przez miesiące i na klastrze, a tu chodzi o
+bajty, które trzeba trzymać naraz. Żadna istniejąca pamięć nie jest w zasięgu
+wielu rzędów od tego.
+
+Liczba parametrów jest liczbą, którą da się utrzymać; liczba \emph{par}
+parametrów nie jest, a robi to podnoszenie do kwadratu.
 
 I przechowanie jej jest tą tanią częścią. Rozwiązanie układu z nią jest
 sześcienne, około $\val{p17.hess.solve}$ operacji, co Program~\ref{prog:P09}
@@ -664,10 +688,17 @@ znaczenia.
 
 \begin{fr}
 \begin{ansblock}
-Bo $\lambda_{\max}$ też się przeskalowuje. Nie ma to znaczenia, bo $\eta$
-przeskalowuje się razem z nią, w przeciwną stronę, więc \emph{krok faktycznie
-zrobiony} pozostaje bez zmian.
+Bo $\lambda_{\max}$ też się przeskalowuje. Przy przeskalowaniu
+\emph{jednorodnym} nie ma to znaczenia, bo $\eta$ przeskalowuje się razem z nią
+w przeciwną stronę i \emph{krok faktycznie zrobiony} pozostaje bez zmian.
 \end{ansblock}
+
+\textbf{Jednorodne wykonuje tu prawdziwą pracę.} Przeskaluj jeden parametr
+spośród wielu, czyli przypadek zbudowany w sekcji 5, a jeden wspólny $\eta$ nie
+da rady za nim pójść: $\lambda_{\max}$ się przesuwa, a krok każdego innego
+kierunku przesuwa się razem z nim. To przypadek z zadania dodatkowego 4
+przeciw temu tutaj, a różnica między nimi polega na tym, czy zmiana układu
+współrzędnych jest zmianą \emph{każdej} współrzędnej.
 
 To jest różnica między tymi dwoma użyciami w jednym zdaniu. W sekcji 3
 krzywizna pojawia się obok rozmiaru kroku i para jest niezmiennicza, choć żaden
@@ -734,8 +765,10 @@ dostarczyć.
   minima}, więc w siodle robi krok w złą stronę w kierunkach ujemnych. Wraz z
   argumentem zliczającym z sekcji 2 jest to prawdziwy problem w wysokim
   wymiarze}.}
-\sumitem{31--33}{\result{\textbf{Przeskalowanie parametru zmienia krzywiznę o
-  $\val{p17.rescale.factor}$ i zostawia każde wyjście identyczne.} Więc jeden
+\sumitem{31--33}{\result{\textbf{Przeskalowanie parametru przez $c$ zmienia
+  krzywiznę o $c^{2}$ \dash{} $\val{p17.rescale.factor}$ przy tym $c$,
+  którego używają ramki \dash{} i zostawia każde wyjście identyczne.} Więc
+  jeden
   model ma dwie ostrości, a goła liczba opisująca ostrość jest faktem o
   układzie współrzędnych}.}
 \sumitem{34}{\result{\textbf{Żadna wielkość zbudowana z gołych wartości własnych tego
@@ -744,10 +777,12 @@ dostarczyć.
   z konstrukcji}.}
 \sumitem{35--36}{\result{Przeżyłaby miara przekształcająca się tak jak parametry.} \textbf{Ta książka nie zmierzyła twierdzenia o uogólnianiu i go nie
   rozstrzyga}; dostarcza filtru.}
-\sumitem{37--38}{\result{\textbf{Ograniczenie na krok ma ten sam problem i nie cierpi z
-  jego powodu}, bo $\eta$ przeskalowuje się razem z $\lambda$, a krok zrobiony
-  pozostaje bez zmian. Pytaniem o krzywiznę nigdy nie jest \emph{czy jest
-  duża}, tylko \emph{względem czego}}.}
+\sumitem{37--38}{\result{\textbf{Ograniczenie na krok ma ten sam problem i przy
+  przeskalowaniu \emph{jednorodnym} nie cierpi z jego powodu}, bo $\eta$
+  przeskalowuje się razem z $\lambda$, a krok zrobiony pozostaje bez zmian;
+  przeskaluj jeden parametr spośród wielu, a jeden wspólny $\eta$ nie da rady
+  za nim pójść. Pytaniem o krzywiznę nigdy nie jest \emph{czy jest duża},
+  tylko \emph{względem czego}}.}
 \end{summarybox}
 
 \canyou
@@ -761,8 +796,8 @@ dostarczyć.
   na zawsze \dash{} ani nie jest zbieżna, ani rozbieżna, co jest granicą będącą
   granicą, a nie marginesem bezpieczeństwa.}
 \item Strata ma w bieżącym punkcie wartości własne hesjanu $50$, $5$ i
-  $\num{0.5}$. Podaj największy użyteczny krok, wskaźnik uwarunkowania i to,
-  który kierunek jest problemem.
+  $\num{0.5}$. Podaj pułap na krok, wskaźnik uwarunkowania i to, który
+  kierunek porusza się w efekcie najwolniej.
   \answerto{$\eta < 2/50 = \num{0.04}$, ustalone przez $50$. Wskaźnik
   uwarunkowania to $50/\num{0.5} = 100$. Problemem jest kierunek
   $\num{0.5}$: wolno mu na $\eta < 4$, a dostaje $\num{0.04}$, więc porusza się

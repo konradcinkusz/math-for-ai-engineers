@@ -58,23 +58,26 @@
 
 \begin{quiz}
 \item You know a function's value, slope and curvature at a point. What is the
-  best you can say about it nearby? \teachesat{3--4}
+  best you can say about it nearby? \teachesat{1--4}
   \answerto{A parabola \dash{} the second-order Taylor model. Its error falls
   like the cube of the distance, where the tangent line's falls like the
   square, which is what \enquote{best} means here: an order, not a size.}
 \item Program~\ref{prog:P15} found each direction multiplied by
-  $1 - \eta\lambda$ every step. What does that make the largest usable $\eta$?
-  \teachesat{16--17}
-  \answerto{$2/\lambda$, because the walk stays bounded exactly when
-  $\lvert 1 - \eta\lambda \rvert < 1$. With several directions the smallest of
-  those bounds wins, so it is $2/\lambda_{\max}$.}
+  $1 - \eta\lambda$ every step. What ceiling does that put on $\eta$, and is
+  the ceiling itself usable? \teachesat{16--17}
+  \answerto{$\eta$ must be strictly under $2/\lambda$, because the walk stays
+  bounded exactly when $\lvert 1 - \eta\lambda \rvert < 1$ \dash{} so there is
+  no largest usable value, only a bound the set does not contain. At
+  $2/\lambda$ exactly the factor is $-1$ and the coordinate never shrinks,
+  which Test exercise 1 works out. With several directions the smallest of
+  those bounds wins, so the ceiling is $2/\lambda_{\max}$.}
 \item Which direction of a valley decides the step size, and which one has to
   live with it? \teachesat{18--19}
   \answerto{The steepest sets the cap, because it is the one that diverges
   first; the shallowest lives with it, and its own bound is larger by the
   condition number.}
-\item Newton's method uses the curvature and lands on the minimum of a
-  quadratic in one step. Why is it not used for training?
+\item Newton's method uses the curvature to choose a step for each direction
+  separately. Why is it not used for training?
   \teachesat{26--27}
   \answerto{Because the Hessian has one entry per \emph{pair} of parameters
   and solving with it is worse still. At a real model size the matrix alone is
@@ -410,9 +413,18 @@ Against a boundary of $\val{p17.eta.star}$, is that walk safe?
 
 \begin{fr}
 \begin{ansblock}
-Yes, and only just \dash{} which is why its steep coordinate flips sign every
-step instead of diverging.
+Yes, with a margin. Its factor is
+$1 - \val{p17.p15.eta} \times \val{p17.lam.hi} =
+\val{p17.p15.factor}$: negative, so the steep coordinate changes side every
+step, and smaller than one in size, so it shrinks.
 \end{ansblock}
+
+\textbf{The sign flip is not a warning.} It begins as soon as $\eta$ passes
+$1/\lambda$, which here is half the boundary, so alternation is the normal
+behaviour over the whole upper half of the stable range. A loss that
+oscillates is not thereby one hair from divergence; it may be at half the
+ceiling and perfectly safe, and telling the two apart needs the factor rather
+than the shape of the curve.
 
 The script reads P15's committed step size and asserts it lies strictly under
 this program's boundary, so the two cannot come apart.
@@ -457,8 +469,11 @@ There it measured how much a solve amplifies error. Here it measures how much
 the step size you are allowed differs from the step size the slow direction
 wants, and the two readings are the same arithmetic.
 
-Its consequence is a rate. Even at the best compromise step
-$\val{p17.best.eta}$, the slow direction shrinks by a factor of
+Its consequence is a rate. The best single step size for a quadratic is
+$2/(\lambda_{\max} + \lambda_{\min})$ \dash{} Further problem 2 asks why, and
+the short answer is that it is where the two extreme directions are equally
+badly served. Even at that step, $\val{p17.best.eta}$ here, the slow direction
+shrinks by a factor of
 $\val{p17.rate}$ per step, so closing $99$ per cent of the remaining gap takes
 $\val{p17.steps.99}$ steps \dash{} on a bowl with only two directions and
 exact arithmetic.
@@ -506,9 +521,16 @@ Hessian have, and what would that be in bytes at two bytes each?
 $\val{p17.hess.entries}$ entries, so about $\val{p17.hess.bytes}$ bytes.
 \end{ansblock}
 
-Program~\ref{prog:F01}'s ladder of magnitudes has nothing on it that big. The
-number of parameters is a number you can hold; the number of \emph{pairs} of
-parameters is not, and squaring is what does it.
+Put that beside Program~\ref{prog:F01}'s ladder of magnitudes and it clears
+every rung but the top one. It is larger than the tokens in a training corpus
+and larger than the arithmetic a device does in a second; the only thing above
+it there is the whole arithmetic of training the model once, about a hundred
+times larger. And that comparison is not like for like: those are quantities
+you \emph{spend}, over months and across a cluster, where this is bytes that
+have to be held at once. No storage that exists is within many orders of it.
+
+The number of parameters is a number you can hold; the number of \emph{pairs}
+of parameters is not, and squaring is what does it.
 
 And storing it is the cheap part. Solving with it is cubic, about
 $\val{p17.hess.solve}$ operations, which Program~\ref{prog:P09} priced in its
@@ -632,8 +654,8 @@ it a symmetry the architecture has by construction.
 \end{fr}
 
 \begin{fr}
-The honest position is worth stating in full, because it is easy to over-
-correct into saying the whole idea is empty.
+The honest position is worth stating in full, because it is easy to
+over-correct into saying the whole idea is empty.
 
 What is established here is narrow: a bare sharpness number is not a property
 of the function. That does not refute the empirical claim, and it does not
@@ -682,10 +704,17 @@ Say why, and then say why it does not matter for that use.
 
 \begin{fr}
 \begin{ansblock}
-Because $\lambda_{\max}$ rescales too. It does not matter because $\eta$
-rescales with it, in the opposite direction, so the \emph{step actually taken}
-is unchanged.
+Because $\lambda_{\max}$ rescales too. Under a \emph{uniform} rescaling it does
+not matter, because $\eta$ rescales with it in the opposite direction and the
+\emph{step actually taken} is unchanged.
 \end{ansblock}
+
+\textbf{Uniform is doing real work in that sentence.} Rescale one parameter
+among many, which is the case section 5 built, and one shared $\eta$ cannot
+follow it: $\lambda_{\max}$ moves and every other direction's step moves with
+it. That is Further problem 4's case against this one, and the difference
+between them is whether the change of coordinates is a change of \emph{every}
+coordinate.
 
 That is the difference between the two uses in one sentence. In section 3 the
 curvature appears alongside the step size, and the pair is invariant even
@@ -749,8 +778,9 @@ answer to that where the sharpness literature has to supply one.
 \sumitem{29--30}{\result{\textbf{Newton finds stationary points, not minima}, so at a
   saddle it steps the wrong way in the negative directions. With section 2's
   counting argument that is a real problem in high dimension}.}
-\sumitem{31--33}{\result{\textbf{Rescaling a parameter changes the curvature by
-  $\val{p17.rescale.factor}$ and leaves every output identical.} So one model
+\sumitem{31--33}{\result{\textbf{Rescaling a parameter by $c$ changes the
+  curvature by $c^{2}$ \dash{} $\val{p17.rescale.factor}$ at the $c$ the
+  frames use \dash{} and leaves every output identical.} So one model
   has two sharpnesses and a bare sharpness number is a fact about the
   coordinates}.}
 \sumitem{34}{\result{\textbf{No quantity built from the raw eigenvalues survives it}
@@ -759,10 +789,12 @@ answer to that where the sharpness literature has to supply one.
 \sumitem{35--36}{\result{What would survive is a measure that transforms as the
   parameters do.} \textbf{This book has not measured the generalisation claim
   and does not adjudicate it}; what it supplies is a filter.}
-\sumitem{37--38}{\result{\textbf{The step-size bound has the same problem and does not
-  suffer from it}, because $\eta$ rescales with $\lambda$ and the step taken is
-  unchanged. The question about a curvature is never \emph{is it big} but
-  \emph{compared with what}}.}
+\sumitem{37--38}{\result{\textbf{The step-size bound has the same problem and,
+  under a \emph{uniform} rescaling, does not suffer from it}, because
+  $\eta$ rescales with $\lambda$ and the step taken is unchanged; rescale one
+  parameter among many and a single shared $\eta$ cannot follow. The question
+  about a curvature is never \emph{is it big} but \emph{compared with
+  what}}.}
 \end{summarybox}
 
 \canyou
@@ -776,8 +808,8 @@ answer to that where the sharpness literature has to supply one.
   \dash{} it neither converges nor diverges, which is the boundary being a
   boundary rather than a safety margin.}
 \item A loss has Hessian eigenvalues $50$, $5$ and $\num{0.5}$ at the current
-  point. Give the largest usable step, the condition number, and which
-  direction is the problem.
+  point. Give the ceiling on the step, the condition number, and which
+  direction moves most slowly as a result.
   \answerto{$\eta < 2/50 = \num{0.04}$, set by the $50$. The condition number
   is $50/\num{0.5} = 100$. The problem direction is the $\num{0.5}$ one: it is
   allowed $\eta < 4$ and gets $\num{0.04}$, so it moves at a hundredth of the
