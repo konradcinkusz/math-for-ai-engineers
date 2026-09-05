@@ -553,6 +553,19 @@ czynnika dwa od $\sqrt{L}$ kosztuje prawie tyle samo.
 Jeszcze jedna rzecz, którą ta sekcja jest winna, i jest to narzędzie, po które
 każdy sięga, gdy gradient wygląda źle.
 
+Zauważ najpierw, czego ta różnica potrzebuje: dwóch wartości funkcji i
+niczego więcej. Nie czyta przebiegu wstecz, nie wie, którą regułę zastosowano
+w którym węźle, i zadziałałaby bez zmian na modelu, którego kodu gradientu
+nigdy nie widziałeś. Ta niezależność jest tu całą jej wartością \dash{} test
+dzielący maszynerię z tym, co sprawdza, zgadzałby się z nim z niewłaściwego
+powodu.
+
+I zestaw to z tym, co ta sekcja właśnie policzyła. Rachunkiem trybu wstecznego
+były wartości pośrednie, które trzeba przechować, i cała ta sekcja była o jego
+płaceniu; różnica skończona nie przechowuje niczego i nie potrzebuje taśmy, na
+której miałaby to trzymać. Czymkolwiek okaże się zarzut wobec niej, nie jest
+nim pamięć.
+
 Zawsze możesz oszacować pochodną różnicą skończoną, jak zrobił
 Program~\ref{prog:F11}. Dlaczego jest to test implementacji, a nie sama
 implementacja?
@@ -603,6 +616,13 @@ awarii kosztującym najwięcej czasu, bo nie ma błędu, którego można szukać
 Wszystkie trzy są pokazane na różniczkowaniu w trybie odwrotnym w jakichś
 czterdziestu liniach, napisanym dla tego programu, więc nic tutaj nie zależy od
 twierdzenia o jakimkolwiek konkretnym frameworku.
+
+Te trzy nie są trzema wersjami jednego błędu i trudnieją w określony sposób.
+Pierwsza jest miejscowa: jedna operacja, jedna wartość wejściowa, a cała
+trudność mieści się w jednej linii kodu. Pozostałe dwie nie mieszczą się
+w żadnej pojedynczej linii, bo tym, co poszło nie tak, jest zależność między
+dwoma miejscami programu, napisanymi w różnym czasie i wyglądającymi poprawnie
+z osobna. Kolejność jest zamierzona.
 
 Pierwsza. $\relu$ nie jest różniczkowalna w zerze. Co powinno zwracać
 $\frac{\mathrm{d}}{\mathrm{d}x}\relu(x)$ dokładnie w $x = 0$?

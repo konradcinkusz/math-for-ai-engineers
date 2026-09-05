@@ -560,6 +560,18 @@ of two of $\sqrt{L}$ costs almost the same.
 One more thing this section owes, and it is the tool everyone reaches for when
 a gradient looks wrong.
 
+Notice first what the difference needs: two values of the function, and
+nothing else. It does not read the backward pass, does not know which rule was
+applied at which node, and would run unchanged against a model whose gradient
+code you have never seen. That independence is the whole of its value here
+\dash{} a check sharing machinery with the thing it checks would agree with it
+for the wrong reason.
+
+And set it against what this section has just counted. Reverse mode's bill was
+the intermediate values it has to keep, and the whole of this section has been
+about paying it; a finite difference keeps nothing at all, and needs no tape to
+keep it on. Whatever the objection to it turns out to be, it is not memory.
+
 You can always estimate a derivative with a finite difference, as
 Program~\ref{prog:F11} did. Why is that a test of an implementation and not an
 implementation itself?
@@ -611,6 +623,13 @@ search for.
 All three are demonstrated on a reverse-mode differentiator of about forty
 lines, written for this program, so nothing here depends on a claim about any
 particular framework.
+
+The three are not three versions of one mistake, and they get harder in a
+particular way. This first one is local: one operation, one input value, and
+the whole of the difficulty fits in a single line of code. The other two do
+not fit in any single line, because what has gone wrong is a relationship
+between two places in the program that were written at different times and
+that look correct read separately. They are in that order deliberately.
 
 The first. $\relu$ is not differentiable at zero. What should
 $\frac{\mathrm{d}}{\mathrm{d}x}\relu(x)$ return at exactly $x = 0$?
