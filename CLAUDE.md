@@ -21,9 +21,9 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1433 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1435 | 0 | 0 | **0** | 0 |
 | `main-pl` (17x24) | 1460 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1198 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-en-a4` | 1200 | 0 | 0 | 1, the 6.3 pt below | 0 |
 | `main-pl-a4` | 1212 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
@@ -108,7 +108,7 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1667 computed values, all referenced, all present, plus the committed console
+- 1673 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
@@ -15877,6 +15877,287 @@ in frame 27 and $t$ in frame 30 where $t$ already names the observed tokens,
 and its implied prior width prints at two precisions four lines apart
 \dash{} $\num{3.162}$ against $\num{3.16}$, which is
 Program~\ref{prog:F08}'s two-numbers-that-look-like-one.
+
+### Part VII review, batch B: P27 and P28, September 2026
+
+Issues \#166 and \#171, taken as one batch on the Foundation precedent that
+each PR costs a four-format build. This closes Part~VII, and with it every
+part of the book that had open program-review issues except Part~VIII and
+Program~\ref{prog:P34}.
+
+#### THE FINDING: a criterion that did not produce its own answer, and an appendix using the other one
+
+Program~\ref{prog:P27} frame 3 asks how many items an accuracy needs before a
+one-decimal figure can round correctly, answers $\val{p27.decimal.floor}$, and
+justified it: \enquote{the grid has to be finer than \emph{half} a tenth of a
+point, so $1/n$ has to be under $\num{0.001}$}. Half a tenth is
+$\num{0.05}$ points and $100/n < \num{0.05}$ gives $n > 2000$; the inequality
+actually printed is $100/n < \num{0.1}$, a whole tenth. Appendix~A's Further
+problem 1 then applied the \emph{other} reading consistently, and printed
+$20\,001$.
+
+**The script settles it rather than my preference**, which is the only reason
+this was a five-minute fix rather than a judgement call:
+`code/p27_inference.py` computes the floor with `while 1.0 / DEC_FLOOR >=
+0.001`, so the criterion the book actually implements is a whole tenth and the
+word \enquote{half} is the error \dash{} in both editions, where the Polish
+carried \emph{pół dziesiątej} to match. So $\val{p27.decimal.floor}$ stands,
+Further problem 1 becomes $1/n < \num{0.0001}$, and its answer is now
+**emitted** rather than typed, on the blocker batch's rule that an
+`\answerto{}` may not carry a number the reader cannot derive from the page.
+
+**And the two numbers could not both have been right, in a program whose first
+section teaches the reader to check exactly this.** That is what made it a
+major rather than a wording slip: a reader who does what §1 says finds the
+program failing its own test.
+
+#### The transcript printed a value Python does not print, for the third time
+
+`figures/transcripts/p27-odd-count.txt` showed `0.2799` under a line with no
+`round()` in it. The generator's own line was `repr(round(P_ONE, 4))` \dash{}
+the rounding applied to the script's **output** instead of written into the
+listing.
+
+That is Program~\ref{prog:P19}'s finding exactly, and it is now the third
+instance (P19, P28's own listing, this one). The fix is the same and it is the
+only arrangement in which the printed line and the printed result cannot come
+apart: `round(2 * comb(m, (m + 1) // 2) / 2 ** m, 4)` **in the listing**.
+
+Worth noting what does *not* catch it. `make verify` proves the file matches
+the script that wrote it, and it did \dash{} perfectly. Only reading the
+listing against what a session would print does.
+
+#### An answer key stated an identity that is not one, and hid the interesting half
+
+Appendix~A's Test exercise~1 for Program~\ref{prog:P27}: \enquote{Yes:
+$\num{83.3}$ per cent of $60$ is exactly $50$ items.} It is $\num{49.98}$.
+What is true is that $50/60$ is $\num{83.33}\ldots$ per cent, which
+\emph{displays} as $\num{83.3}$.
+
+**And the distinction the slip hid is the exercise's actual content.** Frame 2
+rejects $\num{71.4}$ on $200$ items by doing that multiplication and getting
+$\num{142.8}$; by that literal test $\num{83.3}$ on $60$ would be rejected
+too. The reason the answer is \enquote{yes} is that $\num{83.3}$ is a
+legitimate rounding of an achievable score and $\num{71.4}$ is not \dash{}
+neither $\num{71.0}$ nor $\num{71.5}$ rounds to it. The answer says that now.
+
+Fourth batch running to find a wrong answer key, and the class is now better
+attested than most of the layout ones: **Appendix~A is where a reader goes
+because they already suspect they are wrong**, and no gate in this repository
+reaches it.
+
+#### THE OTHER FINDING: a table shipped with a hole in the column its question turns on
+
+Program~\ref{prog:P28} frame 17 tabulates three priors against their credible
+intervals and widths, and asks which of the numbers to put in a report. The
+middle row's width cell was **literally empty** \dash{}
+`& $\val{p28.strong.cred.hi}$ & \\` \dash{} so the reader was asked to choose
+among numbers one of which was not printed.
+
+Emitted and filled: $\val{p28.width.small}$, $\val{p28.width.strong}$,
+$\val{p28.width.big}$, with an assertion that the three are a progression,
+because that progression is what the elicitation is for. Two numbers and a
+hole is not one.
+
+#### A false equivalence between two frameworks, and the measurement that refutes it
+
+Frame 25 said its \enquote{ten more items} is \enquote{the same size as the
+frequentist threshold, and that is not a coincidence}, against
+Program~\ref{prog:P27}'s $\val{p27.net.needed}$. The two are different
+quantities on different denominators, and the claim they \enquote{hardly
+disagree at all about how much evidence it takes} is false. Measured, with the
+parity constraint respected:
+
+| | m | net | P27's test wants | p |
+|---|---|---|---|---|
+| P27's question | 31 | \dash{} | 13 | $\num{0.029}$ |
+| where P28's posterior crosses 95% | 41 | 11 | 15 | $\num{0.117}$ |
+
+**At the point the posterior threshold is reached the frequentist test has not
+fired, and is not close to firing.** The bullet now puts the two in the same
+units and says so, which is a better paragraph than the one it replaces.
+
+**My own instrument was wrong first, and the book was right.** Checking
+P27's 13 with a naive search gave 12 \dash{} because on 31 items the net
+$2c - m$ is always odd, so 12 is unreachable. That is the parity constraint
+Program~\ref{prog:P27}'s own pass note records, and I nearly \enquote{found}
+an error in a correct value. Program~\ref{prog:P34}'s rule caught it: watch
+the instrument produce an answer you already know.
+
+#### The comparison with a fixed exploration rate was exactly backwards
+
+Frame 30 said the posterior rule and $\varepsilon$-greedy \enquote{agree while
+the posterior is near a half, because $\val{p28.route.b.pct}$ per cent and
+\enquote{half the traffic, minus a bit} are the same instruction}.
+
+At a posterior of $\val{p28.route.b.pct}$ per cent the posterior rule sends
+$\val{p28.route.a.pct}$ per cent to the arm that is behind and
+$\varepsilon$-greedy sends $\val{p28.eps.pct}$. That is the widest the two
+rules ever are, not the narrowest, and $95/5$ is not \enquote{half the
+traffic, minus a bit}. The frame's own next sentence describes the crossing
+correctly, so the paragraph contradicted itself.
+
+Rewritten to what is true, and it carries the half nobody states: a fixed rate
+**under**-explores early, spending $\val{p28.eps.pct}$ per cent where the
+evidence supports $\val{p28.route.a.pct}$.
+
+#### A trap that printed the answers to two later elicitations
+
+Frame 5's trap box carried \enquote{on $\val{p28.n}$ items it moves the answer
+by less than one item; on $\val{p28.small.n}$ it moves it a great deal} \dash{}
+which is frames 9 and 10's answers, one page earlier, frame 9's bolded takeaway
+almost word for word. Both elicitations were dead for anybody who read it.
+
+It also springs the trap before the reader has computed anything, against this
+book's own rule that a trap box carries the misconception **after** the reader
+has walked into it. The two measured clauses are cut; the magnitude claim
+stays.
+
+#### An ambiguity the script shared with the prose, and which caught me writing it
+
+Frame 28 explained its routing share as \enquote{the number section 4 already
+computed}. Section~4's headline, carried into a Summary item, is
+$\val{p28.p.better.pct}$; the routing figure is $\val{p28.route.b.pct}$, from
+frame 26's unpaired aside on the previous page. A reader answering frame 27
+writes the number the section spent seven frames on and is marked wrong.
+
+**The script's comment said the same ambiguous thing** \dash{} and I walked
+straight into it: emitting the complement I wrote `100 - P_B_BETTER` and got
+$43$, when the routing rule's complement is $\val{p28.route.a.pct}$. The
+assertion `ROUTE_B == P_UNPAIRED` is what pins it, so the code always knew;
+only its comment and the prose did not. Both now name the unpaired figure
+explicitly, and the frame says why routing is the unpaired question.
+
+#### A rewrapper that churned a hundred and sixty lines nobody asked it to
+
+Applying the prose edits by scripted substitution left twelve source lines
+over the wrap width, which the prose detector flags. The obvious fix \dash{}
+rewrap every long line in the four files \dash{} took the diff from 147
+insertions to 263, because **the Polish files already carried 152 and 130
+lines over 79 characters in `HEAD`**. That is their normal wrapping; Polish
+words are longer.
+
+Reverted, and every edit re-applied from a single script whose replacement
+text is pre-wrapped and whose every substitution asserts both that it matched
+exactly once and that no line it inserts exceeds the width. The remaining
+rewrap then touches **only lines this pass created**, which is the diff the
+review earns rather than a whitespace sweep on top of it.
+
+The generalisable half: **a cleanup that is right in the abstract is churn
+when the file already disagrees with it.** Measure what `HEAD` does before
+normalising anything.
+
+#### The prose detector, and the defect it used to have
+
+Run with no file arguments it printed `flagged 0` \dash{} the answer you
+expect, from a loop that never executed. It exits 1 now with
+\emph{no files given -- refusing to report a clean tree}, verified by running
+it bare before it was trusted on anything. That is one line of code against a
+discipline nobody sustains.
+
+Its JOIN heuristic reported eight ordinary inflected words (\emph{returns},
+\emph{osiągalnego}, \emph{niesparowana}, \emph{odpowiadają}); the
+line-length instrument reported zero for every one of them, which is the
+recorded two-instrument false-positive pattern and the reason neither runs
+alone.
+
+#### Also
+
+- **The units are Program~\ref{prog:P29}'s.** Frame 36's note credited
+  Program~\ref{prog:P30} with defining the bit and the nat; P30 defines the
+  divergence, on units P29 supplies.
+- **The odds ratio did not reproduce from the odds printed beside it.** The
+  page gives $9.0$ and $\val{p28.judge.odds.means}$, which divide to
+  $\num{3.863}$, against a printed $\val{p28.judge.factor}$. The exact value
+  is $\frac{27}{7}$, of which $\val{p28.judge.odds.means}$ is a rounding, so
+  the page now shows the division \dash{} and printing the ratio to three
+  significant figures instead would have broken
+  $\val{p28.judge.compound}$, which is that ratio to the fifth power.
+- **The discordant count was stipulated, not measured**, and
+  Program~\ref{prog:P28} presented it as data and then called it
+  \enquote{Program P27's own data} twice. Both say \enquote{stipulated} now,
+  and that nothing below depends on which it is.
+- **Two return-index defects**: P28's Summary skipped frame 11, the
+  uniform-prior trap, and its sixth outcome ranged over frame 37, the closing
+  recap. $8$--$11$ and $31$--$36$.
+- Appendix~A's answer for P28's Test exercise~3 gave $\num{0.93}$ where the
+  value is $\num{0.938}$ \dash{} truncated rather than rounded, so a reader
+  checking against the frame 21 listing gets a different digit.
+- P27's rule-of-thumb answer now carries the parity and the looseness its own
+  program insists on: $\num{1.96}\sqrt{dn}$ gives $11$ at $dn =
+  \val{p27.disc}$ where the exact search gives $\val{p27.net.needed}$.
+- The aibox repeated the title the box itself prints (`\lblInAI`), and the
+  percentiles were \enquote{summed with} a coefficient rather than obtained by
+  summing one.
+- **Thompson sampling is named**, in the frame that derives it. The program
+  indexed the term and never wrote it, so Further problem 4 used a word the
+  reader had no route to.
+
+#### Layout
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1435 | 1433 | `[]` | 0 |
+| `main-pl` | 1460 | 1460 | `[]` | 0 |
+| `main-en-a4` | 1200 | 1198 | `[6.3]` | 0 |
+| `main-pl-a4` | 1212 | 1212 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and **no orphaned cues at any point in the pass, on the first
+build**. That is worth saying for a batch that lengthened a trap box, a bullet
+and several frames in the middle of two programs: every cue after each edit was
+re-rolled and none landed badly.
+
+**And the orphan-tail count did not move at all**: 26 · 28 · 22 · 18 = 94,
+exactly the pre-batch figures. The transcript guard fired 9 / 10 / 7 / 11,
+also unchanged, which is what a batch that splits no listing should give.
+
+**The two editions moved differently from the same edits**: `main-en` and
+`main-en-a4` gained two pages each while `main-pl` and `main-pl-a4` did not
+move a page. The same paragraphs went into both, so the asymmetry is entirely
+where the lines fall \dash{} the fourth batch running to produce it, in a
+different direction each time, and the standing reason to re-measure all four
+rather than the one you wrote in.
+
+#### Gates
+
+Every source gate run **before** the build, which is Program~\ref{prog:P33}'s
+rule and the tenth pass running: parity $56$ file pairs / $1864$ frames / $0$
+failures and $0$ warnings, clean on the first run for both programs;
+`--frames --answers --outcomes --values --elicit --scripts --terms --parts`
+green; `gen_stubs --check` current. The elicitation rate is unmoved at
+$1028/1864$, because the batch converted nothing and added no frame.
+
+**And this file's value ledger was caught by the gate rather than by me**, for
+the fifth time: `make verify` refused the tree until `code/appf_ledgers.py`
+was re-run, because the six values this batch emits moved the count from
+$1667$ to $1673$. The shape has been identical every time \dash{} the gated
+copy in `figures/values/appf.tex` is caught and the ungated sentence four
+hundred lines up is not. **The habit that would retire it is to regenerate
+`appf.tex` in the same command that runs the source gates**, rather than at the
+end of a batch.
+
+#### Recorded rather than taken
+
+Seventeen page-level findings across the two issues, all book-wide layout,
+which is the P05 review pass's standing precedent. The Quiz and
+\enquote{Can you?} room tests are now in their **eighth** consecutive batch,
+with the Part~V diagnosis unchanged and the instrument still owed before the
+sweep. The rest are admonition boxes breaking headless across a turn, a
+two-line aphorism cut in half, figure fills and one-word node wraps, stacked
+fractions set small in a table column, two bare-numeral answer boxes, and the
+blank verso carrying a running head.
+
+**One of them is a one-line preamble change and is still recorded rather than
+taken**: digits fall out of bold inside a trap headline because `\num{}` does
+not inherit the surrounding weight, and siunitx's `detect-weight` fixes it.
+Bold digits are wider than regular ones, so it moves line breaks in every
+bolded headline in the book \dash{} a book-wide layout change nobody has
+measured, which is the same bar the other sixteen fail.
 
 ### Stroud layout pass, August 2026
 

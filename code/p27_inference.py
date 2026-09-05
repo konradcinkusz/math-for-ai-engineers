@@ -178,6 +178,16 @@ while 1.0 / DEC_FLOOR >= 0.001:
 assert DEC_FLOOR == 1001, DEC_FLOOR
 emit("p27.decimal.floor", DEC_FLOOR)
 
+# The same criterion one decimal further out, for Further problem 1.  The
+# grid must be finer than the rounding bin, which is 0.01 points there, so
+# 100/n < 0.01.  Emitted rather than typed: an \answerto may not carry a
+# number the reader cannot derive from values on the page.
+DEC_FLOOR_2 = 1
+while 1.0 / DEC_FLOOR_2 >= 0.0001:
+    DEC_FLOOR_2 += 1
+assert DEC_FLOOR_2 == 10001, DEC_FLOOR_2
+emit("p27.decimal.floor.two", DEC_FLOOR_2)
+
 # And the gap itself, in the only unit an evaluation actually has.
 GAP_PTS = QUOTED_HI - QUOTED_LO
 GAP_ITEMS = GAP_PTS * ITEMS / 100.0
@@ -618,7 +628,7 @@ _lines = [
     ">>> sum(comb(m, c) for c in range(m + 1)",
     "...     if abs(2 * c - m) >= net) / 2 ** m",
     repr(round(P_EXACT, 4)),
-    ">>> 2 * comb(m, (m + 1) // 2) / 2 ** m",
+    ">>> round(2 * comb(m, (m + 1) // 2) / 2 ** m, 4)",
     repr(round(P_ONE, 4)),
 ]
 assert max(len(line) for line in _lines) <= 64, max(_lines, key=len)

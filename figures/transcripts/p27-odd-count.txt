@@ -3,5 +3,5 @@
 >>> sum(comb(m, c) for c in range(m + 1)
 ...     if abs(2 * c - m) >= net) / 2 ** m
 1.0
->>> 2 * comb(m, (m + 1) // 2) / 2 ** m
+>>> round(2 * comb(m, (m + 1) // 2) / 2 ** m, 4)
 0.2799
