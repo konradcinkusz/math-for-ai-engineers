@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1435 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1433 | 0 | 0 | **0** | 0 |
 | `main-pl` (17x24) | 1460 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1194 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1210 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1198 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1212 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -133,7 +133,7 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **96 orphan-tail pages: 28 · 29 · 21 · 18** across `main-en`, `main-pl`,
+- **94 orphan-tail pages: 26 · 28 · 22 · 18** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`. **The passes that have taken the count DOWN are
   listed rather than counted**, because the tally that used to head this entry
   said *five* over a list of four and nothing could check it \dash{} which is
@@ -148,7 +148,9 @@ what was there before.
   two off the Polish builds on a batch that turned no leaf in any format, and
   the Part~IV review took one more \dash{} in `main-pl` and `main-en-a4`,
   against one back in `main-pl-a4` \dash{} on the second consecutive batch to
-  move no page count at all. **Read \enquote{across two builds} literally**: the
+  move no page count at all, and Part~VII's first batch took two more \dash{}
+  two off `main-en` and one off `main-pl` against one back in `main-en-a4`
+  \dash{} on a batch whose `main-pl` did not move a page. **Read \enquote{across two builds} literally**: the
   batch's own build failed at `check` on an orphaned cue, and `check-a4` does
   not run until `check` passes, so the A4 half of this ledger was not measured
   until the cue was cleared. A hard-gate failure in the trade builds hides every
@@ -15538,6 +15540,343 @@ obstacle with the reasoning rather than rediscovering it:
   the \enquote{Can you?} rows set tight, stretched white space beside a figure,
   and a blank verso carrying a running head \dash{} the last found and
   deliberately left in the F04 review pass for the reason recorded there.
+
+### Part VII review, batch A: P23, P25 and P26, September 2026
+
+Issues \#151, \#158 and \#161, taken as one batch because the sweep below found
+that they share a class. Thirteen majors between them; every one is either
+fixed here or is a book-wide layout change recorded with its mechanism.
+
+#### THE FINDING: an answer key sent readers after a construction that does not exist, and the obvious fix is wrong too
+
+Program~\ref{prog:P23}'s further problem 4 asks for three pairwise independent
+events with $\Prob(A \cap B \cap C) = 0$, other than the coins in \S5. Its
+answer offered \enquote{three of the six faces of a die}.
+
+**There is no such triple on a die at all.** Every non-trivial triple of
+subsets of six equally likely outcomes was enumerated and not one is pairwise
+independent with an empty triple intersection. That is a **proof** for that
+sample space rather than evidence about it \dash{}
+Program~\ref{prog:P14}'s distinction \dash{} because nothing was left out.
+
+**And the replacement a careful reader reaches for is also wrong**, which is
+what makes this worth more than a corrected sentence. Three fair coins with
+$A$ = first heads, $B$ = second heads, $C$ = the two agree is *the* textbook
+pairwise-but-not-mutually-independent example, and it gives
+$\Prob(A \cap B \cap C) = \frac{1}{4}$ where this problem demands zero. It
+answers a different question.
+
+What works is \S5's own construction with three faces instead of two: $X$ and
+$Y$ independent and uniform on $\{0, 1, 2\}$, with $A = \{X = 0\}$,
+$B = \{Y = 0\}$ and $C = \{X + Y \equiv 1 \bmod 3\}$. Each has probability
+$\frac{1}{3}$, each pair meets in one of the nine outcomes, and no outcome is
+in all three.
+
+Both halves are now in `code/p23_probability_bayes.py` \dash{} the exhaustion
+and the construction \dash{} so the answer key is gated rather than asserted.
+**Fifth batch running to find a wrong answer key**, and this is the first where
+the correction itself needed checking.
+
+#### The title promised something the program never delivers, and a fossil says when it stopped
+
+Program~\ref{prog:P25} was titled \enquote{\dots concentration and Monte
+Carlo}, printed on the opener and on every recto. **No section, frame, learning
+outcome, Quiz item, Summary item, Test exercise or Further problem in it
+touches Monte Carlo**, and two frames say in as many words that nothing there
+is sampled.
+
+The fossil is one line: \S25.4, \emph{What an evaluation run costs}, still
+carried `\label{sec:P25-monte-carlo}`. **That section was the Monte Carlo
+section**, it was retitled, and the program's title was never swept \dash{}
+which is the P7-insertion shape once more, a rename that moved the thing and
+not the prose. What §25.4 keeps is the rate under a different name, and what
+has no representation in the title at all is §25.6, initialisation, which the
+curriculum review added and which nobody carried up.
+
+**And three of the four places that title lives already disagreed with each
+other.** `tools/programs.json`'s `pl` field had lost \emph{koncentracja} that
+the typeset Polish title carries. **Nothing compares a manifest title with a
+typeset one**, and `gen_stubs.py` cannot: it never regenerates a written
+program.
+
+**A second divergence in the same two lines, and this file was wrong about
+it.** The Polish used `\program[short]{long}` and the English did not, so the
+Polish recto head carried a short title and the English a width-capped
+81-character one. The P16 pass note says \enquote{use it in both editions or in
+neither: parity compares structural tokens, so a short title in one file and
+not the other diverges}. It does not \dash{} C14 counts `\program` once
+whichever form it takes, and parity was green with the asymmetry present, which
+is a measurement rather than a reading.
+
+#### The code carried the hypothesis and the page dropped it, twice in one program
+
+- **Program~\ref{prog:P25} frame 43 answered
+  $n_{\text{in}} \times \Var(w) \times \Var(x)$.** With mean-zero weights the
+  identity is $n_{\text{in}} \times \Var(w) \times \Ex[x^{2}]$, and the two
+  agree only when the input is centred \dash{} which \S25.6 then breaks
+  immediately, because a $\relu$ output is non-negative and has a positive
+  mean. **The script's own comment said \enquote{for independent zero-mean} and
+  it enumerated over $\pm 1$ inputs, where $\Var(x)$ and $\Ex[x^{2}]$ are both
+  $1$**, so the check could not tell the two readings apart: it passed, and the
+  page carried the wrong one. The input alphabet is a parameter now and the
+  enumeration runs over a non-centred one as well, where the variance reading
+  is out by a factor of two and the assertion says so.
+- **\enquote{Twice $\val{p25.eval.n.naive}$} is
+  $\val{p25.eval.n.needed}$ plus one.** Both counts are individually right,
+  being ceilings of $6146.33$ and $12292.67$. **The script's assertion had been
+  relaxed to `N_NEEDED == 2 * N_NAIVE or N_NEEDED == 2 * N_NAIVE - 1`** to
+  allow exactly this, and the page states the clean version.
+
+Two instances in one program of the same shape, and it is worth naming beside
+the recorded classes: **a script's comment or a relaxed assertion is the author
+telling you the page is about to overstate**, and neither is anything a gate
+reads.
+
+#### The rounding flattered, and the reproduce-from-the-page check passed on a false sentence
+
+\enquote{One spread out the Gaussian is right to a per cent}, printed beside a
+ratio of $0.99$ \dash{} from which one per cent reproduces **exactly**. The
+quantity is $0.9871$ and the error is $\num{1.29}$ per cent.
+
+So this book's most-repeated rule, *divide the two numbers as the page prints
+them*, passed on a sentence that is not true of the measurement, because the
+emission rounded in the flattering direction. Three decimals now, and the page
+says \emph{within about one and a half per cent}, which reproduces from
+$\val{p25.tail.ratio1}$.
+
+#### The table skipped exactly the row that settles its own question
+
+Frame 15 asks how many uniforms it takes to be within one per cent of a
+Gaussian everywhere. Frame 16 answered \enquote{Four} over a table of
+$n = 1, 2, 4, 12$. Recomputed with the program's own routine:
+
+| $n$ | 1 | 2 | **3** | 4 | 12 |
+|---|---|---|---|---|---|
+| worst gap | $\num{0.0572}$ | $\num{0.0164}$ | **$\num{0.0099}$** | $\num{0.0074}$ | $\num{0.0023}$ |
+
+$n = 3$ is already inside one per cent, and it is the one row the table did not
+print. The sweep carries it now and the answer is \emph{three, and only
+barely}, which is true and is a better illustration of how fast the convergence
+starts.
+
+The same frame's \enquote{within a fifth of a per cent} was $\num{0.23}$ per
+cent, falsifiable by looking two inches down the page.
+
+#### The page-turn class, swept multiline, and a plain grep missed one
+
+Five instances across three files, and the sweep is the finding rather than the
+fix.
+
+**Program~\ref{prog:P25}'s Polish already said the right thing** \dash{}
+\emph{zanim pójdziesz dalej}, the pagination-proof form this file's rules
+prescribe \dash{} while its English said \emph{before turning over}. So the two
+editions **disagreed in meaning** while agreeing on every token C4, C8, C12 and
+C14 count: no maths span, no numeral, no macro. Program~\ref{prog:P26} had two
+more, wrong in both editions.
+
+**And a line-oriented `grep` missed the P25 instance**, because a source line
+break falls inside the phrase. The `polsko-` hyphen defect is the same
+mechanism from the other side: there a break *created* the defect, here a break
+*hid* it, and in both cases a line-oriented search is the wrong instrument.
+**A phrase-level convention cannot be enforced by a line-oriented grep**, and
+the fix is three lines of Python over the whole file rather than over each of
+its lines.
+
+#### And I made a positional claim and had to unmake it
+
+Correcting \enquote{section 5's second row} I wrote \enquote{the table two
+frames above}. The table is frame 40 and the trap box is frame 45.
+
+The Part~II elicitation pass records the rule it violates \dash{} **a question
+that needs no positional claim should not carry one** \dash{} and the fix is
+the one that rule prescribes: name the thing, not where it sits. It is worth
+recording that the correction for a wrong positional claim was itself a wrong
+positional claim, because that is how the class survives being noticed.
+
+#### The Quiz could not reach the section that repays Program 21
+
+Program~\ref{prog:P26} declares six learning outcomes and its Quiz has five
+items, routing to frames 1--2, 11--12, 13--14, 26--27 and 37--38. **Nothing
+routes into 41--46** \dash{} \S26.6, which carries a declared outcome, supplies
+the score-function estimator and pays back the derivation
+Program~\ref{prog:P21} deferred by name.
+
+That is not a gap in coverage, it is an instruction: the Quiz's own preamble
+says \emph{work only the frames the questions send you to}, so a reader scoring
+five out of five is **authorised** to skip it. Two items added, one to 42--43
+and one to 44--45.
+
+#### Also, and each is a claim narrower than the sentence it sat in
+
+- **Program~\ref{prog:P23} frame 13 spoiled the trap the program says it exists
+  for**, nine frames early: it told the reader to hold on to the split of
+  alarms into real and false, and its note said \S4 was entirely about the
+  consequences. Frame 22 then says \emph{do not compute anything, do not look
+  back at the table, roughly what fraction of its alarms are real} and frame
+  23's trap opens \emph{if you wrote down something near 99}. The two counts
+  cannot leave frame 13 \dash{} its own question is what they sum to \dash{}
+  but being told to memorise them, and being told where they are going, can.
+- **Frame 39's $\frac{5}{16}$ rested on a prior the page never stated.** The
+  script uses `Fraction(1, 2)` for the service being broken and nothing said
+  so, and $X$ and $Y$ were never introduced, so the answer box could not be
+  checked in a book whose rule is that every number on the page can be.
+- **\enquote{Fault rate equals error rate gives exactly half} is exact only
+  when $s + f = 1$**, as this detector's happens to be. The general condition
+  is $p = f/(s+f)$ \dash{} **and the program's own further-problem answer gives
+  it**, so the frame and the Summary contradicted the answer key.
+- **\enquote{Recall is a property of the model and it travels} overstates.** It
+  is invariant to the base rate; it is not invariant to the mix inside the
+  positive class. The precise pair is that recall conditions on the real class
+  so the base rate cannot move it, and precision conditions on what was
+  flagged so the base rate is inside it.
+- **Two cross-references in Program~\ref{prog:P23} pointed at empty rooms**:
+  \enquote{the last section's warning box}, which from \S4 names \S3, which has
+  no box of either kind (it is \S2's *trap* box), and \enquote{section 5's
+  second row}, where the two-row table is \S6's.
+- **Program~\ref{prog:P26} credited Program~\ref{prog:P15} with the recipe for
+  a maximum.** Differentiating and setting to zero is
+  Program~\ref{prog:F11}'s \dash{} which also carries the trap that a zero
+  derivative is not a maximum \dash{} and P15's only stationary anything is
+  Program~\ref{prog:P13}'s stationary *distribution*.
+- **\enquote{The likelihood is a probability of the data} contradicts
+  Program~\ref{prog:F13}'s headline trap** for the Gaussian the next frame
+  uses: for continuous data it is a density and is not bounded by one, which is
+  exactly what F13 was written to establish.
+- **\enquote{The two things \S26.3 said to do} was followed by three
+  instructions**, on the program's own central derivation.
+- **\enquote{Nothing in any library gives an unbiased standard deviation} is a
+  universal about software**, in a book whose rule is that a library's contents
+  are a fact about a version. The durable claim is about the flag and is
+  stronger: no `ddof` value can do it, because the correction depends on the
+  distribution rather than on the sample size.
+- **\enquote{This is the first time the book has said so}** \dash{} the
+  statement-of-first-occurrence class, which nothing can check and which decays
+  the day an earlier program is revised.
+- **Appendix~A's answer T5 called $\num{0.01}$ to $\num{1.0}$ a tenfold change
+  and the prior narrower by $\sqrt{10}$.** It is a hundredfold change and a
+  factor of ten, which the answer's own two printed widths already say.
+- **The $\num{5.5}$ per cent shortfall is a property of the population
+  $\{1, 2, 3, 6\}$**, and Appendix~A's own T2 keeps the qualifier while the
+  trap box and the Summary dropped it. For Gaussian runs it is $\num{6.0}$.
+- **Program~\ref{prog:P25}'s \code{fp16} overflow is \code{inf}, not
+  \code{nan}.** A reader who takes \enquote{not a number} as the definition of
+  overflow greps their logs for `nan` and finds `inf`; `nan` arrives one step
+  later, when an `inf` first meets a subtraction or a multiplication by zero.
+  And the quantity overflowing is a *variance*, whose root is the activation.
+- **\enquote{What fraction of the signal reaches the top?} was answered with a
+  fraction of the variance** \dash{} eight orders of magnitude apart, and the
+  frame's own diagnostic is about the variance.
+- **The $1/\sqrt{d_k}$ was derived from a product that carries no
+  information.** $\sqrt{x} \times 1/\sqrt{x} = 1$ for every $x$, and the two
+  factors are spreads of two different objects, which is not something one
+  multiplies. The honest derivation was already on the page two frames earlier,
+  so the elicitation now asks what divisor gives a spread of one and why it
+  cannot be a constant.
+- **Two Quiz items handed over the conclusions frames 33 and 52 are built to
+  elicit**, and the worse of them ruled the learning rate out in advance, which
+  is precisely the misconception frame 52's trap box exists to catch.
+- **Frames 3 and 17 announced their own traps** \dash{} \enquote{most readers
+  answer it wrongly at speed} and \enquote{the one that turns a true statement
+  into a wrong answer} \dash{} which spends the errorful-generation benefit
+  before the question is asked. The same cut was made in the F02 and F03 passes.
+- **Two Summary routes were off by one at each end**: the six-spreads result is
+  delivered in frame 20's answer box and the route stopped at 19, and the
+  three-part hypothesis is frame 21's rigour box while the route started at 20.
+- **A figure caption said four names over a three-node figure**, and
+  \enquote{a quantity and its own square} named both the section's own
+  *dependent* pair, whose cross term is $\num{40.833}$, and the zero-covariance
+  counterexample, which needs the quantity to be symmetric about zero.
+- **Navigation**: Program~\ref{prog:P21} is one part back and not two;
+  Program~\ref{prog:P05} is four parts back and not three, and the same frame
+  names Part~III, so the two statements disagreed with each other.
+- **An ordinal about the book, false on the day it printed**: \enquote{the
+  first of the ten to have been run}. E6 ran in Program~\ref{prog:P20}, five
+  programs and one part earlier.
+- **An aibox quoted $\num{74.31}$ per cent with an interval computed at
+  $\num{0.80}$**, and the item count $\val{p25.eval.n.needed}$ assumed an
+  accuracy the page never restated. The box's own argument is that the reader
+  should do the square root, and a reader who did got a figure ten per cent
+  larger than the one printed.
+- Two banned words, a table's percent signs against \emph{per cent} in prose,
+  a bold clause opening with a digit, and a sentence that did not parse because
+  a `\val{}` had been dropped into it without a preposition.
+
+#### Process
+
+**`make verify` reads uncommitted as stale and staged as current**, by design
+\dash{} its own comment says so, because testing `git status --porcelain`
+would fail on a staged file and make the gate unusable mid-commit. So
+`git add figures/values/` is a step in the loop rather than a way round the
+gate, and this is worth writing down because the first reading of its output is
+that a script and its committed file have come apart.
+
+#### Layout
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1433 | 1435 | `[]` | 0 |
+| `main-pl` | 1460 | 1460 | `[]` | 0 |
+| `main-en-a4` | 1198 | 1194 | `[6.3]` | 0 |
+| `main-pl-a4` | 1212 | 1210 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and, after the three rounds above, no orphaned cues.
+
+**And the orphan tails went 96 to 94**: 26, 28, 22, 18 against the pre-batch
+28, 29, 21, 18. Down two in `main-en` and one in `main-pl`, up one in
+`main-en-a4`, level in `main-pl-a4`. This batch joins the list of passes that
+have taken that ledger down; the list is the record and no ordinal is written
+here, which is the correction the Part~III review earned when that entry's own
+tally said five over a list of four.
+
+**`main-pl` did not move by a single page** while the other three moved by two,
+four and two, and it lost a tail doing it. The same paragraphs went into both
+editions, so the asymmetry is entirely where the lines fall \dash{} which is
+the third batch running to produce it, in a different direction each time, and
+the standing reason to re-measure all four rather than the one you wrote in.
+
+**The transcript guard fired 9 / 10 / 7 / 11**, against 9 / 10 / 7 / 12 in the
+Part~IV batch \dash{} down one in `main-pl-a4` and identical in the other
+three, on a batch that split no listing. **The cause is not established and is
+deliberately not guessed at**, which is that batch's own note: a firing is a
+page turned rather than a split repaired, and after the first turn everything
+downstream moves, so a single build's $-1$ is as consistent with one earlier
+listing changing its page as with anything about this batch's prose.
+
+#### Gates
+
+Every source gate run **before** the build, which is Program~\ref{prog:P33}'s
+rule and the ninth pass running: parity $56$ file pairs / $1864$ frames / $0$
+failures and $0$ warnings; `--frames --answers --outcomes --values --elicit
+--scripts --terms --parts` green; `gen_stubs --check` current; `make verify`
+current. The prose detector's remaining flags are ordinary inflected words with
+the line-length instrument reporting zero for each, which is the recorded
+two-instrument false-positive pattern.
+
+#### Recorded rather than taken
+
+Twenty page-level findings across the three issues, all book-wide layout, on
+the P05 review pass's standing precedent. The \enquote{Can you?} heading over a
+void and the Quiz heading stranded on the opener are now in their **seventh**
+consecutive batch, with the Part~V diagnosis unchanged: the `quiz` room test of
+$8\baselineskip$ and the box's own `lines before break=12` disagree, and
+`checkpdf`'s heading check learns the *numbered* heading's size from the
+document, so a `\section*` left behind is invisible to it. The instrument is
+owed before the sweep. The rest are admonition boxes breaking with one-word or
+one-line tails, a Summary starting at a page foot, \enquote{Can you?} rows set
+tight, listings set smaller than the body, a Further-problems heading split
+from its list, and short pages where the section guards turned early.
+
+Two findings are neither layout nor taken, and are recorded so the next pass
+decides rather than rediscovers: Program~\ref{prog:P26}'s target vector is $y$
+in frame 27 and $t$ in frame 30 where $t$ already names the observed tokens,
+and its implied prior width prints at two precisions four lines apart
+\dash{} $\num{3.162}$ against $\num{3.16}$, which is
+Program~\ref{prog:F08}'s two-numbers-that-look-like-one.
 
 ### Stroud layout pass, August 2026
 
