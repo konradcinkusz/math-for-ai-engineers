@@ -652,9 +652,9 @@ Appendices:
    | | pages | count |
    |---|---|---|
    | front matter + Part I (F1--F13) | 1--386 | 386 |
-   | Parts II--VI (P1--P22) | 387--896 | 510 |
-   | Parts VII--IX (P23--P34) | 897--1228 | 332 |
-   | back matter (appendices, answers, index) | 1229--1415 | 187 |
+   | Parts II--VI (P1--P22) | 387--904 | 518 |
+   | Parts VII--IX (P23--P34) | 905--1236 | 332 |
+   | back matter (appendices, answers, index) | 1237--1423 | 187 |
 
    These are **PDF pages**, not printed folios, and the difference is
    twenty-eight — the front matter. `main-en.toc` gives folios, so it puts
@@ -664,7 +664,7 @@ Appendices:
    part title rather than by adding twenty-eight to the toc, which is this
    entry's own rule about arithmetic on two measurements.
 
-   So the proposed cut gives an 896-page first volume before any back matter,
+   So the proposed cut gives a 904-page first volume before any back matter,
    which does not settle it: at this geometry the book is nearer three volumes
    than two, or the geometry has to change. **Decide before the front matter is
    written**, and decide against these numbers rather than against the
@@ -711,6 +711,20 @@ Appendices:
    a stale page count elsewhere, because this is the only place the
    one-volume decision has numbers at all, and a reader cannot tell a table
    measured last week from one measured four merges ago.
+
+   **And three more merged batches then went by before the Part III review
+   pass re-measured it**, which is the same failure one round later and is
+   worth recording rather than smoothing: the F07/F12/F13 batch, the F08--F11
+   batch and the P01/P02 review each moved the book and left the table at
+   386/510/332/187.
+
+   The figures above are those three plus this one, and for once the deltas
+   read straightforwardly: **only the row that was written in moved.** Parts
+   II--VI gained eight pages, and Part~I, Parts VII--IX and the back matter
+   are unchanged to the page. That is the first re-measurement in this entry's
+   history where adjusting the row you wrote in would have given the right
+   answer \dash{} which is not a reason to start doing it, because nothing
+   distinguishes this case from the P05 pass's in advance.
 2. **`dotnetbox` or `codebox`** --- section 15(c).
 3. **Whether the mathematics packages may be hard requirements**, breaking the
    graceful degradation both companion preambles maintain --- section 15(a).

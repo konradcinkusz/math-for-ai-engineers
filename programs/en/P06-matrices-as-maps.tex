@@ -522,8 +522,14 @@ at shapes $\val{p06.din} \to \val{p06.dmid} \to \val{p06.dout}$, worst
 disagreement under $\val{p06.collapse.err}$ \dash{} which is rounding, not a
 difference.
 
-Two steps made that rearrangement work, and both were named in section 1. Say
-which two.
+Worth noticing what the check does not depend on. Nothing in the rearrangement
+asks the biases to be anything in particular, or the two widths to be equal, or
+either matrix to be invertible: the collapse is a property of the \emph{form}
+$Wx + b$ rather than of any of the numbers in it, which is why one identity
+covers every stack anybody builds.
+
+Two steps made that rearrangement work. One was named in section 1. Say which
+two, and where the other one came from.
 \dotline
 \nextframe
 \end{fr}

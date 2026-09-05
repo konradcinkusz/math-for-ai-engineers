@@ -321,9 +321,25 @@ Each term is a column times a row, which by Program~\ref{prog:P08} is a matrix
 of rank exactly one. So a matrix is a sum of rank-one pieces, one for each
 singular value, weighted by it.
 
+The construct has a name and a trap in it. $u_i v_i\T$ is a column times a
+row, which is the \textbf{outer product} \dash{} the thing
+Program~\ref{prog:P06} said a low-rank update must never form. Move the
+transpose to the other vector and $a\T b$ is the inner product, which is a
+\emph{number}. One mark in a different place, and a matrix on one side against
+a scalar on the other. Here only the first is even available: $u_i$ has as many
+components as $A$ has rows and $v_i$ as many as it has columns, so for a
+rectangular $A$ the two vectors cannot be paired the other way round at all.
+
 The pieces do not interact: the $u$'s are perpendicular and so are the $v$'s.
-Say what that buys \dash{} what does the total \enquote{size} of $A$ decompose
-into?
+
+Which is what makes the next question answerable at all. When pieces overlap
+there is no telling what any one of them contributes on its own \dash{} the
+whole is not the sum of the parts and asking for a share is asking for
+something that does not exist. Perpendicular pieces are exactly the case where
+it does.
+
+So read $A$ as one long vector and take its squared length, the way
+Program~\ref{prog:P05} would. What does that total decompose into?
 \dotline
 \nextframe
 \end{fr}
@@ -416,7 +432,12 @@ department cares.
 Take a matrix whose singular values run $100, 40, 16, 6, 2, 1$. Keep the top
 $\val{p11.spec.keep}$ of the $\val{p11.spec.n}$ and throw four away.
 
-What fraction of the total do you still have?
+Note that the numbers themselves fall by a factor of a hundred across the list
+and their squares by a factor of ten thousand, so the two ways of adding them
+up give very different answers. Take the squared total \dash{} the
+$\sigma_i^{2}$ of four frames back, which is the one that decomposes.
+
+What fraction of it do you still have?
 \dotline
 \nextframe
 \end{fr}

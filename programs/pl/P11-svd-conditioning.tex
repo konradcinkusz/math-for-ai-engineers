@@ -264,8 +264,7 @@ Wszędzie indziej różnią się, i to nie tylko wartością, ale rodzajem:
 
 Powyższy przykład jest przypadkiem niewygodnym: $\val{p11.lam.hi}$ wobec
 $\val{p11.sig.hi}$ to różnica poniżej $5\%$, a wykres jednego opisany jako
-drugie
-wyglądałby zupełnie rozsądnie.
+drugie wyglądałby zupełnie rozsądnie.
 \end{trapbox}
 
 \begin{fr}
@@ -303,8 +302,25 @@ Każdy składnik to kolumna razy wiersz, co na mocy Programu~\ref{prog:P08} jest
 macierzą rzędu dokładnie jeden. Macierz jest więc sumą kawałków rzędu jeden, po
 jednym na wartość osobliwą, z nią jako wagą.
 
-Kawałki nie oddziałują: wektory $u$ są prostopadłe i wektory $v$ też. Powiedz,
-co to daje \dash{} na co rozkłada się całkowity \enquote{rozmiar} $A$?
+Konstrukcja ma nazwę i pułapkę w środku. $u_i v_i\T$ to kolumna razy wiersz,
+czyli \textbf{iloczyn zewnętrzny} \dash{} to, czego według
+Programu~\ref{prog:P06} aktualizacja niskiego rzędu nigdy nie powinna tworzyć.
+Przenieś transpozycję na drugi wektor, a $a\T b$ jest iloczynem skalarnym,
+czyli \emph{liczbą}. Jeden znak w innym miejscu, a po jednej stronie macierz,
+po drugiej skalar. Tutaj dostępny jest zresztą tylko pierwszy: $u_i$ ma tyle
+składowych, ile $A$ ma wierszy, a $v_i$ tyle, ile kolumn, więc dla prostokątnej
+$A$ tych dwóch wektorów w ogóle nie da się sparować na odwrót.
+
+Kawałki nie oddziałują: wektory $u$ są prostopadłe i wektory $v$ też.
+
+I to właśnie czyni następne pytanie w ogóle odpowiadalnym. Gdy kawałki
+zachodzą na siebie, nie da się powiedzieć, co wnosi którykolwiek z nich z
+osobna \dash{} całość nie jest sumą części, a pytanie o udział jest pytaniem o
+coś, czego nie ma. Kawałki prostopadłe to dokładnie ten przypadek, w którym
+udział istnieje.
+
+Przeczytaj więc $A$ jako jeden długi wektor i weź jego kwadrat długości, tak
+jak zrobiłby to Program~\ref{prog:P05}. Na co rozkłada się ta suma?
 \dotline
 \nextframe
 \end{fr}
@@ -399,7 +415,12 @@ wydziału matematyki.
 Weź macierz, której wartości osobliwe biegną $100, 40, 16, 6, 2, 1$. Zachowaj
 $\val{p11.spec.keep}$ największe z $\val{p11.spec.n}$, a cztery wyrzuć.
 
-Jaki ułamek całości nadal masz?
+Zauważ, że same liczby maleją wzdłuż tej listy stukrotnie, a ich kwadraty
+dziesięciotysiąckrotnie, więc dwa sposoby ich sumowania dają zupełnie różne
+odpowiedzi. Weź sumę kwadratów \dash{} te $\sigma_i^{2}$ sprzed czterech ramek,
+bo to ona się rozkłada.
+
+Jaki jej ułamek nadal masz?
 \dotline
 \nextframe
 \end{fr}
