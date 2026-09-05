@@ -50,11 +50,14 @@
   the only thing a derivative by a vector adds}
 \outcome{8--14}{differentiate a scalar loss with respect to a weight matrix,
   and check the answer by its shape alone}
-\outcome{15--21}{write the derivative of $\softmax$ and say what its rows sum
-  to and why}
-\outcome{22--31}{derive that the gradient of cross-entropy through a
-  $\softmax$ is $p - y$ \dash{} the definition of cross-entropy is
-  \emph{given} here and justified in Program~\ref{prog:P30}}
+\outcome{15--21}{write the derivative of $\softmax$ and say what its columns
+  sum to, what its rows sum to, and why the two reasons differ}
+\outcome{22--29}{derive the gradient of cross-entropy through a $\softmax$,
+  and say why the reciprocal the first step introduces disappears \dash{} the
+  definition of cross-entropy is \emph{given} here, justified in
+  Program~\ref{prog:P26} and interpreted in Program~\ref{prog:P30}}
+\outcome{30--31}{say why layer normalisation's derivative cannot be
+  elementwise}
 \outcome{32--39}{give the two reasons the two operations are fused, and say
   which of them is about speed and which is not}
 \end{outcomes}
@@ -71,10 +74,12 @@
   them inside one derivation, and that is what produces a shape error nobody
   can debug.}
 \item What shape is the derivative of $\softmax$ on $n$ scores, and what do
-  its rows sum to? \teachesat{15--19}
+  its \emph{columns} sum to? \teachesat{15--19}
   \answerto{$n \times n$, one row per output and one column per input by
-  Program~\ref{prog:P16}'s rule. Every row sums to zero, which is
-  \enquote{the probabilities sum to one} differentiated.}
+  Program~\ref{prog:P16}'s rule. Every column sums to zero, which is
+  \enquote{the probabilities sum to one} differentiated with respect to one
+  score. The rows sum to zero as well, for the different reason that
+  $\softmax$ ignores a constant added to every score.}
 \item Cross-entropy through a $\softmax$: what is the gradient with respect to
   the scores? \teachesat{24--25}
   \answerto{$p - y$ \dash{} the predicted distribution minus the one-hot
@@ -251,9 +256,13 @@ Take it one entry at a time, which is all \enquote{matrix calculus} ever is.
 \[ \frac{\partial L}{\partial W_{ij}} = 2 r_i x_j \]
 \end{ansblock}
 
-Because $L = \sum_k r_k^{2}$, so $\partial L/\partial W_{ij} =
-2 r_i \, \partial r_i/\partial W_{ij}$, and $r_i = \sum_j W_{ij}x_j - t_i$
-contributes $x_j$. Every other row of $r$ has no $W_{ij}$ in it.
+Because $L = \sum_k r_k^{2}$, differentiating one term at a time gives
+\[ \frac{\partial L}{\partial W_{ij}} = \sum_k 2 r_k
+   \frac{\partial r_k}{\partial W_{ij}} \]
+and only $k = i$ survives, because $W_{ij}$ appears in row $i$ of $\vect{r}$
+and in no other. Write that row with a summation index of its own,
+$r_i = \sum_m W_{im}x_m - t_i$, and the only term carrying $W_{ij}$ is the
+one at $m = j$, which contributes $x_j$.
 
 Collected up, that is an \textbf{outer product}:
 \[ \frac{\partial L}{\partial W} = 2\,\vect{r}\,\vect{x}\T \]
@@ -334,7 +343,8 @@ denominator takes back $p_i^{2}$; with $i \neq j$ only the denominator moves,
 giving $-p_i p_j$. The single expression covers both because $\delta_{ij}$ is
 $1$ on the diagonal and $0$ off it.
 
-As a matrix,
+As a matrix \dash{} writing $\diag(\vect{p})$ for the matrix carrying
+$\vect{p}$ down its diagonal and zeros everywhere else \dash{}
 \[ J = \diag(\vect{p}) - \vect{p}\,\vect{p}\T \]
 checked entry by entry against a central difference, worst disagreement under
 $\val{p18.jac.bound}$.
@@ -344,29 +354,47 @@ $\val{p18.jac.bound}$.
 That matrix has a property you can predict without computing anything, from
 one fact about $\softmax$ you already have.
 
-The probabilities sum to $1$, whatever the scores are. What does that force
-about each row of $J$?
+The probabilities sum to $1$, whatever the scores are. Differentiate that
+statement with respect to one score $z_j$. What does it force about $J$
+\dash{} and along which axis?
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
 \begin{ansblock}
-Every row sums to $0$.
+Every \emph{column} sums to $0$.
 \end{ansblock}
 
-Because a quantity that is $1$ for every input does not change when an input
-changes, so its derivative is zero in every direction. Measured at under
-$\val{p18.jac.rowsum}$, which is rounding.
+The quantity that is $1$ for every input is $\sum_i p_i$, and its derivative
+with respect to $z_j$ is $\sum_i \partial p_i/\partial z_j$, which by the
+layout of section~\ref{sec:P18-layout} is the sum \emph{down} column $j$.
+Measured at under $\val{p18.jac.colsum}$, which is rounding.
 
 \textbf{So a $\softmax$ can move probability around and can never make more of
-it}, and the row sums are that sentence written as arithmetic. It is also the
-cheapest check on an implementation of the Jacobian anybody will ever write.
+it}, and the column sums are that sentence written as arithmetic.
+
+\begin{note}
+The \emph{rows} sum to zero too, and it is worth separating the two because
+they are different facts with different reasons. A row sum is
+$\sum_j \partial p_i/\partial z_j$, which is what happens to one probability
+when \emph{every} score moves together \dash{} and $\softmax$ is unchanged by
+adding a constant to all its scores, so that is zero as well. Measured at
+under $\val{p18.jac.rowsum}$.
+
+The two coincide here only because this particular $J$ is symmetric, which the
+next frame asks you to notice. In a program whose whole subject is which index
+runs down the rows, giving one of them the other's argument is exactly the
+mistake to avoid, and an earlier draft of this frame made it.
+\end{note}
+
+Either sum is the cheapest check on an implementation of the Jacobian anybody
+will ever write.
 \end{fr}
 
 \begin{fr}
-And one gate, because two programs must not be able to disagree about one
-computation.
+And one cross-check, because two programs must not be able to disagree about
+one computation.
 
 Program~\ref{prog:F07} proved that $\softmax$ on two scores is the logistic
 of their difference. Differentiating both sides of an identity gives an
@@ -380,14 +408,14 @@ $\sigma'(a - b) = \sigma(a-b)\bigl(1 - \sigma(a-b)\bigr)$.
 \end{ansblock}
 
 The script checks it over $\val{p18.gate.f07.pairs}$ pairs rather than at a
-point, worst disagreement under $\val{p18.gate.f07.bound}$, and it reads
-Program~\ref{prog:F07}'s own committed probabilities to confirm the two
-programs are computing one $\softmax$.
+point, worst disagreement under $\val{p18.gate.f07.bound}$, and it re-uses the
+probabilities Program~\ref{prog:F07} computed, to confirm the two programs
+are computing one $\softmax$.
 
-That is worth having for the reason Program~\ref{prog:P04} gives: a gate is
-worth its lines when the two programs quote \emph{one} computation, and this
-one is F07's identity differentiated rather than two numbers that resemble
-each other.
+That is worth having for the reason Program~\ref{prog:P04} gives: a check
+like this is worth its lines when the two programs quote \emph{one}
+computation, and this one is F07's identity differentiated rather than two
+numbers that resemble each other.
 \end{fr}
 
 % ============================================================
@@ -427,8 +455,7 @@ $\partial L/\partial p_c = -1/p_c$, and $\partial L / \partial p_j = 0$ for
 every other $j$.
 \end{ansblock}
 
-Which is where the whole thing could go wrong, and section 5 is about that
-$1/p_c$. For now, carry it.
+For now, carry it.
 
 Now push it through the Jacobian. The chain rule for the scores is
 \[ \frac{\partial L}{\partial z_j}
@@ -453,6 +480,9 @@ In vector form, with $\vect{y}$ the one-hot target,
 \[ \frac{\partial L}{\partial \vect{z}} = \vect{p} - \vect{y} \]
 checked against a central difference, worst disagreement under
 $\val{p18.ce.bound}$.
+
+Section~\ref{sec:P18-fusion} asks why every serious implementation computes
+that expression directly rather than taking the two steps that produced it.
 \end{fr}
 
 \begin{fr}
@@ -506,8 +536,8 @@ derived.
 \end{fr}
 
 \begin{fr}
-The brief for this program names a fifth identity, and it is the one people
-get wrong: layer normalisation. Its output is
+There is a fifth identity worth having, and it is the one people get wrong:
+layer normalisation. Its output is
 \[ \hat{z}_i = \frac{z_i - \mu}{\sqrt{\operatorname{var} + \varepsilon}} \]
 with $\mu$ and the variance both computed over the same vector.
 
@@ -524,7 +554,8 @@ input moves every output \dash{} exactly as with $\softmax$.
 
 That is the shape of the answer, and it is why the gradient carries two
 correction terms rather than one factor. With $\vect{g}$ arriving from above
-and $s$ the standard deviation,
+and $s = \sqrt{\operatorname{var} + \varepsilon}$, the denominator of the
+forward pass,
 \[ \frac{\partial L}{\partial z_i} = \frac{1}{s}\Bigl(g_i
    - \overline{g} - \hat{z}_i\,\overline{g\hat{z}}\Bigr) \]
 where the two bars are means over the vector. The script checks it at
@@ -558,15 +589,15 @@ route, and how much is $\vect{p} - \vect{y}$?
 
 \begin{fr}
 \begin{ansblock}
-About $\val{p18.fuse.twostep}$ operations against $\val{p18.fuse.fused}$
-\dash{} a factor of $\val{p18.fuse.ratio}$.
+$\val{p18.fuse.twostep}$ operations against $\val{p18.fuse.fused}$
+\dash{} a factor of $\val{p18.fuse.ratio}$, exactly.
 \end{ansblock}
 
 The two-step route forms the Jacobian, which has one entry per \emph{pair} of
 classes, and applies it. The fused route is $\val{p18.vocab}$ subtractions
 and no multiplication at all.
 
-And the Jacobian is $\val{p18.fuse.gib}$ GiB at two bytes a number, so it is
+And the Jacobian is $\val{p18.fuse.gb}$ GB at two bytes a number, so it is
 Program~\ref{prog:P16}'s \enquote{nobody forms a Jacobian} arriving in the
 most reused derivation in the field. The difference from that program's case
 is worth noticing: there the product people wanted was cheap, and here the
@@ -611,14 +642,17 @@ what would move it.
 
 \begin{fr}
 \begin{ansblock}
-From the exponential underflowing: below about $\val{p18.cliff}$ under the
-largest score, $e^{z_c - \max z}$ is exactly zero in binary64, so $p_c$ is
-too. A narrower format moves it much closer in.
+From the arithmetic underflowing \dash{} and it is the division rather than
+the exponential. Below about $\val{p18.cliff}$ under the largest score,
+$e^{z_c - \max z}$ is still a subnormal, and dividing it by the sum of the
+exponentials is what rounds $p_c$ to exactly zero; the exponential on its own
+survives to about $\val{p18.cliff.exp}$. A narrower format moves both much
+closer in.
 \end{ansblock}
 
 That is Program~\ref{prog:P01}'s floor arriving in the field's most reused
-derivation, and the script finds the threshold by bisection rather than
-quoting it, so a change of format changes the number on the page.
+derivation, and the script finds both thresholds by bisection rather than
+quoting them, so a change of format changes the numbers on the page.
 
 \begin{trapbox}
 \textbf{\enquote{The fused version is an optimisation.}} It is cheaper, and
@@ -689,12 +723,15 @@ those in a line or two.
   every output shares a denominator with every input}.}
 \sumitem{16--17}{\result{$J = \diag(\vect{p}) - \vect{p}\vect{p}\T$, checked to
   $\val{p18.jac.bound}$}.}
-\sumitem{18--19}{\result{\textbf{Every row of $J$ sums to zero}: the probabilities sum
-  to $1$ whatever the scores do, differentiated. A $\softmax$ moves
-  probability and never makes more}.}
+\sumitem{18--19}{\result{\textbf{Every \emph{column} of $J$ sums to zero}: the
+  probabilities sum to $1$ whatever the scores do, differentiated with respect
+  to one score. Every \emph{row} sums to zero as well, for the different
+  reason that $\softmax$ ignores a constant added to every score, and the two
+  coincide only because this $J$ is symmetric. A $\softmax$ moves probability
+  and never makes more}.}
 \sumitem{20--21}{\result{At $n = 2$ it reduces to $\sigma'(a-b)$, over
   $\val{p18.gate.f07.pairs}$ pairs \dash{} Program~\ref{prog:F07}'s identity
-  differentiated, and a gate rather than a resemblance}.}
+  differentiated, and one computation rather than a resemblance}.}
 \sumitem{22}{\result{\textbf{Cross-entropy is defined here and justified later}:
   $-\sum_j y_j \ln p_j$, which is $-\ln p_c$ for a one-hot target.} Program~\ref{prog:P26} says why it is the right thing to minimise and
   Program~\ref{prog:P30} what it measures.}
@@ -711,7 +748,7 @@ those in a line or two.
   correction terms, checked to $\val{p18.ln.bound}$}.}
 \sumitem{32--33}{\result{\textbf{Fusion, reason one: cost.}
   $\val{p18.fuse.ratio}$ times fewer operations, and the Jacobian nobody
-  forms would be $\val{p18.fuse.gib}$ GiB}.}
+  forms would be $\val{p18.fuse.gb}$ GB}.}
 \sumitem{34--35}{\result{\textbf{Reason two, and it is not about speed}: the two-step
   route forms $-1/p_c$ and $p_c$ underflows to zero, where
   $\vect{p}-\vect{y}$ never forms the reciprocal}.}
@@ -732,15 +769,20 @@ those in a line or two.
   \answerto{$\partial L/\partial W$ is $256 \times 1024$, the shape of $W$,
   because $L$ is a scalar. $\partial\vect{z}/\partial\vect{x}$ is
   $256 \times 1024$ as well \dash{} one row per output, one column per input
-  \dash{} and it is $W$ itself. The two agreeing here is a coincidence of
-  this layer, not a rule.}
+  \dash{} and it is $W$ itself. The two agreeing is a property of \emph{any}
+  linear layer rather than a coincidence of this one: $\partial\vect{z}/
+  \partial\vect{x}$ is $W$ by frame 4, and $\partial L/\partial W$ has $W$'s
+  shape by the scalar rule. What it is not is a general rule about
+  differentiating by a matrix and by a vector.}
 \item A classifier over $10$ classes predicts
   $\vect{p} = (\num{0.7}, \num{0.2}, \num{0.1}, 0, \ldots)$ and the true class
   is the second. Give the gradient with respect to the scores.
   \answerto{$\vect{p} - \vect{y} = (\num{0.7}, -\num{0.8}, \num{0.1}, 0,
   \ldots)$. The true class is pushed up by the $\num{0.8}$ of probability it
   is missing and every other class down by what it holds; the entries sum to
-  zero, which is the $\softmax$ Jacobian's row sums showing through.}
+  zero, which is the Jacobian's \emph{row} sums showing through \dash{} and
+  those are zero because $\softmax$ ignores a constant added to every score,
+  so raising all ten together cannot change the loss.}
 \item Why can you not check a $\softmax$ Jacobian by checking that it is
   diagonal?
   \answerto{Because it is not diagonal, and that is the point of it: every

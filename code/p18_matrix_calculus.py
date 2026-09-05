@@ -228,7 +228,18 @@ gap_jac = max(abs(J[i][j] - J_num[i][j])
 assert gap_jac < CHECK_CEILING, gap_jac
 emit("p18.jac.bound", bound(gap_jac))
 
-# Rows sum to zero: the probabilities sum to one however the scores move.
+# COLUMNS sum to zero, and that is the one the sum-to-one argument gives.
+# d(sum_i p_i)/dz_j is the sum DOWN column j, so "the probabilities sum to one
+# whatever the scores are" forces the column sums, not the row sums. The rows
+# sum to zero as well, for a different reason -- softmax is unchanged by adding
+# a constant to every score, so J times the all-ones vector is zero -- and the
+# two coincide only because J is symmetric, which is asserted immediately
+# below. The frame used to give the row sums the column argument, in the one
+# program whose whole subject is which index runs down the rows.
+col_gap = max(abs(sum(J[i][j] for i in range(N_OUT))) for j in range(N_OUT))
+assert col_gap < 1e-15, col_gap
+emit("p18.jac.colsum", bound(col_gap))
+
 row_gap = max(abs(sum(row)) for row in J)
 assert row_gap < 1e-15, row_gap
 emit("p18.jac.rowsum", bound(row_gap))
@@ -341,11 +352,27 @@ VOCAB = 50_000
 ops_two_step = VOCAB * VOCAB + VOCAB
 ops_fused = VOCAB
 emit("p18.vocab", VOCAB)
-emit("p18.fuse.twostep", sci(float(ops_two_step), 1))
+# FIVE DIGITS, NOT TWO, because the page prints this beside the ratio and a
+# reader divides them. At "2.5e+09" against 50000 the quotient is 50000, and
+# the page said 50001 -- the reproduce-from-the-printed-operands defect F04,
+# F05, P07, P12, P23 and P27 have each paid for. The count is n^2 + n, so the
+# +1 in the ratio is real and it is the operand that has to carry it.
+emit("p18.fuse.twostep", sci(float(ops_two_step), 5))
 emit("p18.fuse.fused", VOCAB)
 assert ops_two_step % ops_fused == 0
 emit("p18.fuse.ratio", ops_two_step // ops_fused)
-emit("p18.fuse.gib", round(VOCAB * VOCAB * 2 / 1024 ** 3))
+_printed = float(f"{float(ops_two_step):.5e}") / float(VOCAB)
+assert round(_printed) == ops_two_step // ops_fused, _printed
+
+# GB, NOT GiB, and the distinction is this book's own. VOCAB^2 * 2 is exactly
+# 5.0e9 bytes, which is 5 GB and 4.66 GiB; the old key computed GiB correctly
+# and then rounded it to 5, so the page printed the GiB label over what a
+# reader computes as the GB figure. That is precisely the confusion P03's
+# summary warns about, and P32 had to rename a MiB key for the same reason.
+_bytes = VOCAB * VOCAB * 2
+emit("p18.fuse.gb", round(_bytes / 10 ** 9))
+assert abs(_bytes / 1024 ** 3 - 4.66) < 0.01           # 4.66 GiB, not 5
+assert _bytes == 5 * 10 ** 9                           # exactly 5 GB
 assert ops_two_step / ops_fused > VOCAB, "the ratio is at least the vocabulary"
 
 
@@ -397,9 +424,29 @@ for _ in range(200):
         hi = mid
 emit("p18.cliff", round(hi))
 assert -760 < hi < -700, hi
+
+# AND WHERE exp ITSELF UNDERFLOWS, which is a DIFFERENT number and about one
+# unit lower. The bisection above finds where the softmax PROBABILITY rounds to
+# zero; between the two, exp is still returning a subnormal and it is the
+# division by the sum of the exponentials that finishes it off. The frame used
+# to say the exponential was zero at the first threshold, which is false over
+# the whole band between them -- and a reader who checks in a REPL, the reader
+# Program P01 trains them to be, finds it wrong.
+elo, ehi = -800.0, 0.0
+for _ in range(200):
+    emid = (elo + ehi) / 2
+    if math.exp(emid) == 0.0:
+        elo = emid
+    else:
+        ehi = emid
+emit("p18.cliff.exp", round(ehi))
+assert ehi < hi, (ehi, hi)             # exp survives lower than the ratio does
+assert math.exp(hi) > 0.0              # subnormal at the probability's cliff
 NOTES.append(f"the two-step gradient divides by zero once a logit falls about "
              f"{abs(round(hi))} below the largest; the fused one returns "
-             f"{fused_bad[BAD_TRUE]:.0f}")
+             f"{fused_bad[BAD_TRUE]:.0f}. exp itself survives to "
+             f"{round(ehi)}, so the band between them is the division "
+             "rounding a subnormal to zero")
 
 
 def main() -> None:
