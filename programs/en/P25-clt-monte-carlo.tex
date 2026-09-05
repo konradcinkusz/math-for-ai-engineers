@@ -1,4 +1,4 @@
-%% P25 --- Sums of random variables: the CLT, concentration and Monte Carlo
+%% P25 --- Sums of random variables: the CLT, concentration and initialisation
 %%
 %% THE ARGUMENT: one rate, 1/sqrt(n), governs an astonishing amount of
 %% practice, and the 1/sqrt(d_k) in attention is that rate wearing a different
@@ -37,8 +37,8 @@
 %% macro, number for number; tools/parity.py compares them. Every number comes
 %% from code/p25_clt_monte_carlo.py.
 
-\program{Sums of random variables: the central limit theorem, concentration
-and Monte Carlo}
+\program[Sums of random variables]{Sums of random variables: the central limit
+theorem, concentration and initialisation}
 \label{prog:P25}
 \index{central limit theorem}
 \index{concentration}
@@ -71,14 +71,15 @@ and Monte Carlo}
   \answerto{No. The theorem is about the middle, and the tail is the one
   question it does not answer \dash{} which is exactly where a tail
   probability gets used.}
-\item Attention divides its scores by $\sqrt{d_k}$. Where does that number
-  come from? \teachesat{30--33}
+\item An attention score is a dot product over $d_k$ terms, each with unit
+  variance. What is the spread of one such score, and what follows for the
+  $\softmax$? \teachesat{30--33}
   \answerto{From the variance of a dot product. With unit-variance entries
   each of the $d_k$ terms contributes $1$ and the variances add, so the score
   has variance $d_k$ and spread $\sqrt{d_k}$. Dividing by $\sqrt{d_k}$ returns
   it to $1$ at any head size.}
-\item A deep network produces \code{nan} on its first step. Name a cause that
-  has nothing to do with the data or the learning rate. \teachesat{48--52}
+\item A deep network produces \code{nan} on its first training step. What is
+  the first thing you would check? \teachesat{48--52}
   \answerto{The weight scale. Each layer multiplies the signal's variance by
   its fan-in times the weight variance, so a scale that is wrong by a factor
   compounds geometrically with depth \dash{} to nothing, or to overflow.}
@@ -119,8 +120,7 @@ nothing here is a limit or an approximation.
 \end{fr}
 
 \begin{fr}
-Now the question that says what the word \emph{independent} is doing, and most
-readers answer it wrongly at speed.
+Now the question that says what the word \emph{independent} is doing.
 
 Instead of throwing two dice, throw one and double it. That is also a total of
 two dice's worth. Is its variance the same
@@ -206,8 +206,10 @@ of outcomes and factorising it is a first probability course's exercise, and
 this program takes the result.
 
 The converse is false, and the book has already met the counterexample: a
-quantity and its own square, in Program~\ref{prog:P24}'s section on what a
-correlation does not see.
+quantity \emph{symmetric about zero} and its own square, in
+Program~\ref{prog:P24}'s section on what a correlation does not see. The
+symmetry is the whole of it \dash{} the die two frames above is not symmetric
+about zero, and its cross term with its own square is nowhere near zero.
 \end{rigourbox}
 \end{fr}
 
@@ -262,7 +264,8 @@ to practice.} An average concentrates on the thing it is estimating, and the
 speed at which it does is fixed: not by the quantity, not by the field, not by
 how carefully the data was collected, but by a square root of a count.
 
-Program~\ref{prog:P21} met it two parts ago and \emph{measured} it \dash{}
+Program~\ref{prog:P21} met it in the previous part and \emph{measured} it
+\dash{}
 twenty thousand values, four thousand trials at each batch size \dash{} while
 saying in a rigour box that the reason was here. This is the reason, and it is
 four lines of section 1.
@@ -334,32 +337,35 @@ Gaussian everywhere?
 
 \begin{fr}
 \begin{ansblock}
-Four, and by twelve it is within a fifth of a per cent.
+Three, and only barely; four is comfortably inside.
 \end{ansblock}
 
 Measured as the largest gap between the exact distribution and the Gaussian of
 the same mean and spread:
 
 \begin{center}
-\begin{tabular}{rrrr}
+\begin{tabular}{rrrrr}
 \toprule
-$n = 1$ & $n = 2$ & $n = 4$ & $n = \val{p25.clt.n.hi}$ \\
+$n = 1$ & $n = 2$ & $n = 3$ & $n = 4$ & $n = \val{p25.clt.n.hi}$ \\
 \midrule
-$\val{p25.clt.gap.1}$ & $\val{p25.clt.gap.2}$ & $\val{p25.clt.gap.4}$ &
-$\val{p25.clt.gap.12}$ \\
+$\val{p25.clt.gap.1}$ & $\val{p25.clt.gap.2}$ & $\val{p25.clt.gap.3}$ &
+$\val{p25.clt.gap.4}$ & $\val{p25.clt.gap.12}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-Four uniforms are already closer to a bell than most people would guess, and
-twelve are within a fifth of a per cent everywhere. What the script asserts is
-the \emph{ordering} rather than the four figures, because the ordering is the
+Three uniforms are already closer to a bell than most people would guess, and
+twelve are within a quarter of a per cent everywhere. What the script asserts
+is the \emph{ordering} rather than the figures, because the ordering is the
 theorem and the figures move with the grid.
+
+The convergence is fastest where it is cheapest: most of the distance is gone
+by three, and the eight further uniforms between there and twelve buy the last
+$\val{p25.clt.gap.3}$ of it.
 \end{fr}
 
 \begin{fr}
-Now the question this section exists for, and it is the one that turns a true
-statement into a wrong answer.
+Now the question this section exists for.
 
 A quantity is a sum of twelve independent pieces, so by the table above it is
 close to Gaussian. You want to know how often it exceeds five spreads. Can you
@@ -390,8 +396,8 @@ ratio & $\val{p25.tail.ratio1}$ & $\val{p25.tail.ratio3}$ &
 \end{tabular}
 \end{center}
 
-One spread out the Gaussian is right to a per cent. Five spreads out it is
-wrong by a factor of $\val{p25.tail.ratio5}$.
+One spread out the Gaussian is right to within about one and a half per cent.
+Five spreads out it is wrong by a factor of $\val{p25.tail.ratio5}$.
 \end{fr}
 
 \begin{fr}
@@ -439,7 +445,7 @@ what gets violated in practice rather than the conclusion. The theorem needs
 the pieces to be independent, to have a finite variance, and for none of them
 to dominate the sum. Heavy-tailed quantities fail the second; a sum over a
 population where one member is most of the total fails the third. In both
-cases the conclusion simply does not apply, and nothing in the arithmetic will
+cases the conclusion does not apply at all, and nothing in the arithmetic will
 warn you.
 \end{rigourbox}
 
@@ -466,7 +472,7 @@ tell them apart, because both produce a bell.
 
 % ============================================================
 \section{What an evaluation run costs}
-\label{sec:P25-monte-carlo}
+\label{sec:P25-eval-cost}
 \index{measurement!sizing an evaluation}
 \index{evaluation!how many items}
 
@@ -492,9 +498,11 @@ Which is a great deal wider than the two decimal places such a number is
 usually quoted to.
 
 A right-or-wrong has variance $p(1-p)$, so an average of $n$ of them has
-spread $\sqrt{p(1-p)/n}$, and the conventional interval is about two of those
-either side. Nothing here is sampled: it is one square root, and a reader can
-redo it on the back of the run's own log line.
+spread $\sqrt{p(1-p)/n}$, and the conventional interval is
+$\val{p25.eval.z}$ of those either side \dash{} which is where the customary
+$95$ per cent comes from, and why the figure is not quite two spreads.
+Nothing here is sampled: it is one square root, and a reader can redo it on
+the back of the run's own log line.
 
 Notice what $p(1-p)$ does, because it is the reason two benchmark numbers of
 the same size are not equally trustworthy. It is largest at a half and falls
@@ -535,8 +543,9 @@ accuracy chosen.
 \begin{fr}
 Now the question that decides a week of somebody's work.
 
-Two models are compared and one scores a percentage point above the other. How
-many items does each need to be evaluated on before that gap means anything?
+Two models scoring around $\val{p25.eval.p}$ are compared and one is a
+percentage point above the other. How many items does each need to be
+evaluated on before that gap means anything?
 
 Give an order of magnitude before reading on \dash{} the point of the question
 is the size, not the digits.
@@ -555,7 +564,9 @@ about is a difference}, and the difference of two independent estimates has
 the sum of their variances \dash{} section 1, in the last place anybody looks
 for it. So the interval that matters is $\sqrt{2}$ times the one on either
 model alone, and the item count is twice what a single interval suggests:
-$\val{p25.eval.n.naive}$ against $\val{p25.eval.n.needed}$.
+$\val{p25.eval.n.naive}$ against $\val{p25.eval.n.needed}$. Both are rounded
+up from counts that are not whole, which is why the second is one short of
+twice the first.
 \end{fr}
 
 \begin{fr}
@@ -563,10 +574,10 @@ $\val{p25.eval.n.naive}$ against $\val{p25.eval.n.needed}$.
 \textbf{Where this shows up.} Two lines of the same evaluation report behave
 completely differently under it.
 
-A benchmark number quoted as $\num{74.31}$ per cent on
-$\val{p25.eval.n.lo}$ items carries an interval of about
-$\pm\val{p25.eval.hw.100}$ points, so the last three of those digits are
-noise \dash{} and the leaderboard sorts on them anyway. Meanwhile a difference
+A benchmark number quoted as $\num{80.00}$ per cent on
+$\val{p25.eval.n.lo}$ items carries an interval of
+$\pm\val{p25.eval.hw.100}$ points, so both of those decimal places are noise
+\dash{} and the leaderboard sorts on them anyway. Meanwhile a difference
 of a point between two rows of that same table is, on that many items, not a
 difference at all.
 
@@ -637,29 +648,30 @@ does the dot product of two of those have?
 Because $d \times \frac{1}{d} \times \frac{1}{d} = \frac{1}{d}$, and the
 spread is its root.
 
-\textbf{Which this book has already measured}, under another name and three
-parts earlier. Program~\ref{prog:P05} asked how the cosine between two random
+\textbf{Which this book has already measured}, under another name and back in
+Part~III. Program~\ref{prog:P05} asked how the cosine between two random
 directions behaves as the dimension grows, and committed its spread at four
-dimensions.
+different dimensions.
 
 \textbf{The two are one theorem at two scalings}, and the derivation
 reproduces all four of P05's committed figures to within
 $\val{p25.p05.worst.pct}$ per cent \dash{} which the script checks, so the
 Part III measurement and this derivation cannot come apart.
 
-Put the two scalings side by side. Unnormalised entries give $\sqrt{d_k}$ and
-normalised ones give $1/\sqrt{d_k}$. What is the product, and what does it
-tell you to do?
+Back to the raw score, which has spread $\sqrt{d_k}$ at every head size. You
+want a spread of $1$ whatever the head size is. What do you divide by, and why
+can the divisor not be a constant?
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{$1$ \dash{} so divide by $\sqrt{d_k}$}
+\ans{By $\sqrt{d_k}$, and a constant cannot do it}
 
-Dividing a raw score by $\sqrt{d_k}$ is not a convention and not a
-constant somebody tuned. It is the step that carries you from the first
-scaling to a spread of one, at any head size.
+Dividing a raw score by $\sqrt{d_k}$ is not a convention and not a constant
+somebody tuned. The quantity being corrected \emph{grows with the head size},
+so any fixed divisor is right at one $d_k$ and wrong at every other; the
+divisor has to carry the $d_k$ because the thing it cancels does.
 \end{fr}
 
 \begin{fr}
@@ -680,8 +692,8 @@ What does a softmax do to a row whose entries are tens apart?
 It stops being a weighting and becomes a choice.
 \end{ansblock}
 
-Measured. This is the book's experiment E9, and it is the first of the ten to
-have been run \dash{} $\val{p25.e9.trials}$ trials at each head size:
+Measured. This is the book's experiment E9 \dash{} $\val{p25.e9.trials}$
+trials at each head size:
 
 \begin{center}
 \begin{tabular}{rrrrr}
@@ -703,8 +715,8 @@ $\val{p25.e9.maxent}$. At $d_k = \val{p25.e9.d.hi}$ the row is at
 $\val{p25.e9.raw.ent.512}$ of that, and one key takes
 $\val{p25.e9.raw.top.512}$ per cent of the weight.
 
-Now predict the same three columns \emph{with} the division, before turning
-over. Say what each does as $d_k$ grows.
+Now predict the same three columns \emph{with} the division, before you
+read on. Say what each does as $d_k$ grows.
 \dotline
 \nextframe
 \end{fr}
@@ -746,7 +758,7 @@ matrix anyway. It is also the whole of the story here: the off-diagonal terms
 describe weight moving between keys, and a row that has already given
 everything to one key has none to move.
 
-Evaluate it at the two top weights above.
+Evaluate it at $d_k = \val{p25.e9.d.hi}$, with the division and without it.
 \dotline
 \nextframe
 \end{fr}
@@ -828,26 +840,37 @@ The fourth name, and it is the one that costs people whole afternoons.
 
 A linear layer takes $n_{\text{in}}$ inputs, multiplies each by a weight and
 adds them up. That is a dot product again, so section 5's identity applies
-unchanged: the inputs are independent with some variance, the weights are
-independent with some variance, and the output is their sum.
+unchanged: the inputs are independent, the weights are independent and drawn
+about zero, and the output is their sum.
 
 Notice how the three quantities divide. The fan-in is a count and belongs to
-the architecture; the two variances belong to the initialiser and to whatever
-fed the layer. The identity holds them apart, which is why the design question
-below has one answer rather than a family of them.
+the architecture; the weight variance belongs to the initialiser and the
+inputs' size belongs to whatever fed the layer. The identity holds them apart,
+which is why the design question below has one answer rather than a family of
+them.
 
-Write down the variance of one output, in terms of the fan-in and the two
-variances.
+Write down the variance of one output, in terms of the fan-in, the weight
+variance, and the average of the input squared.
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{$n_{\text{in}} \times \Var(w) \times \Var(x)$}
+\ans{$n_{\text{in}} \times \Var(w) \times \Ex[x^{2}]$}
 
 The same three steps for the third time. The script enumerates it exactly at
 four fan-ins and three weight scales, so this is an identity rather than an
 approximation, exactly as the attention score was.
+
+\begin{note}
+\textbf{The second moment, and not the variance.} They are the same number
+when the input is centred, which the first layer's is, so the distinction
+costs nothing here and everything two sections down: a $\relu$ output is
+non-negative and therefore has a positive mean, so from the second layer on
+$\Ex[x^{2}]$ and $\Var(x)$ are different numbers. The script checks the
+identity over a centred input alphabet and a non-centred one, and on the
+second the variance reading is out by a factor of two.
+\end{note}
 
 And it immediately answers the design question. If you want a layer to pass a
 signal through without growing or shrinking it, you want that product to be
@@ -856,11 +879,11 @@ $1/n_{\text{in}}$ and nothing else.
 \end{fr}
 
 \begin{fr}
-\mermaidfig{p25-one-rate}{One identity, met under four different names.}%
-{sum, average, score, layer}
+\mermaidfig{p25-one-rate}{One identity, and where the root comes from.}%
+{sum, average, root}
 
-That is the whole of the program's spine, and the last section is what happens
-when the fourth instance is got wrong.
+That is the whole of the program's spine, and the rest of this section is what
+happens when the fourth instance is got wrong.
 \end{fr}
 
 \begin{fr}
@@ -916,7 +939,7 @@ to money.
 
 A network $\val{p25.init.depth}$ layers deep is built with
 $\Var(w) = 1/n_{\text{in}}$, the rule for a linear layer, and $\relu$ between
-them. What fraction of the signal reaches the top?
+them. What fraction of the signal's \emph{variance} reaches the top?
 \dotline
 \nextframe
 \end{fr}
@@ -955,10 +978,15 @@ of the same $\val{p25.init.depth}$ layers.
 Twice the scale is four times the \emph{variance}, so each layer multiplies
 the signal by $\val{p25.init.hot.factor}$ rather than by one.
 
-Program~\ref{prog:P01} says what a number of that size is in \code{fp16}: it
-is not a number. The run reports \code{nan} on its first step, and the
-first thing anybody does is halve the learning rate, which cannot help,
-because no gradient was ever involved.
+That is a variance, so the activation itself is around its root, and
+Program~\ref{prog:P01} says what either of them is in \code{fp16}: both are
+far above the format's ceiling of $\val{p01.fp16.max.exact}$, so both become
+\code{inf}. \code{inf} is an ordinary IEEE value with well-defined arithmetic;
+\code{nan} arrives one step later, the first time an \code{inf} meets a
+subtraction or a multiplication by zero \dash{} a $\softmax$'s max-subtraction,
+a normalisation, a loss. So the log says \code{nan} and the first thing
+anybody does is halve the learning rate, which cannot help, because no
+gradient was ever involved.
 \end{fr}
 
 \begin{fr}
@@ -1039,12 +1067,13 @@ neither is this book's.
   Gaussian. Measured exactly on sums of uniforms, worst gap
   $\val{p25.clt.gap.1}$ at $n = 1$ and $\val{p25.clt.gap.12}$ at
   $n = \val{p25.clt.n.hi}$}.}
-\sumitem{17--19}{\result{\textbf{And it is silent in the tail.} The Gaussian is right
-  to a per cent one spread out and wrong by
+\sumitem{17--20}{\result{\textbf{And it is silent in the tail.} The Gaussian
+  is right to within about one and a half per cent one spread out, and wrong by
   $\val{p25.tail.ratio5}$ times five spreads out; six spreads out the truth is
   exactly zero. The question the theorem answers worst is the one it is most
   used for}.}
-\sumitem{20--22}{\result{The hypothesis is what fails in practice: independence, a
+\sumitem{21--22}{\result{The hypothesis is what fails in practice:
+  independence, a
   finite variance, and no single piece dominating. \textbf{A Gaussian because
   a sum was involved is correct; a Gaussian because it looked bell-shaped is
   an assumption nobody checked.}}}
@@ -1052,16 +1081,17 @@ neither is this book's.
   interval of $\pm\val{p25.eval.hw.100}$ points, and four times the items
   halves it every time}.}
 \sumitem{26--27}{\result{Calling a $\val{p25.eval.gap.pct}$-point difference needs
-  $\val{p25.eval.n.needed}$ items per model \dash{} \textbf{twice}
-  $\val{p25.eval.n.naive}$, because the quantity in question is a
-  \emph{difference} and the variances of the two estimates add}.}
+  $\val{p25.eval.n.needed}$ items per model \dash{} \textbf{twice} the
+  $\val{p25.eval.n.naive}$ a single interval suggests, up to the rounding,
+  because the quantity in question is a \emph{difference} and the variances of
+  the two estimates add}.}
 \sumitem{30--32}{\result{An attention score is a sum of $d_k$ products of
   unit-variance entries, so $\Var = d_k$ and the spread is $\sqrt{d_k}$
   \dash{} enumerated exactly, with no limit theorem in it}.}
 \sumitem{32--33}{Program~\ref{prog:P05} measured the same theorem at the
   normalised scaling, $1/\sqrt{d}$, and the derivation reproduces its four
-  committed figures to $\val{p25.p05.worst.pct}$ per cent.
-  $\sqrt{d_k} \times 1/\sqrt{d_k} = 1$ \emph{is} the division.}
+  committed figures to $\val{p25.p05.worst.pct}$ per cent \dash{} one theorem
+  at two scalings, and a cross-check on both.}
 \sumitem{35--37}{\result{\textbf{E9, run.} Without the division, at
   $d_k = \val{p25.e9.d.hi}$ the row's entropy is
   $\val{p25.e9.raw.ent.512}$ of a possible $\val{p25.e9.maxent}$ and one key
@@ -1075,8 +1105,9 @@ neither is this book's.
   else.} A fixed constant cannot do the job, because the thing corrected grows
   with the head dimension}.}
 \sumitem{42--44}{\result{A layer's output has variance
-  $n_{\text{in}}\Var(w)\Var(x)$ \dash{} the same identity a fourth time
-  \dash{} so a linear layer holds its scale at
+  $n_{\text{in}}\Var(w)\Ex[x^{2}]$ \dash{} the same identity a fourth time,
+  and the \emph{second moment} rather than the variance, because a $\relu$
+  input is not centred \dash{} so a linear layer holds its scale at
   $\Var(w) = 1/n_{\text{in}}$}.}
 \sumitem{45--47}{\result{A $\relu$ keeps \textbf{exactly half} the second moment of a
   symmetric input, by symmetry and integrated to
@@ -1085,7 +1116,8 @@ neither is this book's.
   from}}.}
 \sumitem{48--52}{\result{Depth compounds it geometrically: over
   $\val{p25.init.depth}$ layers, half per layer leaves
-  $\val{p25.init.deep.xavier}$ of the signal and four per layer gives
+  $\val{p25.init.deep.xavier}$ of the signal's variance and four per layer
+  gives
   $\val{p25.init.deep.hot}$. \textbf{A divergence at step one is the
   initialisation, not the learning rate}, and one forward pass tells you
   which}.}
