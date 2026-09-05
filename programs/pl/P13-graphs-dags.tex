@@ -340,6 +340,22 @@ $\val{p13.big.ratio}$ razy za duża, by ją przechować.
 Może odwiedzić wierzchołek ponownie; spacer, który tego nie robi, to
 \emph{ścieżka}.
 
+To rozróżnienie nie jest formalnością. Potęga macierzy liczy każdy ciąg
+krawędzi, który układa się koniec przy końcu, a w iloczynie macierzy nie ma
+nigdzie arytmetyki, która mogłaby pominąć ciągi wracające do już użytego
+wierzchołka \dash{} iloczyn nie pamięta, gdzie był. Wszystko, co ta sekcja
+dowodzi, dotyczy więc spacerów z samej konstrukcji, a liczenie
+\emph{ścieżek} to problem istotnie trudniejszy, na który żadna potęga $A$
+nie odpowiada.
+
+A pytanie o spacery to prawie zawsze to pytanie, które masz. Pytanie, czy
+zmiana tutaj może dosięgnąć usługi oddalonej o $k$ kroków, albo jaką część
+grafu sygnał obejmie po $k$ rundach, jest pytaniem o ciągi krawędzi ułożone
+koniec przy końcu i o nic więcej: trasa, która zawraca, zmarnowała krok, a i
+tak dociera. Pytanie o ścieżki \dash{} ile jest różnych tras prostych
+\dash{} zadaje się rzadko i odpowiada na nie drogo, więc tania maszyneria,
+o której jest ta sekcja, celuje w to pytanie, które się pojawia.
+
 Teraz pytanie, na którym stoi cała sekcja. Wypisz wyraz $(i,j)$ macierzy
 $A^{2}$ jako sumę, używając wyłącznie definicji mnożenia macierzy:
 \[ (A^{2})_{ij} = \sum_{k} A_{ik}A_{kj} \]
@@ -385,6 +401,13 @@ do \code{log}?
 Dwie drogi przez \code{search}: przez \code{rank} i przez \code{store}.
 Odczytanie ich z $A^{3}$ nie wymaga ani szukania, ani przechodzenia grafu, a
 to samo mnożenie odpowiada na to pytanie dla wszystkich par naraz.
+
+Zanim odpowiesz na następne, zauważ dwie rzeczy w tym, jak jest postawione.
+Przekątna to ta część $A^{2}$, na którą nikt nie patrzy, bo \enquote{spacery
+z $i$ z powrotem do $i$} brzmią jak trywialność \dash{} a twierdzenie
+obejmuje ją bez wyjątku, więc cokolwiek ten wyraz mówi, jest wymuszone, a
+nie wybrane. I słowo \emph{nieskierowanym} jest nośne: odpowiedź zmienia
+się, gdy je pominąć, więc ustal, co to słowo kupuje, zanim się zdecydujesz.
 
 Oto drugie czytanie tego samego twierdzenia, warte chwili, bo tu ludzie się
 potykają. W grafie \emph{nieskierowanym} czym jest wyraz z przekątnej

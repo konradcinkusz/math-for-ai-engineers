@@ -108,7 +108,7 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1663 computed values, all referenced, all present, plus the committed console
+- 1665 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
@@ -133,7 +133,7 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **97 orphan-tail pages: 28 · 30 · 22 · 17** across `main-en`, `main-pl`,
+- **96 orphan-tail pages: 28 · 29 · 21 · 18** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`. **The passes that have taken the count DOWN are
   listed rather than counted**, because the tally that used to head this entry
   said *five* over a list of four and nothing could check it \dash{} which is
@@ -144,8 +144,11 @@ what was there before.
   pass is also a layout pass* is written into its note \dash{} the P01/P02
   review took one more off, in `main-pl-a4` alone, and the Part III review took
   two more, in `main-en` and `main-pl`, on a pass that added prose to six
-  programs and lengthened three frames twice over, and the Part~VI review took
-  two off the Polish builds on a batch that turned no leaf in any format. **Read \enquote{across two builds} literally**: the
+  programs and lengthened three frames twice over, the Part~VI review took
+  two off the Polish builds on a batch that turned no leaf in any format, and
+  the Part~IV review took one more \dash{} in `main-pl` and `main-en-a4`,
+  against one back in `main-pl-a4` \dash{} on the second consecutive batch to
+  move no page count at all. **Read \enquote{across two builds} literally**: the
   batch's own build failed at `check` on an orphaned cue, and `check-a4` does
   not run until `check` passes, so the A4 half of this ledger was not measured
   until the cue was cleared. A hard-gate failure in the trade builds hides every
@@ -15241,6 +15244,300 @@ a one-liner nobody has watched produce a known answer, so it is not what the
 number was taken from. The transcript count needed nothing \dash{} the Part~V
 batch had already moved it to $88$ when it split two listings, which is the
 one occasion in four that the instruction was followed.
+
+### Part IV review, P13 and P14, September 2026
+
+Issues \#127 and \#129, taken as one batch on the Foundation precedent that
+each PR costs a four-format build. This closes Part~IV, leaving Parts~VII,
+VIII and IX.
+
+#### THE FINDING: a missing term broke the theorem the section had just proved
+
+Program~\ref{prog:P13} \S3 proves that $A^{k}$'s non-zero entries are the pairs
+joined by a walk of length **exactly** $k$ \dash{} enumerated rather than
+argued, over $\val{p13.walk.checks}$ comparisons. Two frames later its aibox
+wrote a graph network as
+
+\[ X' = \sigma(AXW) \]
+
+and said $k$ layers let a vertex see **within** $k$ hops.
+
+**Both statements were on the page and they contradict each other**, and the
+resolution is a term that was missing from the formula. It is
+$\sigma((A + I)XW)$: the self-loop is what turns *exactly* into *within*,
+because a step spent on it stands still, so a walk of any length up to $k$ is
+padded out to $k$ and counted. Without it a layer replaces what a vertex knows
+with what its neighbours know rather than adding to it, and the reach claim is
+false by the section's own theorem.
+
+**So the defect is not that a formula was mis-transcribed from the
+literature.** The missing term is the one that makes the frame's own
+justification work, and the justification was three frames from a proof of the
+thing it needed. A reader who took the theorem seriously and applied it to the
+formula would have found the contradiction; a reader who took the formula on
+trust would have carried the wrong reach model into a design review.
+
+That is worth pairing with the Part~V batch's finding, because it is the mirror
+image: there a true claim carried the other axis's reason, and here a true claim
+carried a formula that refutes it. **Both are cases where nothing on the page is
+individually false and the page does not hold together**, and neither is
+reachable by any gate in this repository.
+
+#### A guarantee read as a probability, through a whole section
+
+Program~\ref{prog:P14} \S5 is built on a bound holding \enquote{with
+probability at least $\val{p14.conf}$ per cent}, used $\val{p14.uses}$ times.
+It then asked \emph{what is the chance all of them hold} and answered
+\emph{about $\val{p14.allhold}$ per cent}.
+
+**\enquote{At least} is a floor, so the product is a floor**, and the
+guarantee gives nothing better \dash{} the true probability can be anything
+from that floor up to one. The section had converted a lower bound into an
+equality and then reasoned with the equality: the frame, its answer block, the
+Quiz item, its Appendix~A answer, the table's two row labels and the Summary
+item all said \emph{the chance}.
+
+The corrected reading is stronger rather than weaker, which is what makes it
+worth the six edits. What the arithmetic licenses is that **the guarantee
+permits a false statement among the twenty more often than not**, and nothing
+in the paper marks which \dash{} which is the sentence the section wanted, and
+is true of a floor where the original was a claim about a distribution nobody
+had.
+
+It is the recorded class one level up: a quantifier right about the ensemble
+and false about a member has now been joined by **a bound read as a value**.
+Both are true statements narrowed by a word nobody carried through.
+
+#### The universal approximation theorem, quoted without two of its hypotheses
+
+The same program states the UAT and asks the reader to name its parts. It had
+\enquote{every continuous function on a bounded region}, and the theorem needs
+**closed**; it named no activation at all, and the theorem needs one that is
+**not a polynomial**.
+
+**Both are falsifiable in one line, which is why they are hypotheses and not
+scenery.** A continuous function on an interval with its ends left off need not
+be bounded, and $1/x$ on $\intoo{0}{1}$ takes every value above $1$, so no
+network of any size comes within any $\varepsilon$ of it. And with the identity
+activation a one-hidden-layer network is affine in its input, so the best
+approximation to $x^{2}$ on $\intcc{0}{1}$ is $x - \frac{1}{8}$ and its worst
+error is exactly $\frac{1}{8}$ \dash{} $\varepsilon = \num{0.1}$ is out of
+reach however many units are added.
+
+In the program whose \S1 counts the hypotheses as one of the three parts of a
+theorem, quoting one without them is the program's own subject arriving in its
+own worked example. Both are now on the page with their counterexamples, and
+the quantifier frame that follows names the activation among the things the
+network is allowed to depend on.
+
+#### A claim about a corpus that needs a property nobody stated
+
+\S1's payoff said finding the connected components is how a corpus gets
+deduplicated \dash{} keep one document from each. **That is exactly right when
+\enquote{is a duplicate of} is transitive, and near-duplicate matching usually
+is not.** $A$ can match $B$ and $B$ match $C$ while $A$ and $C$ have nothing in
+common, so a component chains together documents no pair of which matched, and
+a deduplication pass quietly removes a whole topic.
+
+The failure is invisible from inside the job: the component is correctly
+computed, the documents in it were correctly matched pairwise, and every step
+is right. It is Program~\ref{prog:P33}'s shape \dash{} a correct computation of
+the wrong quantity \dash{} arriving in the one place this program claims a
+production payoff.
+
+#### Also, and every one is a claim narrower than the sentence it sat in
+
+- **\enquote{The list wins on all three}** \dash{} it loses the third. The
+  matrix answers \emph{is there an edge from $u$ to $v$} in one step where the
+  list walks $u$'s neighbours, $\val{p13.big.avgdeg}$ of them on average at
+  the section's own scale. That is the matrix's only win, and paying for it in
+  whole rows is why nobody buys it, which is a better sentence than the one
+  that claimed a clean sweep.
+- **The cycle needed both of its clauses.** \enquote{Without retracing an
+  edge} alone lets through two loops joined at a single point, walked as one
+  closed route: it repeats no edge and it is a pair of cycles rather than one.
+  The vertex clause excludes it, and the two clauses exclude different things.
+- **A row-stochastic matrix needs a positive row sum.** A vertex with no
+  outgoing edges has nothing to divide and its row stays all zeros \dash{}
+  which is the dangling-vertex case the section measures three frames later,
+  and the definition had not admitted it could arise.
+- **Program~\ref{prog:F10} said nothing about graphs.** It gave the set, and
+  the sentence crediting it with \enquote{a graph is a set plus a relation}
+  was the recorded class once more. What this program needs beside the set is
+  a set of pairs of its members, and everything else follows from those two.
+- **\emph{Node} and \emph{vertex} were both in use**, in one program, in the
+  Quiz and in two answer keys. One word throughout; the other is not wrong and
+  is not the one the rest of the book uses.
+- **Two Summary items and one aibox stripped of repository jargon**, and one
+  aibox's forward pointer aimed at what a random walk settles rather than at
+  attention, which is not what \S5 computes.
+
+#### The hyphen defect, and a sweep that was as wide as the directory it ran in
+
+Appendix~B's Polish text carried a source-line break inside a hyphenated word,
+so `polsko-angielska` printed as **`polsko- -angielska`**. The Part~V batch
+found this class in a program, fixed it, and recorded a sweep that came back
+clean.
+
+**That sweep covered `programs/` and this instance is in `appendices/`.**
+Dated by `git log -S` to `c2e8761`, the notation-contract commit, which is to
+say it has been on the page since scaffolding and survived every pass since.
+
+Re-swept here over `programs/`, `appendices/` **and** `frontmatter/`: one
+candidate and zero defects, the candidate being a minus sign inside maths. So
+the class is now clear book-wide, measured rather than remembered.
+
+It is Program~\ref{prog:P27}'s finding in a third place \dash{} **a sweep is as
+wide as the artefact somebody thought to open** \dash{} and the two previous
+instances were a section of a notes file and the artefacts that existed when a
+fix ran. This one is a *directory*, which is the cheapest of the three to get
+wrong, because the sweep's command line looks complete.
+
+#### Two claims I refused to write into this note
+
+Both came out of the batch's own record rather than out of the book, and both
+were checked before being written down rather than after.
+
+- **A count of hyphen candidates that disagreed with itself** between two runs.
+  Rather than reconcile two remembered numbers, the sweep was re-run over all
+  three directories and the answer is above. **A count of occurrences is the
+  class this file forbids**, and a disagreeing pair of them is not evidence for
+  either.
+- **That the first commit \enquote{silently fixed several findings and named
+  none}.** Reading its message shows it names them. The claim was written from
+  the feel of a large diffstat, which is exactly how this file's oldest class
+  gets in \dash{} and the instrument that settles it is `git show`, which costs
+  one command.
+
+#### Process, and three recorded traps firing
+
+- **The background-exit trap fired again.** The harness reported a build
+  complete and the log's own line said what had happened; the recorded habit
+  \dash{} read the log's `MAKE_EXIT` line, never the notification \dash{} is
+  the whole of what separated the two.
+- **`check` failing withheld the A4 ledgers, twice.** `make check-a4` does not
+  run until `make check` passes, so two of this batch's rounds measured the
+  trade pair and reported nothing about A4. It is the ledger entry this file
+  already carries, and it is worth restating as a rule for a cue walk: **a
+  round that ends red has told you about the builds upstream of the gate and
+  nothing about the ones after it.**
+- **This file's value ledger was stale for the fifth time.** $1663$ against
+  `make debt`'s $1665$, and the shape was identical to the four before it: the
+  gated copy in `figures/values/appf.tex` was caught by `make verify` and the
+  ungated sentence four hundred lines up was not. `make verify` also caught
+  `appf.tex` itself two values stale from this batch's own first commit, before
+  any PDF was built, which is the argument for that appendix demonstrated once
+  more.
+
+#### The diagram measurement, discharged exactly
+
+The first commit's message recorded that five reworked Mermaid sources still
+owed a width measurement. Rendered and measured with `pdfinfo`: **all five at
+$\num{657.12}$ pt**, which is mermaid's own wrap cap and where a third of the
+book's figures already sit. Exact rather than merely inside the band, so no
+redesign and no rule-2 re-measurement was needed.
+
+Read by content first \dash{} node, caption and manifest copy \dash{} against
+the frames on either side. None carries an answer to a question put beside it.
+
+#### The cue walk, and a hand-off between the two trade builds
+
+| round | edit | result |
+|---|---|---|
+| 1 | \dash{} | one orphaned cue in `main-en`, P13's DAG frame |
+| 2 | that frame lengthened, both editions | `main-en` cleared, **`main-pl` gained one** on the same frame |
+| 3 | the same frame lengthened again | clean, all four |
+
+The Part~III and Part~V batches each recorded this hand-off between the two
+**A4** builds, on a frame they had just lengthened. This is the first time it
+has happened between the two **trade** builds, and the mechanism is the same
+one: the two editions set the same paragraph in different numbers of lines, so
+a tail pushed clear of a boundary in one lands near it in the other.
+
+Every round was a **lengthening**, in both editions; no recorded attempt to
+clear an orphaned cue by lengthening has failed. Round 2's paragraph earns its
+place by saying what the vertex clause excludes that the edge clause does not,
+and round 3's by saying that a wasted step still arrives \dash{} which is the
+sentence the frame's own question turns on.
+
+**And round 2's Polish paragraph shipped with a doubled word**, `krok i i tak`,
+which the prose detector does not look for: it reports joins, new over-long
+lines and lost paragraph breaks, and a duplicated short word is none of the
+three. Caught by reading the paragraph rather than by any instrument, and fixed
+with an assertion on the substitution so the edit could not silently miss.
+
+#### Layout: two consecutive batches have now moved no page count at all
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1435 | 1435 | `[]` | 0 |
+| `main-pl` | 1460 | 1460 | `[]` | 0 |
+| `main-en-a4` | 1194 | 1194 | `[6.3]` | 0 |
+| `main-pl-a4` | 1210 | 1210 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and, after the three rounds above, no orphaned cues.
+
+**No page count moved in any format, for the second batch running**, so the
+recorded tell applies and was tested rather than waved through. Two
+instruments, on the Part~VI precedent: the four PDFs are minutes old against
+`date -u` rather than carried over, and both editions' round-2 paragraph is
+present in the finished files under `pdftotext`. A build that never ran and a
+build that changed nothing report identically, and only the second is
+consistent with both.
+
+**And the orphan tails went 97 to 96**: 28, 29, 21, 18 against 28, 30, 22, 17.
+Down one in `main-pl` and `main-en-a4`, up one in `main-pl-a4`, level in
+`main-en`. This batch joins the list of passes that have taken that ledger
+down; the list is the record and no ordinal is written here, which is the
+correction the Part~III review earned when this entry's own tally said five
+over a list of four.
+
+**The transcript guard fired 9 / 10 / 7 / 12**, against 8 / 9 / 6 / 11 in each
+of the Part~V and Part~VI batches \dash{} up one in every build, on a batch
+that split no listing. **The cause is not established and is deliberately not
+guessed at here.** A firing is a page turned rather than a split repaired, and
+after the first turn everything downstream moves, so a uniform $+1$ is as
+consistent with one earlier listing changing its page as with anything about
+this batch's own prose. It is recorded as a measurement and labelled as
+judgement about its cause, which is what this file asks of a reading of a
+mechanism.
+
+#### Gates
+
+Every source gate run **before** the build, which is Program~\ref{prog:P33}'s
+rule and the eighth pass running: parity $56$ file pairs / $1864$ frames /
+$0$ failures and $0$ warnings; `--frames --answers --outcomes --values
+--elicit --scripts --terms --parts` green; `gen_stubs --check` current;
+`reflist` $492$ labels in each edition and $0$ mismatches. The elicitation rate
+is unmoved at $1028/1864$, because the batch converted nothing and added no
+frame.
+
+#### Recorded rather than taken
+
+Eleven page-level findings across the two issues, all book-wide layout, which
+is the P05 review pass's standing precedent \dash{} the next person meets the
+obstacle with the reasoning rather than rediscovering it:
+
+- the \enquote{Can you?} heading stranded with its table overleaf, and the Quiz
+  heading and instruction stranded with the questions overleaf. **Sixth batch
+  running that this has been recorded**, and the Part~V batch's diagnosis
+  stands: the `quiz` room test of $8\baselineskip$ and the box's own
+  `lines before break=12` disagree, so there is a window in which the reserve
+  passes and the box then moves whole \dash{} and `checkpdf`'s heading check
+  learns the **numbered** heading's size from the document, so a `\section*`
+  left behind is invisible to it. **The instrument is owed before the sweep**;
+- a trap box and a Quiz box each broken across a page turn, and a box opening a
+  page with no badge and no lead-in. The continuation mark the Part~V batch
+  shipped marks these; stopping them is the room test above;
+- a Further problem alone on a page, a transcript set smaller than the body,
+  the \enquote{Can you?} rows set tight, stretched white space beside a figure,
+  and a blank verso carrying a running head \dash{} the last found and
+  deliberately left in the F04 review pass for the reason recorded there.
 
 ### Stroud layout pass, August 2026
 

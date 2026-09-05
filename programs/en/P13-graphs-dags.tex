@@ -341,6 +341,22 @@ $\val{p13.big.ratio}$ times too large to store.
 A \textbf{walk} of length $k$ is a sequence of $k$ edges laid end to end. It
 may revisit a vertex; a walk that does not is a \emph{path}.
 
+The distinction is not a nicety. A matrix power counts every sequence of
+edges that fits end to end, and there is no arithmetic anywhere in a matrix
+product that could skip the sequences which come back to a vertex they have
+already used \dash{} a product has no memory of where it has been. So
+everything this section proves is about walks by construction, and counting
+\emph{paths} is a genuinely harder problem that no power of $A$ answers.
+
+And the walk question is nearly always the one you have. Asking whether a
+change here can reach a service $k$ steps away, or how much of the graph a
+signal touches after $k$ rounds, is asking about sequences of edges laid end
+to end and nothing more: a route that doubles back has wasted a step and
+still arrives. The path question \dash{} how many distinct simple routes are
+there \dash{} is the one that is rarely asked and expensively answered, so
+the cheap machinery this section is about is pointed at the question that
+comes up.
+
 Now the question the whole section rests on. Write out the $(i,j)$ entry of
 $A^{2}$ as a sum, using nothing but the definition of matrix multiplication:
 \[ (A^{2})_{ij} = \sum_{k} A_{ik}A_{kj} \]
@@ -386,6 +402,13 @@ the gateway to \code{log}?
 The two routes through \code{search}: by way of \code{rank} and by way of
 \code{store}. Reading them off $A^{3}$ takes no search and no traversal, and
 the same multiplication answers the question for every pair at once.
+
+Before you answer the next one, notice two things about how it is put. The
+diagonal is the part of $A^{2}$ nobody looks at, because \enquote{walks from
+$i$ back to $i$} sounds like a triviality \dash{} and the theorem covers it
+with no exception, so whatever the entry says is forced rather than chosen.
+And the word \emph{undirected} is load-bearing: the answer moves if you drop
+it, so work out what that word is buying before you commit.
 
 Here is a second reading of the same theorem, worth a moment because it is
 where people slip. On an \emph{undirected} graph, what is the diagonal entry
