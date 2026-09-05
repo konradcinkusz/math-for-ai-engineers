@@ -390,13 +390,28 @@ NOTES.append("the optimum is sqrt(L) exactly, from d/dk (L/k + k) = 0")
 
 def main() -> None:
     TRANSCRIPTS.mkdir(parents=True, exist_ok=True)
-    lines = [
+    # TWO listings, and the split is the whole point of this pass. The second
+    # block IS the answer frame 34 elicits -- a.grad printed as 5.0 with
+    # b.v = 99.0 two lines above it -- and it used to sit in frame 31, four
+    # frames earlier and on the facing page of the same spread, where no
+    # covering hand reaches. P23 split its own listing for exactly this and
+    # P08 did it again; here the ReLU half stays where section 5's first
+    # failure is demonstrated and the in-place half moves after frame 35's
+    # answer, where it confirms rather than reveals. Each imports what it
+    # calls, so either runs pasted into a REPL on its own.
+    relu_lines = [
         ">>> from p16_autodiff import V, relu, backward",
         ">>> x = V(0.0)",
         ">>> y = relu(x)",
         ">>> backward(y)",
         ">>> x.grad",
         f"{z.grad}",
+    ]
+    (TRANSCRIPTS / "p16-relu.txt").write_text(
+        "\n".join(relu_lines) + "\n", encoding="utf8")
+
+    inplace_lines = [
+        ">>> from p16_autodiff import V, backward",
         f">>> a, b = V({A0}), V({B0})",
         ">>> p = a * b",
         f">>> b.v = {OVERWRITE}",
@@ -404,8 +419,8 @@ def main() -> None:
         ">>> a.grad",
         f"{stale}",
     ]
-    (TRANSCRIPTS / "p16-silent.txt").write_text(
-        "\n".join(lines) + "\n", encoding="utf8")
+    (TRANSCRIPTS / "p16-inplace.txt").write_text(
+        "\n".join(inplace_lines) + "\n", encoding="utf8")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     out_lines = [

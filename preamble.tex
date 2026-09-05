@@ -143,6 +143,14 @@
   }%
 }{}
 
+% ONE HYPHENATION EXCEPTION, and it is here rather than in a program because a
+% hyphenation exception is a property of the document's patterns. TeX offered
+% "implement-ation" in P16, which is not the standard division
+% (im-ple-men-ta-tion) and which draws the eye to the break rather than to the
+% bolded phrase it sat inside. Adding it CAN move one line break, so measure
+% the multiset after touching this list rather than assuming it is free.
+\hyphenation{im-ple-men-ta-tion im-ple-men-ta-tions}
+
 % babel-polish makes " an active shorthand. listings reads its body verbatim
 % and an active character in a verbatim context is a category-code accident
 % waiting to happen, so the shorthand is turned off globally. Polish quotation
