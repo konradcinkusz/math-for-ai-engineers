@@ -150,10 +150,10 @@ Now the other one. $\frac{\partial f}{\partial y}$, holding $x$ still.
 \begin{fr}
 \ans{$x^{2} + 3$}
 This time $x^{2}$ is the constant multiplying $y$, so it survives as itself,
-and $3y$ differentiates to $3$.
+and $3y$ differentiates to $3$, so the second term survives too.
 
 \begin{trapbox}
-Look at what just happened to the two answers. $\frac{\partial f}{\partial x}$
+Look at what has happened to the two answers. $\frac{\partial f}{\partial x}$
 still has a $y$ in it and $\frac{\partial f}{\partial y}$ still has an $x$.
 
 \textbf{Holding an input still does not remove it from the answer.} It is
@@ -271,8 +271,8 @@ without a caveat.
 
 \begin{fr}
 One more property before it is used. Program~\ref{prog:F11} said the
-derivative of a constant is zero. What is the gradient at a point where $f$
-has a minimum?
+derivative is zero at the bottom of a curve. What is the gradient at a point
+where $f$ has a minimum, and why must \emph{every} component vanish?
 \nextframe
 \end{fr}
 
@@ -325,6 +325,9 @@ $u$, see how much $f$ changed, divide by $h$, and shrink $h$.
 \end{ansblock}
 
 \[ D_u f = \lim_{h \to 0} \frac{f(\vect{p} + h u) - f(\vect{p})}{h} \]
+Here $\vect{p}$ is the point you are standing at, written as a vector so that
+$\vect{p} + hu$ means a step of length $h$ from it; the book keeps that letter
+for a point from here on.
 
 It is the same limit, on the one-variable function you get by walking along a
 straight line through the point. Nothing new has been defined; a direction has
@@ -363,7 +366,27 @@ circle, computes the limit numerically for each and compares it against the
 dot product. The worst disagreement anywhere is under
 $\val{p15.dir.bound}$.
 
-\transcript{p15-directional}
+\begin{rigourbox}
+\textbf{\enquote{The limit is linear in the direction} is a hypothesis, not an
+observation.} It is what \emph{differentiable at the point} means, and it is
+doing all the work in the step above. Having both partial derivatives is not
+enough on its own.
+
+The standard counterexample is worth seeing once, because it is nastier than
+it looks:
+\[ f(x, y) = \frac{x\,y^{2}}{x^{2} + y^{4}}, \qquad f(0, 0) = 0 \]
+Both partials at the origin are zero, because $f$ is zero along each axis. So
+the dot product predicts a rate of zero in every direction. The rate along a
+unit direction $(a, b)$ with $a \neq 0$ is in fact $b^{2}/a$, which the script
+checks at three directions \dash{} unbounded as $a$ shrinks, and zero only
+along the $x$ axis.
+
+Every function this book differentiates is differentiable where it does so, so
+the identity holds throughout. What differentiability is, and how to check it,
+is a first course in analysis.
+\end{rigourbox}
+
+\transcript{p15-gradient}
 
 \mermaidfig{p15-any-direction}{One number per direction, and where it comes
 from.}{any direction}
@@ -387,9 +410,10 @@ $\val{p15.fx.at} \times \num{0.6} + \val{p15.fy.at} \times \num{0.8} =
 $\num{0.6}^{2} + \num{0.8}^{2} = 1$.
 \end{ansblock}
 
-Which is the number the listing above prints, and it is smaller than the
-gradient's own length of $\val{p15.grad.len}$. That is not a coincidence and
-the next section is about why.
+\transcript{p15-directional}
+
+It is smaller than the gradient's own length of $\val{p15.grad.len}$. That is
+not a coincidence and the next section is about why.
 
 \begin{note}
 The $3$--$4$--$5$ triangle is why $(\num{0.6}, \num{0.8})$ is a unit vector,
@@ -461,9 +485,14 @@ was a number chosen to make a check pass rather than a statement about the
 mathematics.
 
 What is asserted now is a pair \dash{} that no direction beats the gradient,
-which is exact and is Program~\ref{prog:P05}'s inequality; and that the
-sampled best falls short by no more than the resolution. The second turns the
+which is exact because $\cos\theta$ is never above $1$; and that the sampled
+best falls short by no more than the resolution. The second turns the
 shortfall from an embarrassment into an explanation.
+
+The first half used to be attributed to an inequality of
+Program~\ref{prog:P05}'s, and this book states no such inequality anywhere.
+What it has is the identity above, and a cosine that cannot exceed one, which
+is all the argument needs.
 \end{note}
 \end{fr}
 
@@ -592,9 +621,10 @@ It moves in the direction of the \emph{negative} gradient, and this is the
 single most common sign error in a hand-written training loop.
 
 It is worth seeing what it costs rather than being told. At the point
-$(\val{p15.zig.start.x}, \val{p15.zig.start.y})$ on the bowl below, the value
-is $\val{p15.sign.before}$. One small step against the gradient takes it to
-$\val{p15.sign.down}$. One small step \emph{with} the gradient takes it to
+$(\val{p15.zig.start.x}, \val{p15.zig.start.y})$ on the bowl the next frame
+writes down, the value is $\val{p15.sign.before}$. One step of size
+$\val{p15.sign.eta}$ against the gradient takes it to $\val{p15.sign.down}$.
+One step of the same size \emph{with} the gradient takes it to
 $\val{p15.sign.up}$.
 
 Nothing raises an error. The loop runs, the numbers are finite, and the loss
@@ -610,23 +640,42 @@ $\val{p15.lam.lo}$, so its contours are ellipses
 $\val{p10.basin.axisratio}$ times longer than they are wide. That is a
 valley: steep across, shallow along.
 
+Written out, it is
+\[ f(x, y) = \tfrac{1}{2}\left(\val{p15.lam.hi}\,x^{2}
+   + \val{p15.lam.lo}\,y^{2}\right),
+   \qquad
+   \nabla f = (\val{p15.lam.hi}\,x,\; \val{p15.lam.lo}\,y) \]
+and every number in this section comes from those two expressions, so a reader
+who wants to check one has everything needed to.
+
+\textbf{The half is not decoration.} Section~\ref{sec:P15-steepest} wrote a
+quadratic as $ax^{2} + by^{2}$, whose gradient is $(2ax, 2by)$ \dash{} so
+there the coefficient is half the curvature and the two conventions differ by
+a factor of two in every gradient. With the half in front, the coefficients
+\emph{are} the eigenvalues, the gradient is each eigenvalue times its own
+coordinate, and a step multiplies that coordinate by $1 - \eta\lambda$ rather
+than by $1 - 2\eta\lambda$. That is the form the rest of this section and the
+whole of Program~\ref{prog:P17} are written in, and it is why it is worth
+paying the half.
+
 This program uses that same bowl rather than inventing another, and the script
 reads P10's committed numbers and fails the build if they have moved.
 
 Start at $(\val{p15.zig.start.x}, \val{p15.zig.start.y})$, which is off both
-axes. Before computing anything: does the negative gradient there point at the
-minimum?
+axes. Section~\ref{sec:P15-steepest} has already settled whether the negative
+gradient there points at the minimum, so the question worth asking is the
+other one. Before computing anything: roughly how far off is it \dash{} a
+degree or two, or something you would notice?
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{No \dash{} it is $\val{p15.zig.angle}$ degrees away from it}
+\ans{$\val{p15.zig.angle}$ degrees away from it.}
 The minimum is at the origin, so the direction home is straight back along the
 line you are on. The negative gradient is perpendicular to the contour
 instead, and on an ellipse those are two different directions.
 
-\textbf{Forty-two degrees is not a rounding error, it is nearly half a right
-angle.} The steering is not slightly off; it is pointing somewhere else
+\textbf{That is not a rounding error, it is nearly half a right angle.} The steering is not slightly off; it is pointing somewhere else
 entirely, and it is doing so for a reason that is now completely understood
 rather than mysterious.
 
@@ -663,8 +712,9 @@ It crosses $\val{p15.zig.crossings}$ times in $\val{p15.zig.steps}$ steps
 far as it moves.
 \end{ansblock}
 
-$\val{p15.zig.pathlen}$ of path to cover $\val{p15.zig.moved}$ of ground.
-Nearly seven-eighths of the walking is sideways.
+$\val{p15.zig.pathlen}$ of path to cover $\val{p15.zig.moved}$ of ground, so
+$\val{p15.zig.sideways.pct}$ per cent of the walking is sideways \dash{} which
+is the two figures above divided, and the script checks that it is.
 
 \begin{note}
 The measure is distance travelled against distance \emph{covered}, not against
@@ -674,8 +724,13 @@ twenty steps it has not arrived, so it has travelled less than the whole way
 home. That says something about the step size and nothing about the direction.
 
 Path over displacement is $1$ for any straight path however far it gets, which
-is exactly the property this section is about, and it is $1$ for the round
-bowl to the last bit.
+is exactly the property this section is about, and it is $1$ for the round bowl
+to the last bit \dash{} the control being run at
+$\lambda = \val{p15.lam.lo}$, so that $1 - \eta\lambda$ is positive and each
+step lands short of the centre rather than past it. Raise the step above
+$1/\lambda$ and the walk still converges and still never leaves the line, but
+it lands on the far side every step, so the path stops equalling the
+displacement while the direction is as exact as ever.
 \end{note}
 \end{fr}
 
@@ -696,8 +751,8 @@ $\eta = \val{p15.zig.eta}$, work out that factor for the steep direction
 \ans{$\val{p15.fac.hi}$ and $\val{p15.fac.lo}$}
 And there is the zig-zag, in the signs. The steep coordinate is multiplied by
 a \emph{negative} number, so it changes side every single step while shrinking
-by a fifth. The shallow one is multiplied by a positive number just under one,
-so it creeps towards zero without ever crossing.
+by a fifth. The shallow one is multiplied by a positive number a little under
+one, so it creeps towards zero without ever crossing.
 
 \textbf{One direction overshoots and one crawls, and the same step size is
 responsible for both.} Make the step small enough to stop the overshooting and
@@ -714,8 +769,8 @@ where the boundary is.
 And the fix is Program~\ref{prog:P20}'s. Momentum averages the recent steps,
 so the sideways components \dash{} which alternate in sign \dash{} cancel
 against each other while the forward ones \dash{} which do not \dash{} add up.
-That sentence is only obvious once you have seen this picture, which is why
-this program produces the problem and leaves it standing.
+That sentence needs the alternating sign this section has just measured,
+which is why this program produces the problem and leaves it standing.
 \end{rigourbox}
 \end{fr}
 
@@ -769,7 +824,8 @@ Trust the algebra here and distrust the mental image, in that order.
 \sumitem{8--9}{\result{\textbf{The gradient is the partials written as a vector},
   $\nabla f$, with a length as well as a direction \dash{} here
   $\val{p15.grad.len}$}.}
-\sumitem{9}{\result{\textbf{The word does two jobs.} Programs F06 and F11 use
+\sumitem{9}{\result{\textbf{The word does two jobs.} Programs~\ref{prog:F06}
+  and~\ref{prog:F11} use
   \enquote{gradient} for the slope of a line, a single number; here it is a
   vector with one component per input}.}
 \sumitem{10--11}{\result{It is written as a vector \textbf{so that it can be dotted
@@ -787,7 +843,7 @@ Trust the algebra here and distrust the mental image, in that order.
   asserted}.}
 \sumitem{23--24}{\result{At $\cos\theta = 0$ the rate is zero, so \textbf{the
   gradient is perpendicular to the contour} \dash{} the same equation read at
-  its other end, exactly zero over $\val{p15.perp.trials}$ rational cases}.}
+  its other end}.}
 \sumitem{25--26}{The perpendicularity is checked \textbf{exactly over the
   rationals}, with no tolerance anywhere, because a claim containing the word
   \emph{perpendicular} is a claim about an exact zero.}
@@ -847,12 +903,17 @@ Trust the algebra here and distrust the mental image, in that order.
   comparing rulers rather than slopes. The unit requirement is what makes the
   number a property of the surface.}
 \item On a bowl with contours that are circles, how many times does gradient
-  descent cross from one side to the other before arriving?
-  \answerto{None, for any step size that converges at all. The negative
-  gradient points exactly at the centre, so every step is along the same
-  straight line and the path is $1$ times its own displacement \dash{} which
-  the script asserts exactly. Crossing needs the contours to be non-circular,
-  and that is the whole content of section 5.}
+  descent cross from one side to the other before arriving \dash{} and what
+  does your answer depend on?
+  \answerto{None, provided $\eta < 1/\lambda$, so that $1 - \eta\lambda$ is
+  positive. The negative gradient points exactly at the centre, so every step
+  is along the same straight line and the path is $1$ times its own
+  displacement \dash{} which the script asserts exactly, at a step of that
+  size. \textbf{It is not true for every converging step.} Between $1/\lambda$
+  and $2/\lambda$ the walk converges and still never leaves the line, but each
+  step lands past the centre, so it crosses on every one of them. Crossing the
+  valley \emph{sideways} is the different thing, it needs the contours to be
+  non-circular, and that is the whole content of section 5.}
 \end{testexercises}
 
 \begin{furtherproblems}
@@ -892,6 +953,12 @@ Trust the algebra here and distrust the mental image, in that order.
   perpendicular points from the centre. The script checks exactly that, by
   sweeping the ratio and asserting the angle increases at every step \dash{}
   which is the invariant, where any single angle would be a fact about one
-  bowl. It cannot grow past a right angle, because the step would then be
-  going uphill.}
+  bowl.
+
+  \textbf{It does not grow without limit, and the ceiling is not a right
+  angle.} From this start point it climbs towards $45$ degrees, which is the
+  angle between $(\lambda, 1)$ and $(1, 1)$ as $\lambda$ runs away, and the
+  script asserts that too. What holds on any convex bowl is that the angle
+  stays \emph{acute}, because $\nabla f \cdot \vect{p} = 2f$, which is
+  positive anywhere but the minimum.}
 \end{furtherproblems}

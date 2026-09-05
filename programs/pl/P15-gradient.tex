@@ -153,11 +153,11 @@ Teraz druga. $\frac{\partial f}{\partial y}$, przy $x$ trzymanym w miejscu.
 
 \begin{fr}
 \ans{$x^{2} + 3$}
-Tym razem to $x^{2}$ jest stałą mnożącą $y$, więc przeżywa jako ono samo, a $3y$
-różniczkuje się do $3$.
+Tym razem to $x^{2}$ jest stałą mnożącą $y$, więc przeżywa jako ono samo, a
+$3y$ różniczkuje się do $3$, więc drugi składnik też przeżywa.
 
 \begin{trapbox}
-Popatrz, co się właśnie stało z dwiema odpowiedziami.
+Popatrz, co się stało z dwiema odpowiedziami.
 $\frac{\partial f}{\partial x}$ nadal ma w sobie $y$, a
 $\frac{\partial f}{\partial y}$ nadal ma $x$.
 
@@ -273,8 +273,9 @@ jedną z niewielu rzeczy, które przenoszą się bez zastrzeżeń.
 
 \begin{fr}
 Jeszcze jedna własność, zanim zostanie użyty. Program~\ref{prog:F11}
-powiedział, że pochodna stałej to zero. Ile wynosi gradient w punkcie, w
-którym $f$ ma minimum?
+powiedział, że pochodna jest zerem na dnie krzywej. Ile wynosi gradient w
+punkcie, w którym $f$ ma minimum, i dlaczego \emph{każda} składowa musi
+zniknąć?
 \nextframe
 \end{fr}
 
@@ -328,6 +329,9 @@ zmniejszaj $h$.
 \end{ansblock}
 
 \[ D_u f = \lim_{h \to 0} \frac{f(\vect{p} + h u) - f(\vect{p})}{h} \]
+Tutaj $\vect{p}$ to punkt, w którym stoisz, zapisany jako wektor, tak że
+$\vect{p} + hu$ oznacza krok długości $h$ od niego; od tego miejsca książka
+zostawia tę literę dla punktu.
 
 To ta sama granica, na funkcji jednej zmiennej, którą dostajesz, idąc wzdłuż
 prostej przez punkt. Nic nowego nie zostało zdefiniowane; wybrano kierunek i
@@ -366,7 +370,27 @@ $\val{p15.dir.steps}$ kierunków dookoła okręgu, liczy granicę numerycznie dl
 każdego i porównuje z iloczynem skalarnym. Najgorsza niezgodność gdziekolwiek
 jest poniżej $\val{p15.dir.bound}$.
 
-\transcript{p15-directional}
+\begin{rigourbox}
+\textbf{\enquote{Granica jest liniowa względem kierunku} to założenie, a nie
+obserwacja.} Jest to znaczenie słowa \emph{różniczkowalna w punkcie} i to ono
+wykonuje całą pracę w kroku powyżej. Samo istnienie obu pochodnych cząstkowych
+nie wystarcza.
+
+Standardowy kontrprzykład warto zobaczyć raz, bo jest paskudniejszy, niż
+wygląda:
+\[ f(x, y) = \frac{x\,y^{2}}{x^{2} + y^{4}}, \qquad f(0, 0) = 0 \]
+Obie cząstkowe w początku układu są zerami, bo $f$ jest zerem wzdłuż każdej
+osi. Iloczyn skalarny przewiduje więc tempo zero w każdym kierunku. Tempo
+wzdłuż jednostkowego kierunku $(a, b)$ przy $a \neq 0$ wynosi w istocie
+$b^{2}/a$, co skrypt sprawdza w trzech kierunkach \dash{} nieograniczone, gdy
+$a$ maleje, i zerowe tylko wzdłuż osi $x$.
+
+Każda funkcja, którą ta książka różniczkuje, jest tam różniczkowalna, więc
+tożsamość obowiązuje wszędzie. Czym jest różniczkowalność i jak ją sprawdzić,
+to pierwszy kurs analizy.
+\end{rigourbox}
+
+\transcript{p15-gradient}
 
 \mermaidfig{p15-any-direction}{Jedna liczba na kierunek i skąd ona
 pochodzi.}{dowolny kierunek}
@@ -390,9 +414,10 @@ $\val{p15.fx.at} \times \num{0.6} + \val{p15.fy.at} \times \num{0.8} =
 $\num{0.6}^{2} + \num{0.8}^{2} = 1$.
 \end{ansblock}
 
-Jest to liczba, którą drukuje listing powyżej, i jest mniejsza niż własna
-długość gradientu, $\val{p15.grad.len}$. To nie przypadek i o tym jest
-następna sekcja.
+\transcript{p15-directional}
+
+Jest mniejsza niż własna długość gradientu, $\val{p15.grad.len}$. To nie
+przypadek i o tym jest następna sekcja.
 
 \begin{note}
 Trójkąt $3$--$4$--$5$ jest powodem, dla którego $(\num{0.6}, \num{0.8})$ jest
@@ -464,9 +489,14 @@ tolerancja była liczbą dobraną tak, by sprawdzenie przeszło, a nie zdaniem o
 matematyce.
 
 Orzekana jest teraz para \dash{} że żaden kierunek nie bije gradientu, co jest
-dokładne i jest nierównością z Programu~\ref{prog:P05}; oraz że próbkowany
+dokładne, bo $\cos\theta$ nigdy nie przekracza $1$; oraz że próbkowany
 najlepszy ustępuje o nie więcej niż rozdzielczość. Drugie zamienia niedobór z
 zawstydzenia w wyjaśnienie.
+
+Pierwsza połowa była kiedyś przypisywana nierówności
+Programu~\ref{prog:P05}, a ta książka nigdzie takiej nierówności nie podaje.
+Ma tożsamość powyżej i cosinus, który nie może przekroczyć jedynki, i tyle
+temu argumentowi wystarczy.
 \end{note}
 \end{fr}
 
@@ -593,9 +623,10 @@ się w kierunku gradientu \emph{ujemnego}, a jest to najczęstszy błąd znaku w
 ręcznie pisanej pętli treningowej.
 
 Warto zobaczyć, ile to kosztuje, zamiast dać sobie to powiedzieć. W punkcie
-$(\val{p15.zig.start.x}, \val{p15.zig.start.y})$ na niecce poniżej wartość
-wynosi $\val{p15.sign.before}$. Jeden mały krok przeciwnie do gradientu
-sprowadza ją do $\val{p15.sign.down}$. Jeden mały krok \emph{zgodnie} z
+$(\val{p15.zig.start.x}, \val{p15.zig.start.y})$ na niecce, którą zapisuje
+kolejna ramka, wartość wynosi $\val{p15.sign.before}$. Jeden krok o rozmiarze
+$\val{p15.sign.eta}$ przeciwnie do gradientu sprowadza ją do
+$\val{p15.sign.down}$. Jeden krok tego samego rozmiaru \emph{zgodnie} z
 gradientem podnosi ją do $\val{p15.sign.up}$.
 
 Nic nie zgłasza błędu. Pętla działa, liczby są skończone, a strata rośnie
@@ -611,22 +642,41 @@ $\val{p15.lam.lo}$, więc jej poziomice są elipsami
 $\val{p10.basin.axisratio}$ raza dłuższymi niż szerszymi. To dolina: stroma w
 poprzek, płytka wzdłuż.
 
+Zapisana, jest to
+\[ f(x, y) = \tfrac{1}{2}\left(\val{p15.lam.hi}\,x^{2}
+   + \val{p15.lam.lo}\,y^{2}\right),
+   \qquad
+   \nabla f = (\val{p15.lam.hi}\,x,\; \val{p15.lam.lo}\,y) \]
+i każda liczba w tej sekcji bierze się z tych dwóch wyrażeń, więc czytelnik,
+który chce jedną sprawdzić, ma do tego wszystko.
+
+\textbf{Połówka nie jest ozdobą.} Sekcja~\ref{sec:P15-steepest} zapisała
+funkcję kwadratową jako $ax^{2} + by^{2}$, której gradient to $(2ax, 2by)$
+\dash{} tam współczynnik jest połową krzywizny i obie konwencje różnią się o
+czynnik dwa w każdym gradiencie. Z połówką z przodu współczynniki
+\emph{są} wartościami własnymi, gradient to każda wartość własna razy jej
+własna współrzędna, a krok mnoży tę współrzędną przez $1 - \eta\lambda$, a nie
+przez $1 - 2\eta\lambda$. W tej postaci napisana jest reszta tej sekcji i cały
+Program~\ref{prog:P17}, i dlatego warto zapłacić tę połówkę.
+
 Ten program używa tej samej niecki, zamiast wymyślać kolejną, a skrypt czyta
 zatwierdzone liczby P10 i przerywa budowanie, jeśli się przesunęły.
 
 Zacznij w $(\val{p15.zig.start.x}, \val{p15.zig.start.y})$, czyli poza obiema
-osiami. Zanim cokolwiek policzysz: czy ujemny gradient wskazuje tam minimum?
+osiami. Sekcja~\ref{sec:P15-steepest} rozstrzygnęła już, czy ujemny gradient
+wskazuje tam minimum, więc warto zapytać o to drugie. Zanim cokolwiek
+policzysz: jak bardzo jest obok \dash{} o stopień czy dwa, czy o coś, co
+byłoby widać?
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{Nie \dash{} jest $\val{p15.zig.angle}$ stopni od niego}
+\ans{$\val{p15.zig.angle}$ stopni od niego.}
 Minimum jest w początku układu, więc droga do domu prowadzi prosto z powrotem
 wzdłuż prostej, na której stoisz. Ujemny gradient stoi za to prostopadle do
 poziomicy, a na elipsie są to dwa różne kierunki.
 
-\textbf{Czterdzieści dwa stopnie to nie błąd zaokrąglenia, to prawie połowa
-kąta prostego.} Sterowanie nie jest lekko nietrafione; wskazuje zupełnie gdzie
+\textbf{To nie błąd zaokrąglenia, to prawie połowa kąta prostego.} Sterowanie nie jest lekko nietrafione; wskazuje zupełnie gdzie
 indziej, i robi to z powodu, który jest teraz całkowicie zrozumiały, a nie
 tajemniczy.
 
@@ -663,8 +713,9 @@ Przechodzi $\val{p15.zig.crossings}$ razy w $\val{p15.zig.steps}$ krokach
 niż pokonuje.
 \end{ansblock}
 
-$\val{p15.zig.pathlen}$ drogi, żeby pokonać $\val{p15.zig.moved}$ terenu.
-Prawie siedem ósmych marszu idzie w bok.
+$\val{p15.zig.pathlen}$ drogi, żeby pokonać $\val{p15.zig.moved}$ terenu, więc
+$\val{p15.zig.sideways.pct}$ procent marszu idzie w bok \dash{} co jest
+ilorazem dwóch liczb powyżej, a skrypt sprawdza, że tak jest.
 
 \begin{note}
 Miarą jest dystans przebyty wobec dystansu \emph{pokonanego}, a nie wobec
@@ -675,7 +726,12 @@ rozmiarze kroku, a nic o kierunku.
 
 Droga przez przemieszczenie wynosi $1$ dla każdej prostej drogi, jak daleko by
 nie zaszła, co jest dokładnie tą własnością, o której jest ta sekcja, i wynosi
-$1$ dla okrągłej niecki co do ostatniego bitu.
+$1$ dla okrągłej niecki co do ostatniego bitu \dash{} przy kontroli puszczonej
+dla $\lambda = \val{p15.lam.lo}$, tak że $1 - \eta\lambda$ jest dodatnie i
+każdy krok ląduje przed środkiem, a nie za nim. Podnieś krok powyżej
+$1/\lambda$, a marsz nadal jest zbieżny i nadal nie schodzi z prostej, ale
+ląduje po drugiej stronie w każdym kroku, więc droga przestaje równać się
+przemieszczeniu, choć kierunek jest tak samo dokładny.
 \end{note}
 \end{fr}
 
@@ -714,8 +770,9 @@ nie może powiedzieć, gdzie leży granica.
 A naprawa należy do Programu~\ref{prog:P20}. Moment pędu uśrednia ostatnie
 kroki, więc składowe boczne \dash{} które zmieniają znak \dash{} kasują się
 wzajemnie, podczas gdy te do przodu \dash{} które nie zmieniają \dash{}
-sumują się. To zdanie staje się oczywiste dopiero po zobaczeniu tego obrazu i
-dlatego ten program produkuje problem i zostawia go stojącym.
+sumują się. To zdanie potrzebuje naprzemiennego znaku, który ta sekcja
+właśnie zmierzyła, i dlatego ten program produkuje problem i zostawia go
+stojącym.
 \end{rigourbox}
 \end{fr}
 
@@ -769,7 +826,8 @@ Ufaj tu algebrze i nie ufaj obrazowi w głowie, w tej kolejności.
 \sumitem{8--9}{\result{\textbf{Gradient to pochodne cząstkowe zapisane jako wektor},
   $\nabla f$, mający długość oprócz kierunku \dash{} tutaj
   $\val{p15.grad.len}$}.}
-\sumitem{9}{\result{\textbf{Słowo wykonuje dwie prace.} Programy F06 i F11 używają
+\sumitem{9}{\result{\textbf{Słowo wykonuje dwie prace.} Programy~\ref{prog:F06}
+  i~\ref{prog:F11} używają
   słowa \enquote{gradient} dla współczynnika kierunkowego prostej, jednej
   liczby; tutaj jest to wektor po jednej składowej na wejście}.}
 \sumitem{10--11}{\result{Zapisuje się go jako wektor \textbf{po to, by dało się go
@@ -787,7 +845,7 @@ Ufaj tu algebrze i nie ufaj obrazowi w głowie, w tej kolejności.
   jego długość}. Wyprowadzone, nie orzeczone}.}
 \sumitem{23--24}{\result{Przy $\cos\theta = 0$ tempo jest zerem, więc \textbf{gradient
   jest prostopadły do poziomicy} \dash{} to samo równanie odczytane na drugim
-  krańcu, dokładnie zero na $\val{p15.perp.trials}$ przypadkach wymiernych}.}
+  krańcu}.}
 \sumitem{25--26}{Prostopadłość jest sprawdzona \textbf{dokładnie nad liczbami
   wymiernymi}, bez żadnej tolerancji, bo twierdzenie zawierające słowo
   \emph{prostopadły} jest twierdzeniem o dokładnym zerze.}
@@ -848,12 +906,17 @@ Ufaj tu algebrze i nie ufaj obrazowi w głowie, w tej kolejności.
   Porównywałbyś linijki, a nie zbocza. Wymóg jednostkowości jest tym, co czyni
   tę liczbę własnością powierzchni.}
 \item W niecce o poziomicach będących okręgami ile razy spadek gradientu
-  przechodzi z jednej strony na drugą, zanim dotrze?
-  \answerto{Ani razu, dla dowolnego zbieżnego rozmiaru kroku. Ujemny gradient
-  wskazuje środek dokładnie, więc każdy krok idzie wzdłuż tej samej prostej, a
-  droga wynosi $1$ raza własne przemieszczenie \dash{} co skrypt orzeka
-  dokładnie. Przechodzenie wymaga poziomic nieokrągłych i to cała treść
-  sekcji 5.}
+  przechodzi z jednej strony na drugą, zanim dotrze \dash{} i od czego zależy
+  twoja odpowiedź?
+  \answerto{Ani razu, o ile $\eta < 1/\lambda$, tak że $1 - \eta\lambda$ jest
+  dodatnie. Ujemny gradient wskazuje środek dokładnie, więc każdy krok idzie
+  wzdłuż tej samej prostej, a droga wynosi $1$ raza własne przemieszczenie
+  \dash{} co skrypt orzeka dokładnie, przy kroku tego rozmiaru.
+  \textbf{Nie jest to prawdą dla każdego zbieżnego kroku.} Między $1/\lambda$
+  a $2/\lambda$ marsz jest zbieżny i nadal nie schodzi z prostej, ale każdy
+  krok ląduje za środkiem, więc przechodzi w każdym z nich. Przechodzenie
+  doliny \emph{w bok} to co innego, wymaga poziomic nieokrągłych i to cała
+  treść sekcji 5.}
 \end{testexercises}
 
 \begin{furtherproblems}
@@ -892,6 +955,11 @@ Ufaj tu algebrze i nie ufaj obrazowi w głowie, w tej kolejności.
   \answerto{Rośnie: im bardziej wydłużona niecka, tym dalej od środka wskazuje
   prostopadła. Skrypt sprawdza dokładnie to, przeglądając stosunek i orzekając,
   że kąt rośnie na każdym kroku \dash{} co jest niezmiennikiem, gdzie
-  pojedynczy kąt byłby faktem o jednej niecce. Nie może urosnąć powyżej kąta
-  prostego, bo krok szedłby wtedy pod górę.}
+  pojedynczy kąt byłby faktem o jednej niecce.
+
+  \textbf{Nie rośnie bez ograniczeń, a sufitem nie jest kąt prosty.} Z tego
+  punktu startowego wspina się ku $45$ stopniom, czyli kątowi między
+  $(\lambda, 1)$ a $(1, 1)$, gdy $\lambda$ ucieka, i skrypt orzeka też to. Na
+  każdej niecce wypukłej prawdą jest, że kąt pozostaje \emph{ostry}, bo
+  $\nabla f \cdot \vect{p} = 2f$, co jest dodatnie wszędzie poza minimum.}
 \end{furtherproblems}

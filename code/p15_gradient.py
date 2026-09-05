@@ -144,6 +144,30 @@ GRAD = (fx(PX, PY), fy(PX, PY))
 GLEN = math.hypot(*GRAD)
 emit("p15.grad.len", GLEN, digits=4)
 
+# THE HYPOTHESIS THE IDENTITY NEEDS, checked rather than asserted. Section 3
+# gets D_u f = grad f . u from "the limit is linear in the direction", which is
+# not a property of every function of two variables -- it IS differentiability,
+# and the rigour box says so. The standard counterexample is checked here so
+# that a claim in a printed box does not rest on the author's arithmetic:
+# f = x y^2 / (x^2 + y^4) has both partials zero at the origin, so the dot
+# product predicts zero in every direction, and the true rate along a unit
+# (a, b) with a != 0 is b^2 / a. Nothing is emitted; the box quotes the
+# formula and the reader can run it.
+def _pathological(x, y):
+    return 0.0 if (x == 0.0 and y == 0.0) else x * y * y / (x * x + y ** 4)
+
+
+_hh = 1e-6
+assert abs((_pathological(_hh, 0) - _pathological(-_hh, 0)) / (2 * _hh)) < 1e-12
+assert abs((_pathological(0, _hh) - _pathological(0, -_hh)) / (2 * _hh)) < 1e-12
+for _a, _b in ((0.6, 0.8), (0.8, 0.6), (0.5, math.sqrt(3) / 2)):
+    _rate = _pathological(1e-7 * _a, 1e-7 * _b) / 1e-7
+    assert abs(_rate - _b * _b / _a) < 1e-9, (_a, _b, _rate)
+NOTES.append("the standard counterexample checks out: partials zero at the "
+             "origin, directional derivative b^2/a, so differentiability is "
+             "the hypothesis and not a formality")
+
+
 # ---------------------------------------------------------------------------
 # 3. THE DERIVATION. The directional derivative is a dot product, so P05's
 #    cosine settles which direction is steepest without any new machinery.
@@ -330,8 +354,21 @@ assert ratio > 1.2, ratio
 emit("p15.zig.ratio", ratio, digits=2)
 emit("p15.zig.pathlen", path_len, digits=3)
 emit("p15.zig.moved", math.dist(path[0], path[-1]), digits=3)
+
+# THE SIDEWAYS FRACTION IS EMITTED RATHER THAN NAMED AS A FRACTION IN WORDS.
+# The prose used to say "nearly seven-eighths", which is 87.5 per cent, and a
+# reader dividing the two printed figures gets 85.5 -- the reproduce-from-the-
+# page defect F04, F05, P07, P12, P23 and P27 have each paid for. So the
+# number is computed, and asserted to agree with what the PRINTED operands
+# give, not merely with the underlying floats.
+_moved = math.dist(path[0], path[-1])
+SIDEWAYS = 100.0 * (1.0 - _moved / path_len)
+emit("p15.zig.sideways.pct", SIDEWAYS, digits=1)
+_printed = 100.0 * (1.0 - float(f"{_moved:.3f}") / float(f"{path_len:.3f}"))
+assert abs(_printed - SIDEWAYS) < 0.05, (_printed, SIDEWAYS)
 NOTES.append(f"on P10's bowl the step turns {ang_long:.1f} deg away from the "
-             f"minimum and the path is {ratio:.2f}x the straight line")
+             f"minimum and the path is {ratio:.2f}x the straight line, so "
+             f"{SIDEWAYS:.1f}% of the walking is sideways")
 
 # THE INVARIANT rather than either figure: the worse the elongation, the
 # further the first step points away from the minimum. Monotone over a sweep,
@@ -339,6 +376,22 @@ NOTES.append(f"on P10's bowl the step turns {ang_long:.1f} deg away from the "
 angs = [angle_to_minimum(START, r, 1) for r in range(1, 60)]
 assert all(angs[i] < angs[i + 1] + 1e-12 for i in range(len(angs) - 1))
 NOTES.append("the angle grows monotonically with the eigenvalue ratio")
+
+# AND IT IS BOUNDED, which the further-problem answer used to get wrong. The
+# old answer said the angle "cannot grow past a right angle, because the step
+# would then be going uphill" -- two errors in one clause. The step never goes
+# uphill at all (its rate is -|grad|^2), and the ceiling from THIS start point
+# is 45 degrees, not 90: grad = (lam*x, y) tends to the direction of the x axis
+# as lam runs away, so the angle tends to the one between the x axis and the
+# start point, which is 45 for (1, 1). What is true on any convex bowl is that
+# the angle stays acute, because grad . p = lam x^2 + y^2 = 2f > 0.
+assert abs(angle_to_minimum(START, 10 ** 8, 1) - 45.0) < 1e-3
+assert all(a < 45.0 for a in angs)
+for _r in (1, 3, 20, 500):
+    _g = grad_q(START, _r, 1)
+    assert _g[0] * START[0] + _g[1] * START[1] > 0          # 2f, so acute
+NOTES.append("bounded too: it climbs towards 45 deg from (1, 1) and stays "
+             "acute because grad . p = 2f")
 
 # F11's RECURRENCE, GATED. F11 walks f = (x-3)^2 + 1, whose curvature is 2, and
 # its committed factor is (1 - 2 eta). Per eigendirection this program's factor
@@ -371,7 +424,13 @@ def fq(pt) -> float:
     return 0.5 * (LAM_HI * pt[0] ** 2 + LAM_LO * pt[1] ** 2)
 
 
+# THE STEP SIZE IS EMITTED, because the three values below are a measurement
+# and a reader cannot reproduce a measurement whose step size is not on the
+# page. It is deliberately not the walk's eta: at 0.09 the wrong-sign step on
+# the steep coordinate multiplies it by 1 + eta*lam_hi = 2.8, which is a
+# divergence rather than the "one small step" the trap box describes.
 SMALL = 0.02
+emit("p15.sign.eta", SMALL, digits=2)
 g0 = grad_q(START)
 down = (START[0] - SMALL * g0[0], START[1] - SMALL * g0[1])
 up = (START[0] + SMALL * g0[0], START[1] + SMALL * g0[1])
@@ -387,17 +446,31 @@ NOTES.append("wrong sign: one step takes the value UP rather than down")
 
 def main() -> None:
     TRANSCRIPTS.mkdir(parents=True, exist_ok=True)
-    lines = [
+    # TWO listings, not one, and the split is the point. The dot product with
+    # (0.6, 0.8) is the answer frame 18 elicits, so a single listing printing
+    # it alongside the gradient put that answer on the page BEFORE the
+    # question -- the defect P04's and P08's passes both had to fix. The
+    # gradient half stays where the sweep is described; the dot-product half
+    # goes after frame 19's answer, where it confirms rather than reveals.
+    # Each imports what it calls, so either can be pasted into a REPL on its
+    # own -- which is the other half of P04's finding.
+    grad_lines = [
         ">>> from p15_gradient import f, fx, fy, GRAD",
         ">>> f(2, 5), fx(2, 5), fy(2, 5)",
         f"{(f(PX, PY), fx(PX, PY), fy(PX, PY))}",
         ">>> GRAD",
         f"{GRAD}",
+    ]
+    (TRANSCRIPTS / "p15-gradient.txt").write_text(
+        "\n".join(grad_lines) + "\n", encoding="utf8")
+
+    dir_lines = [
+        ">>> from p15_gradient import GRAD",
         ">>> round(sum(g * u for g, u in zip(GRAD, (0.6, 0.8))), 4)",
         f"{round(sum(g * u for g, u in zip(GRAD, (0.6, 0.8))), 4)}",
     ]
     (TRANSCRIPTS / "p15-directional.txt").write_text(
-        "\n".join(lines) + "\n", encoding="utf8")
+        "\n".join(dir_lines) + "\n", encoding="utf8")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     out = [

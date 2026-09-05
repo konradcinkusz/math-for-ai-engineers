@@ -200,8 +200,21 @@ emit("p17.eta.star", ETA_STAR, digits=2)
 _p15_eta = float(committed("p15.tex", "p15.zig.eta") or 0.09)
 assert 0 < _p15_eta < ETA_STAR, (_p15_eta, ETA_STAR)
 emit("p17.p15.eta", _p15_eta, digits=2)
+
+# AND THE FACTOR, because the frame used to explain the sign flip by nearness
+# to the boundary and that is not the cause. 1 - eta*lam goes negative as soon
+# as eta passes 1/lam, which is HALF the boundary, so alternation is the normal
+# behaviour over the whole upper half of the stable range. Printing the factor
+# is what lets the frame say that instead.
+_p15_factor = 1 - _p15_eta * LAM_HI
+assert -1 < _p15_factor < 0, _p15_factor
+assert _p15_eta > 1 / LAM_HI                       # above 1/lam: it alternates
+assert _p15_eta < 2 / LAM_HI                       # under 2/lam: it converges
+emit("p17.p15.factor", _p15_factor, digits=2)
 NOTES.append(f"gated: P15 walks at eta = {_p15_eta}, under this program's "
-             f"boundary of {ETA_STAR}")
+             f"boundary of {ETA_STAR}, with factor {_p15_factor:.2f} -- "
+             "negative because eta is above 1/lambda, not because it is near "
+             "the boundary")
 
 # MEASURED rather than only derived: sweep eta and find where the walk stops
 # converging. The empirical threshold must be the derived one.

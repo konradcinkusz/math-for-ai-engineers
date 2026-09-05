@@ -20,10 +20,13 @@
 \outcome{8--14}{zróżniczkować skalarną stratę po macierzy wag i sprawdzić
   wynik samym jego kształtem}
 \outcome{15--21}{zapisać pochodną $\softmax$ i powiedzieć, do czego sumują
-  się jej wiersze i dlaczego}
-\outcome{22--31}{wyprowadzić, że gradient entropii krzyżowej przez $\softmax$
-  wynosi $p - y$ \dash{} definicja entropii krzyżowej jest tu \emph{dana}, a
-  uzasadnia ją Program~\ref{prog:P30}}
+  się jej kolumny, do czego jej wiersze i dlaczego powody są różne}
+\outcome{22--29}{wyprowadzić gradient entropii krzyżowej przez $\softmax$ i
+  powiedzieć, dlaczego odwrotność wprowadzona w pierwszym kroku znika \dash{}
+  definicja entropii krzyżowej jest tu \emph{dana}, uzasadnia ją
+  Program~\ref{prog:P26}, a interpretuje Program~\ref{prog:P30}}
+\outcome{30--31}{powiedzieć, dlaczego pochodna normalizacji warstwy nie może
+  być po współrzędnych}
 \outcome{32--39}{podać dwa powody, dla których obie operacje są łączone, i
   powiedzieć, który z nich dotyczy szybkości, a który nie}
 \end{outcomes}
@@ -41,10 +44,12 @@
   wyprowadzeniu i to właśnie daje błąd kształtu, którego nikt nie umie
   wytropić.}
 \item Jaki kształt ma pochodna $\softmax$ na $n$ wynikach i do czego sumują
-  się jej wiersze? \teachesat{15--19}
+  się jej \emph{kolumny}? \teachesat{15--19}
   \answerto{$n \times n$, jeden wiersz na wyjście i jedna kolumna na wejście,
-  z reguły Programu~\ref{prog:P16}. Każdy wiersz sumuje się do zera, co jest
-  zróżniczkowanym \enquote{prawdopodobieństwa sumują się do jedynki}.}
+  z reguły Programu~\ref{prog:P16}. Każda kolumna sumuje się do zera, co jest
+  \enquote{prawdopodobieństwa sumują się do jedynki} zróżniczkowanym po jednym
+  wyniku. Wiersze też sumują się do zera, z innego powodu: $\softmax$ ignoruje
+  stałą dodaną do każdego wyniku.}
 \item Entropia krzyżowa przez $\softmax$: jaki jest gradient po wynikach?
   \teachesat{24--25}
   \answerto{$p - y$ \dash{} przewidziany rozkład minus cel one-hot. To
@@ -222,9 +227,13 @@ macierzowy}.
 \[ \frac{\partial L}{\partial W_{ij}} = 2 r_i x_j \]
 \end{ansblock}
 
-Bo $L = \sum_k r_k^{2}$, więc $\partial L/\partial W_{ij} =
-2 r_i \, \partial r_i/\partial W_{ij}$, a $r_i = \sum_j W_{ij}x_j - t_i$
-wnosi $x_j$. Żaden inny wiersz $r$ nie ma w sobie $W_{ij}$.
+Bo $L = \sum_k r_k^{2}$, więc różniczkowanie po jednym składniku daje
+\[ \frac{\partial L}{\partial W_{ij}} = \sum_k 2 r_k
+   \frac{\partial r_k}{\partial W_{ij}} \]
+i przeżywa tylko $k = i$, bo $W_{ij}$ występuje w wierszu $i$ wektora
+$\vect{r}$ i w żadnym innym. Zapisz ten wiersz z własnym wskaźnikiem
+sumowania, $r_i = \sum_m W_{im}x_m - t_i$, a jedynym składnikiem niosącym
+$W_{ij}$ jest ten przy $m = j$, który wnosi $x_j$.
 
 Zebrane razem jest to \textbf{iloczyn zewnętrzny}:
 \[ \frac{\partial L}{\partial W} = 2\,\vect{r}\,\vect{x}\T \]
@@ -307,7 +316,8 @@ odbiera $p_i^{2}$; przy $i \neq j$ rusza się tylko mianownik, dając
 $-p_i p_j$. Jedno wyrażenie obejmuje oba, bo $\delta_{ij}$ daje $1$ na
 przekątnej i $0$ poza nią.
 
-Jako macierz,
+Jako macierz \dash{} pisząc $\diag(\vect{p})$ na macierz niosącą
+$\vect{p}$ na swojej przekątnej i zera wszędzie indziej \dash{}
 \[ J = \diag(\vect{p}) - \vect{p}\,\vect{p}\T \]
 sprawdzona wpis po wpisie wobec różnicy centralnej, najgorsza rozbieżność
 poniżej $\val{p18.jac.bound}$.
@@ -317,30 +327,47 @@ poniżej $\val{p18.jac.bound}$.
 Ta macierz ma własność, którą przewidzisz, nic nie licząc, z jednego faktu o
 $\softmax$, który już masz.
 
-Prawdopodobieństwa sumują się do $1$, jakiekolwiek byłyby wyniki. Co to
-wymusza na każdym wierszu $J$?
+Prawdopodobieństwa sumują się do $1$, jakiekolwiek byłyby wyniki.
+Zróżniczkuj to zdanie po jednym wyniku $z_j$. Co to wymusza na $J$ \dash{} i
+wzdłuż której osi?
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
 \begin{ansblock}
-Każdy wiersz sumuje się do $0$.
+Każda \emph{kolumna} sumuje się do $0$.
 \end{ansblock}
 
-Bo wielkość, która dla każdego wejścia wynosi $1$, nie zmienia się, gdy
-wejście się zmienia, więc jej pochodna jest zerem w każdym kierunku.
-Zmierzone poniżej $\val{p18.jac.rowsum}$, co jest zaokrągleniem.
+Wielkością, która dla każdego wejścia wynosi $1$, jest $\sum_i p_i$, a jej
+pochodna po $z_j$ to $\sum_i \partial p_i/\partial z_j$, czyli \dash{} przy
+układzie z sekcji~\ref{sec:P18-layout} \dash{} suma \emph{w dół} kolumny $j$.
+Zmierzone poniżej $\val{p18.jac.colsum}$, co jest zaokrągleniem.
 
 \textbf{Zatem $\softmax$ umie przesuwać prawdopodobieństwo i nigdy nie umie
-zrobić go więcej}, a sumy wierszy są tym zdaniem zapisanym jako arytmetyka.
-Są też najtańszym sprawdzeniem implementacji jakobianu, jakie ktokolwiek
-napisze.
+zrobić go więcej}, a sumy kolumn są tym zdaniem zapisanym jako arytmetyka.
+
+\begin{note}
+\emph{Wiersze} też sumują się do zera i warto te dwie rzeczy rozdzielić, bo są
+to różne fakty z różnych powodów. Suma wiersza to
+$\sum_j \partial p_i/\partial z_j$, czyli to, co dzieje się z jednym
+prawdopodobieństwem, gdy \emph{każdy} wynik rusza się razem \dash{} a
+$\softmax$ nie zmienia się po dodaniu stałej do wszystkich wyników, więc i to
+jest zerem. Zmierzone poniżej $\val{p18.jac.rowsum}$.
+
+Pokrywają się tutaj tylko dlatego, że akurat ten $J$ jest symetryczny, o co
+prosi kolejna ramka. W programie, którego całym tematem jest to, który indeks
+biegnie w dół wierszy, danie jednemu z nich argumentu drugiego jest dokładnie
+tym błędem, którego trzeba unikać, a wcześniejszy szkic tej ramki go popełnił.
+\end{note}
+
+Którakolwiek z tych sum jest najtańszym sprawdzeniem implementacji jakobianu,
+jakie ktokolwiek napisze.
 \end{fr}
 
 \begin{fr}
-I jedna brama, bo dwa programy nie mogą się różnić co do jednej obliczonej
-rzeczy.
+I jedno sprawdzenie krzyżowe, bo dwa programy nie mogą się różnić co do
+jednej obliczonej rzeczy.
 
 Program~\ref{prog:F07} udowodnił, że $\softmax$ na dwóch wynikach jest
 funkcją logistyczną ich różnicy. Zróżniczkowanie obu stron tożsamości daje
@@ -354,14 +381,14 @@ $\sigma'(a - b) = \sigma(a-b)\bigl(1 - \sigma(a-b)\bigr)$.
 \end{ansblock}
 
 Skrypt sprawdza to na $\val{p18.gate.f07.pairs}$ parach, a nie w punkcie,
-najgorsza rozbieżność poniżej $\val{p18.gate.f07.bound}$, i czyta zapisane
-prawdopodobieństwa z Programu~\ref{prog:F07}, by potwierdzić, że oba programy
-liczą jeden $\softmax$.
+najgorsza rozbieżność poniżej $\val{p18.gate.f07.bound}$, i używa ponownie
+prawdopodobieństw, które policzył Program~\ref{prog:F07}, by potwierdzić, że
+oba programy liczą jeden $\softmax$.
 
-Warto to mieć z powodu, który podaje Program~\ref{prog:P04}: brama jest warta
-swoich linijek, gdy oba programy cytują \emph{jedną} obliczoną rzecz, a ta
-jest zróżniczkowaną tożsamością z F07, a nie dwiema liczbami podobnymi do
-siebie.
+Warto to mieć z powodu, który podaje Program~\ref{prog:P04}: takie
+sprawdzenie jest warte swoich linijek, gdy oba programy cytują \emph{jedną}
+obliczoną rzecz, a ta jest zróżniczkowaną tożsamością z F07, a nie dwiema
+liczbami podobnymi do siebie.
 \end{fr}
 
 % ============================================================
@@ -401,8 +428,7 @@ $\partial L/\partial p_c = -1/p_c$, a $\partial L / \partial p_j = 0$ dla
 każdego innego $j$.
 \end{ansblock}
 
-I tu wszystko mogłoby pójść źle, a sekcja 5 jest właśnie o tym $1/p_c$. Na
-razie nieś to dalej.
+Na razie nieś to dalej.
 
 Teraz przepchnij to przez jakobian. Regułą łańcuchową dla wyników jest
 \[ \frac{\partial L}{\partial z_j}
@@ -427,6 +453,9 @@ W postaci wektorowej, przy $\vect{y}$ jako celu one-hot,
 \[ \frac{\partial L}{\partial \vect{z}} = \vect{p} - \vect{y} \]
 sprawdzone wobec różnicy centralnej, najgorsza rozbieżność poniżej
 $\val{p18.ce.bound}$.
+
+Sekcja~\ref{sec:P18-fusion} pyta, dlaczego każda poważna implementacja liczy
+to wyrażenie wprost, zamiast wykonywać dwa kroki, które je dały.
 \end{fr}
 
 \begin{fr}
@@ -480,8 +509,8 @@ książka już nie wyprowadziła.
 \end{fr}
 
 \begin{fr}
-Opis tego programu wymienia piątą tożsamość i jest to ta, którą ludzie robią
-źle: normalizacja warstwowa. Jej wyjściem jest
+Jest jeszcze piąta tożsamość, którą warto mieć, i jest to ta, którą ludzie
+robią źle: normalizacja warstwowa. Jej wyjściem jest
 \[ \hat{z}_i = \frac{z_i - \mu}{\sqrt{\operatorname{var} + \varepsilon}} \]
 gdzie $\mu$ i wariancja liczone są po tym samym wektorze.
 
@@ -498,8 +527,9 @@ wejścia rusza każde wyjście \dash{} dokładnie jak przy $\softmax$.
 \end{ansblock}
 
 To jest kształt odpowiedzi i dlatego gradient niesie dwa człony poprawkowe, a
-nie jeden czynnik. Przy $\vect{g}$ nadchodzącym z góry i $s$ jako odchyleniu
-standardowym
+nie jeden czynnik. Przy $\vect{g}$ nadchodzącym z góry i
+$s = \sqrt{\operatorname{var} + \varepsilon}$, mianowniku z przebiegu w
+przód,
 \[ \frac{\partial L}{\partial z_i} = \frac{1}{s}\Bigl(g_i
    - \overline{g} - \hat{z}_i\,\overline{g\hat{z}}\Bigr) \]
 gdzie obie kreski są średnimi po wektorze. Skrypt sprawdza to najgorzej na
@@ -533,15 +563,15 @@ $\vect{p} - \vect{y}$?
 
 \begin{fr}
 \begin{ansblock}
-Około $\val{p18.fuse.twostep}$ operacji wobec $\val{p18.fuse.fused}$
-\dash{} czynnik $\val{p18.fuse.ratio}$.
+$\val{p18.fuse.twostep}$ operacji wobec $\val{p18.fuse.fused}$
+\dash{} czynnik $\val{p18.fuse.ratio}$, dokładnie.
 \end{ansblock}
 
 Droga dwukrokowa tworzy jakobian, który ma jeden wpis na \emph{parę} klas, i
 go stosuje. Droga połączona to $\val{p18.vocab}$ odejmowań i żadnego
 mnożenia.
 
-A jakobian ma $\val{p18.fuse.gib}$ GiB przy dwóch bajtach na liczbę, więc
+A jakobian ma $\val{p18.fuse.gb}$ GB przy dwóch bajtach na liczbę, więc
 jest to \enquote{nikt nie tworzy jakobianu} z Programu~\ref{prog:P16}
 docierające do najczęściej używanego wyprowadzenia w tej dziedzinie. Różnicę
 wobec tamtego przypadku warto zauważyć: tam iloczyn, którego ludzie chcieli,
@@ -587,14 +617,17 @@ przesunęło.
 
 \begin{fr}
 \begin{ansblock}
-Z niedomiaru funkcji wykładniczej: poniżej mniej więcej $\val{p18.cliff}$ pod
-największym wynikiem $e^{z_c - \max z}$ jest dokładnie zerem w binary64, więc
-$p_c$ też. Węższy format przesuwa go znacznie bliżej.
+Z niedomiaru arytmetyki \dash{} i to dzielenia, a nie samej funkcji
+wykładniczej. Poniżej mniej więcej $\val{p18.cliff}$ pod największym wynikiem
+$e^{z_c - \max z}$ jest wciąż liczbą subnormalną, a to podzielenie jej przez
+sumę wykładników zaokrągla $p_c$ dokładnie do zera; sama funkcja wykładnicza
+dociąga do mniej więcej $\val{p18.cliff.exp}$. Węższy format przesuwa oba
+progi znacznie bliżej.
 \end{ansblock}
 
 To jest podłoga z Programu~\ref{prog:P01} docierająca do najczęściej
-używanego wyprowadzenia w dziedzinie, a skrypt znajduje ten próg przez
-bisekcję, zamiast go cytować, więc zmiana formatu zmienia liczbę na stronie.
+używanego wyprowadzenia w dziedzinie, a skrypt znajduje oba progi przez
+bisekcję, zamiast je cytować, więc zmiana formatu zmienia liczby na stronie.
 
 \begin{trapbox}
 \textbf{\enquote{Wersja połączona to optymalizacja.}} Jest tańsza, a gdyby to
@@ -666,13 +699,15 @@ Wszystko inne wyprowadzono tutaj z nich w linijkę albo dwie.
   wyjście dzieli mianownik z każdym wejściem}.}
 \sumitem{16--17}{\result{$J = \diag(\vect{p}) - \vect{p}\vect{p}\T$, sprawdzone do
   $\val{p18.jac.bound}$}.}
-\sumitem{18--19}{\result{\textbf{Każdy wiersz $J$ sumuje się do zera}:
+\sumitem{18--19}{\result{\textbf{Każda \emph{kolumna} $J$ sumuje się do zera}:
   prawdopodobieństwa sumują się do $1$, cokolwiek robią wyniki, po
-  zróżniczkowaniu. $\softmax$ przesuwa prawdopodobieństwo i nigdy nie robi go
-  więcej}.}
+  zróżniczkowaniu po jednym wyniku. Każdy \emph{wiersz} też sumuje się do
+  zera, z innego powodu: $\softmax$ ignoruje stałą dodaną do każdego wyniku,
+  a pokrywa się to tylko dlatego, że ten $J$ jest symetryczny. $\softmax$
+  przesuwa prawdopodobieństwo i nigdy nie robi go więcej}.}
 \sumitem{20--21}{\result{Przy $n = 2$ sprowadza się do $\sigma'(a-b)$, na
   $\val{p18.gate.f07.pairs}$ parach \dash{} zróżniczkowana tożsamość z
-  Programu~\ref{prog:F07}, brama, a nie podobieństwo}.}
+  Programu~\ref{prog:F07}, jedna obliczona rzecz, a nie podobieństwo}.}
 \sumitem{22}{\result{\textbf{Entropia krzyżowa jest tu zdefiniowana, a uzasadniona
   później}: $-\sum_j y_j \ln p_j$, czyli $-\ln p_c$ dla celu one-hot.} Program~\ref{prog:P26} mówi, dlaczego to właściwa rzecz do minimalizowania,
   a Program~\ref{prog:P30}, co ona mierzy.}
@@ -690,7 +725,7 @@ Wszystko inne wyprowadzono tutaj z nich w linijkę albo dwie.
   $\val{p18.ln.bound}$}.}
 \sumitem{32--33}{\result{\textbf{Łączenie, powód pierwszy: koszt.}
   $\val{p18.fuse.ratio}$ razy mniej operacji, a jakobian, którego nikt nie
-  tworzy, miałby $\val{p18.fuse.gib}$ GiB}.}
+  tworzy, miałby $\val{p18.fuse.gb}$ GB}.}
 \sumitem{34--35}{\result{\textbf{Powód drugi i nie chodzi w nim o szybkość}: droga
   dwukrokowa tworzy $-1/p_c$, a $p_c$ wpada w niedomiar do zera, podczas gdy
   $\vect{p}-\vect{y}$ nigdy nie tworzy odwrotności}.}
@@ -712,15 +747,20 @@ Wszystko inne wyprowadzono tutaj z nich w linijkę albo dwie.
   \answerto{$\partial L/\partial W$ ma $256 \times 1024$, czyli kształt $W$,
   bo $L$ jest skalarem. $\partial\vect{z}/\partial\vect{x}$ ma też
   $256 \times 1024$ \dash{} jeden wiersz na wyjście, jedna kolumna na
-  wejście \dash{} i jest samym $W$. To, że oba się tu zgadzają, jest
-  przypadkiem tej warstwy, a nie regułą.}
+  wejście \dash{} i jest samym $W$. To, że oba się zgadzają, jest własnością
+  \emph{każdej} warstwy liniowej, a nie przypadkiem tej: $\partial\vect{z}/
+  \partial\vect{x}$ jest samym $W$ z ramki 4, a $\partial L/\partial W$ ma
+  kształt $W$ z reguły skalarnej. Nie jest to natomiast ogólna reguła o
+  różniczkowaniu po macierzy i po wektorze.}
 \item Klasyfikator na $10$ klasach przewiduje
   $\vect{p} = (\num{0.7}, \num{0.2}, \num{0.1}, 0, \ldots)$, a prawdziwa
   klasa jest druga. Podaj gradient po wynikach.
   \answerto{$\vect{p} - \vect{y} = (\num{0.7}, -\num{0.8}, \num{0.1}, 0,
   \ldots)$. Prawdziwa klasa jest pchana w górę o $\num{0.8}$ brakującego
   prawdopodobieństwa, a każda inna w dół o to, które trzyma; wpisy sumują się
-  do zera, w czym przebijają sumy wierszy jakobianu $\softmax$.}
+  do zera, w czym przebijają sumy \emph{wierszy} jakobianu \dash{} a te są
+  zerami, bo $\softmax$ ignoruje stałą dodaną do każdego wyniku, więc
+  podniesienie wszystkich dziesięciu razem nie może zmienić straty.}
 \item Dlaczego nie da się sprawdzić jakobianu $\softmax$ przez sprawdzenie,
   że jest diagonalny?
   \answerto{Bo nie jest diagonalny i o to w nim chodzi: każde wyjście dzieli

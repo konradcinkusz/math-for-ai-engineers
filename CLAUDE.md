@@ -21,10 +21,10 @@ companion volumes.
 
 | | Pages | Errors | Unresolved | Overfull hbox | Overfull vbox |
 |---|---|---|---|---|---|
-| `main-en` (17x24) | 1423 | 0 | 0 | **0** | 0 |
-| `main-pl` (17x24) | 1456 | 0 | 0 | **0** | 0 |
-| `main-en-a4` | 1188 | 0 | 0 | 1, the 6.3 pt below | 0 |
-| `main-pl-a4` | 1204 | 0 | 0 | **0** | 0 |
+| `main-en` (17x24) | 1435 | 0 | 0 | **0** | 0 |
+| `main-pl` (17x24) | 1460 | 0 | 0 | **0** | 0 |
+| `main-en-a4` | 1194 | 0 | 0 | 1, the 6.3 pt below | 0 |
+| `main-pl-a4` | 1210 | 0 | 0 | **0** | 0 |
 
 **Three of the four builds now carry no overfull box at all, and the fourth
 carries one.** That box is `$7\,000\,000\,000$` in F1, which cannot break; it
@@ -108,14 +108,14 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1651 computed values, all referenced, all present, plus the committed console
+- 1656 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
   moves and the appendix does not \dash{} which is why the appendix's own
   fourteen values are inside this count
 - 0 `verifybox` blocks · 300 Mermaid sources, all rendering
-- 84 `\transcript{}` references, every one backed by a committed file and
+- 88 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
 - **54 Polish renderings named in Appendix~D, every one used in the prose of
@@ -133,7 +133,7 @@ what was there before.
   both editions for the whole of the book; see *Appendix E pass* below
 - **0 stranded frame openers and 0 stranded section headings**, in all four
   builds. Both are structural and both are hard gates in `tools/checkpdf.py`.
-- **94 orphan-tail pages: 27 · 30 · 19 · 18** across `main-en`, `main-pl`,
+- **99 orphan-tail pages: 28 · 31 · 22 · 18** across `main-en`, `main-pl`,
   `main-en-a4`, `main-pl-a4`. **The passes that have taken the count DOWN are
   listed rather than counted**, because the tally that used to head this entry
   said *five* over a list of four and nothing could check it \dash{} which is
@@ -14537,6 +14537,517 @@ duplicated a word \dash{} all fixed before the build, which is what that
 instrument is for. Its JOIN candidates were ordinary inflected Polish words and
 the line-length instrument reported zero for every one of them, which is the
 two-instrument rule doing its job rather than a defect.
+
+### Part V review, P15 to P18, September 2026
+
+Issues \#173, \#155, \#159 and \#162, taken as one batch on the Foundation
+precedent that each PR costs a four-format build. This closes Part~V's program
+reviews.
+
+#### THE FINDING: a true claim carrying the other axis's reason
+
+Program~\ref{prog:P18} \S3 derives the $\softmax$ Jacobian and reads a property
+off it: the probabilities sum to $1$ whatever the scores are, so differentiate
+that statement with respect to one score and the responses must cancel. **The
+frame, its Quiz answer and its Summary item all said this makes the rows sum to
+zero.**
+
+The rows do sum to zero. So does every column. **What the argument on the page
+proves is the column**, because $\sum_i p_i$ differentiated with respect to
+$z_j$ is $\sum_i \partial p_i/\partial z_j$, which in numerator layout is the
+sum *down* column $j$. The rows sum to zero for a different reason entirely
+\dash{} $\sum_j \partial p_i/\partial z_j$ is what happens to one probability
+when *every* score moves together, and a $\softmax$ is unchanged by adding a
+constant to all its scores.
+
+**So nothing on the page was arithmetically false, and that is what let it
+survive.** The claim was true, its justification belonged to the other index,
+and the two coincide here only because this particular $J$ is symmetric
+\dash{} which is a property of the $\softmax$ Jacobian and not of Jacobians. In
+the one section whose whole subject is that a Jacobian has two indices and that
+which one you hold fixed *is* the content of a layout convention, giving one of
+them the other's argument is the defect the section exists to prevent.
+
+The Summary item is `\result{}`-wrapped, so Appendix~\ref{app:C} replayed it,
+which is the blocker batch's shape once more, after that batch and the
+F07/F12/F13 one: **one wrong statement is wrong in exactly two places and one
+fix is right in exactly two.** The frame now delivers both sums with their two
+distinct reasons, a note says they coincide only through the symmetry, and the
+Quiz, the Summary item and the Test exercise each name the axis their own
+argument proves.
+
+**And the first draft of this note said the row sums are \enquote{not zero and
+have no reason to be}**, which is false, and it is the class the note is about.
+It was caught by opening the corrected frames rather than by writing from the
+feel of the fix \dash{} which is the only thing that has ever caught this class
+\dash{} and the true finding is the sharper one: a claim carrying the wrong
+reason is harder to see than a wrong claim, because nothing it says is false.
+
+#### A quantity computed in one unit and printed in the other
+
+Program~\ref{prog:P18} priced the Jacobian nobody forms at \enquote{$5$ GiB}.
+The script computes $2n^{2}$ bytes at $n = \val{p18.vocab}$, which is
+$5 \times 10^{9}$ **exactly** \dash{} five gigabytes by construction, and
+$\num{4.66}$ GiB. So the page named one unit and printed the other unit's
+number.
+
+That is Program~\ref{prog:P32}'s MiB defect recurring one part earlier, and it
+escaped for the same reason: nobody divides a memory figure by $1024^{3}$ to
+check a unit. What is different is that here the figure a reader can reproduce
+is the one that was mislabelled \dash{} $2n^{2}$ with $n$ a round
+$\num{50000}$ is arithmetic anybody can do in their head, and $\num{4.66}$ is
+not, so checking the number would have confirmed it while checking the unit
+was the thing nobody did. The key is `p18.fuse.gb` now, the page says GB, and
+the script asserts both the exact $5 \times 10^{9}$ and that the GiB reading
+would have been $\num{4.66}$, so the two cannot be confused again.
+
+#### The transcript answered a later frame, twice in one batch
+
+Program~\ref{prog:P15}'s listing printed the dot product with $(\num{0.6},
+\num{0.8})$ \dash{} which is exactly what the next frame elicits \dash{} on the
+page before the question. Program~\ref{prog:P16}'s printed frame 34's answer,
+`a.grad` as $\num{5.0}$ with `b.v` two lines above it, in frame 31, on the
+facing page of the same spread.
+
+Both were split in two, with the half that confirms moved below the answer it
+confirms, and both halves replayed in a REPL. That is
+Program~\ref{prog:P23}'s rule (**a transcript may not answer any question put
+to the reader anywhere later in the program**), which now has instances in
+P04, P23, P08 and both of these.
+
+The batch's own contribution is a count rather than a rule: **the two splits
+took the book from $84$ transcript references to $88$**, so there are now four
+more places a listing can fail to fit and the guard has four more chances to
+turn a page. The ledger at the top of this file moved with them, and see below
+for how it was caught.
+
+#### The ledger went stale inside the batch that moved it
+
+`make verify` reported `figures/values/appf.tex` STALE on this pass's own tree.
+The cause is the two transcripts above and the four values P15 and P16 emitted:
+those three commits moved the ledger and **did not re-run
+`code/appf_ledgers.py`**, so the appendix that prints the counts had been three
+commits behind since the first of them.
+
+This is the standing instruction from the Part~II elicitation pass \dash{} *a
+pass that moves a ledger has to re-run the script and grep the prose for it*
+\dash{} arriving again, and the shape has been identical every time:
+**the gated copy was caught and the ungated sentence four hundred lines up was
+not.** `make verify` refuses the tree until `appf.tex` is regenerated; nothing
+refuses anything about this file's own \enquote{$1651$ computed values}, which
+was also three behind and was corrected by hand here.
+
+The narrow habit that would retire it: **regenerate `appf.tex` in the same
+command that runs the source gates**, rather than at the end of a batch, so a
+mid-batch commit cannot carry a stale ledger even briefly.
+
+#### Three claims about other programs, and all three were opened
+
+- **\enquote{Program~\ref{prog:P05}'s inequality}**, in a
+  Program~\ref{prog:P15} note giving the reason a directional derivative is
+  bounded by the gradient's length. **The book states no such inequality
+  anywhere**, which Program~\ref{prog:P24}'s own pass had already recorded
+  about Cauchy--Schwarz and which nothing had swept for. What the argument
+  needs is the identity directly above it and a cosine that cannot exceed one.
+- **\enquote{Program~\ref{prog:F01}'s ladder of magnitudes has nothing on it
+  that big}**, in Program~\ref{prog:P17}, of a Hessian at
+  $\num{9.8e19}$ bytes. The ladder's top rung is $10^{22}$. The frame now says
+  what is true and keeps the point: it clears every rung but the top one, and
+  the comparison is not like for like, because those are quantities spent over
+  months where this is bytes held at once.
+- **And my own first replacement for that one was two orders out**, saying the
+  Hessian is *of the same order as the arithmetic of training the model once*.
+  Caught by opening `f01-magnitudes.mmd` rather than by reasoning about it,
+  which is the only thing that has ever caught this class.
+
+#### Two claims true of something narrower than the sentence they sat in
+
+Both Program~\ref{prog:P17}, and both about the same inequality.
+
+- **\enquote{The largest usable $\eta$} is $2/\lambda$, which does not
+  converge.** The stable set is open and has no largest member, so the Quiz
+  asked for something that does not exist \dash{} and its own Test exercise 1
+  asked for the *ceiling*, which is right, so the program contradicted itself
+  between its entry instrument and its exit one.
+- **\enquote{Only just, which is why its steep coordinate flips sign}** gives
+  the flip the wrong cause. $1 - \eta\lambda$ goes negative as soon as $\eta$
+  passes $1/\lambda$, which is **half** the boundary, so alternation is the
+  normal behaviour over the whole upper half of the stable range rather than a
+  symptom of being near the edge. The factor is emitted and asserted, and the
+  frame now says a sign flip is not a warning.
+
+And one that is the same shape one level up: Program~\ref{prog:P17} frame 38's
+invariance is a claim about a **uniform** rescaling. Rescale one parameter
+among many \dash{} which is the case its own \S5 built \dash{} and one shared
+$\eta$ cannot follow. The frame and its Summary item both carry the qualifier
+now.
+
+#### Reverse mode is not a bracketing of $Jv$, which is what the frame said
+
+Program~\ref{prog:P16} frame 14 called the left-to-right bracketing of
+$J_3J_2J_1v$ \enquote{reverse mode}. $(J_3J_2)$ is a matrix--matrix product,
+which is exactly the object the next frame's note says neither mode ever forms.
+
+Reverse mode is not a bracketing of $Jv$ at all: it is the left-to-right
+bracketing of $u\T J_3J_2J_1$, in which **every intermediate stays a row
+vector**. So the frame named the right algorithm for the wrong expression, in
+the program whose entire decision procedure is which of two products you are
+associating. Frame 13 now asks for the two quantities it has just named, frame
+14 answers with one bracket of $Jv$ and one of $u\T J$ and names the third
+bracket as the matrix-forming one nobody uses, and Summary item 6 says the
+same.
+
+#### A gradient check quoted a digit count the program's own check beats by four orders
+
+\enquote{A gradient check that agrees to four or five digits is what a correct
+implementation looks like} sits beside this program's own check agreeing to
+better than $\val{p16.check.bound}$. There is no one digit count that means
+correct: it depends on the difference, its step and its precision, and a
+one-sided check in single precision is a different instrument from a central
+difference in double. The frame says that now, which is more useful than either
+number.
+
+#### THE MEASUREMENT: a per-program inconsistency that is a book-wide drift
+
+Issue \#162's last finding is that Program~\ref{prog:P18}'s questions carry a
+row of dots $13$ times and not $6$, with no visible rule, and asks for one rule
+applied or dots everywhere.
+
+**Measured across all forty-seven programs before deciding**, which is
+Appendix~\ref{app:C}'s pass's rule about checking whether an existing mark
+means what you need across the corpus rather than across the files you happened
+to open:
+
+| | programs | dotted share |
+|---|---|---|
+| every elicitation dotted | $17$ | $100\%$ |
+| mixed | $30$ | $10\%$ to $79\%$ |
+| the book | $47$ | $64\%$ |
+
+The $657$ dotted and $371$ dotless add to $1028$, which is the elicitation
+ledger's own figure, so the two measurements check each other.
+
+**The $100\%$ programs are two blocks \dash{} P07 to P11, and P23 to P34
+\dash{} with a mixed band of P12 to P22 between them at $42\%$ to $79\%$, and
+the lowest rates in the book in the Foundation part**, F08 at $10\%$ and F09
+at $15\%$. P18 at $68\%$ sits inside the mixed band and is not an outlier in
+it. **No cause is claimed here**: the two blocks are suggestive and this pass
+did not open those programs to find out, and a mechanism read off the shape of
+a table is the class this file keeps recording.
+
+That is enough to change the fix, and is why nothing was edited. Adding six dot
+rows to P18 would move one program to $100\%$ and leave twenty-nine mixed,
+which is Program~\ref{prog:P28}'s finding exactly \dash{} **fixing an instance
+is not fixing the class**. The book-wide fix is $371$ additions across thirty
+programs in both editions, every one a lengthening, which re-rolls pagination
+in most of the book: a pass of its own, on the scale of the two elicitation
+passes.
+
+**And the rule half of the issue's suggestion is not available either**, which
+the same measurement settles. The dotted set already contains pure prose
+judgements \dash{} \enquote{what is it telling each one to do}, \enquote{say
+why its derivative cannot be elementwise} \dash{} and the dotless set contains
+formulas. So *dots where a symbol is produced* describes neither set, and
+stating it as the rule would mean removing dots from prose questions as well as
+adding them to symbolic ones: twenty edits in P18 alone, half of them
+shortening frames, which is the direction Program~\ref{prog:F06}'s rule warns
+about.
+
+Recorded rather than taken, with the measurement, which is the standing
+precedent. **The deliverable is the table**, exactly as the F03 second review
+pass said of its own rule-2 page measurement.
+
+#### And removing the spoiler took the declared forward reference with it
+
+Outcome 4 read \enquote{derive that the gradient of cross-entropy through a
+$\softmax$ is $\vect{p} - \vect{y}$ \dash{} the definition of cross-entropy is
+\emph{given} here and justified in Program~\ref{prog:P30}}. The first half is
+the spoiler above; **the second half is the declared forward reference**, and
+cutting the sentence cut both.
+
+That falsifies two things at once, and neither is in the program's frames.
+P18's own file header says \enquote{section 4 gives it a definitional frame and
+the Learning outcomes say so}, so the header was made false by this pass's own
+correction \dash{} which is Appendix~\ref{app:D}'s class, and the second
+instance in this run after Program~\ref{prog:F12}'s. And the *Structure*
+section of this file states the convention the pointer exists for: each
+declared forward reference is stated in the owning program's Learning outcomes
+with a pointer, and P18's is one of the four.
+
+**No gate reaches it.** C14 compares the two editions' macro histograms, so a
+`\ref` removed from both is invisible; `--outcomes` counts declarations and
+checks the panel's placement; nothing reads what an outcome says.
+
+**And restoring the pointer verbatim would have reinstated the issue's first
+major finding, which is the part worth carrying.** That pointer said the
+definition is \enquote{justified in Program~\ref{prog:P30}} \dash{} while frame
+22 and Summary item 12 both say Program~\ref{prog:P26} justifies it and
+Program~\ref{prog:P30} says what it measures, and so does this file's own
+account of the declared forward reference. **Three statements about one
+question, and the outcome was the odd one out**, on the page a reader meets
+first and the page they self-rate on. It now names both, in the order the
+frames do.
+
+So the outcome names the skill, carries no finding, keeps the pointer **and
+agrees with the frames**, which is what the convention asked for all along.
+The issue's own closing nit asks for the opposite \dash{} move the pointer out
+of the outcome and leave it in frame 22 and the Summary, because the extra
+clause unbalances the rating table \dash{} and that is refused for the reason
+this subsection exists: the pointer is not an editorial aside, it is the
+declaration, and a rating table's shape is not worth the convention.
+
+Two generalisable halves, and the second is the sharper one. **A spoiler fix
+is a deletion, and a deletion cannot be checked for what it takes with it**
+\dash{} every recorded instance of this class was an edit that made a *claim*
+false, and this one made a *promise* undeliverable by removing the thing the
+promise pointed at. And **restoring what a deletion took is not a revert**: the
+text that comes back is as old as the defect that was in it, so it gets read
+against the current frames like anything else. Here it was three lines of
+`grep` and it turned one recorded defect into two fixed ones.
+
+#### Also
+
+- **Program~\ref{prog:P18}'s opener spent its own headline.** Outcome 4
+  promised the reader would \enquote{derive $\vect{p} - \vect{y}$}, printing
+  \S4's result on the program's first page. The outcome names the skill now and
+  carries no finding, which is the correction F03, F04 and F08 each needed
+  \dash{} an outcome reads like a promise and writes like a summary. What the
+  first cut of that fix also removed is the subsection above.
+- **Program~\ref{prog:P18}'s index clash.** Frame 12 differentiates $L =
+  \sum_k r_k^{2}$ by $W_{ij}$ and used $j$ for both the column of $W$ and the
+  summation index inside $r_i$, so the surviving term was named by a letter
+  already bound. The inner sum runs over $m$ now, and the frame says which term
+  survives and why.
+- **$\diag$ arrived undefined** in the Jacobian's matrix form, and
+  `p18.cliff` was reported at the exponential's threshold rather than the
+  division's \dash{} the two are $\val{p18.cliff}$ and
+  $\val{p18.cliff.exp}$, found by bisection, and the frame now says which step
+  underflows first and why the reciprocal is the one that matters.
+- **An announced trap** \dash{} \enquote{which is where the whole thing could
+  go wrong, and section 5 is about that $1/p_c$} \dash{} removed on the F02
+  review pass's rule, with a neutral forward pointer in the frame after.
+- Repository jargon off the page in four places: \enquote{one gate},
+  \enquote{a gate is worth its lines}, \enquote{the brief for this program},
+  and a Summary item calling a cross-check \enquote{a gate rather than a
+  resemblance}. The last is `\result{}`-wrapped, so Appendix~\ref{app:C}
+  carried it too.
+- **Program~\ref{prog:P15}'s $D_u f = \nabla f \cdot u$ was asserted from
+  \enquote{the limit being linear in the direction} with no rigour box.** That
+  linearity *is* differentiability, so the argument assumed its own hypothesis;
+  a rigour box says so and gives the standard counterexample, whose partials
+  are zero at the origin while the rate along $(a, b)$ is $b^{2}/a$, checked in
+  the script at three directions.
+- **Program~\ref{prog:P15}'s \S5 bowl was never written as a function**, and
+  every number in the section needs a $\frac{1}{2}$ the page never stated
+  \dash{} while the only quadratic the program does write, in \S4, uses the
+  other convention and would give a gradient twice as large. The bowl is
+  written out where it is introduced, with the reason for the half.
+- **A source-line break inside a hyphenated word.** \enquote{over-correct}
+  split across two source lines printed as \enquote{over- correct}. A sweep of
+  both editions found no second instance, which is worth knowing because
+  nothing in this repository reads prose and the detector the elicitation
+  passes built looks for joins rather than for splits.
+
+#### The one book-wide layout change this batch took, and the two it did not
+
+Issue \#159 asks for it by name and offers three ways: give `trapbox` (and
+`warning`, `note`, `aibox`) the continuation mark `summarybox` already uses,
+repeat a dimmed title on continuation pieces, or shorten the box. **The mark
+is the cheapest of the three and it is one key.**
+
+That is a book-wide layout change, which the P05 review pass and the F08--F11
+batch both say to record rather than take. **What separates this one is that
+an overlay adds no height, so it cannot move a page** \dash{} and that is a
+reading of a mechanism, which this file's own rule says stays labelled as
+judgement until it is run. So it was measured first, with compression off and
+the fill operators counted: **a broken box gains exactly one filled path on
+its first piece and none on its last**, which is what `overlay first and
+middle` promises and is the whole of what it costs.
+
+**And that fill count is the whole of the evidence, because the book build
+cannot separate it.** Four programs' prose landed in the same tree, so every
+page delta below measures both and attributes neither \dash{} which is exactly
+the position the Appendix~E pass recorded for its own front-matter fix. The
+prediction was tested where it could be tested, at the mechanism; **do not
+read the page table as confirmation of it.**
+
+`\mfacontinuationmark` generalises from `fill=mblue` to `fill=tcbcolframe`,
+which is byte-identical for `summarybox` \dash{} whose `colframe` **is**
+`mblue` \dash{} and gives every other box a mark in its own colour. Putting
+the key on the two shared styles reaches all eight admonitions and nothing
+else, which is what those styles exist for.
+
+**The answer box opts out, and that was verified rather than assumed.**
+`mfa answer` derives from `mfa outlined`, so it would have inherited the mark
+\dash{} and the preamble's own comment says it appears about thirty times per
+program against an admonition's four or five, which is already the reason its
+rule is the lighter one. `no overlay` is the key that clears an inherited
+overlay, and it was put to TeX in both directions before being believed: with
+it a broken box's first piece carries two filled paths, without it three, and
+its last piece two either way.
+
+**The generalisable half is that one issue named one defect and asked for two
+fixes whose costs differ by a whole build.** The same finding \dash{} a
+bordered block opening a recto anonymously \dash{} can be answered by marking
+the break or by preventing it, and the second is a room test. A room test
+turns pages, and the F08--F11 batch measured exactly what that costs: its
+transcript guard cleared a split no editorial fix could settle and put three
+orphaned cues and three orphan tails back doing it. An overlay draws inside
+padding that is already there. **Ask which half of a layout fix is being
+proposed before pricing it**, because \enquote{mark it} and \enquote{stop it
+happening} look like one job and are not.
+
+So the room test for the un-numbered back-matter headings is recorded below
+rather than taken, and it now has a diagnosis it did not have: `quiz` **does**
+carry a room test, of $8\baselineskip$ \dash{} heading, instruction and the
+first question \dash{} and its box separately carries `lines before break=12`.
+Those two constants disagree, so there is a window in which the reserve passes
+and the box then moves whole, which is exactly the stranding the issue
+reports. And **no instrument counts it**: `checkpdf`'s heading check learns the
+*numbered* heading's size from the document, so a `\section*` left behind is
+invisible to it. A pass that takes this needs the instrument first, then a
+sweep across four builds, which is what the `\section` guard's own constant
+cost when it was chosen.
+
+#### A reviewer asked for the fix that had already shipped
+
+Issue \#159's sliver finding \dash{} an empty framed box at the foot of a
+page where a transcript begins \dash{} proposes *a `\needspace`-style room
+test before `\transcript` sized for at least three listing lines*. **That is
+verbatim the guard the F08--F11 batch shipped**, and the ancestry is
+checkable: the issue's own base, `9402620`, is an ancestor of `5dc186c`, which
+is where the guard landed.
+
+The P01/P02 pass named the rule \dash{} **a review is a claim about the build
+it was made on** \dash{} and this is its strongest form yet. Every previous
+instance was a finding that no longer reproduces; here the *remedy* the
+reviewer specifies is the remedy in the tree, arrived at independently by two
+readers of the same defect. It cost one `git merge-base` to establish, and it
+is the second such retirement in this batch after the two \enquote{Can you?}
+panel majors the Part~III batch had already closed.
+
+#### Recorded rather than taken
+
+All four are book-wide layout changes nobody has measured, which is the P05
+review pass's precedent: the next person meets the obstacle with the reasoning
+rather than rediscovering it.
+
+- **The un-numbered back-matter headings need the room test `\section` has**
+  \dash{} \enquote{Quiz}, \enquote{Can you?}, \enquote{Test exercises} \dash{}
+  with the diagnosis above and the instrument owed before the sweep. Fourth
+  batch running that the Quiz half of this has been recorded.
+- **A Summary item breaks inside its bolded lead.** The Summary is scanned by
+  running down the leads, so a lead split across a leaf breaks the one thing
+  being scanned, and the continuation mark cannot rescue a break inside a
+  phrase. The fix is a `\penalty` inside `\sumitem`, which is one line and
+  moves pagination in every program whose Summary spans a break.
+- **All three of Program~\ref{prog:P17}'s figures are three grey boxes of
+  prose**, in the program whose subject \dash{} a parabola hugging a curve, a
+  ravine's stretched contours, one basin drawn twice at two scales \dash{} is
+  the most drawable material in Part~V. The obstacle is the one the P05 review
+  pass named and it is convention rather than capability: every figure in this
+  book is a committed Mermaid source rendered per language and counted in
+  Appendix~F's manifest, and a drawn figure would be a second mechanism
+  outside that pipeline.
+- **A blank verso carries a running head**, found and deliberately left in the
+  F04 review pass for the reason recorded there.
+
+#### Layout, and a cue walk whose second round measured half the book
+
+`MAKE_EXIT 0`, all four formats, zero errors and zero unresolved references.
+
+| | pages | was | overfull hbox | vbox |
+|---|---|---|---|---|
+| `main-en` | 1435 | 1423 | `[]` | 0 |
+| `main-pl` | 1460 | 1456 | `[]` | 0 |
+| `main-en-a4` | 1194 | 1188 | `[6.3]` | 0 |
+| `main-pl-a4` | 1210 | 1204 | `[]` | 0 |
+
+**The overfull multiset came back element for element to the baseline in all
+four builds** \dash{} the one box is F01's unbreakable $7\,000\,000\,000$
+\dash{} with zero overfull vboxes, no stranded frame openers, no stranded
+section headings and, after four rounds, no orphaned cues.
+
+**And the orphan tails went 94 to 99**: 28, 31, 22, 18 against 27, 30, 19, 18.
+Up one, one and three, level in `main-pl-a4`. That is a correctness batch
+moving the ledger the wrong way, which is the F01--F06 finding's other
+direction and the fourth batch running to demonstrate that **a correctness pass
+is also a layout pass** \dash{} the arithmetic of the page is not something a
+pass gets to choose.
+
+The cue walk took four rounds, and **round 2 measured two of the four builds.**
+
+| round | edit | result |
+|---|---|---|
+| 1 | \dash{} | 2 orphaned cues, **both in `main-pl-a4`**: P16 frame 28 and P17 frame 35 |
+| 2 | both lengthened, both editions | `main-en` clean, **`main-pl` gained one** at P16 frame 30 \dash{} and the A4 pair was never measured |
+| 3 | P16 frame 30 lengthened | trade pair clean, `main-pl-a4` clean, **`main-en-a4` gained one at P16 frame 28** |
+| 4 | P16 frame 28 lengthened again | clean, all four |
+
+**Round 2's `check` failed, so `check-a4` did not run**, which is the ledger
+entry this file already carries and the reason its own orphan-tail figures were
+once stitched together from two builds. It has a consequence for the walk
+rather than only for the ledger: after round 2 there was no evidence that round
+1's two A4 cues had cleared, and none until round 3. **A round that ends red
+has told you about the builds upstream of the gate and nothing about the ones
+after it**, so a walk cannot be read as converging until a round runs green to
+the end.
+
+**And round 3's cue was on the frame round 2 had lengthened, moved from
+`main-pl-a4` into `main-en-a4`.** The Part~III batch recorded exactly that
+hand-off, on exactly that pair of builds, on a frame it lengthened three times;
+this is the second instance, in a different program and a different part. The
+two A4 builds are set to about the same measure, so a tail sitting one line
+from a boundary in one is not far from it in the other \dash{} which is a
+reading of the mechanism rather than a measurement, and is labelled as one.
+What is measured is that lengthening for `main-pl-a4` twice now produced a cue
+in `main-en-a4`, which is worth expecting rather than being surprised by.
+
+Round 2's own new cue is the other half of the walk and is a different shape:
+it landed **two frames after** the frame that round lengthened, with a section
+heading between them. That is the F08--F11 batch's shortest-range walk one
+frame further out, and the heading is the part worth noticing \dash{}
+`\section` carries its own room test, so between a lengthened frame and the
+next cue there is a second thing that can turn a page.
+
+The four cues landed two in `main-pl-a4`, one in `main-pl` and one in
+`main-en-a4`, so `main-en` is the one build that stayed clean throughout.
+**No pattern is claimed from that**: four observations across three builds is
+not a distribution, and the same paragraphs went into both editions, so where
+the lines fall is the whole of it. It is the standing reason to re-measure all
+four rather than the one you wrote in.
+
+Every round was a **lengthening**, in both editions, which is
+Program~\ref{prog:F06}'s two-sided rule; **no recorded attempt to clear an
+orphaned cue by lengthening has failed.** Every added paragraph earns its
+place. Frame 28's first says what the finite difference *needs* \dash{} two
+values of the function and nothing else, so it would run unchanged against a
+model whose gradient code you have never seen, and a check sharing machinery
+with the thing it checks would agree with it for the wrong reason; its second
+sets that against what \S16.4 has just counted, because reverse mode's whole
+bill was the intermediates it has to keep and a finite difference keeps
+nothing, so whatever the objection turns out to be it is not memory. Frame 30's
+says the three silent failures get harder in a particular way \dash{} the first
+fits in one line of code and the other two are relationships between two places
+in a program written at different times, each correct read alone. P17 frame
+35's says the awkward reparametrisation is not one case to be legislated
+against but the general one, so a claim about sharpness needs a measure that
+transforms with the parameters.
+
+**The transcript guard fired 8 / 9 / 6 / 11**, against the 8 / 7 / 6 / 11 the
+Part~III batch recorded, and the counts are taken from the final `latexmk`
+pass. The two splits above took the book from $84$ transcript references to
+$88$, so there are four more places a listing can fail to fit; `main-pl` is
+where two of them landed.
+
+#### Gates
+
+Every source gate run **before** the build, which is Program~\ref{prog:P33}'s
+rule again: parity $56$ file pairs / $1864$ frames / $0$
+failures and $0$ warnings on the first run; `--frames --answers --outcomes
+--values --elicit --scripts --terms --parts` green; `gen_stubs --check`
+current. The elicitation rate is unmoved at $1028/1864$, because the batch
+converted nothing and added no frame.
 
 ### Stroud layout pass, August 2026
 

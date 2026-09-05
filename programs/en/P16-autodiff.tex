@@ -67,7 +67,7 @@
   input. It is called the Jacobian, and Program~\ref{prog:P15}'s gradient is
   the case $n = 1$.}
 \item Why does a framework not compute the Jacobian of a network?
-  \teachesat{13--14}
+  \teachesat{12--13}
   \answerto{Because it would have one row per output and one column per
   parameter, which for a real model is a matrix nobody can store. What is
   computed is a \emph{product} with it, which is the same size as the
@@ -253,7 +253,8 @@ cost to form the whole product?
 \begin{fr}
 \begin{ansblock}
 Each is $\val{p16.width} \times \val{p16.width}$, and forming the product means
-multiplying $\val{p16.depth}$ of them together.
+multiplying $\val{p16.depth}$ of them together: five matrix multiplications, so
+$5 \times \val{p16.width}^{3}$ multiplications in all.
 \end{ansblock}
 
 At those sizes that is nothing. Now put a real layer in: a width of a few
@@ -272,28 +273,40 @@ precise about it.
 You never want $J$. You want either $Jv$ for some direction $v$, or $u^{\mathsf{T}}J$
 for some weighting $u$. Both of those are vectors, not matrices.
 
-Given a chain $J_3 J_2 J_1$ and a vector $v$, write down two different ways to
-bracket the computation of $J_3 J_2 J_1 v$.
+Take a chain $J_3 J_2 J_1$. In what order would you multiply to get
+$J_3 J_2 J_1 v$ without ever building a matrix \dash{} and in what order for
+$u^{\mathsf{T}} J_3 J_2 J_1$?
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
 \begin{ansblock}
-$J_3(J_2(J_1 v))$, working from the right; or $(J_3 J_2) J_1$ and then apply
-it to $v$, working from the left.
+$J_3(J_2(J_1 v))$, from the right; and $((u^{\mathsf{T}}J_3)J_2)J_1$, from the
+left.
 \end{ansblock}
 
-Both give the same answer, because matrix multiplication is associative. They
-do not cost the same, and Program~\ref{prog:P06} measured exactly that: one
-bracketing of a triple product cost $\val{p06.cost.left}$ multiplications and
-the other $\val{p06.cost.right}$, a factor of $\val{p06.cost.ratio}$, for an
-identical result.
+Each keeps every intermediate a vector: a matrix times a vector is a vector,
+and a row vector times a matrix is a row vector, so nothing bigger than a
+layer's worth of numbers ever exists. \textbf{Right-to-left on $Jv$ is forward
+mode. Left-to-right on $u^{\mathsf{T}}J$ is reverse mode.}
 
-\textbf{That measurement is this program's whole subject, taken one program
-before it had a name.} The right-to-left bracketing is forward mode. The
-left-to-right bracketing is reverse mode. The script gates the ratio here
-against P06's committed numbers, so the two programs cannot come apart.
+There is a third way to bracket and nobody uses it. Write $(J_3 J_2) J_1 v$
+and the first step multiplies two \emph{matrices} together, which builds
+exactly the object this section says never gets built. It gives the same
+answer, because matrix multiplication is associative, and it is the expensive
+one \dash{} so the two modes are not the two brackets of $Jv$. They are one
+bracket of $Jv$ and one of $u^{\mathsf{T}}J$.
+
+\textbf{That the bracketing decides the cost is this program's whole subject,
+and Program~\ref{prog:P06} measured it one program before it had a name}: one
+bracketing of a triple product cost $\val{p06.cost.left}$ multiplications and
+the other $\val{p06.cost.right}$, for an identical result. Its shapes are not
+these shapes, so that factor is not the price of choosing the wrong mode
+\dash{} the price for this chain is in section~\ref{sec:P16-modes}, and it is
+the input count. The two figures here are Program~\ref{prog:P06}'s own and the
+script checks them against it, so the two programs cannot disagree about one
+computation.
 
 \mermaidfig{p16-two-brackets}{The same product, from either end.}{two
 brackets}
@@ -307,8 +320,9 @@ matrix times a vector is a vector, so nothing bigger than a layer's worth of
 numbers ever exists. Working from the left with a row vector, the same is true
 from the other end.
 
-Working from the middle outwards would form a matrix, and that is the thing
-neither mode ever does. \textbf{Nobody forms a Jacobian} is not a
+Multiplying two of the Jacobians together first \dash{} $(J_3J_2)$, from
+either end or from the middle \dash{} would form a matrix, and that is the
+thing neither mode ever does. \textbf{Nobody forms a Jacobian} is not a
 simplification; it is a statement about which brackets are used.
 \end{note}
 \end{fr}
@@ -382,8 +396,8 @@ The measurement, on a chain small enough to count exactly. A stack
 $\val{p16.depth}$ deep and $\val{p16.width}$ wide, ending in one output, with
 every Jacobian a rational matrix so nothing rounds.
 
-Both routines count their own multiplications as they go. Predict the ratio
-before reading on.
+Both routines count their own multiplications as they go. Predict the ratio of
+the forward count to the reverse count before reading on.
 \dotline
 \nextframe
 \end{fr}
@@ -407,7 +421,8 @@ folklore, and folklore is what makes people reach for it on a problem with one
 input and ten thousand outputs, where it is exactly as wasteful as forward
 mode is here.
 
-There is a second half people drop, and section 4 is about it: reverse mode
+There is a second half people drop, and section~\ref{sec:P16-memory} is about
+it: reverse mode
 buys its speed with memory, and forward mode does not need any.
 \end{trapbox}
 \end{fr}
@@ -482,8 +497,8 @@ the computation and never looks back, so its memory is a constant. That is the
 second half of the trade the previous section's trapbox named: reverse mode
 buys a factor of the parameter count in time and pays for it in memory.
 
-\mermaidfig{p16-keep-or-recompute}{What the backward pass needs, and the way
-out.}{keep or recompute}
+\mermaidfig{p16-keep-or-recompute}{What the backward pass has to keep, and
+what forward mode does not.}{keep or recompute}
 \end{fr}
 
 \begin{fr}
@@ -529,9 +544,10 @@ $\sqrt{L}$ rather than asserting a tolerance.
 \begin{fr}
 \begin{aibox}
 That factor is the difference between a model that fits on a card and one that
-does not, and the price is stated exactly: one extra forward pass, which is a
-third of a training step rather than a doubling of it, because a step is a
-forward and a backward and the backward is the expensive half.
+does not, and the price is stated exactly: one extra forward pass. That is a
+third more work rather than a doubling, and the arithmetic behind it is worth
+having: a backward pass costs about two forward passes, so a step is roughly
+three forward-equivalents and one more forward is a third on top.
 
 It is also why the knob is usually on or off rather than tuned. The optimum is
 $\sqrt{L}$ and the curve near a minimum is flat \dash{} which
@@ -543,6 +559,18 @@ of two of $\sqrt{L}$ costs almost the same.
 \begin{fr}
 One more thing this section owes, and it is the tool everyone reaches for when
 a gradient looks wrong.
+
+Notice first what the difference needs: two values of the function, and
+nothing else. It does not read the backward pass, does not know which rule was
+applied at which node, and would run unchanged against a model whose gradient
+code you have never seen. That independence is the whole of its value here
+\dash{} a check sharing machinery with the thing it checks would agree with it
+for the wrong reason.
+
+And set it against what this section has just counted. Reverse mode's bill was
+the intermediate values it has to keep, and the whole of this section has been
+about paying it; a finite difference keeps nothing at all, and needs no tape to
+keep it on. Whatever the objection to it turns out to be, it is not memory.
 
 You can always estimate a derivative with a finite difference, as
 Program~\ref{prog:F11} did. Why is that a test of an implementation and not an
@@ -563,13 +591,22 @@ U-curve showed the error falling as the step shrinks and then \emph{rising}
 again as cancellation takes over, with a best case that is nowhere near
 machine precision.
 
-\textbf{So a gradient check that agrees to four or five digits is what a
-correct implementation looks like}, and demanding fifteen would be demanding
-that the test be better than it can be.
+\textbf{So a gradient check does not agree to the last bit}, and demanding
+that it should would be demanding the test be better than it can be.
 
-This program's own differentiator is checked exactly that way: against a
-central difference at $\val{p16.check.n}$ inputs, agreeing to better than
-$\val{p16.check.bound}$. That is the check passing, not the check being weak.
+How close it gets is a property of the difference rather than of the code, and
+it moves with the step, the precision and which difference you take.
+Program~\ref{prog:F11} measured a one-sided difference bottoming out around
+$10^{-8}$; a central difference does better still, because its truncation
+error shrinks as $h^{2}$ rather than as $h$.
+
+So there is no one digit count that means \emph{correct}. A handful of digits
+is what a one-sided check in single precision gives over a whole network; this
+program's own differentiator, checked against a central difference in double
+precision at $\val{p16.check.n}$ inputs, agrees to better than
+$\val{p16.check.bound}$ \dash{} orders tighter. Both are the check passing.
+What would be a mistake is to fix on one tolerance and call everything outside
+it a bug.
 \end{fr}
 
 % ============================================================
@@ -586,6 +623,13 @@ search for.
 All three are demonstrated on a reverse-mode differentiator of about forty
 lines, written for this program, so nothing here depends on a claim about any
 particular framework.
+
+The three are not three versions of one mistake, and they get harder in a
+particular way. This first one is local: one operation, one input value, and
+the whole of the difficulty fits in a single line of code. The other two do
+not fit in any single line, because what has gone wrong is a relationship
+between two places in the program that were written at different times and
+that look correct read separately. They are in that order deliberately.
 
 The first. $\relu$ is not differentiable at zero. What should
 $\frac{\mathrm{d}}{\mathrm{d}x}\relu(x)$ return at exactly $x = 0$?
@@ -604,7 +648,7 @@ And it chooses without telling you. This one returns
 $\val{p16.relu.chosen}$; a different one may return the other; and nothing in
 either case raises anything.
 
-\transcript{p16-silent}
+\transcript{p16-relu}
 
 \begin{trapbox}
 \textbf{\enquote{The gradient is wrong at zero} is the wrong complaint.} There
@@ -653,10 +697,12 @@ invisible in every place people look.
 \end{fr}
 
 \begin{fr}
-The third. A value that the tape still refers to is overwritten in place after
-being used.
+The third. Reverse mode records each operation as it runs \dash{} the
+\textbf{tape} \dash{} keeping for each one either the operand it will need on
+the way back or the local derivative it computed from it.
 
-Say what the backward pass computes with, before reading on.
+Now suppose a value the tape still refers to is overwritten in place after
+being used. Say what the backward pass computes with, before reading on.
 \dotline
 \nextframe
 \end{fr}
@@ -668,11 +714,13 @@ or the new one, depending on whether the local derivative was stored or the
 tensor was.
 \end{ansblock}
 
-In the listing above, the product of $\val{p16.inplace.a}$ and
+In the listing below, the product of $\val{p16.inplace.a}$ and
 $\val{p16.inplace.used}$ stored the second of them as the first one's local
 derivative. Overwriting that second value afterwards leaves the gradient
 computed with $\val{p16.inplace.used}$ while the value now holds
 $\val{p16.inplace.now}$.
+
+\transcript{p16-inplace}
 
 \textbf{So the gradient is consistent with a computation that no longer
 exists.} It is not garbage, which is what makes it dangerous \dash{} it is a
@@ -737,15 +785,21 @@ $\code{backward()}$ is, and there is nothing else in it.
 \sumitem{5--6}{\result{\textbf{A linear map is its own Jacobian}, which is
   Program~\ref{prog:F11}'s statement about a straight line one dimension count
   up. An elementwise activation's Jacobian is diagonal}.}
+\sumitem{7--8}{\result{\textbf{The gradient of a scalar loss is one row and one
+  column per parameter} \dash{} $\val{p16.params}$ numbers here, exactly the
+  size of the model, which is what makes the \emph{next} Jacobian's size the
+  surprise}.}
 \sumitem{9--10}{\result{\textbf{The chain rule multiplies Jacobians}, in the order the
   shapes allow, which is Program~\ref{prog:P06}'s composition}.}
 \sumitem{11--14}{\result{\textbf{Nobody forms a Jacobian.} What is computed is a
   product with one, and the intermediates are then vectors rather than
   matrices}.}
-\sumitem{14--15}{\result{The same product bracketed from either end costs differently
-  \dash{} Program~\ref{prog:P06} measured $\val{p06.cost.left}$ against
-  $\val{p06.cost.right}$ for an identical answer. \textbf{Those two brackets
-  are the two modes.}}}
+\sumitem{14--15}{\result{\textbf{Forward mode is $J_3(J_2(J_1v))$ and reverse
+  mode is $((u\T J_3)J_2)J_1$}: one bracket of $Jv$ and one of $u\T J$, each
+  keeping every intermediate a vector. Multiplying two Jacobians together
+  first is the third bracket, it forms the matrix nobody forms, and
+  Program~\ref{prog:P06} measured $\val{p06.cost.left}$ against
+  $\val{p06.cost.right}$ for what bracketing costs}.}
 \sumitem{16--17}{\result{\textbf{Forward mode costs one pass per input; reverse costs
   one per output.} That is the whole decision procedure and it is two
   integers}.}
@@ -816,7 +870,7 @@ $\code{backward()}$ is, and there is nothing else in it.
   it is.}
 \item Your gradient check agrees to six digits for every parameter except one,
   where it disagrees in the first digit. What are the three candidates from
-  section 5, and how would you tell them apart?
+  section~\ref{sec:P16-silent}, and how would you tell them apart?
   \answerto{A non-differentiable point, a detached path, or an in-place write.
   Perturb that one parameter and watch: if the disagreement vanishes when you
   move slightly off the point, it is the first; if the analytic gradient is
@@ -832,14 +886,15 @@ $\code{backward()}$ is, and there is nothing else in it.
 \end{testexercises}
 
 \begin{furtherproblems}
-\item Show that if $f$ is linear then forward and reverse mode compute the
-  same thing in the same number of operations when there is one input and one
-  output.
-  \answerto{With one input and one output the Jacobian is a single number, the
-  chain is a product of scalars, and both bracketings are the same product in
-  a different order \dash{} the same count either way. The two modes only
-  separate when a dimension is bigger than one, which is another way of saying
-  the shape is the whole argument.}
+\item Show that forward and reverse mode compute the same thing in the same
+  number of operations when there is one input and one output \dash{} and say
+  what you had to assume about $f$.
+  \answerto{Nothing beyond differentiability. With one input and one output
+  every Jacobian in the chain is a single number, the chain is a product of
+  scalars, and both bracketings are the same product in a different order
+  \dash{} the same count either way. Linearity is not used anywhere, which is
+  worth noticing: the shape is the whole argument, and the two modes separate
+  only when a dimension is bigger than one.}
 \item A model has $P$ parameters and the loss is a vector of $C$ per-class
   losses rather than a scalar. What does that do to the cost of getting every
   derivative?
@@ -847,7 +902,7 @@ $\code{backward()}$ is, and there is nothing else in it.
   one pass per output. That is why a training loop reduces to a scalar before
   differentiating: summing or averaging the per-class losses first turns $C$
   passes into one, and it is the same reduction that makes the whole argument
-  in section 3 work.}
+  in section~\ref{sec:P16-modes} work.}
 \item Forward mode needs no stored activations. Why is that not an argument
   for using it in training?
   \answerto{Because it would need one pass per parameter, and the parameter
