@@ -493,17 +493,21 @@ Wróć do grafu wywołań i do własności, której jeszcze nie użyto: nie da s
 wrócić tam, skąd się wyszło.
 
 \textbf{Cykl} to spacer wracający do wierzchołka startowego bez powtarzania
-krawędzi. Graf skierowany bez cykli jest \textbf{acykliczny}, a skierowany graf
-acykliczny to \emph{DAG}.
+krawędzi i bez przechodzenia dwukrotnie przez żaden inny wierzchołek. Graf
+skierowany bez cykli jest \textbf{acykliczny}, a skierowany graf acykliczny to
+\emph{DAG}.
 
-Zastrzeżenie o powtarzaniu czyni to słowo używalnym i warto się przy nim
-zatrzymać. Każdy graf nieskierowany mający choć jedną krawędź ma spacer, który
-wychodzi z wierzchołka i wraca \dash{} owo \enquote{tam i z powrotem} z
-pułapki \dash{} więc bez tego zastrzeżenia nic nie byłoby acykliczne, a
-słowo nie znaczyłoby nic. W grafie skierowanym zastrzeżenie pracuje mniej, bo
-przejście krawędzią z powrotem jest możliwe tylko wtedy, gdy taka krawędź
-istnieje; \emph{to} jest powód, dla którego acykliczność orzeka się o grafach
-skierowanych, a o nieskierowanych prawie nigdy.
+Oba zastrzeżenia są potrzebne i wykluczają co innego. Każdy graf
+nieskierowany mający choć jedną krawędź ma spacer, który wychodzi z
+wierzchołka i wraca \dash{} owo \enquote{tam i z powrotem} z pułapki \dash{}
+więc bez zastrzeżenia o krawędziach nic nie byłoby acykliczne, a słowo nie
+znaczyłoby nic. W grafie skierowanym pracuje ono mniej, bo przejście krawędzią
+z powrotem jest możliwe tylko wtedy, gdy taka krawędź istnieje; \emph{to} jest
+powód, dla którego acykliczność orzeka się o grafach skierowanych, a o
+nieskierowanych prawie nigdy. Zastrzeżenie o wierzchołkach wyklucza to, czego
+nie wyklucza tamto: dwie pętle złączone w jednym punkcie, przebyte jako jedna
+zamknięta trasa. Nie powtarza ona żadnej krawędzi, więc samo zastrzeżenie o
+krawędziach by ją przepuściło, a jest to para cykli, a nie jeden.
 
 Załóżmy, że musisz uruchomić te sześć usług w jakiejś kolejności, każdą po
 wszystkim, od czego zależy. Co daje ci acykliczność?
@@ -629,7 +633,9 @@ Zamiast pytać, które wierzchołki są osiągalne, idź za krawędziami losowo:
 wierzchołka wybierz jednostajnie jedną z krawędzi wychodzących i idź. Macierzą
 tych prawdopodobieństw jest $P$, gdzie $P_{ij}$ to szansa kroku z $i$ do $j$
 \dash{} macierz sąsiedztwa z każdym wierszem podzielonym przez jego własną
-sumę.
+sumę, co wymaga, by ta suma była dodatnia. Wierzchołek bez krawędzi
+wychodzących nie ma czego dzielić i jego wiersz zostaje taki, jaki był: same
+zera.
 
 Ile musi wynosić suma każdego wiersza $P$ i dlaczego?
 \dotline
@@ -761,8 +767,8 @@ Jedna uwaga na koniec, i o to tak naprawdę w tym programie chodziło.
 Zadano jednemu obiektowi trzy pytania i każde zamieniło się w arytmetykę już
 obecną w książce. \emph{Co może sięgnąć czego} stało się potęgą macierzy. \emph{W
 jakim porządku wolno to liczyć} stało się własnością, której sprawdzenie nic
-nie kosztuje, a kupuje determinizm. \emph{Gdzie osiada uwaga} stało się
-wektorem własnym.
+nie kosztuje, a kupuje determinizm. \emph{Gdzie osiada błądzenie losowe} stało
+się wektorem własnym.
 
 \textbf{Żadne z tych trzech nie potrzebowało rysunku}, a rysunek jest tym, po
 co większość ludzi sięga najpierw. Graf narysowany na tablicy jest

@@ -76,8 +76,8 @@
 \item Zdanie sprawdzono na czterdziestu kolejnych wejściach i za każdym razem
   zachodzi. Co zostało ustalone? \teachesat{22--23}
   \answerto{To, że zachodzi na tych czterdziestu. Wyrażenie $n^{2}+n+41$ jest
-  pierwsze dla każdego $n$ od $0$ do $\val{p14.euler.first}$ wyłącznie, a
-  złożone w $\val{p14.euler.first}$, więc czterdzieści potwierdzeń może być
+  pierwsze dla $\val{p14.euler.first}$ kolejnych wartości i złożone w
+  $n = \val{p14.euler.first}$, więc czterdzieści potwierdzeń może być
   warte zero.}
 \item Twierdzenie o zbieżności zakłada wypukłość funkcji celu. Artykuł cytuje
   je o sieci neuronowej. Co poszło nie tak? \teachesat{26--27}
@@ -157,10 +157,14 @@ Program~\ref{prog:P13}, gdy udowodnił jeden kierunek w jednym zdaniu, a drugi
 przekazał tutaj.
 
 \textbf{Założeniem w obu jest \enquote{skierowany}} i słowo to wykonuje
-prawdziwą pracę: graf nieskierowany z jedną krawędzią ma marszrutę tam i z
-powrotem, więc bez tego słowa twierdzenie jest fałszywe, a cała sekcja 4
-Programu~\ref{prog:P13} paruje. Jest to zarazem słowo, które czytelnik
-najchętniej pominie, bo stoi przed rzeczownikiem i czyta się jak dekoracja.
+prawdziwą pracę. Krawędź nieskierowana wskazuje w obie strony, więc każdy z
+jej końców musiałby stać po drugim i żaden porządek nie istnieje \dash{} a
+jednak, według definicji, którą podaje Program~\ref{prog:P13}, ten graf nie ma
+żadnego cyklu, bo marszruta tam i z powrotem powtarza swoją jedyną krawędź.
+Acykliczny i bez porządku topologicznego: więc bez tego słowa twierdzenie jest
+fałszywe, a cała sekcja 4 Programu~\ref{prog:P13} paruje. Jest to zarazem
+słowo, które czytelnik najchętniej pominie, bo stoi przed rzeczownikiem i
+czyta się jak dekoracja.
 \end{fr}
 
 \begin{fr}
@@ -229,7 +233,8 @@ udowodnić i nie będzie ci to potrzebne.
 \index{proof!implication}
 
 \begin{fr}
-Prawie każda para założenie--teza to \emph{implikacja}: jeśli $P$, to $Q$.
+Prawie każda para założenie--teza to \emph{implikacja}: jeśli $P$, to $Q$,
+zapisywana $P \Rightarrow Q$ i czytana \emph{$P$ implikuje $Q$}.
 Program~\ref{prog:F10} dał \emph{i}, \emph{lub} oraz \emph{nie}; to jest
 czwarty spójnik i to jego ludzie rozumieją źle.
 
@@ -246,14 +251,14 @@ implikacja nie orzeka niczego i liczy się jako prawdziwa, co czyta się jak
 formalność, a jest całą treścią tego spójnika.
 
 \begin{center}
-\begin{tabular}{cccc}
+\begin{tabular}{ccccc}
 \toprule
-$P$ & $Q$ & $P \Rightarrow Q$ & $Q \Rightarrow P$ \\
+& $P$ & $Q$ & $P \Rightarrow Q$ & $Q \Rightarrow P$ \\
 \midrule
-F & F & T & T \\
-F & T & T & F \\
-T & F & F & T \\
-T & T & T & T \\
+1 & F & F & T & T \\
+2 & F & T & T & F \\
+3 & T & F & F & T \\
+4 & T & T & T & T \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -479,7 +484,6 @@ tego, ile jednostek dodasz. Żadna z nich nie jest szczegółem.
 \emph{Z czego składa się twierdzenie} policzyło hipotezy jako jedną z trzech
 części, więc zdanie cytowane bez nich jest innym zdaniem.
 
-\begin{warning}
 \textbf{To, jak rośnie wymagany rozmiar, jest prawdziwym pytaniem z
 prawdziwymi odpowiedziami, a ta książka ani nie przeprowadziła
 eksperymentu, ani nie przejrzała tamtej literatury.} Są wyniki w obie strony
@@ -490,7 +494,6 @@ Powiedzenie, który przypadek stosuje się do konkretnej architektury, wykracza
 poza to, co ta książka zrobiła, więc nie jest powiedziane. Ustalony jest tu
 kształt zdania, który jest faktem o kwantyfikatorach i nie potrzebuje
 eksperymentu.
-\end{warning}
 \end{fr}
 
 % ============================================================
@@ -553,8 +556,8 @@ Oto dlaczego to rozróżnienie nie jest akademickie. Rozważ $n^{2} + n + 41$.
 \transcript{p14-forty-confirmations}
 
 \begin{trapbox}
-\textbf{Jest pierwsze dla każdego $n$ od $0$ do $\val{p14.euler.first}$
-wyłącznie, a złożone w $\val{p14.euler.first}$}, gdzie wynosi
+\textbf{Jest pierwsze dla $\val{p14.euler.first}$ kolejnych wartości od
+$n = 0$, a złożone w $n = \val{p14.euler.first}$}, gdzie wynosi
 $\val{p14.euler.at}$ \dash{} czyli $\val{p14.euler.factor}$ do kwadratu.
 
 Czterdzieści kolejnych potwierdzeń. Każdy zestaw testów by to przepuścił;
@@ -781,8 +784,9 @@ której będziesz używał co tydzień.
   Istnieje-$y$-dla-każdego-$x$ jest mocniejsze i pociąga drugie; odwrotnie
   zawodzi, co pokazuje relacja na $\val{p14.dom}$ elementach i potwierdza
   wszystkie $\val{p14.qchecked}$ relacji na trzech}.}
-\sumitem{17--18}{\result{\textbf{Uniwersalna aproksymacja jest dla-każdego-a-potem-
-  istnieje}, więc sieć może zależeć od funkcji, tolerancji i ustalonej
+\sumitem{17--18}{\result{\textbf{Uniwersalna aproksymacja jest
+  dla-każdego-a-potem-istnieje}, więc sieć może zależeć od funkcji, tolerancji
+  i ustalonej
   aktywacji. Milczy o
   $\val{p14.silent}$ rzeczach, w tym o tym, jak duża musi być sieć i czy
   uczenie ją znajduje}.}
@@ -805,10 +809,10 @@ której będziesz używał co tydzień.
   mówi nic o sieci neuronowej.} Traci się gwarancję, a nie metodę \dash{} co
   jest własną regułą tej książki o pomiarze zastosowaną do zdania}.}
 \sumitem{28--29}{\result{\textbf{Ograniczenie na $\val{p14.conf}$ procent użyte
-  $\val{p14.uses}$ razy gwarantuje wszystkie tylko w $\val{p14.allhold}$
-  procentach przypadków}, gwarantuje nie więcej niż rzut monetą po
-  $\val{p14.flip}$ użyciach i potrzebowałoby $\val{p14.needed}$ procent na
-  każde, żeby sięgnąć $\val{p14.joint}$ procent przy $\val{p14.uses}$}.}
+  $\val{p14.uses}$ razy gwarantuje wszystkie naraz na nie więcej niż
+  $\val{p14.allhold}$ procent}, spada do rzutu monetą po $\val{p14.flip}$
+  użyciach i potrzebowałoby $\val{p14.needed}$ procent na każde, żeby sięgnąć
+  $\val{p14.joint}$ procent przy $\val{p14.uses}$}.}
 \sumitem{30--31}{\result{Trzy błędne cytaty to po jednym z każdej części: zgubione
   założenie, zgubiony kwantyfikator i przepaść między istnieniem a
   konstrukcją. \textbf{Nie ma czwartego rodzaju pomyłki, bo nie ma czwartej
@@ -841,9 +845,9 @@ której będziesz używał co tydzień.
   $\val{p14.conf}$ procentach \dash{} zacieśnienie ograniczenia na użycie z
   $5\%$ do $1\%$ kupuje około pięciu razy więcej użyć, co jest wymianą, którą
   autor artykułu musiał zrobić i zwykle jej nie podaje.}
-\item \emph{Istnieje krok uczenia działający dla każdej architektury} wobec
-  \emph{dla każdej architektury istnieje działający krok uczenia}. Które
-  wolałbyś mieć, a które jest prawdopodobne?
+\item \enquote{Istnieje krok uczenia działający dla każdej architektury}
+  oraz \enquote{dla każdej architektury istnieje działający krok uczenia}.
+  Które wolałbyś mieć, a które jest prawdopodobne?
   \answerto{Pierwsze jest znacznie mocniejsze i to je domyślna wartość w
   bibliotece orzeka w domyśle; drugie jest niemal puste i to go ktokolwiek by
   bronił. Całą różnicą jest kolejność dwóch kwantyfikatorów, a poradnik

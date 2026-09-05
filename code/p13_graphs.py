@@ -379,7 +379,7 @@ EXACT = stationary_exact(P)
 assert matvec(transpose(P), EXACT) == EXACT, \
     "the exact stationary vector must be an eigenvector for eigenvalue 1"
 assert sum(EXACT) == 1
-# and power iteration must be heading there
+# and the iteration must be heading there
 # A BOUND, never the figure. The gap after sixty steps is rounding noise whose
 # size is a property of the arithmetic rather than of the mathematics, and
 # Program P06 had two of exactly these rejected by CI for being committed as
@@ -387,7 +387,7 @@ assert sum(EXACT) == 1
 _err = max(abs(float(a - b)) for a, b in zip(PI, EXACT))
 PI_BOUND = 15
 assert _err < 10 ** -PI_BOUND, \
-    f"power iteration must clear 1e-{PI_BOUND}, off by {_err:.2e}"
+    f"the iteration must clear 1e-{PI_BOUND}, off by {_err:.2e}"
 emit("p13.pi.bound", PI_BOUND)
 for i, x in enumerate(EXACT):
     emit(f"p13.exact.num.{i}", x.numerator)

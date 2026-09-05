@@ -494,17 +494,21 @@ Back to the call graph, and to the property it has that has not been used yet:
 you cannot get back to where you started.
 
 A \textbf{cycle} is a walk that returns to its starting vertex without
-retracing an edge. A directed graph with none is \textbf{acyclic}, and a
-directed acyclic graph is a \emph{DAG}.
+retracing an edge and without passing through any other vertex twice. A
+directed graph with none is \textbf{acyclic}, and a directed acyclic graph is
+a \emph{DAG}.
 
-The clause about retracing is what makes the word usable, and it is worth a
-moment. Every undirected graph with even one edge has a walk that leaves a
-vertex and comes back \dash{} the \enquote{out and back} the trapbox named
-\dash{} so without that clause nothing would be acyclic and the word would
-mean nothing. On a directed graph the clause is doing less work, because
-following an edge back is only possible if the edge back exists; \emph{that}
-is the reason acyclicity is a statement people make about directed graphs and
-almost never about undirected ones.
+Both clauses earn their place, and they exclude different things. Every
+undirected graph with even one edge has a walk that leaves a vertex and comes
+back \dash{} the \enquote{out and back} the trapbox named \dash{} so without
+the clause about edges nothing would be acyclic and the word would mean
+nothing. On a directed graph that clause is doing less work, because following
+an edge back is only possible if the edge back exists; \emph{that} is the
+reason acyclicity is a statement people make about directed graphs and almost
+never about undirected ones. The clause about vertices excludes something the
+other one does not: two loops joined at a single point, walked as one closed
+route. It repeats no edge, so the clause about edges would let it through, and
+it is a pair of cycles rather than one.
 
 Suppose you have to run those six services in some order, each after
 everything it depends on. What does acyclicity buy you?
@@ -627,7 +631,9 @@ One last object, and it puts Part~III's machinery on a graph.
 Instead of asking which vertices are reachable, follow the edges at random:
 from a vertex, pick one of its outgoing edges uniformly and go. The matrix of
 those probabilities is $P$, where $P_{ij}$ is the chance of stepping from $i$
-to $j$ \dash{} the adjacency matrix with each row divided by its own row sum.
+to $j$ \dash{} the adjacency matrix with each row divided by its own row sum,
+which needs that sum to be positive. A vertex with no outgoing edges has
+nothing to divide, and its row stays as it was: all zeros.
 
 What must each row of $P$ add up to, and why?
 \dotline
@@ -758,7 +764,7 @@ One closing observation, which is what this program has really been about.
 Three questions were asked of one object and each turned into arithmetic
 already in the book. \emph{What can reach what} became a power of a matrix.
 \emph{In what order may this be evaluated} became a property that costs
-nothing to check and buys determinism. \emph{Where does attention settle}
+nothing to check and buys determinism. \emph{Where does a random walk settle}
 became an eigenvector.
 
 \textbf{None of the three needed a picture}, and the picture is the thing most

@@ -80,9 +80,9 @@
   the first of the two.}
 \item A claim is checked on forty consecutive inputs and holds every time.
   What has been established? \teachesat{22--23}
-  \answerto{That it holds on those forty. $n^{2}+n+41$ is prime for every $n$
-  from $0$ to $\val{p14.euler.first}$ exclusive and composite at
-  $\val{p14.euler.first}$, so forty confirmations can be worth nothing.}
+  \answerto{That it holds on those forty. $n^{2}+n+41$ is prime for
+  $\val{p14.euler.first}$ consecutive values and composite at
+  $n = \val{p14.euler.first}$, so forty confirmations can be worth nothing.}
 \item A convergence theorem assumes the objective is convex. A paper cites it
   about a neural network. What has gone wrong? \teachesat{26--27}
   \answerto{A hypothesis was dropped. The conclusion is quoted and the
@@ -162,10 +162,13 @@ exactly what Program~\ref{prog:P13} said when it proved one direction in a
 sentence and handed the other here.
 
 \textbf{The hypothesis in both is \enquote{directed}}, and it is doing real
-work: an undirected graph with one edge has a walk out and back, so without
-that word the theorem is false and the whole of Program~\ref{prog:P13}'s
-section 4 evaporates. It is also the word a reader is likeliest to skip,
-because it sits before the noun and reads like scenery.
+work. An undirected edge points both ways, so each of its endpoints would have
+to come after the other and no order exists \dash{} and yet, by the definition
+Program~\ref{prog:P13} gives, that graph has no cycle at all, because the walk
+out and back retraces its one edge. Acyclic and with no topological order: so
+without that word the theorem is false and the whole of section 4 of
+Program~\ref{prog:P13} evaporates. It is also the word a reader is likeliest
+to skip, because it sits before the noun and reads like scenery.
 \end{fr}
 
 \begin{fr}
@@ -234,8 +237,9 @@ about. You will not be able to prove it, and you will not need to.
 
 \begin{fr}
 Almost every hypothesis-and-conclusion pair is an \emph{implication}: if $P$,
-then $Q$. Program~\ref{prog:F10} gave \emph{and}, \emph{or} and \emph{not};
-this is the fourth connective and it is the one people get wrong.
+then $Q$, written $P \Rightarrow Q$ and read \emph{$P$ implies $Q$}.
+Program~\ref{prog:F10} gave \emph{and}, \emph{or} and \emph{not}; this is the
+fourth connective and it is the one people get wrong.
 
 There are $\val{p14.rows}$ cases, since $P$ and $Q$ are each true or false.
 In how many of them is \enquote{if $P$ then $Q$} \emph{false}?
@@ -250,14 +254,14 @@ no claim at all and is counted true, which reads as a technicality and is the
 whole of what the connective means.
 
 \begin{center}
-\begin{tabular}{cccc}
+\begin{tabular}{ccccc}
 \toprule
-$P$ & $Q$ & $P \Rightarrow Q$ & $Q \Rightarrow P$ \\
+& $P$ & $Q$ & $P \Rightarrow Q$ & $Q \Rightarrow P$ \\
 \midrule
-F & F & T & T \\
-F & T & T & F \\
-T & F & F & T \\
-T & T & T & T \\
+1 & F & F & T & T \\
+2 & F & T & T & F \\
+3 & T & F & F & T \\
+4 & T & T & T & T \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -403,8 +407,9 @@ sentence is true and the second is false. One witness is a proof that the two
 are different claims, which is section 2's asymmetry doing work.
 
 \begin{note}
-Only one direction is safe, and it is worth knowing which. \textbf{There-is-a-
-$y$-for-all-$x$ always implies for-all-$x$-there-is-a-$y$}, never the reverse:
+Only one direction is safe, and it is worth knowing which.
+\textbf{There-is-a-$y$-for-all-$x$ always implies
+for-all-$x$-there-is-a-$y$}, never the reverse:
 the universal witness serves as each individual one. The script checks that
 over \emph{every} relation on a three-element set \dash{} all
 $\val{p14.qchecked}$ of them \dash{} which is again an exhaustive proof rather
@@ -482,7 +487,6 @@ Neither is a detail. \emph{What a theorem is made of} counted the hypotheses
 as one of the three parts, so a statement quoted without them is a different
 statement.
 
-\begin{warning}
 \textbf{How the required size grows is a real question with real answers, and
 this book has neither run the experiment nor surveyed that literature.} There
 are results in both directions \dash{} constructions that are efficient for
@@ -492,7 +496,6 @@ for others.
 Saying which applies to any particular architecture is beyond what this book
 has done, so it is not said. What is established here is the shape of the
 statement, which is a fact about the quantifiers and needs no experiment.
-\end{warning}
 \end{fr}
 
 % ============================================================
@@ -555,8 +558,8 @@ Here is why the distinction is not academic. Consider $n^{2} + n + 41$.
 \transcript{p14-forty-confirmations}
 
 \begin{trapbox}
-\textbf{It is prime for every $n$ from $0$ to $\val{p14.euler.first}$
-exclusive, and composite at $\val{p14.euler.first}$}, where it is
+\textbf{It is prime for $\val{p14.euler.first}$ consecutive values from
+$n = 0$, and composite at $n = \val{p14.euler.first}$}, where it is
 $\val{p14.euler.at}$ \dash{} which is $\val{p14.euler.factor}$ squared.
 
 Forty consecutive confirmations. Any test suite would have passed it; any
@@ -774,8 +777,9 @@ subject you will use every week.
   holding and the conclusion failing}, because
   $\lnot(P \Rightarrow Q) = P \wedge \lnot Q$. Establishing may need every
   case; refuting needs one}.}
-\sumitem{15--16}{\result{\textbf{Quantifier order changes the claim.} There-is-a-$y$-
-  for-all-$x$ is the stronger, and implies the other; the reverse fails, as a
+\sumitem{15--16}{\result{\textbf{Quantifier order changes the claim.}
+  There-is-a-$y$-for-all-$x$ is the stronger, and implies the other; the
+  reverse fails, as a
   relation on $\val{p14.dom}$ elements shows and all
   $\val{p14.qchecked}$ relations on three confirm}.}
 \sumitem{17--18}{\result{\textbf{Universal approximation is for-all-then-there-exists},
@@ -802,10 +806,10 @@ subject you will use every week.
   \dash{} which is this book's own rule about measurement applied to a
   sentence}.}
 \sumitem{28--29}{\result{\textbf{A $\val{p14.conf}$ per cent bound used
-  $\val{p14.uses}$ times guarantees all of them only $\val{p14.allhold}$ per
-  cent of the time}, guarantees no better than a coin flip after
-  $\val{p14.flip}$ uses, and would need $\val{p14.needed}$ per cent each to
-  reach $\val{p14.joint}$ per cent across $\val{p14.uses}$}.}
+  $\val{p14.uses}$ times guarantees all of them together at no better than
+  $\val{p14.allhold}$ per cent}, falls to a coin flip after $\val{p14.flip}$
+  uses, and would need $\val{p14.needed}$ per cent each to reach
+  $\val{p14.joint}$ per cent across $\val{p14.uses}$}.}
 \sumitem{30--31}{\result{The three misquotations are one of each part: a dropped
   hypothesis, a dropped quantifier, and the gap between existence and
   construction. \textbf{There is no fourth kind of mistake because there is no
@@ -837,8 +841,8 @@ subject you will use every week.
   $\val{p14.conf}$ per cent \dash{} tightening the per-use bound from $5\%$ to
   $1\%$ buys about five times as many uses, which is the trade the paper's
   author had to make and usually does not state.}
-\item \emph{There is a learning rate that works for every architecture}
-  against \emph{for every architecture there is a learning rate that works}.
+\item \enquote{There is a learning rate that works for every architecture}
+  and \enquote{for every architecture there is a learning rate that works}.
   Which would you rather have, and which is plausible?
   \answerto{The first is far stronger and is what a default in a library
   claims implicitly; the second is nearly vacuous and is what anybody would
