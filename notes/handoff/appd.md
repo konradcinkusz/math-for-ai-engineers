@@ -168,6 +168,54 @@ uses it. My first draft of the row said only that "each is in real use in its
 own language" — the outcome without the reasoning, which is the defect this
 pass opened by fixing in §D.4. Rewritten to carry the argument.
 
+## The expansion broke the page, and only CI could see it
+
+Thirteen new rows took §D.3's table from twenty to thirty-three, and a
+`tabularx` inside a `center` **cannot break across pages**. CI came back with
+
+```
+errors 0 · unresolved refs 0 · OVERFULL VBOX 1 [488.3]
+(./appendices/en/appD-terminology.tex  Appendix D.  [1339] [1340] [1341]
+Overfull \vbox (488.30074pt too high)
+```
+
+in all four builds. That is this book's recorded class exactly — *an overfull
+vbox means a boxed block grew past a page and could not break*, and the
+Appendix E pass met the same thing at 284 pt on an eleven-row table. The
+recorded remedy is stated in the same breath and was applied without a detour:
+**split the table, do not shrink the text.**
+
+`longtable` is loaded and is not the answer, for the reason Appendix E's pass
+already wrote down: it has no `X` column, and `xltabular` or `ltablex` would be
+a package neither of this project's two machines is guaranteed to have, which
+is Program~P09's trap.
+
+**The split is the section's own argument rather than an arbitrary halving**,
+which is the precedent Appendix E set when it split its exclusions table. §D.3
+opens by saying Polish translates where a form exists and borrows where none
+does; the three tables are that sentence sorted, plus the rows that need more
+than a gloss:
+
+| table | rows |
+|---|---|
+| what the Polish edition translates | 16 |
+| what it borrows and inflects | 9 |
+| what needs more than a gloss — one word, two jobs | 8 |
+
+The third is the useful one and it exists because of this failure: `head`,
+`inference`, `normalisation`, `precision`, `recall`, both `residual` senses and
+`significand` were scattered alphabetically through a long list, and collecting
+them makes the section argue where it used to enumerate.
+
+**The generalisable half is about which machine can see what.** Every gate this
+container can run was green before the push and stayed green after it: parity,
+all nine `check_structure` checks, `gen_stubs`, `make verify`, `make debt`.
+None of them reads a page, because none of them can — there is no TeX here. A
+table that grows past a page is invisible to every source-level check in the
+repository **by construction**, so an appendix pass that adds rows has no local
+instrument for the one defect it is most likely to cause. Expect it, and expect
+CI to be the thing that finds it.
+
 ## Values
 
 None emitted, none retired. `code/` is untouched.

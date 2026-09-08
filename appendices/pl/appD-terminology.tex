@@ -129,6 +129,8 @@ angielskie i odmienia je po polsku \dash{} \emph{embeddingów},
 a kalka wymyślona przez tłumacza jest gorsza niż zapożyczenie, którego wszyscy
 już używają.
 
+Trzy tabele to ta reguła, posortowana. Te wydanie polskie tłumaczy.
+
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}llX@{}}
 \toprule
@@ -142,39 +144,73 @@ już używają.
 \plterm{backpropagation}{propagacja wsteczna}{Ustalone.
   Program~\ref{prog:F12} mówi, czym jest: regułą łańcuchową zastosowaną do
   złożenia warstw.}
-\plterm{benchmark}{benchmark}{Zapożyczone i odmieniane.}
-\plterm{checkpointing}{checkpointing}{Zapożyczone. Wymiana arytmetyki na bajty,
-  Program~\ref{prog:P16}.}
 \plterm{cross-entropy}{entropia krzyżowa}{Ustalone.}
 \plterm{evaluation set}{zbiór ewaluacyjny}{Ustalone.}
 \plterm{feature}{cecha}{Ustalone i używane wszędzie.}
 \plterm{gradient descent}{spadek gradientu}{Ustalone. Książka pisze i
   \emph{spadek gradientu}, i \emph{spadek gradientowy}, co jest jedną nazwą
   w dwóch formach gramatycznych, a nie dwoma słowami.}
-\plterm{harness}{harness}{Zapożyczone i odmieniane; \emph{zestaw} był próbowany
-  i zderzył się ze \emph{zbiorem}.}
-\plterm{head}{głowica}{W uwadze. \emph{Głowa} to ta anatomiczna.}
-\plterm{hyperparameter}{hiperparametr}{Zapożyczone i odmieniane.}
-\plterm{inference}{wnioskowanie}{Dwie role, a polszczyzna przenosi angielską
-  kolizję, zamiast ją rozstrzygać: wnioskowanie statystyczne,
-  Programy~\ref{prog:P27} i \ref{prog:P28}, oraz uruchamianie wytrenowanego
-  modelu, jak w \emph{przy wnioskowaniu} w Programie~\ref{prog:F02}.}
 \plterm{layer}{warstwa}{Ustalone.}
-\plterm{logit}{logit}{To samo słowo w polskiej statystyce.}
 \plterm{loss}{strata}{Ustalone. \emph{Funkcja straty} na funkcję.}
-\plterm{normalisation}{normalizacja}{Dwie role, po polsku tak samo jak po
-  angielsku: dzielenie wektora przez jego długość, Program~\ref{prog:F09}, oraz
-  normalizacja warstwy, Program~\ref{prog:P32}.}
 \plterm{optimiser}{optymalizator}{Ustalone.}
 \plterm{overfitting}{przeuczenie}{Ustalone.}
 \plterm{perplexity}{perpleksja}{Ustalone. Program~\ref{prog:P29} mówi, co ta
   liczba zlicza.}
+\plterm{probe}{sonda}{Zwykłe polskie słowo, realnie używane w tym znaczeniu,
+  więc nie kalka. Program~\ref{prog:P31}.}
+\plterm{sequence}{sekwencja}{Ustalone.}
+\plterm{vocabulary}{słownik}{Ustalone.}
+\plterm{weight}{waga}{Ustalone.}
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+A te zapożycza, bo żadna polska forma nie jest w realnym użyciu. Słowo
+angielskie zostaje i odmienia się po polsku, bo tak mówią polscy
+inżynierowie.
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{Angielski} & \textbf{Wydanie polskie} & \textbf{notatka} \\
+\midrule
+\plterm{benchmark}{benchmark}{Zapożyczone i odmieniane.}
+\plterm{checkpointing}{checkpointing}{Zapożyczone. Wymiana arytmetyki na bajty,
+  Program~\ref{prog:P16}.}
+\plterm{harness}{harness}{Zapożyczone i odmieniane; \emph{zestaw} był próbowany
+  i zderzył się ze \emph{zbiorem}.}
+\plterm{hyperparameter}{hiperparametr}{Zapożyczone i odmieniane.}
+\plterm{logit}{logit}{To samo słowo w polskiej statystyce.}
+\plterm{prompt}{prompt}{Zapożyczone i odmieniane.}
+\plterm{softmax}{softmax}{Zapożyczone; nigdzie nietłumaczone.}
+\plterm{token}{token}{Zapożyczone i odmieniane. \emph{Tokenizator} na to, co je
+  produkuje.}
+\plterm{transformer}{transformer}{Zapożyczone. Nigdy \emph{transformator}, bo
+  to urządzenie elektryczne.}
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+Te wymagają czegoś więcej niż tłumaczenia. W każdym jedno słowo pełni dwie
+role albo oba wydania ustaliły co innego, a czytelnik, który weźmie pierwsze
+znaczenie, gdzieś w książce się pomyli.
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{Angielski} & \textbf{Wydanie polskie} & \textbf{notatka} \\
+\midrule
+\plterm{head}{głowica}{W uwadze. \emph{Głowa} to ta anatomiczna.}
+\plterm{inference}{wnioskowanie}{Dwie role, a polszczyzna przenosi angielską
+  kolizję, zamiast ją rozstrzygać: wnioskowanie statystyczne,
+  Programy~\ref{prog:P27} i \ref{prog:P28}, oraz uruchamianie wytrenowanego
+  modelu, jak w \emph{przy wnioskowaniu} w Programie~\ref{prog:F02}.}
+\plterm{normalisation}{normalizacja}{Dwie role, po polsku tak samo jak po
+  angielsku: dzielenie wektora przez jego długość, Program~\ref{prog:F09}, oraz
+  normalizacja warstwy, Program~\ref{prog:P32}.}
 \plterm{precision}{precyzja}{Dwie role, a kolizja jest w obu językach: miara
   klasyfikacji z Programu~\ref{prog:P23} oraz szerokość mantysy liczby
   zmiennoprzecinkowej w całym Programie~\ref{prog:P01}.}
-\plterm{probe}{sonda}{Zwykłe polskie słowo, realnie używane w tym znaczeniu,
-  więc nie kalka. Program~\ref{prog:P31}.}
-\plterm{prompt}{prompt}{Zapożyczone i odmieniane.}
 \plterm{recall}{czułość}{Ustalone. Stoi obok \emph{precyzji} w tym samym
   raporcie klasyfikacji i warunkuje po drugiej populacji.}
 \plterm{residual connection}{rezydualny}{\emph{Połączenie rezydualne},
@@ -182,20 +218,12 @@ już używają.
 \plterm{residual of a fit}{reszta}{Inny obiekt, a polszczyzna daje mu inne
   słowo: to, co zostawia dopasowanie najmniejszych kwadratów,
   Program~\ref{prog:P08}. Angielski ma na oba jedno słowo.}
-\plterm{sequence}{sekwencja}{Ustalone.}
 \plterm{significand}{mantysa}{Wydania rozstrzygają to inaczej i oba mają
   rację. Standard mówi \emph{significand} o przechowywanych bitach, a
   \emph{mantysę} rezerwuje dla części ułamkowej logarytmu, więc wydanie
   angielskie pisze \emph{significand}; polska praktyka mówi \emph{mantysa} na
   jedno i drugie, więc wydanie polskie też. Program~\ref{prog:P01} ma ramkę
   z oznaczeniami w obu wydaniach, w każdym z przeciwnym wnioskiem.}
-\plterm{softmax}{softmax}{Zapożyczone; nigdzie nietłumaczone.}
-\plterm{token}{token}{Zapożyczone i odmieniane. \emph{Tokenizator} na to, co je
-  produkuje.}
-\plterm{transformer}{transformer}{Zapożyczone. Nigdy \emph{transformator}, bo
-  to urządzenie elektryczne.}
-\plterm{vocabulary}{słownik}{Ustalone.}
-\plterm{weight}{waga}{Ustalone.}
 \bottomrule
 \end{tabularx}
 \end{center}

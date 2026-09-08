@@ -122,6 +122,8 @@ and inflects it Polish \dash{} \emph{embeddingów}, \emph{tokenizator},
 \emph{benchmarku} \dash{} which is what Polish engineers say, and a calque
 invented by a translator is worse than a borrowing everybody already uses.
 
+The three tables are that rule, sorted. These the Polish edition translates.
+
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}llX@{}}
 \toprule
@@ -134,39 +136,73 @@ invented by a translator is worse than a borrowing everybody already uses.
 \plterm{backpropagation}{propagacja wsteczna}{Established.
   Program~\ref{prog:F12} says what it is: the chain rule applied to a
   composition of layers.}
-\plterm{benchmark}{benchmark}{Borrowed and inflected.}
-\plterm{checkpointing}{checkpointing}{Borrowed. Trading arithmetic for bytes,
-  Program~\ref{prog:P16}.}
 \plterm{cross-entropy}{entropia krzyżowa}{Established.}
 \plterm{evaluation set}{zbiór ewaluacyjny}{Established.}
 \plterm{feature}{cecha}{Established, and used throughout.}
 \plterm{gradient descent}{spadek gradientu}{Established. The book writes
   both \emph{spadek gradientu} and \emph{spadek gradientowy}, which is one
   name in two grammatical forms rather than two words.}
-\plterm{harness}{harness}{Borrowed and inflected; \emph{zestaw} was tried and
-  collided with \emph{zbiór}.}
-\plterm{head}{głowica}{Of attention. \emph{Głowa} is the anatomical one.}
-\plterm{hyperparameter}{hiperparametr}{Borrowed and inflected.}
-\plterm{inference}{wnioskowanie}{Two jobs, and the Polish carries the English
-  collision rather than resolving it: statistical inference,
-  Programs~\ref{prog:P27} and \ref{prog:P28}, and running a trained model, as
-  in \emph{przy wnioskowaniu} at Program~\ref{prog:F02}.}
 \plterm{layer}{warstwa}{Established.}
-\plterm{logit}{logit}{The same word in Polish statistics.}
 \plterm{loss}{strata}{Established. \emph{Funkcja straty} for the function.}
-\plterm{normalisation}{normalizacja}{Two jobs, in Polish as in English:
-  dividing a vector by its length, Program~\ref{prog:F09}, and layer
-  normalisation, Program~\ref{prog:P32}.}
 \plterm{optimiser}{optymalizator}{Established.}
 \plterm{overfitting}{przeuczenie}{Established.}
 \plterm{perplexity}{perpleksja}{Established. Program~\ref{prog:P29} says what
   the number counts.}
+\plterm{probe}{sonda}{An ordinary Polish word with real use in this sense,
+  so not a calque. Program~\ref{prog:P31}.}
+\plterm{sequence}{sekwencja}{Established.}
+\plterm{vocabulary}{słownik}{Established.}
+\plterm{weight}{waga}{Established.}
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+And these it borrows, because no Polish form is in real use. The
+English word is kept and inflected Polish, which is what Polish engineers
+say.
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{English} & \textbf{Polish edition} & \textbf{note} \\
+\midrule
+\plterm{benchmark}{benchmark}{Borrowed and inflected.}
+\plterm{checkpointing}{checkpointing}{Borrowed. Trading arithmetic for bytes,
+  Program~\ref{prog:P16}.}
+\plterm{harness}{harness}{Borrowed and inflected; \emph{zestaw} was tried and
+  collided with \emph{zbiór}.}
+\plterm{hyperparameter}{hiperparametr}{Borrowed and inflected.}
+\plterm{logit}{logit}{The same word in Polish statistics.}
+\plterm{prompt}{prompt}{Borrowed and inflected.}
+\plterm{softmax}{softmax}{Borrowed; not translated anywhere.}
+\plterm{token}{token}{Borrowed and inflected. \emph{Tokenizator} for the thing
+  that produces them.}
+\plterm{transformer}{transformer}{Borrowed. Never \emph{transformator}, which
+  is an electrical device.}
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+These need more than a gloss. In each, one word is doing two jobs, or
+the two editions have settled on different words, and a reader who takes the
+first reading will be wrong somewhere else in the book.
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{English} & \textbf{Polish edition} & \textbf{note} \\
+\midrule
+\plterm{head}{głowica}{Of attention. \emph{Głowa} is the anatomical one.}
+\plterm{inference}{wnioskowanie}{Two jobs, and the Polish carries the English
+  collision rather than resolving it: statistical inference,
+  Programs~\ref{prog:P27} and \ref{prog:P28}, and running a trained model, as
+  in \emph{przy wnioskowaniu} at Program~\ref{prog:F02}.}
+\plterm{normalisation}{normalizacja}{Two jobs, in Polish as in English:
+  dividing a vector by its length, Program~\ref{prog:F09}, and layer
+  normalisation, Program~\ref{prog:P32}.}
 \plterm{precision}{precyzja}{Two jobs, and the collision is in both languages:
   the classification metric of Program~\ref{prog:P23}, and the width of a
   floating-point significand throughout Program~\ref{prog:P01}.}
-\plterm{probe}{sonda}{An ordinary Polish word with real use in this sense,
-  so not a calque. Program~\ref{prog:P31}.}
-\plterm{prompt}{prompt}{Borrowed and inflected.}
 \plterm{recall}{czułość}{Established. It sits beside \emph{precyzja} on the
   same classification report and conditions on the other population.}
 \plterm{residual connection}{rezydualny}{\emph{Połączenie rezydualne},
@@ -174,20 +210,12 @@ invented by a translator is worse than a borrowing everybody already uses.
 \plterm{residual of a fit}{reszta}{A different object, and Polish gives it a
   different word: what a least-squares fit leaves over,
   Program~\ref{prog:P08}. English uses one word for both.}
-\plterm{sequence}{sekwencja}{Established.}
 \plterm{significand}{mantysa}{The two editions disagree here and both are
   right. The standard says \emph{significand} for the stored bits and reserves
   \emph{mantissa} for the fractional part of a logarithm, so the English
   edition writes \emph{significand}; Polish practice says \emph{mantysa} for
   both objects, so the Polish edition does too. Program~\ref{prog:P01} carries
   a notation box in each edition, reaching the opposite conclusion in each.}
-\plterm{softmax}{softmax}{Borrowed; not translated anywhere.}
-\plterm{token}{token}{Borrowed and inflected. \emph{Tokenizator} for the thing
-  that produces them.}
-\plterm{transformer}{transformer}{Borrowed. Never \emph{transformator}, which
-  is an electrical device.}
-\plterm{vocabulary}{słownik}{Established.}
-\plterm{weight}{waga}{Established.}
 \bottomrule
 \end{tabularx}
 \end{center}
