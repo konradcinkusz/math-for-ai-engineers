@@ -449,7 +449,7 @@ gradientu jest takim czymś.
 \end{ansblock}
 
 \[ v \leftarrow \beta_2 v + (1-\beta_2) g^{2}, \qquad
-   w \leftarrow w - \eta\,\frac{g}{\sqrt{v} + \varepsilon} \]
+   w \leftarrow w - \eta\,\frac{g}{\sqrt{v}} \]
 
 $\sqrt{v}$ ma jednostki gradientu, więc $g/\sqrt{v}$ nie ma żadnych, a
 \textbf{krok wynosi około $\eta$ niezależnie od tego, jak duży jest gradient}.
@@ -482,16 +482,16 @@ mianownik razem.
 \end{fr}
 
 \begin{fr}
-Ten niedomiar nie jest szumem ani przybliżeniem. Pierwszy krok wynosi dokładnie
-\[ \frac{\eta}{1 + \varepsilon/\lvert g\rvert} \]
-co skrypt sprawdza w każdej współrzędnej przy każdej skali. Odchylenie od
-$\eta$ należy więc w całości do epsilona i jest największe tam, gdzie gradient
-jest \emph{najmniejszy} \dash{} po przeciwnej stronie niż ta, o którą ludzie
-się martwią.
+Ten niedomiar nie jest szumem ani przybliżeniem i ma jedną przyczynę. Żadna
+implementacja nie może dzielić przez $\sqrt{v}$, dopóki $v$ jest bliskie
+zera, więc każda niesie mały $\varepsilon$, żeby to powstrzymać. Odchylenie
+od $\eta$ należy więc w całości do epsilona i jest największe tam, gdzie
+gradient jest \emph{najmniejszy} \dash{} po przeciwnej stronie niż ta, o
+którą ludzie się martwią.
 
-Rodzi to pytanie, o którym przy pisaniu epsilona zwykle nikt nie myśli. Jest
-po to, żeby powstrzymać dzielenie przez zero. Gdzie ma stać: w środku
-pierwiastka, dodany do $v$, czy na zewnątrz, dodany do $\sqrt{v}$?
+Rodzi to pytanie, o którym przy pisaniu epsilona zwykle nikt nie myśli. Gdzie
+ma stać: w środku pierwiastka, dodany do $v$, czy na zewnątrz, dodany do
+$\sqrt{v}$?
 \dotline
 \nextframe
 \end{fr}
@@ -502,8 +502,12 @@ Na zewnątrz. W środku jest dodawany do \emph{kwadratu} gradientu, a to nie jes
 gradient.
 \end{ansblock}
 
-To znowu argument z jednostek i ma mierzalną konsekwencję. Przy
-$\varepsilon = \val{p20.eps}$ i gradiencie $\val{p20.eps.g}$:
+To znowu argument z jednostek. Przy epsilonie na zewnątrz pierwszy krok
+wynosi dokładnie
+\[ \frac{\eta}{1 + \varepsilon/\lvert g\rvert} \]
+co skrypt sprawdza w każdej współrzędnej przy każdej skali, i ma to mierzalną
+konsekwencję. Przy $\varepsilon = \val{p20.eps}$ i gradiencie
+$\val{p20.eps.g}$:
 
 \begin{center}
 \begin{tabular}{ll}

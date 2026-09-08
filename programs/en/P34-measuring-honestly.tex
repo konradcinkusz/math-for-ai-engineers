@@ -700,17 +700,12 @@ $\val{p34.bill.price.times}$ times the price mentions neither.
 \end{fr}
 
 \begin{fr}
-Program~\ref{prog:P29} met this identity in a different currency and it is
-worth putting the two side by side, because they behave differently.
+Both the price and the length belong to the model, which is precisely why
+quoting one of them settles nothing: neither can be divided out of a
+comparison, and neither is a property of the task alone.
 
-There, bits per character is bits per token times tokens per character, and
-\textbf{one of the two factors belongs to the tokeniser}: the same model on
-the same text reports $\val{p29.bpc.a}$ and $\val{p29.bpc.b}$ bits per
-character at $\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ tokens per character.
-
-Here \textbf{both factors belong to the model}. The price is a fact about
-which model you called and the length is a fact about how it answers, which
-is precisely why quoting one of them settles nothing.
+Program~\ref{prog:P29} met an identity of the same shape in a different
+currency, and Section~\ref{sec:P34-measures} puts the two side by side.
 
 \mermaidfig{p34-two-quantities}{A price per token is half of what a task
   costs}{only the product is billed}
@@ -740,6 +735,13 @@ second factor belongs to the tokeniser. Compare two systems that tokenise
 differently and the difference you measure is the tokenisers'. Two losses
 are comparable under one tokeniser and under no other condition, and stating
 that condition costs a sentence.
+
+Program~\ref{prog:P29} measured exactly that: the same model on the same
+text reports $\val{p29.bpc.a}$ and $\val{p29.bpc.b}$ bits per character at
+$\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ tokens per character, a factor of
+$\val{p29.bpc.ratio}$ in which the model plays no part at all. That is the
+contrast with the bill: there both factors were the model's and neither
+cancelled.
 \end{fr}
 
 \begin{fr}

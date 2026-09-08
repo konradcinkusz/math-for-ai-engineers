@@ -675,17 +675,12 @@ o żadnym z tych dwóch.
 \end{fr}
 
 \begin{fr}
-Program~\ref{prog:P29} spotkał tę tożsamość w innej walucie i warto postawić
-obie obok siebie, bo zachowują się inaczej.
+I cena, i długość należą do modelu, dlatego właśnie podanie jednej z nich
+niczego nie załatwia: żadnej nie da się wydzielić z porównania i żadna nie
+jest własnością samego zadania.
 
-Tam bity na znak to bity na token razy tokeny na znak i \textbf{jeden z
-dwóch czynników należy do tokenizatora}: ten sam model na tym samym tekście
-raportuje $\val{p29.bpc.a}$ i $\val{p29.bpc.b}$ bita na znak przy
-$\val{p29.tpc.a}$ i $\val{p29.tpc.b}$ tokena na znak.
-
-Tutaj \textbf{oba czynniki należą do modelu}. Cena jest faktem o tym, który
-model wywołałeś, a długość faktem o tym, jak on odpowiada, dlatego właśnie
-podanie jednej z nich niczego nie załatwia.
+Program~\ref{prog:P29} spotkał tożsamość tego samego kształtu w innej
+walucie, a sekcja~\ref{sec:P34-measures} stawia obie obok siebie.
 
 \mermaidfig{p34-two-quantities}{Cena za token to połowa tego, co kosztuje
   zadanie}{rozliczany jest tylko iloczyn}
@@ -715,6 +710,12 @@ tokenizatora. Porównaj dwa systemy, które tokenizują inaczej, a różnica,
 którą zmierzysz, należy do tokenizatorów. Dwie straty są porównywalne przy
 jednym tokenizatorze i pod żadnym innym warunkiem, a podanie tego warunku
 kosztuje zdanie.
+
+Program~\ref{prog:P29} zmierzył dokładnie to: ten sam model na tym samym
+tekście raportuje $\val{p29.bpc.a}$ i $\val{p29.bpc.b}$ bita na znak przy
+$\val{p29.tpc.a}$ i $\val{p29.tpc.b}$ tokena na znak, czyli czynnik
+$\val{p29.bpc.ratio}$, w którym model nie gra żadnej roli. To kontrast z
+rachunkiem: tam oba czynniki należały do modelu i żaden się nie skracał.
 \end{fr}
 
 \begin{fr}
