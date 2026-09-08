@@ -92,6 +92,18 @@ No page counts, no overfull-box multiset, no orphan-tail ledger and no
 orphaned-cue walk are in this note, per the parallel arrangement — and they
 could not have been taken here in any case, for the reason above.
 
+**CI then answered part of the width question, and it is worth being exact
+about which part.** Build run 212 came back green on all four formats, and
+`build.yml` runs `checklog.py` as a hard gate and `checkpdf.py --cues=warn`
+after it. So on CI's metrics — the fuller ones, with newtx and inconsolata
+— this branch has **no error, no unresolved reference, no rerun or
+label-drift warning, no overfull vbox, no overfull hbox over the 15 pt budget,
+no stranded frame opener and no stranded section heading**, in every format.
+That is as far as it goes: a box under 15 pt still passes, the cue check is
+`--cues=warn` there by design, and the orphan tail is never fatal. **So the
+page counts, the exact multiset and both of those ledgers are still the sync
+session's, and the cue walk in particular is untouched by a green CI run.**
+
 ## Values
 
 None emitted, none retired. `make verify` reports every computed value and
