@@ -19,9 +19,14 @@
 %%        entropy of ONE distribution and never a quantity between two, so this
 %%        program must not contradict that sentence.
 %%        AND ITS TWO ALPHABETS ARE THIS PROGRAM'S ARRIVAL. P29 calls the 0.078
-%%        gap "the rounding of a length to a whole number"; the winning code's
-%%        lengths have a Kraft sum of exactly one, so the code implies a
+%%        gap "the rounding of a length to a whole number". What section 1
+%%        sends the second source down is P29's code for the FIRST alphabet,
+%%        (1,2,3,3) -- NOT its best code for the second, which is four
+%%        two-digit words. Its Kraft sum is exactly one, so it implies a
 %%        distribution which IS P29's other row, and the gap IS the divergence.
+%%        The two codes TIE at 2 bits on this source, asserted in the script:
+%%        so the divergence is the excess over the ENTROPY FLOOR, not over the
+%%        best code anybody could build, and P29 was right to call it rounding.
 %%   P26  says the excess "has a name and is P30's", and owns cross-entropy as
 %%        a negative log-likelihood. Section 8 closes its loop.
 %%   P19  owns Jensen both ways, so KL >= 0 is two lines from a theorem the
@@ -134,9 +139,9 @@ $q$ it was built for, so the same average is
 which is called the \textbf{cross-entropy} of $p$ against $q$. It is
 Program~\ref{prog:P18}'s loss, and this is what it measures.
 
-Now: what would the \emph{best available} code for this second source have
-averaged, and where in Program~\ref{prog:P29} is that number already
-written down?
+Now: what is the least a symbol from this source could \emph{ever} cost, if
+a codeword length did not have to be a whole number of bits \dash{} and
+where in Program~\ref{prog:P29} is that number already written down?
 \dotline
 \nextframe
 \end{fr}
@@ -144,14 +149,16 @@ written down?
 \begin{fr}
 \ans{$\val{p30.src.h}$ bits \dash{} the source's own entropy}
 
-Program~\ref{prog:P29} computed it and printed it beside the code length,
-because entropy is the shortest average any code for that source can reach.
+Program~\ref{prog:P29} computed it and printed it beside the code length, and
+was careful about what it is: a \textbf{floor}. It is the shortest average a
+code could reach if a length could be $\logb{2}\frac{5}{2}$ bits, and it
+cannot, so the best code you can actually build for this source averages
+$\val{p30.src.ce}$ and not $\val{p30.src.h}$.
 
-So you are paying $\val{p30.src.ce}$ and the best available is
-$\val{p30.src.h}$.
+So you are paying $\val{p30.src.ce}$ against a floor of $\val{p30.src.h}$.
 
-How much is the wrong code costing you, and where have you seen \emph{that}
-number before?
+How far above the floor are you, and where have you seen \emph{that} number
+before?
 \dotline
 \nextframe
 \end{fr}
@@ -164,10 +171,21 @@ That program measured exactly this and called it \emph{the rounding of a
 length to a whole number}, because a codeword cannot be
 $\logb{2}\frac{5}{2}$ bits long.
 
-It is that, and it is something else as well.
+It is that, and the rounding half is worth taking seriously before anything
+else is built on it.
+
+Program~\ref{prog:P29}'s own best code for this source is four two-digit
+words, and four two-digit words average exactly $\val{p30.src.ce}$ on any
+distribution at all. So the code you have been sending it down ties with the
+best one you could have built: \textbf{against the best available code the
+wrong code is costing you nothing.} The $\val{p30.src.kl}$ is the excess over
+the \emph{floor}, which no whole-digit code reaches, which is why
+Program~\ref{prog:P29} could call the whole of it a rounding and be right.
+
+And it is something else as well.
 
 \begin{center}
-\emph{The cost of the wrong code, minus the cost of the right one,\\
+\emph{The cost of a code, minus the floor the source itself sets,\\
 is a quantity in its own right.}
 \end{center}
 
@@ -185,9 +203,11 @@ Check it on the numbers: $\val{p30.src.h} + \val{p30.src.kl}
 There is a detail in that arrival worth stopping on, because it is what makes
 the identity an identity rather than a near-enough.
 
-Program~\ref{prog:P29}'s best code for the second alphabet has lengths $1$,
-$2$, $3$, $3$, and its Kraft sum $\sum_i 2^{-l_i}$ is exactly $1$. So the
-numbers $q_i = 2^{-l_i}$ add to one, which makes them a distribution.
+The code you have been sending the source down \dash{} the one
+Program~\ref{prog:P29} built for its \emph{first} alphabet \dash{} has
+lengths $1$, $2$, $3$, $3$, and its Kraft sum $\sum_i 2^{-l_i}$ is exactly
+$1$. So the numbers $q_i = 2^{-l_i}$ add to one, which makes them a
+distribution.
 
 Which distribution is it?
 \dotline
@@ -252,7 +272,7 @@ concave, so
 \begin{align*}
   -\KL{p}{q} &\;=\; \sum_i p_i \logb{2}\frac{q_i}{p_i}
               \;\le\; \logb{2} \sum_i p_i \frac{q_i}{p_i} \\
-              &\;=\; \logb{2} \sum_i q_i \;=\; \logb{2} 1 \;=\; 0
+              &\;=\; \logb{2} \sum_i q_i \;\le\; \logb{2} 1 \;=\; 0
 \end{align*}
 
 so $\KL{p}{q} \ge 0$, always.
@@ -260,7 +280,10 @@ so $\KL{p}{q} \ge 0$, always.
 
 Nothing new was defined to get that. It is Program~\ref{prog:P19}'s
 inequality applied to a ratio, and the last step is only that a distribution
-sums to one.
+sums to at most one. Note which sum it is: dividing by $p_i$ needs $p_i$ to be
+positive, so the outcomes where $p$ has no weight drop out, and over the rest
+the $q_i$ can fall short of one \dash{} which is exactly when $q$ puts mass
+where $p$ has none. The inequality survives it, and §4 is about that case.
 \end{fr}
 
 \begin{fr}
@@ -287,9 +310,9 @@ same distribution, because the ratio has to be one.
 and it is positive otherwise.}
 \end{center}
 
-Checked rather than asserted: over all $\val{p30.simplex.n}$ distributions on
-three outcomes with denominator $\val{p30.tri.den}$, and so over every one of
-their ordered pairs, the divergence is never negative and is zero only where
+Checked rather than asserted: over all $\val{p30.simplex.n}$ strictly
+positive distributions on three outcomes with denominator
+$\val{p30.tri.den}$, and so over every one of their ordered pairs, the divergence is never negative and is zero only where
 the two agree. Exhaustive on that grid, which makes it a proof there rather
 than evidence about it \dash{} Program~\ref{prog:P14}'s distinction.
 
@@ -357,6 +380,13 @@ the loss is the floor plus the excess and the floor is not on the screen.
 \begin{fr}
 Everything so far would be true of a distance. This is where that stops.
 
+One change of unit first, and it is the collision Program~\ref{prog:F03}
+warned about. Sections 1 and 2 counted in bits, because they were counting
+binary digits somebody has to send. From here the logarithm is natural and
+the figures are in \textbf{nats}, which is what a loss reports; multiply by
+$\logb{2} e = \num{1.443}$ to read any of them back as bits. Nothing about
+the mathematics changes, and every identity above survives the substitution.
+
 Program~\ref{prog:F05} built a four-token distribution and printed it at
 three temperatures. At $T = \num{0.5}$ it is peaked \dash{}
 $\val{f05.sm.t05.p1}$ on the leading token and $\val{f05.sm.t05.p4}$ on the
@@ -381,8 +411,8 @@ Do you expect them to be close to each other?
 \ans{They are not: $\val{p30.f05.fwd}$ against $\val{p30.f05.rev}$ nats}
 
 A factor of $\val{p30.f05.ratio}$, on two distributions that differ only in a
-temperature setting, computed from the twelve probabilities
-Program~\ref{prog:F05} committed.
+temperature setting, computed from the eight probabilities in
+Program~\ref{prog:F05}'s two outer columns.
 
 \begin{center}
 \emph{$\KL{p}{q}$ and $\KL{q}{p}$ are different numbers,\\
@@ -484,7 +514,7 @@ To $\KL{p}{q}$ it contributes $p_i \ln \frac{p_i}{0}$, which is
 \textbf{infinite}.
 
 To $\KL{q}{p}$ it contributes $0 \times \ln \frac{0}{p_i}$, which is
-\textbf{nothing at all} \dash{} the outcome is simply not in the sum.
+\textbf{nothing at all} \dash{} the outcome is not in the sum at all.
 \end{ansblock}
 
 \begin{center}
@@ -603,7 +633,7 @@ There is no optimiser here. The candidates are a finite set and
 candidate for each centre and each half-width, $\val{p30.fam.n}$ in all. The
 best is the best of all of them, which makes the result a proof over that
 family rather than evidence about it \dash{} Program~\ref{prog:P14}'s
-distinction, doing the job P05 warns about.
+distinction, doing the job Program~\ref{prog:P05} warns about.
 \end{fr}
 
 \begin{fr}
@@ -665,7 +695,7 @@ before any of them has been scored.}
 \end{center}
 
 That is not a preference expressed by a small margin. Most of the search
-space is simply unavailable to it, and the part that remains is the wide part.
+space is unavailable to it, and the part that remains is the wide part.
 \end{fr}
 
 \begin{fr}
@@ -778,6 +808,13 @@ Does the divergence obey it?
 No. Here is a triple, exact, on three outcomes with denominator
 $\val{p30.tri.den}$:
 
+\[ a = \tfrac{1}{\val{p30.tri.den}}(\val{p30.tri.a1}, \val{p30.tri.a2},
+     \val{p30.tri.a3}), \quad
+   b = \tfrac{1}{\val{p30.tri.den}}(\val{p30.tri.b1}, \val{p30.tri.b2},
+     \val{p30.tri.b3}), \quad
+   c = \tfrac{1}{\val{p30.tri.den}}(\val{p30.tri.c1}, \val{p30.tri.c2},
+     \val{p30.tri.c3}) \]
+
 \[ \KL{a}{c} = \val{p30.tri.direct}, \qquad
    \KL{a}{b} + \KL{b}{c} = \val{p30.tri.via} \]
 
@@ -789,8 +826,8 @@ not a marginal violation but roughly half the direct value.
 \begin{fr}
 It would be easy to file that as a pathological corner, so it was counted.
 
-Every ordered triple of distributions on that grid was tested:
-$\val{p30.tri.total}$ of them.
+Every ordered triple of three \emph{distinct} distributions on that grid was
+tested: $\val{p30.tri.total}$ of them.
 
 How many do you expect to violate the inequality \dash{} a handful, a
 percentage, or most of them?
@@ -805,6 +842,14 @@ $\val{p30.tri.pct}$ per cent}
 Close to a quarter. Violating the triangle inequality is not a corner case
 for this quantity, it is the \textbf{common case}, and any argument that
 chained two divergences together to bound a third was never going to work.
+
+A further $\val{p30.tri.equal}$ triples meet it with equality, exactly, so
+the inequality is not merely broken here and there: it is broken a quarter of
+the time and only just held a good deal of the rest. Those two counts are
+decided over the integers rather than in floating point, and the reason is
+Program~\ref{prog:P01}'s: comparing two of these sums as decimals puts the
+equality cases on whichever side the rounding falls, and a count that moves
+with the arithmetic is a fact about the machine.
 
 \begin{trapbox}
 \textbf{\enquote{It is a distance-like quantity, so the usual intuitions
@@ -826,7 +871,7 @@ precisely because somebody had to be told this once.
 \end{fr}
 
 % ============================================================
-\section{Why not simply symmetrise it}
+\section{Why not symmetrise it}
 \label{sec:P30-js}
 \index{Jensen--Shannon divergence}
 
@@ -860,9 +905,10 @@ every one of the $\val{p30.js.seps}$ separations returns
 $\val{p30.js.cap}$, to the last figure the arithmetic carries, while the
 divergence is infinite for all four.
 
-That looks like a curiosity about point masses. When in the life of a
-training run are the model's distribution and the target on disjoint
-support?
+That looks like a curiosity about point masses. A softmax model never has
+disjoint support from anything \dash{} it puts some mass on every token in
+the vocabulary. So when in the life of a training run does a symmetric
+bounded quantity saturate anyway?
 \dotline
 \nextframe
 \end{fr}
@@ -871,12 +917,21 @@ support?
 \ans{At the start, which is when you most need to be told which way to move}
 
 That saturation is not a quirk at the extreme. It is the regime a training
-run begins in.
+run begins in \dash{} and it gets there by a milder route than a missing
+outcome.
 
-At the beginning a model puts its mass more or less anywhere, which is
-exactly the disjoint-support case. A symmetric bounded quantity reports the
-same number there whatever the model does, so it carries \textbf{no
+At the beginning a model is near uniform over the vocabulary, so the mass it
+puts on the token the target actually wants is about $\frac{1}{V}$. The
+supports overlap perfectly well; what is small is the mass they \emph{share}.
+That is enough. Over a vocabulary of $\val{p30.init.vocab}$ tokens the
+symmetric quantity sits $\val{p30.init.gap}$ below its ceiling, where the
+divergence is still finite and still falling, so the bounded one reports very
+nearly the same number whatever the model does and carries \textbf{almost no
 information about which way to move}.
+
+Disjoint support is the sharper version of the same thing, and it belongs to
+generators over continuous outputs, where the model's outputs can miss the
+data outright. A classifier never gets there; it does not have to.
 
 \begin{center}
 \emph{Boundedness and a useful gradient are the same property\\
@@ -997,10 +1052,10 @@ claims people make with it are usually not supported.
   Program~\ref{prog:P29}'s \enquote{rounding} gap of $\val{p30.src.kl}$ bits
   \emph{is} the divergence, and its two alphabets are the source and the code
   \dash{} $\val{p30.src.h} + \val{p30.src.kl} = \val{p30.src.ce}$.}
-\sumitem{7--9}{\textbf{\result{The excess is never negative}}, by
+\sumitem{7--10}{\textbf{\result{The excess is never negative}}, by
   Program~\ref{prog:P19}'s Jensen on a concave logarithm, and it is zero
   exactly when the two distributions agree. Checked over every ordered pair
-  of the $\val{p30.simplex.n}$ distributions on a grid.}
+  of the $\val{p30.simplex.n}$ strictly positive distributions on a grid.}
 \sumitem{11--12}{\result{A cross-entropy therefore has a floor, and the floor
   is the \emph{target's} entropy}. A loss that stops falling may have arrived rather
   than stalled, and the loss alone cannot tell you which.}
@@ -1026,9 +1081,10 @@ claims people make with it are usually not supported.
   tried, so the behaviour belongs to the direction and not to the target.}
 \sumitem{34--38}{\textbf{\result{It is not a distance.}} The triangle inequality
   Program~\ref{prog:F09} gave you fails for $\val{p30.tri.bad}$ of
-  $\val{p30.tri.total}$ ordered triples \dash{} $\val{p30.tri.pct}$ per cent,
-  so the common case \dash{} the worst detour being shorter by
-  $\val{p30.tri.gap}$ nats.}
+  $\val{p30.tri.total}$ ordered triples of distinct distributions \dash{}
+  $\val{p30.tri.pct}$ per cent, so the common case \dash{} the worst detour
+  being shorter by $\val{p30.tri.gap}$ nats, and $\val{p30.tri.equal}$ more
+  triples meeting it with equality.}
 \sumitem{39--42}{\result{\textbf{Symmetrising costs the signal.}
   Jensen--Shannon is symmetric, finite and bounded, and the bound is
   $\ln 2 = \val{p30.js.cap}$}: point masses $1$ and $\val{p30.js.far}$ bins
@@ -1045,11 +1101,11 @@ claims people make with it are usually not supported.
 \item A source follows $(\frac12, \frac12)$ and you code it with a scheme
   built for $(\frac34, \frac14)$. Give the cross-entropy, the entropy and
   the divergence, in bits.
-  \answerto{The code lengths are $\logb{2}\frac43 = \num{0.415}$ and
+  \answerto{The code lengths are $\logb{2}\frac43 = \val{p30.t1.len}$ and
   $\logb{2}4 = 2$, so the cross-entropy is
-  $\frac12(\num{0.415}) + \frac12(2) = \num{1.207}$ bits. The entropy is
-  $1$ bit. The divergence is the difference, $\num{0.207}$ bits \dash{} what
-  the wrong code costs you per symbol.}
+  $\frac12(\val{p30.t1.len}) + \frac12(2) = \val{p30.t1.ce}$ bits. The
+  entropy is $1$ bit. The divergence is the difference,
+  $\val{p30.t1.kl}$ bits \dash{} what the wrong code costs you per symbol.}
 \item Without computing anything, say which of $\KL{p}{q}$ and $\KL{q}{p}$
   is infinite when $q$ is zero on an outcome $p$ gives weight to, and why.
   \answerto{$\KL{p}{q}$. The first argument weights the sum, so that outcome
@@ -1075,9 +1131,11 @@ claims people make with it are usually not supported.
 \item Give a one-sentence reason why a bounded, symmetric divergence is a
   poor training objective even though it fixes every complaint §3 and §6
   make.
-  \answerto{Because it saturates: on the disjoint support a run starts from
-  it reports $\ln 2$ whatever the model does, so it says nothing about which
-  way to move.}
+  \answerto{Because it saturates. A run starts with the model near uniform,
+  so the mass it shares with the target is about $\frac{1}{V}$ \dash{} the
+  supports overlap, but barely \dash{} and the bounded quantity sits
+  $\val{p30.init.gap}$ under $\ln 2$ whatever the model does, so it says
+  next to nothing about which way to move.}
 \item Training loss has flattened at a number well above zero and the team is
   arguing about whether the model has stopped learning. What quantity settles
   it, and can you read it off the loss?

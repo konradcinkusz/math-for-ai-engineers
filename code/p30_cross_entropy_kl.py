@@ -15,10 +15,16 @@ not restate it as a count here; the list is what is checkable.  What it names:
        AND ITS TWO ALPHABETS ARE THIS PROGRAM'S ARRIVAL.  P29 reports that the
        best code for (2/5, 1/5, 1/5, 1/5) averages 2.000 bits against an
        entropy of 1.922 and calls the 0.078 gap "the rounding of a length to a
-       whole number".  The winning lengths are (1, 2, 3, 3), whose Kraft sum is
-       exactly 1, so the code implies q_i = 2^-l_i = (1/2, 1/4, 1/8, 1/8) --
-       which is P29's OTHER row.  The gap IS KL(p||q).  Nothing new is computed
-       to arrive: this program says what a number already on the page is.
+       whole number".  What this program sends that source down is P29's OTHER
+       code, the (1, 2, 3, 3) one it built for the dyadic alphabet -- NOT P29's
+       best code for this source, which is four two-digit words.  Its Kraft sum
+       is exactly 1, so it implies q_i = 2^-l_i = (1/2, 1/4, 1/8, 1/8), which
+       is P29's other ROW, and the gap IS KL(p||q).  Nothing new is computed to
+       arrive: this program says what a number already on the page is.
+       The two codes TIE at exactly 2 bits on this source, which is asserted in
+       section 1 and is the half that is easy to get wrong -- it means the
+       divergence is the excess over the ENTROPY, not over the best code any
+       reader could build, and that is why P29 was right to call it a rounding.
   P26  says in as many words that "what vanishes is the EXCESS of the
        cross-entropy over the target's own entropy, and that excess has a name
        and is P30's".  It also owns cross-entropy as a negative log-likelihood,
@@ -168,13 +174,30 @@ def js(a, b) -> float:
 # ======================================================================
 DYADIC = [Fraction(1, 2), Fraction(1, 4), Fraction(1, 8), Fraction(1, 8)]
 NONDY = [Fraction(2, 5), Fraction(1, 5), Fraction(1, 5), Fraction(1, 5)]
-LENGTHS = (1, 2, 3, 3)                       # P29's winning code, in bits
+LENGTHS = (1, 2, 3, 3)          # the code P29 built FOR THE DYADIC alphabet
+BEST_NONDY = (2, 2, 2, 2)       # and the one it found best for THIS source
 
 # The code is COMPLETE -- its Kraft sum is exactly one -- which is what makes
 # q_i = 2^-l_i a distribution and the identity below an identity rather than
 # an inequality.  Assert it rather than assume it.
 assert sum(Fraction(1, 2 ** l) for l in LENGTHS) == 1
 assert [Fraction(1, 2 ** l) for l in LENGTHS] == DYADIC
+
+# AND THE TWO CODES TIE ON THIS SOURCE, exactly, which is the half of the
+# arrival that is easy to get wrong.  P29's best code for (2/5,1/5,1/5,1/5) is
+# four two-digit words, not these lengths; it averages exactly 2 on ANY
+# distribution, and the dyadic code averages exactly 2 on THIS one.  So
+# against the best code a reader could actually build, the "wrong" code costs
+# NOTHING -- and the divergence is the excess over the entropy FLOOR, which no
+# whole-digit code reaches.  That is why P29 could call the whole gap a
+# rounding and be right.  Exact over Fraction, so it is a proof and not a
+# near-enough.
+assert sum(Fraction(1, 2 ** l) for l in BEST_NONDY) == 1
+assert (sum(p * l for p, l in zip(NONDY, BEST_NONDY))
+        == sum(p * l for p, l in zip(NONDY, LENGTHS)) == 2)
+# Its implied distribution is the uniform one, and its excess is the same
+# 0.078 -- necessarily, since the excess is the cost minus the same entropy.
+assert [Fraction(1, 2 ** l) for l in BEST_NONDY] == [Fraction(1, 4)] * 4
 
 H_SRC = entropy(NONDY) / LOG2
 CE_SRC = cross_entropy(NONDY, DYADIC) / LOG2
@@ -190,14 +213,18 @@ assert abs(CE_SRC - (H_SRC + KL_SRC)) < 1e-12, (CE_SRC, H_SRC, KL_SRC)
 # makes "cross-entropy is a code length" a statement rather than a metaphor.
 assert abs(CE_SRC - sum(float(p) * l for p, l in zip(NONDY, LENGTHS))) < 1e-12
 
-# GATE on P29, three values.  If any of them moves, this program is quietly
-# about a different pair of alphabets and the build says so.
-for key, got in (("p29.nondy.h", H_SRC),
-                 ("p29.nondy.best", CE_SRC),
-                 ("p29.nondy.gap", KL_SRC)):
+# GATE on P29.  Only the FIRST of these is a shared computation: the entropy
+# of the same distribution, computed twice.  The other two are the tie proved
+# above -- P29's best code and this program's wrong code are different
+# quantities that happen to be equal here -- so they are gated with a comment
+# saying so rather than presented as one number, which is the "one value doing
+# two jobs" defect P02's review pass recorded.
+for key, got, shared in (("p29.nondy.h", H_SRC, True),
+                         ("p29.nondy.best", CE_SRC, False),
+                         ("p29.nondy.gap", KL_SRC, False)):
     _c = committed("p29.tex", key)
     if _c is not None:
-        assert abs(float(_c) - got) < 5e-4, (key, _c, got)
+        assert abs(float(_c) - got) < 5e-4, (key, _c, got, shared)
 NOTES.append(
     f"  * P29's 'rounding' gap IS a divergence: {H_SRC:.3f} + {KL_SRC:.3f}"
     f" = {CE_SRC:.3f} bits, and the two alphabets are the source and the code.")
@@ -361,12 +388,74 @@ NOTES.append(
 #     contrast is against a property they can check -- which is what
 #     makes "KL distance" a misnomer rather than pedantry.
 # ======================================================================
+#
+#     THE COUNT IS DECIDED EXACTLY, and it has to be.  A float `>` comparison
+#     put the figure at 37814; recomputed exactly it is 37482, because 978 of
+#     the triples sit ON equality and rounding pushed 332 of them to the wrong
+#     side.  A count that moves with the arithmetic is a property of the
+#     machine, which this book commits as a bound and never as a figure -- so
+#     the test below uses no arithmetic at all for the part that is delicate.
+#
+#     The difference telescopes.  Writing A, B, C for the integer numerators
+#     over the common denominator D,
+#
+#         KL(a||c) - KL(a||b) - KL(b||c) = sum_i (a_i - b_i) ln(b_i / c_i)
+#                                        = (1/D) sum_i (A_i - B_i) ln(B_i/C_i)
+#
+#     -- the ln D terms cancel because the a_i and the b_i each sum to one.
+#     Every numerator here is at most 10, so each ln is an integer combination
+#     of ln 2, ln 3, ln 5 and ln 7, and those four are linearly independent
+#     over the rationals (unique factorisation).  So the difference is zero
+#     EXACTLY when all four integer coefficients vanish -- an integer test,
+#     with no epsilon and no tolerance anywhere.
+_PRIMES = (2, 3, 5, 7)
+
+
+def _expo(n: int) -> tuple[int, ...]:
+    """The exponents of 2, 3, 5 and 7 in n.  Every numerator on this grid
+    factors over them; the assertion is what says so rather than assuming it."""
+    v = [0] * len(_PRIMES)
+    for i, q in enumerate(_PRIMES):
+        while n % q == 0:
+            n //= q
+            v[i] += 1
+    assert n == 1, f"numerator {n} does not factor over {_PRIMES}"
+    return tuple(v)
+
+
+_EXPO = {n: _expo(n) for n in {int(x * GRID_D) for t in _simplex3 for x in t}}
+
+
+def _tri_coeffs(a, b, c) -> tuple[int, ...]:
+    """D times the triangle difference, as integer coefficients on the four
+    logarithms.  All zero means the inequality is met with equality, exactly."""
+    v = [0] * len(_PRIMES)
+    for ai, bi, ci in zip(a, b, c):
+        w = int((ai - bi) * GRID_D)
+        eb, ec = _EXPO[int(bi * GRID_D)], _EXPO[int(ci * GRID_D)]
+        for t in range(len(_PRIMES)):
+            v[t] += w * (eb[t] - ec[t])
+    return tuple(v)
+
+
 _triples = list(itertools.permutations(_simplex3, 3))
-_bad = [(a, b, c) for a, b, c in _triples if kl(a, c) > kl(a, b) + kl(b, c)]
+_flat = [(t, _tri_coeffs(*t)) for t in _triples]
+_equal = [t for t, v in _flat if not any(v)]
+_bad = [t for t, v in _flat
+        if any(v) and kl(t[0], t[2]) > kl(t[0], t[1]) + kl(t[1], t[2])]
 emit("p30.tri.total", len(_triples))
 emit("p30.tri.bad", len(_bad))
+emit("p30.tri.equal", len(_equal))
 emit("p30.tri.pct", pct(100 * len(_bad) / len(_triples)), 1)
 assert _bad, "no counterexample -- the section has nothing to show"
+assert _equal, "no equality case -- the exact test is looking at nothing"
+
+# The sign is then safe to take in floats, and this is what says so: away from
+# the exact zeros the smallest difference on this grid is nine orders above
+# double precision, so no float comparison here can be on a knife edge.
+_MARGIN = min(abs(sum(v[t] * math.log(_PRIMES[t]) for t in range(len(_PRIMES))))
+              for _, v in _flat if any(v)) / GRID_D
+assert _MARGIN > 1e-6, _MARGIN
 
 TA, TB, TC = max(_bad, key=lambda t: kl(t[0], t[2]) - kl(t[0], t[1]) - kl(t[1], t[2]))
 emit("p30.tri.direct", kl(TA, TC), 4)
@@ -375,9 +464,16 @@ emit("p30.tri.gap", kl(TA, TC) - kl(TA, TB) - kl(TB, TC), 4)
 emit("p30.tri.den", GRID_D)
 NOTES.append(
     f"  * the triangle inequality fails for {len(_bad)} of {len(_triples)}"
-    f" ordered triples -- {100 * len(_bad) / len(_triples):.1f} per cent, so"
-    f" it is the common case; the worst detour is SHORTER by"
-    f" {kl(TA, TC) - kl(TA, TB) - kl(TB, TC):.4f} nats.")
+    f" ordered triples of DISTINCT distributions -- "
+    f"{100 * len(_bad) / len(_triples):.1f} per cent, so it is the common"
+    f" case; {len(_equal)} more meet it with equality, and the worst detour"
+    f" is SHORTER by {kl(TA, TC) - kl(TA, TB) - kl(TB, TC):.4f} nats.")
+
+# The counterexample the frame prints, so a reader can check it rather than
+# take it on trust.  Printed as numerators over the common denominator.
+for _lbl, _d in (("a", TA), ("b", TB), ("c", TC)):
+    for _i, _x in enumerate(_d, 1):
+        emit(f"p30.tri.{_lbl}{_i}", int(_x * GRID_D))
 
 
 # ======================================================================
@@ -416,6 +512,61 @@ assert math.log(2) / JS_OVERLAP > 3.0, math.log(2) / JS_OVERLAP
 # is zero where p has weight, the other is exactly ln 2.
 assert kl(_half, _mass) == math.inf
 assert abs(kl(_mass, _half) - math.log(2)) < 1e-12, kl(_mass, _half)
+
+
+# WHEN A RUN ACTUALLY SATURATES IT, and it is not the disjoint-support case.
+# A softmax model has FULL support at initialisation -- near-uniform over the
+# vocabulary -- so its support contains the target's and nothing here is
+# disjoint.  Jensen--Shannon is near its ceiling anyway, for a different
+# reason: the mass the two SHARE is about 1/V, which is tiny and not zero.
+# The literal disjoint-support case belongs to generators over continuous
+# outputs, whose output manifold can miss the data manifold outright.
+INIT_V = 50_000
+_target = [Fraction(1)] + [Fraction(0)] * (INIT_V - 1)
+_init = [Fraction(1, INIT_V)] * INIT_V
+JS_INIT = js(_target, _init)
+# Reported as the SHORTFALL from the ceiling, where every figure is
+# significant, rather than as a value that sits a ten-thousandth under it --
+# P05's rule for a quantity near a boundary.
+#
+# The first draft of this asserted that the value and ln 2 print the SAME
+# figure at four decimals.  They do not: 0.6930 against 0.6931, and the
+# assertion failed on its first run.  That is the better statement anyway --
+# the ceiling is approached and not reached, because the shared mass is small
+# and not zero, which is the whole of the correction this section carries.
+emit("p30.init.vocab", INIT_V)
+emit("p30.init.gap", math.log(2) - JS_INIT, 6)
+assert 0 < math.log(2) - JS_INIT < 1e-3, JS_INIT
+assert f"{JS_INIT:.4f}" != f"{math.log(2):.4f}", (JS_INIT, math.log(2))
+# The supports are NOT disjoint, and this is the assertion that says so.
+assert all(t == 0 or i > 0 for t, i in zip(_target, _init))
+assert kl(_target, _init) < math.inf and kl(_init, _target) == math.inf
+NOTES.append(
+    f"  * at initialisation a softmax model over {INIT_V} tokens is"
+    f" {math.log(2) - JS_INIT:.2e} from the Jensen--Shannon ceiling --"
+    f" saturated because the SHARED mass is about 1/V, not because the"
+    f" supports are disjoint.")
+
+
+# ======================================================================
+# 7a. THE TEST EXERCISE, computed rather than typed.  Its answer used to
+#     carry three literals, and the arithmetic did not close: the operands
+#     it hands the reader, 0.415 and 2, average to 1.2075, and the page
+#     printed 1.207.  Three decimals cannot hold this one, so it is four --
+#     and `reproduces` is what keeps it that way rather than my care.
+# ======================================================================
+T1_P = [Fraction(1, 2), Fraction(1, 2)]
+T1_Q = [Fraction(3, 4), Fraction(1, 4)]
+T1_LEN = math.log(4 / 3) / LOG2                  # the long codeword, in bits
+T1_CE = cross_entropy(T1_P, T1_Q) / LOG2
+T1_KL = kl(T1_P, T1_Q) / LOG2
+assert abs(entropy(T1_P) / LOG2 - 1) < 1e-12     # the entropy is exactly 1 bit
+emit("p30.t1.len", T1_LEN, 4)
+emit("p30.t1.ce", T1_CE, 4)
+emit("p30.t1.kl", T1_KL, 4)
+# The two sums a reader will actually do, checked as the page prints them.
+reproduces(T1_CE, 4, (T1_LEN, 4), (2.0, 4), op=lambda a, b: (a + b) / 2)
+reproduces(T1_KL, 4, (T1_CE, 4), (1.0, 4), op=lambda a, b: a - b)
 
 
 # ======================================================================
@@ -476,6 +627,12 @@ _lines = [
     "...         return inf",
     "...     s = sum(x * log(x / y) for x, y in zip(a, b) if x)",
     "...     return round(s, 4)",
+    # The blank continuation line CLOSES the block.  Without it the listing
+    # does not run: paste it into a REPL and the def is never finished, so
+    # both result lines below come back NameError -- P04's defect, and the
+    # only instrument that sees it is replaying what the page prints.
+    # P33's transcript already carries this line; P29's does not.
+    "...",
     ">>> p, q = [0.9, 0.1], [0.5, 0.5]",
     ">>> kl(p, q), kl(q, p)",
 ]

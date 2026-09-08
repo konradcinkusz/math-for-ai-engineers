@@ -104,8 +104,9 @@ go zbudowano, więc ta sama średnia to
 co nazywa się \textbf{entropią krzyżową} $p$ względem $q$. To strata z
 Programu~\ref{prog:P18}, i to jest właśnie to, co ona mierzy.
 
-A teraz: ile dałby średnio \emph{najlepszy dostępny} kod dla tego drugiego
-źródła i gdzie w Programie~\ref{prog:P29} ta liczba już stoi zapisana?
+A teraz: ile co najmniej może \emph{kiedykolwiek} kosztować symbol z tego
+źródła, gdyby długość słowa kodowego nie musiała być całkowitą liczbą bitów
+\dash{} i gdzie w Programie~\ref{prog:P29} ta liczba już stoi zapisana?
 \dotline
 \nextframe
 \end{fr}
@@ -113,15 +114,16 @@ A teraz: ile dałby średnio \emph{najlepszy dostępny} kod dla tego drugiego
 \begin{fr}
 \ans{$\val{p30.src.h}$ bita \dash{} własna entropia źródła}
 
-Program~\ref{prog:P29} ją policzył i wydrukował obok długości kodu, bo
-entropia jest najkrótszą średnią, jaką może osiągnąć jakikolwiek kod dla tego
-źródła.
+Program~\ref{prog:P29} ją policzył i wydrukował obok długości kodu, i był
+ostrożny co do tego, czym ona jest: to \textbf{podłoga}. To najkrótsza
+średnia, jaką kod mógłby osiągnąć, gdyby długość mogła wynosić
+$\logb{2}\frac{5}{2}$ bita, a nie może \dash{} więc najlepszy kod, jaki
+naprawdę da się zbudować dla tego źródła, daje średnio $\val{p30.src.ce}$, a
+nie $\val{p30.src.h}$.
 
-Płacisz więc $\val{p30.src.ce}$, a najlepsze dostępne to
-$\val{p30.src.h}$.
+Płacisz więc $\val{p30.src.ce}$ przy podłodze $\val{p30.src.h}$.
 
-Ile kosztuje cię niewłaściwy kod i gdzie widziałeś \emph{tę} liczbę
-wcześniej?
+O ile jesteś nad podłogą i gdzie widziałeś \emph{tę} liczbę wcześniej?
 \dotline
 \nextframe
 \end{fr}
@@ -134,10 +136,22 @@ Tamten program zmierzył dokładnie to i nazwał to \emph{zaokrągleniem długo�
 do liczby całkowitej}, bo słowo kodowe nie może mieć
 $\logb{2}\frac{5}{2}$ bita długości.
 
-Jest tym, i jest jeszcze czymś.
+Jest tym, i tę połowę o zaokrągleniu warto potraktować poważnie, zanim cokolwiek
+się na niej zbuduje.
+
+Program~\ref{prog:P29} ma dla tego źródła własny najlepszy kod \dash{} cztery
+dwucyfrowe słowa \dash{} a cztery dwucyfrowe słowa dają średnio dokładnie
+$\val{p30.src.ce}$ przy dowolnym rozkładzie. Kod, którym wysyłasz to źródło,
+remisuje więc z najlepszym, jaki dałoby się zbudować: \textbf{względem
+najlepszego dostępnego kodu ten niewłaściwy nie kosztuje cię nic.} Wielkość
+$\val{p30.src.kl}$ to nadwyżka nad \emph{podłogą}, do której żaden kod o
+całkowitych długościach nie sięga \dash{} i dlatego
+Program~\ref{prog:P29} miał prawo nazwać to w całości zaokrągleniem.
+
+I jest jeszcze czymś.
 
 \begin{center}
-\emph{Koszt niewłaściwego kodu minus koszt właściwego\\
+\emph{Koszt kodu minus podłoga, którą wyznacza samo źródło,\\
 to wielkość sama w sobie.}
 \end{center}
 
@@ -154,7 +168,8 @@ Sprawdź na liczbach: $\val{p30.src.h} + \val{p30.src.kl}
 W tym dojściu jest szczegół, przy którym warto się zatrzymać, bo to on
 sprawia, że tożsamość jest tożsamością, a nie przybliżeniem.
 
-Najlepszy kod dla drugiego alfabetu z Programu~\ref{prog:P29} ma długości
+Kod, którym wysyłasz to źródło \dash{} ten, który Program~\ref{prog:P29}
+zbudował dla swojego \emph{pierwszego} alfabetu \dash{} ma długości
 $1$, $2$, $3$, $3$, a jego suma Krafta $\sum_i 2^{-l_i}$ wynosi dokładnie
 $1$. Liczby $q_i = 2^{-l_i}$ sumują się więc do jedynki, co czyni z nich
 rozkład.
@@ -221,7 +236,7 @@ więc
 \begin{align*}
   -\KL{p}{q} &\;=\; \sum_i p_i \logb{2}\frac{q_i}{p_i}
               \;\le\; \logb{2} \sum_i p_i \frac{q_i}{p_i} \\
-              &\;=\; \logb{2} \sum_i q_i \;=\; \logb{2} 1 \;=\; 0
+              &\;=\; \logb{2} \sum_i q_i \;\le\; \logb{2} 1 \;=\; 0
 \end{align*}
 
 a zatem $\KL{p}{q} \ge 0$, zawsze.
@@ -229,7 +244,11 @@ a zatem $\KL{p}{q} \ge 0$, zawsze.
 
 Nic nowego nie trzeba było definiować. To nierówność z
 Programu~\ref{prog:P19} zastosowana do ilorazu, a ostatni krok mówi tylko
-tyle, że rozkład sumuje się do jedynki.
+tyle, że rozkład sumuje się co najwyżej do jedynki. Zwróć uwagę, po czym ta
+suma biegnie: dzielenie przez $p_i$ wymaga, by $p_i$ było dodatnie, więc
+wyniki, na których $p$ nie ma wagi, wypadają, a po reszcie $q_i$ mogą nie
+dobić do jedynki \dash{} dokładnie wtedy, gdy $q$ kładzie masę tam, gdzie $p$
+nie ma żadnej. Nierówność to przetrzymuje, a §4 jest o tym przypadku.
 \end{fr}
 
 \begin{fr}
@@ -257,8 +276,8 @@ a poza tym jest dodatnia.}
 \end{center}
 
 Sprawdzone, a nie zadeklarowane: po wszystkich $\val{p30.simplex.n}$
-rozkładach na trzech wynikach o mianowniku $\val{p30.tri.den}$, a więc po
-każdej ich uporządkowanej parze, dywergencja nigdy nie jest ujemna i wynosi
+ściśle dodatnich rozkładach na trzech wynikach o mianowniku
+$\val{p30.tri.den}$, a więc po każdej ich uporządkowanej parze, dywergencja nigdy nie jest ujemna i wynosi
 zero tylko tam, gdzie oba się zgadzają. Wyczerpująco na tej siatce, co czyni
 z tego dowód, a nie świadectwo \dash{} rozróżnienie z
 Programu~\ref{prog:P14}.
@@ -330,6 +349,14 @@ ekranie.
 \begin{fr}
 Wszystko dotąd byłoby prawdą o odległości. Tu się to kończy.
 
+Najpierw jedna zmiana jednostki, i to ta kolizja, przed którą ostrzegał
+Program~\ref{prog:F03}. Sekcje 1 i 2 liczyły w bitach, bo liczyły cyfry
+dwójkowe, które ktoś musi wysłać. Od tego miejsca logarytm jest naturalny, a
+liczby są w \textbf{natach}, czyli w tym, co raportuje strata; pomnóż przez
+$\logb{2} e = \num{1.443}$, żeby odczytać którąkolwiek z nich z powrotem w
+bitach. W matematyce nic się nie zmienia, a każda tożsamość powyżej
+przetrzymuje to podstawienie.
+
 Program~\ref{prog:F05} zbudował rozkład na czterech tokenach i wydrukował go
 w trzech temperaturach. Przy $T = \num{0.5}$ jest szpiczasty \dash{}
 $\val{f05.sm.t05.p1}$ na wiodącym tokenie i $\val{f05.sm.t05.p4}$ na
@@ -354,8 +381,8 @@ Czy spodziewasz się, że będą sobie bliskie?
 \ans{Nie są: $\val{p30.f05.fwd}$ przeciwko $\val{p30.f05.rev}$ nata}
 
 Czynnik $\val{p30.f05.ratio}$, na dwóch rozkładach różniących się tylko
-ustawieniem temperatury, policzony z dwunastu prawdopodobieństw, które
-Program~\ref{prog:F05} zapisał.
+ustawieniem temperatury, policzony z ośmiu prawdopodobieństw z dwóch
+skrajnych kolumn Programu~\ref{prog:F05}.
 
 \begin{center}
 \emph{$\KL{p}{q}$ i $\KL{q}{p}$ to różne liczby,\\
@@ -455,7 +482,7 @@ Do $\KL{p}{q}$ wnosi $p_i \ln \frac{p_i}{0}$, czyli
 \textbf{nieskończoność}.
 
 Do $\KL{q}{p}$ wnosi $0 \times \ln \frac{0}{p_i}$, czyli
-\textbf{zupełnie nic} \dash{} tego wyniku po prostu nie ma w sumie.
+\textbf{zupełnie nic} \dash{} tego wyniku w ogóle nie ma w sumie.
 \end{ansblock}
 
 \begin{center}
@@ -572,7 +599,7 @@ kandydat dla każdego środka i każdej połówkowej szerokości, razem
 $\val{p30.fam.n}$. Najlepszy jest najlepszym ze wszystkich, co czyni z
 wyniku dowód dla tej rodziny, a nie świadectwo o niej \dash{} rozróżnienie z
 Programu~\ref{prog:P14}, wykonujące dokładnie tę pracę, przed którą
-ostrzega P05.
+ostrzega Program~\ref{prog:P05}.
 \end{fr}
 
 \begin{fr}
@@ -633,7 +660,7 @@ zanim któregokolwiek z nich oceniono.}
 \end{center}
 
 To nie jest preferencja wyrażona niewielkim marginesem. Większość przestrzeni
-poszukiwań jest dla niego po prostu niedostępna, a to, co zostaje, to część
+poszukiwań jest dla niego niedostępna, a to, co zostaje, to część
 szeroka.
 \end{fr}
 
@@ -748,6 +775,13 @@ Czy dywergencja jej przestrzega?
 Nie. Oto trójka, dokładna, na trzech wynikach o mianowniku
 $\val{p30.tri.den}$:
 
+\[ a = \tfrac{1}{\val{p30.tri.den}}(\val{p30.tri.a1}, \val{p30.tri.a2},
+     \val{p30.tri.a3}), \quad
+   b = \tfrac{1}{\val{p30.tri.den}}(\val{p30.tri.b1}, \val{p30.tri.b2},
+     \val{p30.tri.b3}), \quad
+   c = \tfrac{1}{\val{p30.tri.den}}(\val{p30.tri.c1}, \val{p30.tri.c2},
+     \val{p30.tri.c3}) \]
+
 \[ \KL{a}{c} = \val{p30.tri.direct}, \qquad
    \KL{a}{b} + \KL{b}{c} = \val{p30.tri.via} \]
 
@@ -759,8 +793,8 @@ marginalnym naruszeniem, tylko mniej więcej połową wartości wprost.
 \begin{fr}
 Łatwo byłoby odłożyć to jako patologiczny narożnik, więc to policzono.
 
-Sprawdzono każdą uporządkowaną trójkę rozkładów na tej siatce:
-$\val{p30.tri.total}$ z nich.
+Sprawdzono każdą uporządkowaną trójkę trzech \emph{różnych} rozkładów na tej
+siatce: $\val{p30.tri.total}$ z nich.
 
 Ile spodziewasz się naruszeń nierówności \dash{} garstkę, jakiś procent, czy
 większość?
@@ -776,6 +810,15 @@ Blisko jednej czwartej. Naruszanie nierówności trójkąta nie jest dla tej
 wielkości przypadkiem brzegowym, tylko \textbf{przypadkiem typowym}, a każde
 rozumowanie łańcuchowo składające dwie dywergencje, by ograniczyć trzecią,
 nigdy nie miało prawa zadziałać.
+
+Kolejne $\val{p30.tri.equal}$ trójek spełnia ją z równością, dokładnie, więc
+nierówność nie jest tu naruszona tylko tu i ówdzie: jest naruszona w jednej
+czwartej przypadków i ledwie utrzymana w sporej części reszty. Oba te
+zliczenia rozstrzyga się na liczbach całkowitych, a nie w arytmetyce
+zmiennoprzecinkowej, i powód jest z Programu~\ref{prog:P01}: porównanie
+dwóch takich sum jako ułamków dziesiętnych rzuca przypadki równości na tę
+stronę, na którą wypadnie zaokrąglenie, a zliczenie, które zmienia się wraz z
+arytmetyką, jest faktem o maszynie.
 
 \begin{trapbox}
 \textbf{\enquote{To wielkość odległościopodobna, więc zwykłe intuicje w
@@ -798,7 +841,7 @@ dokładnie przy zgodzie. Warto je mieć i nie są odległością. Słowa
 \end{fr}
 
 % ============================================================
-\section{Dlaczego po prostu jej nie usymetrycznić}
+\section{Dlaczego jej nie usymetrycznić}
 \label{sec:P30-js}
 \index{dywergencja Jensena--Shannona}
 
@@ -832,8 +875,10 @@ $\val{p30.js.far}$ przedziały: każde z $\val{p30.js.seps}$ oddaleń zwraca
 $\val{p30.js.cap}$, co do ostatniej cyfry, którą niesie arytmetyka, podczas
 gdy dywergencja jest nieskończona dla wszystkich czterech.
 
-Wygląda to na ciekawostkę o masach punktowych. Kiedy w życiu biegu
-treningowego rozkład modelu i cel są na rozłącznych nośnikach?
+Wygląda to na ciekawostkę o masach punktowych. Model z softmaksem nigdy nie
+ma nośnika rozłącznego z czymkolwiek \dash{} kładzie trochę masy na każdym
+tokenie ze słownika. Kiedy więc w życiu biegu treningowego wielkość
+symetryczna i ograniczona i tak się nasyca?
 \dotline
 \nextframe
 \end{fr}
@@ -843,12 +888,21 @@ treningowego rozkład modelu i cel są na rozłącznych nośnikach?
 iść}
 
 To nasycenie nie jest dziwactwem na skraju. To reżim, w którym bieg
-treningowy się zaczyna.
+treningowy się zaczyna \dash{} i dochodzi tam łagodniejszą drogą niż przez
+brakujący wynik.
 
-Na początku model rozkłada masę mniej więcej gdziekolwiek, co jest właśnie
-przypadkiem rozłącznych nośników. Wielkość symetryczna i ograniczona podaje
-tam tę samą liczbę, cokolwiek model zrobi, więc nie niesie \textbf{żadnej
-informacji o tym, w którą stronę się ruszyć}.
+Na początku model jest niemal jednostajny na słowniku, więc masa, którą kładzie
+na tokenie faktycznie oczekiwanym przez cel, wynosi około $\frac{1}{V}$.
+Nośniki nakładają się całkiem dobrze; mała jest masa, którą \emph{dzielą}. I
+to wystarcza. Przy słowniku $\val{p30.init.vocab}$ tokenów wielkość
+symetryczna leży $\val{p30.init.gap}$ poniżej swojego sufitu, gdzie
+dywergencja jest wciąż skończona i wciąż maleje, więc ta ograniczona podaje
+niemal tę samą liczbę, cokolwiek model zrobi, i niesie \textbf{prawie żadną
+informację o tym, w którą stronę się ruszyć}.
+
+Rozłączne nośniki to ostrzejsza wersja tego samego i należą do generatorów o
+wyjściach ciągłych, gdzie wyjścia modelu mogą wprost minąć dane. Klasyfikator
+nigdy tam nie dociera; nie musi.
 
 \begin{center}
 \emph{Ograniczoność i użyteczny gradient to ta sama własność\\
@@ -974,10 +1028,11 @@ tym, dlaczego stawiane z jej pomocą tezy zwykle nie są uzasadnione.
   $\val{p30.src.kl}$ bita, \emph{jest} dywergencją, a jego dwa alfabety są
   źródłem i kodem \dash{}
   $\val{p30.src.h} + \val{p30.src.kl} = \val{p30.src.ce}$.}
-\sumitem{7--9}{\textbf{\result{Nadwyżka nigdy nie jest ujemna}}, na mocy nierówności
+\sumitem{7--10}{\textbf{\result{Nadwyżka nigdy nie jest ujemna}}, na mocy nierówności
   Jensena z Programu~\ref{prog:P19} dla wklęsłego logarytmu, i wynosi zero
   dokładnie wtedy, gdy oba rozkłady się zgadzają. Sprawdzone po każdej
-  uporządkowanej parze z $\val{p30.simplex.n}$ rozkładów na siatce.}
+  uporządkowanej parze z $\val{p30.simplex.n}$ ściśle dodatnich rozkładów na
+  siatce.}
 \sumitem{11--12}{\result{Entropia krzyżowa ma więc podłogę, a tą podłogą
   jest entropia \emph{celu}}. Strata, która przestaje spadać, mogła dojść, a nie
   utknąć, i sama strata nie powie ci która.}
@@ -1003,9 +1058,10 @@ tym, dlaczego stawiane z jej pomocą tezy zwykle nie są uzasadnione.
   kierunku, a nie do celu.}
 \sumitem{34--38}{\textbf{\result{To nie jest odległość.}} Nierówność trójkąta, którą
   dał ci Program~\ref{prog:F09}, zawodzi dla $\val{p30.tri.bad}$ z
-  $\val{p30.tri.total}$ uporządkowanych trójek \dash{}
+  $\val{p30.tri.total}$ uporządkowanych trójek różnych rozkładów \dash{}
   $\val{p30.tri.pct}$ procent, czyli w przypadku typowym \dash{} przy czym
-  najgorszy objazd jest krótszy o $\val{p30.tri.gap}$ nata.}
+  najgorszy objazd jest krótszy o $\val{p30.tri.gap}$ nata, a kolejne
+  $\val{p30.tri.equal}$ trójek spełnia ją z równością.}
 \sumitem{39--42}{\result{\textbf{Usymetrycznienie kosztuje sygnał.} Dywergencja
   Jensena--Shannona jest symetryczna, skończona i ograniczona, a
   ograniczeniem jest $\ln 2 = \val{p30.js.cap}$}: masy punktowe oddalone o
@@ -1023,11 +1079,11 @@ tym, dlaczego stawiane z jej pomocą tezy zwykle nie są uzasadnione.
 \item Źródło stosuje się do $(\frac12, \frac12)$, a kodujesz je schematem
   zbudowanym dla $(\frac34, \frac14)$. Podaj entropię krzyżową, entropię i
   dywergencję, w bitach.
-  \answerto{Długości kodu to $\logb{2}\frac43 = \num{0.415}$ oraz
+  \answerto{Długości kodu to $\logb{2}\frac43 = \val{p30.t1.len}$ oraz
   $\logb{2}4 = 2$, więc entropia krzyżowa wynosi
-  $\frac12(\num{0.415}) + \frac12(2) = \num{1.207}$ bita. Entropia to
-  $1$ bit. Dywergencja to różnica, $\num{0.207}$ bita \dash{} tyle kosztuje
-  cię niewłaściwy kod na symbol.}
+  $\frac12(\val{p30.t1.len}) + \frac12(2) = \val{p30.t1.ce}$ bita.
+  Entropia to $1$ bit. Dywergencja to różnica, $\val{p30.t1.kl}$ bita
+  \dash{} tyle kosztuje cię niewłaściwy kod na symbol.}
 \item Nie licząc niczego, powiedz, która z $\KL{p}{q}$ i $\KL{q}{p}$ jest
   nieskończona, gdy $q$ jest zerem na wyniku, któremu $p$ nadaje wagę, i
   dlaczego.
@@ -1055,9 +1111,11 @@ tym, dlaczego stawiane z jej pomocą tezy zwykle nie są uzasadnione.
 \item Podaj jednozdaniowy powód, dla którego ograniczona, symetryczna
   dywergencja jest kiepskim celem treningowym, mimo że naprawia każdą
   skargę z §3 i §6.
-  \answerto{Bo się nasyca: na rozłącznym nośniku, od którego bieg startuje,
-  podaje $\ln 2$ cokolwiek model zrobi, więc nie mówi nic o tym, w którą
-  stronę się ruszyć.}
+  \answerto{Bo się nasyca. Bieg startuje z modelem niemal jednostajnym, więc
+  masa, którą dzieli z celem, wynosi około $\frac{1}{V}$ \dash{} nośniki
+  się nakładają, ale ledwie \dash{} a wielkość ograniczona leży
+  $\val{p30.init.gap}$ poniżej $\ln 2$, cokolwiek model zrobi, więc nie
+  mówi prawie nic o tym, w którą stronę się ruszyć.}
 \item Strata treningowa wypłaszczyła się na liczbie wyraźnie powyżej zera, a
   zespół spiera się, czy model przestał się uczyć. Która wielkość to
   rozstrzyga i czy da się ją odczytać ze straty?

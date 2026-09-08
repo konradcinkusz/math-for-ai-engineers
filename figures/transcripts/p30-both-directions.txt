@@ -4,6 +4,7 @@
 ...         return inf
 ...     s = sum(x * log(x / y) for x, y in zip(a, b) if x)
 ...     return round(s, 4)
+...
 >>> p, q = [0.9, 0.1], [0.5, 0.5]
 >>> kl(p, q), kl(q, p)
 (0.3681, 0.5108)
