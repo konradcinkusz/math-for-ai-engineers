@@ -144,12 +144,33 @@ pages, over a thousand, sixty.
 reports all computed output current, `figures/values/appf.tex` included —
 this pass moves no ledger, so the sync session inherits nothing stale from it.
 
+## The build: what CI settles, and what it does not
+
+There is no TeX installation in this container at all (`pdflatex: command not
+found`), so not even a standalone syntax probe was available here — the four
+formats were never mine to measure. **CI run 220 came back green on all eight
+jobs**, which is the second machine and the only compile this branch has had:
+
+- all four formats compiled, `en`/`pl` × standard/A4;
+- `checklog.py` green on each, so on CI's metrics there is no error, no
+  unresolved reference, no rerun or label-drift warning, no overfull vbox and
+  no hbox over the 15 pt budget;
+- `checkpdf.py` green on each: no stranded frame opener, no stranded section
+  heading;
+- and the new `--rigour` step green in the parity job.
+
+**Stated with its limits rather than as a clean bill.** A box under 15 pt
+still passes; the cue check is advisory in CI by design; the orphan tail is
+never fatal. The page counts, the exact overfull multiset and both page-level
+ledgers remain the sync session's, and CI's metrics are not the container that
+writes the published PDF. What it does settle is the thing I could not: the
+appendix, its six new tables and the new section are valid LaTeX and typeset
+in every format.
+
 ## What I deliberately did not do
 
-- **No build.** There is no TeX installation in this container at all
-  (`pdflatex: command not found`), so even the standalone syntax probe I
-  wanted was unavailable. I am not claiming a compile I did not run. What I
-  did run instead: brace balance, environment balance, per-table column counts
+- **No four-format build here**, per the parallel arrangement, and none was
+  possible anyway — see above. What I ran instead: brace balance, environment balance, per-table column counts
   against each `tabularx` spec, and a check that no *new* source line exceeds
   79 characters (the file's own ten pre-existing long lines left alone, on the
   measure-what-HEAD-does rule). **Every one of the six new tables is exactly
