@@ -472,8 +472,10 @@ $\val{p20.adam.decades}$ rzędach wielkości:
 
 \transcript{p20-unit-step}
 
-Krok wynosi $\val{p20.adam.eta}$ w każdej współrzędnej dla dużych gradientów i
-jest o $\val{p20.adam.shortfall}$ procent krótszy dla małych.
+Krok wynosi $\val{p20.adam.eta}$ w każdej współrzędnej dla dużych gradientów.
+Dla małych jest krótszy, i to nie tak samo w obu: o
+$\val{p20.adam.shortfall}$ procent przy mniejszym z dwóch gradientów i o
+$\val{p20.adam.shortfall.lo}$ przy większym.
 \textbf{To dlatego Adam jest niewrażliwy na skalowanie straty}: pomnóż stratę
 przez tysiąc, a każdy gradient zostanie pomnożony przez tysiąc \dash{} licznik i
 mianownik razem.

@@ -418,6 +418,15 @@ NOTES.append(f"at beta = {BETA_F04} the two conventions differ by a factor of "
 # ---------------------------------------------------------------------------
 B1, B2, EPS = 0.9, 0.999, 1e-8
 
+# The listing in section 4 rounds to this many places, INSIDE its own
+# code, and the two shortfall figures the frame beside it prints are
+# derived from the strings that rounding produces. Four places was not
+# enough: 0.0997 divides to 0.30 per cent against a stated 0.33, so a
+# reader who checked the sentence against the listing above it found
+# them disagreeing. Six places reproduces exactly and leaves the large
+# gradients still printing 0.1, which is the row the section is about.
+TRANSCRIPT_DIGITS = 6
+
 
 def adam(eta, b1=B1, b2=B2, eps=EPS, eps_inside=False):
     def step(w, g, state, k):
@@ -463,9 +472,35 @@ for _s in SCALES:
 # smallest -- the opposite end from the one people worry about.
 assert max(_shortfalls) < 4e-3, _shortfalls
 assert _shortfalls == sorted(_shortfalls, reverse=True), _shortfalls
+
+# --- AND THE FRAME QUOTED ONE FIGURE FOR TWO STEPS THE LISTING SHOWS AS
+# DIFFERENT, which is three defects in one sentence and every one of them is
+# this book's own recorded class. The emitted number is a max over the three
+# scales, so it was A BOUND QUOTED AS A VALUE; it belongs to the SMALLER of
+# the two small gradients, where the frame said "the small ones"; and it did
+# not REPRODUCE FROM THE PAGE, because a listing rounded to four decimals
+# prints 0.0997, which divides to 0.30 per cent against a stated 0.33.
+#
+# All three are fixed at once by emitting BOTH coordinates' shortfalls and
+# deriving each from the string the listing will print. That is stronger than
+# a corrected figure: the two shortfalls differing by a factor of two is the
+# NEXT frame's claim -- the departure is largest where the gradient is
+# smallest -- made visible in the listing the reader has just read.
+SHORT_LISTED = (3e-6, 7e-6)          # the two gradients the transcript shows
+_listed = []
+for _g in SHORT_LISTED:
+    _step = ETA_ADAM * _g / (_g + EPS)
+    _printed = float(f"{_step:.{TRANSCRIPT_DIGITS}f}")   # what the page shows
+    _listed.append(100.0 * (ETA_ADAM - _printed) / ETA_ADAM)
+# The two figures the frame prints must be what a reader gets by dividing the
+# two numbers the listing prints, to the decimal the page carries.
+for _pct, _g in zip(_listed, SHORT_LISTED):
+    assert f"{_pct:.2f}" == f"{100.0 * EPS / (_g + EPS):.2f}", (_pct, _g)
+assert _listed[0] > 2 * _listed[1], _listed   # largest at the SMALLER gradient
 emit("p20.adam.eta", ETA_ADAM, 1)
 emit("p20.adam.decades", 12)
-emit("p20.adam.shortfall", 100 * max(_shortfalls), 2)
+emit("p20.adam.shortfall", _listed[0], 2)
+emit("p20.adam.shortfall.lo", _listed[1], 2)
 NOTES.append("Adam's first step is eta/(1 + eps/|g|) in every coordinate, so "
              f"over 12 decades of gradient it is within "
              f"{100 * max(_shortfalls):.2f} per cent of eta, and the epsilon "
@@ -809,10 +844,10 @@ def main() -> None:
         ">>> from p20_gradient_descent import adam",
         ">>> tiny, huge = (3e-6, -7e-6), (3e6, -7e6)",
         ">>> step = adam(0.1)",
-        ">>> [round(abs(c), 4) for c in step((0,0), tiny, {}, 1)]",
-        f"{[round(abs(c), 4) for c in adam(0.1)((0.0, 0.0), (3e-6, -7e-6), {}, 1)]}",
-        ">>> [round(abs(c), 4) for c in step((0,0), huge, {}, 1)]",
-        f"{[round(abs(c), 4) for c in adam(0.1)((0.0, 0.0), (3e6, -7e6), {}, 1)]}",
+        f">>> [round(abs(c), {TRANSCRIPT_DIGITS}) for c in step((0,0), tiny, {{}}, 1)]",
+        f"{[round(abs(c), TRANSCRIPT_DIGITS) for c in adam(0.1)((0.0, 0.0), (3e-6, -7e-6), {}, 1)]}",
+        f">>> [round(abs(c), {TRANSCRIPT_DIGITS}) for c in step((0,0), huge, {{}}, 1)]",
+        f"{[round(abs(c), TRANSCRIPT_DIGITS) for c in adam(0.1)((0.0, 0.0), (3e6, -7e6), {}, 1)]}",
     ]
     for line in lines:
         assert len(line) <= 64, (len(line), line)

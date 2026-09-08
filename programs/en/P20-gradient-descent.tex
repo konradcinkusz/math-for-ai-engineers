@@ -500,8 +500,10 @@ first step is taken for gradients spanning $\val{p20.adam.decades}$ decades:
 
 \transcript{p20-unit-step}
 
-The step is $\val{p20.adam.eta}$ in every coordinate for the large gradients,
-and short of it by $\val{p20.adam.shortfall}$ per cent for the small ones.
+The step is $\val{p20.adam.eta}$ in every coordinate for the large gradients.
+For the small ones it falls short, and not by the same amount in both:
+$\val{p20.adam.shortfall}$ per cent at the smaller of the two gradients and
+$\val{p20.adam.shortfall.lo}$ at the larger.
 \textbf{This is why Adam is insensitive to loss scaling}: multiply the loss by
 a thousand and every gradient is multiplied by a thousand, and the numerator
 and the denominator are multiplied by a thousand together.
