@@ -18,6 +18,8 @@ can be trusted to remember:
               Summary item whose frame range it prints?
   --terms     Does every Polish rendering Appendix D names actually occur
               in the prose of programs/pl?
+  --index     Does every NAME an \\index{} entry prints occur in the prose of
+              the file the mark sits in?
 
 Exit code is 0 when the ledger is clean and 1 when it is not, so any of these
 can be turned into a hard CI gate by dropping the --soft flag.
@@ -649,6 +651,105 @@ def check_terms(soft: bool) -> int:
     return 0 if (bad == 0 or soft) else 1
 
 
+RE_INDEX = re.compile(r"\\index\{((?:[^{}]|\{[^{}]*\})*)\}")
+# A NAME, for this check: a run of letters, at least two long, carrying at
+# least one capital. That is the decidable half of an index entry and the only
+# half worth a gate -- see the note above check_index().
+RE_NAME = re.compile(r"[A-Za-z]*[A-Z][A-Za-z]*")
+# \DeclareMathOperator{\relu}{ReLU} and \newcommand{\tg}{...}: what the source
+# writes as a macro and the page prints as a word. Learnt from the preamble
+# and the language files rather than listed here, the way checkpdf.py learns
+# the next-frame cue out of lang/*.tex rather than hard-coding it -- so a new
+# operator cannot make this check start lying.
+RE_OPERATOR = re.compile(
+    r"\\(?:DeclareMathOperator\*?|newcommand\*?|providecommand\*?)"
+    r"\{?\\([A-Za-z@]+)\}?(?:\[\d\])?\{([^{}]*)\}")
+
+
+def _printed_forms() -> dict[str, str]:
+    forms: dict[str, str] = {}
+    for f in (ROOT / "preamble.tex", ROOT / "lang" / "en.tex",
+              ROOT / "lang" / "pl.tex"):
+        if f.exists():
+            for macro, body in RE_OPERATOR.findall(f.read_text(encoding="utf8")):
+                forms.setdefault("\\" + macro, body)
+    return forms
+
+
+def check_index(soft: bool) -> int:
+    r"""An index entry that names something the page never prints.
+
+    The index is the one artefact in this book whose coordinates rest entirely
+    on where an \index{} mark happens to sit, and a review of it found the two
+    ways that goes wrong: a mark parked at a section opener several pages
+    before the term it names, and -- worse -- \index{optimiser!AdamW} against a
+    program that deliberately never writes the word, so the index asserted by
+    its existence that the book discusses AdamW under that name.
+
+    Only the second is checkable from the source, and only for part of an
+    entry. Most index leaves in this book are DESCRIPTIONS rather than terms
+    ("what it omits", "as an inverse", "and the ELBO"), so the obvious check --
+    assert the leaf occurs in the prose -- reports most of the book and is the
+    permanently red ledger CLAUDE.md refuses. Measured before this was
+    written, by taking each leaf's longest content word and asking whether it
+    occurs in the file at all: of the 926 marks across the two editions it
+    reports a hundred and thirty, the Polish far worse than the English
+    because Polish inflects and a stem match is not available. Almost every
+    one of the hundred and thirty is a description doing its job.
+
+    A NAME is the decidable half. AdamW, PageRank, Thompson, ELBO, PCA, SVD,
+    Jacobian: a capitalised token either appears in the file or it does not,
+    and if it does not then the index has named something the reader cannot
+    find. Over the same 926 marks about eighty carry such a token, and once
+    the three this pass found were cleared every one of them is printed. So
+    this is a hard gate on a clean, narrow class rather than a ledger on a
+    wide one, and the count it prints is the ledger.
+
+    A see-reference is exempt by construction: \index{SVD|see{singular value
+    decomposition}} names another ENTRY, not a word in the body, and saying so
+    is the whole point of the device.
+    """
+    forms = _printed_forms()
+    bad = 0
+    marks = names = 0
+    for lang in LANGS:
+        for f in program_files(lang):
+            src = f.read_text(encoding="utf8")
+            prose = RE_TEX_COMMENT.sub("", RE_INDEX.sub("", src))
+            # A macro the page prints as a word counts as the word.
+            for macro, body in forms.items():
+                if macro in prose:
+                    prose += " " + body
+            for m in RE_INDEX.finditer(src):
+                marks += 1
+                entry = m.group(1)
+                # A see-reference names another ENTRY rather than a word in
+                # the body, and its head is by construction a word the book
+                # does NOT print -- that is why it needs a see. Both halves
+                # are exempt, and the whole mark is skipped.
+                if re.search(r"\|\s*(?:seealso|see)\b", entry):
+                    continue
+                payload = entry.split("|")[0]
+                shown = " ".join(seg.split("@")[-1]
+                                 for seg in payload.split("!"))
+                for token in RE_NAME.findall(shown):
+                    if len(token) < 2:
+                        continue
+                    names += 1
+                    if token not in prose:
+                        line = src[:m.start()].count("\n") + 1
+                        print(f"  {f.relative_to(ROOT)}:{line}: index entry "
+                              f"{payload!r} names {token!r}, which this file "
+                              f"never prints. An index entry for a word the "
+                              f"body does not write sends the reader to a page "
+                              f"that does not carry it.")
+                        bad += 1
+    if bad == 0:
+        print(f"  {names} names in {marks} index entries, "
+              f"every one printed in its own program.")
+    return 0 if (bad == 0 or soft) else 1
+
+
 RE_PARTRANGE = re.compile(r"\(([FP]\d+)--([FP]\d+)\)")
 
 
@@ -708,12 +809,13 @@ def main() -> int:
     p.add_argument("--results", action="store_true")
     p.add_argument("--terms", action="store_true")
     p.add_argument("--parts", action="store_true")
+    p.add_argument("--index", action="store_true")
     p.add_argument("--all", action="store_true")
     p.add_argument("--soft", action="store_true",
                    help="report but always exit 0 (the default for a draft)")
     a = p.parse_args()
     if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit,
-                a.scripts, a.results, a.terms, a.parts, a.all)):
+                a.scripts, a.results, a.terms, a.parts, a.index, a.all)):
         a.all = True
     rc = 0
     if a.all or a.frames:
@@ -734,6 +836,8 @@ def main() -> int:
         rc |= check_terms(a.soft)
     if a.all or a.parts:
         rc |= check_parts(a.soft)
+    if a.all or a.index:
+        rc |= check_index(a.soft)
     return rc
 
 

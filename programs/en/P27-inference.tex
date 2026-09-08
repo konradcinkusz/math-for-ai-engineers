@@ -41,14 +41,15 @@
 \begin{outcomes}
 \outcome{1--6}{say what a quoted benchmark difference is worth, in items
   rather than in points}
-\outcome{7--14}{build a confidence interval for a metric that has no formula,
-  and name the unit that has to be resampled}
-\outcome{15--22}{size and run a comparison between two models evaluated on
+\outcome{7--15}{build a confidence interval for a metric that has no formula,
+  name the unit that has to be resampled, and say what a given width costs
+  in items}
+\outcome{16--23}{size and run a comparison between two models evaluated on
   the same prompts}
-\outcome{23--30}{state what a p-value is, and what it is not}
-\outcome{31--36}{say what forty comparisons on one leaderboard do to all of
+\outcome{24--31}{state what a p-value is, and what it is not}
+\outcome{32--37}{say what forty comparisons on one leaderboard do to all of
   the above}
-\outcome{37--39}{apply the whole of it to a number somebody has published}
+\outcome{38--40}{apply the whole of it to a number somebody has published}
 \end{outcomes}
 
 \begin{quiz}
@@ -69,12 +70,12 @@
   \answerto{The bootstrap: resample the items with replacement, recompute the
   metric on each resample, and take the middle of the answers.}
 \item Two models were evaluated on the same prompts rather than on separate
-  draws. Does that make the comparison harder or easier? \teachesat{16--17}
+  draws. Does that make the comparison harder or easier? \teachesat{17--18}
   \answerto{Easier, and usually by a lot. The two scores are correlated, and
   the variance of a difference subtracts twice the covariance, so the item
   count needed falls by a factor of $1-\rho$.}
 \item A comparison returns $p = \num{0.03}$. What is the probability that the
-  two models are equally good? \teachesat{24--25}
+  two models are equally good? \teachesat{25--26}
   \answerto{The p-value does not say. It is the probability of a result this
   extreme \emph{if} they were equally good, and reading it backwards is the
   inversion Program~\ref{prog:P23} warns about.}
@@ -395,9 +396,70 @@ width}. Buying a narrower one costs items, at
 Program~\ref{prog:P25}'s four-times-for-half.
 \end{trapbox}
 
-You can now put an interval on anything you can compute. That still leaves
-the question the program opened with, and it turns out that asking it
-directly is far cheaper than putting an interval on each model separately.
+You can now put an interval on anything you can compute, so there is exactly
+one lever left. Your evaluation is $\val{p27.boot.n}$ items and the interval
+above runs from $\val{p27.boot.lo}$ to $\val{p27.boot.hi}$, which is
+$\val{p27.w.200}$ points wide; a leaderboard prints one decimal place.
+Roughly how many items would it take to get that interval under one point?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+About $\val{p27.w.onepoint}$ \dash{} the width has to fall by a factor of
+$\val{p27.w.200}$, four times the items halves it, so the items go as the
+square of that factor: $\val{p27.w.200}$ squared, times the
+$\val{p27.boot.n}$ you have.
+\end{ansblock}
+
+Swept over three decades at the same accuracy, with the interval computed
+exactly rather than resampled:
+
+\begin{center}
+\begin{tabular}{rrr}
+\toprule
+items in the set & interval width, points & the interval, in items \\
+\midrule
+$50$ & $\val{p27.w.50}$ & $\val{p27.w.span.50}$ \\
+$\val{p27.boot.n}$ & $\val{p27.w.200}$ & $\val{p27.w.span.200}$ \\
+$800$ & $\val{p27.w.800}$ & $\val{p27.w.span.800}$ \\
+$\num{3200}$ & $\val{p27.w.3200}$ & $\val{p27.w.span.3200}$ \\
+$\num{12800}$ & $\val{p27.w.12800}$ & $\val{p27.w.span.12800}$ \\
+$\num{51200}$ & $\val{p27.w.51200}$ & $\val{p27.w.span.51200}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The second row is the interval you already have, and the rest is that same
+computation at other sizes. Four times the items halves the width at every
+step, which is Program~\ref{prog:P25}'s rule measured rather than quoted
+\dash{} and \textbf{the exactness is in the third column}, where the span
+doubles as whole numbers. The points column is those spans divided by the set
+size and then rounded, so dividing two of its entries gives $2$ to two
+decimal places rather than $2$ exactly.
+
+The one step that is not a halving is the first, and the smallest set is
+where it breaks: $50$ items give $\val{p27.w.coarse}$ times the width of
+$\val{p27.boot.n}$ rather than twice. A span is a whole number of items, and
+on $50$ items one item is worth two points, so the interval is
+$\val{p27.w.span.50}$ items wide and the next span down is a whole two points
+narrower. That is section 1's grid at its coarsest, and here it rounds
+outward: the bootstrap reports a shade more uncertainty than the formula
+does.
+
+The table brackets its own answer \dash{} $\val{p27.w.12800}$ points at
+$\num{12800}$ items and $\val{p27.w.51200}$ at $\num{51200}$ \dash{} and the
+crossing is at about $\val{p27.w.onepoint}$. \emph{About} is the honest form
+rather than a hedge: the span moves one item at a time, so near the crossing
+the width steps above and below one point as the set grows, and a size quoted
+to the item would be a property of the grid rather than of the method.
+
+All of that is one interval on one model. The question the program opened
+with is about the difference between two, the number that answers that one is
+section 3's rather than this one's, and it turns out that asking the
+difference directly is far cheaper than putting an interval on each model
+separately.
 \end{fr}
 
 % ============================================================
@@ -600,7 +662,7 @@ the comparison is reported in a form from which it cannot be checked.
 % ============================================================
 \section{What a p-value says}
 \label{sec:P27-p-value}
-\index{p-value}
+\index{pvalue@p-value}
 \index{inference!what a p-value does not say}
 
 \begin{fr}
@@ -990,46 +1052,51 @@ already have.
   not $\val{p27.clust.n}$ observations, and a bootstrap over rows reports an
   interval too narrow by $\val{p27.clust.factor}$. More resamples never
   narrow an interval; only items do}.}
-\sumitem{15--17}{\result{\textbf{Pairing multiplies the items you need by
+\sumitem{14--15}{\result{\textbf{The width is set by the item count and by nothing
+  else}, and four times the items halves it \dash{} measured, not quoted. The
+  interval spans $\val{p27.w.span.200}$ items on $\val{p27.boot.n}$ and
+  $\val{p27.w.span.51200}$ on $\num{51200}$, and it falls under one point at
+  about $\val{p27.w.onepoint}$ items}.}
+\sumitem{16--18}{\result{\textbf{Pairing multiplies the items you need by
   $1-\rho$}, exactly, at every accuracy and gap. Program~\ref{prog:P25}'s
   $\val{p27.n.rho00}$ becomes $\val{p27.n.rho90}$ at $\rho = \num{0.9}$
   \dash{} an order of magnitude, from the covariance term in
   $\Var(X-Y)$}.}
-\sumitem{18--19}{\result{\textbf{Only the discordant items carry the difference.}
+\sumitem{19--20}{\result{\textbf{Only the discordant items carry the difference.}
   The $\val{p27.concord}$ items both models answered the same way cancel
   exactly, and the comparison is entirely about the
   $\val{p27.disc}$ that are left}.}
-\sumitem{19--20}{\result{Under \enquote{equally good} those items are fair coin
+\sumitem{20--21}{\result{Under \enquote{equally good} those items are fair coin
   flips, so the test is Program~\ref{prog:P12}'s binomial coefficient over
   integers \dash{} exact, machine-independent, and needing no variance.
   \textbf{The worked gap gives $\val{p27.p.exact}$}: an odd count cannot fall
   evenly, so the observed lead of $\val{p27.net}$ is the smallest available
   and a result at least this lopsided is certain}.}
-\sumitem{21}{\result{\textbf{On this evaluation a gap under
+\sumitem{22}{\result{\textbf{On this evaluation a gap under
   $\val{p27.net.needed.pts}$ points is not a result}, found by search. The
   published gap was $\val{p27.gap.pts}$}.}
-\sumitem{23--25}{\result{\textbf{A p-value is
+\sumitem{24--26}{\result{\textbf{A p-value is
   $\Prob(\text{data this extreme} \mid \text{no difference})$}, and reading
   it backwards is Program~\ref{prog:P23}'s inversion \dash{} the same error
   as the base rate}.}
-\sumitem{26--27}{\result{Given a prior it can be turned round, and the answer is
+\sumitem{27--28}{\result{Given a prior it can be turned round, and the answer is
   alarming: at $\val{p27.prior.real.pct}$ per cent of comparisons real and
   $\val{p27.power.pct}$ per cent power, $\val{p27.fdr.pct}$ per cent of
   \enquote{significant} findings are false}.}
-\sumitem{28--29}{\result{\textbf{One comparison in twenty between identical models
+\sumitem{29--30}{\result{\textbf{One comparison in twenty between identical models
   reports a difference}, by construction. Here $\val{p27.null.rate.pct}$ per
   cent, because a discrete test steps over the threshold rather than landing
   on it}.}
-\sumitem{31--33}{\result{\textbf{$\val{p27.models}$ comparisons make that
+\sumitem{32--34}{\result{\textbf{$\val{p27.models}$ comparisons make that
   $\val{p27.any.false.pct}$ per cent.} Dividing the threshold restores it and
   costs $\val{p27.bonf.cost}$ times the items \dash{} multiple comparisons
   is a budget line, not a technicality}.}
-\sumitem{34--35}{\result{\textbf{And sorting a table biases its top row.} The winner
+\sumitem{35--36}{\result{\textbf{And sorting a table biases its top row.} The winner
   of $\val{p27.models}$ \emph{equal} models sits $\val{p27.emax}$ standard
   errors above its own truth, which is $\val{p27.lb.margin}$ points at
   $\val{p27.lb.n}$ items. Selection, not measurement \dash{} and the same
   arithmetic is why a held-out set exists}.}
-\sumitem{37--39}{\result{What is left when a comparison cannot resolve what you care
+\sumitem{38--40}{\result{What is left when a comparison cannot resolve what you care
   about is a design question. \textbf{And \enquote{no significant
   difference} becomes a measurement the moment you say how large a difference
   would have had to be.}}}
@@ -1061,6 +1128,15 @@ already have.
   \answerto{Too narrow, by up to $\sqrt{600/50} = \sqrt{12} \approx
   \num{3.5}$. The bootstrap believes it has $600$ independent observations
   and in the worst case it has $50$.}
+\item Your evaluation set has $800$ items and you want the interval half as
+  wide. How many items does that take, and what happens to the interval's
+  span, measured in items?
+  \answerto{Four times as many, so $\num{3200}$ \dash{} and the span
+  \emph{doubles}, from $\val{p27.w.span.800}$ items to
+  $\val{p27.w.span.3200}$. Those are one fact rather than two: the width is
+  the span divided by the set size, so quadrupling the set while doubling
+  the span halves the width. A span that grows while the interval narrows is
+  the half that reads wrongly.}
 \item A team runs $20$ comparisons against a baseline and reports the two
   that came back at $p < \num{0.05}$. If none of the $20$ systems differs
   from the baseline, how many such reports would you expect?

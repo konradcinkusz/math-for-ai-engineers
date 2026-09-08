@@ -338,6 +338,172 @@ assert abs(CLUSTER_FACTOR ** 2 - CLUSTER_ROWS) < 1e-12
 
 
 # ======================================================================
+# 2b.  EXPERIMENT E7, run here.
+#
+# The specification is "bootstrap confidence-interval width against
+# evaluation-set size on a public benchmark; the size needed to resolve one
+# point", and Program P32's split settles the "public benchmark" half before
+# anything is computed: ASK WHETHER THE CLAIM NEEDS EXTERNAL DATA OR IS A
+# STATEMENT ABOUT THE ESTIMATOR.  The width of a bootstrap interval on a
+# proportion is a function of (n, p) and of nothing else, so a benchmark
+# would supply one number, p -- and p sets the CONSTANT while n sets the
+# SHAPE.  The shape is what E7 asks for, so it needs no download, and the
+# sweep runs at this section's own accuracy rather than at a borrowed one.
+#
+# Nothing here is simulated.  Section 2 established that on a proportion the
+# bootstrap distribution IS Binomial(n, k/n) exactly, so every width below is
+# an exact percentile of that binomial -- no seed, no resampling, and the
+# same answer on every machine.
+# ======================================================================
+
+def log_binom_pmf(n: int, k: int, p: float) -> float:
+    """log P(X = k) for X ~ Binomial(n, p), via lgamma.
+
+    binom_pmf above forms math.comb(n, k) as an exact integer and then
+    multiplies by p**k; at n = 3200 that integer is about 10**961 and the
+    conversion to a float raises OverflowError, so the sweep cannot use it.
+    This is the same quantity in log space and it is checked against
+    binom_pmf at n = 200 before it is used -- an instrument is not evidence
+    until it has been watched producing an answer already known."""
+    return (math.lgamma(n + 1) - math.lgamma(k + 1) - math.lgamma(n - k + 1)
+            + k * math.log(p) + (n - k) * math.log1p(-p))
+
+
+for _k in (0, 1, 100, 143, 200):
+    _exact, _log = binom_pmf(200, _k, BOOT_P), math.exp(log_binom_pmf(200, _k, BOOT_P))
+    assert abs(_exact - _log) <= 1e-12 * max(_exact, 1e-300), (_k, _exact, _log)
+
+
+def boot_span(n: int, p: float = BOOT_P) -> int:
+    """The 95 per cent bootstrap interval's span, in ITEMS.
+
+    The endpoints are counts, so the span is a whole number of items and the
+    width in points is 100 * span / n -- an exact rational, identical on
+    every machine.  That quantisation is section 1's grid, and it is why the
+    answer to "how many items" below is a round number rather than a size."""
+    total, lo, hi = 0.0, None, None
+    for k in range(n + 1):
+        total += math.exp(log_binom_pmf(n, k, p))
+        if lo is None and total >= 0.025:
+            lo = k
+        if total >= 0.975:
+            hi = k
+            break
+    assert lo is not None and hi is not None, n
+    return hi - lo
+
+
+def boot_width(n: int, p: float = BOOT_P) -> float:
+    """The same interval's width, in percentage points."""
+    return 100.0 * boot_span(n, p) / n
+
+
+SWEEP = (50, BOOT_N, 800, 3200, 12800, 51200)
+SPANS = {n: boot_span(n) for n in SWEEP}
+WIDTHS = {n: 100.0 * SPANS[n] / n for n in SWEEP}
+
+# The n = BOOT_N row IS the interval printed two frames earlier.  Gated
+# rather than resembled: two numbers on one page that look like one are the
+# defect this book keeps recording, and here being the same number is the
+# point.
+assert abs(WIDTHS[BOOT_N] - (BOOT_HI - BOOT_LO)) < 1e-9, (
+    f"the sweep's {BOOT_N}-item row is {WIDTHS[BOOT_N]} and the interval the "
+    f"section already prints is {BOOT_HI - BOOT_LO} wide; they are the same "
+    f"interval and must agree.")
+# And the frame now asks the reader to do that subtraction, so it is checked
+# on the PRINTED forms as well: the endpoints carry one decimal and the width
+# carries two, and a reader who subtracts must land on what the table says.
+reproduces(WIDTHS[BOOT_N], 2, (BOOT_HI, 1), (BOOT_LO, 1), op=lambda a, b: a - b)
+
+# THE INVARIANT, which is Program P25's four-times-for-half measured rather
+# than quoted.  The bound is DERIVED and not chosen: each endpoint sits on a
+# grid 100/n points wide, so the width carries at most that much
+# quantisation and a comparison across a fourfold step carries at most
+# 100/n + 2 * 100/(4n).
+for n in SWEEP[:-1]:
+    slack = 150.0 / n
+    assert abs(WIDTHS[n] - 2.0 * WIDTHS[4 * n]) <= slack, (
+        n, WIDTHS[n], WIDTHS[4 * n], slack)
+
+# And the bootstrap tracks the closed form to within one item's width at
+# every size, which is the same assertion section 2 already makes at n = 200
+# carried across three decades.
+for n in SWEEP:
+    assert abs(WIDTHS[n] - 2.0 * half_width(BOOT_P, n)) <= 100.0 / n, n
+
+for n in SWEEP:
+    emit(f"p27.w.{n}", WIDTHS[n], 2)
+
+# The one departure from the halving, and it is at the SMALLEST set, where
+# the grid is coarsest.  Emitted because the frame names it; guarded because
+# a reader will divide the table's own two top rows.
+COARSE = WIDTHS[SWEEP[0]] / WIDTHS[SWEEP[1]]
+reproduces(COARSE, 2, (WIDTHS[SWEEP[0]], 2), (WIDTHS[SWEEP[1]], 2),
+           op=lambda a, b: a / b)
+emit("p27.w.coarse", COARSE, 2)
+
+# The span in items at the two ends of the sweep.  It DOUBLES exactly at
+# every step from BOOT_N up, which is the halving seen in whole numbers, and
+# that is asserted rather than printed six times.
+for n in SWEEP[1:-1]:
+    assert SPANS[4 * n] == 2 * SPANS[n], (n, SPANS[n], SPANS[4 * n])
+# ... and the coarsest step does NOT, which is the row the frame names.
+# Written out rather than folded into the loop above: the first draft of
+# this line compared SPANS[50] with 2 * SPANS[200] // 2, which is
+# SPANS[200] -- a vacuous assertion that could not fail, and the class
+# Programs P01 and P05 both record.
+assert SPANS[SWEEP[1]] != 2 * SPANS[SWEEP[0]], (SPANS[SWEEP[0]], SPANS[SWEEP[1]])
+# The spans are printed beside the widths BECAUSE THE EXACTNESS LIVES THERE.
+# A width in points is a span divided by n and then rounded, so the points
+# column halves to two decimal places and the items column doubles as whole
+# numbers -- and a reader dividing 6.25 by 3.12 gets 2.00 rather than 2
+# exactly.  Quoting the halving off the points column would be a claim the
+# page cannot support; quoting it off the items column is arithmetic.
+for n in SWEEP:
+    emit(f"p27.w.span.{n}", SPANS[n])
+
+# THE SIZE NEEDED TO RESOLVE ONE POINT, and it is quoted to two significant
+# figures ON PURPOSE.  Setting 2 z sqrt(p(1-p)/n) = 1 point gives
+#     n = 4 p (1-p) (z / delta)^2
+# exactly, but the MEASURED crossing is not a single size: near there the
+# span moves by one item at a time, so the width steps above and below one
+# point as n grows.  A knife-edge "smallest n" would be a lattice artefact
+# and machine-legible precision the quantity does not have.  What is
+# committed instead is a round figure with the crossing bracketed at a
+# comfortable distance either side -- Program P06's rule, that a quantity
+# whose exact value is an artefact is committed as a bound.
+ONE_POINT = 1.0
+N_ONE_POINT_EXACT = 4.0 * BOOT_P * (1 - BOOT_P) * (Z / (ONE_POINT / 100.0)) ** 2
+
+
+def two_sig_figs(x: float) -> int:
+    e = math.floor(math.log10(abs(x)))
+    return int(round(x, -(e - 1)))
+
+
+N_ONE_POINT = two_sig_figs(N_ONE_POINT_EXACT)
+# The reader's own route is the table: the width has to fall from the
+# BOOT_N row to one point, and items go as the square of that factor.  It
+# must land on the same two significant figures or the page cannot be
+# checked on the page.
+_reader = float(f"{WIDTHS[BOOT_N]:.2f}") ** 2 * BOOT_N
+assert two_sig_figs(_reader) == N_ONE_POINT, (_reader, N_ONE_POINT)
+# And the crossing really is bracketed, measured on the exact bootstrap
+# rather than on the formula.  A tenth either side is far outside anything
+# the grid or a library's lgamma can move.
+assert boot_width(round(0.9 * N_ONE_POINT)) > ONE_POINT
+assert boot_width(round(1.1 * N_ONE_POINT)) < ONE_POINT
+# The table brackets it too, which is what makes it the answer to its own
+# question rather than a table with an answer bolted on.
+assert WIDTHS[12800] > ONE_POINT > WIDTHS[51200]
+emit("p27.w.onepoint", N_ONE_POINT)
+NOTES.append(
+    f"E7: bootstrap width {WIDTHS[SWEEP[0]]:.2f} points at {SWEEP[0]} items "
+    f"to {WIDTHS[SWEEP[-1]]:.2f} at {SWEEP[-1]}; under one point from about "
+    f"{N_ONE_POINT} items.")
+
+
+# ======================================================================
 # 3.  The paired comparison.  THE HEADLINE.
 #
 # Program P25 sized the comparison for two INDEPENDENT evaluations and got

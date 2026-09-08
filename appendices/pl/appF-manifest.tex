@@ -88,8 +88,7 @@ zaplanowano dziesięć eksperymentów. Każdy wiersz poniżej niesie własny sta
 \textbf{Nie ma tu żadnej sumy i ten brak jest sednem.} Liczba \enquote{ile
 wykonano} to twierdzenie o tej książce, którego nic z niczego nie wyprowadza,
 i taka liczba psuje się po cichu: zdanie \enquote{żaden nie został wykonany}
-stało na stronie, w pliku czytanym przez następnego autora jako pierwszy,
-przez pięć programów po tym, jak jeden został.
+przetrwało pięć programów po tym, jak jeden został wykonany.
 
 \medskip
 \textbf{Wykonane i opisane w programie, który je wykonał.}
@@ -99,40 +98,44 @@ przez pięć programów po tym, jak jeden został.
 \toprule
 \textbf{\#} & \textbf{Co mierzy} & \textbf{Gdzie} \\
 \midrule
+E3 & Kąt między losowymi wektorami jednostkowymi w miarę wzrostu wymiaru i
+  koncentracja wokół kąta prostego & Program~\ref{prog:P05} \\
 E6 & Spadek zwykły, pęd i Adam na formie kwadratowej o znanym wskaźniku
   uwarunkowania; kroki do tolerancji wobec przewidzianej liczby &
-  \ref{prog:P20} \\
+  Program~\ref{prog:P20} \\
 E8 & Dywergencja w przód i wstecz dopasowana do jednego celu dwumodalnego;
-  pokrywanie modów wobec ich wybierania & \ref{prog:P30} \\
+  pokrywanie modów wobec ich wybierania & Program~\ref{prog:P30} \\
 E9 & Rozrzut wyników i entropia uwagi z dzielnikiem pierwiastkowym i bez
-  niego, dla różnych rozmiarów głowicy & \ref{prog:P25}, \ref{prog:P32} \\
+  niego, dla różnych rozmiarów głowicy & Programy~\ref{prog:P25}
+  i~\ref{prog:P32} \\
 E10 & Dopasowanie prawa potęgowego do kształtu używanego w literaturze, z
-  podanym błędem ekstrapolacji & \ref{prog:P33} \\
+  podanym błędem ekstrapolacji & Program~\ref{prog:P33} \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
 \medskip
-\textbf{Zmierzone, ale niezadeklarowane.} Każdy z tych programów zmierzył coś,
-co blisko przypomina stojącą obok specyfikację, i żaden pass nie zadeklarował
-eksperymentu. To, czy specyfikacja jest spełniona, jest zadaniem do
-przeczytania w napisanym programie, a nie wnioskiem do wyciągnięcia z tabeli
-\dash{} i dlatego tabela mówi to, zamiast mówić \enquote{wykonane}.
+\textbf{Wykonane połowicznie.} Jedna specyfikacja ma jedną część spełnioną, a
+drugą nie, i to rozróżnienie warto zachować, zamiast zaokrąglać je w
+którąkolwiek stronę. To, czy specyfikacja jest spełniona, jest osądem o
+programie, a nie czymś, co rozstrzyga tabela.
 
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}lXl@{}}
 \toprule
 \textbf{\#} & \textbf{Co specyfikuje} & \textbf{Gdzie} \\
 \midrule
-E1 & Wynik, przy którym naiwny $\softmax$ przepełnia każdy format, i ile
-  kosztuje niemaksymalny punkt odniesienia & \ref{prog:P02} \\
-E3 & Kąt między losowymi wektorami jednostkowymi w miarę wzrostu wymiaru i
-  koncentracja wokół kąta prostego & \ref{prog:P05} \\
-E5 & Tryb w przód wobec trybu wstecz: czas i szczyt pamięci wobec głębokości
-  oraz zmierzony koszt punktów kontrolnych & \ref{prog:P16} \\
+E1 & Wynik, przy którym naiwny $\softmax$ przepełnia każdy format, i błąd
+  obliczenia naiwnego wobec stabilizowanego w miarę wzrostu wyników &
+  Program~\ref{prog:P02} \\
 \bottomrule
 \end{tabularx}
 \end{center}
+
+Program~\ref{prog:P02} podaje wynik, przy którym przepełnia się każdy z
+czterech formatów, co jest dokładnie pierwszą częścią. Nie przemiata zakresu
+wielkości i nie zestawia obliczenia naiwnego ze stabilizowanym, co jest
+częścią drugą.
 
 \medskip
 \textbf{Niewykonane.}
@@ -140,21 +143,28 @@ E5 & Tryb w przód wobec trybu wstecz: czas i szczyt pamięci wobec głębokośc
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}lXl@{}}
 \toprule
-\textbf{\#} & \textbf{Co by rozstrzygnął} & \textbf{Gdzie} \\
+\textbf{\#} & \textbf{Co by rozstrzygnął} & \textbf{Gdzie by trafił} \\
 \midrule
 E2 & Ręcznie policzone operacje i bajty jednego przebiegu w przód wobec
   zmierzonego czasu zegara; gdzie model się myli i o ile &
-  \ref{prog:P03} \\
+  Program~\ref{prog:P03} \\
 E4 & Widmo wartości szczególnych prawdziwej macierzy zanurzeń i błąd
   rekonstrukcji wobec rzędu \dash{} ten wymaga wytrenowanego modelu &
-  \ref{prog:P11} \\
+  Program~\ref{prog:P11} \\
+E5 & Tryb w przód wobec trybu wstecz: czas i szczyt pamięci wobec głębokości
+  oraz zmierzony koszt punktów kontrolnych & Program~\ref{prog:P16} \\
 E7 & Szerokość przedziału wobec rozmiaru zbioru ewaluacyjnego na publicznym
   benchmarku; rozmiar potrzebny do rozstrzygnięcia jednego punktu &
-  \ref{prog:P27} \\
+  Program~\ref{prog:P27} \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
+E5 zasługuje na osobne zdanie, bo obok niego pewien program jednak coś
+zmierzył. Program~\ref{prog:P16} policzył operacje dokładnie i wyprowadził
+szczyt punktów kontrolnych z arytmetyki, świadomie i z uzasadnieniem podanym
+na miejscu. Zegar i pomiar szczytu pamięci to inny przyrząd, a to właśnie o
+niego prosi ta specyfikacja.
 \section{Co liczy build}
 \label{sec:F-ledgers}
 \index{manifest!ledgers}
@@ -174,22 +184,29 @@ Wartości obliczone, każda użyta i obecna & $\val{appf.values}$ \\
 Zapisy konsoli, każdy wytworzony przez skrypt &
   $\val{appf.transcripts}$ \\
 Diagramy & $\val{appf.diagrams}$ \\
-Twierdzenia oznaczone jako niezweryfikowane & $\val{appf.verifybox}$ \\
-Ramki, które zadają ci pytanie &
-  $\val{appf.elicit}$, czyli $\val{appf.elicit.pct}$ procent \\
-Polskie odpowiedniki wymienione w Dodatku~\ref{app:D} & $\val{appf.terms.rend}$
-  w $\val{appf.terms.rows}$ wierszach \\
+Bloki z nagłówkiem \enquote{\lblVerify} & $\val{appf.verifybox}$ \\
+Ramki, które zadają ci pytanie & $\val{appf.elicit}$ \\
+Polskie odpowiedniki wymienione w Dodatku~\ref{app:D}, w
+  $\val{appf.terms.rows}$ wierszach & $\val{appf.terms.rend}$ \\
 Zakresy części we wstępie, wobec manifestu & $\val{appf.parts}$ \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
 \medskip
-Dwie z nich opisują jedno wydanie tam, gdzie rejestr samego buildu opisuje oba,
-a różnica jest czynnikiem dwa, a nie sprzecznością: w obu wydaniach razem jest
-$\val{appf.transcripts.both}$ zapisów konsoli i
-$\val{appf.diagrams.both}$ diagramów, bo każdy powstaje osobno w każdym
-języku. Cytuj tę liczbę, którą masz na myśli, i powiedz, która to.
+Trzy z nich opisują jedno wydanie tam, gdzie rejestr samego buildu opisuje
+oba, a w każdym przypadku różnica jest czynnikiem dwa, a nie sprzecznością:
+w obu wydaniach razem jest $\val{appf.transcripts.both}$ zapisów konsoli i
+$\val{appf.diagrams.both}$ diagramów, a polskich odpowiedników jest dwa razy
+$\val{appf.terms.rend}$, bo każde wydanie niesie własne. Cytuj tę liczbę,
+którą masz na myśli, i powiedz, która to.
+
+\medskip
+Dwie liczby ramek nie opisują braku. Liczba zaplanowana to suma oszacowań
+robionych program po programie, a każde powstało, zanim istnieli sąsiedzi
+tego programu: program, którego sąsiad już czegoś nauczył, zostaje z mniejszą
+pracą do wykonania, więc oszacowania wychodziły wysokie. Każdy program w tej
+książce jest napisany.
 
 \medskip
 Trzy dalsze są sprawdzane na gotowej stronie, a nie w źródle, i celowo nie
@@ -211,9 +228,8 @@ powoływać.} Metoda, którą pożycza, została do tego standardu zwalidowana
 \dash{} przed swoją publikacją. To jest fakt o metodzie i nie jest
 przenaszalny. Nikt nie był testowany na \emph{tej} książce. Dopóki ktoś nie
 będzie, rejestr zostaje otwarty, a instrumentem będą punktowane Zadania
-sprawdzające, a nie Quiz: Quiz działa tylko na programach Podstaw, a jego
-pozycje służą tak samo na wejściu, jak na wyjściu, więc różnica wyników mierzy
-pamięć pytań.
+sprawdzające, a nie Quiz: pozycje Quizu służą tak samo na wejściu, jak na
+wyjściu, więc różnica wyników mierzy pamięć pytań.
 \end{warning}
 
 \medskip
@@ -221,15 +237,17 @@ Trzy inne rzeczy są zaległe i warto nazwać każdą osobno, bo każda jest inn
 rodzajem długu.
 
 \medskip
-\textbf{Pomiary, które wymagają wytrenowanego modelu.} Cztery twierdzenia w tej
-książce są podane jako mechanizm i oznaczone jako osąd, a nie zmierzone, bo ich
+\textbf{Pomiary, które wymagają wytrenowanego modelu.} Te twierdzenia są
+podane jako mechanizm i oznaczone jako osąd, a nie zmierzone, bo ich
 rozstrzygnięcie wymaga wag, których ta książka nie dostarcza i nie pobiera: czy
 widmo prawdziwej macierzy zanurzeń opada tak, jak zakładają metody niskiego
 rzędu; czy rząd głębokiego stosu uwagi spada bez żadnej wąskiej warstwy, która
 by go do tego zmusiła; czy dolina, w której ląduje przebieg uczenia, ma
-znaczenie w skali, w jakiej ludzie trenują; i czy niezależność zakładana przez
-dzielnik pierwiastkowy przeżywa trening. Każde jest oznaczone tam, gdzie się
-pojawia.
+znaczenie w skali, w jakiej ludzie trenują; czy niezależność zakładana przez
+dzielnik pierwiastkowy przeżywa trening; i czy metoda adaptacyjna dochodzi do
+lepszego wyniku niż pęd na prawdziwej powierzchni. Każde jest oznaczone tam,
+gdzie się pojawia, i nie ma tu ich liczby z tego samego powodu, który podaje
+tabela eksperymentów.
 
 \medskip
 \textbf{Tempo, w jakim ta książka zadaje ci pytania, nie jest równe.} Biegnie
