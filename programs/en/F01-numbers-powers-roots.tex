@@ -937,9 +937,11 @@ claim.
   percentage and as a ratio, and say which you would put on a slide.
   \answerto{A $\num{37.5}\%$ reduction, or $\num{1.6}\times$ cheaper. Put the two figures
   on the slide; the reader can compute either.}
-\item Show that $10^{-3} < 2^{-10} < 10^{-2}$.
-  \answerto{$2^{-10} = 1/1024 \approx \num{9.77e-4}$, which lies between
-  $\num{1e-3}$ and $\num{1e-2}$.}
+\item Show that $10^{-4} < 2^{-10} < 10^{-3}$.
+  \answerto{$2^{10} = 1024$ exceeds $10^{3}$, so taking reciprocals reverses
+  the comparison: $2^{-10} = 1/1024 \approx \num{9.77e-4}$ sits just
+  \emph{under} $10^{-3}$ rather than just over it, and well above
+  $10^{-4}$.}
 \item Estimate how many novels of \val{f01.novel.words} words fit in a context
   window of $\num{1e6}$ tokens.
   \answerto{One novel is about \val{f01.novel.tokens} tokens, so about seven
