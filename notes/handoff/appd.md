@@ -83,7 +83,7 @@ translated.
 present; the source is the two editions, not a general glossary*. Twenty rows
 omitted, among others, *optimiser* (77 uses in `programs/pl`), *activation*
 (67), *normalisation* (56), *cross-entropy* (41), *sampling* (35),
-*inference* (27), *perplexity* (15). Twelve rows added to §D.3 and one to §D.4,
+*inference* (27), *perplexity* (15). Thirteen rows added to §D.3 and one to §D.4,
 every rendering checked against the prose before it was written.
 
 ## The row I got wrong, and how
@@ -123,6 +123,7 @@ both senses on the page rather than assumed:
 | `normalisation` / *normalizacja* | unit length, F09:292 | layer norm, P32 §32.6 |
 | `residual` | *rezydualny* — the connection, P32 | *reszta* — what a fit leaves, P08:407 |
 | `sample` | *próba* — statistical, P26 | *próbka* — one in hand, P27 |
+| `significand` | *significand* in the English | *mantysa* in the Polish |
 
 The last two run opposite ways and both belong on the page: English has one word
 for the residual and Polish sensibly has two, which is a thing an English reader
@@ -151,6 +152,14 @@ is found, the sentence has to move with it.
 - §D.2's ten-row notation-box table was re-verified and is correct:
   `grep -c 'begin{notationbox}'` gives F02, F03, F04, P01, P03, P12, P15, P18
   and P23 one each and P24 three, which the table collapses into one row.
+
+**And one of my own Polish notes was a mistranslation.** `precision`'s note read
+*szerokość znaczącej liczby zmiennoprzecinkowej* — "the width of the significant
+floating-point number". The book's Polish word is *mantysa*, forty times in
+`P01-floating-point.tex`, where the English writes *significand* forty-seven
+times. Corrected, and the divergence earned a row of its own: it is a term the
+book uses constantly and renders differently in the two editions, which is
+exactly what this glossary is for.
 
 ## Values
 
