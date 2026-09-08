@@ -56,6 +56,7 @@ would print the current edition's form in both columns and say nothing.
 \emph{tan}    & \emph{tg}     & \code{\textbackslash tg}, the tangent \\
 \emph{cot}    & \emph{ctg}    & \code{\textbackslash ctg}, the cotangent \\
 \emph{arctan} & \emph{arc tg} & \code{\textbackslash arctg}, the inverse tangent \\
+\emph{arccot} & \emph{arc ctg} & \code{\textbackslash arcctg}, the inverse cotangent \\
 \emph{gcd}    & \emph{NWD}    & \code{\textbackslash gcdop}, the greatest common divisor \\
 \emph{lcm}    & \emph{NWW}    & \code{\textbackslash lcmop}, the lowest common multiple \\
 \emph{span}   & \emph{lin}    & \code{\textbackslash spanof}, the span of a set of vectors \\
@@ -65,11 +66,11 @@ would print the current edition's form in both columns and say nothing.
 \end{center}
 
 \medskip
-And four that are deliberately \emph{not} on that list, because both editions
+And some that are deliberately \emph{not} on that list, because both editions
 set them the same way. $\Prob$, $\Ex$, $\Var$ and $\Cov$ are written as they are
 written in English, and the interval $\intcc{a}{b}$ keeps its square brackets in
-both. The last two are the ones a Polish reader is most likely to be surprised
-by, and both are taken up in section~\ref{sec:D-unsettled}.
+both. The variance and the interval are the two a Polish reader is most likely
+to be surprised by, and both are taken up in section~\ref{sec:D-unsettled}.
 
 \section{Where the book stops to say a symbol is not what you expect}
 \label{sec:D-boxes}
@@ -105,6 +106,10 @@ The last of those is the one that matters most to a Polish reader and it is not
 optional: $D^{2}(X)$ and $M(X)$ are \emph{current} Polish teaching usage rather
 than a historical curiosity, so a reader who learned them and meets an
 unexplained $\Var$ has reason to doubt the book rather than their schooling.
+The book writes $\Var$ and $\Ex$ anyway, and the reason is the one this whole
+appendix runs on: those are what the libraries and the papers a reader is going
+to open write. Program~\ref{prog:P24} carries the correspondence in both
+directions, so neither notation is left standing alone.
 
 \section{Terms, English-headed}
 \label{sec:D-terms}
@@ -122,11 +127,17 @@ invented by a translator is worse than a borrowing everybody already uses.
 \toprule
 \textbf{English} & \textbf{Polish edition} & \textbf{note} \\
 \midrule
+\plterm{activation}{aktywacja}{Established. \emph{Funkcja aktywacji} for the
+  function itself.}
 \plterm{attention}{uwaga}{\emph{mechanizm uwagi}, \emph{warstwa uwagi},
   \emph{głowica uwagi}. Real Polish usage; the bare English term is not used.}
+\plterm{backpropagation}{propagacja wsteczna}{Established.
+  Program~\ref{prog:F12} says what it is: the chain rule applied to a
+  composition of layers.}
 \plterm{benchmark}{benchmark}{Borrowed and inflected.}
 \plterm{checkpointing}{checkpointing}{Borrowed. Trading arithmetic for bytes,
   Program~\ref{prog:P16}.}
+\plterm{cross-entropy}{entropia krzyżowa}{Established.}
 \plterm{evaluation set}{zbiór ewaluacyjny}{Established.}
 \plterm{feature}{cecha}{Established, and used throughout.}
 \plterm{gradient descent}{spadek gradientu}{Established. The book writes
@@ -135,13 +146,34 @@ invented by a translator is worse than a borrowing everybody already uses.
 \plterm{harness}{harness}{Borrowed and inflected; \emph{zestaw} was tried and
   collided with \emph{zbiór}.}
 \plterm{head}{głowica}{Of attention. \emph{Głowa} is the anatomical one.}
+\plterm{hyperparameter}{hiperparametr}{Borrowed and inflected.}
+\plterm{inference}{wnioskowanie}{Two jobs, and the Polish carries the English
+  collision rather than resolving it: statistical inference,
+  Programs~\ref{prog:P27} and \ref{prog:P28}, and running a trained model, as
+  in \emph{przy wnioskowaniu} at Program~\ref{prog:F02}.}
 \plterm{layer}{warstwa}{Established.}
 \plterm{logit}{logit}{The same word in Polish statistics.}
 \plterm{loss}{strata}{Established. \emph{Funkcja straty} for the function.}
+\plterm{normalisation}{normalizacja}{Two jobs, in Polish as in English:
+  dividing a vector by its length, Program~\ref{prog:F09}, and layer
+  normalisation, Program~\ref{prog:P32}.}
+\plterm{optimiser}{optymalizator}{Established.}
 \plterm{overfitting}{przeuczenie}{Established.}
+\plterm{perplexity}{perpleksja}{Established. Program~\ref{prog:P29} says what
+  the number counts.}
+\plterm{precision}{precyzja}{Two jobs, and the collision is in both languages:
+  the classification metric of Program~\ref{prog:P23}, and the width of a
+  floating-point significand throughout Program~\ref{prog:P01}.}
 \plterm{probe}{sonda}{An ordinary Polish word with real use in this sense,
   so not a calque. Program~\ref{prog:P31}.}
 \plterm{prompt}{prompt}{Borrowed and inflected.}
+\plterm{recall}{czułość}{Established. It sits beside \emph{precyzja} on the
+  same classification report and conditions on the other population.}
+\plterm{residual connection}{rezydualny}{\emph{Połączenie rezydualne},
+  \emph{strumień rezydualny}. Program~\ref{prog:P32}.}
+\plterm{residual of a fit}{reszta}{A different object, and Polish gives it a
+  different word: what a least-squares fit leaves over,
+  Program~\ref{prog:P08}. English uses one word for both.}
 \plterm{sequence}{sekwencja}{Established.}
 \plterm{softmax}{softmax}{Borrowed; not translated anywhere.}
 \plterm{token}{token}{Borrowed and inflected. \emph{Tokenizator} for the thing
@@ -158,7 +190,7 @@ invented by a translator is worse than a borrowing everybody already uses.
 \label{sec:D-unsettled}
 \index{terminology!unsettled}
 
-Three terms in this book are rendered more than one way in the Polish edition.
+Four terms in this book are rendered more than one way in the Polish edition.
 They are listed rather than quietly picked, because a reader who meets the
 second word needs to know it is the first one.
 
@@ -178,6 +210,12 @@ second word needs to know it is the first one.
   term a Polish engineer will type into a search box.}
 \plterm{learning rate}{współczynnik uczenia, krok uczenia}{Both are in real
   use. \emph{Krok} reads as \emph{step}, which is what it multiplies.}
+\plterm{sample}{próba, próbka}{\emph{Próba} is the statistical term and is what
+  the book writes in the collocations \dash{} \emph{wariancja z próby},
+  \emph{średnia z próby}, Program~\ref{prog:P26}. \emph{Próbka} is what it
+  writes where the sample is a concrete thing in hand, as in
+  Program~\ref{prog:P27}'s bootstrap. \emph{Próbkowanie} is the operation
+  either way.}
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -195,7 +233,30 @@ finds a different noun waiting for them.
 Two more entries are worth naming because they are the opposite case \dash{}
 places where the Polish edition is settled and the reader may expect otherwise.
 $\intcc{a}{b}$ keeps square brackets rather than the angle brackets Polish
-schooling uses, flagged at the first interval a reader meets; and the hyperbolic
-tangent stays $\tanh$ rather than \emph{tgh}, which is the keyboard test of
-section~\ref{sec:D-notation} deciding against the Polish form because the reader
-will type this one.
+schooling uses, because ISO 80000-2 and every paper the reader is being trained
+to open write them that way. No program stops to explain that, so
+Appendix~\ref{app:B} is where it is recorded rather than the first interval a
+reader meets. And the hyperbolic tangent stays $\tanh$ rather than \emph{tgh},
+which is the keyboard test of section~\ref{sec:D-notation} deciding against the
+Polish form because the reader will type this one.
+
+\section{Two rules nothing can check}
+\label{sec:D-untestable}
+\index{terminology!translator rules}
+
+The two editions are compared against each other line by line, and two of the
+translator's rules sit outside everything that comparison can see.
+
+\textbf{A listing's comments stay English.} The reader is being trained to read
+English code, and a comment translated into Polish is the one line of a session
+they could not paste into a terminal and search for. Most of the book's
+listings are console transcripts generated once by \code{code/} and pulled into
+both editions from the same file, so their comments are English by construction
+rather than by anybody's discipline; a listing authored inline is held to the
+rule by hand.
+
+\textbf{A constant's spelling is never translated.} $e$ is $e$ and $\pi$ is
+$\pi$ in both editions. They are names rather than words, so translating one
+would be translating an identifier \dash{} which is the keyboard test of
+section~\ref{sec:D-notation} again, applied to a symbol the reader will type
+rather than to a function they will call.

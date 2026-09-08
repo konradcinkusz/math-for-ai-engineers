@@ -62,6 +62,7 @@ niczego.
 \emph{tan}    & \emph{tg}     & \code{\textbackslash tg}, tangens \\
 \emph{cot}    & \emph{ctg}    & \code{\textbackslash ctg}, cotangens \\
 \emph{arctan} & \emph{arc tg} & \code{\textbackslash arctg}, tangens odwrotny \\
+\emph{arccot} & \emph{arc ctg} & \code{\textbackslash arcctg}, cotangens odwrotny \\
 \emph{gcd}    & \emph{NWD}    & \code{\textbackslash gcdop}, największy wspólny dzielnik \\
 \emph{lcm}    & \emph{NWW}    & \code{\textbackslash lcmop}, najmniejsza wspólna wielokrotność \\
 \emph{span}   & \emph{lin}    & \code{\textbackslash spanof}, powłoka liniowa zbioru wektorów \\
@@ -71,11 +72,11 @@ niczego.
 \end{center}
 
 \medskip
-I cztery, których celowo \emph{nie} ma na tej liście, bo oba wydania składają je
+I kilka, których celowo \emph{nie} ma na tej liście, bo oba wydania składają je
 tak samo. $\Prob$, $\Ex$, $\Var$ i $\Cov$ pisze się tak, jak pisze się je po
-angielsku, a przedział $\intcc{a}{b}$ zachowuje nawiasy kwadratowe w obu. Dwa
-ostatnie najpewniej zaskoczą polskiego czytelnika i oba wracają w
-sekcji~\ref{sec:D-unsettled}.
+angielsku, a przedział $\intcc{a}{b}$ zachowuje nawiasy kwadratowe w obu.
+Wariancja i przedział to te dwa, które najpewniej zaskoczą polskiego
+czytelnika, i oba wracają w sekcji~\ref{sec:D-unsettled}.
 
 \section{Gdzie książka zatrzymuje się, by powiedzieć, że symbol znaczy co innego}
 \label{sec:D-boxes}
@@ -111,6 +112,10 @@ Ostatnia z nich znaczy najwięcej dla polskiego czytelnika i nie jest
 opcjonalna: $D^{2}(X)$ i $M(X)$ to \emph{obecny} polski uzus dydaktyczny, a nie
 historyczna ciekawostka, więc czytelnik, który się ich nauczył i napotyka
 niewyjaśnione $\Var$, ma powód, by zwątpić w książkę, a nie w swoją szkołę.
+Książka i tak pisze $\Var$ oraz $\Ex$, a powód jest ten, na którym stoi cały ten
+dodatek: tak piszą biblioteki i artykuły, które czytelnik będzie otwierał.
+Program~\ref{prog:P24} niesie tę odpowiedniość w obie strony, więc żaden
+z zapisów nie zostaje sam.
 
 \section{Terminy, hasłem angielskie}
 \label{sec:D-terms}
@@ -129,12 +134,18 @@ już używają.
 \toprule
 \textbf{Angielski} & \textbf{Wydanie polskie} & \textbf{notatka} \\
 \midrule
+\plterm{activation}{aktywacja}{Ustalone. \emph{Funkcja aktywacji} na samą
+  funkcję.}
 \plterm{attention}{uwaga}{\emph{mechanizm uwagi}, \emph{warstwa uwagi},
   \emph{głowica uwagi}. Realny polski uzus; samego terminu angielskiego się
   nie używa.}
+\plterm{backpropagation}{propagacja wsteczna}{Ustalone.
+  Program~\ref{prog:F12} mówi, czym jest: regułą łańcuchową zastosowaną do
+  złożenia warstw.}
 \plterm{benchmark}{benchmark}{Zapożyczone i odmieniane.}
 \plterm{checkpointing}{checkpointing}{Zapożyczone. Wymiana arytmetyki na bajty,
   Program~\ref{prog:P16}.}
+\plterm{cross-entropy}{entropia krzyżowa}{Ustalone.}
 \plterm{evaluation set}{zbiór ewaluacyjny}{Ustalone.}
 \plterm{feature}{cecha}{Ustalone i używane wszędzie.}
 \plterm{gradient descent}{spadek gradientu}{Ustalone. Książka pisze i
@@ -143,13 +154,34 @@ już używają.
 \plterm{harness}{harness}{Zapożyczone i odmieniane; \emph{zestaw} był próbowany
   i zderzył się ze \emph{zbiorem}.}
 \plterm{head}{głowica}{W uwadze. \emph{Głowa} to ta anatomiczna.}
+\plterm{hyperparameter}{hiperparametr}{Zapożyczone i odmieniane.}
+\plterm{inference}{wnioskowanie}{Dwie role, a polszczyzna przenosi angielską
+  kolizję, zamiast ją rozstrzygać: wnioskowanie statystyczne,
+  Programy~\ref{prog:P27} i \ref{prog:P28}, oraz uruchamianie wytrenowanego
+  modelu, jak w \emph{przy wnioskowaniu} w Programie~\ref{prog:F02}.}
 \plterm{layer}{warstwa}{Ustalone.}
 \plterm{logit}{logit}{To samo słowo w polskiej statystyce.}
 \plterm{loss}{strata}{Ustalone. \emph{Funkcja straty} na funkcję.}
+\plterm{normalisation}{normalizacja}{Dwie role, po polsku tak samo jak po
+  angielsku: dzielenie wektora przez jego długość, Program~\ref{prog:F09}, oraz
+  normalizacja warstwy, Program~\ref{prog:P32}.}
+\plterm{optimiser}{optymalizator}{Ustalone.}
 \plterm{overfitting}{przeuczenie}{Ustalone.}
+\plterm{perplexity}{perpleksja}{Ustalone. Program~\ref{prog:P29} mówi, co ta
+  liczba zlicza.}
+\plterm{precision}{precyzja}{Dwie role, a kolizja jest w obu językach: miara
+  klasyfikacji z Programu~\ref{prog:P23} oraz szerokość znaczącej liczby
+  zmiennoprzecinkowej w całym Programie~\ref{prog:P01}.}
 \plterm{probe}{sonda}{Zwykłe polskie słowo, realnie używane w tym znaczeniu,
   więc nie kalka. Program~\ref{prog:P31}.}
 \plterm{prompt}{prompt}{Zapożyczone i odmieniane.}
+\plterm{recall}{czułość}{Ustalone. Stoi obok \emph{precyzji} w tym samym
+  raporcie klasyfikacji i warunkuje po drugiej populacji.}
+\plterm{residual connection}{rezydualny}{\emph{Połączenie rezydualne},
+  \emph{strumień rezydualny}. Program~\ref{prog:P32}.}
+\plterm{residual of a fit}{reszta}{Inny obiekt, a polszczyzna daje mu inne
+  słowo: to, co zostawia dopasowanie najmniejszych kwadratów,
+  Program~\ref{prog:P08}. Angielski ma na oba jedno słowo.}
 \plterm{sequence}{sekwencja}{Ustalone.}
 \plterm{softmax}{softmax}{Zapożyczone; nigdzie nietłumaczone.}
 \plterm{token}{token}{Zapożyczone i odmieniane. \emph{Tokenizator} na to, co je
@@ -166,7 +198,7 @@ już używają.
 \label{sec:D-unsettled}
 \index{terminology!unsettled}
 
-Trzy terminy w tej książce są w wydaniu polskim oddawane więcej niż jednym
+Cztery terminy w tej książce są w wydaniu polskim oddawane więcej niż jednym
 słowem. Są wypisane, a nie po cichu rozstrzygnięte, bo czytelnik, który napotyka
 drugie słowo, musi wiedzieć, że to pierwsze.
 
@@ -189,6 +221,11 @@ drugie słowo, musi wiedzieć, że to pierwsze.
 \plterm{learning rate}{współczynnik uczenia, krok uczenia}{Obie formy są w
   realnym użyciu. \emph{Krok} to \emph{step}, czyli dokładnie to, co ten
   współczynnik mnoży.}
+\plterm{sample}{próba, próbka}{\emph{Próba} to termin statystyczny i to jego
+  książka używa w utartych połączeniach \dash{} \emph{wariancja z próby},
+  \emph{średnia z próby}, Program~\ref{prog:P26}. \emph{Próbka} pojawia się
+  tam, gdzie próba jest konkretną rzeczą w ręku, jak w bootstrapie
+  Programu~\ref{prog:P27}. \emph{Próbkowanie} to operacja w obu przypadkach.}
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -205,8 +242,31 @@ inny rzeczownik.
 \medskip
 Dwa dalsze hasła warto nazwać, bo są przypadkiem odwrotnym \dash{} miejscami,
 w których wydanie polskie jest ustalone, a czytelnik może spodziewać się czegoś
-innego. $\intcc{a}{b}$ zachowuje nawiasy kwadratowe zamiast ostrych, których
-uczy polska szkoła, co jest sygnalizowane przy pierwszym przedziale, jaki
-czytelnik napotyka; a tangens hiperboliczny zostaje $\tanh$ zamiast
-\emph{tgh}, co jest testem klawiatury z sekcji~\ref{sec:D-notation}
-rozstrzygającym przeciw formie polskiej, bo tę czytelnik będzie wpisywał.
+innego. $\intcc{a}{b}$ zachowuje nawiasy kwadratowe zamiast ostrych, których uczy
+polska szkoła, bo ISO 80000-2 i każdy artykuł, który czytelnik będzie otwierał,
+piszą je właśnie tak. Żaden program się nad tym nie zatrzymuje, więc zapisem
+tego jest Dodatek~\ref{app:B}, a nie pierwszy przedział, jaki czytelnik
+napotyka. A tangens hiperboliczny zostaje $\tanh$ zamiast \emph{tgh}, co jest
+testem klawiatury z sekcji~\ref{sec:D-notation} rozstrzygającym przeciw formie
+polskiej, bo tę czytelnik będzie wpisywał.
+
+\section{Dwie reguły, których nic nie sprawdzi}
+\label{sec:D-untestable}
+\index{terminology!translator rules}
+
+Oba wydania są porównywane ze sobą linia po linii, a dwie reguły tłumacza leżą
+poza wszystkim, co to porównanie widzi.
+
+\textbf{Komentarze w listingu zostają angielskie.} Czytelnik jest szkolony do
+czytania angielskiego kodu, a komentarz przetłumaczony na polski to jedyna
+linia sesji, której nie dałoby się wkleić do terminala i wyszukać. Większość
+listingów w tej książce to zapisy konsoli wygenerowane raz przez \code{code/}
+i wciągane do obu wydań z tego samego pliku, więc ich komentarze są angielskie
+z konstrukcji, a nie z czyjejś dyscypliny; listing pisany wprost w tekście
+trzyma się tej reguły ręcznie.
+
+\textbf{Zapisu stałej nigdy się nie tłumaczy.} $e$ to $e$, a $\pi$ to $\pi$
+w obu wydaniach. To nazwy, a nie słowa, więc tłumaczenie którejkolwiek byłoby
+tłumaczeniem identyfikatora \dash{} czyli znowu testem klawiatury z
+sekcji~\ref{sec:D-notation}, zastosowanym do symbolu, który czytelnik wpisze,
+a nie do funkcji, którą wywoła.
