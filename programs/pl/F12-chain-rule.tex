@@ -50,7 +50,6 @@
 \program{Reguły różniczkowania i reguła łańcuchowa}
 \label{prog:F12}
 \index{derivative!rules}
-\index{chain rule!and backpropagation}
 
 \begin{outcomes}
 \outcome{1--6}{różniczkować sumę, wielokrotność stałą i potęgę bez wracania do
@@ -479,7 +478,6 @@ reguły łańcuchowej.
 % ============================================================
 \section{Sieć jest złożeniem}
 \label{sec:F12-network}
-\index{chain rule!and backpropagation}
 
 \begin{fr}
 Program~\ref{prog:F05} ustalił, że głęboka sieć jest złożeniem i niczym
@@ -536,9 +534,10 @@ sieci jako iloczyn}
 Teraz to zdanie.
 
 \begin{aibox}
-\textbf{Propagacja wsteczna to reguła łańcuchowa zastosowana do złożenia
-warstw, z wartościami pośrednimi zapamiętanymi, a nie liczonymi od nowa.} Nie
-ma w niej nic więcej.
+\textbf{Propagacja wsteczna\index{propagacja wsteczna}%
+\index{chain rule!and backpropagation} to reguła łańcuchowa zastosowana do
+złożenia warstw, z wartościami pośrednimi zapamiętanymi, a nie liczonymi od
+nowa.} Nie ma w niej nic więcej.
 
 Każdy czynnik tego iloczynu potrzebuje $z_k$, czyli wejścia warstwy $k$. Te
 wartości policzono po drodze w przód. Więc algorytm brzmi: idź w przód i

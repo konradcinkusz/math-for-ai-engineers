@@ -50,7 +50,6 @@
 \program{Rules of differentiation and the chain rule}
 \label{prog:F12}
 \index{derivative!rules}
-\index{chain rule!and backpropagation}
 
 \begin{outcomes}
 \outcome{1--6}{differentiate a sum, a constant multiple and a power without
@@ -484,7 +483,6 @@ factor.
 % ============================================================
 \section{A network is a composition}
 \label{sec:F12-network}
-\index{chain rule!and backpropagation}
 
 \begin{fr}
 Program~\ref{prog:F05} established that a deep network is a composition and
@@ -540,9 +538,10 @@ whole thing is one function inside another and its derivative is a product.}
 Now the sentence.
 
 \begin{aibox}
-\textbf{Backpropagation is the chain rule applied to a composition of layers,
-with the intermediate values kept rather than recomputed.} There is nothing
-else in it.
+\textbf{Backpropagation\index{backpropagation}%
+\index{chain rule!and backpropagation} is the chain rule applied to a
+composition of layers, with the intermediate values kept rather than
+recomputed.} There is nothing else in it.
 
 Every factor in that product needs $z_k$, the input to layer $k$. Those values
 were all computed on the way forward. So the algorithm is: go forward and keep

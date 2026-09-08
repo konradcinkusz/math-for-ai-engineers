@@ -145,6 +145,14 @@
 % The date the book's facts were last checked. User-visible, so it lives here.
 \newcommand{\pinnedon}{August 2026}
 
+% ---------- Index cross-references ----------
+% What a see-reference prints in the index. These are user-visible strings and
+% differ between the editions, so they live here; preamble.tex builds \see and
+% \seealso out of them rather than out of babel's \seename, which is not there
+% on an installation where the preamble's babel probe found nothing.
+\newcommand{\lblIndexSee}{see}
+\newcommand{\lblIndexSeeAlso}{see also}
+
 % ---------- PDF metadata ----------
 % The subject, the keyword list and the document language are user-visible
 % strings that differ between the editions, so they live here rather than in

@@ -156,8 +156,9 @@ That multiplying it by the likelihood gives something of the same shape
 \dash{} so that the answer can be updated again without the algebra growing.
 \end{ansblock}
 
-That property has a name, \textbf{conjugacy}, and for a rate observed through
-successes and failures the family that has it is the \textbf{Beta}:
+That property has a name, \textbf{conjugacy}\index{conjugacy}, and for a rate
+observed through successes and failures the family that has it is the
+\textbf{Beta}:
 
 \[ p(\theta) \;\propto\; \theta^{a-1}\,(1-\theta)^{b-1},
    \qquad 0 \le \theta \le 1 \]
@@ -196,7 +197,6 @@ had about the case where it does not.
 % ============================================================
 \section{The update is adding counts}
 \label{sec:P28-conjugacy}
-\index{conjugacy}
 \index{prior!what it is worth in observations}
 
 \begin{fr}
@@ -624,7 +624,6 @@ agreement carries no information about the difference either way.
 
 \section{Routing under uncertainty}
 \label{sec:P28-routing}
-\index{inference!Thompson sampling}
 
 \begin{fr}
 Section 4 produced a number and stopped. Suppose instead of stopping you have
@@ -650,7 +649,7 @@ $\Prob(\theta_B > \theta_A)$ \dash{} which is frame 26's \emph{unpaired}
 figure and not the paired $\val{p28.p.better.pct}$ the section leads on.
 Routing is a question about one model against the other, so it is the
 per-model posteriors that answer it. The rule has a name, \emph{Thompson
-sampling}.
+sampling}\index{inference!Thompson sampling}.
 
 So it needs no experiment to describe and no parameter to set. It
 \textbf{explores in exact proportion to how likely each arm is to be the best
@@ -712,7 +711,6 @@ moving underneath it.
 
 \section{A judge model's stated probability}
 \label{sec:P28-judge}
-\index{inference!calibration}
 
 \begin{fr}
 A judge model scores candidate answers and reports a confidence with each
@@ -812,8 +810,8 @@ posterior on the rate}
 $\val{p28.bucket.right}$ of $\val{p28.bucket.n}$, uniform prior, and the
 credible interval runs from $\val{p28.bucket.lo}$ to $\val{p28.bucket.hi}$ per
 cent. \textbf{The stated $\val{p28.judge.says.pct}$ is outside it}, so the
-miscalibration is measured rather than suspected, and the width says how sure
-the measurement is.
+miscalibration\index{inference!calibration} is measured rather than suspected,
+and the width says how sure the measurement is.
 
 That is section 3's machinery applied to the one number in a pipeline nobody
 audits, and it needs the two counts Program~\ref{prog:F10} owns and nothing

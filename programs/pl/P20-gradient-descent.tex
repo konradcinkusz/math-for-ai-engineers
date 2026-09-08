@@ -13,7 +13,7 @@
 \program[Od SGD do Adama]{Metoda gradientu prostego: od SGD do Adama}
 \label{prog:P20}
 \index{optymalizator}
-\index{metoda gradientu prostego}
+\index{metoda gradientu prostego!jako optymalizator}
 
 \begin{outcomes}
 \outcome{1--7}{zapisać jedną aktualizację, której wariantem jest każdy
@@ -635,7 +635,6 @@ jest najmniej godna zaufania.
 \section{Gdzie wchodzi kara}
 \label{sec:P20-decay}
 \index{optymalizator!weight decay}
-\index{optymalizator!AdamW}
 
 \begin{fr}
 Jeszcze dwie naprawy, obie dotyczą rzeczy siedzących \emph{wokół} aktualizacji,
@@ -706,7 +705,9 @@ $\lambda$ spotykająca dwie krzywizny, więc kara niemal unicestwia współrzęd
 o małym gradiencie \dash{} i jest to własność kary, a nie metody, która ją
 niesie.
 
-Do samego Adama należy drugi wiersz. Kara odsprzężona nigdy nie przechodzi
+Do samego Adama należy drugi wiersz. Kara
+odsprzężona\index{optymalizator!kara odsprzężona}%
+\index{AdamW|see{optymalizator, kara odsprzężona}} nigdy nie przechodzi
 przez $\sqrt{v}$, więc ciągnie obie współrzędne o ten sam ułamek ich samych,
 wobec kroku, którego rozmiar normalizator już ustalił; przy tej $\lambda$
 zostawia to obie w ich minimum danych, z dokładnością lepszą niż
