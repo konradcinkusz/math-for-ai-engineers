@@ -50,8 +50,8 @@
   $\ln \val{p29.seven.n} = \val{p29.seven.nats}$ nata.}
 \item Perpleksja modelu wynosi $\val{p29.f03.ppl}$. Powiedz, co to twierdzi o
   modelu, w zdaniu bez logarytmu. \teachesat{21--22}
-  \answerto{Na każdej pozycji jest on tak niepewny jak ktoś wybierający
-  jednostajnie spośród $\val{p29.f03.ppl}$ tokenów \dash{} ze słownika o
+  \answerto{Średnio jest on tak niepewny jak ktoś wybierający jednostajnie
+  spośród $\val{p29.f03.ppl}$ tokenów \dash{} ze słownika o
   $\val{p29.vocab}$ tokenach.}
 \item Dwa modele podają rozkłady następnego tokena. Jeden ma entropię
   $\val{p29.wrong.ent}$ nata, drugi $\val{p29.spread.ent}$. Który prędzej ma
@@ -264,8 +264,9 @@ zmieniło; zmieniło się to, co wiedziałeś.
 
 Dlatego ten sam tekst ma różne entropie pod różnymi modelami i dlatego teza
 postaci \enquote{ten tekst zawiera $N$ bitów} jest niepełna, dopóki nie nazwie
-rozkładu, względem którego ją zmierzono. Sekcja 6 mówi, co się dzieje, gdy
-ktoś o tym zapomni.
+rozkładu, względem którego ją zmierzono. Program~\ref{prog:P30} nadaje
+zapomnianemu rozkładowi nazwę i cenę; sekcja 6 to ten sam kształt pominięcia,
+tylko brakuje w nim innej wielkości.
 \end{trapbox}
 \end{fr}
 
@@ -402,8 +403,14 @@ Jaka jest najlepsza osiągalna oczekiwana długość i dokąd idzie różnica?
 \begin{fr}
 \ans{$\val{p29.nondy.best}$ bita, a różnica to zaokrąglenie}
 
-Dokładnie dwa, z czterech dwucyfrowych słów kodowych; nadwyżka nad entropią to
-$\val{p29.nondy.gap}$ bita. Nie ma dokąd indziej pójść: entropia mówi, ile
+Dokładnie dwa, i osiąga się to na dwa sposoby: czterema dwucyfrowymi słowami
+kodowymi albo długościami $1, 2, 3, 3$ \dash{} które daje zasada z poprzedniej
+ramki, bo długość to własne zaskoczenie zaokrąglone w górę. Oba wydają budżet
+co do joty i oba dają średnio dwa, więc czytelnik, który poszedł tą metodą, nie
+pomylił się. \textbf{Sam remis jest dowodem}: dwóch całkiem różnych kodów nie
+da się jednocześnie pobić, a nadwyżka nad entropią to
+$\val{p29.nondy.gap}$ bita w obu przypadkach. Nie ma dokąd indziej pójść:
+entropia mówi, ile
 średnia \emph{mogłaby} wynosić, gdyby długość mogła wynosić
 $\logb{2} \frac{5}{2} = \num{1.32}$ cyfry, a nie może.
 
@@ -447,8 +454,8 @@ wcześniej, więc prawdziwy schemat musi go przesłać albo uzgodnić z góry. T
 
 \begin{fr}
 Program~\ref{prog:P19} wyprowadza, dlaczego nie wolno uśredniać perpleksji, z
-pomiarem, i przekazuje tutaj po imieniu jedną rzecz: \textbf{co ta liczba
-znaczy}. To jest ta rzecz.
+pomiarem, i zostawia temu programowi to, co ta liczba \emph{znaczy}.
+\textbf{To jest ta rzecz.}
 
 Entropia w natach jest liczbą rzeczywistą i nikt nie ma dla niej intuicji. Ale
 sekcja 2 dała rozkład, którego entropia czyta się łatwo: jednostajny na $n$
@@ -465,7 +472,7 @@ Puść to więc wstecz. Mając entropię $H$ w natach, co mówi ci $e^{H}$?
 \[ \text{efektywne wybory} \;=\; e^{H} \]
 
 Dla rozkładu jednostajnego na $n$ zwraca to $n$, dokładnie \dash{} sprawdzone
-przy każdym $n$ od $2$ do $\val{p29.eff.checked}+1$, bo twierdzenie postaci
+przy każdym $n$ od $2$ do $\val{p29.eff.upto}$, bo twierdzenie postaci
 \enquote{zawsze} nie powinno opierać się na jednym przypadku. Dla wszystkiego
 innego zwraca liczbę między jednym a $n$, i ta liczba jest uczciwą odpowiedzią
 na pytanie \enquote{ile opcji ten rozkład naprawdę waży?}
@@ -488,7 +495,9 @@ kształt modelu, który jest pewien i może się mylić.
 Teraz liczba, którą czytelnik naprawdę spotyka. Program~\ref{prog:F02} ma
 model o średniej stracie $\val{p29.f02.loss}$ nata na token, a
 Program~\ref{prog:F03} podniósł to do \textbf{perpleksji}
-$\val{p29.f03.ppl}$, nie mówiąc, czego ta odpowiedź jest liczbą.
+$\val{p29.f03.ppl}$ i odczytuje perpleksję jako uczciwą kostkę o tylu
+ścianach \dash{} nie wyprowadzając, dlaczego eksponenta entropii w ogóle jest
+licznikiem. Sekcja 4 właśnie to wyprowadziła.
 
 Złóż jedno z drugim. Co perpleksja $\val{p29.f03.ppl}$ twierdzi o tym modelu?
 \dotline
@@ -496,13 +505,18 @@ Złóż jedno z drugim. Co perpleksja $\val{p29.f03.ppl}$ twierdzi o tym modelu?
 \end{fr}
 
 \begin{fr}
-\ans{Na każdej pozycji jest tak niepewny jak ktoś wybierający jednostajnie
-spośród $\val{p29.f03.ppl}$ tokenów}
+\ans{Średnio jest tak niepewny jak ktoś wybierający jednostajnie spośród
+$\val{p29.f03.ppl}$ tokenów}
 
 \begin{center}
 \emph{Perpleksja to efektywna liczba jednakowo prawdopodobnych wyborów,\\
-które model waży na każdym kroku, i nic więcej.}
+które model waży, uśredniona po pozycjach, na których ją zmierzono.}
 \end{center}
+
+Zastrzeżenie nie jest uprzejmością. Ta liczba wzięła się ze \emph{średniej}
+straty, więc eksponenta zwraca średnią z liczników pozycyjnych, a
+Program~\ref{prog:F03} nazywa średnią, na której to stoi: geometryczne średnie
+prawdopodobieństwo tokena, którego ta liczba jest odwrotnością.
 
 To twierdzenie o modelu, a nie pozycja w rankingu, i da się je zestawić ze
 słownikiem. Przy $\val{p29.vocab}$ tokenach ten model zawęził pole do
@@ -525,7 +539,7 @@ który ta książka już wydrukowała w innym celu.
 
 Program~\ref{prog:P25} przeprowadził eksperyment E9 na wierszu uwagi po
 $\val{p29.att.keys}$ kluczach i podał jego entropię w natach: z dzieleniem
-przez $\frac{1}{\sqrt{d_k}}$ \dash{} $\val{p29.att.scaled.ent}$ przy
+przez $1/\sqrt{d_k}$ \dash{} $\val{p29.att.scaled.ent}$ przy
 największym rozmiarze głowicy; bez niego \dash{} $\val{p29.att.raw.ent}$. Jego
 wniosek brzmiał, że skalowanie utrzymuje entropię w miejscu, co jest prawdą i
 trudno to sobie wyobrazić.
@@ -547,25 +561,26 @@ przypadków?
 $\val{p29.att.raw.eff}$ bez niego}
 
 \begin{center}
-\begin{tabular}{lccc}
+\begin{tabular}{lcc}
 \toprule
- & entropia, naty & efektywne klucze & z \\
+ & entropia, naty & efektywne klucze, z $\val{p29.att.keys}$ \\
 \midrule
-bez $\frac{1}{\sqrt{d_k}}$ & $\val{p29.att.raw.ent}$
-  & $\val{p29.att.raw.eff}$ & $\val{p29.att.keys}$ \\
+bez $1/\sqrt{d_k}$ & $\val{p29.att.raw.ent}$
+  & $\val{p29.att.raw.eff}$ \\
 z nim & $\val{p29.att.scaled.ent}$
-  & $\val{p29.att.scaled.eff}$ & $\val{p29.att.keys}$ \\
+  & $\val{p29.att.scaled.eff}$ \\
 \midrule
 jednostajny, sufit & $\val{p29.att.maxent}$
-  & $\val{p29.att.keys}$ & $\val{p29.att.keys}$ \\
+  & $\val{p29.att.keys}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\textbf{Bez skalowania głowica zapadła się na jeden klucz i dziesiątą część
-drugiego.} Program~\ref{prog:P25} mógł powiedzieć, że entropia jest mała;
-licznik mówi, że architektura wyrzuciła siedem ósmych tego, do czego głowica
-została zbudowana, zanim jeszcze cokolwiek się nauczyła.
+\textbf{Bez skalowania głowica wykonuje mniej więcej pracę jednego klucza.}
+Program~\ref{prog:P25} zmierzył $\val{p29.att.raw.top}$ procent wagi wiersza
+siedzące na jednym z $\val{p29.att.keys}$ i mógł powiedzieć, że entropia jest
+mała; licznik mówi, że architektura wyrzuciła siedem ósmych tego, do czego
+głowica została zbudowana, zanim jeszcze cokolwiek się nauczyła.
 
 A wiersz sufitu to tożsamość sprzed dwóch ramek, a nie czwarty pomiar:
 $\val{p29.att.maxent}$ nata to $\ln \val{p29.att.keys}$, więc jego eksponenta
@@ -583,11 +598,17 @@ Programu~\ref{prog:F03} ma entropię $\val{p29.seven.nats}$ nata i efektywny
 licznik $\val{p29.seven.n}$.
 
 Kłopot w tym, że raportowana perpleksja niemal nigdy nie jest jedną pozycją.
-Jest eksponentą \textbf{średniej} straty po korpusie, a
-Program~\ref{prog:P19} zmierzył, co to ukrywa: przy rozrzucie dwóch natów
-efektywne liczniki na token rozciągają się na rzędy wielkości, podczas gdy
-raportowana liczba siedzi pośrodku, i \emph{żadna pozycja} nie musi ważyć
-siedmiu tokenów.
+Jest eksponentą \textbf{średniej} straty po korpusie, a średnia ukrywa swój
+rozrzut. Program~\ref{prog:P19} zmierzył jeden koszt tego: przy rozrzucie
+$\val{p29.spread.nats}$ nata uśrednienie perpleksji złą stroną zwraca liczbę
+$\val{p29.p19.ratio}$ raza większą od właściwej.
+
+Koszt dla \emph{licznika} to jeden wiersz rachunku tej właśnie sekcji. Token,
+którego strata leży rozrzut powyżej średniej, waży
+$e^{2 \times \val{p29.spread.nats}} = \val{p29.count.ratio}$ raza więcej
+wyborów niż token rozrzut poniżej, a średnia całkowicie się z tego skraca. Sam
+rozrzut rozstawia więc liczniki pozycyjne o czynnik $\val{p29.count.ratio}$ i
+\emph{żadna pozycja} nie musi ważyć siedmiu tokenów.
 
 Zdanie do użycia jest więc tym z zastrzeżeniem. Perpleksja siedem mówi, że
 model jest średnio tak niepewny jak jednostajny wybór spośród siedmiu; nie
@@ -729,8 +750,9 @@ potrzebujesz?
    \times \frac{\text{tokeny}}{\text{znak}} \]
 
 a drugi czynnik jest własnością \textbf{tokenizera}, który w stracie nie
-występuje nigdzie. Dwa tokenizery na tym samym tekście po
-$\val{p29.tpc.a}$ i $\val{p29.tpc.b}$ tokena na znak dają
+występuje nigdzie. Weź tę jedną podaną liczbę
+$\val{f03.nats.to.bits}$ bita na token do dwóch tokenizerów pracujących po
+$\val{p29.tpc.a}$ i $\val{p29.tpc.b}$ tokena na znak:
 
 \begin{center}
 \begin{tabular}{lcc}
@@ -741,8 +763,8 @@ bity na znak & $\val{p29.bpc.a}$ & $\val{p29.bpc.b}$ \\
 \end{tabular}
 \end{center}
 
-Ten sam model i ten sam tekst. O jaki czynnik różnią się obie odpowiedzi i
-czego ten czynnik jest własnością?
+Jedna liczba straty, dwie tezy o kompresji. O jaki czynnik się różnią i czego
+ten czynnik jest własnością?
 \dotline
 \nextframe
 \end{fr}
@@ -753,6 +775,16 @@ czego ten czynnik jest własnością?
 $\val{p29.tpc.b} / \val{p29.tpc.a}$, dokładnie \dash{} czynnik bitów na token
 się skraca, więc iloraz nie mówi o modelu zupełnie nic. Skrypt to potwierdza,
 bo jest to całe twierdzenie tej sekcji.
+
+\begin{note}
+Czytaj obie kolumny jako jedną \emph{podaną liczbę}, a nie jako jeden model.
+Strata na token należy do modelu \textbf{i} jego tokenizera razem \dash{}
+trenuje się je w parze, a macierze zanurzeń i wyjścia są indeksowane
+słownikiem \dash{} więc żaden pojedynczy model nie podaje
+$\val{f03.nats.to.bits}$ bita na token przy obu. I to właśnie czyni tę tabelę
+wartą druku: ta sama liczba na karcie modelu opisuje dwa kompresory oddalone o
+czynnik $\val{p29.bpc.ratio}$.
+\end{note}
 
 Liczba bitów na token jest więc ilorazem podanym bez jednej ze swoich dwóch
 wielkości, czyli powracającą pretensją tej książki docierającą tam, gdzie robi
@@ -769,9 +801,11 @@ Trzy konsekwencje warte wyniesienia, a każda jest sprawdzalna, a nie tylko
 przestrogą.
 
 \begin{itemize}
-\item \textbf{Model może obniżyć swoją stratę, zmieniając tokenizer}, nie
-  ruszając wag. Grubsze tokeny to mniej trudniejszych predykcji; strata na
-  token rośnie, a strata na znak wcale nie musi.
+\item \textbf{Bity na znak są wielkością, która podróżuje, a bity na token
+  nie.} Zmień tokenizer, a strata na token się przesunie, bo grubsze tokeny to
+  mniej trudniejszych predykcji; przesunąć się nie musi strata na znak. Czyli
+  liczba zależna od tokenizera stoi na karcie modelu, a porównywalna jest tą,
+  której nikt nie podaje.
 \item \textbf{Dwie straty są porównywalne tylko przy jednym tokenizerze.} To
   jest ten warunek, zwykle się go nie wypowiada, a wypowiedzenie kosztuje
   zdanie.
@@ -841,7 +875,7 @@ Program~\ref{prog:P30} go definiuje i pokazuje, że nie jest symetryczny.
   $\val{p29.ppl.frac}$ procent słownika o $\val{p29.vocab}$ tokenach.}
 \sumitem{23--24}{Entropie uwagi z Programu~\ref{prog:P25} czytane jako
   liczniki: $\val{p29.att.raw.eff}$ efektywnego klucza z
-  $\val{p29.att.keys}$ bez dzielenia przez $\frac{1}{\sqrt{d_k}}$ i
+  $\val{p29.att.keys}$ bez dzielenia przez $1/\sqrt{d_k}$ i
   $\val{p29.att.scaled.eff}$ z nim.}
 \sumitem{25}{Raportowana perpleksja jest eksponentą \emph{średniej}, więc żadna
   konkretna pozycja nie musi tak wyglądać \dash{} i to jest cena wniosku
@@ -854,10 +888,12 @@ Program~\ref{prog:P30} go definiuje i pokazuje, że nie jest symetryczny.
   i błędny ma niską. Używaj jej jako filtra na własne zgadywanie modelu, a
   nigdy jako gwarancji odpowiedzi.}
 \sumitem{31--33}{\result{\textbf{Bity na token to nie bity na znak.} Przemnóż przez
-  tokeny na znak, które należą do tokenizera}: $\val{p29.tpc.a}$ i
-  $\val{p29.tpc.b}$ dają $\val{p29.bpc.a}$ i $\val{p29.bpc.b}$ na tym samym
-  modelu i tym samym tekście, czyli czynnik $\val{p29.bpc.ratio}$, który jest
-  ilorazem tokenizerów i niczym o modelu.}
+  tokeny na znak, które należą do tokenizera}: jedna podana liczba
+  $\val{f03.nats.to.bits}$ bita na token staje się $\val{p29.bpc.a}$ albo
+  $\val{p29.bpc.b}$ przy $\val{p29.tpc.a}$ i $\val{p29.tpc.b}$ tokena na
+  znak, czyli czynnik $\val{p29.bpc.ratio}$, który jest ilorazem tokenizerów i
+  niczym o modelu. Bity na znak są wielkością, która podróżuje między
+  tokenizerami.}
 \sumitem{34}{\result{Dwie straty są porównywalne tylko przy jednym
   tokenizerze}, a teza o kompresji jest sprawdzalna tam, gdzie strata nie
   jest.}
@@ -892,9 +928,9 @@ Program~\ref{prog:P30} go definiuje i pokazuje, że nie jest symetryczny.
   samym korpusie i model drugiego zespołu zostaje uznany za gorszy. Co musisz
   sprawdzić najpierw?
   \answerto{Czy oba użyły tego samego tokenizera. Bity na token razy tokeny na
-  znak to bity na znak, a tylko to drugie jest własnością modelu i tekstu, a
-  nie tokenizera \dash{} grubszy tokenizer podnosi stratę na token przy
-  niezmienionym modelu.}
+  znak to bity na znak, a tylko \emph{bity na znak} są własnością modelu i
+  tekstu, a nie tokenizera \dash{} grubszy tokenizer podnosi stratę na token
+  przy niezmienionym modelu.}
 \end{testexercises}
 
 \begin{furtherproblems}
@@ -910,7 +946,9 @@ Program~\ref{prog:P30} go definiuje i pokazuje, że nie jest symetryczny.
   \answerto{$3 \times \frac14 + 2 \times \frac18 = 1$, więc jest dopuszczalny i
   nic nie zostaje. Gdyby wyszło mniej niż jeden, byłaby nieużyta gałąź i jakieś
   słowo kodowe dałoby się skrócić \dash{} dlatego kod optymalny zawsze wydaje
-  budżet dokładnie, gdy prawdopodobieństwa na to pozwalają.}
+  budżet dokładnie, jakiekolwiek byłyby prawdopodobieństwa. Prawdopodobieństwa
+  rozstrzygają, czy średnia długość sięgnie entropii, a nigdy tego, czy budżet
+  zostanie wydany.}
 \item Dwa niezależne rozkłady mają entropie $H_1$ i $H_2$. Jaka jest entropia
   pary i jaka efektywna liczba wyborów?
   \answerto{$H_1 + H_2$, bo zaskoczenia się dodają, a wartość oczekiwana jest
@@ -925,7 +963,7 @@ Program~\ref{prog:P30} go definiuje i pokazuje, że nie jest symetryczny.
   \answerto{$\val{p29.att.raw8.eff}$ klucza z $\val{p29.att.keys}$. Jest
   większa, bo nieskalowane wyniki rosną z $d_k$, więc przy małym rozmiarze
   głowicy nie rozeszły się jeszcze dość daleko, by nasycić softmax \dash{}
-  czyli całe to, do czego służy dzielenie przez $\frac{1}{\sqrt{d_k}}$,
+  czyli całe to, do czego służy dzielenie przez $1/\sqrt{d_k}$,
   powiedziane jako licznik zamiast jako wariancja.}
 \item Kolega proponuje monitorować entropię rozkładu następnego tokena i
   wzywać dyżurnego, gdy przekroczy próg. Podaj jedną awarię, którą to łapie, i
