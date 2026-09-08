@@ -1,4 +1,4 @@
-.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 scripts terms parts \
+.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 scripts terms parts index \
         text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames elicit outcomes values translate shots debt
 
@@ -39,8 +39,10 @@ all-formats: numbers diagrams en pl en-a4 pl-a4 check check-a4
 check:
 	@python3 tools/gen_stubs.py --check
 	@python3 tools/check_structure.py --scripts
+	@python3 tools/check_structure.py --results
 	@python3 tools/check_structure.py --terms
 	@python3 tools/check_structure.py --parts
+	@python3 tools/check_structure.py --index
 	@python3 tools/checklog.py main-en.log main-pl.log
 	@python3 tools/checkpdf.py main-en.pdf main-pl.pdf
 	@python3 tools/parity.py | tail -n 3
@@ -250,7 +252,20 @@ values:
 scripts:
 	@python3 tools/check_structure.py --scripts
 
-# 5b. Appendix D is a claim about the body on every line, and a glossary row
+# 5c. Appendix C's coordinates. Nothing in that appendix is transcribed --
+#     each line is a \result{} mark inside a Summary item, and the frame
+#     range it prints comes from the \sumitem it sits in, not from the
+#     mark. So a mark written anywhere else silently inherits whichever
+#     Summary item was read last, and prints a coordinate it never
+#     earned. Measured: a probe \result outside every Summary item, in
+#     BOTH editions, left parity and every other ledger green -- C14
+#     counts macros generically, so only a one-edition mark already
+#     fails, and a fault identical in both is the shape this repository
+#     keeps being bitten by. See the note above check_results().
+results:
+	@python3 tools/check_structure.py --results
+
+# 5d. Appendix D is a claim about the body on every line, and a glossary row
 #     naming a word the book does not use is the failure that matters. It is
 #     not hypothetical: the suggested table in notes/03 carries rows for
 #     `dropout` and `ground truth`, and neither appears anywhere in either
@@ -261,7 +276,7 @@ scripts:
 terms:
 	@python3 tools/check_structure.py --terms
 
-# 5b. The introduction's own map of the book, against the manifest.
+# 5e. The introduction's own map of the book, against the manifest.
 #     This is the one class the parity checks are structurally blind to:
 #     C4, C8, C12 and C14 all compare the two EDITIONS, so a part range
 #     that is stale in both stays green. Seven of the nine ranges were
@@ -271,6 +286,16 @@ terms:
 #     the editions.
 parts:
 	@python3 tools/check_structure.py --parts
+
+# 5c. An index entry that names something the page never prints. The index is
+#     the one artefact whose coordinates rest entirely on where an \index{}
+#     mark happens to sit, and nothing looked at it until a review found
+#     \index{optimiser!AdamW} against a program that deliberately never writes
+#     the word. Narrow on purpose: most index leaves here are DESCRIPTIONS
+#     rather than terms, so asserting the leaf occurs in the prose reports
+#     most of the book. A NAME is the decidable half and it is clean.
+index:
+	@python3 tools/check_structure.py --index
 
 # 6. The two editions out of step. tools/parity.py is the single parity tool;
 #    it compares an ORDERED structural signature rather than counts, because a
@@ -298,8 +323,10 @@ debt:
 	@echo; echo "== Elicitation rate =="          ; $(MAKE) -s elicit
 	@echo; echo "== Computed values =="           ; $(MAKE) -s values
 	@echo; echo "== Transcripts on the page =="   ; $(MAKE) -s scripts
+	@echo; echo "== Appendix C coordinates =="   ; $(MAKE) -s results
 	@echo; echo "== Appendix D terminology =="   ; $(MAKE) -s terms
 	@echo; echo "== The introduction's map =="    ; $(MAKE) -s parts
+	@echo; echo "== The index's own names =="     ; $(MAKE) -s index
 	@echo; echo "== Polish/English parity =="     ; $(MAKE) -s translate
 	@echo; echo "== Unverified claims, diagrams ="; $(MAKE) -s shots
 	@echo

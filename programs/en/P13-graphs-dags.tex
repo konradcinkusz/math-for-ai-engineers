@@ -34,8 +34,8 @@
 
 \program{Graphs, DAGs and random walks}
 \label{prog:P13}
-\index{graph}
-\index{graph!adjacency matrix}
+\index{graph (vertices and edges)}
+\index{graph (vertices and edges)!adjacency matrix}
 
 \begin{outcomes}
 \outcome{1--8}{say what a graph is with no picture, and count its edges
@@ -81,7 +81,7 @@
 % ============================================================
 \section{A set and a relation}
 \label{sec:P13-what}
-\index{graph!definition}
+\index{graph (vertices and edges)!definition}
 
 \begin{fr}
 Program~\ref{prog:F10} gave you the set, and said nothing at all about
@@ -236,7 +236,7 @@ for it that a graph library already has.
 % ============================================================
 \section{Two encodings, two costs}
 \label{sec:P13-encodings}
-\index{graph!adjacency list}
+\index{graph (vertices and edges)!adjacency list}
 
 \begin{fr}
 There are two ways to write the relation down, and they are not
@@ -335,7 +335,7 @@ $\val{p13.big.ratio}$ times too large to store.
 % ============================================================
 \section{Walks are matrix powers}
 \label{sec:P13-walks}
-\index{graph!walk}
+\index{graph (vertices and edges)!walk}
 
 \begin{fr}
 A \textbf{walk} of length $k$ is a sequence of $k$ edges laid end to end. It
@@ -510,7 +510,7 @@ is a claim about trained networks, and it would need one.
 % ============================================================
 \section{A DAG, and the order that makes evaluation well defined}
 \label{sec:P13-dag}
-\index{graph!directed acyclic}
+\index{graph (vertices and edges)!directed acyclic}
 
 \begin{fr}
 Back to the call graph, and to the property it has that has not been used yet:
@@ -645,8 +645,7 @@ in, and it is why the memory grows with the number of steps unrolled.
 % ============================================================
 \section{Where a random walk settles}
 \label{sec:P13-walks-random}
-\index{graph!random walk}
-\index{graph!PageRank}
+\index{graph (vertices and edges)!random walk}
 
 \begin{fr}
 One last object, and it puts Part~III's machinery on a graph.
@@ -723,7 +722,8 @@ would have made it a claim about a threshold.
 \end{fr}
 
 \begin{fr}
-That is \textbf{PageRank}, and the definition is the whole of it: a page's
+That is \textbf{PageRank}\index{graph (vertices and edges)!PageRank}, and the
+definition is the whole of it: a page's
 rank is its share of the time an endless random walk spends there. A page is
 important because important pages link to it, which sounds circular and is
 instead an eigenvector equation.

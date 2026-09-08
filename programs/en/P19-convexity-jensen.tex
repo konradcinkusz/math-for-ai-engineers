@@ -498,7 +498,6 @@ smell, different mechanism, and they do not have the same fix.
 % ============================================================
 \section{The same inequality, once more}
 \label{sec:P19-elbo}
-\index{Jensen's inequality!and the ELBO}
 
 \begin{fr}
 Jensen turns up in one more place a reader of this field will meet, and the
@@ -517,7 +516,8 @@ $\ln$ of an average.
 Checked over $\val{p19.elbo.trials}$ random positive samples, and on the
 worked set in the script the gap is $\val{p19.elbo.gap}$.
 
-\textbf{That one line is the evidence lower bound.} Written with an
+\textbf{That one line is the evidence lower
+bound.}\index{Jensen's inequality!and the ELBO} Written with an
 expectation rather than a weighted sum it reads
 $\ln \Ex[x] \ge \Ex[\ln x]$, and every variational method in the field is
 built on choosing the $x$ so that the right-hand side is something you can

@@ -288,33 +288,78 @@ LB_MARGIN = E_MAX * LB_SE
 assert f"{LB_SE:.2f}" == committed("p27.tex", "p27.lb.se"), LB_SE
 assert f"{LB_MARGIN:.1f}" == committed("p27.tex", "p27.lb.margin"), LB_MARGIN
 
+# THE MARGIN IS PRINTED HERE TO A THIRD FIGURE, AND THAT IS THE RECORDED
+# RULE RATHER THAN A PREFERENCE.  Program P27 prints it as 3.1, which is
+# right for a quantity it only ever states; here it is SQUARED, and squaring
+# is where a rounding shows.  1000 x 3.1^2 is 9610 against a true 9798, so a
+# reader who does the arithmetic the display asks for is two per cent out and
+# cannot tell whether the formula or the answer is wrong.  Program P27's own
+# script does exactly this for `p27.z.bonf`, and its comment gives the same
+# reason: the extra digit is what makes the line checkable by the reader
+# rather than merely correct.
+MARGIN_3SF = LB_MARGIN
+assert f"{MARGIN_3SF:.1f}" == committed("p27.tex", "p27.lb.margin"), MARGIN_3SF
+
 HALVE_TIMES = 4
 assert abs(E_MAX * 100.0 * math.sqrt(LB_P * (1 - LB_P) / (HALVE_TIMES * LB_N))
            - LB_MARGIN / 2.0) < 1e-9
 
-# The count that states one model's accuracy to within a single point.
+# The count that states one model's accuracy to within a single point.  It is
+# emitted to THREE SIGNIFICANT FIGURES, for the same reason the margin is: a
+# margin good to three figures cannot support a four-figure count, and at
+# four the page prints 9798 where its own two operands give 9797.  Program
+# F04's `f04.decay.ratio` took this fix first, at 22 800.
 ONE_PT = 1.0
-ONE_PT_N = math.ceil((E_MAX ** 2) * LB_P * (1 - LB_P) * 10000.0 / (ONE_PT ** 2))
-assert E_MAX * 100.0 * math.sqrt(LB_P * (1 - LB_P) / ONE_PT_N) <= ONE_PT
-assert E_MAX * 100.0 * math.sqrt(LB_P * (1 - LB_P) / (ONE_PT_N - 1)) > ONE_PT
-
-# And Program P27's own count for TELLING TWO MODELS APART at one point.
-DETECT_N = int(committed("p27.tex", "p27.n.rho00") or 12293)
-DETECT_RATIO = DETECT_N / ONE_PT_N
-assert 1.0 < DETECT_RATIO < 2.0, DETECT_RATIO
-
+ONE_PT_EXACT = LB_N * (LB_MARGIN / ONE_PT) ** 2
+assert 1000.0 <= ONE_PT_EXACT < 10000.0, ONE_PT_EXACT     # so -2 is 3 s.f.
+ONE_PT_N = int(round(ONE_PT_EXACT, -2))
+assert ONE_PT_N == int(round(LB_N * (float(f"{MARGIN_3SF:.2f}") / ONE_PT) ** 2,
+                             -2)), ONE_PT_N
+# The page states what the one-decimal margin would have given, because that
+# is the arithmetic a reader does and the whole reason for the third figure.
+# It is written inline rather than emitted: it is a wrong answer, and a value
+# ledger is for the numbers the book stands behind (Program F10's finding).
+assert round(LB_N * (float(f"{MARGIN_3SF:.1f}") / ONE_PT) ** 2) == 9610
 # A THRESHOLD CHOSEN SO A CLAIM WOULD PASS IS NOT AN ASSERTION.  The draft
-# had `ONE_PT_N > 10 * LB_N`, which fails at 9798 against 10000 -- and the
-# invariant it was reaching for needs no constant at all: the item count
-# scales as the SQUARE of the margin it buys, so going from P27's own margin
-# to one point costs exactly that ratio squared.
-assert ONE_PT_N == math.ceil(LB_N * (LB_MARGIN / ONE_PT) ** 2), ONE_PT_N
+# had `ONE_PT_N > 10 * LB_N`, which fails here -- and the invariant it was
+# reaching for needs no constant at all: the item count scales as the SQUARE
+# of the margin it buys, so going from P27's own margin to one point costs
+# exactly that ratio squared.
+assert abs(E_MAX * 100.0 * math.sqrt(LB_P * (1 - LB_P) / ONE_PT_EXACT)
+           - ONE_PT) < 1e-12
 
+# Program P27's own counts for TELLING TWO MODELS APART at one point, and
+# THE TWO OF THEM ARE THE SECTION.  `p27.n.rho00` is the INDEPENDENT case --
+# P27's table heads that row rho = 0 and its own Test exercise says "if the
+# two evaluations are independent" -- so quoting it for evaluations run on
+# the same prompts inverts the finding P27 section 3 exists to deliver.  The
+# paired figure is `p27.n.rho90`, at the correlation P27 says two models
+# worth comparing usually have, and it is an order of magnitude smaller.
+DETECT_N = int(committed("p27.tex", "p27.n.rho00") or 12293)
+PAIRED_N = int(committed("p27.tex", "p27.n.rho90") or 1229)
+assert PAIRED_N < DETECT_N, (PAIRED_N, DETECT_N)
+# P27's own 1 - rho, at the correlation its table calls a tenth of the cost.
+assert round(DETECT_N / PAIRED_N) == 10, DETECT_N / PAIRED_N
+DETECT_RATIO = DETECT_N / ONE_PT_N
+PAIRED_RATIO = ONE_PT_N / PAIRED_N
+# The ORDERING is the section's claim and it needs no constant: the paired
+# route is cheaper than pinning one accuracy to a point and the independent
+# one is dearer.  A first version of this line asserted `PAIRED_RATIO > 5.0`,
+# which is a threshold chosen so a claim would pass -- the failure mode the
+# comment thirty lines above warns about, committed thirty lines below it.
+# The two printed ratios are gated by `reproduces` instead, which is where a
+# figure belongs.
+assert PAIRED_N < ONE_PT_N < DETECT_N, (PAIRED_N, ONE_PT_N, DETECT_N)
+
+emit("p34.lb.margin", MARGIN_3SF, 2)
 emit("p34.halve.times", HALVE_TIMES)
 emit("p34.halve.n", HALVE_TIMES * LB_N)
 emit("p34.one.pt.n", ONE_PT_N)
 emit("p34.detect.ratio", reproduces(DETECT_RATIO, 2, (float(DETECT_N), 0),
                                     (float(ONE_PT_N), 0), op=lambda a, b: a / b), 2)
+emit("p34.paired.ratio",
+     reproduces(PAIRED_RATIO, 1, (float(ONE_PT_N), 0), (float(PAIRED_N), 0),
+                op=lambda a, b: a / b), 1)
 
 
 # ======================================================================
@@ -359,6 +404,24 @@ SEEN_GAP = TRUE_GAP * float(ATTEN)
 ITEMS_TIMES = 1.0 / float(ATTEN) ** 2
 assert SEEN_GAP < TRUE_GAP and ITEMS_TIMES > 1.0
 
+# THE (a - b)^2 FACTOR IS THE EFFECT-SIZE HALF, AND IT IS EXACT.  THE NOISE
+# HALF IS NOT UNCHANGED, which a draft of this section claimed.  A judged
+# item is a Bernoulli with parameter p' = p*a + (1 - p)*b rather than p, so
+# the per-item variance moves too -- here it FALLS, by about one and a half
+# per cent, which is the opposite direction from the attenuation and an order
+# of magnitude smaller.  So the true factor is 1.54 rather than 1.56, and the
+# page may not say "exactly the same power": it says the effect half is exact
+# and names what the noise half does.  Emitted as the shift rather than as a
+# second factor, because two numbers that look like one is Program F08's
+# defect and 1.54 beside 1.56 is exactly that shape.
+P_SEEN = reported(P_TRUE, J_A, J_B)
+VAR_TRUE, VAR_SEEN = P_TRUE * (1 - P_TRUE), P_SEEN * (1 - P_SEEN)
+VAR_SHIFT = 100.0 * float(1 - VAR_SEEN / VAR_TRUE)
+assert VAR_SEEN < VAR_TRUE, (VAR_SEEN, VAR_TRUE)
+EXACT_TIMES = float(VAR_SEEN / VAR_TRUE) * ITEMS_TIMES
+assert 0 < VAR_SHIFT < 100.0 * abs(1.0 - 1.0 / ITEMS_TIMES), VAR_SHIFT
+assert abs(EXACT_TIMES - ITEMS_TIMES) / ITEMS_TIMES < 0.02, EXACT_TIMES
+
 # THE TRAP.  A judge's card reports AGREEMENT with human labels, which is
 #   A = p*a + (1 - p)*(1 - b),
 # and that pins p*a - (1 - p)*b.  It pins a - b only when the coefficients
@@ -368,6 +431,15 @@ assert SEEN_GAP < TRUE_GAP and ITEMS_TIMES > 1.0
 P_J = P_TRUE                                    # section 2's own accuracy
 AGREE = reported(P_J, J_A, 1 - J_B)
 assert AGREE == P_J * J_A + (1 - P_J) * (1 - J_B)
+
+
+# The card says one linear equation and the page now prints it, because both
+# the agreement and the two bounds need p and it last appeared twenty frames
+# earlier.  p*a - (1-p)*b = agreement - (1-p), and that constant is what a
+# reader has to be able to rebuild.
+AGREE_CONST = AGREE - (1 - P_J)
+assert f"{float(AGREE_CONST):.4f}" == "0.6365", AGREE_CONST
+assert f"{float(P_J):.3f}" == "0.715" and f"{float(1 - P_J):.3f}" == "0.285"
 
 
 def atten_at(a: F, p: F, agree: F) -> F:
@@ -416,6 +488,7 @@ emit("p34.judge.seen.gap", reproduces(SEEN_GAP, 1, (TRUE_GAP, 1),
                                       (float(ATTEN), 2), op=lambda g, a: g * a), 1)
 emit("p34.judge.items.times", reproduces(ITEMS_TIMES, 2, (float(ATTEN), 2),
                                          op=lambda a: 1.0 / a ** 2), 2)
+emit("p34.judge.var.pct", VAR_SHIFT, 1)
 emit("p34.judge.agree.pct", pct(float(AGREE) * 100), 2)
 emit("p34.judge.atten.lo", float(ATT_LO), 3)
 emit("p34.judge.atten.hi", float(ATT_HI), 3)
@@ -510,11 +583,21 @@ PROBE_SHARE = 100.0 * BIAS_50 / PROBE_I
 assert 0 < PROBE_SHARE < 100, PROBE_SHARE
 
 # The count at which the artefact is under a twentieth of the reported figure.
+# ANCHORED AT N = 50, WHICH IS THE COUNT THE PAGE PRINTS.  A draft anchored
+# it at P31's hundred-item figure and got 204, where a reader scaling the
+# fifty-item figure as 1/N -- which is what the frame asks them to do -- gets
+# 207.  The two differ because the plug-in bias falls a shade FASTER than
+# 1/N at these sizes: P31's own pair gives 0.010332 at fifty and 0.005079 at
+# a hundred, a ratio above two.  So 207 is the conservative side of an
+# approximate law, and it is the side the reader can reproduce.
 PROBE_TOL = 0.05 * PROBE_I
-PROBE_N = math.ceil(BIAS_100 * 100.0 / PROBE_TOL)
-assert BIAS_100 * 100.0 / PROBE_N <= PROBE_TOL
-assert BIAS_100 * 100.0 / (PROBE_N - 1) > PROBE_TOL
+PROBE_N = math.ceil(BIAS_50 * 50.0 / PROBE_TOL)
+assert BIAS_50 * 50.0 / PROBE_N <= PROBE_TOL
+assert BIAS_50 * 50.0 / (PROBE_N - 1) > PROBE_TOL
 assert PROBE_N > 50
+# The hundred-item anchor is the smaller count, which is what "faster than
+# 1/N" means; the frame says so rather than letting the two look like one.
+assert math.ceil(BIAS_100 * 100.0 / PROBE_TOL) < PROBE_N
 
 # P31's data-processing gap, read back and left as a bound rather than a figure.
 DPI_BEST = float(committed("p31.tex", "p31.dpi.best") or 0.0647)
@@ -525,7 +608,9 @@ assert 1.0 - DPI_BEST / DPI_IXY > 0.25
 emit("p34.probe.i", PROBE_I, 2)
 emit("p34.probe.share.pct", reproduces(pct(PROBE_SHARE), 1, (BIAS_50, 6),
                                        (PROBE_I, 2), op=lambda b, i: 100.0 * b / i), 1)
-emit("p34.probe.n", PROBE_N)
+emit("p34.probe.n",
+     int(reproduces(float(PROBE_N), 0, (BIAS_50, 6), (PROBE_I, 2),
+                    op=lambda b, i: float(math.ceil(b * 50.0 / (0.05 * i))))))
 
 
 # ======================================================================
