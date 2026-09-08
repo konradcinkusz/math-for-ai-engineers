@@ -574,22 +574,25 @@ on. How many times do you run it?
 \begin{fr}
 \ans{More than once, and the enumeration above says why}
 
-One shuffled run is one draw from the distribution those enumerated tables
-came from. The table printed its mean; the same enumeration has the rest of
-it, and it is wide.
+A shuffled run is one draw from a null distribution. The enumeration above
+is the one place in this program where you can see the whole of such a
+distribution rather than one sample of it, and the table printed only its
+mean.
 
 At $N = 10$ its spread is $\val{p31.null.sd10}$ nats against a mean of
-$\val{p31.bias.n10}$. The spread is larger than the quantity it is being used
-to measure, and about one run in twenty reports $\val{p31.null.q95}$ nats or
-more \dash{} on data with nothing in it. That holds at every $N$ the table
-covers, not just the smallest.
+$\val{p31.bias.n10}$, and about one run in twenty reports
+$\val{p31.null.q95}$ nats or more \dash{} on data with nothing in it. The
+spread exceeds the mean at every $N$ the table covers, so a run that reports
+several times the floor is not an artefact of the smallest sample.
 
 \begin{trapbox}
 \textbf{\enquote{I ran the shuffled control and subtracted it.}}
 
-The control is a random variable and one run is one sample of it, so the
-difference you report can come out negative, or twice the real excess, with
-nothing in the run to say which happened.
+The control is a random variable and one run is one sample of it, so what
+you report is the real excess plus however far that single draw fell from
+the bias it was standing in for \dash{} a quantity as large as the bias
+itself. It can come out negative, and nothing in the run says which
+happened.
 
 Shuffle a number of times instead, and read where your observed estimate
 sits among the shuffled ones rather than subtracting any single one of them.

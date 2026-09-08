@@ -559,23 +559,26 @@ pójdziesz dalej. Ile razy je uruchamiasz?
 \begin{fr}
 \ans{Więcej niż raz, a powyższe wyliczenie mówi dlaczego}
 
-Jedno przetasowane uruchomienie to jedno losowanie z rozkładu, z którego
-pochodzą wyliczone tabele. Tabela wypisała jego średnią; to samo wyliczenie
-ma resztę tego rozkładu, a on jest szeroki.
+Przetasowane uruchomienie to jedno losowanie z rozkładu zerowego.
+Powyższe wyliczenie jest jedynym miejscem w tym programie, gdzie widać cały
+taki rozkład, a nie jedną jego próbkę, a tabela wypisała tylko jego
+średnią.
 
 Przy $N = 10$ jego rozrzut to $\val{p31.null.sd10}$ nata wobec średniej
-$\val{p31.bias.n10}$. Rozrzut jest większy niż wielkość, którą ma mierzyć,
-a mniej więcej jedno uruchomienie na dwadzieścia zwraca
-$\val{p31.null.q95}$ nata lub więcej \dash{} na danych, w których nic nie
-ma. Trzyma się to przy każdym $N$, które obejmuje tabela, nie tylko przy
-najmniejszym.
+$\val{p31.bias.n10}$, a mniej więcej jedno uruchomienie na dwadzieścia
+zwraca $\val{p31.null.q95}$ nata lub więcej \dash{} na danych, w których
+nic nie ma. Rozrzut przewyższa średnią przy każdym $N$, które obejmuje
+tabela, więc uruchomienie zwracające wielokrotność podłogi nie jest
+artefaktem najmniejszej próby.
 
 \begin{trapbox}
 \textbf{\enquote{Uruchomiłem przetasowaną kontrolę i ją odjąłem.}}
 
-Kontrola jest zmienną losową, a jedno uruchomienie to jedna jej próbka, więc
-podawana różnica może wyjść ujemna albo dwa razy większa niż prawdziwa
-nadwyżka, a nic w tym uruchomieniu nie powie, co się stało.
+Kontrola jest zmienną losową, a jedno uruchomienie to jedna jej próbka,
+więc to, co podajesz, jest prawdziwą nadwyżką powiększoną o to, jak daleko
+tamto jedno losowanie padło od obciążenia, które miało zastąpić \dash{} o
+wielkość tak dużą jak samo obciążenie. Może wyjść ujemna, a nic w tym
+uruchomieniu nie powie, co się stało.
 
 Przetasuj zamiast tego wiele razy i odczytaj, gdzie twój zaobserwowany
 estymat leży wśród przetasowanych, zamiast odejmować którykolwiek z nich.
