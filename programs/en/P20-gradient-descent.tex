@@ -478,7 +478,7 @@ squared gradient is one.
 \end{ansblock}
 
 \[ v \leftarrow \beta_2 v + (1-\beta_2) g^{2}, \qquad
-   w \leftarrow w - \eta\,\frac{g}{\sqrt{v} + \varepsilon} \]
+   w \leftarrow w - \eta\,\frac{g}{\sqrt{v}} \]
 
 $\sqrt{v}$ has the units of a gradient, so $g/\sqrt{v}$ has none, and
 \textbf{the step is about $\eta$ however large the gradient is}.
@@ -508,16 +508,16 @@ and the denominator are multiplied by a thousand together.
 \end{fr}
 
 \begin{fr}
-The shortfall is not noise and it is not an approximation. The first step is
-exactly
-\[ \frac{\eta}{1 + \varepsilon/\lvert g\rvert} \]
-which the script checks in every coordinate at every scale. So the departure
-from $\eta$ is entirely the epsilon's, and it is largest where the gradient is
-\emph{smallest} \dash{} the opposite end from the one people worry about.
+The shortfall is not noise and it is not an approximation, and it has one
+cause. No implementation can divide by $\sqrt{v}$ while $v$ is still near
+zero, so every one of them carries a small $\varepsilon$ to stop that. The
+departure from $\eta$ is entirely the epsilon's, and it is largest where the
+gradient is \emph{smallest} \dash{} the opposite end from the one people
+worry about.
 
 Which raises the question the epsilon is usually written without any thought
-about. It is there to stop a division by zero. Where should it go: inside the
-square root, added to $v$, or outside it, added to $\sqrt{v}$?
+about. Where should it go: inside the square root, added to $v$, or outside
+it, added to $\sqrt{v}$?
 \dotline
 \nextframe
 \end{fr}
@@ -528,8 +528,12 @@ Outside. Inside, it is added to a gradient \emph{squared}, which is not a
 gradient.
 \end{ansblock}
 
-That is the units argument again and it has a measurable consequence. With
-$\varepsilon = \val{p20.eps}$ and a gradient of $\val{p20.eps.g}$:
+That is the units argument again. With the epsilon outside, the first step is
+exactly
+\[ \frac{\eta}{1 + \varepsilon/\lvert g\rvert} \]
+which the script checks in every coordinate at every scale, and it has a
+measurable consequence. With $\varepsilon = \val{p20.eps}$ and a gradient of
+$\val{p20.eps.g}$:
 
 \begin{center}
 \begin{tabular}{ll}

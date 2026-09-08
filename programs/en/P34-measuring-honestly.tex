@@ -51,7 +51,7 @@
   ordering nobody thought was in question}
 \outcome{16--19}{say what narrowing a reported interval costs, in items}
 \outcome{20--28}{say what an imperfect judge does to a measured difference,
-  and why its agreement figure does not tell you}
+  and what would have to be known about the judge to correct for it}
 \outcome{29--35}{price a model per task rather than per token, and say which
   second quantity a per-token figure leaves out}
 \outcome{36--43}{name three published measures that are computed correctly
@@ -659,18 +659,12 @@ $\val{p34.bill.price.times}$ times the price mentions neither.
 \end{fr}
 
 \begin{fr}
-Program~\ref{prog:P29} met this identity in a different currency and it is
-worth putting the two side by side, because they behave differently.
+Both the price and the length belong to the model, which is precisely why
+quoting one of them settles nothing: neither can be divided out of a
+comparison, and neither is a property of the task alone.
 
-There, bits per character is bits per token times tokens per character, and
-\textbf{the model's contribution cancels}: the same model on the same text
-reports $\val{p29.bpc.a}$ and $\val{p29.bpc.b}$ bits per character at
-$\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ tokens per character, a factor of
-$\val{p29.bpc.ratio}$ that is a fact about the tokeniser and about nothing
-else.
-
-Here neither factor cancels. Both the price and the length belong to the
-model, which is precisely why quoting one of them settles nothing.
+Program~\ref{prog:P29} met an identity of the same shape in a different
+currency, and Section~\ref{sec:P34-measures} puts the two side by side.
 
 \mermaidfig{p34-two-quantities}{A price per token is half of what a task
   costs}{only the product is billed}
@@ -700,6 +694,13 @@ second factor belongs to the tokeniser. Compare two systems that tokenise
 differently and the difference you measure is the tokenisers'. Two losses
 are comparable under one tokeniser and under no other condition, and stating
 that condition costs a sentence.
+
+Program~\ref{prog:P29} measured exactly that: the same model on the same
+text reports $\val{p29.bpc.a}$ and $\val{p29.bpc.b}$ bits per character at
+$\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ tokens per character, a factor of
+$\val{p29.bpc.ratio}$ in which the model plays no part at all. That is the
+contrast with the bill: there both factors were the model's and neither
+cancelled.
 \end{fr}
 
 \begin{fr}
