@@ -21,14 +21,14 @@
   nazwać wielkość, która to rozstrzyga}
 \outcome{7--10}{powiedzieć, dlaczego ta wielkość nigdy nie jest ujemna, kiedy
   jest zerem i dlaczego jest symetryczna}
-\outcome{11--15}{powiedzieć, dlaczego jest symetryczna, choć dwie entropie
-  warunkowe, z których się ją składa, nie są}
-\outcome{16--25}{powiedzieć, w którą stronę myli się estymator wtykowy na
+\outcome{11--15}{zapisać informację wzajemną jako różnicę entropii, w każdym
+  z dwóch kierunków, i powiedzieć, co mierzy każdy z tych dwóch kawałków}
+\outcome{16--26}{powiedzieć, w którą stronę myli się estymator wtykowy na
   danych bez zależności i ile pozycji trzeba, żeby przestało to mieć
   znaczenie}
-\outcome{26--34}{powiedzieć, co przetwarzanie może, a czego nie może zrobić z
+\outcome{27--35}{powiedzieć, co przetwarzanie może, a czego nie może zrobić z
   informacją, i odczytać tę samą nierówność z obu jej końców}
-\outcome{35--38}{powiedzieć, co trzeba by zmierzyć, zanim twierdzenie
+\outcome{36--39}{powiedzieć, co trzeba by zmierzyć, zanim twierdzenie
   interpretowalnościowe o warstwie będzie uzasadnione}
 \end{outcomes}
 
@@ -38,20 +38,20 @@
   \answerto{Niczego. Program~\ref{prog:P24} buduje parę o korelacji dokładnie
   zero, w której jedna jest funkcją drugiej; ten program buduje wielkość,
   która to widzi.}
-\item Informacja wzajemna jest symetryczna. Czy dwie entropie warunkowe,
-  którymi można ją zapisać, też są? \teachesat{12--13}
-  \answerto{Nie, i mogą się różnić ogromnie \dash{} jedna z nich może być
-  dokładnie zerem, a druga nie. Ta sama liczba powstaje z dwóch różnych
-  kawałków.}
+\item Zapisz informację wzajemną jako różnicę entropii. Czy da się to zrobić
+  na więcej niż jeden sposób? \teachesat{14--15}
+  \answerto{Na dwa: $H(Y) - H(Y \mid X)$ oraz $H(X) - H(X \mid Y)$. To ta
+  sama liczba, a kawałki, z których powstaje, nie są tymi samymi
+  kawałkami.}
 \item Szacujesz informację wzajemną między dwiema wielkościami naprawdę
   niezależnymi, na skończonej próbie. Co dostajesz? \teachesat{16--17}
   \answerto{Liczbę dodatnią, w wartości oczekiwanej, przy każdym rozmiarze
   próby. Prawda wynosi zero, a estymator jej nie zwraca.}
 \item Ktoś ulepsza swoją sondę i podaje wyższy wynik. Co to mówi o warstwie?
-  \teachesat{28--29}
+  \teachesat{29--30}
   \answerto{Nic nowego. Sonda jest przetwarzaniem, więc jej wynik od zawsze
   był ograniczony tym, co warstwa niosła; lepsza sonda to zdanie o sondzie.}
-\item A jeśli sonda wypada źle? \teachesat{30--31}
+\item A jeśli sonda wypada źle? \teachesat{31--32}
   \answerto{Też nic, w drugą stronę. To ograniczenie jest ograniczeniem od
   dołu i jest luźne o wielkość, której nikt nie mierzy.}
 \end{quiz}
@@ -143,7 +143,8 @@ Zastosuj to do pary, którą zostawił Program~\ref{prog:P24}.
 
 Rozkład łączny kładzie $\frac{1}{\val{p24.tri.n}}$ na każdym z $(-1, 1)$,
 $(0, 0)$ i $(1, 1)$, a nigdzie indziej nic. Brzegi to $Z$ jednostajne na
-trzech wartościach i $W$ na dwóch.
+trzech wartościach, a $W$ przyjmuje $0$ z prawdopodobieństwem
+$\frac{1}{3}$ i $1$ z prawdopodobieństwem $\frac{2}{3}$.
 
 Policz albo przyjmij na jedną ramkę na wiarę: odpowiedź to
 $\val{p31.zw.mi}$ nata.
@@ -210,7 +211,8 @@ uzyskanie nie wymagało nowej matematyki: to twierdzenie o dywergencji,
 odczytane na konkretnej parze argumentów.
 
 Sprawdzone, nie zadeklarowane: na wszystkich $\val{p31.sym.trials}$
-rozkładach łącznych na wymiernej siatce ani jeden nie wychodzi ujemny.
+niezerowych układach zliczeń tabeli $2 \times 3$ o komórkach ze zbioru
+$\{0, 1, 2, 3\}$, unormowanych do rozkładu, ani jeden nie wychodzi ujemny.
 \end{fr}
 
 \begin{fr}
@@ -234,7 +236,7 @@ argumentów niczego: rozkład łączny $p(x, y)$ to ta sama tabela czytana z
 drugiej strony, a iloczyn $p(x)\,p(y)$ to ten sam iloczyn. Żaden argument
 dywergencji się nie ruszył.
 
-Sprawdzone na tych samych $\val{p31.sym.trials}$ rozkładach łącznych, z
+Sprawdzone na tych samych $\val{p31.sym.trials}$ tabelach, z
 odpowiedziami zgodnymi co do ostatniego bitu, jaki niesie arytmetyka.
 
 \begin{note}
@@ -260,7 +262,10 @@ co innego.
 programie. \textbf{Entropia warunkowa}
 \[ H(Y \mid X) \;=\; H(X, Y) \;-\; H(X) \]
 to tyle niepewności $Y$, ile zostaje, gdy $X$ jest znane: niepewność pary
-pomniejszona o niepewność samego $X$.
+pomniejszona o niepewność samego $X$. Pierwszy człon to entropia z
+Programu~\ref{prog:P29} z \emph{parą} jako zdarzeniem, co nie wymaga nowej
+definicji \dash{} para jest czymś, co zachodzi, a suma z tamtego programu
+biegnie po tym, co zachodzi.
 
 Weź znowu parę z Programu~\ref{prog:P24}, z $W = Z^{2}$. Ile wynosi
 $H(W \mid Z)$?
@@ -302,8 +307,12 @@ zależności, którą ta wielkość mierzy.
 \end{fr}
 
 \begin{fr}
-Obie te entropie warunkowe prowadzą do tej samej informacji wzajemnej, i to
-jest fakt wart wyniesienia z tej sekcji:
+Obie te entropie warunkowe prowadzą do tej samej informacji wzajemnej, a to
+są dwie linijki arytmetyki, nie nowy fakt. Rozbij logarytm w definicji:
+\[ I(X; Y) \;=\; \sum_{x, y} p(x, y) \ln \frac{p(x, y)}{p(x)\,p(y)}
+   \;=\; H(X) + H(Y) - H(X, Y) \]
+a entropia warunkowa powyżej mówi, że $H(X, Y) - H(X)$ to $H(Y \mid X)$.
+Podstaw ją, a potem zrób to samo z literami zamienionymi miejscami:
 \[ I(X; Y) \;=\; H(Y) - H(Y \mid X) \;=\; H(X) - H(X \mid Y) \]
 \dash{} niepewność, którą miałeś, pomniejszona o tę, która ci zostaje. To
 jest zdanie, które ludzie mają na myśli, mówiąc \emph{ile znajomość $X$ mówi
@@ -453,10 +462,10 @@ kolumna pokazuje. Konsekwencja jest tą, której nikt nie wypowiada.
 liczba jest solidna.}}
 
 Poprawka jest najmniej dokładna dokładnie tam, gdzie obciążenie jest
-największe. Przy $N = 100$ mieści się w dwóch procentach, a usuwane
-obciążenie to $\val{p31.bias.n100}$ nata, którego nikt nie potrzebował
-usuwać. Przy $N = 10$ zostawia prawie jedną trzecią obciążenia, a to jest
-ten reżim, dla którego po poprawkę się sięga.
+największe. Przy $N = 100$ zostawia poniżej dwóch procent obciążenia, a
+usuwane obciążenie to $\val{p31.bias.n100}$ nata, którego nikt nie
+potrzebował usuwać. Przy $N = 10$ zostawia $\val{p31.bias.left10}$ procent
+z niego, a to jest ten reżim, dla którego po poprawkę się sięga.
 
 Środek zaradczy, który działa tam, gdzie go nie potrzebujesz, i zawodzi tam,
 gdzie potrzebujesz, jest gorszy niż brak środka, bo usuwa powód do
@@ -516,12 +525,15 @@ ewaluacyjny ma kilkaset zdań.
 
 Aktywacje są ciągłe i zostają zbinowane, sklastrowane albo skwantowane
 \dash{} co ustala liczbę komórek, a nikt jej nie podaje. Jeśli ta liczba
-jest czymś w rodzaju $\val{p31.big.cells}$, a próba to kilkaset, to zgodnie
-z powyższą arytmetyką estymat jest zdominowany przez własne obciążenie i
-wyszedłby dodatni także na przetasowanych etykietach.
+jest czymś w rodzaju $\val{p31.big.cells}$, a próba to kilkaset, to jesteś
+daleko poniżej $\val{p31.big.per}$ pozycji na komórkę, których wzór
+wymagał, więc wzór nie stosuje się, a odpowiedź jakościowa jest gorsza, nie
+lepsza: jakiekolwiek jest obciążenie, jest rzędu samej wielkości.
+Uruchomienie na etykietach bez żadnego związku z wejściem też wyszłoby
+dodatnie.
 
-Istnieje sprawdzian, który kosztuje jedno dodatkowe uruchomienie i
-rozstrzyga to całkowicie.
+Istnieje sprawdzian, który kosztuje tylko moc obliczeniową, a jest różnicą
+między liczbą a wynikiem.
 \end{aibox}
 
 Jaki?
@@ -532,12 +544,48 @@ Jaki?
 \begin{fr}
 \ans{Przetasuj etykiety i puść cały potok jeszcze raz}
 
-Cokolwiek to zwróci, jest podłogą: to, co produkują twoje biny, twój rozmiar
-próby i twój estymator na danych, w których nie ma żadnej zależności.
-Twierdzeniem jest to, co zostaje ponad tą podłogą.
+Etykiety zachowują rozkład, który miały, i tracą każdy związek z wejściem,
+więc cokolwiek to uruchomienie zwróci, wyprodukowały twoje biny, twój
+rozmiar próby i twój estymator na danych, w których nic nie ma.
 
-Nikt tego prawie nigdy nie podaje, a to jest różnica między liczbą a
-wynikiem.
+Nikt tego prawie nigdy nie robi, a jest tanie.
+
+Teraz pytanie, które ten przepis ukrywa, i warto na nie odpowiedzieć, zanim
+pójdziesz dalej. Ile razy je uruchamiasz?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Więcej niż raz, a powyższe wyliczenie mówi dlaczego}
+
+Jedno przetasowane uruchomienie to jedno losowanie z rozkładu, z którego
+pochodzą wyliczone tabele. Tabela wypisała jego średnią; to samo wyliczenie
+ma resztę tego rozkładu, a on jest szeroki.
+
+Przy $N = 10$ jego rozrzut to $\val{p31.null.sd10}$ nata wobec średniej
+$\val{p31.bias.n10}$. Rozrzut jest większy niż wielkość, którą ma mierzyć,
+a mniej więcej jedno uruchomienie na dwadzieścia zwraca
+$\val{p31.null.q95}$ nata lub więcej \dash{} na danych, w których nic nie
+ma. Trzyma się to przy każdym $N$, które obejmuje tabela, nie tylko przy
+najmniejszym.
+
+\begin{trapbox}
+\textbf{\enquote{Uruchomiłem przetasowaną kontrolę i ją odjąłem.}}
+
+Kontrola jest zmienną losową, a jedno uruchomienie to jedna jej próbka, więc
+podawana różnica może wyjść ujemna albo dwa razy większa niż prawdziwa
+nadwyżka, a nic w tym uruchomieniu nie powie, co się stało.
+
+Przetasuj zamiast tego wiele razy i odczytaj, gdzie twój zaobserwowany
+estymat leży wśród przetasowanych, zamiast odejmować którykolwiek z nich.
+Ten ruch pochodzi z Programu~\ref{prog:P27}, pod inną nazwą: zbuduj rozkład
+statystyki przy hipotezie zerowej, w której efekt został usunięty, a potem
+odczytaj położenie zaobserwowanej wartości w tym rozkładzie. Tam hipotezą
+było, że dwa modele są równie dobre, i wyliczono każdy wynik; tutaj jest nią
+to, że etykiety nie mają nic wspólnego z wejściem, a uruchomienia są tym
+wyliczeniem.
+\end{trapbox}
 
 \mermaidfig{p31-bias-is-not-signal}{Skąd bierze się estymat wtykowy}{sygnał czy próba}
 \end{fr}
@@ -558,7 +606,7 @@ wejście. Zapisz to jako $X \to Y \to Z$.
 Sonda może być czymkolwiek: klasyfikatorem liniowym, siecią głęboką, tablicą
 przeglądową, rzutem monetą ignorującym wejście.
 
-Zgadnij, zanim ramka się odwróci. Czy $I(X; Z)$ może przekroczyć $I(X; Y)$?
+Zgadnij, zanim pójdziesz dalej. Czy $I(X; Z)$ może przekroczyć $I(X; Y)$?
 \dotline
 \nextframe
 \end{fr}
@@ -614,8 +662,9 @@ zawsze ruchem ku sufitowi, a nigdy ruchem sufitu.
 \begin{fr}
 Ta sama nierówność ma drugi koniec i to jego nikt nie cytuje.
 
-Wróć do $\val{p31.dpi.channels}$ wyliczonych sond. Najlepsza z nich to
-konkretna liczba i nie jest nią $\val{p31.dpi.ixy}$.
+Wróć do $\val{p31.dpi.channels}$ wyliczonych kanałów \dash{} każdej sondy
+w tej rodzinie. Najlepszy z nich to konkretna liczba i nie jest nią
+$\val{p31.dpi.ixy}$.
 
 Sięga $\val{p31.dpi.best}$ nata. Wobec warstwy niosącej
 $\val{p31.dpi.ixy}$, ile zostawia za sobą najlepsza dostępna sonda w tej
@@ -652,8 +701,10 @@ patrzysz, a odstęp nie jest podawany, bo nie jest mierzony.
 Warto dokładnie powiedzieć, skąd bierze się tu ten odstęp, bo nie jest to
 porażka sond.
 
-Wyliczona wyżej rodzina to każde odwzorowanie z trójwartościowego $Y$ na
-dwuwartościowe $Z$.
+Wyliczona wyżej rodzina to każdy kanał z trójwartościowego $Y$ na
+dwuwartościowe $Z$ na tamtej siatce, a zawiera wszystkie
+$\val{p31.dpi.det}$ odwzorowań, które dokonują wyboru wprost, a nie
+losowo.
 
 Powiedz, co każde takie odwzorowanie musi zrobić i dlaczego to coś kosztuje.
 \dotline
@@ -664,7 +715,10 @@ Powiedz, co każde takie odwzorowanie musi zrobić i dlaczego to coś kosztuje.
 \ans{Musi scalić dwie z trzech wartości, a cokolwiek scali, część tego, co
 je rozróżniało, przepada}
 
-Najlepszy wybór traci najmniej; żaden wybór nie traci niczego.
+Najlepszy wybór traci najmniej; żaden wybór nie traci niczego. Nie jest to
+też argument o samej ósemce: najlepszy ze wszystkich
+$\val{p31.dpi.channels}$ wyliczonych kanałów okazuje się być jednym z nich,
+więc losowanie wyboru nie odkupuje tego, co kosztowało scalenie.
 
 Sonda o wyjściu mniejszym niż wejście jest dokładnie w tej sytuacji, a to
 opisuje każdą sondę, jaką ktokolwiek trenuje.
@@ -675,8 +729,10 @@ opisuje każdą sondę, jaką ktokolwiek trenuje.
 Nierówność rozstrzyga też pytanie o warstwy, i to akurat w stronę, której
 ludzie się nie spodziewają.
 
-Sieć liczy warstwę $k+1$ z warstwy $k$. Zatem
-$X \to \text{warstwa } k \to \text{warstwa } k+1$, i nierówność stosuje się:
+Sieć liczy każdą warstwę z warstw wcześniejszych i z niczego więcej, więc
+$X \to (\text{wszystko przed warstwą } k+1) \to \text{warstwa } k+1$
+i nierówność stosuje się \dash{} przez połączenie rezydualne tak samo jak
+przez zwykły łańcuch:
 \textbf{informacja o wejściu może z głębokością tylko spadać, nigdy rosnąć.}
 
 Brzmi to, jakby przeczyło wszystkiemu, co się mówi o głębszych warstwach
@@ -734,8 +790,9 @@ Zatrzymaj się na chwilę i wypisz, o co byś poprosił, zanim pójdziesz dalej.
   Sekcja~4: obciążenie rośnie z komórkami i maleje z pozycjami.
 \item \textbf{Rozmiar próby wobec tej liczby}, jako pozycje na komórkę.
 \item \textbf{Podłoga z przetasowanych etykiet}: ten sam potok puszczony na
-  etykietach bez związku z wejściem. Cokolwiek zwróci, jest obciążeniem, a
-  twierdzeniem jest tylko to, co siedzi ponad nim.
+  etykietach bez związku z wejściem, wiele razy, i to, gdzie podawany estymat
+  leży wśród tych uruchomień. Jedno z nich jest losowaniem z szerokiego
+  rozkładu, a nie samą podłogą.
 \item \textbf{Jaka była pojemność sondy}, bo sekcja~5 mówi, że wynik jest
   ograniczeniem od dołu, a większa sonda podnosi go, nie ruszając warstwy.
 \item \textbf{Co jest z czym porównywane.} Sam wynik jest nieinterpretowalny;
@@ -745,7 +802,8 @@ Zatrzymaj się na chwilę i wypisz, o co byś poprosił, zanim pójdziesz dalej.
 \end{ansblock}
 
 Żadna z tych pięciu nie jest trudna. Trzecia rozstrzygnęłaby większość
-sporów i kosztuje jedno dodatkowe uruchomienie.
+sporów i nie kosztuje nic poza mocą obliczeniową na ponowne puszczenie
+potoku.
 \end{fr}
 
 \begin{fr}
@@ -792,16 +850,19 @@ nieuzasadnionym, a stwierdzane jest tu tylko to drugie.
   $\val{p31.big.need}$ pozycji}}, żeby obciążenie zeszło poniżej jednego
   procenta maksimum $\val{p31.big.max}$ nata \dash{} około
   $\val{p31.big.per}$ na komórkę.}
-\sumitem{24--25}{\textbf{\result{Sprawdzianem, który to rozstrzyga, jest jedno
-  dodatkowe uruchomienie}}: przetasuj etykiety, puść cały potok jeszcze raz i
-  podaj tylko to, co siedzi ponad tym, co zwróci.}
-\sumitem{26--27}{\result{\textbf{Przetwarzanie nie tworzy informacji}: jeśli
+\sumitem{24--26}{\textbf{\result{Sprawdzianem jest uruchomienie na
+  przetasowanych etykietach, a jedno z nich jest losowaniem, a nie podłogą}}:
+  jego rozrzut $\val{p31.null.sd10}$ nata przewyższa własną średnią
+  $\val{p31.bias.n10}$ przy $N = 10$, więc tasuj wiele razy i odczytaj, gdzie
+  wśród nich leży zaobserwowany estymat.}
+\sumitem{27--28}{\result{\textbf{Przetwarzanie nie tworzy informacji}: jeśli
   $X \to Y \to Z$, to $I(X; Z) \le I(X; Y)$}, sprawdzone wobec wszystkich
   $\val{p31.dpi.channels}$ kanałów w rodzinie.}
-\sumitem{28--33}{\textbf{\result{Wynik sondy jest więc ograniczeniem od dołu}}, a
-  najlepsza sonda w tej rodzinie i tak zostawia za sobą więcej niż jedną
-  czwartą. Lepsza sonda nie mówi nic o warstwie, i gorsza też nie.}
-\sumitem{35--38}{\textbf{Nic tutaj nie zostało zmierzone na prawdziwym
+\sumitem{29--34}{\textbf{\result{Wynik sondy jest więc ograniczeniem od
+  dołu}}, a najlepsza sonda w tej rodzinie i tak zostawia za sobą więcej
+  niż jedną czwartą. Lepsza sonda nie mówi nic o warstwie, i gorsza też
+  nie.}
+\sumitem{36--39}{\textbf{Nic tutaj nie zostało zmierzone na prawdziwym
   modelu}, a stawiane twierdzenie mówi, że zwykły materiał dowodowy nie
   odróżnia tamtego twierdzenia od jego zaprzeczenia \dash{} a nie, że jest
   ono fałszywe.}
@@ -814,7 +875,9 @@ nieuzasadnionym, a stwierdzane jest tu tylko to drugie.
   Bez liczenia dywergencji powiedz, ile wynosi $I(X; Y)$ i dlaczego.
   \answerto{$H(Y) = \ln 2$ nata. $Y$ jest funkcją $X$, więc
   $H(Y \mid X) = 0$ i $I(X; Y) = H(Y) - 0$. Ten sam argument co dla pary z
-  Programu~\ref{prog:P24}, z dwiema wartościami zamiast trzech.}
+  Programu~\ref{prog:P24}, z $X$ na czterech wartościach zamiast trzech i
+  $Y$ na dwóch, tak jak $W$ \dash{} ale równie prawdopodobnych, i dlatego
+  $H(Y)$ to $\ln 2$ tam, gdzie $H(W)$ było $\val{p31.zw.mi}$.}
 \item Dwie wielkości mają $I(X; Y) = 0$. Ktoś wnioskuje, że ich korelacja
   wynosi zero. Ma rację i czy odwrotność też jest bezpieczna?
   \answerto{Ma rację, a odwrotność nie jest. $I = 0$ to niezależność, która
@@ -827,7 +890,8 @@ nieuzasadnionym, a stwierdzane jest tu tylko to drugie.
   $\val{p31.bias.n50}$ a $\val{p31.bias.n100}$ nata, więc mniej więcej piąta
   część $\num{0.05}$ jest tym, co estymator zwraca na niczym \dash{} a
   wartość oczekiwana nie jest sufitem, więc ogon tego rozkładu sięga jeszcze
-  wyżej. Przetasuj etykiety, puść jeszcze raz i podaj różnicę.}
+  wyżej. Przetasuj etykiety i puść jeszcze raz wiele razy, a potem podaj,
+  gdzie $\num{0.05}$ leży wśród tego, co te uruchomienia zwrócą.}
 \item Kolega podaje, że sonda na warstwie 20 punktuje wyżej niż ta sama
   sonda na warstwie 4, i wnioskuje, że warstwa 20 niesie więcej informacji o
   wejściu. Co jest złego w tym wniosku?
@@ -864,11 +928,14 @@ nieuzasadnionym, a stwierdzane jest tu tylko to drugie.
   informację wzajemną wobec $\val{p31.big.k}$-wartościowej etykiety. Ktoś
   proponuje podwoić liczbę kubełków, żeby \enquote{rozdzielić więcej
   struktury}. Co to robi z potrzebnym rozmiarem próby?
-  \answerto{Komórek robi się czterokrotnie więcej, więc obciążenie przy
-  ustalonej próbie rośnie mniej więcej czterokrotnie, a pozycje potrzebne do
-  utrzymania obciążenia rosną też mniej więcej czterokrotnie \dash{} z
-  $\val{p31.big.need}$ do jakichś szesnastu tysięcy. Drobniejsze biny kupują
-  rozdzielczość i płacą za nią pozycjami, a zapłata zwykle nie jest wnoszona.}
+  \answerto{Rusza się tylko jedna oś: etykieta nadal jest
+  $\val{p31.big.k}$-wartościowa, więc komórek robi się z
+  $\val{p31.big.cells}$ \dash{} $\val{p31.big.cells.finer}$, a $(a-1)(b-1)$
+  z $\val{p31.big.ab}$ \dash{} $\val{p31.big.ab.finer}$. Pozycje potrzebne
+  do utrzymania obciążenia na jednym procencie maksimum rosną z
+  $\val{p31.big.need}$ do $\val{p31.big.need.finer}$ \dash{} mniej więcej
+  dwukrotnie, a nie czterokrotnie. Drobniejsze biny kupują rozdzielczość i
+  płacą za nią pozycjami, a zapłata zwykle nie jest wnoszona.}
 \item Nierówność o przetwarzaniu danych mówi $I(X; Z) \le I(X; Y)$, gdy
   $X \to Y \to Z$. Podaj $Z$, dla którego zachodzi ona z równością.
   \answerto{Dowolna odwracalna funkcja $Y$ \dash{} choćby przenumerowanie
