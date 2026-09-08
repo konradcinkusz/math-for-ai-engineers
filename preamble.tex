@@ -2905,6 +2905,32 @@
 % So the only lever on a balanced column that is a hair too tall is real
 % shrink inside it, which is the \parskip above. That is the whole of it.
 
+% ---- Index cross-references -------------------------------------------
+%
+% \see and \seealso are what makeindex writes for an \index{...|see{...}}
+% mark, and a see-reference is the only device an index has for carrying a
+% reader from the word they brought to the word the book uses. This index had
+% none of either until the entries for SVD, PCA and KL were added.
+%
+% \providecommand FIRST and \renewcommand SECOND, deliberately, and the pair
+% is not a belt-and-braces habit. imakeidx may or may not supply \see on a
+% given installation, and where it does it builds the word out of babel's
+% \seename -- which this preamble has only when its babel probe found the
+% language file, so on a bare installation that branch is an undefined control
+% sequence. The pair below is the one form that gives the same macro
+% everywhere: provide it so the \renewcommand cannot fail on a machine that
+% has no \see, then take it over on a machine that has.
+%
+% Both take TWO arguments. The second is the page number makeindex passes
+% through the encapsulation, and a see-reference discards it; declare only one
+% and that page number sets after the target, which is what a stray folio
+% beside a cross-reference is. The word itself is user-visible and lives in
+% lang/<lang>.tex, like every other such string.
+\providecommand*\see[2]{}
+\renewcommand*\see[2]{\emph{\lblIndexSee} #1}
+\providecommand*\seealso[2]{}
+\renewcommand*\seealso[2]{\emph{\lblIndexSeeAlso} #1}
+
 \makeindex
 
 % ============================================================

@@ -1,4 +1,4 @@
-.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 scripts terms parts \
+.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 scripts terms parts index \
         text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames elicit outcomes values translate shots debt
 
@@ -42,6 +42,7 @@ check:
 	@python3 tools/check_structure.py --results
 	@python3 tools/check_structure.py --terms
 	@python3 tools/check_structure.py --parts
+	@python3 tools/check_structure.py --index
 	@python3 tools/checklog.py main-en.log main-pl.log
 	@python3 tools/checkpdf.py main-en.pdf main-pl.pdf
 	@python3 tools/parity.py | tail -n 3
@@ -286,6 +287,16 @@ terms:
 parts:
 	@python3 tools/check_structure.py --parts
 
+# 5c. An index entry that names something the page never prints. The index is
+#     the one artefact whose coordinates rest entirely on where an \index{}
+#     mark happens to sit, and nothing looked at it until a review found
+#     \index{optimiser!AdamW} against a program that deliberately never writes
+#     the word. Narrow on purpose: most index leaves here are DESCRIPTIONS
+#     rather than terms, so asserting the leaf occurs in the prose reports
+#     most of the book. A NAME is the decidable half and it is clean.
+index:
+	@python3 tools/check_structure.py --index
+
 # 6. The two editions out of step. tools/parity.py is the single parity tool;
 #    it compares an ORDERED structural signature rather than counts, because a
 #    histogram cannot see \yourturn moving from frame 2 to frame 3, and every
@@ -315,6 +326,7 @@ debt:
 	@echo; echo "== Appendix C coordinates =="   ; $(MAKE) -s results
 	@echo; echo "== Appendix D terminology =="   ; $(MAKE) -s terms
 	@echo; echo "== The introduction's map =="    ; $(MAKE) -s parts
+	@echo; echo "== The index's own names =="     ; $(MAKE) -s index
 	@echo; echo "== Polish/English parity =="     ; $(MAKE) -s translate
 	@echo; echo "== Unverified claims, diagrams ="; $(MAKE) -s shots
 	@echo

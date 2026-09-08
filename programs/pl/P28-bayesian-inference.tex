@@ -145,8 +145,9 @@ postaci zamkniętej. Zanim pójdziesz dalej: czego byś od niego oczekiwał?
 algebry.
 \end{ansblock}
 
-Ta własność ma nazwę, \textbf{sprzężoność}, a dla współczynnika obserwowanego
-przez sukcesy i porażki rodziną, która ją ma, jest \textbf{Beta}:
+Ta własność ma nazwę, \textbf{sprzężoność}\index{sprzężoność}, a dla
+współczynnika obserwowanego przez sukcesy i porażki rodziną, która ją ma,
+jest \textbf{Beta}:
 
 \[ p(\theta) \;\propto\; \theta^{a-1}\,(1-\theta)^{b-1},
    \qquad 0 \le \theta \le 1 \]
@@ -183,7 +184,6 @@ zwykle przypadku, w którym znaczenia nie ma.
 
 \section{Aktualizacja dodaje zliczenia}
 \label{sec:P28-conjugacy}
-\index{sprzężoność}
 \index{prior!ile jest wart w obserwacjach}
 
 \begin{fr}
@@ -610,7 +610,6 @@ ujęciach, bo zgodność i tak nie niesie żadnej informacji o różnicy.
 
 \section{Kierowanie ruchu przy niepewności}
 \label{sec:P28-routing}
-\index{wnioskowanie!próbkowanie Thompsona}
 
 \begin{fr}
 Sekcja 4 wyprodukowała liczbę i zatrzymała się. Załóżmy, że zamiast zatrzymać
@@ -638,7 +637,7 @@ liczba
 z ramki 26, a nie sparowane $\val{p28.p.better.pct}$, którymi prowadzi
 sekcja. Kierowanie ruchu to pytanie o jeden model wobec drugiego, więc
 odpowiadają na nie rozkłady a posteriori każdego z nich. Reguła ma nazwę:
-\emph{próbkowanie Thompsona}.
+\emph{próbkowanie Thompsona}\index{wnioskowanie!próbkowanie Thompsona}.
 
 Reguła nie potrzebuje więc eksperymentu, by ją opisać, ani parametru, by ją
 ustawić. \textbf{Eksploruje dokładnie proporcjonalnie do tego, jak
@@ -701,7 +700,6 @@ krzywa ucieka spod niego.
 
 \section{Deklarowane prawdopodobieństwo modelu sędziego}
 \label{sec:P28-judge}
-\index{wnioskowanie!kalibracja}
 
 \begin{fr}
 Model sędzia ocenia kandydujące odpowiedzi i podaje przy każdej swoją pewność.
@@ -802,7 +800,8 @@ rozkład a posteriori na współczynnik}
 $\val{p28.bucket.right}$ z $\val{p28.bucket.n}$, prior jednostajny, a przedział
 wiarygodności biegnie od $\val{p28.bucket.lo}$ do $\val{p28.bucket.hi}$
 procent. \textbf{Deklarowane $\val{p28.judge.says.pct}$ leży poza nim}, więc
-rozkalibrowanie jest zmierzone, a nie podejrzewane, a szerokość mówi, jak
+rozkalibrowanie\index{wnioskowanie!kalibracja} jest zmierzone, a nie
+podejrzewane, a szerokość mówi, jak
 pewny jest pomiar.
 
 To maszyneria z sekcji 3 nałożona na jedyną liczbę w potoku, której nikt nie
