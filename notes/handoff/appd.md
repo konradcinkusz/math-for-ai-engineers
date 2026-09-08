@@ -157,9 +157,16 @@ is found, the sentence has to move with it.
 *szerokość znaczącej liczby zmiennoprzecinkowej* — "the width of the significant
 floating-point number". The book's Polish word is *mantysa*, forty times in
 `P01-floating-point.tex`, where the English writes *significand* forty-seven
-times. Corrected, and the divergence earned a row of its own: it is a term the
-book uses constantly and renders differently in the two editions, which is
-exactly what this glossary is for.
+times. Corrected, and the divergence earned a row of its own — and the row is
+the best-evidenced one in the table, because **the two editions carry notation
+boxes on this word that reach opposite conclusions from the same argument**.
+`P01` English is headed *"Significand, not mantissa"*: the standard reserves
+*mantissa* for the fractional part of a logarithm, so the English edition
+avoids it. `P01` Polish is headed *"Mantysa, i uwaga na drugie znaczenie"* and
+says *w praktyce po polsku obu rzeczom mówi się mantysa*, so the Polish edition
+uses it. My first draft of the row said only that "each is in real use in its
+own language" — the outcome without the reasoning, which is the defect this
+pass opened by fixing in §D.4. Rewritten to carry the argument.
 
 ## Values
 
