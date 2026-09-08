@@ -14,6 +14,8 @@ can be trusted to remember:
   --values    Is every \\val{} reference backed by a computed value, and is
               every computed value used?
   --scripts   Does every \\transcript{} name a file that exists?
+  --results   Does every \\result{} mark for Appendix C sit inside the
+              Summary item whose frame range it prints?
   --terms     Does every Polish rendering Appendix D names actually occur
               in the prose of programs/pl?
 
@@ -393,6 +395,191 @@ def check_scripts(soft: bool) -> int:
 
 
 # ---------------------------------------------------------------------------
+# --results: Appendix C's coordinates, which cannot be wrong ONLY IF the mark
+# sits where it can pick one up.
+#
+# The whole design of that appendix is that nothing in it is transcribed:
+# \result{...} marks a span of a Summary item, and the program key and frame
+# range it stores are the ones LaTeX is on when it reads the mark. Appendix B
+# was hand-authored, shipped four false pointers, and cost two separate passes
+# to find them by reading; Appendix C is built so that class cannot arise.
+#
+# The range does not come from the mark. It comes from \sumitem, which stashes
+# it in \mfa@sumfr for the mark to pick up -- so a \result written ANYWHERE
+# ELSE silently inherits whichever Summary item was read last, or, in a program
+# whose Summary has not been reached, the \providecommand fallback, and prints
+# `[?]`. Either way the appendix carries a coordinate the mark never earned,
+# which is exactly the defect it exists to make impossible.
+#
+# NOTHING ELSE SEES IT, and that was measured rather than assumed: a probe
+# \result placed outside every Summary item, in BOTH editions, left parity,
+# --frames, --answers, --outcomes, --values, --scripts and gen_stubs --check
+# all green. It has to be both editions to be interesting -- C14 counts every
+# macro generically, so a mark added to one edition alone already fails -- and
+# an edit made in both is the recorded shape of the defect this repository
+# keeps being bitten by: a check that is wrong in the same way in both editions
+# stays green and only the ledger lies.
+#
+# Two smaller faults ride along on the same parse, because both cost one line
+# and neither is visible anywhere else. A mark nested inside another mark
+# stores its text twice, so the appendix prints the inner formula on its own
+# line and again inside the outer one. And an empty mark prints a bullet, no
+# formula and a coordinate, which reads as damage.
+RE_RESULT = re.compile(r"\\result\{")
+RE_SUMITEM = re.compile(r"\\sumitem\{")
+
+
+def _blank_comments(s: str) -> str:
+    """TeX comments out, offsets preserved.
+
+    The line numbers this check reports have to name the line in the file, so
+    the comment is replaced by spaces of its own length rather than removed.
+    """
+    return re.sub(r"(?<!\\)%[^\n]*", lambda m: " " * len(m.group(0)), s)
+
+
+def _group_end(s: str, open_brace: int) -> int | None:
+    """Index one past the `}` matching the `{` at open_brace, or None."""
+    depth = 0
+    i = open_brace
+    while i < len(s):
+        c = s[i]
+        if c == "\\":            # \{ and \} are literal braces, not grouping
+            i += 2
+            continue
+        if c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    return None
+
+
+def _second_arg_spans(text: str, opener: re.Pattern) -> list[tuple[int, int]]:
+    """The body (second argument) of every \\sumitem{range}{body} in text."""
+    out = []
+    for m in opener.finditer(text):
+        first = _group_end(text, m.end() - 1)
+        if first is None:
+            continue
+        j = first
+        while j < len(text) and text[j] in " \n\t":
+            j += 1
+        if j < len(text) and text[j] == "{":
+            second = _group_end(text, j)
+            if second is not None:
+                out.append((j, second))
+    return out
+
+
+def check_results(soft: bool) -> int:
+    bad = 0
+    marked = 0
+    items = 0
+    for lang in LANGS:
+        for f in program_files(lang):
+            raw = f.read_text(encoding="utf8")
+            text = _blank_comments(raw)
+            bodies = _second_arg_spans(text, RE_SUMITEM)
+            items += len(bodies)
+            marks = []
+            for m in RE_RESULT.finditer(text):
+                end = _group_end(text, m.end() - 1)
+                if end is None:
+                    continue
+                marks.append((m.start(), m.end(), end))
+            for start, body_open, end in marks:
+                marked += 1
+                where = f"{f.relative_to(ROOT)}:{text[:start].count(chr(10)) + 1}"
+                if not any(a <= start < b for a, b in bodies):
+                    print(f"  {where}: \\result outside every \\sumitem body. "
+                          f"The frame range comes from \\sumitem, so this mark "
+                          f"would print whichever range was read last.")
+                    bad += 1
+                if any(o < start and end <= e for o, _, e in marks
+                       if (o, e) != (start, end)):
+                    print(f"  {where}: \\result nested inside another one; "
+                          f"Appendix C would print its text twice.")
+                    bad += 1
+                if not text[body_open:end - 1].strip():
+                    print(f"  {where}: empty \\result{{}} -- a bullet and a "
+                          f"coordinate with no formula between them.")
+                    bad += 1
+    if bad == 0:
+        print(f"  {marked // len(LANGS)} results marked for Appendix C in each "
+              f"edition, every one inside the Summary item whose frame range "
+              f"it prints ({items // len(LANGS)} Summary items in all; an item "
+              f"that is a caveat rather than a result is deliberately unmarked).")
+    _report_contract_bypass()
+    return 0 if (bad == 0 or soft) else 1
+
+
+# The second half, and it is REPORTED rather than fatal.
+#
+# Appendix C is the one place in the book where the notation contract has to
+# hold exactly: it is entered by somebody looking a formula up, with none of
+# the section around it, so a spelling that disagrees with Appendix B there is
+# worse than no reference at all.
+#
+# The contract is implemented as macros in lang/{en,pl}.tex so the SOURCE is
+# identical and only the output differs -- \gcdop sets `gcd` in English and
+# `NWD` in Polish, \spanof sets `span` and `lin`. Writing \operatorname{gcd}
+# instead sets `gcd` in both, which is a one-edition divergence that no parity
+# check can see, because both editions carry the same wrong token.
+#
+# C10 forbids exactly one of these spellings, \operatorname{lcm}. The contract
+# owns ten operators. So the list here is READ OUT OF lang/en.tex rather than
+# typed, and an operator added to the contract is covered the day it is added.
+#
+# It does not fail the build, on the treatment this book gives every ledger
+# nobody can responsibly clear in the pass that finds it: the sites it names
+# are in a merged program, the fix is a substitution that changes no glyph
+# today, and a gate that is red on somebody else's file teaches the next person
+# to stop reading the output. Printed on every run instead. When the count goes
+# up, that is the signal.
+RE_DECLARE_OP = re.compile(r"\\DeclareMathOperator\{\\(\w+)\}\{([^{}]*)\}")
+
+
+def _contract_operators() -> dict[str, str]:
+    """{raw spelling -> the macro that owns it}, read from the contract."""
+    text = (ROOT / "lang" / "en.tex").read_text(encoding="utf8")
+    out: dict[str, str] = {}
+    for macro, setting in RE_DECLARE_OP.findall(text):
+        for wrapper in ("operatorname", "mathrm", "text"):
+            out[f"\\{wrapper}{{{setting}}}"] = f"\\{macro}"
+    return out
+
+
+def _report_contract_bypass() -> None:
+    ops = _contract_operators()
+    hits: list[tuple[str, str, str]] = []
+    for lang in LANGS:
+        for f in program_files(lang):
+            text = _blank_comments(f.read_text(encoding="utf8"))
+            for mo in RE_RESULT.finditer(text):
+                end = _group_end(text, mo.end() - 1)
+                if end is None:
+                    continue
+                span = text[mo.end():end - 1]
+                for raw, macro in ops.items():
+                    if raw in span:
+                        line = text[:mo.start()].count(chr(10)) + 1
+                        hits.append((f"{f.relative_to(ROOT)}:{line}", raw, macro))
+    if not hits:
+        print("  Every marked span spells the contract's operators through "
+              "their macros.")
+        return
+    print(f"  {len(hits)} marked spans hard-code an operator the notation "
+          f"contract owns a macro for. Both editions carry the same token, so "
+          f"no parity check can see it, and Appendix C replays it verbatim:")
+    for where, raw, macro in hits:
+        print(f"    {where}: {raw} -- use {macro}")
+    print("  Reported, never fatal.")
+
+
+# ---------------------------------------------------------------------------
 # --terms: Appendix D is a claim about the body on every line.
 #
 # A glossary row naming a word the book does not use is the failure that
@@ -518,6 +705,7 @@ def main() -> int:
     p.add_argument("--values", action="store_true")
     p.add_argument("--elicit", action="store_true")
     p.add_argument("--scripts", action="store_true")
+    p.add_argument("--results", action="store_true")
     p.add_argument("--terms", action="store_true")
     p.add_argument("--parts", action="store_true")
     p.add_argument("--all", action="store_true")
@@ -525,7 +713,7 @@ def main() -> int:
                    help="report but always exit 0 (the default for a draft)")
     a = p.parse_args()
     if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit,
-                a.scripts, a.terms, a.parts, a.all)):
+                a.scripts, a.results, a.terms, a.parts, a.all)):
         a.all = True
     rc = 0
     if a.all or a.frames:
@@ -540,6 +728,8 @@ def main() -> int:
         rc |= check_elicitation(a.soft)
     if a.all or a.scripts:
         rc |= check_scripts(a.soft)
+    if a.all or a.results:
+        rc |= check_results(a.soft)
     if a.all or a.terms:
         rc |= check_terms(a.soft)
     if a.all or a.parts:
