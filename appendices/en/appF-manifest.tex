@@ -87,8 +87,7 @@ were specified for that purpose. Each row below carries its own status.
 \textbf{No total appears here, and the omission is the point.} A count of how
 many have been run is a claim about this book that nothing derives from
 anything, and it decays silently: the sentence \enquote{none has been run}
-stayed on the page, and in the file the next author reads first, for five
-programs after one had been.
+survived five programs after one had been run.
 
 \medskip
 \textbf{Run, and reported in the program that ran them.}
@@ -98,40 +97,43 @@ programs after one had been.
 \toprule
 \textbf{\#} & \textbf{What it measures} & \textbf{Where} \\
 \midrule
+E3 & The angle between random unit vectors as the dimension climbs, and the
+  concentration towards a right angle & Program~\ref{prog:P05} \\
 E6 & Plain descent, momentum and Adam on a quadratic of known condition
   number; steps to tolerance against the predicted count &
-  \ref{prog:P20} \\
+  Program~\ref{prog:P20} \\
 E8 & Forward against reverse divergence fitted to one bimodal target;
-  mode-covering against mode-seeking & \ref{prog:P30} \\
+  mode-covering against mode-seeking & Program~\ref{prog:P30} \\
 E9 & Score spread and attention entropy with and without the square-root
-  divisor, across head sizes & \ref{prog:P25}, \ref{prog:P32} \\
+  divisor, across head sizes & Programs~\ref{prog:P25}
+  and~\ref{prog:P32} \\
 E10 & A power-law fit on the shape the literature uses, with the fit's own
-  extrapolation error reported & \ref{prog:P33} \\
+  extrapolation error reported & Program~\ref{prog:P33} \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
 \medskip
-\textbf{Measured, but not claimed.} Each of these programs measured something
-that closely resembles the specification beside it, and no pass ever claimed
-the experiment. Whether the specification is met is a reading job on a written
-program, and it is not an inference to draw from a table \dash{} which is why
-the table says this rather than saying \enquote{run}.
+\textbf{Half run.} One specification has one clause met and the other not,
+and the distinction is worth keeping rather than rounding to either side.
+Whether a specification is met is a judgement about a program, not something
+a table can settle.
 
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}lXl@{}}
 \toprule
 \textbf{\#} & \textbf{What it specifies} & \textbf{Where} \\
 \midrule
-E1 & The score at which a naive $\softmax$ overflows each format, and what a
-  non-maximal pivot costs & \ref{prog:P02} \\
-E3 & The angle between random unit vectors as the dimension climbs, and the
-  concentration towards a right angle & \ref{prog:P05} \\
-E5 & Forward against reverse mode: time and peak memory against depth, and
-  the measured cost of checkpointing & \ref{prog:P16} \\
+E1 & The score at which a naive $\softmax$ overflows each format, and the
+  error of the naive computation against the stabilised one as the scores
+  grow & Program~\ref{prog:P02} \\
 \bottomrule
 \end{tabularx}
 \end{center}
+
+Program~\ref{prog:P02} gives the score at which each of the four formats
+overflows, which is the first clause exactly. It does not sweep the magnitude
+and set the naive computation against the stabilised one, which is the second.
 
 \medskip
 \textbf{Not run.}
@@ -139,19 +141,27 @@ E5 & Forward against reverse mode: time and peak memory against depth, and
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}lXl@{}}
 \toprule
-\textbf{\#} & \textbf{What it would settle} & \textbf{Where} \\
+\textbf{\#} & \textbf{What it would settle} & \textbf{Where it would go} \\
 \midrule
 E2 & Hand-counted operations and bytes for one forward pass against a
   measured wall clock; where the model is wrong and by how much &
-  \ref{prog:P03} \\
+  Program~\ref{prog:P03} \\
 E4 & The singular-value spectrum of a real embedding matrix, and
   reconstruction error against rank \dash{} this one needs a trained model &
-  \ref{prog:P11} \\
+  Program~\ref{prog:P11} \\
+E5 & Forward against reverse mode: time and peak memory against depth, and
+  the measured cost of checkpointing & Program~\ref{prog:P16} \\
 E7 & Interval width against evaluation-set size on a public benchmark; the
-  size needed to resolve one point & \ref{prog:P27} \\
+  size needed to resolve one point & Program~\ref{prog:P27} \\
 \bottomrule
 \end{tabularx}
 \end{center}
+
+E5 is the one worth a sentence, because a program did measure something
+next to it. Program~\ref{prog:P16} counted operations exactly and derived
+the checkpointing peak from the arithmetic, deliberately and with its
+reasons given there. A wall clock and a peak-memory figure are a different
+instrument, and they are what this specification asks for.
 
 \section{What the build counts}
 \label{sec:F-ledgers}
@@ -172,22 +182,29 @@ Computed values, every one referenced and present & $\val{appf.values}$ \\
 Console transcripts, every one produced by a script &
   $\val{appf.transcripts}$ \\
 Diagrams & $\val{appf.diagrams}$ \\
-Claims marked as unverified & $\val{appf.verifybox}$ \\
-Frames that put a question to you &
-  $\val{appf.elicit}$, or $\val{appf.elicit.pct}$ per cent \\
-Polish renderings named in Appendix~\ref{app:D} & $\val{appf.terms.rend}$
-  in $\val{appf.terms.rows}$ rows \\
+Boxes headed \enquote{\lblVerify} & $\val{appf.verifybox}$ \\
+Frames that put a question to you & $\val{appf.elicit}$ \\
+Polish renderings named in Appendix~\ref{app:D}, in
+  $\val{appf.terms.rows}$ rows & $\val{appf.terms.rend}$ \\
 Part ranges in the introduction, against the manifest & $\val{appf.parts}$ \\
 \bottomrule
 \end{tabularx}
 \end{center}
 
 \medskip
-Two of those describe one edition where the build's own ledger describes both,
-and the difference is a factor of two rather than a disagreement: there are
-$\val{appf.transcripts.both}$ transcripts across the two editions and
-$\val{appf.diagrams.both}$ diagrams, because each is produced separately in
-each language. Quote whichever you mean and say which it is.
+Three of those describe one edition where the build's own ledger describes
+both, and in each the difference is a factor of two rather than a
+disagreement: there are $\val{appf.transcripts.both}$ transcripts across the
+two editions and $\val{appf.diagrams.both}$ diagrams, and the Polish
+renderings likewise number twice $\val{appf.terms.rend}$, because each
+edition carries its own. Quote whichever you mean and say which it is.
+
+\medskip
+The two frame counts do not describe a shortfall. The planned figure is the
+sum of estimates made program by program, and each was made before its
+neighbours existed: a program whose neighbour has already taught something
+arrives with less left to do, so the estimates ran high. Every program in
+this book is written.
 
 \medskip
 Three more are checked on the finished page rather than in the source, and
@@ -210,9 +227,8 @@ cent of readers reaching eighty per cent of the objectives \dash{} before its
 own publication. That is a fact about the method and it is not transferable.
 Nobody has been trialled on \emph{this} book. Until somebody has, the ledger
 stays open, and the instrument when it happens is the scored Test exercises
-rather than the Quiz: the Quiz runs on the Foundation programs only, and its
-items serve on entry and on exit alike, so a score difference across it
-measures memory of the questions.
+rather than the Quiz: the Quiz's items serve on entry and on exit alike, so a
+score difference across it measures memory of the questions.
 \end{warning}
 
 \medskip
@@ -220,14 +236,16 @@ Three other things are owed, and they are worth naming individually because
 each is a different kind of debt.
 
 \medskip
-\textbf{The measurements that need a trained model.} Four claims in this book
-are stated as mechanism and labelled as judgement rather than measured,
-because settling them needs weights this book does not ship and does not
-download: whether a real embedding matrix's spectrum falls the way low-rank
-methods assume; whether the rank of a deep attention stack falls without any
-narrow layer to force it; whether the basin a training walk lands in matters
-at the scale people train at; and whether the independence the square-root
-divisor assumes survives training. Each is marked where it appears.
+\textbf{The measurements that need a trained model.} These claims are stated
+as mechanism and labelled as judgement rather than measured, because settling
+them needs weights this book does not ship and does not download: whether a
+real embedding matrix's spectrum falls the way low-rank methods assume;
+whether the rank of a deep attention stack falls without any narrow layer to
+force it; whether the basin a training walk lands in matters at the scale
+people train at; whether the independence the square-root divisor assumes
+survives training; and whether an adaptive optimiser reaches a better answer
+than momentum on a real surface. Each is marked where it appears, and no
+count of them is given here for the reason the experiment table gives.
 
 \medskip
 \textbf{The rate at which this book asks you questions is not even.} It runs
