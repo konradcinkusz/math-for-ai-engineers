@@ -118,6 +118,15 @@ jobs:
       - name: The introduction's map matches the manifest
         run: python3 tools/check_structure.py --parts
 
+      # An index entry naming something the body never prints. Nothing looked
+      # at the index until a review of it found \index{optimiser!AdamW}
+      # against a program that deliberately declines to name the algorithm --
+      # so the index asserted, by its existence, that the book discusses
+      # AdamW under that name. Restricted to NAMES, because most index leaves
+      # here are descriptions and a check over those reports most of the book.
+      - name: No index entry names a word the body never prints
+        run: python3 tools/check_structure.py --index
+
   diagrams:
     name: Render diagrams
     runs-on: ubuntu-latest
