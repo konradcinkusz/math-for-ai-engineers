@@ -235,6 +235,33 @@ entries re-filed, and a decision about which of two descriptions a reader will
 use — and a half-retirement is worse than either state. Whoever takes it has
 the four pairs above already.
 
+### The wider misplaced-mark class has no instrument here, and I built an inert one
+
+The eight instances the review cites are fixed. **The class is wider and I am
+not claiming it is clear**, because the distance that matters is a distance in
+*pages* and pages need a build.
+
+Recorded so the next person does not build what I built. I wrote a second
+audit for the checkable-looking subclass — a mark on a `\section` opener whose
+leaf's key word is printed nowhere in its own section — and it returned
+**zero flagged out of 442 opener marks**. That looked like the class being
+clear. Run against the parent commit as a known-answer test, it returns
+**zero out of 458**: it would have missed every one of the eight defects the
+review found.
+
+The reason is the defect itself. The mark sits at the *top* of a section that
+does name the term, several pages down, so a window that runs to the next
+`\section` always contains it. **An instrument that accepted the input and
+returned a plausible answer** — and the plausible answer was the one I wanted.
+A narrower window is not the fix either: a section is not a page, and how many
+pages a section spans is the thing only a build knows.
+
+The real instrument is the one the review specifies and it needs a real
+`.ind`: for every entry whose leaf is a term, assert the term occurs on the
+page the `.ind` assigns it. It is worth building on a machine that can compile.
+Note before starting that the leaf-is-a-term precondition is the hard part —
+see the measurement under the checker above.
+
 ### Minor — twelve entries with two page numbers in one hyperlink
 
 **Not verifiable here and the review's stated cause is refuted.** It proposes
@@ -339,9 +366,34 @@ gen_stubs.py --check     47 programs, 2418 planned frames; current
 make numbers && verify   All computed output is current
 ```
 
-`figures/values/appf.tex` is untouched and `code/appf_ledgers.py` was not run —
-that is the sync session's. **No value was emitted or retired in this pass**, so
-the value ledger has not moved on my account.
+**No value was emitted or retired in this pass**, so the value ledger has not
+moved on my account: `make numbers` produces no drift on the merged tree and
+`figures/values/appf.tex` is byte-identical to what main already carries.
+
+**But `make numbers` runs `code/appf_ledgers.py`, and the brief says not to.**
+`VAL_SRC := $(wildcard code/*.py)` and the ledger script lives in `code/`, so
+the two instructions in the brief — run `make numbers && make verify`, and do
+not run `appf_ledgers.py` — cannot both be obeyed. That is worth knowing before
+the next parallel batch: what the brief means is *do not commit a regenerated
+`appf.tex`*, and on a branch that emits no value there is nothing to commit
+anyway.
+
+**And the ledger's redness costs more than a stale number.** The first CI run on
+this branch failed the *Recompute every number* job, on `appf.values` 1674
+against a computed 1677 that was **not mine** — it was inherited, because a
+`pull_request` run checks out the branch merged with the *current* base, and
+main at that moment carried P34's three new values against a ledger P34
+deliberately left for the sync session. That job runs first and gates the four
+compile jobs, so **the four PDFs never built at all**, and this pass's one
+genuinely unverifiable change — the `\see` machinery, on a container with no
+TeX — got no verification from the one machine that could give it. Merging
+current main was the fix and it needed no edit: main had since been
+regenerated, and `make numbers` came back clean.
+
+The general shape, for whoever writes the next brief: **a ledger that is
+somebody else's to regenerate cannot also be a hard gate that runs first**,
+because its redness hides every page-level job behind it from every branch,
+not only from the branch that made it stale.
 
 The prose detector reports three JOIN candidates and zero long lines:
 `seealso` and `seename` in `preamble.tex` and `seealso` in `P15-gradient.tex`,
