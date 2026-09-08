@@ -39,6 +39,7 @@ all-formats: numbers diagrams en pl en-a4 pl-a4 check check-a4
 check:
 	@python3 tools/gen_stubs.py --check
 	@python3 tools/check_structure.py --scripts
+	@python3 tools/check_structure.py --results
 	@python3 tools/check_structure.py --terms
 	@python3 tools/check_structure.py --parts
 	@python3 tools/check_structure.py --index
@@ -251,7 +252,20 @@ values:
 scripts:
 	@python3 tools/check_structure.py --scripts
 
-# 5b. Appendix D is a claim about the body on every line, and a glossary row
+# 5c. Appendix C's coordinates. Nothing in that appendix is transcribed --
+#     each line is a \result{} mark inside a Summary item, and the frame
+#     range it prints comes from the \sumitem it sits in, not from the
+#     mark. So a mark written anywhere else silently inherits whichever
+#     Summary item was read last, and prints a coordinate it never
+#     earned. Measured: a probe \result outside every Summary item, in
+#     BOTH editions, left parity and every other ledger green -- C14
+#     counts macros generically, so only a one-edition mark already
+#     fails, and a fault identical in both is the shape this repository
+#     keeps being bitten by. See the note above check_results().
+results:
+	@python3 tools/check_structure.py --results
+
+# 5d. Appendix D is a claim about the body on every line, and a glossary row
 #     naming a word the book does not use is the failure that matters. It is
 #     not hypothetical: the suggested table in notes/03 carries rows for
 #     `dropout` and `ground truth`, and neither appears anywhere in either
@@ -262,7 +276,7 @@ scripts:
 terms:
 	@python3 tools/check_structure.py --terms
 
-# 5b. The introduction's own map of the book, against the manifest.
+# 5e. The introduction's own map of the book, against the manifest.
 #     This is the one class the parity checks are structurally blind to:
 #     C4, C8, C12 and C14 all compare the two EDITIONS, so a part range
 #     that is stale in both stays green. Seven of the nine ranges were
@@ -309,6 +323,7 @@ debt:
 	@echo; echo "== Elicitation rate =="          ; $(MAKE) -s elicit
 	@echo; echo "== Computed values =="           ; $(MAKE) -s values
 	@echo; echo "== Transcripts on the page =="   ; $(MAKE) -s scripts
+	@echo; echo "== Appendix C coordinates =="   ; $(MAKE) -s results
 	@echo; echo "== Appendix D terminology =="   ; $(MAKE) -s terms
 	@echo; echo "== The introduction's map =="    ; $(MAKE) -s parts
 	@echo; echo "== The index's own names =="     ; $(MAKE) -s index
