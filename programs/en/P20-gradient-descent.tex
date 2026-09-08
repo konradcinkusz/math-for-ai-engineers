@@ -37,7 +37,7 @@
 \program[From SGD to Adam]{Gradient descent: from SGD to Adam}
 \label{prog:P20}
 \index{optimiser}
-\index{gradient descent}
+\index{gradient descent!as an optimiser}
 
 \begin{outcomes}
 \outcome{1--7}{write the one update every optimiser here is a variant of, and
@@ -665,7 +665,6 @@ least trustworthy.
 \section{Where the penalty enters}
 \label{sec:P20-decay}
 \index{optimiser!weight decay}
-\index{optimiser!AdamW}
 
 \begin{fr}
 Two more repairs, and both are about things that sit \emph{around} the update
@@ -737,7 +736,9 @@ $\lambda$ meeting two curvatures, so the penalty nearly annihilates the
 coordinate with the small gradient \dash{} and it is a property of the penalty
 rather than of the method carrying it.
 
-What belongs to Adam alone is the second row. Decoupled decay never passes
+What belongs to Adam alone is the second row. Decoupled
+decay\index{optimiser!decoupled decay}%
+\index{AdamW|see{optimiser, decoupled decay}} never passes
 through $\sqrt{v}$, so it pulls both coordinates by the same fraction of
 themselves against a step whose size the normaliser has already fixed; at this
 $\lambda$ that leaves both at their data minimum, to better than
