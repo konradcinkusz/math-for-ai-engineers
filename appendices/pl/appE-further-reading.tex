@@ -16,6 +16,27 @@
 % zanim trafiło na stronę -- to dyscyplina wypracowana w passie Dodatku D.
 % Nic tego nie bramkuje; nic nie może.
 %
+%
+% SEKCJA E.5 TO SKOROWIDZ TRAS DLA RAMEK RYGORU i jest bramkowana:
+% tools/check_structure.py --rigour przewraca build, gdy ramka odkłada wynik
+% poza książkę, a żaden wiersz tutaj mu nie odpowiada. Ramka odkładająca
+% WEWNĄTRZ książki cytuje program, do którego odkłada, więc ramka bez
+% \ref{prog:...} jest z konstrukcji skierowana na zewnątrz -- to kryterium jest
+% dokładne, jest stabilne między wydaniami i to je czyta ten test. Czego NIE
+% umie przeczytać, to czy nazwany cel zawiera dowód; pięć wierszy mówi "nie
+% zbadane" właśnie dlatego, że nikt tej lektury nie odbył.
+%
+% WCIĄŻ NIEZAŁATWIONE: nic w książce nie odwołuje się do tego dodatku. Nigdzie
+% w programs/ nie ma \ref{app:E}, więc czytelnik stojący przy ramce rygoru nie
+% ma jak się dowiedzieć, że sekcja E.5 istnieje. Domknięcie tego wymaga edycji
+% każdego odkładającego programu i jest passem samym w sobie.
+%
+% A OŚWIADCZENIE O ZAKRESIE MA DWA ŹRÓDŁA, nie jedno. Dwie pierwsze tabele
+% sekcji E.3 to notes/01-curriculum.md sekcja 13; trzecia tabela i cztery
+% akapity "najmniej pewne" to notes/02-grounding-and-traps.md sekcja 4, czyli
+% druga i większa lista wyłączeń, której pierwsza wersja tego dodatku nigdy nie
+% otworzyła. Rozszerzając oświadczenie o zakresie, otwórz obie.
+%
 % ŻADNYCH ADRESÓW WWW. Treść tej książki nie drukuje żadnego, a wydrukowany
 % adres psuje się szybciej niż tytuł.
 
@@ -50,6 +71,14 @@ Uporządkowane według tego, jak blisko każda praca stoi czytelnika, dla które
 ta książka powstała: pracującego inżyniera, sprawnego w kodzie, któremu
 matematyka ze szkoły wyblakła, a który dziś wdraża modele.
 
+Każdy wpis mówi, co dana praca robi dobrze, co robi źle \emph{dla tego
+czytelnika}, jaki próg zakłada przed pierwszą stroną i czy jest pierwszą
+lekturą, czy odnośnikiem. \textbf{Żaden nie mówi, ile czasu zajmuje}, i to
+pominięcie jest celowe, a nie przeoczone: nikt w tym projekcie nie zmierzył
+żadnej lektury, a czas wymyślony po to, żeby wypełnić kolumnę, byłby pierwszym
+niepopartym twierdzeniem w tej książce. To próg i skala rozstrzygają, a one są
+faktami.
+
 \medskip
 \textbf{Deisenroth, Faisal i Ong, \emph{Mathematics for Machine Learning}.}
 Najbliższy konkurent i nazywa tę samą lukę co ta książka \dash{} autorzy piszą,
@@ -61,7 +90,9 @@ krótkie ujęcie rozkładów macierzy, jakie jest dostępne.
 \textbf{Robi źle, dla tego czytelnika:} nazywa lukę szkoła\dash{}uczenie
 maszynowe swoim celem, a potem zaczyna powyżej niej \dash{} rozdział 2 otwiera
 się układami równań liniowych, a nic w tej książce nie uczy przekształcania
-nierówności ani przesuwania wskaźnika sumowania. Cztery docelowe metody są
+nierówności ani przesuwania wskaźnika sumowania \dash{} progiem, jaki w
+praktyce zakłada, jest sprawna algebra i trochę rachunku różniczkowego.
+Cztery docelowe metody są
 sprzed uczenia głębokiego, nie ma ani jednej strony o nadmiarze czy
 uwarunkowaniu, a większość zadań nie ma rozwiązania.
 \textbf{Werdykt:} najlepsza pozycja, na którą można wskazać, i mimo przedmowy
@@ -75,7 +106,9 @@ nikt nie naśladuje \dash{} nadmiar i niedomiar, stabilizacja log-sum-exp,
 uwarunkowanie, jakobian i hesjan. To jedyna praca tutaj, która traktuje maszynę
 jako obiekt o skończonej precyzji. \textbf{Robi źle:} część~I jest
 przypomnieniem, a nie nauczaniem \dash{} cztery rozdziały w miejsce dwóch lat
-studiów, bez zadań i bez przykładów rozwiązanych krok po kroku \dash{} i jest
+studiów, co jest przypomnieniem dla kogoś, kto ten materiał spotkał, a nie
+nauczaniem dla kogoś, kto go nie spotkał, bez zadań i bez przykładów
+rozwiązanych krok po kroku \dash{} i jest
 zamrożona w 2016 roku, więc nie ma transformera ani współczesnej praktyki
 mieszanej precyzji. \textbf{Werdykt:} ten rozdział jest przodkiem części~II tej
 książki, a ta książka schodzi o rząd wielkości głębiej i z liczbami.
@@ -264,6 +297,70 @@ Teorii kategorii, geometrii różniczkowej, rozmaitości & Czasem przywoływane 
 \end{tabularx}
 \end{center}
 
+\medskip
+A na koniec klasyczny program, z którego ta książka rezygnuje. Dwie tabele
+powyżej to tematy, z których \emph{pożycza}, więc każdy wskazuje książkę. Tu są
+techniki, które kurs matematyki wyćwiczyłby, a ich celem nie jest żadna książka
+\dash{} jest nim program tej książki i procedura, którą już masz zainstalowaną.
+Na tym polega cały argument za ich wycięciem: nie na tym, że są nieciekawe, ale
+na tym, że robotę, do której wymyślono je jako robotę ręczną, robi dziś
+biblioteka, a umiejętnością, która przeżywa, jest wiedza, które wywołanie i
+dlaczego.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}XX@{}}
+\toprule
+\textbf{Niećwiczone} & \textbf{Co robi tę robotę zamiast tego} \\
+\midrule
+Techniki całkowania: przez części, przez podstawienie, ułamki proste & Nic w
+  pętli treningowej nie całkuje symbolicznie. Całka przychodzi jako wartość
+  oczekiwana i jest szacowana próbkowaniem, czyli Programem~\ref{prog:F13},
+  a potem Programem~\ref{prog:P25} \\
+Wielomiany charakterystyczne, Cayley--Hamilton, postać Jordana & Żadna
+  biblioteka nie liczy wartości własnej z wielomianu. Program~\ref{prog:P10}
+  robi wartości własne jako kierunki niezmiennicze, a Program~\ref{prog:P11}
+  rozkład, który naprawdę wywołujesz \\
+Wyznaczniki przez rozwinięcie Laplace'a, wzory Cramera & Kosztowne silniowo i
+  nigdy nieużywane przy rozmiarze. Program~\ref{prog:P09} uczy, co wyznacznik
+  \emph{znaczy}, podaje wzór dla $2 \times 2$ i mówi, że powyżej maszyna liczy
+  go eliminacją i ty też powinieneś \\
+Częstościowa teoria estymatorów: dostateczność, nierówność Cramér--Rao, UMVU &
+  Program~\ref{prog:P26} robi największą wiarygodność jako \emph{cel}, czyli
+  tę część, która pojawia się w każdej funkcji straty; teoria optymalności nie
+  dochodzi do biurka \\
+Klasyczny zwierzyniec testów: tablice $t$, $\chi^{2}$, ANOVA, $F$ & Masz
+  komputer. Program~\ref{prog:P27} odpowiada na te same pytania przez losowanie
+  ze zwracaniem i przez test dokładny na parach niezgodnych, przy mniejszej
+  liczbie założeń i bez tablicy do sprawdzania \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\textbf{I cztery wyłączenia, co do których ta książka jest najmniej pewna},
+wypisane dlatego, że powiedzenie tego teraz jest tańsze niż bronienie ich
+później.
+
+\emph{Teoria optymalizacji wypukłej} jest poza zakresem na tej podstawie, że
+uczenie głębokie nie jest wypukłe, a kontrargument jest dobry: kwantyzacja,
+kalibracja, problemy serwowania i routingu oraz dekodowanie z ograniczeniami są
+wypukłe, a inżynier, który nie umie takiego rozpoznać, rozwiązuje go pętlą.
+Programy~\ref{prog:P19} i~\ref{prog:P22} zachowują umiejętność rozpoznawania
+właśnie dlatego i to jest pierwsze wyłączenie do rewizji, jeśli czytelnicy
+zgłoszą, że potrzebują więcej.
+
+\emph{Matematyka dyskretna} zatrzymuje się daleko przed algorytmami i
+złożonością. Da się tego bronić tylko dlatego, że czytelnik jest inżynierem
+oprogramowania, który spotkał już graf \dash{} czyli przy założeniu, którego ta
+książka nie robi nigdzie indziej.
+
+\emph{Wnioskowanie przyczynowe} jest wyłączone całkowicie i jest to coraz
+bardziej błędne, w miarę jak ewaluacja i analiza testów A/B stają się częścią
+tej roboty. To kandydat na drugie wydanie, a nie temat, który tu nie należy.
+
+\emph{Stochastyczne równania różniczkowe} są wyłączone w tabeli powyżej. Dziś
+da się tej granicy bronić i za kilka lat może się nie dać.
+
 \section{Tematy, których uczy, ale tylko do głębokości roboczej}
 \label{sec:E-depth}
 \index{further reading!working depth}
@@ -293,6 +390,105 @@ aktualizacji, które wyprowadza Program~\ref{prog:P20} \dash{} Nocedal i Wright.
 
 A na uczenie maszynowe, które to wszystko konsumuje: Goodfellow, Bengio i
 Courville na obraz z 2016 roku, Murphy i Bishop na obecny.
+
+\section{Dokąd prowadzi każde niedowiedzione zdanie}
+\label{sec:E-route}
+\index{further reading!rigour boxes}
+\index{rigour boxes!destinations}
+
+Ramka rygoru nazywa wynik, mówi, że nie jest tu dowodzony, i mówi, gdzie
+mieszka dowód. Większość wskazuje inny program tej książki. Te, które wskazują
+\emph{poza} nią, nazywają rodzaj kursu \dash{} \enquote{dowolny pierwszy kurs
+analizy} \dash{} i, z jednym wyjątkiem, żadnego tytułu. Ta sekcja jest dla nich
+skorowidzem i trzymana jest reguła, a nie liczba: ramka, która wychodzi poza
+książkę, ma tu wiersz.
+
+\begin{note}
+\textbf{Celem jest tutaj praca, którą ten dodatek już przedstawił, albo nic
+\dash{} i kolumna mówi, co z tych dwojga.} Tam, gdzie pisze \emph{nie zbadane},
+żadne źródło z tego dodatku nie zostało przeczytane pod tym kątem, a nazwanie
+jakiegoś mimo to byłoby ruchem, o którego odrzucenie prosi czterdzieści siedem
+programów. Ostatnia z trzech tabel poniżej to właśnie te wiersze. To jest stan
+zapisu, a nie luka w składzie, i warto to wiedzieć, zanim ruszysz szukać.
+\end{note}
+
+\medskip
+Najpierw fundamenty pod matematyką, której ta książka uczy.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xll@{}}
+\toprule
+\textbf{Powiedziane i niedowiedzione} & \textbf{Odłożone z}
+  & \textbf{Dokąd iść} \\
+\midrule
+Kiedy granica istnieje i kiedy pokrycie nie ma znaczenia &
+  \ref{prog:F04}, \ref{prog:F13}, \ref{prog:P09} & Abbott; Tao \\
+Różniczkowalność i wzór Taylora z resztą &
+  \ref{prog:P15}, \ref{prog:P17} & Abbott; Tao \\
+Że dwie bazy mają ten sam rozmiar, i twierdzenie spektralne &
+  \ref{prog:P04}, \ref{prog:P10} & Axler; Strang \\
+Czym jest prawdopodobieństwo na kontinuum &
+  \ref{prog:P23} & Williams; Durrett \\
+Że rzeczy niezależne się faktoryzują, i funkcje charakterystyczne &
+  \ref{prog:P25} & Blitzstein i Hwang \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+Potem wyniki, których ta książka używa i których nie wyprowadza.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xll@{}}
+\toprule
+\textbf{Powiedziane i niedowiedzione} & \textbf{Odłożone z}
+  & \textbf{Dokąd iść} \\
+\midrule
+Warunek regularności ograniczeń i dostateczność &
+  \ref{prog:P22} & Boyd i Vandenberghe \\
+Nierówność Krafta i granica kodowania źródła &
+  \ref{prog:P29}, \ref{prog:P30} & Cover i Thomas \\
+Dolna granica dowodowa i wnioskowanie wariacyjne &
+  \ref{prog:P19} & Murphy \\
+Efektywność asymptotyczna i nierówność Cramér--Rao &
+  \ref{prog:P26} & wyłączone powyżej \\
+Co ścieżka rezydualna i warstwa normalizująca robią z wariancją &
+  \ref{prog:P25} & Program~\ref{prog:P32} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+I pięć, których ten dodatek nie umie spłacić.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xll@{}}
+\toprule
+\textbf{Powiedziane i niedowiedzione} & \textbf{Odłożone z}
+  & \textbf{Dokąd iść} \\
+\midrule
+Metoda gwiazdek i przegród, i zliczanie z powtórzeniami &
+  \ref{prog:P12} & nie zbadane \\
+Ile naprawdę prawie prostopadłych kierunków mieści przestrzeń &
+  \ref{prog:P05} & nie zbadane \\
+Dlaczego losowanie ze zwracaniem szacuje rozkład z próby &
+  \ref{prog:P27} & nie zbadane \\
+Jak napisać dowód, a nie go przeczytać &
+  \ref{prog:P14} & nie zbadane \\
+Przypadek pierwiastka podwójnego w rekurencji liniowej &
+  \ref{prog:P20} & nie zbadane \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+Dwa wiersze tej ostatniej tabeli mają wskazówkę w samym programie, a nie
+tutaj: Program~\ref{prog:P27} nazywa pracę, z której wziął się bootstrap, a
+Program~\ref{prog:P05} nazywa dziedzinę, do której należy jego pytanie.
+Pozostałe nazywają rodzaj kursu i żadnego tytułu. \textbf{Jeden z nich nie jest
+pominięciem, tylko własnym stanowiskiem tej książki}: uczy czytać twierdzenie i
+mówi wprost, że pisać go nie będziesz musiał, więc podręcznik pisania dowodów
+jest jedynym celem, do którego odmawia cię odesłać.
 
 \medskip
 To ostatnie zdanie jest sensem całego dodatku. Ta książka nie uczy żadnego z

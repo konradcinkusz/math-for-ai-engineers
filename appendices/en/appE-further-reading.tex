@@ -16,6 +16,27 @@
 % written program before it was imported, which is the discipline Appendix D's
 % pass earned. That is not gated by anything; nothing here can be.
 %
+%
+% SECTION E.5 IS THE ROUTE INDEX FOR THE RIGOUR BOXES, and it is gated:
+% tools/check_structure.py --rigour fails when a box defers outside the book
+% and no row here answers it. A box that defers INSIDE the book cites the
+% program it defers to, so a box with no \ref{prog:...} is outward-facing by
+% construction -- that criterion is exact, it is edition-stable, and it is
+% what the check reads. What it CANNOT read is whether the destination named
+% contains the proof; five rows say "not surveyed" precisely because nobody
+% has done that reading.
+%
+% STILL OUTSTANDING: nothing in the book references this appendix. There is no
+% \ref{app:E} anywhere in programs/, so a reader standing at a rigour box has
+% no way to know section E.5 exists. Closing it means editing every deferring
+% program and is a pass of its own.
+%
+% AND THE SCOPE STATEMENT HAS TWO SOURCES, not one. Sections E.3's first two
+% tables are notes/01-curriculum.md section 13; the third table and the four
+% "least sure about" paragraphs are notes/02-grounding-and-traps.md section 4,
+% which is a second and larger exclusions list that the first draft of this
+% appendix never opened. If you extend the scope statement, open both.
+%
 % NO WEB ADDRESSES. The body of this book prints none, and a printed address
 % rots faster than a title does.
 
@@ -48,6 +69,14 @@ Ordered by how close each work sits to the reader this book was written for: a
 working engineer, competent in code, whose school mathematics has decayed, and
 who is now shipping models.
 
+Every entry says what the work does well, what it does badly \emph{for this
+reader}, the floor it assumes before its first page, and whether it is a first
+reading or a reference. \textbf{None of them says how long it takes}, and the
+omission is deliberate rather than an oversight: nobody on this project has
+timed a reading, and a duration invented to fill the column would be the first
+unsupported claim in the book. The floor and the scale are what decide it, and
+those are facts.
+
 \medskip
 \textbf{Deisenroth, Faisal and Ong, \emph{Mathematics for Machine Learning}.}
 The closest competitor, and it names the same gap this book does \dash{} its
@@ -59,8 +88,9 @@ treatment of matrix decompositions available. \textbf{Does badly, for this
 reader:} it states the school-to-machine-learning gap as its target and then
 starts above it \dash{} chapter 2 opens on systems of linear equations, and
 nothing in it teaches you to rearrange an inequality or shift a summation
-index. Its four target methods are pre-deep-learning, there is not one page on
-overflow or conditioning, and most exercises have no worked solution.
+index \dash{} the floor it assumes in practice is fluent algebra and some
+calculus. Its four target methods are pre-deep-learning, there is not one page
+on overflow or conditioning, and most exercises have no worked solution.
 \textbf{Verdict:} the best reference to point at, and not a path from zero
 despite its preface.
 
@@ -72,7 +102,9 @@ valuable sixty pages in this whole survey and the one nobody imitates
 the Jacobian and the Hessian. It is the only work here that treats the machine
 as a finite-precision object. \textbf{Does badly:} Part~I is a refresher rather
 than a teacher, four chapters standing in for two years of undergraduate
-mathematics, with no exercises and no worked examples; and it is frozen in
+mathematics, which is a refresher for somebody who has met that material and
+not a teacher for somebody who has not, with no exercises and no worked
+examples; and it is frozen in
 2016, so there is no transformer and no modern mixed-precision practice.
 \textbf{Verdict:} that chapter is the ancestor of this book's Part~II, and this
 book goes an order of magnitude deeper with numbers.
@@ -260,6 +292,68 @@ Category theory, differential geometry, manifolds & Occasionally invoked in
 \end{tabularx}
 \end{center}
 
+\medskip
+And the classical curriculum this book declines. The two tables above are
+subjects it \emph{borrows} from, so each names a book. These are techniques a
+mathematics course would drill, and their destination is not a book at all
+\dash{} it is a program of this one and a routine you already have installed.
+That is the whole of the argument for cutting them: not that they are
+uninteresting, but that the work they were invented to do by hand is now done
+by a library, and the skill that survives is knowing which library call and
+why.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}XX@{}}
+\toprule
+\textbf{Not drilled} & \textbf{What does the work instead} \\
+\midrule
+Integration technique: by parts, by substitution, partial fractions & Nothing
+  in a training loop integrates symbolically. An integral arrives as an
+  expectation and is estimated by sampling, which is Program~\ref{prog:F13}
+  and then Program~\ref{prog:P25} \\
+Characteristic polynomials, Cayley--Hamilton, Jordan form & No library computes
+  an eigenvalue from a polynomial. Program~\ref{prog:P10} does eigenvalues as
+  invariant directions, and Program~\ref{prog:P11} does the decomposition you
+  actually call \\
+Determinants by cofactor expansion, Cramer's rule & Factorially expensive and
+  never used at size. Program~\ref{prog:P09} teaches what a determinant
+  \emph{means}, gives the $2 \times 2$ formula, and says that beyond it a
+  machine computes one by elimination and so should you \\
+Frequentist estimator theory: sufficiency, the Cramér--Rao bound, UMVU &
+  Program~\ref{prog:P26} does maximum likelihood as an \emph{objective}, which
+  is the part that shows up in every loss function; the optimality theory does
+  not reach the desk \\
+The classical test zoo: $t$ tables, $\chi^{2}$, ANOVA, $F$ & You have a
+  computer. Program~\ref{prog:P27} answers the same questions by resampling and
+  by an exact test on the discordant pairs, with fewer assumptions and no table
+  to look up \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\textbf{And four exclusions this book is least sure about}, stated because
+saying so now is cheaper than defending them later.
+
+\emph{Convex optimisation theory} is out on the grounds that deep learning is
+not convex, and the counter-argument is good: quantisation, calibration,
+serving and routing problems and constrained decoding are convex, and an
+engineer who cannot recognise one solves it with a loop.
+Programs~\ref{prog:P19} and~\ref{prog:P22} keep the recognition skill for
+exactly that reason, and this is the first exclusion to revisit if readers
+report needing more.
+
+\emph{Discrete mathematics} stops well short of algorithms and complexity.
+That is defensible only because the reader is a software engineer who has met a
+graph before \dash{} an assumption this book makes nowhere else.
+
+\emph{Causal inference} is excluded outright, and that is increasingly wrong as
+evaluation and A/B analysis become part of the job. It is a candidate for a
+second edition rather than a subject that does not belong.
+
+\emph{Stochastic differential equations} are excluded in the table above. That
+is a defensible line today and it may not be one in a few years.
+
 \section{The subjects it does teach, but only to working depth}
 \label{sec:E-depth}
 \index{further reading!working depth}
@@ -289,6 +383,106 @@ the update rules Program~\ref{prog:P20} derives, Nocedal and Wright.
 
 And for the machine learning that consumes all of it: Goodfellow, Bengio and
 Courville for the 2016 picture, Murphy and Bishop for the current one.
+
+\section{Where each unproved statement goes}
+\label{sec:E-route}
+\index{further reading!rigour boxes}
+\index{rigour boxes!destinations}
+
+A rigour box names a result, says it is not proved here, and says where the
+proof lives. Most of them point at another program of this book. The ones that
+point \emph{outside} it name a kind of course \dash{} \enquote{any first
+analysis course} \dash{} and, with a single exception, no title. This section
+is the index for them, and the rule rather than the count is what is kept: a
+box that leaves the book has a row here.
+
+\begin{note}
+\textbf{A destination here is a work this appendix has already introduced, or
+it is nothing, and the column says which.} Where it says \emph{not surveyed},
+no source in this appendix was read for that subject, and naming one anyway
+would be the move forty-seven programs have asked you to refuse. The last of
+the three tables below is the rows that say it. That is the state of the
+record rather than a gap in the typesetting, and it is worth knowing before
+you go looking.
+\end{note}
+
+\medskip
+First the foundations underneath the mathematics this book does teach.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xll@{}}
+\toprule
+\textbf{Stated and not proved} & \textbf{Deferred from}
+  & \textbf{Where to go} \\
+\midrule
+When a limit exists, and when a covering does not matter &
+  \ref{prog:F04}, \ref{prog:F13}, \ref{prog:P09} & Abbott; Tao \\
+Differentiability, and Taylor with a remainder &
+  \ref{prog:P15}, \ref{prog:P17} & Abbott; Tao \\
+That two bases have the same size, and the spectral theorem &
+  \ref{prog:P04}, \ref{prog:P10} & Axler; Strang \\
+What a probability is on a continuum &
+  \ref{prog:P23} & Williams; Durrett \\
+That independent things factorise, and characteristic functions &
+  \ref{prog:P25} & Blitzstein and Hwang \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+Then the results the book uses and does not derive.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xll@{}}
+\toprule
+\textbf{Stated and not proved} & \textbf{Deferred from}
+  & \textbf{Where to go} \\
+\midrule
+Constraint qualification, and sufficiency &
+  \ref{prog:P22} & Boyd and Vandenberghe \\
+Kraft's inequality, and the source-coding bound &
+  \ref{prog:P29}, \ref{prog:P30} & Cover and Thomas \\
+The evidence lower bound, and variational inference &
+  \ref{prog:P19} & Murphy \\
+Asymptotic efficiency, and the Cramér--Rao bound &
+  \ref{prog:P26} & excluded above \\
+What a residual path and a normalisation layer do to the variance &
+  \ref{prog:P25} & Program~\ref{prog:P32} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+And the five this appendix cannot discharge.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xll@{}}
+\toprule
+\textbf{Stated and not proved} & \textbf{Deferred from}
+  & \textbf{Where to go} \\
+\midrule
+Stars and bars, and counting with repetition &
+  \ref{prog:P12} & not surveyed \\
+How many nearly perpendicular directions a space really holds &
+  \ref{prog:P05} & not surveyed \\
+Why resampling estimates a sampling distribution &
+  \ref{prog:P27} & not surveyed \\
+How to write a proof rather than read one &
+  \ref{prog:P14} & not surveyed \\
+The repeated-root case of a linear recurrence &
+  \ref{prog:P20} & not surveyed \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+Two rows of that last table have a pointer in the program itself rather than
+here: Program~\ref{prog:P27} names the paper the bootstrap came from, and
+Program~\ref{prog:P05} names the field its question belongs to. The rest name
+a kind of course and no title. \textbf{One of them is not an omission but the
+book's own position}: this book teaches you to read a theorem and says in as
+many words that you will not need to write one, so a proof-writing text is the
+one destination it declines to send you to.
 
 \medskip
 That last sentence is the point of the whole appendix. This book teaches none

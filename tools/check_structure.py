@@ -16,6 +16,8 @@ can be trusted to remember:
   --scripts   Does every \\transcript{} name a file that exists?
   --terms     Does every Polish rendering Appendix D names actually occur
               in the prose of programs/pl?
+  --rigour    Does Appendix E name a destination for every rigour box that
+              sends the reader outside the book?
 
 Exit code is 0 when the ledger is clean and 1 when it is not, so any of these
 can be turned into a hard CI gate by dropping the --soft flag.
@@ -510,6 +512,104 @@ def check_parts(soft: bool) -> int:
     return 0 if (bad == 0 or soft) else 1
 
 
+RE_RIGOUR = re.compile(r"\\begin\{rigourbox\}(.*?)\\end\{rigourbox\}", re.S)
+RE_PROGREF = re.compile(r"\\ref\{prog:(\w+)\}")
+RE_ROUTE_SECTION = re.compile(
+    r"\\label\{sec:E-route\}(.*?)(?=\n\\section|\Z)", re.S)
+RE_TABULARX = re.compile(
+    r"\\begin\{tabularx\}\{[^}]*\}\{[^}]*\}(.*?)\\end\{tabularx\}", re.S)
+
+
+def check_rigour(soft: bool) -> int:
+    """Appendix E names a destination for every rigour box that leaves the book.
+
+    A rigour box says: here is a result, it is not proved here, and here is
+    where the proof lives. Most point at another program; the ones that point
+    OUTSIDE the book named a kind of course and, with one exception, no title,
+    so the reader was sent to "any first analysis course" and left to find
+    one. The count is deliberately not stated here -- a tally of occurrences
+    decays silently, which is why this prints the number it has just computed
+    rather than one somebody wrote down.
+
+    STILL OUTSTANDING, and this check cannot see it: nothing in the book
+    references Appendix E. There is no \\ref{app:E} in any program, so a
+    reader standing at a rigour box has no way to know the destination exists.
+    Fixing that means editing every deferring program, which is a pass of its
+    own.
+
+    The mechanical half is exact and is what this checks. A box that defers
+    INSIDE the book cites the program it defers to, so a box containing no
+    \\ref{prog:...} cannot be deferring inside it: it is outward-facing by
+    construction, and Appendix E owes it a row. The criterion is
+    edition-stable -- both editions carry the same fourteen -- which is why
+    the check can be run against each and is not merely comparing them.
+
+    Parity is blind to this in the way it is blind to every claim about the
+    book: C4, C8, C12 and C14 all compare the two EDITIONS, so a row missing
+    from both stays green. That is the same shape as the seven part ranges
+    that were wrong in both introductions for the whole of the book.
+
+    WHAT THIS DOES NOT CHECK, and the tool says so rather than letting a green
+    ledger imply otherwise: whether the destination named actually contains
+    the proof. That is a reading job, and five of Appendix E's own rows say
+    "not surveyed" precisely because nobody has done it for those subjects.
+    """
+    bad = 0
+    for lang in LANGS:
+        app = ROOT / "appendices" / lang / "appE-further-reading.tex"
+        if not app.exists():
+            continue
+        src = RE_TEX_COMMENT.sub("", app.read_text(encoding="utf8"))
+        m = RE_ROUTE_SECTION.search(src)
+        if not m:
+            print(f"  {app.relative_to(ROOT)}: no route section "
+                  f"(\\label{{sec:E-route}}). Every rigour box that leaves "
+                  f"the book needs a destination and this is where they live.")
+            bad += 1
+            continue
+        # The SECOND column of every route row is "Deferred from" and is
+        # the only one that names a source; the third names a destination,
+        # which may itself be a program of this book (P25's residual box is
+        # answered in P32) and must not be read as a program that defers.
+        # Parsed positionally rather than by the shape of the reference,
+        # because that distinction is the whole content of the check.
+        routed: set[str] = set()
+        for body in RE_TABULARX.findall(m.group(1)):
+            for row in body.split(r"\\"):
+                cells = row.split("&")
+                if len(cells) >= 2:
+                    routed |= set(RE_PROGREF.findall(cells[1]))
+
+        outward: dict[str, int] = {}
+        for f in program_files(lang):
+            text = RE_TEX_COMMENT.sub("", f.read_text(encoding="utf8"))
+            if not written(text):
+                continue
+            stem = f.name.split("-")[0]
+            for box in RE_RIGOUR.findall(text):
+                if not RE_PROGREF.search(box):
+                    outward[stem] = outward.get(stem, 0) + 1
+
+        for stem in sorted(set(outward) - routed):
+            print(f"  {lang}: {stem} has a rigour box that defers outside "
+                  f"the book and Appendix E names no destination for it. "
+                  f"A reader sent to \"a first course\" with no title is "
+                  f"sent nowhere.")
+            bad += 1
+        have = {f.name.split("-")[0] for f in program_files(lang)
+                if RE_RIGOUR.search(f.read_text(encoding="utf8"))}
+        for stem in sorted(routed - have):
+            if stem in {f.name.split("-")[0] for f in program_files(lang)}:
+                print(f"  {lang}: Appendix E routes a rigour box to {stem}, "
+                      f"which carries none. The row is stale.")
+                bad += 1
+    if bad == 0:
+        print(f"  {len(outward)} programs defer a result outside the book; "
+              f"Appendix E names a destination, or says it has none, for "
+              f"every one.")
+    return 0 if (bad == 0 or soft) else 1
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--frames", action="store_true")
@@ -520,12 +620,13 @@ def main() -> int:
     p.add_argument("--scripts", action="store_true")
     p.add_argument("--terms", action="store_true")
     p.add_argument("--parts", action="store_true")
+    p.add_argument("--rigour", action="store_true")
     p.add_argument("--all", action="store_true")
     p.add_argument("--soft", action="store_true",
                    help="report but always exit 0 (the default for a draft)")
     a = p.parse_args()
     if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit,
-                a.scripts, a.terms, a.parts, a.all)):
+                a.scripts, a.terms, a.parts, a.rigour, a.all)):
         a.all = True
     rc = 0
     if a.all or a.frames:
@@ -544,6 +645,8 @@ def main() -> int:
         rc |= check_terms(a.soft)
     if a.all or a.parts:
         rc |= check_parts(a.soft)
+    if a.all or a.rigour:
+        rc |= check_rigour(a.soft)
     return rc
 
 
