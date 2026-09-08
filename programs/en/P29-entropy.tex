@@ -74,8 +74,8 @@
   $\ln \val{p29.seven.n} = \val{p29.seven.nats}$ nats.}
 \item A model's perplexity is $\val{p29.f03.ppl}$. Say what that claims about
   the model, in a sentence with no logarithm in it. \teachesat{21--22}
-  \answerto{At each position it is as uncertain as somebody choosing
-  uniformly among $\val{p29.f03.ppl}$ tokens \dash{} out of a vocabulary of
+  \answerto{On average it is as uncertain as somebody choosing uniformly
+  among $\val{p29.f03.ppl}$ tokens \dash{} out of a vocabulary of
   $\val{p29.vocab}$.}
 \item Two models report next-token distributions. One has entropy
   $\val{p29.wrong.ent}$ nats, the other $\val{p29.spread.ent}$. Which is more
@@ -287,8 +287,9 @@ about the message changed; what changed is what you knew.
 
 That is why the same text has different entropies under different models, and
 why a claim of the form \enquote{this text contains $N$ bits} is incomplete
-until it names the distribution it was measured against. §6 is what happens
-when somebody forgets.
+until it names the distribution it was measured against.
+Program~\ref{prog:P30} is where the forgotten distribution gets a name and a
+cost; §6 is the same shape of omission with a different quantity missing.
 \end{trapbox}
 \end{fr}
 
@@ -425,8 +426,13 @@ What is the best achievable expected length, and where does the difference go?
 \begin{fr}
 \ans{$\val{p29.nondy.best}$ bits, and the difference is the rounding}
 
-Exactly two, from four codewords of two digits each; the gap over the entropy
-is $\val{p29.nondy.gap}$ of a bit. There is nowhere else for it to go: the
+Exactly two, and it is reached two ways: four codewords of two digits each,
+or lengths $1, 2, 3, 3$ \dash{} which is what the previous frame's rule gives,
+since a length is its own surprise rounded up. Both spend the budget exactly
+and both average two, so a reader who followed the method has not gone wrong.
+\textbf{The tie is itself the evidence}: two quite different codes cannot both
+be beaten, and the gap over the entropy is $\val{p29.nondy.gap}$ of a bit
+either way. There is nowhere else for it to go: the
 entropy says what the average \emph{could} be if a length could be
 $\logb{2} \frac{5}{2} = \num{1.32}$ digits, and it cannot.
 
@@ -470,8 +476,8 @@ not break the bound \dash{} it is why the bound is a bound.
 
 \begin{fr}
 Program~\ref{prog:P19} works out why you cannot average perplexities, with the
-measurement, and hands one thing here by name: \textbf{what the number means}.
-This is that.
+measurement, and leaves what the number \emph{means} to this program.
+\textbf{This is that.}
 
 An entropy in nats is a real number and nobody has an intuition for one. But
 §2 gave a distribution whose entropy is easy to read: the uniform one over $n$
@@ -489,7 +495,7 @@ you?
 \[ \text{effective choices} \;=\; e^{H} \]
 
 For a uniform distribution over $n$ this returns $n$, exactly \dash{} checked
-at every $n$ from $2$ to $\val{p29.eff.checked}+1$, because a claim of the
+at every $n$ from $2$ to $\val{p29.eff.upto}$, because a claim of the
 form \enquote{always} should not rest on one case. For everything else it
 returns a number between one and $n$, and that number is the honest answer to
 \enquote{how many options is this distribution really weighing?}
@@ -511,7 +517,9 @@ is the shape of a model that is certain and may be wrong.
 Now the number the reader actually meets. Program~\ref{prog:F02} has a model
 at a mean loss of $\val{p29.f02.loss}$ nats per token, and
 Program~\ref{prog:F03} exponentiated that to a \textbf{perplexity} of
-$\val{p29.f03.ppl}$ without saying what the answer was a count of.
+$\val{p29.f03.ppl}$, and reads a perplexity as a fair die of that many sides
+\dash{} without deriving why the exponential of an entropy is a count at all.
+§4 has just derived it.
 
 Put the two together. What does a perplexity of $\val{p29.f03.ppl}$ claim
 about that model?
@@ -520,13 +528,18 @@ about that model?
 \end{fr}
 
 \begin{fr}
-\ans{At each position it is as uncertain as somebody choosing uniformly among
+\ans{On average it is as uncertain as somebody choosing uniformly among
 $\val{p29.f03.ppl}$ tokens}
 
 \begin{center}
 \emph{A perplexity is the effective number of equally likely choices\\
-the model is weighing at each step, and nothing else.}
+a model weighs, averaged over the positions it was measured on.}
 \end{center}
+
+The qualifier is not politeness. This figure came from a \emph{mean} loss, so
+what the exponential returns is an average of the per-position counts, and
+Program~\ref{prog:F03} names the average it rests on: the geometric-mean token
+probability, of which this figure is the reciprocal.
 
 That is a statement about a model rather than a position on a leaderboard, and
 it can be checked against a vocabulary. At $\val{p29.vocab}$ tokens this model
@@ -550,7 +563,7 @@ measurement this book has already printed for another reason.
 
 Program~\ref{prog:P25} ran experiment E9 on an attention row over
 $\val{p29.att.keys}$ keys and reported its entropy in nats: with the
-$\frac{1}{\sqrt{d_k}}$ division, $\val{p29.att.scaled.ent}$ at the largest
+$1/\sqrt{d_k}$ division, $\val{p29.att.scaled.ent}$ at the largest
 head size; without it, $\val{p29.att.raw.ent}$. Its conclusion was that
 scaling holds the entropy still, which is true and hard to picture.
 
@@ -570,23 +583,25 @@ Read both as counts. How many keys is that head looking at, in each case?
 $\val{p29.att.raw.eff}$ without it}
 
 \begin{center}
-\begin{tabular}{lccc}
+\begin{tabular}{lcc}
 \toprule
- & entropy, nats & effective keys & of \\
+ & entropy, nats & effective keys, of $\val{p29.att.keys}$ \\
 \midrule
-without $\frac{1}{\sqrt{d_k}}$ & $\val{p29.att.raw.ent}$
-  & $\val{p29.att.raw.eff}$ & $\val{p29.att.keys}$ \\
+without $1/\sqrt{d_k}$ & $\val{p29.att.raw.ent}$
+  & $\val{p29.att.raw.eff}$ \\
 with it & $\val{p29.att.scaled.ent}$
-  & $\val{p29.att.scaled.eff}$ & $\val{p29.att.keys}$ \\
+  & $\val{p29.att.scaled.eff}$ \\
 \midrule
 uniform, the ceiling & $\val{p29.att.maxent}$
-  & $\val{p29.att.keys}$ & $\val{p29.att.keys}$ \\
+  & $\val{p29.att.keys}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\textbf{Unscaled, the head has collapsed onto one key and a tenth of another.}
-Program~\ref{prog:P25} could say the entropy was small; a count says the
+\textbf{Unscaled, the head is doing about the work of a single key.}
+Program~\ref{prog:P25} measured $\val{p29.att.raw.top}$ per cent of the row's
+weight sitting on one of the $\val{p29.att.keys}$, and could say the entropy
+was small; a count says the
 architecture has thrown away seven eighths of what the head was built to do,
 before any training has happened.
 
@@ -605,10 +620,17 @@ what §4 has just built: Program~\ref{prog:F03}'s seven-way uniform case has
 entropy $\val{p29.seven.nats}$ nats and effective count $\val{p29.seven.n}$.
 
 The trouble is that a reported perplexity is almost never one position. It is
-the exponential of a \textbf{mean} loss over a corpus, and
-Program~\ref{prog:P19} measured what that hides: at a spread of two nats the
-per-token effective counts range over orders of magnitude while the reported
-figure sits in the middle, and \emph{no position at all} need be weighing
+the exponential of a \textbf{mean} loss over a corpus, and a mean hides its
+spread. Program~\ref{prog:P19} measured one cost of that: at a spread of
+$\val{p29.spread.nats}$ nats, averaging the perplexities the wrong way returns
+a figure $\val{p29.p19.ratio}$ times the right one.
+
+The cost to the \emph{count} is one line of this section's own arithmetic. A
+token whose loss sits a spread above the mean is weighing
+$e^{2 \times \val{p29.spread.nats}} = \val{p29.count.ratio}$ times as many
+choices as one a spread below it, and the mean cancels out of that entirely.
+So the spread alone puts the per-position counts a factor of
+$\val{p29.count.ratio}$ apart, and \emph{no position at all} need be weighing
 seven tokens.
 
 So the sentence to use is the guarded one. A perplexity of seven says the
@@ -755,8 +777,9 @@ you need?
    \times \frac{\text{tokens}}{\text{character}} \]
 
 and the second factor is a property of the \textbf{tokeniser}, which appears
-nowhere in the loss. Two tokenisers on the same text at
-$\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ tokens per character give
+nowhere in the loss. Take that one reported figure of
+$\val{f03.nats.to.bits}$ bits per token to two tokenisers running at
+$\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ tokens per character:
 
 \begin{center}
 \begin{tabular}{lcc}
@@ -767,8 +790,8 @@ bits per character & $\val{p29.bpc.a}$ & $\val{p29.bpc.b}$ \\
 \end{tabular}
 \end{center}
 
-The same model and the same text. By what factor do the two answers differ,
-and what is that factor a property of?
+One loss figure, two compression claims. By what factor do they differ, and
+what is that factor a property of?
 \dotline
 \nextframe
 \end{fr}
@@ -779,6 +802,16 @@ and what is that factor a property of?
 $\val{p29.tpc.b} / \val{p29.tpc.a}$, exactly \dash{} the bits-per-token
 factor cancels, so the ratio says nothing whatever about the model. The script
 asserts that, because it is the section's whole claim.
+
+\begin{note}
+Read the two columns as one \emph{reported figure} rather than as one model. A
+loss per token belongs to the model \textbf{and} its tokeniser together
+\dash{} they are trained as a pair, and the embedding and output matrices are
+indexed by the vocabulary \dash{} so no single model reports
+$\val{f03.nats.to.bits}$ bits per token under both. That is what makes the
+table worth printing: the same number on a model card describes two
+compressors a factor of $\val{p29.bpc.ratio}$ apart.
+\end{note}
 
 So a bits-per-token figure is a ratio quoted without one of its two
 quantities, which is this book's recurring complaint arriving in the place it
@@ -795,9 +828,11 @@ Three consequences worth carrying, and each is checkable rather than a
 caution.
 
 \begin{itemize}
-\item \textbf{A model can lower its loss by changing its tokeniser}, with the
-  weights untouched. Coarser tokens mean fewer, harder predictions; the loss
-  per token rises and the loss per character need not.
+\item \textbf{Bits per character is the quantity that travels and bits per
+  token is not.} Change the tokeniser and the loss per token moves, because
+  coarser tokens mean fewer and harder predictions; what need not move is the
+  loss per character. So the tokeniser-dependent figure is the one on the
+  model card, and the comparable one is the one nobody quotes.
 \item \textbf{Two losses are comparable only under one tokeniser.} That is
   the condition, it is usually unstated, and stating it costs a sentence.
 \item \textbf{A compression claim is checkable and a loss is not.} Bits per
@@ -865,7 +900,7 @@ Program~\ref{prog:P30} defines it, and shows that it is not symmetric.
   $\val{p29.ppl.frac}$ per cent of a $\val{p29.vocab}$-token vocabulary.}
 \sumitem{23--24}{Program~\ref{prog:P25}'s attention entropies read as counts:
   $\val{p29.att.raw.eff}$ effective keys of $\val{p29.att.keys}$ without the
-  $\frac{1}{\sqrt{d_k}}$ division and $\val{p29.att.scaled.eff}$ with it.}
+  $1/\sqrt{d_k}$ division and $\val{p29.att.scaled.eff}$ with it.}
 \sumitem{25}{A reported perplexity is the exponential of a \emph{mean}, so no
   particular position need look like it \dash{} which is what
   Program~\ref{prog:P19}'s finding costs you when you read the number aloud.}
@@ -878,10 +913,11 @@ Program~\ref{prog:P30} defines it, and shows that it is not symmetric.
   guessing and never as a warrant for an answer.}
 \sumitem{31--33}{\result{\textbf{Bits per token is not bits per character.} Multiply
   by tokens per character, which belongs to the tokeniser}:
-  $\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ give
-  $\val{p29.bpc.a}$ and $\val{p29.bpc.b}$ on the same model and the same
-  text, a factor of $\val{p29.bpc.ratio}$ that is the tokenisers' ratio and
-  nothing about the model.}
+  one reported figure of $\val{f03.nats.to.bits}$ bits per token becomes
+  $\val{p29.bpc.a}$ or $\val{p29.bpc.b}$ at $\val{p29.tpc.a}$ and
+  $\val{p29.tpc.b}$ tokens per character, a factor of
+  $\val{p29.bpc.ratio}$ that is the tokenisers' and nothing about the model.
+  Bits per character is the quantity that travels between tokenisers.}
 \sumitem{34}{\result{Two losses are comparable only under one tokeniser},
   and a compression claim is checkable where a loss is not.}
 \end{summarybox}
@@ -918,9 +954,9 @@ Program~\ref{prog:P30} defines it, and shows that it is not symmetric.
   on the same corpus and the second team's model is declared worse. What must
   you check first?
   \answerto{That both used the same tokeniser. Bits per token times tokens per
-  character is bits per character, and only the second is a property of the
-  model and the text rather than of the tokeniser \dash{} so a coarser
-  tokeniser raises the loss per token while the model is unchanged.}
+  character is bits per character, and only \emph{bits per character} is a
+  property of the model and the text rather than of the tokeniser \dash{} so a
+  coarser tokeniser raises the loss per token while the model is unchanged.}
 \end{testexercises}
 
 \begin{furtherproblems}
@@ -937,8 +973,9 @@ Program~\ref{prog:P30} defines it, and shows that it is not symmetric.
   \answerto{$3 \times \frac14 + 2 \times \frac18 = 1$, so it is admissible
   with nothing to spare. Had it come to less than one there would be an
   unused branch, and some codeword could be shortened \dash{} which is why an
-  optimal code always spends the budget exactly when the probabilities allow
-  it.}
+  optimal code always spends the budget exactly, whatever the probabilities
+  are. What the probabilities decide is whether the expected length reaches
+  the entropy, never whether the budget is spent.}
 \item Two independent distributions have entropies $H_1$ and $H_2$. What is
   the entropy of the pair, and what is the effective number of choices?
   \answerto{$H_1 + H_2$, because the surprises add and the expectation is
@@ -953,7 +990,7 @@ Program~\ref{prog:P30} defines it, and shows that it is not symmetric.
   \answerto{$\val{p29.att.raw8.eff}$ keys of $\val{p29.att.keys}$. It is
   larger because the unscaled scores grow with $d_k$, so at a small head size
   they have not yet spread far enough to saturate the softmax \dash{} which is
-  the whole of what the $\frac{1}{\sqrt{d_k}}$ division is for, said as a
+  the whole of what the $1/\sqrt{d_k}$ division is for, said as a
   count instead of as a variance.}
 \item A colleague proposes monitoring the entropy of the next-token
   distribution and paging when it exceeds a threshold. Give one failure this

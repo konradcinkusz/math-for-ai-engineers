@@ -16,15 +16,18 @@ not restate it as a count here; the list is what is checkable.  What it names:
        best code for (2/5, 1/5, 1/5, 1/5) averages 2.000 bits against an
        entropy of 1.922 and calls the 0.078 gap "the rounding of a length to a
        whole number".  What this program sends that source down is P29's OTHER
-       code, the (1, 2, 3, 3) one it built for the dyadic alphabet -- NOT P29's
-       best code for this source, which is four two-digit words.  Its Kraft sum
-       is exactly 1, so it implies q_i = 2^-l_i = (1/2, 1/4, 1/8, 1/8), which
-       is P29's other ROW, and the gap IS KL(p||q).  Nothing new is computed to
-       arrive: this program says what a number already on the page is.
-       The two codes TIE at exactly 2 bits on this source, which is asserted in
-       section 1 and is the half that is easy to get wrong -- it means the
-       divergence is the excess over the ENTROPY, not over the best code any
-       reader could build, and that is why P29 was right to call it a rounding.
+       code, the (1, 2, 3, 3) one it built for the dyadic alphabet.  Its Kraft
+       sum is exactly 1, so it implies q_i = 2^-l_i = (1/2, 1/4, 1/8, 1/8),
+       which is P29's other ROW, and the gap IS KL(p||q).  Nothing new is
+       computed to arrive: this program says what a number already on the page
+       is.
+       AND THE TWO CODES TIE at exactly 2 bits on this source -- P29's own
+       frame 18 now says so, naming four two-digit words and (1, 2, 3, 3) as
+       two ways to the same best length, and calling the tie the evidence.
+       That is the half that is easy to get wrong: it means the divergence is
+       the excess over the ENTROPY FLOOR and not over the best code any reader
+       could build, which is why P29 was right to call the gap a rounding.
+       Asserted in section 1 over Fraction rather than taken from P29's prose.
   P26  says in as many words that "what vanishes is the EXCESS of the
        cross-entropy over the target's own entropy, and that excess has a name
        and is P30's".  It also owns cross-entropy as a negative log-likelihood,

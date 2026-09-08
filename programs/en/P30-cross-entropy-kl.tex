@@ -21,12 +21,14 @@
 %%        AND ITS TWO ALPHABETS ARE THIS PROGRAM'S ARRIVAL. P29 calls the 0.078
 %%        gap "the rounding of a length to a whole number". What section 1
 %%        sends the second source down is P29's code for the FIRST alphabet,
-%%        (1,2,3,3) -- NOT its best code for the second, which is four
-%%        two-digit words. Its Kraft sum is exactly one, so it implies a
-%%        distribution which IS P29's other row, and the gap IS the divergence.
-%%        The two codes TIE at 2 bits on this source, asserted in the script:
-%%        so the divergence is the excess over the ENTROPY FLOOR, not over the
-%%        best code anybody could build, and P29 was right to call it rounding.
+%%        (1,2,3,3). Its Kraft sum is exactly one, so it implies a distribution
+%%        which IS P29's other row, and the gap IS the divergence.
+%%        AND THE TWO CODES TIE at 2 bits on this source -- P29's frame 18 says
+%%        so itself, naming four two-digit words and (1,2,3,3) as two ways to
+%%        the same best length. So the divergence is the excess over the
+%%        ENTROPY FLOOR, not over the best code anybody could build, which is
+%%        why P29 was right to call it rounding. Asserted over Fraction in the
+%%        script rather than taken from P29's prose.
 %%   P26  says the excess "has a name and is P30's", and owns cross-entropy as
 %%        a negative log-likelihood. Section 8 closes its loop.
 %%   P19  owns Jensen both ways, so KL >= 0 is two lines from a theorem the
@@ -175,13 +177,14 @@ $\logb{2}\frac{5}{2}$ bits long.
 It is that, and the rounding half is worth taking seriously before anything
 else is built on it.
 
-Program~\ref{prog:P29}'s own best code for this source is four two-digit
-words, and four two-digit words average exactly $\val{p30.src.ce}$ on any
-distribution at all. So the code you have been sending it down ties with the
-best one you could have built: \textbf{against the best available code the
-wrong code is costing you nothing.} The $\val{p30.src.kl}$ is the excess over
-the \emph{floor}, which no whole-digit code reaches, which is why
-Program~\ref{prog:P29} could call the whole of it a rounding and be right.
+Program~\ref{prog:P29} reaches its best length here two ways \dash{} four
+two-digit words, or the very lengths you have been using \dash{} and both
+average exactly $\val{p30.src.ce}$. So the code you have been sending the
+source down \emph{is} one of the best codes for it: \textbf{against the best
+available code the wrong code is costing you nothing.} The
+$\val{p30.src.kl}$ is the excess over the \emph{floor}, which no whole-digit
+code reaches, and that is why Program~\ref{prog:P29} could call the whole of
+it a rounding and be right.
 
 And it is something else as well.
 

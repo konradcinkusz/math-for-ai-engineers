@@ -293,6 +293,21 @@ _h_nondy = entropy_bits(NONDY)
 _bn, _an = best_code(NONDY, cap=CAP)
 assert float(_bn) > _h_nondy, (_bn, _h_nondy)
 assert float(_bn) < _h_nondy + 1
+# THE OPTIMUM IS A TIE, and the draft's answer box named only one half of it.
+# best_code returns the lexicographically first minimiser, which is (1,2,3,3)
+# -- the assignment section 3's own "a length is its own surprise in bits"
+# rule produces -- while the page said "four codewords of two digits each".
+# A reader who followed the previous frame's method arrives at 1,2,3,3 and is
+# told they were wrong.  Both are enumerated here so the frame can say so.
+_optimal = sorted({tuple(sorted(l))
+                   for l in itertools.product(range(1, CAP + 1),
+                                              repeat=len(NONDY))
+                   if kraft_ok(l)
+                   and sum(p * q for p, q in zip(NONDY, l)) == _bn})
+assert _optimal == [(1, 2, 3, 3), (2, 2, 2, 2)], _optimal
+assert tuple(_an) == (1, 2, 3, 3), _an
+NOTES.append("the non-dyadic optimum is a TIE: (1,2,3,3) and (2,2,2,2) both "
+             f"give {float(_bn):.3f} bits with Kraft sum exactly 1.")
 emit("p29.nondy.h", _h_nondy, 3)
 emit("p29.nondy.best", float(_bn), 3)
 emit("p29.nondy.gap",
@@ -316,9 +331,13 @@ emit("p29.code.cap", CAP)
 # The anchor is a definition rather than a demonstration: a uniform choice
 # among n has entropy ln n, so its exponential is n, EXACTLY.  Checked over a
 # range so the page can say "always" rather than "here".
-for n in range(2, 40):
+EFF_UPTO = 39
+for n in range(2, EFF_UPTO + 1):
     assert abs(math.exp(entropy_nats([Fraction(1, n)] * n)) - n) < 1e-9, n
-emit("p29.eff.checked", 38)
+# The UPPER LIMIT, not the count.  The draft emitted 38 and the page then read
+# "every n from 2 to 38 + 1" -- a \val{} with an arithmetic operator hanging
+# off it, which reads as the author's own sum left on the page.
+emit("p29.eff.upto", EFF_UPTO)
 
 # THE GATE ON F03 AND F02, run in both directions: F02's per-token loss is
 # committed at 2.4 nats and F03 exponentiated it to a perplexity of 11.02.
@@ -330,6 +349,29 @@ emit("p29.f02.loss", _loss, 1)
 emit("p29.f03.ppl", _ppl, 2)
 NOTES.append(f"F03's perplexity reproduces from F02's loss: "
              f"exp({_loss}) = {math.exp(_loss):.2f} against {_ppl}.")
+
+# WHAT P19 MEASURED, AND WHAT IT DID NOT.  P19 frame 23 tabulates the ratio of
+# the WRONGLY averaged perplexity to the right one -- 7.42 at a spread of two
+# nats -- and says nothing whatever about per-token effective counts or about
+# orders of magnitude.  The draft credited it with both.  The spread's effect
+# on the counts is this program's own arithmetic, so it is computed here: a
+# token a spread above the mean weighs e^(mu+sigma) choices and one a spread
+# below e^(mu-sigma), so the two differ by e^(2 sigma) and the mean cancels --
+# which is why no mean is quoted beside it.  Gated on P19's committed ratio,
+# whose closed form for near-Gaussian losses is exp(sigma^2 / 2), so if that
+# measurement moves the spread this program quotes stops matching it.
+SPREAD_NATS = 2.0
+_p19_ratio = float(committed("p19.tex", "p19.ppl.ratio.20") or 7.42)
+assert abs(math.exp(SPREAD_NATS ** 2 / 2) - _p19_ratio) < 0.05, (
+    math.exp(SPREAD_NATS ** 2 / 2), _p19_ratio)
+emit("p29.spread.nats", SPREAD_NATS, 1)
+emit("p29.p19.ratio", _p19_ratio, 2)
+emit("p29.count.ratio",
+     reproduces(math.exp(2 * SPREAD_NATS), 1, (SPREAD_NATS, 1),
+                op=lambda a: math.exp(2 * a)), 1)
+NOTES.append(f"at P19's spread of {SPREAD_NATS} nats two tokens a spread "
+             f"either side of the mean differ by a factor of "
+             f"{math.exp(2 * SPREAD_NATS):.1f} in effective count.")
 
 # And the reading that makes it a statement about a model rather than a
 # leaderboard number: at every position the model is as uncertain as somebody
@@ -366,6 +408,13 @@ for tag, key in (("raw", "p25.e9.raw.ent.512"), ("scaled", "p25.e9.scaled.ent.51
 # it is spread over most of them.
 assert math.exp(float(committed("p25.tex", "p25.e9.raw.ent.512"))) < 1.2
 assert math.exp(float(committed("p25.tex", "p25.e9.scaled.ent.512"))) > 5.0
+# AND THE WEIGHT ITSELF, because a count is not a weight vector and the draft
+# glossed 1.12 as "one key and a tenth of another" -- which is a description of
+# a row of weights, and a row at (1, 0.1) normalised has effective count 1.36
+# rather than 1.12.  P25 committed what the row actually does, so the frame
+# quotes that instead of inventing a picture of it.
+emit("p29.att.raw.top",
+     float(committed("p25.tex", "p25.e9.raw.top.512") or 95.5), 1)
 NOTES.append("P25's attention entropies read as effective key counts: "
              f"{math.exp(float(committed('p25.tex', 'p25.e9.raw.ent.512'))):.2f} "
              f"unscaled against "
@@ -444,9 +493,12 @@ emit("p29.bpc.b",
      reproduces(BPT * TPC_B, 3, (BPT, 4), (TPC_B, 2), op=lambda a, b: a * b), 3)
 emit("p29.bpc.ratio",
      reproduces(TPC_B / TPC_A, 2, (TPC_B, 2), (TPC_A, 2), op=lambda a, b: a / b), 2)
-# The whole claim of the section, asserted: the SAME model on the SAME text
-# reports two different bits-per-character figures under two tokenisers, and
-# the ratio is the tokenisers' ratio and nothing about the model.
+# The whole claim of the section, asserted -- and note WHAT is held fixed.
+# It is the LOSS FIGURE, not the model.  A model's loss per token is a
+# property of (model, tokeniser), so "the same model" cannot report the same
+# bits per token under a coarser tokeniser; what the section shows is that one
+# REPORTED figure of 3.4625 bits per token describes two very different
+# compressors, and the ratio is the tokenisers' and nothing about the model.
 assert abs((BPT * TPC_B) / (BPT * TPC_A) - TPC_B / TPC_A) < 1e-12
 # AND the route the reader will actually take, which the reproduces() calls
 # above do NOT cover: they each check one value against ITS OWN operands, and
@@ -468,6 +520,12 @@ _lines = [
     ">>> def eff(ps):    # effective number of equally likely choices",
     "...     h = -sum(p * log(p) for p in ps if p)",
     "...     return round(exp(h), 2)",
+    # THE BLANK CONTINUATION LINE, which closes the def in a real session.
+    # Without it the listing pasted into a REPL raises SyntaxError on the
+    # next line, because the block has not been closed -- and a transcript is
+    # a claim about what a session prints.  Verified by replaying the file
+    # through code.InteractiveConsole rather than by running it as a script.
+    "...",
     ">>> eff([0.25] * 4), eff([0.97, 0.01, 0.01, 0.01])",
 ]
 _a = round(math.exp(entropy_nats(HONEST_SPREAD)), 2)
