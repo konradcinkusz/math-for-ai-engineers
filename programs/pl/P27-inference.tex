@@ -42,14 +42,15 @@
 \begin{outcomes}
 \outcome{1--6}{powiedzieć, ile warta jest podawana różnica w benchmarku
   \dash{} w pozycjach, a nie w punktach}
-\outcome{7--14}{zbudować przedział ufności dla metryki, która nie ma wzoru, i
-  nazwać jednostkę, którą trzeba losować}
-\outcome{15--22}{zaplanować i przeprowadzić porównanie dwóch modeli
+\outcome{7--15}{zbudować przedział ufności dla metryki, która nie ma wzoru,
+  nazwać jednostkę, którą trzeba losować, i powiedzieć, ile dana szerokość
+  kosztuje pozycji}
+\outcome{16--23}{zaplanować i przeprowadzić porównanie dwóch modeli
   ewaluowanych na tych samych promptach}
-\outcome{23--30}{powiedzieć, czym p-wartość jest, a czym nie jest}
-\outcome{31--36}{powiedzieć, co czterdzieści porównań w jednym rankingu robi z
+\outcome{24--31}{powiedzieć, czym p-wartość jest, a czym nie jest}
+\outcome{32--37}{powiedzieć, co czterdzieści porównań w jednym rankingu robi z
   tym wszystkim}
-\outcome{37--39}{zastosować całość do liczby, którą ktoś opublikował}
+\outcome{38--40}{zastosować całość do liczby, którą ktoś opublikował}
 \end{outcomes}
 
 \begin{quiz}
@@ -72,12 +73,12 @@
   takim losowaniu i weź środek otrzymanych odpowiedzi.}
 \item Dwa modele ewaluowano na tych samych promptach, a nie na osobnych
   próbach. Czy to czyni porównanie trudniejszym, czy łatwiejszym?
-  \teachesat{16--17}
+  \teachesat{17--18}
   \answerto{Łatwiejszym, i zwykle znacznie. Oba wyniki są skorelowane, a
   wariancja różnicy odejmuje podwojoną kowariancję, więc potrzebna liczba
   pozycji spada o czynnik $1-\rho$.}
 \item Porównanie zwraca $p = \num{0.03}$. Jakie jest prawdopodobieństwo, że
-  oba modele są równie dobre? \teachesat{24--25}
+  oba modele są równie dobre? \teachesat{25--26}
   \answerto{P-wartość tego nie mówi. To prawdopodobieństwo wyniku równie
   skrajnego \emph{przy założeniu}, że są równie dobre, a czytanie tego wstecz
   to odwrócenie, przed którym ostrzega Program~\ref{prog:P23}.}
@@ -395,9 +396,73 @@ szerokości}. Węższy kosztuje pozycje, po czterokroć za połowę z
 Programu~\ref{prog:P25}.
 \end{trapbox}
 
-Umiesz już nałożyć przedział na cokolwiek, co potrafisz policzyć. Zostaje
-pytanie, od którego program się zaczął, i okazuje się, że zadanie go wprost
-jest znacznie tańsze niż nakładanie przedziału osobno na każdy model.
+Umiesz już nałożyć przedział na cokolwiek, co potrafisz policzyć, zostaje
+więc dokładnie jedna dźwignia. Twoja ewaluacja ma $\val{p27.boot.n}$ pozycji,
+a przedział powyżej biegnie od $\val{p27.boot.lo}$ do $\val{p27.boot.hi}$,
+czyli ma $\val{p27.w.200}$ punktów szerokości; tablica wyników drukuje jedno
+miejsce po przecinku. Mniej więcej ile pozycji trzeba, żeby ten przedział
+zszedł poniżej jednego punktu?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Około $\val{p27.w.onepoint}$ \dash{} szerokość musi spaść
+$\val{p27.w.200}$ razy, a czterokroć więcej pozycji dzieli ją na pół, więc
+pozycje idą jak kwadrat tego czynnika: $\val{p27.w.200}$ do kwadratu, razy te
+$\val{p27.boot.n}$, które masz.
+\end{ansblock}
+
+Zmierzone przez trzy rzędy wielkości przy tej samej dokładności, z
+przedziałem policzonym dokładnie zamiast losowanym:
+
+\begin{center}
+\begin{tabular}{rrr}
+\toprule
+pozycji w zbiorze & szerokość przedziału, punkty & przedział, w pozycjach \\
+\midrule
+$50$ & $\val{p27.w.50}$ & $\val{p27.w.span.50}$ \\
+$\val{p27.boot.n}$ & $\val{p27.w.200}$ & $\val{p27.w.span.200}$ \\
+$800$ & $\val{p27.w.800}$ & $\val{p27.w.span.800}$ \\
+$\num{3200}$ & $\val{p27.w.3200}$ & $\val{p27.w.span.3200}$ \\
+$\num{12800}$ & $\val{p27.w.12800}$ & $\val{p27.w.span.12800}$ \\
+$\num{51200}$ & $\val{p27.w.51200}$ & $\val{p27.w.span.51200}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Drugi wiersz to przedział, który już masz, a reszta to ten sam rachunek przy
+innych rozmiarach. Czterokroć więcej pozycji dzieli szerokość na pół na
+każdym kroku: Program~\ref{prog:P25} podaje tę regułę, a tutaj jest ona
+zmierzona, a nie zacytowana \dash{} i \textbf{dokładność siedzi w trzeciej
+kolumnie}, gdzie rozpiętość podwaja się na liczbach całkowitych. Kolumna
+punktów to te rozpiętości podzielone przez rozmiar zbioru i zaokrąglone, więc
+podzielenie dwóch jej wpisów daje $2$ z dokładnością do dwóch miejsc po
+przecinku, a nie $2$ dokładnie.
+
+Jedyny krok, który nie jest połową, to pierwszy, i łamie go najmniejszy
+zbiór: $50$ pozycji daje $\val{p27.w.coarse}$ razy szerokość
+$\val{p27.boot.n}$ pozycji zamiast dwa razy. Rozpiętość jest całkowitą liczbą
+pozycji, a na $50$ pozycjach jedna pozycja warta jest dwa punkty, więc
+przedział ma $\val{p27.w.span.50}$ pozycji szerokości, a następna rozpiętość
+w dół jest węższa o całe dwa punkty. To siatka z sekcji 1 w najgrubszym
+wydaniu i tutaj zaokrągla na zewnątrz: bootstrap podaje odrobinę więcej
+niepewności niż wzór.
+
+Tabela sama ogranicza własną odpowiedź \dash{} $\val{p27.w.12800}$ punktu
+przy $\num{12800}$ pozycjach i $\val{p27.w.51200}$ przy $\num{51200}$
+\dash{} a przejście wypada około $\val{p27.w.onepoint}$. \emph{Około} jest
+formą uczciwą, a nie asekuracją: rozpiętość zmienia się po jednej pozycji,
+więc w pobliżu przejścia szerokość skacze nad jeden punkt i pod niego w miarę
+rośnięcia zbioru, a rozmiar podany co do pozycji byłby własnością siatki, a
+nie metody.
+
+To wszystko jest jednym przedziałem na jednym modelu. Pytanie, od którego
+program się zaczął, dotyczy różnicy między dwoma modelami, odpowiadająca na
+nie liczba należy do sekcji 3, a nie do tej, i okazuje się, że zadanie
+pytania o różnicę wprost jest znacznie tańsze niż nakładanie przedziału
+osobno na każdy model.
 \end{fr}
 
 % ============================================================
@@ -987,46 +1052,51 @@ rozkład na to, czego nie jesteś pewien, a nie na dane, które już masz.
   użytkowników to nie $\val{p27.clust.n}$ obserwacji, a bootstrap po wierszach
   podaje przedział za wąski o $\val{p27.clust.factor}$. Więcej losowań nigdy
   nie zwęża przedziału; robią to tylko pozycje}.}
-\sumitem{15--17}{\result{\textbf{Parowanie mnoży potrzebne pozycje przez
+\sumitem{14--15}{\result{\textbf{Szerokość ustala liczba pozycji i nic poza nią},
+  a czterokroć więcej pozycji dzieli ją na pół \dash{} zmierzone, a nie
+  zacytowane. Przedział ma rozpiętość $\val{p27.w.span.200}$ pozycji przy
+  $\val{p27.boot.n}$ i $\val{p27.w.span.51200}$ przy $\num{51200}$, a poniżej
+  jednego punktu schodzi przy około $\val{p27.w.onepoint}$ pozycjach}.}
+\sumitem{16--18}{\result{\textbf{Parowanie mnoży potrzebne pozycje przez
   $1-\rho$}, dokładnie, przy każdej dokładności i każdej różnicy.
   Program~\ref{prog:P25} podaje $\val{p27.n.rho00}$, co staje się
   $\val{p27.n.rho90}$ przy $\rho = \num{0.9}$ \dash{} rząd wielkości, z wyrazu
   kowariancji w $\Var(X-Y)$}.}
-\sumitem{18--19}{\result{\textbf{Różnicę niosą tylko pozycje niezgodne.} Te
+\sumitem{19--20}{\result{\textbf{Różnicę niosą tylko pozycje niezgodne.} Te
   $\val{p27.concord}$ pozycji, na których oba modele odpowiedziały tak samo,
   skracają się dokładnie, a porównanie dotyczy w całości
   $\val{p27.disc}$ pozostałych}.}
-\sumitem{19--20}{\result{Przy \enquote{równie dobre} te pozycje są uczciwymi rzutami
+\sumitem{20--21}{\result{Przy \enquote{równie dobre} te pozycje są uczciwymi rzutami
   monetą, więc testem jest symbol Newtona z Programu~\ref{prog:P12} na
   liczbach całkowitych \dash{} dokładny, niezależny od maszyny i niepotrzebujący
   wariancji. \textbf{Przerobiona różnica daje $\val{p27.p.exact}$}: nieparzysta
   liczba nie wypada po równo, więc zaobserwowana przewaga
   $\val{p27.net}$ jest najmniejszą dostępną, a wynik co najmniej tak
   przechylony jest pewny}.}
-\sumitem{21}{\result{\textbf{Na tej ewaluacji różnica poniżej
+\sumitem{22}{\result{\textbf{Na tej ewaluacji różnica poniżej
   $\val{p27.net.needed.pts}$ punktu nie jest wynikiem}, znalezione przez
   szukanie. Opublikowana różnica to $\val{p27.gap.pts}$ punktu}.}
-\sumitem{23--25}{\result{\textbf{P-wartość to
+\sumitem{24--26}{\result{\textbf{P-wartość to
   $\Prob(\text{dane tak skrajne} \mid \text{brak różnicy})$}, a czytanie jej
   wstecz to odwrócenie z Programu~\ref{prog:P23} \dash{} ten sam błąd co przy
   częstości bazowej}.}
-\sumitem{26--27}{\result{Mając rozkład a priori da się ją odwrócić, a odpowiedź
+\sumitem{27--28}{\result{Mając rozkład a priori da się ją odwrócić, a odpowiedź
   niepokoi: przy $\val{p27.prior.real.pct}$ procentach porównań prawdziwych i
   mocy $\val{p27.power.pct}$ procent $\val{p27.fdr.pct}$ procent
   \enquote{istotnych} odkryć jest fałszywych}.}
-\sumitem{28--29}{\result{\textbf{Jedno na dwadzieścia porównań identycznych modeli
+\sumitem{29--30}{\result{\textbf{Jedno na dwadzieścia porównań identycznych modeli
   raportuje różnicę}, z konstrukcji. Tutaj $\val{p27.null.rate.pct}$ procent,
   bo test dyskretny przekracza próg skokiem, zamiast na nim lądować}.}
-\sumitem{31--33}{\result{\textbf{$\val{p27.models}$ porównań robi z tego
+\sumitem{32--34}{\result{\textbf{$\val{p27.models}$ porównań robi z tego
   $\val{p27.any.false.pct}$ procent.} Podzielenie progu to przywraca i
   kosztuje $\val{p27.bonf.cost}$ raza tyle pozycji \dash{} wielokrotne
   porównania są pozycją w budżecie, a nie drobiazgiem}.}
-\sumitem{34--35}{\result{\textbf{A sortowanie tabeli obciąża jej górny wiersz.}
+\sumitem{35--36}{\result{\textbf{A sortowanie tabeli obciąża jej górny wiersz.}
   Zwycięzca $\val{p27.models}$ \emph{równych} modeli leży $\val{p27.emax}$
   błędu standardowego powyżej własnej prawdy, czyli $\val{p27.lb.margin}$
   punktu na $\val{p27.lb.n}$ pozycjach. Selekcja, nie pomiar \dash{} i ta sama
   arytmetyka jest powodem, dla którego istnieje zbiór odłożony}.}
-\sumitem{37--39}{\result{To, co zostaje, gdy porównanie nie rozstrzyga rzeczy, na
+\sumitem{38--40}{\result{To, co zostaje, gdy porównanie nie rozstrzyga rzeczy, na
   której ci zależy, jest pytaniem o projekt. \textbf{A \enquote{brak istotnej
   różnicy} staje się pomiarem w chwili, gdy podasz, jak duża musiałaby być
   różnica.}}}
@@ -1058,6 +1128,15 @@ rozkład na to, czego nie jesteś pewien, a nie na dane, które już masz.
   \answerto{Za wąski, nawet o $\sqrt{600/50} = \sqrt{12} \approx
   \num{3.5}$. Bootstrap sądzi, że ma $600$ niezależnych obserwacji, a w
   najgorszym razie ma $50$.}
+\item Twój zbiór ewaluacyjny ma $800$ pozycji i chcesz przedział o połowę
+  węższy. Ile to kosztuje pozycji i co dzieje się z rozpiętością przedziału
+  liczoną w pozycjach?
+  \answerto{Czterokroć tyle, czyli $\num{3200}$ \dash{} a rozpiętość się
+  \emph{podwaja}, z $\val{p27.w.span.800}$ pozycji na
+  $\val{p27.w.span.3200}$. To jeden fakt, a nie dwa: szerokość to rozpiętość
+  podzielona przez rozmiar zbioru, więc czterokrotne powiększenie zbioru
+  przy podwojeniu rozpiętości daje połowę szerokości. Rozpiętość rosnąca
+  wtedy, gdy przedział się zwęża, to połowa, którą czyta się na opak.}
 \item Zespół przeprowadza $20$ porównań z odniesieniem i raportuje dwa, które
   wróciły z $p < \num{0.05}$. Gdyby żaden z $20$ systemów nie różnił się od
   odniesienia, ilu takich raportów byś się spodziewał?
