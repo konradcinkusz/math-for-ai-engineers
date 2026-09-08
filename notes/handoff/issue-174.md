@@ -112,12 +112,19 @@ payload are untouched. Lengths moved in six places:
 frames 35 and 37 are three frames apart, so the intervening break can move.
 P20's three edits are consecutive and net roughly one line longer.
 
-## Values
+## Values, and the ledger this pass ended up owning
 
-None emitted and none retired. `make debt` reports 1673 computed values
-before and after, and `make verify` did **not** report `figures/values/appf.tex`
-stale, because no ledger moved. Elicitation is unchanged at 1028/1864 (55%):
-this pass converted nothing.
+None emitted and none retired by this pass, and elicitation is unchanged at
+1028/1864 (55%), because it converted nothing and added no frame.
+
+**It did regenerate `figures/values/appf.tex`, 1674 -> 1677**, which the
+parallel arrangement had reserved for a synchronising pass. The reason is
+that this branch was later asked to merge itself: the P34 review (#178)
+added three values and left the ledger at HEAD by the same rule, so `main`
+was carrying `appf.values = 1674` against a real count of 1677, and CI's
+"Recompute every number" job gates hard on `$(COMPUTED)` drift. The P20
+session hit exactly this one merge earlier and regenerated it for the same
+reason. **A branch that merges itself cannot hand the ledger on.**
 
 ## A collision with another live session, test-merged
 
@@ -127,8 +134,9 @@ time**, and it touches the same section. Its change is confined to **frame
 `p20.adam.shortfall.lo`, so the frame now reads "not by the same amount in
 both". Mine are frames 23, 25 and 26.
 
-**Test-merged, and it is clean** --- `git merge --no-commit` of that branch
-into this one auto-merges both editions with no conflict. More usefully, the
+**It merged first, and it composed exactly as the test merge predicted.**
+A `git merge --no-commit` had auto-merged both editions with no conflict
+before either landed, and the real merge did the same. More usefully, the
 two compose rather than merely coexisting, and the composed reading is better
 than either alone:
 
@@ -189,3 +197,38 @@ knows every answer. A check restricted to those two regions is a smaller
 problem than the one the prototype measured --- but it is the same semantic
 discriminator, so it would need the author to adjudicate its hits, and a
 gate nobody can clear is the permanently-red ledger this repository refuses.
+
+
+## A second collision, which did NOT compose: P34, and the resolution
+
+**PR #210 (the P34 review, #178) merged while this branch was open, and it
+fixes two of the same findings** --- outcome 4 and frame 35. Both conflicts
+were that overlap. Neither resolution loses behaviour, so it was resolved
+here rather than escalated, and it is a composite:
+
+- **outcome 4 -> theirs.** "what its published agreement figure is a
+  statement about" removes the spoiler as cleanly as this pass's wording,
+  and P34 is that pass's unit.
+- **frame 35 -> this pass's, and the reason is a finding.** Their fix
+  replaced "the model's contribution cancels" with "**one of the two factors
+  belongs to the tokeniser**", in bold --- which is frame 37's own opening
+  sentence, one frame before frame 36 asks the question. It also kept the
+  numbers under it, and "the same model reports two different figures" is one
+  step from "the model cancelled": Program P02's rule that supplying the last
+  step of an answer is as much a spoiler as stating it. This pass moves the
+  illustration into frame 37, where it confirms rather than reveals, and that
+  hunk merged cleanly, so the two compose.
+
+**The generalisable half, and it is new.** Two sessions reading the same
+issue found the same two defects and fixed them differently, and one of the
+two fixes was incomplete in a way only visible from the *other* pass's
+reading. A duplicated fix is not wasted work: it is a second reading, and
+where the two disagree the disagreement is the signal. What it costs is a
+conflict, and the conflict is where somebody has to know both readings ---
+which is an argument for the per-program issue and the synthesis issue not
+being worked in parallel on the same unit.
+
+**One thing left un-reconciled, deliberately.** The detector reports 18
+candidates on the merged P34 and every one is pre-existing: `origin/main`'s
+Polish P34 carries 111 lines over the wrap width and so does this tree, so
+they came in with #210 and are not this pass's to sweep.
