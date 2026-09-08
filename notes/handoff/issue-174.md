@@ -232,3 +232,42 @@ being worked in parallel on the same unit.
 candidates on the merged P34 and every one is pre-existing: `origin/main`'s
 Polish P34 carries 111 lines over the wrap width and so does this tree, so
 they came in with #210 and are not this pass's to sweep.
+
+
+## A third collision, and it is the one worth keeping: P31
+
+**PR #211 (a P31 review, issue #45) merged while this branch was open and
+rewrote the same aibox.** Its rewrite is *better on the substance* --- it
+replaces "the estimate is dominated by its own bias" with the regime
+argument, that a few hundred items over that many cells is far below the
+items per cell the bias formula needed, so the formula does not apply and
+whatever the bias is, it is of the order of the quantity itself. That is
+section 4's own point and it belongs there.
+
+**And its last sentence reintroduced the defect this issue files for P31**:
+
+> A run on labels with no relationship to the input at all would have come
+> back positive too.
+
+Two lines below it the frame asks *What is it?*, and the answer block reads
+*Shuffle the labels and re-run the whole pipeline --- the labels keep the
+distribution they had and lose every relationship to the input.* So the
+sentence is the answer, in the answer's own words, above the question. It is
+the same spoiler this pass had just removed, rewritten from scratch by
+somebody fixing something else in the same box.
+
+Resolved as a composite in both editions: their regime argument in full,
+their final sentence replaced by "nothing in the number itself would say so".
+
+**This is the strongest evidence in the run for what the issue argues.**
+\#174's thesis is that the class cannot be closed by a rule, because reading
+for it does not scale. Here a careful pass, working the same box, with the
+rule written down in CLAUDE.md, reintroduced the spoiler within hours of its
+removal --- not by ignoring the rule but by rewriting the sentence for an
+unrelated reason and not re-reading it against the question two lines below.
+**A spoiler is not a defect you fix once; it is a defect the next edit to
+that paragraph can recreate**, and nothing in the repository can see it.
+
+That is an argument for the narrow mechanical check this pass declined to
+ship, but only in the two regions that print *before frame 1*. It is not an
+argument for one over the whole book: the prototype's numbers still stand.
