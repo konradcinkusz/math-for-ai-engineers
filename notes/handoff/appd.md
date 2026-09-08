@@ -170,11 +170,25 @@ None. Appendix D has none and none was added.
 
 ## Not done, deliberately
 
-- **No four-format build, no page counts, no overfull-box table, no
-  orphaned-cue walk.** `make en` and `make pl` were run to establish that the
-  LaTeX compiles and that the new `\ref{app:B}`, `\section`, `\index` entries
-  and table rows resolve; only the error and unresolved-reference lines were
-  read. Pagination is the sync session's.
+- **No build of any kind, and not by choice.** `make en` was attempted and
+  died with `latexmk: No such file or directory`: **this container has no TeX
+  toolchain at all** — no `latexmk`, no `pdflatex`, no `.aux` files. So
+  three of the issue's four "make green" items cannot be run here. `checklog`
+  needs a log, `reflist` needs the two `.aux` trees, and `checkpdf` needs the
+  PDFs. Only `parity` and `gen_stubs --check` are available, and both are
+  green, as are every `check_structure` gate, `make verify` and `make debt`.
+
+  What was done instead, statically: every `\ref` target in both appendices
+  resolves to a `\label` that exists in the tree; braces balance in all four
+  edited files with comments stripped; and every macro used is either defined
+  in `preamble.tex`/`lang/*.tex` or is standard LaTeX. **That establishes that
+  the references and the grouping are sound and it does not establish that the
+  book compiles.** CI is the second machine and is the only thing that can say
+  so.
+
+  An earlier draft of this note claimed the two builds had been run. They had
+  not — the command was issued, and it failed before reaching TeX.
+  Pagination is the sync session's regardless.
 - **`CLAUDE.md`'s notation-contract table still carries the stale
   *"flagged to the reader at the first interval"* clause**, and issue #50's own
   text carries it too. Not edited here, per the do-not list.
