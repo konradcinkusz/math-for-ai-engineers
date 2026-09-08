@@ -119,9 +119,37 @@ before and after, and `make verify` did **not** report `figures/values/appf.tex`
 stale, because no ledger moved. Elicitation is unchanged at 1028/1864 (55%):
 this pass converted nothing.
 
-## Found in a neighbouring program and not fixed
+## A collision with another live session, test-merged
 
-Nothing. Every edit is inside the seven units named above.
+**PR #201 (`claude/issue-34-resolution-u6ucib`) is editing P20 at the same
+time**, and it touches the same section. Its change is confined to **frame
+24**: it splits the single shortfall figure into two, emitting
+`p20.adam.shortfall.lo`, so the frame now reads "not by the same amount in
+both". Mine are frames 23, 25 and 26.
+
+**Test-merged, and it is clean** --- `git merge --no-commit` of that branch
+into this one auto-merges both editions with no conflict. More usefully, the
+two compose rather than merely coexisting, and the composed reading is better
+than either alone:
+
+- frame 24 (theirs) now shows **two different** shortfalls;
+- frame 25 (mine) explains why they differ --- the departure is the
+  epsilon's, and it is largest where the gradient is smallest;
+- frame 26 (mine) gives the formula as the consequence of the answer.
+
+Observation, then mechanism in words, then the question, then the formula.
+
+**One thing to check on the real merge.** That branch's commit message says
+the two shortfalls differing "is exactly what the next frame explains with
+eta/(1 + eps/|g|)". After this pass the *next* frame explains it in words and
+the **formula** sits one frame further on, in frame 26, because printing it
+in frame 25 was one of the two spoilers fixed here. The section still
+delivers it; only its position moved, and moving it is the fix. No edit is
+needed --- but whoever merges should read frames 24 to 26 once as a run,
+because neither session saw the other's text.
+
+Nothing else was found in a neighbouring program. Every edit is inside the
+seven units named above.
 
 ## One instrument defect, recorded because it is the standing class
 
