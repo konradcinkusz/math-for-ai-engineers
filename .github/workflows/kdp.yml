@@ -22,9 +22,12 @@ on:
     tags: ['kdp-v*']
   # The regression guard's whole job is to prove the four existing PDFs have
   # not moved, and the moment that claim is made is a pull request -- so it
-  # runs here too. Only the cheap jobs do: the volume matrix is cut to one
-  # volume below, because eight compiles of a book is a release cost and a
-  # smoke test is what a PR needs.
+  # runs here too. How much else runs is DECIDED BY THE DIFF rather than by the
+  # event: `scope' below builds all four volumes when a file every volume reads
+  # has changed and volume III alone otherwise. This comment used to say the
+  # matrix was always cut to one volume, which was true when it was written and
+  # was made false by `scope' in the same commit that added it -- and it is
+  # exactly the arrangement that let a volume I defect through a green PR.
   pull_request:
     paths:
       - 'kdp/**'
