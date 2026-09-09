@@ -55,9 +55,13 @@ FORMATS = {
 # rather than the nominal size -- the same gap `checkpdf.py` records for a
 # `\Large` heading measuring smaller than the body.
 #
-# So this constant is empirical, and it is used because it was VALIDATED: with
-# it the formula reproduces every figure CLAUDE.md's pass notes measured by
-# hand, to a hundredth of a point. Do not "correct" it to 15.
+# So this constant is empirical, and it is used because it was VALIDATED
+# against measurements somebody else took, by hand, months earlier: with it
+# the formula returns 4.32 pt for f01-magnitudes at 210 x 667 and 5.37 pt for
+# the same figure on A4, both of which CLAUDE.md's F02 review pass records to
+# the digit. F3.1 comes back 8.53 against a recorded 8.51, and the 0.02 is the
+# note quoting W and H as whole numbers where the render is fractional.
+# Do not "correct" this to 15.
 BASE_PT = 12.57
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
