@@ -305,11 +305,24 @@ ANSBLOCK_WORKED = (
 
 
 def _ansblock_bodies(text: str) -> list[str]:
-    """Every ansblock body in source order, comments already gone."""
+    """Every ansblock body in source order, comments already gone.
+
+    The same-line form is handled explicitly even though the book contains
+    none: without it the scan would run past the close and swallow the next
+    answer whole, reporting one body where there are two and classifying it by
+    the wrong content. That is a silent wrong answer rather than a crash, which
+    is the failure mode this repository keeps paying for -- so it is closed
+    here rather than left latent for whoever writes the first one.
+    """
     out, lines, i = [], text.split("\n"), 0
     while i < len(lines):
         if RE_ANSBLOCK_OPEN.search(lines[i]):
-            body = [lines[i].split(r"\begin{ansblock}", 1)[1]]
+            after = lines[i].split(r"\begin{ansblock}", 1)[1]
+            if RE_ANSBLOCK_CLOSE.search(after):
+                out.append(after.split(r"\end{ansblock}", 1)[0])
+                i += 1
+                continue
+            body = [after]
             j, depth = i + 1, 1
             while j < len(lines):
                 if RE_ANSBLOCK_OPEN.search(lines[j]):
