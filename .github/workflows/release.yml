@@ -90,13 +90,32 @@ jobs:
           root_file: main-${{ matrix.lang }}.tex
           args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
 
-      - name: Fail on unresolved references
+      # The same two gates the other two workflows use, and for the same
+      # reasons. The inline grep this replaces saw undefined references and
+      # nothing else. checklog.py sees those, AND an error that
+      # -interaction=nonstopmode has written a PDF over the top of, AND an
+      # overfull vbox, AND "Rerun to get" and "Label(s) may have changed" --
+      # a non-converged build exits 0 with a stale frame total on an opener,
+      # and that failure is a WRONG number rather than a missing one.
+      #
+      # Then the artefact, because a stranded frame opener and a stranded
+      # section heading produce no error, no warning and no overfull box, so
+      # no log can see either. Both hold under EITHER installation's metrics
+      # -- the reservations behind them are measured in \baselineskip -- so
+      # they are hard here exactly as they are in build.yml. A release was
+      # the one artefact a reader can be handed that nothing checked at all.
+      #
+      # The cue is --cues=warn, as it is in build.yml and pages.yml: its
+      # LOCATION is a property of the installation, so failing a release on it
+      # would ask the author to chase a machine they cannot build.
+      #
+      # This runs BEFORE the rename below, while the file is still main-*.pdf.
+      - name: Refuse to release a build that only looked like it worked
         run: |
-          if grep -q "Reference.*undefined" main-${{ matrix.lang }}.log; then
-            echo "::error::Refusing to release with unresolved cross-references."
-            grep "Reference.*undefined" main-${{ matrix.lang }}.log | sort -u
-            exit 1
-          fi
+          python3 tools/checklog.py main-${{ matrix.lang }}.log
+          command -v pdftotext >/dev/null 2>&1 || \
+            sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          python3 tools/checkpdf.py --cues=warn main-${{ matrix.lang }}.pdf
 
       - name: Name the artefact after the tag
         run: |
