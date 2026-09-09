@@ -169,3 +169,32 @@
 \newcommand{\lblPdfSubject}{Programowany kurs matematyki potrzebnej inżynierowi AI, od arytmetyki po jeden blok transformera}
 \newcommand{\lblPdfKeywords}{matematyka, uczenie maszynowe, algebra liniowa, analiza matematyczna, prawdopodobieństwo, teoria informacji, nauczanie programowane}
 \newcommand{\lblPdfLang}{pl-PL}
+
+% ---------- Wydanie tomowe KDP ----------
+% Uzywane wylacznie przez kdp/preamble-kdp.tex i wygenerowana mape serii.
+% Sa tutaj, a nie w tamtej preambule, bo to lancuchy widoczne dla czytelnika,
+% ktore roznia sie miedzy wydaniami -- i dlatego, ze C3 porownuje oba
+% katalogi, wiec lancuch dodany do jednego wydania i nie do drugiego jest
+% niezdefiniowana sekwencja sterujaca w dokladnie jednej kompilacji.
+%
+% W zadnym z nich nie ma liczby tomow. Podzial mieszka w tools/volumes.json,
+% a mapa serii go drukuje; zdanie mowiace, ile jest tomow, byloby druga kopia
+% tego faktu.
+\newcommand{\lblVolume}{Tom}
+\newcommand{\lblSeriesMap}{Seria}
+\newcommand{\lblYouAreHere}{jesteś tutaj}
+\newcommand{\lblTitle}{Tytuł}
+\newcommand{\lblParts}{Części}
+\newcommand{\lblSeriesMapIntro}{Ta książka ukazuje się jako seria tomów. Każdy
+  jest samodzielny: zawiera odpowiedzi do własnych programów oraz notację,
+  wykaz wzorów i terminologię dla materiału, który obejmuje.}
+\newcommand{\lblSeriesMapNote}{Odsyłacz do programu z innego tomu ma po sobie
+  numer tego tomu, jak \lblProgram~12 (\lblVolume~III). Dalsza lektura i
+  manifest są w ostatnim tomie.}
+% Zdanie o wsparciu AI na stronie redakcyjnej tomu. KDP pyta osobno, przy
+% wysylce, o deklaracje maszynowo czytelna; tamta jest decyzja o autorstwie i
+% mieszka w tools/volumes.json, nieustawiona dopoki nie ustawi jej czlowiek.
+% To jest tylko zdanie, ktore widzi czytelnik.
+\newcommand{\lblAiAssist}{Ta książka powstała przy wsparciu narzędzi AI. Każda
+  liczba, którą drukuje, jest wynikiem skryptu z katalogu \texttt{code/}
+  i jest sprawdzana ponownie przy każdej kompilacji.}
