@@ -249,13 +249,16 @@ alignment between a header row and the rows beneath it. The same reasoning gover
 
 ## 6. Quiz, summary, exercises
 
-**`quiz`** — Foundation only, enforced. A quiz in Part II is a sign the Program
-has been written as revision. It is a warning rather than an error, because a
-draft has to be allowed to compile. The frame range against each item is the whole
-point: the quiz is diagnostic on entry and the exit test on the way out, so a
-reader who gets item three wrong must be told which frames to work. The hint is
-set flush right *on its own line*, so a long question and a long hint cannot fight
-for the same line and produce an overfull hbox.
+**`quiz`** — **every** program carries one. This entry said *Foundation only,
+enforced*, and both halves were wrong: the Quiz is on all forty-seven programs,
+and nothing enforces anything — `grep -n quiz tools/*.py Makefile` finds no
+check and no warning, so the "warning rather than an error" it described has
+never existed. A claim that a rule is enforced is a claim about the tooling and
+it is one grep from being settled. The frame range against each item is the whole
+point: the quiz is a diagnostic on entry and nothing else — the exit test is the
+scored Test exercises — so a reader who gets item three wrong must be told which
+frames to work. The hint is set flush right *on its own line*, so a long question
+and a long hint cannot fight for the same line and produce an overfull hbox.
 
 **`summary`** — `\sitem[7]{...}` prints the frame number flush right in square
 brackets, so the summary doubles as a return index. Both forms work:
@@ -574,26 +577,32 @@ an `\addtocontents`.
 
 ---
 
-## 14. Ledgers: what LaTeX counts and what the Makefile greps
+## 14. Ledgers: what was planned in LaTeX, and what Python actually counts
 
-Debt is counted, not remembered. The split is deliberate: **a grep gets what a grep
-can see; everything else is counted by LaTeX and emitted as a package warning.**
+Debt is counted, not remembered. **The split below is what was planned, and the
+book did not build it that way** — which matters, because this file opens by
+promising that nothing in it is proposed and untested. It was: no
+`Package mfa Warning` is emitted anywhere, `\mfaminframes` and `\mfamaxframes`
+were never defined, and the snippet's `programs/*.tex` predates the
+`programs/{en,pl}/` split. The counting moved out of LaTeX and into Python, and
+it reads the **source** rather than the log, which is why it runs in seconds and
+before a build rather than after one.
 
-LaTeX counts, per Program:
+Four of the seven planned counts exist, in `tools/check_structure.py`:
 
-- frames outside the 30–70 range (`\mfaminframes` / `\mfamaxframes`)
-- outcomes declared but `\canyou` never called
-- a Foundation Program with no quiz
-- a Program with no summary
-- exercises whose count does not match their solutions
-- `\val` keys with no computed value
-- solutions recorded when `\listofanswers` was never called
+| planned LaTeX warning | what actually checks it |
+|---|---|
+| frames outside the 30–70 range | `--frames`, with the band taken from `programs.json` where a program plans fewer on purpose |
+| outcomes declared but `\canyou` never called | `--outcomes`, which also requires the panel to precede the Test exercises |
+| exercises whose count does not match their solutions | `--answers` |
+| `\val` keys with no computed value | `--values`, and parity's C7 from the other side |
 
-CI reads them out of the log with one line:
-
-```bash
-grep 'Package mfa Warning' main.log
-```
+**Three were never built and nothing replaced them:** a Program with no quiz, a
+Program with no summary, and solutions recorded without `\listofanswers`.
+Parity's C14 macro histogram would catch a summary dropped from one edition and
+not from both. None of the three has fired as a defect, which is why nobody
+noticed; the entry is here so the next person does not read the list above as a
+description of a mechanism that exists.
 
 ### Makefile
 

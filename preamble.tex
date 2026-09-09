@@ -1434,11 +1434,20 @@
 % ============================================================
 
 % ---- Quiz -----------------------------------------------------------------
-% Foundation programs only. It is a diagnostic on the way in and the same test
-% on the way out, which is what lets one book serve a reader who needs the
-% whole program and a reader who needs four frames of it. Each question names
-% the frames that teach it, so a wrong answer routes the reader somewhere
-% specific rather than back to the beginning.
+% EVERY program carries one, and this comment said "Foundation programs only"
+% for the whole of the book. Each question names the frames that teach it, so a
+% wrong answer routes the reader somewhere specific rather than back to the
+% beginning, which is what lets one book serve a reader who needs the whole
+% program and a reader who needs four frames of it.
+%
+% It is a diagnostic on the way IN and nothing else. This comment also called it
+% "the same test on the way out", which is the claim the F04 review pass cut
+% from \lblCanYouFooter, the P04 pass cut from the front matter and the
+% F01--F06 batch cut from \lblQuizIntro -- answered a second time it is the
+% same questions put to a reader who now remembers them, so the difference
+% between two scores measures memory. The instrument is the scored Test
+% exercises. Three places were swept and the file that implements the Quiz was
+% not, because a comment is a claim about the book and nothing checks it.
 \newlist{quizlist}{enumerate}{1}
 \setlist[quizlist]{label=\arabic*., leftmargin=2.0em, itemsep=5pt, topsep=3pt}
 
