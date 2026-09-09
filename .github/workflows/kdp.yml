@@ -117,11 +117,18 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
           mkdir -p /tmp/head
           pdfinfo main-en.pdf | awk '/^Pages/{print $2}' > /tmp/head/pages
-          # reflist.py compares label -> number resolution. A KDP change that
-          # moved a single \ref would show up here and nowhere else.
-          python3 tools/reflist.py > /tmp/head/refs 2>/dev/null || true
-          cp main-en.aux /tmp/head/aux
-          echo "HEAD: $(cat /tmp/head/pages) pages"
+          # NOT reflist.py, which stood here and answered a different question.
+          # reflist compares the two EDITIONS against each other and prints a
+          # COUNT, so two builds differing by a moved \ref produce identical
+          # output; and this job compiles main-en only, so it failed on the
+          # absent main-pl.aux on BOTH sides and the diff below compared two
+          # error strings whose sole difference was the absolute path each tree
+          # sat at. Had the paths matched it would have gone green having
+          # compared nothing. auxrefs.py dumps label -> number for ONE tree and
+          # refuses an empty answer. No `|| true`: a guard that cannot read its
+          # evidence has none, and must stop rather than compare two blanks.
+          python3 tools/auxrefs.py . > /tmp/head/refs
+          echo "HEAD: $(cat /tmp/head/pages) pages, $(wc -l < /tmp/head/refs) labels"
 
       # The merge base, built from the same diagrams, so only the source differs.
       #
@@ -166,10 +173,15 @@ jobs:
             echo "::error::additive: the four existing PDFs must not change."
             exit 1
           fi
-          # And the cross-references, which a page count cannot see.
-          ( cd "$RUNNER_TEMP/base" && python3 tools/reflist.py > /tmp/base-refs 2>/dev/null || true )
+          # And the cross-references, which a page count cannot see: a \ref
+          # can resolve to a different program with the page total unmoved.
+          # The base tree is a worktree of an OLDER commit and does not contain
+          # auxrefs.py, so HEAD's copy is POINTED AT it rather than run inside
+          # it -- which is why the script takes its tree root as an argument.
+          python3 "$GITHUB_WORKSPACE/tools/auxrefs.py" "$RUNNER_TEMP/base" > /tmp/base-refs
+          echo "base $(wc -l < /tmp/base-refs) labels, head $(wc -l < /tmp/head/refs) labels"
           if ! diff -q /tmp/base-refs /tmp/head/refs >/dev/null 2>&1; then
-            echo "::error::the resolved cross-reference list changed"
+            echo "::error::a cross-reference resolves differently than on the base"
             diff /tmp/base-refs /tmp/head/refs | head -30 || true
             exit 1
           fi

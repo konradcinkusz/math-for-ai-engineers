@@ -30,6 +30,65 @@ artefacts, so `.github/workflows/kdp.yml`'s first job builds `main-en` on the
 merge base and on `HEAD` and fails if the page count or the resolved
 cross-reference list differs by one entry. It gates every other job.
 
+### The cross-reference half compared two error messages
+
+**Four things were wrong with that job and every one of them let it pass or
+skip rather than fail**, which is the shape worth carrying rather than any of
+the four: a guard is the one piece of machinery whose failure mode is silence,
+so each defect in it was invisible in exactly the direction that mattered.
+
+The first three are recorded in the commits that fixed them \dash{} it ran on
+no event a pull request produces; its base worktree sat in `/tmp`, which a
+Docker action does not mount, so it failed on its own scaffolding; and it fell
+back to `git rev-parse HEAD~1`, which would have compared HEAD against its own
+previous commit and passed.
+
+**The fourth is the worst, and it surfaced only once the first three were
+fixed and the compiles actually ran.** The step read
+
+    ( cd "$RUNNER_TEMP/base" && python3 tools/reflist.py > /tmp/base-refs 2>/dev/null || true )
+
+against the same command run at HEAD, and diffed the two. `tools/reflist.py`
+does not answer that question. It compares the two **editions** \dash{}
+English against Polish \dash{} and this job compiles `main-en` only, so on
+both sides it failed on the absent `main-pl.aux` and printed one line:
+
+    FAIL  /home/runner/work/_temp/base/main-pl.aux missing -- build both editions first
+    FAIL  /home/runner/work/math-for-ai-engineers/.../main-pl.aux missing -- build both editions first
+
+**The guard's cross-reference half had never once compared a cross-reference.**
+It compared two error strings whose sole difference was the absolute path each
+tree sat at \dash{} and that difference is the only reason it went red rather
+than green. Two trees at one path and it would have passed, having read
+nothing.
+
+And it would not have worked even with both editions built, which is the part
+that makes this a design error rather than a missing file: `reflist.py`'s
+output is a **summary** \dash{} `484 labels in en, 484 in pl, 0 mismatches`
+\dash{} so two builds differing by a moved `\ref` print the identical line.
+The step's own comment claimed *a KDP change that moved a single `\ref` would
+show up here and nowhere else*. It could not have shown up there at all.
+
+`tools/auxrefs.py` dumps `label → number` for **one** tree and is diffed
+against itself at the two commits, which is the comparison that was wanted. Two
+things about it are load-bearing:
+
+- **It takes the tree root as an argument** rather than deriving it from its
+  own location. The base side is a worktree of an older commit, so it does not
+  contain this script; HEAD's copy has to be able to read a tree it is not
+  standing in. A flag added to `reflist.py` would have been absent exactly
+  where it was needed.
+- **It refuses an empty answer.** The aux tree is an `\@input{}` chain, so a
+  main file whose per-program `.aux` files are missing yields zero labels and
+  prints zero lines \dash{} and two empty files diff clean. That is the same
+  vacuous pass in a new costume, so it exits 1 instead.
+
+Watched firing before being believed, which is this repository's own rule and
+the only reason the replacement is trusted: the same tree twice diffs clean;
+one perturbed entry reports `prog:F08 F8 → F9` and fails; a hollow aux tree
+and a missing one each exit 1 rather than printing nothing; and HEAD's copy
+pointed at a foreign tree returns the identical 495 labels it returns in place.
+
 ---
 
 ## 2. Ten point, and why it is not a preference
