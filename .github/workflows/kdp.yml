@@ -188,6 +188,56 @@ jobs:
           echo "The trade edition is unchanged: same page count, same references."
 
   # -------------------------------------------------------------------------
+  # -------------------------------------------------------------------------
+  # WHICH VOLUMES THIS DIFF HAS TO BE PROVED ON.
+  #
+  # A pull request used to build volume III alone, on the argument that eight
+  # compiles of a book is a release cost and a smoke test is what a PR needs.
+  # That argument is right about a change to ONE volume's content and wrong
+  # about a change to what every volume reads -- and the difference cost a red
+  # tag build: kdp/preamble-kdp.tex gained a frame-room guard, the PR proved it
+  # on volume III, and volume I English stranded a frame opener that nobody saw
+  # until `kdp-v1.0.0` built all eight.
+  #
+  # So the rule is the narrow one rather than "always build eight": a diff that
+  # touches a file every volume reads builds every volume, and anything else
+  # keeps the smoke test. The matrix cannot be computed inside `strategy`, so it
+  # is an output here.
+  # -------------------------------------------------------------------------
+  scope:
+    name: Which volumes this diff needs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [regression]
+    outputs:
+      volumes: ${{ steps.pick.outputs.volumes }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - id: pick
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo 'volumes=[1, 2, 3, 4]' >> "$GITHUB_OUTPUT"
+            echo "::notice::$GITHUB_EVENT_NAME builds every volume."
+            exit 0
+          fi
+          BASE=$(git merge-base HEAD "origin/${{ github.event.repository.default_branch }}") \
+            || { echo "::error::cannot find the merge base; refusing to guess one"; exit 1; }
+          # Everything below is read by all eight builds, so a change to it is
+          # only proved by all eight. kdpstage.py and kdpbuild.py are here for
+          # the same reason the preamble is: this pipeline has already shipped
+          # one defect in each of them that volume III did not exhibit.
+          SHARED='^(kdp/preamble-kdp\.tex|kdp/.*\.tex|tools/kdpbuild\.py|tools/kdpstage\.py|tools/gen_volumes\.py|tools/volumes\.json|tools/checkkdp\.py)$'
+          if git diff --name-only "$BASE"...HEAD | grep -qE "$SHARED"; then
+            echo 'volumes=[1, 2, 3, 4]' >> "$GITHUB_OUTPUT"
+            echo "::notice::this diff touches a file every volume reads, so all four are built."
+          else
+            echo 'volumes=[3]' >> "$GITHUB_OUTPUT"
+            echo "::notice::no shared KDP file in this diff; volume III is the smoke test."
+          fi
+
   numbers:
     name: Recompute every number
     runs-on: ubuntu-latest
@@ -303,15 +353,16 @@ jobs:
     name: Volume ${{ matrix.volume }} (${{ matrix.lang }})
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [numbers, manifest, diagrams-kdp]
+    needs: [scope, numbers, manifest, diagrams-kdp]
     strategy:
       fail-fast: false
       matrix:
         lang: [en, pl]
-        # A pull request builds the smallest volume in both languages -- enough
-        # to catch a broken interior in the two compiles it costs. A tag or a
-        # dispatch builds all four, because that is when a volume is uploaded.
-        volume: ${{ fromJSON(github.event_name == 'pull_request' && '[3]' || '[1, 2, 3, 4]') }}
+        # Decided by the `scope' job above, not here: a diff touching a file
+        # every volume reads builds all four, anything else builds volume III
+        # as a smoke test. `strategy' cannot run a git command, which is why
+        # that decision is a job output.
+        volume: ${{ fromJSON(needs.scope.outputs.volumes) }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
@@ -411,9 +462,15 @@ jobs:
     name: Collect the uploads
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [build-volume, crossvolume]
+    needs: [scope, build-volume, crossvolume]
+    # Keyed on WHETHER THERE IS A FULL SET TO BUNDLE, not on the event. It used
+    # to read `github.event_name != 'pull_request'`, which was a proxy for the
+    # same thing while a PR could only ever build one volume -- and the proxy
+    # stopped being true the moment `scope` could widen the matrix. Collecting
+    # eight interiors that have already been built and checked is a download and
+    # an upload, so it is worth doing wherever the eight exist.
     if: always() && needs.build-volume.result == 'success'
-        && github.event_name != 'pull_request'
+        && needs.scope.outputs.volumes != '[3]'
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5

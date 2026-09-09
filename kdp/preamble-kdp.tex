@@ -170,6 +170,54 @@
 \apptocmd{\tableofcontents}{\emergencystretch=2em\relax}{}{%
   \PackageWarning{mfakdp}{Could not set emergencystretch for the narrower measure}}
 
+% ---------- A frame opener needs room for what OPENS the frame ---------------
+%  preamble.tex's \begin{fr} turns the page when fewer than
+%  \mfaframeabove+\mfaframebelow+7\baselineskip are left. That seven was swept
+%  against the four existing formats and never against this trim, and at 6 x 9
+%  it admits a page it should not: volume I English stranded frame 4's rule and
+%  margin badge at the foot of PDF page 349 with its body overleaf, and the
+%  badge is the book's navigation device -- standing alone it names nothing.
+%
+%  IT IS NOT A METRICS DIVERGENCE. CI and the bare container report the same
+%  426 pages, the same page 349 and the same three orphaned cues, so this is a
+%  property of the geometry and is fixable here rather than a thing to chase
+%  between two TeX installations.
+%
+%  AND SEVEN LINES IS THE WRONG QUANTITY, not merely too few. The room test
+%  counts LINES; what opens that frame is an unbreakable answer table, which
+%  needs more than its line count suggests. That is exactly the arithmetic
+%  preamble.tex records against \begin{quiz} -- "it reserves 8\baselineskip
+%  while the box under it will not begin on a page that cannot hold 12 lines,
+%  so the guard admits pages on which the box provably cannot start".
+%
+%  Hooked with \BeforeBeginEnvironment rather than \renewenvironment{fr}: the
+%  original test still runs and finds a fresh page, so nothing is duplicated
+%  and this cannot drift from preamble.tex's own definition. \mfaframeabove and
+%  \mfaframebelow are read from there for the same reason.
+%
+%  SWEPT, NOT CHOSEN, and checkpdf.py says why in as many words: a LARGER
+%  number is not a safer one. Turning a page moves every break after it, so
+%  this guard can strand a frame it previously cleared. The table is below.
+\newcommand{\mfakdpframelines}{8}
+\makeatletter
+\newcommand{\mfakdp@frameroom}{%
+  \par
+  \ifdim\pagegoal=\maxdimen\else
+    \ifdim\dimexpr\pagegoal-\pagetotal\relax<%
+          \dimexpr\mfaframeabove+\mfaframebelow+\mfakdpframelines\baselineskip\relax
+      \newpage
+    \fi
+  \fi
+}
+%  \BeforeBeginEnvironment IS INSIDE THIS GROUP ON PURPOSE. Outside it, `@' is
+%  not a letter, so \mfakdp@frameroom tokenises as \mfakdp followed by the
+%  characters @frameroom and every \begin{fr} in the book raises
+%  "Undefined control sequence ... \mfakdp @frameroom". This preamble already
+%  warns about that trap twice, on \resultsbody and on \mfa@outframes, and it
+%  was walked into a third time here.
+\BeforeBeginEnvironment{fr}{\mfakdp@frameroom}
+\makeatother
+
 % ---------- The back matter's tables have to be able to break ----------------
 %  Every tabularx in appendices D, E and F is \linewidth wide and UNBREAKABLE,
 %  and at 6 x 9 the text block is shorter than the trade format's, so a table
