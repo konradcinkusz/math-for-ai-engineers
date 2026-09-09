@@ -126,6 +126,16 @@ one, because not one of them occurs in an `ansblock` body anywhere in the book.
 A second, independently written survey script agreed with the ledger to the
 unit on all three figures before either was trusted.
 
+**And the parser itself carried the class it was written to report.** The book
+contains no `\begin{ansblock}…\end{ansblock}` on one line, so the scan was
+correct on the tree it was written against and would have stayed correct until
+somebody wrote one — then it would have run past the close and swallowed every
+answer up to the next `\end{ansblock}`. Measured, by introducing one into F08:
+the unhardened parser reports **0 plain and 1 worked where the file has 6 and
+2**, and the book total drops by six. Not a crash — a plausible number, from a
+ledger nobody would re-derive. Closed rather than left latent, and proved both
+ways.
+
 ---
 
 ## What was recorded rather than taken (b), and the mechanism
