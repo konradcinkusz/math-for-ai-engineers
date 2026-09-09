@@ -2290,6 +2290,15 @@
 
 % Terminal transcripts: no line numbers, no keyword colouring. Everything in
 % one of these was copied from a real run.
+%
+% AND NOTHING IN THE BOOK USES IT -- zero occurrences outside this file. The
+% transcript mechanism below replaced it, deliberately: an in-source console
+% block cannot quote a \val{} and a block nobody ran reads exactly like one
+% that was. Why it is still defined is not recorded anywhere and is not guessed
+% at here. What matters to the next person is that it carries the SAME
+% \scriptsize the note on basicstyle below is about, so a pass that raises the
+% size there and leaves this one ships a book with two transcript sizes. Raise
+% both, or delete this. (longtable is the other loaded-and-unused thing here.)
 \lstnewenvironment{console}[1][]
   {\lstset{style=mfacode,numbers=none,basicstyle=\ttfamily\scriptsize,
            keywordstyle=\color{black},backgroundcolor=\color{white},#1}}
@@ -2320,6 +2329,32 @@
 % C12's strict numeric comparison stays green. The consequence is that parity's
 % C13 cannot see the file at all -- VERB_ENV_RE scans in-source environments --
 % so the ASCII rule is asserted by the script that writes it.
+%
+% THAT SENTENCE WAS A CLAIM ABOUT THE SCRIPTS AND FOUR OF THEM DID NOT MAKE IT.
+% f11, p15, p16 and p17 wrote their transcripts out with no assertion of any
+% kind, and a fifth and sixth (f03, f04) asserted ASCII and HEIGHT and not
+% WIDTH. Every script that writes a transcript now asserts ASCII and the
+% 64-character measure, and each of those guards was watched failing on a
+% deliberate mutation before it was believed.
+%
+% THE WIDTH GUARD IS THE ONLY INSTRUMENT THERE IS, and the reason is one line
+% of mfacode: breaklines=true. An over-wide listing line does not overfull. It
+% wraps, prints the postbreak arrow into the middle of what the reader is meant
+% to paste back into a REPL, and leaves no error, no warning and no overfull
+% box anywhere in the log -- so the build cannot tell you whether a transcript
+% line fits, and a build that is clean is not evidence that one does. f04's
+% transcript shipped a 76-character line and a 73-character one for exactly
+% that reason: a wrapped listing reads like the book's own convention. It is the graceful degradation this file already
+% records for the missing-file marker below, for \mermaidfig's fallback and
+% for gen_stubs' escape() outside backticks. No tally: the rule is that every
+% graceful degradation in this preamble is a place where a defect can look
+% intentional, and the instances are named where they are found.
+%
+% The 64 itself is a HOUSE FIGURE rather than a page measurement -- it was
+% taken from the widest listing line already in the book when the first guard
+% was written, and f04's 76 was in the book at the time, so even that basis was
+% not what it said. Nobody has measured what a listing line can be. See the
+% note on basicstyle below, which is where that matters.
 %
 % AND IT MUST SURVIVE THE FILE BEING ABSENT. figures/transcripts is written by
 % `make numbers`, exactly as figures/values is, so a clean checkout that has
@@ -2408,6 +2443,57 @@
   \IfFileExists{figures/transcripts/#1.txt}{%
     \begin{lrbox}{\mfa@transcriptbox}%
     \begin{minipage}{\linewidth}%
+    % This is one step SMALLER than mfacode's own basicstyle, which is
+    % \footnotesize -- so a transcript is the smallest type on its page, and it
+    % is the one thing the reader was told to check character by character. A
+    % review issue asks for \footnotesize and A BOX NO WIDER THAN THE MEASURE.
+    % Both are recorded here rather than taken, and this is what they would
+    % cost.
+    %
+    % THE FORMAT THE ISSUE CHECKED IS THE SLACKER OF THE TWO, and that holds
+    % however the point sizes come out: the trade build has the narrower measure
+    % (13.0 cm against A4's 14.8) and never the larger type, so it binds first
+    % and the issue checked A4. Put numbers on it and it is closer than it
+    % looks. Taking the class files at 9 pt for \footnotesize at 11 pt and 10 pt
+    % at 12 pt -- NOT measured here, check it first -- 64 characters need a
+    % typewriter advance of at most 369.4/(64*9) = 0.641 em in the trade format
+    % against 419.4/(64*10) = 0.655 em on A4.
+    %
+    % NOBODY HAS MEASURED THAT ADVANCE, and it is not one number: it is a
+    % property of the typewriter font, and the two installations do not share
+    % one. This container has Latin Modern Mono and CI has inconsolata, which is
+    % narrower -- the divergence the upquote comment near the top of this file
+    % records from both ends, and it is font-dependent there too. The
+    % container that builds the published PDF cannot even be asked; it has no
+    % TeX at all. And note what a clean build does NOT prove: with
+    % breaklines=true a line that does not fit wraps silently, so zero overfull
+    % boxes is not evidence that anything fits.
+    %
+    % AND IT IS A BOOK-WIDE LAYOUT CHANGE, not a style tweak. 88 references,
+    % every box a point or two taller, which makes \mfa@transcriptroom above
+    % fire more often; each firing turns a page, and every orphaned cue and
+    % orphan tail after it is re-rolled. When that guard was introduced its cost
+    % was measured in isolation -- one build for the prose and one for the guard
+    % alone -- and it put three cues and three tails back. This is larger. It
+    % wants the same treatment: this change and nothing else, four formats,
+    % checkpdf either side, and `grep -c MFA-TRANSCRIPT-TURN' either side, which
+    % is already a ledger.
+    %
+    % THE PRECONDITION IS NOW TRUE AND WAS NOT. The issue rests its case on the
+    % 64-character guard fitting; six scripts did not run that guard and f04's
+    % transcript broke it at 76. All of them assert it now, so the widest line
+    % in the book is f03-underflow's, which sits ON 64 rather than under it and
+    % is the listing to measure first.
+    %
+    % THE BOX: mfacode sets frame=single with framesep=6pt and leaves framerule,
+    % xleftmargin and framexleftmargin at their listings defaults, so the rule is
+    % drawn outside a body that is \linewidth wide. Whether that overhangs the
+    % measure, and by how much, is a question for TeX and is NOT settled here --
+    % it is a reading of a mechanism, and this book has twice been confident,
+    % specific and wrong about one of those. Two things about it are settled: it comes from mfacode, so it is
+    % every listing in the book and not transcripts alone; and pulling the rule
+    % inside \linewidth means narrowing the body, which tightens the same measure
+    % the paragraph above is about. Do not take the two fixes as independent.
     \lstinputlisting[style=mfacode, numbers=none,
                      basicstyle=\ttfamily\scriptsize,
                      keywordstyle=\color{black},

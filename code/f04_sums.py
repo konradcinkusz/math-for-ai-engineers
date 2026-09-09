@@ -545,6 +545,18 @@ assert BIAS_WORST < 1e-12, \
 # answer the frame it sits in, nor the frame on either side of it. ZERO_FACTORIAL
 # is still computed and still asserted below -- a further problem asks for 0!
 # by two routes -- it is only kept off this page.
+#
+# AND THE TWO COMMENTS ARE SHORT BECAUSE THE MEASURE IS. The book's transcript
+# guard is 64 characters and this file used to ship a 76-character line and a
+# 73-character one -- the only two lines in the book over the guard -- because
+# main() asserted the transcript's HEIGHT and not its WIDTH. Nothing else could
+# see it: mfacode sets breaklines=true, so an over-wide listing line does not
+# overfull. It wraps, prints listings' continuation arrow into what the reader
+# is meant to paste back into a REPL, and leaves no error, no warning and no
+# overfull box anywhere in the log. This assertion is the only instrument for
+# it. What the two comments said is in the paragraph under the listing anyway
+# ("the loop body never executes, so what comes back is whatever the
+# accumulator was set to"), so the trim costs the page nothing.
 # ==========================================================================
 EMPTY_SUM = sum([])
 EMPTY_PROD = math.prod([])
@@ -567,9 +579,9 @@ TRANSCRIPT = Path(__file__).resolve().parents[1] / "figures" / "transcripts" / "
 # A console block nobody ran is indistinguishable from one that was, which is
 # exactly where a remembered number survives review.
 TRANSCRIPT_TEXT = f""">>> import math
->>> sum([])                 # the loop never runs: total stays as it started
+>>> sum([])        # the loop never runs
 {EMPTY_SUM}
->>> math.prod([])           # the same loop, with a different accumulator
+>>> math.prod([])  # the same loop, a different accumulator
 {EMPTY_PROD}
 """
 
@@ -629,6 +641,7 @@ OUT = Path(__file__).resolve().parent.parent / "figures" / "values" / "f04.tex"
 def main() -> None:
     assert TRANSCRIPT_TEXT.isascii(), "transcript must be ASCII: listings cannot set it otherwise"
     assert len(TRANSCRIPT_TEXT.strip().splitlines()) <= 14, "transcript too tall for one frame"
+    assert max(len(l) for l in TRANSCRIPT_TEXT.splitlines()) <= 64, "transcript too wide"
     TRANSCRIPT.parent.mkdir(parents=True, exist_ok=True)
     TRANSCRIPT.write_text(TRANSCRIPT_TEXT, encoding="ascii")
 
