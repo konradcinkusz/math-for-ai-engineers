@@ -117,7 +117,36 @@ jobs:
 
       - name: Record HEAD's page count and cross-references
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          # apt-get update refreshes EVERY repository the runner image has
+          # configured and fails on any one of them -- and under `bash -e' that
+          # ends the job. This workflow installs from Ubuntu's own archive and
+          # from nothing else, and one of the third-party repositories the image
+          # ships preconfigured, Google's Chrome repo, failed this pull request
+          # mid-publish:
+          #
+          #   E: Failed to fetch .../chrome-stable/.../Packages.gz
+          #      Hash Sum mismatch
+          #      Release file created at:    Wed, 09 Sep 2026 17:16:59 +0000
+          #      Last modification reported: Wed, 09 Sep 2026 09:41:12 +0000
+          #
+          # -- an index and a Release file disagreeing for as long as a publish
+          # takes, on a service this repository does not touch. Every diagram had
+          # already rendered; the job died installing two packages.
+          #
+          # SO LET THE INSTALL DECIDE, which is the question actually being
+          # asked. If the package is obtainable the step proceeds; if it is not,
+          # apt names the PACKAGE it cannot find rather than the index it could
+          # not refresh. `flake' is not a root cause and this is not a retry:
+          # the step no longer fails on a condition that does not stop it doing
+          # its job. The warning keeps a real apt outage visible in the log.
+          #
+          # The same three lines are at the two other apt sites in this file.
+          # build.yml, release.yml and pages.yml carry it too and are NOT
+          # touched here: the first two are on the list this path may not
+          # modify, and the third is outside this change.
+          sudo apt-get update -qq \
+            || echo "::warning::apt-get update failed; the install below decides"
+          sudo apt-get install -y -qq poppler-utils
           mkdir -p /tmp/head
           pdfinfo main-en.pdf | awk '/^Pages/{print $2}' > /tmp/head/pages
           # NOT reflist.py, which stood here and answered a different question.
@@ -328,7 +357,11 @@ jobs:
             diff <(echo "$a") <(echo "$b") || true; exit 1; }
       - name: Convert to DeviceGray for the interior
         run: |
-          sudo apt-get update -qq
+          # Update non-fatal, install decisive -- see the note at the first
+          # apt site in this file. Google's Chrome repo failed this workflow
+          # mid-publish and killed a job that installs from Ubuntu's archive.
+          sudo apt-get update -qq \
+            || echo "::warning::apt-get update failed; the install below decides"
           sudo apt-get install -y -qq ghostscript poppler-utils
           python3 tools/kdpstage.py
       - name: No diagram may survive as colour
@@ -371,7 +404,11 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.13' }
       - run: |
-          sudo apt-get update -qq
+          # Update non-fatal, install decisive -- see the note at the first
+          # apt site in this file. Google's Chrome repo failed this workflow
+          # mid-publish and killed a job that installs from Ubuntu's archive.
+          sudo apt-get update -qq \
+            || echo "::warning::apt-get update failed; the install below decides"
           sudo apt-get install -y -qq texlive-latex-base texlive-latex-recommended \
             texlive-latex-extra texlive-lang-polish texlive-science latexmk \
             lmodern poppler-utils ghostscript
