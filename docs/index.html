@@ -29,10 +29,10 @@
   h2 { font-size: 1.25rem; color: var(--blue); margin: 2.5rem 0 .75rem; }
   a { color: var(--teal); }
   .banner {
-    background: var(--light); border-left: 3px solid var(--red);
+    background: var(--light); border-left: 3px solid var(--amber);
     padding: .9rem 1.1rem; margin: 1.5rem 0 2rem; border-radius: 0 4px 4px 0;
   }
-  .banner strong { color: var(--red); }
+  .banner strong { color: var(--amber); }
   table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .94rem; }
   th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
   th { color: var(--grey); font-weight: 600; white-space: nowrap; }
@@ -81,18 +81,21 @@
   companion volumes:
   <a href="book-en.pdf">English</a> &middot;
   <a href="book-pl.pdf">polski</a>.
-  Same source, same page for page; A4 is the one to read on a screen or print
-  at home.
+  One source; the two formats paginate differently by construction, and nothing
+  in the book navigates by page &mdash; every cross-reference names a program
+  and a frame. A4 is the one to read on a screen or print at home.
 </p>
 
 <div class="banner">
-  <strong>Early draft.</strong> The structure, the build, the bilingual tooling
-  and <strong>Program F1 in both languages</strong> are done — 163 pages on A4
-  in each language, zero errors, zero overfull vboxes, and a parity
-  check that reports no failures across 56 file pairs. Forty-six of
-  forty-seven programs are stubs carrying the brief they must satisfy. Every
-  ledger is printed on every CI build, so the debt is visible rather than
-  quietly carried.
+  <strong>Complete draft.</strong> All forty-seven programs and all six
+  appendices are written, in both languages. There are no stubs left anywhere
+  in the book, so what remains is finishing rather than drafting. What is
+  <em>not</em> done is the part no build can do: <strong>nobody has read
+  it</strong>, so the 80/80 standard below is printed as outstanding on every
+  build and may not be claimed. Every ledger is computed from the tree rather
+  than typed — printed on each CI run and in Appendix F — so the debt is
+  visible to a reader holding the paper rather than only to somebody who can
+  run the tooling.
 </div>
 
 <h2>Why</h2>
@@ -105,45 +108,55 @@
 <p>
   Every book in this field is a <em>second</em> book. Each assumes a floor —
   algebraic automaticity — that it does not teach and does not test. This one
-  starts at arithmetic and means it, and it uses K. A. Stroud's
+  starts at arithmetic and means it. It has a floor of its own and says so: the
+  vocabulary of the job — model, token, parameter, training run, evaluation —
+  is assumed throughout, and the mathematics is not. And it uses K. A. Stroud's
   programmed-learning format, which means it cannot be read. It has to be
   worked.
 </p>
 
 <h2>What a program looks like</h2>
 <p>
-  A stream of numbered <strong>frames</strong>. Nearly every frame ends by
-  asking you for something, and <strong>the answer is at the top of the next
-  frame</strong> — so you commit before you check. Over one program that happens
-  forty to seventy times.
+  A stream of numbered <strong>frames</strong>, a few dozen to a program. Over
+  half the frames in the book end by asking you for something, and <strong>the
+  answer is at the top of the next frame</strong> — so you commit before you
+  check. The rate is measured on every build, for the book and for each program
+  separately, because a format that has stopped asking has stopped being this
+  one.
 </p>
 <p>
   And it sets traps on purpose. Where a topic has a standard misconception the
   text walks you into it, lets you commit to the wrong answer, then says flatly
-  that it is wrong. Thirty-eight of them are catalogued, each phrased in the
-  reader's own voice.
+  that it is wrong. Every one is catalogued with its correction and the
+  program that owns it, each phrased in the reader's own voice.
 </p>
 
 <h2>Every number is computed, not remembered</h2>
 <p>
-  A numeric value lives in a script, is written to a generated file, and reaches
-  the page as a reference. The book contains no digits of its own — so a changed
-  number shows up in review as a diff, and CI fails the build when a script no
-  longer produces what the book prints. A few from Program F1:
+  A numeric value lives in a script, is written to a generated file, and
+  reaches the page as a reference — so a changed number shows up in review as a
+  diff, and CI fails the build when a script no longer produces what the book
+  prints. The one exception is arithmetic the program is teaching:
+  <code>2<sup>5</sup> = 32</code> is the thing you are meant to do, and putting
+  it behind a reference would be theatre. Five from Program F1, and this page
+  is checked against the same files the book reads:
 </p>
 <div class="scroll">
 <table>
-  <tr><th>2<sup>10</sup> against 10<sup>3</sup></th><td>2.40% above</td></tr>
-  <tr><th>2<sup>80</sup> against 10<sup>24</sup></th><td><strong>20.89% above</strong> — the same error, compounded eight times</td></tr>
-  <tr><th>7 billion parameters at 2 bytes</th><td>14 GB, and 13.04 GiB</td></tr>
-  <tr><th>A gibibyte against a gigabyte</th><td>7.37% more bytes</td></tr>
-  <tr><th>“Fifty per cent faster” on 200 ms</th><td>100 ms or 133.3 ms — <strong>33.3 ms apart</strong></td></tr>
+  <tr><th>2<sup>10</sup> against 10<sup>3</sup></th><td><span data-val="f01.kib.over.si.pct">2.40</span>% above</td></tr>
+  <tr><th>2<sup>80</sup> against 10<sup>24</sup></th><td><strong><span data-val="f01.two.eighty.err.pct">20.89</span>% above</strong> — the same error, compounded eight times</td></tr>
+  <tr><th>7 billion parameters at 2 bytes</th><td><span data-val="f01.weights.gb">14</span> GB, and <span data-val="f01.weights.gib">13.04</span> GiB</td></tr>
+  <tr><th>A gibibyte against a gigabyte</th><td><span data-val="f01.gib.over.si.pct">7.37</span>% more bytes</td></tr>
+  <tr><th>“Fifty per cent faster” on <span data-val="f01.base.ms">200</span> ms</th><td><span data-val="f01.fifty.pct.less.ms">100</span> ms or <span data-val="f01.fifty.pct.more.rate.ms">133.3</span> ms — <strong><span data-val="f01.speedup.discrepancy.ms">33.3</span> ms apart</strong></td></tr>
 </table>
 </div>
 <p>
-  Ten experiments are specified across the book and <strong>none has been
-  run</strong>. Until one is, the claim it would support is labelled as
-  judgement and its table stays empty.
+  Ten experiments are specified across the book, most of them free and
+  finishing on a laptop in under a minute. Until the one behind a claim has
+  been run, the claim is labelled as judgement rather than measurement — and
+  the ledger records what became of each, naming the pass behind the ones that
+  have run rather than counting them, because a total is exactly the kind of
+  sentence that goes quietly out of date.
 </p>
 
 <h2>Two editions that cannot drift apart</h2>
@@ -176,7 +189,7 @@
   <tr><th>IV — Discrete structures</th><td>Combinatorics · Graphs and DAGs · Logic and reading theorems</td></tr>
   <tr><th>V — Calculus and autodiff</th><td>The gradient · Jacobians and autodiff · The Hessian · Matrix calculus</td></tr>
   <tr><th>VI — Optimisation</th><td>Convexity · SGD to Adam · Stochastic optimisation · Lagrange multipliers</td></tr>
-  <tr><th>VII — Probability and statistics</th><td>Bayes · Distributions · CLT and Monte Carlo · Maximum likelihood · Inference · Bayesian inference</td></tr>
+  <tr><th>VII — Probability and statistics</th><td>Bayes · Distributions · CLT, concentration and initialisation · Maximum likelihood · Inference · Bayesian inference</td></tr>
   <tr><th>VIII — Information theory</th><td>Entropy · Cross-entropy and KL · Mutual information</td></tr>
   <tr><th>IX — Assembling it</th><td>The transformer, derived · Anatomy of a training run · Measuring a model honestly</td></tr>
 </table>

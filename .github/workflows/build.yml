@@ -127,6 +127,16 @@ jobs:
       - name: The introduction's map matches the manifest
         run: python3 tools/check_structure.py --parts
 
+      # The README and the landing page each print the same five figures out
+      # of Program F1, and each typed them in by hand -- the only place in this
+      # repository where a digit reaches a reader with no script behind it, in
+      # the two artefacts somebody meets BEFORE the book. `make verify` is
+      # structurally blind to the drift that breaks them: it compares a values
+      # file with the script that wrote it, and those two stay in perfect
+      # agreement while a page quoting them goes stale.
+      - name: Every figure in the shop window is the value its script computes
+        run: python3 tools/check_structure.py --site
+
       # Every rigour box that sends the reader OUTSIDE the book has a
       # destination in Appendix E. A box deferring INSIDE the book cites the
       # program it defers to, so a box with no \ref{prog:...} is
