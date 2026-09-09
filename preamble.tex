@@ -661,6 +661,74 @@
 \makeatother
 \renewcommand{\sectionmark}[1]{}
 
+% ---- The blank verso -------------------------------------------------------
+% \cleardoublepage inserts a leaf whenever a chapter, an appendix or a part
+% would otherwise open on a verso, and the leaf it inserts is blank IN THE BODY
+% ONLY. The output routine still runs under whatever \pagestyle is current, so
+% it shipped with the head rule, the folio and the running title over an
+% otherwise white page: a leaf carrying "88" and "Program F3" and nothing else,
+% which on a screen is a page that says nothing and in print is a misprint.
+% Every chapter and appendix whose predecessor ended on a recto produced one.
+%
+% The wrapper below is the emptypage package's, written out rather than
+% required. A package one of this project's two TeX installations has and a
+% reader's does not is latent on every machine that exists here -- which is the
+% trap recorded against mathtools -- and this is four lines that touch nothing.
+%
+% It is a WRAPPER rather than a \patchcmd on purpose. A patch has to match
+% \hbox{}\newpage inside the kernel's own definition, and a \patchcmd that
+% stops matching fails into a warning that checklog.py prints and does not fail
+% on -- so the fix would go inert while the build stayed green, which is this
+% preamble's own recorded failure mode: a graceful degradation is where a
+% defect looks intentional. Wrapping calls whatever \cleardoublepage happens to
+% be, so there is nothing to match and nothing to go quiet.
+%
+% \clearpage FIRST, and outside the group, so the page in hand ships under its
+% own style; then \pagestyle{empty} inside a group, which \ps@empty installs
+% with local \lets, so the blank leaf ships bare and the group hands the fancy
+% style straight back. When no leaf is needed the group encloses nothing.
+%
+% IT MOVES NO PAGE, and that is MEASURED rather than reasoned. The mechanism
+% says it should not -- the leaf is forced by \newpage either way, so this
+% changes what is drawn on a page that already exists and not whether it
+% exists -- but the doubled \clearpage cannot be settled by reading, since
+% \cleardoublepage opens with one of its own and that is a no-op only because
+% the first leaves material behind it. If it were not, every leaf would become
+% two.
+%
+% So it was compared against the same commit on the same machine, which is the
+% only comparison that holds one variable: CI, main-en-a4, this change against
+% main at c9b8bb6. checkpdf's two page-level ledgers came back ELEMENT FOR
+% ELEMENT -- nine orphaned cues at pages 86, 91, 137, 148, 336, 456, 475, 528
+% and 824, and twenty-seven orphan tails ending at page 1004 of 1168 -- and a
+% single leaf inserted or dropped anywhere would have shifted every number
+% after it. Zero errors, zero unresolved references, zero overfull boxes of
+% either kind. The PDF came out 3,337 bytes SMALLER, which is the ink coming
+% off the leaves and is the other half of the check: the pagination did not
+% move and the heads did go.
+%
+% Note that CI paginates differently from the container that writes the
+% published PDF, so 1168 is not CLAUDE.md's figure for this format and is not
+% meant to be. What transfers is the comparison, not the number.
+%
+% tools/checkpdf.py needed NO code change, which is worth saying because the
+% obvious expectation -- the issue's own -- is that it did. Three of its four
+% tests read a body page as a word below head + HEAD_GAP and the fourth throws
+% the head away by HEAD_FRACTION, so a leaf carrying only a head was already
+% outside all four; now it carries nothing and the loop skips it before any of
+% them runs. Driven with synthetic pdftotext XML both ways, head_baseline,
+% text_blocks, foot_baseline and chapter_final answer identically, and giving
+% the leaf real body ink moves chapter_final -- so that is a measurement and
+% not an empty comparison. Only the chapter_final docstring had to move,
+% because that sentence was a claim about this book rather than about the check.
+\makeatletter
+\let\mfa@cleardoublepage\cleardoublepage
+\renewcommand{\cleardoublepage}{%
+  \clearpage
+  {\pagestyle{empty}\mfa@cleardoublepage}%
+}
+\makeatother
+
 % ============================================================
 %  FRAMES — the unit the whole method is built from
 %  ---------------------------------------------------------
