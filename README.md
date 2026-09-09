@@ -21,20 +21,34 @@ build proves the two editions have the same programs, the same frame numbering
 and the same numbers, so a correction applied to one cannot silently miss the
 other.
 
-**Read it now — both editions, rebuilt on every push to `main`:**
+## Download
 
-- **[English edition (PDF, A4)](https://konradcinkusz.github.io/math-for-ai-engineers/book-en-a4.pdf)**
-- **[Wydanie polskie (PDF, A4)](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl-a4.pdf)**
+Every link here is public — no account, no sign-in.
 
-Also in the 17 × 24 cm trade format that matches the companion volumes —
-[English](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf) ·
-[polski](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf).
-One source, four PDFs: A4 at 12pt is the one to read on a screen or print at
-home, and it is what the download links above point at.
+| | English | polski |
+|---|---|---|
+| **A4, 12pt** — for a screen, or an office printer | **[Download](https://konradcinkusz.github.io/math-for-ai-engineers/book-en-a4.pdf)** | **[Pobierz](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl-a4.pdf)** |
+| **17 × 24 cm** — the trade format, matching the companion volumes | [Download](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf) | [Pobierz](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf) |
+| **17 × 24 cm, `v1.0.0`** — a fixed version, for citing | [Download](https://github.com/konradcinkusz/math-for-ai-engineers/releases/download/v1.0.0/Mathematics-from-Zero-for-the-AI-Engineer-v1.0.0.pdf) | [Pobierz](https://github.com/konradcinkusz/math-for-ai-engineers/releases/download/v1.0.0/Matematyka-od-zera-dla-inzyniera-AI-v1.0.0.pdf) |
 
-The same four PDFs are attached to every run of the build workflow as
-artefacts, kept for fourteen days — which is the route to use if a link above
-does not resolve.
+**The first two rows are rebuilt on every push to `main`**, so they are always
+the current book and will change under you. The third is pinned to a tag and
+will not move — quote that one if you are citing a page or handing somebody a
+fixed copy.
+
+A4 at 12pt is the one to read. One source and four PDFs: the formats paginate
+differently by construction, and nothing in the book navigates by page, because
+every cross-reference names a program and a frame rather than a leaf.
+
+[Every release](https://github.com/konradcinkusz/math-for-ai-engineers/releases)
+· [the site](https://konradcinkusz.github.io/math-for-ai-engineers/). The four
+current PDFs are also attached to each build run as artefacts, kept fourteen
+days, which is the route if a link above does not resolve.
+
+**The 6 × 9 in paperback volumes are not downloadable here.** They are built by
+the `KDP` workflow on a `kdp-v*` tag and kept as workflow artefacts, which
+require a GitHub account and expire; they are print interiors for upload rather
+than something to read on a screen. The four PDFs above are the book.
 
 > **Complete draft.** All forty-seven programs and all six appendices are
 > written, in both languages. There are no stubs left anywhere in the book, so
@@ -294,6 +308,10 @@ CLAUDE.md                  working notes: conventions, traps hit, resolved quest
   [polski A4](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl-a4.pdf) ·
   [English 17×24](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf) ·
   [polski 17×24](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf)
+- **[Releases](https://github.com/konradcinkusz/math-for-ai-engineers/releases)** — the same book pinned to a
+  tag, if you need a copy that will not change:
+  [English](https://github.com/konradcinkusz/math-for-ai-engineers/releases/download/v1.0.0/Mathematics-from-Zero-for-the-AI-Engineer-v1.0.0.pdf) ·
+  [polski](https://github.com/konradcinkusz/math-for-ai-engineers/releases/download/v1.0.0/Matematyka-od-zera-dla-inzyniera-AI-v1.0.0.pdf)
 - **[LangChain, LangGraph and Async Python](https://github.com/konradcinkusz/llm-book)** — companion volume
 - **[Microsoft Agent Framework for .NET Engineers](https://github.com/konradcinkusz/maf-book)** — companion volume
 
