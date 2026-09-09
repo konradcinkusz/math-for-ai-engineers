@@ -306,9 +306,9 @@ paper formats”) and the generated series map.
    raises the tolerance so a real defect stops being reported; this changes how
    TeX breaks the paragraph so the defect stops existing, and `checklog.py` still
    fails the volume on anything left. Both editions of all four volumes now build
-   with **zero overfull vboxes, zero overfull hboxes and no KDP failure**, and
-   every change is inside `kdp/`, so the four existing PDFs cannot move and the
-   regression job proves it.
+   with **zero overfull vboxes, nothing over the hbox budget and no KDP
+   failure**, and every change is inside `kdp/`, so the four existing PDFs
+   cannot move and the regression job proves it.
 
    | volume | pages | overfull hbox | overfull vbox | KDP |
    |---|---|---|---|---|
@@ -323,6 +323,13 @@ paper formats”) and the generated series map.
 
    Zero errors and zero unresolved references in all eight. The two 0.8 pt boxes
    are inside the 15 pt budget, so `checklog.py` exits 0 on every volume.
+
+   **And the sentence introducing that table said \enquote{zero overfull
+   hboxes} until it was read against the table two lines under it.** The
+   measurement was right, the summary of it was not, and it is the second
+   overstatement in this one entry \dash{} which is the entry whose own lesson
+   is below. A summary sentence is a claim about the table beneath it and gets
+   read against it like any other.
 
    **What the entry above still owes is a habit rather than a fix: run the gate
    the workflow runs, over every artefact, before writing a sentence about any of
