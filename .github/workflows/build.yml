@@ -127,6 +127,15 @@ jobs:
       - name: The introduction's map matches the manifest
         run: python3 tools/check_structure.py --parts
 
+      # Every rigour box that sends the reader OUTSIDE the book has a
+      # destination in Appendix E. A box deferring INSIDE the book cites the
+      # program it defers to, so a box with no \ref{prog:...} is
+      # outward-facing by construction, and Appendix E owes it a row. Both
+      # editions carry the same set, so this is a claim about the
+      # book rather than a comparison of the two, which is exactly the class
+      # parity is structurally blind to.
+      - name: Every rigour box that leaves the book has a destination
+        run: python3 tools/check_structure.py --rigour
       # An index entry naming something the body never prints. Nothing looked
       # at the index until a review of it found \index{optimiser!AdamW}
       # against a program that deliberately declines to name the algorithm --

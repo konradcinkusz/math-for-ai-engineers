@@ -1,4 +1,5 @@
-.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 scripts terms parts index \
+.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 \
+        scripts terms parts rigour index \
         text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames elicit outcomes values translate shots debt
 
@@ -42,6 +43,7 @@ check:
 	@python3 tools/check_structure.py --results
 	@python3 tools/check_structure.py --terms
 	@python3 tools/check_structure.py --parts
+	@python3 tools/check_structure.py --rigour
 	@python3 tools/check_structure.py --index
 	@python3 tools/checklog.py main-en.log main-pl.log
 	@python3 tools/checkpdf.py main-en.pdf main-pl.pdf
@@ -287,6 +289,18 @@ terms:
 parts:
 	@python3 tools/check_structure.py --parts
 
+# 5b. Appendix E is where a rigour box that leaves the book lands. Such a box
+#     names a result, says it is not proved here and says where the proof
+#     lives; the ones that send the reader OUTSIDE the book named a kind of
+#     course -- "any first analysis course" -- and, with one exception, no
+#     title. Nothing in the book references Appendix E even now, which this
+#     check cannot see. The mechanical half is exact: a box that defers
+#     inside the book cites the program it defers to, so a box with no
+#     \ref{prog:...} is outward-facing by construction and is owed a row.
+#     Parity cannot see this, for the reason it could not see the seven wrong
+#     part ranges -- a row missing from BOTH editions diverges from nothing.
+rigour:
+	@python3 tools/check_structure.py --rigour
 # 5c. An index entry that names something the page never prints. The index is
 #     the one artefact whose coordinates rest entirely on where an \index{}
 #     mark happens to sit, and nothing looked at it until a review found
@@ -326,6 +340,7 @@ debt:
 	@echo; echo "== Appendix C coordinates =="   ; $(MAKE) -s results
 	@echo; echo "== Appendix D terminology =="   ; $(MAKE) -s terms
 	@echo; echo "== The introduction's map =="    ; $(MAKE) -s parts
+	@echo; echo "== Rigour-box destinations =="   ; $(MAKE) -s rigour
 	@echo; echo "== The index's own names =="     ; $(MAKE) -s index
 	@echo; echo "== Polish/English parity =="     ; $(MAKE) -s translate
 	@echo; echo "== Unverified claims, diagrams ="; $(MAKE) -s shots
