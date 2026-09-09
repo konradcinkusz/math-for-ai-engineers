@@ -484,8 +484,39 @@ jobs:
         run: |
           python3 tools/kdpsummary.py dist >> "$GITHUB_STEP_SUMMARY"
           python3 tools/kdpsummary.py dist
+      # THE NAME HAS TO BE SANITISED, and this job is the first thing in the
+      # workflow ever to need it. On a tag push github.ref_name is `kdp-v1.0.0';
+      # on a pull request it is `236/merge', and actions/upload-artifact rejects
+      # a name containing a forward slash. That is what THIS pull request failed
+      # on, after all eight interiors had built and been checked -- so the defect
+      # was latent from the day the job was written and only surfaced because the
+      # `if' above stopped being event-keyed. A condition that skips a step is
+      # also a condition that never tests it.
+      #
+      # A WHITELIST rather than a case on the event. upload-artifact forbids
+      # " : < > | * ? \r \n \ and /, and git's own ref rules forbid only some of
+      # those -- a quote, a pipe and the angle brackets are all legal in a branch
+      # name -- so a name derived from a ref is not safe by construction and
+      # substituting the slash alone would leave the rest. tr -c keeps
+      # [A-Za-z0-9._-] and replaces everything else, squeezes the runs so
+      # `236/merge' cannot become `236--merge', and trims the ends.
+      #
+      # The tag path is unchanged, which is the point: `kdp-v1.0.0' passes
+      # through byte for byte, so a release's archive keeps the name it had.
+      # github.ref_name goes through env rather than into the script, because a
+      # branch name interpolated into a shell is a branch name that can run one.
+      - id: label
+        env:
+          REF: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          NAME=$(printf '%s' "$REF" | tr -c 'A-Za-z0-9._-' '-' | tr -s '-' \
+                 | sed 's/^-//; s/-$//')
+          [ -n "$NAME" ] || { echo "::error::the ref sanitises to nothing"; exit 1; }
+          echo "name=kdp-release-$NAME" >> "$GITHUB_OUTPUT"
+          echo "::notice::bundling the eight interiors as kdp-release-$NAME"
       - uses: actions/upload-artifact@v4
         with:
-          name: kdp-release-${{ github.ref_name }}
+          name: ${{ steps.label.outputs.name }}
           path: dist
           retention-days: 90
