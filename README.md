@@ -32,6 +32,10 @@ Also in the 17 × 24 cm trade format that matches the companion volumes —
 One source, four PDFs: A4 at 12pt is the one to read on a screen or print at
 home, and it is what the download links above point at.
 
+The same four PDFs are attached to every run of the build workflow as
+artefacts, kept for fourteen days — which is the route to use if a link above
+does not resolve.
+
 > **Complete draft.** All forty-seven programs and all six appendices are
 > written, in both languages. There are no stubs left anywhere in the book, so
 > what remains is finishing rather than drafting. Every ledger below is printed
@@ -43,10 +47,11 @@ home, and it is what the download links above point at.
 
 ## What a program looks like
 
-Each of the forty-seven programs is a stream of numbered **frames**. Nearly every
-frame ends by asking you for something, and **the answer is at the top of the
-next frame** — so you commit before you check. Over one program that happens
-forty to seventy times.
+Each of the forty-seven programs is a stream of numbered **frames**, a few
+dozen of them. More than half end by asking you for something, and **the answer
+is at the top of the next frame** — so you commit before you check. The rate is
+measured on every build, per program and for the book, because a format that has
+stopped asking has stopped being this one.
 
 Around the frames sits the same skeleton every time:
 
@@ -62,8 +67,10 @@ Around the frames sits the same skeleton every time:
 
 And it sets traps on purpose. Where a topic has a standard misconception the
 text walks you into it, lets you commit to the wrong answer, then says flatly
-that it is wrong and shows you why. [Thirty-eight of them](notes/02-grounding-and-traps.md)
-are catalogued, each phrased in the reader's own voice.
+that it is wrong and shows you why. Every one is
+[catalogued](notes/02-grounding-and-traps.md) with its correction and the
+program that owns it, each phrased in the reader's own voice — and the tally is
+deliberately not stated, for the same reason the value count below is not.
 
 ---
 
@@ -79,7 +86,7 @@ Nine parts, thirteen Foundation programs and thirty-four main programs.
 | **IV — Discrete structures** | Combinatorics · Graphs and DAGs · Logic and reading theorems |
 | **V — Calculus and autodiff** | The gradient · Jacobians and autodiff · The Hessian · Matrix calculus |
 | **VI — Optimisation** | Convexity · SGD to Adam · Stochastic optimisation · Lagrange multipliers |
-| **VII — Probability and statistics** | Bayes · Distributions · CLT and Monte Carlo · Maximum likelihood · Inference · Bayesian inference |
+| **VII — Probability and statistics** | Bayes · Distributions · CLT, concentration and initialisation · Maximum likelihood · Inference · Bayesian inference |
 | **VIII — Information theory** | Entropy · Cross-entropy and KL · Mutual information |
 | **IX — Assembling it** | The transformer, derived · Anatomy of a training run · Measuring a model honestly |
 
@@ -111,15 +118,22 @@ A few, so you can see the shape:
 
 | | |
 |---|---|
-| `2^10` against `10^3` | 2.40% above |
-| `2^80` against `10^24` | **20.89% above** — the same error, compounded eight times |
-| 7 billion parameters at 2 bytes | 14 GB, and 13.04 GiB |
-| A gibibyte against a gigabyte | 7.37% more bytes |
-| "Fifty per cent faster" on 200 ms | 100 ms or 133.3 ms, **33.3 ms apart** |
+| `2^10` against `10^3` | <span data-val="f01.kib.over.si.pct">2.40</span>% above |
+| `2^80` against `10^24` | **<span data-val="f01.two.eighty.err.pct">20.89</span>% above** — the same error, compounded eight times |
+| 7 billion parameters at 2 bytes | <span data-val="f01.weights.gb">14</span> GB, and <span data-val="f01.weights.gib">13.04</span> GiB |
+| A gibibyte against a gigabyte | <span data-val="f01.gib.over.si.pct">7.37</span>% more bytes |
+| "Fifty per cent faster" on <span data-val="f01.base.ms">200</span> ms | <span data-val="f01.fifty.pct.less.ms">100</span> ms or <span data-val="f01.fifty.pct.more.rate.ms">133.3</span> ms, **<span data-val="f01.speedup.discrepancy.ms">33.3</span> ms apart** |
 
-Ten experiments are specified across the book and **none has been run**. Until
-one is, the claim it would support is labelled as judgement and its table stays
-empty. Nine of the ten are free and finish on a laptop in under a minute.
+Those five are read out of `figures/values/` and compared with what the scripts
+now produce — `make frontpage`, and a step in both workflows — so this table
+cannot quietly stop being true while the book's own copy of it moves.
+
+Ten experiments are specified across the book, nine of them free and finishing
+on a laptop in under a minute. Until the one behind a claim has been run, the
+claim is labelled as judgement rather than measurement — and
+[the ledger](notes/01-curriculum.md) names the pass that ran each rather than
+counting them, because a total is exactly the kind of sentence that goes
+quietly out of date.
 
 ---
 
