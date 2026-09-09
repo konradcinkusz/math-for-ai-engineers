@@ -258,10 +258,11 @@ napotyka drugie słowo, musi wiedzieć, że to pierwsze.
 \toprule
 \textbf{Angielski} & \textbf{Wydanie polskie} & \textbf{notatka} \\
 \midrule
-\plterm{batch}{partia, wsad, batch}{Wszystkie trzy, na jeden obiekt.
-  \emph{Partia} jest najczęstsza; \emph{wsad} niesie przymiotnik
-  \emph{wsadowy}, na który \emph{partia} nie ma formy; \emph{batch} to
-  zapożyczenie. Spodziewaj się wszystkich trzech.}
+\plterm{batch}{partia, wsad, batch}{Jeden obiekt; każdy odpowiednik ma swoje
+  zadanie. \emph{Partia} jest podstawą i jako jedyna tworzy złożenie \dash{}
+  \emph{mikropartia}; \emph{wsad} niesie przymiotnik \emph{wsadowy}, którego
+  \emph{partia} nie tworzy; \emph{batch} to zapożyczenie. Liczby tu nie
+  podajemy: podano ją raz, a pod spodem pojawił się czwarty.}
 \plterm{embedding}{zanurzenie, embedding}{Własna reguła tłumaczeniowa tej
   książki każe zostawiać słowo angielskie tam, gdzie polska forma jest kalką,
   której nikt nie wyszuka, a wydanie polskie i tak używa głównie
@@ -272,6 +273,33 @@ napotyka drugie słowo, musi wiedzieć, że to pierwsze.
 \plterm{learning rate}{współczynnik uczenia, krok uczenia}{Obie formy są w
   realnym użyciu. \emph{Krok} to \emph{step}, czyli to, co ten współczynnik
   daje, a nie to, co mnoży: mnoży gradient, a krok jest wynikiem.}
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\begin{note}
+Najdotkliwszym kosztem nieustalonego słowa jest odsyłacz, który przemianowuje
+rzecz, na którą wskazuje. Tabela tego, czego ta książka nie zmierzyła, w
+Programie~\ref{prog:P32} odsyła czytelnika do Programu~\ref{prog:P08} i
+Programu~\ref{prog:P11} po widmo prawdziwej macierzy zanurzeń; wydanie polskie
+pisze tam \emph{macierz zanurzeń}, tak samo jak Program~\ref{prog:P11}, a
+Program~\ref{prog:P08} pisze \emph{macierz embeddingów}. Tego nie da się
+naprawić przy samym odsyłaczu, bo wiersz wskazuje dwa programy, które nie
+zgadzają się ze sobą, i to jest argument za rozstrzygnięciem \emph{embedding}
+w pierwszej kolejności.
+\end{note}
+
+\medskip
+Jeden wiersz stoi poniżej, a nie powyżej, z odwrotnego powodu: wygląda na
+nieustalony, a nie jest. \emph{Próba} i \emph{próbka} dzielą między siebie
+pracę, zamiast o nią konkurować, a ten podział warto znać.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{Angielski} & \textbf{Wydanie polskie} & \textbf{notatka} \\
+\midrule
 \plterm{sample}{próba, próbka}{\emph{Próba} to termin statystyczny i to jego
   książka używa w utartych połączeniach \dash{} \emph{wariancja z próby},
   \emph{średnia z próby}, Program~\ref{prog:P26}. \emph{Próbka} pojawia się
@@ -282,18 +310,8 @@ napotyka drugie słowo, musi wiedzieć, że to pierwsze.
 \end{center}
 
 \medskip
-\begin{note}
-Najczystszy przypadek to odsyłacz, który przemianowuje rzecz, na którą wskazuje.
-Program~\ref{prog:P18} odsyła do Programu~\ref{prog:P06} po fakt, że prawdziwe
-biblioteki układają wsad wzdłuż pierwszej osi; wydanie polskie pisze tam
-\emph{partię}, a tutaj \emph{wsad}, więc czytelnik idący za wskazówką zastaje
-inny rzeczownik.
-\end{note}
-
-\medskip
-Dwa dalsze hasła warto nazwać, bo są przypadkiem odwrotnym \dash{} miejscami,
-w których wydanie polskie jest ustalone, a czytelnik może spodziewać się czegoś
-innego. $\intcc{a}{b}$ zachowuje nawiasy kwadratowe zamiast ostrych, których uczy
+Dwa dalsze hasła warto nazwać z tego samego powodu i żadne nie jest terminem.
+$\intcc{a}{b}$ zachowuje nawiasy kwadratowe zamiast ostrych, których uczy
 polska szkoła, bo ISO 80000-2 i każdy artykuł, który czytelnik będzie otwierał,
 piszą je właśnie tak. Żaden program się nad tym nie zatrzymuje, więc zapisem
 tego jest Dodatek~\ref{app:B}, a nie pierwszy przedział, jaki czytelnik
