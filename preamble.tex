@@ -521,11 +521,20 @@
 % and replace it after any change that moves pages; a sweep table naming a
 % constant the code no longer uses reads as evidence and is worse than none.
 %
-% ONLY NUMBERED SECTIONS. \section* is the Quiz, Can you?, the diagram and
-% answer manifests and the front matter; none of those is followed by a frame,
-% and the Quiz carries a room test of its own, sized for its own contents.
-% Putting this in front of \section* as well would turn pages at the top of
-% every program for no gain.
+% ONLY NUMBERED SECTIONS. \section* is the Quiz, the diagram and answer
+% manifests and the front matter; none of those is followed by a frame, so
+% putting this guard in front of \section* as well would turn pages at the top
+% of every program for no gain.
+%
+% Two things this sentence used to say are false, and both are why the stranded
+% Quiz heading was walked past rather than measured. Can you? is NOT a
+% \section* -- \canyou calls \mfa@endhead -- so nothing here was ever going to
+% reach it, and its own case is argued in the note above \canyou. And the Quiz's
+% room test is not "sized for its own contents": it reserves 8\baselineskip
+% while the box under it will not begin on a page that cannot hold 12 lines.
+% 8 < 12 before the heading and its three-line instruction are counted at all,
+% so the guard admits pages on which the box provably cannot start. The note
+% above \begin{quiz} has the arithmetic.
 \newlength{\mfasectionroom}
 \makeatletter
 \newcommand{\mfa@sectionroom}{%
@@ -1256,6 +1265,27 @@
 % from the code, and a change nobody can explain is worse than a widow that can
 % be measured. If it is ever fixed, the gate is that all four .toc files stay
 % byte-identical.
+%
+% AND THE PARAGRAPH IS NOT WHAT STRANDS THIS HEADING. Everything above reasons
+% about the line after the heading and says nothing about the tabularx under
+% it, which is one unbreakable box: when it does not fit it moves whole, and
+% the heading and its three-line instruction are left at the foot of the page
+% with \flushbottom spending the page's stretch as a hole beneath them. \nobreak
+% holds the paragraph to the heading and has nothing to say about the table, so
+% the two are stranded together rather than the heading alone. Of \mfa@endhead's
+% three callers this is the only one exposed: a named frame carries
+% \mfa@namedframe's own room test, and Further problems is followed by a list,
+% which breaks.
+%
+% The fix needs no constant and no sweep, which is worth knowing before reaching
+% for one: \sbox the table, compare its height against \pagegoal-\pagetotal and
+% \newpage when it will not fit, guarding \pagegoal=\maxdimen and a table taller
+% than \textheight. That is the measure-your-own-box idiom the frame badge, the
+% Summary icon and \mfaheadmark already use, and it is exact where a reserve in
+% \baselineskip is a guess. It still turns pages, so what it costs is a
+% measurement across all four builds. And longtable is NOT the alternative,
+% though it is loaded and looks like one: it has no X column, and this table
+% has one.
 \newcommand{\canyou}{%
   \par\vspace{18pt}%
   \mfa@endhead{\lblCanYou}%
@@ -1364,8 +1394,28 @@
 % The heading, the instruction and the rectangle are one instrument, and
 % \section* binds only the first two. Without the room test the heading and its
 % paragraph sat at the foot of the opener and the box began overleaf, in all
-% four builds -- not by chance, by layout. Eight \baselineskip is heading plus
-% instruction plus the first question.
+% four builds -- not by chance, by layout.
+%
+% AND THE RESERVE IS TOO SMALL, WHICH THE TWO CONSTANTS IN THIS ONE COMMENT
+% SETTLE BETWEEN THEM. Eight \baselineskip was sized as heading plus
+% instruction plus the FIRST QUESTION -- that is, on the assumption that the
+% box would break after one question. The `lines before break=12' this comment
+% opens by arguing for forbids exactly that: below twelve lines the box does
+% not break, it moves whole. So 8 < 12 before the heading and its three-line
+% instruction are counted at all, and on every page whose remaining room falls
+% between the two the guard passes, the heading and the instruction are set,
+% and the box goes overleaf. In that window the guard does not fail to prevent
+% the stranding. It produces it.
+%
+% NOT CORRECTED HERE, deliberately. The reserve has to become heading plus
+% instruction plus `lines before break' plus the box's rule and top padding,
+% which is a derivation and not a sweep -- but raising it turns a page at the
+% top of a program, and every break in the book after that page moves with it.
+% What that costs is a measurement across all four builds, and the sweep table
+% for \mfasectionreserve is what one looks like. Whoever takes it should give
+% the two numbers one macro so they cannot drift apart again, and should know
+% that tools/checkpdf.py cannot see this defect: is_heading matches on a
+% section NUMBER, and \section* has none.
 \newenvironment{quiz}{%
   \par
   \ifdim\pagegoal=\maxdimen\else
@@ -2000,6 +2050,57 @@
 % left bar, no outline. \emph{outlined} is a block the reader must stop at, and
 % it gets a full rule on white. That is the whole visual grammar; a third
 % treatment would mean the first two are not carrying their meaning.
+%
+% THE BREAK IS MARKED AND IT IS NOT NAMED, and that difference is the whole of
+% review issue #116. `overlay first and middle' below puts the continuation
+% triangle on every piece but the last, so a reader who reaches the foot of a
+% broken box is told to turn over -- and the piece they LAND on carries
+% nothing at all, because the mark is on the pieces before the break and never
+% on the pieces after it. A page can still open with a coloured bar, three
+% lines of text, no title, and no frame badge, because the badge was on the
+% page before. The review found that shape in nineteen of the fifty-five units
+% it judged, and it is right about all of it.
+%
+% Four remedies were asked for and none is taken here, for one reason common
+% to all four: each moves pagination by construction, and the property that
+% made the continuation mark takeable holds for none of them. An overlay is
+% drawn inside padding that already exists, so it adds no height and cannot
+% move a page -- which is why it was settled by counting fill operators in a
+% standalone file rather than by four book builds. These cannot be:
+%
+%   lines before break / lines after break     changes WHERE the box breaks
+%   title after break                          a title bar per continuation
+%   breakable=false under a height threshold   moves a whole box to the next page
+%   a room test before a frame's trailing box  turns the page
+%
+% WHAT IT WOULD COST, measured from source rather than estimated. Each edition
+% carries 436 admonition boxes, of which 424 are inside a frame and the other
+% twelve are in the Summary and Quiz regions; 296 in English and 293 in Polish
+% are the LAST thing in their frame, and 65 in each are the whole of it. So a
+% guard that keeps a trailing box with its frame would fire at up to 296 sites
+% per edition, against the count \transcript's own \typeout ledger reports for
+% the guard above -- and that one, measured in isolation, cleared a split no
+% editorial fix could reach and put three orphaned cues and three orphan tails
+% back doing it. Re-derive the population with one pass over
+% programs/{en,pl}/*.tex counting the eight \begin{...} above; it is a loop and
+% a minute, and it is worth re-deriving rather than quoting from here.
+%
+% Two mechanisms worth having before anybody starts, each of which costs a
+% cycle to rediscover. \needspace does NOT keep a box with what precedes it:
+% that is measured on \mfa@namedframe above, 95pt reserved against 54pt left
+% and the heading still stranded, because a breakable tcolorbox splits itself
+% in its own code rather than asking the page builder. The working mechanism is
+% the explicit \pagegoal-\pagetotal test that \begin{fr}, \section and
+% \transcript already use. And a continuation TITLE needs a new string in BOTH
+% lang/en.tex and lang/pl.tex -- there is none today, and parity's C3 fails a
+% label defined in one language only.
+%
+% The one figure here that is an estimate and not a measurement: at the
+% review's own eight-line threshold, about 193 English boxes and 197 Polish
+% ones would stop being breakable -- two in five. That divides each box body by
+% 68 characters for a typeset line, which is a proxy for a quantity only a
+% build can report, and it is quoted to price the option rather than to settle
+% it.
 \tcbset{
   mfa tinted/.style={
     enhanced, breakable, sharp corners,
@@ -2323,6 +2424,10 @@
 % main-<fmt>.log` counts how many listings did not fit and were turned.
 % Measured when the guard was added: 7 / 5 / 6 / 10 across the four builds,
 % against ONE split listing reported by the review issue that prompted it.
+% A second review, filed independently on the build before this guard landed,
+% names two more -- P12's and P22's -- so the ledger above is not the guard
+% overreaching, it is the class being wider than either reviewer could see from
+% the pages they happened to read.
 \newsavebox{\mfa@transcriptbox}
 \newcommand{\mfa@transcriptroom}{%
   \ifdim\pagegoal=\maxdimen\else
