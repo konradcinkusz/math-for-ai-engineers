@@ -67,10 +67,17 @@ Part~IV, discrete structures. Log space is Part~II's — `P02` is titled
 *Numerical error, stability and computing in log-space*, one part later — and
 Part~VIII's, seven later. False under every reading.
 
-Both clauses now name a program rather than counting parts or frames: *a
-question that needs no positional claim should not carry one*, and a
-part-distance decays the moment the curriculum moves. `Program~P2` matches
-the file's own bare style at line 26 (`Program~F1 has you compute…`).
+Both clauses now say something true: the frame-length claim is gone, and
+*three parts later* is *the very next part*, which is where P02 sits.
+
+**The first draft of this fix named the program and that was wrong too.** It
+read `Program~P2` — matching the introduction's own `(P1--P3)` part-range
+notation and its bare `Program~F1` at line 26. But `\mainnumbering` sets
+`\thechapter` to `\arabic{chapter}` (`preamble.tex:284-288`), so the main
+sequence prints as *Program 1* to *Program 34* and **no page in the book
+carries the heading "Program P2"**. Naming a part rather than a program
+sidesteps it, keeps the original sentence's shape, and cannot send a reader
+looking for a chapter that is not there under that name.
 
 - `frontmatter/en/introduction.tex:82-86`, `frontmatter/pl/introduction.tex:82-86`
 
