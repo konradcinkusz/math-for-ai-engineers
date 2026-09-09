@@ -105,27 +105,38 @@ jobs:
           echo "HEAD: $(cat /tmp/head/pages) pages"
 
       # The merge base, built from the same diagrams, so only the source differs.
+      #
+      # NOT /tmp. latex-action is a DOCKER action, and its `docker run` mounts
+      # the workspace and /home/runner and nothing else, so a working_directory
+      # under /tmp is invisible inside the container: it answered
+      # "File 'main-en.tex' cannot be found from the directory '/tmp/base'" and
+      # the guard proving the four existing PDFs had not moved failed on its own
+      # scaffolding rather than on the book. $RUNNER_TEMP is under /home/runner
+      # and is mounted at the SAME path, which also keeps the worktree's .git
+      # file -- an absolute pointer back into the real repository -- resolvable
+      # on both sides of the mount.
       - name: Compile the trade edition at the merge base
         run: |
           BASE=$(git merge-base HEAD origin/${{ github.event.repository.default_branch }} 2>/dev/null \
                  || git rev-parse HEAD~1)
           echo "base = $BASE"
-          git stash list >/dev/null 2>&1 || true
-          git worktree add /tmp/base "$BASE"
-          cp -r figures/diagrams /tmp/base/figures/ 2>/dev/null || true
-          cp -r figures/values /tmp/base/figures/ 2>/dev/null || true
-          cp -r figures/transcripts /tmp/base/figures/ 2>/dev/null || true
+          git worktree add "$RUNNER_TEMP/base" "$BASE"
+          for d in diagrams values transcripts; do
+            cp -r "figures/$d" "$RUNNER_TEMP/base/figures/" 2>/dev/null || true
+          done
+          test -f "$RUNNER_TEMP/base/main-en.tex" \
+            || { echo "::error::the base worktree has no main-en.tex"; exit 1; }
 
       - name: Compile the base
         uses: xu-cheng/latex-action@v4
         with:
-          working_directory: /tmp/base
+          working_directory: ${{ runner.temp }}/base
           root_file: main-en.tex
           args: -pdf -interaction=nonstopmode -file-line-error
 
       - name: The two must agree
         run: |
-          B=$(pdfinfo /tmp/base/main-en.pdf | awk '/^Pages/{print $2}')
+          B=$(pdfinfo "$RUNNER_TEMP/base/main-en.pdf" | awk '/^Pages/{print $2}')
           H=$(cat /tmp/head/pages)
           echo "base $B pages, head $H pages"
           if [ "$B" != "$H" ]; then
@@ -134,7 +145,7 @@ jobs:
             exit 1
           fi
           # And the cross-references, which a page count cannot see.
-          ( cd /tmp/base && python3 tools/reflist.py > /tmp/base-refs 2>/dev/null || true )
+          ( cd "$RUNNER_TEMP/base" && python3 tools/reflist.py > /tmp/base-refs 2>/dev/null || true )
           if ! diff -q /tmp/base-refs /tmp/head/refs >/dev/null 2>&1; then
             echo "::error::the resolved cross-reference list changed"
             diff /tmp/base-refs /tmp/head/refs | head -30 || true
