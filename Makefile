@@ -413,7 +413,7 @@ debt:
 KDP_STAGE := build/kdp/tex
 KDP_VOLS  := $(shell python3 -c "import json;print(' '.join(str(v['n']) for v in json.load(open('tools/volumes.json'))['volumes']))" 2>/dev/null)
 
-.PHONY: volumes volumes-check
+.PHONY: kdp-stage volumes volumes-check
 
 # Regenerate the per-volume wiring from the two manifests.
 volumes:
@@ -422,3 +422,8 @@ volumes:
 volumes-check:
 	@python3 tools/gen_volumes.py --check
 	@python3 tools/test_gen_volumes.py
+
+# The staging tree: symlinks to the real sources, plus the grayscale diagrams at
+# the path \mermaidfig hard-codes. Depends on the colour renders existing.
+kdp-stage: diagrams
+	@python3 tools/kdpstage.py
