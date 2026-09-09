@@ -29,8 +29,20 @@ they sit at the two ends of a frame.
        above. \\dotline ends `\\par\\vspace{2pt}`, and glue after a paragraph is a
        legal breakpoint; \\nextframe's own leading \\nopagebreak is contributed
        after that glue and so arrives too late to forbid it. The fix is
-       therefore editorial -- shorten the frame so the tail fits -- and NOT a
-       penalty bolted onto \\dotline, which was tried, measured and reverted.
+       therefore editorial, and NOT a penalty bolted onto \\dotline, which was
+       tried, measured and reverted.
+
+       WHICH editorial move is the half people get wrong, so it is stated here
+       rather than only in the pass notes: LENGTHEN the frame, never shorten
+       it. Adding a paragraph carries the question, its dots and the cue over
+       the boundary together; cutting one only pulls the previous frame's
+       material up to fill the gap, so the page stays full and the tail stays
+       exactly where it was. Measured in both directions -- F06 trimmed one
+       frame over two rounds and the cue did not move, and F10 trimmed three
+       frames in both editions, rebuilt all four and got the same three cues on
+       the same three pages, then lengthened the same three and cleared all of
+       them. No recorded lengthening has failed. Both edits go in BOTH
+       editions, or the two stop saying the same thing.
 
     3. STRANDED SECTION HEADING. A numbered section heading is the last thing
        on a page and the section itself begins overleaf.
@@ -67,7 +79,33 @@ they sit at the two ends of a frame.
            it could never come clean. Detected as: the next page that carries
            any ink at all has no running head, or there is no next page.
 
-None of the four can be prevented by a constant. `\\begin{fr}` reserves room
+    5. THE CUE AT THE FOOT OF A VERSO. The question, its \\dotline and the cue
+       fill a left-hand page, so the answer opens the RIGHT-HAND PAGE OF THE
+       SAME SPREAD -- in view, four inches away, while the question is still
+       being read.
+
+       This is not a room defect and no amount of trimming addresses it. The
+       page is full, the frame is well formed, and every one of the four checks
+       above calls it healthy: it is not a cue alone (2), its ink reaches the
+       foot of the block (4), and nothing is stranded (1, 3). What decides it
+       is the PARITY of the page the question happens to end on.
+
+       The method rests on the answer being coverable. notes/07 section 3 has
+       the answer box as "a thing you put your hand over", and a hand covers
+       what is below it on the leaf it rests on; it cannot cover the facing
+       leaf, and the cue gives the reader no reason to think it must. So on a
+       verso the elicitation is spent before the question has been read.
+
+       REPORTED AND NEVER FATAL, on the orphan tail's reasoning and one step
+       further: there is no editorial fix at all. Trimming a frame moves the
+       break, and moving the break moves the parity of every later question in
+       the program -- so a cut that rescues one elicitation spends another, and
+       does it differently in each of the four builds. The remedy, if there is
+       one, is a parity-aware room test at \\dotline; it is untried, it turns
+       pages, and preamble.tex carries the measured cost of the unconditional
+       version that was tried and reverted.
+
+None of the five can be prevented by a constant. `\\begin{fr}` reserves room
 before it draws the rule, and that reservation IS NOT MONOTONIC: measured over
 F1, reserving six baselineskips stranded a frame that five did not, because a
 larger reservation turns pages earlier and reshuffles every later break. The
@@ -78,7 +116,7 @@ Usage:
     tools/checkpdf.py main-en.pdf main-pl.pdf main-en-a4.pdf main-pl-a4.pdf
 
 Needs pdftotext (poppler). 1 and 3 are structural and always fatal. 2 is
-fatal unless --cues=warn is passed. 4 is reported in full and never fatal --
+fatal unless --cues=warn is passed. 4 and 5 are reported and never fatal --
 see the note above main() for why, and read the count rather than the exit
 code.
 """
@@ -101,9 +139,27 @@ MARGIN_SLACK = 2.0
 HEAD_FRACTION = 0.10
 
 # A numbered section heading opens with its number: F4.7 in a program, B.2 in
-# an appendix. \section* -- the Quiz, Can you?, the manifests, the front matter
-# -- has no number and is deliberately not matched: none of those is followed
-# by a frame, and the Quiz carries a room test of its own.
+# an appendix. \section* -- the Quiz, the manifests, the front matter -- has no
+# number, so is_heading cannot match one and this check has never looked at one.
+#
+# That exclusion used to be justified here on two grounds: that none of them is
+# followed by a frame, and that the Quiz carries a room test of its own. The
+# first holds. The second does not. The Quiz's reserve is 8\baselineskip against
+# a box that will not begin on a page which cannot hold 12 lines, so the guard
+# admits pages on which the box provably cannot start -- the arithmetic is in
+# the note above \begin{quiz} in preamble.tex. And Can you? is not a \section*
+# at all: \canyou calls \mfa@endhead, and what follows it is an unbreakable
+# tabularx with no guard of any kind.
+#
+# So the blind spot is real, it is this check's, and it is the reason those two
+# headings are found by eye. Closing it needs the heading STRING rather than a
+# number -- \lblQuiz and \lblCanYou read out of lang/*.tex the way cue_strings()
+# already reads \lblNextFrame -- and a SECOND size calibration, because
+# \mfa@endhead sets \large where a numbered section sets \Large, so the height
+# heading_metrics learns will not match Can you?. It is not written here because
+# the pass that found the blind spot had no TeX installation and so could not
+# watch it fire on a page it already knew was wrong, and a check nobody has
+# watched fire is worth less than no check at all.
 RE_SECNO = re.compile(r"^[A-Z]?\d*\.\d+$")
 
 # How high up the text block a body page's ink may stop before the page reads
@@ -154,6 +210,33 @@ def text_blocks(pages, head: float) -> dict[int, tuple[float, float]]:
             right[round(x1)] += 1
     return {k: (float(left.most_common(1)[0][0]), float(right.most_common(1)[0][0]))
             for k, (left, right) in per.items()}
+
+
+def verso_parity(blocks) -> int | None:
+    """Which parity class of PDF page is a verso -- MEASURED, not assumed.
+
+    Page 1 of the file is a recto, so odd PDF pages are rectos and even ones
+    versos, and that is true of every book this repository has built. It is
+    still an assumption about the artefact rather than a reading of it, and
+    this tool's habit is the other one: text_blocks learns the block edges
+    from the page instead of from the geometry options, precisely so that the
+    check survived the day the A4 format was added.
+
+    The reading is free, because text_blocks has already taken it. THE MARGINS
+    ARE MIRRORED: the outer margin is the narrow one, so a verso's block
+    starts nearer the paper's left edge than a recto's -- 51 pt against 62 pt
+    in the trade format. The parity whose block starts further left is the
+    verso, whatever the file's first page happens to be.
+
+    Returns None when the two are indistinguishable. That means the document
+    is not set twoside with mirrored margins, so there is no verso to find and
+    a count of zero would be a false reading rather than a clean one; the
+    caller says so instead of reporting it.
+    """
+    even, odd = blocks[0][0], blocks[1][0]
+    if abs(even - odd) < MARGIN_SLACK:
+        return None
+    return 0 if even < odd else 1
 
 
 def lines_of(ws):
@@ -235,14 +318,21 @@ def head_baseline(pages) -> float:
 
 
 def chapter_final(pages, head: float) -> set[int]:
-    """The pages after which a chapter or appendix opener begins.
+    r"""The pages after which a chapter or appendix opener begins.
 
     A page with no running head is an opener or a part page: every other page
     carries one. Blank versos are skipped over, because a chapter that starts
-    recto leaves one between itself and the page this is really about -- and
-    note that a blank verso here is blank in the BODY only: this book's
-    \cleardoublepage leaves the running head on it, so a page with nothing but
-    a head is what has to be skipped rather than a page with nothing at all.
+    recto leaves one between itself and the page this is really about.
+
+    `inked` asks for a word BELOW the head line rather than for any word at
+    all, and that test used to be load-bearing here: the preamble's
+    \cleardoublepage left the running head on the blank leaf, so it was a page
+    with nothing but a head and "has any words" would have counted it. The
+    preamble now ships that leaf under the `empty` style, so it carries no
+    words at all and the two tests agree about it. The head test is kept
+    because it is still the only thing that separates an opener -- whose
+    topmost word is below the head line -- from a body page, which is what
+    `openers` below is asking.
     """
     inked = [pno for pno, (_, _, body) in enumerate(pages, start=1)
              if any(w[1] > head + HEAD_GAP for w in words(body))]
@@ -276,11 +366,16 @@ def foot_baseline(pages, blocks, head: float) -> float:
 
 
 def check(path: Path, cues: set[str]):
-    """All four defects, from one parse of the artefact.
+    """All five defects, from one parse of the artefact.
 
     Returns (stranded openers, orphaned cues, stranded headings, orphan tails,
-    heading count) -- the last so the caller can refuse to report a green
-    heading result from a calibration that found nothing to calibrate on.
+    heading count, spread) -- the heading count so the caller can refuse to
+    report a green heading result from a calibration that found nothing to
+    calibrate on, and `spread` the triple (verso parity, pages ending on the
+    cue, those of them that are versos) for defect 5. The second of those is
+    the denominator: a count of verso cue-endings means nothing without the
+    number of cue-endings it is drawn from, because the two move together
+    whenever the book grows.
     """
     xml = subprocess.run(["pdftotext", "-bbox", str(path), "-"],
                          capture_output=True, text=True, check=True).stdout
@@ -290,11 +385,13 @@ def check(path: Path, cues: set[str]):
     foot = foot_baseline(pages, blocks, head)
     sec_h, sec_n = heading_metrics(pages, blocks, head)
     finals = chapter_final(pages, head)
+    verso = verso_parity(blocks)
     top = head + HEAD_GAP
     stranded: list[tuple[int, list[str]]] = []
     orphans: list[tuple[int, str]] = []
     headings: list[tuple[int, str]] = []
     tails: list[tuple[int, float, str]] = []
+    cue_ends: list[int] = []
     for pno, (_, ph, body) in enumerate(pages, start=1):
         ph = float(ph)
         lo, hi = blocks[pno % 2]
@@ -304,21 +401,33 @@ def check(path: Path, cues: set[str]):
         in_block = [w for w in ws
                     if w[1] > top and lo - MARGIN_SLACK <= w[0] <= hi + MARGIN_SLACK]
 
+        # Defects 3 and 5 are both statements about the LAST LINE of the
+        # block, so it is read once here and asked two questions.
+        block_lines = lines_of(in_block) if in_block else {}
+        last = block_lines[max(block_lines)] if block_lines else []
+
         # --- 3. the stranded section heading -------------------------------
         # The last line of the block is a heading, so its section starts on the
         # next page. Worth the same weight as a stranded opener: both promise
         # the reader something the page does not then carry.
-        if sec_n and in_block:
-            lines = lines_of(in_block)
-            last = lines[max(lines)]
-            if is_heading(last, lo, sec_h):
-                headings.append((pno, " ".join(w[4] for w in last)))
+        if sec_n and last and is_heading(last, lo, sec_h):
+            headings.append((pno, " ".join(w[4] for w in last)))
+
+        # --- 5. the cue at the foot of the page ----------------------------
+        # The cue is its own right-aligned paragraph and check_structure.py
+        # requires it to be the last thing in its frame, so "the last line of
+        # the block is the cue" is exactly "this page ends by asking". Whether
+        # that spends the elicitation is then decided by the page's parity,
+        # which is why both are collected and only the verso ones are counted
+        # against the book -- see defect 5 at the top of this file.
+        if last and " ".join(w[4] for w in last) in cues:
+            cue_ends.append(pno)
 
         # --- 4. the orphan tail --------------------------------------------
         # A page with a running head is a body page; a part page and a chapter
         # opener have none, are laid out by their own rules, and are excluded.
-        # A page with nothing in the block is a blank verso and is excluded by
-        # the same test.
+        # A blank verso reaches none of the four tests: it carries no words at
+        # all, so the loop skipped it above.
         if in_block and pno not in finals and min(w[1] for w in ws) <= head + HEAD_GAP:
             fill = (max(w[3] for w in in_block) - top) / (foot - top)
             if fill < FILL_FLOOR:
@@ -362,13 +471,24 @@ def check(path: Path, cues: set[str]):
                       and lo - MARGIN_SLACK <= w[0] <= hi + MARGIN_SLACK]
         if not body_below:
             stranded.append((pno, [w[4].strip() for w in badges]))
-    return stranded, orphans, headings, tails, sec_n
+    # A cue ALONE on a page is defect 2 and not defect 5, and the two sets are
+    # kept disjoint deliberately. On such a page the question is not on the
+    # page at all -- it is on the leaf before, which the reader has already
+    # turned -- so the answer opposite is not in view beside its question. The
+    # reader's complaint there is that the cue instructs nothing, which is what
+    # defect 2 says and what makes it a hard gate; naming the same page twice
+    # under two diagnoses would make both ledgers harder to read.
+    alone = {pno for pno, _ in orphans}
+    ends = [pno for pno in cue_ends if pno not in alone]
+    versos = [pno for pno in ends if verso is not None and pno % 2 == verso]
+    return stranded, orphans, headings, tails, sec_n, (verso, ends, versos)
 
 
 # The orphaned cue does not fail the build when --cues=warn is passed, and CI
-# passes it. THE ORPHAN TAIL NEVER FAILS THE BUILD, on any invocation. Neither
-# is the gate going soft; both are the gate being honest about what it can
-# know, and the second needs its reasoning stated rather than assumed.
+# passes it. THE ORPHAN TAIL AND THE VERSO CUE NEVER FAIL THE BUILD, on any
+# invocation. None of that is the gate going soft; it is the gate being honest
+# about what it can know, and the last two need their reasoning stated rather
+# than assumed.
 #
 # The tail is a PRE-EXISTING CLASS. When the check was written it named 15
 # pages -- one in the trade English build, six in the trade Polish, four in
@@ -412,6 +532,39 @@ def check(path: Path, cues: set[str]):
 # attempts are recorded in preamble.tex with their measurements, and all three
 # made it worse or did nothing.
 #
+# THE VERSO CUE IS REPORTED FOR THE TAIL'S REASON AND ONE FURTHER. The tail is
+# clearable in principle and merely expensive: a frame can be shortened until
+# its ink reaches the foot. The verso cue is not clearable at all by editing,
+# because it is not a statement about how much room a frame needs. It is a
+# statement about the PARITY of the leaf the question ends on, and parity is a
+# property of every break before it in the program: shorten the frame that
+# spends one elicitation and the break moves, and the next question in the
+# program lands on the other parity. A cut therefore trades one instance for
+# another, and does the trade differently in each of the four builds and
+# differently again on the CI installation, which paginates differently from
+# the container that writes the published PDF.
+#
+# So there is nothing an author can do frame by frame, which is exactly the
+# condition under which a red gate teaches the next person to stop reading the
+# output. It is a ledger instead, and it is printed as a COUNT AND A RATE
+# rather than as a list of pages, because the individual pages cannot be acted
+# on and the two numbers say different things: the count is elicitations spent
+# and grows with the book, and the rate is what a remedy would move. Roughly
+# one cue-ending page in two is a verso by construction, so a rate near a half
+# is the null result, and the thing to watch is the rate MOVING -- which is
+# what a structural remedy would do and what nothing else would.
+#
+# The remedy, if it is taken, is a parity-aware room test at \dotline: turn the
+# page early when the cue is about to end a verso with little room left, so the
+# answer opens a recto and the paper does the covering. It is untried. It turns
+# pages, so it moves the two ledgers above and the page counts with them, and
+# the unconditional version of the same idea WAS tried, measured and reverted
+# -- preamble.tex carries that table beside \nextframe, and it is the thing to
+# read before re-running it. Note that the parity-aware version fires on about
+# half as many pages as the one that was measured, which is the whole of the
+# reason it is worth measuring separately rather than inferring from that
+# table.
+#
 # FILL_FLOOR WAS SWEPT, not chosen. It is the fraction of the text block a body
 # page's ink has to reach. Against the build this check was written on:
 #
@@ -452,7 +605,8 @@ def main() -> int:
             print(f"== {path} == MISSING")
             ok = False
             continue
-        stranded, orphans, headings, tails, sec_n = check(path, cues)
+        stranded, orphans, headings, tails, sec_n, spread = check(path, cues)
+        verso, cue_ends, verso_cues = spread
         if not sec_n:
             ok = False
             print(f"== {path.name} == NO NUMBERED SECTION HEADING FOUND")
@@ -489,12 +643,36 @@ def main() -> int:
             print(f"== {path.name} == {len(found)} {name}")
             for d in found:
                 print(f"      PDF page {d[0]}: {detail(d)}")
-            print("      Shorten the frame so its tail fits on one page. Do NOT bolt")
-            print("      a penalty onto \\dotline: that was tried, measured and")
-            print("      reverted, and it moves every later break.")
+            print("      LENGTHEN the frame, in both editions, so that its question,")
+            print("      its dots and the cue cross the boundary together. Shortening")
+            print("      is the move that does NOT work: it pulls the previous frame")
+            print("      up to fill the gap and the tail stays where it was, measured")
+            print("      twice (F06 over two rounds, F10 over three frames and four")
+            print("      builds). Do NOT bolt a penalty onto \\dotline either: that")
+            print("      was tried, measured and reverted, and it moves every later")
+            print("      break.")
             if not fatal:
                 print("      Not failing the build: see the note at the top of this")
                 print("      file for what this count is and is not.")
+        if verso is None:
+            ok = False
+            print(f"== {path.name} == VERSO AND RECTO CANNOT BE TOLD APART")
+            print("      The two page parities' text blocks start at the same")
+            print("      place, so the margins are not mirrored and there is no")
+            print("      verso to find. Reporting no verso cues would be a false")
+            print("      reading rather than a clean one, so it fails here.")
+        elif cue_ends:
+            n, total = len(verso_cues), len(cue_ends)
+            print(f"== {path.name} == {n} of {total} pages that END ON THE CUE "
+                  f"are versos ({n / total:.0%}), reported not fatal")
+            print("      The answer opens the facing recto, in the same spread and")
+            print("      in view, where the reader's covering hand cannot reach it.")
+            print("      Pages are not listed and no frame should be trimmed to")
+            print("      move one: the remedy is structural, and trimming trades")
+            print("      this instance for the next. Both numbers say something:")
+            print("      the count is elicitations spent and grows with the book,")
+            print("      the rate is near a half by construction and only a")
+            print("      structural change moves it. See the note above main().")
         if not (stranded or orphans or headings or tails) and sec_n:
             print(f"== {path.name} == no stranded frame openers, no stranded "
                   f"section headings, no orphaned cues, no orphan tails")

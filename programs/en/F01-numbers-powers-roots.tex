@@ -566,7 +566,11 @@ from.
 
 \mermaidfig{f01-magnitudes}{%
   The quantities this book keeps returning to, on one ladder. Every step is
-  an exponent, and every question about cost is a subtraction along it.}{%
+  an exponent, and every question about cost is a subtraction along it. The
+  ladder rounds every quantity to a power of ten, so its $10^{7}$ seconds and
+  the $\num{2e8}$ this section computed are one question asked at two
+  precisions \dash{} rounding both operands moved the answer by a factor of
+  $20$.}{%
   A logarithmic ladder from a single token to the FLOPs of a training run.}
 
 % ============================================================
@@ -683,8 +687,9 @@ the first time.
 \end{fr}
 
 \mermaidfig{f01-prefixes}{%
-  The two prefix ladders and the gap between them. The gap compounds: it is
-  \val{f01.kib.over.si.pct}\% at kilo and \val{f01.tib.over.si.pct}\% at tera,
+  The two prefix ladders at their ends, and the gap between them. The gap
+  compounds: it is \val{f01.kib.over.si.pct}\% at kilo and
+  \val{f01.tib.over.si.pct}\% at tera,
   which is the same compounding as $2^{80}$ against $10^{24}$.}{%
   SI decimal prefixes against IEC binary prefixes, with the widening gap.}
 

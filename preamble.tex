@@ -521,11 +521,20 @@
 % and replace it after any change that moves pages; a sweep table naming a
 % constant the code no longer uses reads as evidence and is worse than none.
 %
-% ONLY NUMBERED SECTIONS. \section* is the Quiz, Can you?, the diagram and
-% answer manifests and the front matter; none of those is followed by a frame,
-% and the Quiz carries a room test of its own, sized for its own contents.
-% Putting this in front of \section* as well would turn pages at the top of
-% every program for no gain.
+% ONLY NUMBERED SECTIONS. \section* is the Quiz, the diagram and answer
+% manifests and the front matter; none of those is followed by a frame, so
+% putting this guard in front of \section* as well would turn pages at the top
+% of every program for no gain.
+%
+% Two things this sentence used to say are false, and both are why the stranded
+% Quiz heading was walked past rather than measured. Can you? is NOT a
+% \section* -- \canyou calls \mfa@endhead -- so nothing here was ever going to
+% reach it, and its own case is argued in the note above \canyou. And the Quiz's
+% room test is not "sized for its own contents": it reserves 8\baselineskip
+% while the box under it will not begin on a page that cannot hold 12 lines.
+% 8 < 12 before the heading and its three-line instruction are counted at all,
+% so the guard admits pages on which the box provably cannot start. The note
+% above \begin{quiz} has the arithmetic.
 \newlength{\mfasectionroom}
 \makeatletter
 \newcommand{\mfa@sectionroom}{%
@@ -651,6 +660,74 @@
 \renewcommand{\chaptermark}[1]{\markboth{\@chapapp\ \thechapter}{#1}}
 \makeatother
 \renewcommand{\sectionmark}[1]{}
+
+% ---- The blank verso -------------------------------------------------------
+% \cleardoublepage inserts a leaf whenever a chapter, an appendix or a part
+% would otherwise open on a verso, and the leaf it inserts is blank IN THE BODY
+% ONLY. The output routine still runs under whatever \pagestyle is current, so
+% it shipped with the head rule, the folio and the running title over an
+% otherwise white page: a leaf carrying "88" and "Program F3" and nothing else,
+% which on a screen is a page that says nothing and in print is a misprint.
+% Every chapter and appendix whose predecessor ended on a recto produced one.
+%
+% The wrapper below is the emptypage package's, written out rather than
+% required. A package one of this project's two TeX installations has and a
+% reader's does not is latent on every machine that exists here -- which is the
+% trap recorded against mathtools -- and this is four lines that touch nothing.
+%
+% It is a WRAPPER rather than a \patchcmd on purpose. A patch has to match
+% \hbox{}\newpage inside the kernel's own definition, and a \patchcmd that
+% stops matching fails into a warning that checklog.py prints and does not fail
+% on -- so the fix would go inert while the build stayed green, which is this
+% preamble's own recorded failure mode: a graceful degradation is where a
+% defect looks intentional. Wrapping calls whatever \cleardoublepage happens to
+% be, so there is nothing to match and nothing to go quiet.
+%
+% \clearpage FIRST, and outside the group, so the page in hand ships under its
+% own style; then \pagestyle{empty} inside a group, which \ps@empty installs
+% with local \lets, so the blank leaf ships bare and the group hands the fancy
+% style straight back. When no leaf is needed the group encloses nothing.
+%
+% IT MOVES NO PAGE, and that is MEASURED rather than reasoned. The mechanism
+% says it should not -- the leaf is forced by \newpage either way, so this
+% changes what is drawn on a page that already exists and not whether it
+% exists -- but the doubled \clearpage cannot be settled by reading, since
+% \cleardoublepage opens with one of its own and that is a no-op only because
+% the first leaves material behind it. If it were not, every leaf would become
+% two.
+%
+% So it was compared against the same commit on the same machine, which is the
+% only comparison that holds one variable: CI, main-en-a4, this change against
+% main at c9b8bb6. checkpdf's two page-level ledgers came back ELEMENT FOR
+% ELEMENT -- nine orphaned cues at pages 86, 91, 137, 148, 336, 456, 475, 528
+% and 824, and twenty-seven orphan tails ending at page 1004 of 1168 -- and a
+% single leaf inserted or dropped anywhere would have shifted every number
+% after it. Zero errors, zero unresolved references, zero overfull boxes of
+% either kind. The PDF came out 3,337 bytes SMALLER, which is the ink coming
+% off the leaves and is the other half of the check: the pagination did not
+% move and the heads did go.
+%
+% Note that CI paginates differently from the container that writes the
+% published PDF, so 1168 is not CLAUDE.md's figure for this format and is not
+% meant to be. What transfers is the comparison, not the number.
+%
+% tools/checkpdf.py needed NO code change, which is worth saying because the
+% obvious expectation -- the issue's own -- is that it did. Three of its four
+% tests read a body page as a word below head + HEAD_GAP and the fourth throws
+% the head away by HEAD_FRACTION, so a leaf carrying only a head was already
+% outside all four; now it carries nothing and the loop skips it before any of
+% them runs. Driven with synthetic pdftotext XML both ways, head_baseline,
+% text_blocks, foot_baseline and chapter_final answer identically, and giving
+% the leaf real body ink moves chapter_final -- so that is a measurement and
+% not an empty comparison. Only the chapter_final docstring had to move,
+% because that sentence was a claim about this book rather than about the check.
+\makeatletter
+\let\mfa@cleardoublepage\cleardoublepage
+\renewcommand{\cleardoublepage}{%
+  \clearpage
+  {\pagestyle{empty}\mfa@cleardoublepage}%
+}
+\makeatother
 
 % ============================================================
 %  FRAMES — the unit the whole method is built from
@@ -1113,6 +1190,41 @@
 % worked in F6 -- see CLAUDE.md's F6 pass. When a frame's tail sits one line
 % past the boundary, LENGTHENING it can push the whole tail over together,
 % where trimming only pulls more of the previous frame up behind it.
+%
+% AND THE CUE HAS A SECOND FAILURE THAT IS NOT A ROOM FAILURE AT ALL, so none
+% of the above reaches it. When the cue ends a VERSO the page is full, the
+% frame is well formed, and the answer opens the facing recto -- inside the
+% same spread, in view, while the question is still being read. "Cover the
+% page and turn over" is the right instruction on a recto and describes
+% nothing the reader can do on a verso: a hand covers what is below it on the
+% leaf it rests on, and the facing leaf is not one of those. Roughly half of
+% every cue that ends a page does it on a verso, by construction.
+%
+% IT CANNOT BE FIXED BY EDITING, and that is what separates it from the four
+% attempts above. Those are statements about how much ROOM a frame needs, so a
+% frame can be shortened or lengthened until the tail fits. This is a
+% statement about the PARITY of the leaf the question ends on, and parity is a
+% property of every break before it: move the break that spends one
+% elicitation and the next question in the program lands on the other parity.
+% A cut trades one instance for another, differently in each of the four
+% builds and differently again under CI's metrics. There is no frame to fix.
+%
+% The remedy, if it is taken, is the room test above made PARITY-AWARE: give
+% \dotline the reservation, but arm it only on an even page, so the cue that
+% would have ended a verso starts a recto instead and the paper does the
+% covering. UNTRIED, and it must be measured rather than inferred from the
+% table above -- that table is the unconditional guard, which fired on every
+% short page and turned two cues into eight tails and six pages. The
+% parity-aware one fires on about half as many pages and buys something the
+% unconditional one did not: a page turned here moves the answer BEHIND the
+% leaf rather than merely lower on it. That is a different trade, not a
+% smaller version of the same one, and the tails it costs have to be weighed
+% against elicitations it saves rather than against cues it silences.
+%
+% Anyone measuring it: it turns pages, so page counts, orphaned cues and
+% orphan tails all move, and all four builds have to be swept together.
+% tools/checkpdf.py reports the verso-cue rate on every run, so the sweep has
+% a number to move; read its defect 5 before starting.
 \newcommand{\nextframe}{%
   \par\nopagebreak\vspace{3pt}\nopagebreak
   {\raggedleft\itshape\lblNextFrame\par}%
@@ -1271,6 +1383,27 @@
 % from the code, and a change nobody can explain is worse than a widow that can
 % be measured. If it is ever fixed, the gate is that all four .toc files stay
 % byte-identical.
+%
+% AND THE PARAGRAPH IS NOT WHAT STRANDS THIS HEADING. Everything above reasons
+% about the line after the heading and says nothing about the tabularx under
+% it, which is one unbreakable box: when it does not fit it moves whole, and
+% the heading and its three-line instruction are left at the foot of the page
+% with \flushbottom spending the page's stretch as a hole beneath them. \nobreak
+% holds the paragraph to the heading and has nothing to say about the table, so
+% the two are stranded together rather than the heading alone. Of \mfa@endhead's
+% three callers this is the only one exposed: a named frame carries
+% \mfa@namedframe's own room test, and Further problems is followed by a list,
+% which breaks.
+%
+% The fix needs no constant and no sweep, which is worth knowing before reaching
+% for one: \sbox the table, compare its height against \pagegoal-\pagetotal and
+% \newpage when it will not fit, guarding \pagegoal=\maxdimen and a table taller
+% than \textheight. That is the measure-your-own-box idiom the frame badge, the
+% Summary icon and \mfaheadmark already use, and it is exact where a reserve in
+% \baselineskip is a guess. It still turns pages, so what it costs is a
+% measurement across all four builds. And longtable is NOT the alternative,
+% though it is loaded and looks like one: it has no X column, and this table
+% has one.
 \newcommand{\canyou}{%
   \par\vspace{18pt}%
   \mfa@endhead{\lblCanYou}%
@@ -1379,8 +1512,28 @@
 % The heading, the instruction and the rectangle are one instrument, and
 % \section* binds only the first two. Without the room test the heading and its
 % paragraph sat at the foot of the opener and the box began overleaf, in all
-% four builds -- not by chance, by layout. Eight \baselineskip is heading plus
-% instruction plus the first question.
+% four builds -- not by chance, by layout.
+%
+% AND THE RESERVE IS TOO SMALL, WHICH THE TWO CONSTANTS IN THIS ONE COMMENT
+% SETTLE BETWEEN THEM. Eight \baselineskip was sized as heading plus
+% instruction plus the FIRST QUESTION -- that is, on the assumption that the
+% box would break after one question. The `lines before break=12' this comment
+% opens by arguing for forbids exactly that: below twelve lines the box does
+% not break, it moves whole. So 8 < 12 before the heading and its three-line
+% instruction are counted at all, and on every page whose remaining room falls
+% between the two the guard passes, the heading and the instruction are set,
+% and the box goes overleaf. In that window the guard does not fail to prevent
+% the stranding. It produces it.
+%
+% NOT CORRECTED HERE, deliberately. The reserve has to become heading plus
+% instruction plus `lines before break' plus the box's rule and top padding,
+% which is a derivation and not a sweep -- but raising it turns a page at the
+% top of a program, and every break in the book after that page moves with it.
+% What that costs is a measurement across all four builds, and the sweep table
+% for \mfasectionreserve is what one looks like. Whoever takes it should give
+% the two numbers one macro so they cannot drift apart again, and should know
+% that tools/checkpdf.py cannot see this defect: is_heading matches on a
+% section NUMBER, and \section* has none.
 \newenvironment{quiz}{%
   \par
   \ifdim\pagegoal=\maxdimen\else
@@ -2015,6 +2168,57 @@
 % left bar, no outline. \emph{outlined} is a block the reader must stop at, and
 % it gets a full rule on white. That is the whole visual grammar; a third
 % treatment would mean the first two are not carrying their meaning.
+%
+% THE BREAK IS MARKED AND IT IS NOT NAMED, and that difference is the whole of
+% review issue #116. `overlay first and middle' below puts the continuation
+% triangle on every piece but the last, so a reader who reaches the foot of a
+% broken box is told to turn over -- and the piece they LAND on carries
+% nothing at all, because the mark is on the pieces before the break and never
+% on the pieces after it. A page can still open with a coloured bar, three
+% lines of text, no title, and no frame badge, because the badge was on the
+% page before. The review found that shape in nineteen of the fifty-five units
+% it judged, and it is right about all of it.
+%
+% Four remedies were asked for and none is taken here, for one reason common
+% to all four: each moves pagination by construction, and the property that
+% made the continuation mark takeable holds for none of them. An overlay is
+% drawn inside padding that already exists, so it adds no height and cannot
+% move a page -- which is why it was settled by counting fill operators in a
+% standalone file rather than by four book builds. These cannot be:
+%
+%   lines before break / lines after break     changes WHERE the box breaks
+%   title after break                          a title bar per continuation
+%   breakable=false under a height threshold   moves a whole box to the next page
+%   a room test before a frame's trailing box  turns the page
+%
+% WHAT IT WOULD COST, measured from source rather than estimated. Each edition
+% carries 436 admonition boxes, of which 424 are inside a frame and the other
+% twelve are in the Summary and Quiz regions; 296 in English and 293 in Polish
+% are the LAST thing in their frame, and 65 in each are the whole of it. So a
+% guard that keeps a trailing box with its frame would fire at up to 296 sites
+% per edition, against the count \transcript's own \typeout ledger reports for
+% the guard above -- and that one, measured in isolation, cleared a split no
+% editorial fix could reach and put three orphaned cues and three orphan tails
+% back doing it. Re-derive the population with one pass over
+% programs/{en,pl}/*.tex counting the eight \begin{...} above; it is a loop and
+% a minute, and it is worth re-deriving rather than quoting from here.
+%
+% Two mechanisms worth having before anybody starts, each of which costs a
+% cycle to rediscover. \needspace does NOT keep a box with what precedes it:
+% that is measured on \mfa@namedframe above, 95pt reserved against 54pt left
+% and the heading still stranded, because a breakable tcolorbox splits itself
+% in its own code rather than asking the page builder. The working mechanism is
+% the explicit \pagegoal-\pagetotal test that \begin{fr}, \section and
+% \transcript already use. And a continuation TITLE needs a new string in BOTH
+% lang/en.tex and lang/pl.tex -- there is none today, and parity's C3 fails a
+% label defined in one language only.
+%
+% The one figure here that is an estimate and not a measurement: at the
+% review's own eight-line threshold, about 193 English boxes and 197 Polish
+% ones would stop being breakable -- two in five. That divides each box body by
+% 68 characters for a typeset line, which is a proxy for a quantity only a
+% build can report, and it is quoted to price the option rather than to settle
+% it.
 \tcbset{
   mfa tinted/.style={
     enhanced, breakable, sharp corners,
@@ -2204,6 +2408,15 @@
 
 % Terminal transcripts: no line numbers, no keyword colouring. Everything in
 % one of these was copied from a real run.
+%
+% AND NOTHING IN THE BOOK USES IT -- zero occurrences outside this file. The
+% transcript mechanism below replaced it, deliberately: an in-source console
+% block cannot quote a \val{} and a block nobody ran reads exactly like one
+% that was. Why it is still defined is not recorded anywhere and is not guessed
+% at here. What matters to the next person is that it carries the SAME
+% \scriptsize the note on basicstyle below is about, so a pass that raises the
+% size there and leaves this one ships a book with two transcript sizes. Raise
+% both, or delete this. (longtable is the other loaded-and-unused thing here.)
 \lstnewenvironment{console}[1][]
   {\lstset{style=mfacode,numbers=none,basicstyle=\ttfamily\scriptsize,
            keywordstyle=\color{black},backgroundcolor=\color{white},#1}}
@@ -2234,6 +2447,32 @@
 % C12's strict numeric comparison stays green. The consequence is that parity's
 % C13 cannot see the file at all -- VERB_ENV_RE scans in-source environments --
 % so the ASCII rule is asserted by the script that writes it.
+%
+% THAT SENTENCE WAS A CLAIM ABOUT THE SCRIPTS AND FOUR OF THEM DID NOT MAKE IT.
+% f11, p15, p16 and p17 wrote their transcripts out with no assertion of any
+% kind, and a fifth and sixth (f03, f04) asserted ASCII and HEIGHT and not
+% WIDTH. Every script that writes a transcript now asserts ASCII and the
+% 64-character measure, and each of those guards was watched failing on a
+% deliberate mutation before it was believed.
+%
+% THE WIDTH GUARD IS THE ONLY INSTRUMENT THERE IS, and the reason is one line
+% of mfacode: breaklines=true. An over-wide listing line does not overfull. It
+% wraps, prints the postbreak arrow into the middle of what the reader is meant
+% to paste back into a REPL, and leaves no error, no warning and no overfull
+% box anywhere in the log -- so the build cannot tell you whether a transcript
+% line fits, and a build that is clean is not evidence that one does. f04's
+% transcript shipped a 76-character line and a 73-character one for exactly
+% that reason: a wrapped listing reads like the book's own convention. It is the graceful degradation this file already
+% records for the missing-file marker below, for \mermaidfig's fallback and
+% for gen_stubs' escape() outside backticks. No tally: the rule is that every
+% graceful degradation in this preamble is a place where a defect can look
+% intentional, and the instances are named where they are found.
+%
+% The 64 itself is a HOUSE FIGURE rather than a page measurement -- it was
+% taken from the widest listing line already in the book when the first guard
+% was written, and f04's 76 was in the book at the time, so even that basis was
+% not what it said. Nobody has measured what a listing line can be. See the
+% note on basicstyle below, which is where that matters.
 %
 % AND IT MUST SURVIVE THE FILE BEING ABSENT. figures/transcripts is written by
 % `make numbers`, exactly as figures/values is, so a clean checkout that has
@@ -2303,6 +2542,10 @@
 % main-<fmt>.log` counts how many listings did not fit and were turned.
 % Measured when the guard was added: 7 / 5 / 6 / 10 across the four builds,
 % against ONE split listing reported by the review issue that prompted it.
+% A second review, filed independently on the build before this guard landed,
+% names two more -- P12's and P22's -- so the ledger above is not the guard
+% overreaching, it is the class being wider than either reviewer could see from
+% the pages they happened to read.
 \newsavebox{\mfa@transcriptbox}
 \newcommand{\mfa@transcriptroom}{%
   \ifdim\pagegoal=\maxdimen\else
@@ -2318,6 +2561,57 @@
   \IfFileExists{figures/transcripts/#1.txt}{%
     \begin{lrbox}{\mfa@transcriptbox}%
     \begin{minipage}{\linewidth}%
+    % This is one step SMALLER than mfacode's own basicstyle, which is
+    % \footnotesize -- so a transcript is the smallest type on its page, and it
+    % is the one thing the reader was told to check character by character. A
+    % review issue asks for \footnotesize and A BOX NO WIDER THAN THE MEASURE.
+    % Both are recorded here rather than taken, and this is what they would
+    % cost.
+    %
+    % THE FORMAT THE ISSUE CHECKED IS THE SLACKER OF THE TWO, and that holds
+    % however the point sizes come out: the trade build has the narrower measure
+    % (13.0 cm against A4's 14.8) and never the larger type, so it binds first
+    % and the issue checked A4. Put numbers on it and it is closer than it
+    % looks. Taking the class files at 9 pt for \footnotesize at 11 pt and 10 pt
+    % at 12 pt -- NOT measured here, check it first -- 64 characters need a
+    % typewriter advance of at most 369.4/(64*9) = 0.641 em in the trade format
+    % against 419.4/(64*10) = 0.655 em on A4.
+    %
+    % NOBODY HAS MEASURED THAT ADVANCE, and it is not one number: it is a
+    % property of the typewriter font, and the two installations do not share
+    % one. This container has Latin Modern Mono and CI has inconsolata, which is
+    % narrower -- the divergence the upquote comment near the top of this file
+    % records from both ends, and it is font-dependent there too. The
+    % container that builds the published PDF cannot even be asked; it has no
+    % TeX at all. And note what a clean build does NOT prove: with
+    % breaklines=true a line that does not fit wraps silently, so zero overfull
+    % boxes is not evidence that anything fits.
+    %
+    % AND IT IS A BOOK-WIDE LAYOUT CHANGE, not a style tweak. 88 references,
+    % every box a point or two taller, which makes \mfa@transcriptroom above
+    % fire more often; each firing turns a page, and every orphaned cue and
+    % orphan tail after it is re-rolled. When that guard was introduced its cost
+    % was measured in isolation -- one build for the prose and one for the guard
+    % alone -- and it put three cues and three tails back. This is larger. It
+    % wants the same treatment: this change and nothing else, four formats,
+    % checkpdf either side, and `grep -c MFA-TRANSCRIPT-TURN' either side, which
+    % is already a ledger.
+    %
+    % THE PRECONDITION IS NOW TRUE AND WAS NOT. The issue rests its case on the
+    % 64-character guard fitting; six scripts did not run that guard and f04's
+    % transcript broke it at 76. All of them assert it now, so the widest line
+    % in the book is f03-underflow's, which sits ON 64 rather than under it and
+    % is the listing to measure first.
+    %
+    % THE BOX: mfacode sets frame=single with framesep=6pt and leaves framerule,
+    % xleftmargin and framexleftmargin at their listings defaults, so the rule is
+    % drawn outside a body that is \linewidth wide. Whether that overhangs the
+    % measure, and by how much, is a question for TeX and is NOT settled here --
+    % it is a reading of a mechanism, and this book has twice been confident,
+    % specific and wrong about one of those. Two things about it are settled: it comes from mfacode, so it is
+    % every listing in the book and not transcripts alone; and pulling the rule
+    % inside \linewidth means narrowing the body, which tightens the same measure
+    % the paragraph above is about. Do not take the two fixes as independent.
     \lstinputlisting[style=mfacode, numbers=none,
                      basicstyle=\ttfamily\scriptsize,
                      keywordstyle=\color{black},
@@ -2953,6 +3247,12 @@
 %  Change these here; they propagate through both editions.
 % ============================================================
 \newcommand{\bookedition}{0.1}
+% \bookyear is the copyright year and is NOT \pinnedon. \pinnedon says when
+% the arithmetic was last run, which moves with every `make numbers'; the
+% copyright year says when the work was published, which does not. They agree
+% today and that is a coincidence with a lifetime -- the first time they part,
+% a reader of the copyright page will be reading two facts, not one twice.
+\newcommand{\bookyear}{2026}
 % \pinnedon is a user-visible string and lives in lang/<lang>.tex, not here.
 % It said "August 2026" on the Polish title page for exactly as long as it
 % took somebody to read the Polish title page.

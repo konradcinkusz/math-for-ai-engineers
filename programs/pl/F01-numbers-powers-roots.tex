@@ -576,7 +576,11 @@ Ta liczba nie jest hipotetyczna, a reszta programu pokazuje, skąd się bierze.
 
 \mermaidfig{f01-magnitudes}{%
   Wielkości, do których ta książka stale wraca, na jednej drabinie. Każdy
-  szczebel to wykładnik, a każde pytanie o koszt to odejmowanie wzdłuż niej.}{%
+  szczebel to wykładnik, a każde pytanie o koszt to odejmowanie wzdłuż niej.
+  Drabina zaokrągla każdą wielkość do potęgi dziesiątki, więc jej $10^{7}$
+  sekund i $\num{2e8}$ policzone w tej sekcji to jedno pytanie zadane z
+  dwiema dokładnościami \dash{} zaokrąglenie obu składników przesunęło
+  odpowiedź o czynnik $20$.}{%
   Drabina logarytmiczna od pojedynczego tokena do liczby FLOP-ów treningu.}
 
 % ============================================================
@@ -691,8 +695,9 @@ popołudnie.
 \end{fr}
 
 \mermaidfig{f01-prefixes}{%
-  Dwie drabiny przedrostków i przepaść między nimi. Ta przepaść się kumuluje:
-  \val{f01.kib.over.si.pct}\% przy kilo i \val{f01.tib.over.si.pct}\% przy
+  Dwie drabiny przedrostków na swoich końcach i przepaść między nimi. Ta
+  przepaść się kumuluje: \val{f01.kib.over.si.pct}\% przy kilo i
+  \val{f01.tib.over.si.pct}\% przy
   tera, czyli dokładnie to samo kumulowanie co $2^{80}$ wobec $10^{24}$.}{%
   Przedrostki dziesiętne SI wobec dwójkowych IEC i rosnąca różnica.}
 

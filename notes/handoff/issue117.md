@@ -198,3 +198,27 @@ instances it would be permanently red on day one.
   against 490 `ansblock`, of which 378 carry no display and no second
   paragraph; 43 of 47 programs set a plain one-sentence answer both ways.**
   Reported by `make debt`, never fatal, on the orphan tail's reasoning.
+
+## Merged into main, and the figures re-measured across it
+
+Merged at the author's instruction rather than left for the sync session.
+`origin/main` had moved 43 commits under this branch — other sessions had
+touched `Makefile`, `preamble.tex` and `tools/check_structure.py`. Two
+conflicts, both additive and both resolved by keeping **both** sides:
+`figuresize` alongside `answerbox` in the Makefile's `.PHONY` and roll-up, and
+`a.site` alongside `a.answerbox` in the argparse guard. `make debt` was run end
+to end afterwards and prints all three new sections.
+
+**Every figure quoted in this note, in `notes/07`, in `preamble.tex` and in the
+check's own docstring was re-measured on the merged tree rather than assumed
+to have survived** — twenty of the forty-seven programs had been edited,
+including P04 and P20, which this note cites by frame. All of it holds
+unchanged: 543 / 378 / 112, 43 of 47, F08 at 6 plain and 2 worked, P19 at 0
+and 17, P29 at 19 and 0, the 40–80 band at 138 against 137, and every line
+citation (F08 `:141`, `:151`, `:179`, `:226`, `:302`; P20 `:430`, `:493`,
+`:787`; P08 `:436`). P04's `ansblock` frames are still 2, 3, 25, 31, 33 and
+P20's only `\ans` is still frame 24.
+
+That re-measurement was the point of doing it rather than a formality: a
+number written against one tree is a claim about that tree, and this branch
+carried four copies of the same three figures.

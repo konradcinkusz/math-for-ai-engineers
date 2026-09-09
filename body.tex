@@ -21,6 +21,18 @@
 
 \input{frontmatter/\booklang/titlepage}
 
+%  The copyright page is the VERSO of the title page, so titlepage.tex ends
+%  with \clearpage rather than \cleardoublepage and this file fills the page
+%  that \cleardoublepage used to leave blank. Moving it, or turning that
+%  \clearpage back into a \cleardoublepage, costs the book a leaf.
+\input{frontmatter/\booklang/copyright}
+
+%  There is no preface and no acknowledgements, and that is a decision rather
+%  than an omission: the Introduction already does a preface's work -- who the
+%  book is for, what it assumes, what it refuses to claim -- and a second
+%  chapter saying the same thing before it would be read as throat-clearing.
+%  Recorded here because an absence in a directory listing is not a decision.
+
 \tableofcontents
 
 \input{frontmatter/\booklang/how-to-use}

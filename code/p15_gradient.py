@@ -444,6 +444,22 @@ assert _pf(fq(up)) > _pf(fq(START)) > _pf(fq(down))
 NOTES.append("wrong sign: one step takes the value UP rather than down")
 
 
+def _write_transcript(stem: str, lines: list[str]) -> None:
+    r"""Write one console transcript, asserting the two things the page needs.
+
+    ASCII because `listings` cannot set a character it has no literate mapping
+    for, and 64 characters because that is the measure. Neither is visible to
+    any other gate -- the reasoning is in preamble.tex above \transcript, with
+    the note that breaklines=true means an over-wide line wraps silently rather
+    than overfulling. The HEIGHT is deliberately not asserted: the room test in
+    \transcript handles a tall listing, and F11's sweep is long on purpose.
+    """
+    text = "\n".join(lines) + "\n"
+    assert text.isascii(), f"{stem}: listings cannot set a non-ASCII transcript"
+    assert max(len(l) for l in lines) <= 64, f"{stem}: transcript too wide"
+    (TRANSCRIPTS / f"{stem}.txt").write_text(text, encoding="ascii")
+
+
 def main() -> None:
     TRANSCRIPTS.mkdir(parents=True, exist_ok=True)
     # TWO listings, not one, and the split is the point. The dot product with
@@ -461,16 +477,14 @@ def main() -> None:
         ">>> GRAD",
         f"{GRAD}",
     ]
-    (TRANSCRIPTS / "p15-gradient.txt").write_text(
-        "\n".join(grad_lines) + "\n", encoding="utf8")
+    _write_transcript("p15-gradient", grad_lines)
 
     dir_lines = [
         ">>> from p15_gradient import GRAD",
         ">>> round(sum(g * u for g, u in zip(GRAD, (0.6, 0.8))), 4)",
         f"{round(sum(g * u for g, u in zip(GRAD, (0.6, 0.8))), 4)}",
     ]
-    (TRANSCRIPTS / "p15-directional.txt").write_text(
-        "\n".join(dir_lines) + "\n", encoding="utf8")
+    _write_transcript("p15-directional", dir_lines)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     out = [
