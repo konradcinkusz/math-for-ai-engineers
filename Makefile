@@ -1,4 +1,4 @@
-.PHONY: all a4 all-formats check check-a4 site stubs-check en pl en-a4 pl-a4 \
+.PHONY: all a4 all-formats check check-a4 site frontpage stubs-check en pl en-a4 pl-a4 \
         scripts terms parts rigour index \
         text-only watch-en watch-pl clean diagrams diagrams-clean \
         numbers verify stubs answers frames elicit outcomes values translate shots figuresize debt
@@ -45,6 +45,7 @@ check:
 	@python3 tools/check_structure.py --parts
 	@python3 tools/check_structure.py --rigour
 	@python3 tools/check_structure.py --index
+	@python3 tools/check_structure.py --site
 	@python3 tools/checklog.py main-en.log main-pl.log
 	@python3 tools/checkpdf.py main-en.pdf main-pl.pdf
 	@python3 tools/checkfigures.py --quiet
@@ -85,6 +86,7 @@ text-only:
 # Assemble locally exactly what CI publishes to Pages, so a link or a layout
 # change can be checked before it is deployed rather than after.
 site: en pl en-a4 pl-a4
+	@python3 tools/check_structure.py --site
 	@rm -rf _site && mkdir -p _site
 	@cp -r docs/. _site/
 	@cp main-en.pdf "_site/Mathematics-from-Zero-for-the-AI-Engineer.pdf"
@@ -312,6 +314,16 @@ rigour:
 index:
 	@python3 tools/check_structure.py --index
 
+# 5d. A digit on the README or the landing page. Those two are the only place
+#     in this repository where a number reaches a reader with no script behind
+#     it -- both printed the same five figures out of Program F1, typed in by
+#     hand, in the artefacts somebody meets BEFORE the book. `make verify`
+#     is structurally blind to it: it compares a values file against the
+#     script that wrote it, and the two stay in perfect agreement while a page
+#     quoting them goes stale.
+frontpage:
+	@python3 tools/check_structure.py --site
+
 # 6. The two editions out of step. tools/parity.py is the single parity tool;
 #    it compares an ORDERED structural signature rather than counts, because a
 #    histogram cannot see \yourturn moving from frame 2 to frame 3, and every
@@ -350,6 +362,7 @@ debt:
 	@echo; echo "== The introduction's map =="    ; $(MAKE) -s parts
 	@echo; echo "== Rigour-box destinations =="   ; $(MAKE) -s rigour
 	@echo; echo "== The index's own names =="     ; $(MAKE) -s index
+	@echo; echo "== The shop window's figures ==" ; $(MAKE) -s frontpage
 	@echo; echo "== Polish/English parity =="     ; $(MAKE) -s translate
 	@echo; echo "== Unverified claims, diagrams ="; $(MAKE) -s shots
 	@echo; echo "== Diagram type size =="        ; $(MAKE) -s figuresize || true
