@@ -6,9 +6,9 @@ read, so "both editions" needed no duplicated edit --- and no program file was
 touched, so no other unit's files were either.
 
 **This container has no TeX and no `pdftotext`.** Nothing here can compile the
-book or read a PDF, so the P23 "ask TeX" instrument was not available. What
-*was* available is written up under *What was verified* below, and what was
-not is stated in the preamble comment itself rather than left implied.
+book or read a PDF, so the P23 "ask TeX" instrument was not available --- and
+the one claim that needed it was then settled by CI instead, which compiles
+all four formats on every push. See *What was verified* below.
 
 Gates, run before any edit and again after, all green: `parity.py` 56 file
 pairs / 1866 frames / 0 declared divergences / 0 failures, 0 warnings;
@@ -88,16 +88,34 @@ a body page as a word below `head + HEAD_GAP` and the fourth discards the head
 by `HEAD_FRACTION`, so the leaf was already outside all four; it now carries
 no words and the loop's `if not ws: continue` skips it before any of them.
 
-**NOT verified here, and it needs the four-format build.** That the change
-moves no page. It is a reading of a mechanism --- the leaf is forced by
-`\newpage` either way --- and this file's rule is that such a reading stays
-judgement until it is run. The one thing the mechanism cannot settle from here
-is the doubled `\clearpage`: `\cleardoublepage` opens with one of its own, and
-that is a no-op only because the first leaves material behind it. **If that
-were wrong the failure would be loud rather than subtle** --- every one of
-these leaves would become two and the page counts would jump by the number of
-chapters --- so it lands squarely in the measurement the sync session takes
-anyway. Expect the page table and the overfull multiset element for element.
+**Verified on CI, after the first push.** The pass note above was written
+saying this was outstanding; it is not, and the correction is the finding. CI
+compiles all four formats, so pushing the branch produced exactly the
+comparison the container could not: **this change against `main` at
+`c9b8bb6`, on the same machine.**
+
+`main-en-a4`, both of checkpdf's page-level ledgers, element for element:
+
+| | `main` @ c9b8bb6 | this branch |
+|---|---|---|
+| orphaned cues | 9: pp. 86, 91, 137, 148, 336, 456, 475, 528, 824 | **identical** |
+| orphan tails | 27, ending p. 1004 | **identical, same head lines** |
+| pages | --- | 1168 |
+| errors / unresolved / overfull hbox / vbox | --- | 0 / 0 / 0 / 0 |
+
+**A single leaf inserted or dropped anywhere would have shifted every page
+number after it**, and the last tail is at page 1004 of 1168. So the doubled
+`\clearpage` is idempotent, as the form requires, and the change is free.
+
+The other half of the check is that it *did* something: the PDF came out
+**3,337 bytes smaller** (5,584,085 -> 5,580,748), which is the head rule, the
+folio and the running title coming off some thirty leaves.
+
+**CI paginates differently from the container that writes the published PDF**,
+so 1168 is not CLAUDE.md's figure for this format and is not meant to be. What
+transfers is the comparison rather than the number --- CLAUDE.md's own table
+still wants re-measuring on the container, and that is the sync session's,
+though on this evidence it should not move.
 
 ## Frames whose length I changed
 
@@ -130,6 +148,18 @@ page's own line breaks in a `\Large` centred block in two languages, so it
 wants its own measurement. Both editions carry it identically, so C4, C8, C12
 and C14 are all blind to it, exactly as they were to the introduction's nine
 part ranges.
+
+## One thing fixed that the issue did not name
+
+`tools/checkpdf.py`'s `chapter_final` docstring was not a raw string and
+contained `\cleardoublepage`, so every CI run printed
+
+    tools/checkpdf.py:238: SyntaxWarning: invalid escape sequence '\c'
+
+Pre-existing --- it is on `main` too, at line 244 --- but it is in the one
+function this pass edits, it is one character, and CLAUDE.md's P32 pass
+already records the rule: **write LaTeX through raw strings, `r"""..."""`,
+always.** Swept the whole file afterwards; that was the only one.
 
 ## Recorded rather than taken
 

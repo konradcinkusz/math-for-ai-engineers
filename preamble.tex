@@ -679,19 +679,28 @@
 % with local \lets, so the blank leaf ships bare and the group hands the fancy
 % style straight back. When no leaf is needed the group encloses nothing.
 %
-% IT MOVES NO PAGE. That is a claim about a mechanism and not a measurement,
-% so it is written here to be confirmed rather than believed: the leaf is
-% forced by \newpage either way, so this changes what is drawn on a page that
-% already exists and not whether it exists. \chapter's own \thispagestyle
-% runs after this returns, which is why an opener still comes out `plain'.
+% IT MOVES NO PAGE, and that is MEASURED rather than reasoned. The mechanism
+% says it should not -- the leaf is forced by \newpage either way, so this
+% changes what is drawn on a page that already exists and not whether it
+% exists -- but the doubled \clearpage cannot be settled by reading, since
+% \cleardoublepage opens with one of its own and that is a no-op only because
+% the first leaves material behind it. If it were not, every leaf would become
+% two.
 %
-% The one thing the mechanism cannot settle from here is the doubled
-% \clearpage -- \cleardoublepage opens with one of its own, and a \clearpage
-% on an already-empty page is a no-op only because the first one leaves
-% material behind it. If that were wrong every one of these leaves would
-% become two, so the failure is not a subtle one: the page counts would jump
-% by the number of chapters. Read them against the table in CLAUDE.md, in all
-% four builds, and expect them element for element.
+% So it was compared against the same commit on the same machine, which is the
+% only comparison that holds one variable: CI, main-en-a4, this change against
+% main at c9b8bb6. checkpdf's two page-level ledgers came back ELEMENT FOR
+% ELEMENT -- nine orphaned cues at pages 86, 91, 137, 148, 336, 456, 475, 528
+% and 824, and twenty-seven orphan tails ending at page 1004 of 1168 -- and a
+% single leaf inserted or dropped anywhere would have shifted every number
+% after it. Zero errors, zero unresolved references, zero overfull boxes of
+% either kind. The PDF came out 3,337 bytes SMALLER, which is the ink coming
+% off the leaves and is the other half of the check: the pagination did not
+% move and the heads did go.
+%
+% Note that CI paginates differently from the container that writes the
+% published PDF, so 1168 is not CLAUDE.md's figure for this format and is not
+% meant to be. What transfers is the comparison, not the number.
 %
 % tools/checkpdf.py needed NO code change, which is worth saying because the
 % obvious expectation -- the issue's own -- is that it did. Three of its four

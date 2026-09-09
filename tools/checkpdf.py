@@ -235,7 +235,7 @@ def head_baseline(pages) -> float:
 
 
 def chapter_final(pages, head: float) -> set[int]:
-    """The pages after which a chapter or appendix opener begins.
+    r"""The pages after which a chapter or appendix opener begins.
 
     A page with no running head is an opener or a part page: every other page
     carries one. Blank versos are skipped over, because a chapter that starts
