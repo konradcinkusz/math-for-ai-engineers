@@ -1,0 +1,431 @@
+name: KDP
+
+# The paperback volumes, and NOTHING ELSE. build.yml and release.yml are
+# untouched: this workflow is additive, exactly as the KDP build is additive to
+# the source, and the first job it runs exists to prove that the two existing
+# editions have not moved.
+#
+# It does not run on every push. A volume build is eight compiles of a book, and
+# the thing it validates -- the interior against Amazon's requirements -- only
+# matters when somebody is about to upload one.
+
+on:
+  workflow_dispatch:
+    inputs:
+      langs:
+        description: 'en, pl, or both'
+        default: 'both'
+      volumes:
+        description: 'comma-separated volume numbers, or all'
+        default: 'all'
+  push:
+    tags: ['kdp-v*']
+  # The regression guard's whole job is to prove the four existing PDFs have
+  # not moved, and the moment that claim is made is a pull request -- so it
+  # runs here too. Only the cheap jobs do: the volume matrix is cut to one
+  # volume below, because eight compiles of a book is a release cost and a
+  # smoke test is what a PR needs.
+  pull_request:
+    paths:
+      - 'kdp/**'
+      - 'tools/volumes.json'
+      - 'tools/gen_volumes.py'
+      - 'tools/test_gen_volumes.py'
+      - 'tools/kdp*.py'
+      - 'tools/checkkdp.py'
+      - 'tools/checkxvol.py'
+      - '.github/workflows/kdp.yml'
+      - 'preamble.tex'
+      - 'lang/*.tex'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kdp-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -------------------------------------------------------------------------
+  # THE GUARD. The KDP work is additive or it is a defect, and "additive" is a
+  # claim about the four existing PDFs rather than about the diff. This builds
+  # the trade edition on the merge base and on HEAD and fails if the page count
+  # or the resolved cross-reference list moved by so much as one entry.
+  #
+  # It gates everything else, because a volume that is correct at the cost of
+  # the book it came from is not worth having.
+  # -------------------------------------------------------------------------
+  regression:
+    name: The existing editions have not moved
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - run: pip install --quiet numpy sympy
+
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: Render diagrams
+        run: |
+          shopt -s nullglob
+          SRC=(figures/mermaid/*/*.mmd)
+          [ ${#SRC[@]} -eq 0 ] && { mkdir -p figures/diagrams; exit 0; }
+          printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
+          npm install -g @mermaid-js/mermaid-cli@11
+          for f in "${SRC[@]}"; do
+            lang=$(basename "$(dirname "$f")"); key=$(basename "$f" .mmd)
+            mkdir -p "figures/diagrams/$lang"
+            timeout 180 mmdc -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
+              -p .puppeteer.json -c figures/mermaid/config.json \
+              -b transparent --pdfFit \
+              || { echo "::error file=$f::failed to render $lang/$key"; exit 1; }
+          done
+
+      # The cheapest form of the guard, and it runs before two book compiles.
+      # The page-count comparison below catches the EFFECT of touching a shared
+      # file; this catches the cause in a second, and names the file.
+      - name: No KDP change may touch the files the four PDFs are made of
+        run: |
+          BASE=$(git merge-base HEAD "origin/${{ github.event.repository.default_branch }}") \
+            || { echo "::error::cannot find the merge base; refusing to guess one"; exit 1; }
+          echo "base = $BASE"
+          BAD=$(git diff --name-only "$BASE"...HEAD | grep -E \
+            '^(main-(en|pl)(-a4)?\.tex|body\.tex|structure\.tex|preamble\.tex|\.github/workflows/(build|release)\.yml)$' \
+            || true)
+          if [ -n "$BAD" ]; then
+            echo "::error::the KDP path is additive and these are not its to change:"
+            echo "$BAD" | sed 's/^/::error::  /'
+            exit 1
+          fi
+          echo "None of the seven shared files is in this diff."
+          echo "MFA_BASE=$BASE" >> "$GITHUB_ENV"
+
+      - name: Compile the trade edition at HEAD
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main-en.tex
+          args: -pdf -interaction=nonstopmode -file-line-error
+
+      - name: Record HEAD's page count and cross-references
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          mkdir -p /tmp/head
+          pdfinfo main-en.pdf | awk '/^Pages/{print $2}' > /tmp/head/pages
+          # NOT reflist.py, which stood here and answered a different question.
+          # reflist compares the two EDITIONS against each other and prints a
+          # COUNT, so two builds differing by a moved \ref produce identical
+          # output; and this job compiles main-en only, so it failed on the
+          # absent main-pl.aux on BOTH sides and the diff below compared two
+          # error strings whose sole difference was the absolute path each tree
+          # sat at. Had the paths matched it would have gone green having
+          # compared nothing. auxrefs.py dumps label -> number for ONE tree and
+          # refuses an empty answer. No `|| true`: a guard that cannot read its
+          # evidence has none, and must stop rather than compare two blanks.
+          python3 tools/auxrefs.py . > /tmp/head/refs
+          echo "HEAD: $(cat /tmp/head/pages) pages, $(wc -l < /tmp/head/refs) labels"
+
+      # The merge base, built from the same diagrams, so only the source differs.
+      #
+      # NOT /tmp. latex-action is a DOCKER action, and its `docker run` mounts
+      # the workspace and /home/runner and nothing else, so a working_directory
+      # under /tmp is invisible inside the container: it answered
+      # "File 'main-en.tex' cannot be found from the directory '/tmp/base'" and
+      # the guard proving the four existing PDFs had not moved failed on its own
+      # scaffolding rather than on the book. $RUNNER_TEMP is under /home/runner
+      # and is mounted at the SAME path, which also keeps the worktree's .git
+      # file -- an absolute pointer back into the real repository -- resolvable
+      # on both sides of the mount.
+      - name: Compile the trade edition at the merge base
+        run: |
+          # $MFA_BASE, set by the path check above. NOT `|| git rev-parse HEAD~1`,
+          # which is what stood here: if origin/<default> were unavailable the
+          # guard would quietly compare HEAD against its own previous commit and
+          # pass, proving nothing about the four existing PDFs. A guard that
+          # weakens itself in silence is worse than one that stops.
+          test -n "$MFA_BASE" || { echo "::error::no merge base"; exit 1; }
+          git worktree add "$RUNNER_TEMP/base" "$MFA_BASE"
+          for d in diagrams values transcripts; do
+            cp -r "figures/$d" "$RUNNER_TEMP/base/figures/" 2>/dev/null || true
+          done
+          test -f "$RUNNER_TEMP/base/main-en.tex" \
+            || { echo "::error::the base worktree has no main-en.tex"; exit 1; }
+
+      - name: Compile the base
+        uses: xu-cheng/latex-action@v4
+        with:
+          working_directory: ${{ runner.temp }}/base
+          root_file: main-en.tex
+          args: -pdf -interaction=nonstopmode -file-line-error
+
+      - name: The two must agree
+        run: |
+          B=$(pdfinfo "$RUNNER_TEMP/base/main-en.pdf" | awk '/^Pages/{print $2}')
+          H=$(cat /tmp/head/pages)
+          echo "base $B pages, head $H pages"
+          if [ "$B" != "$H" ]; then
+            echo "::error::main-en moved from $B to $H pages. The KDP work is"
+            echo "::error::additive: the four existing PDFs must not change."
+            exit 1
+          fi
+          # And the cross-references, which a page count cannot see: a \ref
+          # can resolve to a different program with the page total unmoved.
+          # The base tree is a worktree of an OLDER commit and does not contain
+          # auxrefs.py, so HEAD's copy is POINTED AT it rather than run inside
+          # it -- which is why the script takes its tree root as an argument.
+          python3 "$GITHUB_WORKSPACE/tools/auxrefs.py" "$RUNNER_TEMP/base" > /tmp/base-refs
+          echo "base $(wc -l < /tmp/base-refs) labels, head $(wc -l < /tmp/head/refs) labels"
+          if ! diff -q /tmp/base-refs /tmp/head/refs >/dev/null 2>&1; then
+            echo "::error::a cross-reference resolves differently than on the base"
+            diff /tmp/base-refs /tmp/head/refs | head -30 || true
+            exit 1
+          fi
+          echo "The trade edition is unchanged: same page count, same references."
+
+  # -------------------------------------------------------------------------
+  numbers:
+    name: Recompute every number
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [regression]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - run: pip install --quiet numpy sympy
+      - run: make numbers
+      - name: Fail if any committed value or transcript has drifted
+        run: |
+          if [ -n "$(git status --porcelain figures/values figures/transcripts)" ]; then
+            echo "::error::a script no longer produces what the book prints"
+            git --no-pager diff --stat figures/values figures/transcripts
+            exit 1
+          fi
+          echo "Every computed value and transcript is current."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kdp-values
+          path: |
+            figures/values
+            figures/transcripts
+          retention-days: 14
+
+  # -------------------------------------------------------------------------
+  manifest:
+    name: The split matches the manifests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [regression]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - name: Every part in exactly one volume, in manifest order
+        run: python3 tools/gen_volumes.py --check
+      - name: And the checks that say so have been watched firing
+        run: python3 tools/test_gen_volumes.py
+
+  # -------------------------------------------------------------------------
+  diagrams-kdp:
+    name: Render diagrams, and grey them
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [regression]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - name: Render every Mermaid source to PDF
+        run: |
+          shopt -s nullglob
+          SRC=(figures/mermaid/*/*.mmd)
+          if [ ${#SRC[@]} -eq 0 ]; then mkdir -p figures/diagrams; exit 0; fi
+          printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
+          npm install -g @mermaid-js/mermaid-cli@11
+          FAILED=0
+          for f in "${SRC[@]}"; do
+            lang=$(basename "$(dirname "$f")"); key=$(basename "$f" .mmd)
+            mkdir -p "figures/diagrams/$lang"
+            echo "::group::$lang/$key"
+            # A per-render timeout, for the reason the job-level one exists: a
+            # wedged headless Chromium otherwise spends the whole budget and
+            # names neither the diagram nor the reason.
+            if ! timeout 180 mmdc -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
+                 -p .puppeteer.json -c figures/mermaid/config.json \
+                 -b transparent --pdfFit; then
+              [ $? -eq 124 ] && echo "::error file=$f::TIMED OUT on $lang/$key" \
+                             || echo "::error file=$f::failed on $lang/$key"
+              FAILED=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $FAILED
+      - name: Both languages must carry the same diagram keys
+        run: |
+          a=$(cd figures/mermaid/en && ls *.mmd | sort)
+          b=$(cd figures/mermaid/pl && ls *.mmd | sort)
+          [ "$a" = "$b" ] || { echo "::error::diagram sets differ"; \
+            diff <(echo "$a") <(echo "$b") || true; exit 1; }
+      - name: Convert to DeviceGray for the interior
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ghostscript poppler-utils
+          python3 tools/kdpstage.py
+      - name: No diagram may survive as colour
+        run: |
+          pip install --quiet pikepdf
+          python3 - <<'PY'
+          import glob, sys, pikepdf
+          sys.path.insert(0, 'tools')
+          from checkkdp import nongray_pages
+          bad = [f for f in sorted(glob.glob('build/kdp/tex/figures/diagrams/*/*.pdf'))
+                 if nongray_pages(__import__('pathlib').Path(f))[0]]
+          if bad:
+              print(f"::error::{len(bad)} diagram(s) are still colour: {bad[:5]}")
+              sys.exit(1)
+          print("Every diagram is DeviceGray.")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kdp-diagrams-gray
+          path: build/kdp/tex/figures/diagrams
+          retention-days: 14
+
+  # -------------------------------------------------------------------------
+  build-volume:
+    name: Volume ${{ matrix.volume }} (${{ matrix.lang }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [numbers, manifest, diagrams-kdp]
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [en, pl]
+        # A pull request builds the smallest volume in both languages -- enough
+        # to catch a broken interior in the two compiles it costs. A tag or a
+        # dispatch builds all four, because that is when a volume is uploaded.
+        volume: ${{ fromJSON(github.event_name == 'pull_request' && '[3]' || '[1, 2, 3, 4]') }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq texlive-latex-base texlive-latex-recommended \
+            texlive-latex-extra texlive-lang-polish texlive-science latexmk \
+            lmodern poppler-utils ghostscript
+          pip install --quiet pikepdf
+          # The back matter's tables have to break at 6 x 9 and xltabular is
+          # what lets them. preamble-kdp.tex guards its \usepackage so a machine
+          # without it still builds -- and then six of the eight volumes carry an
+          # overfull vbox, which is a loud failure in checklog.py but a confusing
+          # one. Name the cause here instead. It ships in texlive-latex-extra.
+          kpsewhich xltabular.sty >/dev/null \
+            || { echo "::error::xltabular.sty is absent; add texlive-latex-extra"; exit 1; }
+
+      - uses: actions/download-artifact@v5
+        with: { name: kdp-values, path: figures }
+      - uses: actions/download-artifact@v5
+        with: { name: kdp-diagrams-gray, path: build/kdp/tex/figures/diagrams }
+
+      - name: Stage the build tree
+        run: python3 tools/kdpstage.py
+
+      # Two passes: the gutter is a function of the page count and the page
+      # count is a function of the gutter. kdpbuild.py converges it and stops
+      # after three rather than oscillating.
+      - name: Compile, converging the gutter
+        run: python3 tools/kdpbuild.py ${{ matrix.volume }} ${{ matrix.lang }}
+
+      - name: Check the log properly
+        run: python3 tools/checklog.py build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.log
+
+      # The cue check is reported rather than fatal here for the reason
+      # CLAUDE.md gives: it is a property of the installation that paginated,
+      # so the machine that must fix it is not the one that saw it.
+      - name: Check the artefact for stranded openers
+        run: python3 tools/checkpdf.py --cues=warn build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.pdf
+
+      - name: Check it against KDP's requirements
+        run: |
+          python3 tools/checkkdp.py --json build/kdp \
+            --summary "$GITHUB_STEP_SUMMARY" \
+            build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.pdf
+
+      - name: Cover specification and template
+        run: python3 tools/kdpcover.py build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.pdf
+
+      - name: Upload form metadata
+        run: |
+          python3 tools/kdpmeta.py --summary "$GITHUB_STEP_SUMMARY" \
+            build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.pdf
+
+      # if: always(), because a log-only failure is exactly when the log is the
+      # one artefact anybody wants.
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kdp-log-v${{ matrix.volume }}-${{ matrix.lang }}
+          path: build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.log
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kdp-v${{ matrix.volume }}-${{ matrix.lang }}
+          path: |
+            build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.pdf
+            build/kdp/kdp-v${{ matrix.volume }}-${{ matrix.lang }}/
+          retention-days: 30
+
+  # -------------------------------------------------------------------------
+  # Every cross-volume pointer must name a program that exists somewhere in the
+  # series. A volume build cannot see this: its own references all resolve, by
+  # construction, because the generated map defines them.
+  # -------------------------------------------------------------------------
+  crossvolume:
+    name: Every cross-volume pointer lands somewhere
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Reads the SOURCE, not a PDF, so it needs no volume built. It used to wait
+    # on the matrix, which put the workflow's cheapest signal behind its most
+    # expensive job and silenced it entirely whenever a volume failed to build.
+    needs: [regression]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - name: Pointers, against the manifest
+        run: python3 tools/checkxvol.py
+
+  # -------------------------------------------------------------------------
+  package:
+    name: Collect the uploads
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [build-volume, crossvolume]
+    if: always() && needs.build-volume.result == 'success'
+        && github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - uses: actions/download-artifact@v5
+        with: { pattern: 'kdp-v*', path: dist, merge-multiple: false }
+      - name: What each volume costs and what it must sell for
+        run: |
+          python3 tools/kdpsummary.py dist >> "$GITHUB_STEP_SUMMARY"
+          python3 tools/kdpsummary.py dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kdp-release-${{ github.ref_name }}
+          path: dist
+          retention-days: 90

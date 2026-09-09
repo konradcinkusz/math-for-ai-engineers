@@ -1,0 +1,50 @@
+%% The volume copyright page \dash{} the verso of the volume title page.
+%%
+%% It differs from the trade edition's in exactly the three places a volume
+%% differs: it names the volume, it prints an ISBN when one has been issued,
+%% and it does not claim the book is published in "two paper formats", which
+%% stopped being true the moment a third existed.
+%%
+%% \mfavolisbn is \relax until tools/volumes.json carries one, so the ISBN
+%% paragraph prints the absence rather than an empty label. Do not write an
+%% ISBN out by hand here: it is issued, not derived, and volumes.json is where
+%% the pipeline reads it for metadata.json as well.
+
+\thispagestyle{empty}
+\vspace*{\fill}
+
+{\small\color{mgrey}\raggedright\setlength{\parindent}{0pt}%
+\emph{\mfaseriestitle} \dash{} \lblVolume~\mfavolnumeral,
+\emph{\mfavoltitlehere}. Edition \bookedition.
+
+\medskip
+Copyright \textcopyright{} \bookyear{} \mfabookauthor. All rights reserved
+except as licensed here.
+
+\medskip
+The prose is licensed CC BY-NC-SA 4.0. The code \dash{} every script under
+\texttt{code/}, and every listing this book prints from one \dash{} is
+licensed MIT.
+
+\medskip
+\ifx\mfavolisbn\relax
+Self-published by the author. No ISBN has been issued for this volume, so it
+may be read and copied under the licences above and cannot yet be catalogued
+by a library.
+\else
+Self-published by the author. ISBN \mfavolisbn.
+\fi
+
+\medskip
+\lblAiAssist
+
+\medskip
+Numbers pinned \pinnedon. That is a different date from the copyright year
+above and it means a different thing.
+
+\medskip
+The programmed-learning method is K.~A. Stroud's. This book is not affiliated
+with, nor derived from, his.
+\par}
+
+\cleardoublepage

@@ -1,0 +1,45 @@
+%% Strona redakcyjna tomu \dash{} werso strony tytulowej tomu.
+%%
+%% Rozni sie od strony redakcyjnej wydania handlowego dokladnie w tych trzech
+%% miejscach, w ktorych rozni sie tom: nazywa tom, drukuje ISBN, gdy zostal
+%% nadany, i nie twierdzi, ze ksiazka ukazuje sie w "dwoch formatach", co
+%% przestalo byc prawda w chwili, gdy powstal trzeci.
+
+\thispagestyle{empty}
+\vspace*{\fill}
+
+{\small\color{mgrey}\raggedright\setlength{\parindent}{0pt}%
+\emph{\mfaseriestitle} \dash{} \lblVolume~\mfavolnumeral,
+\emph{\mfavoltitlehere}. Wydanie \bookedition.
+
+\medskip
+Copyright \textcopyright{} \bookyear{} \mfabookauthor. Wszelkie prawa
+zastrzeżone poza tym, co objęte licencjami poniżej.
+
+\medskip
+Tekst na licencji CC BY-NC-SA 4.0. Kod \dash{} każdy skrypt w katalogu
+\texttt{code/} i każdy listing, który ta książka z niego drukuje \dash{} na
+licencji MIT.
+
+\medskip
+\ifx\mfavolisbn\relax
+Wydanie własne autora. Dla tego tomu nie nadano numeru ISBN, więc można go
+czytać i kopiować na powyższych licencjach, ale nie może jeszcze zostać
+skatalogowany przez bibliotekę.
+\else
+Wydanie własne autora. ISBN \mfavolisbn.
+\fi
+
+\medskip
+\lblAiAssist
+
+\medskip
+Liczby przypięte \pinnedon. To inna data niż rok praw autorskich powyżej
+i znaczy co innego.
+
+\medskip
+Metoda nauczania programowanego pochodzi od K.~A. Strouda. Ta książka nie jest
+z nim powiązana ani z niego wyprowadzona.
+\par}
+
+\cleardoublepage

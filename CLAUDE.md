@@ -569,6 +569,105 @@ sentence, never to loosen the check.
 
 ---
 
+## And a third format, which may not touch the other two
+
+The book is also published as Amazon KDP paperback **volumes** \dash{} 6 x 9 in
+at 10pt, black ink, four volumes over the nine parts. The whole of that path is
+`kdp/`, `tools/volumes.json` and the tools whose names begin `kdp` or `checkkdp`
+\dash{} `make kdp` names every one of them in order, which is checkable where a
+tally here would not be. The reasoning and the measurements are
+`notes/09-kdp-volumes.md`.
+
+**It is additive, and that is a hard constraint rather than a preference.**
+`main-{en,pl}.tex`, `main-{en,pl}-a4.tex`, `body.tex`, `structure.tex`,
+`preamble.tex`, `build.yml` and `release.yml` are **not to be modified by KDP
+work**. The four existing PDFs must stay identical in page count and in resolved
+cross-references, and `.github/workflows/kdp.yml`'s first job proves it by
+building `main-en` on the merge base and on `HEAD` and failing on a difference of
+one entry. It gates every other job in that workflow. A volume that is correct at
+the cost of the book it came from is not worth having.
+
+The things in it that are load-bearing were each found by a measurement rather
+than by reading, and the count is deliberately not stated \dash{} this file's own
+rule about a tally, applied to the list below:
+
+- **No new `\bookpaper` branch.** `kdp/preamble-kdp.tex` reads `preamble.tex` and
+  then re-issues `\geometry`. This preamble's own `\AtBeginDocument` badge
+  assertion then validates the NEW geometry, which is what is wanted \dash{} and
+  the assertion **does not fire at 6 x 9**, because its recto term is
+  `paperwidth - textwidth - 1in - oddsidemargin`, which geometry makes equal to
+  `outer`, so the gutter cancels out of it. Compiled at three gutter brackets it
+  reported the same 45.5244 pt every time.
+
+- **Re-issuing `\geometry` does not move the running head.** fancyhdr freezes
+  `\headwidth` at `\textwidth` when `\pagestyle{fancy}` runs, which is inside
+  `\input{preamble}` and therefore BEFORE the new geometry. It stayed
+  369.88583 pt \dash{} the trade format's text width to the hundredth \dash{}
+  against this format's 340.06732, so the head was 29.82 pt too wide and the
+  outer folio hung 15.19 pt from the trim, inside KDP's safe zone. Nothing warns;
+  a head wider than its block looks deliberate. `\setlength{\headwidth}{\textwidth}`
+  after the geometry is the fix.
+
+- **`\mermaidfig` hard-codes `figures/diagrams/\booklang/`, so the grayscale
+  diagrams cannot be a second path.** A shadow directory first on `TEXINPUTS`
+  looks like the answer and is not: `kpsewhich` resolves the shadowed name and
+  the build ignores it, because graphicx opens a name containing a slash relative
+  to the working directory and never consults the search path when the file is
+  there. The tell is the leading `./` in the log's `<./figures/diagrams/...>`.
+  The KDP build therefore compiles in `build/kdp/tex`, where `figures/diagrams`
+  IS the gray set and everything else is a symlink \dash{} file by file, not
+  directory by directory, because `\include` writes `<program>.aux` beside its
+  source and a symlinked directory would put those writes back in the real tree,
+  colliding with the trade build's.
+
+- **Program numbering is positional.** `\mainnumbering` sets the chapter counter
+  to 0, so a volume starting at Part IV calls P12 \enquote{Program 1} \dash{}
+  silently, and every Summary bracket, Quiz route and cross-reference in the
+  series is then wrong. `tools/gen_volumes.py` emits the `\setcounter` offset, and
+  that is the whole reason the per-volume structure file is generated.
+
+- **The back matter's tables cannot break, and at 6 x 9 they do not fit.** Every
+  `tabularx` in appendices D, E and F is `\linewidth` wide and unbreakable, and
+  this trim's text block is shorter than the trade format's \dash{} so seven of
+  the eight volumes carried an overfull vbox, the worst 207.8 pt. Shrinking
+  cannot reach that (38% wanted, `\small` buys 8%) and splitting the table in the
+  source would move the four existing PDFs. `kdp/preamble-kdp.tex` aliases
+  `tabularx` to `xltabular` **at `\appendix`**, which is what makes it safe: a
+  `longtable` cannot live in a `tcolorbox`, and every boxed `tabularx` in this
+  book \dash{} the `\canyou` panel among them \dash{} is in the body, behind
+  that point. All 34 appendix tables sit inside `\begin{center}`, where a
+  `longtable` is supposed to be impossible; asked of pdflatex at this geometry it
+  sets a 60-row table over three pages with zero vboxes.
+
+- **And a narrower measure needs somewhere to put the slack, which is not
+  `\vfuzz`.** The prose was written for 70 characters a line and sets at 69 here,
+  so twelve paragraphs in volume IV had no break TeX could take and one of them
+  put a verso 2.2 pt inside the gutter. `\emergencystretch` changes how the
+  paragraph BREAKS, where `\vfuzz` would change what gets REPORTED, and
+  `checklog.py` still fails on anything left. 2em is swept rather than chosen:
+  none 4 boxes, 1em 1 box, 2em zero, 4em identical, at a price of one loose line.
+  **It has to be appended after `\tableofcontents`**, because `preamble.tex`
+  appends `\emergencystretch=0pt` there to stop its own contents fix leaking, so
+  a value set in a preamble is wiped before the first body page \dash{} swept at
+  1, 2 and 3em in the preamble it gave byte-identical answers, which is this
+  file's own signal that a change did not REACH what was measured.
+
+**Two checks were asked for and are deliberately not written**, because in both
+cases the volume is not the thing the claim is about. `--terms` scoped to one
+volume would fail on 11 to 15 of the 42 glossary renderings, since they are used
+in *other volumes'* programs \dash{} but Appendix D's claim is about the book, and
+the book is the series, so the existing book-wide check is the correct gate.
+`--parts` reads `frontmatter/<lang>/introduction.tex`, and carrying that file in
+every volume leaves it green with nothing to write.
+
+**And three of the seven appendices scope themselves.** A, C and the index are
+accumulated as the programs are typeset, so a volume gets its own \dash{}
+Appendix C is 18 pages in Volume III against 70 for the whole book. That is
+cheaper than any plan assumed and it has a consequence worth deciding rather than
+inheriting: a reader who owns one volume cannot get the whole book's formula
+reference.
+
+
 ## The Stroud machinery, in LaTeX
 
 Implemented in `preamble.tex`. The interesting decisions:

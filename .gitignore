@@ -46,3 +46,9 @@ __pycache__/
 
 # Locally assembled Pages site (make site)
 _site/
+
+# KDP build output. kdp/generated IS committed -- it is generated from the two
+# manifests and gated by `gen_volumes.py --check`, exactly as structure.tex is.
+# The converged gutter and the pad leaf are MEASUREMENTS and are written
+# into the staging tree under build/, so build/ covers them.
+build/

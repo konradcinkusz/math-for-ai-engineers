@@ -396,3 +396,68 @@ debt:
 	@echo "  stands is the other: the same items serve entry and exit, so the"
 	@echo "  difference between two scores measures memory. Every program has"
 	@echo "  Test exercises."
+
+# ============================================================
+#  KDP paperback volumes
+#  ---------------------------------------------------------
+#  ADDITIVE. Nothing above this line changes, and `all`, `a4` and `all-formats`
+#  still produce exactly what they produced before: the KDP work reads
+#  preamble.tex rather than editing it, and compiles in its own staging tree so
+#  the two cannot share an aux file.
+#
+#  The split lives in tools/volumes.json. The gutter is a function of the page
+#  count and the page count is a function of the gutter, so `kdp` runs
+#  tools/kdpbuild.py, which converges it and stops after three passes rather
+#  than oscillating.
+# ============================================================
+KDP_STAGE := build/kdp/tex
+KDP_VOLS  := $(shell python3 -c "import json;print(' '.join(str(v['n']) for v in json.load(open('tools/volumes.json'))['volumes']))" 2>/dev/null)
+
+.PHONY: kdp kdp-en kdp-pl kdp-stage check-kdp census volumes volumes-check \
+        kdp-covers kdp-metadata kdp-clean $(addprefix kdp-v,$(KDP_VOLS))
+
+# Regenerate the per-volume wiring from the two manifests.
+volumes:
+	@python3 tools/gen_volumes.py
+
+volumes-check:
+	@python3 tools/gen_volumes.py --check
+	@python3 tools/test_gen_volumes.py
+
+# The staging tree: symlinks to the real sources, plus the grayscale diagrams at
+# the path \mermaidfig hard-codes. Depends on the colour renders existing.
+kdp-stage: diagrams
+	@python3 tools/kdpstage.py
+
+kdp: numbers volumes kdp-stage
+	@python3 tools/kdpbuild.py --all
+	@$(MAKE) --no-print-directory check-kdp
+
+kdp-en: numbers volumes kdp-stage
+	@for v in $(KDP_VOLS); do python3 tools/kdpbuild.py $$v en; done
+
+kdp-pl: numbers volumes kdp-stage
+	@for v in $(KDP_VOLS); do python3 tools/kdpbuild.py $$v pl; done
+
+# One volume, both languages: `make kdp-v3`.
+$(addprefix kdp-v,$(KDP_VOLS)): kdp-v%: numbers volumes kdp-stage
+	@python3 tools/kdpbuild.py $*
+
+check-kdp:
+	@python3 tools/checkkdp.py --json build/kdp $(KDP_STAGE)/kdp-v*.pdf
+
+kdp-covers:
+	@python3 tools/kdpcover.py --all
+
+kdp-metadata:
+	@python3 tools/kdpmeta.py --all
+
+# The page census the split is chosen from. Builds the whole book in the KDP
+# geometry as ONE document, per part, so a split can be reasoned about before
+# any volume exists.
+census: numbers kdp-stage
+	@python3 tools/kdpcensus.py
+
+kdp-clean:
+	@rm -rf build/kdp kdp/gutter
+	@echo "removed build/kdp and kdp/gutter (kdp/generated is committed)"

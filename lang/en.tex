@@ -166,3 +166,33 @@
 \newcommand{\lblPdfSubject}{A programmed course in the mathematics an AI engineer needs, from arithmetic to one transformer block}
 \newcommand{\lblPdfKeywords}{mathematics, machine learning, linear algebra, calculus, probability, information theory, programmed learning}
 \newcommand{\lblPdfLang}{en-GB}
+
+% ---------- The KDP volume edition ----------
+% Used only by kdp/preamble-kdp.tex and the generated series map. They live
+% here rather than in that preamble because they are user-visible strings that
+% differ between the editions, which is what this file is for -- and because
+% C3 compares the two catalogues, so a string added to one edition and not the
+% other is an undefined control sequence in exactly one build.
+%
+% No count of volumes appears in any of these. The split lives in
+% tools/volumes.json and the series map prints it; a sentence saying how many
+% volumes there are would be a second copy of that fact, and this book has
+% spent enough passes correcting tallies nothing can check.
+\newcommand{\lblVolume}{Volume}
+\newcommand{\lblSeriesMap}{The series}
+\newcommand{\lblYouAreHere}{you are here}
+\newcommand{\lblTitle}{Title}
+\newcommand{\lblParts}{Parts}
+\newcommand{\lblSeriesMapIntro}{This book is published as a series of volumes.
+  Each one is self-contained: it carries the answers to its own programs, and
+  the notation, formula reference and terminology for the material it holds.}
+\newcommand{\lblSeriesMapNote}{A reference to a program in another volume is
+  printed with that volume's number after it, like \lblProgram~12
+  (\lblVolume~III). Further reading and the manifest are in the final volume.}
+% The AI-assistance line on the volume copyright page. KDP asks separately, at
+% upload, for a machine-readable declaration; that one is a decision about
+% authorship and lives in tools/volumes.json, unset until a human sets it.
+% This is only the sentence a reader sees.
+\newcommand{\lblAiAssist}{This book was prepared with the assistance of AI
+  tooling. Every number it prints is produced by a script in \texttt{code/}
+  and re-checked on every build.}

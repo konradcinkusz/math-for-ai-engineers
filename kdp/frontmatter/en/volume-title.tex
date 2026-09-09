@@ -1,0 +1,29 @@
+%% The volume title page. Every string on it comes from tools/volumes.json by
+%% way of kdp/generated/volinfo-v<n>-<lang>.tex, so a volume cannot be titled
+%% one thing here and another on the series map.
+\thispagestyle{empty}
+\begin{center}
+\vspace*{2.4cm}
+
+{\Large\color{mgrey} \mfaseriestitle}
+
+\vspace{0.9cm}
+{\large\color{mgrey} \lblVolume~\mfavolnumeral}
+
+\vspace{0.5cm}
+{\Huge\bfseries\color{mblue} \mfavoltitlehere}
+
+\vspace{0.9cm}
+{\large\color{mgrey} \mfavolsubtitle}
+
+\vspace{2.2cm}
+{\large \mfabookauthor}
+
+\vfill
+{\small\color{mgrey} Edition \bookedition}
+
+\vspace{1.2cm}
+\end{center}
+%  \clearpage, not \cleardoublepage: the copyright page is the VERSO of this
+%  one, exactly as in the trade edition.
+\clearpage
