@@ -26,10 +26,12 @@
 % umie przeczytać, to czy nazwany cel zawiera dowód; pięć wierszy mówi "nie
 % zbadane" właśnie dlatego, że nikt tej lektury nie odbył.
 %
-% WCIĄŻ NIEZAŁATWIONE: nic w książce nie odwołuje się do tego dodatku. Nigdzie
-% w programs/ nie ma \ref{app:E}, więc czytelnik stojący przy ramce rygoru nie
-% ma jak się dowiedzieć, że sekcja E.5 istnieje. Domknięcie tego wymaga edycji
-% każdego odkładającego programu i jest passem samym w sobie.
+% WCIĄŻ NIEZAŁATWIONE, ALE WĘŻSZE NIŻ BYŁO: nigdzie w programs/ nadal nie ma
+% \ref{app:E}, więc czytelnik stojący przy ramce rygoru nie ma jak się
+% dowiedzieć, że sekcja E.5 istnieje. Domknięcie tego wymaga edycji każdego
+% odkładającego programu i jest passem samym w sobie. Przestało być prawdą, że
+% NIC nie odwołuje się do dodatku: ramka twierdzeń we frontmatter/*/how-to-use
+% .tex wskazuje teraz sekcję E.6 i jest to jedyna droga do tego dodatku.
 %
 % A OŚWIADCZENIE O ZAKRESIE MA DWA ŹRÓDŁA, nie jedno. Dwie pierwsze tabele
 % sekcji E.3 to notes/01-curriculum.md sekcja 13; trzecia tabela i cztery
@@ -491,6 +493,111 @@ mówi wprost, że pisać go nie będziesz musiał, więc podręcznik pisania dow
 jest jedynym celem, do którego odmawia cię odesłać.
 
 \medskip
-To ostatnie zdanie jest sensem całego dodatku. Ta książka nie uczy żadnego z
-tych tematów tak głęboko jak jej własne źródła i nigdy nie miała. To, co
+To ostatnie zdanie jest sensem wszystkiego powyżej. Ta książka nie uczy żadnego
+z tych tematów tak głęboko jak jej własne źródła i nigdy nie miała. To, co
 twierdzi, jest węższe i sprawdzalne: że możesz je teraz otworzyć.
+
+\section{Skąd wzięło się każde przypisane twierdzenie}
+\label{sec:E-sources}
+\index{dalsza lektura!źródła}
+\index{źródła!dla przypisanych twierdzeń}
+
+\textbf{Ta sekcja robi co innego niż reszta dodatku i właśnie dlatego są
+rozdzielone.} Wszystko powyżej poleca: mówi, dokąd pójść dalej, i o każdym celu
+wydaje sąd. Ta sekcja przypisuje: nazywa pracę stojącą za każdym twierdzeniem,
+jakie ta książka wypowiada o cudzym wyniku, żeby czytelnik chcący je sprawdzić
+mógł to zrobić. Praca, do której cię odsyłamy, i praca, na której opiera się
+zdanie, to nie to samo, a wpis tutaj nie jest ani rekomendacją, ani
+przestrogą.
+
+\begin{note}
+\textbf{Tom i zakres stron, bez numerów zeszytów.} Numer zeszytu to jeszcze
+jedno miejsce, w którym chowa się błąd przepisania, i nic nie daje: czasopismo,
+tom i zakres stron lokalizują artykuł w każdym indeksie na świecie. Nie ma tu nic, czego nie sprawdzono w
+zapisie samego czasopisma, co jest regułą, na której stoi reszta tej książki, i
+powodem, dla którego lista jest krótka. Nie ma adresów sieciowych, z powodu,
+który ten dodatek już podaje; tam, gdzie praca nie ukazała się poza serwerem
+preprintów, podany jest jej identyfikator, który jest numerem dokumentu, a nie
+adresem.
+\end{note}
+
+\medskip
+Najpierw dowody na samą metodę. To jest argument, jaki \emph{Jak korzystać z
+tej książki} wytacza za formatem, przez który cię przeprowadza, i jedyne
+miejsce, w którym czytelnik chcący sprawdzić rację bytu tej książki musi w tym
+celu z niej wyjść.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xl@{}}
+\toprule
+\textbf{Źródło} & \textbf{Co niesie} \\
+\midrule
+K. A. Stroud, \emph{Engineering Mathematics: Programmes and Problems},
+  Macmillan, 1970 & format \\
+C. C. Kulik, B. J. Schwalb i J. A. Kulik, \enquote{Programmed Instruction in
+  Secondary Education: A Meta-Analysis of Evaluation Findings},
+  \emph{Journal of Educational Research}, 75, 133--138, 1982
+  & argument przeciw \\
+H. L. Roediger i J. D. Karpicke, \enquote{Test-Enhanced Learning: Taking
+  Memory Tests Improves Long-Term Retention}, \emph{Psychological Science},
+  17, 249--255, 2006 & przypominanie \\
+N. Kornell, M. J. Hays i R. A. Bjork, \enquote{Unsuccessful Retrieval
+  Attempts Enhance Subsequent Learning}, \emph{Journal of Experimental
+  Psychology: Learning, Memory, and Cognition}, 35, 989--998, 2009
+  & generowanie błędu \\
+B. Butterfield i J. Metcalfe, \enquote{Errors Committed with High Confidence
+  Are Hypercorrected}, \emph{Journal of Experimental Psychology: Learning,
+  Memory, and Cognition}, 27, 1491--1494, 2001 & efekt pewności \\
+J. D. Karpicke, A. C. Butler i H. L. Roediger, \enquote{Metacognitive
+  Strategies in Student Learning: Do Students Practise Retrieval When They
+  Study on Their Own?}, \emph{Memory}, 17, 471--479, 2009
+  & dlaczego jest gorzej \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+Potem wyniki, które nazywają programy. Każdy z nich to miejsce, w którym
+program mówi, czyja praca dała pewną linijkę, i do tej pory mówił to nazwiskiem
+bez tytułu.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xl@{}}
+\toprule
+\textbf{Źródło} & \textbf{Nazwane w} \\
+\midrule
+C. Eckart i G. Young, \enquote{The Approximation of One Matrix by Another of
+  Lower Rank}, \emph{Psychometrika}, 1, 211--218, 1936 & \ref{prog:P11} \\
+B. Efron, \enquote{Bootstrap Methods: Another Look at the Jackknife},
+  \emph{The Annals of Statistics}, 7, 1--26, 1979 & \ref{prog:P27} \\
+D. P. Kingma i J. Ba, \enquote{Adam: A Method for Stochastic Optimization},
+  \emph{International Conference on Learning Representations}, 2015
+  & \ref{prog:F02} \\
+J. L. Ba, J. R. Kiros i G. E. Hinton, \enquote{Layer Normalization},
+  arXiv:1607.06450, 2016 & \ref{prog:F02} \\
+A. Vaswani et al., \enquote{Attention Is All You Need}, \emph{Advances in
+  Neural Information Processing Systems}, 30, 5998--6008, 2017
+  & \ref{prog:F02}, \ref{prog:F08} \\
+K. He, X. Zhang, S. Ren i J. Sun, \enquote{Delving Deep into Rectifiers:
+  Surpassing Human-Level Performance on ImageNet Classification},
+  \emph{IEEE International Conference on Computer Vision}, 1026--1034, 2015
+  & \ref{prog:P25} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\textbf{A jedno twierdzenie ze wstępu nie ma tu źródła.} To, że małe kroki i
+liniowa sekwencja okazały się nieistotne, a natychmiastowe wzmocnienie
+niekluczowe, jest twierdzeniem o mechanizmie formatu, a nie o jego wynikach, i
+metaanaliza powyżej go nie niesie. Nie zbadano dla niego żadnego źródła, więc
+żadnego się nie nazywa: podstawienie pracy, która mogłaby je zawierać, byłoby
+tym ruchem, którego czterdzieści siedem programów kazało ci odmawiać. To samo
+traktowanie dostają powyższe wiersze oznaczone \emph{nie zbadane}, i z tego
+samego powodu.
+
+\medskip
+Wpis tutaj nie jest rekomendacją lektury i jego obecność nie mówi nic o tym,
+czy praca jest warta twojego wieczoru. Mówi coś węższego i jest to jedyne, co
+ten dodatek kiedykolwiek twierdził: że zdanie, które się na nim opiera,
+zostało z nim zestawione i że teraz możesz zrobić to samo.

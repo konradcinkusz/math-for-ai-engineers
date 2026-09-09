@@ -26,10 +26,12 @@
 % contains the proof; five rows say "not surveyed" precisely because nobody
 % has done that reading.
 %
-% STILL OUTSTANDING: nothing in the book references this appendix. There is no
-% \ref{app:E} anywhere in programs/, so a reader standing at a rigour box has
-% no way to know section E.5 exists. Closing it means editing every deferring
-% program and is a pass of its own.
+% STILL OUTSTANDING, AND NARROWER THAN IT WAS: there is still no \ref{app:E}
+% anywhere in programs/, so a reader standing at a rigour box has no way to
+% know section E.5 exists. Closing that means editing every deferring program
+% and is a pass of its own. What is no longer true is that NOTHING references
+% the appendix: the claims box in frontmatter/*/how-to-use.tex now points at
+% section E.6, which is the only route into this appendix the book has.
 %
 % AND THE SCOPE STATEMENT HAS TWO SOURCES, not one. Sections E.3's first two
 % tables are notes/01-curriculum.md section 13; the third table and the four
@@ -485,6 +487,111 @@ many words that you will not need to write one, so a proof-writing text is the
 one destination it declines to send you to.
 
 \medskip
-That last sentence is the point of the whole appendix. This book teaches none
+That last sentence is the point of everything above it. This book teaches none
 of those subjects to the depth its own sources do, and it was never meant to.
 What it claims is narrower and checkable: that you can now open them.
+
+\section{Where each attributed claim came from}
+\label{sec:E-sources}
+\index{further reading!sources}
+\index{sources!for attributed claims}
+
+\textbf{This section does a different job from the rest of the appendix, and
+the two are kept apart for that reason.} Everything above recommends: it says
+where to go next and carries a verdict on each destination. This section
+attributes: it names the work behind each claim this book makes about somebody
+else's result, so that a reader who wants to check one can. A work you are
+being sent to read and a work a sentence rests on are not the same kind of
+thing, and an entry here is neither a recommendation nor a warning against.
+
+\begin{note}
+\textbf{Volume and page range, and no issue numbers.} An issue number is one
+more place for a transcription error to hide, and it buys nothing: a journal, a
+volume and a page range locate an article in any index in the world. Nothing is printed here that was not checked
+against the journal's own record, which is the rule the rest of this book runs
+on and the reason the list is short. There are no web addresses, for the reason
+this appendix already gives; where a work was never published outside a
+preprint server its identifier is given instead, which is a document number
+rather than an address.
+\end{note}
+
+\medskip
+First the evidence for the method itself. This is the argument \emph{How to use
+this book} makes for the format it puts you through, and it is the one place
+where a reader wanting to check the book's case for its own existence has to
+leave the book to do it.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xl@{}}
+\toprule
+\textbf{Source} & \textbf{What it carries} \\
+\midrule
+K. A. Stroud, \emph{Engineering Mathematics: Programmes and Problems},
+  Macmillan, 1970 & the format \\
+C. C. Kulik, B. J. Schwalb and J. A. Kulik, \enquote{Programmed Instruction in
+  Secondary Education: A Meta-Analysis of Evaluation Findings},
+  \emph{Journal of Educational Research}, 75, 133--138, 1982
+  & the case against \\
+H. L. Roediger and J. D. Karpicke, \enquote{Test-Enhanced Learning: Taking
+  Memory Tests Improves Long-Term Retention}, \emph{Psychological Science},
+  17, 249--255, 2006 & retrieval practice \\
+N. Kornell, M. J. Hays and R. A. Bjork, \enquote{Unsuccessful Retrieval
+  Attempts Enhance Subsequent Learning}, \emph{Journal of Experimental
+  Psychology: Learning, Memory, and Cognition}, 35, 989--998, 2009
+  & errorful generation \\
+B. Butterfield and J. Metcalfe, \enquote{Errors Committed with High Confidence
+  Are Hypercorrected}, \emph{Journal of Experimental Psychology: Learning,
+  Memory, and Cognition}, 27, 1491--1494, 2001 & the confidence effect \\
+J. D. Karpicke, A. C. Butler and H. L. Roediger, \enquote{Metacognitive
+  Strategies in Student Learning: Do Students Practise Retrieval When They
+  Study on Their Own?}, \emph{Memory}, 17, 471--479, 2009
+  & why it feels worse \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+Then the results the programs name. Each of these is a place where a program
+says whose work a line came from, and until now said it with a surname and no
+title.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}Xl@{}}
+\toprule
+\textbf{Source} & \textbf{Named in} \\
+\midrule
+C. Eckart and G. Young, \enquote{The Approximation of One Matrix by Another of
+  Lower Rank}, \emph{Psychometrika}, 1, 211--218, 1936 & \ref{prog:P11} \\
+B. Efron, \enquote{Bootstrap Methods: Another Look at the Jackknife},
+  \emph{The Annals of Statistics}, 7, 1--26, 1979 & \ref{prog:P27} \\
+D. P. Kingma and J. Ba, \enquote{Adam: A Method for Stochastic Optimization},
+  \emph{International Conference on Learning Representations}, 2015
+  & \ref{prog:F02} \\
+J. L. Ba, J. R. Kiros and G. E. Hinton, \enquote{Layer Normalization},
+  arXiv:1607.06450, 2016 & \ref{prog:F02} \\
+A. Vaswani et al., \enquote{Attention Is All You Need}, \emph{Advances in
+  Neural Information Processing Systems}, 30, 5998--6008, 2017
+  & \ref{prog:F02}, \ref{prog:F08} \\
+K. He, X. Zhang, S. Ren and J. Sun, \enquote{Delving Deep into Rectifiers:
+  Surpassing Human-Level Performance on ImageNet Classification},
+  \emph{IEEE International Conference on Computer Vision}, 1026--1034, 2015
+  & \ref{prog:P25} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\medskip
+\textbf{And one claim in the front matter has no source here.} That small steps
+and linear sequencing turned out not to be essential, and that immediate
+reinforcement turned out not to be critical, is a claim about the format's
+mechanism rather than about its results, and the meta-analysis above does not
+carry it. No source was surveyed for it, so none is named: putting up a paper
+that might contain it would be the move forty-seven programs have asked you to
+refuse. It is the same treatment the rows above marked \emph{not surveyed} get,
+and for the same reason.
+
+\medskip
+An entry here is not a reading recommendation, and its presence says nothing
+about whether the work is worth your evening. What it says is narrower, and it
+is the only thing this appendix has ever claimed: that the sentence resting on
+it was checked against it, and that you can now do the same.
