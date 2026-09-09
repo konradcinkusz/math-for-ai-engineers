@@ -79,7 +79,7 @@ caption, so the line says what the reader would see.
 Replacing the copy joined 31 calls whose argument had been wrapped mid-word
 across two source lines, taking them past 79 characters. They were re-wrapped
 to `}{%` plus an indented continuation — **the book's own idiom, 64 occurrences
-in the tree before this pass**, including `f01-magnitudes`, whose 70-character
+in the tree before this pass**, including `f01-magnitudes`, whose 72-character
 manifest copy ships in Appendix F today. Every changed source line is within 79
 characters.
 
@@ -91,7 +91,7 @@ characters.
   48-character line budget by measurement — 153 of 284 manifest lines were at
   or over it with none overflowing, because `\@dottedtocline` wraps, and what
   actually overflows is a long unbreakable `\texttt{}` key. **No key changed**,
-  and the longest copy added is 45 characters against an existing maximum of
+  and the longest copy added is 50 characters against an existing maximum of
   124. Confirm on the four-format build.
 - **Appendix~F is at the back**, so a manifest line that wraps to a second line
   lengthens Appendix~F and moves nothing in the body — the same argument the
