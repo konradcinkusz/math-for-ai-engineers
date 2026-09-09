@@ -33,6 +33,21 @@
 % the appendix: the claims box in frontmatter/*/how-to-use.tex now points at
 % section E.6, which is the only route into this appendix the book has.
 %
+% SECTION E.6 IS A LIST AND NOT A TABLE, deliberately, and it must not be
+% tidied into one. A center+tabularx block cannot break across a page, and
+% this appendix has already produced the largest overfull vbox in the book
+% from exactly that -- 284 pt, from section E.3's exclusions table. What
+% decides it is rows times row height, and a citation is three typeset lines
+% where E.5's rows are one, so six of them come to about the height that
+% overflowed. reslist is an itemize, so it breaks; the class is gone rather
+% than made less likely, on both installations and at any page position.
+%
+% It is the book's own reference-matter list -- Appendix C replays every
+% \result{} through it -- and its ragged-right rationale, written in the
+% preamble beside it, is about reference matter generally. Reusing it couples
+% this section to that one: restyle reslist for Appendix C and this changes
+% too, which is worth knowing before anybody does.
+%
 % AND THE SCOPE STATEMENT HAS TWO SOURCES, not one. Sections E.3's first two
 % tables are notes/01-curriculum.md section 13; the third table and the four
 % "least sure about" paragraphs are notes/02-grounding-and-traps.md section 4,
@@ -521,64 +536,56 @@ this book} makes for the format it puts you through, and it is the one place
 where a reader wanting to check the book's case for its own existence has to
 leave the book to do it.
 
-\begin{center}
-\begin{tabularx}{\linewidth}{@{}Xl@{}}
-\toprule
-\textbf{Source} & \textbf{What it carries} \\
-\midrule
-K. A. Stroud, \emph{Engineering Mathematics: Programmes and Problems},
-  Macmillan, 1970 & the format \\
-C. C. Kulik, B. J. Schwalb and J. A. Kulik, \enquote{Programmed Instruction in
-  Secondary Education: A Meta-Analysis of Evaluation Findings},
-  \emph{Journal of Educational Research}, 75, 133--138, 1982
-  & the case against \\
-H. L. Roediger and J. D. Karpicke, \enquote{Test-Enhanced Learning: Taking
-  Memory Tests Improves Long-Term Retention}, \emph{Psychological Science},
-  17, 249--255, 2006 & retrieval practice \\
-N. Kornell, M. J. Hays and R. A. Bjork, \enquote{Unsuccessful Retrieval
+\begin{reslist}
+\item K. A. Stroud, \emph{Engineering Mathematics: Programmes and Problems},
+  Macmillan, 1970 \dash{} the format itself.
+\item C. C. Kulik, B. J. Schwalb and J. A. Kulik, \enquote{Programmed
+  Instruction in Secondary Education: A Meta-Analysis of Evaluation Findings},
+  \emph{Journal of Educational Research}, 75, 133--138, 1982 \dash{} the case
+  against it.
+\item H. L. Roediger and J. D. Karpicke, \enquote{Test-Enhanced Learning:
+  Taking Memory Tests Improves Long-Term Retention}, \emph{Psychological
+  Science}, 17, 249--255, 2006 \dash{} retrieval practice, and the delays at
+  which the advantage appears.
+\item N. Kornell, M. J. Hays and R. A. Bjork, \enquote{Unsuccessful Retrieval
   Attempts Enhance Subsequent Learning}, \emph{Journal of Experimental
-  Psychology: Learning, Memory, and Cognition}, 35, 989--998, 2009
-  & errorful generation \\
-B. Butterfield and J. Metcalfe, \enquote{Errors Committed with High Confidence
-  Are Hypercorrected}, \emph{Journal of Experimental Psychology: Learning,
-  Memory, and Cognition}, 27, 1491--1494, 2001 & the confidence effect \\
-J. D. Karpicke, A. C. Butler and H. L. Roediger, \enquote{Metacognitive
+  Psychology: Learning, Memory, and Cognition}, 35, 989--998, 2009 \dash{}
+  errorful generation.
+\item B. Butterfield and J. Metcalfe, \enquote{Errors Committed with High
+  Confidence Are Hypercorrected}, \emph{Journal of Experimental Psychology:
+  Learning, Memory, and Cognition}, 27, 1491--1494, 2001 \dash{} why the
+  benefit is largest when the learner was confident.
+\item J. D. Karpicke, A. C. Butler and H. L. Roediger, \enquote{Metacognitive
   Strategies in Student Learning: Do Students Practise Retrieval When They
-  Study on Their Own?}, \emph{Memory}, 17, 471--479, 2009
-  & why it feels worse \\
-\bottomrule
-\end{tabularx}
-\end{center}
+  Study on Their Own?}, \emph{Memory}, 17, 471--479, 2009 \dash{} why the
+  method that teaches more feels worse.
+\end{reslist}
 
 \medskip
 Then the results the programs name. Each of these is a place where a program
 says whose work a line came from, and until now said it with a surname and no
 title.
 
-\begin{center}
-\begin{tabularx}{\linewidth}{@{}Xl@{}}
-\toprule
-\textbf{Source} & \textbf{Named in} \\
-\midrule
-C. Eckart and G. Young, \enquote{The Approximation of One Matrix by Another of
-  Lower Rank}, \emph{Psychometrika}, 1, 211--218, 1936 & \ref{prog:P11} \\
-B. Efron, \enquote{Bootstrap Methods: Another Look at the Jackknife},
-  \emph{The Annals of Statistics}, 7, 1--26, 1979 & \ref{prog:P27} \\
-D. P. Kingma and J. Ba, \enquote{Adam: A Method for Stochastic Optimization},
-  \emph{International Conference on Learning Representations}, 2015
-  & \ref{prog:F02} \\
-J. L. Ba, J. R. Kiros and G. E. Hinton, \enquote{Layer Normalization},
-  arXiv:1607.06450, 2016 & \ref{prog:F02} \\
-A. Vaswani et al., \enquote{Attention Is All You Need}, \emph{Advances in
-  Neural Information Processing Systems}, 30, 5998--6008, 2017
-  & \ref{prog:F02}, \ref{prog:F08} \\
-K. He, X. Zhang, S. Ren and J. Sun, \enquote{Delving Deep into Rectifiers:
-  Surpassing Human-Level Performance on ImageNet Classification},
+\begin{reslist}
+\item C. Eckart and G. Young, \enquote{The Approximation of One Matrix by
+  Another of Lower Rank}, \emph{Psychometrika}, 1, 211--218, 1936 \dash{}
+  Program~\ref{prog:P11}.
+\item B. Efron, \enquote{Bootstrap Methods: Another Look at the Jackknife},
+  \emph{The Annals of Statistics}, 7, 1--26, 1979 \dash{}
+  Program~\ref{prog:P27}.
+\item D. P. Kingma and J. Ba, \enquote{Adam: A Method for Stochastic
+  Optimization}, \emph{International Conference on Learning Representations},
+  2015 \dash{} Program~\ref{prog:F02}.
+\item J. L. Ba, J. R. Kiros and G. E. Hinton, \enquote{Layer Normalization},
+  arXiv:1607.06450, 2016 \dash{} Program~\ref{prog:F02}.
+\item A. Vaswani et al., \enquote{Attention Is All You Need}, \emph{Advances
+  in Neural Information Processing Systems}, 30, 5998--6008, 2017 \dash{}
+  Programs~\ref{prog:F02} and~\ref{prog:F08}.
+\item K. He, X. Zhang, S. Ren and J. Sun, \enquote{Delving Deep into
+  Rectifiers: Surpassing Human-Level Performance on ImageNet Classification},
   \emph{IEEE International Conference on Computer Vision}, 1026--1034, 2015
-  & \ref{prog:P25} \\
-\bottomrule
-\end{tabularx}
-\end{center}
+  \dash{} Program~\ref{prog:P25}.
+\end{reslist}
 
 \medskip
 \textbf{And one claim in the front matter has no source here.} That small steps

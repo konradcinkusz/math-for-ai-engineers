@@ -180,6 +180,30 @@ in §E.6 as having no surveyed source, which is exactly where §E.5's *not
 surveyed* rows live, and those are not in F's list either. Consistent, but
 worth a second opinion when the sibling issues are triaged.
 
+## The tables became lists, and that is the one structural decision here
+
+The first draft set both reference lists as `center`+`tabularx`, matching
+E.5. **That was wrong and CI would have been the expensive way to find out.**
+A center+tabularx block cannot break across a page, and this appendix has
+already produced the largest overfull vbox in the book from exactly that --
+284 pt, from E.3's exclusions table. CLAUDE.md's own note on it says what
+decides the height: rows times row height. E.5's rows are one typeset line; a
+full citation is three. Six citations therefore came to about the height that
+overflowed once already, and there are four paginations and two installations
+for it to land badly in.
+
+Converted to `reslist`, which is an itemize and therefore **breaks**. The
+class is gone rather than made less likely, at any page position on either
+installation -- the structural fix rather than the editorial one, which is
+this repository's stated preference wherever one exists.
+
+`reslist` is the book's own reference-matter list: Appendix C replays every
+`\result{}` through it, and the ragged-right rationale written beside it in
+the preamble is about reference matter in general. **Reusing it couples E.6 to
+Appendix C** -- restyle it there and this changes too. That is recorded in
+both file headers along with the rest of the reasoning, so nobody tidies the
+lists back into tables.
+
 ## For the sync session
 
 - **No frame anywhere in the book was touched, so there is no cue to walk.**
