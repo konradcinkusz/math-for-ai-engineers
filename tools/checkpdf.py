@@ -318,14 +318,21 @@ def head_baseline(pages) -> float:
 
 
 def chapter_final(pages, head: float) -> set[int]:
-    """The pages after which a chapter or appendix opener begins.
+    r"""The pages after which a chapter or appendix opener begins.
 
     A page with no running head is an opener or a part page: every other page
     carries one. Blank versos are skipped over, because a chapter that starts
-    recto leaves one between itself and the page this is really about -- and
-    note that a blank verso here is blank in the BODY only: this book's
-    \\cleardoublepage leaves the running head on it, so a page with nothing but
-    a head is what has to be skipped rather than a page with nothing at all.
+    recto leaves one between itself and the page this is really about.
+
+    `inked` asks for a word BELOW the head line rather than for any word at
+    all, and that test used to be load-bearing here: the preamble's
+    \cleardoublepage left the running head on the blank leaf, so it was a page
+    with nothing but a head and "has any words" would have counted it. The
+    preamble now ships that leaf under the `empty` style, so it carries no
+    words at all and the two tests agree about it. The head test is kept
+    because it is still the only thing that separates an opener -- whose
+    topmost word is below the head line -- from a body page, which is what
+    `openers` below is asking.
     """
     inked = [pno for pno, (_, _, body) in enumerate(pages, start=1)
              if any(w[1] > head + HEAD_GAP for w in words(body))]
@@ -419,8 +426,8 @@ def check(path: Path, cues: set[str]):
         # --- 4. the orphan tail --------------------------------------------
         # A page with a running head is a body page; a part page and a chapter
         # opener have none, are laid out by their own rules, and are excluded.
-        # A page with nothing in the block is a blank verso and is excluded by
-        # the same test.
+        # A blank verso reaches none of the four tests: it carries no words at
+        # all, so the loop skipped it above.
         if in_block and pno not in finals and min(w[1] for w in ws) <= head + HEAD_GAP:
             fill = (max(w[3] for w in in_block) - top) / (foot - top)
             if fill < FILL_FLOOR:
