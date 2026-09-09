@@ -263,6 +263,81 @@ worth a look.
 
 ---
 
+## CI failed, and the fix is the recorded one: split the table
+
+The first push was green on every source gate here and **red on CI, in both
+trade builds and neither A4 build**:
+
+| build | overfull vbox |
+|---|---|
+| `en (standard)` | **25.9 pt too high** |
+| `pl (standard)` | **53.1 pt too high** |
+| `en (a4)`, `pl (a4)` | clean |
+
+`c9b8bb6` \dash{} this branch's exact base \dash{} passed CI at 08:51, so the
+box was mine and not pre-existing. That check came first, before any fix: two
+of four failing is not by itself evidence of authorship.
+
+**The location was read out of TeX's own words rather than inferred from the
+page number**, which is this repository's standing rule and the one the P12
+pass spent five cycles learning:
+
+```
+4224- (./appendices/en/appD-terminology.tex
+4225- Appendix D.
+4226- [1341 ...] [1342] [1343] [1344] [1345] [1346]
+4240: Overfull \vbox (25.90097pt too high) has occurred while \output is active
+```
+
+The file open when the box was emitted is `appD-terminology.tex`. Appendix~D
+opens on page 1341 and the box is on 1347.
+
+**The mechanism.** §D.4's rows sit in a `center`+`tabularx`, which **cannot
+break across a page**, and the `X` column at the trade format's measure is only
+about 130 pt wide \dash{} so every note in it wraps into ten or more lines.
+Lengthening one row by a few source lines adds far more rendered height than it
+looks like it will. A4 passes because its text block is taller; both languages
+fail because the row grew in both.
+
+**The fix is CLAUDE.md's own for this class \dash{} split the table, do not
+shrink the text \dash{} and a real distinction was available rather than an
+arbitrary halving.** §D.4's fourth row, `sample`, is **not an unsettled
+term**: its own note describes a settled division of labour (`próba` for the
+statistical term in the collocations, `próbka` where the sample is a concrete
+thing in hand). And the section already carried a following group for exactly
+that case \dash{} “places where the Polish edition is settled and the reader
+may expect otherwise”, the interval brackets and `tanh`. So `sample` moved down
+to join it, in its own one-row table, and the unsettled table now carries the
+three terms the issue is about. Appendix~E's pass took the same route and
+recorded the same tell: the section reads better for it, which is how you know
+the split was available rather than imposed.
+
+The `batch` row was also trimmed back toward its original length, keeping the
+rule and the no-count. Measured on the note text of the first table:
+
+| | at `HEAD` | now |
+|---|---|---|
+| `en` | 1646 chars | **1101 (67%)** |
+| `pl` | 1678 chars | **1167 (70%)** |
+
+About five hundred fewer characters in a column that fits roughly
+twenty-five \dash{} some twenty rendered lines, against overflows of 25.9 and
+53.1 pt. A margin rather than a squeak.
+
+**There is no TeX in this container**, so none of this could be measured
+locally and CI is the only instrument for it. The character measurement above
+is a proxy, and it was checked against a known answer first (four rows at
+`HEAD`, three now) after the first version of that same script silently sliced
+the wrong table \dash{} it had matched the `\ref{sec:D-unsettled}` in §D.1
+instead of the `\label`, and returned a plausible “+0, 100%”. One more
+instrument that accepted the input and answered.
+
+**For the sync session:** the split changes §D.4's page shape, so Appendix~D is
+a page or so longer and everything after it shifts. It is back matter, so no
+frame and no cue moves.
+
+---
+
 ## Values
 
 **None emitted and none retired.** `make verify` reports *All computed output is
