@@ -413,7 +413,8 @@ debt:
 KDP_STAGE := build/kdp/tex
 KDP_VOLS  := $(shell python3 -c "import json;print(' '.join(str(v['n']) for v in json.load(open('tools/volumes.json'))['volumes']))" 2>/dev/null)
 
-.PHONY: kdp-stage census volumes volumes-check
+.PHONY: kdp kdp-en kdp-pl kdp-stage census volumes volumes-check \
+        $(addprefix kdp-v,$(KDP_VOLS))
 
 # Regenerate the per-volume wiring from the two manifests.
 volumes:
@@ -427,6 +428,19 @@ volumes-check:
 # the path \mermaidfig hard-codes. Depends on the colour renders existing.
 kdp-stage: diagrams
 	@python3 tools/kdpstage.py
+
+kdp: numbers volumes kdp-stage
+	@python3 tools/kdpbuild.py --all
+
+kdp-en: numbers volumes kdp-stage
+	@for v in $(KDP_VOLS); do python3 tools/kdpbuild.py $$v en; done
+
+kdp-pl: numbers volumes kdp-stage
+	@for v in $(KDP_VOLS); do python3 tools/kdpbuild.py $$v pl; done
+
+# One volume, both languages: `make kdp-v3`.
+$(addprefix kdp-v,$(KDP_VOLS)): kdp-v%: numbers volumes kdp-stage
+	@python3 tools/kdpbuild.py $*
 
 # The page census the split is chosen from. Builds the whole book in the KDP
 # geometry as ONE document, per part, so a split can be reasoned about before
