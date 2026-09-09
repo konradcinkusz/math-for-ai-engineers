@@ -1175,6 +1175,41 @@
 % worked in F6 -- see CLAUDE.md's F6 pass. When a frame's tail sits one line
 % past the boundary, LENGTHENING it can push the whole tail over together,
 % where trimming only pulls more of the previous frame up behind it.
+%
+% AND THE CUE HAS A SECOND FAILURE THAT IS NOT A ROOM FAILURE AT ALL, so none
+% of the above reaches it. When the cue ends a VERSO the page is full, the
+% frame is well formed, and the answer opens the facing recto -- inside the
+% same spread, in view, while the question is still being read. "Cover the
+% page and turn over" is the right instruction on a recto and describes
+% nothing the reader can do on a verso: a hand covers what is below it on the
+% leaf it rests on, and the facing leaf is not one of those. Roughly half of
+% every cue that ends a page does it on a verso, by construction.
+%
+% IT CANNOT BE FIXED BY EDITING, and that is what separates it from the four
+% attempts above. Those are statements about how much ROOM a frame needs, so a
+% frame can be shortened or lengthened until the tail fits. This is a
+% statement about the PARITY of the leaf the question ends on, and parity is a
+% property of every break before it: move the break that spends one
+% elicitation and the next question in the program lands on the other parity.
+% A cut trades one instance for another, differently in each of the four
+% builds and differently again under CI's metrics. There is no frame to fix.
+%
+% The remedy, if it is taken, is the room test above made PARITY-AWARE: give
+% \dotline the reservation, but arm it only on an even page, so the cue that
+% would have ended a verso starts a recto instead and the paper does the
+% covering. UNTRIED, and it must be measured rather than inferred from the
+% table above -- that table is the unconditional guard, which fired on every
+% short page and turned two cues into eight tails and six pages. The
+% parity-aware one fires on about half as many pages and buys something the
+% unconditional one did not: a page turned here moves the answer BEHIND the
+% leaf rather than merely lower on it. That is a different trade, not a
+% smaller version of the same one, and the tails it costs have to be weighed
+% against elicitations it saves rather than against cues it silences.
+%
+% Anyone measuring it: it turns pages, so page counts, orphaned cues and
+% orphan tails all move, and all four builds have to be swept together.
+% tools/checkpdf.py reports the verso-cue rate on every run, so the sweep has
+% a number to move; read its defect 5 before starting.
 \newcommand{\nextframe}{%
   \par\nopagebreak\vspace{3pt}\nopagebreak
   {\raggedleft\itshape\lblNextFrame\par}%
@@ -3197,6 +3232,12 @@
 %  Change these here; they propagate through both editions.
 % ============================================================
 \newcommand{\bookedition}{0.1}
+% \bookyear is the copyright year and is NOT \pinnedon. \pinnedon says when
+% the arithmetic was last run, which moves with every `make numbers'; the
+% copyright year says when the work was published, which does not. They agree
+% today and that is a coincidence with a lifetime -- the first time they part,
+% a reader of the copyright page will be reading two facts, not one twice.
+\newcommand{\bookyear}{2026}
 % \pinnedon is a user-visible string and lives in lang/<lang>.tex, not here.
 % It said "August 2026" on the Polish title page for exactly as long as it
 % took somebody to read the Polish title page.

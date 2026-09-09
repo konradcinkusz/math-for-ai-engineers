@@ -844,6 +844,14 @@ def check_parts(soft: bool) -> int:
     The ranges are read positionally, in document order, because the part
     names differ between the editions by design and the manifest carries
     both. A missing or extra range is therefore a failure too.
+
+    The program count in the same sentence is NOT checked here, and that is
+    a decision rather than an oversight. It used to read "forty-six" against
+    a manifest of forty-seven, and the fix that landed (#224) is the better
+    one: the introduction now prints \val{appf.programs}, computed by
+    code/appf_ledgers.py. A computed value cannot go stale, so a checker
+    reading a spelt numeral would be a second mechanism for one fact -- which
+    is the defect this book keeps recording, not a guard against it.
     """
     import json
     manifest = json.loads((ROOT / "tools" / "programs.json")
