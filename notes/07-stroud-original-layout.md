@@ -143,6 +143,31 @@ multi-paragraph worked answer with displayed maths at `0.86\linewidth` is
 where the overfull hboxes would come from, so the block form gives up the
 narrowness and keeps the white ground and the hairline.
 
+**And the departure is applied well past that reason, which is measured rather
+than estimated.** Of the 490 `ansblock`s in each edition, **112 carry a
+display, a list, a table or a listing, or run to more than one paragraph, and
+378 carry none of it** — one sentence, no display, the thing `\ans` is for.
+The overfull hbox the departure was taken to avoid cannot arise in those 378,
+so they are full width and left-aligned for a reason that does not reach them.
+Meanwhile 543 answers of the same kind *are* set with `\ans`, and **43 of the
+47 programs use both treatments for a plain one-sentence answer** — F08 in
+three consecutive frames, and P20 setting the single word *Adam* narrow and
+centred while setting a bare `\val{}` across the measure.
+
+The edge is the element the method rests on: section 3's own words are *a thing
+you put your hand over*. Two edges for one kind of answer is what issue #117
+reports, and the split above says which way it resolves — the 378 belong in
+`\ans`, which is what this section already prescribes, rather than `\ans`
+being widened to meet them.
+
+**`make answerbox` reports the split**, per program and for the book, on the
+orphan tail's reasoning: reported and never fatal, because the count is in the
+hundreds and none of it can be cleared without a book-wide pagination pass.
+Both editions read 378 against 112 and cannot drift apart — parity's C4 and
+C14 compare the two editions and fail on a treatment changed in one and not
+the other, proved by mutation. What no check can see is both editions being
+wrong together, which is what the ledger is for.
+
 **The revision exercise's answers are not the following frame.** The original's
 frame 15 is a revision exercise and its frame 16 is the answers to it. This
 book carries every answer to Appendix A, keyed by program and item, so the
