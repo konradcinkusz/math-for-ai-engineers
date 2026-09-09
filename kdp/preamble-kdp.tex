@@ -1,0 +1,227 @@
+% ============================================================
+%  preamble-kdp.tex --- the KDP paperback interior, 6 x 9 in
+%
+%  ADDITIVE. This file reads preamble.tex and then re-issues \geometry and
+%  redefines the palette. preamble.tex, body.tex, structure.tex and the four
+%  main files are untouched, so the trade and A4 editions cannot move: their
+%  page counts and cross-reference lists are asserted unchanged by the
+%  `regression' job in .github/workflows/kdp.yml.
+%
+%  There is deliberately NO new \bookpaper branch. geometry accepts a second
+%  \geometry{} before \begin{document}, and preamble.tex's own \AtBeginDocument
+%  badge assertion then validates the NEW geometry rather than the old one,
+%  which is exactly the behaviour wanted.
+% ============================================================
+
+\input{preamble}
+
+% ---------- Trim and margins ------------------------------------------------
+%  152.4 x 228.6 mm is 6 x 9 in exactly, and comes out as 432 x 648 pt in the
+%  finished PDF -- measured, not intended.
+%
+%  THE GUTTER IS A FUNCTION OF THE PAGE COUNT, and the page count is a function
+%  of the gutter, so the build is two-pass: compile with the default below,
+%  read the true page count, and if it implies a different bracket write
+%  kdp/gutter/<volume>-<lang>.tex and compile again. tools/kdpbuild.py drives
+%  that and gives up after three passes rather than oscillating.
+%
+%  KDP's minimum inside margin, plus the 1 mm of safety volumes.json declares:
+%      <=150 pp  0.375 in     301-500 pp  0.625 in     701-828 pp  0.875 in
+%      151-300   0.500 in     501-700     0.750 in
+%
+%  The default is the 301-500 bracket because that is where most volumes of
+%  this book land; it is a starting point for pass one and nothing else.
+%
+%  Outer, top and bottom are all well clear of KDP's 0.25 in (6.35 mm) floor.
+%  The safety margin over KDP's minimum is 2 mm, not 1, and the extra
+%  millimetre is microtype's. Character protrusion hangs an em dash 2.99 pt
+%  (1.06 mm) into the gutter -- deliberate optical margin alignment, and
+%  still ink a KDP reviewer would measure. At 1 mm of safety the protruded
+%  dash came to 0.623 in against a 0.625 in requirement.
+\providecommand{\kdpgutterdefault}{17.88mm}
+\IfFileExists{kdp/gutter/\mfavolume-\booklang.tex}{%
+  \input{kdp/gutter/\mfavolume-\booklang}}{}
+\providecommand{\kdpinner}{\kdpgutterdefault}
+
+%  top and bottom are 18 and 20 mm rather than the 16 and 18 they were first
+%  written as, and the two extra millimetres are not taste. The running head and
+%  the page folio sit INSIDE the top and bottom margins -- geometry places them
+%  there by construction -- so at 16/18 the head's ink landed 15.75 pt from the
+%  trim and the folio 13.52 pt, both inside KDP's 0.25 in (18 pt) safe zone.
+%  Measured with tools/checkkdp.py, which is what found them.
+\geometry{
+  paperwidth=152.4mm, paperheight=228.6mm,
+  inner=\kdpinner, outer=16mm, top=18mm, bottom=20mm,
+  head=23pt, headsep=0.7cm, footskip=1.2cm,
+  marginparsep=5pt, marginparwidth=1.2cm
+}
+
+%  RE-ISSUING \geometry DOES NOT MOVE THE RUNNING HEAD, and that is a trap with
+%  a measurement attached. fancyhdr freezes \headwidth at \textwidth when
+%  \pagestyle{fancy} runs -- which is inside \input{preamble}, BEFORE the
+%  geometry above. So \headwidth stayed 369.88583 pt, which is the trade
+%  format's text width to the hundredth, against this format's 340.06732: the
+%  head was 29.82 pt too wide and the outer folio hung 15.19 pt from the trim,
+%  well inside the safe zone.
+%
+%  Nothing warns. The head simply sets wider than the block, and on a page of
+%  running text it looks deliberate.
+\setlength{\headwidth}{\textwidth}
+
+%  THE FRAME BADGE NEEDS NO CHANGE, and the claim that it would is false.
+%  preamble.tex's assertion compares marginparwidth+marginparsep against the
+%  narrower OUTER margin, and geometry makes that term identically equal to
+%  `outer' -- so the gutter cancels out of it. Compiled at three brackets, the
+%  assertion reported the same figure every time:
+%
+%      inner=10.53mm -> margin badge 39.14322pt fits outer margin 45.5244pt
+%      inner=16.88mm -> margin badge 39.14322pt fits outer margin 45.5244pt
+%      inner=23.23mm -> margin badge 39.14322pt fits outer margin 45.5244pt
+%
+%  1.2 cm + 5 pt is 39.14322 pt against an outer margin of 45.5244 pt, so the
+%  badge keeps 6.38 pt (2.24 mm) of clear paper. Badge widths at 10pt, measured
+%  out of the box register on this book's own \mfa@drawbadge:
+%
+%          1 digit   2 digits  3 digits
+%   10pt   14.750pt  20.500pt  26.250pt
+%
+%  No program in the book exceeds 66 printed frames, so the badge is never more
+%  than two digits. The assertion stays a hard error and is not weakened.
+
+% ---------- Black ink, and nothing else -------------------------------------
+%  Amazon classifies an interior as colour if ANY page carries a non-gray mark,
+%  and the price step is large enough to decide whether the book can be sold.
+%
+%  Every colour application point in preamble.tex goes through one of the
+%  fourteen names below -- measured over the file, not assumed -- as do the six
+%  frontmatter files that use them by name, so redefining the names reaches all
+%  of them. Measured after this block: of 1524 pages, 0 carried a non-gray mark
+%  outside the diagrams, and the 150 that did were exactly the 150 diagram
+%  pages. The diagrams are handled in the pipeline rather than here, because
+%  \mermaidfig builds its own path and editing it would mean editing
+%  preamble.tex -- see make diagrams-kdp.
+%
+%  Values are chosen to keep the contrast ORDER of the original palette: the
+%  frame rule and badge fill stay lighter than the text, the tinted boxes stay
+%  a hair off white, and the outlined boxes keep a rule dark enough to read as
+%  a stop. \definecolor{...}{gray}{...} emits DeviceGray, so these are K-only.
+\definecolor{mblue}{gray}{0.00}      % headings, badge text, part rules
+\definecolor{mgreen}{gray}{0.25}     % Your turn, aibox
+\definecolor{mteal}{gray}{0.25}      % notationbox, urls
+\definecolor{mamber}{gray}{0.30}     % warning, trapbox
+\definecolor{mred}{gray}{0.15}       % errors and missing-content markers
+\definecolor{mgrey}{gray}{0.35}      % secondary text, routes, frame ranges
+\definecolor{mlight}{gray}{0.955}    % tinted box background
+\definecolor{mfaint}{gray}{0.985}    % faintest tint
+\definecolor{codebg}{gray}{0.975}    % listing background
+\definecolor{codeframe}{gray}{0.855} % frame hairline and badge fill
+\definecolor{kw}{gray}{0.00}         % listing keywords
+\definecolor{str}{gray}{0.30}        % listing strings
+\definecolor{cmt}{gray}{0.40}        % listing comments
+\definecolor{typ}{gray}{0.20}        % listing types
+
+%  A coloured link box is colour. The interior is print, so links are inert and
+%  are set in the body colour rather than suppressed -- suppressing them would
+%  change \ref's spacing, and this file may not move a line the trade edition
+%  does not move.
+\hypersetup{colorlinks=true, linkcolor=black, urlcolor=black,
+            citecolor=black, filecolor=black}
+
+% ---------- Listing furniture must stay inside the text block ----------------
+%  style=mfacode sets numbers=left with numbersep=8pt and leaves xleftmargin at
+%  the listings default of zero, so a line number is set ENTIRELY OUTSIDE the
+%  block: 8 pt of separation plus the digits themselves. In the trade format
+%  that lands in a wide outer margin and looks deliberate. Here it lands in the
+%  GUTTER, and tools/checkkdp.py measured it at 0.556 in against the 0.625 in
+%  KDP requires -- on a volume with zero overfull boxes, so nothing else could
+%  have found it.
+%
+%  Indenting the listing by more than (numbersep + the widest number) puts the
+%  numbers back inside. 16 pt clears three digits; no listing in this book runs
+%  to a hundred lines, so two is the real case and this has 8 pt of slack.
+%  Applied to every listing rather than only the numbered ones, so that a
+%  listing added later cannot reintroduce it.
+\lstset{xleftmargin=16pt}
+
+% ---------- The last leaf ---------------------------------------------------
+%  KDP accepts an odd page count and then prints the last leaf as a stray recto.
+%  The parity that matters is the PDF's, not the printed folio's -- the front
+%  matter is roman, so \value{page} cannot answer it -- so tools/kdpbuild.py
+%  measures the finished file and defines \mfapadleaf when a blank verso is
+%  needed. The generated body reads it at the end.
+\providecommand{\mfapadverso}{%
+  \ifdefined\mfapadleaf \null\thispagestyle{empty}\clearpage \fi}
+
+% ---------- Cross-volume references -----------------------------------------
+%  A program split across volumes still refers to programs in the other three:
+%  1521 \ref{prog:...} in programs/en alone, 729 of which cross a boundary
+%  under the committed split -- 48%, and 163 of those point forwards. Left
+%  alone every one of them sets `??' and release.yml's unresolved-reference
+%  gate rejects the build.
+%
+%  \ref IS THE ONLY REFERENCE COMMAND IN THE BOOK -- 3467 uses, and zero
+%  \pageref, \autoref, \nameref or \cref -- so there is one place to act.
+%
+%  THREE THINGS WERE TRIED. The first two are recorded because they look right.
+%
+%   1. \renewcommand{\ref}: broke immediately. hyperref's \ref is \@ifstar-aware
+%      and a naive redefinition consumes the wrong token; the build died with
+%      `Missing \endcsname inserted' and an undefined reference to \reserved@d.
+%      Do not intercept \ref.
+%
+%   2. Supplying the label with an EMPTY anchor field. Correct, and noisy:
+%      hyperref logged `Suppressing link with empty target' 257 times in one
+%      volume.
+%
+%   3. What is here: supply the label, and anchor it at the volume's own series
+%      map. \ref then resolves normally, so it CANNOT raise an unresolved
+%      reference -- the gate stays meaningful rather than being worked around
+%      -- and the link goes to the page that says which volume the target is
+%      in, which is the only honest destination when the target is in another
+%      book. Measured: 0 unresolved references and 0 empty-target warnings
+%      across all sixteen volume builds.
+%
+%  xr is deliberately not used. It would make each volume read its siblings'
+%  .aux files, which imposes a build order and breaks the parallel matrix.
+\providecommand{\lblVolume}{Volume}
+\makeatletter
+%  THE TAG MUST CARRY A BREAK OPPORTUNITY. Written `#2\,(\lblVolume~#3)' it is
+%  one unbreakable run, and on the narrower 6 x 9 measure it produced the four
+%  worst over-budget hboxes in the whole prototype -- 43.4, 30.5, 29.3 and
+%  18.6 pt, every one of them the tag itself rather than the book's prose.
+%  \allowbreak before the parenthesis is the entire fix, and it took three of
+%  the four English volumes from failing checklog.py to passing with no page
+%  count changed.
+\newcommand{\mfavolref}[3]{% #1 label, #2 printed number, #3 volume numeral
+  \@namedef{r@#1}{{#2\,\allowbreak(\lblVolume\nobreak\ #3)}{0}{}{mfa@seriesmap}{}}}
+\makeatother
+
+% ---------- The series map --------------------------------------------------
+%  Generated from tools/volumes.json by tools/gen_volumes.py, so it cannot
+%  drift from the split it describes, and printed in every volume. It is also
+%  the anchor every cross-volume reference lands on.
+\newcommand{\mfaseriesmapanchor}{\hypertarget{mfa@seriesmap}{}}
+\newcommand{\mfahere}{\hfill\textbf{\lblYouAreHere}}
+%  \mfavoltitleof{3}, not \mfavoltitle3: the second parses as the macro
+%  \mfavoltitle followed by the character 3, which is an undefined control
+%  sequence per row -- six of them on the first build of the series map.
+\newcommand{\mfavoltitleof}[1]{\csname mfavoltitle#1\endcsname}
+\newcommand{\mfaseriesrow}[5]{#1 & #2 & #3 & #4 & #5}
+\newcommand{\mfaseriesmap}[1]{%
+  \cleardoublepage
+  \mfaseriesmapanchor
+  \section*{\lblSeriesMap}%
+  \phantomsection\addcontentsline{toc}{chapter}{\lblSeriesMap}%
+  \markboth{\lblSeriesMap}{\lblSeriesMap}%
+  \noindent\lblSeriesMapIntro\par\medskip
+  \noindent\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X l l r@{}}
+    \toprule
+    \textbf{\lblVolume} & \textbf{\lblTitle} & \textbf{\lblParts}
+      & \textbf{\lblPrograms} & \\
+    \midrule
+    #1 \\
+    \bottomrule
+  \end{tabularx}\par\medskip
+  \noindent\lblSeriesMapNote\par
+  \clearpage
+}
