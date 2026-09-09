@@ -48,10 +48,10 @@ does not resolve.
 ## What a program looks like
 
 Each of the forty-seven programs is a stream of numbered **frames**, a few
-dozen of them. More than half end by asking you for something, and **the answer
-is at the top of the next frame** — so you commit before you check. The rate is
-measured on every build, per program and for the book, because a format that has
-stopped asking has stopped being this one.
+dozen of them. Over half the frames in the book end by asking you for something,
+and **the answer is at the top of the next frame** — so you commit before you
+check. The rate is measured on every build, for the book and for each program
+separately, because a format that has stopped asking has stopped being this one.
 
 Around the frames sits the same skeleton every time:
 
@@ -131,9 +131,9 @@ cannot quietly stop being true while the book's own copy of it moves.
 Ten experiments are specified across the book, nine of them free and finishing
 on a laptop in under a minute. Until the one behind a claim has been run, the
 claim is labelled as judgement rather than measurement — and
-[the ledger](notes/01-curriculum.md) names the pass that ran each rather than
-counting them, because a total is exactly the kind of sentence that goes
-quietly out of date.
+[the ledger](notes/01-curriculum.md) records what became of each, naming the
+pass behind the ones that have run rather than counting them, because a total is
+exactly the kind of sentence that goes quietly out of date.
 
 ---
 

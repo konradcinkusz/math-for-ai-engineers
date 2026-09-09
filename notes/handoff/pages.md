@@ -154,6 +154,21 @@ Wired into `make check`, `make site` (which should not assemble a site whose
 figures have drifted), `make debt` via a `frontpage` target — **not** `site`,
 which is taken by the existing local-assembly target — and both workflows.
 
+## One of my own corrections was the defect it replaced
+
+The first draft of item 4 read "More than half of them end by asking you for
+something" after a clause that had just localised to "a program". The book-wide
+rate is 55%; the lowest program is **45%**. So as a per-program claim it is
+false of at least one member while true of the ensemble — which is the
+quantifier class this batch catalogued three instances of, committed in the fix
+for it. Caught by re-reading my own replacements against the ledger rather than
+against the feel of the fix, before the push. Both pages now say "over half the
+frames in the book", which is the quantity that is measured.
+
+The experiments sentence went the same way one notch smaller: "names the pass
+that ran each" is true of the rows that have run and not of the four that have
+not. It records what became of each now.
+
 ## Recorded rather than taken
 
 - **`build.yml` carries `paths-ignore: ['docs/**', '**.md']`,** so a docs-only
