@@ -59,9 +59,11 @@ except by the appendices.
 ## 3. Part I --- Podstawy / Foundation (F1--F13)
 
 Assumes genuinely nothing: no algebra, no trigonometry, no calculus. Every
-Foundation program opens with a **Quiz** that is both the diagnostic on entry
-and the exit test, exactly as Stroud does it. A reader who passes the Quiz reads
-the Summary and moves on.
+program in the book opens with a **Quiz**, Foundation and main sequence alike.
+It is the diagnostic on entry and nothing else: Stroud used the same items on
+the way out, and this book does not, because answered a second time they are
+put to a reader who now remembers them. A reader who passes the Quiz reads the
+Summary and moves on; §14 says what the exit instrument is instead.
 
 Foundation is not a watered-down version of the main parts. It is bent
 deliberately towards the payoff: logarithms get a whole program because
@@ -322,9 +324,12 @@ learning that consumes all of it.
 Every program, without exception:
 
 1. **Learning outcomes** --- on entry, numbered.
-2. **Quiz** --- Foundation programs only. Diagnostic on the way in, exit test on
-   the way out. Each question names the frames that cover it, so a wrong answer
-   routes the reader rather than merely scoring them.
+2. **Quiz** --- on every program, not the Foundation thirteen only: this entry
+   said otherwise for the whole of the book, and §21 below reasoned from it. A
+   diagnostic on the way in and nothing else --- the exit test is the scored
+   Test exercises, because the same items answered twice measure memory. Each
+   question names the frames that cover it, so a wrong answer routes the reader
+   rather than merely scoring them.
 3. **Frames** --- numbered, small, nearly all demanding a response. **The answer
    appears at the top of the next frame.** The reader is told, in the front
    matter and again at the first frame of F1, to cover the next frame until they
@@ -795,7 +800,9 @@ do not disagree.
 1. **P7, *Tensors, shapes and index notation*, was missing** and is the largest
    content gap in the book — and in every book in §1. Inserted between P6 and
    the old P7; everything after it moved up one, so the book is now 47
-   programs and roughly 2,415 frames.
+   programs and 2,418 planned frames — which is what §1 above says and what
+   `gen_stubs.py --check` prints; *roughly 2,415* stood here, derived from
+   nothing and disagreeing with the same document.
 2. **F13 was curriculum inertia.** Forty-five frames on the integral in a book
    whose §13 excludes every integration technique by name. Cut to twenty and
    retitled *Accumulation, area and expectation*.
@@ -809,10 +816,12 @@ do not disagree.
    floors are now separated in the front matter: no mathematics beyond school
    arithmetic, but the vocabulary of the job assumed throughout.
 
-**And §16's 80/80 obligation was unmeasurable as written.** §14 puts the Quiz on
-Foundation programs only, so the standard could not be measured on 34 of the 47
-and was contaminated on the other 13, the same items serving as entry and exit
-test. The instrument is the scored Test exercises, which every program has.
+**And §16's 80/80 obligation was unmeasurable as written.** §14 put the Quiz on
+Foundation programs only at the time, so the standard could not be measured on
+34 of the 47 and was contaminated on the other 13, the same items serving as
+entry and exit test. The written book gives every program a Quiz, which retires
+the first half and leaves the second: the instrument is the scored Test
+exercises, and the contamination is why.
 
 Three further findings are recorded and **not** acted on, because they are
 judgement calls for the author rather than defects:

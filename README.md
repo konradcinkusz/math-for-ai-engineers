@@ -58,7 +58,7 @@ Around the frames sits the same skeleton every time:
 | | |
 |---|---|
 | **Learning outcomes** | What you will be able to do, listed before you start |
-| **Quiz** | Foundation programs only. Take it *before*: it tells you whether you need the program, and which frames if you only need part of it |
+| **Quiz** | Take it *before*: it tells you whether you need the program, and which frames if you only need part of it. A diagnostic, never a score |
 | **Frames** | The program |
 | **Summary** | Every item tagged with the frame it came from, `[17]` — so the summary is also the route back |
 | **Can you?** | The outcomes again, one for one, rated 1–5. **Generated from the outcomes**, so the two cannot drift |
