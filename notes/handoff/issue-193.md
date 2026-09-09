@@ -54,11 +54,18 @@ tables on §E.5's own pattern -- the evidence for the method, then the results
 the programs name -- plus a note on the citation format and a paragraph on the
 one claim with no source.
 
-**Ten entries, and every one was checked against the journal's own record
-rather than written from memory.** That was not fastidiousness: writing a
-bibliography from memory would have committed the exact defect the issue is
-about, one level up, and the misattribution above is what it looks like when
-somebody does.
+**Every entry was checked against the journal's own record rather than written
+from memory.** That was not fastidiousness: writing a bibliography from memory
+would have committed the exact defect the issue is about, one level up, and the
+misattribution above is what it looks like when somebody does.
+
+> **And the first draft of this note said "ten entries" over a table of
+> twelve**, as does the commit message, which is in the history and stays
+> there. It is this file's own most-repeated rule -- never state a count of
+> occurrences -- broken in the pass whose entire subject is claims nobody
+> checked, in the sentence claiming everything had been checked. The fix is the
+> one the rule prescribes: name the practice, not the tally, because a tally
+> decays the moment somebody adds a row and nothing can see it.
 
 | Source | Carries |
 |---|---|
