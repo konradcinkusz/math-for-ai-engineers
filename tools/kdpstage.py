@@ -113,15 +113,32 @@ def main() -> int:
     ap.add_argument("--check", action="store_true")
     a = ap.parse_args()
 
-    n_src = len(list((ROOT / "figures" / "diagrams").glob("*/*.pdf")))
-    if n_src == 0:
-        print("  no rendered diagrams found -- run `make diagrams` first")
+    src_dir, pre_dir = ROOT / "figures" / "diagrams", STAGE / "figures" / "diagrams"
+    n_src = len(list(src_dir.glob("*/*.pdf")))
+    n_pre = len(list(pre_dir.glob("*/*.pdf")))
+
+    # THE COLOUR SET IS THE INPUT TO THE CONVERSION, AND IT IS ABSENT BY DESIGN
+    # IN CI'S PER-VOLUME JOB. `diagrams-kdp` renders and converts once and ships
+    # the GRAY set as an artifact, which `build-volume` unpacks straight into
+    # this staging tree -- so eight volume builds do not each re-run ghostscript
+    # over three hundred files. What is still owed there is the OTHER half of
+    # this script, the symlink tree, and bailing here skipped it: the job
+    # reported "no rendered diagrams found -- run `make diagrams` first" while
+    # standing on a complete set of them.
+    #
+    # This may not become a pass that read nothing, which is the failure mode
+    # this pipeline keeps producing: with neither a colour source nor a
+    # populated gray stage there is nothing to build against, and that stops.
+    if n_src == 0 and n_pre == 0:
+        print("  no rendered diagrams found -- run `make diagrams` first, or")
+        print(f"  unpack a prebuilt gray set into {pre_dir.relative_to(ROOT)}")
         return 1
+    prestaged = n_src == 0
 
     if a.check:
-        missing = [p for p in (ROOT / "figures" / "diagrams").glob("*/*.pdf")
-                   if not (STAGE / "figures" / "diagrams"
-                           / p.relative_to(ROOT / "figures" / "diagrams")).exists()]
+        missing = ([] if prestaged else
+                   [q for q in src_dir.glob("*/*.pdf")
+                    if not (pre_dir / q.relative_to(src_dir)).exists()])
         gone = [r for r in LINK_TREES + LINK_FILES if not (STAGE / r).exists()]
         if missing or gone:
             print(f"  the KDP staging tree is incomplete: "
@@ -129,7 +146,8 @@ def main() -> int:
                   + (f", {gone} not staged" if gone else "")
                   + ". Run: make kdp-stage")
             return 1
-        print(f"  KDP staging tree is current ({n_src} gray diagrams).")
+        print(f"  KDP staging tree is current ({n_pre if prestaged else n_src} "
+              f"gray diagrams{', prebuilt' if prestaged else ''}).")
         return 0
 
     STAGE.mkdir(parents=True, exist_ok=True)
@@ -140,11 +158,16 @@ def main() -> int:
             t.unlink()
         t.symlink_to(os.path.relpath(ROOT / f, t.parent))
         links += 1
-    done, errs = gray_diagrams()
+    if prestaged:
+        done, errs, n_src = n_pre, [], n_pre
+    else:
+        done, errs = gray_diagrams()
     for e in errs[:5]:
         print(f"  {e}")
-    print(f"  staged {links} symlinks and {done} of {n_src} grayscale diagrams "
-          f"into {STAGE.relative_to(ROOT)}"
+    print(f"  staged {links} symlinks and "
+          + (f"found {done} prebuilt grayscale diagrams"
+             if prestaged else f"{done} of {n_src} grayscale diagrams")
+          + f" in {STAGE.relative_to(ROOT)}"
           + (f", {len(errs)} failures" if errs else ""))
     return 1 if errs else 0
 

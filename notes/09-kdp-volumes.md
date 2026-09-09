@@ -195,6 +195,43 @@ Two properties matter and both are checked per file:
 * **inline colours are caught**. Two `.mmd` sources hard-code their own hex
   values, which a grayscale Mermaid *theme* could not reach.
 
+### The stager refused to do the half of its job that was still owed
+
+`tools/kdpstage.py` does two things: it symlinks the source tree into
+`build/kdp/tex`, and it converts the colour diagrams to grayscale. In CI's
+per-volume job the second is already done \dash{} `diagrams-kdp` renders and
+converts **once** and ships the gray set as an artifact, which `build-volume`
+unpacks straight into the staging tree, so eight volume builds do not each run
+ghostscript over three hundred files.
+
+The script tested for the **colour** set and returned 1 when it found none:
+
+    no rendered diagrams found -- run `make diagrams` first
+
+It printed that while standing on a complete set of three hundred converted
+diagrams, and it skipped the symlink half, which was the only half still owed.
+So the volume build failed on the input it had rather than on the one it
+lacked.
+
+It is the milder cousin of the other four defects in this pipeline: those let a
+guard pass having read nothing, and this one stopped a job that had everything
+it needed. **Both come of a check that names one input when the work has two**,
+and the fix is the same shape either way \dash{} decide what is actually
+missing before deciding to stop.
+
+The colour set present is still the local path and converts as before; absent
+with a populated gray stage is the CI path and skips the conversion, saying
+`prebuilt` in the log so a reader can tell which branch ran. **Neither present
+still stops**, because that is the vacuous pass this file keeps recording.
+
+Proved in every direction before it was believed: the old code reproduces the
+CI message byte for byte in the CI state; the new one stages 576 symlinks and
+finds 300 prebuilt diagrams there; with neither input it exits 1; and from a
+tree shaped exactly as CI's \dash{} fresh stage, gray artifact only, no
+colour source \dash{} `kdp-v3-pl` builds to 308 pages, converging on pass 1,
+with `checklog` and `checkkdp` both clean. 308 is the same figure the local
+build gives.
+
 ### Why a staged tree rather than a second path
 
 `\mermaidfig` hard-codes `figures/diagrams/<lang>/<key>.pdf` in both of its
