@@ -288,6 +288,13 @@ jobs:
             texlive-latex-extra texlive-lang-polish texlive-science latexmk \
             lmodern poppler-utils ghostscript
           pip install --quiet pikepdf
+          # The back matter's tables have to break at 6 x 9 and xltabular is
+          # what lets them. preamble-kdp.tex guards its \usepackage so a machine
+          # without it still builds -- and then six of the eight volumes carry an
+          # overfull vbox, which is a loud failure in checklog.py but a confusing
+          # one. Name the cause here instead. It ships in texlive-latex-extra.
+          kpsewhich xltabular.sty >/dev/null \
+            || { echo "::error::xltabular.sty is absent; add texlive-latex-extra"; exit 1; }
 
       - uses: actions/download-artifact@v5
         with: { name: kdp-values, path: figures }

@@ -587,8 +587,9 @@ building `main-en` on the merge base and on `HEAD` and failing on a difference o
 one entry. It gates every other job in that workflow. A volume that is correct at
 the cost of the book it came from is not worth having.
 
-Four things in it are load-bearing and each was found by a measurement rather
-than by reading:
+The things in it that are load-bearing were each found by a measurement rather
+than by reading, and the count is deliberately not stated \dash{} this file's own
+rule about a tally, applied to the list below:
 
 - **No new `\bookpaper` branch.** `kdp/preamble-kdp.tex` reads `preamble.tex` and
   then re-issues `\geometry`. This preamble's own `\AtBeginDocument` badge
@@ -624,6 +625,32 @@ than by reading:
   silently, and every Summary bracket, Quiz route and cross-reference in the
   series is then wrong. `tools/gen_volumes.py` emits the `\setcounter` offset, and
   that is the whole reason the per-volume structure file is generated.
+
+- **The back matter's tables cannot break, and at 6 x 9 they do not fit.** Every
+  `tabularx` in appendices D, E and F is `\linewidth` wide and unbreakable, and
+  this trim's text block is shorter than the trade format's \dash{} so seven of
+  the eight volumes carried an overfull vbox, the worst 207.8 pt. Shrinking
+  cannot reach that (38% wanted, `\small` buys 8%) and splitting the table in the
+  source would move the four existing PDFs. `kdp/preamble-kdp.tex` aliases
+  `tabularx` to `xltabular` **at `\appendix`**, which is what makes it safe: a
+  `longtable` cannot live in a `tcolorbox`, and every boxed `tabularx` in this
+  book \dash{} the `\canyou` panel among them \dash{} is in the body, behind
+  that point. All 34 appendix tables sit inside `\begin{center}`, where a
+  `longtable` is supposed to be impossible; asked of pdflatex at this geometry it
+  sets a 60-row table over three pages with zero vboxes.
+
+- **And a narrower measure needs somewhere to put the slack, which is not
+  `\vfuzz`.** The prose was written for 70 characters a line and sets at 69 here,
+  so twelve paragraphs in volume IV had no break TeX could take and one of them
+  put a verso 2.2 pt inside the gutter. `\emergencystretch` changes how the
+  paragraph BREAKS, where `\vfuzz` would change what gets REPORTED, and
+  `checklog.py` still fails on anything left. 2em is swept rather than chosen:
+  none 4 boxes, 1em 1 box, 2em zero, 4em identical, at a price of one loose line.
+  **It has to be appended after `\tableofcontents`**, because `preamble.tex`
+  appends `\emergencystretch=0pt` there to stop its own contents fix leaking, so
+  a value set in a preamble is wiped before the first body page \dash{} swept at
+  1, 2 and 3em in the preamble it gave byte-identical answers, which is this
+  file's own signal that a change did not REACH what was measured.
 
 **Two checks were asked for and are deliberately not written**, because in both
 cases the volume is not the thing the claim is about. `--terms` scoped to one

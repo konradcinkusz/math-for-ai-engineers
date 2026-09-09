@@ -67,19 +67,23 @@ in `tools/volumes.json` and nowhere else.
 
 | Vol | Parts | Programs | en pp | pl pp |
 |---|---|---|---|---|
-| I | I | F1–F13 | 428 | 436 |
-| II | II, III | P1–P11 | 328 | 332 |
-| III | IV, V, VI | P12–P22 | 308 | 310 |
-| IV | VII, VIII, IX | P23–P34 | 412 | 418 |
+| I | I | F1–F13 | 426 | 434 |
+| II | II, III | P1–P11 | 326 | 330 |
+| III | IV, V, VI | P12–P22 | 306 | 308 |
+| IV | VII, VIII, IX | P23–P34 | 408 | 414 |
 
-Every volume is inside the 24–828 window with over four hundred pages of
-headroom, spread is −18 % to +16 % about the mean, and the binding constraint is
-Polish in every volume, as expected.
+Every volume is inside the 24–828 window with over three hundred and ninety
+pages of headroom, and the binding constraint is Polish in every volume, as
+expected. **These are the counts after the back matter's tables were made
+breakable** (section 9): every volume lost two to four pages, so re-measure them
+from the build in front of you rather than quoting them from here.
 
-**A three-volume split also fits** — I (428) | II–V (~476) | VI–IX (~477) — and
-saves about sixty pages of duplicated back matter and one book. It is a product
-decision rather than a technical one and the pipeline does not care: change
-`tools/volumes.json` and run `make volumes`.
+**A three-volume split also fits** — I (426) | II–V and VI–IX both near 475 —
+and saves about sixty pages of duplicated back matter and one book. Those two
+figures are derived from the four-volume counts rather than built, and a
+derivation is not a measurement: `make census` is what settles it. It is a
+product decision rather than a technical one and the pipeline does not care:
+change `tools/volumes.json` and run `make volumes`.
 
 ---
 
@@ -242,36 +246,88 @@ paper formats”) and the generated series map.
 
 ## 9. What is still owed
 
-1. **Four of the eight interiors still fail on a margin, and every one is a
-   `tabularx` in an appendix that cannot break across a page.** All eight are
-   even, colour-free and fully embedded; these are the remainder.
+1. **Nothing, on the eight interiors \dash{} and the entry that stood here said
+   otherwise because it was measured with one instrument.** It read *four of the
+   eight interiors still fail on a margin*, listed the four that fail
+   `checkkdp.py`, and concluded that *volumes I, II and III English and Volume IV
+   Polish pass every check*. The workflow runs `checklog.py` **first**, and
+   against that **six of the eight failed** and **seven of the eight carried an
+   overfull vbox**, the worst 207.8 pt \dash{} including two volumes the entry
+   named as clean. The pull request's own smoke test is volume III, chosen
+   because it is the smallest, and it was red in both languages.
 
-   | volume | failure | what is there |
-   |---|---|---|
-   | I pl | bottom 0.203 in, p428 | Appendix D, vbox 39.8 pt |
-   | II pl | bottom 0.203 in, p326 | Appendix D, vbox 39.8 pt |
-   | III pl | bottom 0.037 in, p304 | Appendix D, vbox 51.8 pt |
-   | IV en | inner 0.595 in, p276 | an overfull hbox of 45.7 pt |
-   | IV en | bottom 0.037 in, p396 | Appendix E, vbox 207.8 pt |
+   That is this repository's oldest recorded class arriving in the note about the
+   thing it describes: **a claim about an artefact written from the instrument
+   that was to hand rather than from the one the gate uses.** The correction is
+   the finding; the numbers are below it.
 
-   Volumes I, II and III English and Volume IV Polish pass every check.
+   **One cause, and shrinking could not reach it.** Every `tabularx` in
+   appendices D, E and F is `\linewidth` wide and cannot break across a page, and
+   at 6 x 9 the text block is shorter than the trade format's \dash{} so a table
+   that fits there grows past a page here. 207.8 pt out of a 540 pt block wants a
+   38% reduction where `\small` buys 8%, so the recorded fix for an overfull vbox
+   applies: split the table. It splits itself instead.
 
-   **They are not fixable from inside this pipeline, and that is the point worth
-   recording.** `tabularx` cannot break across a page at all; Appendices D and E
-   fit in the trade format because their chunks were split to fit *that* measure,
-   and at 6 × 9 those chunks are three or four lines too tall. The two available
-   fixes are both out of bounds here:
+   **And the two reasons this entry gave for ruling that out were both wrong.**
+   It said `ltablex` *turns every `tabularx` in the book into a `longtable`, and
+   this book puts one inside a `tcolorbox`*. The switch does not have to be
+   global: installed by `\appendix`, every `tabularx` inside a box is already
+   behind it, because **all 34 appendix tables sit outside boxes** and the
+   `\canyou` panel is in the body. The unstated second reason was that all 34 sit
+   inside `\begin{center}`, where everybody says a `longtable` cannot go. Asked
+   of pdflatex at this geometry rather than reasoned about, it sets a 60-row table
+   over three pages with zero overfull vboxes. Both were readings of a mechanism,
+   and both cost nothing to run.
 
-   * **edit the appendix** — which moves the four existing PDFs, and the
-     regression job exists to forbid exactly that;
-   * **make `tabularx` breakable in the KDP build** with `ltablex` — which turns
-     every `tabularx` in the book into a `longtable`, and this book puts one
-     inside a `tcolorbox` (the *Can you?* panel), where a `longtable` cannot go.
+   `kdp/preamble-kdp.tex` therefore aliases `tabularx` to `xltabular` at
+   `\appendix` and sets those tables `\footnotesize`, which is swept rather than
+   chosen: at the body size volume IV's English carries 12 overfull hboxes with a
+   worst of 45.7 pt, at `\small` 5 with a worst of 18.8 \dash{} still over the
+   15 pt budget \dash{} and at `\footnotesize` 4 with a worst of 7.6.
 
-   So it needs a pass of its own: either split those two tables at rows that fit
-   both measures, and re-measure all four existing PDFs, or move the glossary to
-   a breakable environment book-wide. `tools/checkkdp.py` fails on them so they
-   stay visible.
+   **The last of those four breached the gutter, and the lever for it was in the
+   wrong place three times before it was in the wrong size once.** A 7.6 pt box
+   on a verso put page 276 2.2 pt inside the 0.625 in KDP requires at that page
+   count. The prose was written for the trade format's 70 characters a line and
+   sets at 69 here, so rewriting it would move the four existing PDFs and would
+   be wrong anyway. `\emergencystretch` is the instrument \dash{} and swept at 1,
+   2 and 3em in the preamble it gave **byte-identical** answers, because
+   `preamble.tex` appends `\emergencystretch=0pt` after `\tableofcontents` to
+   stop its own contents fix leaking into the body, so a value set in a preamble
+   is wiped before the first body page. That is this book's own signal that a
+   change did not REACH what was measured, and its own rule that when a fix does
+   not move the number you check **where** it runs before you check how large it
+   is. Appended after the contents instead, the sweep separates: none 4 boxes and
+   an inner margin of 0.5953 in, 1em 1 box, **2em zero boxes and 0.6624 in**, 4em
+   identical to 2em. 2em is the floor rather than a preference, and the price is
+   one loose line \dash{} 9 underfull hboxes against 10.
+
+   **It is not the `\vfuzz` objection this file records elsewhere.** `\vfuzz`
+   raises the tolerance so a real defect stops being reported; this changes how
+   TeX breaks the paragraph so the defect stops existing, and `checklog.py` still
+   fails the volume on anything left. Both editions of all four volumes now build
+   with **zero overfull vboxes, zero overfull hboxes and no KDP failure**, and
+   every change is inside `kdp/`, so the four existing PDFs cannot move and the
+   regression job proves it.
+
+   | volume | pages | overfull hbox | overfull vbox | KDP |
+   |---|---|---|---|---|
+   | I en | 426 | 0 | 0 | clean |
+   | I pl | 434 | 0 | 0 | clean |
+   | II en | 326 | 0.8 pt | 0 | clean |
+   | II pl | 330 | 0.8 pt | 0 | clean |
+   | III en | 306 | 0 | 0 | clean |
+   | III pl | 308 | 0 | 0 | clean |
+   | IV en | 408 | 0 | 0 | clean |
+   | IV pl | 414 | 0 | 0 | clean |
+
+   Zero errors and zero unresolved references in all eight. The two 0.8 pt boxes
+   are inside the 15 pt budget, so `checklog.py` exits 0 on every volume.
+
+   **What the entry above still owes is a habit rather than a fix: run the gate
+   the workflow runs, over every artefact, before writing a sentence about any of
+   them.** Six of eight was one loop away the whole time.
+
 2. **The rate card.** `pricing` in `tools/volumes.json` is Amazon's figures and
    nothing in this repository can verify them. Every price the pipeline prints is
    only as good as that block.

@@ -143,6 +143,64 @@
 %  listing added later cannot reintroduce it.
 \lstset{xleftmargin=16pt}
 
+% ---------- A narrower measure needs somewhere to put the slack -------------
+%  The prose was written for the trade format's 70 characters a line and sets at
+%  69 here, so a handful of paragraphs have no break TeX can take: measured, 12
+%  overfull hboxes in volume IV's English, the worst 45.7 pt, and one of them
+%  pushed a verso 2.2 pt inside the gutter KDP requires at 408 pages. Rewriting
+%  the prose would move the four existing PDFs and would be wrong anyway, since
+%  the trade edition sets those paragraphs correctly.
+%
+%  This is NOT the \vfuzz objection CLAUDE.md records. \vfuzz raises the
+%  tolerance so a real defect stops being REPORTED; \emergencystretch changes
+%  how TeX breaks the paragraph so it stops EXISTING -- the line is set loose
+%  instead of overfull, and checklog.py still fails on anything left.
+%
+%  2em, swept: none gives 4 boxes and an inner margin of 0.5953 in, 1em gives 1
+%  box, 2em gives ZERO boxes and 0.6624 in, and 4em is identical to 2em. So 2em
+%  is the floor and not a preference.
+%
+%  It goes AFTER \tableofcontents because preamble.tex appends
+%  \emergencystretch=0pt there to stop its own contents fix leaking into the
+%  body -- so a value set in a preamble is wiped before the first body page.
+%  Swept at 1, 2 and 3em in the preamble first: byte-identical answers, which is
+%  this book's own signal that a change did not REACH what was measured, and its
+%  own rule that when a fix does not move the number you check where it runs
+%  before you check how large it is.
+\apptocmd{\tableofcontents}{\emergencystretch=2em\relax}{}{%
+  \PackageWarning{mfakdp}{Could not set emergencystretch for the narrower measure}}
+
+% ---------- The back matter's tables have to be able to break ----------------
+%  Every tabularx in appendices D, E and F is \linewidth wide and UNBREAKABLE,
+%  and at 6 x 9 the text block is shorter than the trade format's, so a table
+%  that fits there grows past a page here: measured, an overfull vbox in six of
+%  the eight volumes, 15.8 pt in volume III's English Appendix D and 207.8 pt in
+%  volume IV's Appendix E.
+%
+%  CLAUDE.md's recorded fix for an overfull vbox is to split the table and not
+%  to shrink the text, and shrinking cannot reach this anyway: 207.8 pt out of a
+%  540 pt block wants a 38% reduction, where \small buys 8%. Splitting it in the
+%  source would move the four existing PDFs, which this path may not do.
+%
+%  So the tables break instead. xltabular is longtable with tabularx's X column,
+%  and the alias is installed by \appendix rather than in the preamble, because
+%  the \canyou panel and every tabularx inside a tcolorbox are in the BODY -- a
+%  longtable cannot live in a box, and after \appendix there is not one left.
+%  Measured: all 34 appendix tables sit inside \begin{center}, and a longtable
+%  inside center is the thing everybody says does not work. It does; asked of
+%  pdflatex at this geometry it sets a 60-row table over three pages with zero
+%  overfull vboxes. That was a reading of a mechanism until it was run.
+%
+%  Guarded, because a TeX installation without xltabular must still build. The
+%  degradation is loud rather than quiet: without it the tables do not break,
+%  and checklog.py fails the volume on the vbox it then reports.
+\IfFileExists{xltabular.sty}{%
+  \usepackage{xltabular}%
+  \apptocmd{\appendix}{%
+    \renewenvironment{tabularx}{\footnotesize\xltabular}{\endxltabular}%
+  }{}{\PackageWarning{mfakdp}{Could not patch \string\appendix\space for breakable tables}}%
+}{\PackageWarning{mfakdp}{xltabular absent: the back matter's tables cannot break}}
+
 % ---------- The last leaf ---------------------------------------------------
 %  KDP accepts an odd page count and then prints the last leaf as a stray recto.
 %  The parity that matters is the PDF's, not the printed folio's -- the front
