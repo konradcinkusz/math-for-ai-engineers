@@ -171,6 +171,14 @@ lookahead excluded `2^7<br/>`, so four files would have shipped with a caret
 each. Worth keeping — the sweep asserted "no caret left in this file" rather
 than trusting the regex.
 
+**One honest cost, stated rather than buried.** `\mermaidfig`'s unrendered
+fallback prints the `.mmd` source through `listings`, so on a tree where
+`make diagrams` has not run a reader of that fallback now sees
+`10<sup>22</sup>` where they used to see `10^22`. That is strictly worse in
+the fallback and strictly better on the page, and the fallback is an
+author-only degradation — it is never in a shipped PDF. `<` and `>` are safe
+there: the book loads `T1` fontenc and the listing is `\ttfamily`.
+
 `f02-equation-to-code` is the one deliberate judgement: its `PRINTED` node is
 an ASCII-art transcription of a typeset formula and its sibling nodes use
 `sigma2` because they are what you *type*. Converting only the printed one
@@ -265,6 +273,23 @@ of it to be re-rolled. **Walk the cues.**
 
 The two captions lengthened (F1.2 by four lines, F1.3 by one) and P12.2's
 caption is level.
+
+## A correction of my own, made before this was pushed
+
+The first version of `checkfigures.py` documented its `BASE_PT = 12.57` as
+"mermaid's own base font, `themeVariables.fontSize`". **That is wrong**, and
+it is exactly the class this pass is about — a plausible reading of a
+mechanism written from the feel of it. `config.json` asks for 15px and the
+rendered PDF really does set 15.0 pt; the content stream carries exactly two
+`Tf` sizes, 15.0 and 12.5, the second being a `<sup>`. What comes back from a
+`pdftotext` word box is 12.57, because **pdftotext reports the font's own box
+rather than the nominal size** — the same gap `checkpdf.py` already records
+for a `\Large` heading measuring smaller than the body.
+
+So the constant is empirical and is used because it is validated: it
+reproduces `f01-magnitudes` at 4.32 pt, F3.1 at 8.53 against a recorded 8.51,
+and F1.1 on A4 at 5.37, all from CLAUDE.md's own hand measurements. The
+comment says so, and says not to "correct" it to 15.
 
 ## Values
 

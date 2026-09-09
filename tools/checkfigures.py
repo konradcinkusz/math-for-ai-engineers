@@ -38,13 +38,26 @@ import re
 import statistics
 import sys
 
-# The two boxes `\mermaidfig` scales into, in points, per format. Taken from
-# the geometry in preamble.tex: 0.95\linewidth by 0.42\textheight.
+# The two boxes `\mermaidfig` scales into, in points, per format -- it sets
+# `width=0.95\linewidth, height=0.42\textheight, keepaspectratio`, so these
+# are those two products. They check out against the geometry: 350.9/0.95 is a
+# 12.98 cm measure and 229.2/0.42 a 19.18 cm text height, which is the trade
+# format's block.
 FORMATS = {
     "trade": (350.9, 229.2),   # 17 x 24 cm at 11pt
     "a4":    (398.4, 284.9),   # A4 at 12pt
 }
-# Mermaid's own base font, themeVariables.fontSize in figures/mermaid/config.json.
+# The unscaled node text as `pdftotext` MEASURES it, not as mermaid nominates
+# it -- and the difference is the point. config.json asks for 15px and the
+# rendered PDF really does set 15.0 pt (checked: the content stream carries
+# exactly two `Tf` sizes, 15.0 for body and 12.5 for a <sup>). What comes back
+# from a word box is 12.57, because pdftotext reports the font's own box
+# rather than the nominal size -- the same gap `checkpdf.py` records for a
+# `\Large` heading measuring smaller than the body.
+#
+# So this constant is empirical, and it is used because it was VALIDATED: with
+# it the formula reproduces every figure CLAUDE.md's pass notes measured by
+# hand, to a hundredth of a point. Do not "correct" it to 15.
 BASE_PT = 12.57
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
