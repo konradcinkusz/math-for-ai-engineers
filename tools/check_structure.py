@@ -754,6 +754,82 @@ def check_index(soft: bool) -> int:
 
 RE_PARTRANGE = re.compile(r"\(([FP]\d+)--([FP]\d+)\)")
 
+# "Nine parts, forty-six programs." -- the introduction's own map of the book.
+# The nine has been gated since the P7 insertion was found in seven of the
+# nine ranges; the number beside it, in the same six-word sentence, was wrong
+# by one for the whole of the book and nothing looked at it. Both editions
+# said forty-six and Appendix E said forty-seven four times, so the book
+# contradicted itself between page one and the back matter.
+#
+# The count is spelt as a word, so checking it needs a word-to-integer map.
+# The map is compositional and covers 1--99 in both languages rather than
+# listing the two numbers that happen to be wanted today: a table with one
+# entry in it is a tally wearing a check's clothes, and the first curriculum
+# change would walk straight past it. A manifest count the map cannot render
+# is a FAILURE and says so, so this check cannot go quiet by growing out of
+# its own range.
+NUMWORD = {
+    "en": {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+           "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
+           "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15,
+           "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19,
+           "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60,
+           "seventy": 70, "eighty": 80, "ninety": 90},
+    "pl": {"jeden": 1, "dwa": 2, "trzy": 3, "cztery": 4, "pięć": 5,
+           "sześć": 6, "siedem": 7, "osiem": 8, "dziewięć": 9,
+           "dziesięć": 10, "jedenaście": 11, "dwanaście": 12,
+           "trzynaście": 13, "czternaście": 14, "piętnaście": 15,
+           "szesnaście": 16, "siedemnaście": 17, "osiemnaście": 18,
+           "dziewiętnaście": 19, "dwadzieścia": 20, "trzydzieści": 30,
+           "czterdzieści": 40, "pięćdziesiąt": 50, "sześćdziesiąt": 60,
+           "siedemdziesiąt": 70, "osiemdziesiąt": 80,
+           "dziewięćdziesiąt": 90},
+}
+
+# The noun the count attaches to, per edition. Deliberately one form each:
+# this scans the introduction only, where the book prints its own map, and a
+# wider net would catch the genuine subset counts that live elsewhere -- the
+# Polish "How to use this book" says "Dwa programy" of two programs and is
+# right to.
+PROGWORD = {"en": "programs", "pl": "programów"}
+
+RE_COUNTED = re.compile(
+    r"(?:([^\W\d_-]+)[\s~]+)?([^\W\d_-]+(?:-[^\W\d_-]+)?)[\s~]+"
+    r"(?:programs|programów)")
+
+
+def numword(words, lang):
+    """Sum a spelt numeral, or None if these words are not one.
+
+    Compositional rather than tabulated, so 'forty-seven' and 'czterdzieści
+    siedem' are read the same way and neither is special-cased. Returns None
+    for anything that is not a numeral at all, which is what lets the caller
+    walk every "<word> programs" in the file and quietly skip "these
+    programs" and "Foundation programs".
+    """
+    table = NUMWORD[lang]
+    total = 0
+    for part in words:
+        for tok in part.lower().split("-"):
+            if tok not in table:
+                return None
+            total += table[tok]
+    return total or None
+
+
+def spell(n, lang):
+    """The words this check would expect, or None if it cannot render n."""
+    table = NUMWORD[lang]
+    inv = {v: k for k, v in table.items()}
+    if n in inv:
+        return inv[n]
+    tens, units = divmod(n, 10)
+    if 2 <= tens <= 9 and units:
+        joiner = "-" if lang == "en" else " "
+        return inv[tens * 10] + joiner + inv[units]
+    return None
+
+
 
 def check_parts(soft: bool) -> int:
     """Every part range the introduction prints against the manifest.
@@ -769,6 +845,13 @@ def check_parts(soft: bool) -> int:
     The ranges are read positionally, in document order, because the part
     names differ between the editions by design and the manifest carries
     both. A missing or extra range is therefore a failure too.
+
+    It checks the PROGRAM COUNT in the same sentence as well, and that half
+    was added after the first half had been green for months over a sentence
+    reading "Nine parts, forty-six programs." The nine was gated; the
+    forty-six was four words away, was wrong by one, and was contradicted
+    four times per edition by Appendix E. Gating one number in a sentence
+    does not gate the sentence.
     """
     import json
     manifest = json.loads((ROOT / "tools" / "programs.json")
@@ -794,9 +877,47 @@ def check_parts(soft: bool) -> int:
                       f"({w[0]}--{w[1]}). The introduction is the book's own "
                       f"map and it prints on page one.")
                 bad += 1
+    # And the count of programs in the same sentence, which is the other half
+    # of the book's own map and was the half nothing read.
+    nprog = len(manifest["programs"])
+    for lang in LANGS:
+        f = ROOT / "frontmatter" / lang / "introduction.tex"
+        if not f.exists():
+            continue
+        src = RE_TEX_COMMENT.sub("", f.read_text(encoding="utf8"))
+        wanted = spell(nprog, lang)
+        if wanted is None:
+            print(f"  {f.relative_to(ROOT)}: the manifest has {nprog} "
+                  f"programs and this check's numeral table stops at 99, so "
+                  f"it cannot say whether the introduction is right. Widen "
+                  f"NUMWORD rather than deleting the check.")
+            bad += 1
+            continue
+        seen = 0
+        for m in RE_COUNTED.finditer(src):
+            words = [w for w in m.groups() if w]
+            got = numword(words, lang)
+            if got is None and len(words) == 2:
+                got = numword(words[1:], lang)
+            if got is None:
+                continue          # "these programs", "Foundation programs"
+            seen += 1
+            if got != nprog:
+                line = src[:m.start()].count("\n") + 1
+                print(f"  {f.relative_to(ROOT)}:{line}: the introduction "
+                      f"counts {got} programs where the manifest has "
+                      f"{nprog} ({wanted}). It is the book's own map and it "
+                      f"prints on page one.")
+                bad += 1
+        if seen == 0:
+            print(f"  {f.relative_to(ROOT)}: prints no count of programs at "
+                  f"all. The map says how many parts there are and must say "
+                  f"how many programs.")
+            bad += 1
+
     if bad == 0:
-        print(f"  {len(want)} part ranges in each introduction, "
-              f"every one matching the manifest.")
+        print(f"  {len(want)} part ranges in each introduction, every one "
+              f"matching the manifest, and both count {nprog} programs.")
     return 0 if (bad == 0 or soft) else 1
 
 
