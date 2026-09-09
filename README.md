@@ -219,6 +219,44 @@ the Mermaid source in place of the figure rather than failing.
 | `make check` | `checklog` + `parity` + `reflist`, without rebuilding |
 | `make debt` | Every outstanding-work ledger |
 
+### The KDP paperback volumes
+
+The book is also published as a series of paperback volumes for Amazon KDP, at
+6 × 9 in and 10pt, black ink on white paper. That path is **additive**: it reads
+`preamble.tex` rather than editing it and compiles in its own staging tree, so
+`make`, `make a4` and `make all-formats` still produce exactly what they produced
+before. The KDP workflow's first job proves it, by building the trade edition on
+the merge base and on HEAD and failing if the page count or the resolved
+cross-reference list moved.
+
+The split lives in `tools/volumes.json` and nowhere else — four volumes, each a
+contiguous run of whole parts — and everything per-volume is generated from it
+into `kdp/generated`, gated by `gen_volumes.py --check` exactly as
+`structure.tex` is gated by `gen_stubs.py --check`.
+
+| Command | Does |
+|---|---|
+| `make kdp` | Every volume, both languages, then the KDP checks |
+| `make kdp-v3` | One volume, both languages |
+| `make kdp-en` / `make kdp-pl` | One language, every volume |
+| `make volumes` | Regenerate the per-volume wiring from the manifests |
+| `make volumes-check` | Fail if it is stale, and run the mutation tests |
+| `make kdp-stage` | The staging tree, with the grayscale diagrams |
+| `make check-kdp` | Trim, page count, colour, fonts and margins |
+| `make kdp-covers` | Spine width and a dimensioned cover template |
+| `make kdp-metadata` | The upload form as JSON, with what is still owed |
+| `make census` | Page count per part, for choosing a split |
+
+Two things are worth knowing before touching it. **10pt is a measurement, not a
+preference**: at 6 × 9 it reproduces the trade format's measure (69.3 characters
+against 70.0) where 11pt misses it by six and produces overfull vboxes up to
+241.8 pt. And **program numbering is positional** — `\mainnumbering` resets the
+chapter counter, so a volume starting at Part IV would call P12 "Program 1"
+unless the generator emits the offset. `notes/09-kdp-volumes.md` records what was
+measured, what was tried and failed, and what is still owed.
+
+---
+
 **Do not check a build with `grep '^!' main.log`.** With `-file-line-error` an
 error line begins with a path, and `-interaction=nonstopmode` writes a PDF over
 the top of it, so both the exit code and the PDF say fine. That is not

@@ -414,7 +414,7 @@ KDP_STAGE := build/kdp/tex
 KDP_VOLS  := $(shell python3 -c "import json;print(' '.join(str(v['n']) for v in json.load(open('tools/volumes.json'))['volumes']))" 2>/dev/null)
 
 .PHONY: kdp kdp-en kdp-pl kdp-stage check-kdp census volumes volumes-check \
-        $(addprefix kdp-v,$(KDP_VOLS))
+        kdp-covers kdp-metadata kdp-clean $(addprefix kdp-v,$(KDP_VOLS))
 
 # Regenerate the per-volume wiring from the two manifests.
 volumes:
@@ -446,8 +446,18 @@ $(addprefix kdp-v,$(KDP_VOLS)): kdp-v%: numbers volumes kdp-stage
 check-kdp:
 	@python3 tools/checkkdp.py --json build/kdp $(KDP_STAGE)/kdp-v*.pdf
 
+kdp-covers:
+	@python3 tools/kdpcover.py --all
+
+kdp-metadata:
+	@python3 tools/kdpmeta.py --all
+
 # The page census the split is chosen from. Builds the whole book in the KDP
 # geometry as ONE document, per part, so a split can be reasoned about before
 # any volume exists.
 census: numbers kdp-stage
 	@python3 tools/kdpcensus.py
+
+kdp-clean:
+	@rm -rf build/kdp kdp/gutter
+	@echo "removed build/kdp and kdp/gutter (kdp/generated is committed)"
