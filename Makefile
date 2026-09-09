@@ -396,3 +396,29 @@ debt:
 	@echo "  stands is the other: the same items serve entry and exit, so the"
 	@echo "  difference between two scores measures memory. Every program has"
 	@echo "  Test exercises."
+
+# ============================================================
+#  KDP paperback volumes
+#  ---------------------------------------------------------
+#  ADDITIVE. Nothing above this line changes, and `all`, `a4` and `all-formats`
+#  still produce exactly what they produced before: the KDP work reads
+#  preamble.tex rather than editing it, and compiles in its own staging tree so
+#  the two cannot share an aux file.
+#
+#  The split lives in tools/volumes.json. The gutter is a function of the page
+#  count and the page count is a function of the gutter, so `kdp` runs
+#  tools/kdpbuild.py, which converges it and stops after three passes rather
+#  than oscillating.
+# ============================================================
+KDP_STAGE := build/kdp/tex
+KDP_VOLS  := $(shell python3 -c "import json;print(' '.join(str(v['n']) for v in json.load(open('tools/volumes.json'))['volumes']))" 2>/dev/null)
+
+.PHONY: volumes volumes-check
+
+# Regenerate the per-volume wiring from the two manifests.
+volumes:
+	@python3 tools/gen_volumes.py
+
+volumes-check:
+	@python3 tools/gen_volumes.py --check
+	@python3 tools/test_gen_volumes.py

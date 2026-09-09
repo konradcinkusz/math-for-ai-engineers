@@ -1,0 +1,110 @@
+{
+  "_comment": [
+    "The volume split, and the ONLY place it is defined. tools/programs.json",
+    "stays the source of truth for parts and programs; this file is a VIEW over",
+    "it -- a list of contiguous whole parts per volume -- never a fork of it.",
+    "",
+    "Nothing measured belongs in this file. Page counts, spine widths and",
+    "printing costs are read from the built PDFs by tools/gen_volumes.py and",
+    "tools/checkkdp.py, because a measurement copied into a manifest is the",
+    "class of claim this repository keeps finding stale.",
+    "",
+    "body_pt is 10 and that is a measurement rather than a preference: at 6x9",
+    "the trade format's measure is reproduced at 10pt (69.3 characters against",
+    "70.0) and missed at 11pt (64.4), the whole book sets SHORTER than the trade",
+    "edition rather than longer, and 11pt produces overfull vboxes up to 241.8pt",
+    "that 10pt does not. The three agree; see docs/kdp.md."
+  ],
+  "body_pt": 10,
+  "trim": { "width_mm": 152.4, "height_mm": 228.6, "name": "6x9" },
+  "paper": { "stock": "white", "thickness_in_per_page": 0.002252 },
+  "margins_mm": { "outer": 16, "top": 18, "bottom": 20, "gutter_safety": 2.0 },
+  "limits": { "max_pages_black_regular": 828, "min_pages": 24 },
+  "_pricing_comment": [
+    "AMAZON'S FIGURES, NOT A MEASUREMENT. These are the EU (EUR) paperback",
+    "black-ink rates and the Spanish book VAT rate as supplied to this project.",
+    "They change, and nothing in this repository can verify them. Re-check them",
+    "against the current KDP rate card before believing any price this pipeline",
+    "prints; every number derived from them is only as good as this block."
+  ],
+  "pricing": {
+    "currency": "EUR",
+    "fixed_cost": 0.75,
+    "per_page_cost": 0.012,
+    "royalty_rate": 0.60,
+    "vat_rate": 0.04
+  },
+  "series": {
+    "en": "Mathematics from Zero for the AI Engineer",
+    "pl": "Matematyka od zera dla inzyniera AI"
+  },
+  "author": "Konrad Cinkusz",
+  "volumes": [
+    {
+      "n": 1,
+      "slug": "foundation",
+      "parts": ["I"],
+      "title":    { "en": "Foundation", "pl": "Podstawy" },
+      "subtitle": { "en": "Arithmetic to the chain rule, assuming nothing",
+                    "pl": "Od arytmetyki do reguly lancuchowej, bez zalozen" },
+      "isbn": { "en": null, "pl": null },
+      "list_price": { "en": null, "pl": null },
+      "keywords": [],
+      "categories": [],
+      "description_html": { "en": null, "pl": null }
+    },
+    {
+      "n": 2,
+      "slug": "number-and-linear-algebra",
+      "parts": ["II", "III"],
+      "title":    { "en": "Number, Precision and Linear Algebra",
+                    "pl": "Liczba, precyzja i algebra liniowa" },
+      "subtitle": { "en": "What a float costs, and what a matrix does",
+                    "pl": "Ile kosztuje liczba zmiennoprzecinkowa i co robi macierz" },
+      "isbn": { "en": null, "pl": null },
+      "list_price": { "en": null, "pl": null },
+      "keywords": [],
+      "categories": [],
+      "description_html": { "en": null, "pl": null }
+    },
+    {
+      "n": 3,
+      "slug": "calculus-and-optimisation",
+      "parts": ["IV", "V", "VI"],
+      "title":    { "en": "Discrete Structures, Calculus and Optimisation",
+                    "pl": "Struktury dyskretne, rachunek rozniczkowy i optymalizacja" },
+      "subtitle": { "en": "Counting, gradients, and why a training run diverges",
+                    "pl": "Zliczanie, gradienty i dlaczego trening rozbiega sie" },
+      "isbn": { "en": null, "pl": null },
+      "list_price": { "en": null, "pl": null },
+      "keywords": [],
+      "categories": [],
+      "description_html": { "en": null, "pl": null }
+    },
+    {
+      "n": 4,
+      "slug": "probability-and-assembly",
+      "parts": ["VII", "VIII", "IX"],
+      "title":    { "en": "Probability, Information and Assembly",
+                    "pl": "Prawdopodobienstwo, informacja i zlozenie" },
+      "subtitle": { "en": "From Bayes to one transformer block, measured",
+                    "pl": "Od Bayesa do jednego bloku transformera, zmierzone" },
+      "isbn": { "en": null, "pl": null },
+      "list_price": { "en": null, "pl": null },
+      "keywords": [],
+      "categories": [],
+      "description_html": { "en": null, "pl": null }
+    }
+  ],
+  "ai_content_disclosure": {
+    "_comment": [
+      "KDP requires this at upload and it is a declaration about AUTHORSHIP with",
+      "terms-of-service consequences. A generator must not default it, so these",
+      "are null until a human sets them; tools/gen_volumes.py reports them as",
+      "blocking rather than emitting a guess."
+    ],
+    "text_ai_generated": null,
+    "translation_ai_generated": null,
+    "images_ai_generated": null
+  }
+}
