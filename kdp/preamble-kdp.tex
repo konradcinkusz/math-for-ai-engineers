@@ -170,6 +170,98 @@
 \apptocmd{\tableofcontents}{\emergencystretch=2em\relax}{}{%
   \PackageWarning{mfakdp}{Could not set emergencystretch for the narrower measure}}
 
+% ---------- A frame opener needs room for what OPENS the frame ---------------
+%  preamble.tex's \begin{fr} turns the page when fewer than
+%  \mfaframeabove+\mfaframebelow+7\baselineskip are left. That seven was swept
+%  against the four existing formats and never against this trim, and at 6 x 9
+%  it admits a page it should not: volume I English stranded frame 4's rule and
+%  margin badge at the foot of PDF page 349 with its body overleaf, and the
+%  badge is the book's navigation device -- standing alone it names nothing.
+%
+%  IT IS NOT A METRICS DIVERGENCE. CI and the bare container report the same
+%  426 pages, the same page 349 and the same three orphaned cues, so this is a
+%  property of the geometry and is fixable here rather than a thing to chase
+%  between two TeX installations.
+%
+%  AND SEVEN LINES IS THE WRONG QUANTITY, not merely too few. The room test
+%  counts LINES; what opens that frame is an unbreakable answer table, which
+%  needs more than its line count suggests. That is exactly the arithmetic
+%  preamble.tex records against \begin{quiz} -- "it reserves 8\baselineskip
+%  while the box under it will not begin on a page that cannot hold 12 lines,
+%  so the guard admits pages on which the box provably cannot start".
+%
+%  Hooked with \BeforeBeginEnvironment rather than \renewenvironment{fr}: the
+%  original test still runs and finds a fresh page, so nothing is duplicated
+%  and this cannot drift from preamble.tex's own definition. \mfaframeabove and
+%  \mfaframebelow are read from there for the same reason.
+%
+%  SWEPT, NOT CHOSEN, and checkpdf.py says why in as many words: a LARGER
+%  number is not a safer one. Turning a page moves every break after it, so
+%  this guard can strand a frame it previously cleared. Volume I English, which
+%  is where the defect was, with \mfasectionreserve at preamble.tex's own 12:
+%
+%      lines | pages | openers | headings | cues | tails
+%        7   |  426  |    1    |    0     |  3   |  10
+%        8   |  426  |    0    |    0     |  3   |  10
+%        9   |  428  |    0    |    2     |  3   |   7
+%       10   |  430  |    0    |    4     |  4   |   9
+%       11   |  432  |    0    |    4     |  3   |   8
+%       12   |  438  |    0    |    4     |  5   |   8
+%
+%  Eight clears it at ZERO cost -- same page count, same cues, same tails -- and
+%  every value above it trades one stranded frame opener for two to four
+%  stranded section HEADINGS while the volume grows twelve pages. The heading
+%  column is the coupling the next comment is about, and it is why this table
+%  has to be read together with that one rather than on its own.
+\newcommand{\mfakdpframelines}{8}
+\makeatletter
+\newcommand{\mfakdp@frameroom}{%
+  \par
+  \ifdim\pagegoal=\maxdimen\else
+    \ifdim\dimexpr\pagegoal-\pagetotal\relax<%
+          \dimexpr\mfaframeabove+\mfaframebelow+\mfakdpframelines\baselineskip\relax
+      \newpage
+    \fi
+  \fi
+}
+%  \BeforeBeginEnvironment IS INSIDE THIS GROUP ON PURPOSE. Outside it, `@' is
+%  not a letter, so \mfakdp@frameroom tokenises as \mfakdp followed by the
+%  characters @frameroom and every \begin{fr} in the book raises
+%  "Undefined control sequence ... \mfakdp @frameroom". This preamble already
+%  warns about that trap twice, on \resultsbody and on \mfa@outframes, and it
+%  was walked into a third time here.
+\BeforeBeginEnvironment{fr}{\mfakdp@frameroom}
+\makeatother
+
+%  AND THE SECTION GUARD HAS TO MOVE WITH IT, which the first sweep could not
+%  see because it measured one volume. preamble.tex reserves
+%  \mfasectionreserve\baselineskip before a numbered heading; raising the FRAME
+%  reservation opens a window in which \section passes its test, prints, and the
+%  \begin{fr} immediately after it then turns the page -- stranding the heading
+%  the section guard exists to protect. At 8 frame lines that cost four stranded
+%  headings across volumes II, III and IV where seven had none. The two
+%  constants are coupled and have to be swept together, so this table was taken
+%  on volume III English WITH the frame reservation already at 8:
+%
+%      reserve | pages | openers | headings
+%        12    |  306  |    0    |    1
+%        13    |  306  |    0    |    0
+%        14    |  308  |    0    |    0
+%        15    |  310  |    0    |    0
+%        16    |  310  |    0    |    0
+%
+%  Thirteen is the cheapest value that clears it: 14 and above clear it too and
+%  each costs pages. Confirmed on all eight interiors at 8 and 13 -- no stranded
+%  opener and no stranded heading anywhere, checklog and checkkdp clean.
+%
+%  AND THE PAGE COST IS NOT MONOTONIC ACROSS VOLUMES, which is the thing to know
+%  before touching either number again: going from 12 to 13 cost volume III
+%  Polish two pages and SAVED volume IV English two. A guard that turns a page
+%  reshuffles every break after it, so a value cheap in one volume is not cheap
+%  in the next, and a sweep on one volume cannot choose for the other seven --
+%  which is exactly how the first sweep here missed four stranded headings.
+\renewcommand{\mfasectionreserve}{13}
+
 % ---------- The back matter's tables have to be able to break ----------------
 %  Every tabularx in appendices D, E and F is \linewidth wide and UNBREAKABLE,
 %  and at 6 x 9 the text block is shorter than the trade format's, so a table

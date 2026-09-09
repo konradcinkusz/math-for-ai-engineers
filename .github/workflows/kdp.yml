@@ -22,9 +22,12 @@ on:
     tags: ['kdp-v*']
   # The regression guard's whole job is to prove the four existing PDFs have
   # not moved, and the moment that claim is made is a pull request -- so it
-  # runs here too. Only the cheap jobs do: the volume matrix is cut to one
-  # volume below, because eight compiles of a book is a release cost and a
-  # smoke test is what a PR needs.
+  # runs here too. How much else runs is DECIDED BY THE DIFF rather than by the
+  # event: `scope' below builds all four volumes when a file every volume reads
+  # has changed and volume III alone otherwise. This comment used to say the
+  # matrix was always cut to one volume, which was true when it was written and
+  # was made false by `scope' in the same commit that added it -- and it is
+  # exactly the arrangement that let a volume I defect through a green PR.
   pull_request:
     paths:
       - 'kdp/**'
@@ -114,7 +117,36 @@ jobs:
 
       - name: Record HEAD's page count and cross-references
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          # apt-get update refreshes EVERY repository the runner image has
+          # configured and fails on any one of them -- and under `bash -e' that
+          # ends the job. This workflow installs from Ubuntu's own archive and
+          # from nothing else, and one of the third-party repositories the image
+          # ships preconfigured, Google's Chrome repo, failed this pull request
+          # mid-publish:
+          #
+          #   E: Failed to fetch .../chrome-stable/.../Packages.gz
+          #      Hash Sum mismatch
+          #      Release file created at:    Wed, 09 Sep 2026 17:16:59 +0000
+          #      Last modification reported: Wed, 09 Sep 2026 09:41:12 +0000
+          #
+          # -- an index and a Release file disagreeing for as long as a publish
+          # takes, on a service this repository does not touch. Every diagram had
+          # already rendered; the job died installing two packages.
+          #
+          # SO LET THE INSTALL DECIDE, which is the question actually being
+          # asked. If the package is obtainable the step proceeds; if it is not,
+          # apt names the PACKAGE it cannot find rather than the index it could
+          # not refresh. `flake' is not a root cause and this is not a retry:
+          # the step no longer fails on a condition that does not stop it doing
+          # its job. The warning keeps a real apt outage visible in the log.
+          #
+          # The same three lines are at the two other apt sites in this file.
+          # build.yml, release.yml and pages.yml carry it too and are NOT
+          # touched here: the first two are on the list this path may not
+          # modify, and the third is outside this change.
+          sudo apt-get update -qq \
+            || echo "::warning::apt-get update failed; the install below decides"
+          sudo apt-get install -y -qq poppler-utils
           mkdir -p /tmp/head
           pdfinfo main-en.pdf | awk '/^Pages/{print $2}' > /tmp/head/pages
           # NOT reflist.py, which stood here and answered a different question.
@@ -188,6 +220,56 @@ jobs:
           echo "The trade edition is unchanged: same page count, same references."
 
   # -------------------------------------------------------------------------
+  # -------------------------------------------------------------------------
+  # WHICH VOLUMES THIS DIFF HAS TO BE PROVED ON.
+  #
+  # A pull request used to build volume III alone, on the argument that eight
+  # compiles of a book is a release cost and a smoke test is what a PR needs.
+  # That argument is right about a change to ONE volume's content and wrong
+  # about a change to what every volume reads -- and the difference cost a red
+  # tag build: kdp/preamble-kdp.tex gained a frame-room guard, the PR proved it
+  # on volume III, and volume I English stranded a frame opener that nobody saw
+  # until `kdp-v1.0.0` built all eight.
+  #
+  # So the rule is the narrow one rather than "always build eight": a diff that
+  # touches a file every volume reads builds every volume, and anything else
+  # keeps the smoke test. The matrix cannot be computed inside `strategy`, so it
+  # is an output here.
+  # -------------------------------------------------------------------------
+  scope:
+    name: Which volumes this diff needs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [regression]
+    outputs:
+      volumes: ${{ steps.pick.outputs.volumes }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - id: pick
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo 'volumes=[1, 2, 3, 4]' >> "$GITHUB_OUTPUT"
+            echo "::notice::$GITHUB_EVENT_NAME builds every volume."
+            exit 0
+          fi
+          BASE=$(git merge-base HEAD "origin/${{ github.event.repository.default_branch }}") \
+            || { echo "::error::cannot find the merge base; refusing to guess one"; exit 1; }
+          # Everything below is read by all eight builds, so a change to it is
+          # only proved by all eight. kdpstage.py and kdpbuild.py are here for
+          # the same reason the preamble is: this pipeline has already shipped
+          # one defect in each of them that volume III did not exhibit.
+          SHARED='^(kdp/preamble-kdp\.tex|kdp/.*\.tex|tools/kdpbuild\.py|tools/kdpstage\.py|tools/gen_volumes\.py|tools/volumes\.json|tools/checkkdp\.py)$'
+          if git diff --name-only "$BASE"...HEAD | grep -qE "$SHARED"; then
+            echo 'volumes=[1, 2, 3, 4]' >> "$GITHUB_OUTPUT"
+            echo "::notice::this diff touches a file every volume reads, so all four are built."
+          else
+            echo 'volumes=[3]' >> "$GITHUB_OUTPUT"
+            echo "::notice::no shared KDP file in this diff; volume III is the smoke test."
+          fi
+
   numbers:
     name: Recompute every number
     runs-on: ubuntu-latest
@@ -275,7 +357,11 @@ jobs:
             diff <(echo "$a") <(echo "$b") || true; exit 1; }
       - name: Convert to DeviceGray for the interior
         run: |
-          sudo apt-get update -qq
+          # Update non-fatal, install decisive -- see the note at the first
+          # apt site in this file. Google's Chrome repo failed this workflow
+          # mid-publish and killed a job that installs from Ubuntu's archive.
+          sudo apt-get update -qq \
+            || echo "::warning::apt-get update failed; the install below decides"
           sudo apt-get install -y -qq ghostscript poppler-utils
           python3 tools/kdpstage.py
       - name: No diagram may survive as colour
@@ -303,21 +389,26 @@ jobs:
     name: Volume ${{ matrix.volume }} (${{ matrix.lang }})
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [numbers, manifest, diagrams-kdp]
+    needs: [scope, numbers, manifest, diagrams-kdp]
     strategy:
       fail-fast: false
       matrix:
         lang: [en, pl]
-        # A pull request builds the smallest volume in both languages -- enough
-        # to catch a broken interior in the two compiles it costs. A tag or a
-        # dispatch builds all four, because that is when a volume is uploaded.
-        volume: ${{ fromJSON(github.event_name == 'pull_request' && '[3]' || '[1, 2, 3, 4]') }}
+        # Decided by the `scope' job above, not here: a diff touching a file
+        # every volume reads builds all four, anything else builds volume III
+        # as a smoke test. `strategy' cannot run a git command, which is why
+        # that decision is a job output.
+        volume: ${{ fromJSON(needs.scope.outputs.volumes) }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with: { python-version: '3.13' }
       - run: |
-          sudo apt-get update -qq
+          # Update non-fatal, install decisive -- see the note at the first
+          # apt site in this file. Google's Chrome repo failed this workflow
+          # mid-publish and killed a job that installs from Ubuntu's archive.
+          sudo apt-get update -qq \
+            || echo "::warning::apt-get update failed; the install below decides"
           sudo apt-get install -y -qq texlive-latex-base texlive-latex-recommended \
             texlive-latex-extra texlive-lang-polish texlive-science latexmk \
             lmodern poppler-utils ghostscript
@@ -411,9 +502,15 @@ jobs:
     name: Collect the uploads
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [build-volume, crossvolume]
+    needs: [scope, build-volume, crossvolume]
+    # Keyed on WHETHER THERE IS A FULL SET TO BUNDLE, not on the event. It used
+    # to read `github.event_name != 'pull_request'`, which was a proxy for the
+    # same thing while a PR could only ever build one volume -- and the proxy
+    # stopped being true the moment `scope` could widen the matrix. Collecting
+    # eight interiors that have already been built and checked is a download and
+    # an upload, so it is worth doing wherever the eight exist.
     if: always() && needs.build-volume.result == 'success'
-        && github.event_name != 'pull_request'
+        && needs.scope.outputs.volumes != '[3]'
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
@@ -424,8 +521,39 @@ jobs:
         run: |
           python3 tools/kdpsummary.py dist >> "$GITHUB_STEP_SUMMARY"
           python3 tools/kdpsummary.py dist
+      # THE NAME HAS TO BE SANITISED, and this job is the first thing in the
+      # workflow ever to need it. On a tag push github.ref_name is `kdp-v1.0.0';
+      # on a pull request it is `236/merge', and actions/upload-artifact rejects
+      # a name containing a forward slash. That is what THIS pull request failed
+      # on, after all eight interiors had built and been checked -- so the defect
+      # was latent from the day the job was written and only surfaced because the
+      # `if' above stopped being event-keyed. A condition that skips a step is
+      # also a condition that never tests it.
+      #
+      # A WHITELIST rather than a case on the event. upload-artifact forbids
+      # " : < > | * ? \r \n \ and /, and git's own ref rules forbid only some of
+      # those -- a quote, a pipe and the angle brackets are all legal in a branch
+      # name -- so a name derived from a ref is not safe by construction and
+      # substituting the slash alone would leave the rest. tr -c keeps
+      # [A-Za-z0-9._-] and replaces everything else, squeezes the runs so
+      # `236/merge' cannot become `236--merge', and trims the ends.
+      #
+      # The tag path is unchanged, which is the point: `kdp-v1.0.0' passes
+      # through byte for byte, so a release's archive keeps the name it had.
+      # github.ref_name goes through env rather than into the script, because a
+      # branch name interpolated into a shell is a branch name that can run one.
+      - id: label
+        env:
+          REF: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          NAME=$(printf '%s' "$REF" | tr -c 'A-Za-z0-9._-' '-' | tr -s '-' \
+                 | sed 's/^-//; s/-$//')
+          [ -n "$NAME" ] || { echo "::error::the ref sanitises to nothing"; exit 1; }
+          echo "name=kdp-release-$NAME" >> "$GITHUB_OUTPUT"
+          echo "::notice::bundling the eight interiors as kdp-release-$NAME"
       - uses: actions/upload-artifact@v4
         with:
-          name: kdp-release-${{ github.ref_name }}
+          name: ${{ steps.label.outputs.name }}
           path: dist
           retention-days: 90
