@@ -29,8 +29,20 @@ they sit at the two ends of a frame.
        above. \\dotline ends `\\par\\vspace{2pt}`, and glue after a paragraph is a
        legal breakpoint; \\nextframe's own leading \\nopagebreak is contributed
        after that glue and so arrives too late to forbid it. The fix is
-       therefore editorial -- shorten the frame so the tail fits -- and NOT a
-       penalty bolted onto \\dotline, which was tried, measured and reverted.
+       therefore editorial, and NOT a penalty bolted onto \\dotline, which was
+       tried, measured and reverted.
+
+       WHICH editorial move is the half people get wrong, so it is stated here
+       rather than only in the pass notes: LENGTHEN the frame, never shorten
+       it. Adding a paragraph carries the question, its dots and the cue over
+       the boundary together; cutting one only pulls the previous frame's
+       material up to fill the gap, so the page stays full and the tail stays
+       exactly where it was. Measured in both directions -- F06 trimmed one
+       frame over two rounds and the cue did not move, and F10 trimmed three
+       frames in both editions, rebuilt all four and got the same three cues on
+       the same three pages, then lengthened the same three and cleared all of
+       them. No recorded lengthening has failed. Both edits go in BOTH
+       editions, or the two stop saying the same thing.
 
     3. STRANDED SECTION HEADING. A numbered section heading is the last thing
        on a page and the section itself begins overleaf.
@@ -489,9 +501,14 @@ def main() -> int:
             print(f"== {path.name} == {len(found)} {name}")
             for d in found:
                 print(f"      PDF page {d[0]}: {detail(d)}")
-            print("      Shorten the frame so its tail fits on one page. Do NOT bolt")
-            print("      a penalty onto \\dotline: that was tried, measured and")
-            print("      reverted, and it moves every later break.")
+            print("      LENGTHEN the frame, in both editions, so that its question,")
+            print("      its dots and the cue cross the boundary together. Shortening")
+            print("      is the move that does NOT work: it pulls the previous frame")
+            print("      up to fill the gap and the tail stays where it was, measured")
+            print("      twice (F06 over two rounds, F10 over three frames and four")
+            print("      builds). Do NOT bolt a penalty onto \\dotline either: that")
+            print("      was tried, measured and reverted, and it moves every later")
+            print("      break.")
             if not fatal:
                 print("      Not failing the build: see the note at the top of this")
                 print("      file for what this count is and is not.")
