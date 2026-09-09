@@ -55,8 +55,12 @@ preface. It is the book this one should cite constantly and never duplicate.
 
 ### 1.2 Goodfellow, Bengio, Courville — *Deep Learning* (MIT, 2016), Part I
 
-**Does well.** Chapter 4, *Numerical Computation*, is the most valuable sixty
-pages in this entire survey and it is the one nobody imitates. Overflow and
+**Does well.** Chapter 4, *Numerical Computation*, is the most valuable chapter
+in this entire survey and it is the one nobody imitates. (It said *sixty pages*
+until September 2026. Nobody on this project counted them and the Sources entry
+for this work is a review, not a page count, so the figure was a remembered
+number — the class this project forbids. Dropped rather than replaced, because
+no one here can check the replacement either.) Overflow and
 underflow, the softmax/log-sum-exp stabilisation, poor conditioning,
 gradient-based optimisation, the Jacobian and Hessian, constrained optimisation.
 It is the only work here that treats the machine as a finite-precision object.
@@ -213,8 +217,9 @@ algebra is introduced as needed, top-down, with additional resources consulted
 only when relevant.
 
 **Where it is right, and this book must concede it.** It is right about
-**entry**. Requiring two years of mathematics before anyone may train a
-classifier has gatekept the field, produced nothing, and is empirically false.
+**entry**. The claim that two years of mathematics must come before anyone may
+train a classifier kept people out of the field, produced nothing, and is
+empirically false. (A *requirement* cannot be false; the claim behind it can.)
 Top-down order is also right: motivation before machinery.
 
 **Where it is incomplete.** The fast.ai claim is about *starting*, not about

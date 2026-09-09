@@ -388,6 +388,22 @@ NOTES.append(f"checkpointing: {LAYERS} layers, optimum every {best_k}, peak "
 NOTES.append("the optimum is sqrt(L) exactly, from d/dk (L/k + k) = 0")
 
 
+def _write_transcript(stem: str, lines: list[str]) -> None:
+    r"""Write one console transcript, asserting the two things the page needs.
+
+    ASCII because `listings` cannot set a character it has no literate mapping
+    for, and 64 characters because that is the measure. Neither is visible to
+    any other gate -- the reasoning is in preamble.tex above \transcript, with
+    the note that breaklines=true means an over-wide line wraps silently rather
+    than overfulling. The HEIGHT is deliberately not asserted: the room test in
+    \transcript handles a tall listing, and F11's sweep is long on purpose.
+    """
+    text = "\n".join(lines) + "\n"
+    assert text.isascii(), f"{stem}: listings cannot set a non-ASCII transcript"
+    assert max(len(l) for l in lines) <= 64, f"{stem}: transcript too wide"
+    (TRANSCRIPTS / f"{stem}.txt").write_text(text, encoding="ascii")
+
+
 def main() -> None:
     TRANSCRIPTS.mkdir(parents=True, exist_ok=True)
     # TWO listings, and the split is the whole point of this pass. The second
@@ -407,8 +423,7 @@ def main() -> None:
         ">>> x.grad",
         f"{z.grad}",
     ]
-    (TRANSCRIPTS / "p16-relu.txt").write_text(
-        "\n".join(relu_lines) + "\n", encoding="utf8")
+    _write_transcript("p16-relu", relu_lines)
 
     inplace_lines = [
         ">>> from p16_autodiff import V, backward",
@@ -419,8 +434,7 @@ def main() -> None:
         ">>> a.grad",
         f"{stale}",
     ]
-    (TRANSCRIPTS / "p16-inplace.txt").write_text(
-        "\n".join(inplace_lines) + "\n", encoding="utf8")
+    _write_transcript("p16-inplace", inplace_lines)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     out_lines = [

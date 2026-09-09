@@ -320,6 +320,22 @@ NOTES.append(f"rescaling one parameter by {SCALES[2]:.0f} multiplies the "
 # not reference is a second copy nobody would correct.
 
 
+def _write_transcript(stem: str, lines: list[str]) -> None:
+    r"""Write one console transcript, asserting the two things the page needs.
+
+    ASCII because `listings` cannot set a character it has no literate mapping
+    for, and 64 characters because that is the measure. Neither is visible to
+    any other gate -- the reasoning is in preamble.tex above \transcript, with
+    the note that breaklines=true means an over-wide line wraps silently rather
+    than overfulling. The HEIGHT is deliberately not asserted: the room test in
+    \transcript handles a tall listing, and F11's sweep is long on purpose.
+    """
+    text = "\n".join(lines) + "\n"
+    assert text.isascii(), f"{stem}: listings cannot set a non-ASCII transcript"
+    assert max(len(l) for l in lines) <= 64, f"{stem}: transcript too wide"
+    (TRANSCRIPTS / f"{stem}.txt").write_text(text, encoding="ascii")
+
+
 def main() -> None:
     TRANSCRIPTS.mkdir(parents=True, exist_ok=True)
     lines = [
@@ -333,8 +349,7 @@ def main() -> None:
         ">>> x",
         f"{_diverge_demo()}",
     ]
-    (TRANSCRIPTS / "p17-too-big.txt").write_text(
-        "\n".join(lines) + "\n", encoding="utf8")
+    _write_transcript("p17-too-big", lines)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     out = [
