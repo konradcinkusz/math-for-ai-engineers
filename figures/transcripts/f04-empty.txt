@@ -1,5 +1,5 @@
 >>> import math
->>> sum([])                 # the loop never runs: total stays as it started
+>>> sum([])        # the loop never runs
 0
->>> math.prod([])           # the same loop, with a different accumulator
+>>> math.prod([])  # the same loop, a different accumulator
 1

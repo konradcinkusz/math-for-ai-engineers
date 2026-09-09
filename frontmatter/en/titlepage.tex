@@ -5,22 +5,18 @@
 {\Huge\bfseries\color{mblue} Mathematics\\[6pt] from Zero\\[6pt] for the AI Engineer}
 
 \vspace{1.0cm}
-{\Large\color{mgrey} Forty-six programs, worked \dash{}\\[4pt]
+{\Large\color{mgrey} \val{appf.programs} programs, worked \dash{}\\[4pt]
 from arithmetic to scaled dot-product attention}
 
 \vspace{2.4cm}
 {\large Konrad Cinkusz}
 
 \vfill
-{\small\color{mgrey}
-Edition \bookedition, \pinnedon.\\[4pt]
-Every number in this book is produced by a script in \texttt{code/}\\[2pt]
-and checked on every build.\\[10pt]
-Also available in Polish as \emph{Matematyka od zera dla inżyniera AI}.\\[10pt]
-Prose: CC BY-NC-SA 4.0 \quad$\cdot$\quad Code: MIT\\[4pt]
-The programmed-learning method is K.~A. Stroud's.\\
-This book is not affiliated with, nor derived from, his.}
+{\small\color{mgrey} Edition \bookedition}
 
 \vspace{1.2cm}
 \end{center}
-\cleardoublepage
+%  \clearpage, not \cleardoublepage: the copyright page is the VERSO of this
+%  one and body.tex \inputs it next. \cleardoublepage would skip that leaf and
+%  cost the book a page.
+\clearpage

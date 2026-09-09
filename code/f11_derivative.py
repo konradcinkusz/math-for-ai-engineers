@@ -288,7 +288,21 @@ def main() -> None:
     out = ["         h            (f(3+h) - f(3)) / h         error"]
     for tag, approx, err in ROWS:
         out.append(f"  {tag:>8}   {approx:>22.12f}   {err:>12.1e}")
-    TRANSCRIPT.write_text("\n".join(out) + "\n", encoding="utf8")
+    # ASCII and the 64-character measure. Nothing else can see either: parity's
+    # C13 scans in-source environments and never opens this file, and mfacode
+    # sets breaklines=true, so an over-wide line wraps into a continuation arrow
+    # rather than overfulling and leaves the log clean.
+    #
+    # THE HEIGHT IS DELIBERATELY NOT ASSERTED, where the other scripts cap it at
+    # fourteen lines "too tall for one frame". This is the tallest listing in the
+    # book at eighteen rows and every one of them is load-bearing: the error
+    # falls, bottoms out and climbs again, and that curve is the whole argument.
+    # A tall listing is handled by the room test in \transcript now, not by a
+    # cap here.
+    _text = "\n".join(out) + "\n"
+    assert _text.isascii(), "transcript must be ASCII: listings cannot set it otherwise"
+    assert max(len(l) for l in out) <= 64, "transcript too wide"
+    TRANSCRIPT.write_text(_text, encoding="ascii")
 
     width = max(len(k) for k in VALUES)
     for k, (body, numeric) in VALUES.items():

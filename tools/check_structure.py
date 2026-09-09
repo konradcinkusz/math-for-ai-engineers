@@ -90,6 +90,9 @@ RE_ANSWERTO = re.compile(r"\\answerto\{")
 RE_VAL = re.compile(r"\\(?:raw)?val\{([^}]+)\}")
 RE_TRANSCRIPT = re.compile(r"\\transcript\{([^}]*)\}")
 RE_MFAVAL = re.compile(r"\\mfaval\{([^}]+)\}")
+# The same declaration read for its VALUE as well as its key, which is what
+# lets a page outside the book be checked against the book's own arithmetic.
+RE_MFAVAL_PAIR = re.compile(r"\\mfaval(?:text)?\{([^}]+)\}\{([^}]*)\}")
 # An exercise item: \item at the top level of one of the three list
 # environments. Counted per environment rather than globally, because the
 # answer key is prefixed by environment.
@@ -752,6 +755,78 @@ def check_index(soft: bool) -> int:
     return 0 if (bad == 0 or soft) else 1
 
 
+# THE README AND THE LANDING PAGE PRINT DIGITS AND NOTHING PUT A SCRIPT
+# BEHIND THEM.
+#
+# `README.md` and `docs/index.html` are the shop window: each argues that
+# every number in this book is computed rather than remembered, and each made
+# that argument with the same five figures typed into a table by hand -- one
+# defect in two artefacts, which is this repository's own recurring finding
+# that fixing an instance is not fixing the class. They were correct when this check was
+# written -- all five re-derived from figures/values/f01.tex -- which is the
+# same standing every fabricated console block in this repository's record had
+# on the day it was written. The book's own numbers are gated by `make verify`;
+# these sat outside every gate the repository has, in the one artefact a reader
+# meets before the book.
+#
+# So a figure on that page carries the key it came from, and this compares the
+# rendered text against what the script now computes. It fires in the direction
+# that actually breaks it -- a value moving under a page nobody edited -- and
+# `make verify` cannot see that, because the values file and its script still
+# agree perfectly.
+#
+# Note the asymmetry in where it runs: build.yml carries `paths-ignore:
+# docs/**`, so a docs-only pull request runs no CI at all, and it is pages.yml
+# -- which has no paths-ignore -- that catches an edit to the page itself
+# before anything is published.
+RE_SITE_VAL = re.compile(r'data-val="([^"]+)"\s*>([^<]*)<')
+
+
+SITE_PAGES = ("docs/index.html", "README.md")
+
+
+def check_site(soft: bool) -> int:
+    computed: dict[str, str] = {}
+    for f in sorted((ROOT / "figures" / "values").glob("*.tex")):
+        for key, value in RE_MFAVAL_PAIR.findall(f.read_text(encoding="utf8")):
+            computed[key] = value
+
+    bad = 0
+    total = 0
+    for rel in SITE_PAGES:
+        page = ROOT / rel
+        if not page.exists():
+            print(f"  {rel} is not there; a page this check is written for "
+                  f"has been renamed or removed.")
+            bad += 1
+            continue
+
+        tagged = RE_SITE_VAL.findall(page.read_text(encoding="utf8"))
+        if not tagged:
+            print(f"  {rel} tags no figure with the value that produced it. "
+                  f"A digit on that page is a claim with no script behind it.")
+            bad += 1
+            continue
+        total += len(tagged)
+
+        for key, shown in tagged:
+            shown = shown.strip()
+            if key not in computed:
+                print(f"  {rel}: data-val=\"{key}\" names no computed value. "
+                      f"Run `make numbers`, or correct the key.")
+                bad += 1
+            elif shown != computed[key]:
+                print(f"  {rel}: {key} is shown as {shown!r} and code/ now "
+                      f"computes {computed[key]!r}.")
+                bad += 1
+
+    if not bad:
+        print(f"  {total} figures across {len(SITE_PAGES)} pages a reader "
+              f"meets before the book, every one the value its script "
+              f"computes.")
+    return 0 if (not bad or soft) else 1
+
+
 RE_PARTRANGE = re.compile(r"\(([FP]\d+)--([FP]\d+)\)")
 
 
@@ -769,6 +844,14 @@ def check_parts(soft: bool) -> int:
     The ranges are read positionally, in document order, because the part
     names differ between the editions by design and the manifest carries
     both. A missing or extra range is therefore a failure too.
+
+    The program count in the same sentence is NOT checked here, and that is
+    a decision rather than an oversight. It used to read "forty-six" against
+    a manifest of forty-seven, and the fix that landed (#224) is the better
+    one: the introduction now prints \val{appf.programs}, computed by
+    code/appf_ledgers.py. A computed value cannot go stale, so a checker
+    reading a spelt numeral would be a second mechanism for one fact -- which
+    is the defect this book keeps recording, not a guard against it.
     """
     import json
     manifest = json.loads((ROOT / "tools" / "programs.json")
@@ -909,6 +992,7 @@ def main() -> int:
     p.add_argument("--results", action="store_true")
     p.add_argument("--terms", action="store_true")
     p.add_argument("--parts", action="store_true")
+    p.add_argument("--site", action="store_true")
     p.add_argument("--rigour", action="store_true")
     p.add_argument("--index", action="store_true")
     p.add_argument("--all", action="store_true")
@@ -917,6 +1001,7 @@ def main() -> int:
     a = p.parse_args()
     if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit,
                 a.scripts, a.results, a.terms, a.parts, a.rigour,
+                a.site,
                 a.index, a.all)):
         a.all = True
     rc = 0
@@ -938,6 +1023,8 @@ def main() -> int:
         rc |= check_terms(a.soft)
     if a.all or a.parts:
         rc |= check_parts(a.soft)
+    if a.all or a.site:
+        rc |= check_site(a.soft)
     if a.all or a.rigour:
         rc |= check_rigour(a.soft)
     if a.all or a.index:

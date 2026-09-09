@@ -3,14 +3,19 @@
 % NIC TUTAJ NIE JEST PISANE Z PAMIĘCI i to ograniczenie ukształtowało ten
 % dodatek bardziej niż cokolwiek innego. Sekcje E.1 i E.2 to przegląd
 % konkurencji z notes/02-grounding-and-traps.md sekcja 1, przeprowadzony przed
-% zaplanowaniem książki, który dla każdego cytatu podaje recenzję -- patrz
-% sekcja Sources w tamtym pliku. Sekcja E.3 to notes/01-curriculum.md sekcja 13.
+% zaplanowaniem książki. Podaje źródła twierdzeń o świecie; jego sekcja Sources
+% nazywa recenzję dla jednego z dwóch niesionych tu cytatów, a dla
+% "encyklopedycznej pozycji referencyjnej" Murphy'ego nie nazywa żadnej, więc
+% dodatek niczego nie obiecuje. Sekcja E.3 to notes/01-curriculum.md sekcja 13.
 %
-% Sekcja E.4 celowo podaje NAZWY BEZ WERDYKTÓW. Repozytorium notuje te tytuły
-% jako wskazówki i nic więcej, więc dopisanie im charakterystyki byłoby jej
-% wymyśleniem -- a to jest dokładnie ta klasa, przed którą książka przestrzega
-% przez czterdzieści siedem programów. Dodatek mówi to wprost, zamiast wypełniać
-% lukę.
+% Sekcja E.4 podaje NAZWY, a nazwa jest tam werdyktem tylko tam, gdzie E.1 już
+% go wydała -- Strang, Deisenroth/Faisal/Ong, Goodfellow/Bengio/Courville,
+% Murphy i Bishop powtarzają się w obu. TO POKRYCIE JEST POWODEM BRZMIENIA
+% RAMKI OSTRZEŻENIA: mówiła kiedyś wprost, że poniższa lista nie została
+% przeczytana i porównana, co jej własne nazwy fałszowały. Podawaj regułę,
+% nigdy zliczenia. Dla reszty repozytorium notuje tytuł i nic więcej, więc
+% dopisanie charakterystyki byłoby jej wymyśleniem -- a to jest dokładnie ta
+% klasa, przed którą książka przestrzega przez czterdzieści siedem programów.
 %
 % Każde twierdzenie o PROGRAMIE zostało tu sprawdzone w napisanym programie,
 % zanim trafiło na stronę -- to dyscyplina wypracowana w passie Dodatku D.
@@ -26,10 +31,27 @@
 % umie przeczytać, to czy nazwany cel zawiera dowód; pięć wierszy mówi "nie
 % zbadane" właśnie dlatego, że nikt tej lektury nie odbył.
 %
-% WCIĄŻ NIEZAŁATWIONE: nic w książce nie odwołuje się do tego dodatku. Nigdzie
-% w programs/ nie ma \ref{app:E}, więc czytelnik stojący przy ramce rygoru nie
-% ma jak się dowiedzieć, że sekcja E.5 istnieje. Domknięcie tego wymaga edycji
-% każdego odkładającego programu i jest passem samym w sobie.
+% WCIĄŻ NIEZAŁATWIONE, ALE WĘŻSZE NIŻ BYŁO: nigdzie w programs/ nadal nie ma
+% \ref{app:E}, więc czytelnik stojący przy ramce rygoru nie ma jak się
+% dowiedzieć, że sekcja E.5 istnieje. Domknięcie tego wymaga edycji każdego
+% odkładającego programu i jest passem samym w sobie. Przestało być prawdą, że
+% NIC nie odwołuje się do dodatku: ramka twierdzeń we frontmatter/*/how-to-use
+% .tex wskazuje teraz sekcję E.6 i jest to jedyna droga do tego dodatku.
+%
+% SEKCJA E.6 JEST LISTĄ, A NIE TABELĄ, celowo, i nie wolno jej w tabelę
+% przerobić. Blok center+tabularx nie łamie się przez stronę, a ten dodatek
+% wyprodukował już z tego największy overfull vbox w książce -- 284 pt, z
+% tabeli wykluczeń w sekcji E.3. Decyduje liczba wierszy razy ich wysokość, a
+% cytowanie to trzy złożone linie tam, gdzie wiersze E.5 mają jedną, więc
+% sześć z nich daje mniej więcej tę wysokość, która się przelała. reslist to
+% itemize, więc się łamie; klasa znika, a nie staje się mniej prawdopodobna,
+% na obu instalacjach i przy każdym położeniu na stronie.
+%
+% To jest książkowa lista materiału źródłowego \dash{} Dodatek C odtwarza
+% przez nią każdy \result{} \dash{} a uzasadnienie jej wyrównania do lewej,
+% napisane w preambule obok niej, dotyczy materiału źródłowego w ogóle. Użycie
+% jej tutaj wiąże tę sekcję z tamtą: zmiana stylu reslist dla Dodatku C zmieni
+% też to, o czym warto wiedzieć, zanim ktoś to zrobi.
 %
 % A OŚWIADCZENIE O ZAKRESIE MA DWA ŹRÓDŁA, nie jedno. Dwie pierwsze tabele
 % sekcji E.3 to notes/01-curriculum.md sekcja 13; trzecia tabela i cztery
@@ -49,17 +71,19 @@ a nie ukryta.
 
 Sekcje~\ref{sec:E-survey} i~\ref{sec:E-positions} podają werdykt o każdej
 pozycji, bo te prace zostały przeczytane i porównane, zanim książka powstała:
-przegląd, z którego pochodzą, istnieje po to, by odpowiedzieć, \emph{co już
-istnieje i co każda z tych prac robi dobrze, a co źle dla tego czytelnika},
-i dla każdego cytatu podaje opublikowaną recenzję.
+przegląd, z którego pochodzą, istnieje po to, by odpowiedzieć na dwa pytania
+\dash{} \emph{co już istnieje}, oraz \emph{co każda z tych prac robi dobrze,
+a co źle dla tego czytelnika?} Tam, gdzie cytat nie jest tu przypisany do
+nazwanej recenzji, jest tak dlatego, że zapis, z którego pochodzi, żadnej nie
+nazywa.
 Sekcja~\ref{sec:E-not} mówi, czego ta książka nie uczy, dlaczego i gdzie dany
 temat jest zrobiony porządnie.
 
-Sekcja~\ref{sec:E-depth} to lista nazw bez werdyktów i mówi o tym wprost. Ta
-książka nie sprawdziła tamtych prac tak, jak sprawdziła pierwszą połowę, a
-jednozdaniowa charakterystyka wymyślona po to, by wypełnić kolumnę, byłaby
-dokładnie tym, o czym czterdzieści siedem programów prosi cię, byś tego nie
-przyjmował.
+Sekcja~\ref{sec:E-depth} to lista nazw i mówi, które z nich mają werdykt.
+Część to prace, które Sekcja~\ref{sec:E-survey} już oceniła, i tamta ocena
+zostaje; reszty ta książka nie sprawdziła tak samo, a jednozdaniowa
+charakterystyka wymyślona po to, by wypełnić lukę, byłaby dokładnie tym,
+o czym czterdzieści siedem programów prosi cię, byś tego nie przyjmował.
 
 Nie ma tu adresów WWW. Tytuł i nazwisko przeżyją każdy URL.
 
@@ -101,7 +125,7 @@ nie jest drogą od zera.
 \medskip
 \textbf{Goodfellow, Bengio i Courville, \emph{Deep Learning}, część~I.}
 \textbf{Robi dobrze:} rozdział 4, \emph{Numerical Computation}, to
-najwartościowsze sześćdziesiąt stron w całym tym przeglądzie i jedyne, których
+najwartościowszy rozdział w całym tym przeglądzie i jedyny, którego
 nikt nie naśladuje \dash{} nadmiar i niedomiar, stabilizacja log-sum-exp,
 uwarunkowanie, jakobian i hesjan. To jedyna praca tutaj, która traktuje maszynę
 jako obiekt o skończonej precyzji. \textbf{Robi źle:} część~I jest
@@ -118,7 +142,7 @@ książki, a ta książka schodzi o rząd wielkości głębiej i z liczbami.
 \textbf{Robi dobrze:} Strang jest najlepszym żyjącym wykładowcą algebry
 liniowej, a to jest miejsce, w którym łączy cztery podprzestrzenie, SVD i
 przybliżenie niskiego rzędu z danymi. Ustawienie SVD w środku ciężkości jest
-dokładnie słuszne i to ta książka wprowadziła takie ujęcie do głównego nurtu.
+dokładnie słuszne.
 \textbf{Robi źle:} recenzenci nie owijają w bawełnę \dash{} recenzja MAA pisze,
 że autor próbował wtłoczyć zdecydowanie za dużo materiału w 432 strony, więc
 każdy temat dostaje bardzo szybkie ujęcie, a wyniki bywają podane bez dowodu i
@@ -128,7 +152,8 @@ bez cytowania. Zakłada też ukończony pierwszy kurs; to kurs drugi.
 \medskip
 \textbf{Boyd i Vandenberghe, \emph{Introduction to Applied Linear Algebra}.}
 \textbf{Robi dobrze:} najlepiej zaprojektowany podręcznik stosowanej algebry
-liniowej i temperamentem najbliższy tej książce. Jest agresywnie wąski \dash{}
+liniowej w tym przeglądzie i temperamentem najbliższy tej książce. Jest
+agresywnie wąski \dash{}
 zbudowany na liniowej niezależności i faktoryzacji QR i prawie na niczym innym
 \dash{} i dowodzi, że książka może pominąć większość swojego przedmiotu i być
 przez to lepsza. Darmowy PDF, z materiałami w Pythonie i Julii.
@@ -163,13 +188,14 @@ podłogi. \textbf{Werdykt:} cel, a nie droga \dash{} a warunkiem powodzenia tej
 książki jest to, że możesz ją teraz otworzyć.
 
 \medskip
-\textbf{Murphy, \emph{Probabilistic Machine Learning}.}
+\textbf{Murphy, \emph{Probabilistic Machine Learning} \dash{} wprowadzenie
+z 2022 roku i tom zaawansowany z 2023.}
 \textbf{Robi dobrze:} najpełniejsze i najbardziej aktualne pojedyncze ujęcie,
 spięte modelowaniem probabilistycznym, z dobrą sekcją o tle matematycznym i
 otwartym kodem. \textbf{Robi źle:} poziom magisterski wprost z własnej
 deklaracji, z założeniem rachunku różniczkowego, statystyki i algebry liniowej;
 opis recenzenta, że to encyklopedyczna pozycja referencyjna, jest zarazem
-pochwałą i problemem, przy ponad tysiącu stron.
+pochwałą i problemem, przy ponad tysiącu stron w obu tomach razem.
 \textbf{Werdykt:} pozycja referencyjna, do której kierować się tematami, kiedy
 już umiesz ją czytać.
 
@@ -190,8 +216,9 @@ przekłada z postaci twierdzenie\dash{}dowód na coś, na czym można działać.
 
 \medskip
 \textbf{3Blue1Brown.} \emph{Essence of Linear Algebra} i \emph{Essence of
-Calculus} robią coś, czego nie robi żadna książka: sprawiają, że geometryczna
-treść wyznacznika albo pochodnej staje się widoczna w kilka sekund.
+Calculus} robią coś, czego nie robią tutejsze książki: sprawiają, że
+geometryczna treść wyznacznika albo pochodnej staje się widoczna w kilka
+sekund.
 
 A najmocniejszy argument za czytaniem książki takiej jak ta stawia ich autor.
 Sanderson mówił publicznie, że obawia się, iż jego praca jest intelektualnym
@@ -208,8 +235,9 @@ obrazu, przerób program dla zapamiętania.
 \medskip
 \textbf{fast.ai i stanowisko, że matematyki potrzeba mniej, niż ci się
 wydaje.} Ma rację co do \emph{wejścia} i ta książka przyznaje to bez
-zastrzeżeń: wymaganie dwóch lat matematyki, zanim ktokolwiek wytrenuje
-klasyfikator, zamykało pole, nie dało nic i jest empirycznie fałszywe.
+zastrzeżeń: twierdzenie, że dwa lata matematyki muszą poprzedzić wytrenowanie
+klasyfikatora, odcinało ludzi od tej dziedziny, nie dało nic i jest empirycznie
+fałszywe.
 
 To stanowisko odpowiada na pytanie, \emph{czy mogę coś wdrożyć?} Nie odpowiada,
 dlaczego strata poszła w \code{nan} na kroku cztery tysiące i tylko w połowicznej
@@ -260,7 +288,7 @@ Stochastycznych równań różniczkowych, a więc i pełnej matematyki modeli
   dyfuzyjnych & Książka daje rozkład Gaussa i fakt, że wariancje niezależnych
   wielkości się dodają, co jest całym łańcuchem Gaussów w czasie dyskretnym, i
   nigdy tego do niego nie stosuje & Särkkä i Solin \\
-Analizy zespolonej i transformaty Fouriera poza wzmianką &
+Analizy zespolonej i transformaty Fouriera, o której ta książka nie wspomina &
   Program~\ref{prog:F08} daje okrąg jednostkowy; twierdzenia o splocie to
   osobna książka & Bracewell \\
 \bottomrule
@@ -292,7 +320,8 @@ Teorii uczenia ze wzmocnieniem i wyników o zbieżności & Programy~\ref{prog:P2
   i~\ref{prog:P22} dają estymatory gradientu i ograniczenie KL, czyli to, czym
   inżynier faktycznie manipuluje & Sutton i Barto \\
 Teorii kategorii, geometrii różniczkowej, rozmaitości & Czasem przywoływane w
-  pracach o interpretowalności; nie są nośne dla tej roboty & Lee \\
+  pracach o interpretowalności; nie są nośne dla tej roboty, a na teorię
+  kategorii nie przejrzano tu żadnego źródła & Lee, na geometrię \\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -366,12 +395,14 @@ da się tej granicy bronić i za kilka lat może się nie dać.
 \index{further reading!working depth}
 
 \begin{warning}
-\textbf{To są nazwy, nie werdykty, i ta różnica jest celowa.}
-Sekcja~\ref{sec:E-survey} mówi, co każda praca robi dobrze, a co źle, bo tamte
-prace zostały przeczytane i porównane ze sobą, zanim ta książka powstała.
-Poniższa lista nie została. Dopisanie jej charakterystyki mimo to jest dokładnie
+\textbf{To są nazwy, a nazwa jest tu werdyktem tylko tam, gdzie
+Sekcja~\ref{sec:E-survey} już go wydała.} Tamta sekcja mówi, co każda praca
+robi dobrze, a co źle, bo tamte prace zostały przeczytane i porównane ze sobą,
+zanim ta książka powstała. Tam, gdzie nazwa z poniższej listy pojawia się i
+tam, jej werdykt zostaje, a ta sekcja nic do niego nie dodaje. Reszta nie
+została przeczytana i porównana, a wymyślanie im charakterystyki jest dokładnie
 tym ruchem, o którego odrzucenie ta książka prosi przez czterdzieści siedem
-programów, więc dalej jest wskazówka i nic więcej.
+programów \dash{} więc dla nich dalej jest wskazówka i nic więcej.
 \end{warning}
 
 \medskip
@@ -390,6 +421,15 @@ aktualizacji, które wyprowadza Program~\ref{prog:P20} \dash{} Nocedal i Wright.
 
 A na uczenie maszynowe, które to wszystko konsumuje: Goodfellow, Bengio i
 Courville na obraz z 2016 roku, Murphy i Bishop na obecny.
+
+\medskip
+I jedna luka jest tu warta nazwania, zamiast zostawiania jej do odkrycia.
+Część~II schodzi o rząd wielkości głębiej niż jedyny rozdział, jaki ten
+przegląd znalazł na ten temat, a na samą arytmetykę zmiennoprzecinkową nie
+przejrzano tu żadnego źródła, więc ta sekcja nie ma na nią wskazówki.
+Sekcja~\ref{sec:E-not} kieruje do Trefethena i Baua
+oraz do Highama na numeryczną algebrę liniową, czyli na temat sąsiedni,
+a nie ten.
 
 \section{Dokąd prowadzi każde niedowiedzione zdanie}
 \label{sec:E-route}
@@ -491,6 +531,103 @@ mówi wprost, że pisać go nie będziesz musiał, więc podręcznik pisania dow
 jest jedynym celem, do którego odmawia cię odesłać.
 
 \medskip
-To ostatnie zdanie jest sensem całego dodatku. Ta książka nie uczy żadnego z
-tych tematów tak głęboko jak jej własne źródła i nigdy nie miała. To, co
+To ostatnie zdanie jest sensem wszystkiego powyżej. Ta książka nie uczy żadnego
+z tych tematów tak głęboko jak jej własne źródła i nigdy nie miała. To, co
 twierdzi, jest węższe i sprawdzalne: że możesz je teraz otworzyć.
+
+\section{Skąd wzięło się każde przypisane twierdzenie}
+\label{sec:E-sources}
+\index{dalsza lektura!źródła}
+\index{źródła!dla przypisanych twierdzeń}
+
+\textbf{Ta sekcja robi co innego niż reszta dodatku i właśnie dlatego są
+rozdzielone.} Wszystko powyżej poleca: mówi, dokąd pójść dalej, i o każdym celu
+wydaje sąd. Ta sekcja przypisuje: nazywa pracę stojącą za każdym twierdzeniem,
+jakie ta książka wypowiada o cudzym wyniku, żeby czytelnik chcący je sprawdzić
+mógł to zrobić. Praca, do której cię odsyłamy, i praca, na której opiera się
+zdanie, to nie to samo, a wpis tutaj nie jest ani rekomendacją, ani
+przestrogą.
+
+\begin{note}
+\textbf{Tom i zakres stron, bez numerów zeszytów.} Numer zeszytu to jeszcze
+jedno miejsce, w którym chowa się błąd przepisania, i nic nie daje: czasopismo,
+tom i zakres stron lokalizują artykuł w każdym indeksie na świecie. Nie ma tu nic, czego nie sprawdzono w
+zapisie samego czasopisma, co jest regułą, na której stoi reszta tej książki, i
+powodem, dla którego lista jest krótka. Nie ma adresów sieciowych, z powodu,
+który ten dodatek już podaje; tam, gdzie praca nie ukazała się poza serwerem
+preprintów, podany jest jej identyfikator, który jest numerem dokumentu, a nie
+adresem.
+\end{note}
+
+\medskip
+Najpierw dowody na samą metodę. To jest argument, jaki \emph{Jak korzystać z
+tej książki} wytacza za formatem, przez który cię przeprowadza, i jedyne
+miejsce, w którym czytelnik chcący sprawdzić rację bytu tej książki musi w tym
+celu z niej wyjść.
+
+\begin{reslist}
+\item K. A. Stroud, \emph{Engineering Mathematics: Programmes and Problems},
+  Macmillan, 1970 \dash{} sam format.
+\item C. C. Kulik, B. J. Schwalb i J. A. Kulik, \enquote{Programmed
+  Instruction in Secondary Education: A Meta-Analysis of Evaluation Findings},
+  \emph{Journal of Educational Research}, 75, 133--138, 1982 \dash{} argument
+  przeciw niemu.
+\item H. L. Roediger i J. D. Karpicke, \enquote{Test-Enhanced Learning:
+  Taking Memory Tests Improves Long-Term Retention}, \emph{Psychological
+  Science}, 17, 249--255, 2006 \dash{} przypominanie z pamięci i odstępy, po
+  których przewaga się pojawia.
+\item N. Kornell, M. J. Hays i R. A. Bjork, \enquote{Unsuccessful Retrieval
+  Attempts Enhance Subsequent Learning}, \emph{Journal of Experimental
+  Psychology: Learning, Memory, and Cognition}, 35, 989--998, 2009 \dash{}
+  generowanie błędu.
+\item B. Butterfield i J. Metcalfe, \enquote{Errors Committed with High
+  Confidence Are Hypercorrected}, \emph{Journal of Experimental Psychology:
+  Learning, Memory, and Cognition}, 27, 1491--1494, 2001 \dash{} dlaczego
+  korzyść jest największa, gdy uczący się był pewny swego.
+\item J. D. Karpicke, A. C. Butler i H. L. Roediger, \enquote{Metacognitive
+  Strategies in Student Learning: Do Students Practise Retrieval When They
+  Study on Their Own?}, \emph{Memory}, 17, 471--479, 2009 \dash{} dlaczego
+  metoda, która uczy więcej, wydaje się gorsza.
+\end{reslist}
+
+\medskip
+Potem wyniki, które nazywają programy. Każdy z nich to miejsce, w którym
+program mówi, czyja praca dała pewną linijkę, i do tej pory mówił to nazwiskiem
+bez tytułu.
+
+\begin{reslist}
+\item C. Eckart i G. Young, \enquote{The Approximation of One Matrix by
+  Another of Lower Rank}, \emph{Psychometrika}, 1, 211--218, 1936 \dash{}
+  Program~\ref{prog:P11}.
+\item B. Efron, \enquote{Bootstrap Methods: Another Look at the Jackknife},
+  \emph{The Annals of Statistics}, 7, 1--26, 1979 \dash{}
+  Program~\ref{prog:P27}.
+\item D. P. Kingma i J. Ba, \enquote{Adam: A Method for Stochastic
+  Optimization}, \emph{International Conference on Learning Representations},
+  2015 \dash{} Program~\ref{prog:F02}.
+\item J. L. Ba, J. R. Kiros i G. E. Hinton, \enquote{Layer Normalization},
+  arXiv:1607.06450, 2016 \dash{} Program~\ref{prog:F02}.
+\item A. Vaswani et al., \enquote{Attention Is All You Need}, \emph{Advances
+  in Neural Information Processing Systems}, 30, 5998--6008, 2017 \dash{}
+  Programy~\ref{prog:F02} i~\ref{prog:F08}.
+\item K. He, X. Zhang, S. Ren i J. Sun, \enquote{Delving Deep into
+  Rectifiers: Surpassing Human-Level Performance on ImageNet Classification},
+  \emph{IEEE International Conference on Computer Vision}, 1026--1034, 2015
+  \dash{} Program~\ref{prog:P25}.
+\end{reslist}
+
+\medskip
+\textbf{A jedno twierdzenie ze wstępu nie ma tu źródła.} To, że małe kroki i
+liniowa sekwencja okazały się nieistotne, a natychmiastowe wzmocnienie
+niekluczowe, jest twierdzeniem o mechanizmie formatu, a nie o jego wynikach, i
+metaanaliza powyżej go nie niesie. Nie zbadano dla niego żadnego źródła, więc
+żadnego się nie nazywa: podstawienie pracy, która mogłaby je zawierać, byłoby
+tym ruchem, którego czterdzieści siedem programów kazało ci odmawiać. To samo
+traktowanie dostają powyższe wiersze oznaczone \emph{nie zbadane}, i z tego
+samego powodu.
+
+\medskip
+Wpis tutaj nie jest rekomendacją lektury i jego obecność nie mówi nic o tym,
+czy praca jest warta twojego wieczoru. Mówi coś węższego i jest to jedyne, co
+ten dodatek kiedykolwiek twierdził: że zdanie, które się na nim opiera,
+zostało z nim zestawione i że teraz możesz zrobić to samo.

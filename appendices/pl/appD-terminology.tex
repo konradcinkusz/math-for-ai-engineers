@@ -10,23 +10,29 @@
 % Argumenty 1 i 2 są identyczne w obu wydaniach: hasłem jest termin angielski,
 % bo to jego czytelnik będzie szukał. Tłumaczona jest wyłącznie notatka.
 %
-% Tabela w sekcji D.1 NIE jest bramkowana i jest pisana ręcznie celowo. Obie
-% jej kolumny to dosłowny tekst, bo wpisanie tam makra kontraktu wypisałoby
-% formę bieżącego wydania w OBU kolumnach i nie powiedziałoby niczego -- a poza
-% tym C10 zakazuje \tan, \cot, \arctan, \gcd i \operatorname{lcm} wprost i
-% słusznie, bo proza nigdy nie może zaszywać formy, którą drugie wydanie składa
-% inaczej. Parytet C3 pilnuje, by oba pliki językowe definiowały ten sam ZBIÓR
-% makr; nic nie sprawdza, czy ta tabela opisuje je poprawnie. Czytaj ją więc
+% Tabela w sekcji D.1 NIE jest bramkowana i jest pisana ręcznie celowo. Dwie
+% jej pierwsze kolumny to dosłowny tekst, bo wpisanie tam makra kontraktu
+% wypisałoby formę bieżącego wydania w OBU kolumnach i nie powiedziałoby
+% niczego -- a poza tym C10 zakazuje \tan, \cot, \arctan, \gcd i
+% \operatorname{lcm} wprost i słusznie, bo proza nigdy nie może zaszywać formy,
+% którą drugie wydanie składa inaczej. Parytet C3 pilnuje, by oba pliki
+% językowe definiowały ten sam ZBIÓR makr; nic nie sprawdza, czy ta tabela
+% opisuje je poprawnie. Czytaj ją więc
 % razem z lang/en.tex i lang/pl.tex, ilekroć któryś się zmieni.
 
 \chapter{Słownik terminów}
 \label{app:D}
 
 \noindent
-Dwa języki, jedna książka i jedna strona, na której spisano wybory. Ten dodatek
+Dwa języki, jedna książka i jedno miejsce, w którym spisano wybory. Ten dodatek
 jest dla czytelnika obu wydań: polskiego, który musi wiedzieć, za jakie
 angielskie słowo stoi dany polski termin, i angielskiego, który może czytać
 polski artykuł albo siedzieć na polskim przeglądzie projektu.
+
+Tabele mają wszędzie hasła angielskie i jest to decyzja, a nie przeoczenie: to
+terminu angielskiego czytelnik będzie szukał, to jego przeczyta w artykule i
+zobaczy w API, więc to on jest hasłem, które się nie rusza. Polski czytelnik
+szukający terminu czyta więc kolumnę środkową, a nie pierwszą.
 
 Mówi też, gdzie wydanie polskie \emph{nie} ustaliło jednego słowa. To trudniejsza
 połowa i jest tutaj, a nie sprzątnięta pod dywan, bo czytelnik, który napotyka
@@ -50,9 +56,9 @@ zdefiniowane w jednym pliku językowym i nie w drugim to niezdefiniowana
 sekwencja sterująca w dokładnie jednej z dwóch kompilacji, i dlatego ta para
 jest bramkowana.
 
-Obie kolumny są złożone jako dosłowny tekst i jest to celowe. Wpisanie tu makra
-kontraktu wypisałoby formę bieżącego wydania w obu kolumnach i nie powiedziałoby
-niczego.
+Dwie pierwsze kolumny są złożone jako dosłowny tekst i jest to celowe.
+Wpisanie tu makra kontraktu wypisałoby formę bieżącego wydania w obu kolumnach
+i nie powiedziałoby niczego.
 
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}llX@{}}
@@ -76,7 +82,16 @@ I kilka, których celowo \emph{nie} ma na tej liście, bo oba wydania składają
 tak samo. $\Prob$, $\Ex$, $\Var$ i $\Cov$ pisze się tak, jak pisze się je po
 angielsku, a przedział $\intcc{a}{b}$ zachowuje nawiasy kwadratowe w obu.
 Wariancja i przedział to te dwa, które najpewniej zaskoczą polskiego
-czytelnika, i oba wracają w sekcji~\ref{sec:D-unsettled}.
+czytelnika: wariancja wraca w sekcji~\ref{sec:D-boxes}, a przedział
+w sekcji~\ref{sec:D-unsettled}.
+
+Ta tabela to symbole. Interpunkcja rozchodzi się tak samo, tym samym
+mechanizmem, i jest tu nazwana, a nie stabelaryzowana:
+\code{\textbackslash dash} składa w wydaniu angielskim pauzę, a w tym
+półpauzę, a \code{\textbackslash enquote} składa cudzysłowy tego wydania,
+które akurat jest budowane. Oba są makrami w tych samych dwóch plikach
+językowych i z tego samego powodu \dash{} konwencji typograficznej nie da się
+wymagać od tłumacza przez całą książkę.
 
 \section{Gdzie książka zatrzymuje się, by powiedzieć, że symbol znaczy co innego}
 \label{sec:D-boxes}
@@ -90,11 +105,11 @@ znaczy kolizję, w którą ktoś już wszedł.
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}lX@{}}
 \toprule
-\textbf{gdzie} & \textbf{co rozstrzyga} \\
+\textbf{program} & \textbf{co rozstrzyga} \\
 \midrule
 \ref{prog:F02} & litera jest nazwą, a nie zagadką \\
 \ref{prog:F03} & nigdy goły logarytm, i dlaczego zakaz ma wyjątki \\
-\ref{prog:F04} & jedno angielskie słowo w dwóch rolach \\
+\ref{prog:F04} & \emph{index} w dwóch rolach: wykładnik i indeks dolny \\
 \ref{prog:P01} & mantysa, i co to słowo ze sobą niesie \\
 \ref{prog:P03} & logarytm bez podstawy, wewnątrz $O$ \\
 \ref{prog:P12} & symbol Newtona, czytany na dwa sposoby \\
@@ -124,8 +139,9 @@ z zapisów nie zostaje sam.
 Hasłem jest termin angielski, bo to jego czytelnik będzie szukał, czytał w
 artykule i widział w API. Tam, gdzie polska forma jest w realnym użyciu, wydanie
 polskie jej używa. Tam, gdzie żadnej nie ma, wydanie polskie zostawia słowo
-angielskie i odmienia je po polsku \dash{} \emph{embeddingów},
-\emph{tokenizator}, \emph{benchmarku} \dash{} bo tak mówią polscy inżynierowie,
+angielskie i odmienia je po polsku \dash{} \emph{tokenizator},
+\emph{benchmarku}, \emph{hiperparametr} \dash{} bo tak mówią polscy
+inżynierowie,
 a kalka wymyślona przez tłumacza jest gorsza niż zapożyczenie, którego wszyscy
 już używają.
 
@@ -149,7 +165,8 @@ Trzy tabele to ta reguła, posortowana. Te wydanie polskie tłumaczy.
 \plterm{feature}{cecha}{Ustalone i używane wszędzie.}
 \plterm{gradient descent}{spadek gradientu}{Ustalone. Książka pisze i
   \emph{spadek gradientu}, i \emph{spadek gradientowy}, co jest jedną nazwą
-  w dwóch formach gramatycznych, a nie dwoma słowami.}
+  w dwóch formach gramatycznych, a nie dwoma słowami \dash{} i dlatego jest
+  tutaj, a nie w sekcji~\ref{sec:D-unsettled}.}
 \plterm{layer}{warstwa}{Ustalone.}
 \plterm{loss}{strata}{Ustalone. \emph{Funkcja straty} na funkcję.}
 \plterm{optimiser}{optymalizator}{Ustalone.}
@@ -232,9 +249,9 @@ znaczenie, gdzieś w książce się pomyli.
 \label{sec:D-unsettled}
 \index{terminology!unsettled}
 
-Terminy poniżej są w wydaniu polskim oddawane więcej niż jednym słowem. Są
-wypisane, a nie po cichu rozstrzygnięte, bo czytelnik, który napotyka drugie
-słowo, musi wiedzieć, że to pierwsze.
+Terminy poniżej są w wydaniu polskim oddawane więcej niż jednym
+\emph{słowem}. Są wypisane, a nie po cichu rozstrzygnięte, bo czytelnik, który
+napotyka drugie słowo, musi wiedzieć, że to pierwsze.
 
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}llX@{}}
@@ -254,8 +271,8 @@ słowo, musi wiedzieć, że to pierwsze.
   rzeczownik poszedł za nim. \emph{Embedding} to termin, który polski inżynier
   wpisze w wyszukiwarkę.}
 \plterm{learning rate}{współczynnik uczenia, krok uczenia}{Obie formy są w
-  realnym użyciu. \emph{Krok} to \emph{step}, czyli dokładnie to, co ten
-  współczynnik mnoży.}
+  realnym użyciu. \emph{Krok} to \emph{step}, czyli to, co ten współczynnik
+  daje, a nie to, co mnoży: mnoży gradient, a krok jest wynikiem.}
 \bottomrule
 \end{tabularx}
 \end{center}

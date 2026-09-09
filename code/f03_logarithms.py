@@ -588,6 +588,11 @@ OUT = Path(__file__).resolve().parent.parent / "figures" / "values" / "f03.tex"
 def main() -> None:
     assert TRANSCRIPT_TEXT.isascii(), "transcript must be ASCII: listings cannot set it otherwise"
     assert len(TRANSCRIPT_TEXT.strip().splitlines()) <= 14, "transcript too tall for one frame"
+    # The measure, and this listing sits ON the guard at 64 rather than under
+    # it -- it is the widest in the book. mfacode sets breaklines=true, so an
+    # over-wide line wraps into a continuation arrow instead of overfulling and
+    # the log says nothing; this assertion is the only instrument for it.
+    assert max(len(l) for l in TRANSCRIPT_TEXT.splitlines()) <= 64, "transcript too wide"
     TRANSCRIPT.parent.mkdir(parents=True, exist_ok=True)
     TRANSCRIPT.write_text(TRANSCRIPT_TEXT, encoding="ascii")
 

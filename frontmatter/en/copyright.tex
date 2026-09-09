@@ -1,0 +1,58 @@
+%% copyright \dash{} the verso of the title page.
+%%
+%% It sits on page ii, which \cleardoublepage was already leaving blank, so
+%% the book gained an imprint at no cost in pages. Everything on it used to be
+%% set in grey at the foot of the title page, which is where a copyright page
+%% goes when a book has not got one.
+%%
+%% \bookedition and \bookyear are pinned in preamble.tex and \pinnedon is a
+%% user-visible string in lang/<lang>.tex. Write none of the three out by hand
+%% here: the edition number and the copyright year are one fact each, and the
+%% pin date is a different fact from both.
+%%
+%% The ISBN is named as absent rather than left to be inferred. It cannot be
+%% derived, computed or written -- it is issued -- so it is the one thing this
+%% book owes its reader that no pass over this repository can close, and
+%% Appendix F lists it with the rest.
+
+\thispagestyle{empty}
+\vspace*{\fill}
+
+{\small\color{mgrey}\raggedright\setlength{\parindent}{0pt}%
+%  Every paragraph here is flush left. \parindent is zeroed rather
+%  than left to \raggedright, which does zero it -- but this page has
+%  six paragraphs and only the first would have carried a \noindent.
+\emph{Mathematics from Zero for the AI Engineer}. Edition \bookedition.
+
+\medskip
+Copyright \textcopyright{} \bookyear{} Konrad Cinkusz. All rights reserved
+except as licensed here.
+
+\medskip
+The prose is licensed CC BY-NC-SA 4.0. The code \dash{} every script under
+\texttt{code/}, and every listing this book prints from one \dash{} is
+licensed MIT.
+
+\medskip
+Self-published by the author. There is no imprint, no distributor, no ISBN
+and no recorded place of publication, so this book may be read and copied
+under the licences above and cannot yet be stocked by a shop or catalogued by
+a library. That absence is recorded in Appendix~\ref{app:F} with the rest of
+what this book owes its reader.
+
+\medskip
+Published in two languages and two paper formats: English and Polish, at
+$17 \times 24$~cm and on A4. Also available in Polish as
+\emph{Matematyka od zera dla inżyniera AI}.
+
+\medskip
+Numbers pinned \pinnedon. Every number in this book is produced by a script
+in \texttt{code/} and re-checked on every build. That is a different date from
+the copyright year above and it means a different thing.
+
+\medskip
+The programmed-learning method is K.~A. Stroud's. This book is not affiliated
+with, nor derived from, his.
+\par}
+
+\cleardoublepage
