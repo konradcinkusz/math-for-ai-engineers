@@ -164,13 +164,55 @@ jobs:
             echo "- \`book-en-a4.pdf\` / \`book-pl-a4.pdf\` (A4, 12pt)"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - uses: actions/configure-pages@v5
+      - name: Configure Pages
+        id: configure_pages
+        uses: actions/configure-pages@v5
         with:
-          # The very first deploy has no Pages site to look up yet, so
-          # configure-pages' "Get Pages site" call 404s and the job fails.
-          # enablement: true makes it create the site via the API instead of
-          # requiring someone to click it into existence in Settings first.
+          # This comment used to claim enablement: true makes "Create Pages
+          # site" stand in for clicking it into existence in Settings. That
+          # was never measured and it is false: every run of this workflow
+          # since it was written -- the first one included -- got exactly the
+          # same failure here, "Resource not accessible by integration" on
+          # Create Pages site, with the book itself compiling clean and every
+          # gate above passing. The reason is not a missing YAML permission.
+          # Creating a repository's FIRST Pages site is an administrative
+          # action, and `administration` is not one of the scopes a
+          # workflow's `permissions:` block can grant the default
+          # GITHUB_TOKEN -- so no value of enablement, and no permission
+          # added here, can make this call succeed. Once a Pages site exists,
+          # "Get Pages site" finds it and this step never tries to create
+          # anything, which is why enablement: true is harmless to leave set.
+          #
+          # The actual fix is a human, once: a repository admin visits
+          # Settings -> Pages -> Build and deployment -> Source, and chooses
+          # "GitHub Actions". That click creates the site under the admin's
+          # own permissions; every push after it deploys with no further
+          # action here.
           enablement: true
+
+      # Only fires when the step above is what failed -- an unrelated failure
+      # earlier in the job (a broken build, a drifted number) must not be
+      # reported as a Settings problem, and this step's own id makes that
+      # distinction checkable rather than assumed.
+      - name: Explain a Pages-configuration failure, if that is what happened
+        if: ${{ failure() && steps.configure_pages.conclusion == 'failure' }}
+        run: |
+          {
+            echo "## Pages build failed at Settings, not at the book"
+            echo ""
+            echo "Every PDF compiled and every gate above this step passed."
+            echo "The failure is in \`actions/configure-pages@v5\`: this"
+            echo "repository has never had a GitHub Pages site created, and"
+            echo "creating one is an administrative action the default"
+            echo "\`GITHUB_TOKEN\` cannot be granted, whatever this workflow's"
+            echo "\`permissions:\` block says."
+            echo ""
+            echo "**Fix once, by hand:** a repository admin visits"
+            echo "**Settings -> Pages -> Build and deployment -> Source**"
+            echo "and sets it to **GitHub Actions**. That single click creates"
+            echo "the site under the admin's own permissions. Every push"
+            echo "after it will publish with no further action here."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-pages-artifact@v3
         with:

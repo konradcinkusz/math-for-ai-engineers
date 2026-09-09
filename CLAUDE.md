@@ -1187,6 +1187,39 @@ Each cost time; none is obvious from its error message.
   in the same quiz was set fully justified on its last line with an underfull
   hbox in the log. Brace the parameter and the `\par` together.
 
+- **`enablement: true` does not create a repository's first GitHub Pages site,
+  and `pages.yml`'s own comment claimed it did without the claim ever having
+  been run.** Every one of that workflow's runs since it was written failed at
+  the same step \dash{} spot-checked across the whole history (run 1, the
+  first ever; three more spread through the middle; the latest) and all five
+  show the identical shape: all four PDFs compile, every gate above passes,
+  and the job dies at `actions/configure-pages@v5` with *Create Pages site
+  failed: Resource not accessible by integration*. Not one of eighty-eight
+  completed runs had ever succeeded.
+
+  The reason is not a missing line in the workflow's `permissions:` block.
+  Creating a repository's Pages site **for the first time** is an
+  administrative action, and `administration` is not one of the scopes a
+  workflow can grant its own `GITHUB_TOKEN` \dash{} `actions`, `contents`,
+  `id-token`, `pages` and the rest are, `administration` is not, so no
+  permission added to the YAML and no value of `enablement` can reach that
+  call. `enablement: true` only helps *after* a site exists, by letting a
+  later run's `configure-pages` find it via `Get Pages site` rather than
+  attempting `Create Pages site` at all \dash{} which is a real and worth
+  keeping, and is not what the deleted comment said it did.
+
+  **The fix is a human, once, outside any file in this repository:** a
+  repository admin visits Settings -> Pages -> Build and deployment -> Source,
+  and chooses "GitHub Actions". That single click creates the site under the
+  admin's own permissions; every push after it deploys with nothing further
+  needed here. `pages.yml` now says this at the point of failure \dash{} in
+  the step's own comment, and in a summary line that fires only when
+  `configure-pages` is what failed, so an unrelated build failure is never
+  misreported as a Settings problem. **The generalisable rule: a comment
+  claiming a workflow step avoids a manual step is itself a claim, and this
+  one had never been checked against a single run of the workflow it was
+  written for.**
+
 ---
 
 ## Resolved questions
