@@ -294,7 +294,7 @@ def chapter_final(pages, head: float) -> set[int]:
     carries one. Blank versos are skipped over, because a chapter that starts
     recto leaves one between itself and the page this is really about -- and
     note that a blank verso here is blank in the BODY only: this book's
-    \cleardoublepage leaves the running head on it, so a page with nothing but
+    \\cleardoublepage leaves the running head on it, so a page with nothing but
     a head is what has to be skipped rather than a page with nothing at all.
     """
     inked = [pno for pno, (_, _, body) in enumerate(pages, start=1)
@@ -513,10 +513,9 @@ def check(path: Path, cues: set[str]):
 # rather than as a list of pages, because the individual pages cannot be acted
 # on and the two numbers say different things: the count is elicitations spent
 # and grows with the book, and the rate is what a remedy would move. Roughly
-# one cue-ending page in two
-# is a verso by construction, so a rate near a half is the null result and the
-# thing to watch is the rate MOVING -- which is what a structural remedy would
-# do and what nothing else would.
+# one cue-ending page in two is a verso by construction, so a rate near a half
+# is the null result, and the thing to watch is the rate MOVING -- which is
+# what a structural remedy would do and what nothing else would.
 #
 # The remedy, if it is taken, is a parity-aware room test at \dotline: turn the
 # page early when the cue is about to end a verso with little room left, so the

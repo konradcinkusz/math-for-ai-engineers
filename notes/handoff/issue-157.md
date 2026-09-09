@@ -123,8 +123,38 @@ its refusal branch were exercised too, and the refusal exits 1.
 **The probe is disposable and is not in the tree**, on this repository's own
 habit. What it establishes is that the instrument looks at something and can
 tell a verso from a recto; **it establishes nothing whatever about the book.**
-The first build to run `checkpdf.py` gets the first real reading, and that
-reading is this issue's headline number.
+
+### And then CI took the first real reading
+
+The four builds on this PR ran it on the book. `main-en-a4`:
+
+> `121 of 230 pages that END ON THE CUE are versos (53%), reported not fatal`
+
+Three things follow, and only the first two are worth anything. The check
+**runs on the real artefact without crashing**, and its fatal refusal branch
+**did not fire** --- so verso and recto were told apart in every build, as the
+geometry says they must be (A4's `inner`/`outer` differ by 17.0 pt and the
+trade format's by 11.4 pt, against a 2 pt slack). And the reading is
+**plausible rather than degenerate**: 53%, which is the null half, and not the
+0% or 100% a broken parity test would give.
+
+**The third thing is the count, and it is not a finding.** It is a pagination
+measurement, so it is void on the next merge --- which is exactly why the sync
+session owns it and why it is quoted here as an instrument reading rather than
+entered in a ledger. What is worth noticing is only that it lands where the
+issue said it would: 121/230 against the issue's 114/220 on a book that has
+since grown by 62 cues.
+
+### One pre-existing wart, fixed because this PR made it noise
+
+CI printed `checkpdf.py:291: SyntaxWarning: invalid escape sequence '\c'`
+above the check's own output. It is **pre-existing on `main`** (line 238
+there), one docstring carrying `\cleardoublepage` where every other backslash
+in the file is escaped, and it was invisible locally because Python emits that
+warning at compile time only and `__pycache__` was hiding it --- an instrument
+returning a plausible clean answer, which is the theme of this pass. One
+character, and it is in scope because the warning now prints directly above
+defect 5's ledger.
 
 The probe's first run failed, and the failure was mine rather than the tool's:
 my synthetic body lines were not justified, so the mode of the words' `xMax`
