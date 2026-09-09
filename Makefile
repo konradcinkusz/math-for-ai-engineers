@@ -413,7 +413,7 @@ debt:
 KDP_STAGE := build/kdp/tex
 KDP_VOLS  := $(shell python3 -c "import json;print(' '.join(str(v['n']) for v in json.load(open('tools/volumes.json'))['volumes']))" 2>/dev/null)
 
-.PHONY: kdp kdp-en kdp-pl kdp-stage census volumes volumes-check \
+.PHONY: kdp kdp-en kdp-pl kdp-stage check-kdp census volumes volumes-check \
         $(addprefix kdp-v,$(KDP_VOLS))
 
 # Regenerate the per-volume wiring from the two manifests.
@@ -431,6 +431,7 @@ kdp-stage: diagrams
 
 kdp: numbers volumes kdp-stage
 	@python3 tools/kdpbuild.py --all
+	@$(MAKE) --no-print-directory check-kdp
 
 kdp-en: numbers volumes kdp-stage
 	@for v in $(KDP_VOLS); do python3 tools/kdpbuild.py $$v en; done
@@ -441,6 +442,9 @@ kdp-pl: numbers volumes kdp-stage
 # One volume, both languages: `make kdp-v3`.
 $(addprefix kdp-v,$(KDP_VOLS)): kdp-v%: numbers volumes kdp-stage
 	@python3 tools/kdpbuild.py $*
+
+check-kdp:
+	@python3 tools/checkkdp.py --json build/kdp $(KDP_STAGE)/kdp-v*.pdf
 
 # The page census the split is chosen from. Builds the whole book in the KDP
 # geometry as ONE document, per part, so a split can be reasoned about before
