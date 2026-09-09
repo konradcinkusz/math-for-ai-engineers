@@ -20,6 +20,23 @@ on:
         default: 'all'
   push:
     tags: ['kdp-v*']
+  # The regression guard's whole job is to prove the four existing PDFs have
+  # not moved, and the moment that claim is made is a pull request -- so it
+  # runs here too. Only the cheap jobs do: the volume matrix is cut to one
+  # volume below, because eight compiles of a book is a release cost and a
+  # smoke test is what a PR needs.
+  pull_request:
+    paths:
+      - 'kdp/**'
+      - 'tools/volumes.json'
+      - 'tools/gen_volumes.py'
+      - 'tools/test_gen_volumes.py'
+      - 'tools/kdp*.py'
+      - 'tools/checkkdp.py'
+      - 'tools/checkxvol.py'
+      - '.github/workflows/kdp.yml'
+      - 'preamble.tex'
+      - 'lang/*.tex'
 
 permissions:
   contents: read
@@ -246,7 +263,10 @@ jobs:
       fail-fast: false
       matrix:
         lang: [en, pl]
-        volume: [1, 2, 3, 4]
+        # A pull request builds the smallest volume in both languages -- enough
+        # to catch a broken interior in the two compiles it costs. A tag or a
+        # dispatch builds all four, because that is when a volume is uploaded.
+        volume: ${{ fromJSON(github.event_name == 'pull_request' && '[3]' || '[1, 2, 3, 4]') }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
@@ -323,7 +343,10 @@ jobs:
     name: Every cross-volume pointer lands somewhere
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [build-volume]
+    # Reads the SOURCE, not a PDF, so it needs no volume built. It used to wait
+    # on the matrix, which put the workflow's cheapest signal behind its most
+    # expensive job and silenced it entirely whenever a volume failed to build.
+    needs: [regression]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
@@ -338,6 +361,7 @@ jobs:
     timeout-minutes: 15
     needs: [build-volume, crossvolume]
     if: always() && needs.build-volume.result == 'success'
+        && github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
