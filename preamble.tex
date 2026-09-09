@@ -2000,6 +2000,57 @@
 % left bar, no outline. \emph{outlined} is a block the reader must stop at, and
 % it gets a full rule on white. That is the whole visual grammar; a third
 % treatment would mean the first two are not carrying their meaning.
+%
+% THE BREAK IS MARKED AND IT IS NOT NAMED, and that difference is the whole of
+% review issue #116. `overlay first and middle' below puts the continuation
+% triangle on every piece but the last, so a reader who reaches the foot of a
+% broken box is told to turn over -- and the piece they LAND on carries
+% nothing at all, because the mark is on the pieces before the break and never
+% on the pieces after it. A page can still open with a coloured bar, three
+% lines of text, no title, and no frame badge, because the badge was on the
+% page before. The review found that shape in nineteen of the fifty-five units
+% it judged, and it is right about all of it.
+%
+% Four remedies were asked for and none is taken here, for one reason common
+% to all four: each moves pagination by construction, and the property that
+% made the continuation mark takeable holds for none of them. An overlay is
+% drawn inside padding that already exists, so it adds no height and cannot
+% move a page -- which is why it was settled by counting fill operators in a
+% standalone file rather than by four book builds. These cannot be:
+%
+%   lines before break / lines after break     changes WHERE the box breaks
+%   title after break                          a title bar per continuation
+%   breakable=false under a height threshold   moves a whole box to the next page
+%   a room test before a frame's trailing box  turns the page
+%
+% WHAT IT WOULD COST, measured from source rather than estimated. Each edition
+% carries 436 admonition boxes, of which 424 are inside a frame and the other
+% twelve are in the Summary and Quiz regions; 296 in English and 293 in Polish
+% are the LAST thing in their frame, and 65 in each are the whole of it. So a
+% guard that keeps a trailing box with its frame would fire at up to 296 sites
+% per edition, against the count \transcript's own \typeout ledger reports for
+% the guard above -- and that one, measured in isolation, cleared a split no
+% editorial fix could reach and put three orphaned cues and three orphan tails
+% back doing it. Re-derive the population with one pass over
+% programs/{en,pl}/*.tex counting the eight \begin{...} above; it is a loop and
+% a minute, and it is worth re-deriving rather than quoting from here.
+%
+% Two mechanisms worth having before anybody starts, each of which costs a
+% cycle to rediscover. \needspace does NOT keep a box with what precedes it:
+% that is measured on \mfa@namedframe above, 95pt reserved against 54pt left
+% and the heading still stranded, because a breakable tcolorbox splits itself
+% in its own code rather than asking the page builder. The working mechanism is
+% the explicit \pagegoal-\pagetotal test that \begin{fr}, \section and
+% \transcript already use. And a continuation TITLE needs a new string in BOTH
+% lang/en.tex and lang/pl.tex -- there is none today, and parity's C3 fails a
+% label defined in one language only.
+%
+% The one figure here that is an estimate and not a measurement: at the
+% review's own eight-line threshold, about 193 English boxes and 197 Polish
+% ones would stop being breakable -- two in five. That divides each box body by
+% 68 characters for a typeset line, which is a proxy for a quantity only a
+% build can report, and it is quoted to price the option rather than to settle
+% it.
 \tcbset{
   mfa tinted/.style={
     enhanced, breakable, sharp corners,
@@ -2288,6 +2339,10 @@
 % main-<fmt>.log` counts how many listings did not fit and were turned.
 % Measured when the guard was added: 7 / 5 / 6 / 10 across the four builds,
 % against ONE split listing reported by the review issue that prompted it.
+% A second review, filed independently on the build before this guard landed,
+% names two more -- P12's and P22's -- so the ledger above is not the guard
+% overreaching, it is the class being wider than either reviewer could see from
+% the pages they happened to read.
 \newsavebox{\mfa@transcriptbox}
 \newcommand{\mfa@transcriptroom}{%
   \ifdim\pagegoal=\maxdimen\else
