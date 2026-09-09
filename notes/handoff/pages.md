@@ -178,6 +178,13 @@ which is taken by the existing local-assembly target — and both workflows.
   experiments table. One number, one line; left because `notes/02` is shared
   and a parallel session may be in it.
 
+- **`tools/check_structure.py:247`** — `check_elicitation`'s docstring is not
+  a raw string and contains `\blank` and `\yourturn`, so **every invocation of
+  this tool in every job prints `SyntaxWarning: invalid escape sequence '\y'`**
+  before its own output. Visible in the CI log of run 34333946874. One
+  character to fix (an `r` prefix on that docstring), and left alone because
+  that function belongs to another unit and a parallel session may be in it.
+
 ## Values
 
 None emitted, none retired. `figures/values/` is untouched, so `make verify`
