@@ -31,13 +31,13 @@
   name the quantity that settles it}
 \outcome{7--10}{say why the quantity can never be negative, when it is zero,
   and why it is symmetric}
-\outcome{11--15}{say why it is symmetric when the two conditional entropies
-  it is built from are not}
-\outcome{16--25}{say which way a plug-in estimate is wrong on data with no
+\outcome{11--15}{write mutual information as a difference of entropies, in
+  either of the two directions, and say what each of the two pieces measures}
+\outcome{16--26}{say which way a plug-in estimate is wrong on data with no
   dependence, and how many items it takes for that to stop mattering}
-\outcome{26--34}{say what post-processing can and cannot do to information,
+\outcome{27--35}{say what post-processing can and cannot do to information,
   and read the same inequality from both of its ends}
-\outcome{35--38}{say what would have to be measured before an
+\outcome{36--39}{say what would have to be measured before an
   interpretability claim about a layer is supported}
 \end{outcomes}
 
@@ -47,22 +47,22 @@
   \answerto{Nothing. Program~\ref{prog:P24} builds a pair whose correlation
   is exactly zero and where one is a function of the other; this program
   builds the quantity that sees it.}
-\item Mutual information is symmetric. Are the two conditional entropies it
-  can be written with also symmetric? \teachesat{12--13}
-  \answerto{No, and they can differ enormously \dash{} one of them can be
-  exactly zero while the other is not. The same number is reached from two
-  different pieces.}
+\item Write mutual information as a difference of entropies. Is there more
+  than one way to do it? \teachesat{14--15}
+  \answerto{Two ways: $H(Y) - H(Y \mid X)$ and $H(X) - H(X \mid Y)$. They are
+  the same number, and the pieces they are built from are not the same
+  pieces.}
 \item You estimate the mutual information between two quantities that are
   genuinely independent, from a finite sample. What do you get?
   \teachesat{16--17}
   \answerto{A positive number, in expectation, at every sample size. The
   truth is zero and the estimator does not return it.}
 \item Somebody improves their probe and reports a higher score. What does
-  that say about the layer? \teachesat{28--29}
+  that say about the layer? \teachesat{29--30}
   \answerto{Nothing new. A probe is post-processing, so its score was
   always bounded by what the layer carried; a better probe is a statement
   about the probe.}
-\item And if a probe scores badly? \teachesat{30--31}
+\item And if a probe scores badly? \teachesat{31--32}
   \answerto{Also nothing, in the other direction. The bound is a lower
   bound and it is loose by an amount nobody measures.}
 \end{quiz}
@@ -159,7 +159,8 @@ Apply it to the pair Program~\ref{prog:P24} left you.
 
 The joint puts $\frac{1}{\val{p24.tri.n}}$ on each of $(-1, 1)$, $(0, 0)$ and
 $(1, 1)$ and nothing anywhere else. The margins are $Z$ uniform on three
-values and $W$ on two.
+values, and $W$ taking $0$ with probability $\frac{1}{3}$ and $1$ with
+probability $\frac{2}{3}$.
 
 Work it out, or take it on trust for one frame: the answer is
 $\val{p31.zw.mi}$ nats.
@@ -226,8 +227,9 @@ otherwise. That is the property the correlation did not have, and it took no
 new mathematics to get: it is a theorem about a divergence, read on a
 particular pair of arguments.
 
-Checked rather than asserted: over all $\val{p31.sym.trials}$ joint
-distributions on a rational grid, not one comes out negative.
+Checked rather than asserted: over all $\val{p31.sym.trials}$ non-zero count
+patterns of a $2 \times 3$ table with cells in $\{0, 1, 2, 3\}$, each
+normalised to a distribution, not one comes out negative.
 \end{fr}
 
 \begin{fr}
@@ -252,7 +254,7 @@ the two arguments of nothing: the joint $p(x, y)$ is the same table read the
 other way, and the product $p(x)\,p(y)$ is the same product. Neither argument
 of the divergence has moved.
 
-Checked over the same $\val{p31.sym.trials}$ joints, with the two answers
+Checked over the same $\val{p31.sym.trials}$ tables, with the two answers
 agreeing to the last bit the arithmetic carries.
 
 \begin{note}
@@ -278,7 +280,10 @@ One definition connects the two, and it is the only new object in this
 program. The \textbf{conditional entropy}
 \[ H(Y \mid X) \;=\; H(X, Y) \;-\; H(X) \]
 is what is left of $Y$'s uncertainty once $X$ is known: the uncertainty in
-the pair, less the uncertainty in $X$ alone.
+the pair, less the uncertainty in $X$ alone. The first term is
+Program~\ref{prog:P29}'s entropy with the \emph{pair} as the outcome, which
+needs no new definition \dash{} a pair is a thing that happens, and that
+program's sum runs over whatever happens.
 
 Take Program~\ref{prog:P24}'s pair again, with $W = Z^{2}$. What is
 $H(W \mid Z)$?
@@ -321,8 +326,13 @@ quantity, not of the relationship it is measuring.
 \end{fr}
 
 \begin{fr}
-Both of those conditional entropies reach the same mutual information, which
-is the fact worth carrying out of this section:
+Both of those conditional entropies reach the same mutual information, and
+that is two lines of arithmetic rather than a new fact. Split the logarithm
+in the definition:
+\[ I(X; Y) \;=\; \sum_{x, y} p(x, y) \ln \frac{p(x, y)}{p(x)\,p(y)}
+   \;=\; H(X) + H(Y) - H(X, Y) \]
+and the conditional entropy above says $H(X, Y) - H(X)$ is $H(Y \mid X)$.
+Substitute it, then do the same with the letters the other way round:
 \[ I(X; Y) \;=\; H(Y) - H(Y \mid X) \;=\; H(X) - H(X \mid Y) \]
 \dash{} the uncertainty you had, less the uncertainty you are left with.
 That is the sentence people mean when they say \emph{how much knowing $X$
@@ -359,7 +369,6 @@ subject and is less than people assume.
 \section{What a finite sample does to it}
 \label{sec:P31-estimation}
 \index{mutual information!estimation bias}
-\index{estimation!of mutual information}
 
 \begin{fr}
 Everything so far has assumed you know the joint distribution. You do not.
@@ -470,10 +479,10 @@ which the column shows it doing. The consequence is the one nobody states.
 sound.}}
 
 The correction is least accurate exactly where the bias is largest. At
-$N = 100$ it is within two per cent and the bias it is removing is
-$\val{p31.bias.n100}$ nats, which nobody needed removed. At $N = 10$ it
-leaves nearly a third of the bias behind, and that is the regime the
-correction was reached for.
+$N = 100$ it leaves under two per cent of the bias behind and the bias it is
+removing is $\val{p31.bias.n100}$ nats, which nobody needed removed. At
+$N = 10$ it leaves $\val{p31.bias.left10}$ per cent of it behind, and that is
+the regime the correction was reached for.
 
 A remedy that works where you do not need it and fails where you do is worse
 than no remedy, because it removes the reason to be careful.
@@ -531,10 +540,13 @@ evaluation set has a few hundred sentences.
 The activations are continuous and get binned, or clustered, or quantised
 \dash{} which fixes the number of cells, and nobody reports it. If that
 number is anything like $\val{p31.big.cells}$ and the sample is a few
-hundred, then by the arithmetic above the estimate is dominated by its own
-bias, and it would have come out positive on shuffled labels.
+hundred, then you are far below the $\val{p31.big.per}$ items per cell the
+formula needed, so the formula does not apply and the qualitative answer is
+worse rather than better: whatever the bias is, it is of the order of the
+quantity itself. Nothing in the number itself would say so.
 
-There is a check that costs one extra run and settles it completely.
+There is a check that costs nothing but the compute, and it is the difference
+between a number and a result.
 \end{aibox}
 
 What is it?
@@ -545,12 +557,50 @@ What is it?
 \begin{fr}
 \ans{Shuffle the labels and re-run the whole pipeline}
 
-Whatever that reports is the floor: it is what your bins, your sample size
-and your estimator produce on data with no relationship in it at all. The
-claim is whatever is left above it.
+The labels keep the distribution they had and lose every relationship to the
+input, so whatever that run reports was produced by your bins, your sample
+size and your estimator on data with nothing in it.
 
-It is almost never reported, and it is the difference between a number and a
-result.
+It is almost never done, and it is cheap.
+
+Now the question the recipe hides, and it is worth answering before you read
+on. How many times do you run it?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{More than once, and the enumeration above says why}
+
+A shuffled run is one draw from a null distribution. The enumeration above
+is the one place in this program where you can see the whole of such a
+distribution rather than one sample of it, and the table printed only its
+mean.
+
+At $N = 10$ its spread is $\val{p31.null.sd10}$ nats against a mean of
+$\val{p31.bias.n10}$, and about one run in twenty reports
+$\val{p31.null.q95}$ nats or more \dash{} on data with nothing in it. The
+spread exceeds the mean at every $N$ the table covers, so a run that reports
+several times the floor is not an artefact of the smallest sample.
+
+\begin{trapbox}
+\textbf{\enquote{I ran the shuffled control and subtracted it.}}
+
+The control is a random variable and one run is one sample of it, so what
+you report is the real excess plus however far that single draw fell from
+the bias it was standing in for \dash{} a quantity as large as the bias
+itself. It can come out negative, and nothing in the run says which
+happened.
+
+Shuffle a number of times instead, and read where your observed estimate
+sits among the shuffled ones rather than subtracting any single one of them.
+That move is Program~\ref{prog:P27}'s under a different name: build the
+distribution of a statistic under a null in which the effect has been
+removed, then read the observed value's position in it. There the null was
+that two models are equally good and every outcome was enumerated; here it
+is that the labels have nothing to do with the input, and the runs are the
+enumeration.
+\end{trapbox}
 
 \mermaidfig{p31-bias-is-not-signal}{Where a plug-in estimate comes from}{signal or sample}
 \end{fr}
@@ -571,7 +621,7 @@ the input. Write that as $X \to Y \to Z$.
 The probe may be anything: a linear classifier, a deep network, a lookup
 table, a coin flip that ignores its input.
 
-Take a guess before the frame turns over. Can $I(X; Z)$ exceed $I(X; Y)$?
+Take a guess before you read on. Can $I(X; Z)$ exceed $I(X; Y)$?
 \dotline
 \nextframe
 \end{fr}
@@ -628,8 +678,9 @@ always movement towards the ceiling and never movement of it.
 \begin{fr}
 The same inequality has another end, and it is the one nobody quotes.
 
-Go back to the $\val{p31.dpi.channels}$ enumerated probes. The best of them
-is a real number, and it is not $\val{p31.dpi.ixy}$.
+Go back to the $\val{p31.dpi.channels}$ enumerated channels \dash{} every
+probe in that family. The best of them is a real number, and it is not
+$\val{p31.dpi.ixy}$.
 
 It reaches $\val{p31.dpi.best}$ nats. Against a layer carrying
 $\val{p31.dpi.ixy}$, how much is the best available probe in that family
@@ -666,8 +717,9 @@ at, and the gap is not reported because it is not measured.
 It is worth being precise about why the gap exists here, because it is not a
 failure of the probes.
 
-The family enumerated above is every map from a three-valued $Y$ to a
-two-valued $Z$.
+The family enumerated above is every channel from a three-valued $Y$ to a
+two-valued $Z$ on that grid, and it contains all $\val{p31.dpi.det}$ of the
+maps that make the choice outright rather than at random.
 
 Say what any such map is forced to do, and why that costs something.
 \dotline
@@ -678,7 +730,10 @@ Say what any such map is forced to do, and why that costs something.
 \ans{It has to merge two of the three values, and whatever it merges, some
 of what distinguished them is gone}
 
-The best choice loses least; no choice loses nothing.
+The best choice loses least; no choice loses nothing. That is not an
+argument about the eight alone, either: the best of all
+$\val{p31.dpi.channels}$ enumerated channels turns out to be one of them, so
+randomising the choice does not buy back what merging cost.
 
 A probe with a smaller output than its input is in exactly that position, and
 that describes every probe anybody trains.
@@ -689,8 +744,10 @@ that describes every probe anybody trains.
 The inequality also settles a question about layers, and this one goes the
 way people do not expect.
 
-A network computes layer $k+1$ from layer $k$. So
-$X \to \text{layer } k \to \text{layer } k+1$, and the inequality applies:
+A network computes each layer from the layers before it and from nothing
+else, so $X \to (\text{everything before layer } k+1) \to \text{layer } k+1$
+and the inequality applies \dash{} through a residual connection as much
+as through a plain chain:
 \textbf{information about the input can only fall with depth, never rise.}
 
 That sounds like it contradicts everything anybody says about deeper layers
@@ -748,8 +805,9 @@ Take a moment and list what you would ask for, before reading on.
   Section~4: the bias grows with cells and shrinks with items.
 \item \textbf{The sample size against that number}, as items per cell.
 \item \textbf{The shuffled-label floor}: the same pipeline run on labels with
-  no relationship to the input. Whatever it reports is the bias, and the
-  claim is only what sits above it.
+  no relationship to the input, several times, and where the reported
+  estimate sits among those runs. One of them is a draw from a wide
+  distribution rather than the floor itself.
 \item \textbf{What the probe's capacity was}, because section~5 says a
   score is a lower bound and a bigger probe raises it without moving the
   layer.
@@ -760,7 +818,8 @@ Take a moment and list what you would ask for, before reading on.
 \end{ansblock}
 
 Not one of the five is difficult. The third is the one that would settle
-most disputes and it costs a single extra run.
+most disputes and it costs nothing but the compute to run the pipeline
+again.
 \end{fr}
 
 \begin{fr}
@@ -806,16 +865,17 @@ unsupported, and only the second is being asserted here.
   $\val{p31.big.need}$ items}} for the bias to fall under one per cent of the
   maximum $\val{p31.big.max}$ nats \dash{} about $\val{p31.big.per}$ per
   cell.}
-\sumitem{24--25}{\textbf{\result{The check that settles it is one extra run}}:
-  shuffle the labels, re-run the whole pipeline, and report only what sits
-  above whatever that returns.}
-\sumitem{26--27}{\result{\textbf{Post-processing cannot create information}: if
+\sumitem{24--26}{\textbf{\result{The check is a shuffled-label run, and one of
+  them is a draw rather than a floor}}: its spread $\val{p31.null.sd10}$ nats
+  exceeds its own mean $\val{p31.bias.n10}$ at $N = 10$, so shuffle several
+  times and read where the observed estimate sits among them.}
+\sumitem{27--28}{\result{\textbf{Post-processing cannot create information}: if
   $X \to Y \to Z$ then $I(X; Z) \le I(X; Y)$}, checked against all
   $\val{p31.dpi.channels}$ channels in a family.}
-\sumitem{28--33}{\textbf{\result{So a probe's score is a lower bound}}, and the best
-  probe in that family still leaves more than a quarter behind. A better
-  probe says nothing about the layer, and neither does a worse one.}
-\sumitem{35--38}{\textbf{Nothing here was measured on a real model}, and the
+\sumitem{29--34}{\textbf{\result{So a probe's score is a lower bound}}, and
+  the best probe in that family still leaves more than a quarter behind.
+  A better probe says nothing about the layer, and neither does a worse one.}
+\sumitem{36--39}{\textbf{Nothing here was measured on a real model}, and the
   claim being made is that the usual evidence does not distinguish the claim
   from its absence \dash{} not that it is false.}
 \end{summarybox}
@@ -827,7 +887,9 @@ unsupported, and only the second is being asserted here.
   Without computing a divergence, say what $I(X; Y)$ is and why.
   \answerto{$H(Y) = \ln 2$ nats. $Y$ is a function of $X$, so
   $H(Y \mid X) = 0$ and $I(X; Y) = H(Y) - 0$. The same argument as
-  Program~\ref{prog:P24}'s pair, with two values instead of three.}
+  Program~\ref{prog:P24}'s pair, with $X$ on four values instead of three and
+  $Y$ on two as $W$ was \dash{} but equally likely, which is why $H(Y)$ is
+  $\ln 2$ where $H(W)$ was $\val{p31.zw.mi}$.}
 \item Two quantities have $I(X; Y) = 0$. Somebody concludes their
   correlation is zero. Are they right, and is the converse also safe?
   \answerto{Right, and the converse is not. $I = 0$ is independence, which
@@ -841,7 +903,8 @@ unsupported, and only the second is being asserted here.
   and $\val{p31.bias.n100}$ nats there, so about a fifth of $\num{0.05}$ is
   what the estimator returns on nothing \dash{} and an expectation is not a
   ceiling, so the tail of that distribution reaches higher still. Shuffle the
-  labels, re-run, and report the difference.}
+  labels and re-run several times, and report where $\num{0.05}$ sits among
+  what those runs return.}
 \item A colleague reports that a probe on layer 20 scores higher than the
   same probe on layer 4, and concludes layer 20 carries more information
   about the input. What is wrong with the conclusion?
@@ -878,11 +941,13 @@ unsupported, and only the second is being asserted here.
   and computes mutual information against a $\val{p31.big.k}$-way label.
   Somebody proposes doubling the buckets to \enquote{resolve more
   structure}. What does that do to the sample size needed?
-  \answerto{Cells go up fourfold, so the bias at a fixed sample goes up
-  about fourfold and the items needed to hold the bias fixed go up about
-  fourfold too \dash{} from $\val{p31.big.need}$ to some sixteen thousand.
-  Finer bins buy resolution and pay for it in items, and the payment is
-  usually not made.}
+  \answerto{Only one axis moves: the label is still
+  $\val{p31.big.k}$-way, so the cells go from $\val{p31.big.cells}$ to
+  $\val{p31.big.cells.finer}$ and $(a-1)(b-1)$ from $\val{p31.big.ab}$ to
+  $\val{p31.big.ab.finer}$. The items needed to hold the bias at one per cent
+  of the maximum go from $\val{p31.big.need}$ to $\val{p31.big.need.finer}$
+  \dash{} about twice, not four times. Finer bins buy resolution and pay for
+  it in items, and the payment is usually not made.}
 \item The data-processing inequality says $I(X; Z) \le I(X; Y)$ when
   $X \to Y \to Z$. Give a $Z$ for which it holds with equality.
   \answerto{Any invertible function of $Y$ \dash{} relabelling the values,

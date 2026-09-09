@@ -49,17 +49,17 @@
   of its error more items can reach}
 \outcome{8--15}{re-weight one evaluation set and say what that does to an
   ordering nobody thought was in question}
-\outcome{16--19}{say what narrowing a reported interval costs, in items}
+\outcome{16--19}{say what narrowing a reported margin costs, in items}
 \outcome{20--28}{say what an imperfect judge does to a measured difference,
-  and why its agreement figure does not tell you}
+  and what its published agreement figure is a statement about}
 \outcome{29--35}{price a model per task rather than per token, and say which
   second quantity a per-token figure leaves out}
 \outcome{36--43}{name three published measures that are computed correctly
   from the wrong quantity}
 \outcome{44--47}{say which claims in this program have not been checked
   against a trained model, and why saying so is not a hedge}
-\outcome{48--52}{name the three reasons a table in a book is blank, and say
-  which of them is a debt}
+\outcome{48--52}{name the three things a book can do about a number it
+  cannot give you, and say which of them leaves a debt}
 \end{outcomes}
 
 \begin{quiz}
@@ -77,7 +77,7 @@
   all, and past about $\val{p34.mis.n}$ items it is the larger of the two.}
 \item Two models are $\val{p27.gap.pts}$ points apart on one evaluation set.
   Both models are then held completely fixed and the set's mix of short and
-  long prompts is changed by $\val{p34.mix.shift}$ items. What happens?
+  long prompts is changed slightly. What can happen to the ordering?
   \teachesat{11--14}
   \answerto{The ordering reverses. The scores become $\val{p34.mix.alt.b}$
   and $\val{p34.mix.alt.a}$, and one model's own score ranges over
@@ -111,10 +111,10 @@
 \index{evaluation!as an estimation problem}
 
 \begin{fr}
-Program~\ref{prog:P27} left you holding a leaderboard: $\val{p27.items}$
-items, the top model at $\val{p27.near.hi}$ per cent and the next at
-$\val{p27.near.lo}$, and an exact test saying the gap between them is the
-least informative outcome the arithmetic permits.
+Program~\ref{prog:P27} left you holding an evaluation set:
+$\val{p27.items}$ items, the top model at $\val{p27.near.hi}$ per cent and
+the next at $\val{p27.near.lo}$, and an exact test saying the gap between
+them is the least informative outcome the arithmetic permits.
 
 This program is about everything else on that page. Start with the score
 itself. You ran a fixed set of items, you counted, and you divided. The
@@ -191,14 +191,16 @@ which first tips at $n = \val{p34.mis.n}$.
 That is not a large number. It is about two and a half times the set
 Program~\ref{prog:P27} was arguing over.
 
-Program~\ref{prog:P27}'s own leaderboard ran $\val{p27.lb.n}$ items. Which of
+That program's leaderboard is a different table from the set above:
+$\val{p27.models}$ models, each scored on $\val{p27.lb.n}$ items. Which of
 the two contributes more there, and by how much?
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{The mis-specification, by a factor of about $\val{p34.mis.ratio}$.}
+\ans{The mis-specification: its squared bias is $\val{p34.mis.ratio}$
+  times the variance.}
 
 At a thousand items the benchmark's distance from your task contributes
 roughly twice what the sampling does \dash{} and \textbf{only the sampling
@@ -262,8 +264,8 @@ Half the items are of each kind, so each score is the plain average:
 \end{ansblock}
 
 Those are Program~\ref{prog:P27}'s two committed figures, to the digit. This
-is the same leaderboard, with one thing about it written down that was there
-all along.
+is the same evaluation set, with one thing about it written down that was
+there all along.
 
 The even split was a choice somebody made. Suppose they had weighted the
 short prompts by $w$ instead. What happens to the gap?
@@ -295,8 +297,8 @@ short ones, which is what you would get by writing the items on a different
 afternoon.
 
 The even split puts $\val{p34.mix.short}$ short items in the set. How many of
-the $\val{p27.items}$ have to change kind before the leaderboard's top two
-change places?
+the $\val{p27.items}$ have to change kind before the two models change
+places?
 \dotline
 \nextframe
 \end{fr}
@@ -310,7 +312,7 @@ so A now leads by $\val{p34.mix.alt.gap}$ points.
 
 Neither model was retrained, retuned or re-prompted. Every answer either of
 them gave is the answer it gave before. Ten items out of two hundred moved
-from one bucket to the other, and the ordering the leaderboard reports is the
+from one bucket to the other, and the ordering the set reports is the
 other way round.
 
 \transcript{p34-remix}
@@ -330,7 +332,7 @@ of scores it can be reported as having?
 \ans{From $\val{p34.mix.b.long}$ to $\val{p34.mix.b.short}$ per cent \dash{}
   $\val{p34.mix.swing}$ points.}
 
-Set that beside the two numbers the leaderboard is actually arguing about.
+Set that beside the two numbers the comparison is actually arguing about.
 The gap under discussion is $\val{p27.gap.pts}$ points.
 Program~\ref{prog:P27} computed that this evaluation set could not
 distinguish the two models until the gap reached
@@ -365,18 +367,25 @@ its first program.
 \end{fr}
 
 % ============================================================
-\section{What a narrower interval costs}
+\section{What precision costs}
 \label{sec:P34-interval}
 \index{evaluation!the cost of precision}
 
 \begin{fr}
-Program~\ref{prog:P27} committed one interval and this section prices it.
-A leaderboard entry at $\val{p27.lb.p.pct}$ per cent on $\val{p27.lb.n}$
-items has a standard error of $\val{p27.lb.se}$ points, and under that
-program's own correction for reading forty entries the margin is
-$\val{p27.lb.margin}$ points.
+Program~\ref{prog:P27} committed two numbers about one leaderboard entry
+and this section prices them.
 
-Suppose that is too wide to act on and you want half of it. How many items?
+An entry at $\val{p27.lb.p.pct}$ per cent on $\val{p27.lb.n}$ items has a
+standard error of $\val{p27.lb.se}$ points. And that program showed
+something larger sitting on top of it: sort $\val{p27.models}$ models of
+\emph{equal} true accuracy by their observed scores, and the one at the top
+sits $\val{p27.lb.margin}$ points above its own truth \dash{}
+$\val{p27.emax}$ of those standard errors. That is a \textbf{selection
+effect} rather than a measurement error, and it is built from the same
+standard error, so it shrinks with the item count for the same reason.
+
+Suppose that much slack is too much to act on and you want half of it. How
+many items?
 \dotline
 \nextframe
 \end{fr}
@@ -384,13 +393,13 @@ Suppose that is too wide to act on and you want half of it. How many items?
 \begin{fr}
 \ans{$\val{p34.halve.times}$ times as many \dash{} $\val{p34.halve.n}$.}
 
-Precision goes as $1/\sqrt{n}$, so halving an interval is squaring the
+Precision goes as $1/\sqrt{n}$, so halving a margin is squaring the
 factor. It is worth saying in the currency it is actually paid in: four
 times the items to write, four times the items to label, and four times the
 inference bill to score them.
 
-Push it one step further. To state a single model's accuracy to within one
-point, at the same correction, how many items?
+Push it one step further. To bring that overshoot under a single point,
+how many items?
 \dotline
 \nextframe
 \end{fr}
@@ -399,33 +408,53 @@ point, at the same correction, how many items?
 \begin{ansblock}
 The count scales as the square of the margin it buys:
 \[ n = \val{p27.lb.n} \times
-   \left(\frac{\val{p27.lb.margin}}{\num{1.0}}\right)^{2}
+   \left(\frac{\val{p34.lb.margin}}{\num{1.0}}\right)^{2}
    \approx \val{p34.one.pt.n} . \]
 \end{ansblock}
 
-Nearly ten thousand items, to say one number to within one point.
+The margin is $\val{p34.lb.margin}$ here where
+Program~\ref{prog:P27} prints $\val{p27.lb.margin}$, and the extra figure is
+the point rather than pedantry: this line \emph{squares} it, and squaring is
+where a rounding shows. At $\val{p27.lb.margin}$ the same display gives
+$\num{9610}$. Both numbers are then good to three figures and no further,
+which is why the count is written the way it is.
 
-Program~\ref{prog:P27} computed a different count from the same machinery:
-how many items are needed to \emph{tell two models apart} at one point, when
-both are run on the same prompts. How do the two compare?
+Nearly ten thousand items, to pin one number to within one point.
+
+Program~\ref{prog:P27} computed counts from the same machinery for a
+different question: how many items are needed to \emph{tell two models
+apart} at one point. It committed one for evaluations run on different
+prompts and one for evaluations run on the same prompts. How do those two
+compare with this one?
 \dotline
 \nextframe
 \end{fr}
 
 \begin{fr}
-\ans{$\val{p27.n.rho00}$ against $\val{p34.one.pt.n}$ \dash{} a factor of
-  $\val{p34.detect.ratio}$.}
+\ans{$\val{p27.n.rho00}$ on different prompts, and $\val{p27.n.rho90}$ on
+  the same ones.}
 
-Stating one model's accuracy to a point and separating two models by a point
-cost about the same, and both are two orders of magnitude past the set in
-front of you.
+Run the two models on \emph{different} prompts and separating them by a point
+costs slightly more than pinning one model's own number to a point \dash{}
+$\val{p27.n.rho00}$ against $\val{p34.one.pt.n}$, a factor of
+$\val{p34.detect.ratio}$. Run them on the \emph{same} prompts and it costs
+$\val{p27.n.rho90}$, about an eighth of it: a factor of
+$\val{p34.paired.ratio}$ the other way.
+
+Program~\ref{prog:P27}'s paired comparison is where that comes from. Paired
+evaluations share whatever makes an item easy or hard, so the shared part
+cancels out of the \emph{difference} and the count falls by exactly
+$1-\rho$. Nothing about either model changed and nothing was bought. The
+evaluation was run differently.
 
 \begin{note}
-That is the honest reading of an interval: it is a \textbf{budget
-statement}. It says what the evaluation you have already paid for is able to
+That is the honest reading of these counts: they are a \textbf{budget
+statement}. They say what the evaluation you have already paid for is able to
 resolve, and the answer is usually \enquote{less than the difference being
-discussed}. Nobody has ten thousand items per model, which is why almost
-every published comparison is under-powered rather than wrong.
+discussed}. Nobody has ten thousand items per model \dash{} which is why
+almost every published comparison is under-powered rather than wrong, and why
+the cheapest thing on this page is a decision about how the evaluation is
+run rather than about how much of it to buy.
 \end{note}
 \end{fr}
 
@@ -495,13 +524,21 @@ one. What does the shrinkage do to the number of items you need?
 \begin{fr}
 \ans{It multiplies it by $\val{p34.judge.items.times}$.}
 
-The effect shrinks by $a - b$ and the sampling noise does not, so the ratio
-of the two shrinks by $a - b$ as well; and Section~\ref{sec:P34-interval}'s
-arithmetic says a count scales as the square of the resolution it buys. So
-the item count is divided by $(a-b)^{2}$ \dash{} more than half again as many
-items, for exactly the same power, bought by nothing but the marking.
+The effect shrinks by $a - b$, exactly, by an identity with no $p$ in it;
+Section~\ref{sec:P34-interval}'s arithmetic then says a count scales as the
+square of the resolution it buys. So the item count is divided by
+$(a-b)^{2}$ \dash{} more than half again as many items, bought by nothing
+but the marking.
 
-That is not a small correction to a budget. It is also not on anybody's
+The noise half is not quite untouched, and it is worth being exact about
+which half is. A judged item is \emph{marked} right with probability
+$p\,a + (1-p)\,b$ rather than $p$, which is the reported accuracy this
+section opened with, so its variance moves as well \dash{} here downwards, by
+$\val{p34.judge.var.pct}$ per cent. That works against the $(a-b)^{2}$
+factor rather than with it and is far smaller than it. The effect half is an
+identity; the noise half is a correction of about a per cent.
+
+That is not a small addition to a budget. It is also not on anybody's
 report.
 \end{fr}
 
@@ -512,8 +549,9 @@ on which the judge and a person say the same thing, which for a model of
 accuracy $p$ is
 \[ \text{agreement} = p\,a + (1-p)(1-b) . \]
 
-At this program's accuracy and these two rates that is
-$\val{p34.judge.agree.pct}$ per cent, which is a respectable card.
+At the accuracy of $\num{0.715}$ this program has been using, and these two
+rates, that is $\val{p34.judge.agree.pct}$ per cent, which is a respectable
+card.
 
 Does knowing the agreement tell you the attenuation?
 \dotline
@@ -522,9 +560,10 @@ Does knowing the agreement tell you the attenuation?
 
 \begin{fr}
 \begin{ansblock}
-No. Agreement pins the combination $p\,a - (1-p)\,b$ and nothing more, so at
-$\val{p34.judge.agree.pct}$ per cent the card is consistent with every judge
-whose attenuation lies in
+No. Agreement pins the combination $p\,a - (1-p)\,b$ and nothing more, so
+$\num{0.715}\,a - \num{0.285}\,b = \num{0.6365}$ is the whole of what the
+card says. Run $a$ and $b$ over the pairs that satisfy it, and the
+attenuation lies in
 \[ \val{p34.judge.atten.lo} \;\le\; a - b \;\le\;
    \val{p34.judge.atten.hi} . \]
 \end{ansblock}
@@ -609,6 +648,8 @@ $\val{p34.bill.tok.a}$. Which is dearer to run?
 \begin{ansblock}
 Multiply the two ratios:
 \[ \frac{\text{B per task}}{\text{A per task}}
+   = \val{p34.bill.price.times} \times
+     \frac{\val{p34.bill.tok.b}}{\val{p34.bill.tok.a}}
    = \val{p34.bill.price.times} \times \val{p34.bill.tok.times}
    = \val{p34.bill.task.times} , \]
 so B is $\val{p34.bill.saving.pct}$ per cent \emph{cheaper} per task while
@@ -626,7 +667,7 @@ could B afford before A became the cheaper of the two?
 \begin{fr}
 \ans{$\val{p34.bill.breakeven}$ tokens.}
 
-B has to be at least a third terser than A to pay for its price, and at
+B has to be more than a third terser than A to pay for its price, and at
 $\val{p34.bill.tok.b}$ tokens it is. Move it to
 $\val{p34.bill.breakeven}$ and the two are exactly level; move it past and
 the per-token figure becomes right again.
@@ -659,18 +700,12 @@ $\val{p34.bill.price.times}$ times the price mentions neither.
 \end{fr}
 
 \begin{fr}
-Program~\ref{prog:P29} met this identity in a different currency and it is
-worth putting the two side by side, because they behave differently.
+Both the price and the length belong to the model, which is precisely why
+quoting one of them settles nothing: neither can be divided out of a
+comparison, and neither is a property of the task alone.
 
-There, bits per character is bits per token times tokens per character, and
-\textbf{the model's contribution cancels}: the same model on the same text
-reports $\val{p29.bpc.a}$ and $\val{p29.bpc.b}$ bits per character at
-$\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ tokens per character, a factor of
-$\val{p29.bpc.ratio}$ that is a fact about the tokeniser and about nothing
-else.
-
-Here neither factor cancels. Both the price and the length belong to the
-model, which is precisely why quoting one of them settles nothing.
+Program~\ref{prog:P29} met an identity of the same shape in a different
+currency, and Section~\ref{sec:P34-measures} puts the two side by side.
 
 \mermaidfig{p34-two-quantities}{A price per token is half of what a task
   costs}{only the product is billed}
@@ -700,6 +735,13 @@ second factor belongs to the tokeniser. Compare two systems that tokenise
 differently and the difference you measure is the tokenisers'. Two losses
 are comparable under one tokeniser and under no other condition, and stating
 that condition costs a sentence.
+
+Program~\ref{prog:P29} measured exactly that: the same model on the same
+text reports $\val{p29.bpc.a}$ and $\val{p29.bpc.b}$ bits per character at
+$\val{p29.tpc.a}$ and $\val{p29.tpc.b}$ tokens per character, a factor of
+$\val{p29.bpc.ratio}$ in which the model plays no part at all. That is the
+contrast with the bill: there both factors were the model's and neither
+cancelled.
 \end{fr}
 
 \begin{fr}
@@ -734,10 +776,18 @@ that reported figure?
 \begin{fr}
 \ans{About $\val{p34.probe.n}$.}
 
-Four times the items to reduce the artefact to a twentieth of the claim, on
-a measurement that is routinely reported from a few dozen. And unlike the
-sampling error, this one does not straddle the truth \dash{} it is in one
-direction, so it never averages away across the layers of a paper.
+Scale the fifty-item figure as $1/N$ and $\val{p31.bias.n50} \times 50$
+divided by a twentieth of $\val{p34.probe.i}$ is that count. Four times the
+items, to reduce the artefact to a twentieth of the claim, on a measurement
+routinely reported from a few dozen.
+
+Two things about the number itself. The $1/N$ law is a law the estimator
+approaches rather than obeys \dash{} Program~\ref{prog:P31}'s own pair,
+$\val{p31.bias.n50}$ at $50$ and $\val{p31.bias.n100}$ at $100$, falls a
+shade faster than $1/N$, so scaling from the smaller count is the
+conservative side of it. And unlike the sampling error, this bias does not
+straddle the truth: it is in one direction, so it never averages away across
+the layers of a paper.
 \end{fr}
 
 \begin{fr}
@@ -847,8 +897,9 @@ This book's two companion volumes both carry a table with nothing in it, and
 so does this one. That is deliberate in all three, and it is not one
 decision repeated.
 
-Before reading on: a table in a technical book is blank. Name the reasons it
-might be, and say which of them is a debt somebody owes you.
+Before reading on: suppose a technical book has a number its own table asks
+for and cannot give you. Name the things it can do about that, and say which
+of them leaves you owed something.
 \dotline
 \nextframe
 \end{fr}
@@ -858,13 +909,13 @@ might be, and say which of them is a debt somebody owes you.
 Three, and only the first is a debt.
 
 \begin{enumerate}
-\item \textbf{The experiment has not been run.} A debt \dash{} and the book
-  owes you what would settle it and what it costs.
-\item \textbf{The number is a property of your machine.} Not a debt. A table
-  filled in by somebody else would be actively misleading, and what belongs
-  there is the method.
-\item \textbf{It was measured and is marked indicative}, because it moves
-  with a choice nobody standardised.
+\item \textbf{Leave it blank, because the experiment has not been run.} A
+  debt \dash{} and the book owes you what would settle it and what it costs.
+\item \textbf{Leave it blank, because the number is a property of your
+  machine.} Not a debt. A table filled in by somebody else would be actively
+  misleading, and what belongs there is the method.
+\item \textbf{Print it and mark it indicative}, because it was measured and
+  it moves with a choice nobody standardised.
 \end{enumerate}
 \end{ansblock}
 
@@ -945,14 +996,21 @@ would I know if it were wrong?}
 \sumitem{13--14}{\result{One model's score ranges over $\val{p34.mix.swing}$ points
   across the possible mixes \dash{} $\val{p34.mix.swing.times}$ times the
   difference Program~\ref{prog:P27} says would be meaningful}.}
-\sumitem{17--18}{\result{Precision goes as $1/\sqrt{n}$, so halving an interval is
-  $\val{p34.halve.times}$ times the items, and stating one accuracy to a
-  point takes about $\val{p34.one.pt.n}$ of them}.}
+\sumitem{17--18}{\result{Precision goes as $1/\sqrt{n}$, so halving a margin is
+  $\val{p34.halve.times}$ times the items, and bringing the top entry of
+  $\val{p27.models}$ equally good models within a point of its own truth
+  takes about $\val{p34.one.pt.n}$ of them}.}
+\sumitem{18--19}{\result{Separating two models by a point costs
+  $\val{p27.n.rho00}$ items each on different prompts and
+  $\val{p27.n.rho90}$ on the same ones, so the design decision is worth more
+  than the budget}: Program~\ref{prog:P27}'s $1-\rho$, on this page's
+  numbers.}
 \sumitem{21--22}{\result{An imperfect judge reports $(a-b)$ times the true gap
   between any two models, exactly, and the constant does not depend on either
   model's accuracy}.}
-\sumitem{24--26}{\result{That divides the usable item count by $(a-b)^{2}$, and a
-  judge's agreement figure does not determine $a-b$}: at
+\sumitem{24--26}{\result{That divides the usable item count by $(a-b)^{2}$
+  \dash{} the noise moves by about a per cent and the effect by all of it
+  \dash{} and a judge's agreement figure does not determine $a-b$}: at
   $\val{p34.judge.agree.pct}$ per cent it ranges from
   $\val{p34.judge.atten.lo}$ to $\val{p34.judge.atten.hi}$.}
 \sumitem{27--28}{\result{Agreement pins the attenuation only at an accuracy of one
@@ -972,8 +1030,9 @@ would I know if it were wrong?}
 \sumitem{44--47}{Program~\ref{prog:P17}'s sharpness claim needs trained
   models and is stated as outstanding; this program's own three findings need
   none, because each is a statement about a design.}
-\sumitem{48--49}{A blank table has three reasons and only one is a debt: not
-  run, not transferable, or measured and marked indicative.}
+\sumitem{48--49}{A book with a number it cannot give you has three moves and
+  only one is a debt: blank because not run, blank because not transferable,
+  or printed and marked indicative.}
 \sumitem{51--52}{A claim needs a method and a number, or it is labelled
   judgement \dash{} and the method is the design as much as the arithmetic.}
 \end{summarybox}
@@ -1013,7 +1072,7 @@ would I know if it were wrong?}
   neither figure decides on its own.}
 \item A table in a book is blank and the book says the number depends on your
   hardware. Is that a debt?
-  \answerto{No. It is the second of the three reasons: a number that is a
+  \answerto{No. It is the second of the three moves: a number that is a
   property of the reader's machine cannot be supplied, and a table filled in
   by somebody else would be actively misleading. What is owed there is the
   method, not the figure.}

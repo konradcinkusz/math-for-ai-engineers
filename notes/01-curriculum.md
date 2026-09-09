@@ -479,7 +479,7 @@ Fill the column in the pass that runs the experiment; never restate a total.
 | E4 | P11 | Singular-value spectrum of a real open-weights embedding matrix; reconstruction error against rank | Free | not run — needs a trained model |
 | E5 | P16 | Forward against reverse mode: time and peak memory against depth; the measured cost of gradient checkpointing | Free | **not run** — P16 counted operations instead, deliberately |
 | E6 | P20 | SGD, momentum and Adam on a quadratic of known condition number; iterations to tolerance against the predicted count | Free | **run, P20 pass** |
-| E7 | P27 | Bootstrap confidence-interval width against evaluation-set size on a public benchmark; the size needed to resolve one point | Free | not run |
+| E7 | P27 | Bootstrap confidence-interval width against evaluation-set size on a public benchmark; the size needed to resolve one point | Free | **run, P27 pass — split, see the note** |
 | E8 | P30 | Forward against reverse KL fitted to the same bimodal target; mode covering against mode seeking | Free | **run, P30 pass** — see the note |
 | E9 | **P25**, then P32 | **The headline.** Logit variance and softmax entropy with and without `1/sqrt(d_k)`, across head sizes | Free | **run: P25 pass on random vectors, P32 pass through the assembly** |
 | E10 | P33 | A scaling-law power fit on published numbers, with the fit's extrapolation uncertainty reported | Cheap | **run, P33 pass — split, see the note** |
@@ -506,6 +506,28 @@ weight draw rather than an average**, so its own scores sit a few per cent off
 the nominal before training starts. The remaining half — whether the
 independence the derivation assumes survives training — still needs a trained
 model and is stated as outstanding.
+
+**E7 was run in the P27 pass, and P32's question split it too.** The
+specification says “on a public benchmark”, and the width of a bootstrap
+interval on a proportion is a function of $(n, p)$ and of nothing else — so a
+benchmark would supply one number, $p$, and **$p$ sets the constant while $n$
+sets the shape**. The shape is what E7 asks for, so the sweep needs no
+download and runs at the section's own accuracy instead of a borrowed one.
+Nothing in it is simulated either: P27 §2 had already established that on a
+proportion the bootstrap distribution *is* $\mathrm{Binomial}(n, k/n)$
+exactly, so every width is an exact percentile of that binomial — no seed, and
+the same answer on every machine. Measured across three decades the width goes
+26.00 points at 50 items to 0.78 at 51 200, halving at every fourfold step,
+and it falls under one point at about 31 000 items. Two things came out of it
+that the specification did not ask for. **The exactness is in the span
+measured in items**, which doubles as whole numbers — 25, 50, 100, 200, 400 —
+where the points column is those spans divided by the set size and rounded, so
+dividing two of *its* entries gives 2 to two decimal places and not 2 exactly.
+And **the crossing is not a single size**: the span moves one item at a time,
+so near one point the width steps above and below it as the set grows, which
+is why the answer is committed as a round figure with the crossing bracketed
+either side rather than as a smallest $n$ that would be an artefact of the
+grid.
 
 **E10 was run in the P33 pass, and P32's question split it.** The
 specification says “on published numbers”, and the P32 pass established the

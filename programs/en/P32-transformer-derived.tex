@@ -65,9 +65,9 @@
   argument for that divisor still apply? \teachesat{8--9}
   \answerto{Yes, and it is exact: the assembled score is a bilinear form
   whose variance works out to $d_k$ in expectation, so nothing changes.}
-\item A plain chain of $\val{p32.depth}$ layers has a gradient bounded by
-  $\val{p32.plain.bound}$. What does adding a residual connection to each
-  layer do to that? \teachesat{23--24}
+\item A plain chain of $\val{p32.depth}$ layers has a gradient that is a
+  product of one factor per layer, each at most $\frac{1}{4}$. What does
+  adding a residual connection to each layer do to that? \teachesat{23--24}
   \answerto{It stops the gradient being a single product at all. It becomes
   a sum over paths, one of which is the identity and contributes $1$.}
 \item A model with $\val{p32.layers}$ layers of width $\val{p32.d}$ is
@@ -224,7 +224,7 @@ than \emph{replace} is the reason a deep stack trains at all.
 \section{The score, and whether the derivation survives assembly}
 \label{sec:P32-score}
 \index{attention!score}
-\index{attention!the square-root divisor}
+\index{attention!divisor checked@the $1/\sqrt{d_k}$ divisor, in a block}
 
 \begin{fr}
 A score is one dot product: a query at one position against a key at

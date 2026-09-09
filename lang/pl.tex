@@ -148,6 +148,14 @@
 % The date the book's facts were last checked. User-visible, so it lives here.
 \newcommand{\pinnedon}{sierpień 2026}
 
+% ---------- Odsyłacze w skorowidzu ----------
+% To, co drukuje odsyłacz w skorowidzu. Napisy widoczne dla czytelnika i różne
+% w obu wydaniach, więc mieszkają tutaj; preamble.tex buduje z nich \see i
+% \seealso, a nie z \seename z babel, którego nie ma tam, gdzie sonda babel w
+% preambule niczego nie znalazła.
+\newcommand{\lblIndexSee}{zob.}
+\newcommand{\lblIndexSeeAlso}{zob.\ też}
+
 % ---------- Metadane PDF ----------
 % Temat, lista słów kluczowych i język dokumentu to łańcuchy widoczne dla
 % czytelnika i różne w obu wydaniach, więc mieszkają tutaj, a nie w czterech

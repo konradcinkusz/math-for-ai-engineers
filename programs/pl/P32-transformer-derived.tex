@@ -47,9 +47,9 @@
   dzielnikiem nadal obowiązuje? \teachesat{8--9}
   \answerto{Tak, i to dokładnie: złożony wynik jest formą dwuliniową, której
   wariancja wychodzi $d_k$ w wartości oczekiwanej, więc nic się nie zmienia.}
-\item Zwykły łańcuch $\val{p32.depth}$ warstw ma gradient ograniczony przez
-  $\val{p32.plain.bound}$. Co robi z tym dodanie połączenia rezydualnego do
-  każdej warstwy? \teachesat{23--24}
+\item Zwykły łańcuch $\val{p32.depth}$ warstw ma gradient będący iloczynem
+  jednego czynnika na warstwę, każdy najwyżej $\frac{1}{4}$. Co robi z tym
+  dodanie połączenia rezydualnego do każdej warstwy? \teachesat{23--24}
   \answerto{Sprawia, że gradient przestaje być pojedynczym iloczynem. Staje
   się sumą po ścieżkach, z których jedna jest identycznością i wnosi $1$.}
 \item Model o $\val{p32.layers}$ warstwach szerokości $\val{p32.d}$ obsługuje
@@ -202,7 +202,7 @@ sekcja~\ref{sec:P32-residual} pokazuje, że wybór \emph{dodaj} zamiast
 \section{Wynik i to, czy wyprowadzenie przeżywa złożenie}
 \label{sec:P32-score}
 \index{uwaga!wynik}
-\index{uwaga!dzielnik pierwiastkowy}
+\index{uwaga!dzielnik sprawdzony@dzielnik $1/\sqrt{d_k}$, w bloku}
 
 \begin{fr}
 Wynik to jeden iloczyn skalarny: zapytanie z jednej pozycji przeciwko

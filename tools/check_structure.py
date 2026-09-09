@@ -14,10 +14,14 @@ can be trusted to remember:
   --values    Is every \\val{} reference backed by a computed value, and is
               every computed value used?
   --scripts   Does every \\transcript{} name a file that exists?
+  --results   Does every \\result{} mark for Appendix C sit inside the
+              Summary item whose frame range it prints?
   --terms     Does every Polish rendering Appendix D names actually occur
               in the prose of programs/pl?
   --rigour    Does Appendix E name a destination for every rigour box that
               sends the reader outside the book?
+  --index     Does every NAME an \\index{} entry prints occur in the prose of
+              the file the mark sits in?
 
 Exit code is 0 when the ledger is clean and 1 when it is not, so any of these
 can be turned into a hard CI gate by dropping the --soft flag.
@@ -395,6 +399,191 @@ def check_scripts(soft: bool) -> int:
 
 
 # ---------------------------------------------------------------------------
+# --results: Appendix C's coordinates, which cannot be wrong ONLY IF the mark
+# sits where it can pick one up.
+#
+# The whole design of that appendix is that nothing in it is transcribed:
+# \result{...} marks a span of a Summary item, and the program key and frame
+# range it stores are the ones LaTeX is on when it reads the mark. Appendix B
+# was hand-authored, shipped four false pointers, and cost two separate passes
+# to find them by reading; Appendix C is built so that class cannot arise.
+#
+# The range does not come from the mark. It comes from \sumitem, which stashes
+# it in \mfa@sumfr for the mark to pick up -- so a \result written ANYWHERE
+# ELSE silently inherits whichever Summary item was read last, or, in a program
+# whose Summary has not been reached, the \providecommand fallback, and prints
+# `[?]`. Either way the appendix carries a coordinate the mark never earned,
+# which is exactly the defect it exists to make impossible.
+#
+# NOTHING ELSE SEES IT, and that was measured rather than assumed: a probe
+# \result placed outside every Summary item, in BOTH editions, left parity,
+# --frames, --answers, --outcomes, --values, --scripts and gen_stubs --check
+# all green. It has to be both editions to be interesting -- C14 counts every
+# macro generically, so a mark added to one edition alone already fails -- and
+# an edit made in both is the recorded shape of the defect this repository
+# keeps being bitten by: a check that is wrong in the same way in both editions
+# stays green and only the ledger lies.
+#
+# Two smaller faults ride along on the same parse, because both cost one line
+# and neither is visible anywhere else. A mark nested inside another mark
+# stores its text twice, so the appendix prints the inner formula on its own
+# line and again inside the outer one. And an empty mark prints a bullet, no
+# formula and a coordinate, which reads as damage.
+RE_RESULT = re.compile(r"\\result\{")
+RE_SUMITEM = re.compile(r"\\sumitem\{")
+
+
+def _blank_comments(s: str) -> str:
+    """TeX comments out, offsets preserved.
+
+    The line numbers this check reports have to name the line in the file, so
+    the comment is replaced by spaces of its own length rather than removed.
+    """
+    return re.sub(r"(?<!\\)%[^\n]*", lambda m: " " * len(m.group(0)), s)
+
+
+def _group_end(s: str, open_brace: int) -> int | None:
+    """Index one past the `}` matching the `{` at open_brace, or None."""
+    depth = 0
+    i = open_brace
+    while i < len(s):
+        c = s[i]
+        if c == "\\":            # \{ and \} are literal braces, not grouping
+            i += 2
+            continue
+        if c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    return None
+
+
+def _second_arg_spans(text: str, opener: re.Pattern) -> list[tuple[int, int]]:
+    """The body (second argument) of every \\sumitem{range}{body} in text."""
+    out = []
+    for m in opener.finditer(text):
+        first = _group_end(text, m.end() - 1)
+        if first is None:
+            continue
+        j = first
+        while j < len(text) and text[j] in " \n\t":
+            j += 1
+        if j < len(text) and text[j] == "{":
+            second = _group_end(text, j)
+            if second is not None:
+                out.append((j, second))
+    return out
+
+
+def check_results(soft: bool) -> int:
+    bad = 0
+    marked = 0
+    items = 0
+    for lang in LANGS:
+        for f in program_files(lang):
+            raw = f.read_text(encoding="utf8")
+            text = _blank_comments(raw)
+            bodies = _second_arg_spans(text, RE_SUMITEM)
+            items += len(bodies)
+            marks = []
+            for m in RE_RESULT.finditer(text):
+                end = _group_end(text, m.end() - 1)
+                if end is None:
+                    continue
+                marks.append((m.start(), m.end(), end))
+            for start, body_open, end in marks:
+                marked += 1
+                where = f"{f.relative_to(ROOT)}:{text[:start].count(chr(10)) + 1}"
+                if not any(a <= start < b for a, b in bodies):
+                    print(f"  {where}: \\result outside every \\sumitem body. "
+                          f"The frame range comes from \\sumitem, so this mark "
+                          f"would print whichever range was read last.")
+                    bad += 1
+                if any(o < start and end <= e for o, _, e in marks
+                       if (o, e) != (start, end)):
+                    print(f"  {where}: \\result nested inside another one; "
+                          f"Appendix C would print its text twice.")
+                    bad += 1
+                if not text[body_open:end - 1].strip():
+                    print(f"  {where}: empty \\result{{}} -- a bullet and a "
+                          f"coordinate with no formula between them.")
+                    bad += 1
+    if bad == 0:
+        print(f"  {marked // len(LANGS)} results marked for Appendix C in each "
+              f"edition, every one inside the Summary item whose frame range "
+              f"it prints ({items // len(LANGS)} Summary items in all; an item "
+              f"that is a caveat rather than a result is deliberately unmarked).")
+    _report_contract_bypass()
+    return 0 if (bad == 0 or soft) else 1
+
+
+# The second half, and it is REPORTED rather than fatal.
+#
+# Appendix C is the one place in the book where the notation contract has to
+# hold exactly: it is entered by somebody looking a formula up, with none of
+# the section around it, so a spelling that disagrees with Appendix B there is
+# worse than no reference at all.
+#
+# The contract is implemented as macros in lang/{en,pl}.tex so the SOURCE is
+# identical and only the output differs -- \gcdop sets `gcd` in English and
+# `NWD` in Polish, \spanof sets `span` and `lin`. Writing \operatorname{gcd}
+# instead sets `gcd` in both, which is a one-edition divergence that no parity
+# check can see, because both editions carry the same wrong token.
+#
+# C10 forbids exactly one of these spellings, \operatorname{lcm}. The contract
+# owns ten operators. So the list here is READ OUT OF lang/en.tex rather than
+# typed, and an operator added to the contract is covered the day it is added.
+#
+# It does not fail the build, on the treatment this book gives every ledger
+# nobody can responsibly clear in the pass that finds it: the sites it names
+# are in a merged program, the fix is a substitution that changes no glyph
+# today, and a gate that is red on somebody else's file teaches the next person
+# to stop reading the output. Printed on every run instead. When the count goes
+# up, that is the signal.
+RE_DECLARE_OP = re.compile(r"\\DeclareMathOperator\{\\(\w+)\}\{([^{}]*)\}")
+
+
+def _contract_operators() -> dict[str, str]:
+    """{raw spelling -> the macro that owns it}, read from the contract."""
+    text = (ROOT / "lang" / "en.tex").read_text(encoding="utf8")
+    out: dict[str, str] = {}
+    for macro, setting in RE_DECLARE_OP.findall(text):
+        for wrapper in ("operatorname", "mathrm", "text"):
+            out[f"\\{wrapper}{{{setting}}}"] = f"\\{macro}"
+    return out
+
+
+def _report_contract_bypass() -> None:
+    ops = _contract_operators()
+    hits: list[tuple[str, str, str]] = []
+    for lang in LANGS:
+        for f in program_files(lang):
+            text = _blank_comments(f.read_text(encoding="utf8"))
+            for mo in RE_RESULT.finditer(text):
+                end = _group_end(text, mo.end() - 1)
+                if end is None:
+                    continue
+                span = text[mo.end():end - 1]
+                for raw, macro in ops.items():
+                    if raw in span:
+                        line = text[:mo.start()].count(chr(10)) + 1
+                        hits.append((f"{f.relative_to(ROOT)}:{line}", raw, macro))
+    if not hits:
+        print("  Every marked span spells the contract's operators through "
+              "their macros.")
+        return
+    print(f"  {len(hits)} marked spans hard-code an operator the notation "
+          f"contract owns a macro for. Both editions carry the same token, so "
+          f"no parity check can see it, and Appendix C replays it verbatim:")
+    for where, raw, macro in hits:
+        print(f"    {where}: {raw} -- use {macro}")
+    print("  Reported, never fatal.")
+
+
+# ---------------------------------------------------------------------------
 # --terms: Appendix D is a claim about the body on every line.
 #
 # A glossary row naming a word the book does not use is the failure that
@@ -461,6 +650,105 @@ def check_terms(soft: bool) -> int:
     if bad == 0:
         print(f"  {total} Polish renderings named in Appendix D, "
               f"every one used in the prose.")
+    return 0 if (bad == 0 or soft) else 1
+
+
+RE_INDEX = re.compile(r"\\index\{((?:[^{}]|\{[^{}]*\})*)\}")
+# A NAME, for this check: a run of letters, at least two long, carrying at
+# least one capital. That is the decidable half of an index entry and the only
+# half worth a gate -- see the note above check_index().
+RE_NAME = re.compile(r"[A-Za-z]*[A-Z][A-Za-z]*")
+# \DeclareMathOperator{\relu}{ReLU} and \newcommand{\tg}{...}: what the source
+# writes as a macro and the page prints as a word. Learnt from the preamble
+# and the language files rather than listed here, the way checkpdf.py learns
+# the next-frame cue out of lang/*.tex rather than hard-coding it -- so a new
+# operator cannot make this check start lying.
+RE_OPERATOR = re.compile(
+    r"\\(?:DeclareMathOperator\*?|newcommand\*?|providecommand\*?)"
+    r"\{?\\([A-Za-z@]+)\}?(?:\[\d\])?\{([^{}]*)\}")
+
+
+def _printed_forms() -> dict[str, str]:
+    forms: dict[str, str] = {}
+    for f in (ROOT / "preamble.tex", ROOT / "lang" / "en.tex",
+              ROOT / "lang" / "pl.tex"):
+        if f.exists():
+            for macro, body in RE_OPERATOR.findall(f.read_text(encoding="utf8")):
+                forms.setdefault("\\" + macro, body)
+    return forms
+
+
+def check_index(soft: bool) -> int:
+    r"""An index entry that names something the page never prints.
+
+    The index is the one artefact in this book whose coordinates rest entirely
+    on where an \index{} mark happens to sit, and a review of it found the two
+    ways that goes wrong: a mark parked at a section opener several pages
+    before the term it names, and -- worse -- \index{optimiser!AdamW} against a
+    program that deliberately never writes the word, so the index asserted by
+    its existence that the book discusses AdamW under that name.
+
+    Only the second is checkable from the source, and only for part of an
+    entry. Most index leaves in this book are DESCRIPTIONS rather than terms
+    ("what it omits", "as an inverse", "and the ELBO"), so the obvious check --
+    assert the leaf occurs in the prose -- reports most of the book and is the
+    permanently red ledger CLAUDE.md refuses. Measured before this was
+    written, by taking each leaf's longest content word and asking whether it
+    occurs in the file at all: of the 926 marks across the two editions it
+    reports a hundred and thirty, the Polish far worse than the English
+    because Polish inflects and a stem match is not available. Almost every
+    one of the hundred and thirty is a description doing its job.
+
+    A NAME is the decidable half. AdamW, PageRank, Thompson, ELBO, PCA, SVD,
+    Jacobian: a capitalised token either appears in the file or it does not,
+    and if it does not then the index has named something the reader cannot
+    find. Over the same 926 marks about eighty carry such a token, and once
+    the three this pass found were cleared every one of them is printed. So
+    this is a hard gate on a clean, narrow class rather than a ledger on a
+    wide one, and the count it prints is the ledger.
+
+    A see-reference is exempt by construction: \index{SVD|see{singular value
+    decomposition}} names another ENTRY, not a word in the body, and saying so
+    is the whole point of the device.
+    """
+    forms = _printed_forms()
+    bad = 0
+    marks = names = 0
+    for lang in LANGS:
+        for f in program_files(lang):
+            src = f.read_text(encoding="utf8")
+            prose = RE_TEX_COMMENT.sub("", RE_INDEX.sub("", src))
+            # A macro the page prints as a word counts as the word.
+            for macro, body in forms.items():
+                if macro in prose:
+                    prose += " " + body
+            for m in RE_INDEX.finditer(src):
+                marks += 1
+                entry = m.group(1)
+                # A see-reference names another ENTRY rather than a word in
+                # the body, and its head is by construction a word the book
+                # does NOT print -- that is why it needs a see. Both halves
+                # are exempt, and the whole mark is skipped.
+                if re.search(r"\|\s*(?:seealso|see)\b", entry):
+                    continue
+                payload = entry.split("|")[0]
+                shown = " ".join(seg.split("@")[-1]
+                                 for seg in payload.split("!"))
+                for token in RE_NAME.findall(shown):
+                    if len(token) < 2:
+                        continue
+                    names += 1
+                    if token not in prose:
+                        line = src[:m.start()].count("\n") + 1
+                        print(f"  {f.relative_to(ROOT)}:{line}: index entry "
+                              f"{payload!r} names {token!r}, which this file "
+                              f"never prints. An index entry for a word the "
+                              f"body does not write sends the reader to a page "
+                              f"that does not carry it.")
+                        bad += 1
+    if bad == 0:
+        print(f"  {names} names in {marks} index entries, "
+              f"every one printed in its own program.")
     return 0 if (bad == 0 or soft) else 1
 
 
@@ -618,15 +906,18 @@ def main() -> int:
     p.add_argument("--values", action="store_true")
     p.add_argument("--elicit", action="store_true")
     p.add_argument("--scripts", action="store_true")
+    p.add_argument("--results", action="store_true")
     p.add_argument("--terms", action="store_true")
     p.add_argument("--parts", action="store_true")
     p.add_argument("--rigour", action="store_true")
+    p.add_argument("--index", action="store_true")
     p.add_argument("--all", action="store_true")
     p.add_argument("--soft", action="store_true",
                    help="report but always exit 0 (the default for a draft)")
     a = p.parse_args()
     if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit,
-                a.scripts, a.terms, a.parts, a.rigour, a.all)):
+                a.scripts, a.results, a.terms, a.parts, a.rigour,
+                a.index, a.all)):
         a.all = True
     rc = 0
     if a.all or a.frames:
@@ -641,12 +932,16 @@ def main() -> int:
         rc |= check_elicitation(a.soft)
     if a.all or a.scripts:
         rc |= check_scripts(a.soft)
+    if a.all or a.results:
+        rc |= check_results(a.soft)
     if a.all or a.terms:
         rc |= check_terms(a.soft)
     if a.all or a.parts:
         rc |= check_parts(a.soft)
     if a.all or a.rigour:
         rc |= check_rigour(a.soft)
+    if a.all or a.index:
+        rc |= check_index(a.soft)
     return rc
 
 

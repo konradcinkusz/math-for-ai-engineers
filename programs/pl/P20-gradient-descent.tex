@@ -13,7 +13,7 @@
 \program[Od SGD do Adama]{Metoda gradientu prostego: od SGD do Adama}
 \label{prog:P20}
 \index{optymalizator}
-\index{metoda gradientu prostego}
+\index{metoda gradientu prostego!jako optymalizator}
 
 \begin{outcomes}
 \outcome{1--7}{zapisać jedną aktualizację, której wariantem jest każdy
@@ -449,7 +449,7 @@ gradientu jest takim czymś.
 \end{ansblock}
 
 \[ v \leftarrow \beta_2 v + (1-\beta_2) g^{2}, \qquad
-   w \leftarrow w - \eta\,\frac{g}{\sqrt{v} + \varepsilon} \]
+   w \leftarrow w - \eta\,\frac{g}{\sqrt{v}} \]
 
 $\sqrt{v}$ ma jednostki gradientu, więc $g/\sqrt{v}$ nie ma żadnych, a
 \textbf{krok wynosi około $\eta$ niezależnie od tego, jak duży jest gradient}.
@@ -472,24 +472,26 @@ $\val{p20.adam.decades}$ rzędach wielkości:
 
 \transcript{p20-unit-step}
 
-Krok wynosi $\val{p20.adam.eta}$ w każdej współrzędnej dla dużych gradientów i
-jest o $\val{p20.adam.shortfall}$ procent krótszy dla małych.
+Krok wynosi $\val{p20.adam.eta}$ w każdej współrzędnej dla dużych gradientów.
+Dla małych jest krótszy, i to nie tak samo w obu: o
+$\val{p20.adam.shortfall}$ procent przy mniejszym z dwóch gradientów i o
+$\val{p20.adam.shortfall.lo}$ przy większym.
 \textbf{To dlatego Adam jest niewrażliwy na skalowanie straty}: pomnóż stratę
 przez tysiąc, a każdy gradient zostanie pomnożony przez tysiąc \dash{} licznik i
 mianownik razem.
 \end{fr}
 
 \begin{fr}
-Ten niedomiar nie jest szumem ani przybliżeniem. Pierwszy krok wynosi dokładnie
-\[ \frac{\eta}{1 + \varepsilon/\lvert g\rvert} \]
-co skrypt sprawdza w każdej współrzędnej przy każdej skali. Odchylenie od
-$\eta$ należy więc w całości do epsilona i jest największe tam, gdzie gradient
-jest \emph{najmniejszy} \dash{} po przeciwnej stronie niż ta, o którą ludzie
-się martwią.
+Ten niedomiar nie jest szumem ani przybliżeniem i ma jedną przyczynę. Żadna
+implementacja nie może dzielić przez $\sqrt{v}$, dopóki $v$ jest bliskie
+zera, więc każda niesie mały $\varepsilon$, żeby to powstrzymać. Odchylenie
+od $\eta$ należy więc w całości do epsilona i jest największe tam, gdzie
+gradient jest \emph{najmniejszy} \dash{} po przeciwnej stronie niż ta, o
+którą ludzie się martwią.
 
-Rodzi to pytanie, o którym przy pisaniu epsilona zwykle nikt nie myśli. Jest
-po to, żeby powstrzymać dzielenie przez zero. Gdzie ma stać: w środku
-pierwiastka, dodany do $v$, czy na zewnątrz, dodany do $\sqrt{v}$?
+Rodzi to pytanie, o którym przy pisaniu epsilona zwykle nikt nie myśli. Gdzie
+ma stać: w środku pierwiastka, dodany do $v$, czy na zewnątrz, dodany do
+$\sqrt{v}$?
 \dotline
 \nextframe
 \end{fr}
@@ -500,8 +502,12 @@ Na zewnątrz. W środku jest dodawany do \emph{kwadratu} gradientu, a to nie jes
 gradient.
 \end{ansblock}
 
-To znowu argument z jednostek i ma mierzalną konsekwencję. Przy
-$\varepsilon = \val{p20.eps}$ i gradiencie $\val{p20.eps.g}$:
+To znowu argument z jednostek. Przy epsilonie na zewnątrz pierwszy krok
+wynosi dokładnie
+\[ \frac{\eta}{1 + \varepsilon/\lvert g\rvert} \]
+co skrypt sprawdza w każdej współrzędnej przy każdej skali, i ma to mierzalną
+konsekwencję. Przy $\varepsilon = \val{p20.eps}$ i gradiencie
+$\val{p20.eps.g}$:
 
 \begin{center}
 \begin{tabular}{ll}
@@ -633,7 +639,6 @@ jest najmniej godna zaufania.
 \section{Gdzie wchodzi kara}
 \label{sec:P20-decay}
 \index{optymalizator!weight decay}
-\index{optymalizator!AdamW}
 
 \begin{fr}
 Jeszcze dwie naprawy, obie dotyczą rzeczy siedzących \emph{wokół} aktualizacji,
@@ -704,7 +709,9 @@ $\lambda$ spotykająca dwie krzywizny, więc kara niemal unicestwia współrzęd
 o małym gradiencie \dash{} i jest to własność kary, a nie metody, która ją
 niesie.
 
-Do samego Adama należy drugi wiersz. Kara odsprzężona nigdy nie przechodzi
+Do samego Adama należy drugi wiersz. Kara
+odsprzężona\index{optymalizator!kara odsprzężona}%
+\index{AdamW|see{optymalizator, kara odsprzężona}} nigdy nie przechodzi
 przez $\sqrt{v}$, więc ciągnie obie współrzędne o ten sam ułamek ich samych,
 wobec kroku, którego rozmiar normalizator już ustalił; przy tej $\lambda$
 zostawia to obie w ich minimum danych, z dokładnością lepszą niż

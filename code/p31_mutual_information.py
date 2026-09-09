@@ -199,7 +199,12 @@ NOTES.append(
 #     asymmetric quantity and will expect this one to be asymmetric too.
 # ======================================================================
 _SYM_TRIALS = 0
-for _num in product(range(4), repeat=6):        # every 2x3 joint on a /15 grid
+# every NON-ZERO count pattern of a 2x3 table with each cell in {0,1,2,3},
+# normalised.  It is patterns rather than distinct distributions -- (1,1,1,
+# 1,1,1) and (2,2,2,2,2,2) normalise to the same one -- so the frames say
+# patterns.  "All 4095 joint distributions" claimed a completeness this does
+# not have and a reader could not reproduce it from what is on the page.
+for _num in product(range(4), repeat=6):
     _tot = sum(_num)
     if _tot == 0:
         continue
@@ -210,8 +215,9 @@ for _num in product(range(4), repeat=6):        # every 2x3 joint on a /15 grid
     _SYM_TRIALS += 1
 emit("p31.sym.trials", _SYM_TRIALS)
 NOTES.append(
-    f"  * symmetric and non-negative on all {_SYM_TRIALS} joints of a 2x3"
-    f" rational grid, with no tolerance beyond floating-point noise")
+    f"  * symmetric and non-negative on all {_SYM_TRIALS} non-zero patterns"
+    f" of a 2x3 table with cells in {{0,1,2,3}}, normalised, with no tolerance"
+    f" beyond floating-point noise")
 
 
 # ======================================================================
@@ -237,11 +243,20 @@ def plugin_mi_2x2(cell, N):
 
 
 def exact_bias_2x2(N):
-    """E[plug-in MI] when X and Y are INDEPENDENT and uniform.  The truth is
-    exactly zero, so every nat this returns is the estimator's own."""
+    """The WHOLE null distribution of the plug-in estimate when X and Y are
+    INDEPENDENT and uniform.  The truth is exactly zero, so every nat this
+    returns is the estimator's own.
+
+    Returns its mean, its standard deviation, its 95th percentile and the
+    number of tables.  The spread matters as much as the mean and the frames
+    need both: a single shuffled-label run is ONE DRAW from this, so what it
+    reports is only as good as the distribution is narrow -- and it is not
+    narrow.  Nothing is sampled here either, so the spread is exact."""
     total = Fraction(0)
     expect = 0.0
+    second = 0.0
     tables = 0
+    atoms = []
     for a in range(N + 1):
         for b in range(N - a + 1):
             for c in range(N - a - b + 1):
@@ -249,18 +264,33 @@ def exact_bias_2x2(N):
                 w = Fraction(comb(N, a) * comb(N - a, b) * comb(N - a - b, c),
                              4 ** N)
                 total += w
-                expect += float(w) * plugin_mi_2x2((a, b, c, d), N)
+                v = plugin_mi_2x2((a, b, c, d), N)
+                fw = float(w)
+                expect += fw * v
+                second += fw * v * v
+                atoms.append((v, fw))
                 tables += 1
     assert total == 1, total          # the enumeration is COMPLETE, exactly
-    return expect, tables
+    sd = math.sqrt(max(second - expect * expect, 0.0))
+    atoms.sort()
+    cum = 0.0
+    q95 = atoms[-1][0]
+    for v, w in atoms:
+        cum += w
+        if cum >= 0.95:
+            q95 = v
+            break
+    return expect, sd, q95, tables
 
 
 BIAS_NS = (10, 20, 50, 100)
 _bias = {}
+_null = {}
 for _N in BIAS_NS:
-    _e, _t = exact_bias_2x2(_N)
+    _e, _sd, _q95, _t = exact_bias_2x2(_N)
     _pred = 1 / (2 * _N)                       # (|X|-1)(|Y|-1)/2N at 2x2
     _bias[_N] = (_e, _t, _pred, _e / _pred)
+    _null[_N] = (_e, _sd, _q95)
     emit(f"p31.bias.n{_N}", _e, 6)
     emit(f"p31.bias.tables{_N}", _t)
     emit(f"p31.bias.ratio{_N}", _e / _pred, 3)
@@ -286,6 +316,56 @@ NOTES.append(
     f" where the bias is largest: {_ratios[0]:.3f}x off at N=10, converging to"
     f" {_ratios[-1]:.3f}x by N=100 -- the remedy fails hardest in the regime"
     f" that needs it")
+
+# HOW MUCH OF THE BIAS SURVIVES THE CORRECTION.  The trap box reads the last
+# column of the table, so it has to read it the way a reader will: the
+# correction removes 1/2N of a bias that is r times 1/2N, so what is left is
+# (r-1)/r of it.  The frame said "nearly a third" at N = 10 where the column
+# it is quoting says 23 per cent, and it quoted N = 100 as a percentage in
+# the same sentence -- so a reader applying one reading to both rows found
+# the page disagreeing with itself.  Emitted rather than worded, and asserted
+# to come back out of the RATIO THE PAGE PRINTS rather than out of the float.
+def _left_of_bias(r):
+    return 100.0 * (r - 1.0) / r
+
+
+_left10 = pct(_left_of_bias(_bias[10][3]))
+reproduces(_left10, 1, (_bias[10][3], 3), op=_left_of_bias)
+emit("p31.bias.left10", _left10, 1)
+# At N = 100 NO single decimal serves: the exact remainder is 1.55 per cent
+# and the ratio the page prints gives 1.57, which round to 1.5 and 1.6.  The
+# guard above fired on exactly that, on its first run.  So the frame keeps a
+# BOUND there -- F05's recorded remedy -- and both readings have to clear it.
+_TWO_PER_CENT = 2.0
+assert _left_of_bias(_bias[100][3]) < _TWO_PER_CENT, _bias[100]
+assert _left_of_bias(float(f"{_bias[100][3]:.3f}")) < _TWO_PER_CENT, _bias[100]
+# and the remedy is worst where the bias is largest, which is the trap's point
+assert _left_of_bias(_ratios[0]) > _left_of_bias(_ratios[-1]), _ratios
+
+# THE SPREAD OF THE NULL, which is what decides whether ONE shuffled run is
+# a floor or a draw.  The enumeration above already has the whole
+# distribution, so this costs nothing and it is exact: no sample, no seed.
+# THE INVARIANT, asserted rather than any one figure: the null's spread
+# EXCEEDS ITS OWN MEAN at every N enumerated, and its 95th percentile is more
+# than three times that mean.  So a single run cannot measure the mean it is
+# being used as -- one run in twenty comes back several times too high, and
+# nothing in that run says which kind it was.
+for _N in BIAS_NS:
+    _m, _sd, _q = _null[_N]
+    assert _sd > _m, (_N, _sd, _m)
+    assert _q > 3 * _m, (_N, _q, _m)
+emit("p31.null.sd10", _null[10][1], 4)
+emit("p31.null.q95", _null[10][2], 4)
+# and the page puts the 95th percentile beside the mean, so the reader's own
+# division has to clear the bound the frame states.
+assert (float(f"{_null[10][2]:.4f}")
+        > 4 * float(f"{_bias[10][0]:.6f}")), _null[10]
+NOTES.append(
+    f"  * and ONE shuffled run is a DRAW from that null, not the null: its"
+    f" spread {_null[10][1]:.4f} exceeds its own mean {_bias[10][0]:.4f} at"
+    f" N=10 and at every N enumerated, and its 95th percentile"
+    f" {_null[10][2]:.4f} is more than four times the mean -- so a single run"
+    f" reports a floor it cannot measure")
 
 # THE SCALE-UP, and the first draft of it quoted the formula outside its own
 # regime.  (|X|-1)(|Y|-1)/2N is asymptotic in N against the number of CELLS,
@@ -316,6 +396,36 @@ NOTES.append(
     f" {_max_mi:.2f} nats only at N = {BIG_N} -- about {BIG_N / _cells:.0f}"
     f" items per cell, and nobody reports that alongside the estimate")
 
+# FINER BINS ON ONE AXIS ONLY, which is what the further problem asks and
+# what its answer got wrong.  Doubling the ACTIVATION buckets leaves the
+# label alone, so the table goes 16 x 16 to 32 x 16: the cells DOUBLE rather
+# than quadruple, and the largest value the quantity can take does not move
+# at all, because it is still bounded by the 16-way label.  The answer said
+# fourfold and quoted "some sixteen thousand"; a reader reusing the formula
+# the frames just gave them gets about half that and finds the book wrong in
+# the one place it invites them to check it.
+FINE_A, FINE_B = 2 * BIG_K, BIG_K
+_cells_fine = FINE_A * FINE_B
+_max_fine = log(min(FINE_A, FINE_B))
+assert _cells_fine == 2 * _cells, (_cells_fine, _cells)      # NOT fourfold
+assert _max_fine == _max_mi, (_max_fine, _max_mi)     # the label bounds it
+_need_fine = math.ceil((FINE_A - 1) * (FINE_B - 1)
+                       / (2 * float(_TOL) * _max_fine))
+assert _need_fine / _cells_fine > 10, (_need_fine, _cells_fine)
+# and the shape: the requirement scales with (a-1)(b-1) and with nothing else
+# here, so the ratio of the two sample sizes is the ratio of those terms.
+assert abs(_need_fine / BIG_N
+           - ((FINE_A - 1) * (FINE_B - 1))
+           / ((BIG_K - 1) ** 2)) < 0.01, _need_fine
+emit("p31.big.ab", (BIG_K - 1) ** 2)
+emit("p31.big.cells.finer", _cells_fine)
+emit("p31.big.ab.finer", (FINE_A - 1) * (FINE_B - 1))
+emit("p31.big.need.finer", _need_fine)
+NOTES.append(
+    f"  * doubling the buckets on ONE axis takes the cells from {_cells} to"
+    f" {_cells_fine} and the sample needed from {BIG_N} to {_need_fine} --"
+    f" about twice, not four times, because the label axis does not move")
+
 
 # ======================================================================
 # 4.  The data-processing inequality, and it is worth reading from BOTH
@@ -342,11 +452,15 @@ JOINT_XY = {(0, 0): Fraction(3, 12), (0, 1): Fraction(2, 12), (0, 2): Fraction(1
 I_XY = mi(JOINT_XY)
 
 _best = 0.0
+_best_chan = None
 _channels = 0
+_deterministic = 0
 for _c0 in _vectors(2):
     for _c1 in _vectors(2):
         for _c2 in _vectors(2):
             _chan = {0: _c0, 1: _c1, 2: _c2}
+            if all(_p in (0, 1) for _row in _chan.values() for _p in _row):
+                _deterministic += 1
             _jz: dict = {}
             for (_x, _y), _p in JOINT_XY.items():
                 for _z in (0, 1):
@@ -356,10 +470,22 @@ for _c0 in _vectors(2):
             # NOTHING may exceed what the layer carried.  No tolerance beyond
             # floating-point noise: this is the inequality, not an estimate.
             assert _i <= I_XY + 1e-12, (_chan, _i, I_XY)
-            _best = max(_best, _i)
+            if _i > _best:
+                _best, _best_chan = _i, _chan
 
+# WHAT WAS ENUMERATED, said correctly.  343 = 7^3 is every STOCHASTIC channel
+# on the grid, three rows taking one of seven values each; the frames called
+# it "every map from a three-valued Y to a two-valued Z", of which there are
+# eight.  Both counts are asserted here so the page cannot describe one and
+# quote the other -- and the best of the 343 turns out to BE one of the eight,
+# which is what keeps the merging argument in the next frame about the family
+# the page says was enumerated.
+assert _deterministic == 2 ** 3, _deterministic
+assert all(_p in (0, 1)
+           for _row in _best_chan.values() for _p in _row), _best_chan
 emit("p31.dpi.ixy", I_XY, 4)
 emit("p31.dpi.channels", _channels)
+emit("p31.dpi.det", _deterministic)
 emit("p31.dpi.best", _best, 4)
 # The page would print 74.1 per cent beside two values that divide to 74.2,
 # which is the class F04, F05, P07, P12, P23 and P27 each paid for -- caught
