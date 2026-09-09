@@ -1,7 +1,7 @@
 .PHONY: all a4 all-formats check check-a4 site frontpage stubs-check en pl en-a4 pl-a4 \
         scripts terms parts rigour index \
         text-only watch-en watch-pl clean diagrams diagrams-clean \
-        numbers verify stubs answers frames elicit outcomes values translate shots debt
+        numbers verify stubs answers frames elicit outcomes values translate shots figuresize debt
 
 # Two paper formats from one source. `standard` is the 17 x 24 cm trade format
 # shared with the companion volumes; `a4` is A4 at 12pt, which is what the book
@@ -48,6 +48,7 @@ check:
 	@python3 tools/check_structure.py --site
 	@python3 tools/checklog.py main-en.log main-pl.log
 	@python3 tools/checkpdf.py main-en.pdf main-pl.pdf
+	@python3 tools/checkfigures.py --quiet
 	@python3 tools/parity.py | tail -n 3
 	@python3 tools/reflist.py 2>/dev/null || true
 
@@ -333,6 +334,13 @@ translate:
 	  echo "  (cross-reference comparison needs a completed build of both editions)"
 
 # 7. Numeric claims not produced by a script, and diagrams not drawn.
+# The node text inside a diagram lands at whatever size the scale-to-measure
+# leaves it, and until this pass nothing in the repository looked at that
+# number. Reads figures/diagrams/, which `make diagrams` writes, and is quiet
+# on a checkout where they have not been rendered.
+figuresize:
+	@python3 tools/checkfigures.py --quiet
+
 shots:
 	@printf "  verifybox blocks: "
 	@grep -rc 'begin{verifybox}' programs appendices 2>/dev/null \
@@ -357,6 +365,7 @@ debt:
 	@echo; echo "== The shop window's figures ==" ; $(MAKE) -s frontpage
 	@echo; echo "== Polish/English parity =="     ; $(MAKE) -s translate
 	@echo; echo "== Unverified claims, diagrams ="; $(MAKE) -s shots
+	@echo; echo "== Diagram type size =="        ; $(MAKE) -s figuresize || true
 	@echo
 	@echo "== Reader validation =="
 	@echo "  80/80: NOT ESTABLISHED. The method is validated; this book is not."

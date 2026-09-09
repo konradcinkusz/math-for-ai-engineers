@@ -1,21 +1,13 @@
 flowchart LR
-  subgraph R["R -- liczby rzeczywiste"]
+  subgraph R["R -- rzeczywiste, np. pi"]
     direction LR
-    subgraph Q["Q -- wymierne: iloraz dwoch calkowitych"]
+    subgraph Q["Q -- wymierne, np. 1/3 oraz 0,1"]
       direction LR
-      subgraph Z["Z -- calkowite"]
+      subgraph Z["Z -- calkowite, np. -3"]
         direction LR
-        subgraph N["N -- 0, 1, 2, 3, ..."]
-          n1["4"]
-        end
-        z1["-3"]
+        N["N -- 0, 1, 2, 3, ..."]
       end
-      q1["1/3 = 0,333..."]
-      q2["0,1"]
     end
-    r1["e"]
-    r2["pi"]
   end
-
-  F["F -- to, co przechowuje maszyna:<br/>SKONCZONY podzbior Q.<br/>Nie ma w nim 0,1.<br/>Patrz Program 1."]
-  Q -. "zawiera F, ale F nie zawiera N ani Z" .-> F
+  F["F -- to, co przechowuje maszyna:<br/>SKONCZONY podzbior Q,<br/>a 0,1 do niego nie nalezy"]
+  Q -. "zawiera F; F nie zawiera N ani Z" .-> F
