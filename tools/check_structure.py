@@ -277,6 +277,154 @@ def check_elicitation(soft: bool) -> int:
     return 0
 
 
+# The two treatments an answer can be set in, and what separates them.
+#
+# \ans      0.86\linewidth, centred, flush centre, UNBREAKABLE, 5pt above and
+#           below the text inside the rule.
+# ansblock  the full measure, left-aligned, BREAKABLE, 6pt above and below.
+#
+# Both inherit `mfa answer', so the skips around them are the same and only the
+# geometry differs. Read out of preamble.tex rather than measured: there is no
+# TeX installation in the container this was written in.
+#
+# The preamble says what the second is for -- "a multi-paragraph or worked
+# answer, where a centred box would be wrong" -- so the predicate below is that
+# sentence and not a length. A body carrying a display, a list, a table or a
+# listing cannot sit in a fitted centred box; anything else can.
+#
+# The marker list is not a judgement call, and that was checked rather than
+# assumed: adding array, cases, every matrix environment, \dotline and \blank
+# moves neither figure by one, because not one of them occurs in an ansblock
+# body anywhere in the book. (Which also confirms, for free, CLAUDE.md's
+# recorded rule that a \blank inside an ansblock is a defect: there are none.)
+RE_ANSBLOCK_OPEN = re.compile(r"\\begin\{ansblock\}")
+RE_ANSBLOCK_CLOSE = re.compile(r"\\end\{ansblock\}")
+ANSBLOCK_WORKED = (
+    r"\[", r"\begin{align", r"\begin{equation", r"\begin{gather",
+    r"\begin{tabular", r"\begin{center", r"\begin{itemize",
+    r"\begin{enumerate", r"\begin{python", r"\transcript", r"\mermaidfig",
+    r"\begin{lstlisting", r"\begin{verbatim",
+)
+
+
+def _ansblock_bodies(text: str) -> list[str]:
+    """Every ansblock body in source order, comments already gone.
+
+    The same-line form is handled explicitly even though the book contains
+    none: without it the scan would run past the close and swallow the next
+    answer whole, reporting one body where there are two and classifying it by
+    the wrong content. That is a silent wrong answer rather than a crash, which
+    is the failure mode this repository keeps paying for -- so it is closed
+    here rather than left latent for whoever writes the first one.
+    """
+    out, lines, i = [], text.split("\n"), 0
+    while i < len(lines):
+        if RE_ANSBLOCK_OPEN.search(lines[i]):
+            after = lines[i].split(r"\begin{ansblock}", 1)[1]
+            if RE_ANSBLOCK_CLOSE.search(after):
+                out.append(after.split(r"\end{ansblock}", 1)[0])
+                i += 1
+                continue
+            body = [after]
+            j, depth = i + 1, 1
+            while j < len(lines):
+                if RE_ANSBLOCK_OPEN.search(lines[j]):
+                    depth += 1
+                if RE_ANSBLOCK_CLOSE.search(lines[j]):
+                    depth -= 1
+                    if depth == 0:
+                        body.append(lines[j].split(r"\end{ansblock}", 1)[0])
+                        break
+                body.append(lines[j])
+                j += 1
+            out.append("\n".join(body))
+            i = j + 1
+        else:
+            i += 1
+    return out
+
+
+def _plain(body: str) -> bool:
+    """A one-sentence answer: no display, no list, no listing, one paragraph."""
+    if any(m in body for m in ANSBLOCK_WORKED):
+        return False
+    return len([p for p in re.split(r"\n\s*\n", body) if p.strip()]) <= 1
+
+
+def check_answerbox(soft: bool) -> int:
+    r"""Report which of the two answer treatments each program uses, and for what.
+
+    REPORTED, NEVER FATAL, on the orphan tail's and the elicitation rate's
+    reasoning: there is no defensible threshold, the count is in the hundreds,
+    and nothing can be cleared without a book-wide pagination pass. A gate that
+    is red on something nobody can responsibly clear teaches the next person to
+    stop reading the output.
+
+    The answer box is the one element the whole method depends on: the reader
+    learns where its edge is and covers it with a hand. Two treatments for one
+    kind of answer move that edge, and they are used interchangeably -- 38 of
+    the 47 programs set a plain one-sentence answer both ways, F08 does it in
+    three consecutive frames, and P20 sets the single word "Adam" narrow and
+    centred while setting a single \val{} full width and left-aligned.
+
+    NOTHING ELSE IN THIS REPOSITORY LOOKS AT IT, and the reason is exact.
+    parity's C4 and C14 both compare the two EDITIONS, so they catch a
+    treatment changed in one and not the other -- proved by mutation: turning
+    one English ansblock into an \ans fails C4 at the token index and C14 on
+    the histogram, and the two editions accordingly agree everywhere, 378 plain
+    against 112 worked in each. What no check can see is both editions being
+    wrong TOGETHER, which is this repository's oldest recorded class and is
+    what this ledger is for.
+
+    The column is plain-against-worked rather than a length, and that is the
+    whole of why this ledger can say which way the eventual fix goes.
+    notes/07 section 3 records the original's answer box as "narrower than the
+    measure, centred... a thing you put your hand over", and notes/07 records
+    ansblock's full width as a DEPARTURE from it, with its reason stated: "a
+    multi-paragraph worked answer with displayed maths at 0.86\linewidth is
+    where the overfull hboxes would come from". That reason reaches the 112
+    worked answers. It does not reach the other 378, which carry no display and
+    no second paragraph and so cannot produce the box the departure was taken
+    to avoid. A departure applied past its own justification is a defect the
+    notes can adjudicate, where two treatments merely looking different is a
+    matter of taste.
+
+    A length threshold was deliberately not used. The issue that produced this
+    ledger proposed "no display and under about 120 characters"; the corpus
+    says the two treatments overlap across the whole range where one-sentence
+    answers live -- 138 \ans against 137 plain ansblocks between 40 and 80
+    characters -- so any cut would be a number chosen to make a sentence come
+    out, which is the failure mode this book has paid for five times over.
+    """
+    rows, mixed = [], 0
+    for f in program_files("en"):
+        src = RE_TEX_COMMENT.sub("", f.read_text(encoding="utf8"))
+        if not written(src):
+            continue
+        bodies = _ansblock_bodies(src)
+        plain = [b for b in bodies if _plain(b)]
+        n_ans = len(re.findall(r"\\ans\{", src))
+        if n_ans and plain:
+            mixed += 1
+        rows.append((f.stem, n_ans, len(plain), len(bodies) - len(plain)))
+    if not rows:
+        print("  No written program to measure.")
+        return 0
+    for stem, n_ans, plain, worked in rows:
+        print(f"  {stem:<30} {n_ans:>3} \\ans   {plain:>3} plain ansblock   "
+              f"{worked:>3} worked")
+    t_ans = sum(r[1] for r in rows)
+    t_plain = sum(r[2] for r in rows)
+    t_worked = sum(r[3] for r in rows)
+    print(f"  {'BOOK':<30} {t_ans:>3} \\ans   {t_plain:>3} plain ansblock   "
+          f"{t_worked:>3} worked")
+    print(f"  {mixed} of {len(rows)} programs set a plain one-sentence answer "
+          f"both ways.")
+    print("  Reported, never fatal. When a plain answer is set full width, the "
+          "edge the reader covers has moved.")
+    return 0
+
+
 def check_answers(soft: bool) -> int:
     bad = 0
     for lang in LANGS:
@@ -988,6 +1136,7 @@ def main() -> int:
     p.add_argument("--outcomes", action="store_true")
     p.add_argument("--values", action="store_true")
     p.add_argument("--elicit", action="store_true")
+    p.add_argument("--answerbox", action="store_true")
     p.add_argument("--scripts", action="store_true")
     p.add_argument("--results", action="store_true")
     p.add_argument("--terms", action="store_true")
@@ -1000,9 +1149,8 @@ def main() -> int:
                    help="report but always exit 0 (the default for a draft)")
     a = p.parse_args()
     if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit,
-                a.scripts, a.results, a.terms, a.parts, a.rigour,
-                a.site,
-                a.index, a.all)):
+                a.answerbox, a.scripts, a.results, a.terms, a.parts,
+                a.rigour, a.site, a.index, a.all)):
         a.all = True
     rc = 0
     if a.all or a.frames:
@@ -1015,6 +1163,8 @@ def main() -> int:
         rc |= check_values(a.soft)
     if a.all or a.elicit:
         rc |= check_elicitation(a.soft)
+    if a.all or a.answerbox:
+        rc |= check_answerbox(a.soft)
     if a.all or a.scripts:
         rc |= check_scripts(a.soft)
     if a.all or a.results:

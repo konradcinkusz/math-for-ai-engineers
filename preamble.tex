@@ -1077,6 +1077,21 @@
 % answer box as narrower than the measure and centred: a multi-paragraph worked
 % answer with displayed maths at 0.86\linewidth is where the overfull hboxes
 % would come from. The departure is recorded in notes/07.
+%
+% AND IT IS APPLIED PAST ITS OWN REASON. Measured, in each edition: of 490
+% ansblocks, 112 carry a display, a list, a table or a listing, or run to more
+% than one paragraph -- and 378 carry none of it. The overfull hbox that bought
+% the departure cannot arise in those 378, and 43 of the 47 programs set a
+% plain one-sentence answer BOTH ways, so the edge the reader covers moves
+% within a single program. `make answerbox' reports the split; issue #117 is
+% the finding; notes/07 carries the argument.
+%
+% Do not fix it by widening \ans. That would spend the one thing notes/07
+% section 3 records the box for -- narrower than the measure, centred, a thing
+% you put your hand over -- to accommodate boxes that never needed the width.
+% The 378 belong in \ans. Both routes move the geometry of hundreds of boxes
+% and therefore every page break in the book, so it is a pass of its own with
+% the four-format build, the overfull multiset and a cue walk behind it.
 \newenvironment{ansblock}{%
   \par\nopagebreak
   \begin{tcolorbox}[

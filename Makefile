@@ -1,7 +1,8 @@
 .PHONY: all a4 all-formats check check-a4 site frontpage stubs-check en pl en-a4 pl-a4 \
         scripts terms parts rigour index \
         text-only watch-en watch-pl clean diagrams diagrams-clean \
-        numbers verify stubs answers frames elicit outcomes values translate shots figuresize debt
+        numbers verify stubs answers frames elicit answerbox outcomes values \
+        translate shots figuresize debt
 
 # Two paper formats from one source. `standard` is the 17 x 24 cm trade format
 # shared with the companion volumes; `a4` is A4 at 12pt, which is what the book
@@ -238,6 +239,21 @@ frames:
 elicit:
 	@python3 tools/check_structure.py --elicit
 
+# 3c. Which of the two answer treatments each program uses, and for what.
+#     REPORTED, NEVER FATAL, on the same reasoning as 3b: the count is in
+#     the hundreds and nothing can be cleared without a book-wide
+#     pagination pass, so a hard gate here would be permanently red.
+#
+#     The answer box is the one element the method rests on -- the reader
+#     learns where its edge is and covers it -- and \ans sets a plain
+#     answer at 0.86 of the measure, centred, while ansblock sets it at
+#     the full measure, left-aligned. 43 of the 47 programs use both for
+#     the same kind of answer. parity's C4 and C14 compare the two
+#     EDITIONS, so they catch a treatment changed in one and not the
+#     other and are blind to both being wrong together.
+answerbox:
+	@python3 tools/check_structure.py --answerbox
+
 # 4. Programs that declare no learning outcomes. The "Can you?" checklist is
 #    GENERATED from the outcomes, so it can no longer drift from them -- which
 #    means the only failure left is a program that declared none at all.
@@ -355,6 +371,7 @@ debt:
 	@echo; echo "== Frames =="                    ; $(MAKE) -s frames
 	@echo; echo "== Learning outcomes =="         ; $(MAKE) -s outcomes
 	@echo; echo "== Elicitation rate =="          ; $(MAKE) -s elicit
+	@echo; echo "== Answer-box treatment =="      ; $(MAKE) -s answerbox
 	@echo; echo "== Computed values =="           ; $(MAKE) -s values
 	@echo; echo "== Transcripts on the page =="   ; $(MAKE) -s scripts
 	@echo; echo "== Appendix C coordinates =="   ; $(MAKE) -s results
