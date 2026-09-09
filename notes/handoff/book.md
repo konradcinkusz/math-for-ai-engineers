@@ -59,10 +59,48 @@ that has just grown; it is retired rather than incremented, and names the
 reason the experiment table already gives. That cross-reference was checked:
 `appendices/en/appF-manifest.tex:86` does give it.
 
+## Superseded by #224 while this branch was open — read this first
+
+`main` moved thirty commits under this branch and another session fixed the
+program count **better than I did**, so a third of my work is not in the merge
+and the record of it matters more than the work would have.
+
+I found, independently and before that landed, that
+`frontmatter/{en,pl}/introduction.tex:80` and both title-page subtitles read
+"forty-six programs" against a manifest of forty-seven — the P7-insertion
+off-by-one in one more artefact, contradicted four times per edition by
+Appendix E. The reason nobody had opened it is still worth having: the **other**
+number in that six-word sentence, the nine parts, has been gated since that
+insertion was found, and gating one number in a sentence does not gate the
+sentence.
+
+My fix was to correct the word and extend `check_structure.py --parts` with a
+compositional English/Polish numeral reader over 1–99, mutation-tested in four
+directions. **#224's fix is strictly better and mine is gone from this branch.**
+It makes the count a computed value, `\val{appf.programs}`, emitted by
+`code/appf_ledgers.py` — which is this book's own first convention, cannot go
+stale, and needs no checker at all. A spelt-numeral gate on top of it would be
+a second mechanism for one fact, which is the defect this repository keeps
+recording rather than a guard against it. All that survives in
+`check_structure.py` is a docstring paragraph in `check_parts` saying the count
+is deliberately not checked there, and why, so the next person does not add the
+checker back.
+
+The knock-on the issue named is also partly superseded: #196 cut the companion
+library from Appendix F and replaced *"That is the whole of what is
+outstanding, as far as anybody knows"* with a much more careful sentence. My
+edit to that sentence is dropped; the ISBN entry is re-applied on top of #196's
+text, and the lead-in tally is retired — it has read "Three" and "Two" inside a
+fortnight and **neither was wrong when it was written**, which is the argument
+for not having it.
+
+The one thing I did not take from `main` is the title page's grey imprint
+block, because moving it to the copyright page is this issue.
+
 ## What I found that the issue did not, and fixed
 
-**The introduction miscounts the book's own programs, on page one, in both
-editions.** `frontmatter/{en,pl}/introduction.tex:80` read "Nine parts,
+**The introduction miscounted the book's own programs, on page one, in both
+editions — superseded by #224, see above.** `frontmatter/{en,pl}/introduction.tex:80` read "Nine parts,
 forty-six programs." / "Dziewięć części, czterdzieści sześć programów." The
 manifest has forty-seven and `gen_stubs.py --check` prints forty-seven. So the
 book contradicted itself: Appendix E says forty-seven four times per edition.
@@ -70,24 +108,14 @@ It is the P7-insertion off-by-one surviving in a further artefact, and it is
 the one nobody had opened because the *other* number in the same six-word
 sentence — the nine parts — has been gated since that insertion was found.
 
-Gating one number in a sentence does not gate the sentence.
-`check_structure.py --parts` now checks the program count as well. It reads the
-count as a spelt numeral in either language, compositionally over 1–99 rather
-than from a two-entry table, and **fails** if the manifest count is outside
-that range rather than going quiet. Proved by mutation in four directions
-before it was believed: the real defect (named both editions and both correct
-spellings), the count deleted, a count wrong the other way, and a manifest
-count past the numeral table. It skips "these programs" and "Foundation
-programs" without special-casing them.
+Gating one number in a sentence does not gate the sentence. Both the
+introductions and both title-page subtitles now carry `\val{appf.programs}`
+from #224, taken verbatim from `main` — including the Polish subtitle, which
+differs from the English by a word and is another session's decision, not this
+issue's business.
 
-**The title page's subtitle carried the same stale count** — "Forty-six
-programs, worked" / "Czterdzieści sześć programów". Not corrected to
-forty-seven: retired. A subtitle does not need a tally, "from arithmetic to
-scaled dot-product attention" is what a browsing reader wants, and this file's
-own rule is to name the rule rather than the count. The subtitle now reads
-"Worked, program by program" / "Przerobione, program po programie".
-
-**`lang/en.tex:80`** carried "forty-six programs deep" in a comment. Corrected.
+**`lang/en.tex:80`** carried "forty-six programs deep" in a comment. Corrected;
+that one is a comment rather than a printed value and #224 did not reach it.
 
 ## Claims of my own I had to withdraw
 
@@ -134,6 +162,20 @@ it moves.
 So: **no cue walk should be needed.** Please confirm rather than assume — if
 the four page counts move by anything other than 0 or the Appendix F leaf, the
 `\clearpage`/`\cleardoublepage` reasoning above is what to re-examine first.
+
+**CI built all four formats green** on the pre-merge head (run 34334457718; all
+nine checks success, including `Compile en/pl (standard)` and `(a4)`), so the
+copyright page compiles and no overfull box, stranded opener or stranded
+heading came with it. That does **not** settle the page counts: they are
+printed into each compile job's step summary, and the Actions log artefacts
+live on `productionresultssa10.blob.core.windows.net`, which this session's
+egress policy blocks — so an agent session cannot read them. Read them from the
+run's step summaries in a browser, or just from your own `make all-formats`.
+
+And note what CI's green cannot cover: `checkpdf.py` runs there with
+`--cues=warn`, so an **orphaned cue** would not have turned it red. The
+argument that this change cannot produce one is structural — `\mainmatter`
+restarts the body on a fresh page — but it is an argument, not a measurement.
 
 ## Ledgers the sync session owns
 

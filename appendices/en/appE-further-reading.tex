@@ -3,14 +3,19 @@
 % NOTHING HERE IS WRITTEN FROM MEMORY, and that constraint shaped the appendix
 % more than anything else. Sections E.1 and E.2 are the competitive survey in
 % notes/02-grounding-and-traps.md section 1, which was run before the book was
-% planned and which cites a review for every quotation it carries -- see that
-% file's own Sources section. Section E.3 is notes/01-curriculum.md section 13.
+% planned. It sources its claims about the world; its Sources section names a
+% review for one of the two quotations carried here and, for Murphy's
+% "encyclopedic reference", names none, so the appendix does not promise one.
+% Section E.3 is notes/01-curriculum.md section 13.
 %
-% Section E.4 carries NAMES WITHOUT VERDICTS on purpose. The repository records
-% those titles as pointers and nothing more, so writing a characterisation for
-% them would be inventing one -- which is the class this book spends
-% forty-seven programs telling the reader not to accept. The appendix says so
-% rather than filling the gap.
+% Section E.4 carries NAMES, and a name there is a verdict only where E.1 has
+% already given one -- Strang, Deisenroth/Faisal/Ong, Goodfellow/Bengio/
+% Courville, Murphy and Bishop all recur. THAT OVERLAP IS THE POINT OF THE
+% WARNING BOX'S WORDING: it used to say flatly that the list below was not read
+% and compared, which its own names falsified. State the rule, never a tally.
+% For the rest the repository records a title and nothing more, so writing a
+% characterisation would be inventing one -- the class this book spends
+% forty-seven programs telling the reader not to accept.
 %
 % Every claim this appendix makes about a PROGRAM was checked against the
 % written program before it was imported, which is the discipline Appendix D's
@@ -49,15 +54,18 @@ rather than hidden.
 
 Sections~\ref{sec:E-survey} and~\ref{sec:E-positions} carry a verdict on every
 entry, because those works were read and compared before this book was
-planned: the survey behind them exists to answer \emph{what already exists, and
-what does each do well and badly for this reader}, and it cites a published
-review for every quotation. Section~\ref{sec:E-not} says what this book does
-not teach, why not, and where the subject is done properly.
+planned: the survey behind them exists to answer two questions \dash{}
+\emph{what already exists}, and \emph{what does each do well and badly for this
+reader?} Where a quotation here is not attributed to a named review, that is
+because the record behind it does not name one.
+Section~\ref{sec:E-not} says what this book does not teach, why not, and where
+the subject is done properly.
 
-Section~\ref{sec:E-depth} is a list of names with no verdicts attached, and it
-says so. This book has not held those works to the standard the first half is
-held to, and a one-line characterisation invented to fill the column would be
-exactly the thing forty-seven programs have been asking you not to accept.
+Section~\ref{sec:E-depth} is a list of names, and it says which of them carry a
+verdict. Some are works Section~\ref{sec:E-survey} has already judged, and that
+judgement stands; the rest this book has not held to that standard, and a
+one-line characterisation invented to fill the gap would be exactly the thing
+forty-seven programs have been asking you not to accept.
 
 No web addresses appear here. A title and an author outlive a URL.
 
@@ -97,7 +105,7 @@ despite its preface.
 \medskip
 \textbf{Goodfellow, Bengio and Courville, \emph{Deep Learning}, Part~I.}
 \textbf{Does well:} chapter 4, \emph{Numerical Computation}, is the most
-valuable sixty pages in this whole survey and the one nobody imitates
+valuable chapter in this whole survey and the one nobody imitates
 \dash{} overflow and underflow, the log-sum-exp stabilisation, conditioning,
 the Jacobian and the Hessian. It is the only work here that treats the machine
 as a finite-precision object. \textbf{Does badly:} Part~I is a refresher rather
@@ -114,7 +122,7 @@ book goes an order of magnitude deeper with numbers.
 \textbf{Does well:} Strang is the finest expositor of linear algebra alive, and
 this is where he connects the four subspaces, the SVD and low-rank
 approximation to data. Putting the SVD at the centre of gravity is exactly
-right, and this book made that framing mainstream. \textbf{Does badly:}
+right. \textbf{Does badly:}
 reviewers are blunt about the density \dash{} the MAA review says he has tried
 to cram far too much material into 432 pages, so each topic gets a very quick
 presentation and results are stated without proof or citation. It also assumes
@@ -123,8 +131,9 @@ a completed first course; it is a second one.
 
 \medskip
 \textbf{Boyd and Vandenberghe, \emph{Introduction to Applied Linear Algebra}.}
-\textbf{Does well:} the best-designed applied linear algebra text there is, and
-the closest to this book in temperament. It is aggressively narrow \dash{}
+\textbf{Does well:} the best-designed applied linear algebra text in this
+survey, and the closest to this book in temperament. It is aggressively narrow
+\dash{}
 built on linear independence and the QR factorisation and almost nothing else
 \dash{} and it proves that a book can omit most of its subject and be better
 for it. Free PDF, with Python and Julia companions.
@@ -159,12 +168,14 @@ of a model and is never taught from the floor.
 success condition is that you can now open it.
 
 \medskip
-\textbf{Murphy, \emph{Probabilistic Machine Learning}.}
+\textbf{Murphy, \emph{Probabilistic Machine Learning} \dash{} the 2022
+introduction and the 2023 advanced volume.}
 \textbf{Does well:} the most complete and most current single treatment, unified
 by probabilistic modelling, with a good mathematical-background section and open
 code. \textbf{Does badly:} graduate-level by its own statement, assuming
 calculus, statistics and linear algebra; a reviewer's description of it as an
-encyclopedic reference is both praise and the problem, at over a thousand pages.
+encyclopedic reference is both praise and the problem, at over a thousand pages
+across the two.
 \textbf{Verdict:} the reference to route to per topic, once you can read it.
 
 \medskip
@@ -184,8 +195,8 @@ translates it out of theorem-and-proof form into something you can act on.
 
 \medskip
 \textbf{3Blue1Brown.} \emph{Essence of Linear Algebra} and \emph{Essence of
-Calculus} do something no book does: they make the geometric content of a
-determinant or a derivative visible in seconds.
+Calculus} do something the books here do not: they make the geometric content
+of a determinant or a derivative visible in seconds.
 
 And the strongest argument for reading a book like this one instead is made by
 their author. Sanderson has said publicly that he worries his work is
@@ -201,8 +212,9 @@ watch the video for the picture, work the program for the retention.
 \medskip
 \textbf{fast.ai, and the position that you need less mathematics than you
 think.} It is right about \emph{entry}, and this book concedes the point
-without reservation: requiring two years of mathematics before anyone may train
-a classifier gatekept the field, produced nothing, and is empirically false.
+without reservation: the claim that two years of mathematics must come before
+anyone may train a classifier kept people out of the field, produced nothing,
+and is empirically false.
 
 What the position answers is \emph{can I ship something?} What it does not
 answer is why the loss went to \code{nan} at step four thousand and only in
@@ -254,7 +266,7 @@ Stochastic differential equations, and so the full mathematics of diffusion
   models & The book gives the Gaussian and the fact that variances add, which
   is the whole of a discrete-time chain of Gaussians, and never applies them to
   one & Särkkä and Solin \\
-Complex analysis, and the Fourier transform beyond a mention &
+Complex analysis, and the Fourier transform, which this book does not mention &
   Program~\ref{prog:F08} gives the unit circle; convolution theorems are a book
   of their own & Bracewell \\
 \bottomrule
@@ -287,7 +299,8 @@ Reinforcement learning theory and convergence results &
   the KL constraint, which is what an engineer touching alignment work actually
   manipulates & Sutton and Barto \\
 Category theory, differential geometry, manifolds & Occasionally invoked in
-  interpretability writing; not load-bearing for the work & Lee \\
+  interpretability writing; not load-bearing for the work, and no source here
+  was surveyed for the category theory & Lee, for the geometry \\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -359,12 +372,14 @@ is a defensible line today and it may not be one in a few years.
 \index{further reading!working depth}
 
 \begin{warning}
-\textbf{These are names, not verdicts, and the difference is deliberate.}
-Section~\ref{sec:E-survey} says what each work does well and badly because
-those works were read and compared against each other before this book was
-planned. The list below was not. Writing a characterisation for it anyway is
-precisely the move this book has spent forty-seven programs asking you to
-refuse, so what follows is a pointer and nothing more.
+\textbf{These are names, and a name here is a verdict only where
+Section~\ref{sec:E-survey} has already given one.} That section says what each
+work does well and badly because those works were read and compared against
+each other before this book was planned. Where a name below appears there too,
+its verdict stands and this section adds nothing to it. The rest were not read
+and compared, and inventing a characterisation for them is precisely the move
+this book has spent forty-seven programs asking you to refuse \dash{} so for
+those, what follows is a pointer and nothing more.
 \end{warning}
 
 \medskip
@@ -383,6 +398,15 @@ the update rules Program~\ref{prog:P20} derives, Nocedal and Wright.
 
 And for the machine learning that consumes all of it: Goodfellow, Bengio and
 Courville for the 2016 picture, Murphy and Bishop for the current one.
+
+\medskip
+And one gap here is worth naming rather than leaving to be found. Part~II goes
+an order of magnitude deeper than the one chapter this survey found on the
+subject, and no source for floating-point arithmetic itself was surveyed for
+this appendix, so this section has no pointer for it.
+Section~\ref{sec:E-not} sends you to Trefethen and Bau and to Higham for
+numerical linear algebra, which is the neighbouring subject rather than that
+one.
 
 \section{Where each unproved statement goes}
 \label{sec:E-route}

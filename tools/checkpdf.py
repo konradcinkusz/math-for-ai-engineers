@@ -29,8 +29,20 @@ they sit at the two ends of a frame.
        above. \\dotline ends `\\par\\vspace{2pt}`, and glue after a paragraph is a
        legal breakpoint; \\nextframe's own leading \\nopagebreak is contributed
        after that glue and so arrives too late to forbid it. The fix is
-       therefore editorial -- shorten the frame so the tail fits -- and NOT a
-       penalty bolted onto \\dotline, which was tried, measured and reverted.
+       therefore editorial, and NOT a penalty bolted onto \\dotline, which was
+       tried, measured and reverted.
+
+       WHICH editorial move is the half people get wrong, so it is stated here
+       rather than only in the pass notes: LENGTHEN the frame, never shorten
+       it. Adding a paragraph carries the question, its dots and the cue over
+       the boundary together; cutting one only pulls the previous frame's
+       material up to fill the gap, so the page stays full and the tail stays
+       exactly where it was. Measured in both directions -- F06 trimmed one
+       frame over two rounds and the cue did not move, and F10 trimmed three
+       frames in both editions, rebuilt all four and got the same three cues on
+       the same three pages, then lengthened the same three and cleared all of
+       them. No recorded lengthening has failed. Both edits go in BOTH
+       editions, or the two stop saying the same thing.
 
     3. STRANDED SECTION HEADING. A numbered section heading is the last thing
        on a page and the section itself begins overleaf.
@@ -101,9 +113,27 @@ MARGIN_SLACK = 2.0
 HEAD_FRACTION = 0.10
 
 # A numbered section heading opens with its number: F4.7 in a program, B.2 in
-# an appendix. \section* -- the Quiz, Can you?, the manifests, the front matter
-# -- has no number and is deliberately not matched: none of those is followed
-# by a frame, and the Quiz carries a room test of its own.
+# an appendix. \section* -- the Quiz, the manifests, the front matter -- has no
+# number, so is_heading cannot match one and this check has never looked at one.
+#
+# That exclusion used to be justified here on two grounds: that none of them is
+# followed by a frame, and that the Quiz carries a room test of its own. The
+# first holds. The second does not. The Quiz's reserve is 8\baselineskip against
+# a box that will not begin on a page which cannot hold 12 lines, so the guard
+# admits pages on which the box provably cannot start -- the arithmetic is in
+# the note above \begin{quiz} in preamble.tex. And Can you? is not a \section*
+# at all: \canyou calls \mfa@endhead, and what follows it is an unbreakable
+# tabularx with no guard of any kind.
+#
+# So the blind spot is real, it is this check's, and it is the reason those two
+# headings are found by eye. Closing it needs the heading STRING rather than a
+# number -- \lblQuiz and \lblCanYou read out of lang/*.tex the way cue_strings()
+# already reads \lblNextFrame -- and a SECOND size calibration, because
+# \mfa@endhead sets \large where a numbered section sets \Large, so the height
+# heading_metrics learns will not match Can you?. It is not written here because
+# the pass that found the blind spot had no TeX installation and so could not
+# watch it fire on a page it already knew was wrong, and a check nobody has
+# watched fire is worth less than no check at all.
 RE_SECNO = re.compile(r"^[A-Z]?\d*\.\d+$")
 
 # How high up the text block a body page's ink may stop before the page reads
@@ -489,9 +519,14 @@ def main() -> int:
             print(f"== {path.name} == {len(found)} {name}")
             for d in found:
                 print(f"      PDF page {d[0]}: {detail(d)}")
-            print("      Shorten the frame so its tail fits on one page. Do NOT bolt")
-            print("      a penalty onto \\dotline: that was tried, measured and")
-            print("      reverted, and it moves every later break.")
+            print("      LENGTHEN the frame, in both editions, so that its question,")
+            print("      its dots and the cue cross the boundary together. Shortening")
+            print("      is the move that does NOT work: it pulls the previous frame")
+            print("      up to fill the gap and the tail stays where it was, measured")
+            print("      twice (F06 over two rounds, F10 over three frames and four")
+            print("      builds). Do NOT bolt a penalty onto \\dotline either: that")
+            print("      was tried, measured and reverted, and it moves every later")
+            print("      break.")
             if not fatal:
                 print("      Not failing the build: see the note at the top of this")
                 print("      file for what this count is and is not.")

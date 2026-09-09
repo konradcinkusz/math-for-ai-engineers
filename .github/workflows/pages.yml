@@ -47,6 +47,74 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # ORDER IS THE POINT, and it was measured rather than argued. Until
+      # this step moved it ran LAST, after the diagram render, four LaTeX
+      # compiles and every gate. Run 34331393420 is the shape every one of the
+      # 89 failures before it had: seventeen minutes and thirty-three seconds
+      # of green steps, then ONE SECOND here to fail, then upload and deploy
+      # skipped. A one-second precondition that decides whether anything can
+      # be published belongs before the seventeen minutes it gates rather than
+      # after them, and this is where GitHub's own starter workflows put it --
+      # ahead of the build, not behind it.
+      #
+      # It is safe to move because nothing downstream reads its outputs: the
+      # site is assembled from docs/ and the four PDFs, and upload-pages-artifact
+      # takes a path. So on a repository whose Pages site does not exist this
+      # saves the whole build, and on one where it does the step costs a second
+      # wherever it sits.
+      - name: Configure Pages
+        id: configure_pages
+        uses: actions/configure-pages@v5
+        with:
+          # This comment used to claim enablement: true makes "Create Pages
+          # site" stand in for clicking it into existence in Settings. That
+          # was never measured and it is false: every run of this workflow
+          # since it was written -- the first one included -- got exactly the
+          # same failure here, "Resource not accessible by integration" on
+          # Create Pages site, in runs whose every other step was green. The
+          # reason is not a missing YAML permission.
+          #
+          # Creating a repository's FIRST Pages site is an administrative
+          # action, and `administration` is not one of the scopes a
+          # workflow's `permissions:` block can grant the default
+          # GITHUB_TOKEN -- so no value of enablement, and no permission
+          # added here, can make this call succeed. Once a Pages site exists,
+          # "Get Pages site" finds it and this step never tries to create
+          # anything, which is why enablement: true is harmless to leave set.
+          #
+          # The actual fix is a human, once: a repository admin visits
+          # Settings -> Pages -> Build and deployment -> Source, and chooses
+          # "GitHub Actions". That click creates the site under the admin's
+          # own permissions; every push after it deploys with no further
+          # action here.
+          enablement: true
+
+      # Only fires when the step above is what failed -- an unrelated failure
+      # earlier in the job (a broken build, a drifted number) must not be
+      # reported as a Settings problem, and this step's own id makes that
+      # distinction checkable rather than assumed.
+      - name: Explain a Pages-configuration failure, if that is what happened
+        if: ${{ failure() && steps.configure_pages.conclusion == 'failure' }}
+        run: |
+          {
+            echo "## Pages build failed at Settings, not at the book"
+            echo ""
+            echo "Nothing was built: this step runs first, deliberately, so"
+            echo "that a repository with no Pages site fails in seconds rather"
+            echo "than after seventeen minutes of compiling a book it cannot"
+            echo "publish. The failure is in \`actions/configure-pages@v5\`: this"
+            echo "repository has never had a GitHub Pages site created, and"
+            echo "creating one is an administrative action the default"
+            echo "\`GITHUB_TOKEN\` cannot be granted, whatever this workflow's"
+            echo "\`permissions:\` block says."
+            echo ""
+            echo "**Fix once, by hand:** a repository admin visits"
+            echo "**Settings -> Pages -> Build and deployment -> Source**"
+            echo "and sets it to **GitHub Actions**. That single click creates"
+            echo "the site under the admin's own permissions. Every push"
+            echo "after it will publish with no further action here."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
@@ -74,6 +142,14 @@ jobs:
             [ -n "$new" ] && { echo "Untracked, never compared to anything:"; echo "$new"; }
             exit 1
           fi
+
+      # docs/index.html and README.md print figures out of Program F1 with
+      # no \val{} behind them. build.yml checks them too, but it carries
+      # `paths-ignore: docs/**`, so a docs-only pull request runs no CI at all
+      # -- this workflow has no paths-ignore, and is the only gate an edit to
+      # the landing page itself passes before it is served to a reader.
+      - name: Refuse to publish a page whose figures have drifted
+        run: python3 tools/check_structure.py --site
 
       - uses: actions/setup-node@v4
         with:
@@ -147,12 +223,17 @@ jobs:
           cp main-pl-a4.pdf _site/book-pl-a4.pdf
           ls -la _site
 
-      - name: Report what was published
-        if: always()
+      # `always()` so a later failure still leaves the log summary behind --
+      # and guarded on a log EXISTING, because this step now sits downstream of
+      # a gate that can fail before anything is compiled, and a summary headed
+      # "published" over four logs that were never written is the kind of green
+      # report this workflow exists to refuse.
+      - name: Report what was built
+        if: ${{ always() && hashFiles('main-en.log') != '' }}
         continue-on-error: true
         run: |
           {
-            echo "## Published to Pages"
+            echo "## What this run built"
             echo ""
             echo '```'
             python3 tools/checklog.py --summary \
@@ -162,56 +243,6 @@ jobs:
             echo "- \`book-en.pdf\` / \`Mathematics-from-Zero-for-the-AI-Engineer.pdf\`"
             echo "- \`book-pl.pdf\` / \`Matematyka-od-zera-dla-inzyniera-AI.pdf\`"
             echo "- \`book-en-a4.pdf\` / \`book-pl-a4.pdf\` (A4, 12pt)"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Configure Pages
-        id: configure_pages
-        uses: actions/configure-pages@v5
-        with:
-          # This comment used to claim enablement: true makes "Create Pages
-          # site" stand in for clicking it into existence in Settings. That
-          # was never measured and it is false: every run of this workflow
-          # since it was written -- the first one included -- got exactly the
-          # same failure here, "Resource not accessible by integration" on
-          # Create Pages site, with the book itself compiling clean and every
-          # gate above passing. The reason is not a missing YAML permission.
-          # Creating a repository's FIRST Pages site is an administrative
-          # action, and `administration` is not one of the scopes a
-          # workflow's `permissions:` block can grant the default
-          # GITHUB_TOKEN -- so no value of enablement, and no permission
-          # added here, can make this call succeed. Once a Pages site exists,
-          # "Get Pages site" finds it and this step never tries to create
-          # anything, which is why enablement: true is harmless to leave set.
-          #
-          # The actual fix is a human, once: a repository admin visits
-          # Settings -> Pages -> Build and deployment -> Source, and chooses
-          # "GitHub Actions". That click creates the site under the admin's
-          # own permissions; every push after it deploys with no further
-          # action here.
-          enablement: true
-
-      # Only fires when the step above is what failed -- an unrelated failure
-      # earlier in the job (a broken build, a drifted number) must not be
-      # reported as a Settings problem, and this step's own id makes that
-      # distinction checkable rather than assumed.
-      - name: Explain a Pages-configuration failure, if that is what happened
-        if: ${{ failure() && steps.configure_pages.conclusion == 'failure' }}
-        run: |
-          {
-            echo "## Pages build failed at Settings, not at the book"
-            echo ""
-            echo "Every PDF compiled and every gate above this step passed."
-            echo "The failure is in \`actions/configure-pages@v5\`: this"
-            echo "repository has never had a GitHub Pages site created, and"
-            echo "creating one is an administrative action the default"
-            echo "\`GITHUB_TOKEN\` cannot be granted, whatever this workflow's"
-            echo "\`permissions:\` block says."
-            echo ""
-            echo "**Fix once, by hand:** a repository admin visits"
-            echo "**Settings -> Pages -> Build and deployment -> Source**"
-            echo "and sets it to **GitHub Actions**. That single click creates"
-            echo "the site under the admin's own permissions. Every push"
-            echo "after it will publish with no further action here."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-pages-artifact@v3

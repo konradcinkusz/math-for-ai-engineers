@@ -90,6 +90,9 @@ RE_ANSWERTO = re.compile(r"\\answerto\{")
 RE_VAL = re.compile(r"\\(?:raw)?val\{([^}]+)\}")
 RE_TRANSCRIPT = re.compile(r"\\transcript\{([^}]*)\}")
 RE_MFAVAL = re.compile(r"\\mfaval\{([^}]+)\}")
+# The same declaration read for its VALUE as well as its key, which is what
+# lets a page outside the book be checked against the book's own arithmetic.
+RE_MFAVAL_PAIR = re.compile(r"\\mfaval(?:text)?\{([^}]+)\}\{([^}]*)\}")
 # An exercise item: \item at the top level of one of the three list
 # environments. Counted per environment rather than globally, because the
 # answer key is prefixed by environment.
@@ -752,83 +755,79 @@ def check_index(soft: bool) -> int:
     return 0 if (bad == 0 or soft) else 1
 
 
-RE_PARTRANGE = re.compile(r"\(([FP]\d+)--([FP]\d+)\)")
-
-# "Nine parts, forty-six programs." -- the introduction's own map of the book.
-# The nine has been gated since the P7 insertion was found in seven of the
-# nine ranges; the number beside it, in the same six-word sentence, was wrong
-# by one for the whole of the book and nothing looked at it. Both editions
-# said forty-six and Appendix E said forty-seven four times, so the book
-# contradicted itself between page one and the back matter.
+# THE README AND THE LANDING PAGE PRINT DIGITS AND NOTHING PUT A SCRIPT
+# BEHIND THEM.
 #
-# The count is spelt as a word, so checking it needs a word-to-integer map.
-# The map is compositional and covers 1--99 in both languages rather than
-# listing the two numbers that happen to be wanted today: a table with one
-# entry in it is a tally wearing a check's clothes, and the first curriculum
-# change would walk straight past it. A manifest count the map cannot render
-# is a FAILURE and says so, so this check cannot go quiet by growing out of
-# its own range.
-NUMWORD = {
-    "en": {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
-           "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
-           "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15,
-           "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19,
-           "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60,
-           "seventy": 70, "eighty": 80, "ninety": 90},
-    "pl": {"jeden": 1, "dwa": 2, "trzy": 3, "cztery": 4, "pięć": 5,
-           "sześć": 6, "siedem": 7, "osiem": 8, "dziewięć": 9,
-           "dziesięć": 10, "jedenaście": 11, "dwanaście": 12,
-           "trzynaście": 13, "czternaście": 14, "piętnaście": 15,
-           "szesnaście": 16, "siedemnaście": 17, "osiemnaście": 18,
-           "dziewiętnaście": 19, "dwadzieścia": 20, "trzydzieści": 30,
-           "czterdzieści": 40, "pięćdziesiąt": 50, "sześćdziesiąt": 60,
-           "siedemdziesiąt": 70, "osiemdziesiąt": 80,
-           "dziewięćdziesiąt": 90},
-}
-
-# The noun the count attaches to, per edition. Deliberately one form each:
-# this scans the introduction only, where the book prints its own map, and a
-# wider net would catch the genuine subset counts that live elsewhere -- the
-# Polish "How to use this book" says "Dwa programy" of two programs and is
-# right to.
-PROGWORD = {"en": "programs", "pl": "programów"}
-
-RE_COUNTED = re.compile(
-    r"(?:([^\W\d_-]+)[\s~]+)?([^\W\d_-]+(?:-[^\W\d_-]+)?)[\s~]+"
-    r"(?:programs|programów)")
+# `README.md` and `docs/index.html` are the shop window: each argues that
+# every number in this book is computed rather than remembered, and each made
+# that argument with the same five figures typed into a table by hand -- one
+# defect in two artefacts, which is this repository's own recurring finding
+# that fixing an instance is not fixing the class. They were correct when this check was
+# written -- all five re-derived from figures/values/f01.tex -- which is the
+# same standing every fabricated console block in this repository's record had
+# on the day it was written. The book's own numbers are gated by `make verify`;
+# these sat outside every gate the repository has, in the one artefact a reader
+# meets before the book.
+#
+# So a figure on that page carries the key it came from, and this compares the
+# rendered text against what the script now computes. It fires in the direction
+# that actually breaks it -- a value moving under a page nobody edited -- and
+# `make verify` cannot see that, because the values file and its script still
+# agree perfectly.
+#
+# Note the asymmetry in where it runs: build.yml carries `paths-ignore:
+# docs/**`, so a docs-only pull request runs no CI at all, and it is pages.yml
+# -- which has no paths-ignore -- that catches an edit to the page itself
+# before anything is published.
+RE_SITE_VAL = re.compile(r'data-val="([^"]+)"\s*>([^<]*)<')
 
 
-def numword(words, lang):
-    """Sum a spelt numeral, or None if these words are not one.
+SITE_PAGES = ("docs/index.html", "README.md")
 
-    Compositional rather than tabulated, so 'forty-seven' and 'czterdzieści
-    siedem' are read the same way and neither is special-cased. Returns None
-    for anything that is not a numeral at all, which is what lets the caller
-    walk every "<word> programs" in the file and quietly skip "these
-    programs" and "Foundation programs".
-    """
-    table = NUMWORD[lang]
+
+def check_site(soft: bool) -> int:
+    computed: dict[str, str] = {}
+    for f in sorted((ROOT / "figures" / "values").glob("*.tex")):
+        for key, value in RE_MFAVAL_PAIR.findall(f.read_text(encoding="utf8")):
+            computed[key] = value
+
+    bad = 0
     total = 0
-    for part in words:
-        for tok in part.lower().split("-"):
-            if tok not in table:
-                return None
-            total += table[tok]
-    return total or None
+    for rel in SITE_PAGES:
+        page = ROOT / rel
+        if not page.exists():
+            print(f"  {rel} is not there; a page this check is written for "
+                  f"has been renamed or removed.")
+            bad += 1
+            continue
+
+        tagged = RE_SITE_VAL.findall(page.read_text(encoding="utf8"))
+        if not tagged:
+            print(f"  {rel} tags no figure with the value that produced it. "
+                  f"A digit on that page is a claim with no script behind it.")
+            bad += 1
+            continue
+        total += len(tagged)
+
+        for key, shown in tagged:
+            shown = shown.strip()
+            if key not in computed:
+                print(f"  {rel}: data-val=\"{key}\" names no computed value. "
+                      f"Run `make numbers`, or correct the key.")
+                bad += 1
+            elif shown != computed[key]:
+                print(f"  {rel}: {key} is shown as {shown!r} and code/ now "
+                      f"computes {computed[key]!r}.")
+                bad += 1
+
+    if not bad:
+        print(f"  {total} figures across {len(SITE_PAGES)} pages a reader "
+              f"meets before the book, every one the value its script "
+              f"computes.")
+    return 0 if (not bad or soft) else 1
 
 
-def spell(n, lang):
-    """The words this check would expect, or None if it cannot render n."""
-    table = NUMWORD[lang]
-    inv = {v: k for k, v in table.items()}
-    if n in inv:
-        return inv[n]
-    tens, units = divmod(n, 10)
-    if 2 <= tens <= 9 and units:
-        joiner = "-" if lang == "en" else " "
-        return inv[tens * 10] + joiner + inv[units]
-    return None
-
+RE_PARTRANGE = re.compile(r"\(([FP]\d+)--([FP]\d+)\)")
 
 
 def check_parts(soft: bool) -> int:
@@ -846,12 +845,13 @@ def check_parts(soft: bool) -> int:
     names differ between the editions by design and the manifest carries
     both. A missing or extra range is therefore a failure too.
 
-    It checks the PROGRAM COUNT in the same sentence as well, and that half
-    was added after the first half had been green for months over a sentence
-    reading "Nine parts, forty-six programs." The nine was gated; the
-    forty-six was four words away, was wrong by one, and was contradicted
-    four times per edition by Appendix E. Gating one number in a sentence
-    does not gate the sentence.
+    The program count in the same sentence is NOT checked here, and that is
+    a decision rather than an oversight. It used to read "forty-six" against
+    a manifest of forty-seven, and the fix that landed (#224) is the better
+    one: the introduction now prints \val{appf.programs}, computed by
+    code/appf_ledgers.py. A computed value cannot go stale, so a checker
+    reading a spelt numeral would be a second mechanism for one fact -- which
+    is the defect this book keeps recording, not a guard against it.
     """
     import json
     manifest = json.loads((ROOT / "tools" / "programs.json")
@@ -877,47 +877,9 @@ def check_parts(soft: bool) -> int:
                       f"({w[0]}--{w[1]}). The introduction is the book's own "
                       f"map and it prints on page one.")
                 bad += 1
-    # And the count of programs in the same sentence, which is the other half
-    # of the book's own map and was the half nothing read.
-    nprog = len(manifest["programs"])
-    for lang in LANGS:
-        f = ROOT / "frontmatter" / lang / "introduction.tex"
-        if not f.exists():
-            continue
-        src = RE_TEX_COMMENT.sub("", f.read_text(encoding="utf8"))
-        wanted = spell(nprog, lang)
-        if wanted is None:
-            print(f"  {f.relative_to(ROOT)}: the manifest has {nprog} "
-                  f"programs and this check's numeral table stops at 99, so "
-                  f"it cannot say whether the introduction is right. Widen "
-                  f"NUMWORD rather than deleting the check.")
-            bad += 1
-            continue
-        seen = 0
-        for m in RE_COUNTED.finditer(src):
-            words = [w for w in m.groups() if w]
-            got = numword(words, lang)
-            if got is None and len(words) == 2:
-                got = numword(words[1:], lang)
-            if got is None:
-                continue          # "these programs", "Foundation programs"
-            seen += 1
-            if got != nprog:
-                line = src[:m.start()].count("\n") + 1
-                print(f"  {f.relative_to(ROOT)}:{line}: the introduction "
-                      f"counts {got} programs where the manifest has "
-                      f"{nprog} ({wanted}). It is the book's own map and it "
-                      f"prints on page one.")
-                bad += 1
-        if seen == 0:
-            print(f"  {f.relative_to(ROOT)}: prints no count of programs at "
-                  f"all. The map says how many parts there are and must say "
-                  f"how many programs.")
-            bad += 1
-
     if bad == 0:
-        print(f"  {len(want)} part ranges in each introduction, every one "
-              f"matching the manifest, and both count {nprog} programs.")
+        print(f"  {len(want)} part ranges in each introduction, "
+              f"every one matching the manifest.")
     return 0 if (bad == 0 or soft) else 1
 
 
@@ -1030,6 +992,7 @@ def main() -> int:
     p.add_argument("--results", action="store_true")
     p.add_argument("--terms", action="store_true")
     p.add_argument("--parts", action="store_true")
+    p.add_argument("--site", action="store_true")
     p.add_argument("--rigour", action="store_true")
     p.add_argument("--index", action="store_true")
     p.add_argument("--all", action="store_true")
@@ -1038,6 +1001,7 @@ def main() -> int:
     a = p.parse_args()
     if not any((a.frames, a.answers, a.outcomes, a.values, a.elicit,
                 a.scripts, a.results, a.terms, a.parts, a.rigour,
+                a.site,
                 a.index, a.all)):
         a.all = True
     rc = 0
@@ -1059,6 +1023,8 @@ def main() -> int:
         rc |= check_terms(a.soft)
     if a.all or a.parts:
         rc |= check_parts(a.soft)
+    if a.all or a.site:
+        rc |= check_site(a.soft)
     if a.all or a.rigour:
         rc |= check_rigour(a.soft)
     if a.all or a.index:
