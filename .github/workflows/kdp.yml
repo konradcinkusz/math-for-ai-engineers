@@ -87,6 +87,25 @@ jobs:
               || { echo "::error file=$f::failed to render $lang/$key"; exit 1; }
           done
 
+      # The cheapest form of the guard, and it runs before two book compiles.
+      # The page-count comparison below catches the EFFECT of touching a shared
+      # file; this catches the cause in a second, and names the file.
+      - name: No KDP change may touch the files the four PDFs are made of
+        run: |
+          BASE=$(git merge-base HEAD "origin/${{ github.event.repository.default_branch }}") \
+            || { echo "::error::cannot find the merge base; refusing to guess one"; exit 1; }
+          echo "base = $BASE"
+          BAD=$(git diff --name-only "$BASE"...HEAD | grep -E \
+            '^(main-(en|pl)(-a4)?\.tex|body\.tex|structure\.tex|preamble\.tex|\.github/workflows/(build|release)\.yml)$' \
+            || true)
+          if [ -n "$BAD" ]; then
+            echo "::error::the KDP path is additive and these are not its to change:"
+            echo "$BAD" | sed 's/^/::error::  /'
+            exit 1
+          fi
+          echo "None of the seven shared files is in this diff."
+          echo "MFA_BASE=$BASE" >> "$GITHUB_ENV"
+
       - name: Compile the trade edition at HEAD
         uses: xu-cheng/latex-action@v4
         with:
@@ -117,10 +136,13 @@ jobs:
       # on both sides of the mount.
       - name: Compile the trade edition at the merge base
         run: |
-          BASE=$(git merge-base HEAD origin/${{ github.event.repository.default_branch }} 2>/dev/null \
-                 || git rev-parse HEAD~1)
-          echo "base = $BASE"
-          git worktree add "$RUNNER_TEMP/base" "$BASE"
+          # $MFA_BASE, set by the path check above. NOT `|| git rev-parse HEAD~1`,
+          # which is what stood here: if origin/<default> were unavailable the
+          # guard would quietly compare HEAD against its own previous commit and
+          # pass, proving nothing about the four existing PDFs. A guard that
+          # weakens itself in silence is worse than one that stops.
+          test -n "$MFA_BASE" || { echo "::error::no merge base"; exit 1; }
+          git worktree add "$RUNNER_TEMP/base" "$MFA_BASE"
           for d in diagrams values transcripts; do
             cp -r "figures/$d" "$RUNNER_TEMP/base/figures/" 2>/dev/null || true
           done
