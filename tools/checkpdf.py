@@ -101,9 +101,27 @@ MARGIN_SLACK = 2.0
 HEAD_FRACTION = 0.10
 
 # A numbered section heading opens with its number: F4.7 in a program, B.2 in
-# an appendix. \section* -- the Quiz, Can you?, the manifests, the front matter
-# -- has no number and is deliberately not matched: none of those is followed
-# by a frame, and the Quiz carries a room test of its own.
+# an appendix. \section* -- the Quiz, the manifests, the front matter -- has no
+# number, so is_heading cannot match one and this check has never looked at one.
+#
+# That exclusion used to be justified here on two grounds: that none of them is
+# followed by a frame, and that the Quiz carries a room test of its own. The
+# first holds. The second does not. The Quiz's reserve is 8\baselineskip against
+# a box that will not begin on a page which cannot hold 12 lines, so the guard
+# admits pages on which the box provably cannot start -- the arithmetic is in
+# the note above \begin{quiz} in preamble.tex. And Can you? is not a \section*
+# at all: \canyou calls \mfa@endhead, and what follows it is an unbreakable
+# tabularx with no guard of any kind.
+#
+# So the blind spot is real, it is this check's, and it is the reason those two
+# headings are found by eye. Closing it needs the heading STRING rather than a
+# number -- \lblQuiz and \lblCanYou read out of lang/*.tex the way cue_strings()
+# already reads \lblNextFrame -- and a SECOND size calibration, because
+# \mfa@endhead sets \large where a numbered section sets \Large, so the height
+# heading_metrics learns will not match Can you?. It is not written here because
+# the pass that found the blind spot had no TeX installation and so could not
+# watch it fire on a page it already knew was wrong, and a check nobody has
+# watched fire is worth less than no check at all.
 RE_SECNO = re.compile(r"^[A-Z]?\d*\.\d+$")
 
 # How high up the text block a body page's ink may stop before the page reads
