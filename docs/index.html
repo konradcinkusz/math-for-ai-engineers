@@ -4,19 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mathematics from Zero for the AI Engineer</title>
-<meta name="description" content="A programmed-learning course from arithmetic to scaled dot-product attention, in Polish and English, built from one repository.">
+<meta name="description" content="A programmed-learning course from arithmetic to scaled dot-product attention, in Polish and English, built from one repository — and how to work through it.">
 <style>
   :root {
     --blue: #1F4E79; --green: #2E6B4F; --teal: #0E7C7B; --amber: #B26A00; --red: #9B2C2C;
     --grey: #5A5A5A; --light: #F4F6F8; --bg: #ffffff; --fg: #1a1a1a;
-    --border: #D8DEE4;
+    --border: #D8DEE4; --sheet: rgba(244, 246, 248, .97);
   }
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
       --bg: #14171a; --fg: #e8eaed; --light: #1e2328; --grey: #9aa3ab;
-      --blue: #7BAEDC; --teal: #4FC3C2; --amber: #E0A24A; --red: #E08A8A;
-      --border: #2b3238;
+      --blue: #7BAEDC; --green: #7CC4A0; --teal: #4FC3C2; --amber: #E0A24A; --red: #E08A8A;
+      --border: #2b3238; --sheet: rgba(30, 35, 40, .97);
     }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171a; --fg: #e8eaed; --light: #1e2328; --grey: #9aa3ab;
+    --blue: #7BAEDC; --green: #7CC4A0; --teal: #4FC3C2; --amber: #E0A24A; --red: #E08A8A;
+    --border: #2b3238; --sheet: rgba(30, 35, 40, .97);
   }
   * { box-sizing: border-box; }
   body {
@@ -24,10 +29,12 @@
     font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   .wrap { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
-  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.15; color: var(--blue); margin: 0 0 .4rem; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.15; color: var(--blue); margin: 0 0 .4rem; text-wrap: balance; }
   .sub { color: var(--grey); font-size: 1.1rem; margin: 0 0 2rem; }
-  h2 { font-size: 1.25rem; color: var(--blue); margin: 2.5rem 0 .75rem; }
+  h2 { font-size: 1.25rem; color: var(--blue); margin: 2.5rem 0 .75rem; text-wrap: balance; }
+  h3 { font-size: 1.02rem; color: var(--blue); margin: 0 0 .5rem; }
   a { color: var(--teal); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
   .banner {
     background: var(--light); border-left: 3px solid var(--amber);
     padding: .9rem 1.1rem; margin: 1.5rem 0 2rem; border-radius: 0 4px 4px 0;
@@ -55,6 +62,103 @@
   .dl small { display: block; font-weight: 400; color: var(--grey); font-size: .78rem; }
   .dl a:hover small { color: var(--bg); }
   .alt { font-size: .88rem; color: var(--grey); margin-top: -.4rem; }
+
+  /* ---- The two tabs. Without script both panels show, one under the other,
+          and the tab bar is a pair of in-page links. ---- */
+  .tabs { display: flex; gap: .25rem; border-bottom: 1px solid var(--border); margin: 2rem 0 1.5rem; }
+  .tabs a {
+    text-decoration: none; color: var(--grey); font-weight: 600; padding: .55rem .9rem;
+    border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap;
+  }
+  .tabs a:hover { color: var(--blue); }
+  .tabs a[aria-selected="true"] { color: var(--blue); border-bottom-color: var(--blue); }
+  .tabpanel[hidden] { display: none; }
+  html:not(.js) .tabpanel { border-top: 1px solid var(--border); padding-top: .5rem; }
+
+  /* ---- Provenance chips. Every piece of advice on the second tab carries one. ---- */
+  .src {
+    display: inline-block; font-size: .66rem; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; padding: .12rem .45rem .1rem; border-radius: 3px;
+    vertical-align: .14em; margin-right: .35rem; background: var(--light); border: 1px solid var(--border);
+  }
+  .src-book { color: var(--blue); }
+  .src-lab { color: var(--teal); }
+
+  /* ---- A frame pair, set the way the book sets one. ---- */
+  .demo { margin: 1.5rem 0 1.75rem; }
+  .page {
+    position: relative; background: var(--bg); border: 1px solid var(--border);
+    padding: 1.1rem 3.4rem 1.1rem 1.25rem;
+    font-family: Georgia, "Times New Roman", "Latin Modern Roman", serif; font-size: .96rem; line-height: 1.55;
+  }
+  .frame + .frame { margin-top: 1.2rem; }
+  .rule { display: flex; align-items: center; gap: .6rem; margin: 0 -2.3rem .6rem 0; }
+  .rule::before { content: ""; flex: 1; border-top: 1px solid var(--fg); }
+  .badge {
+    font: 700 .8rem/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--light); border: 1px solid var(--border); border-radius: 4px;
+    padding: .3rem .45rem; color: var(--fg); font-variant-numeric: tabular-nums;
+  }
+  .frame p { margin: 0 0 .55rem; }
+  .ans {
+    display: block; width: 86%; margin: 0 auto .7rem; border: 1px solid var(--green);
+    padding: .45rem .8rem; text-align: center; background: var(--bg);
+  }
+  .ans .num { overflow-wrap: anywhere; }
+  .dots { display: flex; align-items: baseline; gap: 1rem; margin: .5rem 0 0; }
+  .dots::before { content: ""; flex: 1; border-bottom: 2px dotted var(--grey); transform: translateY(-.4em); }
+  .cue { font-style: italic; white-space: nowrap; }
+  .trap { border: 1px solid var(--fg); padding: .55rem .8rem .3rem; margin: .5rem 0 .6rem; }
+  .trap .label {
+    display: block; font: 700 .7rem/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: .07em; text-transform: uppercase; color: var(--red); margin-bottom: .25rem;
+  }
+  .covered { position: relative; }
+  .sheet {
+    position: absolute; inset: 0; z-index: 2; background: var(--sheet);
+    border: 1px dashed var(--grey); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: .6rem; padding: 1rem; text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .sheet p { margin: 0; color: var(--grey); font-size: .9rem; max-width: 28rem; }
+  .lift {
+    font: 600 .9rem/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--blue); background: var(--light); border: 1px solid var(--blue);
+    border-radius: 6px; padding: .5rem .95rem; cursor: pointer;
+  }
+  .lift:hover { background: var(--blue); color: var(--bg); }
+  .demo.lifted .sheet { position: static; inset: auto; background: none; border: 0; padding: .1rem 0 .6rem; flex-direction: row; justify-content: flex-end; }
+  .demo.lifted .sheet p { display: none; }
+  html:not(.js) .sheet { display: none; }
+  .demo figcaption { font-size: .86rem; color: var(--grey); margin-top: .6rem; }
+
+  /* ---- The loop, the routes, the habits, the evidence. ---- */
+  .loop { counter-reset: step; list-style: none; padding: 0; margin: 1rem 0; }
+  .loop li { counter-increment: step; position: relative; padding-left: 2.4rem; margin: 0 0 .6rem; }
+  .loop li::before {
+    content: counter(step); position: absolute; left: 0; top: 0; width: 1.7rem;
+    font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums;
+    border-top: 2px solid var(--blue); padding-top: .2rem; line-height: 1.3;
+  }
+  .routes { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .route { background: var(--light); padding: 1rem 1.1rem; border-top: 3px solid var(--blue); }
+  .route p { margin: 0 0 .6rem; font-size: .95rem; }
+  .route p:last-child { margin-bottom: 0; }
+  .habits { list-style: square; }
+  .habits li { margin: .55rem 0; }
+  .evidence td:first-child { font-weight: 600; white-space: nowrap; }
+  .evidence td { font-variant-numeric: tabular-nums; }
+  .sources li { margin: .45rem 0; font-size: .92rem; }
+
+  @media (max-width: 600px) {
+    .routes { grid-template-columns: 1fr; }
+    .evidence td:first-child { white-space: normal; }
+    .page { padding-right: 2.6rem; }
+    .rule { margin-right: -1.8rem; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tabs a { transition: color .15s, border-color .15s; }
+  }
 </style>
 </head>
 <body>
@@ -96,6 +200,13 @@
   &mdash; or
   <a href="https://github.com/konradcinkusz/math-for-ai-engineers/releases">every release</a>.
 </p>
+
+<nav class="tabs" role="tablist" aria-label="Sections of this page">
+  <a role="tab" id="tab-book" href="#book" aria-controls="panel-book" aria-selected="true">The book</a>
+  <a role="tab" id="tab-learn" href="#learn" aria-controls="panel-learn" aria-selected="false" tabindex="-1">How to learn from it</a>
+</nav>
+
+<section class="tabpanel" id="panel-book" data-hash="book" role="tabpanel" aria-labelledby="tab-book">
 
 <div class="banner">
   <strong>Complete draft.</strong> All forty-seven programs and all six
@@ -140,6 +251,10 @@
   text walks you into it, lets you commit to the wrong answer, then says flatly
   that it is wrong. Every one is catalogued with its correction and the
   program that owns it, each phrased in the reader's own voice.
+</p>
+<p class="alt">
+  How to work one — the rule at every frame, the loop around every program, and
+  where to begin — is on the <a href="#learn">other tab</a>.
 </p>
 
 <h2>Every number is computed, not remembered</h2>
@@ -234,6 +349,376 @@
   Readers rate the method they retain less from as the more effective one.
 </p>
 
+</section>
+
+<section class="tabpanel" id="panel-learn" data-hash="learn" role="tabpanel" aria-labelledby="tab-learn">
+
+<h2>It has to be worked</h2>
+<p>
+  <em>How to use this book</em>, the first chapter of the front matter, opens
+  with a sentence to take literally: <strong>this book cannot be read. It has
+  to be worked.</strong> The format is built so that passive reading produces
+  almost nothing, and four pages in you will feel it.
+</p>
+<p>
+  This tab is that chapter's instructions in one place, beside what the
+  research behind them actually measured. Advice marked
+  <span class="src src-book">the book</span> is the book's own, from its front
+  matter and its programs. Advice marked <span class="src src-lab">the
+  research</span> is drawn from the studies listed at the foot of this page;
+  where it goes beyond what the book prints, it is a habit the research
+  supports and the book leaves to you.
+</p>
+
+<h2 id="learn-rule">The one rule</h2>
+<p>
+  <span class="src src-book">the book</span> Each program is a stream of small
+  numbered <strong>frames</strong>. Most end by asking you for something — a
+  number, a word, a line of working — and <strong>the answer is at the top of
+  the next frame</strong>. A row of dots means a word, a number or an
+  expression is missing and you are to supply it. So: cover the next frame
+  before you read the current one to the end. A sheet of paper is enough.
+  Write your answer down — on paper, not in your head — and only then uncover.
+</p>
+<p>
+  That is the one rule that is not negotiable. Break it and the book
+  degenerates into a mediocre collection of worked examples, and every
+  advantage the method has is gone. You will be tempted to break it in exactly
+  the frames where it matters most, which are the ones where you are not sure.
+</p>
+
+<figure class="demo" id="demo">
+  <div class="page">
+    <div class="frame">
+      <div class="rule"><span class="badge">30</span></div>
+      <div class="ans">10<sup>3</sup>. So 2<sup>10</sup> &asymp; 10<sup>3</sup>, and a factor of 1024 can be read as a factor of a thousand.</div>
+      <p>2<sup>10</sup> exceeds 10<sup>3</sup> by <span data-val="f01.kib.over.si.pct">2.40</span>%, which for a back-of-envelope answer is nothing. Say it that way round, and always: “the approximation is low by <span data-val="f01.kib.over.si.pct">2.40</span>%” is a different claim about a different denominator, and the two answers are not the same number.</p>
+      <p>Now push it. 2<sup>80</sup> is eight of those factors stacked up, so it should be about 10<sup>24</sup>. Is the error still nothing?</p>
+      <p class="dots"><em class="cue">Next frame.</em></p>
+    </div>
+    <div class="frame">
+      <div class="rule"><span class="badge">31</span></div>
+      <div class="covered">
+        <div class="sheet">
+          <p>Your sheet of paper. It stays here until you have written an answer to frame 30 down — the number, or at least the direction.</p>
+          <button type="button" class="lift" aria-expanded="false" aria-controls="demo-hidden">Lift the sheet</button>
+        </div>
+        <div id="demo-hidden">
+          <div class="ans">No. 2<sup>80</sup> = <span class="num" data-val="f01.two.eighty">1208925819614629174706176</span>, which is <span data-val="f01.two.eighty.err.pct">20.89</span>% above 10<sup>24</sup>.</div>
+          <div class="trap">
+            <span class="label">Trap</span>
+            <p><strong>A small relative error compounds into a large one.</strong> Each factor of 1024 carries <span data-val="f01.kib.over.si.pct">2.40</span>% and the errors multiply rather than add, so eight of them is not eight times <span data-val="f01.kib.over.si.pct">2.40</span>% — it is <span data-val="f01.two.eighty.err.pct">20.89</span>%. The rule to carry away: an approximation is safe once, and a repeated approximation needs checking.</p>
+          </div>
+          <p>Estimating in standard form is now three steps: round each quantity to one significant figure, add or subtract the exponents, and renormalise.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <figcaption>
+    Frames 30 and 31 of Program F1, set the way the book sets them: a hairline
+    across the measure at every frame boundary, the frame number in the outer
+    margin, the previous frame's answer boxed at the top of the next, and the
+    cue at the end of any frame that has asked for something. The sheet is the
+    part you supply. Every figure in the pair is read from the same files the
+    book reads and checked against the scripts before this page is published.
+  </figcaption>
+</figure>
+
+<p>
+  <span class="src src-lab">the research</span> The rule is a laboratory result
+  carried onto the page. Roediger and Karpicke (2006) had students learn a
+  short passage either by reading it four times or by reading it once and
+  recalling it three times. Five minutes later the rereaders were ahead, 83% to
+  71%. A week later they had fallen to 40% and the recallers still held 61% —
+  and the rereaders had predicted they would remember more. A frame is that
+  second schedule with the recall placed at every page turn rather than at the
+  end of a chapter.
+</p>
+<p>
+  Stroud's own instruction to his readers says the same thing in fewer words:
+  <q>you are strongly advised to cover up the following frame until you have
+  made your response</q>, and <q>there is no need to hurry</q>.
+</p>
+
+<h2 id="learn-loop">One program, in order</h2>
+<p>
+  <span class="src src-book">the book</span> Every program has the same seven
+  parts, and the order you meet them in is the method. The loop the front
+  matter recommends is <strong>read the outcomes &rarr; take the Quiz &rarr;
+  work the frames &rarr; Can you? &rarr; Test exercises &rarr; Further
+  problems</strong>.
+</p>
+<ol class="loop">
+  <li><b>Learning outcomes.</b> What you will be able to do, listed before you
+    start with a box beside each, so you can judge the program against its own
+    promise — and come back and tick.</li>
+  <li><b>Quiz.</b> Take it <em>before</em> the program. If you score well,
+    work only the frames the questions send you to: the frame numbers beside
+    each question are the route back, and they are the whole point of scoring
+    it. It is a diagnostic, never a score.</li>
+  <li><b>Frames.</b> The program itself. The box at the top right of the
+    opener says how many, so the length of the commitment is known before you
+    start; across the book a program runs from twenty-two to sixty-four
+    teaching frames. The Summary and the Test exercises are numbered frames
+    too, and carry the last two numbers.</li>
+  <li><b>Summary.</b> Every item is tagged with the frame it came from, like
+    [17]. The Summary is therefore also a route back.</li>
+  <li><b>Can you?</b> The outcomes again, one for one, rated 1 (no) to 5 (yes,
+    unaided). Anything below 4 is not a matter for reflection: go back to the
+    frames named beside it and work them again.</li>
+  <li><b>Test exercises.</b> Exactly what the program taught, in the order it
+    taught it, with no traps. They score what the program taught, item by
+    item, and they are the instrument the book measures itself against. Most
+    people skip them, and they are the most informative thing in the
+    sequence: what they report is frequently below the feeling of having
+    understood.</li>
+  <li><b>Further problems.</b> Consolidation, and more of it than you will
+    want. Work these until the method is automatic rather than recalled —
+    that is the whole of the difference between having understood a technique
+    and being able to use it.</li>
+</ol>
+<p>
+  Answers to the Quiz, the Test exercises and the Further problems are in
+  Appendix A, keyed Q, T and P by program. Do not take the Quiz a second time
+  as a measure of progress: answered again it is the same questions put to a
+  reader who now remembers the answers, so the difference between two Quiz
+  scores measures your memory.
+</p>
+
+<h2 id="learn-start">Where to start</h2>
+<div class="routes">
+  <div class="route">
+    <h3>Starting from arithmetic</h3>
+    <p><span class="src src-book">the book</span> Program F1, frame 1, and in
+      order. Part I assumes no mathematics beyond school arithmetic — not
+      algebra, not trigonometry, not calculus — and means it. After F13,
+      Programs 1 to 34 in order: the main parts are not independent, and where
+      one program leans on an earlier one it names it on the spot.</p>
+    <p>What it does assume is your job. Model, token, parameter, training run
+      and evaluation are used without explanation from Program F1 on, because
+      every payoff in the book is a payoff in that job.</p>
+  </div>
+  <div class="route">
+    <h3>Already have a degree</h3>
+    <p><span class="src src-book">the book</span> Do not read Part I in
+      order. <strong>Work the thirteen Foundation Quizzes and nothing
+      else</strong> — they take an afternoon. Enter a Foundation program only
+      where its Quiz goes badly, and enter it at the frames the failed question
+      names rather than at frame 1. Then start at Program 1 and read the main
+      parts in order.</p>
+    <p>Two Foundation programs are worth working even if the Quiz goes well:
+      <strong>F3</strong> on logarithms, because almost everything numerical in
+      the book happens in log-space and the reasons are not the ones taught at
+      school; and <strong>F12</strong> on the chain rule, because
+      backpropagation is the chain rule and nothing else, and the book leans on
+      that sentence for four hundred pages.</p>
+  </div>
+</div>
+<p>
+  Part II — floating point, numerical stability, cost — comes before the
+  linear algebra on purpose. Everything after it is arithmetic performed by a
+  finite machine on a budget, and a book that waits four hundred pages to admit
+  the machine cannot represent 0.1 has spent four hundred pages teaching a
+  fiction.
+</p>
+
+<h2 id="learn-traps">Walk into the traps</h2>
+<p>
+  <span class="src src-book">the book</span> Where a topic has a standard
+  misconception, the text walks you into it, lets you commit to the wrong
+  answer, then says flatly that it is wrong and shows you why. That is
+  uncomfortable and it is the most valuable thing in the format: a
+  misconception that has been elicited and corrected is gone, and one that has
+  merely been avoided is waiting. So when a frame says <em>as fast as you
+  can</em> or <em>before you read on</em>, do exactly that. Guess, on paper. Do
+  not look ahead for the shape of the answer.
+</p>
+<p>
+  <span class="src src-lab">the research</span> Two results say why a wrong
+  answer written down is worth more than a right answer read. Kornell, Hays and
+  Bjork (2009) had people guess at questions they could not know, then showed
+  them the answer; on a later test they beat people who had spent the same time
+  studying the answer — the pretesting effect, in six experiments. Butterfield
+  and Metcalfe (2001) found that errors made with high confidence are the ones
+  most likely to be corrected once the right answer is shown — the
+  hypercorrection effect, replicated by several groups since. The frames you
+  are surest of are the ones the trap is built for, and the correction explains
+  the reasoning that produced the wrong answer rather than only naming the
+  right one. Read it for that.
+</p>
+<p>
+  Note how sure you were before you uncover. A miss you were confident about is
+  not a lapse; it is the one the format most rewards.
+</p>
+
+<h2 id="learn-pace">Pace: space it, mix it, test it again</h2>
+<p>
+  <span class="src src-lab">the research</span> The book says <em>there is no
+  need to hurry</em> and leaves the timetable to you. The research does not,
+  and three findings translate into habits the format cannot enforce on its
+  own:
+</p>
+<ul class="habits">
+  <li><b>Space the sittings.</b> Cepeda and colleagues (2008) taught over 1,350
+    people a set of facts, reviewed them after a gap of up to three and a half
+    months, and tested up to a year later. The best gap between first study and
+    review was a fraction of how long you want to remember for — 20 to 40 per
+    cent of a week, 5 to 10 per cent of a year. A program's numbered sections
+    are the natural unit of a sitting; a program finished in one evening is
+    the massed schedule that loses.</li>
+  <li><b>Come back to the Test exercises.</b> A week or two after a program,
+    work them again on paper. As a score the second attempt is contaminated by
+    memory, exactly as the book says of the Quiz; as practice it is the
+    retrieval the whole method rests on, timed where the spacing research puts
+    it.</li>
+  <li><b>Mix the Further problems.</b> Rohrer and Taylor (2007) had students
+    practise four kinds of volume problem either blocked by type or shuffled.
+    The shuffled group got fewer right while practising, 60 per cent against
+    89, and three times as many right a week later, 63 per cent against 20.
+    Three programs on, pull a handful of Further problems from an earlier one
+    into the sitting.</li>
+</ul>
+<p>
+  Dunlosky and colleagues (2013) reviewed ten study techniques and rated two of
+  high utility — practice testing and distributed practice — three of moderate
+  utility, interleaved practice among them, and five of low utility:
+  summarising, highlighting, mnemonics, imagery and rereading. The format
+  builds the first two into the way the pages turn. The third is yours to
+  arrange, and the last five are what the book is shaped to stop you doing.
+</p>
+
+<h2 id="learn-feel">What it will feel like</h2>
+<p>
+  <span class="src src-book">the book</span> It will feel worse than reading
+  while you are doing it. In the retrieval-practice studies the advantage is
+  absent at an immediate test and appears after two days and a week; readers
+  consistently rate the method they retain less from as the more effective one,
+  because fluency feels like learning and effort feels like failure.
+  <strong>If you abandon this book because it feels inefficient, you will be
+  abandoning it for the reason it works.</strong>
+</p>
+<p>
+  <span class="src src-lab">the research</span> That is measured rather than
+  asserted. Asked how they study, most of 177 undergraduates said they reread
+  their notes, and few said they tested themselves (Karpicke, Butler and
+  Roediger, 2009). Given a science text, students who practised recalling it
+  outscored students who drew concept maps of it on questions of inference a
+  week later, and had expected the reverse (Karpicke and Blunt, 2011). Rohrer
+  and Taylor's shuffled group above was wrong more often on the day and right
+  more often a week later. The feeling is not a signal about the method. It is
+  the method.
+</p>
+
+<h2 id="learn-claims">What the method is entitled to claim</h2>
+<p>
+  <span class="src src-book">the book</span> K. A. Stroud's <em>Engineering
+  Mathematics</em> (1970) came out of eight years of programmed-learning work
+  at Lanchester College of Technology, Coventry, where the whole first year of
+  engineering mathematics was taught this way. Each programme was validated
+  before publication to above <strong>80/80</strong>: at least 80 per cent of
+  students scoring at least 80 per cent. The finding worth having is that the
+  spread narrowed rather than that the mean rose — the method lifts the bottom
+  of the distribution.
+</p>
+<p>
+  <strong>This book has not been tested on a single reader.</strong> It borrows
+  the method and is not entitled to borrow the evidence; every build prints
+  that as outstanding, and it will keep printing it until somebody runs the
+  trial. And the general case for programmed instruction is not good: Kulik,
+  Schwalb and Kulik's 1982 meta-analysis of 48 evaluations in secondary schools
+  found results very similar to conventional teaching, with no typical gain in
+  achievement or in how students felt about the subject. The book quotes that
+  against itself rather than leaving it out. What it defends instead is
+  narrower and better supported — retrieval practice and errorful generation,
+  which is what the frame and the trap are for.
+</p>
+<div class="scroll">
+<table class="evidence">
+  <tr><th>Rule</th><th>What was measured</th><th>Source</th></tr>
+  <tr><td>Answer before you uncover</td><td>Read four times: 83% at five minutes, 40% at a week. Read once and recall three times: 71%, then 61%.</td><td><a href="https://journals.sagepub.com/doi/10.1111/j.1467-9280.2006.01693.x">Roediger &amp; Karpicke 2006</a></td></tr>
+  <tr><td>Guess even when you cannot know</td><td>A wrong guess followed by the answer beat the same time spent studying the answer, in six experiments.</td><td><a href="https://web.williams.edu/Psychology/Faculty/Kornell/Publications/Kornell.Hays.Bjork.2009.pdf">Kornell, Hays &amp; Bjork 2009</a></td></tr>
+  <tr><td>Note how sure you were</td><td>Errors held with high confidence were corrected more often after feedback than errors held with low confidence.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/11713883/">Butterfield &amp; Metcalfe 2001</a></td></tr>
+  <tr><td>Space the sittings</td><td>Best gap between study and review about a fifth of the retention interval at a few weeks, less at a year; over 1,350 people.</td><td><a href="https://journals.sagepub.com/doi/abs/10.1111/j.1467-9280.2008.02209.x">Cepeda et al. 2008</a></td></tr>
+  <tr><td>Mix the problems</td><td>Shuffled practice 63% a week later against 20% blocked, after scoring 60% against 89% during practice.</td><td><a href="https://digitalcommons.usf.edu/psy_facpub/1767/">Rohrer &amp; Taylor 2007</a></td></tr>
+  <tr><td>Do not trust the feeling</td><td>Most of 177 students reread; few self-test. Recall beat concept mapping a week later, and students predicted the reverse.</td><td><a href="https://www.tandfonline.com/doi/abs/10.1080/09658210802647009">Karpicke et al. 2009</a>; <a href="https://www.science.org/doi/10.1126/science.1199327">Karpicke &amp; Blunt 2011</a></td></tr>
+  <tr><td>Test and space first</td><td>Ten techniques rated: practice testing and distributed practice high; interleaving moderate; rereading and highlighting low.</td><td><a href="https://journals.sagepub.com/doi/abs/10.1177/1529100612453266">Dunlosky et al. 2013</a></td></tr>
+  <tr><td>The format as a whole</td><td>48 evaluations in secondary schools: programmed instruction about the same as conventional teaching.</td><td><a href="https://www.tandfonline.com/doi/abs/10.1080/00220671.1982.10885369">Kulik, Schwalb &amp; Kulik 1982</a></td></tr>
+</table>
+</div>
+
+<h2 id="learn-kit">What to have beside you</h2>
+<ul>
+  <li><b>Paper, a pen and a sheet to cover with.</b> The whole method is a
+    thing you put your hand over.</li>
+  <li><b>The A4 PDF</b> for a screen or an office printer; the 17 × 24 cm one
+    if you bind it. The formats paginate differently and nothing navigates by
+    page — every reference names a program and a frame — so either works, and
+    so does the Polish edition, which has the same frames and the same answers.</li>
+  <li><b>A Python prompt.</b> The console listings in the book are produced by
+    the same scripts that compute every number in it, and each has been
+    extracted from the finished PDF and run. Paste them and change the
+    numbers.</li>
+  <li><b>The back matter.</b> Appendix A holds every answer, keyed by program
+    and item; Appendix C is the formula reference, replayed from the
+    Summaries; Appendix B records the notation decisions; Appendix F prints
+    what the book still owes you, computed on every build rather than typed.</li>
+  <li><b>An erratum is the most valuable thing you can send back.</b> A wrong
+    digit in a mathematics book is something a reader will carry. Include the
+    program and the frame number.</li>
+</ul>
+
+<h2 id="learn-sources">Sources</h2>
+<ul class="sources">
+  <li>K. A. Stroud, <em>Engineering Mathematics: Programmes and Problems</em>,
+    Macmillan, 1970, and the later editions with D. J. Booth — the format, the
+    80/80 validation, and the instruction to cover the following frame.
+    <a href="https://www.goodreads.com/book/show/2145638.Engineering_Mathematics">The book</a>.</li>
+  <li>C. C. Kulik, B. J. Schwalb and J. A. Kulik, “Programmed Instruction in
+    Secondary Education: A Meta-Analysis of Evaluation Findings”, <em>Journal
+    of Educational Research</em>, 75, 133–138, 1982.
+    <a href="https://www.tandfonline.com/doi/abs/10.1080/00220671.1982.10885369">Abstract</a>.</li>
+  <li>H. L. Roediger and J. D. Karpicke, “Test-Enhanced Learning: Taking
+    Memory Tests Improves Long-Term Retention”, <em>Psychological Science</em>,
+    17, 249–255, 2006.
+    <a href="https://journals.sagepub.com/doi/10.1111/j.1467-9280.2006.01693.x">Article</a>.</li>
+  <li>N. Kornell, M. J. Hays and R. A. Bjork, “Unsuccessful Retrieval Attempts
+    Enhance Subsequent Learning”, <em>Journal of Experimental Psychology:
+    Learning, Memory, and Cognition</em>, 35, 989–998, 2009.
+    <a href="https://web.williams.edu/Psychology/Faculty/Kornell/Publications/Kornell.Hays.Bjork.2009.pdf">PDF</a>.</li>
+  <li>B. Butterfield and J. Metcalfe, “Errors Committed with High Confidence
+    Are Hypercorrected”, <em>Journal of Experimental Psychology: Learning,
+    Memory, and Cognition</em>, 27, 1491–1494, 2001.
+    <a href="https://pubmed.ncbi.nlm.nih.gov/11713883/">Abstract</a>.</li>
+  <li>J. D. Karpicke, A. C. Butler and H. L. Roediger, “Metacognitive
+    Strategies in Student Learning: Do Students Practise Retrieval When They
+    Study on Their Own?”, <em>Memory</em>, 17, 471–479, 2009.
+    <a href="https://www.tandfonline.com/doi/abs/10.1080/09658210802647009">Abstract</a>.</li>
+  <li>J. D. Karpicke and J. R. Blunt, “Retrieval Practice Produces More
+    Learning than Elaborative Studying with Concept Mapping”, <em>Science</em>,
+    331, 772–775, 2011.
+    <a href="https://www.science.org/doi/10.1126/science.1199327">Article</a>.</li>
+  <li>N. J. Cepeda, E. Vul, D. Rohrer, J. T. Wixted and H. Pashler, “Spacing
+    Effects in Learning: A Temporal Ridgeline of Optimal Retention”,
+    <em>Psychological Science</em>, 19, 1095–1102, 2008.
+    <a href="https://journals.sagepub.com/doi/abs/10.1111/j.1467-9280.2008.02209.x">Article</a>.</li>
+  <li>D. Rohrer and K. Taylor, “The Shuffling of Mathematics Problems Improves
+    Learning”, <em>Instructional Science</em>, 35, 481–498, 2007.
+    <a href="https://digitalcommons.usf.edu/psy_facpub/1767/">Record</a>.</li>
+  <li>J. Dunlosky, K. A. Rawson, E. J. Marsh, M. J. Nathan and D. T.
+    Willingham, “Improving Students' Learning With Effective Learning
+    Techniques”, <em>Psychological Science in the Public Interest</em>, 14,
+    4–58, 2013.
+    <a href="https://journals.sagepub.com/doi/abs/10.1177/1529100612453266">Article</a>.</li>
+</ul>
+<p class="alt">
+  The book's own attributions for the first six are in Appendix E, which prints
+  no web addresses by policy; the links here are for a reader who wants the
+  paper tonight. Every figure quoted above was read from the study's abstract
+  or its reported results, not from a summary of it.
+</p>
+
+</section>
+
 <footer>
   <p>
     <a href="https://github.com/konradcinkusz/math-for-ai-engineers">Repository</a> ·
@@ -247,5 +732,74 @@
 </footer>
 
 </div>
+<script>
+(function () {
+  var root = document.documentElement;
+  root.classList.add('js');
+
+  // The two tabs. The hash names the panel, so #learn is a link somebody can
+  // send; with no hash, or one that names no panel, the book tab shows. The
+  // panels' own ids are different from the hash names on purpose: an element
+  // whose id matched would make the browser jump to it on load, and the title
+  // and the tab bar would be scrolled out of view.
+  var tabs = [].slice.call(document.querySelectorAll('.tabs [role="tab"]'));
+  var panels = [].slice.call(document.querySelectorAll('.tabpanel'));
+  var names = panels.map(function (p) { return p.getAttribute('data-hash'); });
+
+  function show(name, record) {
+    if (names.indexOf(name) < 0) { name = names[0]; }
+    panels.forEach(function (p) { p.hidden = p.getAttribute('data-hash') !== name; });
+    tabs.forEach(function (t) {
+      var on = t.getAttribute('href') === '#' + name;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+    });
+    if (record && history.replaceState) { history.replaceState(null, '', '#' + name); }
+  }
+
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function (e) {
+      e.preventDefault();
+      show(t.getAttribute('href').slice(1), true);
+    });
+    t.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) { return; }
+      e.preventDefault();
+      var next = tabs[(i + d + tabs.length) % tabs.length];
+      show(next.getAttribute('href').slice(1), true);
+      next.focus();
+    });
+  });
+
+  // A link inside one panel that names the other panel switches tabs rather
+  // than scrolling to a hidden section.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a || a.getAttribute('role') === 'tab') { return; }
+    var name = a.getAttribute('href').slice(1);
+    if (names.indexOf(name) < 0) { return; }
+    e.preventDefault();
+    show(name, true);
+    document.querySelector('.tabs').scrollIntoView({ block: 'start' });
+  });
+
+  window.addEventListener('hashchange', function () {
+    show((location.hash || '#').slice(1), false);
+  });
+  show((location.hash || '#').slice(1), false);
+
+  // The sheet over frame 31.
+  var demo = document.getElementById('demo');
+  var lift = demo && demo.querySelector('.lift');
+  if (lift) {
+    lift.addEventListener('click', function () {
+      var lifted = demo.classList.toggle('lifted');
+      lift.setAttribute('aria-expanded', lifted ? 'true' : 'false');
+      lift.textContent = lifted ? 'Cover frame 31 again' : 'Lift the sheet';
+    });
+  }
+})();
+</script>
 </body>
 </html>

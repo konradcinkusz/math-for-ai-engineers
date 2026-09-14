@@ -308,6 +308,10 @@ CLAUDE.md                  working notes: conventions, traps hit, resolved quest
   [polski A4](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl-a4.pdf) ·
   [English 17×24](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf) ·
   [polski 17×24](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf)
+- **[How to learn from it](https://konradcinkusz.github.io/math-for-ai-engineers/#learn)** — the
+  front matter's instructions on one page, beside what the research behind
+  them measured: the rule at every frame, the loop around every program, and
+  where to begin.
 - **[Releases](https://github.com/konradcinkusz/math-for-ai-engineers/releases)** — the same book pinned to a
   tag, if you need a copy that will not change:
   [English](https://github.com/konradcinkusz/math-for-ai-engineers/releases/download/v1.0.0/Mathematics-from-Zero-for-the-AI-Engineer-v1.0.0.pdf) ·
