@@ -1,0 +1,70 @@
+name: Lab
+
+# The exercise engine under lab/, and NOTHING ELSE. build.yml, pages.yml,
+# release.yml and kdp.yml are untouched: this workflow is additive, exactly as
+# lab/ is additive to the source, and its first job exists to prove that.
+
+on:
+  pull_request:
+    paths:
+      - 'lab/**'
+      - '.github/workflows/lab.yml'
+      - 'figures/values/**'
+  push:
+    branches: [main]
+    paths:
+      - 'lab/**'
+      - '.github/workflows/lab.yml'
+      - 'figures/values/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -------------------------------------------------------------------------
+  # THE GUARD. The lab is additive or it is a defect: every path a change
+  # touches must be one the lab may touch. An allow-list rather than a
+  # deny-list, so it stays correct when the book grows a directory.
+  # -------------------------------------------------------------------------
+  guard:
+    name: The book is untouched
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Every changed path is one the lab may change
+        run: |
+          base="${{ github.event.pull_request.base.sha || github.event.before }}"
+          python3 lab/tools/labcheck.py --guard "$base"
+
+  # -------------------------------------------------------------------------
+  # THE ENGINE. The reference solutions pass every check; the untouched stubs
+  # pass none. A check that passes on an empty exercise file is not a check,
+  # so the instrument is watched producing a known answer in both directions.
+  # -------------------------------------------------------------------------
+  engine:
+    name: Solutions pass, stubs do not
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install --quiet pytest
+      - name: The lab's own gates
+        run: python3 lab/tools/labcheck.py --all
+      - name: The same checks under pytest
+        run: LAB_SOLUTIONS=1 python3 -m pytest -q lab/tests
+      - name: A reader with nothing installed gets the same answer
+        run: |
+          LAB_SOLUTIONS=1 python3 lab/check.py p01 | tail -1
+          python3 lab/check.py p01 | tail -1 || true

@@ -57,6 +57,19 @@ than something to read on a screen. The four PDFs above are the book.
 > typed, so the debt is visible to a reader holding the paper rather than only
 > to somebody who can run `make debt`.
 
+
+## The lab
+
+`lab/` holds the book's computer exercises: Python stubs the reader completes
+beside a program, and checks that compare what the code prints with the
+numbers the book prints — read out of the same `figures/values/` files the
+pages are set from, so the two cannot disagree. Nothing beyond Python is
+needed: `python3 lab/check.py p01`. The first lab is Program P1, whose own
+method is that a claim about what the machine stores is settled by asking
+it. See [`lab/README.md`](lab/README.md), and
+[`notes/10-learning-app.md`](notes/10-learning-app.md) for the learning
+application the engine is built for.
+
 ---
 
 ## What a program looks like
