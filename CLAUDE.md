@@ -677,7 +677,10 @@ from and the one `make verify` gates \dash{} so the lab has no numbers of its
 own to drift, and the book cannot move a value without the lab noticing. It
 was built in September 2026 as the first piece of *What is left* item 6, and
 the learning application it is the exercise layer of is proposed in
-`notes/10-learning-app.md`; the reasoning is there and is not repeated here.
+`notes/10-learning-app.md`; the reasoning is there and is not repeated here. The application is `ab-ovo` \dash{} its own repository, its
+own name, decided in September 2026 \dash{} and
+`notes/11-ab-ovo-session-prompt.md` is the brief for the session that
+initialises it; issue #239 tracks everything it still owes and is owed.
 
 **It is additive on the KDP pattern, and the proof is cheaper than the KDP
 one.** The lab reads `preamble.tex` and `figures/values/` and writes nothing
@@ -16760,6 +16763,8 @@ look first when one of them next goes stale.
    reader to is read out of `figures/values/p01.tex` rather than typed. The
    learning application that would run those checks in a browser, and
    encapsulate the book with them, is proposed in `notes/10-learning-app.md`.
+   It is named `ab-ovo`, its session brief is
+   `notes/11-ab-ovo-session-prompt.md`, and issue #239 is its tracker.
 7. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
    ledger stays open and the book may not claim it.
 8. **The review issues.** The book has been read end to end \dash{} one

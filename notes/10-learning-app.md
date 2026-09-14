@@ -178,10 +178,10 @@ flowchart LR
         LAB --> CC
         CC --> BUNDLE["content-&lt;tag&gt;.tar<br/>frames · quiz routes · values · .mmd · lab"]
     end
-    subgraph App["odzera (new repo, the scaffold template's shape)"]
-        WEB["@odzera/web<br/>Next.js + BFF<br/>frame view · lab pane (Pyodide)"]
-        API["Odzera.Api<br/>owns progressdb<br/>progress sync · the instrument"]
-        PG[("odzera-postgres")]
+    subgraph App["ab-ovo (new repo, the scaffold template's shape)"]
+        WEB["@ab-ovo/web<br/>Next.js + BFF<br/>frame view · lab pane (Pyodide)"]
+        API["AbOvo.Api<br/>owns apidb<br/>progress sync · the instrument"]
+        PG[("ab-ovo-postgres")]
         AUTH["authservice<br/>(published image)"]
         WEB -->|"server-side proxy"| API
         API --> PG
@@ -286,20 +286,24 @@ smallest system that exercises every principle"* (`INIT-GENERIC-TEMPLATE.md`
 §3) \dash{} with the one service it allows and the one it forbids inventing.
 
 **The argument and the derived names** (`INIT` §1 requires them echoed before
-anything is written). The slug is `odzera`: the name `notes/01-curriculum.md`
-§18 already reserved for the companion library, and the application is that
-library's front. `^[a-z][a-z0-9-]*$` holds.
+anything is written). The slug is `ab-ovo` \dash{} Latin *ab ovo*, from the
+very beginning, which names the method rather than the subject and so holds for
+every later track; decided in September 2026 and recorded in issue #239 §7.
+`^[a-z][a-z0-9-]*$` holds. The companion library of
+`notes/01-curriculum.md` §18 keeps its own name, `odzera`, and the two no
+longer collide. The database is the derivation's `apidb`, not a renamed one:
+a database name is nothing a deviation would buy.
 
 | Derived | Value |
 |---|---|
-| System slug | `odzera` |
-| .NET root namespace and solution | `Odzera` |
-| Projects | `Odzera.AppHost`, `Odzera.ServiceDefaults`, `Odzera.Contracts`, `Odzera.Api`, `Odzera.Api.Tests` |
-| Frontend workspace | `web/`, npm scope `@odzera` |
-| Fly apps | `odzera-api-<env>`, `odzera-web-<env>`, `odzera-authservice-<env>` |
-| Fly Postgres app / database | `odzera-postgres` / `progressdb` |
-| Container images | `ghcr.io/konradcinkusz/odzera-api`, `ghcr.io/konradcinkusz/odzera-web` |
-| Config prefix | `Odzera__…` |
+| System slug | `ab-ovo` |
+| .NET root namespace and solution | `AbOvo` |
+| Projects | `AbOvo.AppHost`, `AbOvo.ServiceDefaults`, `AbOvo.Contracts`, `AbOvo.Api`, `AbOvo.Api.Tests` |
+| Frontend workspace | `web/`, npm scope `@ab-ovo` |
+| Fly apps | `ab-ovo-api-<env>`, `ab-ovo-web-<env>`, `ab-ovo-authservice-<env>` |
+| Fly Postgres app / database | `ab-ovo-postgres` / `apidb` |
+| Container images | `ghcr.io/konradcinkusz/ab-ovo-api`, `ghcr.io/konradcinkusz/ab-ovo-web` |
+| Config prefix | `AbOvo__…` |
 
 **The bounded contexts, drawn around data cohesion** (P3: *"Bounded contexts
 are drawn around data cohesion, not around nouns"*). There are two kinds of
@@ -307,7 +311,7 @@ data and they have nothing in common: **content**, immutable per book tag,
 identical for every reader; and **progress**, per reader, mutable, small.
 Content is a static artefact and needs no database and no service \dash{} the
 web app serves it from the pinned bundle. Progress is the one service:
-`Odzera.Api` owns `progressdb`, and owns the instrument's aggregate tables
+`AbOvo.Api` owns `apidb`, and owns the instrument's aggregate tables
 beside it because they are derived from the same writes. That is one service,
 one database, no second service invented (`INIT` §12).
 
@@ -315,9 +319,9 @@ one database, no second service invented (`INIT` §12).
 
 | | The application's answer |
 |---|---|
-| P1 AppHost | `Odzera.AppHost` declares Postgres, the API and the web app with `WithReference`, `WaitFor`, `WithHttpHealthCheck`; development only |
-| P2 kernel | `Odzera.ServiceDefaults`, the eight concerns and nothing else; the ~800-line CI ceiling and the no-entity architecture test from the first commit |
-| P3 / P4 | `Odzera.Api` owns `progressdb`; `DATABASE_PROVIDER` selects Postgres and falls back to InMemory; schema by `MigrateAsync` in a hosted service. Progress is *"a lost transaction"*-shaped, so it takes the ORM-managed schema and not the snapshot pattern (`STATE-SNAPSHOT-PERSISTENCE.md` §6 says which) |
+| P1 AppHost | `AbOvo.AppHost` declares Postgres, the API and the web app with `WithReference`, `WaitFor`, `WithHttpHealthCheck`; development only |
+| P2 kernel | `AbOvo.ServiceDefaults`, the eight concerns and nothing else; the ~800-line CI ceiling and the no-entity architecture test from the first commit |
+| P3 / P4 | `AbOvo.Api` owns `apidb`; `DATABASE_PROVIDER` selects Postgres and falls back to InMemory; schema by `MigrateAsync` in a hosted service. Progress is *"a lost transaction"*-shaped, so it takes the ORM-managed schema and not the snapshot pattern (`STATE-SNAPSHOT-PERSISTENCE.md` §6 says which) |
 | P5 | No user store, no token minting; RS256 validated against authservice's JWKS; gitleaks pre-commit and CI |
 | P6 / P7 | Multi-stage Dockerfiles on `:8080` and `:3000`; four Fly apps, below |
 | P8 | The whole reader loop works with no backend at all; `/health` reports `progress`, `auth` and `instrument` as degraded when they are |
@@ -341,10 +345,10 @@ rule holds for the lab pane as well; nothing is fetched from a CDN at run time.
 
 | App | Shape | `min_machines_running` | Why |
 |---|---|---|---|
-| `odzera-postgres` | database | n/a | No public listener; `.internal:5432` over 6PN; `PGDATA` in a subdirectory of the mount |
-| `odzera-authservice-<env>` | HTTP | **1** | Every validator fetches its JWKS in-request |
-| `odzera-api-<env>` | HTTP | **1** | The web app's server side calls it in-request |
-| `odzera-web-<env>` | frontend | 0 | Entered only from a browser; a cold start is a slow first page |
+| `ab-ovo-postgres` | database | n/a | No public listener; `.internal:5432` over 6PN; `PGDATA` in a subdirectory of the mount |
+| `ab-ovo-authservice-<env>` | HTTP | **1** | Every validator fetches its JWKS in-request |
+| `ab-ovo-api-<env>` | HTTP | **1** | The web app's server side calls it in-request |
+| `ab-ovo-web-<env>` | frontend | 0 | Entered only from a browser; a cold start is a slow first page |
 
 `flyio/SECRETS.md` and `flyio/INFRASTRUCTURE-ANALYSIS.md` answer the four cost
 questions; at this size the honest answer to *what runs when nothing is
@@ -441,7 +445,7 @@ hardest, and the two agree.
 README, *"enforced by an architectural absence \dash{} a view that does not
 exist \dash{} rather than by policy alone"*):
 
-- **`odzera` measures the book, never the reader.** There is no per-reader
+- **`ab-ovo` measures the book, never the reader.** There is no per-reader
   score, no ranking, no comparison between readers, and no table from which one
   could be built: outcomes are recorded against a *frame*, an *attempt* and a
   *check run*, with the reader's identity absent from the aggregate store.
@@ -505,17 +509,17 @@ release. Definition of done: every program of both editions compiles; every
 attached to a tag. This is the phase whose size the probe measured.
 
 **Phase 1 \dash{} the application, one program.** `/init-generic-template
-odzera` on an empty repository, the ADRs of §6 recorded, then the frame view
+ab-ovo` on an empty repository, the ADRs of §6 recorded, then the frame view
 for Program P1 in both languages with the next frame hidden until the reader
 commits, and the lab pane for Lab P1 running the seven exercises under
 Pyodide. Definition of done, per `INIT` §11, is the public URL \dash{}
-`odzera-web-dev.fly.dev` serving P1 \dash{} plus the Playwright journey of
+`ab-ovo-web-dev.fly.dev` serving P1 \dash{} plus the Playwright journey of
 §6.1, and P8's literal test: the app cloned and run with zero credentials
 serves the program and passes the check.
 
 **Phase 2 \dash{} progress and accounts.** Local progress with export; then
 authservice adopted as `MASTER-PROMPT.md` phase 2 describes, and sync through
-`Odzera.Api`.
+`AbOvo.Api`.
 
 **Phase 3 \dash{} the instrument.** The aggregate store, the four measures of
 §6.4 with their counter-measures and intervals, consent, and the first honest
