@@ -11,6 +11,7 @@ None of it is the book; all of it is why the book is shaped as it is.
 | `04-macro-design.md` | The programmed-learning machinery in LaTeX, and the traps in implementing it. |
 | `05-floating-point-plan.md` | The frame-by-frame plan for **P1**. Written when the floating-point material was proposed as F1; the curriculum moved it to P1, and the plan is unchanged and still correct for its new home. |
 | `06-numeric-verification.py` | An independent re-derivation of every numeric claim in that plan, and in F1. Its output is `06-numeric-verification.out.txt`: **152 claims checked, 152 confirmed**, plus two consistency defects it found that were not about arithmetic — one quantity emitted at two precisions, and a device count rounded to nearest where it should take a ceiling. Both are fixed. |
+| `10-learning-app.md` | The learning application that encapsulates the book and its exercises: the review of the book as a medium, the proposal measured against `konradcinkusz/architecture-standards`, the four decisions it has to record as ADRs, and the plan. Its exercise engine is `lab/`. |
 
 Note that `06-numeric-verification.py` is not part of the build. The book's own
 numbers come from `code/`, which writes `figures/values/` and is gated by

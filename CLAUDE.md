@@ -668,6 +668,62 @@ inheriting: a reader who owns one volume cannot get the whole book's formula
 reference.
 
 
+## And a fourth artefact, the lab, which touches nothing the book reads
+
+`lab/` is the book's **exercise engine**: computer exercises whose every
+expected number is one the book prints. `lab/tests/labkit.py` reads
+`figures/values/<program>.tex` \dash{} the file a program's own pages are set
+from and the one `make verify` gates \dash{} so the lab has no numbers of its
+own to drift, and the book cannot move a value without the lab noticing. It
+was built in September 2026 as the first piece of *What is left* item 6, and
+the learning application it is the exercise layer of is proposed in
+`notes/10-learning-app.md`; the reasoning is there and is not repeated here.
+
+**It is additive on the KDP pattern, and the proof is cheaper than the KDP
+one.** The lab reads `preamble.tex` and `figures/values/` and writes nothing
+the book reads, so `lab/tools/labcheck.py --guard <ref>` proves it from the
+diff alone: every changed path must be under `lab/`, the lab's own workflow, or
+the documents \dash{} an allow-list rather than a deny-list, so it stays right
+when the book grows a directory. `.github/workflows/lab.yml` runs it on every
+pull request that touches the lab.
+
+**The instrument is watched producing a known answer in both directions
+before it is believed**, which is Program~\ref{prog:P34}'s rule made a gate:
+`--tests` requires every check to pass on `lab/solutions/` and every check to
+fail, or report itself as not implemented, on the untouched stubs in
+`lab/exercises/`. Lab P1 measured: seven exercises, thirteen checks, thirteen
+pass on the solutions, thirteen report `todo` and none passes on the stubs,
+under pytest and under the stdlib runner alike. A check that passes on an
+empty file is not a check, and this file records five instruments in three
+passes that returned a plausible answer to nothing.
+
+**Three rules the engine carries, each earned elsewhere in this file:**
+
+- **A check compares strings, never floats.** `f"{gap(1.0):.2e}"` against the
+  committed `2.22e-16`, because two numbers on one page are the same number
+  only if they are the same string (the P05 review pass).
+- **Every expected value has a script behind it.** No literal in a test; a
+  value the book does not commit is a value the lab does not check, which is
+  the blocker batch's rule about answer keys applied one artefact over.
+- **A failed check names the frames to re-read, never the solution.** The
+  message is the covered answer box; `lab/solutions/` exists so the build can
+  prove the exercises solvable, and the reader's README says what it is for.
+
+**What was deliberately not built, and why.** The first cut of this work was a
+PDF companion \dash{} a screen-sized LaTeX document on the KDP pattern, with
+the exercise stubs printed by `listings` range markers so the page and the
+file could not disagree. The range-marker mechanism was probed and works
+(`rangebeginprefix`/`rangeendprefix`, markers dropped, underscored filenames
+fine), and it is recorded here so nobody re-probes it. The document itself was
+not written, because the question it answers \dash{} how to put an exercise
+beside a page \dash{} is the one the application answers better, and a second
+presentation of the same exercises would be a second thing to keep true.
+`lab/tools/content_probe.py` is the measurement behind that decision: run over
+`programs/en` with the book's own tokeniser it finds every frame, which of
+them open with an answer and which end with a cue (the two agree frame for
+frame, which is C16 seen from the other side), every box, every route and
+every value, without a line of hand work.
+
 ## The Stroud machinery, in LaTeX
 
 Implemented in `preamble.tex`. The interesting decisions:
@@ -16698,6 +16754,12 @@ look first when one of them next goes stale.
 6. **`odzera`, the companion library.** One stage per part, every gradient
    checked against finite differences in CI, no GPU, the whole suite under a
    minute. Specified in `notes/01-curriculum.md` §18; nothing built.
+   **Its first piece exists, from the reader's side: the exercise engine under
+   `lab/`.** Lab P1's seven exercises are stage 00's float utilities asked of
+   the reader before they read them, and every value the checks hold the
+   reader to is read out of `figures/values/p01.tex` rather than typed. The
+   learning application that would run those checks in a browser, and
+   encapsulate the book with them, is proposed in `notes/10-learning-app.md`.
 7. **Reader validation.** Nobody has read this. Until somebody has, the 80/80
    ledger stays open and the book may not claim it.
 8. **The review issues.** The book has been read end to end \dash{} one
