@@ -575,19 +575,46 @@ sentence, never to loosen the check.
 
 The book is also published as Amazon KDP paperback **volumes** \dash{} 6 x 9 in
 at 10pt, black ink, four volumes over the nine parts. The whole of that path is
-`kdp/`, `tools/volumes.json` and the tools whose names begin `kdp` or `checkkdp`
-\dash{} `make kdp` names every one of them in order, which is checkable where a
-tally here would not be. The reasoning and the measurements are
+`kdp/`, `tools/volumes.json`, `.github/workflows/volumes.yml` and the tools whose
+names begin `kdp` or `checkkdp` \dash{} `make kdp` names every one of them in
+order, which is checkable where a tally here would not be. The reasoning and the measurements are
 `notes/09-kdp-volumes.md`.
 
 **It is additive, and that is a hard constraint rather than a preference.**
 `main-{en,pl}.tex`, `main-{en,pl}-a4.tex`, `body.tex`, `structure.tex`,
-`preamble.tex`, `build.yml` and `release.yml` are **not to be modified by KDP
+`preamble.tex`, `build.yml` and `pages.yml` are **not to be modified by KDP
 work**. The four existing PDFs must stay identical in page count and in resolved
 cross-references, and `.github/workflows/kdp.yml`'s first job proves it by
 building `main-en` on the merge base and on `HEAD` and failing on a difference of
 one entry. It gates every other job in that workflow. A volume that is correct at
 the cost of the book it came from is not worth having.
+
+**`release.yml` came off that list when the release path was unified, and
+`pages.yml` went on to it in the same edit.** The list is the four PDFs' own
+sources plus the workflows that are theirs alone: `build.yml`, which proves they
+compile on every push, and `pages.yml`, which publishes them \dash{} and which
+had never been on it although it is the surface most readers get the book from.
+`release.yml` is neither any more. One `v*` tag now attaches **all twelve PDFs**
+to the release, the four editions and the eight interiors, so a rule forbidding
+the volume path to touch it would forbid the volumes reaching a reader at all.
+What that gives up is small and worth naming rather than glossing: release.yml
+compiles the same four formats `build.yml` does, on every pull request, so a
+volume change that broke them there would be red long before a tag \dash{} and
+the volumes reach release.yml through one `uses:` line naming `volumes.yml`,
+which is the KDP path's side of the list by design.
+
+**There is no `kdp-v*` tag.** There were two release paths and they produced
+different things: a `v*` tag published two PDFs of the book, and a
+differently-prefixed tag built eight interiors into workflow artefacts that
+expire after ninety days and need a GitHub account to fetch \dash{} so the eight
+volumes were not downloadable at all, and the README had to spend a paragraph
+saying which tag built what. The volume build is `.github/workflows/volumes.yml`
+now, called by `release.yml` on a tag and by `kdp.yml` on a pull request, so both
+compile the same interiors through the same steps. **And no release asset carries
+its version in its name**, which is what lets a link be current without being
+edited: `releases/latest/download/<name>.pdf` resolves to the newest and
+`releases/download/<tag>/<name>.pdf` still pins an old one. A README row naming a
+version is the class of claim this file spends most of its rules refusing.
 
 The things in it that are load-bearing were each found by a measurement rather
 than by reading, and the count is deliberately not stated \dash{} this file's own

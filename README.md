@@ -1,6 +1,47 @@
 # Mathematics from Zero for the AI Engineer
 ### Matematyka od zera dla inżyniera AI
 
+## Download
+
+Every link here is public — no account, no sign-in. **One tag builds all
+twelve**, so every PDF in this table comes from the same commit.
+
+| | English | polski |
+|---|---|---|
+| **The book — A4, 12pt** — for a screen, or an office printer | **[Download](https://konradcinkusz.github.io/math-for-ai-engineers/book-en-a4.pdf)** | **[Pobierz](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl-a4.pdf)** |
+| **The book — 17 × 24 cm** — the trade format | [Download](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf) | [Pobierz](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf) |
+| **Volume I · Tom I** — Part I, 6 × 9 in | [Foundation](https://github.com/konradcinkusz/math-for-ai-engineers/releases/latest/download/Mathematics-from-Zero-for-the-AI-Engineer-Volume-1.pdf) | [Podstawy](https://github.com/konradcinkusz/math-for-ai-engineers/releases/latest/download/Matematyka-od-zera-dla-inzyniera-AI-Tom-1.pdf) |
+| **Volume II · Tom II** — Parts II–III, 6 × 9 in | [Number, Precision and Linear Algebra](https://github.com/konradcinkusz/math-for-ai-engineers/releases/latest/download/Mathematics-from-Zero-for-the-AI-Engineer-Volume-2.pdf) | [Liczba, precyzja i algebra liniowa](https://github.com/konradcinkusz/math-for-ai-engineers/releases/latest/download/Matematyka-od-zera-dla-inzyniera-AI-Tom-2.pdf) |
+| **Volume III · Tom III** — Parts IV–VI, 6 × 9 in | [Discrete Structures, Calculus and Optimisation](https://github.com/konradcinkusz/math-for-ai-engineers/releases/latest/download/Mathematics-from-Zero-for-the-AI-Engineer-Volume-3.pdf) | [Struktury dyskretne, rachunek różniczkowy i optymalizacja](https://github.com/konradcinkusz/math-for-ai-engineers/releases/latest/download/Matematyka-od-zera-dla-inzyniera-AI-Tom-3.pdf) |
+| **Volume IV · Tom IV** — Parts VII–IX, 6 × 9 in | [Probability, Information and Assembly](https://github.com/konradcinkusz/math-for-ai-engineers/releases/latest/download/Mathematics-from-Zero-for-the-AI-Engineer-Volume-4.pdf) | [Prawdopodobieństwo, informacja i złożenie](https://github.com/konradcinkusz/math-for-ai-engineers/releases/latest/download/Matematyka-od-zera-dla-inzyniera-AI-Tom-4.pdf) |
+| **A fixed copy, for citing** — every format, pinned to a tag | [Latest release](https://github.com/konradcinkusz/math-for-ai-engineers/releases/latest) | [Najnowsze wydanie](https://github.com/konradcinkusz/math-for-ai-engineers/releases/latest) |
+
+**The first two rows are rebuilt on every push to `main`**, so they are always
+the current book and will change under you. **The eight volumes come from the
+newest release** and do not move until the next tag — and that release carries
+the two editions above as well, under the same filenames, which is the copy to
+take if you are citing a page or handing somebody something fixed.
+
+**None of the names in a release carries its version.** That is deliberate:
+`releases/latest/download/<name>.pdf` therefore always resolves to the newest,
+and `releases/download/v1.2.0/<name>.pdf` still pins an old one, so a link can
+be current or fixed and neither has to be edited when a tag lands.
+
+A4 at 12pt is the one to read. One source and four PDFs: the formats paginate
+differently by construction, and nothing in the book navigates by page, because
+every cross-reference names a program and a frame rather than a leaf.
+
+**The four volumes are the same book split for print** — 6 × 9 in interiors,
+black ink, sized for Amazon KDP, one per contiguous block of parts. Nothing is
+in a volume that is not in the two editions above, so a volume is the format to
+hold rather than a different book; the split is in `tools/volumes.json` and the
+reasoning in `notes/09-kdp-volumes.md`.
+
+[Every release](https://github.com/konradcinkusz/math-for-ai-engineers/releases)
+· [the site](https://konradcinkusz.github.io/math-for-ai-engineers/). The four
+current editions are also attached to each build run as artefacts, kept fourteen
+days, which is the route if a link above does not resolve.
+
 [![Build](https://github.com/konradcinkusz/math-for-ai-engineers/actions/workflows/build.yml/badge.svg)](https://github.com/konradcinkusz/math-for-ai-engineers/actions/workflows/build.yml)
 [![Pages](https://img.shields.io/github/deployments/konradcinkusz/math-for-ai-engineers/github-pages?label=docs)](https://konradcinkusz.github.io/math-for-ai-engineers/)
 [![Text: CC BY-NC-SA 4.0](https://img.shields.io/badge/text-CC%20BY--NC--SA%204.0-0E7C7B)](LICENSE-CONTENT)
@@ -20,35 +61,6 @@ to be worked.
 build proves the two editions have the same programs, the same frame numbering
 and the same numbers, so a correction applied to one cannot silently miss the
 other.
-
-## Download
-
-Every link here is public — no account, no sign-in.
-
-| | English | polski |
-|---|---|---|
-| **A4, 12pt** — for a screen, or an office printer | **[Download](https://konradcinkusz.github.io/math-for-ai-engineers/book-en-a4.pdf)** | **[Pobierz](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl-a4.pdf)** |
-| **17 × 24 cm** — the trade format, matching the companion volumes | [Download](https://konradcinkusz.github.io/math-for-ai-engineers/book-en.pdf) | [Pobierz](https://konradcinkusz.github.io/math-for-ai-engineers/book-pl.pdf) |
-| **17 × 24 cm, `v1.0.0`** — a fixed version, for citing | [Download](https://github.com/konradcinkusz/math-for-ai-engineers/releases/download/v1.0.0/Mathematics-from-Zero-for-the-AI-Engineer-v1.0.0.pdf) | [Pobierz](https://github.com/konradcinkusz/math-for-ai-engineers/releases/download/v1.0.0/Matematyka-od-zera-dla-inzyniera-AI-v1.0.0.pdf) |
-
-**The first two rows are rebuilt on every push to `main`**, so they are always
-the current book and will change under you. The third is pinned to a tag and
-will not move — quote that one if you are citing a page or handing somebody a
-fixed copy.
-
-A4 at 12pt is the one to read. One source and four PDFs: the formats paginate
-differently by construction, and nothing in the book navigates by page, because
-every cross-reference names a program and a frame rather than a leaf.
-
-[Every release](https://github.com/konradcinkusz/math-for-ai-engineers/releases)
-· [the site](https://konradcinkusz.github.io/math-for-ai-engineers/). The four
-current PDFs are also attached to each build run as artefacts, kept fourteen
-days, which is the route if a link above does not resolve.
-
-**The 6 × 9 in paperback volumes are not downloadable here.** They are built by
-the `KDP` workflow on a `kdp-v*` tag and kept as workflow artefacts, which
-require a GitHub account and expire; they are print interiors for upload rather
-than something to read on a screen. The four PDFs above are the book.
 
 > **Complete draft.** All forty-seven programs and all six appendices are
 > written, in both languages. There are no stubs left anywhere in the book, so
@@ -325,10 +337,10 @@ CLAUDE.md                  working notes: conventions, traps hit, resolved quest
   front matter's instructions on one page, beside what the research behind
   them measured: the rule at every frame, the loop around every program, and
   where to begin.
-- **[Releases](https://github.com/konradcinkusz/math-for-ai-engineers/releases)** — the same book pinned to a
-  tag, if you need a copy that will not change:
-  [English](https://github.com/konradcinkusz/math-for-ai-engineers/releases/download/v1.0.0/Mathematics-from-Zero-for-the-AI-Engineer-v1.0.0.pdf) ·
-  [polski](https://github.com/konradcinkusz/math-for-ai-engineers/releases/download/v1.0.0/Matematyka-od-zera-dla-inzyniera-AI-v1.0.0.pdf)
+- **[Releases](https://github.com/konradcinkusz/math-for-ai-engineers/releases)** — every format pinned to a
+  tag, if you need a copy that will not change: the four editions, and the
+  eight 6 × 9 in paperback interiors. The table at the top of this file links
+  each one directly.
 - **[LangChain, LangGraph and Async Python](https://github.com/konradcinkusz/llm-book)** — companion volume
 - **[Microsoft Agent Framework for .NET Engineers](https://github.com/konradcinkusz/maf-book)** — companion volume
 

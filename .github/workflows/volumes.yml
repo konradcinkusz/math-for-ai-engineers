@@ -1,0 +1,345 @@
+name: Volumes
+
+# THE EIGHT PAPERBACK INTERIORS, and nothing else. CALLED rather than triggered.
+#
+# These six jobs used to sit in the middle of kdp.yml, reachable only from a
+# `kdp-v*` tag -- so the series had two release paths that produced different
+# things. A `v*` tag published two PDFs of the book; a `kdp-v*` tag built eight
+# volume interiors into workflow artefacts, which expire and need a GitHub
+# account to fetch, so a reader could not get a volume at all. The split was
+# invisible from the README and had to be explained in a paragraph.
+#
+# There is one path now. This workflow is the volume build, and both callers get
+# exactly the same eight interiors from it:
+#
+#   kdp.yml      the additivity guard, on a pull request or a dispatch
+#   release.yml  a `v*` tag, which publishes all twelve PDFs to the release
+#
+# Nothing in here is release-specific, deliberately: what the caller does with
+# the artefacts is the caller's business, and this workflow's job is to build
+# them and to refuse the ones that would fail at upload.
+
+on:
+  workflow_call:
+    inputs:
+      volumes:
+        description: 'JSON array of volume numbers, e.g. [1, 2, 3, 4]'
+        type: string
+        default: '[1, 2, 3, 4]'
+      # kdp.yml declared a `langs` dispatch input for a year and the matrix read
+      # `[en, pl]` regardless, so asking for one language built both. It is an
+      # input here because the matrix below actually reads it.
+      langs:
+        description: 'JSON array of languages, e.g. ["en", "pl"]'
+        type: string
+        default: '["en", "pl"]'
+      bundle:
+        description: 'Collect the interiors into one archive and price them'
+        type: boolean
+        default: true
+      # Empty means the ref that triggered the run, which is what
+      # actions/checkout does with no `ref' at all. It is here for the one
+      # caller that builds something else: release.yml can be dispatched
+      # against an existing tag, and without this the four editions would come
+      # from the tag and the eight interiors from the branch -- one release,
+      # two commits, and nothing on the page to say so.
+      ref:
+        description: 'Ref to build; empty means the ref that triggered the run'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  numbers:
+    name: Recompute every number
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with: { ref: "${{ inputs.ref }}" }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - run: pip install --quiet numpy sympy
+      - run: make numbers
+      - name: Fail if any committed value or transcript has drifted
+        run: |
+          if [ -n "$(git status --porcelain figures/values figures/transcripts)" ]; then
+            echo "::error::a script no longer produces what the book prints"
+            git --no-pager diff --stat figures/values figures/transcripts
+            exit 1
+          fi
+          echo "Every computed value and transcript is current."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kdp-values
+          path: |
+            figures/values
+            figures/transcripts
+          retention-days: 14
+
+  # -------------------------------------------------------------------------
+  manifest:
+    name: The split matches the manifests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with: { ref: "${{ inputs.ref }}" }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - name: Every part in exactly one volume, in manifest order
+        run: python3 tools/gen_volumes.py --check
+      - name: And the checks that say so have been watched firing
+        run: python3 tools/test_gen_volumes.py
+
+  # -------------------------------------------------------------------------
+  diagrams-kdp:
+    name: Render diagrams, and grey them
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with: { ref: "${{ inputs.ref }}" }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - name: Render every Mermaid source to PDF
+        run: |
+          shopt -s nullglob
+          SRC=(figures/mermaid/*/*.mmd)
+          if [ ${#SRC[@]} -eq 0 ]; then mkdir -p figures/diagrams; exit 0; fi
+          printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
+          npm install -g @mermaid-js/mermaid-cli@11
+          FAILED=0
+          for f in "${SRC[@]}"; do
+            lang=$(basename "$(dirname "$f")"); key=$(basename "$f" .mmd)
+            mkdir -p "figures/diagrams/$lang"
+            echo "::group::$lang/$key"
+            # A per-render timeout, for the reason the job-level one exists: a
+            # wedged headless Chromium otherwise spends the whole budget and
+            # names neither the diagram nor the reason.
+            if ! timeout 180 mmdc -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
+                 -p .puppeteer.json -c figures/mermaid/config.json \
+                 -b transparent --pdfFit; then
+              [ $? -eq 124 ] && echo "::error file=$f::TIMED OUT on $lang/$key" \
+                             || echo "::error file=$f::failed on $lang/$key"
+              FAILED=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $FAILED
+      - name: Both languages must carry the same diagram keys
+        run: |
+          a=$(cd figures/mermaid/en && ls *.mmd | sort)
+          b=$(cd figures/mermaid/pl && ls *.mmd | sort)
+          [ "$a" = "$b" ] || { echo "::error::diagram sets differ"; \
+            diff <(echo "$a") <(echo "$b") || true; exit 1; }
+      - name: Convert to DeviceGray for the interior
+        run: |
+          # Update non-fatal, install decisive -- see the note at the first
+          # apt site in this file. Google's Chrome repo failed this workflow
+          # mid-publish and killed a job that installs from Ubuntu's archive.
+          sudo apt-get update -qq \
+            || echo "::warning::apt-get update failed; the install below decides"
+          sudo apt-get install -y -qq ghostscript poppler-utils
+          python3 tools/kdpstage.py
+      - name: No diagram may survive as colour
+        run: |
+          pip install --quiet pikepdf
+          python3 - <<'PY'
+          import glob, sys, pikepdf
+          sys.path.insert(0, 'tools')
+          from checkkdp import nongray_pages
+          bad = [f for f in sorted(glob.glob('build/kdp/tex/figures/diagrams/*/*.pdf'))
+                 if nongray_pages(__import__('pathlib').Path(f))[0]]
+          if bad:
+              print(f"::error::{len(bad)} diagram(s) are still colour: {bad[:5]}")
+              sys.exit(1)
+          print("Every diagram is DeviceGray.")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kdp-diagrams-gray
+          path: build/kdp/tex/figures/diagrams
+          retention-days: 14
+
+  # -------------------------------------------------------------------------
+  build-volume:
+    name: Volume ${{ matrix.volume }} (${{ matrix.lang }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [numbers, manifest, diagrams-kdp]
+    strategy:
+      fail-fast: false
+      matrix:
+        # Both decided by the CALLER, not here. `strategy' cannot run a git
+        # command, so kdp.yml works out from the diff whether a pull request
+        # needs all four volumes or volume III as a smoke test, and a release
+        # asks for every one of them. This file holds no opinion about which.
+        lang: ${{ fromJSON(inputs.langs) }}
+        volume: ${{ fromJSON(inputs.volumes) }}
+    steps:
+      - uses: actions/checkout@v5
+        with: { ref: "${{ inputs.ref }}" }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - run: |
+          # Update non-fatal, install decisive -- see the note at the first
+          # apt site in this file. Google's Chrome repo failed this workflow
+          # mid-publish and killed a job that installs from Ubuntu's archive.
+          sudo apt-get update -qq \
+            || echo "::warning::apt-get update failed; the install below decides"
+          sudo apt-get install -y -qq texlive-latex-base texlive-latex-recommended \
+            texlive-latex-extra texlive-lang-polish texlive-science latexmk \
+            lmodern poppler-utils ghostscript
+          pip install --quiet pikepdf
+          # The back matter's tables have to break at 6 x 9 and xltabular is
+          # what lets them. preamble-kdp.tex guards its \usepackage so a machine
+          # without it still builds -- and then six of the eight volumes carry an
+          # overfull vbox, which is a loud failure in checklog.py but a confusing
+          # one. Name the cause here instead. It ships in texlive-latex-extra.
+          kpsewhich xltabular.sty >/dev/null \
+            || { echo "::error::xltabular.sty is absent; add texlive-latex-extra"; exit 1; }
+
+      - uses: actions/download-artifact@v5
+        with: { name: kdp-values, path: figures }
+      - uses: actions/download-artifact@v5
+        with: { name: kdp-diagrams-gray, path: build/kdp/tex/figures/diagrams }
+
+      - name: Stage the build tree
+        run: python3 tools/kdpstage.py
+
+      # Two passes: the gutter is a function of the page count and the page
+      # count is a function of the gutter. kdpbuild.py converges it and stops
+      # after three rather than oscillating.
+      - name: Compile, converging the gutter
+        run: python3 tools/kdpbuild.py ${{ matrix.volume }} ${{ matrix.lang }}
+
+      - name: Check the log properly
+        run: python3 tools/checklog.py build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.log
+
+      # The cue check is reported rather than fatal here for the reason
+      # CLAUDE.md gives: it is a property of the installation that paginated,
+      # so the machine that must fix it is not the one that saw it.
+      - name: Check the artefact for stranded openers
+        run: python3 tools/checkpdf.py --cues=warn build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.pdf
+
+      - name: Check it against KDP's requirements
+        run: |
+          python3 tools/checkkdp.py --json build/kdp \
+            --summary "$GITHUB_STEP_SUMMARY" \
+            build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.pdf
+
+      - name: Cover specification and template
+        run: python3 tools/kdpcover.py build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.pdf
+
+      - name: Upload form metadata
+        run: |
+          python3 tools/kdpmeta.py --summary "$GITHUB_STEP_SUMMARY" \
+            build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.pdf
+
+      # if: always(), because a log-only failure is exactly when the log is the
+      # one artefact anybody wants.
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kdp-log-v${{ matrix.volume }}-${{ matrix.lang }}
+          path: build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.log
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kdp-v${{ matrix.volume }}-${{ matrix.lang }}
+          path: |
+            build/kdp/tex/kdp-v${{ matrix.volume }}-${{ matrix.lang }}.pdf
+            build/kdp/kdp-v${{ matrix.volume }}-${{ matrix.lang }}/
+          retention-days: 30
+
+  # -------------------------------------------------------------------------
+  # Every cross-volume pointer must name a program that exists somewhere in the
+  # series. A volume build cannot see this: its own references all resolve, by
+  # construction, because the generated map defines them.
+  # -------------------------------------------------------------------------
+  crossvolume:
+    name: Every cross-volume pointer lands somewhere
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Reads the SOURCE, not a PDF, so it needs no volume built. It used to wait
+    # on the matrix, which put the workflow's cheapest signal behind its most
+    # expensive job and silenced it entirely whenever a volume failed to build.
+    steps:
+      - uses: actions/checkout@v5
+        with: { ref: "${{ inputs.ref }}" }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - name: Pointers, against the manifest
+        run: python3 tools/checkxvol.py
+
+  # -------------------------------------------------------------------------
+  package:
+    name: Collect the uploads
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [build-volume, crossvolume]
+    # Keyed on WHETHER THERE IS A FULL SET TO BUNDLE, not on the event. It read
+    # `github.event_name != 'pull_request'` once, which was a proxy for the same
+    # thing while a PR could only ever build one volume, and stopped being true
+    # the moment the matrix could widen. Then it read the scope job's output
+    # directly, which stopped being available the moment these jobs became a
+    # workflow somebody else calls. It is an input now, and the caller that
+    # knows whether it wants an archive is the one that says so.
+    if: always() && needs.build-volume.result == 'success' && inputs.bundle
+    steps:
+      - uses: actions/checkout@v5
+        with: { ref: "${{ inputs.ref }}" }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - uses: actions/download-artifact@v5
+        # Not `kdp-v*`, which also matches the `kdp-values' artefact and
+        # put a stray copy of figures/values inside every bundle.
+        with: { pattern: 'kdp-v[0-9]*', path: dist, merge-multiple: false }
+      - name: What each volume costs and what it must sell for
+        run: |
+          python3 tools/kdpsummary.py dist >> "$GITHUB_STEP_SUMMARY"
+          python3 tools/kdpsummary.py dist
+      # THE NAME HAS TO BE SANITISED, and this job is the first thing in the
+      # workflow ever to need it. On a tag push github.ref_name is `v1.0.0';
+      # on a pull request it is `236/merge', and actions/upload-artifact rejects
+      # a name containing a forward slash. That is what THIS pull request failed
+      # on, after all eight interiors had built and been checked -- so the defect
+      # was latent from the day the job was written and only surfaced because the
+      # `if' above stopped being event-keyed. A condition that skips a step is
+      # also a condition that never tests it.
+      #
+      # A WHITELIST rather than a case on the event. upload-artifact forbids
+      # " : < > | * ? \r \n \ and /, and git's own ref rules forbid only some of
+      # those -- a quote, a pipe and the angle brackets are all legal in a branch
+      # name -- so a name derived from a ref is not safe by construction and
+      # substituting the slash alone would leave the rest. tr -c keeps
+      # [A-Za-z0-9._-] and replaces everything else, squeezes the runs so
+      # `236/merge' cannot become `236--merge', and trims the ends.
+      #
+      # The tag path is unchanged, which is the point: a version tag passes
+      # through byte for byte, so a release's archive keeps the name it had.
+      # github.ref_name goes through env rather than into the script, because a
+      # branch name interpolated into a shell is a branch name that can run one.
+      - id: label
+        env:
+          REF: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          NAME=$(printf '%s' "$REF" | tr -c 'A-Za-z0-9._-' '-' | tr -s '-' \
+                 | sed 's/^-//; s/-$//')
+          [ -n "$NAME" ] || { echo "::error::the ref sanitises to nothing"; exit 1; }
+          echo "name=kdp-release-$NAME" >> "$GITHUB_OUTPUT"
+          echo "::notice::bundling the eight interiors as kdp-release-$NAME"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.label.outputs.name }}
+          path: dist
+          retention-days: 90
