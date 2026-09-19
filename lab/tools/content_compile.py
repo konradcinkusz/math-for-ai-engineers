@@ -386,9 +386,17 @@ def convert(src: str, lang: str, vals, ctx: str, seen: Counter,
         if ch == "\\":
             m = MACRO_RE.match(src, i)
             if not m:
+                if src.startswith("\\\\", i):
+                    # A forced line break, and it may carry a spacing
+                    # argument -- \\[2pt] -- which is typesetting and has to
+                    # be eaten rather than left on the page as "[2pt]".
+                    _, j = optional(src, i + 2)
+                    out.append("\n\n")
+                    i = j
+                    continue
                 out.append({"\\%": "%", "\\&": "&", "\\_": "_", "\\#": "#",
-                            "\\$": "$", "\\{": "{", "\\}": "}",
-                            "\\\\": "\n"}.get(src[i:i + 2], src[i + 1:i + 2]))
+                            "\\$": "$", "\\{": "{", "\\}": "}"}
+                           .get(src[i:i + 2], src[i + 1:i + 2]))
                 i += 2
                 continue
             name, j = m.group(1), m.end()
