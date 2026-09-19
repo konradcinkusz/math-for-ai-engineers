@@ -104,6 +104,25 @@ def pct(x: float) -> float:
     return p
 
 
+
+def not_on_a_boundary(x: float, digits: int) -> float:
+    """Refuse a value whose printed form depends on the last bit.
+
+    Program P20's `p20.cos.area` printed 0.501 here and 0.500 on CI because
+    the quantity sat exactly on a rounding boundary and libm is not
+    bit-identical across platforms.  Anything in this file that comes out of
+    a transcendental goes through here.  The distance that matters is to the
+    HALF-step, which is the correction Program P34's pass had to make to the
+    first version of this helper.
+    """
+    step = 10.0 ** -digits
+    frac = abs(x) / step
+    half = abs((frac % 1.0) - 0.5)
+    assert half > 0.02, (
+        f"{x!r} is {half:.4f} of a step from the {digits}-decimal rounding "
+        f"boundary; a different libm will print it differently.")
+    return x
+
 # ---------------------------------------------------------------------------
 # 1. VARIANCES ADD, AND INDEPENDENCE IS DOING THE WORK.
 #
@@ -339,6 +358,65 @@ for z, true_tail, gauss_tail, ratio in TAIL_ROWS:
 
 
 # ---------------------------------------------------------------------------
+# 3b. AND THE STATEMENT THAT IS NEVER SILENT.
+#
+# The rows above measure the Gaussian tail as what it is: an APPROXIMATION
+# WITH NO ERROR CONTROL.  At six spreads it reports a probability for a
+# quantity whose true probability is exactly zero, and nothing in the
+# arithmetic tells you which side of the truth any one of its answers falls
+# on.  Until this block the book diagnosed that and put nothing in its place.
+#
+# Hoeffding is the thing in its place.  For independent X_i each confined to
+# an interval of width w_i,
+#
+#     P(S - E S >= t)  <=  exp(-2 t^2 / sum w_i^2)
+#
+# with no n large enough required and no shape assumed -- boundedness in place
+# of the finite variance the theorem above needed.  Applied to THIS section's
+# own twelve uniforms, so the trade is measured on the example the reader
+# already has rather than described on a new one.
+# ---------------------------------------------------------------------------
+def hoeffding_upper(t: float, n: int, width: float = 1.0) -> float:
+    """One-sided bound on P(S - E S >= t) for n independent bounded terms."""
+    return math.exp(-2.0 * t * t / (n * width * width))
+
+
+# THE FIRST DRAFT OF THE FRAME CALLED THIS "the opposite failure" AND IT IS
+# NOT.  Both the Gaussian and the bound OVERSTATE this particular tail, so a
+# frame promising two errors in opposite directions would have been refuted by
+# its own table.  What separates them is not the direction of this example's
+# error but whether the error has a direction AT ALL: the bound can only ever
+# be too large, and the Gaussian can be either and does not say which.
+HOEFF_ROWS = []
+for _z, _true, _gauss, _r in TAIL_ROWS:
+    _bound = hoeffding_upper(float(_z), TAIL_N)
+    assert _bound >= _true, (_z, _bound, _true)          # it is a bound
+    HOEFF_ROWS.append((_z, _true, _bound, _bound / _true))
+
+# The looseness is not a constant either, and it runs the same way the
+# Gaussian's error does: worst where the question gets asked.
+_loose = [row[3] for row in HOEFF_ROWS]
+assert all(b > a for a, b in zip(_loose, _loose[1:])), _loose
+assert _loose[-1] > 1e6, _loose[-1]      # five spreads: over a millionfold
+
+VALUES["p25.hoeff.5"] = (f"{HOEFF_ROWS[-1][2]:.3g}", True)
+
+# And the one place a bound and an approximation can be told apart by looking:
+# beyond six spreads the true probability is EXACTLY zero, so a correct answer
+# and a useless one are the same answer, and only one of the two is wrong.
+HOEFF_6 = hoeffding_upper(6.0, TAIL_N)
+assert HOEFF_6 > 0.0 and 1 - irwin_hall_cdf(Fraction(TAIL_N), TAIL_N) == 0
+assert HOEFF_6 > GAUSS_TAIL_6            # the safe answer is the larger one
+VALUES["p25.hoeff.6"] = (f"{HOEFF_6:.3g}", True)
+NOTES.append(
+    "Hoeffding bounds the same twelve-uniform tail with no shape assumed and "
+    f"no n required: at five spreads it says at most {HOEFF_ROWS[-1][2]:.3g} "
+    f"where the truth is {HOEFF_ROWS[-1][1]:.3g}, loose by over a millionfold "
+    "-- and it is a BOUND, where the Gaussian beside it is an approximation "
+    "whose error has no sign you can read off")
+
+
+# ---------------------------------------------------------------------------
 # 4. MONTE CARLO: WHAT AN EVALUATION RUN COSTS.
 #
 # The same rate, in the place the reader meets it every week. Nothing here is
@@ -397,6 +475,111 @@ NOTES.append(
 N_NAIVE = math.ceil(EVAL_P * (1.0 - EVAL_P) * (Z95 / GAP) ** 2)
 assert N_NEEDED == 2 * N_NAIVE or N_NEEDED == 2 * N_NAIVE - 1, (N_NEEDED, N_NAIVE)
 emit("p25.eval.n.naive", N_NAIVE)
+
+# ---------------------------------------------------------------------------
+# 4b. THE HOLE THE SECTION'S OWN BEST OBSERVATION OPENS, AND WHAT REFUSING
+#     THE GAUSSIAN COSTS.
+#
+# The section says p(1-p) is largest at a half and falls away towards both
+# ends, so the same item count buys more precision at the top of a benchmark.
+# At the very top it buys an interval of width EXACTLY ZERO -- and that is the
+# state a CI gate is in every day.  The formula returns a number and does not
+# warn, which is Program P33's class: a correct computation of the wrong
+# quantity.
+# ---------------------------------------------------------------------------
+assert half_width(1.0, EVAL_NS[0]) == 0.0, "the hole is exact, not approximate"
+
+# The confidence comes out of the section's OWN multiplier rather than out of
+# a second constant, so the two cannot drift apart.
+DELTA = 2.0 * (1.0 - phi(Z95))
+assert abs(DELTA - 0.05) < 1e-12, DELTA
+
+# What n green runs actually license.  If the true failure rate were above
+# eps, the chance of seeing none of it in n independent runs is (1-eps)^n, so
+# n certifies "at most eps" at confidence 1-delta once (1-eps)^n <= delta.
+# Exact binomial: no bound, no approximation, and no Gaussian.
+EPS_ZERO = GAP                       # one point, the tolerance section 4 prices
+N_ZERO = math.ceil(math.log(DELTA) / math.log(1.0 - EPS_ZERO))
+assert (1.0 - EPS_ZERO) ** N_ZERO <= DELTA
+assert (1.0 - EPS_ZERO) ** (N_ZERO - 1) > DELTA      # and it IS the threshold
+emit("p25.zero.n", N_ZERO)
+
+# The famous name is the rule of three, and the three is a rounded logarithm
+# and nothing else: exp(-n eps) <= delta gives n >= ln(1/delta)/eps.
+N_ZERO_BOUND = math.ceil(math.log(1.0 / DELTA) / EPS_ZERO)
+assert N_ZERO_BOUND >= N_ZERO        # a bound may only ever ask for more
+LN_INV_DELTA = math.log(1.0 / DELTA)
+assert round(LN_INV_DELTA) == 3
+# ...and the three is a coincidence of THIS confidence, which is why the rule
+# of thumb has no other version.  Program P01's precedent: assert both halves,
+# or a true sentence becomes folklore.  At 99 per cent it is a rule of 4.6.
+LN_INV_99 = math.log(1.0 / 0.01)
+assert round(LN_INV_99) != 3
+emit("p25.zero.n.bound", N_ZERO_BOUND)
+emit("p25.zero.ln", not_on_a_boundary(LN_INV_DELTA, 4), 4)
+# ONE decimal, and the guard chose it: at two, ln(100) sits 0.017 of a step
+# from the rounding boundary and prints 4.61 here against 4.60 on another
+# libm -- P20's `p20.cos.area` defect, caught before it shipped this time.
+emit("p25.zero.ln99", not_on_a_boundary(LN_INV_99, 1), 1)
+
+# And the half of it a RATE cannot cover.  The same n that certifies a rate
+# below eps misses a PARTICULAR case of mass q about (1-q)^n of the time, and
+# at one in a thousand it misses it more often than it finds it.  Two true
+# statements about one run, and the gap between them is where a guarantee
+# about a distribution stops and a statement about every input would begin.
+RARE_Q = 0.001
+RARE_MISS = (1.0 - RARE_Q) ** N_ZERO
+assert RARE_MISS > 0.5, RARE_MISS
+emit("p25.rare.miss.pct", not_on_a_boundary(pct(RARE_MISS), 0), 0)
+
+# What the whole section would cost if it refused the Gaussian outright.
+# Two-sided Hoeffding for a proportion: P(|phat - p| >= eps) <= 2exp(-2n eps^2).
+N_HOEFF = math.ceil(math.log(2.0 / DELTA) / (2.0 * GAP ** 2))
+assert N_HOEFF > N_NAIVE
+emit("p25.hoeff.n", N_HOEFF)
+
+# And on the section's OTHER count, because N_NAIVE is the number section 4
+# frames as the mistake and quoting it alone as the baseline would read as
+# endorsing it.  The difference of two independent means is a sum of 2n terms
+# of range 1/n, so Hoeffding gives n >= ln(2/delta)/eps^2 -- the same factor
+# of two the Gaussian route pays, on both sides of the ratio.
+N_HOEFF_DIFF = math.ceil(math.log(2.0 / DELTA) / GAP ** 2)
+assert N_HOEFF_DIFF == 2 * N_HOEFF or N_HOEFF_DIFF == 2 * N_HOEFF - 1
+assert abs(N_HOEFF_DIFF / N_NEEDED - N_HOEFF / N_NAIVE) < 1e-3
+emit("p25.hoeff.n.needed", N_HOEFF_DIFF)
+
+# THE FACTOR SPLITS EXACTLY INTO TWO PRICES THAT MULTIPLY, and the second is
+# the one this section has just taught the reader to notice: a bound that
+# knows only that the values lie in [0, 1] cannot use p(1-p), so it pays for
+# the whole of the benefit the frames above measured.
+PRICE_SHAPE = 2.0 * math.log(2.0 / DELTA) / Z95 ** 2        # no shape assumed
+PRICE_P = 1.0 / (4.0 * EVAL_P * (1.0 - EVAL_P))             # p unknown
+FACTOR_EXACT = (math.log(2.0 / DELTA) / (2.0 * GAP ** 2)) / (
+    EVAL_P * (1.0 - EVAL_P) * (Z95 / GAP) ** 2)
+assert abs(PRICE_SHAPE * PRICE_P - FACTOR_EXACT) < 1e-12
+FACTOR = N_HOEFF / N_NAIVE
+assert abs(FACTOR - FACTOR_EXACT) < 1e-3, (FACTOR, FACTOR_EXACT)
+
+# It comes to 3.00 at this accuracy AND THAT IS A COINCIDENCE, not a property
+# of the bound: the second price is 1/(4p(1-p)), which is 1 at p = 1/2, where
+# the factor is 1.92.  Program P01's rule -- assert the coincidence in both
+# directions, or a true sentence becomes folklore one program later.
+assert round(PRICE_SHAPE * PRICE_P, 2) == 3.00
+assert round(PRICE_SHAPE * 1.0, 2) != 3.00
+
+# The page prints all three, so a reader multiplies the two printed prices and
+# has to land on the printed factor.  F04's rule, checked on the printed forms
+# rather than on the floats.
+assert round(round(PRICE_SHAPE, 2) * round(PRICE_P, 2), 2) == round(FACTOR, 2)
+emit("p25.hoeff.factor", not_on_a_boundary(FACTOR, 2), 2)
+emit("p25.hoeff.price.shape", not_on_a_boundary(PRICE_SHAPE, 2), 2)
+emit("p25.hoeff.price.p", not_on_a_boundary(PRICE_P, 2), 2)
+NOTES.append(
+    f"a run of {N_ZERO} greens certifies a failure rate under "
+    f"{pct(EPS_ZERO):.0f} per cent and nothing stronger, and misses a "
+    f"one-in-a-thousand case {pct(RARE_MISS):.0f} per cent of the time; "
+    f"refusing the Gaussian costs {FACTOR:.2f} times the items, which is "
+    f"{PRICE_SHAPE:.2f} for the shape and {PRICE_P:.2f} for not knowing p")
 
 
 # ---------------------------------------------------------------------------

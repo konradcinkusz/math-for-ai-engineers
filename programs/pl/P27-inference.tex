@@ -48,9 +48,9 @@
 \outcome{16--23}{zaplanować i przeprowadzić porównanie dwóch modeli
   ewaluowanych na tych samych promptach}
 \outcome{24--31}{powiedzieć, czym p-wartość jest, a czym nie jest}
-\outcome{32--37}{powiedzieć, co czterdzieści porównań w jednym rankingu robi z
+\outcome{32--39}{powiedzieć, co czterdzieści porównań w jednym rankingu robi z
   tym wszystkim}
-\outcome{38--40}{zastosować całość do liczby, którą ktoś opublikował}
+\outcome{40--42}{zastosować całość do liczby, którą ktoś opublikował}
 \end{outcomes}
 
 \begin{quiz}
@@ -931,6 +931,50 @@ drugiego, i liczba, którą podajesz, nie była selekcjonowana na niczym.
 \end{trapbox}
 \end{fr}
 
+\begin{fr}
+Trzecia oś, ta sama suma i żadnej tabeli wyników w środku.
+
+Ewaluacja przebiega i zmiana nie pokazuje wygranej. Uruchamiasz ją znowu na
+innym ziarnie. Potem na nowszym wycinku zbioru. Piąty przebieg pokazuje
+wygraną przy $\val{p27.alpha}$ i to właśnie ten trafia do raportu.
+
+Nikt nie nazywa tego $\val{p27.peek.m}$ porównaniami i nikt nigdzie nie
+zapisuje tej liczby. Policz próby tak, jak tabela wyników liczyła modele: przy
+zmianie, która nie robi zupełnie nic, jaka jest szansa, że jedna z
+$\val{p27.peek.m}$ prób pokaże wygraną?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p27.peek.pct}$ procent}
+
+$1 - \num{0.95}^{\val{p27.peek.m}}$, czyli własne wyrażenie tabeli wyników z
+próbami w miejscu modeli. Arytmetyce jest wszystko jedno, czy tych $m$ rzeczy
+to modele, konfiguracje, czy wtorki.
+
+\textbf{I to jest ta jego wersja, której nikt nie wpisuje do budżetu}, bo
+próby są rozdzielone w czasie, a nie ułożone w kolumnie. $\val{p27.models}$
+wierszy w tabeli to $\val{p27.models}$, które widać; $\val{p27.peek.m}$ powtórek
+przez dwa tygodnie to pięć popołudni, z których każde wydawało się jednym
+testem, a te dwa tygodnie nie zostawiają śladu mówiącego inaczej.
+
+Przy $\val{p27.peek.coin}$ próbach wskaźnik przekracza połowę. Procedura, która
+donosi o tym, czego szukała, równie często jak moneta, przy każdym kroku
+wykonanym poprawnie.
+
+Naprawą jest znowu Bonferroni, a postawienie tego w ten sposób robi z niej
+wniosek, a nie drugą regułę do zapamiętania: utrzymanie ogólnego wskaźnika na
+$\val{p27.alpha}$ przez $m$ prób wymaga $\val{p27.alpha}/m$ przy każdej z
+nich. \textbf{Czyli $m$ musi być ustalone przed pierwszą próbą}, bo progu nie
+da się podzielić przez liczbę, której nikt jeszcze nie wybrał. Na tym polega
+całe to, że \enquote{uruchom jeszcze raz} nie jest procedurą \dash{} nie na tym, że
+powtarzanie jest nieuczciwe, lecz na tym, że zostawia $m$ nieokreślone, dopóki
+wynik go nie wybierze. Program~\ref{prog:P25} i jego seria zielonych to ten
+sam warunek z drugiej strony: liczba, która uprawnia do twierdzenia, jest
+ustalana przed przebiegami, a nie kiedy już są.
+\end{fr}
+
 % ============================================================
 \section{Co potrafisz teraz sprawdzić}
 \label{sec:P27-check}
@@ -1096,7 +1140,13 @@ rozkład na to, czego nie jesteś pewien, a nie na dane, które już masz.
   błędu standardowego powyżej własnej prawdy, czyli $\val{p27.lb.margin}$
   punktu na $\val{p27.lb.n}$ pozycjach. Selekcja, nie pomiar \dash{} i ta sama
   arytmetyka jest powodem, dla którego istnieje zbiór odłożony}.}
-\sumitem{38--40}{\result{To, co zostaje, gdy porównanie nie rozstrzyga rzeczy, na
+\sumitem{38--39}{\result{\textbf{A ta sama suma liczy próby równie chętnie
+  jak modele.} Powtarzanie ewaluacji, aż pokaże wygraną, zamienia
+  $\val{p27.alpha}$ w $\val{p27.peek.pct}$ procent przy
+  $\val{p27.peek.m}$ próbach, a $\val{p27.peek.coin}$ prób czyni z tego
+  monetę. \textbf{Liczba prób musi być ustalona przed pierwszą z nich}, bo
+  progu nie da się podzielić przez liczbę, którą wybiera wynik}.}
+\sumitem{40--42}{\result{To, co zostaje, gdy porównanie nie rozstrzyga rzeczy, na
   której ci zależy, jest pytaniem o projekt. \textbf{A \enquote{brak istotnej
   różnicy} staje się pomiarem w chwili, gdy podasz, jak duża musiałaby być
   różnica.}}}

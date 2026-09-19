@@ -362,7 +362,25 @@ The classical test zoo: $t$ tables, $\chi^{2}$, ANOVA, $F$ & You have a
 \end{center}
 
 \medskip
-\textbf{And four exclusions this book is least sure about}, stated because
+And one exclusion that belongs to none of those three, which is worth saying
+plainly rather than filing under the nearest heading. \textbf{Formal
+specification} \dash{} transition systems, inductive invariants, temporal
+logic, refinement \dash{} is not a rigorous foundation underneath what this
+book teaches, because it is underneath nothing here. It is not a specialism
+beginning where a working depth ends, because there is no working depth here
+to begin from. And it is not a technique a library now performs, because the
+thing it produces is a sentence rather than a computation.
+
+What the book gives is the ground it stands on and then stops.
+Program~\ref{prog:F10} gives the set and Program~\ref{prog:P13} the relation
+built on it; Program~\ref{prog:P14} teaches you to \emph{read} a theorem and
+deliberately not to write one \dash{} and an inductive invariant has to be
+written. For the notation itself: Wayne, then Lamport; Jackson for the same
+ideas over relations, and Leino for the version that lives inside a program's
+own source.
+
+\medskip
+\textbf{And the exclusions this book is least sure about}, stated because
 saying so now is cheaper than defending them later.
 
 \emph{Convex optimisation theory} is out on the grounds that deep learning is
@@ -383,6 +401,17 @@ second edition rather than a subject that does not belong.
 
 \emph{Stochastic differential equations} are excluded in the table above. That
 is a defensible line today and it may not be one in a few years.
+
+\emph{Formal specification} is excluded, and what makes that worth doubting is
+the shape of the reader's job rather than the shape of the mathematics. The
+argument for leaving it out was that an engineer's mathematics is the
+mathematics of the model. The argument against it is that when the code
+arrives written by something else, what is left is to say what correct means
+and then to check it \dash{} and the first of those is a notation, which this
+book does not teach. Program~\ref{prog:P25} marks where the statistical half
+stops: a run of greens bounds a rate over the inputs it drew from and says
+nothing about any one of them, and saying something about any one of them is
+what an invariant is for.
 
 \section{The subjects it does teach, but only to working depth}
 \label{sec:E-depth}
@@ -466,6 +495,8 @@ What a probability is on a continuum &
   \ref{prog:P23} & Williams; Durrett \\
 That independent things factorise, and characteristic functions &
   \ref{prog:P25} & Blitzstein and Hwang \\
+A concentration inequality, and why boundedness is enough &
+  \ref{prog:P25} & Wasserman \\
 \bottomrule
 \end{tabularx}
 \end{center}

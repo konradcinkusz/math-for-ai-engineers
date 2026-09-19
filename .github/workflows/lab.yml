@@ -43,7 +43,29 @@ jobs:
       - name: Every changed path is one the lab may change
         run: |
           base="${{ github.event.pull_request.base.sha || github.event.before }}"
-          python3 lab/tools/labcheck.py --guard "$base"
+          mb=$(git merge-base "$base" HEAD)
+          # THE TRIGGER AND THE GUARD DISAGREE ABOUT WHAT A LAB CHANGE IS, AND
+          # BOTH ARE RIGHT. This workflow runs on figures/values/** because the
+          # lab reads its expected values from there, so a value that moves has
+          # to re-run the engine against it. The guard's allow-list excludes
+          # that directory because the lab may not WRITE it. Together they turn
+          # every book pass that emits a value red -- latent from the day this
+          # file was written, because no book pass had run since, and the first
+          # one that did was a P25/P27 pass emitting fifteen values.
+          #
+          # THE DEFECT IS HERE AND NOT IN labcheck.py. --guard answers exactly
+          # one question -- when the lab changes, does anything else? -- and it
+          # answers it correctly. What was wrong is that it was being asked on
+          # diffs that do not touch the lab at all, where the question has no
+          # subject. So the job asks it only when there is something to ask it
+          # about, and the engine below still runs either way, which is the
+          # whole point of the figures/values/** trigger.
+          if [ -n "$(git diff --name-only "$mb" -- lab/)" ]; then
+            python3 lab/tools/labcheck.py --guard "$base"
+          else
+            echo "  no lab/ path in the diff -- the additivity guard has no"
+            echo "  subject here; the engine job is what this trigger is for"
+          fi
 
   # -------------------------------------------------------------------------
   # THE ENGINE. The reference solutions pass every check; the untouched stubs

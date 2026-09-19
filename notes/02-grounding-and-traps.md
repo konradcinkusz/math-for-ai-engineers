@@ -3293,3 +3293,54 @@ question does not.
      little information, and a better probe cannot mean more, because the
      ceiling was fixed before anybody trained one. Owner: P34 §6, from
      P31 §§4--5.
+329. *“The sum is over many independent pieces, so I can read the one-in-a-
+     million case off the Gaussian.”*
+     The theorem is about the middle, and the error grows in exactly the
+     direction a tail probability is asked for: on twelve uniforms the
+     Gaussian is right to within about one and a half per cent one spread
+     out and wrong by a factor of 137 five spreads out. Past six spreads it
+     reports `9.9e-10` for something whose probability is exactly zero,
+     because it has tails running to infinity and the quantity has a floor
+     and a ceiling. Owner: P25 §3.
+330. *“There is nothing to use instead, so the Gaussian will have to do.”*
+     Hoeffding holds at every `n`, for every shape, in exchange for
+     boundedness — and, on the same twelve uniforms, for looseness of over a
+     millionfold at five spreads. The trade is not sharpness against
+     sloppiness. **A bound errs in one direction and says which; an
+     approximation errs in either and says neither**, so only one of the two
+     can finish a sentence beginning “at most”, and its looseness is what
+     those two words cost. Owner: P25 §3.
+331. *“The gate has passed three hundred times in a row, so it works.”*
+     Put `p̂ = 1` into the interval every evaluation quotes and it returns a
+     width of exactly zero, because `p(1-p)` is zero — no warning, no
+     division by zero, an ordinary number that claims the failure rate is
+     known exactly. What `n` greens license is a ceiling and nothing else:
+     `(1-0.01)^n ≤ 0.05` first holds at 299, and the famous rule of three is
+     that condition's exponential bound with `ln(20) = 2.9957` rounded.
+     Owner: P25 §4.
+332. *“And those three hundred green runs cover the edge cases.”*
+     They bound a **rate** over the inputs the runs were drawn from. A
+     particular input turning up once in a thousand is missed by 299 draws
+     74 per cent of the time, so the same run that certifies the rate is
+     under a point is, more likely than not, one that never tried the case
+     you are worried about. Both statements are true and they are about
+     different objects: one a distribution, one a point. Owner: P25 §4, and
+     Appendix E for where the second kind of claim is taught.
+333. *“Refusing the normal approximation would be expensive but at least it
+     is one price.”*
+     It is two prices multiplied. At the book's own tolerance the
+     distribution-free count is 3.00 times the normal one, which is 1.92 for
+     assuming no shape and 1.5625 for not knowing `p` — and the second is the
+     one nobody notices, because a bound that knows only that every score
+     lies in `[0, 1]` cannot use `p(1-p)` and so prices every accuracy as
+     though it were the worst one. Everything a model near the ceiling was
+     buying is handed back. Owner: P25 §4.
+334. *“It didn't show a win, so I reran it on another seed.”*
+     That is the leaderboard's own sum with attempts where the models were,
+     and `1-(1-α)^m` does not care whether the `m` things are models,
+     configurations or Tuesdays: five attempts turn a 5 per cent
+     false-positive rate into 23, and fourteen make it a coin. The version
+     nobody budgets for, because the attempts are separated in time rather
+     than laid out in a column. The repair is Bonferroni, which is why `m`
+     has to be fixed before the first attempt — a threshold cannot be divided
+     by a number the result chooses. Owner: P27 §5.

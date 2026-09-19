@@ -48,12 +48,13 @@ theorem, concentration and initialisation}
   you do}
 \outcome{9--14}{derive the rate at which an average concentrates, and say what
   four times the data buys}
-\outcome{15--22}{say what the central limit theorem promises and what it does
-  not}
-\outcome{23--29}{size an evaluation run from the difference you need to see}
-\outcome{30--41}{derive the $1/\sqrt{d_k}$ in attention, and say what it
+\outcome{15--24}{say what the central limit theorem promises and what it does
+  not, and reach for a bound where it is silent}
+\outcome{25--34}{size an evaluation run from the difference you need to see,
+  and say what a run that never failed licenses}
+\outcome{35--46}{derive the $1/\sqrt{d_k}$ in attention, and say what it
   corrects}
-\outcome{42--54}{say why a run can diverge before it has taken a step}
+\outcome{47--59}{say why a run can diverge before it has taken a step}
 \end{outcomes}
 
 \begin{quiz}
@@ -73,13 +74,13 @@ theorem, concentration and initialisation}
   probability gets used.}
 \item An attention score is a dot product over $d_k$ terms, each with unit
   variance. What is the spread of one such score, and what follows for the
-  $\softmax$? \teachesat{30--33}
+  $\softmax$? \teachesat{35--38}
   \answerto{From the variance of a dot product. With unit-variance entries
   each of the $d_k$ terms contributes $1$ and the variances add, so the score
   has variance $d_k$ and spread $\sqrt{d_k}$. Dividing by $\sqrt{d_k}$ returns
   it to $1$ at any head size.}
 \item A deep network produces \code{nan} on its first training step. What is
-  the first thing you would check? \teachesat{48--52}
+  the first thing you would check? \teachesat{53--57}
   \answerto{The weight scale. Each layer multiplies the signal's variance by
   its fan-in times the weight variance, so a scale that is wrong by a factor
   compounds geometrically with depth \dash{} to nothing, or to overflow.}
@@ -430,15 +431,70 @@ value the quantity can take at all. The Gaussian says
 $\val{p25.tail.gauss6}$, and no amount of $n$ will fix it, because the
 Gaussian has tails running to infinity and this quantity has a floor and a
 ceiling. Most measured quantities do.
+
+So the theorem goes quiet exactly where you most need it to speak. Is there a
+statement about this sum that never goes quiet \dash{} and what would it have
+to give up in exchange?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+There is, and what it gives up is sharpness.
+\end{ansblock}
+
+\textbf{Hoeffding's inequality.} Take independent quantities, each confined to
+an interval. Then the probability that their sum lands $t$ or more above its
+mean is at most
+
+\[ e^{-2t^{2}/W}, \]
+
+where $W$ is the sum of the squared widths of those intervals. There is no $n$
+large enough to wait for and no shape to assume: boundedness does the work a
+finite variance did above, and the statement holds at every $n$.
+
+On the twelve uniforms this section has been using, five spreads out, it says
+the probability is at most $\val{p25.hoeff.5}$. The true figure is
+$\val{p25.tail.true5}$, so the bound is loose by more than a millionfold.
+
+Now push it out to six spreads, where you have just worked out that the answer
+is exactly zero. The Gaussian says $\val{p25.tail.gauss6}$ and the bound says
+$\val{p25.hoeff.6}$. One of those two is wrong. Which?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{The Gaussian}
+
+\enquote{At most $\val{p25.hoeff.6}$} is a true statement about something that
+never happens. It is uselessly true, and it is not wrong.
+$\val{p25.tail.gauss6}$ says the thing turns up about once in a billion
+attempts, and it turns up in none of them.
+
+\textbf{That is the whole difference between a bound and an approximation}, and
+it is worth more than either figure. A bound can only err in one direction and
+tells you which one. An approximation can err in either and tells you neither
+\dash{} the only way to find out how far wrong this one is, is to do the exact
+calculation it was standing in for.
+
+So the two belong in different sentences. Where the claim is \emph{about}, the
+Gaussian is sharp and the bound is hopeless. Where the claim is \emph{at
+most}, only one of them will do at all, and its looseness is what the words
+\enquote{at most} cost.
 \end{fr}
 
 \begin{fr}
 \begin{rigourbox}
-\textbf{Not proved here: the central limit theorem.}
+\textbf{Not proved here: the central limit theorem, or the inequality
+before it.}
 
 The statement is above and the demonstration is measured; the proof needs
 characteristic functions, which is a second course in probability rather than
-a longer section here.
+a longer section here. The bound's proof is shorter and is not a second course
+\dash{} it is an exponential, an expectation and a page of algebra \dash{} but
+it is still a page, and what this section wanted from it was the statement.
 
 What is worth taking instead is the shape of the hypothesis, because that is
 what gets violated in practice rather than the conclusion. The theorem needs
@@ -567,6 +623,117 @@ model alone, and the item count is twice what a single interval suggests:
 $\val{p25.eval.n.naive}$ against $\val{p25.eval.n.needed}$. Both are rounded
 up from counts that are not whole, which is why the second is one short of
 twice the first.
+
+One more count, at the other end of the range. A gate runs on every commit,
+it has run a few hundred times this quarter, and it has never once failed.
+Put that run into the formula above: what interval does it give?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\pm 0$ points}
+
+Not narrow \dash{} zero, and exactly zero. The interval is
+$\val{p25.eval.z}\sqrt{p(1-p)/n}$, the measured $p$ is $1$, and $p(1-p)$ is
+then $0$ however large $n$ is.
+
+\textbf{That is this section's own best observation, one step past where it
+was taken.} $p(1-p)$ falling away towards both ends was the reason the same
+item count buys more precision at the top of a benchmark. At
+the very top it buys a certainty, and no run of any length delivers one.
+
+Nothing warns. The formula is not undefined and it does not divide by zero
+\dash{} it returns an ordinary number, and the number is the claim that the
+failure rate is known exactly. It is the state a gate in continuous
+integration is in on most of the days it runs.
+
+So the formula is out. What does a run of $n$ greens and no reds actually
+entitle you to claim?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+A ceiling on the rate, and nothing at all about any particular input.
+\end{ansblock}
+
+If the true failure rate were $\val{p25.eval.gap.pct}$ per cent or worse, the
+chance of $n$ independent runs all coming up green would be at most
+
+\[ (1 - \num{0.01})^{n} \le \num{0.05}, \]
+
+and that first holds at $n = \val{p25.zero.n}$. So that many greens license
+\enquote{the failure rate is under a point, at $95$ per cent} and nothing
+stronger. No Gaussian was used and none was needed: it is the exact binomial,
+and it is one line.
+
+\textbf{The famous name for it is the rule of three, and the three is a
+rounded logarithm.} Bound $(1 - \num{0.01})^{n}$ above by
+$e^{-\num{0.01}n}$ and the condition becomes $n \ge \val{p25.zero.ln}/\num{0.01}$,
+which rounds up to $\val{p25.zero.n.bound}$ \dash{} one more than the exact
+count, because a bound may only ever ask for more. Ask for $99$ per cent
+instead and the same logarithm is $\val{p25.zero.ln99}$: the three belongs to
+the confidence rather than to the method.
+
+And the sentence it does not license. Those $\val{p25.zero.n}$ greens bound a
+rate over the inputs the runs were drawn from. A particular input that turns
+up once in a thousand is missed by that many draws
+$\val{p25.rare.miss.pct}$ per cent of the time \dash{} so the same run that
+certifies the rate is under a point is, more likely than not, a run that has
+never once tried the case you are worried about. Both statements are true and
+they are about different things: one is about a distribution, the other about
+a point. Appendix~\ref{app:E} says where the second kind of claim is taught,
+because it is not taught here.
+
+One thing is still owed. The frames on the tail measured the Gaussian as an
+approximation with no error control, and every count in this section rests on
+its $\val{p25.eval.z}$. Is this section unsafe \dash{} and what would doing
+without it cost?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+It is safe, and doing without it costs $\val{p25.hoeff.factor}$ times the
+items.
+\end{ansblock}
+
+Safe first, because the two questions are not the same one. An interval is a
+statement about the middle of a distribution and the finding above was about a
+tail, so the Gaussian is being asked here for the one thing it is good at. That is not a defence of it. It is the reason to know which of the
+two you are asking for.
+
+Then the price of not asking. Hoeffding at the same tolerance and the same
+confidence wants $\val{p25.hoeff.n}$ items where the count above is
+$\val{p25.eval.n.naive}$, and $\val{p25.hoeff.n.needed}$ where the count above
+is $\val{p25.eval.n.needed}$ \dash{} the same factor either way, because the
+factor of two sits on both sides of the division.
+
+\textbf{And that factor is two prices multiplied together, not one.}
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+no shape assumed & $\val{p25.hoeff.price.shape}$ \\
+$p$ not known & $\val{p25.hoeff.price.p}$ \\
+\midrule
+together & $\val{p25.hoeff.factor}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The second of them is this section's own observation, being paid for. A bound
+that knows only that every score lies between $0$ and $1$ cannot use $p(1-p)$,
+so it prices every accuracy as though it were the worst one, at a half.
+Everything the frames above bought by noticing that a model near the ceiling
+carries a narrow interval is handed back at the door.
+
+A bound that also knows the variance pays less of that second price. Knowing
+the variance of a right-or-wrong means knowing $p$, which is the quantity
+being measured.
 \end{fr}
 
 \begin{fr}
@@ -1072,49 +1239,68 @@ neither is this book's.
   $\val{p25.tail.ratio5}$ times five spreads out; six spreads out the truth is
   exactly zero. The question the theorem answers worst is the one it is most
   used for}.}
-\sumitem{21--22}{\result{The hypothesis is what fails in practice:
+\sumitem{21--22}{\result{\textbf{And a statement that is never silent.}
+  Hoeffding bounds the probability of landing $t$ or more above the mean by
+  $e^{-2t^{2}/W}$, for $W$ the sum of the squared interval widths \dash{} at
+  every $n$, for every shape, in exchange for boundedness and for looseness.
+  \textbf{A bound errs in one direction and says which; an approximation errs
+  in either and says neither}, which is why only one of the two can finish a
+  sentence beginning \enquote{at most}}.}
+\sumitem{23--24}{\result{The hypothesis is what fails in practice:
   independence, a
   finite variance, and no single piece dominating. \textbf{A Gaussian because
   a sum was involved is correct; a Gaussian because it looked bell-shaped is
   an assumption nobody checked.}}}
-\sumitem{23--25}{\result{An accuracy on $\val{p25.eval.n.lo}$ items carries an
+\sumitem{25--27}{\result{An accuracy on $\val{p25.eval.n.lo}$ items carries an
   interval of $\pm\val{p25.eval.hw.100}$ points, and four times the items
   halves it every time}.}
-\sumitem{26--27}{\result{Calling a $\val{p25.eval.gap.pct}$-point difference needs
+\sumitem{28--29}{\result{Calling a $\val{p25.eval.gap.pct}$-point difference needs
   $\val{p25.eval.n.needed}$ items per model \dash{} \textbf{twice} the
   $\val{p25.eval.n.naive}$ a single interval suggests, up to the rounding,
   because the quantity in question is a \emph{difference} and the variances of
   the two estimates add}.}
-\sumitem{30--32}{\result{An attention score is a sum of $d_k$ products of
+\sumitem{30--31}{\result{\textbf{At $p = 1$ the interval formula returns a
+  width of zero}, because $p(1-p)$ is $0$ \dash{} the state a gate is in on
+  most of the days it runs, and nothing warns. What $n$ greens license is a
+  ceiling: $(1 - \num{0.01})^{n} \le \num{0.05}$ first holds at
+  $\val{p25.zero.n}$, and the \textbf{rule of three} is that condition's
+  exponential bound, with the three a rounded $\val{p25.zero.ln}$}.}
+\sumitem{31--32}{\result{\textbf{A rate is not a case}: the same
+  $\val{p25.zero.n}$ greens miss a one-in-a-thousand input
+  $\val{p25.rare.miss.pct}$ per cent of the time. And refusing the Gaussian
+  outright costs $\val{p25.hoeff.factor}$ times the items, which is
+  \textbf{two prices multiplied} \dash{} $\val{p25.hoeff.price.shape}$ for
+  assuming no shape and $\val{p25.hoeff.price.p}$ for not knowing $p$}.}
+\sumitem{35--37}{\result{An attention score is a sum of $d_k$ products of
   unit-variance entries, so $\Var = d_k$ and the spread is $\sqrt{d_k}$
   \dash{} enumerated exactly, with no limit theorem in it}.}
-\sumitem{32--33}{Program~\ref{prog:P05} measured the same theorem at the
+\sumitem{37--38}{Program~\ref{prog:P05} measured the same theorem at the
   normalised scaling, $1/\sqrt{d}$, and the derivation reproduces its four
   committed figures to $\val{p25.p05.worst.pct}$ per cent \dash{} one theorem
   at two scalings, and a cross-check on both.}
-\sumitem{35--37}{\result{\textbf{E9, run.} Without the division, at
+\sumitem{40--42}{\result{\textbf{E9, run.} Without the division, at
   $d_k = \val{p25.e9.d.hi}$ the row's entropy is
   $\val{p25.e9.raw.ent.512}$ of a possible $\val{p25.e9.maxent}$ and one key
   takes $\val{p25.e9.raw.top.512}$ per cent. With it, nothing moves at any
   head size}.}
-\sumitem{37}{\result{Program~\ref{prog:P18}'s Jacobian diagonal $p(1-p)$ turns that
+\sumitem{42}{\result{Program~\ref{prog:P18}'s Jacobian diagonal $p(1-p)$ turns that
   into a gradient: $\val{p25.e9.resp.raw}$ against
   $\val{p25.e9.resp.scaled}$, so the scaled row is
   $\val{p25.e9.resp.ratio}$ times as responsive}.}
-\sumitem{39--41}{\result{\textbf{The scaling is a variance correction and nothing
+\sumitem{44--46}{\result{\textbf{The scaling is a variance correction and nothing
   else.} A fixed constant cannot do the job, because the thing corrected grows
   with the head dimension}.}
-\sumitem{42--44}{\result{A layer's output has variance
+\sumitem{47--49}{\result{A layer's output has variance
   $n_{\text{in}}\Var(w)\Ex[x^{2}]$ \dash{} the same identity a fourth time,
   and the \emph{second moment} rather than the variance, because a $\relu$
   input is not centred \dash{} so a linear layer holds its scale at
   $\Var(w) = 1/n_{\text{in}}$}.}
-\sumitem{45--47}{\result{A $\relu$ keeps \textbf{exactly half} the second moment of a
+\sumitem{50--52}{\result{A $\relu$ keeps \textbf{exactly half} the second moment of a
   symmetric input, by symmetry and integrated to
   $\val{p25.init.relu.keeps}$. Making that up needs
   $\Var(w) = 2/n_{\text{in}}$, \textbf{which is where He's factor of two comes
   from}}.}
-\sumitem{48--52}{\result{Depth compounds it geometrically: over
+\sumitem{53--57}{\result{Depth compounds it geometrically: over
   $\val{p25.init.depth}$ layers, half per layer leaves
   $\val{p25.init.deep.xavier}$ of the signal's variance and four per layer
   gives
