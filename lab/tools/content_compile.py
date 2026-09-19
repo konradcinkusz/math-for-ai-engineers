@@ -247,6 +247,22 @@ def balanced(src: str, i: int) -> tuple[str, int]:
     raise Refusal("brace", "unbalanced group", src[i:i + 60])
 
 
+def eat_groups(src: str, i: int) -> int:
+    """Skip every remaining braced argument, whitespace between them included.
+
+    `\\mermaidfig` takes three and writes its third on a line of its own, so
+    a loop testing only `src[j] == "{"` stopped at the newline and left
+    `{why a network's derivative is a product}` in F12's body as text.
+    """
+    while True:
+        j = i
+        while j < len(src) and src[j] in " \t\n":
+            j += 1
+        if j >= len(src) or src[j] != "{":
+            return i
+        _, i = balanced(src, j)
+
+
 def optional(src: str, i: int) -> tuple[str | None, int]:
     if i < len(src) and src[i] == "[":
         j = src.index("]", i)
@@ -420,9 +436,7 @@ def apply_macro(name, src, j, lang, vals, ctx, seen, gaps) -> tuple[str, int]:
 
     if name in V2_MACROS:                 # ADR-0014: a v2 field.
         _, j = balanced(src, skip_ws(src, j, ctx))
-        while j < len(src) and src[j] == "{":
-            _, j = balanced(src, j)
-        return "", j                      # counted per program, not here
+        return "", eat_groups(src, j)     # counted per program, not here
 
     if name in ("val", "rawval", "valtext"):
         arg, j = balanced(src, skip_ws(src, j, ctx))
@@ -432,9 +446,7 @@ def apply_macro(name, src, j, lang, vals, ctx, seen, gaps) -> tuple[str, int]:
         return localise_number(arg.strip(), lang), j
 
     if name in DROP:
-        while j < len(src) and src[j] == "{":
-            _, j = balanced(src, j)
-        return "", j
+        return "", eat_groups(src, j)
     if name in LITERAL:
         return LITERAL[name], j
     if name in PER_LANG:
@@ -470,9 +482,7 @@ def apply_macro(name, src, j, lang, vals, ctx, seen, gaps) -> tuple[str, int]:
         # The row of dots IS the covered answer box, and the step already
         # says so with `cue`. A second marker in the body would have the
         # application draw two.
-        while j < len(src) and src[j] == "{":
-            _, j = balanced(src, j)
-        return "", j
+        return "", eat_groups(src, j)
     if name == "nextframe":
         return "", j                      # lifted before conversion; belt and braces
 
@@ -598,6 +608,9 @@ def render_table(env, inner, lang, vals, ctx, seen, gaps) -> str:
         cells = [put(c) for c in split_depth0(raw, "&")]
         cells = [convert(c, lang, vals, ctx, seen, gaps)
                  .replace("\u0000RULE\u0000", "").strip().replace("\n", " ")
+                 # A literal | ends a cell in Markdown, inside a code span as
+                 # readily as outside one -- and F10 tabulates `a | b`.
+                 .replace("|", "\\|")
                  for c in cells]
         if not any(cells):
             continue
@@ -1118,6 +1131,43 @@ def check_structure(bundle) -> list[str]:
     return errs
 
 
+def check_residue(bundle) -> list[str]:
+    """Nothing that is LaTeX may survive into a body, and nothing invisible.
+
+    Each of these three found a real defect the first time it was run, which
+    is why it is a gate rather than a one-off reading: a `\\mermaidfig`
+    whose third argument sits on its own line left `{why a network's
+    derivative is a product}` in F12's body, because the loop eating its
+    arguments stopped at the newline. None of it is invalid Markdown or
+    invalid JSON, so nothing else in this pipeline has an opinion about it.
+    """
+    errs: list[str] = []
+    math = re.compile(r"\$\$.*?\$\$|\$[^$]*\$", re.S)
+    probes = ((re.compile(r"[{}]"), "a brace group survived conversion"),
+              (re.compile(r"\\[a-zA-Z@]+"), "a macro survived conversion"),
+              (re.compile("[\u0000-\u0008\u000b\u000c\u000e-\u001f]"),
+               "a control character reached the bundle"))
+
+    def visit(node, where):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                visit(v, f"{where}/{k}")
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                visit(v, f"{where}/{i}")
+        elif isinstance(node, str):
+            outside = math.sub(" ", node)
+            for probe, what in probes:
+                m = probe.search(outside)
+                if m:
+                    errs.append(
+                        f"{where}: {what} -- "
+                        f"{outside[max(0, m.start() - 40):m.end() + 20]!r}")
+
+    visit(bundle, "")
+    return errs
+
+
 # -------------------------------------------------------------------- packing
 #
 # #239 §1: "The bundle carries lab/exercises, lab/solutions, lab/tests (with
@@ -1211,6 +1261,7 @@ def main() -> int:
     errs: list[str] = []
     check_shape(bundle, schema, schema, "", errs)
     errs += check_structure(bundle)
+    errs += check_residue(bundle)
     if errs:
         print(f"REFUSED  the bundle does not satisfy content-schema v1 "
               f"({len(errs)} problems):", file=sys.stderr)
