@@ -276,6 +276,44 @@ grey marker that read like a decision.
 `\frac`, `\sum`, `\lVert`, custom operators via `\DeclareMathOperator`; KaTeX
 covers all of those; the render test is what turns that sentence into a number.
 
+### 4.1 Measured, September 2026: the compiler is written and the number is zero
+
+`lab/tools/content_compile.py` and `lab/tools/content_katex.js`, gated by
+`.github/workflows/content.yml`. **21 714 of 21 714 maths spans render under
+KaTeX in strict mode**, so the paragraph above is now a measurement and the
+answer is that nothing fails.
+
+**Read the count carefully rather than against the 13 892 above**: the probe
+counts `MATH` tokens in frames, and this counts `$...$` and `$$...$$` in the
+finished bundle \dash{} which includes answers, section titles and route
+labels, and splits a display the probe counted once. The two are different
+quantities and neither is wrong.
+
+**Three things in the plan above did not survive contact, and each is worth
+more than the sentence it replaces.**
+
+- **The frame shape is not `{n, question, answer, cue, modes, boxes, maths,
+  vals, figs}`.** ab-ove owns the schema (`content-schema.v1.json`,
+  ADR-0014), and its step is `{n, kind, body}` with `answer`, `cue`,
+  `section` and `check` optional. Issue #239 §6 settles the conflict in that
+  repository's favour \dash{} *target that schema, do not invent a second
+  one* \dash{} so the richer shape sketched here is what a v2 might carry and
+  is not what ships.
+- **Version 1 carries no figures and no transcripts at all.** ADR-0014 says
+  so by name. 300 figures and 88 transcripts are therefore removed from the
+  bodies and **counted on every run**, which is the orphan-tail ledger's
+  treatment and not a silent drop.
+- **The KaTeX macro table is 31 entries, not 72.** Measured across every
+  maths span in the book: 137 distinct macros appear inside maths, 106 of
+  them KaTeX's own. Five of the 31 differ between the editions, which is the
+  whole of what "the notation contract IS the i18n table" turns out to cost.
+
+**And one genuine finding for ab-ove**, which is what ADR-0014 predicted a
+first real compiler would produce: five frames per edition \dash{} the same
+five in both \dash{} have no content but their answer, and a v1 step requires
+a non-empty `body`. They ship split at a boundary the source already has, and
+the schema question goes upstream.
+
 ---
 
 ## 5. The architecture, measured against the constitution
