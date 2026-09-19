@@ -318,11 +318,6 @@ Reinforcement learning theory and convergence results &
 Category theory, differential geometry, manifolds & Occasionally invoked in
   interpretability writing; not load-bearing for the work, and no source here
   was surveyed for the category theory & Lee, for the geometry \\
-Formal specification: transition systems, inductive invariants, temporal logic
-  & Program~\ref{prog:P14} teaches you to \emph{read} a theorem and
-  deliberately not to write one, and an inductive invariant has to be written;
-  Programs~\ref{prog:F10} and~\ref{prog:P13} give the set and the relation,
-  and nothing here goes on to a state machine & Lamport; Jackson \\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -367,6 +362,24 @@ The classical test zoo: $t$ tables, $\chi^{2}$, ANOVA, $F$ & You have a
 \end{center}
 
 \medskip
+And one exclusion that belongs to none of those three, which is worth saying
+plainly rather than filing under the nearest heading. \textbf{Formal
+specification} \dash{} transition systems, inductive invariants, temporal
+logic, refinement \dash{} is not a rigorous foundation underneath what this
+book teaches, because it is underneath nothing here. It is not a specialism
+beginning where a working depth ends, because there is no working depth here
+to begin from. And it is not a technique a library now performs, because the
+thing it produces is a sentence rather than a computation.
+
+What the book gives is the ground it stands on and then stops.
+Program~\ref{prog:F10} gives the set and Program~\ref{prog:P13} the relation
+built on it; Program~\ref{prog:P14} teaches you to \emph{read} a theorem and
+deliberately not to write one \dash{} and an inductive invariant has to be
+written. For the notation itself: Wayne, then Lamport; Jackson for the same
+ideas over relations, and Leino for the version that lives inside a program's
+own source.
+
+\medskip
 \textbf{And the exclusions this book is least sure about}, stated because
 saying so now is cheaper than defending them later.
 
@@ -398,9 +411,7 @@ and then to check it \dash{} and the first of those is a notation, which this
 book does not teach. Program~\ref{prog:P25} marks where the statistical half
 stops: a run of greens bounds a rate over the inputs it drew from and says
 nothing about any one of them, and saying something about any one of them is
-what an invariant is for. Wayne is the practical route in and Lamport the
-reference behind it; Jackson does the same ideas over relations, and Leino the
-version that lives inside a program's own source.
+what an invariant is for.
 
 \section{The subjects it does teach, but only to working depth}
 \label{sec:E-depth}

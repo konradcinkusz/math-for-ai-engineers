@@ -322,11 +322,6 @@ Teorii uczenia ze wzmocnieniem i wyników o zbieżności & Programy~\ref{prog:P2
 Teorii kategorii, geometrii różniczkowej, rozmaitości & Czasem przywoływane w
   pracach o interpretowalności; nie są nośne dla tej roboty, a na teorię
   kategorii nie przejrzano tu żadnego źródła & Lee, na geometrię \\
-Specyfikacji formalnej: systemów przejść, niezmienników indukcyjnych, logiki
-  temporalnej & Program~\ref{prog:P14} uczy \emph{czytać} twierdzenie i
-  świadomie nie uczy go pisać, a niezmiennik indukcyjny trzeba napisać;
-  Programy~\ref{prog:F10} i~\ref{prog:P13} dają zbiór i relację, a nic tutaj
-  nie idzie dalej, do maszyny stanów & Lamport; Jackson \\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -371,6 +366,24 @@ Klasyczny zwierzyniec testów: tablice $t$, $\chi^{2}$, ANOVA, $F$ & Masz
 \end{center}
 
 \medskip
+I jedno wyłączenie, które nie należy do żadnej z tych trzech tabel, a warto
+powiedzieć to wprost, zamiast wpisywać je pod najbliższy nagłówek.
+\textbf{Specyfikacja formalna} \dash{} systemy przejść, niezmienniki
+indukcyjne, logika temporalna, refinement \dash{} nie jest rygorystycznym
+fundamentem pod tym, czego ta książka uczy, bo nie leży tu pod niczym. Nie
+jest specjalizacją zaczynającą się tam, gdzie kończy się głębokość robocza, bo
+nie ma tu głębokości roboczej, od której mogłaby się zacząć. I nie jest
+techniką, którą wyręcza dziś biblioteka, bo tym, co produkuje, jest zdanie, a
+nie obliczenie.
+
+Książka daje grunt, na którym to stoi, i na tym się zatrzymuje.
+Program~\ref{prog:F10} daje zbiór, a Program~\ref{prog:P13} zbudowaną na nim
+relację; Program~\ref{prog:P14} uczy \emph{czytać} twierdzenie i świadomie
+nie uczy go pisać \dash{} a niezmiennik indukcyjny trzeba napisać. Po samą
+notację: Wayne, potem Lamport; Jackson po te same rzeczy na relacjach, a Leino
+po wersję mieszkającą w źródle samego programu.
+
+\medskip
 \textbf{I wyłączenia, co do których ta książka jest najmniej pewna},
 wypisane dlatego, że powiedzenie tego teraz jest tańsze niż bronienie ich
 później.
@@ -404,9 +417,7 @@ której ta książka nie uczy. Program~\ref{prog:P25} wyznacza miejsce, w który
 kończy się połowa statystyczna: przebieg zielonych ogranicza odsetek po
 wejściach, z których losował, i nie mówi nic o żadnym z nich z osobna, a
 powiedzenie czegoś o którymkolwiek z nich jest tym, do czego służy
-niezmiennik. Wayne to praktyczne wejście, a Lamport stojące za nim źródło;
-Jackson robi te same rzeczy na relacjach, a Leino w wersji mieszkającej w
-źródle samego programu.
+niezmiennik.
 
 \section{Tematy, których uczy, ale tylko do głębokości roboczej}
 \label{sec:E-depth}
