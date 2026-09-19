@@ -724,6 +724,37 @@ them open with an answer and which end with a cue (the two agree frame for
 frame, which is C16 seen from the other side), every box, every route and
 every value, without a line of hand work.
 
+**And the compiler that probe was measuring for is written**:
+`lab/tools/content_compile.py` reads both editions with `tools/parity.py`'s
+tokeniser and emits one data bundle against the learning application's own
+`content-schema.v1.json`, so the application never sees LaTeX. 47 units, 275
+sections, 1866 steps, 1030 answers, 1030 cues, 1408 routes; **21 714 of
+21 714 maths spans render under KaTeX in strict mode**, which turns the open
+question of `notes/10-learning-app.md` §4 into a number. Additive on the KDP
+and lab pattern, and the same guard proves it.
+
+**Three things in it are this book's own habits applied one artefact over.**
+It **refuses rather than degrades** \dash{} an unknown macro, an unresolved
+`\val{}`, a cue whose successor does not answer, two editions whose frames do
+not pair, each naming the program, the frame and the token \dash{} because a
+bundle that renders a blank where a reader expected prose looks finished.
+What schema v1 has no field for is **counted and printed on every run**
+rather than dropped, which is the orphan tail's treatment for the orphan
+tail's reason. And `--cross-check` requires `content_probe.py`, written
+separately and reading the same source, to agree on all five counts.
+
+**That last one earned its place immediately, and the finding is the recorded
+class.** The compiler's section scanner was a regex allowing one level of
+brace nesting, and P07's `\section{An \texorpdfstring{\code{einsum}}{einsum}
+string \dots}` nests two \dash{} so one section of 275 was dropped in
+silence, with no error anywhere. Nothing in the bundle looked wrong; the
+count did, and only because a second instrument had already measured it. The
+fix is `balanced()` rather than a wider regex, which makes the wrong match
+impossible rather than detectable. **A second instrument is worth more than a
+wider pattern**, and the KaTeX render test is the same shape from the other
+side: `KATEX_OK` is a list of macros somebody claims KaTeX renders, and it
+was wrong about 364 spans until Node said so.
+
 ## The Stroud machinery, in LaTeX
 
 Implemented in `preamble.tex`. The interesting decisions:

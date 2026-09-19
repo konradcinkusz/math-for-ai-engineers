@@ -52,3 +52,9 @@ _site/
 # The converged gutter and the pad leaf are MEASUREMENTS and are written
 # into the staging tree under build/, so build/ covers them.
 build/
+
+# The render test installs KaTeX to run every maths span in a content bundle
+# through it (lab/tools/content_katex.js). Node's tree is build output, and a
+# committed one would be a second copy of something npm already pins.
+node_modules/
+package-lock.json
