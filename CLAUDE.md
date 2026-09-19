@@ -52,8 +52,8 @@ changing one of the twenty numbers. **F4 did not move it either, but not for
 free**: its first build added an 11.2 pt box to `main-en-a4` alone, from a
 32-character `\code{}` in a test exercise, and the fix was to set the loop as a
 displayed three-line block instead of running it into the sentence. Parity
-reports **0 failures and 0 warnings** across 56 file pairs; `reflist.py`
-confirms 492 labels resolve to the same numbers in both editions.
+reports **0 failures and 0 warnings** across 57 file pairs; `reflist.py`
+confirms 495 labels resolve to the same numbers in both editions.
 
 **The only page count that moved in the second F3 review pass was `main-pl-a4`,
 231 to 229**, and both of those pages were defects rather than content: a page
@@ -108,7 +108,7 @@ what was there before.
   listed under *What is left*.
 - 0 exercises without an answer · 0 programs outside their frame band ·
   0 programs without declared learning outcomes
-- 1673 computed values, all referenced, all present, plus the committed console
+- 1733 computed values, all referenced, all present, plus the committed console
   transcripts, which are inside the same drift gate as of the F3 pass. **Every
   ledger in this list is now also printed in Appendix~F**, and printed from
   `figures/values/appf.tex` rather than typed, so `make verify` fails when one
@@ -118,16 +118,18 @@ what was there before.
 - 88 `\transcript{}` references, every one backed by a committed file and
   every one now actually on the page \dash{} see *The transcripts were not
   printing* below
-- **54 Polish renderings named in Appendix~D, every one used in the prose of
+- **84 Polish renderings named in Appendix~D, every one used in the prose of
   `programs/pl`** \dash{} `make debt` reports it and `make check` and CI both
   gate on it. A glossary row naming a word the book does not use is a claim
   about the body that is false, and `notes/03`'s suggested table has two of
   them. **The number the tool prints is renderings across BOTH editions**:
-  24 `\plterm` rows per edition, 27 renderings, because three rows carry
+  38 `\plterm` rows per edition, 42 renderings, because some rows carry
   several comma-separated words for one object. This entry said 27 for a
   week, which is the per-edition figure and not what `make debt` puts on the
-  page \dash{} quote the instrument's own number, or say which of the three
-  quantities you mean
+  page; and then all three of its figures went stale together as the appendix
+  grew, which is the same defect one turn of the screw further on \dash{}
+  quote the instrument's own number, or say which of the three quantities you
+  mean, and re-derive all three when any one of them moves
 - **9 part ranges in each introduction, every one matching the manifest**
   \dash{} the same three places gate it. Seven of the nine were wrong in
   both editions for the whole of the book; see *Appendix E pass* below
@@ -16377,6 +16379,240 @@ not inherit the surrounding weight, and siunitx's `detect-weight` fixes it.
 Bold digits are wider than regular ones, so it moves line breaks in every
 bolded headline in the book \dash{} a book-wide layout change nobody has
 measured, which is the same bar the other sixteen fail.
+
+### The concentration and specification pass, September 2026
+
+Worked from an external gap analysis of the book against a skills map. Every
+claim in it that could be checked against the tree was checked first, and all
+of them held: no tail bound anywhere in the prose, no sequential testing, all
+nineteen uses of *invariant* in the programs meaning the **measurement** sense
+rather than `Init ⇒ Inv`, and Appendix~E silent on specification. Its four
+arithmetic figures recomputed correctly.
+
+#### THE FINDING: a true diagnosis with nothing after it
+
+The analysis said Hoeffding is missing. The book's own text says something
+sharper, and it takes reading the two sections together to see it.
+
+Program~\ref{prog:P25} §3 measures the Gaussian tail as an approximation with
+no error control \dash{} at six spreads it reports $\val{p25.tail.gauss6}$ for
+a quantity whose probability is exactly zero \dash{} and closes on *the
+question the theorem answers worst is the one it is most used for*. It then
+offers **nothing** in its place. §4 prices every evaluation run with that same
+$\val{p25.eval.z}$ and never says why that is safe.
+
+And §4's own best observation opens a hole. It says $p(1-p)$ falls away
+towards both ends, so the same item count buys more precision at the top of a
+benchmark \dash{} and at the very top the formula returns an interval of width
+**exactly zero**. No warning, no division by zero, an ordinary number claiming
+the failure rate is known. It is the state a gate in continuous integration is
+in on most of the days it runs, and it is Program~\ref{prog:P33}'s class: a
+correct computation of the wrong quantity.
+
+**That is a class this file has no name for, and it is worth one: a true
+diagnosis with nothing after it.** Every sentence in both places is correct,
+so nothing that reads the source can see it, and nothing that reads the page
+can either. It is not a stale claim, not a wrong number, not a claim about
+another program. It is a section that names a defect and stops.
+
+**And the generalisable half is about the analysis rather than the book: an
+external gap report is a hypothesis about the book, and the book usually has a
+sharper version of it.** \enquote{Hoeffding is missing} is a shopping-list
+item. \enquote{§3 discredits the instrument §4 then prices everything with}
+is a defect with a location, and it came out of checking the report rather
+than acting on it.
+
+#### The factor of three is two prices, and the second is the section's own
+
+At the book's own tolerance and confidence the distribution-free count is
+$\val{p25.hoeff.n}$ items against §4's $\val{p25.eval.n.naive}$, and
+$\val{p25.hoeff.n.needed}$ against $\val{p25.eval.n.needed}$ \dash{} the same
+factor either way, because the factor of two sits on both sides of the
+division. It splits, exactly:
+
+| | |
+|---|---|
+| no shape assumed, $2\ln(2/\delta)/z^{2}$ | $\val{p25.hoeff.price.shape}$ |
+| $p$ not known, $1/(4p(1-p))$ | $\val{p25.hoeff.price.p}$ |
+| together | $\val{p25.hoeff.factor}$ |
+
+**The second is this section's own observation being paid for.** A bound that
+knows only that every score lies in $\intcc{0}{1}$ cannot use $p(1-p)$, so it
+prices every accuracy as the worst one, and everything the frames bought by
+noticing that a model near the ceiling carries a narrow interval is handed
+back at the door. The product is $\num{3.00}$ at $p = \num{0.8}$ **and that is
+a coincidence**, asserted in both directions on Program~\ref{prog:P01}'s rule:
+at $p = \frac{1}{2}$ it is $\val{p25.hoeff.price.shape}$.
+
+#### The boundary guard fired on its first use in this script
+
+`not_on_a_boundary` was copied into `code/p25_clt_monte_carlo.py` from
+`p27_inference.py` and refused the first value put through it: $\ln(100)$ at
+two decimals sits $\num{0.017}$ of a step from the rounding boundary, so it
+prints $\num{4.61}$ here and could print $\num{4.60}$ on another libm. That is
+Program~\ref{prog:P20}'s `p20.cos.area` defect exactly, caught before it
+shipped rather than by CI. Emitted at one decimal, which is also the precision
+the sentence wants.
+
+#### The obvious framing of the peeking frames was wrong
+
+$1-(1-\alpha)^{m}$ is exact for **rerunning until the result you want
+appears**, where each attempt declares a win under the null with probability
+$\alpha$. It is **not** the rate for a blocking gate rerun until it goes
+green: there the per-attempt probability is the test's *power* against a real
+fault, and the number is a different one. The first draft of the script said
+the second; the frames say the first, and the script records the distinction
+so nobody re-derives it.
+
+#### Three positional claims in my own new prose, one of them false
+
+\enquote{Two frames ago} was four frames ago and \enquote{two sections back}
+was one. Removed rather than corrected, which is the Part~II elicitation
+pass's rule: **a question that needs no positional claim should not carry
+one.** Worth recording that the correction for one wrong positional claim was
+itself a wrong positional claim, because that is how the class survives being
+noticed.
+
+#### Nine Polish phrasings that are not Polish, with parity green throughout
+
+*Znana nazwa tego jest reguła trzech* does not parse; *Te $299$ zielonych*
+gets the numeral agreement wrong, since a numeral ending in ninety-nine
+governs the genitive; *częściej niż nie* is *more likely than not* carried
+over word for word; *cena nieodpytania* is not a word; *widocznie 40* means
+**apparently** forty, which is the reverse of the claim its frame makes. C4,
+C8, C12 and C14 were green on every one, because **nothing in this repository
+reads prose**.
+
+And one thing deliberately not changed: *na dwunastu rozkładach jednostajnych*
+looks like a category error and the program has already settled that word at
+four earlier sites. Appendix~\ref{app:C}'s rule \dash{} check whether the
+existing usage means what you need across the corpus, not across the lines you
+happened to open.
+
+#### Appendix E: the exclusion belonged to none of the three tables
+
+The row first went into §E.3's second table and produced a **121.1 pt overfull
+vbox** in `main-en`, which is that appendix's own recorded class: a `tabularx`
+inside a `center` cannot break. Reading it to decide where to split found the
+worse defect. That table is introduced as *the specialisms that begin where a
+working depth ends*, and the book has no working depth in specification at all
+\dash{} **so the row contradicted the sentence introducing its own table.** It
+fits the first table no better (that one is foundations *underneath* what the
+book teaches, and this is underneath nothing here) and the third no better
+still (techniques a library now performs, where what this one produces is a
+sentence rather than a computation).
+
+So it is prose after the three tables, saying that it belongs to none of them
+and why. That is more visible than a table row, it is the only form that is
+not false, and it retires the vbox by construction. **The heading's tally
+\enquote{four exclusions} is retired rather than incremented**, which is this
+file's own rule about a count of occurrences.
+
+#### The lab guard was being asked a question with no subject
+
+This is the first book pass to run since `lab.yml` was written, and it turned
+that workflow's guard job red without touching `lab/` at all. Sixteen runs of
+it exist and every one is a lab PR, so the defect was latent from the day the
+file was written.
+
+**The trigger and the guard disagree about what a lab change is, and both are
+right.** The workflow runs on `figures/values/**` because the lab reads its
+expected values from there, so a value that moves has to re-run the engine
+against it. The guard's allow-list excludes that directory because the lab may
+not *write* it. Together they fail every book pass that emits a value.
+
+Fixing `labcheck.py` was tried first and fails on its own terms: the fix is
+itself a path under `lab/`, so the guard then correctly reports a diff that
+changes the lab and the book together. Working through why is what shows the
+tool has no defect \dash{} `--guard` answers one question, *when the lab
+changes, does anything else?*, and answers it correctly. What was wrong is
+that it was being asked on diffs with no `lab/` path in them, where the
+question has no subject. The job now asks it only when there is something to
+ask about; the engine job still runs either way, which is what that trigger is
+for.
+
+#### A CONTAINER THAT DOES NOT REPRODUCE THE RECORDED TABLE, and the log that lied
+
+This container had **no TeX at all** \dash{} `latexmk: No such file or
+directory` \dash{} and the harness reported that build as exit 0 while the log
+said `MAKE_EXIT 2`. Recorded trap, recorded habit, sixth occurrence.
+
+A bare TeX Live 2023 was installed from the Ubuntu archive, deliberately
+without `texlive-fonts-extra` and `texlive-plain-generic`, which this file
+records as fatal. **It does not reproduce the page table above, and not
+marginally.** Built on `origin/main`, on this machine:
+
+| | recorded table | this container, on `main` |
+|---|---|---|
+| `main-en` pages | 1435 | 1455 |
+| `main-en` overfull hbox | `[]` | 25, the worst $\num{20.6}$ pt |
+| `main-pl` overfull hbox | `[]` | 62, the worst $\num{26.6}$ pt |
+| orphaned cues | 0 | 4 · 4 · 6 · 7 |
+
+So `make check` fails on `main` here, and every absolute figure in the page
+table is unreachable from a fresh `apt-get install` of TeX Live on this image.
+**Nothing in this pass may be attributed from those absolutes**, and the whole
+measurement below is against a baseline worktree of `main` built on this same
+machine \dash{} which is what this file's own rule already says and which had
+never before been the difference between a defect and a phantom.
+
+**And the baseline's first reading was wrong, from the recorded cause.**
+`checklog.py` run on the baseline while `latexmk` was still writing its log
+reported 4 overfull hboxes; the completed log says 25. That is *a PDF a build
+is still writing is not a PDF* applied to the log rather than the artefact,
+and it very nearly produced a pass note claiming twenty-one boxes that were
+never mine. The rule generalises: **read a log only after the build that
+writes it has reported its own exit line**, which is the sentence already in
+*Build traps* about PDFs.
+
+#### Layout, measured against a baseline built on the same machine
+
+| | `main` here | this branch | delta |
+|---|---|---|---|
+| `main-en` | 1455 | 1461 | $+6$ |
+| `main-pl` | 1472 | 1484 | $+12$ |
+| `main-en-a4` | 1212 | 1216 | $+4$ |
+| `main-pl-a4` | 1237 | 1243 | $+6$ |
+
+**The overfull hbox multiset came back element for element in three of the
+four builds**, and `main-pl` gained one box of $\num{0.3}$ pt inside a new
+Polish frame \dash{} two orders below the 15 pt budget, on a machine whose own
+baseline carries 62 boxes, so it is recorded rather than chased. Chasing it is
+the unwinnable loop this file names: the line breaks elsewhere on CI.
+
+Overfull vboxes unchanged at $0 / 1 / 0 / 0$, the one being pre-existing in
+`main-pl` on this machine. **No stranded frame openers and no stranded section
+headings** in any build. **Orphaned cues $4 / 4 / 6 / 7$, which is the
+baseline's own count element for element** \dash{} this pass adds none, on six
+new frames and two lengthened ones. **Orphan tails went $105$ to $104$**, one
+off `main-pl-a4`.
+
+CI is the third machine and compiled all four formats green, with
+`reflist.py` reporting $495$ labels resolving alike in both editions, which is
+the baseline's figure too.
+
+#### Also
+
+- Traps 329 to 334 in `notes/02`, under one shape: what a run that never
+  failed does and does not license.
+- **Every source gate run before the build**, which is
+  Program~\ref{prog:P33}'s rule and the eleventh pass running: parity clean on
+  its first run for both programs, and `--frames --answers --outcomes --values
+  --elicit --scripts --terms --parts --results --rigour` green.
+- Elicitation: Program~\ref{prog:P25} 48% to 52%, the book 55%.
+  Program~\ref{prog:P27} goes 55% to 54%, which is arithmetic rather than a
+  regression \dash{} one eliciting frame in two added to a program above the
+  book rate pulls it towards a half \dash{} and it is recorded rather than
+  smoothed, because the ledger's own instruction is that a fall is the signal.
+- **Four live ledgers in this file were stale and are corrected**: 56 file
+  pairs against 57, 1673 computed values against 1733, 54 Polish renderings
+  against 84, and 492 labels against 495. None was this pass's doing; all four
+  are the recurring class, and the pattern is the one already recorded
+  \dash{} `figures/values/appf.tex` was right every time, because
+  `make verify` refuses the tree otherwise, and the prose four hundred lines
+  up was not. **The page table is NOT corrected**, because this machine cannot
+  measure it comparably, and saying so is better than replacing it with
+  figures from a container that disagrees with it by twenty pages.
 
 ### Stroud layout pass, August 2026
 
