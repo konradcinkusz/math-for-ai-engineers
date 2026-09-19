@@ -47,9 +47,9 @@
 \outcome{16--23}{size and run a comparison between two models evaluated on
   the same prompts}
 \outcome{24--31}{state what a p-value is, and what it is not}
-\outcome{32--37}{say what forty comparisons on one leaderboard do to all of
+\outcome{32--39}{say what forty comparisons on one leaderboard do to all of
   the above}
-\outcome{38--40}{apply the whole of it to a number somebody has published}
+\outcome{40--42}{apply the whole of it to a number somebody has published}
 \end{outcomes}
 
 \begin{quiz}
@@ -929,6 +929,51 @@ another, and the number you report has been selected on nothing.
 \end{trapbox}
 \end{fr}
 
+\begin{fr}
+A third axis, the same sum, and no leaderboard anywhere in it.
+
+The evaluation runs and the change does not show a win. You run it again on
+another seed. Then against the newer snapshot of the set. The fifth run shows
+a win at $\val{p27.alpha}$ and that is the one that gets written up.
+
+Nobody calls that $\val{p27.peek.m}$ comparisons and nobody writes the number
+down anywhere. Count the attempts the way the leaderboard counted the models:
+on a change that does nothing at all, what is the chance that one of
+$\val{p27.peek.m}$ attempts shows a win?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\val{p27.peek.pct}$ per cent}
+
+$1 - \num{0.95}^{\val{p27.peek.m}}$, which is the leaderboard's own
+expression with attempts where the models were. The arithmetic does not care
+whether the $m$ things are models, configurations or Tuesdays.
+
+\textbf{And this is the version of it nobody budgets for}, because the
+attempts are separated in time rather than laid out in a column.
+$\val{p27.models}$ rows in a table are visibly $\val{p27.models}$;
+$\val{p27.peek.m}$ reruns across a fortnight are five afternoons, each of
+which felt like one test, and the fortnight leaves no artefact saying
+otherwise.
+
+At $\val{p27.peek.coin}$ attempts the rate passes a half. A procedure that
+reports whatever it was looking for as often as a coin does, with every
+individual step of it correctly performed.
+
+The repair is Bonferroni again, and putting it that way is what makes it a
+consequence rather than a second rule to remember: holding the overall rate at
+$\val{p27.alpha}$ across $m$ attempts needs
+$\val{p27.alpha}/m$ at each one. \textbf{So $m$ has to be fixed before the
+first attempt}, because a threshold cannot be divided by a number nobody has
+decided yet. That is the whole of why \enquote{run it again} is not a
+procedure \dash{} not that rerunning is dishonest, but that it leaves $m$
+undefined until the result chooses it. Program~\ref{prog:P25}'s run of greens
+is the same condition seen from the other side: the count that licenses the
+claim is fixed before the runs, not once they are in.
+\end{fr}
+
 % ============================================================
 \section{What you can now check}
 \label{sec:P27-check}
@@ -1096,7 +1141,13 @@ already have.
   errors above its own truth, which is $\val{p27.lb.margin}$ points at
   $\val{p27.lb.n}$ items. Selection, not measurement \dash{} and the same
   arithmetic is why a held-out set exists}.}
-\sumitem{38--40}{\result{What is left when a comparison cannot resolve what you care
+\sumitem{38--39}{\result{\textbf{And the same sum counts attempts as readily
+  as models.} Rerunning an evaluation until it shows a win turns
+  $\val{p27.alpha}$ into $\val{p27.peek.pct}$ per cent over
+  $\val{p27.peek.m}$ attempts, and $\val{p27.peek.coin}$ attempts make it a
+  coin. \textbf{The number of attempts has to be fixed before the first one},
+  because a threshold cannot be divided by a number the result chooses}.}
+\sumitem{40--42}{\result{What is left when a comparison cannot resolve what you care
   about is a design question. \textbf{And \enquote{no significant
   difference} becomes a measurement the moment you say how large a difference
   would have had to be.}}}

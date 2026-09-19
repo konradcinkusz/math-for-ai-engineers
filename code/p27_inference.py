@@ -775,6 +775,60 @@ _printed = float(f"{E_MAX:.2f}") * float(f"{LB_SE:.2f}")
 assert f"{_printed:.1f}" == f"{LB_MARGIN:.1f}", (_printed, LB_MARGIN)
 
 
+# ----------------------------------------------------------------------
+# 5b.  The same sum, with ATTEMPTS in place of models.
+#
+# Selection across configurations is the trap box above.  Selection across
+# attempts in TIME is the identical arithmetic and nobody calls it a
+# comparison: the run shows no win, somebody reruns it on another seed, and
+# the fourth one shows a win.  That is m tests of one null hypothesis, and
+# 1-(1-alpha)^m does not care whether the m things were models,
+# configurations or Tuesdays.
+#
+# NOTE THE FRAMING, BECAUSE THE OBVIOUS ONE IS WRONG.  This expression is
+# exact for RERUNNING UNTIL THE RESULT YOU WANT APPEARS, where each attempt
+# declares a win under the null with probability alpha.  It is NOT the rate
+# for a blocking gate rerun until it goes green: there the per-attempt
+# probability is the test's POWER against a real fault, not alpha, and the
+# number would be a different one.  The frames say the first.
+#
+# The whole of this block is the leaderboard's own expression evaluated at a
+# different m, and it is asserted to BE that expression rather than to
+# resemble it -- which is the point the frames make.
+# ----------------------------------------------------------------------
+def any_false(m: int, alpha: float = ALPHA) -> float:
+    """P(at least one of m independent tests fires | the null holds)."""
+    return 1 - (1 - alpha) ** m
+
+
+assert any_false(MODELS) == ANY_FALSE, "section 5's own sum, at another m"
+
+PEEK_M = 5                                  # "rerun it a few times" as a number
+PEEK = any_false(PEEK_M)
+assert PEEK > 4 * ALPHA, PEEK               # four times the nominal rate
+emit("p27.peek.m", PEEK_M)
+emit("p27.peek.pct", not_on_a_boundary(pct(100.0 * PEEK), 0), 0)
+
+# And the count at which a gate stops carrying any information at all.
+PEEK_COIN = 1
+while any_false(PEEK_COIN) < 0.5:
+    PEEK_COIN += 1
+assert any_false(PEEK_COIN) >= 0.5 > any_false(PEEK_COIN - 1)
+emit("p27.peek.coin", PEEK_COIN)
+
+# The repair is Bonferroni again, and stating it as such is what makes it a
+# consequence rather than a second rule: to hold the overall rate at alpha
+# over m attempts, each attempt needs alpha/m -- so the honest move is to fix
+# m in advance, because a threshold cannot be divided by a number nobody has
+# decided yet.  THAT is why "run it until it passes" is not a procedure.
+assert any_false(PEEK_M, ALPHA / PEEK_M) < ALPHA
+NOTES.append(
+    f"rerunning an evaluation until it shows a win is section 5's own sum at "
+    f"m = attempts: {PEEK_M} attempts turn a {pct(100.0 * ALPHA):.0f} per "
+    f"cent false-positive rate into {pct(100.0 * PEEK):.0f}, and {PEEK_COIN} "
+    f"attempts make it a coin flip")
+
+
 # ======================================================================
 # The transcript.  Every transformation applied to a value is INSIDE the
 # listing, because Programs P19 and P24 each shipped a draft where it was not

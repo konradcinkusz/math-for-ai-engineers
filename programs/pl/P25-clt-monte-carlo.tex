@@ -24,12 +24,13 @@ twierdzenie graniczne, koncentracja i inicjalizacja}
   niezależność}
 \outcome{9--14}{wyprowadzić tempo, w jakim średnia się koncentruje, i
   powiedzieć, co daje czterokrotnie więcej danych}
-\outcome{15--22}{powiedzieć, co centralne twierdzenie graniczne obiecuje, a
-  czego nie}
-\outcome{23--29}{dobrać rozmiar ewaluacji do różnicy, którą trzeba zobaczyć}
-\outcome{30--41}{wyprowadzić $1/\sqrt{d_k}$ w uwadze i powiedzieć, co ono
+\outcome{15--24}{powiedzieć, co centralne twierdzenie graniczne obiecuje, a
+  czego nie, i sięgnąć po ograniczenie tam, gdzie ono milczy}
+\outcome{25--34}{dobrać rozmiar ewaluacji do różnicy, którą trzeba zobaczyć,
+  i powiedzieć, do czego uprawnia przebieg bez żadnej porażki}
+\outcome{35--46}{wyprowadzić $1/\sqrt{d_k}$ w uwadze i powiedzieć, co ono
   koryguje}
-\outcome{42--54}{powiedzieć, dlaczego trening może się rozbiec, zanim zrobi
+\outcome{47--59}{powiedzieć, dlaczego trening może się rozbiec, zanim zrobi
   krok}
 \end{outcomes}
 
@@ -51,13 +52,13 @@ twierdzenie graniczne, koncentracja i inicjalizacja}
   potrzebny.}
 \item Wynik uwagi to iloczyn skalarny po $d_k$ składnikach, każdym o
   wariancji jednostkowej. Jaki jest rozrzut takiego wyniku i co z tego wynika
-  dla $\softmax$? \teachesat{30--33}
+  dla $\softmax$? \teachesat{35--38}
   \answerto{Z wariancji iloczynu skalarnego. Przy wpisach o wariancji
   jednostkowej każdy z $d_k$ składników wnosi $1$, a wariancje się dodają,
   więc wynik ma wariancję $d_k$ i rozrzut $\sqrt{d_k}$. Dzielenie przez
   $\sqrt{d_k}$ sprowadza go z powrotem do $1$ przy dowolnym rozmiarze głowicy.}
 \item Głęboka sieć zwraca \code{nan} na pierwszym kroku uczenia. Co
-  sprawdzisz najpierw? \teachesat{48--52}
+  sprawdzisz najpierw? \teachesat{53--57}
   \answerto{Skala wag. Każda warstwa mnoży wariancję sygnału przez swój
   fan-in razy wariancja wag, więc skala błędna o pewien czynnik kumuluje się
   geometrycznie z głębokością \dash{} do zera albo do przepełnienia.}
@@ -420,15 +421,71 @@ wartość, jaką ta wielkość w ogóle może przyjąć. Rozkład Gaussa mówi
 $\val{p25.tail.gauss6}$ i żadne $n$ tego nie naprawi, bo Gauss ma ogony
 biegnące do nieskończoności, a ta wielkość ma podłogę i sufit. Większość
 mierzonych wielkości je ma.
+
+Twierdzenie milknie więc dokładnie tam, gdzie najbardziej potrzeba, żeby
+mówiło. Czy istnieje zdanie o tej sumie, które nie milknie nigdy \dash{} i co
+musiałoby oddać w zamian?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Istnieje, a oddaje ostrość.
+\end{ansblock}
+
+\textbf{Nierówność Hoeffdinga.} Weź niezależne wielkości, każdą zamkniętą w
+przedziale. Prawdopodobieństwo, że ich suma wypadnie o $t$ lub więcej powyżej
+swojej średniej, wynosi wtedy co najwyżej
+
+\[ e^{-2t^{2}/W}, \]
+
+gdzie $W$ to suma kwadratów szerokości tych przedziałów. Nie ma żadnego $n$
+dostatecznie dużego, na które trzeba czekać, ani kształtu, który trzeba
+założyć: ograniczoność robi tu pracę, którą wyżej robiła skończona wariancja,
+a zdanie zachodzi przy każdym $n$.
+
+Na dwunastu rozkładach jednostajnych, których ta sekcja używa, pięć rozrzutów
+od środka daje co najwyżej $\val{p25.hoeff.5}$. Prawdziwa wartość to
+$\val{p25.tail.true5}$, więc ograniczenie jest luźne ponad milionkrotnie.
+
+Wypchnij je teraz na sześć rozrzutów, gdzie przed chwilą wyszło, że odpowiedź
+to dokładnie zero. Rozkład Gaussa mówi $\val{p25.tail.gauss6}$, a ograniczenie
+$\val{p25.hoeff.6}$. Jedno z tych dwóch jest błędne. Które?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{Rozkład Gaussa}
+
+\enquote{Co najwyżej $\val{p25.hoeff.6}$} to zdanie prawdziwe o czymś, co nie
+zdarza się nigdy. Jest bezużytecznie prawdziwe i nie jest błędne.
+$\val{p25.tail.gauss6}$ mówi, że rzecz trafia się mniej więcej raz na miliard
+prób, a nie trafia się w żadnej.
+
+\textbf{Na tym polega cała różnica między ograniczeniem a przybliżeniem} i
+jest ona warta więcej niż którakolwiek z tych liczb. Ograniczenie może mylić
+się tylko w jedną stronę i mówi, w którą. Przybliżenie może mylić się w obie i
+nie mówi w żadną \dash{} jedyny sposób, żeby sprawdzić, jak bardzo myli się to
+konkretne, to wykonać dokładny rachunek, który miało zastąpić.
+
+Oba należą więc do innych zdań. Tam, gdzie twierdzenie brzmi \emph{około},
+Gauss jest ostry, a ograniczenie beznadziejne. Tam, gdzie brzmi \emph{co
+najwyżej}, nadaje się tylko jedno z nich, a jego luz jest tym, ile kosztują
+słowa \enquote{co najwyżej}.
 \end{fr}
 
 \begin{fr}
 \begin{rigourbox}
-\textbf{Nie dowodzimy tutaj: centralnego twierdzenia granicznego.}
+\textbf{Nie dowodzimy tutaj: centralnego twierdzenia granicznego ani
+nierówności sprzed niego.}
 
 Sformułowanie jest powyżej, a pokaz jest zmierzony; dowód potrzebuje funkcji
 charakterystycznych, co jest drugim kursem rachunku prawdopodobieństwa, a nie
-dłuższą sekcją tutaj.
+dłuższą sekcją tutaj. Dowód ograniczenia jest krótszy i nie jest drugim kursem
+\dash{} to funkcja wykładnicza, wartość oczekiwana i strona algebry \dash{}
+ale to wciąż strona, a tej sekcji potrzebne było od niego sformułowanie.
 
 Warto natomiast zabrać kształt założenia, bo to ono bywa łamane w praktyce, a
 nie teza. Twierdzenie potrzebuje, żeby kawałki były niezależne, miały
@@ -555,6 +612,118 @@ liczba pozycji jest dwa razy większa, niż sugeruje pojedynczy przedział:
 $\val{p25.eval.n.naive}$ wobec $\val{p25.eval.n.needed}$. Obie są zaokrąglone
 w górę z liczb, które nie są całkowite, i dlatego druga jest o jeden mniejsza
 niż dwukrotność pierwszej.
+
+Jeszcze jedna liczba, z drugiego końca zakresu. Bramka uruchamia się przy
+każdym commicie, ruszyła w tym kwartale kilkaset razy i ani razu nie zawiodła.
+Wstaw ten przebieg do wzoru powyżej: jaki przedział on daje?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\ans{$\pm 0$ punktów}
+
+Nie wąski \dash{} zerowy, i to dokładnie zerowy. Przedział to
+$\val{p25.eval.z}\sqrt{p(1-p)/n}$, zmierzone $p$ wynosi $1$, a $p(1-p)$ jest
+wtedy $0$ przy dowolnie dużym $n$.
+
+\textbf{To najlepsza obserwacja tej sekcji, o krok dalej, niż ją
+doprowadzono.} Spadek $p(1-p)$ ku obu krańcom był powodem, dla którego ta sama
+liczba pozycji kupuje więcej precyzji na szczycie benchmarku. Na samym
+szczycie kupuje pewność, a żaden przebieg żadnej długości jej nie dostarcza.
+
+Nic nie ostrzega. Wzór nie jest nieokreślony i nie dzieli przez zero \dash{}
+zwraca zwyczajną liczbę, a ta liczba jest twierdzeniem, że odsetek porażek
+jest znany dokładnie. To stan, w jakim bramka w ciągłej integracji bywa przez
+większość dni, w których działa.
+
+Wzór wypada więc z gry. Do czego przebieg $n$ zielonych i ani jednego
+czerwonego naprawdę uprawnia?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Do sufitu na odsetek, i do niczego o żadnym konkretnym wejściu.
+\end{ansblock}
+
+Gdyby prawdziwy odsetek porażek wynosił $\val{p25.eval.gap.pct}$ procent lub
+więcej, szansa, że $n$ niezależnych przebiegów wyjdzie na zielono, byłaby co
+najwyżej
+
+\[ (1 - \num{0.01})^{n} \le \num{0.05}, \]
+
+a to zachodzi po raz pierwszy przy $n = \val{p25.zero.n}$. Tyle zielonych
+uprawnia więc do zdania \enquote{odsetek porażek jest poniżej punktu, przy
+$95$ procentach} i do niczego mocniejszego. Nie użyto żadnego Gaussa i żaden
+nie był potrzebny: to dokładny rozkład dwumianowy i jedna linijka.
+
+\textbf{Znana nazwa tego jest reguła trzech, a ta trójka to zaokrąglony
+logarytm.} Ogranicz $(1 - \num{0.01})^{n}$ z góry przez
+$e^{-\num{0.01}n}$, a warunek staje się $n \ge \val{p25.zero.ln}/\num{0.01}$,
+co zaokrągla się w górę do $\val{p25.zero.n.bound}$ \dash{} o jeden więcej niż
+liczba dokładna, bo ograniczenie może żądać wyłącznie więcej. Zażądaj $99$
+procent, a ten sam logarytm wynosi $\val{p25.zero.ln99}$: trójka należy do
+poziomu ufności, a nie do metody.
+
+I zdanie, do którego to nie uprawnia. Te $\val{p25.zero.n}$ zielonych ogranicza
+odsetek po wejściach, z których przebiegi były losowane. Konkretne wejście
+trafiające się raz na tysiąc jest przy tylu losowaniach pomijane w
+$\val{p25.rare.miss.pct}$ procentach przypadków \dash{} ten sam przebieg,
+który zaświadcza, że odsetek jest poniżej punktu, częściej niż nie jest
+przebiegiem, który ani razu nie dotknął przypadku, o który się martwisz. Oba
+zdania są prawdziwe i mówią o różnych rzeczach: jedno o rozkładzie, drugie o
+punkcie. Dodatek~\ref{app:E} mówi, gdzie uczy się twierdzeń drugiego rodzaju,
+bo tutaj się ich nie uczy.
+
+Zostaje jeszcze jeden dług. Ramki o ogonie zmierzyły rozkład Gaussa jako
+przybliżenie bez kontroli błędu, a każda liczba w tej sekcji opiera się na
+jego $\val{p25.eval.z}$. Czy ta sekcja jest więc niebezpieczna \dash{} i ile
+kosztowałoby obejście się bez niego?
+\dotline
+\nextframe
+\end{fr}
+
+\begin{fr}
+\begin{ansblock}
+Jest bezpieczna, a obejście się bez niego kosztuje $\val{p25.hoeff.factor}$
+razy więcej pozycji.
+\end{ansblock}
+
+Najpierw bezpieczeństwo, bo to nie są dwa razy te same pytania. Przedział jest
+zdaniem o środku rozkładu, a ustalenie powyżej dotyczyło ogona, więc pyta się
+tu Gaussa o tę jedną rzecz, w której jest dobry. To nie jest jego obrona. To
+powód, żeby wiedzieć, o które z dwóch pytań się właśnie pyta.
+
+Potem cena nieodpytania. Hoeffding przy tej samej tolerancji i tej samej
+ufności chce $\val{p25.hoeff.n}$ pozycji tam, gdzie liczba powyżej wynosi
+$\val{p25.eval.n.naive}$, i $\val{p25.hoeff.n.needed}$ tam, gdzie powyżej jest
+$\val{p25.eval.n.needed}$ \dash{} ten sam czynnik w obie strony, bo czynnik
+dwa siedzi po obu stronach dzielenia.
+
+\textbf{A ten czynnik to dwie ceny pomnożone przez siebie, nie jedna.}
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+bez założenia o kształcie & $\val{p25.hoeff.price.shape}$ \\
+$p$ nieznane & $\val{p25.hoeff.price.p}$ \\
+\midrule
+razem & $\val{p25.hoeff.factor}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Druga z nich to obserwacja tej sekcji, za którą się płaci. Ograniczenie, które
+wie tylko tyle, że każdy wynik leży między $0$ a $1$, nie może użyć $p(1-p)$,
+więc wycenia każdą trafność tak, jakby była najgorsza z możliwych, czyli
+połowiczna. Wszystko, co ramki powyżej kupiły zauważeniem, że model blisko
+sufitu niesie wąski przedział, zostaje oddane w drzwiach.
+
+Ograniczenie, które zna też wariancję, płaci mniej tej drugiej ceny. Znać
+wariancję odpowiedzi dobrze-źle to znać $p$, czyli tę wielkość, którą się
+właśnie mierzy.
 \end{fr}
 
 \begin{fr}
@@ -1066,48 +1235,68 @@ powyżej i żaden nie należy do tej książki.
   $\val{p25.tail.ratio5}$ razy pięć rozrzutów od środka; sześć rozrzutów od
   środka prawda wynosi dokładnie zero. Pytanie, na które twierdzenie
   odpowiada najgorzej, jest tym, do którego najczęściej się go używa}.}
-\sumitem{21--22}{\result{W praktyce zawodzi założenie: niezależność, skończona
+\sumitem{21--22}{\result{\textbf{I zdanie, które nie milczy nigdy.}
+  Hoeffding ogranicza prawdopodobieństwo wypadnięcia o $t$ lub więcej powyżej
+  średniej przez $e^{-2t^{2}/W}$, gdzie $W$ to suma kwadratów szerokości
+  przedziałów \dash{} przy każdym $n$, dla każdego kształtu, w zamian za
+  ograniczoność i za luz. \textbf{Ograniczenie myli się w jedną stronę i mówi
+  w którą; przybliżenie myli się w obie i nie mówi w żadną}, i dlatego tylko
+  jedno z nich kończy zdanie zaczynające się od \enquote{co najwyżej}}.}
+\sumitem{23--24}{\result{W praktyce zawodzi założenie: niezależność, skończona
   wariancja i brak dominującego kawałka. \textbf{Rozkład Gaussa dlatego, że w
   grę wchodziła suma, jest poprawny; rozkład Gaussa dlatego, że wyglądało to
   jak dzwon, jest założeniem, którego nikt nie sprawdził.}}}
-\sumitem{23--25}{\result{Trafność na $\val{p25.eval.n.lo}$ pozycjach niesie przedział
+\sumitem{25--27}{\result{Trafność na $\val{p25.eval.n.lo}$ pozycjach niesie przedział
   $\pm\val{p25.eval.hw.100}$ punktu, a cztery razy więcej pozycji zmniejsza go
   o połowę za każdym razem}.}
-\sumitem{26--27}{\result{Orzeczenie o różnicy $\val{p25.eval.gap.pct}$ punktu wymaga
+\sumitem{28--29}{\result{Orzeczenie o różnicy $\val{p25.eval.gap.pct}$ punktu wymaga
   $\val{p25.eval.n.needed}$ pozycji na model \dash{} \textbf{dwa razy} tyle,
   co $\val{p25.eval.n.naive}$ sugerowane przez pojedynczy przedział, z
   dokładnością do zaokrąglenia, bo wielkością, o którą chodzi, jest
   \emph{różnica}, a wariancje obu oszacowań się dodają}.}
-\sumitem{30--32}{\result{Wynik uwagi jest sumą $d_k$ iloczynów wpisów o wariancji
+\sumitem{30--31}{\result{\textbf{Przy $p = 1$ wzór na przedział zwraca
+  szerokość zero}, bo $p(1-p)$ wynosi $0$ \dash{} to stan, w jakim bramka bywa
+  przez większość dni, w których działa, i nic nie ostrzega. Przebieg $n$
+  zielonych uprawnia do sufitu: $(1 - \num{0.01})^{n} \le \num{0.05}$
+  zachodzi po raz pierwszy przy $\val{p25.zero.n}$, a \textbf{reguła trzech}
+  to wykładnicze ograniczenie tego warunku, w którym trójka jest zaokrąglonym
+  $\val{p25.zero.ln}$}.}
+\sumitem{31--32}{\result{\textbf{Odsetek to nie przypadek}: te same
+  $\val{p25.zero.n}$ zielonych pomija wejście trafiające się raz na tysiąc w
+  $\val{p25.rare.miss.pct}$ procentach przypadków. A odrzucenie Gaussa w
+  całości kosztuje $\val{p25.hoeff.factor}$ razy więcej pozycji, czyli
+  \textbf{dwie ceny pomnożone} \dash{} $\val{p25.hoeff.price.shape}$ za brak
+  założenia o kształcie i $\val{p25.hoeff.price.p}$ za nieznajomość $p$}.}
+\sumitem{35--37}{\result{Wynik uwagi jest sumą $d_k$ iloczynów wpisów o wariancji
   jednostkowej, więc $\Var = d_k$, a rozrzut to $\sqrt{d_k}$ \dash{} wyliczone
   dokładnie, bez żadnego twierdzenia granicznego w środku}.}
-\sumitem{32--33}{Program~\ref{prog:P05} zmierzył to samo twierdzenie przy
+\sumitem{37--38}{Program~\ref{prog:P05} zmierzył to samo twierdzenie przy
   skalowaniu znormalizowanym, $1/\sqrt{d}$, a wyprowadzenie odtwarza jego
   cztery zapisane liczby z dokładnością do $\val{p25.p05.worst.pct}$ procent
   \dash{} jedno twierdzenie przy dwóch skalowaniach i wzajemna kontrola.}
-\sumitem{35--37}{\result{\textbf{E9, przeprowadzone.} Bez dzielenia, przy
+\sumitem{40--42}{\result{\textbf{E9, przeprowadzone.} Bez dzielenia, przy
   $d_k = \val{p25.e9.d.hi}$, entropia wiersza wynosi
   $\val{p25.e9.raw.ent.512}$ z możliwych $\val{p25.e9.maxent}$, a jeden klucz
   zabiera $\val{p25.e9.raw.top.512}$ procent. Z dzieleniem nic się nie rusza
   przy żadnym rozmiarze głowicy}.}
-\sumitem{37}{\result{Program~\ref{prog:P18} podaje przekątną jakobianu $p(1-p)$, która
+\sumitem{42}{\result{Program~\ref{prog:P18} podaje przekątną jakobianu $p(1-p)$, która
   zamienia to w gradient: $\val{p25.e9.resp.raw}$ wobec
   $\val{p25.e9.resp.scaled}$, więc wiersz przeskalowany jest
   $\val{p25.e9.resp.ratio}$ razy bardziej wrażliwy}.}
-\sumitem{39--41}{\result{\textbf{Skalowanie jest korektą wariancji i niczym więcej.}
+\sumitem{44--46}{\result{\textbf{Skalowanie jest korektą wariancji i niczym więcej.}
   Ustalona stała nie wykona tego zadania, bo rzecz korygowana rośnie z
   wymiarem głowicy}.}
-\sumitem{42--44}{\result{Wyjście warstwy ma wariancję
+\sumitem{47--49}{\result{Wyjście warstwy ma wariancję
   $n_{\text{in}}\Var(w)\Ex[x^{2}]$ \dash{} ta sama tożsamość po raz czwarty, i
   \emph{drugi moment} zamiast wariancji, bo wejście $\relu$ nie jest
   wycentrowane \dash{} więc warstwa liniowa utrzymuje swoją skalę przy
   $\Var(w) = 1/n_{\text{in}}$}.}
-\sumitem{45--47}{\result{$\relu$ zachowuje \textbf{dokładnie połowę} drugiego momentu
+\sumitem{50--52}{\result{$\relu$ zachowuje \textbf{dokładnie połowę} drugiego momentu
   symetrycznego wejścia, z symetrii i scałkowane do
   $\val{p25.init.relu.keeps}$. Nadrobienie tego wymaga
   $\Var(w) = 2/n_{\text{in}}$, \textbf{i stąd bierze się czynnik dwa u
   Hego}}.}
-\sumitem{48--52}{\result{Głębokość kumuluje to geometrycznie: przez
+\sumitem{53--57}{\result{Głębokość kumuluje to geometrycznie: przez
   $\val{p25.init.depth}$ warstw połowa na warstwę zostawia
   $\val{p25.init.deep.xavier}$ wariancji sygnału, a cztery na warstwę dają
   $\val{p25.init.deep.hot}$. \textbf{Rozbieżność na kroku pierwszym to
