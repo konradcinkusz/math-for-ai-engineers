@@ -1,10 +1,27 @@
 name: Release
 
-# Builds both editions and attaches the PDFs to a GitHub Release.
-# Triggered by pushing a version tag:
+# ONE TAG, EVERY PDF. Push a version tag and this attaches all twelve to the
+# release: the four editions a reader downloads, and the eight 6 x 9 in
+# paperback interiors.
 #
-#   git tag -a v0.1.0 -m "Skeleton and Program F1"
-#   git push origin v0.1.0
+#   git tag -a v1.1.0 -m "Part VII reviewed"
+#   git push origin v1.1.0
+#
+# It used to be two editions, and the paperback volumes were built by a
+# SEPARATELY PREFIXED tag -- `kdp-v*` -- into workflow artefacts that expire
+# after ninety days and need a GitHub account to fetch. So the series had two
+# release paths producing different things, the README had to spend a paragraph
+# saying which tag built what, and the eight volumes were not downloadable at
+# all. There is one path now. `kdp-v*` is gone; kdp.yml keeps the additivity
+# guard a pull request needs and calls the same volumes.yml this does.
+#
+# THE ASSET NAMES CARRY NO TAG, and that is the other half of the change. They
+# used to read `...-v1.0.0.pdf`, which meant no link could name the current one:
+# every README row had to hard-code a version and go stale at the next release,
+# which is the class of claim this repository spends most of its gates refusing.
+# With a stable name, `releases/latest/download/<name>.pdf` always resolves to
+# the newest, and `releases/download/v1.0.0/<name>.pdf` still pins an old one --
+# so the fixed-version link survives and the moving one becomes possible.
 
 on:
   push:
@@ -20,17 +37,15 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: Compile ${{ matrix.lang }}
+  # -------------------------------------------------------------------------
+  # The numbers come first and they gate everything, exactly as they do in
+  # build.yml -- a release whose printed values no longer match the scripts
+  # that produced them is the one artefact nobody can check afterwards.
+  # -------------------------------------------------------------------------
+  numbers:
+    name: Recompute every number
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    strategy:
-      matrix:
-        include:
-          - lang: en
-            pdf: Mathematics-from-Zero-for-the-AI-Engineer
-          - lang: pl
-            pdf: Matematyka-od-zera-dla-inzyniera-AI
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
         with:
@@ -62,35 +77,123 @@ jobs:
             exit 1
           fi
 
+      # Both directories, so the compile jobs get the transcripts as well as
+      # the values. With two paths the artefact is rooted at their least common
+      # ancestor, figures/, which is why the download below unpacks into
+      # figures/ and not into figures/values/.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-values
+          path: |
+            figures/values
+            figures/transcripts
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # -------------------------------------------------------------------------
+  # Rendered ONCE and handed to all four compiles. This used to sit inside the
+  # compile job, which was affordable at two editions and is not at four: there
+  # are three hundred Mermaid sources and rendering every one of them four
+  # times is most of the release's wall clock for no second opinion.
+  # -------------------------------------------------------------------------
+  diagrams:
+    name: Render diagrams
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Render diagrams
+      - name: Render every Mermaid source to PDF
         run: |
           shopt -s nullglob
           SRC=(figures/mermaid/*/*.mmd)
-          [ ${#SRC[@]} -eq 0 ] && exit 0
+          if [ ${#SRC[@]} -eq 0 ]; then mkdir -p figures/diagrams; exit 0; fi
           printf '{"args":["--no-sandbox","--disable-dev-shm-usage"]}\n' > .puppeteer.json
           # Installed once, and each render carries its own timeout: see the
           # reasoning in build.yml, which this loop deliberately mirrors.
           npm install -g @mermaid-js/mermaid-cli@11
+          FAILED=0
           for f in "${SRC[@]}"; do
             lang=$(basename "$(dirname "$f")"); key=$(basename "$f" .mmd)
             mkdir -p "figures/diagrams/$lang"
-            timeout 180 mmdc \
-              -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
-              -p .puppeteer.json -c figures/mermaid/config.json \
-              -b transparent --pdfFit
+            echo "::group::$lang/$key"
+            if ! timeout 180 mmdc \
+                 -i "$f" -o "figures/diagrams/$lang/$key.pdf" \
+                 -p .puppeteer.json -c figures/mermaid/config.json \
+                 -b transparent --pdfFit; then
+              [ $? -eq 124 ] && echo "::error file=$f::TIMED OUT on $lang/$key" \
+                             || echo "::error file=$f::failed on $lang/$key"
+              FAILED=1
+            fi
+            echo "::endgroup::"
           done
+          exit $FAILED
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-diagrams
+          path: figures/diagrams
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # -------------------------------------------------------------------------
+  # ALL FOUR EDITIONS. Two languages times two paper formats, which is what
+  # build.yml compiles on every push and what a release had never attached: a
+  # tag published the trade format alone, so the format the book is actually
+  # read in was available only from the site, which moves under you.
+  # -------------------------------------------------------------------------
+  book:
+    name: Compile ${{ matrix.lang }} (${{ matrix.fmt }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [numbers, diagrams]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lang: en
+            fmt: standard
+            job: main-en
+            pdf: Mathematics-from-Zero-for-the-AI-Engineer
+          - lang: pl
+            fmt: standard
+            job: main-pl
+            pdf: Matematyka-od-zera-dla-inzyniera-AI
+          - lang: en
+            fmt: a4
+            job: main-en-a4
+            pdf: Mathematics-from-Zero-for-the-AI-Engineer-A4
+          - lang: pl
+            fmt: a4
+            job: main-pl-a4
+            pdf: Matematyka-od-zera-dla-inzyniera-AI-A4
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: release-values
+          path: figures
+      - uses: actions/download-artifact@v5
+        with:
+          name: release-diagrams
+          path: figures/diagrams
 
       - name: Compile with latexmk
         uses: xu-cheng/latex-action@v4
         with:
-          root_file: main-${{ matrix.lang }}.tex
+          root_file: ${{ matrix.job }}.tex
           args: -pdf -interaction=nonstopmode -halt-on-error -file-line-error
 
-      # The same two gates the other two workflows use, and for the same
+      # The same two gates the other three workflows use, and for the same
       # reasons. The inline grep this replaces saw undefined references and
       # nothing else. checklog.py sees those, AND an error that
       # -interaction=nonstopmode has written a PDF over the top of, AND an
@@ -112,36 +215,131 @@ jobs:
       # This runs BEFORE the rename below, while the file is still main-*.pdf.
       - name: Refuse to release a build that only looked like it worked
         run: |
-          python3 tools/checklog.py main-${{ matrix.lang }}.log
+          python3 tools/checklog.py ${{ matrix.job }}.log
           command -v pdftotext >/dev/null 2>&1 || \
-            sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
-          python3 tools/checkpdf.py --cues=warn main-${{ matrix.lang }}.pdf
+            { sudo apt-get update -qq \
+                || echo "::warning::apt-get update failed; the install below decides"; \
+              sudo apt-get install -y -qq poppler-utils; }
+          python3 tools/checkpdf.py --cues=warn ${{ matrix.job }}.pdf
 
-      - name: Name the artefact after the tag
-        run: |
-          TAG="${{ github.event.inputs.tag || github.ref_name }}"
-          mv main-${{ matrix.lang }}.pdf "${{ matrix.pdf }}-${TAG}.pdf"
+      # NO TAG IN THE NAME -- see the note at the top of this file. The name is
+      # the one build.yml and pages.yml already use, so the same book arrives
+      # under the same filename however a reader got hold of it.
+      - name: Name the artefact
+        run: mv ${{ matrix.job }}.pdf "${{ matrix.pdf }}.pdf"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: release-${{ matrix.lang }}
-          path: '*.pdf'
+          name: book-${{ matrix.lang }}-${{ matrix.fmt }}
+          path: ${{ matrix.pdf }}.pdf
 
-  release:
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-log-${{ matrix.lang }}-${{ matrix.fmt }}
+          path: ${{ matrix.job }}.log
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # -------------------------------------------------------------------------
+  # THE EIGHT INTERIORS, through the same workflow kdp.yml calls, so a release
+  # and a pull request compile them from the same steps. `ref' matters on a
+  # dispatch: without it the four editions would come from the tag and the
+  # eight volumes from the branch, and nothing in the release would say so.
+  # -------------------------------------------------------------------------
+  volumes:
+    name: Paperback
+    uses: ./.github/workflows/volumes.yml
+    with:
+      ref: ${{ github.event.inputs.tag || '' }}
+
+  # -------------------------------------------------------------------------
+  publish:
     name: Publish release
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    needs: build
+    timeout-minutes: 15
+    needs: [book, volumes]
     permissions:
       contents: write        # scoped to this job only, not the whole workflow
     steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
       - uses: actions/download-artifact@v5
         with:
-          pattern: release-*
+          pattern: book-*
+          path: dist
           merge-multiple: true
+
+      # `kdp-v[0-9]*` rather than `kdp-v*`: the latter also matches the
+      # `kdp-values` artefact, which carries figures/values and no interior at
+      # all. Nothing downstream would have been fooled by it -- the rename
+      # below matches on `kdp-v<digits>-<lang>` -- but a pattern that catches
+      # something it was never aimed at is one waiting to catch something that
+      # matters.
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: kdp-v[0-9]*
+          path: volumes
+
+      # The interiors are built under the name the KDP pipeline uses for them
+      # internally, `kdp-v3-en.pdf`, which tells a reader who has just
+      # downloaded it nothing at all. Renamed here rather than in volumes.yml,
+      # because checkkdp.py, kdpcover.py and kdpmeta.py all address them by
+      # that name and a release is the only place the other one is wanted.
+      #
+      # The stem is READ FROM tools/volumes.json rather than typed: its
+      # `series` entry is already the title the four editions are named after,
+      # so a volume sorts beside the book it came from and neither name can
+      # drift from the other. The volume WORD is the one thing no manifest
+      # carries, and two of them in a filename is cheaper than a fifth copy of
+      # the series titles.
+      - name: Give every volume a name a reader can read
+        run: |
+          python3 - <<'PY'
+          import json, re, shutil, sys
+          from pathlib import Path
+
+          cfg = json.load(open("tools/volumes.json"))
+          stem = {l: re.sub(r"\s+", "-", cfg["series"][l]) for l in ("en", "pl")}
+          word = {"en": "Volume", "pl": "Tom"}
+          want = len(cfg["volumes"]) * 2
+
+          dist = Path("dist"); dist.mkdir(exist_ok=True)
+          found = 0
+          for pdf in sorted(Path("volumes").rglob("kdp-v*.pdf")):
+              m = re.fullmatch(r"kdp-v(\d+)-(en|pl)", pdf.stem)
+              if not m:
+                  continue
+              n, lang = m.group(1), m.group(2)
+              shutil.copy(pdf, dist / f"{stem[lang]}-{word[lang]}-{n}.pdf")
+              found += 1
+
+          # A release that quietly attaches five interiors of eight is the
+          # failure this repository keeps recording: the step accepted what it
+          # was given and returned a plausible answer. Count them.
+          if found != want:
+              sys.exit(f"found {found} volume interiors, expected {want}")
+          print(f"{found} interiors renamed.")
+          PY
+
+      - name: Every PDF this release promises is here
+        run: |
+          set -euo pipefail
+          ls -l dist
+          n=$(find dist -maxdepth 1 -name '*.pdf' | wc -l)
+          # Four editions and eight interiors. Stated as a sum rather than as
+          # `12`, so the arithmetic is on the page beside the claim.
+          want=$(( 4 + 2 * $(python3 -c \
+            "import json;print(len(json.load(open('tools/volumes.json'))['volumes']))") ))
+          [ "$n" -eq "$want" ] || {
+            echo "::error::$n PDFs staged, expected $want"; exit 1; }
+          echo "$n PDFs, which is 4 editions + $(( want - 4 )) interiors."
 
       - uses: softprops/action-gh-release@v2
         with:
-          files: '*.pdf'
+          files: dist/*.pdf
           generate_release_notes: true
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}

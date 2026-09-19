@@ -16,9 +16,18 @@ is the rule this repository already states for the overfull multiset.
 ## 1. What is additive, and how that is proved
 
 `main-{en,pl}.tex`, `main-{en,pl}-a4.tex`, `body.tex`, `structure.tex`,
-`preamble.tex`, `build.yml` and `release.yml` are **not modified**. The KDP
+`preamble.tex`, `build.yml` and `pages.yml` are **not modified**. The KDP
 interior is `kdp/preamble-kdp.tex`, which reads `preamble.tex` and then
 re-issues `\geometry` and redefines the palette.
+
+`release.yml` was on that list and came off it when the release path was
+unified: one `v*` tag now attaches all twelve PDFs, the four editions and the
+eight interiors, so it is shared ground rather than the book's alone and a rule
+forbidding this path to touch it would forbid the volumes reaching a reader.
+`pages.yml` went on in the same edit, having published the four PDFs all along
+without being protected. The volume build itself is
+`.github/workflows/volumes.yml`, which `release.yml` calls on a tag and
+`kdp.yml` calls on a pull request; there is no `kdp-v*` tag any more.
 
 There is deliberately no new `\bookpaper` branch: `geometry` accepts a second
 `\geometry{}` before `\begin{document}`, and `preamble.tex`'s own
