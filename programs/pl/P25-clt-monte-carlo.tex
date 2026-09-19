@@ -656,10 +656,10 @@ najwyżej
 
 a to zachodzi po raz pierwszy przy $n = \val{p25.zero.n}$. Tyle zielonych
 uprawnia więc do zdania \enquote{odsetek porażek jest poniżej punktu, przy
-$95$ procentach} i do niczego mocniejszego. Nie użyto żadnego Gaussa i żaden
+ufności $95$ procent} i do niczego mocniejszego. Nie użyto żadnego Gaussa i żaden
 nie był potrzebny: to dokładny rozkład dwumianowy i jedna linijka.
 
-\textbf{Znana nazwa tego jest reguła trzech, a ta trójka to zaokrąglony
+\textbf{Znana nazwa tego to reguła trzech, a ta trójka to zaokrąglony
 logarytm.} Ogranicz $(1 - \num{0.01})^{n}$ z góry przez
 $e^{-\num{0.01}n}$, a warunek staje się $n \ge \val{p25.zero.ln}/\num{0.01}$,
 co zaokrągla się w górę do $\val{p25.zero.n.bound}$ \dash{} o jeden więcej niż
@@ -667,19 +667,19 @@ liczba dokładna, bo ograniczenie może żądać wyłącznie więcej. Zażądaj 
 procent, a ten sam logarytm wynosi $\val{p25.zero.ln99}$: trójka należy do
 poziomu ufności, a nie do metody.
 
-I zdanie, do którego to nie uprawnia. Te $\val{p25.zero.n}$ zielonych ogranicza
+I zdanie, do którego to nie uprawnia. Tych $\val{p25.zero.n}$ zielonych ogranicza
 odsetek po wejściach, z których przebiegi były losowane. Konkretne wejście
 trafiające się raz na tysiąc jest przy tylu losowaniach pomijane w
 $\val{p25.rare.miss.pct}$ procentach przypadków \dash{} ten sam przebieg,
-który zaświadcza, że odsetek jest poniżej punktu, częściej niż nie jest
-przebiegiem, który ani razu nie dotknął przypadku, o który się martwisz. Oba
+który zaświadcza, że odsetek jest poniżej punktu, najczęściej ani razu nie
+dotknął sytuacji, o którą się martwisz. Oba
 zdania są prawdziwe i mówią o różnych rzeczach: jedno o rozkładzie, drugie o
 punkcie. Dodatek~\ref{app:E} mówi, gdzie uczy się twierdzeń drugiego rodzaju,
 bo tutaj się ich nie uczy.
 
 Zostaje jeszcze jeden dług. Ramki o ogonie zmierzyły rozkład Gaussa jako
 przybliżenie bez kontroli błędu, a każda liczba w tej sekcji opiera się na
-jego $\val{p25.eval.z}$. Czy ta sekcja jest więc niebezpieczna \dash{} i ile
+jego $\val{p25.eval.z}$. Czy ta sekcja jest więc zawodna \dash{} i ile
 kosztowałoby obejście się bez niego?
 \dotline
 \nextframe
@@ -691,12 +691,12 @@ Jest bezpieczna, a obejście się bez niego kosztuje $\val{p25.hoeff.factor}$
 razy więcej pozycji.
 \end{ansblock}
 
-Najpierw bezpieczeństwo, bo to nie są dwa razy te same pytania. Przedział jest
+Najpierw bezpieczeństwo, bo to nie jest dwa razy to samo pytanie. Przedział jest
 zdaniem o środku rozkładu, a ustalenie powyżej dotyczyło ogona, więc pyta się
 tu Gaussa o tę jedną rzecz, w której jest dobry. To nie jest jego obrona. To
 powód, żeby wiedzieć, o które z dwóch pytań się właśnie pyta.
 
-Potem cena nieodpytania. Hoeffding przy tej samej tolerancji i tej samej
+A potem cena tego, że się nie pyta. Hoeffding przy tej samej tolerancji i tej samej
 ufności chce $\val{p25.hoeff.n}$ pozycji tam, gdzie liczba powyżej wynosi
 $\val{p25.eval.n.naive}$, i $\val{p25.hoeff.n.needed}$ tam, gdzie powyżej jest
 $\val{p25.eval.n.needed}$ \dash{} ten sam czynnik w obie strony, bo czynnik
