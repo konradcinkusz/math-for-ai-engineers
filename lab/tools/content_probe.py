@@ -146,7 +146,7 @@ def _residue(body: str) -> str:
         prev, b = b, MATH_SPAN.sub(" ", b)
     b = re.sub(r"\\(?:%s)\s*\{" % KEEP_BODY, "{", b)
     b = re.sub(r"\\(?:%s)\s*\{[^{}]*\}" % DROP_WHOLE, " ", b)
-    b = re.sub(r"\\dash\{\}|\\ldots|\\quad|\\qquad|\\\\|\\%|\\,|\;|\\:", " ", b)
+    b = re.sub(r"\\dash\{\}|\\ldots|\\quad|\\qquad|\\\\|\\%|\\,|\\;|\\:", " ", b)
     b = re.sub(r"\\[A-Za-z@]+\*?", " ", b)
     b = re.sub(r"[{}$~^_&%]", " ", b)
     return re.sub(r"\s+", " ", b).strip()
