@@ -18,7 +18,7 @@ M = load("p01_floating_point")
 FORMATS = ("fp64", "fp32", "fp16", "bf16")
 
 
-# --- exercise 1 -------------------------------------------------------------
+# --- exercise 1: gap ---------------------------------------------------------
 def test_1_gap_matches_the_table():
     """Program P1, frames 7--8: the distance to the next double, at three
     magnitudes, printed to two figures as the program's table prints it."""
@@ -37,7 +37,7 @@ def test_1_gap_is_the_ulp_everywhere():
             f"gap({x}) = {M.gap(x)!r} but the gap at {x} is {math.ulp(x)!r}")
 
 
-# --- exercise 2 -------------------------------------------------------------
+# --- exercise 2: epsilon -----------------------------------------------------
 def test_2_epsilon_matches_the_four_formats():
     """Program P1, frame 9: epsilon is the significand budget as a number."""
     for fmt in FORMATS:
@@ -58,7 +58,7 @@ def test_2_decimal_digits_match():
             f"{want}. It counts to the NEAREST digit.")
 
 
-# --- exercise 3 -------------------------------------------------------------
+# --- exercise 3: tenth -------------------------------------------------------
 def test_3_tenth_error_is_exactly_one_gap():
     """Program P1, frames 10--11: 0.1 + 0.2 is off by exactly one gap at
     0.3 -- the smallest error the format can make there."""
@@ -71,7 +71,7 @@ def test_3_tenth_error_is_exactly_one_gap():
         f"that gap prints {shown}; the program prints {V['p01.sum.gap']}")
 
 
-# --- exercise 4 -------------------------------------------------------------
+# --- exercise 4: orders ------------------------------------------------------
 def test_4_two_orders_disagree_as_printed():
     """Program P1, frames 13--14: the same sum, bracketed two ways, printed
     to seventeen decimals, is the pair the program prints."""
@@ -84,7 +84,7 @@ def test_4_two_orders_disagree_as_printed():
         f"14: each addition rounds immediately, so the ORDER decides.")
 
 
-# --- exercise 5 -------------------------------------------------------------
+# --- exercise 5: threshold ---------------------------------------------------
 def test_5_threshold_is_half_the_gap():
     """Program P1, frames 16--17: a contribution below half the gap at the
     running total vanishes; one above it moves the total."""
@@ -121,7 +121,7 @@ def test_5_the_coincidence_and_where_it_stops():
         "the magnitude, not a law")
 
 
-# --- exercise 6 -------------------------------------------------------------
+# --- exercise 6: store -------------------------------------------------------
 def test_6_store_rounds_to_the_format():
     """Program P1, frames 20--24 and 32: storing in a narrower format is a
     rounding, and fp16's ceiling is the number the program says."""
@@ -145,7 +145,7 @@ def test_6_flips_to_zero_match_the_table():
             f"{want}. Round to the format after EVERY step.")
 
 
-# --- exercise 7 -------------------------------------------------------------
+# --- exercise 7: bf16 --------------------------------------------------------
 def test_7_bf16_rounds_to_nearest_even():
     """Program P1, frames 21--22: bf16 is fp32 with the bottom of the
     significand cut off, seven bits kept, ties to even."""

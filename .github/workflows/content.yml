@@ -1,0 +1,105 @@
+name: Content
+
+# THE CONTENT BUNDLE, and nothing else. Issue #239 §1: the book compiles its
+# own LaTeX into a versioned data bundle that ab-ove consumes, so that the
+# application never sees LaTeX (constitution P11).
+#
+# Additive, on lab.yml's pattern and for the same reason: build.yml,
+# pages.yml, release.yml and kdp.yml are untouched, the four PDFs cannot move,
+# and the first job proves it from the diff rather than promising it in prose.
+
+on:
+  pull_request:
+    paths:
+      - 'lab/**'
+      - 'programs/**'
+      - 'appendices/**'
+      - 'figures/values/**'
+      - 'tools/programs.json'
+      - '.github/workflows/content.yml'
+  # No `paths` filter here: it applies to tags as well as branches, and a
+  # release whose commit happens to touch nothing under programs/ would then
+  # attach no bundle at all.
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: content-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -------------------------------------------------------------------------
+  # THE GATE. A bundle that does not validate is not a bundle, and finding
+  # that out at the far end means it was already attached to a release.
+  # -------------------------------------------------------------------------
+  bundle:
+    name: The book compiles into a bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # The compiler refuses rather than degrades (#239 §1): an unknown
+      # macro, an unresolved \val, a cue whose successor does not answer, two
+      # editions whose frames do not pair. Each stops this step by name.
+      # GITHUB_REF_NAME is "123/merge" on a pull request, which is not a
+      # tag and is not a filename. A bundle built off a tag carries it; one
+      # built off anything else says so.
+      - name: Compile, and validate against content-schema v1
+        run: |
+          case "${GITHUB_REF}" in
+            refs/tags/*) TAG="${GITHUB_REF_NAME}" ;;
+            *)           TAG="dev-${GITHUB_SHA:0:12}" ;;
+          esac
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          python3 lab/tools/content_compile.py \
+            --tag "$TAG" --cross-check \
+            -o build/content/bundle.json \
+            --pack "build/content/content-$TAG.tar"
+
+      # A list of macros KaTeX is claimed to render is an assertion until
+      # something runs it. This is the measurement #239 §1 asks for.
+      - name: Every maths span through KaTeX
+        run: |
+          npm install --no-save --silent katex
+          node lab/tools/content_katex.js build/content/bundle.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: content-bundle
+          path: build/content/
+          retention-days: 14
+
+  # -------------------------------------------------------------------------
+  # THE RELEASE. A tag attaches the tar, so ab-ove can pin a (track, tag)
+  # pair the way it names an image tag (ADR-0008).
+  # -------------------------------------------------------------------------
+  attach:
+    name: Attach the bundle to the release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write        # scoped to this job only, not the whole workflow
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: content-bundle
+          path: build/content
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: build/content/*.tar
+          tag_name: ${{ github.ref_name }}

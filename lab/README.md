@@ -70,3 +70,40 @@ before they read them. Write the stubs, the solution and the checks; every
 expected value comes from `figures/values/`, never from a literal; then run
 `--all`. The first lab is P1 because its own method is *a claim about what
 the machine stores is settled by asking it*.
+
+## The content compiler
+
+`lab/tools/content_compile.py` is the other half of issue #239 §1: it reads
+the two editions with the book's own tokeniser and emits **one data bundle**
+that the learning application consumes, so that the application never sees
+LaTeX. Every exercise id the compiler attaches to a step is declared by the
+lab that owns it — `# --- exercise 4: orders ---` in `tests/test_p01.py` —
+because a name a reader types at `lab/check.py -k` is a name, not something
+to derive from a test's spelling.
+
+```sh
+python3 lab/tools/content_compile.py --tag v0 --cross-check \
+        -o build/content/bundle.json --pack build/content/content-v0.tar
+python3 lab/tools/content_compile.py --only P01 --stdout   # one program
+python3 lab/tools/content_compile.py --survey              # every refusal at once
+python3 lab/tools/content_compile.py --macros              # the KaTeX table
+
+npm install --no-save katex
+node lab/tools/content_katex.js build/content/bundle.json  # the render test
+```
+
+Measured on the whole book: **47 units, 275 sections, 1866 steps, 1030
+answers, 1030 cues, 1408 routes**, and **21 714 of 21 714 maths spans render
+under KaTeX in strict mode**. Every one of the first five figures agrees with
+`lab/tools/content_probe.py`, which was written separately and reads the same
+source — `--cross-check` makes that agreement a gate, and it earned its place
+by catching a `\section` the compiler had silently dropped.
+
+**It refuses rather than degrades.** A macro outside the declared vocabulary,
+a `\val` with no computed value, a cue whose successor does not answer, two
+editions whose frames do not pair: each stops the build and names the
+program, the frame and the token. What schema v1 has no field for — figures,
+transcripts, and the ten steps whose whole content is an answer — is
+**counted and printed on every run** rather than dropped in silence, which is
+the treatment this book already gives the orphan-tail ledger and for the same
+reason.

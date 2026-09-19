@@ -50,8 +50,12 @@ RE_TEST = re.compile(r"^def (test_\w+)\(", re.M)
 
 # Paths a change to the lab may touch. Everything else is the book's, or the
 # book's build's, and a diff reaching it means the lab stopped being additive.
-ALLOWED = ("lab/", ".github/workflows/lab.yml", "notes/", "CLAUDE.md",
-           "README.md", "docs/")
+# `.gitignore` is here because the content compiler's render test installs
+# KaTeX, and a node_modules the guard forbids ignoring is a guard that makes
+# the tree dirty. It is not a file any of the four PDFs reads.
+ALLOWED = ("lab/", ".github/workflows/lab.yml",
+           ".github/workflows/content.yml", ".gitignore",
+           "notes/", "CLAUDE.md", "README.md", "docs/")
 
 
 def labs() -> list[str]:
